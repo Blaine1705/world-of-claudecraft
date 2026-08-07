@@ -74,6 +74,10 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
     root: () => el,
     world: () =>
       ({
+        // The pin store keys off the character (woc_reliquary_pins_<class>_<name>),
+        // so every ReliquaryWindow world needs the identity pair a real IWorld has.
+        cfg: { playerClass: 'warrior' },
+        player: { name: 'Testwright' },
         deedStats: { itemsDiscovered: state.itemsDiscovered },
         reliquaryMarks: new Set<string>(),
         reliquaryRecent: state.recent,
@@ -91,6 +95,7 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
     consumePeek: () => false,
     captureFocus: () => null,
     restoreFocus: () => {},
+    onPinChanged: () => {},
     itemIcon: (item) => `<img data-item-icon="${item.id}" alt="">`,
     moneyHtml: () => '',
     itemTooltip: () => '',

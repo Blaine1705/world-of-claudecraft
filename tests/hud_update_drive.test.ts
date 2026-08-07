@@ -1243,6 +1243,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on deed tracker (not gated on a window)',
   },
   {
+    call: 'this.updateReliquaryTracker',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
+  },
+  {
     call: 'this.calendarWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.calendarWindow.isOpen',
@@ -1496,7 +1503,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // 45 = both sides of the v0.35.0 warfare sync counted 44 alone (the
       // branch's reliquary window vs the release's warfare quartermaster
       // window); the merged tree carries both, decided surface: window.
-    ).toEqual({ window: 45, chrome: 75, none: 16 });
+    ).toEqual({ window: 45, chrome: 76, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

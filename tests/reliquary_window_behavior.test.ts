@@ -30,6 +30,7 @@ import {
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
 import { ITEMS } from '../src/sim/data';
+import { pageCompletion } from '../src/sim/reliquary';
 import { tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
 import {
@@ -43,6 +44,7 @@ import {
 } from '../src/ui/i18n';
 import { reliquaryPageDesc, reliquaryPageName } from '../src/ui/reliquary_i18n';
 import { reliquaryRelicDisplayName, reliquarySourceLineText } from '../src/ui/reliquary_labels';
+import { RELIQUARY_TRACK_CAP } from '../src/ui/reliquary_tracker_view';
 import { reliquarySourceLinePlan } from '../src/ui/reliquary_view';
 import {
   type ReliquaryNavId,
@@ -159,8 +161,10 @@ interface WorldState {
   curatorRank: number;
   /** reliquaryPageClearCount(pageId). */
   clears: Map<string, number>;
-  /** reliquaryPageCompletion(pageId).owned: signature-only. */
+  /** reliquaryPageCompletion(pageId).owned (the signature, and the pin prune). */
   pageOwned: Map<string, number>;
+  /** Overrides reliquaryPageCompletion(pageId).total; the catalog count otherwise. */
+  pageTotal: Map<string, number>;
   /**
    * How many times the painter actually READ each of the two ownership seams
    * the view needs as Sets. Both are copied per repaint and must never be
@@ -184,6 +188,7 @@ function baseState(): WorldState {
     curatorRank: 0,
     clears: new Map(),
     pageOwned: new Map(),
+    pageTotal: new Map(),
     reads: { ownedMounts: 0, weaponSkinIds: 0 },
   };
 }
@@ -198,7 +203,13 @@ interface Rig {
   tooltips: Array<{ node: HTMLElement; html: () => string }>;
   /** Every deps.restoreFocus argument, in order. */
   restored: Array<HTMLElement | null>;
-  counts: { closeOthers: number; hideTooltip: number; captureFocus: number };
+  counts: {
+    closeOthers: number;
+    hideTooltip: number;
+    captureFocus: number;
+    /** onPinChanged: the immediate HUD-tracker nudge a pin toggle owes. */
+    pinChanged: number;
+  };
 }
 
 function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNavId } = {}): Rig {
@@ -211,12 +222,16 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
 
   const tooltips: Rig['tooltips'] = [];
   const restored: Rig['restored'] = [];
-  const counts = { closeOthers: 0, hideTooltip: 0, captureFocus: 0 };
+  const counts = { closeOthers: 0, hideTooltip: 0, captureFocus: 0, pinChanged: 0 };
 
   const deps: ReliquaryWindowDeps = {
     root: () => el,
     world: () =>
       ({
+        // The pin store keys off the character (woc_reliquary_pins_<class>_<name>),
+        // so every ReliquaryWindow world needs the identity pair a real IWorld has.
+        cfg: { playerClass: 'warrior' },
+        player: { name: 'Testwright' },
         deedStats: { itemsDiscovered: state.itemsDiscovered },
         reliquaryMarks: state.marks,
         reliquaryRecent: state.recent,
@@ -235,9 +250,28 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         reliquaryPageClearCount: (pageId: string) => state.clears.get(pageId),
         reliquaryCatalogCompletion: () => state.catalog,
         reliquaryCuratorRank: () => state.curatorRank,
+        // Both hosts answer for EVERY live catalog page and null only for an id
+        // the catalog does not hold, so the stub does the same: null is the
+        // content-drift signal the pin prune keys on, not "this test did not
+        // seed a count". The answer folds the SAME ownership the view model
+        // folds, through the same pageCompletion, so the facet and the painted
+        // shelf row can never disagree about whether a page is illuminated.
+        // pageOwned / pageTotal stay available as signature-only overrides.
         reliquaryPageCompletion: (pageId: string) => {
-          const owned = state.pageOwned.get(pageId);
-          return owned === undefined ? null : { owned, total: 0, complete: false };
+          const def = RELIQUARY_PAGES_BY_ID[pageId];
+          if (!def) return null;
+          // Read through the raw state fields, never the counted world
+          // accessors, so this does not disturb the ownership-read counters.
+          const real = pageCompletion(def, {
+            itemsDiscovered: state.itemsDiscovered,
+            marks: state.marks,
+            ownedMounts: new Set(state.mounts),
+            weaponSkins: new Set(state.weaponSkinIds),
+            deedsEarned: state.deedsEarned,
+          });
+          const owned = state.pageOwned.get(pageId) ?? real.owned;
+          const total = state.pageTotal.get(pageId) ?? real.total;
+          return { owned, total, complete: total > 0 && owned >= total };
         },
       }) as never,
     closeOthers: () => {
@@ -253,6 +287,9 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
     },
     restoreFocus: (target) => {
       restored.push(target);
+    },
+    onPinChanged: () => {
+      counts.pinChanged++;
     },
     itemIcon: (item) => `<img data-item-icon="${item.id}" alt="">`,
     moneyHtml: () => '',
@@ -2469,5 +2506,157 @@ describe('ReliquaryWindow: an elided poll touches no ownership seam', () => {
     state.curatorRank += 1;
     rig.w.refreshIfChanged();
     expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('1');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. The HUD-tracker pin control (shelf rows + the page-detail header)
+// ---------------------------------------------------------------------------
+
+describe('pinning a page to the HUD tracker', () => {
+  /** The shelf-row pin button for one page. */
+  const pinButton = (el: HTMLElement, pageId: string): HTMLElement =>
+    must(el, `.reliquary-pin[data-pin="${pageId}"]`);
+
+  it('renders the pin control as a SIBLING of the row, never nested inside it', () => {
+    // A button inside a button is invalid markup and unreachable to a keyboard:
+    // the row IS a button, so the pin has to be its sibling in the listitem.
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const pin = pinButton(rig.el, PAGE_ID);
+    expect(pin.closest('.reliquary-page-row')).toBeNull();
+    expect(pin.parentElement?.classList.contains('reliquary-page-item')).toBe(true);
+    expect(pin.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('flips aria-pressed and exposes the page through ReliquaryWindow.pinned', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    expect([...rig.w.pinned]).toEqual([]);
+    pinButton(rig.el, PAGE_ID).click();
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+    expect(pinButton(rig.el, PAGE_ID).getAttribute('aria-pressed')).toBe('true');
+    // The accessible name flips with it, so a screen reader hears what the
+    // second press will DO, not what the first one did.
+    expect(pinButton(rig.el, PAGE_ID).getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.unpinAria', { name: reliquaryPageName(PAGE_ID) }),
+    );
+    pinButton(rig.el, PAGE_ID).click();
+    expect([...rig.w.pinned]).toEqual([]);
+    expect(pinButton(rig.el, PAGE_ID).getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('nudges the HUD tracker on an accepted toggle so the strip never lags the button', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const before = rig.counts.pinChanged;
+    pinButton(rig.el, PAGE_ID).click();
+    expect(rig.counts.pinChanged).toBe(before + 1);
+    pinButton(rig.el, PAGE_ID).click();
+    expect(rig.counts.pinChanged).toBe(before + 2);
+  });
+
+  it('refuses an add at the cap visibly: the control is disabled and says why', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const shelfPages = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
+    expect(
+      shelfPages.length,
+      'content premise: the Conquerors shelf holds more pages than the pin cap',
+    ).toBeGreaterThan(RELIQUARY_TRACK_CAP);
+    for (const page of shelfPages.slice(0, RELIQUARY_TRACK_CAP)) {
+      pinButton(rig.el, page.id).click();
+    }
+    expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP);
+    const extra = shelfPages[RELIQUARY_TRACK_CAP];
+    const disabled = pinButton(rig.el, extra.id) as HTMLButtonElement;
+    expect(disabled.disabled).toBe(true);
+    // The refusal rides the accessible name, never a native title attribute
+    // (this window's rule), so it is the same string in every locale.
+    expect(disabled.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) }),
+    );
+    expect(disabled.hasAttribute('title')).toBe(false);
+    const nudges = rig.counts.pinChanged;
+    disabled.click();
+    expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP);
+    expect(rig.counts.pinChanged).toBe(nudges);
+    // An UNPIN at the cap still works, which is what makes the cap navigable.
+    pinButton(rig.el, shelfPages[0].id).click();
+    expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP - 1);
+    expect((pinButton(rig.el, extra.id) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('persists the pins per character across window instances', () => {
+    const state = baseState();
+    const first = makeWindow(state, { nav: 'conquerors' });
+    pinButton(first.el, PAGE_ID).click();
+    first.w.close();
+    document.body.innerHTML = '';
+
+    const second = makeWindow(state, { nav: 'conquerors' });
+    expect([...second.w.pinned]).toEqual([PAGE_ID]);
+    expect(pinButton(second.el, PAGE_ID).getAttribute('aria-pressed')).toBe('true');
+    // Per CHARACTER: the key carries class and name, so another character on
+    // the same browser starts with an empty strip.
+    expect(localStorage.getItem('woc_reliquary_pins_warrior_Testwright')).toBe(
+      JSON.stringify([PAGE_ID]),
+    );
+    expect(localStorage.getItem('woc_reliquary_pins_mage_Testwright')).toBeNull();
+  });
+
+  it('retires an illuminated page from the store and the markup', () => {
+    // The pin control is what releases a pinned page, and an illuminated page
+    // does not render one: without the prune the slot would be wedged forever.
+    const state = baseState();
+    const rig = makeWindow(state, { nav: 'conquerors' });
+    pinButton(rig.el, PAGE_ID).click();
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+
+    // Fill the page for real, through the same ownership seams the game fills
+    // them through, so the facet and the painted row agree it is illuminated.
+    for (const relic of pageDef(PAGE_ID).relics) {
+      switch (relic.kind) {
+        case 'item':
+          state.itemsDiscovered.add(relic.itemId);
+          break;
+        case 'mark':
+          state.marks.add(relic.markId);
+          break;
+        case 'mount':
+          state.mounts.push(relic.mountId);
+          break;
+        case 'weapon_skin':
+          state.weaponSkinIds.push(relic.skinId);
+          break;
+        case 'title':
+          state.deedsEarned.set(relic.deedId, '2026-01-01');
+          break;
+      }
+    }
+    rig.w.render();
+    expect([...rig.w.pinned]).toEqual([]);
+    expect(rig.el.querySelector(`.reliquary-pin[data-pin="${PAGE_ID}"]`)).toBeNull();
+    // The row itself is still there (illuminated, badged), so this is the pin
+    // control retiring, not the page vanishing.
+    expect(rig.el.querySelector(`[data-page="${PAGE_ID}"]`)).not.toBeNull();
+  });
+
+  it('keeps focus on the pin control across the repaint its own click triggers', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    focusClick(rig.el, `.reliquary-pin[data-pin="${PAGE_ID}"]`);
+    const focused = document.activeElement as HTMLElement | null;
+    expect(focused?.dataset.focusKey).toBe(`pin:${PAGE_ID}`);
+    // Not the exact same NODE (innerHTML replaced it), which is exactly why the
+    // key-based restore has to exist.
+    expect(focused?.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('offers the same control on the page-detail header', () => {
+    const rig = openPage(baseState());
+    const header = must(rig.el, '.reliquary-page-header');
+    const pin = must(header, `.reliquary-pin[data-pin="${PAGE_ID}"]`);
+    expect(pin.getAttribute('aria-pressed')).toBe('false');
+    pin.click();
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+    // One page, one pin control per paint: the shelf list and a page detail are
+    // mutually exclusive surfaces, so the focus key stays unique.
+    expect(rig.el.querySelectorAll(`[data-focus-key="pin:${PAGE_ID}"]`).length).toBe(1);
   });
 });

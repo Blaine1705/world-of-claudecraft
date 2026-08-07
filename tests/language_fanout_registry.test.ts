@@ -118,6 +118,10 @@ const FANOUT_ARMS: readonly string[] = [
   // identity card included (the phase 22 QA arm).
   "this.renderCrafting|$('#crafting-window').style.display === 'flex'",
   'this.updateDeedTracker|',
+  // The Reliquary tracker is the same always-on strip: its header label, hints,
+  // and per-row page names all resolve at paint, so one forced repaint here
+  // keeps the strip from showing the previous language for up to a slow tick.
+  'this.updateReliquaryTracker|',
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
@@ -402,6 +406,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateDeedTracker.',
   },
   {
+    file: 'reliquary_tracker_painter.ts',
+    memos: ['lastChip'],
+    reason:
+      'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateReliquaryTracker.',
+  },
+  {
     file: 'hud.ts',
     memos: 'coordinator',
     reason:
@@ -650,7 +660,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-    ).toBe(6);
+      // 7 as of the Reliquary HUD tracker: reliquary_tracker_painter carries the
+      // deed tracker's `lastChip` memo verbatim (the header ARIA presence swap,
+      // no player text), and the fan-out drives it through
+      // this.updateReliquaryTracker.
+    ).toBe(7);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

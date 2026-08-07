@@ -598,6 +598,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
+  // reliquary_tracker is the same painter contract on the same budget: ONE
+  // constructor innerHTML write for the whole skeleton, every refresh write
+  // facet-routed (the fill-flash class rides toggleClass), and the three
+  // setAttribute/removeAttribute pairs only on a chip-mode transition.
+  {
+    file: 'reliquary_tracker_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
+    reflowAllow: {},
+  },
   // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write
   // only when the STRUCTURAL sig changes (new match / roster change). Every
   // per-frame write is facet-routed.

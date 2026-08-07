@@ -47,7 +47,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
-import { RELIQUARY_PAGES } from '../sim/content/reliquary';
+import { RELIQUARY_PAGE_ORDER, RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -609,6 +609,12 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { reliquaryPageName } from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
+import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
+import {
+  buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerView,
+  reliquaryTrackerOwnershipSig,
+} from './reliquary_tracker_view';
 import {
   buildReliquaryUnlockPlan,
   type ReliquaryUnlockEventModel,
@@ -2620,6 +2626,33 @@ export class Hud {
       }
       this.toggleDeedTrackerCollapsed();
     });
+    // The Reliquary tracker header, the same delegation contract as the deed
+    // tracker above: click plus the Enter/Space keydown arm, stopped before the
+    // window-level chat-open/jump binds hijack the focused header button. On the
+    // compact touch tier the rows are folded away (hud.mobile.css) and the
+    // header is a count chip: activation opens The Reliquary instead of toggling
+    // a collapse the player cannot see.
+    $('#reliquary-tracker').addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openReliquary();
+        return;
+      }
+      this.toggleReliquaryTrackerCollapsed();
+    });
+    $('#reliquary-tracker').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openReliquary();
+        return;
+      }
+      this.toggleReliquaryTrackerCollapsed();
+    });
     // The delve board, lockpick panel, map window, and the bank + bags cluster are
     // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
     // / chat (Enter) binds would otherwise hijack those keys on a focused panel
@@ -4629,6 +4662,8 @@ export class Hud {
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
   // trapping window (windowFocus), the deeds/professions shape exactly.
+  // onPinChanged repaints the HUD tracker immediately so a pin toggle never
+  // waits for the slow band.
   private readonly reliquaryWindow = new ReliquaryWindow({
     ...this.presentationBag,
     root: () => $('#reliquary-window'),
@@ -4637,12 +4672,21 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#reliquary-window'),
+    onPinChanged: () => this.updateReliquaryTracker(),
   });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
   private readonly deedTrackerView = makeDeedTrackerView();
   private readonly deedTrackerPainter = new DeedTrackerPainter({
     root: () => $('#deed-tracker'),
+    writers: this.writerFacet,
+  });
+  // Reliquary HUD tracker (#reliquary-tracker): the same slow-band painter over
+  // one reused container, showing the pinned pages (or, before any pin, the
+  // pages closest to Illumination).
+  private readonly reliquaryTrackerView = makeReliquaryTrackerView();
+  private readonly reliquaryTrackerPainter = new ReliquaryTrackerPainter({
+    root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
   // Event calendar window painter (calendar_view.ts month-grid core +
@@ -6153,6 +6197,7 @@ export class Hud {
     // The deed tracker's texts re-localize on its next elided paint; run one
     // now so the strip never shows a stale language for up to a slow tick.
     this.updateDeedTracker();
+    this.updateReliquaryTracker();
     this.charWindow.renderIfOpen();
     // The arena window's render-skip signature is text-independent (offline sentinel or a
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
@@ -9213,6 +9258,9 @@ export class Hud {
     // The deed tracker is always-on chrome (not gated on a window): watched
     // progress climbs from normal play, and earned deeds drop off.
     if (slowHud) this.updateDeedTracker();
+    // The Reliquary tracker is always-on chrome for the same reason: pinned
+    // pages fill from normal play, and an illuminated page drops off.
+    if (slowHud) this.updateReliquaryTracker();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -15603,6 +15651,48 @@ export class Hud {
     settings.set('deedTrackerCollapsed', !settings.get('deedTrackerCollapsed'));
     audio.click();
     this.updateDeedTracker();
+  }
+
+  // Repaint the Reliquary tracker from the live facet: the slow band, a pin
+  // toggle, the collapse toggle, and language switches all funnel here; the
+  // elided writers make an unchanged repaint free. The ownership signature is
+  // what lets the core hold its default (nothing-pinned) ranking instead of
+  // re-folding all 28 catalog pages every slow tick.
+  private updateReliquaryTracker(): void {
+    const collapsed =
+      (this.optionsHooks?.settings.get('reliquaryTrackerCollapsed') ?? false) === true;
+    const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, {
+      pinned: this.reliquaryWindow.pinned,
+      pageIds: RELIQUARY_PAGE_ORDER,
+      completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
+      ownershipSig: reliquaryTrackerOwnershipSig({
+        itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
+        marks: this.sim.reliquaryMarks.size,
+        deedsEarned: this.sim.deedsEarned.size,
+        mounts: this.sim.ownedMounts().length,
+        weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
+      }),
+      collapsed,
+    });
+    // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
+    // is a count chip that opens The Reliquary (see the #reliquary-tracker
+    // click/keydown delegation, which reroutes to openReliquary here). Tell the
+    // painter so it swaps the header from a disclosure toggle to a dialog opener.
+    // Reuse the exact class test the delegation uses so the announced role
+    // matches the behavior.
+    view.chip =
+      document.body.classList.contains('mobile-touch') &&
+      document.body.classList.contains('hud-mobile-compact');
+    this.reliquaryTrackerPainter.update(view);
+  }
+
+  /** Flip the persisted Reliquary-tracker collapse (header click/keyboard delegation). */
+  private toggleReliquaryTrackerCollapsed(): void {
+    const settings = this.optionsHooks?.settings;
+    if (!settings) return;
+    settings.set('reliquaryTrackerCollapsed', !settings.get('reliquaryTrackerCollapsed'));
+    audio.click();
+    this.updateReliquaryTracker();
   }
 
   toggleCalendar(): void {

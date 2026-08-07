@@ -2863,6 +2863,114 @@
     opacity: 0.85;
   }
 
+  /* ---------- Reliquary tracker ---------- */
+  /* Pinned Reliquary pages: the deed-tracker strip scoped to the collection
+     chase. Same dt-* chrome vocabulary (every tracker in #right-tracker-stack
+     shares it) and the same collapsible header tab stop, so the stack reads as
+     one thing. The one addition is .dt-flash, a short pulse on the row whose
+     relic count just rose; it is decoration over a number that is already on
+     screen, so dropping it under reduced motion loses nothing actionable. */
+  #reliquary-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  /* width: fit-content, same rail click-steal rationale as #quest-tracker
+     .qt-header above (every tracker shares #right-tracker-stack). */
+  #reliquary-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #reliquary-tracker .dt-header:hover {
+    color: #fff;
+  }
+  #reliquary-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #reliquary-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #reliquary-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #reliquary-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #reliquary-tracker .dt-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  #reliquary-tracker .dt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  #reliquary-tracker .dt-bar {
+    flex: 0 0 56px;
+    height: 6px;
+    border: 1px solid #3a3325;
+    border-radius: 3px;
+    background: #14110b;
+    overflow: hidden;
+  }
+  #reliquary-tracker .dt-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#e6c76a, #a8842f);
+  }
+  #reliquary-tracker .dt-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #reliquary-tracker .dt-flash {
+    animation: reliquary-tracker-flash 0.9s ease-out;
+  }
+  @keyframes reliquary-tracker-flash {
+    from {
+      color: #ffe9a8;
+      text-shadow: 0 0 6px var(--gold);
+    }
+    to {
+      color: var(--color-text-overlay);
+      text-shadow: 1px 1px 2px #000;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #reliquary-tracker .dt-flash {
+      animation: none;
+    }
+  }
+
   /* ---------- delve tracker ---------- */
   #delve-tracker {
     width: 100%;

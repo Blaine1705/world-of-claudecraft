@@ -3313,7 +3313,16 @@ export const ja_JP: EnTranslations = {
       "charCompletionLabel": "聖遺物庫",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "キュレーター",
-      "charOpen": "聖遺物庫"
+      "charOpen": "聖遺物庫",
+      "trackerLabel": "聖遺物庫",
+      "collapseHint": "聖遺物庫トラッカーを折りたたむ",
+      "expandHint": "聖遺物庫トラッカーを展開",
+      "openWindowHint": "聖遺物庫を開く",
+      "pin": "ピン留め",
+      "unpin": "ピン留め解除",
+      "pinFull": "トラッカーが満杯です（最大 {cap} ページ）",
+      "pinAria": "{name}をHUDトラッカーにピン留め",
+      "unpinAria": "{name}のピン留めを解除"
     },
     "deeds": {
       "title": "功績の書",

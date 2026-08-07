@@ -315,6 +315,10 @@ describe('the window paints the RESOLVED page name, never the model English', ()
   function fakeWorld(): unknown {
     const empty = new Set<string>();
     return {
+      // The pin store keys off the character (woc_reliquary_pins_<class>_<name>),
+      // so every ReliquaryWindow world needs the identity pair a real IWorld has.
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Testwright' },
       deedStats: { itemsDiscovered: empty },
       reliquaryMarks: empty,
       reliquaryRecent: [],
@@ -344,6 +348,7 @@ describe('the window paints the RESOLVED page name, never the model English', ()
       consumePeek: () => false,
       captureFocus: () => null,
       restoreFocus: () => {},
+      onPinChanged: () => {},
       itemIcon: () => '',
       moneyHtml: () => '',
       itemTooltip: () => '',

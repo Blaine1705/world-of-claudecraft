@@ -10562,6 +10562,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.charCompletion': '{owned}/{total}',
   'hudChrome.reliquary.charRankLabel': 'キュレーター',
   'hudChrome.reliquary.charOpen': '聖遺物庫',
+  // The Reliquary (Phase 15): the always-on HUD tracker and its pin control.
+  // The tracker hints mirror the deed-tracker wording above.
+  'hudChrome.reliquary.trackerLabel': '聖遺物庫',
+  'hudChrome.reliquary.collapseHint': '聖遺物庫トラッカーを折りたたむ',
+  'hudChrome.reliquary.expandHint': '聖遺物庫トラッカーを展開',
+  'hudChrome.reliquary.openWindowHint': '聖遺物庫を開く',
+  'hudChrome.reliquary.pin': 'ピン留め',
+  'hudChrome.reliquary.unpin': 'ピン留め解除',
+  'hudChrome.reliquary.pinFull': 'トラッカーが満杯です（最大 {cap} ページ）',
+  'hudChrome.reliquary.pinAria': '{name}をHUDトラッカーにピン留め',
+  'hudChrome.reliquary.unpinAria': '{name}のピン留めを解除',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '記録のない聖遺物',

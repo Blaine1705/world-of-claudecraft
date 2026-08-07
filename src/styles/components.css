@@ -8237,10 +8237,50 @@
   }
   .reliquary-page-item {
     display: flex;
+    gap: 6px;
   }
+  /* min-width: 0 so the row yields to its pin sibling instead of pushing it out
+     of the list: width: 100% only sets the flex BASE size, and a flex item
+     cannot shrink past its content without this. */
   .reliquary-page-row {
     width: 100%;
+    min-width: 0;
     justify-content: space-between;
+  }
+  /* The HUD-tracker pin: a SIBLING of the row button, never nested inside it
+     (a button in a button is invalid and unreachable), styled as the deeds
+     .deed-watch control so the two collection windows offer the same affordance.
+     The pressed state is aria-pressed; .pinned is only its paint. */
+  .reliquary-pin {
+    flex: 0 0 auto;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .reliquary-pin:hover:not(:disabled) {
+    filter: brightness(1.12);
+  }
+  .reliquary-pin:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .reliquary-pin:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-pin.pinned {
+    border-color: #8a6a26;
+    background: #241c0c;
+  }
+  body.mobile-touch .reliquary-pin {
+    min-width: 40px;
+    min-height: 40px;
   }
   .reliquary-page-main {
     display: flex;

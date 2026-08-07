@@ -3313,7 +3313,16 @@ export const it_IT: EnTranslations = {
       "charCompletionLabel": "Reliquary",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "Curator",
-      "charOpen": "The Reliquary"
+      "charOpen": "The Reliquary",
+      "trackerLabel": "Reliquary",
+      "collapseHint": "Collapse Reliquary tracker",
+      "expandHint": "Expand Reliquary tracker",
+      "openWindowHint": "Open The Reliquary",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "pinFull": "The tracker is full (up to {cap} pages)",
+      "pinAria": "Pin {name} to the HUD tracker",
+      "unpinAria": "Unpin {name}"
     },
     "deeds": {
       "title": "Libro delle Imprese",

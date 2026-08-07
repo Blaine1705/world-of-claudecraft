@@ -44,6 +44,11 @@ import {
   reliquarySourceLines,
 } from './reliquary_labels';
 import {
+  pruneReliquaryPins,
+  RELIQUARY_TRACK_CAP,
+  toggleReliquaryPin,
+} from './reliquary_tracker_view';
+import {
   buildReliquaryView,
   CURATOR_RANK_NAME_KEYS,
   curatorRankNameKey,
@@ -91,6 +96,11 @@ const GRID_KEY_SHORTCUTS = 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End';
  *  (every render but the one after a catalog fill) allocates nothing. */
 const NO_FLASH: ReadonlySet<string> = new Set();
 
+/** Pinned pages persist per character (the deeds watchlist storage contract):
+ *  `<prefix>_<class>_<name>`, so two characters on one browser keep their own
+ *  chase on the HUD tracker. */
+const RELIQUARY_PIN_KEY_PREFIX = 'woc_reliquary_pins';
+
 /**
  * What the art and quality ladders need from a relic: a grid cell and a recent
  * find are the same slot shape, so both resolve through one implementation
@@ -119,6 +129,9 @@ export interface ReliquaryWindowDeps extends PainterHostPresentation {
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Repaint the HUD tracker now, so a pin toggle never waits for the slow
+   *  band (the DeedsWindow onWatchChanged contract). */
+  onPinChanged(): void;
 }
 
 export class ReliquaryWindow {
@@ -180,11 +193,25 @@ export class ReliquaryWindow {
    * render (the deeds focusDeedId contract).
    */
   private focusPageId: string | null = null;
+  /**
+   * Pinned pages for the HUD tracker, in pin order (a Set preserves insertion
+   * order, and that order IS the strip's display order). Loaded lazily per
+   * character key, capped at RELIQUARY_TRACK_CAP, and pruned of illuminated
+   * pages on every paint: this window owns the store, the tracker only reads it.
+   */
+  private pinnedSet = new Set<string>();
+  private pinnedKey = '';
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
 
   get isOpen(): boolean {
     return this.opened;
+  }
+
+  /** The live pin set; the HUD tracker reads this each slow-band paint. */
+  get pinned(): ReadonlySet<string> {
+    this.ensurePinsLoaded();
+    return this.pinnedSet;
   }
 
   open(nav?: ReliquaryNavId): void {
@@ -381,6 +408,10 @@ export class ReliquaryWindow {
     // the flag here so a render() from outside wire() (the language fan-out)
     // cannot wedge the slow band's composition hold open forever.
     this.composing = false;
+    // Illuminated pins lose their unpin button in the markup below, so the
+    // stored set has to shed them here or a finished page would hold a cap slot
+    // with no way left to release it (the deeds pruneWatchedIfStale contract).
+    this.prunePinsIfStale();
     const focusKey = captureFocusKey(el);
     const hadFocus = focusedWithin(el) !== null;
     // innerHTML wipes the search field, and the shared data-focus-key restore
@@ -1004,11 +1035,39 @@ export class ReliquaryWindow {
           `</span>` +
           `<span class="reliquary-page-meta">` +
           `<span class="reliquary-progress-text">${esc(progress)}</span>${clears}${done}` +
-          `</span></button></li>`
+          `</span></button>${this.pinButtonHtml(page.pageId, page.complete)}</li>`
         );
       })
       .join('');
     return `<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
+  }
+
+  /**
+   * The pin control for one page: a SIBLING of the page row (never nested; the
+   * row is itself a button), and absent entirely on an illuminated page, which
+   * is exactly what retires it from the HUD tracker (the deeds unwatch-button
+   * contract). At the cap an unpinned page renders disabled with the cap note,
+   * so the refusal is visible rather than a dead click.
+   */
+  private pinButtonHtml(pageId: string, complete: boolean): string {
+    if (complete) return '';
+    this.ensurePinsLoaded();
+    const pinned = this.pinnedSet.has(pageId);
+    const atCap = !pinned && this.pinnedSet.size >= RELIQUARY_TRACK_CAP;
+    const name = reliquaryPageName(pageId);
+    const label = t(pinned ? 'hudChrome.reliquary.unpin' : 'hudChrome.reliquary.pin');
+    // At the cap the refusal IS the accessible name: a disabled control that
+    // still claims it will pin the page describes something it cannot do. The
+    // reason never rides a native title attribute (this window's rule: the HUD
+    // cannot style, position, or dismiss one, and touch never sees it).
+    const aria = atCap
+      ? t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) })
+      : t(pinned ? 'hudChrome.reliquary.unpinAria' : 'hudChrome.reliquary.pinAria', { name });
+    return (
+      `<button type="button" class="reliquary-pin${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
+      `data-focus-key="${esc(`pin:${pageId}`)}" aria-pressed="${pinned}" aria-label="${esc(aria)}"` +
+      `${atCap ? ' disabled' : ''}>${esc(label)}</button>`
+    );
   }
 
   private pageDetailHtml(
@@ -1063,6 +1122,10 @@ export class ReliquaryWindow {
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       `<header class="reliquary-page-header">` +
       `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${done}` +
+      // Same control, same focus key as the shelf row's: the shelf list and a
+      // page detail are mutually exclusive surfaces (contentHtml), so one page
+      // never renders two pin buttons and the key stays unique per paint.
+      this.pinButtonHtml(page.pageId, page.illuminated) +
       `</header>` +
       blurb +
       accountScope +
@@ -1340,6 +1403,28 @@ export class ReliquaryWindow {
         this.render();
       });
     }
+    // The pin control is a SIBLING of the page row, not a child of it, so a pin
+    // click never reaches the row's own listener and no stopPropagation is
+    // needed: the row handler is bound on the row button itself, not on a
+    // container both share.
+    for (const btn of el.querySelectorAll<HTMLElement>('[data-pin]')) {
+      btn.addEventListener('click', () => {
+        const pageId = btn.dataset.pin;
+        if (!pageId) return;
+        this.ensurePinsLoaded();
+        const result = toggleReliquaryPin(this.pinnedSet, pageId);
+        // Refused at the cap: the button already renders disabled with the cap
+        // note, so there is nothing to repaint and nothing to persist.
+        if (!result.changed) return;
+        this.pinnedSet = new Set(result.pinned);
+        this.persistPins();
+        // The tracker repaints now rather than up to a slow band later, so the
+        // strip agrees with the button the player just pressed.
+        this.deps.onPinChanged();
+        audio.click();
+        this.render();
+      });
+    }
     el.querySelector('[data-back]')?.addEventListener('click', () => {
       this.pageId = null;
       this.gridIndex = 0;
@@ -1402,6 +1487,54 @@ export class ReliquaryWindow {
 
   private fmt(n: number): string {
     return formatNumber(n, { maximumFractionDigits: 0 });
+  }
+
+  private pinKey(): string {
+    const world = this.deps.world();
+    return `${RELIQUARY_PIN_KEY_PREFIX}_${world.cfg.playerClass}_${world.player.name}`;
+  }
+
+  /** Drop illuminated and catalog-unknown pages where the set meets fresh
+   *  ownership, so a filled slot frees up the moment its page loses the unpin
+   *  button (an illuminated pin must never wedge the cap, in memory or in
+   *  storage). On a drop: persist and nudge the HUD tracker. */
+  private prunePinsIfStale(): void {
+    this.ensurePinsLoaded();
+    const world = this.deps.world();
+    const result = pruneReliquaryPins(this.pinnedSet, (pageId) =>
+      world.reliquaryPageCompletion(pageId),
+    );
+    if (!result.changed) return;
+    this.pinnedSet = new Set(result.pinned);
+    this.persistPins();
+    this.deps.onPinChanged();
+  }
+
+  private ensurePinsLoaded(): void {
+    const key = this.pinKey();
+    if (key === this.pinnedKey) return;
+    this.pinnedKey = key;
+    this.pinnedSet = new Set();
+    try {
+      const raw = JSON.parse(localStorage.getItem(key) ?? 'null');
+      if (Array.isArray(raw)) {
+        for (const pageId of raw) {
+          if (typeof pageId === 'string' && this.pinnedSet.size < RELIQUARY_TRACK_CAP) {
+            this.pinnedSet.add(pageId);
+          }
+        }
+      }
+    } catch {
+      /* corrupt or unavailable storage: start unpinned */
+    }
+  }
+
+  private persistPins(): void {
+    try {
+      localStorage.setItem(this.pinnedKey, JSON.stringify([...this.pinnedSet]));
+    } catch {
+      /* storage unavailable (private mode); the pins still work in-session */
+    }
   }
 }
 

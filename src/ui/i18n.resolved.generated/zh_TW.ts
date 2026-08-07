@@ -3313,7 +3313,16 @@ export const zh_TW: EnTranslations = {
       "charCompletionLabel": "聖物庫",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "策展人",
-      "charOpen": "聖物庫"
+      "charOpen": "聖物庫",
+      "trackerLabel": "聖物庫",
+      "collapseHint": "摺疊聖物庫追蹤器",
+      "expandHint": "展開聖物庫追蹤器",
+      "openWindowHint": "開啟聖物庫",
+      "pin": "釘選",
+      "unpin": "取消釘選",
+      "pinFull": "追蹤器已滿（最多 {cap} 個頁面）",
+      "pinAria": "將{name}釘選到介面追蹤器",
+      "unpinAria": "取消釘選{name}"
     },
     "deeds": {
       "title": "功績之書",

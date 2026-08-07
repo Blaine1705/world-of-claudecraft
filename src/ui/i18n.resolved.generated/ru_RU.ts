@@ -3313,7 +3313,16 @@ export const ru_RU: EnTranslations = {
       "charCompletionLabel": "Реликварий",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "Хранитель",
-      "charOpen": "Реликварий"
+      "charOpen": "Реликварий",
+      "trackerLabel": "Реликварий",
+      "collapseHint": "Свернуть список Реликвария",
+      "expandHint": "Развернуть список Реликвария",
+      "openWindowHint": "Открыть Реликварий",
+      "pin": "Закрепить",
+      "unpin": "Открепить",
+      "pinFull": "Список отслеживания полон (не более {cap} страниц)",
+      "pinAria": "Закрепить страницу {name} на экране",
+      "unpinAria": "Открепить страницу {name}"
     },
     "deeds": {
       "title": "Книга деяний",

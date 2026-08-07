@@ -10546,6 +10546,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.charCompletion': '{owned}/{total}',
   'hudChrome.reliquary.charRankLabel': '큐레이터',
   'hudChrome.reliquary.charOpen': '성물고',
+  // The Reliquary (Phase 15): the always-on HUD tracker and its pin control.
+  // The tracker hints mirror the deed-tracker wording above.
+  'hudChrome.reliquary.trackerLabel': '성물고',
+  'hudChrome.reliquary.collapseHint': '성물고 추적기 접기',
+  'hudChrome.reliquary.expandHint': '성물고 추적기 펼치기',
+  'hudChrome.reliquary.openWindowHint': '성물고 열기',
+  'hudChrome.reliquary.pin': '고정',
+  'hudChrome.reliquary.unpin': '고정 해제',
+  'hudChrome.reliquary.pinFull': '추적기가 가득 찼습니다 (최대 {cap}개 페이지)',
+  'hudChrome.reliquary.pinAria': 'HUD 추적기에 {name} 고정',
+  'hudChrome.reliquary.unpinAria': '{name} 고정 해제',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '기록되지 않은 성물',

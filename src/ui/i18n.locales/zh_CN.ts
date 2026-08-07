@@ -10072,6 +10072,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.charCompletion': '{owned}/{total}',
   'hudChrome.reliquary.charRankLabel': '策展人',
   'hudChrome.reliquary.charOpen': '圣物库',
+  // The Reliquary (Phase 15): the always-on HUD tracker and its pin control.
+  // The tracker hints mirror the deed-tracker wording above.
+  'hudChrome.reliquary.trackerLabel': '圣物库',
+  'hudChrome.reliquary.collapseHint': '折叠圣物库追踪器',
+  'hudChrome.reliquary.expandHint': '展开圣物库追踪器',
+  'hudChrome.reliquary.openWindowHint': '打开圣物库',
+  'hudChrome.reliquary.pin': '固定',
+  'hudChrome.reliquary.unpin': '取消固定',
+  'hudChrome.reliquary.pinFull': '追踪器已满（最多 {cap} 个页面）',
+  'hudChrome.reliquary.pinAria': '将{name}固定到界面追踪器',
+  'hudChrome.reliquary.unpinAria': '取消固定{name}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '未记录的圣物',

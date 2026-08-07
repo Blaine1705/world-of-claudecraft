@@ -3313,7 +3313,16 @@ export const ko_KR: EnTranslations = {
       "charCompletionLabel": "성물고",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "큐레이터",
-      "charOpen": "성물고"
+      "charOpen": "성물고",
+      "trackerLabel": "성물고",
+      "collapseHint": "성물고 추적기 접기",
+      "expandHint": "성물고 추적기 펼치기",
+      "openWindowHint": "성물고 열기",
+      "pin": "고정",
+      "unpin": "고정 해제",
+      "pinFull": "추적기가 가득 찼습니다 (최대 {cap}개 페이지)",
+      "pinAria": "HUD 추적기에 {name} 고정",
+      "unpinAria": "{name} 고정 해제"
     },
     "deeds": {
       "title": "업적의 서",

@@ -156,8 +156,15 @@ describe('painter hygiene', () => {
     // reliquaryRelicDisplayName(kind, id). Comments (line and jsdoc) are
     // stripped so prose cannot pad the count; trailing line comments are cut
     // too so an unrelated `// ... .name` note on a code line cannot red it.
+    //
+    // ONE read is sanctioned, and it is named here in full rather than counted:
+    // the pin store's per-character storage key (woc_reliquary_pins_<class>_<name>)
+    // reads the CHARACTER name, an identity string that is never rendered. Any
+    // other `.name` in this painter is the untranslated-render candidate this
+    // guard exists to catch, and fails the exact-match below.
     const code = stripComments(painter);
-    expect(code.match(/\.name\b/g) ?? []).toEqual([]);
+    const nameReads = [...code.matchAll(/[\w.]*\.name\b/g)].map((m) => m[0]);
+    expect(nameReads).toEqual(['world.player.name']);
     expect(code).toContain('reliquaryPageName(');
     expect(code).toContain('reliquaryRelicDisplayName(');
   });

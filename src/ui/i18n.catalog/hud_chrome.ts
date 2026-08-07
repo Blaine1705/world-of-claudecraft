@@ -4266,6 +4266,20 @@ export const hudChromeStrings = {
     charCompletion: '{owned}/{total}',
     charRankLabel: 'Curator',
     charOpen: 'The Reliquary',
+    // Phase 15: the always-on HUD tracker (#reliquary-tracker) and the pin
+    // control that fills it. The row tally reuses hudChrome.questTracker.count
+    // and the row progress reuses progressText above, so neither is duplicated
+    // here. The pin cap note is a real refusal, not a silent no-op (the deeds
+    // watchFull precedent).
+    trackerLabel: 'Reliquary',
+    collapseHint: 'Collapse Reliquary tracker',
+    expandHint: 'Expand Reliquary tracker',
+    openWindowHint: 'Open The Reliquary',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The tracker is full (up to {cap} pages)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name}',
   },
   deeds: {
     title: 'Book of Deeds',

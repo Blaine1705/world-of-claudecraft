@@ -3313,7 +3313,16 @@ export const en_XA: EnTranslations = {
       "charCompletionLabel": "[Ŕéļíɋúáŕý]",
       "charCompletion": "[{owned}/{total}]",
       "charRankLabel": "[Çúŕáţóŕ]",
-      "charOpen": "[Ţĥé Ŕéļíɋúáŕý]"
+      "charOpen": "[Ţĥé Ŕéļíɋúáŕý]",
+      "trackerLabel": "[Ŕéļíɋúáŕý]",
+      "collapseHint": "[Çóļļáþšé Ŕéļíɋúáŕý ţŕáçķéŕ]",
+      "expandHint": "[Éẋþáñð Ŕéļíɋúáŕý ţŕáçķéŕ]",
+      "openWindowHint": "[Óþéñ Ţĥé Ŕéļíɋúáŕý]",
+      "pin": "[Þíñ]",
+      "unpin": "[Úñþíñ]",
+      "pinFull": "[Ţĥé ţŕáçķéŕ íš ƒúļļ (úþ ţó {cap} þáĝéš)]",
+      "pinAria": "[Þíñ {name} ţó ţĥé ĤÚÐ ţŕáçķéŕ]",
+      "unpinAria": "[Úñþíñ {name}]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

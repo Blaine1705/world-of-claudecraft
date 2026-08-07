@@ -808,6 +808,52 @@ export function reliquaryRelicPageId(
   return index.pageOf.get(relicId) ?? null;
 }
 
+/** The ranking inputs a nearly-complete candidate row must carry. Kept to the
+ *  three fields the order actually reads, so the HUD tracker can rank its own
+ *  rows through the SAME comparator without carrying the Overview's display
+ *  fields. */
+export interface ReliquaryNearlyRankRow {
+  pageId: string;
+  owned: number;
+  total: number;
+}
+
+/**
+ * Is this page "nearly complete"? The ONE predicate behind both surfaces that
+ * claim the phrase: the Overview strip and the HUD tracker's default selection
+ * (what it shows before the player pins anything). A page qualifies when it is
+ * started but unfinished and either within RELIQUARY_NEARLY_MAX_REMAINING
+ * relics of Illumination or already RELIQUARY_NEARLY_MIN_FRACTION full.
+ */
+export function isReliquaryNearlyComplete(owned: number, total: number): boolean {
+  if (total <= 0 || owned >= total) return false;
+  if (owned < RELIQUARY_NEARLY_MIN_OWNED) return false;
+  const remaining = total - owned;
+  const fraction = owned / total;
+  return remaining <= RELIQUARY_NEARLY_MAX_REMAINING || fraction >= RELIQUARY_NEARLY_MIN_FRACTION;
+}
+
+/**
+ * Rank nearly-complete candidates: fewest remaining first, then highest owned
+ * fraction, then stable page id (so two equally close pages never trade places
+ * between builds). The one comparator both nearly-complete surfaces order by.
+ *
+ * COPY-RETURNING: the caller's array is never sorted in place. A rendered
+ * model array's order is a contract its own consumers read, and this is now
+ * called on a container the HUD tracker reuses across builds.
+ */
+export function rankNearlyComplete<T extends ReliquaryNearlyRankRow>(rows: readonly T[]): T[] {
+  return [...rows].sort((a, b) => {
+    const ra = a.total - a.owned;
+    const rb = b.total - b.owned;
+    if (ra !== rb) return ra - rb;
+    const fa = a.total > 0 ? a.owned / a.total : 0;
+    const fb = b.total > 0 ? b.owned / b.total : 0;
+    if (fa !== fb) return fb - fa;
+    return a.pageId < b.pageId ? -1 : a.pageId > b.pageId ? 1 : 0;
+  });
+}
+
 function buildNearlyComplete(
   pages: readonly ReliquaryPageDef[],
   opts: {
@@ -822,13 +868,7 @@ function buildNearlyComplete(
   const candidates: ReliquaryNearlyPageModel[] = [];
   for (const page of pages) {
     const c = pageCompletion(page, opts);
-    if (c.total <= 0 || c.complete) continue;
-    if (c.owned < RELIQUARY_NEARLY_MIN_OWNED) continue;
-    const remaining = c.total - c.owned;
-    const fraction = c.owned / c.total;
-    if (remaining > RELIQUARY_NEARLY_MAX_REMAINING && fraction < RELIQUARY_NEARLY_MIN_FRACTION) {
-      continue;
-    }
+    if (!isReliquaryNearlyComplete(c.owned, c.total)) continue;
     // The needle narrows here, BEFORE the ranking cap, so a qualifying match
     // that ranks below the cap is still reachable from Overview search.
     if (matches !== undefined && !matches(page.id)) continue;
@@ -837,18 +877,10 @@ function buildNearlyComplete(
       name: page.name,
       owned: c.owned,
       total: c.total,
-      remaining,
+      remaining: c.total - c.owned,
     });
   }
-  // Fewest remaining first, then highest owned fraction, then stable page id.
-  candidates.sort((a, b) => {
-    if (a.remaining !== b.remaining) return a.remaining - b.remaining;
-    const fa = a.total > 0 ? a.owned / a.total : 0;
-    const fb = b.total > 0 ? b.owned / b.total : 0;
-    if (fa !== fb) return fb - fa;
-    return a.pageId < b.pageId ? -1 : a.pageId > b.pageId ? 1 : 0;
-  });
-  return candidates.slice(0, RELIQUARY_NEARLY_MAX);
+  return rankNearlyComplete(candidates).slice(0, RELIQUARY_NEARLY_MAX);
 }
 
 // ---------------------------------------------------------------------------

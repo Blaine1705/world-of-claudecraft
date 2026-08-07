@@ -1371,6 +1371,12 @@ describe('reliquaryFocusFallbackKey', () => {
     expect(reliquaryFocusFallbackKey('cell:item:crypt_helm')).toBeNull();
     expect(reliquaryFocusFallbackKey('back')).toBeNull();
     expect(reliquaryFocusFallbackKey('close')).toBeNull();
+    // The HUD-tracker pin toggle is deliberately in this list, not the one
+    // above: pinning a page does not move it off the surface it lives on (the
+    // shelf row stays, the page detail stays), so the exact-key restore finds
+    // the same control and there is nothing to fall back to. A 'back' fallback
+    // would also be wrong on the shelf, which has no Back button at all.
+    expect(reliquaryFocusFallbackKey('pin:crypt_n')).toBeNull();
   });
 });
 

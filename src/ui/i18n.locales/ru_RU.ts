@@ -10730,6 +10730,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.charCompletion': '{owned}/{total}',
   'hudChrome.reliquary.charRankLabel': 'Хранитель',
   'hudChrome.reliquary.charOpen': 'Реликварий',
+  // The Reliquary (Phase 15): the always-on HUD tracker and its pin control.
+  // The tracker hints mirror the deed-tracker wording above.
+  'hudChrome.reliquary.trackerLabel': 'Реликварий',
+  'hudChrome.reliquary.collapseHint': 'Свернуть список Реликвария',
+  'hudChrome.reliquary.expandHint': 'Развернуть список Реликвария',
+  'hudChrome.reliquary.openWindowHint': 'Открыть Реликварий',
+  'hudChrome.reliquary.pin': 'Закрепить',
+  'hudChrome.reliquary.unpin': 'Открепить',
+  'hudChrome.reliquary.pinFull': 'Список отслеживания полон (не более {cap} страниц)',
+  'hudChrome.reliquary.pinAria': 'Закрепить страницу {name} на экране',
+  'hudChrome.reliquary.unpinAria': 'Открепить страницу {name}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': 'Незарегистрированная реликвия',

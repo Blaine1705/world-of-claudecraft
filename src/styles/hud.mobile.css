@@ -4163,6 +4163,23 @@
   body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
     display: none;
   }
+  /* The Reliquary tracker folds on exactly the same tiers, for the same reason:
+     glanceable decoration on a phone, with the window itself carrying the full
+     pin list. hud.ts routes the compact-tier tap to The Reliquary instead of the
+     invisible collapse toggle. */
+  body.mobile-touch #reliquary-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #reliquary-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
+    display: none;
+  }
   /* ---------- mobile Reliquary (standalone window) ---------- */
   /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
      body column collapses the desktop rail into a chip row (deeds idiom). */

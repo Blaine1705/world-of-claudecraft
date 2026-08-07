@@ -3313,7 +3313,16 @@ export const zh_CN: EnTranslations = {
       "charCompletionLabel": "圣物库",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "策展人",
-      "charOpen": "圣物库"
+      "charOpen": "圣物库",
+      "trackerLabel": "圣物库",
+      "collapseHint": "折叠圣物库追踪器",
+      "expandHint": "展开圣物库追踪器",
+      "openWindowHint": "打开圣物库",
+      "pin": "固定",
+      "unpin": "取消固定",
+      "pinFull": "追踪器已满（最多 {cap} 个页面）",
+      "pinAria": "将{name}固定到界面追踪器",
+      "unpinAria": "取消固定{name}"
     },
     "deeds": {
       "title": "功绩之书",

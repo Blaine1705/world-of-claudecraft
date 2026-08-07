@@ -340,6 +340,7 @@ const UI_PURE_CORES = [
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_view.ts',
   'src/ui/reliquary_sheet_view.ts',
+  'src/ui/reliquary_tracker_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
@@ -1572,6 +1573,10 @@ const UI_DOM_MODULES = [
   // review's note).
   'src/ui/professions_window.ts',
   'src/ui/reconnect_overlay.ts',
+  // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
+  // pinned page set persists per character in localStorage (the deeds_window
+  // watchlist shape), which is browser state this module owns.
+  'src/ui/reliquary_window.ts',
   'src/ui/settings_controls.ts',
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',
