@@ -278,9 +278,10 @@ describe('isHarvestableCorpse', () => {
     // reachable trash beast instead of dead content. claw and tusk joining
     // the yield table (this branch) then retires fen_troll from `excluded`
     // (the one shipped template that used to sit there) into this list
-    // instead, so every tagged template is harvestable: 42.
-    expect(included).toHaveLength(42);
-    // ...and the untagged templates are counted rather than assumed: 188 of
+    // instead, so every tagged template is harvestable. The release harvest-gap
+    // fix then tags dune_troll, bogtoad and hedge_knight: 45.
+    expect(included).toHaveLength(45);
+    // ...and the untagged templates are counted rather than assumed: 185 of
     // them ship, all excluded before this change and all excluded after it,
     // since fen_troll was already tagged (claw, tusk) and only moves from
     // `excluded` into this list, never through `untagged`. (184 before the
@@ -288,7 +289,7 @@ describe('isHarvestableCorpse', () => {
     // the four untagged camp mobs the quest-dedupe pass added, minus
     // shoal_scuttler once it gained a mapped tag.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(188);
+    expect(untagged).toHaveLength(185);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -503,7 +504,7 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // corpses (32 down to 12), leaving the gills/horn-mixed templates that
     // still raise a picture. The two bounds inside the loop are the real
     // assertions.
-    expect(raised).toBe(12);
+    expect(raised).toBe(14);
   });
 
   it('is self-healing: giving horn an item returns every number to the pre-#2514 world', () => {
