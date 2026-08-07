@@ -781,9 +781,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // Moved uphill off (16,1574): the authored spot sat UNDER the world sea
     // plane in a snowmelt basin (-0.38yd, and -0.54 across its reach), so the
     // vein rendered on the pond floor and a miner worked it from the water.
-    // Now on the basin's south rim, 5.7yd of freeboard with the whole harvest
-    // reach 1.6yd clear.
-    pos: { x: 12, z: 1564 },
+    // Now east along the basin's south rim, whole harvest reach clear of the
+    // sea plane (tests/gather_node_placement.test.ts measures it). x is 22,
+    // not the rim-nearest 12: at (12,1564) this vein sat 30.3yd from
+    // ore_frostveil_1 at (8,1534), inside the 27-32yd clustering band
+    // tests/quest_targets.test.ts keeps empty so quest-area grouping cannot
+    // flip with the threshold; 22 restores 33.1yd of separation.
+    pos: { x: 22, z: 1564 },
     level: 19,
     tier: 1,
   },
@@ -1236,9 +1240,12 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     // Moved inland off (406,412): the patch sat 2 yards from the Wickharbor
     // cove's waterline, which reached 1.30yd into its harvest disc, so a sixth
-    // of the reach was open water. Now 5.4yd of freeboard on the headland
-    // above the cove, the whole reach 3.2yd clear.
-    pos: { x: 407, z: 406 },
+    // of the reach was open water. Now on the headland above the cove, whole
+    // reach clear (tests/gather_node_placement.test.ts measures it). (405,407),
+    // not the first dry pick (407,406): that spot sat 31.4yd from
+    // herb_galecrest_1 at (436,394), inside the 27-32yd clustering band
+    // tests/quest_targets.test.ts keeps empty; this one restores 33.6yd.
+    pos: { x: 405, z: 407 },
     level: 20,
     tier: 1,
   },
