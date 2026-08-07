@@ -196,7 +196,7 @@ describe('MailIndex buckets and unread counts', () => {
     expect(index.unreadFor('bob')).toBe(1);
   });
 
-  it('bucket order is book (insertion) order', () => {
+  it('bucket order is per-bucket append order: a re-track lands at the tail', () => {
     const index = new MailIndex<FakeLetter>();
     const a = letter(1, 'alice');
     const b = letter(2, 'alice');

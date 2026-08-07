@@ -191,6 +191,49 @@ describe('the mail revision signal (mailRevFor)', () => {
     tickFor(sim, 2);
     expect(bookOf(sim).find((m) => m.subject === 'Coin')?.returned).toBe(true);
     expect(rawRev(sim)).toBeGreaterThan(rev);
+
+    // Third sweep arm: the RETURNED parcel, expired a second time, is the one
+    // sanctioned destruction (attachments aboard, return flight already run),
+    // and it must bump too.
+    const returned = bookOf(sim).find((m) => m.subject === 'Coin');
+    if (!returned) throw new Error('missing returned parcel');
+    returned.expiresAt = sim.time;
+    rev = rawRev(sim);
+    tickFor(sim, 2);
+    expect(bookOf(sim).some((m) => m.subject === 'Coin')).toBe(false);
+    expect(rawRev(sim)).toBeGreaterThan(rev);
+  });
+
+  it('a parcel-only take bumps through the items dimension alone (read first, no coin)', () => {
+    // Pins the kept-length arm of the conditional take bump: the letter is
+    // read BEFORE the take and carries no coin, so neither the read flip nor
+    // the coin arm can set `mutated`; only the granted-items dimension can.
+    // Without it, the taker's own inbox would keep showing the parcel
+    // attached until the staleness backstop.
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    const bob = sim.addPlayer('mage', 'Bob');
+    sim.addItem('wolf_fang', 1, alice);
+    sim.mailSendResolved(
+      { key: String(bob), name: 'Bob' },
+      'Parcel',
+      'Yours.',
+      0,
+      [{ itemId: 'wolf_fang', count: 1 }],
+      alice,
+    );
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+    const parcel = bookOf(sim).find((m) => m.subject === 'Parcel');
+    if (!parcel) throw new Error('missing parcel');
+    sim.mailMarkRead(parcel.id, bob);
+    expect(parcel.read).toBe(true);
+    expect(parcel.copper).toBe(0);
+
+    const rev = rawRev(sim);
+    sim.mailTake(parcel.id, bob);
+    expect(parcel.items).toHaveLength(0); // granted into Bob's bags
+    expect(rawRev(sim)).toBeGreaterThan(rev);
   });
 
   it('advances on rekey and purge only when something actually changed', () => {

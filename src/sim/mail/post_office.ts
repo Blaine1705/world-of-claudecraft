@@ -312,11 +312,12 @@ export class PostOffice {
   // Everything delivered to this player, via the bucket union (their stable
   // mail key plus their display name, the historical belongsTo dual-key rule).
   // A letter carries exactly one recipientKey, so the buckets never overlap
-  // and the union is duplicate-free. Cross-bucket order can differ from book
-  // order only when a player has legacy name-keyed letters; every consumer is
-  // order-insensitive (mailInfoFor sorts on a total order, take/read find by
-  // unique id, the rest count), pinned by tests/mail_index.test.ts and the
-  // mail suites. The ordering invariant the old per-call scan documented still
+  // and the union is duplicate-free. The result's order is NOT book order:
+  // cross-bucket order differs when a player has legacy name-keyed letters,
+  // and within a bucket an untrack/track bracket (rekey, the return flight)
+  // re-appends at the tail. Every consumer is order-insensitive (mailInfoFor
+  // sorts on a total order, take/read find by unique id, the rest count),
+  // pinned by tests/mail_index.test.ts and the mail suites. The ordering invariant the old per-call scan documented still
   // holds: update() (which lands due letters) runs to completion inside tick()
   // before any mail command or snapshot read observes a newly-due letter.
   private deliveredFor(meta: PlayerMeta): MailMessage[] {

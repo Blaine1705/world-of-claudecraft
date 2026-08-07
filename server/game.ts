@@ -5475,9 +5475,11 @@ export class GameServer {
 
   // Flush the per-pass selfWireJson bucket accumulators into the profiler,
   // beside the bcastSelf total they decompose. A method (not inline in the
-  // loop callback) so the flush path itself is testable: deleting it must
-  // redden tests/self_wire_phase_breakdown.test.ts, not silently zero the
-  // admin table forever.
+  // loop callback) so the flush BODY is testable directly, and the loop-side
+  // wiring (this call site next to the bcastSelf add, plus the per-pass
+  // selfWireNs.clear) is source-pinned by the same suite
+  // (tests/self_wire_phase_breakdown.test.ts), so deleting either cannot
+  // silently zero or inflate the admin table.
   private flushSelfWirePhases(): void {
     if (!this.perfDetailActive) return;
     for (const [phase, ns] of this.selfWireNs) {
@@ -6586,8 +6588,10 @@ export class GameServer {
       // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
       // crafter's own inv mirror on the next snapshot (the requester's side
       // rides the ordinary addItemInstance loot event). The durable order
-      // list itself converges through the per-tick `corder` self-delta for
-      // every affected viewer, not through this event.
+      // list itself converges through the `corder` self-delta for every
+      // affected viewer, not through this event: the actor on the next
+      // snapshot (their own command re-arms the corder gate), passive
+      // viewers within one CORDER_WIRE_HZ window.
       case 'open_commission_order':
         if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
           sim.openCommissionOrder(

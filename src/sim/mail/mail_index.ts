@@ -13,9 +13,11 @@
 // untrack(m) before splicing one out, rekey(m, newKey) for a recipient change,
 // and markRead(m) for the read flip; a mutation that re-arms delivery or the
 // read flag wholesale (the return flight) brackets its field writes with
-// untrack/track. Bucket order is book order per bucket; readers must not
-// depend on cross-bucket order (every current consumer sorts on a total order,
-// finds by unique id, or counts).
+// untrack/track. Bucket order is per-bucket APPEND order, which matches book
+// insertion order only until an untrack/track bracket (rekey, the return
+// flight) re-appends a letter at its bucket tail; readers must not depend on
+// bucket order at all (every current consumer sorts on a total order, finds
+// by unique id, or counts).
 //
 // `src/sim`-pure and clock-free: sim time is passed into every call, no rng,
 // no imports beyond types (enforced by tests/architecture.test.ts).
@@ -29,7 +31,10 @@ export interface IndexedLetter {
 }
 
 // Shared empty result for recipients with no letters; never mutated.
-const EMPTY_BUCKET: never[] = [];
+// Frozen: this is shared module-level state handed to every caller that reads
+// a missing bucket, so runtime-readonly (not just types-readonly) keeps a
+// stray push from corrupting every future empty read.
+const EMPTY_BUCKET: readonly never[] = Object.freeze([]);
 
 export class MailIndex<M extends IndexedLetter> {
   // Every letter in the book, bucketed by its recipientKey (each letter has
@@ -57,7 +62,9 @@ export class MailIndex<M extends IndexedLetter> {
   // Drop a letter's every contribution (the sweep/delete arm, and the first
   // half of an untrack/track mutation bracket).
   untrack(m: M, now: number): void {
-    this.bucketRemove(m);
+    // Idempotent: the unread decrement rides only on an ACTUAL bucket
+    // removal, so a double untrack (unreachable today) under-counts nothing.
+    if (!this.bucketRemove(m)) return;
     if (!m.read && now >= m.deliverAt) this.dec(m.recipientKey);
     this.undelivered.delete(m);
   }
@@ -67,8 +74,8 @@ export class MailIndex<M extends IndexedLetter> {
   // new key on the letter. A same-key call refreshes nothing and costs nothing.
   rekey(m: M, newKey: string, now: number): void {
     if (m.recipientKey === newKey) return;
-    this.bucketRemove(m);
-    if (!m.read && now >= m.deliverAt) {
+    const removed = this.bucketRemove(m);
+    if (removed && !m.read && now >= m.deliverAt) {
       this.dec(m.recipientKey);
       this.inc(newKey);
     }
@@ -135,13 +142,31 @@ export class MailIndex<M extends IndexedLetter> {
     else this.buckets.set(m.recipientKey, [m]);
   }
 
-  private bucketRemove(m: M): void {
+  private bucketRemove(m: M): boolean {
     const bucket = this.buckets.get(m.recipientKey);
-    if (!bucket) return;
-    const i = bucket.indexOf(m);
-    if (i < 0) return;
-    if (bucket.length === 1) this.buckets.delete(m.recipientKey);
-    else bucket.splice(i, 1);
+    if (bucket) {
+      const i = bucket.indexOf(m);
+      if (i >= 0) {
+        if (bucket.length === 1) this.buckets.delete(m.recipientKey);
+        else bucket.splice(i, 1);
+        return true;
+      }
+    }
+    // Desync fallback: a raw recipientKey write on a tracked letter (the
+    // legacy-blob purge shape tests/mail.test.ts seeds) leaves the letter
+    // filed under its OLD key while the field says the new one. Find it
+    // wherever it actually lives so rekey/untrack still account correctly;
+    // this scan runs only on the miss path, unreachable through the normal
+    // track/rekey discipline.
+    for (const [key, arr] of this.buckets) {
+      const i = arr.indexOf(m);
+      if (i >= 0) {
+        if (arr.length === 1) this.buckets.delete(key);
+        else arr.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
   }
 
   private inc(key: string): void {
