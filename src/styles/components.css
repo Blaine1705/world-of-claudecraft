@@ -5932,6 +5932,46 @@
     padding-top: 6px;
   }
 
+  /* ---------- WARFARE quartermaster shop ---------- */
+  /* The honor shop (#warfare-window, warfare_vendor_window.ts) is the vendor
+     family one sectioning level down: it reuses .vendor-goods-grid, .vendor-item,
+     .vi-name/.vi-sub/.vi-price, .vendor-section-title and the .warfare-price /
+     .warfare-balance honor classes verbatim, so only what SECTIONING needs is
+     authored here. It is its own window rather than a second tenant of
+     #vendor-window because the layout is structurally different (one section per
+     armor family plus jewelry and weapons) and wider than the goods grid.
+
+     Width follows the same shape #vendor-window uses, one step wider at the cap
+     because that many sections of tiles need the columns; it carries no #bags
+     companion, so the bags left-edge algebra that binds the vendor window does
+     not apply and the cap is a plain viewport fraction.
+
+     BOTH axes divide by --window-scale: #warfare-window sits inside #ui, which
+     carries zoom: var(--ui-scale), so a bare vh height overshoots the visible
+     viewport exactly as a bare vw width would. Same calc form every other
+     full-window desktop max-height in this sheet uses. */
+  #warfare-window {
+    width: max(400px, min(900px, calc(0.62 * (var(--app-vw, 100vw) / var(--window-scale)))));
+    max-height: calc(var(--app-vh, 100vh) * 0.78 / var(--window-scale) - 24px);
+    overflow-y: auto;
+  }
+  /* An unaffordable honor price tints like an unsatisfied cost everywhere else
+     in the language. Restated at the .warfare-price specificity because the
+     gold honor color would otherwise outrank the .vi-price.unaffordable rule
+     on the inner span. */
+  .vendor-item .vi-price .warfare-price.unaffordable {
+    color: var(--color-text-error);
+  }
+  /* A piece the viewer already wears or carries. The tile still sells (a second
+     copy is a legitimate purchase), so this is a marker beside the .vi-sub
+     "Owned" line, never a refusal. */
+  .vendor-item.warfare-owned {
+    border-left: 2px solid var(--gold);
+  }
+  .vendor-item.warfare-owned .vi-sub {
+    color: var(--gold);
+  }
+
   /* ---------- profession first-tier tutorial ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
@@ -7223,6 +7263,14 @@
      lock mark on the cell, and the always-visible legend line below the
      treasury row. */
   .gbank-dormant-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  /* The member read-only legends (its own class, never a second
+     gbank-dormant-note: the dormant selector must stay unambiguous). */
+  .gbank-readonly-note {
     flex: none;
     font-size: 11px;
     color: var(--color-text-muted);
@@ -13178,6 +13226,53 @@
   .equip-slot:focus-within .equip-unequip-btn,
   body.mobile-touch .equip-slot .equip-unequip-btn {
     opacity: 1;
+  }
+  /* The head socket's helmet-visibility eye: the unequip x's circle chrome, but
+     ALWAYS visible (a standing wardrobe control, not a destructive reveal) and
+     seated at the bottom corner so the two never overlap. */
+  .equip-slot .equip-helm-eye {
+    position: absolute;
+    bottom: -7px;
+    z-index: 2;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
+    color: var(--color-text-secondary, #d6c1a0);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .equip-slot .equip-helm-eye .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .equip-col:not(.equip-col-right) .equip-slot .equip-helm-eye {
+    left: calc(50% - 88px);
+  }
+  .equip-col-right .equip-slot .equip-helm-eye {
+    right: calc(50% - 88px);
+  }
+  .equip-slot .equip-helm-eye[aria-pressed="true"] {
+    color: rgba(214, 193, 160, 0.55);
+  }
+  .equip-slot .equip-helm-eye:hover,
+  .equip-slot .equip-helm-eye:focus-visible {
+    border-color: rgba(255, 218, 160, 0.8);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .equip-slot .equip-helm-eye {
+      transition: none;
+    }
   }
   .equip-slot .equip-unequip-btn:hover,
   .equip-slot .equip-unequip-btn:focus-visible {

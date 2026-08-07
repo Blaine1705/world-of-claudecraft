@@ -118,6 +118,7 @@ import { foulPlayGuardsBreak } from './rogue_talents';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
+import { applySetProcs } from './set_procs';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
@@ -1353,6 +1354,19 @@ export function handleDeath(
   // idiom, admin sweeps) never detonates the clutch (mob/dragonkin_brood.ts).
   if (e.kind === 'mob' && MOBS[e.templateId]?.broodEgg) e.broodCracked = true;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
+
+  // The `kill` set-proc trigger, dispatched here because this is the one place
+  // every death resolves. After the death emit so the event order players and
+  // the parity samplers observe is unchanged (the death lands first, any proc
+  // aura second), and before the threat sweep below so `e` is still a live
+  // object: only its dead flag and auras have been touched.
+  //
+  // This shifts no rng for existing characters: applySetProcs returns before
+  // touching ctx.rng when no equipped proc matches the trigger, and no shipped
+  // set declares a `kill` proc. Preserve that early return.
+  if (killer && killer.id !== e.id && !killer.dead) {
+    applySetProcs(ctx, killer, e, 'kill');
+  }
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn

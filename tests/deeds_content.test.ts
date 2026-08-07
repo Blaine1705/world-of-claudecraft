@@ -62,9 +62,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 259 deeds worth 3060 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(259);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3060);
+  it('ships exactly 262 deeds worth 3145 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(262);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
   });
 
   it('ships the audited per-category counts', () => {
@@ -77,7 +77,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 49,
       collection: 28,
-      pvp: 32,
+      pvp: 35,
       social: 18,
       exploration: 9,
       feat: 3,
@@ -187,6 +187,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_palmreach_first_cast',
       'chr_evergarden_gatherer',
       'chr_evergarden_first_cast',
+      'pvp_honor_sergeant',
+      'pvp_honor_knight_lieutenant',
+      'pvp_honor_field_marshal',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -434,14 +437,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 31 titles and 3 borders', () => {
+  it('ships exactly 34 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(31);
+    expect(titles.length).toBe(34);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(31);
+    expect(new Set(titleTexts).size).toBe(34);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -508,7 +511,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
   // already covered by the brood rework above). No shipped trigger or renown
   // changed on either side.
-  const FROZEN_CATALOG_SHA256 = 'edaa9bd88929ab1cb7c586e162577c41f2f52240d615ecbd4d308e5daec95a25';
+  const FROZEN_CATALOG_SHA256 = 'aad4cbd25ba6b1f12b31a4a385ed5cf65e454e31eade389653676f659634eb8c';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -702,7 +705,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_evergarden_first_cast');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_honor_field_marshal');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

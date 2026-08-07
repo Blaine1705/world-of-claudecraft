@@ -326,6 +326,8 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       },
       displayFacing: sim.player.facing,
       echoMs: 100,

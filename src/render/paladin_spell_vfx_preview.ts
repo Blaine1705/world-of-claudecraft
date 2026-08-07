@@ -24,6 +24,9 @@ const PREVIEW_STATE: AnimState = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 

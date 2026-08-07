@@ -42,6 +42,7 @@ function guildInfo(slots: InvSlot[]): GuildBankInfo {
     capacity: 12,
     purchasedSlots: 24,
     nextExpansionPrice: null,
+    canEdit: true,
   };
 }
 

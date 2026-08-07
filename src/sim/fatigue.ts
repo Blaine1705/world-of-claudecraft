@@ -11,12 +11,24 @@ import type { SimContext } from './sim_context';
 import type { Entity } from './types';
 import { inHollowOpenSea, waterLevel } from './world';
 
-const GRACE_TICKS = 160; // 8s of warning first: real time to turn around
-const PULSE_TICKS = 20; // then one pulse per second
+// The sea is a soft boundary, not a trap: now that the open water is genuinely
+// swimmable it is somewhere players go on purpose, so the whole clock runs five
+// times slower than the original turn-back timer. Every span below is expressed
+// through this one factor so the warn/grace/ramp shape stays intact — only the
+// pace changes.
+const SLOWDOWN = 5;
+const GRACE_TICKS = 160 * SLOWDOWN; // 40s of warning first: real time to turn around
+const PULSE_TICKS = 20 * SLOWDOWN; // then one pulse per five seconds
 const PULSE_PCT = 0.08; // rising: 8%, 16%, 24% ... of max hp
-const REWARN_TICKS = 80; // the on-screen warning repeats every 4s out there
+const REWARN_TICKS = 80 * SLOWDOWN; // the on-screen warning repeats every 20s out there
 
 export const FATIGUE_WARNING = 'The open sea saps your strength. Swim back to shore!';
+
+/** Ticks from entering the fatigue band to the FIRST damage pulse. Exported so
+ *  tests pin the pacing against the real constants: the previous timing was
+ *  baked into a test as a bare tick count, which silently went stale the moment
+ *  the clock was re-paced. */
+export const FATIGUE_FIRST_BITE_TICKS = GRACE_TICKS + PULSE_TICKS;
 
 export function updateSwimFatigue(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;

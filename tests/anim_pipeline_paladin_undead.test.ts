@@ -57,7 +57,7 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_paladin: {', 'player_hunter: {');
+    const block = manifestBlock('player_paladin: swims({', 'player_hunter: swims({');
     expect(block).toContain('paladin_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     // Cast_Verdict still ships in the donor but is unmapped on the composed
@@ -69,7 +69,7 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
   });
 
   it('every mapped ability id is a real paladin ability, and every referenced clip is shipped', () => {
-    const paladinBlock = manifestBlock('player_paladin: {', 'player_hunter: {');
+    const paladinBlock = manifestBlock('player_paladin: swims({', 'player_hunter: swims({');
     const abilityStart = paladinBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = paladinBlock.indexOf('\n      },', abilityStart);

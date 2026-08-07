@@ -165,6 +165,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
+  { name: 'setHelmHidden', kind: 'method' },
   { name: 'unstuck', kind: 'method' },
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
@@ -551,17 +552,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Fields adds the four battleground facet members (bgInfo data plus the
     // bgQueueJoin / bgQueueLeave / bgFlagAction commands), the
     // stop-auto-attack-on-target-switch setting adds
-    // setStopAutoAttackOnTargetSwitch (method), and the commission order board
+    // setStopAutoAttackOnTargetSwitch (method), the commission order board
     // (issue #1298) adds commissionOrders (data) plus openCommissionOrder/
     // cancelCommissionOrder/acceptCommissionOrder/deliverCommissionOrder
-    // (methods), leaving 299 on the v0.35.0 base. Composed with the
+    // (methods), and the paperdoll helmet-visibility eye adds setHelmHidden
+    // (method), leaving 300 on the v0.35.0 base. Composed with the
     // class-overhauls wave: Paladin Consecration ground-state, priest marker
     // projections, and the controlled Warlock pet's pet-bar mirror add three
     // data members; the pet's signature-skill command and autocast toggle add
-    // two methods, leaving 304.
-    expect(IWORLD_MEMBERS.length).toBe(304);
+    // two methods, leaving 305.
+    expect(IWORLD_MEMBERS.length).toBe(305);
     expect(DATA_MEMBERS.length).toBe(79);
-    expect(METHOD_MEMBERS.length).toBe(225);
+    expect(METHOD_MEMBERS.length).toBe(226);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -822,6 +824,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -1147,6 +1150,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -1350,6 +1354,7 @@ const FACET_COSMETICS = [
   'unequipMechChroma',
   'changeWeaponSkin',
   'toggleWeaponStow',
+  'setHelmHidden',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
 type _ExhaustCosmetics = AssertNever<
   Exclude<keyof IWorldCosmetics, (typeof FACET_COSMETICS)[number]>
@@ -1772,8 +1777,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(305);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(305);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

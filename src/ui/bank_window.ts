@@ -305,7 +305,7 @@ export class BankWindow {
   /** True while the window is open on the Guild pane: the bags companion
    *  reads this (via Hud) to route a bag click to guildBankDeposit. Also
    *  requires guildBankInfo to be live RIGHT NOW, so the one-frame window
-   *  between the mirror nulling (demotion, walk-away) and the slow-band
+   *  between the mirror nulling (walk-away, guild loss) and the slow-band
    *  repaint can never route a bag click at the guild facet. */
   get guildTabActive(): boolean {
     return (
@@ -316,7 +316,11 @@ export class BankWindow {
       // deposit the item they clicked (the whole point of that routing is that
       // the guild grid is on screen to drop into).
       this.guildPane.activeView === 'contents' &&
-      this.deps.world().guildBankInfo !== null
+      // A READ-ONLY viewer's contents pane is a reading surface too (every
+      // member sees the bank, only officer-plus may deposit): their bag click
+      // must not arm the guild deposit, so it falls to the same speak-path the
+      // Log view uses (bankOpen stays true, both deposit modes stay off).
+      (this.deps.world().guildBankInfo?.canEdit ?? false)
     );
   }
 
@@ -425,9 +429,10 @@ export class BankWindow {
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
     const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
-    // The Guild tab exists ONLY while guildBankInfo is non-null (officer-plus
-    // at a banker, online, book loaded). When it goes away mid-open (demotion,
-    // leave, a reconcile window), the strip disappears and the pane falls back
+    // The Guild tab exists ONLY while guildBankInfo is non-null (any guild
+    // member at a banker, online, book loaded; a plain member's pane renders
+    // read-only). When it goes away mid-open (leave,
+    // kick, a reconcile window), the strip disappears and the pane falls back
     // to Personal on this same paint; the whole-window walk-away close stays
     // refreshIfChanged's grace-close on bankInfo.
     const guildModel = this.guildPane.model();
@@ -619,17 +624,21 @@ export class BankWindow {
       return;
     }
     // The guild half rides the same signature: a guild op echo, an expansion,
-    // and the tab APPEARING or DISAPPEARING (rank change, reconcile window)
-    // each repaint; null collapses the whole guild arm so the strip drops and
+    // the tab APPEARING or DISAPPEARING (guild loss, reconcile window), and a
+    // canEdit flip (promotion or demotion at the banker: the buttons, action
+    // rows, note, and bag-click routing all change with it) each repaint; null
+    // collapses the whole guild arm so the strip drops and
     // the pane falls back to Personal in render(). Deliberately purse-free
     // (the guild enablement reads snapshot state only, see guild_bank_view.ts)
-    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0), the
+    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0) and
+    // the viewer may edit, the
     // open-the-bank row's shortfall marker reads the officer's own purse (rung
-    // 0 is purse-paid), so the purse joins the signature for that state only.
+    // 0 is purse-paid), so the purse joins the signature for that state only
+    // (a read-only member has no open row, so their pane stays purse-free).
     // Nesting the guild arm under the bankInfo null-gate above is safe because
     // guildBankInfoFor's gate is a strict SUPERSET of bankInfoFor's (same
-    // banker proximity, plus alive + officer-plus + a loaded book): guildBank
-    // can never be non-null while bankInfo is null.
+    // banker proximity, plus alive + guild membership + a loaded book):
+    // guildBank can never be non-null while bankInfo is null.
     const g = this.deps.world().guildBankInfo;
     const sig = JSON.stringify([
       info.capacity,
@@ -643,7 +652,8 @@ export class BankWindow {
         g.purchasedSlots,
         g.nextExpansionPrice,
         g.slots,
-        g.purchasedSlots === 0 ? this.deps.world().copper : null,
+        g.canEdit,
+        g.purchasedSlots === 0 && g.canEdit ? this.deps.world().copper : null,
       ],
       // The activity log's own repaint arm, and NULL unless the log view is
       // actually open: the log is fetched on demand by reading it, so pulling
