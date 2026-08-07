@@ -13,6 +13,7 @@ export const CHAT_TAB_CHANNELS = [
   'say',
   'yell',
   'party',
+  'battleground',
   'general',
   'world',
   'lfg',
@@ -58,6 +59,7 @@ const CHANNEL_SEND_PREFIX: Record<ChatTabChannel, string> = {
   say: '/say ',
   yell: '/y ',
   party: '/p ',
+  battleground: '/bg ',
   general: '/general ',
   world: '/world ',
   lfg: '/lfg ',
@@ -82,6 +84,7 @@ export const CHANNEL_LABEL_KEYS: Record<ChatTabChannel, TranslationKey> = {
   say: 'hud.core.chatChannels.names.say',
   yell: 'hud.core.chatChannels.names.yell',
   party: 'hud.core.chatChannels.names.party',
+  battleground: 'hud.core.chatChannels.names.battleground',
   general: 'hud.core.chatChannels.names.general',
   world: 'hud.core.chatChannels.names.world',
   lfg: 'hud.core.chatChannels.names.lfg',
@@ -111,6 +114,7 @@ const CHAT_CHANNEL_COLORS: Record<ChatColorChannel, string> = {
   say: '#f0ead8',
   yell: '#ff5040',
   party: '#7fd4ff',
+  battleground: '#9ad8a0',
   general: '#ffc864',
   world: '#ff9d5c',
   lfg: '#5cd6a0',
@@ -181,6 +185,7 @@ export function sentLineChannel(line: string): ChatTabChannel | null {
   if (text.startsWith('!')) return null;
   if (!text.startsWith('/')) return 'say';
   if (/^\/p(arty)?\s/i.test(text)) return 'party';
+  if (/^\/bg\s/i.test(text)) return 'battleground';
   if (/^\/y(ell)?\s/i.test(text)) return 'yell';
   if (/^\/s(ay)?\s/i.test(text)) return 'say';
   if (/^\/gu(ild)?\s/i.test(text)) return 'guild';

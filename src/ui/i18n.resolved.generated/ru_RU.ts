@@ -6826,6 +6826,7 @@ export const ru_RU: EnTranslations = {
           "say": "Сказать",
           "yell": "Крик",
           "party": "Группа",
+          "battleground": "Поле боя",
           "general": "Общий",
           "world": "Мир",
           "lfg": "Поиск группы",
@@ -6987,6 +6988,7 @@ export const ru_RU: EnTranslations = {
     "chat": {
       "rightClickName": "ПКМ по {name}",
       "templates": {
+        "battleground": "[Поле боя] {name}: {message}",
         "party": "[Группа] {name}: {message}",
         "yell": "{name} кричит: {message}",
         "whisper": "{name} шепчет: {message}",

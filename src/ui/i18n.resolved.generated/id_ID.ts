@@ -6826,6 +6826,7 @@ export const id_ID: EnTranslations = {
           "say": "Berkata",
           "yell": "Berteriak",
           "party": "Party",
+          "battleground": "Battleground",
           "general": "Umum",
           "world": "Dunia",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const id_ID: EnTranslations = {
     "chat": {
       "rightClickName": "Klik kanan {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",

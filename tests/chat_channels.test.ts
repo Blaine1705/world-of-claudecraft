@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CHANNEL_LABEL_KEYS,
   CHAT_TAB_CHANNELS,
   channelNeedsJoin,
   channelSendPrefix,
@@ -437,5 +438,33 @@ describe('chat channel tabs — pure model', () => {
         }
       }
     });
+  });
+});
+
+describe('chat channel tabs — the battleground channel', () => {
+  // /bg reaches BOTH teams in the match. Before it existed the only way to say
+  // anything to the opposing side was General, which broadcasts realm-wide.
+  it('is a bindable tab channel with its own prefix and needs no /join', () => {
+    expect(CHAT_TAB_CHANNELS).toContain('battleground');
+    expect(channelSendPrefix('battleground')).toBe('/bg ');
+    expect(channelNeedsJoin('battleground')).toBe(false);
+  });
+
+  it('prefixes plain text typed on the tab, and never a typed slash command', () => {
+    expect(composeChatLine('battleground', 'nice flag grab')).toBe('/bg nice flag grab');
+    expect(composeChatLine('battleground', '/p regroup')).toBe('/p regroup');
+  });
+
+  it('sticks after a /bg line so the next plain line stays in the match', () => {
+    expect(sentLineChannel('/bg gg')).toBe('battleground');
+    expect(sentLineChannel('/BG gg')).toBe('battleground');
+    // Not a prefix match on other commands that begin with b.
+    expect(sentLineChannel('/bgsomething gg')).toBeNull();
+  });
+
+  it('carries a tab label and a log color distinct from party', () => {
+    expect(CHANNEL_LABEL_KEYS.battleground).toBe('hud.core.chatChannels.names.battleground');
+    expect(chatChannelColor('battleground')).not.toBe(chatChannelColor('say'));
+    expect(chatChannelColor('battleground')).not.toBe(chatChannelColor('party'));
   });
 });

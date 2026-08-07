@@ -6826,6 +6826,7 @@ export const nl_NL: EnTranslations = {
           "say": "Zeggen",
           "yell": "Schreeuwen",
           "party": "Groep",
+          "battleground": "Battleground",
           "general": "Algemeen",
           "world": "Wereld",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const nl_NL: EnTranslations = {
     "chat": {
       "rightClickName": "Klik met rechts op {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Groep] {name}: {message}",
         "yell": "{name} schreeuwt: {message}",
         "whisper": "{name} fluistert: {message}",

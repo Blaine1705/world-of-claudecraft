@@ -10,22 +10,34 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "es_ES": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "fr_FR": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "fr_CA": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "de_DE": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "zh_CN": [],
@@ -33,31 +45,49 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "nl_NL": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "pl_PL": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "id_ID": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "tr_TR": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "sv_SE": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "vi_VN": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "da_DK": [
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote"
   ]
 };

@@ -6826,6 +6826,7 @@ export const tr_TR: EnTranslations = {
           "say": "Söyle",
           "yell": "Bağır",
           "party": "Grup",
+          "battleground": "Battleground",
           "general": "Genel",
           "world": "Dünya",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const tr_TR: EnTranslations = {
     "chat": {
       "rightClickName": "{name} oyuncusuna sağ tıkla",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grup] {name}: {message}",
         "yell": "{name} bağırıyor: {message}",
         "whisper": "{name} fısıldıyor: {message}",

@@ -1111,6 +1111,7 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 // keys the MovableFrames read.
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
+  battleground: 'hud.chat.templates.battleground',
   yell: 'hud.chat.templates.yell',
   whisper: 'hud.chat.templates.whisper',
   toWhisper: 'hud.chat.templates.toWhisper',
@@ -11985,6 +11986,18 @@ export class Hud {
                 ev.text,
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
+                ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
+                ev.classId,
+              );
+              break;
+            case 'battleground':
+              this.chatLogFrom(
+                ev.from,
+                ev.text,
+                CHAT_TEMPLATE_KEYS.battleground,
+                'battleground',
                 ev.fromPid,
                 ev.flair,
                 ev.fromTitle,

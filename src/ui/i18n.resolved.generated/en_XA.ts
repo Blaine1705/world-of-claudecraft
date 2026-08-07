@@ -6826,6 +6826,7 @@ export const en_XA: EnTranslations = {
           "say": "[Šáý]",
           "yell": "[Ýéļļ]",
           "party": "[Þáŕţý]",
+          "battleground": "[Ɓáţţļéĝŕóúñð]",
           "general": "[Ĝéñéŕáļ]",
           "world": "[Ŵóŕļð]",
           "lfg": "[ĻƑĜ]",
@@ -6987,6 +6988,7 @@ export const en_XA: EnTranslations = {
     "chat": {
       "rightClickName": "[Ŕíĝĥţ-çļíçķ {name}]",
       "templates": {
+        "battleground": "[[Ɓáţţļéĝŕóúñð] {name}: {message}]",
         "party": "[[Þáŕţý] {name}: {message}]",
         "yell": "[{name} ýéļļš: {message}]",
         "whisper": "[{name} ŵĥíšþéŕš: {message}]",

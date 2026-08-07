@@ -6826,6 +6826,7 @@ export const zh_TW: EnTranslations = {
           "say": "說話",
           "yell": "大喊",
           "party": "隊伍",
+          "battleground": "戰場",
           "general": "綜合",
           "world": "世界",
           "lfg": "尋求組隊",
@@ -6987,6 +6988,7 @@ export const zh_TW: EnTranslations = {
     "chat": {
       "rightClickName": "右鍵點擊 {name}",
       "templates": {
+        "battleground": "[戰場] {name}：{message}",
         "party": "[隊伍] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄說：{message}",

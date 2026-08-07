@@ -6826,6 +6826,7 @@ export const ja_JP: EnTranslations = {
           "say": "発言",
           "yell": "叫び",
           "party": "パーティ",
+          "battleground": "戦場",
           "general": "一般",
           "world": "ワールド",
           "lfg": "仲間募集",
@@ -6987,6 +6988,7 @@ export const ja_JP: EnTranslations = {
     "chat": {
       "rightClickName": "{name}を右クリック",
       "templates": {
+        "battleground": "[戦場] {name}: {message}",
         "party": "[パーティ] {name}: {message}",
         "yell": "{name}の叫び: {message}",
         "whisper": "{name}のささやき: {message}",

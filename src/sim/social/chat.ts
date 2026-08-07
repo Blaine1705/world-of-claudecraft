@@ -796,6 +796,34 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'party', message: clean };
   }
 
+  // "/bg message" reaches everyone in the sender's battleground, BOTH teams.
+  // Cross-team by design: before this existed the only way to say anything to
+  // the opposing side was General, which broadcasts it to the whole realm.
+  // The team already has /p (the match welds each side into one party), so a
+  // team-only duplicate here would be the redundant half, not this one.
+  if (/^\/bg\s/i.test(raw)) {
+    const clean = raw.replace(/^\/bg\s+/i, '').trim();
+    if (!clean) return null;
+    const match = ctx.bgMatches.get(r.meta.entityId);
+    if (!match) {
+      ctx.error(r.meta.entityId, 'You are not in a battleground.');
+      return null;
+    }
+    for (const mPid of [...match.teams[0], ...match.teams[1]]) {
+      ctx.emit({
+        type: 'chat',
+        fromPid: r.meta.entityId,
+        from: r.meta.name,
+        ...speakerTitle(r.meta),
+        ...speakerClass(r.meta),
+        text: clean,
+        channel: 'battleground',
+        pid: mPid,
+      });
+    }
+    return { channel: 'battleground', message: clean };
+  }
+
   // "/g message" / "/1 message": world-wide general channel (no pid = broadcast to
   // all). "/1" is the classic numbered-channel shortcut for General; unlike "/g" it
   // is never claimed by the online guild router, so it always reaches General.
@@ -1049,7 +1077,7 @@ export function playEmote(ctx: SimContext, emoteId: OverheadEmoteId, pid?: numbe
 // in sync with the commands handled in chat() above.
 export function helpLines(): string[] {
   return [
-    'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
+    'Chat channels: /s say, /y yell, /general, /p party, /bg battleground, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
     'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',

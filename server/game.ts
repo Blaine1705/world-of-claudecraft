@@ -1187,7 +1187,18 @@ interface WhoRosterRow {
 }
 
 type RememberedChat =
-  | { channel: 'say' | 'yell' | 'general' | 'party' | 'guild' | 'officer' | 'world' | 'lfg' }
+  | {
+      channel:
+        | 'say'
+        | 'yell'
+        | 'general'
+        | 'party'
+        | 'battleground'
+        | 'guild'
+        | 'officer'
+        | 'world'
+        | 'lfg';
+    }
   | { channel: 'whisper'; target: string };
 
 // Identity fields rarely change, so they ride only in "full" records: on an
@@ -9468,6 +9479,11 @@ export class GameServer {
           return this.sim.chat(`/w ${session.rememberedChat.target} ${body}`, pid);
         case 'party':
           return this.sim.chat(`/p ${body}`, pid);
+        // Sticky like every other channel. Out of a match the sim answers with
+        // its own "not in a battleground" refusal, the same way a plain line
+        // sticky to party does once the party is gone.
+        case 'battleground':
+          return this.sim.chat(`/bg ${body}`, pid);
         case 'general':
           return this.sim.chat(`/general ${body}`, pid);
         case 'world':

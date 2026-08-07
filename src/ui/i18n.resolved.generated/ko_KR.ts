@@ -6826,6 +6826,7 @@ export const ko_KR: EnTranslations = {
           "say": "말하기",
           "yell": "외치기",
           "party": "파티",
+          "battleground": "전장",
           "general": "일반",
           "world": "전체",
           "lfg": "파티 찾기",
@@ -6987,6 +6988,7 @@ export const ko_KR: EnTranslations = {
     "chat": {
       "rightClickName": "{name} 우클릭",
       "templates": {
+        "battleground": "[전장] {name}: {message}",
         "party": "[파티] {name}: {message}",
         "yell": "{name} 외침: {message}",
         "whisper": "{name} 귓속말: {message}",

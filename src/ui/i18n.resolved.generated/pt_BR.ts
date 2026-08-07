@@ -6826,6 +6826,7 @@ export const pt_BR: EnTranslations = {
           "say": "Dizer",
           "yell": "Gritar",
           "party": "Grupo",
+          "battleground": "Battleground",
           "general": "Geral",
           "world": "Mundo",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const pt_BR: EnTranslations = {
     "chat": {
       "rightClickName": "Clique direito em {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grupo] {name}: {message}",
         "yell": "{name} grita: {message}",
         "whisper": "{name} sussurra: {message}",

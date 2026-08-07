@@ -6826,6 +6826,7 @@ export const vi_VN: EnTranslations = {
           "say": "Nói",
           "yell": "Hét",
           "party": "Tổ Đội",
+          "battleground": "Battleground",
           "general": "Chung",
           "world": "Thế Giới",
           "lfg": "Tìm Đội",
@@ -6987,6 +6988,7 @@ export const vi_VN: EnTranslations = {
     "chat": {
       "rightClickName": "Nhấp chuột phải {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",

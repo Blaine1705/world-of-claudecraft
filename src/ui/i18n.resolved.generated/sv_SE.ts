@@ -6826,6 +6826,7 @@ export const sv_SE: EnTranslations = {
           "say": "Säg",
           "yell": "Ropa",
           "party": "Grupp",
+          "battleground": "Battleground",
           "general": "Allmänt",
           "world": "Världen",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const sv_SE: EnTranslations = {
     "chat": {
       "rightClickName": "Högerklicka på {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",

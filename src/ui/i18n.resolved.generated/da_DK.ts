@@ -6826,6 +6826,7 @@ export const da_DK: EnTranslations = {
           "say": "Sig",
           "yell": "Råb",
           "party": "Gruppe",
+          "battleground": "Battleground",
           "general": "Generelt",
           "world": "Verden",
           "lfg": "LFG",
@@ -6987,6 +6988,7 @@ export const da_DK: EnTranslations = {
     "chat": {
       "rightClickName": "Højreklik på {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Gruppe] {name}: {message}",
         "yell": "{name} råber: {message}",
         "whisper": "{name} hvisker: {message}",

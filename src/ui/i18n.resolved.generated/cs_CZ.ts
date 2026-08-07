@@ -6826,6 +6826,7 @@ export const cs_CZ: EnTranslations = {
           "say": "Říct",
           "yell": "Křik",
           "party": "Skupina",
+          "battleground": "Battleground",
           "general": "Obecné",
           "world": "Svět",
           "lfg": "Hledání skupiny",
@@ -6987,6 +6988,7 @@ export const cs_CZ: EnTranslations = {
     "chat": {
       "rightClickName": "Pravé kliknutí na {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Skupina] {name}: {message}",
         "yell": "{name} křičí: {message}",
         "whisper": "{name} šeptá: {message}",
