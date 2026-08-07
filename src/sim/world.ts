@@ -61,7 +61,7 @@ import {
   terrainRegionHas,
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
-import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';
+import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
 
@@ -1511,7 +1511,7 @@ export function crossesGardenHedge(
 // border is the vertical ridge the border-edge machinery raises along the
 // shared column edge, opened at the Windway (westPassZ 3380).
 // ---------------------------------------------------------------------------
-const GALE_XMIN = 180; // keep in sync with GALECREST_ZONE.xMin
+const _GALE_XMIN = 180; // keep in sync with GALECREST_ZONE.xMin
 const GALE_ZMIN = 180;
 const GALE_ZMAX = 700;
 const GALE_LAND_LOBES = [

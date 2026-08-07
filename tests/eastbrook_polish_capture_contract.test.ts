@@ -61,8 +61,15 @@ interface AttributionTargetFixture {
 // dirty-input verdict, the one-step remint command) instead of a raw object
 // diff; see provenance_diagnostics.mjs for the 2026-08-05 stale-mint root
 // cause this legibility exists to prevent.
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply
+// queue moves src/render/renderer.ts, and the PR-side ability VFX warm-up
+// moves src/render/renderer.ts plus src/render/prewarm_policy.ts. Those
+// runtimeRender leaves re-mint the composite. No Eastbrook input, geometry
+// value, or capture moved.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
+// back while PR #2982's prewarm policy remains in the release.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
+  '5b297a49a72ed500537f7a92683051b6fc219264a8b36ae204eb62bc64d6f672';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

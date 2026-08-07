@@ -95,6 +95,30 @@ const PR_TIER_EVENT_FRAGMENT =
 // via needs regardless, which requiring "Detect code path changes" closes.)
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
+// pr-gate alone splits those two arms across levels (the docs-only matrix
+// collapse fix): the JOB if carries only the event routing, so every
+// pull_request and merge_group run expands the shard matrix and reports all
+// eight suffixed check runs, and EVERY step carries the release-to-main
+// exclusion plus the code arm, so a leg the run does not apply to no-ops
+// green under its required suffixed name. A job-level skip of a MATRIX job
+// collapses to one check run WITHOUT the (N) suffix, which string-matches
+// none of the required shard contexts and leaves them "expected" forever
+// (observed live on the Phase 3 queue drills, PR #3038), which is why the
+// job if must never regain either gate arm. The step gate keeps the
+// != 'false' fail-closed polarity for the same reason PR_TIER_IF_LINE does.
+const PR_GATE_JOB_IF_LINE =
+  "    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group'";
+const PR_GATE_STEP_GATE_LINE =
+  "        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'";
+
+/** Escape a literal for embedding in a RegExp source. */
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// The step gate as an anchored regex segment for the step-shape pins below:
+// the EXACT literal, escaped and newline-terminated, so an anchored step pin
+// on pr-gate admits precisely the gate and nothing else (an `if: false`
+// neutering mutation still breaks the shape).
+const PR_GATE_STEP_GATE_RE_SEGMENT = `${escapeRe(PR_GATE_STEP_GATE_LINE)}\n`;
+
 // Minimum code path set the changes job must classify as code=true (D10).
 // Each row pairs the original inline-YAML glob with a representative path;
 // the pin is behavioral (through scripts/lib/ci_change_classify.mjs) because
@@ -362,14 +386,36 @@ describe('CI workflow parity', () => {
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
-    for (const job of [prGate, prLongSims, prChecks]) {
+    for (const job of [prLongSims, prChecks]) {
       // Exact composed if: event routing AND code path filter (D10). Dropping
-      // either arm breaks release-to-main exclusion or docs-only skip.
+      // either arm breaks release-to-main exclusion or docs-only skip. These
+      // two are non-matrix jobs, so a job-level skip keeps the exact required
+      // name and satisfies protection; only pr-gate needs the split below.
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
       expect(ifLines).toEqual([PR_TIER_IF_LINE]);
       expect(job).toContain(PR_TIER_EVENT_FRAGMENT);
       expect(job).toContain("needs.changes.outputs.code != 'false'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
+    }
+    // pr-gate: the same two arms, split across levels (see
+    // PR_GATE_JOB_IF_LINE). Exactly one job-level if, equal to the event-only
+    // literal; the step gate on EVERY step, count pinned to the parsed step
+    // list so a new step cannot land ungated and silently run (or leak work)
+    // on a docs-only or release-to-main leg. Space classes are literal spaces,
+    // not \s, so a blank line cannot be absorbed into an indent match; and the
+    // step count matches EVERY list item start, named or not, because a
+    // nameless `- uses:` step is legal YAML and a `- name: `-only sweep would
+    // let it land ungated (fix-round mutation M7).
+    {
+      const jobIfLines = prGate.match(/^ {4}if: .+$/gm) ?? [];
+      expect(jobIfLines).toEqual([PR_GATE_JOB_IF_LINE]);
+      const stepIfLines = prGate.match(/^ {8}if: .+$/gm) ?? [];
+      const stepStarts = prGate.match(/^ {6}- /gm) ?? [];
+      // Vacuity floor near the real step count (checkout, pnpm, node,
+      // install, cache, run): an empty parse must never pass the sweep.
+      expect(stepStarts.length).toBeGreaterThanOrEqual(6);
+      expect(stepIfLines).toEqual(stepStarts.map(() => PR_GATE_STEP_GATE_LINE));
+      expect(prGate).not.toContain('I18N_RELEASE_TIER');
     }
     // Both release jobs share the exact same job-level if line so they skip or
     // run together. Exact-line match (not bare toContain of the fragment) so a
@@ -421,7 +467,7 @@ describe('CI workflow parity', () => {
       // Anchored to the start of a step line, so a YAML-commented-out step
       // (`#        run: npm run build:server`) cannot satisfy it: the substring
       // survives the comment, the anchored form does not.
-      expect(prChecks).toMatch(new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+      expect(prChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(prGate).not.toContain(step);
       expect(prLongSims).not.toContain(step);
     }
@@ -458,9 +504,7 @@ describe('CI workflow parity', () => {
     for (const step of CHECK_RUN_STEPS) {
       // Same anchored form as the PR-tier loop: a YAML-commented-out step must
       // not satisfy the pin.
-      expect(releaseChecks).toMatch(
-        new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`),
-      );
+      expect(releaseChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(releaseGate).not.toContain(step);
     }
     // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus ten
@@ -491,12 +535,16 @@ describe('CI workflow parity', () => {
     const changes = jobSource('changes');
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
     // Phase 2: the selection decision rides the same job's outputs, from the
     // same single classifier step, so the two decisions cannot come from
     // different listing snapshots.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode: ${{ steps.filter.outputs.test_mode }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('changed_files: ${{ steps.filter.outputs.changed_files }}');
     // Anchored, not toContain: a YAML-commented-out step keeps the substring
     // but loses the indented shape, and this one line is the whole classifier.
@@ -521,6 +569,7 @@ describe('CI workflow parity', () => {
     expect(changes).toMatch(/\n {4}timeout-minutes: [1-9]\n/);
     // The API call authenticates with the workflow token via env (never
     // secrets.* and never string-interpolated into the run line).
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('GITHUB_TOKEN: ${{ github.token }}');
     // changes must always run (no job-level if). Gating it to pull_request only
     // would leave needs.changes dependents skipped on push to main/dev.
@@ -531,6 +580,7 @@ describe('CI workflow parity', () => {
     expect(detectEntry).toContain("from './lib/ci_change_classify.mjs'");
     expect(detectEntry).toContain('detectCode');
     expect(detectEntry).toContain('GITHUB_OUTPUT');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('code=${code}');
     // Phase 2 wiring: the entry derives the test mode from the SAME listing
     // (lib/ci_test_select.mjs) and writes all three selection outputs; the
@@ -538,6 +588,7 @@ describe('CI workflow parity', () => {
     // tests/ci_change_classify.test.ts.
     expect(detectEntry).toContain("from './lib/ci_test_select.mjs'");
     expect(detectEntry).toContain('decideTestMode');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('test_mode=${modeDecision.mode}');
     expect(detectEntry).toContain('changed_files=${JSON.stringify(');
     for (const [, sample] of CODE_PATH_SAMPLES) {
@@ -863,6 +914,7 @@ describe('CI workflow parity', () => {
     expect(prGate).toMatch(
       new RegExp(
         String.raw`- name: Run tests \(PR tier, shard \$\{\{ matrix\.shard \}\} of ${SHARD_N}\)\n` +
+          PR_GATE_STEP_GATE_RE_SEGMENT +
           String.raw` {8}env:\n` +
           String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
           String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
@@ -979,23 +1031,35 @@ describe('CI workflow parity', () => {
     // Name-to-uses adjacency plus the path and key lines, TERMINATED BY THE
     // BLANK LINE THAT ENDS THE STEP: a YAML-commented-out copy cannot satisfy
     // it, and neither can a step neutered by an appended `if:` or any other
-    // trailing key (the mutation that beat the pin's first draft).
-    // One shared prefix and hashFiles tail for every copy of the step, so
-    // the shard and lane regexes cannot drift apart: an edit to the key's
-    // input list either moves all three ci.yml key lines or goes red here.
-    const cacheStepPrefix = String.raw`- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
+    // trailing key (the mutation that beat the pin's first draft). pr-gate's
+    // copy is the one exception, and only for the EXACT step gate literal
+    // (PR_GATE_STEP_GATE_LINE, required by its shape here): any other if,
+    // including an `if: false` neuter, still breaks the pin, and release-gate
+    // and the lane still admit no if at all.
+    // One shared name line, body, and hashFiles tail for every copy of the
+    // step, so the shard and lane regexes cannot drift apart: an edit to the
+    // key's input list either moves all three ci.yml key lines or goes red
+    // here.
+    const cacheStepName = String.raw`- name: Cache vitest transform cache\n`;
+    const cacheStepBody = String.raw`(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
     const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n`;
-    const cacheStepRe = new RegExp(
-      `${cacheStepPrefix}${String.raw`shard\$\{\{ matrix\.shard \}\}`}${cacheKeyTail}`,
+    const shardKeySegment = String.raw`shard\$\{\{ matrix\.shard \}\}`;
+    const prGateCacheStepRe = new RegExp(
+      `${cacheStepName}${PR_GATE_STEP_GATE_RE_SEGMENT}${cacheStepBody}${shardKeySegment}${cacheKeyTail}`,
+    );
+    const releaseCacheStepRe = new RegExp(
+      `${cacheStepName}${cacheStepBody}${shardKeySegment}${cacheKeyTail}`,
     );
     // The lane job (Phase 4 rider) carries the same step with a lane key
     // segment where the matrices carry shard${{ matrix.shard }}: the lane has
     // no matrix, so the shard expression would render empty there, and the
     // lane's store earns its own entry rather than borrowing a shard's.
-    const laneCacheStepRe = new RegExp(`${cacheStepPrefix}lane-long-sims${cacheKeyTail}`);
+    const laneCacheStepRe = new RegExp(
+      `${cacheStepName}${cacheStepBody}lane-long-sims${cacheKeyTail}`,
+    );
     for (const [name, stepRe] of [
-      ['pr-gate', cacheStepRe],
-      ['release-gate', cacheStepRe],
+      ['pr-gate', prGateCacheStepRe],
+      ['release-gate', releaseCacheStepRe],
       ['pr-long-sims', laneCacheStepRe],
     ] as const) {
       const job = jobSource(name);

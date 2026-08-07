@@ -24,6 +24,7 @@ import { REACH_DECKS, reachDeckSurface } from '../src/sim/reach_decks';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
 import { groundHeight, terrainHeight, terrainSteepness, WATER_LEVEL } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // The shipped seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -141,9 +142,11 @@ function makeSimWalker(spot: { x: number; z: number }) {
   const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
   sim.setPlayerLevel(20);
   const p = sim.player;
-  const meta = (
-    sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }
-  ).players.get((sim as unknown as { playerId: number }).playerId)!;
+  const meta = expectDefined(
+    (sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }).players.get(
+      (sim as unknown as { playerId: number }).playerId,
+    ),
+  );
   p.pos.x = spot.x;
   p.pos.z = spot.z;
   p.pos.y = groundHeight(spot.x, spot.z, SEED) + 0.05;

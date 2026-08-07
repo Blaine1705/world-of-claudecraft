@@ -802,7 +802,7 @@ function outsideWorldBy(x: number, z: number): number {
 /** Seabed the beyond-rim band settles to (under WATER_LEVEL, gentle). */
 const BEYOND_RIM_SEABED = WATER_LEVEL - 6;
 
-export function farVertexHeight(x: number, z: number, spacing: number, seed: number): number {
+export function farVertexHeight(x: number, z: number, _spacing: number, seed: number): number {
   // Beyond the world rect the heightfield is unauthored procedural noise:
   // under the old fog it was never seen, but fog-free it reads as random
   // cone hills standing offshore. The margin band exists to seat the rim

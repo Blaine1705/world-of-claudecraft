@@ -1823,7 +1823,13 @@ export const zh_CN: EnTranslations = {
       "saveButton": "保存专注",
       "notInTownHint": "你必须在城镇中才能设置专注。",
       "increaseAria": "增加对{component}的专注",
-      "decreaseAria": "减少对{component}的专注"
+      "decreaseAria": "减少对{component}的专注",
+      "respecTierLabel": "重新分配速度",
+      "respecTierTimeOption": "免费（花费时间）",
+      "respecTierPartialOption": "更快（少量花费）",
+      "respecTierInstantOption": "即时（全额花费）",
+      "respecCostFree": "免费",
+      "respecCostLine": "花费 {coin} 和 {materials}"
     },
     "party": {
       "promoteLeader": "提升为队长",
@@ -2071,7 +2077,7 @@ export const zh_CN: EnTranslations = {
       "hostile": "敌对",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "Boss"
+      "boss": "首领"
     },
     "targetFrame": {
       "unlock": "移动目标框",
@@ -4118,7 +4124,7 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
-      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
+      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -7561,6 +7567,8 @@ export const zh_CN: EnTranslations = {
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
       "collectNote": "商人为你保管的收益和退回货物。",
       "saleProceeds": "销售收益",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
       "collectAll": "全部领取"
     },
     "logs": {

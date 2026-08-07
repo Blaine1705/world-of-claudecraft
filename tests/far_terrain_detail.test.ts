@@ -58,6 +58,7 @@ describe('the spliced detail', () => {
     // The tiles carry position, normal, colour and a grass weight. There is no uv
     // attribute and there must not need to be one.
     expect(SRC).toContain('texture2D(uFarDetail, vFarXZ *');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
     expect(SRC).toContain('${(1 / FAR_DETAIL_YARDS).toFixed(6)}');
     expect(SRC).not.toContain('uFarDetail, vUv');
   });
@@ -74,11 +75,14 @@ describe('the spliced detail', () => {
     // Albedo variation alone leaves coarse flat-shaded triangles each taking one
     // light value, which is what reads as plastic at range.
     expect(SRC).toContain('normal = normalize(normal + (viewMatrix');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
     expect(SRC).toContain('${FAR_DETAIL_NORMAL.toFixed(4)} * uFarDetailAmt');
   });
 
   it('interpolates the shipped constants rather than hand-typed numbers', () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
     expect(SRC).toContain('${(1 - FAR_DETAIL_GRAIN).toFixed(4)}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
     expect(SRC).toContain('${(1 + FAR_DETAIL_GRAIN).toFixed(4)}');
   });
 

@@ -76,21 +76,32 @@ the Checks tab (filter by event: merge_group).
 Required on both `main` and `release/**`, all sourced from GitHub Actions:
 
 - `Detect code path changes`. Required itself, and load-bearing: when it fails,
-  its dependents report skipped, and branch protection treats skipped as
-  satisfied. Requiring the job that decides closes that hole for a classifier
-  FAILURE. The residual is inherent to CI-config-in-repo: a queue run executes
+  its non-matrix dependents report skipped under their exact names, and branch
+  protection treats skipped as satisfied (the shard matrix instead collapses to
+  an unsuffixed check run, which blocks by accident rather than by decision).
+  Requiring the job that decides closes that hole for a classifier FAILURE.
+  The residual is inherent to CI-config-in-repo: a queue run executes
   the queued tree's own copy of ci.yml and the classifier, so an honest
   mistake there is caught only because the workflow files
   (`.github/workflows/`) and the selection pipeline's own scripts are
   themselves fail-closed triggers (always `code=true`, always full mode); a
   hostile edit is a review problem, not something protection can solve.
 - `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
+  The matrix legs START on every `pull_request` and `merge_group` run and gate
+  their work at STEP level: on a run the suite does not apply to (a docs-only
+  PR, a release-to-main PR) each leg skips its steps and reports green in
+  seconds under its suffixed name. This is deliberate, not waste: a job-level
+  skip of a MATRIX job collapses to one check run WITHOUT the `(N)` suffix,
+  which string-matches none of these required contexts and leaves them
+  "expected" forever, so the PR could never be queued or merged (observed live
+  on the Phase 3 queue drills).
 - `PR gate (long sims)`: the dedicated lane for the long rotation sims
   (`CI_LONG_SUITES` in `scripts/lib/ci_shard_plan.mjs`). The shard matrix
   deliberately excludes those files, so this job carries coverage nothing else
   in the run has: it is required for the same reason the shards are. It runs
-  (or docs-only-skips) on every `pull_request` and `merge_group` run, exactly
-  like the shards.
+  (or docs-only-skips) on every `pull_request` and `merge_group` run; unlike
+  the shard matrix, a job-level skip is safe here because a non-matrix job's
+  skipped check run keeps its exact required name, which satisfies protection.
 - `PR checks (freshness, typecheck, builds)`.
 - `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue
@@ -114,7 +125,10 @@ Never require these, deliberately:
 
 The same rule generalizes: a check may only join the required list if ci.yml
 produces (or explicitly skips) it on every `pull_request` AND every
-`merge_group` run. Anything else deadlocks the queue. And required-check names
+`merge_group` run. Anything else deadlocks the queue. For a MATRIX job the bar
+is stricter: an explicit job-level skip is NOT enough, because the skipped
+check run drops the `(N)` suffix and satisfies nothing; the legs must start
+and no-op at step level, as the shard matrix does. And required-check names
 are string-matched: renaming a CI job silently un-requires it, so treat the job
 names above as pinned (`tests/ci_workflow.test.ts` holds each name to ci.yml
 and to this doc, including the shard-count suffix range).

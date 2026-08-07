@@ -357,7 +357,7 @@ describe('escort run guards', () => {
 
     // Wound one mob through the real damage path so the full-health check
     // below can prove the walk-home reset (which heals) actually ran.
-    (sim as any).dealDamage(sim.player, wave[0], 50, false, 'physical', null, 'hit');
+    sim.dealDamage(sim.player, wave[0], 50, false, 'physical', null, 'hit');
     expect(wave[0].hp).toBeLessThan(wave[0].maxHp);
 
     // The live-server kite: drag the whole wave far past its leash. The chase
@@ -426,7 +426,7 @@ describe('escort run guards', () => {
     // The player pulls one wave mob through the real damage path: their
     // threat towers over the escortee seed and the mob turns on them.
     teleportTo(sim, mob.pos.x + 2, mob.pos.z);
-    (sim as any).dealDamage(sim.player, mob, 50, false, 'physical', null, 'hit');
+    sim.dealDamage(sim.player, mob, 50, false, 'physical', null, 'hit');
     for (let i = 0; i < 20; i++) sim.tick();
     expect(mob.dead).toBe(false);
     expect(mob.aggroTargetId).toBe(sim.player.id);
@@ -450,7 +450,7 @@ describe('escort run guards', () => {
     // Cut the wave down through the real damage path so death runs the full
     // handleDeath arm (corpse window, respawn timer assignment).
     for (const mob of liveAmbushers(sim)) {
-      (sim as any).dealDamage(sim.player, mob, 999999, false, 'physical', null, 'hit');
+      sim.dealDamage(sim.player, mob, 999999, false, 'physical', null, 'hit');
     }
     // Pre-fix, the generic in-place camp respawn (cfg default 25s, deferred by
     // the corpse window) revived the wave into ambushIds and wedged or

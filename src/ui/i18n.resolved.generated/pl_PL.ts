@@ -392,7 +392,7 @@ export const pl_PL: EnTranslations = {
     "emoteEditor": {
       "title": "Emotki",
       "done": "Gotowe",
-      "close": "Close emotes"
+      "close": "Zamknij emotki"
     },
     "dailyRewards": {
       "title": "Codzienne nagrody",
@@ -1823,7 +1823,13 @@ export const pl_PL: EnTranslations = {
       "saveButton": "Zapisz priorytety",
       "notInTownHint": "Musisz być w mieście, aby ustawić priorytety.",
       "increaseAria": "Zwiększ priorytet: {component}",
-      "decreaseAria": "Zmniejsz priorytet: {component}"
+      "decreaseAria": "Zmniejsz priorytet: {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Mianuj przywódcą",
@@ -2070,7 +2076,7 @@ export const pl_PL: EnTranslations = {
       "familyDemon": "Demon",
       "hostile": "Wrogi",
       "friendly": "Przyjazny",
-      "elite": "Elite",
+      "elite": "Elita",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2679,7 +2685,7 @@ export const pl_PL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Zaklinanie broni - Moc",
       "enchant_weapon_intellect": "Zaklinanie broni - Moc zaklęć",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Zaklinanie ręki dodatkowej - Wytrzymałość",
       "enchant_helmet_fortitude": "Zaklinanie hełmu - Krzepkość",
       "enchant_neck_spirit": "Zaklinanie naszyjnika - Duch",
       "enchant_shoulder_agility": "Zaklinanie naramienników - Zwinność",
@@ -3169,7 +3175,7 @@ export const pl_PL: EnTranslations = {
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
         "wardstones": "Kanały kamieni wardowych (przejście fazy)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)"
       }
     },
     "deeds": {
@@ -4118,7 +4124,7 @@ export const pl_PL: EnTranslations = {
       "bastionBody": "Zalana forteca utracona na rzecz bagien, dzierżona przez utopionych obrońców i sam przybierający przypływ.",
       "templeBody": "Skąpane w blasku księżyca sanktuarium zatopione pod świetlistym górskim jeziorkiem wysoko w szczytach, do którego dociera się przez bramę zimnego światła. Utopiony kult wciąż śpiewa tam na dole w swych zbutwiałych szatach, a ostrzeżenia wyryte na brzegu mówią, że coś na dole tylko śpi. Samodzielna tajemnica, oddzielona od głównej historii, dla ciekawskich i dobrze przygotowanych.",
       "sanctumBody": "Mroczne serce Ciernistego Szczytu, gdzie długa praca kultu osiąga swój straszliwy szczyt.",
-      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by stawić czoła Zulgarowi.",
+      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.",
       "raidName": "Rajd na koniec gry",
       "raidBody": "Za zapieczętowanymi królewskimi drzwiami czeka próba dla dziesięciu graczy: wielofazowa walka i nieśmiertelna moc, którą cały rajd musi wspólnie powstrzymać. Wywalcz sobie wstęp, a potem przyprowadź dziewięcioro przyjaciół.",
       "heroicTitle": "Tryb heroiczny",
@@ -7561,6 +7567,8 @@ export const pl_PL: EnTranslations = {
       "collectEmpty": "Nic nie czeka. Dochód ze sprzedaży i wygasłe oferty zbierają się tutaj.",
       "collectNote": "Zarobki i zwrócone towary, które kupiec przechowuje dla ciebie.",
       "saleProceeds": "Wpływy ze sprzedaży",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Odbierz wszystko"
     },
     "logs": {
