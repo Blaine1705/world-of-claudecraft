@@ -88,8 +88,11 @@ concurrency:
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any
-# other always-on cheap jobs) but skip pr-gate, pr-long-sims, pr-checks, and
-# browser-gate. Any touch of the code path set forces the full PR tier. push
+# other always-on cheap jobs) and skip the PR-tier work: pr-long-sims,
+# pr-checks, and browser-gate skip at JOB level, while pr-gate's matrix legs
+# start and skip at STEP level so all eight suffixed required check runs
+# still report (see the pr-gate job comment for why that difference is
+# load-bearing). Any touch of the code path set forces the full PR tier. push
 # to main/dev-*, workflow_dispatch, and merge_group queue runs always report
 # code=true (full PR tier when unsure).
 # Release/** pushes and release-to-main PRs never consult the filter:
@@ -367,13 +370,26 @@ jobs:
   # script's step list in sync when adding or removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
-    # Compose release-to-main exclusion with the code path filter (D10). Do not
-    # drop either arm: release-to-main must still select release-*, and docs-only
-    # PRs must skip this matrix. needs.changes only; no needs edge to pr-checks.
-    # merge_group always lands here (the queue bar is the full PR tier; the
-    # release-to-main exclusion is a pull_request-arm concern and cannot match).
+    # Two-level gate, split on purpose (docs/merge-queue.md, "The required-check
+    # contract"). The JOB if carries only the event routing, so every
+    # pull_request and merge_group run expands the matrix and reports all eight
+    # suffixed check runs; the STEP gate on every step below carries the
+    # release-to-main exclusion and the code path filter (D10), so a leg the
+    # run does not apply to starts, skips all of its steps, and completes green
+    # in seconds. A job-level skip of a MATRIX job would instead collapse to
+    # ONE check run named without the (N) suffix, which string-matches none of
+    # the required shard contexts and leaves them "expected" forever: under the
+    # branch ruleset a docs-only or release-to-main PR could then never be
+    # queued or merged (observed live on the Phase 3 queue drills, PR #3038:
+    # "8 of 13 required status checks are expected"). Do not drop either step
+    # gate arm: release-to-main must still select release-*, and docs-only PRs
+    # must still skip the suite work. needs.changes only; no needs edge to
+    # pr-checks. merge_group always runs the work (the queue bar is the full
+    # PR tier): the release arm cannot match the event, and the classifier
+    # always reports code=true off a pull_request event, so neither gate arm
+    # can gate off a queue run.
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group'
     # Fail fast on the runner-side checkout-stall class instead of burning
     # tail: on 2026-08-06 thirteen shard, lane, and browser jobs across seven
     # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
@@ -405,21 +421,31 @@ jobs:
         shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+      # The step gate (see the job comment): identical on every step of this
+      # job, pinned that way by tests/ci_workflow.test.ts. A leg that this run
+      # does not apply to (docs-only PR, release-to-main PR) skips every step
+      # and reports green under its required suffixed name. The code arm stays
+      # != 'false' so a missing or empty classifier output runs the suite,
+      # never skips it (fail closed).
       - name: Check out repository
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/checkout@v6
 
       - name: Set up pnpm
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: pnpm/action-setup@v4
         with:
           version: 10.34.5
 
       - name: Set up Node.js
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/setup-node@v6
         with:
           node-version: 26
           cache: pnpm
 
       - name: Install dependencies
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         run: pnpm install --frozen-lockfile
 
       # Persist the vitest transform cache across runs (vite.config.ts enables
@@ -451,9 +477,12 @@ jobs:
       # decays as sources drift until the next rotation (start there if the
       # speedup fades). The binding budget is GitHub's 10 GB per-repo cache
       # quota with LRU eviction: about 0.5 GB per toolchain state per scope
-      # (8 entries at 57-73 MB; no single scope holds both matrices, since
-      # their if arms are exact complements on the events that could share a
-      # ref), roughly 1 GB across the two long-lived producer scopes (main
+      # (8 entries at 57-73 MB; no single scope holds both matrices: on the
+      # one event both jobs now see, a release-to-main PR, pr-gate's copy of
+      # this step is gated off by the step gate above, so release-gate's
+      # matrix is the only producer on that ref; the separation lives in the
+      # STEP gate, not in the job routing), roughly 1 GB across the two
+      # long-lived producer scopes (main
       # plus the release branch) beside the pnpm store, Playwright, and tsc
       # caches. If hot-entry eviction is ever observed, the lever is
       # restricting this step's save to push events, never restore-keys
@@ -475,6 +504,7 @@ jobs:
       # legs and the full replay read the same store: every leg is vitest
       # under the same config.
       - name: Cache vitest transform cache
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
@@ -497,6 +527,7 @@ jobs:
       # Release-gate below keeps the unconditional full run line; the nightly
       # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
