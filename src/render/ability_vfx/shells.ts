@@ -9,8 +9,10 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 const SHELL_SLOTS = 8;
 
 // Per-frame anchor scratch (see ../vfx_anchor.ts): update() resolves one anchor
-// per live shell and consumes it before the next resolve. Module-level because
-// there is exactly one shell pool per fx engine.
+// per live shell and consumes it before the next resolve into it. That
+// consume-before-reuse is what makes a module-level scratch safe to share,
+// even when a second engine is alive (the editor viewport composes its own
+// Renderer): every reading is spent inside one synchronous update pass.
 const anchorScratch = new THREE.Vector3();
 
 interface ShellSlot {

@@ -300,7 +300,7 @@ describe('graphics-settings fairness', () => {
     const visual = readFileSync('src/render/characters/visual.ts', 'utf8');
     const shedBlock = visual.slice(
       visual.indexOf('private applyWeaponVfxShed'),
-      visual.indexOf('weaponVfxShedLevel'),
+      visual.indexOf('private applySkinOrientation'),
     );
     expect(shedBlock.length).toBeGreaterThan(0);
     expect(shedBlock).not.toMatch(/\.visible\s*=/);

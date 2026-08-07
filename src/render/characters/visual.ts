@@ -1789,11 +1789,6 @@ export class CharacterVisual {
     for (const handle of this.weaponVfx) handle.setTuning(this.weaponVfxTuningScratch);
   }
 
-  /** Dev/test probe: the shed multiplier currently applied to the skin rigs. */
-  weaponVfxShedLevel(): number {
-    return this.weaponVfxShed;
-  }
-
   /** Blend pinned skin payloads between the authored grip glue and their
    *  root-relative pin: a bow to BOW_AIM_QUAT while the shot one-shot plays, a
    *  bow-slot gun to GUN_CARRY_QUAT everywhere BUT the shot (and never while
