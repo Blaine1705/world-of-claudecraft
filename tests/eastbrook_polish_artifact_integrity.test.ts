@@ -651,10 +651,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // and metadata seal both re-mint on the merged tree. No capture was retaken.
 // Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved back
 // while PR #2982's prewarm policy remains in the release. No capture was retaken.
+// Re-pinned for the PR #2983 re-land: the rendererIntegration leaf moves
+// forward again (apply queue + vfx.weapon-skins prewarm entry) over the
+// bow-aim renderer edit the release landed after the revert. No capture was
+// retaken.
+// Re-minted for the merge of release/v0.35.0 into this branch: both sides moved
+// the rendererIntegration leaf, so all three literals mint to values matching
+// neither parent. No capture was retaken on either side (the two parents'
+// evidence differs only in its provenance bytes).
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '25cbdea38077fbb667d996b4a69eeb1e6740497277da31edb9ce6b2be8f9fec1';
+  '96d09b80bfac19f80ce313c08a2b53b339ad93a8046f49d68a127cae87a8bb0d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '71efa53e9cee267b357fba6000622b179b631e57e5ecb6d450e8ab5b7de0496f';
+  '330a796002806ed71dc8088bfa2d9e628bfbbda91667eb5f3c4f0247a3ac4663';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1538,10 +1546,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-pinned for the PR #2983 revert: the swept evidence follows the
     // reverted renderer while preserving PR #2982's prewarm-policy leaf.
+    // Re-pinned for the PR #2983 re-land: the swept evidence follows the
+    // re-landed renderer, itself on top of the release's bow-aim edit.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('8000aacd07737a6d05975e3eb0193dc9b20ad057b94e17e22be33ab22641b087');
+    ).toBe('2dd58a755110c65f9dced98aaf824d9fbad1214e2c58fa085e56bbb9100e1c0f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
