@@ -391,7 +391,8 @@ export const pl_PL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotki",
-      "done": "Gotowe"
+      "done": "Gotowe",
+      "close": "Zamknij emotki"
     },
     "dailyRewards": {
       "title": "Codzienne nagrody",
@@ -1277,6 +1278,24 @@ export const pl_PL: EnTranslations = {
       "graphicsFatal": "Przywracanie grafiki nie powiodło się. Wczytaj grę ponownie, aby kontynuować.",
       "graphicsReload": "Wczytaj grę ponownie",
       "graphicsDraftChanged": "Zmiany grafiki są gotowe do zastosowania.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Tryb interfejsu",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Komputer",
@@ -1348,6 +1367,8 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const pl_PL: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICZNY]",
     "itemSoulbound": "Związany z duszą",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1801,7 +1823,13 @@ export const pl_PL: EnTranslations = {
       "saveButton": "Zapisz priorytety",
       "notInTownHint": "Musisz być w mieście, aby ustawić priorytety.",
       "increaseAria": "Zwiększ priorytet: {component}",
-      "decreaseAria": "Zmniejsz priorytet: {component}"
+      "decreaseAria": "Zmniejsz priorytet: {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Mianuj przywódcą",
@@ -2048,7 +2076,7 @@ export const pl_PL: EnTranslations = {
       "familyDemon": "Demon",
       "hostile": "Wrogi",
       "friendly": "Przyjazny",
-      "elite": "Elite",
+      "elite": "Elita",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2657,7 +2685,7 @@ export const pl_PL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Zaklinanie broni - Moc",
       "enchant_weapon_intellect": "Zaklinanie broni - Moc zaklęć",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Zaklinanie ręki dodatkowej - Wytrzymałość",
       "enchant_helmet_fortitude": "Zaklinanie hełmu - Krzepkość",
       "enchant_neck_spirit": "Zaklinanie naszyjnika - Duch",
       "enchant_shoulder_agility": "Zaklinanie naramienników - Zwinność",
@@ -3146,7 +3174,8 @@ export const pl_PL: EnTranslations = {
         "raise_fallen": "Wskrzeszenie Poległych (okresowe fale wrogów)",
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
-        "wardstones": "Kanały kamieni wardowych (przejście fazy)"
+        "wardstones": "Kanały kamieni wardowych (przejście fazy)",
+        "dread_curse": "Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)"
       }
     },
     "deeds": {
@@ -3554,16 +3583,21 @@ export const pl_PL: EnTranslations = {
       "groupInterface": "Interfejs",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Tabela wyników",
       "deeds": "Księga Czynów",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Wytwarzanie",
       "valeCup": "Puchar Doliny",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendarz wydarzeń",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Używaj zdolności z paska akcji (rząd cyfr; drugi pasek znajduje się na klawiaturze numerycznej)",
       "targetFriendly": "Namierz najbliższy przyjazny cel",
       "cycleFriendly": "Przełączaj przyjazny cel",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otwórz menu gry i opcje",
       "bothMouse": "Oba przyciski myszy",
       "runForward": "Biegnij naprzód",
@@ -4090,7 +4124,7 @@ export const pl_PL: EnTranslations = {
       "bastionBody": "Zalana forteca utracona na rzecz bagien, dzierżona przez utopionych obrońców i sam przybierający przypływ.",
       "templeBody": "Skąpane w blasku księżyca sanktuarium zatopione pod świetlistym górskim jeziorkiem wysoko w szczytach, do którego dociera się przez bramę zimnego światła. Utopiony kult wciąż śpiewa tam na dole w swych zbutwiałych szatach, a ostrzeżenia wyryte na brzegu mówią, że coś na dole tylko śpi. Samodzielna tajemnica, oddzielona od głównej historii, dla ciekawskich i dobrze przygotowanych.",
       "sanctumBody": "Mroczne serce Ciernistego Szczytu, gdzie długa praca kultu osiąga swój straszliwy szczyt.",
-      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by stawić czoła Zulgarowi.",
+      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.",
       "raidName": "Rajd na koniec gry",
       "raidBody": "Za zapieczętowanymi królewskimi drzwiami czeka próba dla dziesięciu graczy: wielofazowa walka i nieśmiertelna moc, którą cały rajd musi wspólnie powstrzymać. Wywalcz sobie wstęp, a potem przyprowadź dziewięcioro przyjaciół.",
       "heroicTitle": "Tryb heroiczny",
@@ -4315,6 +4349,8 @@ export const pl_PL: EnTranslations = {
       "sourcesBody": "Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast młócić wrogów. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, sprzedawcy w mieście oferują solidne podstawy, rzemieślnicy przerabiają zebrane materiały na noszalne części, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie dwie waluty znaków kupują ekwipunek nieosiągalny nigdzie indziej: Znaki Wypraw u opiekuna wypraw oraz Znaki heroiczne u heroicznego kwatermistrza.",
       "soulboundTitle": "Związany z duszą: tylko i wyłącznie twój",
       "soulboundBody": "Kilka szczególnych nagród jest związanych z duszą, przywiązanych do twojej postaci od chwili, gdy je zdobędziesz. Przedmiotu związanego z duszą nie można wymienić, wysłać pocztą, sprzedać sprzedawcy ani wystawić na targu; należy tylko i wyłącznie do ciebie. Dziś ta ochrona strzeże żetonów nagród, takich jak Znaki Heroiczne, podczas gdy zdobyty ekwipunek możesz swobodnie wymieniać, sprzedawać i udostępniać.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Zestawy i bonusy zestawów",
       "setsBody": "Część pancerza występuje w pasujących do siebie rodzinach, gdzie kilka elementów skrojono tak, by wyglądały i walczyły jak jedna całość. Noś naraz dość elementów rodziny, a zestaw się przebudzi, dając bonusy ponad statystyki każdej części, a im więcej elementów nosisz, tym silniejszy się staje. Kilka takich rodzin trafia się jako cenne łupy podczas zdobywania poziomów; najpotężniejsze z nich pochodzą z najtrudniejszej zawartości grupowej blisko maksymalnego poziomu, więc kompletowanie pełnego zestawu to klasyczny cel końca gry.",
       "consumablesTitle": "Materiały zużywalne",
@@ -7374,11 +7410,14 @@ export const pl_PL: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Użycie: Przywraca {amount} zdrowia w ciągu {seconds} s. Podczas jedzenia musisz pozostać w pozycji siedzącej.",
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Przedmiot zadania",
       "questRelated": "Zadanie: {quest}",
       "questRules": "Nie można go sprzedać, zdeponować w banku ani wymienić.",
       "questOrphaned": "Niepotrzebny w żadnym aktywnym zadaniu.",
       "classes": "Klasy: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Cena sprzedaży: {money}",
       "clickBuy": "Kliknij, aby kupić",
       "clickSell": "Kliknij, aby sprzedać",
@@ -7529,6 +7568,8 @@ export const pl_PL: EnTranslations = {
       "collectEmpty": "Nic nie czeka. Dochód ze sprzedaży i wygasłe oferty zbierają się tutaj.",
       "collectNote": "Zarobki i zwrócone towary, które kupiec przechowuje dla ciebie.",
       "saleProceeds": "Wpływy ze sprzedaży",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Odbierz wszystko"
     },
     "logs": {
@@ -10307,6 +10348,15 @@ export const pl_PL: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Kołczan Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

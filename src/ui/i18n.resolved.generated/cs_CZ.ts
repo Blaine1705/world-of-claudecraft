@@ -391,7 +391,8 @@ export const cs_CZ: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emoty",
-      "done": "Hotovo"
+      "done": "Hotovo",
+      "close": "Zavřít emoty"
     },
     "dailyRewards": {
       "title": "Denní odměny",
@@ -1277,6 +1278,24 @@ export const cs_CZ: EnTranslations = {
       "graphicsFatal": "Obnova grafiky selhala. Pro pokračování hru znovu načti.",
       "graphicsReload": "Znovu načíst hru",
       "graphicsDraftChanged": "Změny grafiky jsou připravené k použití.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Režim rozhraní",
       "interfaceModeAuto": "Automaticky",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const cs_CZ: EnTranslations = {
     },
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemSoulbound": "Vázáno na duši",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1801,7 +1823,13 @@ export const cs_CZ: EnTranslations = {
       "saveButton": "Uložit zaměření",
       "notInTownHint": "Zaměření lze nastavit jen ve městě.",
       "increaseAria": "Zvýšit zaměření na {component}",
-      "decreaseAria": "Snížit zaměření na {component}"
+      "decreaseAria": "Snížit zaměření na {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Povýšit na vůdce",
@@ -2048,7 +2076,7 @@ export const cs_CZ: EnTranslations = {
       "familyDemon": "Démon",
       "hostile": "Nepřátelský",
       "friendly": "Přátelský",
-      "elite": "Elite",
+      "elite": "Elita",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2657,7 +2685,7 @@ export const cs_CZ: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Okouzlení zbraně - Moc",
       "enchant_weapon_intellect": "Okouzlení zbraně - Síla kouzel",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Okouzlení vedlejší ruky - Výdrž",
       "enchant_helmet_fortitude": "Okouzlení helmy - Pevnost",
       "enchant_neck_spirit": "Okouzlení náhrdelníku - Duch",
       "enchant_shoulder_agility": "Okouzlení nárameníků - Obratnost",
@@ -3146,7 +3174,8 @@ export const cs_CZ: EnTranslations = {
         "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
-        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)",
+        "dread_curse": "Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)"
       }
     },
     "deeds": {
@@ -3554,16 +3583,21 @@ export const cs_CZ: EnTranslations = {
       "groupInterface": "Rozhraní",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Aréna",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Výroba",
       "valeCup": "Pohár údolí",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendář událostí",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otevřít herní menu a nastavení",
       "bothMouse": "Obě tlačítka myši",
       "runForward": "Běh vpřed",
@@ -4090,7 +4124,7 @@ export const cs_CZ: EnTranslations = {
       "bastionBody": "Zaplavená pevnost ztracená v močálu, držená utopenými obránci a samotným stoupajícím přílivem.",
       "templeBody": "Měsíční svatyně potopená pod zářícím plesem vysoko ve štítech, dosažitelná branou studeného světla. Utopený kult tam dole stále zpívá ve shnilých rouchách a varování vyrytá na břehu říkají, že něco níže jen spí. Samostatná záhada mimo hlavní příběh, pro zvědavé a dobře připravené.",
       "sanctumBody": "Temné srdce Thornpeaku, kde dlouhá práce kultu dosáhne strašného vrcholu.",
-      "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys čelil Zulgarovi.",
+      "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.",
       "raidName": "Endgame raid",
       "raidBody": "Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně vyřadit. Získej si vstup a přiveď devět přátel.",
       "heroicTitle": "Hrdinský režim",
@@ -4315,6 +4349,8 @@ export const cs_CZ: EnTranslations = {
       "sourcesBody": "Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.",
       "soulboundTitle": "Vázané k duši: tvé a jen tvé",
       "soulboundBody": "Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. Dnes tato ochrana střeží cenné tokeny jako Hrdinské známky, zatímco výbavu, kterou získáš, můžeš volně směňovat, prodávat i sdílet.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sady a bonusy sad",
       "setsBody": "Některá zbroj přichází ve sladěných rodinách, několika kusech střižených tak, aby vypadaly a bojovaly jako jeden celek. Oblékni dost kusů jedné rodiny najednou a sada se probudí, přidá bonusy nad vlastní statistiky každého kusu, a čím víc kusů nosíš, tím silnější je. Pár takových rodin se objevuje jako ceněné dropy během levelování; ty největší pocházejí z nejtěžšího skupinového obsahu blízko maximální úrovně, takže honba za celou sadou je klasický endgame cíl.",
       "consumablesTitle": "Spotřební předměty",
@@ -7374,11 +7410,14 @@ export const cs_CZ: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Použití: Obnoví {amount} zdraví během {seconds} s. Při jídle musíš zůstat sedět.",
       "useDrink": "Použití: Obnoví {amount} many během {seconds} s. Při pití musíš zůstat sedět.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Úkolový předmět",
       "questRelated": "Úkol: {quest}",
       "questRules": "Nelze prodat, uložit do banky ani směnit.",
       "questOrphaned": "Není potřeba pro žádný aktivní úkol.",
       "classes": "Třídy: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Prodejní cena: {money}",
       "clickBuy": "Kliknutím koupíš",
       "clickSell": "Kliknutím prodáš",
@@ -7529,6 +7568,8 @@ export const cs_CZ: EnTranslations = {
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
       "collectNote": "Výdělky a vrácené zboží, které pro tebe drží Obchodník.",
       "saleProceeds": "Výnosy z prodeje",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Vyzvednout vše"
     },
     "logs": {
@@ -10307,6 +10348,15 @@ export const cs_CZ: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Toulec děsivého tesáku"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

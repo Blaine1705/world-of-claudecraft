@@ -391,7 +391,8 @@ export const id_ID: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Selesai"
+      "done": "Selesai",
+      "close": "Tutup emote"
     },
     "dailyRewards": {
       "title": "Hadiah Harian",
@@ -1277,6 +1278,24 @@ export const id_ID: EnTranslations = {
       "graphicsFatal": "Pemulihan grafis gagal. Muat ulang game untuk melanjutkan.",
       "graphicsReload": "Muat Ulang Game",
       "graphicsDraftChanged": "Perubahan grafis siap diterapkan.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Mode Antarmuka",
       "interfaceModeAuto": "Otomatis",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const id_ID: EnTranslations = {
     },
     "itemHeroicTag": "[HEROIK]",
     "itemSoulbound": "Terikat Jiwa",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1801,7 +1823,13 @@ export const id_ID: EnTranslations = {
       "saveButton": "Simpan Fokus",
       "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",
       "increaseAria": "Tambah fokus pada {component}",
-      "decreaseAria": "Kurangi fokus pada {component}"
+      "decreaseAria": "Kurangi fokus pada {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Angkat jadi Pemimpin",
@@ -2049,7 +2077,7 @@ export const id_ID: EnTranslations = {
       "hostile": "Bermusuhan",
       "friendly": "Ramah",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Bos"
     },
     "targetFrame": {
       "unlock": "Pindahkan bingkai sasaran",
@@ -2657,7 +2685,7 @@ export const id_ID: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Mantrai Senjata - Kekuatan",
       "enchant_weapon_intellect": "Mantrai Senjata - Daya Mantra",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Mantrai Tangan Sekunder - Stamina",
       "enchant_helmet_fortitude": "Mantrai Helm - Keteguhan",
       "enchant_neck_spirit": "Mantrai Kalung - Roh",
       "enchant_shoulder_agility": "Mantrai Bahu - Kegesitan",
@@ -3146,7 +3174,8 @@ export const id_ID: EnTranslations = {
         "raise_fallen": "Bangkitkan Yang Gugur (gelombang bala bantuan berkala)",
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
-        "wardstones": "Saluran Wardstone (transisi fase)"
+        "wardstones": "Saluran Wardstone (transisi fase)",
+        "dread_curse": "Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)"
       }
     },
     "deeds": {
@@ -3554,16 +3583,21 @@ export const id_ID: EnTranslations = {
       "groupInterface": "Antarmuka",
       "groupCamera": "Kamera",
       "talents": "Bakat",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Kriya",
       "valeCup": "Piala Lembah",
+      "mount": "Mount / Dismount",
       "calendar": "Kalender Acara",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Gunakan kemampuan action bar (deretan angka; bilah kedua ada di numpad)",
       "targetFriendly": "Targetkan kawan terdekat",
       "cycleFriendly": "Putar target kawan",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Buka menu permainan dan opsi",
       "bothMouse": "Kedua Tombol Mouse",
       "runForward": "Lari maju",
@@ -4090,7 +4124,7 @@ export const id_ID: EnTranslations = {
       "bastionBody": "Benteng terendam yang lenyap ditelan rawa, dikuasai para penjaga yang tenggelam dan oleh pasang air itu sendiri.",
       "templeBody": "Tempat pemujaan bermandi cahaya bulan yang tenggelam di bawah danau bercahaya tinggi di puncak gunung, dijangkau melalui sebuah gerbang cahaya dingin. Sebuah pemujaan yang tenggelam masih bernyanyi di bawah sana dalam jubah lapuk mereka, dan peringatan yang terukir di tepian mengatakan sesuatu di bawah hanya tertidur. Sebuah misteri yang berdiri sendiri, terpisah dari kisah utama, untuk mereka yang penasaran dan siap sedia.",
       "sanctumBody": "Jantung kelam Thornpeak, tempat pekerjaan panjang sang pemuja mencapai puncaknya yang mengerikan.",
-      "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk menghadapi Zulgar.",
+      "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk melihat siapa yang menunggu di puncaknya.",
       "raidName": "Raid akhir permainan",
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
@@ -4315,6 +4349,8 @@ export const id_ID: EnTranslations = {
       "sourcesBody": "Sebagian besar peningkatan awalmu adalah hadiah misi, jadi lebih menguntungkan menuntaskan misi daripada menggerus musuh. Musuh menjatuhkan perlengkapan saat kamu mengalahkannya, penjaja di kota menjual barang dasar yang andal, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, dua mata uang tanda membeli perlengkapan yang tak ditemukan di tempat lain: Tanda Delve pada penjaga delve, dan Tanda Heroik pada Kepala Perbekalan Heroik.",
       "soulboundTitle": "Soulbound: milikmu dan hanya milikmu",
       "soulboundBody": "Beberapa hadiah istimewa bersifat soulbound, terikat pada karaktermu sejak saat kamu meraihnya. Barang soulbound tak bisa ditukar, dikirim lewat pos, dijual ke penjaja, atau didaftarkan di pasar; ia milikmu dan hanya milikmu. Saat ini perlindungan itu menjaga token hadiah seperti Tanda Heroik, sementara perlengkapan yang kamu menangkan bebas kamu tukar, jual, atau bagikan.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Set dan bonus set",
       "setsBody": "Sebagian zirah hadir dalam keluarga yang serasi, beberapa potongan yang dirancang untuk tampak dan bertarung sebagai satu kesatuan. Kenakan cukup banyak dari satu keluarga sekaligus dan set itu pun bangkit, memberi bonus di atas stat tiap potongannya, dan makin banyak potongan yang kamu kenakan makin kuat jadinya. Beberapa keluarga semacam itu muncul sebagai jarahan berharga selagi kamu naik level; yang terhebat di antaranya berasal dari konten kelompok paling tangguh di dekat batas level, jadi memburu satu set lengkap adalah tujuan babak akhir yang klasik.",
       "consumablesTitle": "Barang Pakai Habis",
@@ -7374,11 +7410,14 @@ export const id_ID: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
       "questOrphaned": "Tidak dibutuhkan untuk misi aktif mana pun.",
       "classes": "Kelas: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",
       "clickSell": "Klik untuk menjual",
@@ -7529,6 +7568,8 @@ export const id_ID: EnTranslations = {
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
       "collectNote": "Pendapatan dan barang kembalian yang disimpan Pedagang untukmu.",
       "saleProceeds": "Hasil penjualan",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Ambil Semua"
     },
     "logs": {
@@ -10307,6 +10348,15 @@ export const id_ID: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Tabung Panah Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

@@ -14,6 +14,7 @@ import {
   isStorableScreenshot,
   listBugReports,
   pruneBugReportsBatch,
+  resolveBugReport,
 } from '../server/bug_report_db';
 import { pool } from '../server/db';
 
@@ -57,7 +58,7 @@ describe('createBugReport', () => {
     query
       .mockResolvedValueOnce({ rows: [{ n: 0 }] } as any)
       .mockResolvedValueOnce({ rows: [{ id: 1 }] } as any);
-    const huge = 'data:image/jpeg;base64,' + 'A'.repeat(BUG_SCREENSHOT_MAX);
+    const huge = `data:image/jpeg;base64,${'A'.repeat(BUG_SCREENSHOT_MAX)}`;
     const res = await createBugReport({ ...base, screenshot: huge });
     expect(query.mock.calls[1][1]?.[8]).toBeNull();
     expect(res.screenshotStored).toBe(false);
@@ -108,7 +109,7 @@ describe('isStorableScreenshot', () => {
     expect(isStorableScreenshot('https://example.com/x.jpg')).toBe(false);
     expect(isStorableScreenshot(null)).toBe(false);
     expect(isStorableScreenshot(42)).toBe(false);
-    expect(isStorableScreenshot('data:image/jpeg;base64,' + 'A'.repeat(BUG_SCREENSHOT_MAX))).toBe(
+    expect(isStorableScreenshot(`data:image/jpeg;base64,${'A'.repeat(BUG_SCREENSHOT_MAX)}`)).toBe(
       false,
     );
   });
@@ -222,5 +223,39 @@ describe('pruneBugReportsBatch (the retention-sweep primitive)', () => {
   it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
     query.mockResolvedValueOnce({ rows: [], rowCount: null } as any);
     await expect(pruneBugReportsBatch(90, 1000)).resolves.toBe(0);
+  });
+});
+
+describe('resolveBugReport', () => {
+  it('resolves an open report, stamping the reviewer, timestamp, and a trimmed note', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const ok = await resolveBugReport(5, 7, 'resolved', '  fixed in 0.34.1  ');
+    expect(ok).toBe(true);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('UPDATE bug_reports');
+    expect(sql).toContain("status = 'open'");
+    expect(sql).toContain('reviewed_at = now()');
+    expect(params).toEqual([5, 'resolved', 7, 'fixed in 0.34.1']);
+  });
+
+  it('dismisses an open report with no note (empty string, never null)', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    await resolveBugReport(6, 7, 'dismissed', undefined);
+    const params = query.mock.calls[0][1]!;
+    expect(params[1]).toBe('dismissed');
+    expect(params[3]).toBe('');
+  });
+
+  it('returns false and is a no-op WHERE-clause-wise for a report that is not open', async () => {
+    query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    const ok = await resolveBugReport(9, 7, 'resolved', 'dup');
+    expect(ok).toBe(false);
+  });
+
+  it('truncates an over-long note to the review-note cap', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    await resolveBugReport(5, 7, 'resolved', 'x'.repeat(5000));
+    const note = query.mock.calls[0][1]![3] as string;
+    expect(note.length).toBe(500);
   });
 });
