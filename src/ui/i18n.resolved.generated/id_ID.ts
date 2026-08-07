@@ -775,6 +775,10 @@ export const id_ID: EnTranslations = {
       "ready": "Ayun",
       "seconds": "{seconds}d"
     },
+    "breath": {
+      "label": "Napas",
+      "drowning": "Tenggelam!"
+    },
     "rest": {
       "resting": "Beristirahat"
     },
@@ -956,6 +960,7 @@ export const id_ID: EnTranslations = {
       "valecup": "Piala Lembah",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Sarungkan/Cabut Senjata",
+      "dive": "Swim Down",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
       "petStop": "Peliharaan: Berhenti",
@@ -1332,6 +1337,7 @@ export const id_ID: EnTranslations = {
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showPetFrame": "Tampilkan Peliharaan Anda",
+      "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
@@ -1527,6 +1533,16 @@ export const id_ID: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Serangan",
@@ -2131,6 +2147,8 @@ export const id_ID: EnTranslations = {
       "showResource": "Tampilkan Mana, Amukan, dan Energi",
       "showAbsorbs": "Tampilkan Perisai Serap",
       "showAuras": "Tampilkan Buff dan Debuff",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Tampilkan Bingkaimu"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const id_ID: EnTranslations = {
       "guildOpenAccept": "Buka",
       "guildOpenNote": "Dibayar dari uangmu sendiri, bukan dari kas guild",
       "guildPurseShort": "Uang tidak cukup",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Barang yang terkunci tidak dapat ditarik dan mencegah guild dibubarkan.",
       "guildDormantHint": "Barang ini terkunci di bank guild dan tidak dapat ditarik.",
       "guildDormantAria": "{item}, jumlah {count}, tidak dapat ditarik",
@@ -2490,7 +2510,7 @@ export const id_ID: EnTranslations = {
       "logNote": "{count} tindakan bank guild terbaru.",
       "logLoading": "Memuat log bank guild...",
       "logEmpty": "Belum ada yang keluar masuk bank guild.",
-      "logRefused": "Hanya perwira guild yang dapat membaca log bank guild.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Mantan anggota guild",
       "logDepositItem": "{actor} menyetor {count} {item}",
       "logWithdrawItem": "{actor} menarik {count} {item}",
@@ -9704,6 +9724,27 @@ export const id_ID: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Sandal Cinderweave"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Medali Sumpah Terakhir"
       },
@@ -12050,6 +12091,11 @@ export const id_ID: EnTranslations = {
         "name": "AMARAH",
         "title": "Kepala Suku Kehormatan",
         "greeting": "Pasir mengingat setiap kemenangan. Habiskan kehormatanmu dengan baik."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "Ahli Sejarah Caddis",
@@ -15182,6 +15228,36 @@ export const id_ID: EnTranslations = {
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Jubah Nightfang",

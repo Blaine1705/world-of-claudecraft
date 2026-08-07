@@ -187,6 +187,9 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   strafeLeft: 'hud.keybinds.actions.strafeLeft',
   strafeRight: 'hud.keybinds.actions.strafeRight',
   jump: 'hud.keybinds.actions.jump',
+  // English-only chrome key, like every keybind row added since the `hud`
+  // domain was tsc-locked to inline per-locale blocks.
+  dive: 'hudChrome.keybinds.dive',
   autorun: 'hud.keybinds.actions.autorun',
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',

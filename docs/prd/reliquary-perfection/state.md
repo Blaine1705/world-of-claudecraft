@@ -5,7 +5,7 @@ fresh session). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
-  Titles page = every NON-hidden title-reward deed (33 today).
+  Titles page = every NON-hidden title-reward deed (36 after the v0.35.0 warfare titles).
 - No weapon-skin reward at rank 5 (maintainer, 2026-08-05).
 - Delivery: extend PR #2976; after each QA PASS, `git push origin HEAD:feature/reliquary`
   (never force). Local branch: `feature/reliquary-perfection` in
@@ -321,8 +321,10 @@ fresh session). Update this line as phases complete.
   in-change (M16), bundles regenerated. New behavioral suite
   tests/reliquary_window_behavior.test.ts (31/31 mutants). Six reviews, every
   finding applied or recorded in progress.md.
-- Phase 13b: COMPLETE with QA (2026-08-07). Executes the settled source
-  ruling: ReliquarySourceKind + delve/rift/quest/store/activity, multi-hint
+- Phase 13b: COMPLETE with QA (2026-08-07; the pre-push base re-merge grew
+  the titles page to 36 with the release's three WARFARE honor titles per
+  the locked rule, catalog 245 slots, completion totals 219/190). Executes
+  the settled source ruling: ReliquarySourceKind + delve/rift/quest/store/activity, multi-hint
   relics (source: one hint or a NON-EMPTY readonly list, frozen at
   construction with the hint objects frozen at their constructors;
   reliquaryRelicSource returns a frozen readonly list, own hints win
@@ -415,8 +417,8 @@ fresh session). Update this line as phases complete.
   the same gate the proc path uses). All owner decisions outside this
   packet; a stats-bearing engineering craftable would un-pend the mark. One
   consequence the owner should know: the pended mark keeps 100% catalog
-  completion unreachable (overview caps at 215/216, the gallery page at
-  5/6); curator rank and every deed are unaffected (top rank needs 100
+  completion unreachable (overview caps at 218/219 after the warfare-title
+  growth, the gallery page at 5/6); curator rank and every deed are unaffected (top rank needs 100
   owned). The inverse zero-routes sweep in tests/reliquary_content.test.ts
   keeps every row honest. The QA additions were
   resolved: the robe is authored boss + quest; the sweep grew an

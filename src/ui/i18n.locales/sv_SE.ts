@@ -55,7 +55,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Laddar gillesbankens logg...',
   'hudChrome.bank.logNote': 'De {count} senaste händelserna i gillesbanken.',
   'hudChrome.bank.logOpenBank': '{actor} öppnade gillesbanken för {amount}',
-  'hudChrome.bank.logRefused': 'Endast gillesofficerare kan läsa gillesbankens logg.',
   'hudChrome.bank.logWithdrawItem': '{actor} tog ut {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} tog ut {amount}',
   'hudChrome.bank.personalTab': 'Personligt',
@@ -11112,4 +11111,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
   'itemUi.vendor.buyStack': 'Köp {count}',
   'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
+  'hudChrome.options.waterRipples': 'Vattenkrusningar (kölvatten)',
+  'hudChrome.breath.label': 'Andning',
+  'hudChrome.breath.drowning': 'Drunknar!',
 };

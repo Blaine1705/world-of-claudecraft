@@ -54,7 +54,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Indlæser laugsbankens log...',
   'hudChrome.bank.logNote': 'De {count} seneste handlinger i laugsbanken.',
   'hudChrome.bank.logOpenBank': '{actor} åbnede laugsbanken for {amount}',
-  'hudChrome.bank.logRefused': 'Kun laugsofficerer kan læse laugsbankens log.',
   'hudChrome.bank.logWithdrawItem': '{actor} tog {count} {item} ud',
   'hudChrome.bank.logWithdrawMoney': '{actor} tog {amount} ud',
   'hudChrome.bank.personalTab': 'Personlig',
@@ -11090,4 +11089,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Omorganiser fanen {channel}: træk den, eller brug Alt+venstre og Alt+højre',
   'itemUi.vendor.buyStack': 'Køb {count}',
   'itemUi.vendor.buyStackAria': 'Køb {count} {item} for {price}',
+  'hudChrome.options.waterRipples': 'Vandkrusninger (kølvand)',
+  'hudChrome.breath.label': 'Åndedræt',
+  'hudChrome.breath.drowning': 'Drukner!',
 };

@@ -775,6 +775,10 @@ export const zh_TW: EnTranslations = {
       "ready": "揮砍",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "呼吸",
+      "drowning": "溺水！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -956,6 +960,7 @@ export const zh_TW: EnTranslations = {
       "valecup": "溪谷盃",
       "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
+      "dive": "Swim Down",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
       "petStop": "寵物：停止",
@@ -1332,6 +1337,7 @@ export const zh_TW: EnTranslations = {
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
       "showPetFrame": "顯示你的寵物",
+      "waterRipples": "水面漣漪（尾波）",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
@@ -1527,6 +1533,16 @@ export const zh_TW: EnTranslations = {
         "assist": "助攻",
         "firstWin": "首勝"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "瀏覽戰爭套裝",
+      "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
+      "jewelry": "飾品",
+      "weapons": "武器",
+      "owned": "已擁有",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
+      "buyConfirmBody": "用 {honor} 購買 {item}？榮譽購買後無法退款。"
     },
     "charSheet": {
       "offense": "攻擊",
@@ -2131,6 +2147,8 @@ export const zh_TW: EnTranslations = {
       "showResource": "顯示法力、怒氣和能量",
       "showAbsorbs": "顯示吸收護盾",
       "showAuras": "顯示增益和減益",
+      "showPets": "Show Pets",
+      "petHealth": "寵物{name}，生命值{pct}",
       "showSelf": "顯示你的框體"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const zh_TW: EnTranslations = {
       "guildOpenAccept": "開啟",
       "guildOpenNote": "由你自己支付，而非公會金庫",
       "guildPurseShort": "金錢不足",
+      "guildReadOnlyNote": "只有公會幹部才能更改公會銀行。",
+      "guildUnopenedNote": "公會銀行尚未開通。",
       "guildDormantNote": "鎖定的物品無法取出，並會阻止解散公會。",
       "guildDormantHint": "該物品已鎖定在公會銀行中，無法取出。",
       "guildDormantAria": "{item}，數量 {count}，無法取出",
@@ -2490,7 +2510,7 @@ export const zh_TW: EnTranslations = {
       "logNote": "最近 {count} 筆公會銀行操作。",
       "logLoading": "正在載入公會銀行日誌...",
       "logEmpty": "公會銀行中尚未存入或取出任何物品。",
-      "logRefused": "只有公會幹部才能查看公會銀行日誌。",
+      "logUnavailable": "目前無法讀取公會銀行日誌。",
       "logFormerMember": "一位已離開的公會成員",
       "logDepositItem": "{actor} 存入了 {count} 個 {item}",
       "logWithdrawItem": "{actor} 取出了 {count} 個 {item}",
@@ -9704,6 +9724,27 @@ export const zh_TW: EnTranslations = {
       "cinderweave_slippers": {
         "name": "織燼便鞋"
       },
+      "thornhide_headdress": {
+        "name": "荊棘兜帽"
+      },
+      "thornhide_mantle": {
+        "name": "荊棘披肩"
+      },
+      "thornhide_vestment": {
+        "name": "荊棘法衣"
+      },
+      "thornhide_cinch": {
+        "name": "荊棘腰帶"
+      },
+      "thornhide_leggings": {
+        "name": "荊棘護腿"
+      },
+      "thornhide_gloves": {
+        "name": "荊棘護手"
+      },
+      "thornhide_boots": {
+        "name": "荊棘軟靴"
+      },
       "final_oath_medallion": {
         "name": "最終誓約勳章"
       },
@@ -12050,6 +12091,11 @@ export const zh_TW: EnTranslations = {
         "name": "怒焰",
         "title": "榮譽軍需官",
         "greeting": "戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。"
+      },
+      "warmarshal_draven_kole": {
+        "name": "戰帥德拉文·科爾",
+        "title": "戰爭軍備庫總管",
+        "greeting": "我只收榮譽這一種貨幣，戰爭軍備庫由我看守。在戰場上掙得你的軍階，我便為你披上迎接下一戰的甲冑。"
       },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",
@@ -15182,6 +15228,36 @@ export const zh_TW: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法師法衣",
         "bonus3": "攻擊速度和施法速度提高 15%。"
+      },
+      "warfare_ashstalker": {
+        "name": "灰燼追獵者裝備",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「灰燼疾行」，使移動速度提高 40%，持續 6 秒。"
+      },
+      "warfare_cinderweave": {
+        "name": "燼織法衣",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。"
+      },
+      "warfare_furyforged": {
+        "name": "怒鑄戰裝",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「不破誓約」，吸收 200 點傷害，持續 10 秒。"
+      },
+      "warfare_stormbound": {
+        "name": "縛雷法衣",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。"
+      },
+      "warfare_thornhide": {
+        "name": "荊棘皮甲",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「棘刺護身」，閃躲機率提高 15%，持續 6 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

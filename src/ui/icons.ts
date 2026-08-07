@@ -4587,6 +4587,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'col_reliquary_rank_3',
   'col_reliquary_rank_4',
   'col_reliquary_rank_5',
+  // The WARFARE lifetime-honor rank titles (warfare tier refactor, phase 3): all three are
+  // 'pvp', so all three fall back to the deed_cat_pvp crest until their commissioned art
+  // lands (docs/achievements/icon-brief.md).
+  'pvp_honor_sergeant',
+  'pvp_honor_knight_lieutenant',
+  'pvp_honor_field_marshal',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

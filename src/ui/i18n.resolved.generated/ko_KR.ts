@@ -775,6 +775,10 @@ export const ko_KR: EnTranslations = {
       "ready": "공격",
       "seconds": "{seconds}초"
     },
+    "breath": {
+      "label": "숨",
+      "drowning": "익사 중!"
+    },
     "rest": {
       "resting": "휴식 중"
     },
@@ -956,6 +960,7 @@ export const ko_KR: EnTranslations = {
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
+      "dive": "Swim Down",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -1332,6 +1337,7 @@ export const ko_KR: EnTranslations = {
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
       "showPetFrame": "내 펫 표시",
+      "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -1527,6 +1533,16 @@ export const ko_KR: EnTranslations = {
         "assist": "도움",
         "firstWin": "첫 승리"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "워페어 세트 둘러보기",
+      "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
+      "jewelry": "장신구",
+      "weapons": "무기",
+      "owned": "보유 중",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
+      "buyConfirmBody": "{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다."
     },
     "charSheet": {
       "offense": "공격",
@@ -2131,6 +2147,8 @@ export const ko_KR: EnTranslations = {
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
+      "showPets": "Show Pets",
+      "petHealth": "펫 {name}, 체력 {pct}",
       "showSelf": "내 프레임 표시"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const ko_KR: EnTranslations = {
       "guildOpenAccept": "개설",
       "guildOpenNote": "길드 금고가 아닌 본인의 소지금에서 지불됩니다",
       "guildPurseShort": "소지금 부족",
+      "guildReadOnlyNote": "길드 장교만 길드 은행을 변경할 수 있습니다.",
+      "guildUnopenedNote": "길드 은행이 아직 개설되지 않았습니다.",
       "guildDormantNote": "잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.",
       "guildDormantHint": "이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.",
       "guildDormantAria": "{item}, 수량 {count}, 꺼낼 수 없음",
@@ -2490,7 +2510,7 @@ export const ko_KR: EnTranslations = {
       "logNote": "최근 길드 은행 활동 {count}건입니다.",
       "logLoading": "길드 은행 기록을 불러오는 중...",
       "logEmpty": "아직 길드 은행에 넣거나 뺀 것이 없습니다.",
-      "logRefused": "길드 장교만 길드 은행 기록을 볼 수 있습니다.",
+      "logUnavailable": "지금은 길드 은행 기록을 볼 수 없습니다.",
       "logFormerMember": "탈퇴한 길드원",
       "logDepositItem": "{actor}님이 {item} {count}개를 넣었습니다",
       "logWithdrawItem": "{actor}님이 {item} {count}개를 꺼냈습니다",
@@ -9704,6 +9724,27 @@ export const ko_KR: EnTranslations = {
       "cinderweave_slippers": {
         "name": "불씨매듭 덧신"
       },
+      "thornhide_headdress": {
+        "name": "가시가죽 두건"
+      },
+      "thornhide_mantle": {
+        "name": "가시가죽 어깨망토"
+      },
+      "thornhide_vestment": {
+        "name": "가시가죽 예복"
+      },
+      "thornhide_cinch": {
+        "name": "가시가죽 허리띠"
+      },
+      "thornhide_leggings": {
+        "name": "가시가죽 다리보호대"
+      },
+      "thornhide_gloves": {
+        "name": "가시가죽 장갑"
+      },
+      "thornhide_boots": {
+        "name": "가시가죽 발덮개"
+      },
       "final_oath_medallion": {
         "name": "최후의 맹세 메달"
       },
@@ -12050,6 +12091,11 @@ export const ko_KR: EnTranslations = {
         "name": "퓨리",
         "title": "명예 병참장교",
         "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
+      "warmarshal_draven_kole": {
+        "name": "전쟁원수 드레이븐 콜",
+        "title": "워페어 보급창 관리관",
+        "greeting": "내가 받는 화폐는 명예뿐이며, 워페어 보급창은 내가 지킨다. 전장에서 계급을 얻어라. 다음 전투를 위해 갑주를 갖춰 주겠다."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",
@@ -15182,6 +15228,36 @@ export const ko_KR: EnTranslations = {
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "warfare_ashstalker": {
+        "name": "잿빛추적자의 장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"잿빛 질주\"가 발동하여 6초 동안 이동 속도가 40% 증가합니다."
+      },
+      "warfare_cinderweave": {
+        "name": "잿불직물 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_furyforged": {
+        "name": "분노벼림 전투장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"꺾이지 않는 맹세\"가 발동하여 10초 동안 200의 피해를 흡수합니다."
+      },
+      "warfare_stormbound": {
+        "name": "폭풍결속 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_thornhide": {
+        "name": "가시가죽 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"가시 방호\"가 발동하여 6초 동안 회피 확률이 15% 증가합니다."
       },
       "wyrmshadow": {
         "name": "밤송곳니 의복",

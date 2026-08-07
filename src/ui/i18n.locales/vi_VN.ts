@@ -50,7 +50,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Đang tải nhật ký ngân hàng bang hội...',
   'hudChrome.bank.logNote': '{count} hoạt động ngân hàng bang hội gần đây nhất.',
   'hudChrome.bank.logOpenBank': '{actor} đã mở ngân hàng bang hội với giá {amount}',
-  'hudChrome.bank.logRefused': 'Chỉ sĩ quan bang hội mới có thể xem nhật ký ngân hàng bang hội.',
   'hudChrome.bank.logWithdrawItem': '{actor} đã rút {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} đã rút {amount}',
   'hudChrome.bank.personalTab': 'Cá Nhân',
@@ -11063,4 +11062,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải',
   'itemUi.vendor.buyStack': 'Mua {count}',
   'itemUi.vendor.buyStackAria': 'Mua {count} {item} với giá {price}',
+  'hudChrome.options.waterRipples': 'Gợn nước (sóng rẽ nước)',
+  'hudChrome.breath.label': 'Hơi thở',
+  'hudChrome.breath.drowning': 'Đang chết đuối!',
 };

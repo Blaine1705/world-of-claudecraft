@@ -308,7 +308,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands.
-    expect(full).toEqual({ owned: 216, total: 216 });
+    expect(full).toEqual({ owned: 219, total: 219 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -316,7 +316,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands.
-    expect(character).toEqual({ owned: 187, total: 187 });
+    expect(character).toEqual({ owned: 190, total: 190 });
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -1616,7 +1616,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 4,
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
-  horizons_titles: 33,
+  horizons_titles: 36,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level

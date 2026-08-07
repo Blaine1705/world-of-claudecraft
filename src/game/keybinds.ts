@@ -127,6 +127,17 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyE'],
   },
   { id: 'jump', label: 'Jump', category: 'Movement', kind: 'held', defaults: ['Space'] },
+  // Swim down, the mirror of Jump's swim up. Ctrl is the one movement-hand key
+  // left unclaimed, and a HELD action matches the bare physical code, so a lone
+  // modifier drives it fine (only the rebinding CAPTURE ignores lone modifiers,
+  // so a player rebinding this must pick a non-modifier key).
+  {
+    id: 'dive',
+    label: 'Swim Down',
+    category: 'Movement',
+    kind: 'held',
+    defaults: ['ControlLeft'],
+  },
   {
     id: 'autorun',
     label: 'Toggle Autorun',

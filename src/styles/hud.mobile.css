@@ -2054,6 +2054,19 @@
   body.mobile-touch #party-frames .party-frame .pf-badge {
     font-size: 9px;
   }
+  /* The pet sliver shrinks with the rest of the mobile row (its bars are 5px here,
+     down from 9px on desktop), staying a hairline cue rather than competing with the
+     member's own health. It is not a primary tap target on mobile: the member row
+     owns the tap, and selecting a party member's pet is a desktop-scale interaction. */
+  body.mobile-touch #party-frames .party-frame .pfm-pet {
+    height: 3px;
+    margin-top: 1px;
+    /* Makes the "the member row owns the tap" claim above actually true. At 3px this
+       is nowhere near the 40x40 touch floor, and without this a tap landing on it
+       selects the pet and stopPropagation swallows the member selection the player
+       meant. Informational on touch; the row keeps the whole tap area. */
+    pointer-events: none;
+  }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;
     margin-top: 1px;
@@ -3713,6 +3726,7 @@
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
+  body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
   body.mobile-touch #options-menu,
@@ -3732,9 +3746,24 @@
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
+  body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
+  }
+  /* The WARFARE shop is many sections deep (one per armor family, plus jewelry
+     and weapons), so it takes the vendor window's full top-to-bottom treatment
+     rather than the shorter quest-log clamp: same
+     --window-scale division for the #ui zoom, same reserved 12px top offset
+     from the centered-sheet base, same safe-area bottom margin. */
+  body.mobile-touch #warfare-window {
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
+    overflow-y: auto;
   }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {
@@ -3985,6 +4014,10 @@
       gap: 6px;
     }
     body.mobile-touch #bank-window .gbank-dormant-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-readonly-note {
       margin: 0 0 2px;
       font-size: 10px;
     }

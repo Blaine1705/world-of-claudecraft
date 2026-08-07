@@ -983,7 +983,9 @@ describe('i18n Localization Key Coverage', () => {
     // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
     // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
     // single 3-piece tier (name+bonus3 only).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
+    // 7 epic families x (name + bonus2/3/4), 3 haste kits x (name + bonus3), and the
+    // 5 WARFARE families x (name + bonus2/4/7).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {

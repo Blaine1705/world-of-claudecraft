@@ -53,11 +53,11 @@ describe('deed_i18n English resolution', () => {
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
-    // deeds, the twelve remaining starter-zone chronicle pairs, and the four
+    // deeds, the twelve remaining starter-zone chronicle pairs, the four
     // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
-    // title manifest row). None of the other appends carry a title reward.
-    expect(manifest.length).toBe(263 * 2 + 34);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(34);
+    // title manifest row), and the three WARFARE lifetime-honor rank titles.
+    expect(manifest.length).toBe(266 * 2 + 37);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(37);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

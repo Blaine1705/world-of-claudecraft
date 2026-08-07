@@ -775,6 +775,10 @@ export const ja_JP: EnTranslations = {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "息",
+      "drowning": "溺れています！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -956,6 +960,7 @@ export const ja_JP: EnTranslations = {
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
+      "dive": "Swim Down",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -1332,6 +1337,7 @@ export const ja_JP: EnTranslations = {
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showPetFrame": "自分のペットを表示",
+      "waterRipples": "水面の波紋（航跡）",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
@@ -1527,6 +1533,16 @@ export const ja_JP: EnTranslations = {
         "assist": "アシスト",
         "firstWin": "初勝利"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "ウォーフェアセットを見る",
+      "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
+      "jewelry": "アクセサリー",
+      "weapons": "武器",
+      "owned": "所有済み",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "{item}を{honor}で購入、所有済み",
+      "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"
     },
     "charSheet": {
       "offense": "攻撃",
@@ -2131,6 +2147,8 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
+      "showPets": "Show Pets",
+      "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const ja_JP: EnTranslations = {
       "guildOpenAccept": "開設",
       "guildOpenNote": "ギルド金庫ではなく、あなた自身の所持金から支払われます",
       "guildPurseShort": "所持金不足",
+      "guildReadOnlyNote": "ギルド銀行を変更できるのはギルド役員のみです。",
+      "guildUnopenedNote": "ギルド銀行はまだ開設されていません。",
       "guildDormantNote": "ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。",
       "guildDormantHint": "このアイテムはギルド銀行にロックされており、引き出せません。",
       "guildDormantAria": "{item}、数量 {count}、引き出し不可",
@@ -2490,7 +2510,7 @@ export const ja_JP: EnTranslations = {
       "logNote": "直近{count}件のギルド銀行の操作です。",
       "logLoading": "ギルド銀行のログを読み込んでいます...",
       "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
-      "logRefused": "ギルド銀行のログを閲覧できるのはギルド役員のみです。",
+      "logUnavailable": "現在、ギルド銀行のログを閲覧できません。",
       "logFormerMember": "元ギルドメンバー",
       "logDepositItem": "{actor} が {item} を {count} 個預けました",
       "logWithdrawItem": "{actor} が {item} を {count} 個引き出しました",
@@ -9704,6 +9724,27 @@ export const ja_JP: EnTranslations = {
       "cinderweave_slippers": {
         "name": "熾火織りの上履き"
       },
+      "thornhide_headdress": {
+        "name": "ソーンハイドの頭巾"
+      },
+      "thornhide_mantle": {
+        "name": "ソーンハイドの肩衣"
+      },
+      "thornhide_vestment": {
+        "name": "ソーンハイドの法衣"
+      },
+      "thornhide_cinch": {
+        "name": "ソーンハイドの腰帯"
+      },
+      "thornhide_leggings": {
+        "name": "ソーンハイドの脚当て"
+      },
+      "thornhide_gloves": {
+        "name": "ソーンハイドの手甲"
+      },
+      "thornhide_boots": {
+        "name": "ソーンハイドの足袋"
+      },
       "final_oath_medallion": {
         "name": "最後の誓いのメダリオン"
       },
@@ -12050,6 +12091,11 @@ export const ja_JP: EnTranslations = {
         "name": "フューリー",
         "title": "名誉補給官",
         "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
+      },
+      "warmarshal_draven_kole": {
+        "name": "戦元帥ドレイヴン・コール",
+        "title": "ウォーフェア軍需庫の管理者",
+        "greeting": "私が受け取る通貨は名誉だけだ。ウォーフェア軍需庫は私が守っている。戦場で階級を勝ち取れ。次の戦いに備えて武具を整えてやろう。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",
@@ -15182,6 +15228,36 @@ export const ja_JP: EnTranslations = {
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "warfare_ashstalker": {
+        "name": "アッシュストーカーの装備",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アッシェンステップ」が発動し、6秒間、移動速度が40%上昇します。"
+      },
+      "warfare_cinderweave": {
+        "name": "シンダーウィーヴの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_furyforged": {
+        "name": "フューリーフォージの戦装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アンブロークンオース」が発動し、10秒間200ダメージを吸収します。"
+      },
+      "warfare_stormbound": {
+        "name": "ストームバウンドの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_thornhide": {
+        "name": "ソーンハイドの装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。"
       },
       "wyrmshadow": {
         "name": "ナイトファングの装束",

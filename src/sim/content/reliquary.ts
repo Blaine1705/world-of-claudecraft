@@ -363,6 +363,11 @@ export const RELIQUARY_HORIZON_TITLES = [
   'col_reliquary_rank_2',
   'col_reliquary_rank_3',
   'col_reliquary_rank_4',
+  // WARFARE lifetime-honor ladder (release v0.35.0 sync): every non-hidden
+  // title deed pages here per the locked titles-page rule.
+  'pvp_honor_sergeant',
+  'pvp_honor_knight_lieutenant',
+  'pvp_honor_field_marshal',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

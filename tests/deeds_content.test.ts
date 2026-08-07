@@ -62,12 +62,11 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 263 deeds worth 3060 total Renown', () => {
-    // Release base (259 / 3060: brood, Thornhollow Fields, Rift pair, seven
-    // per-craft rare-tier profession deeds, twelve starter-zone chronicle
-    // pairs) plus four Reliquary Curator rank bridges (all renown 0).
-    expect(DEED_ORDER.length).toBe(263);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3060);
+  it('ships exactly 266 deeds worth 3145 total Renown', () => {
+    // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
+    // four Reliquary Curator rank bridges (all renown 0).
+    expect(DEED_ORDER.length).toBe(266);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
   });
 
   it('ships the audited per-category counts', () => {
@@ -82,8 +81,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       chronicle: 49,
       // +4 Reliquary Curator rank bridges on top of the release collection set.
       collection: 32,
-      // +4 Thornhollow Fields battleground deeds from release.
-      pvp: 32,
+      // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
+      pvp: 35,
       social: 18,
       exploration: 9,
       feat: 3,
@@ -200,6 +199,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_rank_3',
       'col_reliquary_rank_4',
       'col_reliquary_rank_5',
+      // WARFARE lifetime-honor ladder, the release side of the same merge.
+      'pvp_honor_sergeant',
+      'pvp_honor_knight_lieutenant',
+      'pvp_honor_field_marshal',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -447,16 +450,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 34 titles and 4 borders', () => {
+  it('ships exactly 37 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    // Reliquary Curator ranks append 3 titles + 1 border (cosmetic only)
-    // on top of the release base (31 titles + 3 borders).
-    expect(titles.length).toBe(34);
+    // Reliquary Curator ranks append 3 titles + 1 border and the WARFARE
+    // honor ladder 3 more titles on top of the release base (31 + 3).
+    expect(titles.length).toBe(37);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(34);
+    expect(new Set(titleTexts).size).toBe(37);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -527,10 +530,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // profession-rare block, the gatherer and first-cast pair for frostveil,
   // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
   // already covered by the brood rework above). Re-baselined at the v0.35.0
-  // sync merge that unions those pairs with the Reliquary Phase 6 zero-Renown
-  // Curator rank bridges (col_reliquary_rank_2..5), appended after the
-  // chronicle block. No shipped trigger or renown changed on any side.
-  const FROZEN_CATALOG_SHA256 = 'b93199d60b53c33514db75acb6c34c17fd34b2505625a14880f03f92a054bb3a';
+  // sync merges: first for the union with the Reliquary Curator rank bridges,
+  // then again when the WARFARE honor ladder joined from the release side.
+  // No shipped trigger or renown changed on any side of either merge.
+  const FROZEN_CATALOG_SHA256 = 'e82a32100af98815aeb44a43ce1a9a60a40559a1854e0862ac973a25ed2fdc94';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -724,8 +727,8 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // Reliquary Curator ranks append after the starter-zone chronicle block.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_rank_5');
+    // The WARFARE ladder appends after the Curator rank bridges in the union.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_honor_field_marshal');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

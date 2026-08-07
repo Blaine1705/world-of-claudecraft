@@ -54,7 +54,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Memuat log bank guild...',
   'hudChrome.bank.logNote': '{count} tindakan bank guild terbaru.',
   'hudChrome.bank.logOpenBank': '{actor} membuka bank guild seharga {amount}',
-  'hudChrome.bank.logRefused': 'Hanya perwira guild yang dapat membaca log bank guild.',
   'hudChrome.bank.logWithdrawItem': '{actor} menarik {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} menarik {amount}',
   'hudChrome.bank.personalTab': 'Pribadi',
@@ -11231,4 +11230,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Atur ulang tab {channel}: seret, atau gunakan Alt+Kiri dan Alt+Kanan',
   'itemUi.vendor.buyStack': 'Beli {count}',
   'itemUi.vendor.buyStackAria': 'Beli {count} {item} seharga {price}',
+  'hudChrome.options.waterRipples': 'Riak Air (Ombak Jejak)',
+  'hudChrome.breath.label': 'Napas',
+  'hudChrome.breath.drowning': 'Tenggelam!',
 };

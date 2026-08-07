@@ -607,6 +607,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '顯示法力、怒氣和能量',
   'hudChrome.partyFrames.showAbsorbs': '顯示吸收護盾',
   'hudChrome.partyFrames.showAuras': '顯示增益和減益',
+  'hudChrome.partyFrames.petHealth': '寵物{name}，生命值{pct}',
   'hudChrome.partyFrames.showSelf': '顯示你的框體',
   'hudChrome.frameReset.label': '重置框體位置',
   'hudChrome.options.playerFrameScale': '玩家框縮放',
@@ -840,6 +841,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '擊殺',
   'hudChrome.warfare.floatReasons.assist': '助攻',
   'hudChrome.warfare.floatReasons.firstWin': '首勝',
+  'hudChrome.warfareShop.gossipOption': '瀏覽戰爭套裝',
+  'hudChrome.warfareShop.gossipOptionAria': '瀏覽 {name} 提供的戰爭套裝商店',
+  'hudChrome.warfareShop.jewelry': '飾品',
+  'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.owned': '已擁有',
+  'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 購買 {item}，已擁有',
+  'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 購買 {item}？榮譽購買後無法退款。',
   'hudChrome.keybinds.bgFlag': '戰場奪旗動作',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '荊谷原野',
@@ -7199,6 +7207,36 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.warfare_ashstalker.name': '灰燼追獵者裝備',
+  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「灰燼疾行」，使移動速度提高 40%，持續 6 秒。',
+  'entities.itemSets.warfare_cinderweave.name': '燼織法衣',
+  'entities.itemSets.warfare_cinderweave.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_furyforged.name': '怒鑄戰裝',
+  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「不破誓約」，吸收 200 點傷害，持續 10 秒。',
+  'entities.itemSets.warfare_stormbound.name': '縛雷法衣',
+  'entities.itemSets.warfare_stormbound.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_thornhide.name': '荊棘皮甲',
+  'entities.itemSets.warfare_thornhide.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「棘刺護身」，閃躲機率提高 15%，持續 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
@@ -8642,6 +8680,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '織燼裹腿',
   'entities.items.cinderweave_handwraps.name': '織燼裹手',
   'entities.items.cinderweave_slippers.name': '織燼便鞋',
+  'entities.items.thornhide_headdress.name': '荊棘兜帽',
+  'entities.items.thornhide_mantle.name': '荊棘披肩',
+  'entities.items.thornhide_vestment.name': '荊棘法衣',
+  'entities.items.thornhide_cinch.name': '荊棘腰帶',
+  'entities.items.thornhide_leggings.name': '荊棘護腿',
+  'entities.items.thornhide_gloves.name': '荊棘護手',
+  'entities.items.thornhide_boots.name': '荊棘軟靴',
   'entities.items.final_oath_medallion.name': '最終誓約勳章',
   'entities.items.razorwind_torque.name': '剃風頸環',
   'entities.items.cinder_sigil_pendant.name': '燼印墜飾',
@@ -8657,6 +8702,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '怒焰',
   'entities.npcs.fury.title': '榮譽軍需官',
   'entities.npcs.fury.greeting': '戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。',
+  'entities.npcs.warmarshal_draven_kole.name': '戰帥德拉文·科爾',
+  'entities.npcs.warmarshal_draven_kole.title': '戰爭軍備庫總管',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '我只收榮譽這一種貨幣，戰爭軍備庫由我看守。在戰場上掙得你的軍階，我便為你披上迎接下一戰的甲冑。',
   'guide.economy.bankBody':
     '每座主城都設有鍍金保險箱的分號，它是這片大陸的銀行商號。與那裡的司庫交談即可打開你的保險庫：一處背包之外的私人儲物空間，伴隨角色終身。無論你下次造訪哪家分號，寄存的物品都會安然等候。',
   'guide.economy.bankHow':
@@ -8729,6 +8778,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildOpenAccept': '開啟',
   'hudChrome.bank.guildOpenNote': '由你自己支付，而非公會金庫',
   'hudChrome.bank.guildPurseShort': '金錢不足',
+  'hudChrome.bank.guildReadOnlyNote': '只有公會幹部才能更改公會銀行。',
+  'hudChrome.bank.guildUnopenedNote': '公會銀行尚未開通。',
   'hudChrome.bank.guildDormantNote': '鎖定的物品無法取出，並會阻止解散公會。',
   'hudChrome.bank.guildDormantHint': '該物品已鎖定在公會銀行中，無法取出。',
   'hudChrome.bank.guildDormantAria': '{item}，數量 {count}，無法取出',
@@ -8743,7 +8794,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logNote': '最近 {count} 筆公會銀行操作。',
   'hudChrome.bank.logLoading': '正在載入公會銀行日誌...',
   'hudChrome.bank.logEmpty': '公會銀行中尚未存入或取出任何物品。',
-  'hudChrome.bank.logRefused': '只有公會幹部才能查看公會銀行日誌。',
+  'hudChrome.bank.logUnavailable': '目前無法讀取公會銀行日誌。',
   'hudChrome.bank.logFormerMember': '一位已離開的公會成員',
   'hudChrome.bank.logDepositItem': '{actor} 存入了 {count} 個 {item}',
   'hudChrome.bank.logWithdrawItem': '{actor} 取出了 {count} 個 {item}',
@@ -10854,4 +10905,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔與拆解：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceBatch': '批量製作：單次最多 {count} 件，逐件施放',
+  'hudChrome.options.waterRipples': '水面漣漪（尾波）',
+  'hudChrome.breath.label': '呼吸',
+  'hudChrome.breath.drowning': '溺水！',
 };

@@ -775,6 +775,10 @@ export const da_DK: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Åndedræt",
+      "drowning": "Drukner!"
+    },
     "rest": {
       "resting": "Hviler"
     },
@@ -956,6 +960,7 @@ export const da_DK: EnTranslations = {
       "valecup": "Dalpokalen",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Gem/fremvis våben",
+      "dive": "Swim Down",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
       "petStop": "Kæledyr: Stop",
@@ -1332,6 +1337,7 @@ export const da_DK: EnTranslations = {
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
       "showPetFrame": "Vis dit kæledyr",
+      "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
@@ -1527,6 +1533,16 @@ export const da_DK: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Angreb",
@@ -2131,6 +2147,8 @@ export const da_DK: EnTranslations = {
       "showResource": "Vis mana, raseri og energi",
       "showAbsorbs": "Vis absorberingsskjolde",
       "showAuras": "Vis styrkelser og svækkelser",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Vis din ramme"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const da_DK: EnTranslations = {
       "guildOpenAccept": "Åbn",
       "guildOpenNote": "Betalt af dine egne penge, ikke laugets skatkammer",
       "guildPurseShort": "Ikke nok penge",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Låste genstande kan ikke tages ud og forhindrer, at lauget kan opløses.",
       "guildDormantHint": "Denne genstand er låst i laugsbanken og kan ikke tages ud.",
       "guildDormantAria": "{item}, antal {count}, kan ikke tages ud",
@@ -2490,7 +2510,7 @@ export const da_DK: EnTranslations = {
       "logNote": "De {count} seneste handlinger i laugsbanken.",
       "logLoading": "Indlæser laugsbankens log...",
       "logEmpty": "Der er endnu ikke flyttet noget ind i eller ud af laugsbanken.",
-      "logRefused": "Kun laugsofficerer kan læse laugsbankens log.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Et tidligere laugsmedlem",
       "logDepositItem": "{actor} indsatte {count} {item}",
       "logWithdrawItem": "{actor} tog {count} {item} ud",
@@ -9704,6 +9724,27 @@ export const da_DK: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Glødevævede Sko"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Den Sidste Eds Medaljon"
       },
@@ -12050,6 +12091,11 @@ export const da_DK: EnTranslations = {
         "name": "RASERI",
         "title": "Æreskvartermester",
         "greeting": "Sandet husker hver sejr. Brug din ære godt."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "Lærdomsmester Caddis",
@@ -15182,6 +15228,36 @@ export const da_DK: EnTranslations = {
       "vale_arcanist": {
         "name": "Dalarkanistens klæder",
         "bonus3": "Øger angrebs- og magihastighed med 15%."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Nightfang klæder",

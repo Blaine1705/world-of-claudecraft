@@ -5163,6 +5163,30 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "rewardBorder": true
+  },
+  {
+    "id": "pvp_honor_sergeant",
+    "name": "Sergeant",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Sergeant"
+  },
+  {
+    "id": "pvp_honor_knight_lieutenant",
+    "name": "Knight-Lieutenant",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Knight-Lieutenant"
+  },
+  {
+    "id": "pvp_honor_field_marshal",
+    "name": "Field Marshal",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Field Marshal"
   }
 ];
 
@@ -6328,6 +6352,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Arch-Curator"
+      },
+      {
+        "kind": "title",
+        "name": "Sergeant"
+      },
+      {
+        "kind": "title",
+        "name": "Knight-Lieutenant"
+      },
+      {
+        "kind": "title",
+        "name": "Field Marshal"
       }
     ]
   }

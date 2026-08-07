@@ -775,6 +775,10 @@ export const cs_CZ: EnTranslations = {
       "ready": "Úder",
       "seconds": "{seconds} s"
     },
+    "breath": {
+      "label": "Dech",
+      "drowning": "Topíš se!"
+    },
     "rest": {
       "resting": "Odpočinek"
     },
@@ -956,6 +960,7 @@ export const cs_CZ: EnTranslations = {
       "valecup": "Pohár údolí",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Zasunout/Vytasit zbraň",
+      "dive": "Swim Down",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
       "petStop": "Mazlíček: Zastavit",
@@ -1332,6 +1337,7 @@ export const cs_CZ: EnTranslations = {
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showPetFrame": "Zobrazit tvého mazlíčka",
+      "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
@@ -1527,6 +1533,16 @@ export const cs_CZ: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Útok",
@@ -2131,6 +2147,8 @@ export const cs_CZ: EnTranslations = {
       "showResource": "Zobrazit manu, vztek a energii",
       "showAbsorbs": "Zobrazit absorpční štíty",
       "showAuras": "Zobrazit posílení a oslabení",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {
@@ -2476,6 +2494,8 @@ export const cs_CZ: EnTranslations = {
       "guildOpenAccept": "Otevřít",
       "guildOpenNote": "Placeno z tvých vlastních peněz, ne z cechovní pokladny",
       "guildPurseShort": "Nedostatek peněz",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Uzamčené předměty nelze vybrat a brání rozpuštění cechu.",
       "guildDormantHint": "Tento předmět je v cechovní bance uzamčen a nelze ho vybrat.",
       "guildDormantAria": "{item}, množství {count}, nelze vybrat",
@@ -2490,7 +2510,7 @@ export const cs_CZ: EnTranslations = {
       "logNote": "{count} nejnovějších akcí cechovní banky.",
       "logLoading": "Načítání deníku cechovní banky...",
       "logEmpty": "Do cechovní banky ani z ní se zatím nic nepřesunulo.",
-      "logRefused": "Deník cechovní banky smí číst pouze důstojníci.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Bývalý člen cechu",
       "logDepositItem": "{actor}: vklad {count}x {item}",
       "logWithdrawItem": "{actor}: výběr {count}x {item}",
@@ -9704,6 +9724,27 @@ export const cs_CZ: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Střevíce žárové tkaniny"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Medailon poslední přísahy"
       },
@@ -12050,6 +12091,11 @@ export const cs_CZ: EnTranslations = {
         "name": "FÚRIE",
         "title": "Intendant cti",
         "greeting": "Písky si pamatují každé vítězství. Utrácej svou čest moudře."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "Kronikář Caddis",
@@ -15182,6 +15228,36 @@ export const cs_CZ: EnTranslations = {
       "vale_arcanist": {
         "name": "Regálie arkánisty z údolí",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",
