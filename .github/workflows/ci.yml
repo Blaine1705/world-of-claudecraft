@@ -367,13 +367,24 @@ jobs:
   # script's step list in sync when adding or removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
-    # Compose release-to-main exclusion with the code path filter (D10). Do not
-    # drop either arm: release-to-main must still select release-*, and docs-only
-    # PRs must skip this matrix. needs.changes only; no needs edge to pr-checks.
-    # merge_group always lands here (the queue bar is the full PR tier; the
-    # release-to-main exclusion is a pull_request-arm concern and cannot match).
+    # Two-level gate, split on purpose (docs/merge-queue.md, "The required-check
+    # contract"). The JOB if carries only the event routing, so every
+    # pull_request and merge_group run expands the matrix and reports all eight
+    # suffixed check runs; the STEP gate on every step below carries the
+    # release-to-main exclusion and the code path filter (D10), so a leg the
+    # run does not apply to starts, skips all of its steps, and completes green
+    # in seconds. A job-level skip of a MATRIX job would instead collapse to
+    # ONE check run named without the (N) suffix, which string-matches none of
+    # the required shard contexts and leaves them "expected" forever: under the
+    # branch ruleset a docs-only or release-to-main PR could then never be
+    # queued or merged (observed live on the Phase 3 queue drills, PR #3038:
+    # "8 of 13 required status checks are expected"). Do not drop either step
+    # gate arm: release-to-main must still select release-*, and docs-only PRs
+    # must still skip the suite work. needs.changes only; no needs edge to
+    # pr-checks. merge_group always runs the work (the queue bar is the full
+    # PR tier; neither gate arm can match a merge_group event).
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group'
     # Fail fast on the runner-side checkout-stall class instead of burning
     # tail: on 2026-08-06 thirteen shard, lane, and browser jobs across seven
     # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
@@ -405,21 +416,31 @@ jobs:
         shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+      # The step gate (see the job comment): identical on every step of this
+      # job, pinned that way by tests/ci_workflow.test.ts. A leg that this run
+      # does not apply to (docs-only PR, release-to-main PR) skips every step
+      # and reports green under its required suffixed name. The code arm stays
+      # != 'false' so a missing or empty classifier output runs the suite,
+      # never skips it (fail closed).
       - name: Check out repository
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/checkout@v6
 
       - name: Set up pnpm
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: pnpm/action-setup@v4
         with:
           version: 10.34.5
 
       - name: Set up Node.js
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/setup-node@v6
         with:
           node-version: 26
           cache: pnpm
 
       - name: Install dependencies
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         run: pnpm install --frozen-lockfile
 
       # Persist the vitest transform cache across runs (vite.config.ts enables
@@ -475,6 +496,7 @@ jobs:
       # legs and the full replay read the same store: every leg is vitest
       # under the same config.
       - name: Cache vitest transform cache
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
@@ -497,6 +519,7 @@ jobs:
       # Release-gate below keeps the unconditional full run line; the nightly
       # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
+        if: (github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')) && needs.changes.outputs.code != 'false'
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
