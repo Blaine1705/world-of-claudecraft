@@ -23,6 +23,7 @@ import type {
   WocBidRow,
   WocBrowseQuery,
   WocCustodyExtract,
+  WocCustodyGrant,
   WocListingRow,
   WocMarketCustody,
   WocMarketDeps,
@@ -113,6 +114,29 @@ class FakeCustody implements WocMarketCustody {
         characterId,
         level: 10,
         // The service never reads the state blob; it only hands it to the db.
+        state: {} as unknown as CharacterState,
+        leaseNonce: 'nonce',
+      },
+    };
+  }
+
+  /** Characters whose bags are full: grantCopy refuses them, so a test can
+   *  drive the mail fallback without modelling real capacity. */
+  readonly fullBags = new Set<number>();
+
+  grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant {
+    const inventory = this.bags.get(characterId);
+    // Same three refusals, in the same order, as the real bridge: offline (no
+    // live session), wrong owner, no room.
+    if (!inventory) return { ok: false, reason: 'offline' };
+    if (this.owners.get(characterId) !== accountId) return { ok: false, reason: 'not_yours' };
+    if (this.fullBags.has(characterId)) return { ok: false, reason: 'no_space' };
+    inventory.push(slot);
+    return {
+      ok: true,
+      save: {
+        characterId,
+        level: 10,
         state: {} as unknown as CharacterState,
         leaseNonce: 'nonce',
       },
@@ -2058,6 +2082,145 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     // One agreed price, carried onto both price fields.
     expect(accepted.listing?.buyNowCents).toBe(5000);
     expect(accepted.listing?.startCents).toBe(5000);
+  });
+
+  /** Put the buyer online with room to spare. Without this every hand-off
+   *  refuses as 'offline' and the mail tests below pass for the wrong reason. */
+  function buyerOnline(h: Harness): void {
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+  }
+
+  /** Drive an accepted directed offer all the way to a delivered settlement. */
+  async function settleDirected(h: Harness): Promise<{ listingId: number }> {
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const accepted = await acceptWith(h, offer.offer.id);
+    if (!accepted.ok || !accepted.listing) throw new Error('accept refused');
+    const listingId = accepted.listing.id;
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    unwrap(await h.service.settlementQuote(BUYER_A, bought.settlement.id), 'settlementQuote');
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, bought.settlement.id, 'sig-directed-1'),
+      'confirmSettlement',
+    );
+    return { listingId };
+  }
+
+  it('hands a p2p purchase STRAIGHT to the buyer, with no parcel at all', async () => {
+    // The whole point of the trade window: the two players are standing in front
+    // of each other, so the goods go in the bag, not in the post.
+    const h = stocked();
+    buyerOnline(h);
+    const before = bagsOf(h, CHAR_A).length;
+    await settleDirected(h);
+    expect(bagsOf(h, CHAR_A), 'the item lands in the buyer bags').toHaveLength(before + 1);
+    expect(
+      h.custody.parcels.filter((p) => p.letter === 'delivery'),
+      'and no delivery parcel is booked',
+    ).toHaveLength(0);
+  });
+
+  it('still MAILS an Exchange purchase, which is anonymous and asynchronous', async () => {
+    // The other half of the rule, and the reason this is a branch rather than a
+    // replacement: a public auction winner may be offline, in another zone, or
+    // simply not expecting it.
+    const h = makeHarness();
+    // Online and roomy ON PURPOSE: the branch must key on the sale being
+    // ANONYMOUS, not on the buyer happening to be unreachable. Without this the
+    // case passes whatever deliverOne does, which is how it was first written.
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    const before = bagsOf(h, CHAR_A).length;
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-exchange-1'),
+      'confirmSettlement',
+    );
+    expect(
+      h.custody.parcels.filter((p) => p.letter === 'delivery'),
+      'the exchange route is unchanged',
+    ).toHaveLength(1);
+    expect(bagsOf(h, CHAR_A), 'nothing goes straight into the bags').toHaveLength(before);
+  });
+
+  it('falls back to MAIL when the buyer has no room', async () => {
+    // Full bags must never drop the item, and must never wedge the settlement.
+    const h = stocked();
+    buyerOnline(h);
+    h.custody.fullBags.add(CHAR_A);
+    const before = bagsOf(h, CHAR_A).length;
+    await settleDirected(h);
+    expect(bagsOf(h, CHAR_A), 'nothing forced into full bags').toHaveLength(before);
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(1);
+  });
+
+  it('falls back to MAIL when the buyer has logged out', async () => {
+    const h = stocked();
+    buyerOnline(h);
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const accepted = await acceptWith(h, offer.offer.id);
+    if (!accepted.ok || !accepted.listing) throw new Error('accept refused');
+    const listingId = accepted.listing.id;
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    unwrap(await h.service.settlementQuote(BUYER_A, bought.settlement.id), 'settlementQuote');
+    // Gone between paying and delivery: no live session to hand anything to.
+    h.custody.bags.delete(CHAR_A);
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, bought.settlement.id, 'sig-directed-2'),
+      'confirmSettlement',
+    );
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(1);
+  });
+
+  it('falls back to MAIL when the lease fence refuses the save', async () => {
+    // A takeover rotated the nonce, so this process no longer owns the
+    // character and its in-memory grant will never persist. Mailing is the only
+    // route that still reaches the player, and it must not double-deliver.
+    const h = stocked();
+    buyerOnline(h);
+    h.db.failDeliveredSave = true;
+    const before = bagsOf(h, CHAR_A).length;
+    await settleDirected(h);
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(1);
+    // The fake's bags are not lease-fenced, so the grant it recorded stands;
+    // what matters is that the DURABLE route was taken exactly once.
+    expect(bagsOf(h, CHAR_A).length).toBeGreaterThanOrEqual(before);
+  });
+
+  it('delivers exactly once even if the sweep runs the settlement again', async () => {
+    // The custodyRef claim is shared by both routes precisely so no sequence of
+    // retries can hand over a copy AND post one.
+    const h = stocked();
+    buyerOnline(h);
+    const before = bagsOf(h, CHAR_A).length;
+    await settleDirected(h);
+    await h.service.sweepPass();
+    await h.service.sweepPass();
+    expect(bagsOf(h, CHAR_A), 'one copy, not three').toHaveLength(before + 1);
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
   });
 
   it('refuses acceptance by anyone but the named buyer, as not_found', async () => {

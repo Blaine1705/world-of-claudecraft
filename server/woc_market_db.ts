@@ -13,7 +13,11 @@
 import type { Pool, PoolClient } from 'pg';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
-import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
+import {
+  DB_HEAVY_STATEMENT_TIMEOUT_MS,
+  saveCharacterState,
+  saveCharacterStateOnClient,
+} from './db';
 import type {
   CharacterSaveArgs,
   NewWocListing,
@@ -998,6 +1002,13 @@ export class PgWocMarketDb implements WocMarketDb {
         WHERE custody_ref = $1 AND booked_at IS NULL`,
       [custodyRef],
     );
+  }
+
+  /** The buyer's bags after a hand-to-hand delivery, lease-fenced like every
+   *  other character write here: false means a takeover rotated the nonce and
+   *  this process must not claim the delivery landed. */
+  async saveDeliveredCharacter(save: CharacterSaveArgs): Promise<boolean> {
+    return saveCharacterState(save.characterId, save.level, save.state, save.leaseNonce);
   }
 
   async unclaimCustodyRef(custodyRef: string): Promise<void> {

@@ -337,6 +337,10 @@ export interface WocMarketDb {
   /** Durable book-once claim: true only for the FIRST claim of this ref. */
   claimCustodyRef(realm: string, custodyRef: string): Promise<boolean>;
   markCustodyRefBooked(custodyRef: string): Promise<void>;
+  /** Persist a buyer's bags after a hand-to-hand delivery. False when the lease
+   *  fence rejected the write, which means this process no longer owns the
+   *  character and the delivery must take the mail route instead. */
+  saveDeliveredCharacter(save: CharacterSaveArgs): Promise<boolean>;
   /** Release an unbooked claim so a failed booking can be retried. */
   unclaimCustodyRef(custodyRef: string): Promise<void>;
   claimBuyNowLock(
@@ -535,11 +539,25 @@ export type WocCustodyExtract =
   | { ok: true; extracted: InvSlot; characterName: string; save: CharacterSaveArgs }
   | { ok: false; reason: ExtractRefusal | 'offline' | 'not_yours' };
 
+/**
+ * The result of handing a held copy straight to a live buyer.
+ *
+ * Every refusal is ORDINARY, not an error: the buyer logged out, or their bags
+ * are full, or the character is not theirs. The caller mails the parcel instead,
+ * so the item is never dropped and never duplicated.
+ */
+export type WocCustodyGrant =
+  | { ok: true; save: CharacterSaveArgs }
+  | { ok: false; reason: 'offline' | 'not_yours' | 'no_space' };
+
 /** The one bridge into the live Sim (game.ts wiring). Every method is
  *  synchronous-in-memory except persistMailParcel, which books at most once
  *  by custodyRef and then persists the realm mail blob. */
 export interface WocMarketCustody {
   extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract;
+  /** Hand a held copy straight to a live buyer's bags. Returns the save the
+   *  caller must persist before treating the delivery as done. */
+  grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant;
   /** Compensation for a failed escrow persist: the copy goes straight back. */
   restoreCopy(characterId: number, slot: InvSlot): void;
   /** Book-once (by custodyRef) + persist. 'booked' covers the already-booked
@@ -1682,6 +1700,52 @@ export class WocMarketService {
     return true;
   }
 
+  /**
+   * Put a directed sale's item straight into the buyer's bags.
+   *
+   * Rides the SAME custodyRef as the mail parcel would, deliberately: the claim
+   * is the one key that decides an item is delivered, so hand-off and mail are
+   * mutually exclusive by construction and no sequence of retries can do both.
+   *
+   * Returns false for every reason a hand-off cannot complete, and leaves the
+   * ref unclaimed when it does, so the caller's mail fallback can claim it. The
+   * ORDER is claim, hand over, persist, mark: a crash before the mark leaves an
+   * unbooked claim, which is the existing "held, visible to ops" state rather
+   * than a duplicate.
+   */
+  private async handToBuyer(
+    settlement: WocSettlementRow,
+    item: InvSlot,
+    target: { characterId: number; name: string },
+    custodyRef: string,
+  ): Promise<boolean> {
+    const fresh = await this.deps.db.claimCustodyRef(this.cfg.realm, custodyRef);
+    // Already claimed means a prior pass delivered it (by either route). Report
+    // handled so the caller does not mail a second copy.
+    if (!fresh) return true;
+    const granted = this.deps.custody.grantCopy(settlement.buyerAccount, target.characterId, item);
+    if (!granted.ok) {
+      await this.deps.db.unclaimCustodyRef(custodyRef).catch(() => {});
+      return false;
+    }
+    let saved = false;
+    try {
+      saved = await this.deps.db.saveDeliveredCharacter(granted.save);
+    } catch {
+      saved = false;
+    }
+    if (!saved) {
+      // The lease fence rejected: another process owns this character now, and
+      // this one's session is a zombie whose state can never be persisted. The
+      // in-memory grant therefore evaporates with it, so mailing the copy is
+      // safe and is the only route that still reaches the player.
+      await this.deps.db.unclaimCustodyRef(custodyRef).catch(() => {});
+      return false;
+    }
+    await this.deps.db.markCustodyRefBooked(custodyRef);
+    return true;
+  }
+
   private async deliverOne(settlement: WocSettlementRow): Promise<void> {
     const listing = await this.deps.db.listingById(this.cfg.realm, settlement.listingId);
     if (!listing) return;
@@ -1693,12 +1757,24 @@ export class WocMarketService {
     // No character to deliver to right now: hold in 'delivering'; a later
     // pass retries (the account may recreate a character; admins can act).
     if (!target) return;
-    await this.bookCustodyOnce(
-      { key: String(target.characterId), name: target.name },
-      'delivery',
-      [listing.item],
-      settlementCustodyRef(settlement.id),
-    );
+    const custodyRef = settlementCustodyRef(settlement.id);
+    // A DIRECTED sale is a hand-to-hand deal: the two players agreed in a trade
+    // window, so the goods belong in the buyer's bags, not in their mailbox.
+    // An Exchange sale is anonymous and asynchronous, and keeps the parcel.
+    //
+    // Mail remains the fallback for BOTH, and every reason to fall back is
+    // ordinary rather than exceptional (logged out, bags full, lease lost).
+    const handed =
+      listing.directedBuyerAccount !== null &&
+      (await this.handToBuyer(settlement, listing.item, target, custodyRef));
+    if (!handed) {
+      await this.bookCustodyOnce(
+        { key: String(target.characterId), name: target.name },
+        'delivery',
+        [listing.item],
+        custodyRef,
+      );
+    }
     const advanced = await this.deps.db.transitionSettlement(
       settlement.id,
       ['delivering'],

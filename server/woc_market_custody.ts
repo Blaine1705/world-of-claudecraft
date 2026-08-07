@@ -15,7 +15,7 @@ import {
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
-import type { WocCustodyExtract, WocMarketCustody } from './woc_market';
+import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
  *  wocCustodySession / persistMailBlob plus the public sim). */
@@ -56,6 +56,35 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
         ok: true,
         extracted: out.extracted,
         characterName: session.name,
+        save: {
+          characterId,
+          level: state.level,
+          state,
+          leaseNonce: session.leaseNonce,
+        },
+      };
+    },
+
+    grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant {
+      // Delivery straight into the buyer's bags, for a deal struck face to face.
+      // Every refusal here is ORDINARY and none of them is an error: a buyer who
+      // logged out, or whose bags are full, simply gets the parcel by mail
+      // instead. The caller must therefore be able to fall back, and this must
+      // leave nothing behind when it declines.
+      const session = host.wocCustodySession(characterId);
+      if (!session) return { ok: false, reason: 'offline' };
+      if (session.accountId !== accountId) return { ok: false, reason: 'not_yours' };
+      if (!host.sim.grantTradableCopy(session.pid, slot)) return { ok: false, reason: 'no_space' };
+      const state = host.sim.serializeCharacter(session.pid);
+      if (!state) {
+        // Defensive, and the same shape extractCopy uses: a session that cannot
+        // serialize is one being torn down, so its in-memory bags are never
+        // saved. Nothing is undone because there is nothing durable to undo, and
+        // the caller mails the copy instead.
+        return { ok: false, reason: 'offline' };
+      }
+      return {
+        ok: true,
         save: {
           characterId,
           level: state.level,

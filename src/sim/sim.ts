@@ -24,6 +24,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   canAddItem,
+  canGrantCopies,
   instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
@@ -271,6 +272,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
+import { grantCopies } from './item_instance_transfer';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
@@ -8975,6 +8977,47 @@ export class Sim {
       }
     }
     return out;
+  }
+
+  /**
+   * The inverse of extractTradableCopy: put an escrowed copy back INTO a
+   * player's bags, or refuse when it does not fit.
+   *
+   * Checked and granted in ONE call through the shared canGrantCopies /
+   * grantCopies pair, deliberately. Splitting them across the seam is how the
+   * overflow class in #2139 re-opens: a caller that pre-checks with a different
+   * shape than it grants with (payload-blind, or missing the craftedRecipeId
+   * that decides which stack a plain grant merges into) can see room the grant
+   * cannot use, and overfill the recipient past the modelled cap.
+   *
+   * Returns whether the copy landed, so a broker holding the only copy can fall
+   * back to a delivery it can still complete rather than dropping it.
+   */
+  grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta } = r;
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        slot.itemId,
+        slot.count,
+        slot.instance,
+        slot.craftedRecipeId,
+      )
+    ) {
+      return false;
+    }
+    grantCopies(
+      this.ctx,
+      meta.entityId,
+      slot.itemId,
+      slot.count,
+      slot.instance,
+      slot.craftedRecipeId,
+    );
+    return true;
   }
 
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible

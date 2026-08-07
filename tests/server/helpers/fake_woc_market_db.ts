@@ -468,6 +468,13 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (claim && claim.bookedAtMs === null) claim.bookedAtMs = this.now();
   }
 
+  /** Lease-fenced in the real db; the fake honours the same contract by
+   *  letting a test refuse a save, which is what drives the mail fallback. */
+  failDeliveredSave = false;
+  async saveDeliveredCharacter(_save: CharacterSaveArgs): Promise<boolean> {
+    return !this.failDeliveredSave;
+  }
+
   async unclaimCustodyRef(custodyRef: string): Promise<void> {
     // The Pg DELETE is guarded on booked_at IS NULL: a booked claim is the
     // durable record of a delivered parcel and is never released.
