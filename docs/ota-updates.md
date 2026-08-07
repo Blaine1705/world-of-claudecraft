@@ -25,7 +25,13 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
    `OTA_MANIFEST_URL` through a 60 s single-flight cache, compares the
    manifest against the device's reported bundle/native versions, and answers
    either `{ version, url, checksum }` or the plugin's documented no-update
-   body. `OTA_MANIFEST_URL` unset (or not https) keeps the whole feature dark
+   body. **The device reports two different kinds of value and they are not
+   interchangeable:** `version_name` is the currently applied BUNDLE version
+   (a semver) or the literal `builtin` when the device still runs
+   store-shipped assets, and `version_build` is the NATIVE BUILD NUMBER (iOS
+   CFBundleVersion, Android versionCode), a plain integer like `47`, never a
+   semver. A `builtin` device therefore offers no semver at all, and is
+   resolved through `server/ota_native_build.ts` (see below). `OTA_MANIFEST_URL` unset (or not https) keeps the whole feature dark
    (always "no update"). Manifest validation is strict and fail-closed: the
    bundle URL must be https AND live on the manifest's own origin (so a write
    into the manifest alone can never redirect installs to another host), the
@@ -234,11 +240,18 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
 ## Verifying an update end to end
 
 1. `curl -s $OTA_MANIFEST_URL` shows the new version/url/checksum.
-2. `curl -s -X POST https://worldofclaudecraft.com/api/ota/updates \
+2. Probe the endpoint the way a REAL device does, with a native BUILD NUMBER
+   in `version_build`, not a marketing version. Use a number BELOW this
+   release's `CURRENT_PROJECT_VERSION` (an older store build):
+   `curl -s -X POST https://worldofclaudecraft.com/api/ota/updates \
    -H 'content-type: application/json' \
-   -d '{"platform":"ios","version_name":"builtin","version_build":"0.31.0"}'`
-   answers the offer; posting the published version back answers the
-   no-update body.
+   -d '{"platform":"ios","version_name":"builtin","version_build":"46"}'`
+   answers the offer. Then check BOTH other arms: this release's build number
+   answers the no-update body (its built-in assets already ARE the bundle),
+   and posting the published version back as `version_name` does too.
+   A probe that sends `"version_build":"0.35.0"` proves nothing: no shipped
+   device sends that shape, and using it here is exactly how a total OTA
+   outage went unnoticed once already.
 3. On a device or simulator build: launch, background the app, foreground it;
    the footer version (`appVersionInfo`) shows the new bundle version. A
    deliberate bad bundle (e.g. a zip whose JS throws before boot) must revert
@@ -248,7 +261,14 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
 ## Tests that pin this feature
 
 - `tests/server/ota_updates.test.ts`: the endpoint (offer/no-update/gating,
-  cache single-flight, fail-closed env gate, rate limiting, invalid input).
+  cache single-flight, fail-closed env gate, rate limiting, invalid input),
+  including the store-fresh cases that send a native BUILD NUMBER rather than
+  a semver. Keep those: the suite was previously green while the feature was
+  dark, because every case fed `version_build` a marketing version instead.
+- `tests/server/ota_native_build.test.ts`: pins `NATIVE_BUILD_BRIDGE` against
+  package.json, build.gradle and project.pbxproj. Nothing else notices the
+  bridge going stale, and a stale bridge does not crash, it silently stops
+  offering updates to store-fresh devices.
 - `tests/native_ota.test.ts`: the `notifyAppReady` glue plus source pins on
   the `src/main.ts` wiring, `capacitor.config.ts` plugin block, and the
   `package.json` dependency.
