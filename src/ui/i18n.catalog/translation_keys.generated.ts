@@ -8726,6 +8726,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.damageSpeed'
   | 'itemUi.tooltip.dps'
   | 'itemUi.tooltip.ifYouEquip'
+  | 'itemUi.tooltip.maxStack'
   | 'itemUi.tooltip.qualityKind'
   | 'itemUi.tooltip.questItem'
   | 'itemUi.tooltip.questOrphaned'

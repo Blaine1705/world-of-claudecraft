@@ -1128,6 +1128,64 @@ export const TARGETS = [
     },
   },
   {
+    key: 'stack-size-tooltip',
+    label: 'A single potion hovered in the bags, with the Max stack line',
+    when: ['stack_size_tooltip'],
+    // Desktop only, the material-usedby precedent: the synthetic hover path
+    // does not raise #tooltip on the touch layout, and the tooltip content is
+    // byte-identical on mobile anyway. ONE copy on purpose: the line exists
+    // for the player with no stack badge to learn from.
+    async capture(page) {
+      // Same SwiftShader boot patience as the material-usedby recipe: wait
+      // for the boot hook, then clear the overlays a late boot re-raises.
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        try {
+          sim?.addItem('silverleaf_healing_draught', 1);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover through the REAL pointer path so the tooltip is the one a
+      // player sees, not a hand-built string.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return (
+            (bg && bg.includes('silverleaf_healing_draught')) ||
+            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'material-usedby-tooltip',
     label: 'Rough Hide tooltip with the Used-by craft affinity line',
     when: [

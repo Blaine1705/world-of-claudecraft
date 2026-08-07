@@ -7419,6 +7419,7 @@ export const en_XA: EnTranslations = {
       "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",
       "questOrphaned": "[Ñóţ ñééðéð ƒóŕ áñý áçţíʋé ɋúéšţ.]",
       "classes": "[Çļáššéš: {classes}]",
+      "maxStack": "[Ɱáẋ šţáçķ: {count}]",
       "sellPrice": "[Šéļļ þŕíçé: {money}]",
       "clickBuy": "[Çļíçķ ţó ƀúý]",
       "clickSell": "[Çļíçķ ţó šéļļ]",

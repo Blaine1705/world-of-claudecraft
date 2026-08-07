@@ -607,6 +607,7 @@ import {
 } from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
+import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
 import {
   type BuffStatSource,
@@ -5710,6 +5711,10 @@ export class Hud {
     html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
     html += instanceMakersMarkLine(instance, item.kind);
+    // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
+    // player holding a single potion learns more copies will share the slot;
+    // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.
+    html += stackSizeTooltipLine(item, instance);
     // Gated on the SAME pair the vendor path refuses on (src/sim/items.ts
     // sellItem), never on sellValue alone: a def can carry a sellValue it will
     // never be paid, and advertising a price the server is about to deny is a

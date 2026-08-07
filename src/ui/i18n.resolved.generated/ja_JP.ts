@@ -7419,6 +7419,7 @@ export const ja_JP: EnTranslations = {
       "questRules": "売却、銀行預け入れ、取引はできません。",
       "questOrphaned": "進行中のクエストでは必要ありません。",
       "classes": "クラス: {classes}",
+      "maxStack": "スタック上限: {count}",
       "sellPrice": "売却価格: {money}",
       "clickBuy": "クリックして購入",
       "clickSell": "クリックして売却",

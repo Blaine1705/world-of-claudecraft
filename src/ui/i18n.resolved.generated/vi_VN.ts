@@ -7419,6 +7419,7 @@ export const vi_VN: EnTranslations = {
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
       "questOrphaned": "Không cần thiết cho bất kỳ nhiệm vụ đang thực hiện nào.",
       "classes": "Lớp nhân vật: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Giá bán: {money}",
       "clickBuy": "Nhấp để mua",
       "clickSell": "Nhấp để bán",
