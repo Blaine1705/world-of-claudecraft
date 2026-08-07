@@ -2498,12 +2498,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // the payoff is ramping it with charges (and the Echo healing it feeds).
     effects: [{ type: 'directDamage', min: 10, max: 13 }],
     // The builder originally shipped with no rank ladder, leaving its level-5
-    // packet unchanged at the level-20 cap. Keep the charge-driven mana curve
-    // stable (the base cost remains 16) while the damage learns with the player.
+    // packet unchanged at the level-20 cap. Every rank re-states the DERIVED
+    // base cost (14, see above) so the charge-driven mana curve stays exactly
+    // where the harness put it and only the damage learns with the player.
+    // `cost` is required on AbilityRank, so it has to be repeated, not omitted:
+    // a rank row that drifts from the base cost silently re-tunes the OOM
+    // window for every level at or above that rank.
     ranks: [
-      { rank: 2, level: 10, cost: 16, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
-      { rank: 3, level: 15, cost: 16, effects: [{ type: 'directDamage', min: 12, max: 15 }] },
-      { rank: 4, level: 20, cost: 16, effects: [{ type: 'directDamage', min: 13, max: 15 }] },
+      { rank: 2, level: 10, cost: 14, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
+      { rank: 3, level: 15, cost: 14, effects: [{ type: 'directDamage', min: 12, max: 15 }] },
+      { rank: 4, level: 20, cost: 14, effects: [{ type: 'directDamage', min: 13, max: 15 }] },
     ],
     description:
       "Draws a surge of raw aether through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",

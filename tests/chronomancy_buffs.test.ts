@@ -79,10 +79,13 @@ describe('Aether Darts full-charge barrage', () => {
       { rank: 1, level: surge.learnLevel, cost: surge.cost, effects: surge.effects },
       ...(surge.ranks ?? []),
     ]).toMatchObject([
-      { rank: 1, level: 5, cost: 16, effects: [{ type: 'directDamage', min: 10, max: 13 }] },
-      { rank: 2, level: 10, cost: 16, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
-      { rank: 3, level: 15, cost: 16, effects: [{ type: 'directDamage', min: 12, max: 15 }] },
-      { rank: 4, level: 20, cost: 16, effects: [{ type: 'directDamage', min: 13, max: 15 }] },
+      // Every rank holds the DERIVED base cost of 14 (classes.ts): the ladder
+      // moves the damage only, so the OOM window the balance harness signed off
+      // on is identical at every level. A cost drift here is a silent re-tune.
+      { rank: 1, level: 5, cost: 14, effects: [{ type: 'directDamage', min: 10, max: 13 }] },
+      { rank: 2, level: 10, cost: 14, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
+      { rank: 3, level: 15, cost: 14, effects: [{ type: 'directDamage', min: 12, max: 15 }] },
+      { rank: 4, level: 20, cost: 14, effects: [{ type: 'directDamage', min: 13, max: 15 }] },
     ]);
 
     const darts = ABILITIES.arcane_missiles;
