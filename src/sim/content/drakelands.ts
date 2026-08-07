@@ -790,10 +790,12 @@ export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
     // The second crate sat at x 360, which is exactly CASTLE.wx0, the Last
     // Keep's west curtain wall centerline: once the keep was authored over this
     // stretch of road, castleLift raised that crate to the wall-walk (walkAbs
-    // 13, 7yd over the bailey floor), out of sight and reach of the road below,
-    // and the 4-crate objective could never be finished. It now lies on the
-    // open ground just west of the wall foot, still on the road line.
-    // tests/ground_object_placement.test.ts guards the whole family.
+    // 13, 7yd over the bailey floor), where a player following the road has
+    // nothing to see. Credit was never the gate: interaction.ts measures
+    // dist2d, so height is ignored and someone standing at the wall foot could
+    // still have taken it blind. What the stranding cost was FINDING it. It now
+    // lies on the open ground just west of the wall foot, still on the road
+    // line. tests/ground_object_placement.test.ts guards the whole family.
     positions: [
       { x: 372, z: 1968 },
       { x: 355, z: 2013 },

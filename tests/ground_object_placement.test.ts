@@ -12,8 +12,10 @@
 //
 // These are the guards for that class of bug, not just the one instance.
 import { describe, expect, it } from 'vitest';
+import { CASTLE } from '../src/sim/castle_layout';
 import { isBlocked } from '../src/sim/colliders';
 import { GROUND_OBJECTS } from '../src/sim/data';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
@@ -29,12 +31,21 @@ const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>();
 // the two IS a structure surface under the object.
 const LIFT_EPSILON = 0.01;
 
-// How far the crate may stand ABOVE the ground within a body-radius ring
-// before it is perched on something rather than lying on the ground. Only the
-// crate-is-higher direction is a defect: crates 3 and 4 legitimately lie at the
-// foot of the barbican's side walls, so ground that RISES beside a crate is
-// masonry it rests against, not masonry it rests on.
-const CRATE_PERCH_TOLERANCE = 1.5;
+// Every threshold here is a SHIPPED constant, never a fresh number (the house
+// rule the sibling family guard states, tests/gather_node_placement.test.ts).
+//
+// The ring has to reach PAST the widest masonry a pickup could be standing on
+// top of, or it samples that same surface and reports level ground: the west
+// curtain strip is CASTLE.wallTh wide, so a crate on its centerline is still on
+// wall at half that.
+const PERCH_RING_RADIUS = CASTLE.wallTh;
+// How far the crate may stand ABOVE the ground one ring-step away before it is
+// perched on something rather than lying on it. A rise the player can simply
+// walk up is not a perch, so the bar is the climb gate over that run rather
+// than a number of my own. Only the crate-is-higher direction is a defect:
+// crates 3 and 4 legitimately lie at the foot of the barbican's side walls, so
+// ground that RISES beside a crate is masonry it rests against, not on.
+const CRATE_PERCH_TOLERANCE = PLAYER_MAX_CLIMB_SLOPE * PERCH_RING_RADIUS;
 
 // THE shipped world seed, never a private literal: two of the checks below read
 // seeded state (isBlocked walks the scatter/prop collider grid, and the perch
@@ -42,18 +53,30 @@ const CRATE_PERCH_TOLERANCE = 1.5;
 // policing a world nobody plays. src/sim/CLAUDE.md, world_seed.ts.
 const makeSim = (): Sim => new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
 
-const RING: readonly (readonly [number, number])[] = [
-  [2, 0],
-  [-2, 0],
-  [0, 2],
-  [0, -2],
-  [1.4, 1.4],
-  [-1.4, 1.4],
-  [1.4, -1.4],
-  [-1.4, -1.4],
-];
+const RING: readonly (readonly [number, number])[] = (() => {
+  const r = PERCH_RING_RADIUS;
+  const d = PERCH_RING_RADIUS / Math.SQRT2; // same radius, on the diagonals
+  return [
+    [r, 0],
+    [-r, 0],
+    [0, r],
+    [0, -r],
+    [d, d],
+    [-d, d],
+    [d, -d],
+    [-d, -d],
+  ];
+})();
 
 describe('authored ground pickups stand on reachable natural ground', () => {
+  // One literal pin, deliberately (the sibling guard's reasoning): every
+  // assertion below derives from the shared constant, so without this line a
+  // seed change would reshuffle the whole persistent world with a fully green
+  // suite. Moving the shipped seed must be a decision that reddens a test.
+  it('the shipped world seed is pinned to its literal', () => {
+    expect(WORLD_SEED).toBe(20061);
+  });
+
   it('places no pickup on a walkable structure lift', () => {
     const sim = makeSim();
     const seed = sim.cfg.seed;
@@ -80,9 +103,10 @@ describe('authored ground pickups stand on reachable natural ground', () => {
     for (const p of def?.positions ?? []) {
       const g = groundHeight(p.x, p.z, seed);
       expect(g - terrainHeight(p.x, p.z, seed)).toBeLessThanOrEqual(LIFT_EPSILON);
-      expect(isBlocked(seed, p.x, p.z, 0.5), `crate at ${p.x},${p.z} is inside a collider`).toBe(
-        false,
-      );
+      expect(
+        isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS),
+        `crate at ${p.x},${p.z} is inside a collider`,
+      ).toBe(false);
       for (const [dx, dz] of RING) {
         const around = groundHeight(p.x + dx, p.z + dz, seed);
         expect(
