@@ -217,6 +217,7 @@ export const sv_SE: AdminTranslations = {
   "tickPerf.overBudget": "över 50ms-budgeten",
   "tickPerf.loopHeading": "Loopfaser",
   "tickPerf.simHeading": "interna faser i sim.tick()",
+  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "Fas",
   "tickPerf.colMean": "Medel",
   "tickPerf.colP95": "p95",

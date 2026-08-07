@@ -1,0 +1,197 @@
+// The `corder` self key's cadence + rebuild-only-on-change gate (the market
+// recipe applied to the commission order board, the second O(realm-collection)
+// read that shipped on the per-tick self path). The expensive call is
+// sim.commissionOrdersFor (a walk over the whole board where every open-scope
+// order lands in every viewer's projection), so the decisive pin is a SPY on
+// it, plus per-verb pins that every board mutation advances the revision the
+// server gate polls.
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
+  loadMarketState: vi.fn(async () => null),
+  loadMailState: vi.fn(async () => null),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  insertBankLedgerRow: vi.fn(async () => {}),
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
+  setCharacterHotbarLayout: vi.fn(async () => {}),
+}));
+
+import {
+  type ClientSession,
+  CORDER_BOARD_REFRESH_TICKS,
+  CORDER_WIRE_INTERVAL_TICKS,
+  GameServer,
+} from '../server/game';
+import { broadcast, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+
+// A commission-eligible weapon recipe (the professions_commission_order
+// harness constant): opening an order needs no crafting prerequisites.
+const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
+
+function duePass(server: GameServer): void {
+  for (let i = 0; i < CORDER_WIRE_INTERVAL_TICKS; i++) server.sim.tick();
+  broadcast(server);
+}
+
+function corderSnaps(sent: unknown[], from: number): unknown[] {
+  // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON, the harness idiom
+  return (sent as any[]).slice(from).filter((m) => m.t === 'snap' && m.self && 'corder' in m.self);
+}
+
+function viewerServer(): { server: GameServer; fc: FakeClient; session: ClientSession } {
+  const server = new GameServer();
+  const fc = fakeWs();
+  const session = joinServer(server, fc, 81, 'Viewer');
+  return { server, fc, session };
+}
+
+describe('corder wire cadence + rebuild-only-on-change', () => {
+  it('rebuilds once at join, then never again while the board is unchanged (until the backstop)', () => {
+    const { server, fc } = viewerServer();
+    const spy = vi.spyOn(server.sim, 'commissionOrdersFor');
+    broadcast(server);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(lastSnap(fc.sent).self.corder).toEqual([]);
+
+    const passesToBackstop = Math.ceil(CORDER_BOARD_REFRESH_TICKS / CORDER_WIRE_INTERVAL_TICKS);
+    const sent = fc.sent.length;
+    for (let pass = 0; pass < passesToBackstop - 1; pass++) duePass(server);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(corderSnaps(fc.sent, sent)).toHaveLength(0);
+
+    // The next due pass crosses the staleness backstop: exactly one more
+    // rebuild (and, unchanged, it still elides from the wire).
+    duePass(server);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(corderSnaps(fc.sent, sent)).toHaveLength(0);
+  });
+
+  it("another player's open order reaches the viewer on their next due pass", () => {
+    const { server, fc } = viewerServer();
+    broadcast(server);
+    const spy = vi.spyOn(server.sim, 'commissionOrdersFor');
+
+    const fc2 = fakeWs();
+    const requester = joinServer(server, fc2, 82, 'Requester');
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+
+    const sent = fc.sent.length;
+    duePass(server);
+    const snaps = corderSnaps(fc.sent, sent);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    const rows = (snaps[0] as any).self.corder;
+    expect(rows).toHaveLength(1);
+    expect(rows[0].requesterName).toBe('Requester');
+    expect(rows[0].status).toBe('open');
+    expect(spy.mock.calls.length).toBeGreaterThan(0);
+  });
+
+  it("the viewer's own commission command lands on the next snapshot (prompt re-arm)", () => {
+    const { server, fc, session } = viewerServer();
+    broadcast(server);
+    server.sim.tick(); // one tick only: the plain cadence gate is NOT due yet
+
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'open_commission_order',
+        recipe: SWORD_RECIPE,
+        scope: 'open',
+      }),
+    );
+    const sent = fc.sent.length;
+    broadcast(server);
+    const snaps = corderSnaps(fc.sent, sent);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect((snaps[0] as any).self.corder[0].mine).toBe(true);
+  });
+
+  it('every board verb advances the revision the gate polls; idle ticks do not', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const requester = joinServer(server, fcA, 83, 'Requester');
+    const crafter = joinServer(server, fcB, 84, 'Crafter');
+    const rev = () => server.sim.commissionOrderBoardRev;
+
+    const idle = rev();
+    for (let i = 0; i < 40; i++) server.sim.tick();
+    expect(rev()).toBe(idle);
+
+    // open
+    let before = rev();
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+    expect(rev()).toBeGreaterThan(before);
+    const order = server.sim.commissionOrderBoard.find((o) => o.requesterId === requester.pid);
+    if (!order) throw new Error('missing opened order');
+
+    // a REFUSED verb moves nothing (the requester cannot accept their own order)
+    before = rev();
+    server.sim.acceptCommissionOrder(order.id, requester.pid);
+    expect(rev()).toBe(before);
+
+    // accept
+    before = rev();
+    server.sim.acceptCommissionOrder(order.id, crafter.pid);
+    expect(rev()).toBeGreaterThan(before);
+
+    // open a second order, then cancel it
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+    const second = server.sim.commissionOrderBoard.find(
+      (o) => o.requesterId === requester.pid && o.status === 'open',
+    );
+    if (!second) throw new Error('missing second order');
+    before = rev();
+    server.sim.cancelCommissionOrder(second.id, requester.pid);
+    expect(rev()).toBeGreaterThan(before);
+
+    // deliver: the crafter holds a commission-armed, still-unbound copy and
+    // stands beside the requester (both spawn at the same start), so the
+    // fourth verb's success path is exercised for real.
+    const crafterMeta = server.sim.players.get(crafter.pid);
+    const orderRow = server.sim.commissionOrderBoard.find((o) => o.id === order.id);
+    if (!crafterMeta || !orderRow) throw new Error('missing crafter meta or order');
+    crafterMeta.inventory.push({
+      itemId: orderRow.itemId,
+      count: 1,
+      instance: { bindOnTrade: true },
+    });
+    // a REFUSED deliver first (the requester did not accept it): no bump
+    before = rev();
+    server.sim.deliverCommissionOrder(order.id, requester.pid);
+    expect(rev()).toBe(before);
+    before = rev();
+    server.sim.deliverCommissionOrder(order.id, crafter.pid);
+    expect(server.sim.commissionOrderBoard.find((o) => o.id === order.id)?.status).toBe(
+      'delivered',
+    );
+    expect(rev()).toBeGreaterThan(before);
+
+    // retention sweep: force the cancelled order past its retain window
+    // biome-ignore lint/suspicious/noExplicitAny: reaching sim internals is the harness idiom
+    (second as any).settledAt = -100_000;
+    before = rev();
+    for (let i = 0; i < 2; i++) server.sim.tick();
+    expect(rev()).toBeGreaterThan(before);
+    expect(server.sim.commissionOrderBoard.some((o) => o.id === second.id)).toBe(false);
+  });
+});
