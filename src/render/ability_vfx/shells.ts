@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import type { VfxAnchorResolver } from '../vfx_anchor';
 
 // Translucent buff/barrier shells (the gallery's receiver shell): a soft
 // additive sphere with a fresnel-style rim (rim term in the shader) wrapped
@@ -6,6 +7,11 @@ import * as THREE from 'three';
 // a buff lands. Fixed slot pool; materials cloned once at construction.
 
 const SHELL_SLOTS = 8;
+
+// Per-frame anchor scratch (see ../vfx_anchor.ts): update() resolves one anchor
+// per live shell and consumes it before the next resolve. Module-level because
+// there is exactly one shell pool per fx engine.
+const anchorScratch = new THREE.Vector3();
 
 interface ShellSlot {
   mesh: THREE.Mesh;
@@ -102,12 +108,7 @@ export class BuffShells {
     slot.mesh.visible = true;
   }
 
-  update(
-    dt: number,
-    time: number,
-    frame: number,
-    anchor: (id: number, frac: number) => { x: number; y: number; z: number } | null,
-  ): void {
+  update(dt: number, time: number, frame: number, anchor: VfxAnchorResolver): void {
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -121,7 +122,7 @@ export class BuffShells {
         slot.mesh.visible = false;
         continue;
       }
-      const at = anchor(slot.entityId, 0.5);
+      const at = anchor(slot.entityId, 0.5, anchorScratch);
       if (!at) {
         slot.active = false;
         slot.mesh.visible = false;
