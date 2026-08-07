@@ -1565,10 +1565,9 @@ export const hudChromeStrings = {
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
-  // live here: the honor price, the honor balance, the set-bonus tier line, the
-  // panel title, the close label and the confirm dialog's title/accept/cancel
-  // are all reused from hudChrome.warfare, hudChrome.itemSet, itemUi.vendor and
-  // heroicShop rather than duplicated.
+  // live here: the honor price, the honor balance, the panel title, the close
+  // label and the confirm dialog's title/accept/cancel are all reused from
+  // hudChrome.warfare, itemUi.vendor and heroicShop rather than duplicated.
   warfareShop: {
     // The gossip row that opens this window. A flagged NPC keeps its ordinary
     // goods row too (selling and buyback still have to be reachable), so this
@@ -1580,12 +1579,10 @@ export const hudChromeStrings = {
     weapons: 'Weapons',
     // Marks a piece the viewer already wears or carries. The tile still sells.
     owned: 'Owned',
-    // The owned-count line, as ONE key per arm rather than a count sentence
-    // joined to a tier sentence with a hard-coded space: a translator has to be
-    // able to reorder the two clauses, and the ASCII separator is wrong for
-    // ja_JP and zh_*. The second clause reads against the NEXT unmet tier, never
-    // a bare fraction of the full set ("2 more for the 7-piece bonus" is the
-    // line that motivates the purchase).
+    // The buy tile's accessible name, as ONE key per arm rather than a base name
+    // with an "owned" fragment concatenated on: an aria-label REPLACES the
+    // button's content, so the marker has to sit inside a sentence a translator
+    // can reorder.
     buyAria: 'Buy {item} for {honor}',
     buyOwnedAria: 'Buy {item} for {honor}, already owned',
     // Honor purchases record no buyback, so a mis-tap is unrefundable: the

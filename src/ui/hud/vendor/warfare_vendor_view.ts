@@ -7,17 +7,20 @@
 // warfare_vendor_window.ts. DOM-free and i18n-free so
 // tests/warfare_vendor_view.test.ts can drive it directly.
 //
-// Why this window exists at all: the ordinary vendor grid renders the same forty
-// rows with no indication that four of the families are sets, what their bonuses
-// are, or how close the viewer is to the next tier. The owned-count line below is
-// the whole point of the window.
+// Why this window exists at all: the ordinary vendor grid renders the whole stock
+// as one flat list, with no indication that five of the families are sets and no
+// grouping to buy a family from. The SECTIONING is the point of the window; the
+// bonus text lives in the item tooltip, where every raid tier set already shows
+// it (see the header of warfare_vendor_window.ts for what this deliberately does
+// not paint, and why the tiers / ownedPieces / nextTier fields below survive
+// anyway).
 
 import type { ItemDef, ItemSet } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 
-/** The four WARFARE armor families, in the order the shop lists them. Any set
+/** The five WARFARE armor families, in the order the shop lists them. Any set
  *  the stock carries that is NOT named here still gets a section, appended in
- *  first-seen order, so a fifth family cannot silently vanish from the shop. */
+ *  first-seen order, so a sixth family cannot silently vanish from the shop. */
 export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_furyforged',
   'warfare_stormbound',
@@ -131,13 +134,12 @@ export type WarfareShopWorld = Pick<IWorld, 'honor' | 'inventory' | 'equipment'>
 /**
  * Derive the shop viewer from the world seam: the honor balance, the item ids
  * currently WORN (what the set bonuses key on), and the ids worn or carried
- * (what "already bought this" means for the owned marks and the progress line).
- * Both reads go through `IWorld`, so the numbers resolve identically offline
- * and online.
+ * (what "already bought this" means for the owned marks). Both reads go through
+ * `IWorld`, so the numbers resolve identically offline and online.
  *
  * KNOWN LIMITATION, and deliberate: "owned" covers equipment plus the CARRIED
- * inventory only. A piece parked in the BANK therefore reads as unowned, loses
- * its Owned marker, and is missing from the owned-count line, which can invite
+ * inventory only. A piece parked in the BANK therefore reads as unowned and
+ * loses its Owned marker, which can invite
  * a duplicate purchase of an unrefundable honor item. This is a platform
  * constraint rather than a fixable read: `IWorldBank.bankInfo` is null away
  * from a banker, so bank contents are simply not observable from the shop.
@@ -175,7 +177,7 @@ function distinctSlots(offers: readonly WarfareShopOffer[], ids: ReadonlySet<str
 }
 
 /**
- * Build the sectioned shop view: the honor stock split into its four set
+ * Build the sectioned shop view: the honor stock split into its five set
  * families plus jewelry and weapons, each offer resolved against the item table,
  * the viewer's honor balance, and what they already own.
  *

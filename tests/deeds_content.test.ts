@@ -437,7 +437,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 31 titles and 3 borders', () => {
+  it('ships exactly 34 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     expect(titles.length).toBe(34);

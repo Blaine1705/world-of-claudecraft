@@ -570,6 +570,7 @@ const baseEnTable = {
   'aura.unbrokenOath': 'Unbroken Oath',
   'aura.ashenStep': 'Ashen Step',
   'aura.emberward': 'Emberward',
+  'aura.thornguard': 'Thornguard',
   // The Drakelands dragonkin brood (v0.35 rework): mechanic labels and the
   // player-facing burn/ward/stun aura names.
   'mechanic.broodCleave': 'Brood Cleave',
@@ -8246,6 +8247,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Unbroken Oath': 'aura.unbrokenOath',
   'Ashen Step': 'aura.ashenStep',
   Emberward: 'aura.emberward',
+  Thornguard: 'aura.thornguard',
   // Frost mage proc engine (src/sim/combat/frost_mage.ts): the two self
   // procs and the target debuff; buff bar, target frame and combat log.
   'Fingers of Frost': 'aura.fingersOfFrost',

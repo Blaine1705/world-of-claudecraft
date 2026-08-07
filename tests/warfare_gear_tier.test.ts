@@ -1,4 +1,4 @@
-// Phase 2 of the WARFARE tier refactor: the retuned honor tier and its four
+// Phase 2 of the WARFARE tier refactor: the retuned honor tier and its five
 // armor sets. This suite owns the ARITHMETIC (what a kit plus a set resolves to,
 // and why a hybrid build loses); the per-item budget schedule, the badge-jewelry
 // guard and the price ladder stay pinned in tests/pvp_honor_gear.test.ts.
@@ -10,6 +10,7 @@ import {
   SET_WARFARE_CINDERWEAVE,
   SET_WARFARE_FURYFORGED,
   SET_WARFARE_STORMBOUND,
+  SET_WARFARE_THORNHIDE,
   WARFARE_SET_2PC_DEFENSE_RATING,
   WARFARE_SET_4PC_CC_REDUCTION,
   WARFARE_SET_4PC_OFFENSE_RATING,
@@ -29,12 +30,31 @@ import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_l
 import { PVP_DEFENSE_CAP, PVP_OFFENSE_CAP, pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { Entity, EquipSlot, PlayerClass, SetBonusEffect } from '../src/sim/types';
 
-const WARFARE_SET_IDS = [
-  SET_WARFARE_FURYFORGED,
-  SET_WARFARE_STORMBOUND,
-  SET_WARFARE_ASHSTALKER,
-  SET_WARFARE_CINDERWEAVE,
-] as const;
+// DERIVED from the live catalog, never a hand-listed set of ids. The hand-listed
+// version silently excluded Thornhide, the family added last, from every sweep
+// below: the 2/4/7 breakpoint pin, the never-in-flat-stats invariant, the
+// capstone aggregate, and the crowd-control wording. A family authored after
+// this file must be caught BY the guards, not left outside them.
+const WARFARE_SET_IDS = Object.keys(ITEM_SETS)
+  .filter((setId) => setId.startsWith('warfare_'))
+  .sort();
+
+// The derivation above is only worth having if it is non-vacuous: an empty or
+// short list would pass every `for` loop in this file without asserting a thing.
+describe('the WARFARE family list this suite sweeps', () => {
+  it('resolves every shipped family, so no loop below can pass vacuously', () => {
+    expect(WARFARE_SET_IDS).toEqual([
+      SET_WARFARE_ASHSTALKER,
+      SET_WARFARE_CINDERWEAVE,
+      SET_WARFARE_FURYFORGED,
+      SET_WARFARE_STORMBOUND,
+      SET_WARFARE_THORNHIDE,
+    ]);
+    // Every id resolves to a real set, so a renamed family reds here rather than
+    // quietly dropping out of the filter.
+    for (const setId of WARFARE_SET_IDS) expect(ITEM_SETS[setId], setId).toBeDefined();
+  });
+});
 
 interface Profile {
   name: string;

@@ -11772,8 +11772,8 @@ export class Hud {
           // An Honor purchase rides the same 'vendor' event, and OFFLINE nothing
           // else repaints this window (onInventoryChanged fires only from bank
           // ops and the online net path), so without this arm the balance, the
-          // per-offer affordability, the Owned marks and the owned-count line
-          // all stayed stale until a close and reopen.
+          // per-offer affordability and the Owned marks all stayed stale until a
+          // close and reopen.
           if (this.openWarfareVendorNpcId !== null) this.renderWarfareVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
@@ -14506,8 +14506,8 @@ export class Hud {
   // -------------------------------------------------------------------------
   // WARFARE quartermaster shop (#warfare-window)
   // -------------------------------------------------------------------------
-  // The honor stock rendered as six sections with live set-bonus previews
-  // instead of one flat grid. Gated on the NpcDef warfareVendor FLAG (resolved
+  // The honor stock rendered as one section per family (plus jewelry and
+  // weapons) instead of one flat grid. Gated on the NpcDef warfareVendor FLAG (resolved
   // in the gossip dialog), never a hard-coded npc id, so a second honor
   // quartermaster needs no constant widened. Purchases reuse the existing
   // buyItem command: no new wire command, no new IWorld member.

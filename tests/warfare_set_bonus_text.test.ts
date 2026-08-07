@@ -21,6 +21,7 @@ import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { itemSetBonusField, itemSetBonusPieces, tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
 const WARFARE_SETS = Object.values(ITEM_SETS).filter((set) => set.id.startsWith('warfare_'));
 const NON_LATIN = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
@@ -138,5 +139,41 @@ describe('the 7-piece set bonus text', () => {
     const capstone = model?.bonusTiers.find((tier) => tier.pieces === 7);
     expect(capstone, 'the capstone tier still renders at six pieces').toBeDefined();
     expect(capstone?.active, 'the capstone must be dormant at six pieces').toBe(false);
+  });
+});
+
+// The sibling half of the same defect class: the tier TEXT resolving correctly is
+// worth nothing if the proc it names renders untranslated the moment it fires.
+// Thornguard shipped that way. Its three siblings were registered in sim_i18n's
+// AURA_NAME_KEY and it was not, and nothing caught it: localizeSimAuraName returns
+// null for an unregistered name, every caller falls back to the raw English, and
+// the only round-trip guard in localization_fixes.test.ts sweeps elixirs.
+//
+// Derived from the live catalog rather than a list of four names, so a sixth
+// family's signature is covered the day it is authored.
+describe('the WARFARE capstone proc names', () => {
+  const CAPSTONE_PROC_NAMES = [
+    ...new Set(
+      WARFARE_SETS.flatMap((set) => set.bonuses.map((tier) => tier.effect.proc?.name)).filter(
+        (name): name is string => !!name,
+      ),
+    ),
+  ].sort();
+
+  it('sweeps every signature the families actually declare', () => {
+    // Four, not five: the two caster families deliberately share Emberward.
+    expect(CAPSTONE_PROC_NAMES).toEqual(['Ashen Step', 'Emberward', 'Thornguard', 'Unbroken Oath']);
+  });
+
+  it('every one of them round-trips through the sim aura matcher', () => {
+    setLanguage('en');
+    for (const name of CAPSTONE_PROC_NAMES) {
+      // Not null is the load-bearing half: an unregistered name renders raw
+      // English in the buff frame, buff tooltip, combat log and death recap.
+      expect(
+        localizeSimAuraName(name),
+        `set proc "${name}" is not registered in sim_i18n AURA_NAME_KEY`,
+      ).toBe(name);
+    }
   });
 });

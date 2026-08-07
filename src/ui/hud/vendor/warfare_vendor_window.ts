@@ -35,12 +35,7 @@ import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
-import type {
-  WarfareShopOffer,
-  WarfareShopSection,
-  WarfareShopSetSection,
-  WarfareShopView,
-} from './warfare_vendor_view';
+import type { WarfareShopOffer, WarfareShopSection, WarfareShopView } from './warfare_vendor_view';
 
 export interface WarfareVendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
@@ -141,6 +136,11 @@ export function renderWarfareVendorWindow(
   el.appendChild(balance);
 
   for (const section of view.sections) {
+    // Guard mirrors the vendor window's grids: never leave a dead empty node.
+    // It covers the HEADING as well as the grid, because a title with nothing
+    // under it is the deader of the two. buildWarfareVendorView emits no empty
+    // section today; this stays correct if it ever does.
+    if (section.offers.length === 0) continue;
     const heading = document.createElement('div');
     heading.className = 'vendor-section-title';
     heading.textContent = sectionTitleText(section);
@@ -149,8 +149,7 @@ export function renderWarfareVendorWindow(
     grid.className = 'vendor-goods-grid';
     grid.dataset.grid = section.key;
     for (const offer of section.offers) appendOfferTile(grid, section, offer, deps);
-    // Guard mirrors the vendor window's grids: never leave a dead empty node.
-    if (section.offers.length > 0) el.appendChild(grid);
+    el.appendChild(grid);
   }
 
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());

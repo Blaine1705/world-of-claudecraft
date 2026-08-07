@@ -1,7 +1,8 @@
-// WARFARE gear sold by FURY, the Honor Quartermaster. Every item is a level-20
-// epic sourced at WARFARE_SOURCE_LEVEL, so the item-level index reads it as item
-// level 31 after the epic +6 quality bump: level with the heroic five-man and
-// rift clear-time epics, which is the current farmable tier.
+// WARFARE gear, sold by BOTH honor quartermasters from this one canonical stock:
+// FURY in Eastbrook Vale and Warmarshal Draven Kole in Highwatch. Every item is a
+// level-20 epic sourced at WARFARE_SOURCE_LEVEL, so the item-level index reads it
+// as item level 31 after the epic +6 quality bump: level with the heroic five-man
+// and rift clear-time epics, which is the current farmable tier.
 //
 // Three authored fractions shape every piece. All three are named constants
 // below so the tests pin the constant rather than a magic number:
@@ -28,7 +29,7 @@
 // which is what keeps a complete honor kit from being a shortcut past the
 // heroic tier.
 //
-// The four armor families are also the four WARFARE item sets (see
+// The five armor families are also the five WARFARE item sets (see
 // content/item_sets.ts), with 2, 4, and 7 piece tiers paid in WARFARE rating and
 // PvP-gated effects only, so the sets contribute exactly nothing in PvE. Neck,
 // rings, and weapons carry no set tag: they are shared across role profiles.
@@ -534,9 +535,6 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
   },
 
-  // Necklaces: one Strength, one Agility, and one caster profile. Jewelry carries
-  // no set tag (it is shared across role profiles) and rides the lower
-  // WARFARE_JEWELRY_STAT_FRACTION.
   // Thornhide Garb, the leather caster family. Added after review: a druid's
   // maximum armor weight is LEATHER (equipment_rules.ts LEATHER_CLASSES), and the
   // only int/spi families were Stormbound (mail, unwearable) and Cinderweave
@@ -595,7 +593,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 172, int: 10, sta: 7, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    priceHonor: 1_200,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -627,7 +625,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 132, int: 8, sta: 7, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    priceHonor: 1_050,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -663,6 +661,10 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
   },
+
+  // Necklaces: one Strength, one Agility, and one caster profile. Jewelry carries
+  // no set tag (it is shared across role profiles) and rides the lower
+  // WARFARE_JEWELRY_STAT_FRACTION.
   final_oath_medallion: {
     id: 'final_oath_medallion',
     name: 'Medallion of the Final Oath',

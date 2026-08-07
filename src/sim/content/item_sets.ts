@@ -9,11 +9,11 @@
 // weapon-crit-triggered for the plate and leather archetypes, spell-cast-
 // triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
-// The four WARFARE honor families FURY sells (content/pvp_honor.ts) are the one
-// exception to every sentence around this one: they break at 2, 4 and 7 pieces
-// rather than 2, 3 and 4, and they are paid entirely in WARFARE rating and
-// PvP-gated effects rather than in stats, so they contribute exactly zero in
-// PvE. See the WARFARE block below and docs/design/warfare.md.
+// The five WARFARE honor families the quartermasters sell (content/pvp_honor.ts)
+// are the one exception to every sentence around this one: they break at 2, 4
+// and 7 pieces rather than 2, 3 and 4, and they are paid entirely in WARFARE
+// rating and PvP-gated effects rather than in stats, so they contribute exactly
+// zero in PvE. See the WARFARE block below and docs/design/warfare.md.
 //
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
@@ -102,14 +102,14 @@ export const SET_STORMCALLERS = 'stormcallers'; // t2 cloth (shaman), caster
 export const SET_VALE_ARCANIST = 'vale_arcanist'; // cloth, caster
 export const SET_BOUNDSTONE_VANGUARD = 'boundstone_vanguard'; // mail, melee
 export const SET_GREYJAW_STALKER = 'greyjaw_stalker'; // leather, marksman
-// WARFARE honor sets: the four armor families FURY sells (content/pvp_honor.ts),
-// seven armor pieces each. Neck, rings and weapons carry no set tag because they
-// are shared across role profiles.
+// WARFARE honor sets: the five armor families the quartermasters sell
+// (content/pvp_honor.ts), seven armor pieces each. Neck, rings and weapons carry
+// no set tag because they are shared across role profiles.
 export const SET_WARFARE_FURYFORGED = 'warfare_furyforged'; // mail, Strength
 export const SET_WARFARE_STORMBOUND = 'warfare_stormbound'; // mail, caster
 export const SET_WARFARE_ASHSTALKER = 'warfare_ashstalker'; // leather, Agility
-export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave';
-export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // cloth, caster
+export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave'; // cloth, caster
+export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // leather, caster
 
 // Archetype bonus tiers. Tiers stack (a 3-piece set grants both the 2- and
 // 3-piece bonuses); cast pushback reduction and knockback resistance
@@ -293,7 +293,8 @@ const HASTE_KIT_BONUSES: SetBonusTier[] = [
   },
 ];
 
-// The three WARFARE capstone signatures. All are pvpOnly, so combat/set_procs.ts
+// The four WARFARE capstone signatures (five families, because the two caster
+// families share Emberward). All are pvpOnly, so combat/set_procs.ts
 // refuses them (before the chance roll, so they draw no rng) outside hostile
 // player-versus-player combat and they are inert in PvE by construction.
 const WARFARE_UNBROKEN_OATH: SetProc = {
@@ -339,7 +340,7 @@ const WARFARE_EMBERWARD: SetProc = {
   pvpOnly: true,
 };
 
-// The 2- and 4-piece tiers are identical across all four families; only the
+// The 2- and 4-piece tiers are identical across all five families; only the
 // capstone signature differs. The 4-piece wording says crowd control "cast on
 // you by hostile players" rather than "from hostile players" on purpose: control
 // applied by a player's PET is entity kind 'mob' and takes the non-hostile-pair

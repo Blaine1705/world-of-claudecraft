@@ -92,6 +92,16 @@ const CINDERWEAVE = [
   'cinderweave_slippers',
 ] as const;
 
+const THORNHIDE = [
+  'thornhide_headdress',
+  'thornhide_mantle',
+  'thornhide_vestment',
+  'thornhide_cinch',
+  'thornhide_leggings',
+  'thornhide_gloves',
+  'thornhide_boots',
+] as const;
+
 interface Profile {
   name: string;
   classes: readonly PlayerClass[];
@@ -130,6 +140,19 @@ const PROFILES: readonly Profile[] = [
     name: 'caster cloth',
     classes: ['mage', 'priest', 'warlock', 'druid'],
     armor: CINDERWEAVE,
+    neck: 'cinder_sigil_pendant',
+    rings: ['ashen_focus_ring', 'spellbreakers_seal'],
+    weapon: 'emberglass_warstaff',
+  },
+  // The leather caster family, and the reason this list is worth keeping
+  // complete: it was added after the other four and inherited none of their
+  // coverage, so the sweeps below said "every family" while measuring four of
+  // five. Druid only, because it is the one class whose armor rank is leather
+  // and whose stat identity is int/spi.
+  {
+    name: 'caster leather',
+    classes: ['druid'],
+    armor: THORNHIDE,
     neck: 'cinder_sigil_pendant',
     rings: ['ashen_focus_ring', 'spellbreakers_seal'],
     weapon: 'emberglass_warstaff',
@@ -280,9 +303,9 @@ describe('FURY WARFARE item budgets', () => {
   });
 
   it('reaches the 30 percent capstone for EVERY complete family profile', () => {
-    // This file owns the four role profiles, so it is the only place the claim is
-    // made across all of them: mail Strength, mail caster, leather Agility and
-    // cloth. tests/warfare_gear_tier.test.ts pins the rating arithmetic itself
+    // This file owns the five role profiles, so it is the only place the claim is
+    // made across all of them: mail Strength, mail caster, leather Agility, cloth
+    // caster and leather caster. tests/warfare_gear_tier.test.ts pins the rating arithmetic itself
     // (182 base, 222 at four pieces, 302 clamped to 0.30) against one kit; this
     // asserts no family was left short a piece, a wrong set tag, or a slot gap.
     for (const profile of PROFILES) {

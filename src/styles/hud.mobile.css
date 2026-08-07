@@ -3738,8 +3738,9 @@
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
   }
-  /* The WARFARE shop is six sections deep, so it takes the vendor window's
-     full top-to-bottom treatment rather than the shorter quest-log clamp: same
+  /* The WARFARE shop is many sections deep (one per armor family, plus jewelry
+     and weapons), so it takes the vendor window's full top-to-bottom treatment
+     rather than the shorter quest-log clamp: same
      --window-scale division for the #ui zoom, same reserved 12px top offset
      from the centered-sheet base, same safe-area bottom margin. */
   body.mobile-touch #warfare-window {
