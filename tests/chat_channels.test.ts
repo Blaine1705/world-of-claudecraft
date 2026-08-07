@@ -462,9 +462,13 @@ describe('chat channel tabs: the battleground channel', () => {
     expect(sentLineChannel('/bgsomething gg')).toBeNull();
   });
 
-  it('carries a tab label and a log color distinct from party', () => {
+  it('carries a tab label and a log color unlike every GROUP channel', () => {
     expect(CHANNEL_LABEL_KEYS.battleground).toBe('hud.core.chatChannels.names.battleground');
-    expect(chatChannelColor('battleground')).not.toBe(chatChannelColor('say'));
-    expect(chatChannelColor('battleground')).not.toBe(chatChannelColor('party'));
+    // The point is not merely "some other color". Party, guild and lfg are the
+    // social/group channels, and this is the one channel that also reaches the
+    // enemy team, so it must not wear their family's blue or green.
+    for (const social of ['say', 'party', 'guild', 'lfg'] as const) {
+      expect(chatChannelColor('battleground')).not.toBe(chatChannelColor(social));
+    }
   });
 });
