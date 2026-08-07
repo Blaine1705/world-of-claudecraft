@@ -1258,25 +1258,30 @@ async function startGame(
   // now reads as checkpoint=assets-await instead of masquerading as a scene-build
   // death (start() stamps scene-build-start; the real one is re-stamped below).
   entryDiagnostics.checkpoint('assets-await', baseEntryDiagnostics());
+  // Open the deferred preload lane BEFORE the locale fetch below, not after: the
+  // world's assets are local bundle files while the locale/deed chunks are a real
+  // network request, so starting both together overlaps two independent boot-time
+  // fetches instead of paying their durations back to back. This must still run
+  // before the assetsReady() await further down, which snapshots the task list, so
+  // the Renderer still cannot outrun a load (the world's assets do not fetch at
+  // module import any more, because decoding them merely to show the LAUNCHER
+  // crossed WKWebView's per-process ceiling: a 12 GB iPhone 17 Pro was killed
+  // 1.6 s in and reloaded forever).
+  const deferredStarted = beginDeferredPreloads();
+  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
   // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
   // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
   // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
   // painted above), so a stored non-en visitor never sees an English flash. This is now a
   // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
   // sites) with no .catch, and English is always resident, so a failed fetch must fall back
-  // to English and keep booting rather than reject unhandled.
+  // to English and keep booting rather than reject unhandled. Runs concurrently with the
+  // deferred asset preloads started just above.
   try {
     await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
-  // Open the deferred preload lane: the world's assets do not fetch at module
-  // import any more, because decoding them merely to show the LAUNCHER crossed
-  // WKWebView's per-process ceiling (a 12 GB iPhone 17 Pro was killed 1.6 s in and
-  // reloaded forever). This must run BEFORE the await below, which snapshots the
-  // task list, so the Renderer still cannot outrun a load.
-  const deferredStarted = beginDeferredPreloads();
-  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
   try {
     await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
   } catch (err) {
