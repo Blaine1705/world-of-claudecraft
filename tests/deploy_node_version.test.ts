@@ -132,7 +132,8 @@ describe('deploy and CI Node version pin', () => {
   // positive pin locks that intentional divergence: it reds if desktop-publish.yml is
   // accidentally swept to the target major with the rest, forcing a conscious decision
   // (and an update here) rather than a silent bump. If the publish path is later moved
-  // to the target too, fold it into nodeVersionValues above and delete this.
+  // to the target too, fold it into nodeVersionValues above, delete this, and drop its
+  // NODE_MAJOR_EXEMPTIONS entry below.
   it('keeps desktop-publish.yml on Node 22, not the target major', () => {
     const values = nodeVersionValues(desktopWorkflow);
     expect(values.length).toBeGreaterThan(0);
@@ -158,9 +159,22 @@ describe('deploy and CI Node version pin', () => {
   // exemption list below. The read is single-level by GitHub's own contract: Actions
   // registers only top-level workflow files, so a YAML parked in a subdirectory is inert
   // to CI and a flat read matches the real registration surface rather than narrowing it.
+  // The read still checks that premise (tests/CLAUDE.md, scan-guard rules): the day this
+  // directory grows a subdirectory, refuse loudly instead of quietly skipping whatever
+  // sits inside it, because a workflow parked there would also silently never run in CI.
   const WORKFLOW_DIR = '.github/workflows';
-  const workflowFiles = readdirSync(WORKFLOW_DIR)
-    .filter((name) => /\.ya?ml$/.test(name))
+  const workflowEntries = readdirSync(WORKFLOW_DIR, { withFileTypes: true });
+  const workflowSubdirs = workflowEntries.filter((e) => e.isDirectory()).map((e) => e.name);
+  if (workflowSubdirs.length > 0) {
+    throw new Error(
+      `${WORKFLOW_DIR} grew subdirectories (${workflowSubdirs.join(', ')}): a workflow file ` +
+        'in there is inert to Actions and invisible to this scan; move it to the top level ' +
+        'or extend this scan consciously.',
+    );
+  }
+  const workflowFiles = workflowEntries
+    .filter((e) => e.isFile() && /\.ya?ml$/.test(e.name))
+    .map((e) => e.name)
     .sort();
 
   // Workflows allowed off the target major, each with its recorded reason. An entry must
@@ -176,9 +190,26 @@ describe('deploy and CI Node version pin', () => {
     expect(workflowFiles).toContain('ci.yml');
     expect(workflowFiles).toContain('desktop-publish.yml');
     expect(workflowFiles).toContain('ota-publish.yml');
+    const filesWithValues = new Set<string>();
     for (const file of workflowFiles) {
       if (file in NODE_MAJOR_EXEMPTIONS) continue;
-      const values = nodeVersionValues(readFileSync(join(WORKFLOW_DIR, file), 'utf8'));
+      const text = readFileSync(join(WORKFLOW_DIR, file), 'utf8');
+      // Only a literal numeric node-version is pinnable by extraction, so the
+      // non-literal carriers must be banned here or a new workflow could ride
+      // node-version-file, an expression, or lts/latest straight past the pin.
+      expect(
+        text.includes('node-version-file:'),
+        `${file} uses node-version-file; pin a literal node-version or exempt it with a reason`,
+      ).toBe(false);
+      for (const m of text.matchAll(/^\s*node-version:\s*(.*)$/gm)) {
+        expect(
+          /^['"]?\d+['"]?$/.test(m[1].trim()),
+          `${file} carries a non-literal node-version "${m[1].trim()}"; only a plain major ` +
+            'is pinnable here. Use a literal or exempt the file with a reason.',
+        ).toBe(true);
+      }
+      const values = nodeVersionValues(text);
+      if (values.length > 0) filesWithValues.add(file);
       for (const value of values) {
         expect(
           value,
@@ -187,6 +218,14 @@ describe('deploy and CI Node version pin', () => {
         ).toBe(TARGET_MAJOR);
       }
     }
+    // Per-file vacuity floor for the carrier this arm exists to hold: dropping the
+    // explicit version to ride the runner default is exactly the silent-drift shape,
+    // so a known carrier losing all its node-version lines must red, not pass empty.
+    // (ci.yml, audit.yml, and nightly.yml have their own non-empty guards above.)
+    expect(
+      filesWithValues,
+      'ota-publish.yml no longer declares any node-version; the runner default is unpinned',
+    ).toContain('ota-publish.yml');
   });
 
   it('keeps every exemption naming a real, still-divergent workflow', () => {
