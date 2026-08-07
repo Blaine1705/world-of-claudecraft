@@ -87,6 +87,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -1819,6 +1820,7 @@ export class Renderer {
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
+  private bulwarkFeatures: BulwarkFeaturesView | null = null;
   private castleFeatures: CastleFeaturesView | null = null;
   private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
@@ -4228,6 +4230,10 @@ export class Renderer {
         if (!this.castleFeatures) {
           this.castleFeatures = buildCastleFeatures();
           this.attachZoneFeature(this.castleFeatures);
+        }
+        if (!this.bulwarkFeatures) {
+          this.bulwarkFeatures = buildBulwarkFeatures();
+          this.attachZoneFeature(this.bulwarkFeatures);
         }
         break;
       case 'frost':
