@@ -391,7 +391,8 @@ export const zh_TW: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "關閉表情"
     },
     "dailyRewards": {
       "title": "每日獎勵",
@@ -1277,6 +1278,24 @@ export const zh_TW: EnTranslations = {
       "graphicsFatal": "圖形復原失敗。請重新載入遊戲以繼續。",
       "graphicsReload": "重新載入遊戲",
       "graphicsDraftChanged": "圖形變更已準備好套用。",
+      "gfxSectionQuality": "畫質",
+      "gfxSectionWorld": "世界細節",
+      "gfxSectionLighting": "光照與特效",
+      "gfxSectionCamera": "鏡頭",
+      "gfxSectionDisplay": "顯示",
+      "gfxSectionSystem": "系統",
+      "gfxSectionTouch": "觸控操作",
+      "gfxViewDistance": "視野距離",
+      "gfxWaterQuality": "水面品質",
+      "gfxCharacterDetail": "角色細節",
+      "gfxAmbientOcclusion": "環境光遮蔽",
+      "gfxBloom": "泛光",
+      "gfxAntiAliasing": "反鋸齒",
+      "gfxDynamicLights": "動態光源",
+      "gfxParticleEffects": "粒子特效",
+      "gfxHalf": "半",
+      "gfxCustomNote": "調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。",
+      "gfxEffectsNote": "環境光遮蔽、泛光與反鋸齒依賴後期處理鏈：當「特效與光照」為低時，處理鏈關閉，這些選項不起作用。",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",
@@ -1348,6 +1367,8 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const zh_TW: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "靈魂綁定",
+    "itemUniqueEquipped": "裝備唯一",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1801,7 +1823,13 @@ export const zh_TW: EnTranslations = {
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
       "increaseAria": "增加對{component}的專注",
-      "decreaseAria": "減少對{component}的專注"
+      "decreaseAria": "減少對{component}的專注",
+      "respecTierLabel": "重新分配速度",
+      "respecTierTimeOption": "免費（花費時間）",
+      "respecTierPartialOption": "更快（少量花費）",
+      "respecTierInstantOption": "即時（全額花費）",
+      "respecCostFree": "免費",
+      "respecCostLine": "花費 {coin} 和 {materials}"
     },
     "party": {
       "promoteLeader": "提升為隊長",
@@ -2049,7 +2077,7 @@ export const zh_TW: EnTranslations = {
       "hostile": "敵對",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "Boss"
+      "boss": "首領"
     },
     "targetFrame": {
       "unlock": "移動目標框",
@@ -3146,7 +3174,8 @@ export const zh_TW: EnTranslations = {
         "raise_fallen": "亡者復生（週期性召喚小怪）",
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
-        "wardstones": "護符石引導（階段轉換）"
+        "wardstones": "護符石引導（階段轉換）",
+        "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）"
       }
     },
     "deeds": {
@@ -3554,16 +3583,21 @@ export const zh_TW: EnTranslations = {
       "groupInterface": "介面",
       "groupCamera": "鏡頭",
       "talents": "天賦",
+      "professions": "專業",
       "arena": "競技場",
       "leaderboard": "排行榜",
       "deeds": "功績之書",
+      "sheathe": "收起/拔出武器",
       "crafting": "製作",
       "valeCup": "溪谷盃",
+      "mount": "騎乘 / 下騎",
       "calendar": "活動日曆",
+      "dungeonFinder": "地城搜尋器",
       "discord": "Discord",
       "abilities": "使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）",
       "targetFriendly": "鎖定最近的友方",
       "cycleFriendly": "切換友方目標",
+      "targetAuras": "目標增益與減益效果",
       "gameMenu": "開啟遊戲選單與設定",
       "bothMouse": "滑鼠左右鍵",
       "runForward": "向前奔跑",
@@ -3574,7 +3608,7 @@ export const zh_TW: EnTranslations = {
       "mobileHeading": "行動裝置上",
       "mobileBody": "在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在其他任意處拖曳即可環顧，用兩指捏合來縮放鏡頭，並有螢幕上的按鈕供你使用技能與選單。左上角的一個小箭頭可以顯示或隱藏選單按鈕，而那裡的「更多」按鈕則收納了你其餘的視窗。",
       "controllerHeading": "使用手把時",
-      "controllerBody": "手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角。"
+      "controllerBody": "手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角，也可以將某個按鍵綁定為拉近或拉遠鏡頭（預設未綁定）。"
     },
     "settingsPage": {
       "heading": "設定與效能",
@@ -4090,7 +4124,7 @@ export const zh_TW: EnTranslations = {
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
-      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔上迎戰祖爾加。",
+      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -4315,6 +4349,8 @@ export const zh_TW: EnTranslations = {
       "sourcesBody": "你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。",
       "soulboundTitle": "靈魂綁定：屬於你，也僅屬於你",
       "soulboundBody": "許多珍貴的裝備是靈魂綁定的，從你取得的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它如今是你故事的一部分，沒有其他人能替你佩戴它。",
+      "uniqueTitle": "裝備唯一：同一件傳說只能穿一件",
+      "uniqueBody": "傳說物品是裝備唯一的：你的角色同一時間只能穿戴某件傳說物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、銀行或市場裡，但試圖同時穿戴兩份會被拒絕。物品提示上還帶有金色的「裝備唯一」標籤，讓你在圍繞兩件傳說規劃配裝之前就能看到這條規則。",
       "setsTitle": "套裝與套裝效果",
       "setsBody": "有些護甲以成套的家族出現，數件裝備經過剪裁，使其外觀與戰鬥表現渾然一體。同時穿上足夠多的同家族裝備，套裝便會甦醒，在每件裝備本身的屬性之上額外賦予加成，而你穿得愈多，效果就愈強。少數這樣的家族會在你升級途中作為珍貴的掉落現身；其中最頂尖的則來自接近等級上限的最艱難團隊內容，因此追求一整套裝是經典的終局目標。",
       "consumablesTitle": "消耗品",
@@ -7374,11 +7410,14 @@ export const zh_TW: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
+      "useElixir": "使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。戰鬥中可用。",
+      "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。",
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",
       "questOrphaned": "目前沒有進行中的任務需要此物品。",
       "classes": "職業：{classes}",
+      "maxStack": "最大堆疊：{count}",
       "sellPrice": "出售價格：{money}",
       "clickBuy": "點擊購買",
       "clickSell": "點擊出售",
@@ -7529,6 +7568,8 @@ export const zh_TW: EnTranslations = {
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",
       "collectNote": "商人為你保管的收益和退回貨物。",
       "saleProceeds": "銷售收益",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "另有 {count} 筆較早的交易，已計入總額。",
       "collectAll": "全部領取"
     },
     "logs": {
@@ -10307,6 +10348,15 @@ export const zh_TW: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "厲牙箭袋"
+      },
+      "sharp_claw": {
+        "name": "鋒利的爪"
+      },
+      "curved_tusk": {
+        "name": "彎曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
       },
       "conjured_water4": {
         "name": "魔法泉水"

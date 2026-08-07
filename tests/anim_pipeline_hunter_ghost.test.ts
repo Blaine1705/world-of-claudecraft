@@ -130,10 +130,11 @@ describe('ghost family bespoke attack (issue #2889 follow-up batch)', () => {
     // a DIFFERENT GLB where FLOATING simply no-ops; they, mob_choir_thrall
     // (a separate ghost.glb user), and every other FLOATING family stay on
     // the shared constant. 9 families shared FLOATING/ELEMENTAL_FLOATING
-    // originally (batch 1's own pin); this batch migrates exactly one more
-    // (mob_ghost) off the literal FLOATING usage, leaving 7 remaining direct
-    // `clips: FLOATING,` usages (8 after batch 1, minus mob_ghost here).
+    // originally (batch 1's own pin); this batch migrates one more
+    // (mob_ghost), and the nightkin family's own follow-up migration to
+    // NIGHTKIN_FLOATING (tests/anim_pipeline_warlock_nightkin.test.ts) takes
+    // one more still, leaving 6 remaining direct `clips: FLOATING,` usages.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(7);
+    expect(remaining).toBe(6);
   });
 });
