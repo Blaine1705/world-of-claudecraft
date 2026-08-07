@@ -82,10 +82,11 @@ is dirty (same reason `gate:fast` skips those paths for related expansion). Pref
 transforms under `node_modules/.experimental-vitest-cache` (clear with
 `npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
 across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
-release-gate shard jobs carry an `actions/cache` step for it, keyed per shard on the
-node_modules-layout inputs (lockfile, vite config, `.npmrc`, `package.json`), with the
-design constraints written on the step in `.github/workflows/ci.yml` and pinned by
-`tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
+release-gate shard jobs carry an `actions/cache` step for it, keyed per shard, and the
+long-sims lane job carries the same step keyed per lane (Phase 6, the recorded Phase 4
+rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
+`package.json`), with the design constraints written on the pr-gate copy of the step in
+`.github/workflows/ci.yml` and pinned by `tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
 uncached full replay. Most DOM-environment unit
 tests use `// @vitest-environment happy-dom`; a short exception list still pins
 `jsdom` where happy-dom API gaps bite (see `docs/local-gate-perf/baselines.md`
@@ -158,8 +159,12 @@ scans from disk joins it the moment it lands.
 
 **Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
 a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
-to the full suite. Selection is an optimization for changes we understand; everything else
-gets the old bar. Failing toward *more* tests is the only safe direction, which is also why
+to the full suite. One deliberate carve-out: the regenerated i18n artifacts never widen;
+they classify into their own bucket and are fed to `related` as graph nodes (see
+"Generated i18n artifacts" under the CI section below; the same shared classifier serves
+both arms, and the local gate's own i18n freshness step is the local half of the safety
+argument). Selection is an optimization for changes we understand; everything else gets
+the old bar. Failing toward *more* tests is the only safe direction, which is also why
 an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
 changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
 `GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
@@ -227,6 +232,50 @@ read safely. Selection never applies off `pull_request` events: a merge-queue ru
 `release-gate` keeps the unconditional full 8-shard run line, and the nightly gate
 re-proves the tips daily.
 
+**Generated i18n artifacts.** The regenerated i18n artifacts (the per-locale resolved
+slices directly under `src/ui/i18n.resolved.generated/` and
+`src/admin/i18n.resolved.generated/`, and
+`src/ui/i18n.catalog/translation_keys.generated.ts`) classify into their own bucket
+(`isGeneratedI18nArtifactPath` in `scripts/lib/gate_select_plan.mjs`) instead of the
+unrecognized-widen-to-full catch-all, so a PR that carries a routine regeneration no
+longer forces the full suite: before this rule they were the single dominant full
+trigger (8 of the 25 PRs replayed in Phase 2 went full SOLELY on them). The standing
+rests on three structural facts, each pinned:
+
+1. **Integrity is owned by the freshness step, which selection never touches.** The
+   `pr-checks` job (and `release-checks`, and the full local gate's i18n step) reruns
+   `npm run i18n:gen` and fails on `git diff --exit-code` over EXACTLY the artifact
+   paths, gated only on `code` (any `src/` change), never on `test_mode`. A hand-edited
+   or stale artifact is therefore a red check in every mode. `tests/ci_workflow.test.ts`
+   pins the classifier's path list to the workflow's freshness-diff list AND to the
+   local gate's `I18N_ARTIFACTS` list, so the copies cannot drift apart silently.
+2. **Coverage is owned by the import graph, with the artifacts as entry nodes.** The
+   artifacts are INSIDE the module graph, and are its most-connected i18n node
+   (`src/ui/i18n.ts` statically imports and re-exports the resolved barrel); their
+   DRIVING sources (catalog modules, locale overlays) are build inputs the runtime
+   reaches only through type-erased edges, so `related` over a driving source selects
+   almost nothing. Both arms therefore feed the changed artifact paths THEMSELVES to
+   `vitest related`, which walks the real graph to every consumer, including suites
+   that pin resolved-table content through the `src/ui/i18n.ts` re-export seam without
+   ever naming an artifact (measured: a single resolved slice reaches about 240 of the
+   2296 suites; a locale-fill PR runs the floor plus that set instead of everything).
+   The `generated-i18n` entry in `OUT_OF_GRAPH_PATTERNS` is a belt over this, not the
+   mechanism: it floors the direct artifact-naming importers on every selective run,
+   with witnesses floored SOLELY by it (`tests/i18n_lazy_loader.test.ts`,
+   `tests/i18n_dialect_resolution.test.ts`) pinned in `tests/gate_select_plan.test.ts`.
+   Each `npm test` leg's pretest also regenerates the artifacts, so selected suites
+   always assert over fresh content.
+3. **Deletions and unprovable shapes widen.** The freshness diff cannot flag a
+   deleted-then-regenerated file (regeneration recreates it UNTRACKED, and `git diff`
+   never shows untracked files), so a removed or renamed-away artifact forces full in
+   the mode decision (statuses), the shard plan re-proves presence with the checkout the
+   changes job lacks, and the local planner takes an existence probe and widens without
+   one. Membership is top-level only: the generator's orphan sweep does not recurse, so
+   a SUBDIRECTORY path under an artifact dir is not freshness-provable and keeps the
+   unrecognized widen. Every OTHER `.generated` tree keeps the old behavior:
+   unrecognized, widen. Do not extend the artifact list without a freshness-equivalent
+   proof AND the `tests/ci_workflow.test.ts` coupling.
+
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
 `[ci-shard]` in each shard: mode, reason, floor size, related sources, and the
 outside-floor count), so a suspicious green is auditable at a glance. To reproduce a CI
@@ -247,6 +296,30 @@ queue closes this pre-merge: every queued PR is retested with the FULL suite on 
 exact merge result against the current tip before it may land. The full-suite run on
 every `release/**` push still re-proves the landed tip, and the nightly re-proves it
 daily.
+
+**Known-flake handling** (Phase 6). The shard and lane legs run through
+`scripts/lib/ci_leg_runner.mjs`, which streams each leg's output through with
+backpressure while keeping a bounded tail, and applies the ONE sanctioned automatic
+retry: a leg that exits 1 while its vitest summary shows every test passed, carries the
+exact unhandled `EnvironmentTeardownError: [vitest-worker]: Closing rpc while
+"onUserConsoleLog" was pending` message (the worker-teardown console-log race, first
+recorded 2026-08-05), and whose summary `Errors` count is fully explained by teardown-rpc
+occurrences (so a run also carrying any OTHER unhandled error never retries) is rerun
+once, with a loud `[ci-shard] known-flake retry` banner in the job log, a GitHub warning
+annotation on the run, and a `(known-flake retry used on: ...)` suffix on the PASS line,
+so a green that used the retry is auditable at a glance. At most ONE retry per job,
+shared across all its legs. Any failed test, any other exit code, a signal kill, a spawn
+error, or any unexplained unhandled error fails the job exactly as before: the packet's
+non-goals forbid a blanket retry because retries hide real regressions. Be precise about
+what the guarantee is: test output is not a trust boundary (a test already executes
+arbitrary code in the job), so the summary parse is a narrowing filter, not integrity;
+the property that holds is the policy itself, at most one rerun of the same leg per job,
+always visible in the log. Classifier and policy live in
+`scripts/lib/teardown_rpc_flake.mjs` and `scripts/lib/ci_leg_runner.mjs`, pinned by
+`tests/teardown_rpc_flake.test.ts` and `tests/ci_leg_runner.test.ts`. `release-gate`,
+the nightly, and the local gate carry NO auto-retry: there a teardown-rpc red stays red
+and the remedy remains a manual rerun of the red shard
+(`gh run rerun <run-id> --failed`).
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two

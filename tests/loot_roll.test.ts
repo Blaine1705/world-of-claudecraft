@@ -20,6 +20,7 @@ import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -332,7 +333,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
 
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     const returned = mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots');
     expect(returned).toMatchObject({ count: 1, openToAll: true });
   });
@@ -354,7 +355,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
       // `a` never answered: the leave itself is the last-candidate trigger that
       // runs resolveLootRoll (the only leave-path branch that resolves a roll).
       sim.removePlayer(a);
-      expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+      expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
       expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
       // Won by a live needer, not scattered back to the corpse.
       expect(mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots')).toBeUndefined();
@@ -389,7 +390,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     sim.removePlayer(a); // the leave resolves the tied roll and must draw the tie-break
 
     expect(int).toHaveBeenCalledWith(0, 1); // the resolve-time tie-break fired on the leave path
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     // Exactly one live needer holds it; the leaver never does.
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
     expect(sim.countItem('greyjaw_hide_boots', b) + sim.countItem('greyjaw_hide_boots', c)).toBe(1);
@@ -412,7 +413,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     submitLootRoll(sim.ctx, rollId, 'greed', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
 
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
     expect(mob.loot?.items.find((slot) => slot.itemId === 'greyjaw_hide_boots')).toMatchObject({
       count: 1,
@@ -511,7 +512,7 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
 
   it('hides a curate-phase master roll from the group status', () => {
     const { sim, a, rollId } = openRoll();
-    const roll = (sim as any).pendingLootRolls.get(rollId);
+    const roll = expectDefined(sim.ctx.pendingLootRolls.get(rollId));
     roll.masterLooter = a;
     expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
   });

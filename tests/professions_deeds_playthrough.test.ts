@@ -33,7 +33,12 @@ const KOI = 'glimmerfin_koi';
 const sim = new Sim({ seed: PLAYTHROUGH_SEED, playerClass: 'warrior', autoEquip: true });
 const pid = sim.playerId;
 const meta = sim.players.get(pid) as PlayerMeta;
-const player = sim.entities.get(pid)!;
+function requirePlayer() {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error('playthrough player entity missing');
+  return entity;
+}
+const player = requirePlayer();
 
 function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }>[] {
   return evs.filter((ev): ev is Extract<SimEvent, { type: 'deedUnlocked' }> => {
@@ -164,8 +169,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
     // craft-cast system landed: craft start/complete split shifts shared-stream
-    // draws vs the instant-craft era): the proc lands on attempt index 1.
-    expect(procAt).toBe(1);
+    // draws vs the instant-craft era): the proc lands on attempt index 7.
+    expect(procAt).toBe(7);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -300,8 +305,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: shared-stream draws shift vs the instant-craft era.
-    // The repaired AAA world lands the koi on session index 16.
-    expect(koiSession).toBe(16);
+    // The merged world lands the koi on session index 20.
+    expect(koiSession).toBe(20);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -328,18 +333,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 46 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 128 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 50,
+        hitAt: 116,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 279,
+        hitAt: 4,
       },
     ];
     for (const hunt of hunts) {
@@ -399,8 +404,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: the rare-or-better rarity roll that mints the signed
-    // specimen lands on the first attempt.
-    expect(hitAt).toBe(0);
+    // specimen lands on attempt index 8.
+    expect(hitAt).toBe(8);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

@@ -1143,7 +1143,9 @@ function farTrunkGeo(barkGeo: THREE.BufferGeometry): THREE.BufferGeometry {
   const cached = farTrunkCache.get(barkGeo);
   if (cached) return cached;
   barkGeo.computeBoundingBox();
-  const h = barkGeo.boundingBox!.max.y * 0.8;
+  const barkBox = barkGeo.boundingBox;
+  if (!barkBox) throw new Error('far trunk geometry missing bounds');
+  const h = barkBox.max.y * 0.8;
   const geo = new THREE.CylinderGeometry(0.2, 0.42, h, 5, 1, true);
   geo.translate(0, h / 2, 0);
   // the bark material has vertexColors:true (source GLBs ship COLOR_0); a
@@ -1267,7 +1269,8 @@ function casterLocalBounds(geo: THREE.BufferGeometry): CasterLocalBounds {
   const cached = casterLocalBoundsCache.get(geo);
   if (cached) return cached;
   geo.computeBoundingBox();
-  const box = geo.boundingBox!;
+  const box = geo.boundingBox;
+  if (!box) throw new Error('caster geometry missing bounds');
   const bounds: CasterLocalBounds = {
     radiusXZ: Math.hypot(
       Math.max(Math.abs(box.min.x), Math.abs(box.max.x)),
@@ -3133,7 +3136,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const deadline = performance.now() + buildBudgetMs;
     let built = 0;
     while (buildQueue.length > 0 && built < GRASS_CHUNK_MAX_BUILDS_PER_FRAME) {
-      const chunk = buildQueue.shift()!;
+      const chunk = buildQueue.shift();
+      if (!chunk) break;
       chunk.queued = false;
       if (chunks.get(chunk.key) !== chunk || chunk.ready || chunk.lastSeen !== generation) continue;
       buildChunk(chunk);
@@ -3600,7 +3604,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
       eyeX: number,
       eyeY: number,
       eyeZ: number,
-      fogNear: number,
+      _fogNear: number,
       fogFar: number,
       atmosFogNear: number,
       atmosFogFar: number,

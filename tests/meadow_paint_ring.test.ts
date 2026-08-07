@@ -12,6 +12,7 @@ describe('meadow paint ring', () => {
     // the snippet is spliced via one shared constant, so presence of the
     // constant plus two splice sites is the both-arms guarantee
     expect(terrain).toContain('const GRASS_PAINT_RING_GLSL');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
     const splices = terrain.split('${GRASS_PAINT_RING_GLSL}').length - 1;
     expect(splices, 'rich and plain arms both splice the ring').toBe(2);
     expect(terrain).toContain('uCarpetRing.z > 0.0');

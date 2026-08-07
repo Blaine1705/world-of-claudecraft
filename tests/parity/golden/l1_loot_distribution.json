@@ -10,7 +10,7 @@
     "looter-takes-all common item + personal-loot visibility"
   ],
   "draws": 3,
-  "drawDigest": "22bdb0e2",
+  "drawDigest": "9cfa0ceb",
   "frames": [
     {
       "tick": 0,
@@ -30,11 +30,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "0f01b2e9",
-      "events": "b1db937b",
+      "state": "96ab5205",
+      "events": "a7f88743",
       "rng": {
         "draws": 1,
-        "digest": "5afc057e"
+        "digest": "fc1f956a"
       },
       "label": "after-loot-a",
       "players": [
@@ -53,14 +53,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -176,14 +176,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -459,11 +459,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "09489af5",
-      "events": "22d50c10",
+      "state": "4e1d4fa7",
+      "events": "f836561c",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-rolls",
       "players": [
@@ -482,14 +482,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -624,14 +624,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -920,11 +920,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "90b433db",
+      "state": "73646e0d",
       "events": "024a26d2",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-loot-b",
       "players": [
@@ -943,14 +943,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1094,14 +1094,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1374,11 +1374,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 967,
-      "state": "306620ee",
+      "state": "53f3e720",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "final",
       "players": [
@@ -1397,14 +1397,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1548,14 +1548,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},

@@ -10,7 +10,7 @@
 // realm modules: build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
-import { GALE_HARBOR_DECKS, galeDeckSurfaceAt } from '../sim/gale_harbor';
+import { GALE_HARBOR_DECKS } from '../sim/gale_harbor';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';

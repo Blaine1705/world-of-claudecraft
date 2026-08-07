@@ -675,6 +675,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     // buttons stamp data-focus-key as `${key}:${value}`).
     expect(body).toContain('const focusKey = captureFocusKey(el);');
     expect(body).toContain('restoreFirstEnabled([');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal source text.
     expect(painter).toContain('btn.dataset.focusKey = `${key}:${option.value}`;');
   });
 

@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
-const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
+const URL = `${process.env.GAME_URL ?? 'http://localhost:5173'}/?gfx=ultra`;
 const OUT = process.env.SHOT_OUT ?? 'after';
 const MOBILE = process.env.SHOT_MOBILE === '1';
 // SHOT_TEMPLATE lets the same rig capture the control case (a MIXED template,

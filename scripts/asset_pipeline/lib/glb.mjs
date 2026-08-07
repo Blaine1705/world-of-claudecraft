@@ -701,7 +701,7 @@ export async function addHandslotBones(
     // Hand world pose on the TARGET rig (bind pose).
     const handM = hand.getWorldMatrix();
     const handQuat = mat4RotToQuat(handM);
-    const handP = worldPos(handM);
+    const _handP = worldPos(handM);
     // Hand world scale (uniform-ish): length of the first matrix column. Local
     // offsets under the hand are expressed in this scale.
     const handS = Math.hypot(handM[0], handM[1], handM[2]) || 1;

@@ -51,7 +51,9 @@ describe('decideTestMode: when selection is allowed at all', () => {
 
 // The packet's fall-back acceptance list (docs/qa-gate.md, "Selective PR-tier CI"):
 // lockfile, package.json, workflow files, vite/vitest/tsconfig, generated-file
-// regeneration, and the selection pipeline itself all run the full suite.
+// regeneration, and the selection pipeline itself all run the full suite. One
+// carve-out: the freshness-guarded i18n artifacts classify inert (their own
+// describe below); every OTHER generated tree still widens.
 describe('decideTestMode: fail-closed triggers', () => {
   it.each([
     ['pnpm-lock.yaml'],
@@ -65,7 +67,6 @@ describe('decideTestMode: fail-closed triggers', () => {
     ['tests/helpers/bare_client.ts'],
     ['tests/server/helpers/fake_db.ts'],
     ['tests/global_setup.ts'],
-    ['src/ui/i18n.catalog/translation_keys.generated.ts'],
     ['.browserslistrc'],
     ['some/unrecognized/thing.bin'],
   ])('%s runs the full suite via the shared planner buckets', (p) => {
@@ -214,6 +215,100 @@ describe('decideTestMode: incident replay stays covered', () => {
     const d = decideTestMode({ ...PR, files: [mod('src/sim/rng.ts')] });
     expect(d.mode).toBe('selective');
     expect(d.changedPaths).toEqual(['src/sim/rng.ts']);
+  });
+});
+
+// Generated i18n artifacts (docs/qa-gate.md, "Selective PR-tier CI"): they
+// never WIDEN the run because pr-checks reruns i18n:gen and diffs EXACTLY
+// these paths on every code PR in every mode (tests/ci_workflow.test.ts pins
+// the coupling), and they are never DROPPED from selection either: the shard
+// plan feeds them to `vitest related` as graph nodes, because their consumer
+// suites hang off the artifact side of the import graph (the catalog/overlay
+// driving sources are type-erased build inputs). Deletions stay unprovable:
+// the freshness diff cannot flag a deleted-then-regenerated file, so
+// `removed`/`renamed` widens.
+describe('decideTestMode: generated i18n artifacts', () => {
+  it.each([
+    ['src/ui/i18n.resolved.generated/de_DE.ts'],
+    ['src/ui/i18n.resolved.generated/loaders.ts'],
+    ['src/admin/i18n.resolved.generated/fr_FR.ts'],
+    ['src/ui/i18n.catalog/translation_keys.generated.ts'],
+  ])('%s is inert: a regeneration-carrying PR stays selective', (p) => {
+    const d = decideTestMode({
+      ...PR,
+      files: [mod('src/ui/i18n.catalog/tooltips.ts'), mod(p)],
+    });
+    expect(d.mode).toBe('selective');
+    expect(d.changedPaths).toEqual(['src/ui/i18n.catalog/tooltips.ts', p]);
+    expect(d.reason).toBe(
+      'selective: 1 changed source file(s), 0 changed test file(s), ' +
+        '0 inert path(s), 1 generated i18n artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('keeps an artifact-only diff selective with the audit note in the reason', () => {
+    const d = decideTestMode({
+      ...PR,
+      files: [
+        mod('src/ui/i18n.resolved.generated/en.ts'),
+        mod('src/admin/i18n.resolved.generated/en.ts'),
+      ],
+    });
+    expect(d.mode).toBe('selective');
+    expect(d.reason).toContain('2 generated i18n artifact(s) fed to related (freshness-guarded)');
+  });
+
+  it('widens on a removed or renamed-away artifact (the freshness diff cannot see it)', () => {
+    expect(
+      decideTestMode({
+        ...PR,
+        files: [{ filename: 'src/ui/i18n.resolved.generated/da_DK.ts', status: 'removed' }],
+      }).reason,
+    ).toContain('removed or renamed generated i18n artifact');
+    expect(
+      decideTestMode({
+        ...PR,
+        files: [
+          {
+            filename: 'src/ui/i18n.resolved.generated/da_DK_old.ts',
+            previous_filename: 'src/ui/i18n.resolved.generated/da_DK.ts',
+            status: 'renamed',
+          },
+        ],
+      }).reason,
+    ).toContain('removed or renamed generated i18n artifact');
+  });
+
+  it('keeps every OTHER generated tree an unclassified widen', () => {
+    for (const p of [
+      'src/game/sfx_manifest.generated.ts',
+      'src/guide/content.generated.ts',
+      'src/ui/map_bg_manifest.generated.ts',
+      'src/editor/asset_catalog.generated.ts',
+      'src/sim/thornhollow_field.generated.ts',
+    ]) {
+      const d = decideTestMode({ ...PR, files: [mod('src/ui/hud.ts'), mod(p)] });
+      expect(d.mode).toBe('full');
+      expect(d.reason).toContain('broad or unclassified change');
+    }
+  });
+
+  it('refuses lookalike paths outside the pinned artifact classes', () => {
+    // Prefix matching is anchored at the repo root, requires the directory
+    // separator, and stops at ONE level (the freshness sweep cannot see
+    // deeper); the file arm is an exact-path match, never a basename match
+    // (a same-named file elsewhere is not freshness-proven).
+    for (const p of [
+      'nested/src/ui/i18n.resolved.generated/en.ts',
+      'src/ui/i18n.resolved.generated.bak.ts',
+      'src/guide/i18n.resolved.generated/en.ts',
+      'src/ui/i18n.resolved.generated/sub/en.ts',
+      'src/admin/i18n.catalog/translation_keys.generated.ts',
+      'nested/src/ui/i18n.catalog/translation_keys.generated.ts',
+    ]) {
+      const d = decideTestMode({ ...PR, files: [mod(p)] });
+      expect(d.mode).toBe('full');
+    }
   });
 });
 

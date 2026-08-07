@@ -119,7 +119,7 @@ describe('mob component-type tags', () => {
     // (every claw/tusk-only mix) into fully-mapped, leaving the 5 that still
     // mix a mapped family with gills or horn (the two families still waiting
     // on theirs). The per-template bound above is what holds the line.
-    expect(mixedSeen).toBe(5);
+    expect(mixedSeen).toBe(6);
     // And the threshold really is where the comment says it is, stated as a
     // hypothetical shape rather than waiting for content to author one.
     expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));

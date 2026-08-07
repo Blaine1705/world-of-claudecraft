@@ -59,6 +59,17 @@ the Checks tab (filter by event: merge_group).
    branch, fix, push, re-queue.
 4. A flake verdict needs a clean rerun, not a shrug: re-run the failed job; if
    it greens, re-queue. Judge red CI by clean-runner reruns.
+5. A job that failed with "exceeded the maximum execution time of N minutes"
+   hit its checkout-stall bound (the test and browser jobs carry job-level
+   timeout-minutes sized from measured healthy worst cases; the stall class
+   is runner-side and runs tens of minutes inside actions/checkout, 9.6 to
+   24.4 in the incident sample and up to 68 in the 24 hour replay). First open the killed job's log: if a test step was
+   already failing or still running near the bound, treat it as a real
+   failure or a real slowdown, not a stall (a genuinely red shard on a
+   runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
+   not a code investigation: re-run the failed jobs and re-queue. If the
+   SAME job times out twice on healthy-looking logs, treat it as a real
+   slowdown and investigate before resizing any bound.
 
 ## The required-check contract
 
@@ -96,7 +107,6 @@ Never require these, deliberately:
   `Release checks (freshness, typecheck, builds)`, `Release version gate`):
   release-process lanes, legitimately red or skipped mid-cycle. Release i18n in
   particular is red by design until the release-time locale fill.
-- The AI-assist checks (`PR AI assist` jobs): standing policy, they never gate.
 - `Dependency audit`: its workflow is path-filtered to dependency changes, so
   on most PRs (and on every queue run) the check never reports at all, and a
   required check that never reports blocks the merge forever. Skipped jobs

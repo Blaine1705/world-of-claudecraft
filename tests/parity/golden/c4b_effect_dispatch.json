@@ -14,8 +14,8 @@
     "summonDemon -> summonPet (warlock summon_imp) + selfBuff form switch (druid)",
     "weaponStrike awardCombo latch + finisher combo-spend reset"
   ],
-  "draws": 880,
-  "drawDigest": "0177a784",
+  "draws": 861,
+  "drawDigest": "8fdf89e5",
   "frames": [
     {
       "tick": 0,
@@ -35,77 +35,77 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 970,
-      "state": "ffcc46c6",
+      "state": "54046174",
       "events": "e448214e",
       "rng": {
         "draws": 2,
-        "digest": "8a9fec1e"
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
       "nextId": 970,
-      "state": "a8067310",
+      "state": "4c7ed320",
       "events": "741638a5",
       "rng": {
         "draws": 2,
-        "digest": "8a9fec1e"
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
       "nextId": 970,
-      "state": "d71d00ac",
+      "state": "381d1d07",
       "events": "741638a5",
       "rng": {
         "draws": 2,
-        "digest": "8a9fec1e"
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 20,
       "time": 1,
       "nextId": 970,
-      "state": "13bf0943",
+      "state": "2bbda8a4",
       "events": "a66ae8aa",
       "rng": {
         "draws": 2,
-        "digest": "8a9fec1e"
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
       "nextId": 970,
-      "state": "9b48df68",
+      "state": "dadc6e52",
       "events": "741638a5",
       "rng": {
-        "draws": 3,
-        "digest": "af8e84f7"
+        "draws": 2,
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
       "nextId": 970,
-      "state": "646a7260",
+      "state": "e73858b7",
       "events": "e41b1d4a",
       "rng": {
-        "draws": 3,
-        "digest": "af8e84f7"
+        "draws": 2,
+        "digest": "88a09b1e"
       }
     },
     {
       "tick": 32,
       "time": 1.6,
       "nextId": 970,
-      "state": "6c6b6b63",
-      "events": "8d7aa02f",
+      "state": "1632bd46",
+      "events": "741638a5",
       "rng": {
-        "draws": 5,
-        "digest": "e5d23f65"
+        "draws": 2,
+        "digest": "88a09b1e"
       },
       "label": "warlock-fear",
       "players": [
@@ -888,7 +888,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 1.5,
-          "combatTimer": 0.05,
+          "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -897,7 +897,6 @@
           "fiveSecondRule": 0.15,
           "hp": 50000,
           "id": 968,
-          "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -938,40 +937,19 @@
           }
         },
         {
-          "aggroTargetId": 968,
-          "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 7.95,
-              "school": "shadow",
-              "sourceId": 968,
-              "value": -1.96751
-            }
-          ],
-          "combatTimer": 0.05,
+          "aiState": "idle",
+          "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -1.722316,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 500000,
           "id": 969,
-          "inCombat": true,
           "kind": "mob",
-          "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
-          },
           "level": 8,
           "lootFfaTimer": "Infinity",
           "maxHp": 500000,
@@ -980,9 +958,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 44.171655,
-            "y": -1.273353,
-            "z": -44.652767
+            "x": 37.571328,
+            "y": -1.537145,
+            "z": -42.676213
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -994,13 +972,12 @@
             "armor": 70
           },
           "templateId": "forest_wolf",
-          "threat": [
-            [
-              968,
-              1
-            ]
-          ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.45,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1013,231 +990,231 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 970,
-      "state": "ce27b752",
-      "events": "d2b9ade7",
+      "state": "42d239c8",
+      "events": "1e643691",
       "rng": {
-        "draws": 5,
-        "digest": "e5d23f65"
+        "draws": 4,
+        "digest": "a1db3196"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 970,
-      "state": "bd0e87c3",
+      "state": "0b4660a2",
       "events": "741638a5",
       "rng": {
-        "draws": 5,
-        "digest": "e5d23f65"
+        "draws": 4,
+        "digest": "a1db3196"
       }
     },
     {
       "tick": 45,
       "time": 2.25,
       "nextId": 970,
-      "state": "1cec3173",
+      "state": "2783203e",
       "events": "741638a5",
       "rng": {
-        "draws": 49,
-        "digest": "f465915c"
+        "draws": 48,
+        "digest": "cf621844"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
       "nextId": 970,
-      "state": "b40d0507",
+      "state": "6cd2379e",
       "events": "741638a5",
       "rng": {
-        "draws": 83,
-        "digest": "de3e96c8"
+        "draws": 80,
+        "digest": "19c5ac97"
       }
     },
     {
       "tick": 55,
       "time": 2.75,
       "nextId": 970,
-      "state": "32c8f012",
+      "state": "767a3673",
       "events": "741638a5",
       "rng": {
-        "draws": 116,
-        "digest": "55c88e68"
+        "draws": 113,
+        "digest": "726e008a"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 970,
-      "state": "7a94b52f",
+      "state": "f534e9c9",
       "events": "741638a5",
       "rng": {
-        "draws": 144,
-        "digest": "62f9ef6f"
+        "draws": 137,
+        "digest": "fc0e501e"
       }
     },
     {
       "tick": 65,
       "time": 3.25,
       "nextId": 970,
-      "state": "8bf0e487",
+      "state": "7de226c2",
       "events": "741638a5",
       "rng": {
-        "draws": 183,
-        "digest": "23891d0f"
+        "draws": 176,
+        "digest": "fd897c96"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
       "nextId": 970,
-      "state": "5b260002",
+      "state": "281b9253",
       "events": "741638a5",
       "rng": {
-        "draws": 229,
-        "digest": "34402261"
+        "draws": 221,
+        "digest": "95369e3a"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 970,
-      "state": "b2b09dd6",
+      "state": "5ab08ee9",
       "events": "741638a5",
       "rng": {
-        "draws": 275,
-        "digest": "5f5a30b1"
+        "draws": 268,
+        "digest": "673d8273"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 970,
-      "state": "af38849b",
+      "state": "604262fc",
       "events": "741638a5",
       "rng": {
-        "draws": 315,
-        "digest": "69c64fcb"
+        "draws": 306,
+        "digest": "31bfa32e"
       }
     },
     {
       "tick": 85,
       "time": 4.25,
       "nextId": 970,
-      "state": "b361ca53",
+      "state": "655b632a",
       "events": "741638a5",
       "rng": {
-        "draws": 371,
-        "digest": "2beda11c"
+        "draws": 355,
+        "digest": "ea92f9cf"
       }
     },
     {
       "tick": 90,
       "time": 4.5,
       "nextId": 970,
-      "state": "20763801",
+      "state": "bd94f129",
       "events": "741638a5",
       "rng": {
-        "draws": 418,
-        "digest": "c730ecb7"
+        "draws": 402,
+        "digest": "c18c0fa5"
       }
     },
     {
       "tick": 95,
       "time": 4.75,
       "nextId": 970,
-      "state": "ef0fe226",
+      "state": "343e97d8",
       "events": "741638a5",
       "rng": {
-        "draws": 474,
-        "digest": "c3a057f5"
+        "draws": 455,
+        "digest": "dbc1ee7f"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 970,
-      "state": "f204dcf0",
+      "state": "7c0d0325",
       "events": "741638a5",
       "rng": {
-        "draws": 529,
-        "digest": "a2386b25"
+        "draws": 514,
+        "digest": "6c773ad6"
       }
     },
     {
       "tick": 105,
       "time": 5.25,
       "nextId": 970,
-      "state": "db765ae9",
+      "state": "bd41cf09",
       "events": "741638a5",
       "rng": {
-        "draws": 583,
-        "digest": "dabde4ec"
+        "draws": 566,
+        "digest": "d073540e"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
       "nextId": 970,
-      "state": "8cdd2a88",
+      "state": "21ac8f20",
       "events": "741638a5",
       "rng": {
-        "draws": 630,
-        "digest": "aa6d8344"
+        "draws": 609,
+        "digest": "695c629c"
       }
     },
     {
       "tick": 115,
       "time": 5.75,
       "nextId": 970,
-      "state": "dd250747",
+      "state": "f5a7780e",
       "events": "741638a5",
       "rng": {
-        "draws": 681,
-        "digest": "cba94638"
+        "draws": 662,
+        "digest": "4b359b3b"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 970,
-      "state": "1886c8ae",
+      "state": "3726fc4b",
       "events": "741638a5",
       "rng": {
-        "draws": 741,
-        "digest": "e035ace4"
+        "draws": 718,
+        "digest": "e77eca8a"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 970,
-      "state": "6f079505",
+      "state": "7b920eee",
       "events": "741638a5",
       "rng": {
-        "draws": 795,
-        "digest": "fa9d2f4e"
+        "draws": 777,
+        "digest": "5116092e"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
       "nextId": 970,
-      "state": "61e6221b",
+      "state": "df2771ba",
       "events": "741638a5",
       "rng": {
-        "draws": 846,
-        "digest": "b3977813"
+        "draws": 825,
+        "digest": "d80ac7f0"
       }
     },
     {
       "tick": 133,
       "time": 6.65,
       "nextId": 971,
-      "state": "7225488e",
-      "events": "7e6767d7",
+      "state": "2f24dfc7",
+      "events": "dda91918",
       "rng": {
-        "draws": 871,
-        "digest": "40259dbc"
+        "draws": 852,
+        "digest": "4b51a7f0"
       },
       "label": "warlock-summon",
       "players": [
@@ -2020,7 +1997,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2080,18 +2057,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2100,9 +2077,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -2112,9 +2089,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2132,7 +2109,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2145,11 +2127,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 972,
-      "state": "374fb56f",
+      "state": "b16678cc",
       "events": "0b7b6d20",
       "rng": {
-        "draws": 872,
-        "digest": "ba4c0672"
+        "draws": 853,
+        "digest": "d9050867"
       },
       "label": "warrior-sunder",
       "players": [
@@ -2935,7 +2917,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2995,18 +2977,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -3015,9 +2997,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -3027,9 +3009,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3047,7 +3029,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -3126,11 +3113,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 974,
-      "state": "faf1ec93",
-      "events": "007aad97",
+      "state": "df543e84",
+      "events": "1b948be4",
       "rng": {
-        "draws": 874,
-        "digest": "4a6e5796"
+        "draws": 855,
+        "digest": "2a20cdbb"
       },
       "label": "mage-arcane-explosion",
       "players": [
@@ -3235,12 +3222,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 74
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 69
+              "damageDealt": 74
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3921,7 +3908,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -3981,18 +3968,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -4001,9 +3988,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -4013,9 +4000,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -4033,7 +4020,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -4116,7 +4108,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499965,
+          "hp": 499963,
           "id": 972,
           "inCombat": true,
           "kind": "mob",
@@ -4151,7 +4143,7 @@
           "threat": [
             [
               964,
-              36
+              38
             ]
           ],
           "weapon": {
@@ -4170,7 +4162,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499966,
+          "hp": 499963,
           "id": 973,
           "inCombat": true,
           "kind": "mob",
@@ -4205,7 +4197,7 @@
           "threat": [
             [
               964,
-              35
+              38
             ]
           ],
           "weapon": {
@@ -4220,11 +4212,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 975,
-      "state": "2bce131e",
-      "events": "61f1b360",
+      "state": "07d01465",
+      "events": "bf08ac4d",
       "rng": {
-        "draws": 879,
-        "digest": "c64f0983"
+        "draws": 860,
+        "digest": "07c69b80"
       },
       "label": "rogue-combo-finishers",
       "players": [
@@ -4329,12 +4321,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 74
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 69
+              "damageDealt": 74
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -4417,12 +4409,12 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 111
+            "damageDealt": 117
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 111
+              "damageDealt": 117
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -5027,7 +5019,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -5087,18 +5079,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -5107,9 +5099,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -5119,9 +5111,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -5139,7 +5131,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -5222,7 +5219,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499965,
+          "hp": 499963,
           "id": 972,
           "inCombat": true,
           "kind": "mob",
@@ -5257,7 +5254,7 @@
           "threat": [
             [
               964,
-              36
+              38
             ]
           ],
           "weapon": {
@@ -5276,7 +5273,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499966,
+          "hp": 499963,
           "id": 973,
           "inCombat": true,
           "kind": "mob",
@@ -5311,7 +5308,7 @@
           "threat": [
             [
               964,
-              35
+              38
             ]
           ],
           "weapon": {
@@ -5341,7 +5338,7 @@
           "fallStartY": -2.93145,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499889,
+          "hp": 499883,
           "id": 974,
           "inCombat": true,
           "kind": "mob",
@@ -5376,7 +5373,7 @@
           "threat": [
             [
               965,
-              112
+              118
             ]
           ],
           "weapon": {
@@ -5391,11 +5388,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 976,
-      "state": "bf5c263b",
-      "events": "b55b88a7",
+      "state": "2db53a48",
+      "events": "fc9bb5f4",
       "rng": {
-        "draws": 880,
-        "digest": "0177a784"
+        "draws": 861,
+        "digest": "8fdf89e5"
       },
       "label": "paladin-judge-consecrate",
       "players": [
@@ -5500,12 +5497,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 74
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 69
+              "damageDealt": 74
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -5588,12 +5585,12 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 111
+            "damageDealt": 117
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 111
+              "damageDealt": 117
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -5674,12 +5671,12 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 32
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 32
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -6227,7 +6224,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -6287,18 +6284,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -6307,9 +6304,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -6319,9 +6316,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -6339,7 +6336,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -6422,7 +6424,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499965,
+          "hp": 499963,
           "id": 972,
           "inCombat": true,
           "kind": "mob",
@@ -6457,7 +6459,7 @@
           "threat": [
             [
               964,
-              36
+              38
             ]
           ],
           "weapon": {
@@ -6476,7 +6478,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499966,
+          "hp": 499963,
           "id": 973,
           "inCombat": true,
           "kind": "mob",
@@ -6511,7 +6513,7 @@
           "threat": [
             [
               964,
-              35
+              38
             ]
           ],
           "weapon": {
@@ -6541,7 +6543,7 @@
           "fallStartY": -2.93145,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499889,
+          "hp": 499883,
           "id": 974,
           "inCombat": true,
           "kind": "mob",
@@ -6576,7 +6578,7 @@
           "threat": [
             [
               965,
-              112
+              118
             ]
           ],
           "weapon": {
@@ -6595,7 +6597,7 @@
           "fallStartY": -1.344048,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499968,
           "id": 975,
           "inCombat": true,
           "kind": "mob",
@@ -6627,7 +6629,7 @@
           "threat": [
             [
               966,
-              34
+              33
             ]
           ],
           "weapon": {
@@ -6642,11 +6644,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 977,
-      "state": "4ddc250c",
+      "state": "685be4eb",
       "events": "da52a003",
       "rng": {
-        "draws": 880,
-        "digest": "0177a784"
+        "draws": 861,
+        "digest": "8fdf89e5"
       },
       "label": "druid-moonfire-forms",
       "players": [
@@ -6751,12 +6753,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 74
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 69
+              "damageDealt": 74
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -6839,12 +6841,12 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 111
+            "damageDealt": 117
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 111
+              "damageDealt": 117
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -6925,12 +6927,12 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 32
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 32
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -7491,7 +7493,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -7551,18 +7553,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -7571,9 +7573,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -7583,9 +7585,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -7603,7 +7605,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -7686,7 +7693,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499965,
+          "hp": 499963,
           "id": 972,
           "inCombat": true,
           "kind": "mob",
@@ -7721,7 +7728,7 @@
           "threat": [
             [
               964,
-              36
+              38
             ]
           ],
           "weapon": {
@@ -7740,7 +7747,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499966,
+          "hp": 499963,
           "id": 973,
           "inCombat": true,
           "kind": "mob",
@@ -7775,7 +7782,7 @@
           "threat": [
             [
               964,
-              35
+              38
             ]
           ],
           "weapon": {
@@ -7805,7 +7812,7 @@
           "fallStartY": -2.93145,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499889,
+          "hp": 499883,
           "id": 974,
           "inCombat": true,
           "kind": "mob",
@@ -7840,7 +7847,7 @@
           "threat": [
             [
               965,
-              112
+              118
             ]
           ],
           "weapon": {
@@ -7859,7 +7866,7 @@
           "fallStartY": -1.344048,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499968,
           "id": 975,
           "inCombat": true,
           "kind": "mob",
@@ -7891,7 +7898,7 @@
           "threat": [
             [
               966,
-              34
+              33
             ]
           ],
           "weapon": {
@@ -7947,11 +7954,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 977,
-      "state": "4ddc250c",
+      "state": "685be4eb",
       "events": "741638a5",
       "rng": {
-        "draws": 880,
-        "digest": "0177a784"
+        "draws": 861,
+        "digest": "8fdf89e5"
       },
       "label": "final",
       "players": [
@@ -8056,12 +8063,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 74
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 69
+              "damageDealt": 74
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -8144,12 +8151,12 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 111
+            "damageDealt": 117
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 111
+              "damageDealt": 117
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -8230,12 +8237,12 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 32
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 32
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -8796,7 +8803,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castTotal": 5,
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -8856,18 +8863,18 @@
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Harrow",
-              "remaining": 2.9,
+              "remaining": 3,
               "school": "shadow",
               "sourceId": 968,
-              "value": -1.96751
+              "value": -0.601012
             }
           ],
-          "combatTimer": 5.1,
+          "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.96751,
+          "facing": -0.601012,
           "fallStartY": -1.31492,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -8876,9 +8883,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 44.381487,
-            "y": -1.270697,
-            "z": -44.564863
+            "x": 37.432932,
+            "y": -1.539391,
+            "z": -42.697345
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -8888,9 +8895,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 22.978688,
-            "y": -1.407295,
-            "z": -53.531035
+            "x": 24.568328,
+            "y": 1.708068,
+            "z": -23.933964
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -8908,7 +8915,12 @@
               1
             ]
           ],
-          "wanderTimer": 8.193129,
+          "wanderTarget": {
+            "x": 33.840152,
+            "y": -1.591101,
+            "z": -43.245926
+          },
+          "wanderTimer": 28.4,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -8991,7 +9003,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499965,
+          "hp": 499963,
           "id": 972,
           "inCombat": true,
           "kind": "mob",
@@ -9026,7 +9038,7 @@
           "threat": [
             [
               964,
-              36
+              38
             ]
           ],
           "weapon": {
@@ -9045,7 +9057,7 @@
           "fallStartY": -3.121614,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499966,
+          "hp": 499963,
           "id": 973,
           "inCombat": true,
           "kind": "mob",
@@ -9080,7 +9092,7 @@
           "threat": [
             [
               964,
-              35
+              38
             ]
           ],
           "weapon": {
@@ -9110,7 +9122,7 @@
           "fallStartY": -2.93145,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499889,
+          "hp": 499883,
           "id": 974,
           "inCombat": true,
           "kind": "mob",
@@ -9145,7 +9157,7 @@
           "threat": [
             [
               965,
-              112
+              118
             ]
           ],
           "weapon": {
@@ -9164,7 +9176,7 @@
           "fallStartY": -1.344048,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499968,
           "id": 975,
           "inCombat": true,
           "kind": "mob",
@@ -9196,7 +9208,7 @@
           "threat": [
             [
               966,
-              34
+              33
             ]
           ],
           "weapon": {

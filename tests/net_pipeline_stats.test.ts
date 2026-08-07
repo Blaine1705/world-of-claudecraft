@@ -203,7 +203,7 @@ describe('bare client integration through the real onMessage path', () => {
       // Pin the precondition itself, so a future regression here names the clock
       // instead of the recorder the two assertions below are actually about.
       expect(rewound).toBeGreaterThan(0);
-      (client as any).lastSnapAt = rewound;
+      (client as unknown as { lastSnapAt: number }).lastSnapAt = rewound;
       internals.onMessage(JSON.stringify({ t: 'snap', ents: [wirePlayer(2, 'Bud')], keep: [] }));
 
       const s = client.netPipeline().summary();
@@ -232,7 +232,7 @@ describe('bare client integration through the real onMessage path', () => {
     internals.onMessage(JSON.stringify({ t: 'snap', ents: [], keep: [2] }));
     expect(client.netPipeline().summary().gapMs.count).toBe(1);
 
-    (client as any).reconnectAttempts = 1;
+    (client as unknown as { reconnectAttempts: number }).reconnectAttempts = 1;
     internals.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 20061 }));
     internals.onMessage(JSON.stringify({ t: 'snap', ents: [wirePlayer(2, 'Bud')], keep: [] }));
 

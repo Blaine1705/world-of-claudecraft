@@ -40,7 +40,7 @@
 // planner understands. Any doubt resolves to 'full'.
 
 import { isRelatedSourcePath, isTestPath, normalizeRepoPath } from './gate_fast_plan.mjs';
-import { classifySelectPaths } from './gate_select_plan.mjs';
+import { classifySelectPaths, isGeneratedI18nArtifactPath } from './gate_select_plan.mjs';
 
 /**
  * The selection pipeline's own source files: the modules whose code computes
@@ -61,9 +61,11 @@ export const SELECTION_PIPELINE_FILES = Object.freeze([
   'scripts/lib/ci_change_classify.mjs',
   'scripts/lib/ci_test_select.mjs',
   'scripts/lib/ci_shard_plan.mjs',
+  'scripts/lib/ci_leg_runner.mjs',
   'scripts/lib/gate_discovery.mjs',
   'scripts/lib/gate_select_plan.mjs',
   'scripts/lib/gate_fast_plan.mjs',
+  'scripts/lib/teardown_rpc_flake.mjs',
   'scripts/lib/test_visibility.mjs',
 ]);
 
@@ -176,6 +178,14 @@ export function decideTestMode({ eventName, code, files }) {
       if (isRelatedSourcePath(gone) || isTestPath(gone)) {
         return full(`removed or renamed code path (${JSON.stringify(gone)}): full suite`);
       }
+      // A deleted artifact is the one artifact shape the freshness diff cannot
+      // flag (regeneration recreates it UNTRACKED, and `git diff` never shows
+      // untracked files), so it is unprovable and widens.
+      if (isGeneratedI18nArtifactPath(gone)) {
+        return full(
+          `removed or renamed generated i18n artifact (${JSON.stringify(gone)}): full suite`,
+        );
+      }
     }
     changedPaths.push(name);
   }
@@ -186,8 +196,16 @@ export function decideTestMode({ eventName, code, files }) {
 
   // Shared planner buckets: lockfile, package.json, vite/vitest/tsconfig,
   // turbo/biome/npmrc, tests/helpers + fixtures, vitest setup files, and every
-  // unrecognized path land in broadConfigs and widen to the full suite.
-  const { testFiles, relatedSources, broadConfigs } = classifySelectPaths(changedPaths);
+  // unrecognized path land in broadConfigs and widen to the full suite. The
+  // generatedI18n bucket (freshness-guarded artifacts) never widens: the
+  // deletion guard above already ran over the statuses, presence in the merge
+  // tree is re-proven shard-side (lib/ci_shard_plan.mjs has the checkout this
+  // job lacks), pr-checks' i18n regenerate-and-diff runs on every code PR in
+  // every mode, and the shard plan feeds the artifact paths to `vitest
+  // related` as graph nodes so their consumer suites stay selected (the
+  // rationale lives in lib/gate_select_plan.mjs).
+  const { testFiles, relatedSources, broadConfigs, generatedI18n } =
+    classifySelectPaths(changedPaths);
   if (broadConfigs.length > 0) {
     const shown = broadConfigs.slice(0, 3).map((p) => JSON.stringify(p));
     return full(
@@ -195,12 +213,18 @@ export function decideTestMode({ eventName, code, files }) {
     );
   }
 
+  const inertCount =
+    changedPaths.length - relatedSources.length - testFiles.length - generatedI18n.length;
+  const artifactNote =
+    generatedI18n.length > 0
+      ? `, ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
+      : '';
   return {
     mode: 'selective',
     reason:
       `selective: ${relatedSources.length} changed source file(s), ` +
       `${testFiles.length} changed test file(s), ` +
-      `${changedPaths.length - relatedSources.length - testFiles.length} inert path(s)`,
+      `${inertCount} inert path(s)${artifactNote}`,
     changedPaths,
   };
 }
