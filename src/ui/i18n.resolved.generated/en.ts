@@ -2122,6 +2122,8 @@ export const en: EnTranslations = {
       "showResource": "Show Mana, Rage, and Energy",
       "showAbsorbs": "Show Absorb Shields",
       "showAuras": "Show Buffs and Debuffs",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Show Your Frame"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const en: EnTranslations = {
       "guildOpenAccept": "Open",
       "guildOpenNote": "Paid from your own money, not the guild treasury",
       "guildPurseShort": "Not enough money",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
       "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
       "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
@@ -2481,7 +2485,7 @@ export const en: EnTranslations = {
       "logNote": "The {count} most recent guild bank actions.",
       "logLoading": "Loading the guild bank log...",
       "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "A former guild member",
       "logDepositItem": "{actor} deposited {count} {item}",
       "logWithdrawItem": "{actor} withdrew {count} {item}",

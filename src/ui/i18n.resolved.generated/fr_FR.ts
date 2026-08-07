@@ -2122,6 +2122,8 @@ export const fr_FR: EnTranslations = {
       "showResource": "Afficher le mana, la rage et l’énergie",
       "showAbsorbs": "Afficher les boucliers d’absorption",
       "showAuras": "Afficher les améliorations et affaiblissements",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Afficher votre cadre"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const fr_FR: EnTranslations = {
       "guildOpenAccept": "Ouvrir",
       "guildOpenNote": "Payé avec votre propre argent, et non depuis la trésorerie de la guilde",
       "guildPurseShort": "Pas assez d'argent",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Les objets verrouillés ne peuvent pas être retirés et empêchent la dissolution de la guilde.",
       "guildDormantHint": "Cet objet est verrouillé dans la banque de guilde et ne peut pas être retiré.",
       "guildDormantAria": "{item}, quantité {count}, ne peut pas être retiré",
@@ -2481,7 +2485,7 @@ export const fr_FR: EnTranslations = {
       "logNote": "Les {count} actions les plus récentes de la banque de guilde.",
       "logLoading": "Chargement du journal de la banque de guilde...",
       "logEmpty": "Rien n'a encore été déposé ou retiré de la banque de guilde.",
-      "logRefused": "Seuls les officiers de la guilde peuvent consulter le journal de la banque de guilde.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Un ancien membre de la guilde",
       "logDepositItem": "{actor} a déposé {count} {item}",
       "logWithdrawItem": "{actor} a retiré {count} {item}",

@@ -2122,6 +2122,8 @@ export const vi_VN: EnTranslations = {
       "showResource": "Hiện Mana, Nộ Khí và Năng Lượng",
       "showAbsorbs": "Hiện Khiên Hấp Thụ",
       "showAuras": "Hiện Buff và Debuff",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Hiện Khung Của Bạn"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const vi_VN: EnTranslations = {
       "guildOpenAccept": "Mở",
       "guildOpenNote": "Thanh toán từ tiền của chính bạn, không phải từ ngân khố bang hội",
       "guildPurseShort": "Không đủ tiền",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Vật phẩm bị khóa không thể rút ra và ngăn cản việc giải tán bang hội.",
       "guildDormantHint": "Vật phẩm này đang bị khóa trong ngân hàng bang hội và không thể rút ra.",
       "guildDormantAria": "{item}, số lượng {count}, không thể rút ra",
@@ -2481,7 +2485,7 @@ export const vi_VN: EnTranslations = {
       "logNote": "{count} hoạt động ngân hàng bang hội gần đây nhất.",
       "logLoading": "Đang tải nhật ký ngân hàng bang hội...",
       "logEmpty": "Chưa có gì được chuyển vào hoặc ra khỏi ngân hàng bang hội.",
-      "logRefused": "Chỉ sĩ quan bang hội mới có thể xem nhật ký ngân hàng bang hội.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Một cựu thành viên bang hội",
       "logDepositItem": "{actor} đã gửi {count} {item}",
       "logWithdrawItem": "{actor} đã rút {count} {item}",

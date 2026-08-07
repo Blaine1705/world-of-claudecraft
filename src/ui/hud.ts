@@ -553,7 +553,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
-import { findOwnPet, petFrameDescriptorInto } from './pet_frame_view';
+import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -4172,6 +4172,14 @@ export class Hud {
       onHover: (pid) => {
         this.hoveredPartyPid = pid;
       },
+      // A party member's pet is an ordinary targetable entity, so selecting it is
+      // the same call the row itself makes, just with the pet's id.
+      onTargetPet: (entityId) => this.sim.targetEntity(entityId),
+      petLabel: (name, frac) =>
+        t('hudChrome.partyFrames.petHealth', {
+          name,
+          pct: formatNumber(frac, { style: 'percent', maximumFractionDigits: 0 }),
+        }),
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
       onToggleCollapse: () => this.togglePartyCollapsed(),
       partyAuras: this.partyAurasDeps,
@@ -16510,16 +16518,23 @@ export class Hud {
       showResource: settings?.get('partyFrameShowResource') ?? true,
       showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
       showAuras: settings?.get('partyFrameShowAuras') ?? true,
+      showPets: settings?.get('partyFrameShowPets') ?? true,
       presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
       healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
       sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
     };
+    // Party members' pets, resolved from the SAME roster the pet frame uses. Built
+    // before the signature because the signature folds pet health: a pet losing health
+    // moves no wire field on the party payload, so without it the sliver would freeze.
+    // Skipped entirely when the option is off, so a player who hides pets pays nothing.
+    const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
     const sig = partyFrameSignature(
       info,
       this.sim.playerId,
       this.sim.player.pos,
       undefined,
       config,
+      pets,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -16529,6 +16544,7 @@ export class Hud {
       this.sim.player.pos,
       undefined,
       config,
+      pets,
     );
     this.partyFramesPainter.sync(others, info.leader, info.raid, config);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their

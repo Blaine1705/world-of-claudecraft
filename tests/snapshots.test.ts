@@ -3522,8 +3522,9 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
-  // `guildBank`: guildBankInfoFor additionally needs an officer-plus membership
-  // stamp and a loaded guild book (the banker relocated above covers proximity);
+  // `guildBank`: guildBankInfoFor additionally needs a guild membership stamp
+  // (any rank; officer-plus here also exercises canEdit true over the wire)
+  // and a loaded guild book (the banker relocated above covers proximity);
   // a non-empty treasury + slot makes the mirror distinguishable.
   sim.setPlayerGuildMembership(lp, { guildId: 7, rank: 'officer' });
   sim.loadGuildBank(7, {
@@ -3923,13 +3924,15 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
-    // guild bank mirror: the officer-gated boundary clone survives the wire whole
+    // guild bank mirror: the membership-gated boundary clone survives the wire
+    // whole, canEdit included (the client renders read-only panes from it)
     expect(client.guildBankInfo).toEqual({
       treasury: 12345,
       slots: [{ itemId: 'wolf_fang', count: 4 }],
       capacity: 30,
       purchasedSlots: 30,
       nextExpansionPrice: 50000, // rung-2 literal
+      canEdit: true,
     });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
@@ -4080,6 +4083,38 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.cupInfo?.role).toBe('keeper'); // per-viewer field, arrived on vcup
     expect(Object.keys(client.cupInfo?.queueSizes ?? {}).sort()).toEqual(['1', '2', '3', '4', '5']); // realm-wide field, arrived on vcupb
     expect(client.cupInfo?.live).toBeNull(); // no live match in the fixture
+  });
+
+  it('mirrors canEdit FALSE for a member-rank viewer (the read-only arm over the real wire)', () => {
+    // The fixture above rides canEdit true (officer). This is the negative the
+    // feature exists for: a plain member's snapshot must arrive non-null with
+    // canEdit false, and a demotion mid-session must flip the live mirror
+    // without nulling it.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Grunt');
+    const sim = server.sim;
+    const p = sim.entities.get(session.pid)!;
+    const banker = sim.entities.get(sim.bankerIds[0])!;
+    banker.pos = { ...p.pos };
+    sim.setPlayerGuildMembership(session.pid, { guildId: 9, rank: 'officer' });
+    sim.loadGuildBank(9, {
+      treasury: 777,
+      inventory: [{ itemId: 'wolf_fang', count: 4 }],
+      purchasedSlots: 24,
+    });
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.guildBankInfo?.canEdit).toBe(true);
+    // The demotion re-stamp: same guild, member rank. The stream must STAY
+    // (read-only view), only the edit verdict flips.
+    sim.setPlayerGuildMembership(session.pid, { guildId: 9, rank: 'member' });
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.guildBankInfo).not.toBeNull();
+    expect(client.guildBankInfo?.canEdit).toBe(false);
+    expect(client.guildBankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
   });
 
   it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {

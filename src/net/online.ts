@@ -1529,12 +1529,12 @@ export class ClientWorld implements IWorld {
   bankInfo: BankInfo | null = null;
   // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
   // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
-  // for member rank, and outside a guild (proximity + officer-plus gated by
-  // the server), so it only rides the wire for an officer actually standing
-  // at a bursar. ---
+  // and outside a guild (proximity + membership gated by the server; ANY rank
+  // sees it and `canEdit` marks officer-plus), so it only rides the wire for
+  // a guild member actually standing at a bursar. ---
   guildBankInfo: GuildBankInfo | null = null;
   // The guild bank ACTIVITY LOG mirror. Deliberately NOT a snapshot key: it is
-  // cold, identical for every officer of the guild, and 50 rows wide, so it
+  // cold, identical for every member of the guild, and 50 rows wide, so it
   // rides its own on-demand request/response pair (`guild_bank_log` ->
   // `gbanklog`) that the guildBankLog() read below issues while the log view is
   // open. `guildBankLogAt` is the SEND time of the last request and is the ONE
@@ -3378,16 +3378,18 @@ export class ClientWorld implements IWorld {
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
       // `guildBank` follows the same delta contract; the server encodes null
-      // away from a banker, on death, for member rank, and outside a guild
-      // (the proximity + officer-plus gate lives in sim guildBankInfoFor).
+      // away from a banker, on death, and outside a guild (the proximity +
+      // membership gate lives in sim guildBankInfoFor; any rank sees it, the
+      // snapshot's canEdit flag marks officer-plus).
       if (s.guildBank !== undefined) {
         // BOTH EDGES of the gate reset the activity log, not just the losing
-        // one. Losing it (walked away, died, demoted to member, left or
-        // switched guild) invalidates the rows: they are one guild's history
-        // read under a rank this client may no longer hold, so they are dropped
-        // rather than left to paint into the next pane that opens. REGAINING it
+        // one. Losing it (walked away, died, left or switched guild)
+        // invalidates the rows: they are one guild's history
+        // read under a membership this client may no longer hold, so they are
+        // dropped rather than left to paint into the next pane that opens.
+        // REGAINING it
         // has to reset too, because the answer this client is holding was taken
-        // while the gate was shut: an officer who opened the log away from the
+        // while the gate was shut: a member who opened the log away from the
         // banker got a `refused`, and without this the pane went on saying
         // refused for the rest of the TTL after they walked up. Re-arming on
         // the transition makes it self-correct in one frame.

@@ -7268,6 +7268,14 @@
     color: var(--color-text-muted);
     margin: 0 0 4px;
   }
+  /* The member read-only legends (its own class, never a second
+     gbank-dormant-note: the dormant selector must stay unambiguous). */
+  .gbank-readonly-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
   .bank-item.gbank-dormant {
     border-style: dashed;
   }

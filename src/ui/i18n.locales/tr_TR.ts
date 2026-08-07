@@ -54,7 +54,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Lonca bankası günlüğü yükleniyor...',
   'hudChrome.bank.logNote': 'En son {count} lonca bankası işlemi.',
   'hudChrome.bank.logOpenBank': '{actor}, lonca bankasını {amount} karşılığında açtı',
-  'hudChrome.bank.logRefused': 'Lonca bankası günlüğünü yalnızca subaylar okuyabilir.',
   'hudChrome.bank.logWithdrawItem': '{actor}, {count} {item} çekti',
   'hudChrome.bank.logWithdrawMoney': '{actor}, {amount} çekti',
   'hudChrome.bank.personalTab': 'Kişisel',

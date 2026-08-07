@@ -2122,6 +2122,8 @@ export const nl_NL: EnTranslations = {
       "showResource": "Mana, woede en energie tonen",
       "showAbsorbs": "Absorptieschilden tonen",
       "showAuras": "Versterkingen en verzwakkingen tonen",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Je eigen frame tonen"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const nl_NL: EnTranslations = {
       "guildOpenAccept": "Openen",
       "guildOpenNote": "Betaald uit je eigen geld, niet uit de gildekas",
       "guildPurseShort": "Niet genoeg geld",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Vergrendelde voorwerpen kunnen niet worden opgenomen en verhinderen het ontbinden van de gilde.",
       "guildDormantHint": "Dit voorwerp is vergrendeld in de gildebank en kan niet worden opgenomen.",
       "guildDormantAria": "{item}, aantal {count}, kan niet worden opgenomen",
@@ -2481,7 +2485,7 @@ export const nl_NL: EnTranslations = {
       "logNote": "De {count} meest recente gildebankacties.",
       "logLoading": "Het logboek van de gildebank wordt geladen...",
       "logEmpty": "Er is nog niets in of uit de gildebank verplaatst.",
-      "logRefused": "Alleen gildeofficieren kunnen het logboek van de gildebank lezen.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Een oud-gildelid",
       "logDepositItem": "{actor} stortte {count} {item}",
       "logWithdrawItem": "{actor} nam {count} {item} op",

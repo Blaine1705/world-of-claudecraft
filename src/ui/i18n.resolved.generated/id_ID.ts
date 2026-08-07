@@ -2122,6 +2122,8 @@ export const id_ID: EnTranslations = {
       "showResource": "Tampilkan Mana, Amukan, dan Energi",
       "showAbsorbs": "Tampilkan Perisai Serap",
       "showAuras": "Tampilkan Buff dan Debuff",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Tampilkan Bingkaimu"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const id_ID: EnTranslations = {
       "guildOpenAccept": "Buka",
       "guildOpenNote": "Dibayar dari uangmu sendiri, bukan dari kas guild",
       "guildPurseShort": "Uang tidak cukup",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Barang yang terkunci tidak dapat ditarik dan mencegah guild dibubarkan.",
       "guildDormantHint": "Barang ini terkunci di bank guild dan tidak dapat ditarik.",
       "guildDormantAria": "{item}, jumlah {count}, tidak dapat ditarik",
@@ -2481,7 +2485,7 @@ export const id_ID: EnTranslations = {
       "logNote": "{count} tindakan bank guild terbaru.",
       "logLoading": "Memuat log bank guild...",
       "logEmpty": "Belum ada yang keluar masuk bank guild.",
-      "logRefused": "Hanya perwira guild yang dapat membaca log bank guild.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Mantan anggota guild",
       "logDepositItem": "{actor} menyetor {count} {item}",
       "logWithdrawItem": "{actor} menarik {count} {item}",

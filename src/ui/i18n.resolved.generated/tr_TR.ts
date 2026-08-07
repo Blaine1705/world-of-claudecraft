@@ -2122,6 +2122,8 @@ export const tr_TR: EnTranslations = {
       "showResource": "Mana, Öfke ve Enerjiyi Göster",
       "showAbsorbs": "Soğurma Kalkanlarını Göster",
       "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const tr_TR: EnTranslations = {
       "guildOpenAccept": "Aç",
       "guildOpenNote": "Lonca hazinesinden değil, kendi paranından ödenir",
       "guildPurseShort": "Yeterli para yok",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Kilitli eşyalar çekilemez ve loncanın dağıtılmasını engeller.",
       "guildDormantHint": "Bu eşya lonca bankasında kilitli ve çekilemez.",
       "guildDormantAria": "{item}, adet {count}, çekilemez",
@@ -2481,7 +2485,7 @@ export const tr_TR: EnTranslations = {
       "logNote": "En son {count} lonca bankası işlemi.",
       "logLoading": "Lonca bankası günlüğü yükleniyor...",
       "logEmpty": "Lonca bankasına henüz bir şey girmedi ya da çıkmadı.",
-      "logRefused": "Lonca bankası günlüğünü yalnızca subaylar okuyabilir.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Eski bir lonca üyesi",
       "logDepositItem": "{actor}, {count} {item} yatırdı",
       "logWithdrawItem": "{actor}, {count} {item} çekti",

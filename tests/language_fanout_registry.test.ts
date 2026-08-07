@@ -381,6 +381,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastAnnounced gates nothing that is drawn: it decides only whether the refusal line RE-ANNOUNCES to assistive tech (a live region inserted already-populated is not announced, so the pane re-writes the same text one task later). The visible text is rebuilt unconditionally on every paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives. A locale switch therefore relocalizes the log by itself; at worst the refusal is not re-announced in the new locale, which is the correct behaviour anyway (the refusal did not change).',
   },
   {
+    file: 'guild_bank_window.ts',
+    memos: ['prevReadOnly'],
+    reason:
+      'prevReadOnly gates nothing that is drawn: it is the demotion-edge detector deciding only whether the read-only note carries live-region semantics on THIS paint (a mid-view rank loss is voiced once; steady read-only repaints stay silent, the guild_bank_log_window lastAnnounced shape). The note text and every other string are rebuilt unconditionally on each paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives, so a locale switch relocalizes the whole Guild tab by itself. The edge cannot fire from a locale switch either: readOnly derives from the snapshot canEdit flag, not from any text.',
+  },
+  {
     file: 'deed_tracker_painter.ts',
     memos: ['lastChip'],
     reason:
@@ -583,7 +589,12 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 5 as of the guild bank activity log: its `lastAnnounced` memo gates an
       // assistive-tech RE-ANNOUNCEMENT and nothing that is drawn (argued in the
       // frontend-seam review of that slice; the row states the reasoning).
-    ).toBe(5);
+      // 6 as of the guild bank member read-only view: guild_bank_window's
+      // `prevReadOnly` is the same announcement-only shape (it decides whether
+      // the read-only note is a live region on the demotion-edge paint, never
+      // what is drawn; BankWindow.render repaints the pane wholesale and the
+      // fan-out already drives it).
+    ).toBe(6);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

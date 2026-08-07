@@ -2122,6 +2122,8 @@ export const sv_SE: EnTranslations = {
       "showResource": "Visa mana, raseri och energi",
       "showAbsorbs": "Visa absorptionssköldar",
       "showAuras": "Visa positiva och negativa effekter",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Visa din ram"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const sv_SE: EnTranslations = {
       "guildOpenAccept": "Öppna",
       "guildOpenNote": "Betalas med dina egna pengar, inte gillets kassa",
       "guildPurseShort": "Otillräckligt med pengar",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Fastlåsta föremål kan inte tas ut och hindrar gillet från att upplösas.",
       "guildDormantHint": "Det här föremålet är fastlåst i gillesbanken och kan inte tas ut.",
       "guildDormantAria": "{item}, antal {count}, kan inte tas ut",
@@ -2481,7 +2485,7 @@ export const sv_SE: EnTranslations = {
       "logNote": "De {count} senaste händelserna i gillesbanken.",
       "logLoading": "Laddar gillesbankens logg...",
       "logEmpty": "Inget har flyttats in i eller ut ur gillesbanken ännu.",
-      "logRefused": "Endast gillesofficerare kan läsa gillesbankens logg.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "En tidigare gillesmedlem",
       "logDepositItem": "{actor} satte in {count} {item}",
       "logWithdrawItem": "{actor} tog ut {count} {item}",

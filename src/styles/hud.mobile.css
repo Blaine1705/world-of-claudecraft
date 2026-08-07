@@ -2054,6 +2054,19 @@
   body.mobile-touch #party-frames .party-frame .pf-badge {
     font-size: 9px;
   }
+  /* The pet sliver shrinks with the rest of the mobile row (its bars are 5px here,
+     down from 9px on desktop), staying a hairline cue rather than competing with the
+     member's own health. It is not a primary tap target on mobile: the member row
+     owns the tap, and selecting a party member's pet is a desktop-scale interaction. */
+  body.mobile-touch #party-frames .party-frame .pfm-pet {
+    height: 3px;
+    margin-top: 1px;
+    /* Makes the "the member row owns the tap" claim above actually true. At 3px this
+       is nowhere near the 40x40 touch floor, and without this a tap landing on it
+       selects the pet and stopPropagation swallows the member selection the player
+       meant. Informational on touch; the row keeps the whole tap area. */
+    pointer-events: none;
+  }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;
     margin-top: 1px;
@@ -4001,6 +4014,10 @@
       gap: 6px;
     }
     body.mobile-touch #bank-window .gbank-dormant-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-readonly-note {
       margin: 0 0 2px;
       font-size: 10px;
     }

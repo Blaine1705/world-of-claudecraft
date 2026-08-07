@@ -2122,6 +2122,8 @@ export const da_DK: EnTranslations = {
       "showResource": "Vis mana, raseri og energi",
       "showAbsorbs": "Vis absorberingsskjolde",
       "showAuras": "Vis styrkelser og svækkelser",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Vis din ramme"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const da_DK: EnTranslations = {
       "guildOpenAccept": "Åbn",
       "guildOpenNote": "Betalt af dine egne penge, ikke laugets skatkammer",
       "guildPurseShort": "Ikke nok penge",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Låste genstande kan ikke tages ud og forhindrer, at lauget kan opløses.",
       "guildDormantHint": "Denne genstand er låst i laugsbanken og kan ikke tages ud.",
       "guildDormantAria": "{item}, antal {count}, kan ikke tages ud",
@@ -2481,7 +2485,7 @@ export const da_DK: EnTranslations = {
       "logNote": "De {count} seneste handlinger i laugsbanken.",
       "logLoading": "Indlæser laugsbankens log...",
       "logEmpty": "Der er endnu ikke flyttet noget ind i eller ud af laugsbanken.",
-      "logRefused": "Kun laugsofficerer kan læse laugsbankens log.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Et tidligere laugsmedlem",
       "logDepositItem": "{actor} indsatte {count} {item}",
       "logWithdrawItem": "{actor} tog {count} {item} ud",

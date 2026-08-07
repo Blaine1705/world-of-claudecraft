@@ -2122,6 +2122,8 @@ export const de_DE: EnTranslations = {
       "showResource": "Mana, Wut und Energie anzeigen",
       "showAbsorbs": "Absorptionsschilde anzeigen",
       "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Eigenen Rahmen anzeigen"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const de_DE: EnTranslations = {
       "guildOpenAccept": "Eröffnen",
       "guildOpenNote": "Aus Eurem eigenen Geld bezahlt, nicht aus der Gildenkasse",
       "guildPurseShort": "Nicht genug Geld",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Gesperrte Gegenstände können nicht entnommen werden und verhindern die Auflösung der Gilde.",
       "guildDormantHint": "Dieser Gegenstand ist in der Gildenbank gesperrt und kann nicht entnommen werden.",
       "guildDormantAria": "{item}, Menge {count}, kann nicht entnommen werden",
@@ -2481,7 +2485,7 @@ export const de_DE: EnTranslations = {
       "logNote": "Die {count} letzten Aktionen der Gildenbank.",
       "logLoading": "Protokoll der Gildenbank wird geladen...",
       "logEmpty": "Es wurde noch nichts in die Gildenbank eingelagert oder aus ihr entnommen.",
-      "logRefused": "Nur Gildenoffiziere können das Protokoll der Gildenbank einsehen.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Ein ehemaliges Gildenmitglied",
       "logDepositItem": "{actor} hat {count} {item} eingelagert",
       "logWithdrawItem": "{actor} hat {count} {item} entnommen",

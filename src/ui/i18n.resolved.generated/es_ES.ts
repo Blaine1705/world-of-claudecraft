@@ -2122,6 +2122,8 @@ export const es_ES: EnTranslations = {
       "showResource": "Mostrar maná, ira y energía",
       "showAbsorbs": "Mostrar escudos de absorción",
       "showAuras": "Mostrar beneficios y perjuicios",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Mostrar tu marco"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const es_ES: EnTranslations = {
       "guildOpenAccept": "Abrir",
       "guildOpenNote": "Pagado con tu propio dinero, no con la tesorería de la hermandad",
       "guildPurseShort": "Dinero insuficiente",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Los objetos bloqueados no se pueden retirar e impiden disolver la hermandad.",
       "guildDormantHint": "Este objeto está bloqueado en el banco de la hermandad y no se puede retirar.",
       "guildDormantAria": "{item}, cantidad {count}, no se puede retirar",
@@ -2481,7 +2485,7 @@ export const es_ES: EnTranslations = {
       "logNote": "Las {count} acciones más recientes del banco de la hermandad.",
       "logLoading": "Cargando el registro del banco de la hermandad...",
       "logEmpty": "Aún no se ha movido nada dentro o fuera del banco de la hermandad.",
-      "logRefused": "Solo los oficiales de la hermandad pueden leer el registro del banco de la hermandad.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Un antiguo miembro de la hermandad",
       "logDepositItem": "{actor} depositó {count} {item}",
       "logWithdrawItem": "{actor} retiró {count} {item}",

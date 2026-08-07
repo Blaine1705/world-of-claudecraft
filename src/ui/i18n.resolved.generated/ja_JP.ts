@@ -2122,6 +2122,8 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
+      "showPets": "Show Pets",
+      "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const ja_JP: EnTranslations = {
       "guildOpenAccept": "開設",
       "guildOpenNote": "ギルド金庫ではなく、あなた自身の所持金から支払われます",
       "guildPurseShort": "所持金不足",
+      "guildReadOnlyNote": "ギルド銀行を変更できるのはギルド役員のみです。",
+      "guildUnopenedNote": "ギルド銀行はまだ開設されていません。",
       "guildDormantNote": "ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。",
       "guildDormantHint": "このアイテムはギルド銀行にロックされており、引き出せません。",
       "guildDormantAria": "{item}、数量 {count}、引き出し不可",
@@ -2481,7 +2485,7 @@ export const ja_JP: EnTranslations = {
       "logNote": "直近{count}件のギルド銀行の操作です。",
       "logLoading": "ギルド銀行のログを読み込んでいます...",
       "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
-      "logRefused": "ギルド銀行のログを閲覧できるのはギルド役員のみです。",
+      "logUnavailable": "現在、ギルド銀行のログを閲覧できません。",
       "logFormerMember": "元ギルドメンバー",
       "logDepositItem": "{actor} が {item} を {count} 個預けました",
       "logWithdrawItem": "{actor} が {item} を {count} 個引き出しました",

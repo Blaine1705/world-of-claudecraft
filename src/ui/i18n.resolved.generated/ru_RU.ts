@@ -2122,6 +2122,8 @@ export const ru_RU: EnTranslations = {
       "showResource": "Показывать ману, ярость и энергию",
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
+      "showPets": "Show Pets",
+      "petHealth": "Питомец {name}, здоровье {pct}",
       "showSelf": "Показывать вашу рамку"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const ru_RU: EnTranslations = {
       "guildOpenAccept": "Открыть",
       "guildOpenNote": "Оплачивается из ваших собственных денег, а не из казны гильдии",
       "guildPurseShort": "Недостаточно денег",
+      "guildReadOnlyNote": "Вносить изменения в банк гильдии могут только офицеры гильдии.",
+      "guildUnopenedNote": "Банк гильдии пока не открыт.",
       "guildDormantNote": "Заблокированные предметы нельзя забрать, и они не дают распустить гильдию.",
       "guildDormantHint": "Этот предмет заблокирован в банке гильдии, его нельзя забрать.",
       "guildDormantAria": "{item}, количество {count}, нельзя забрать",
@@ -2481,7 +2485,7 @@ export const ru_RU: EnTranslations = {
       "logNote": "{count} последних операций банка гильдии.",
       "logLoading": "Загрузка журнала банка гильдии...",
       "logEmpty": "В банк гильдии пока ничего не клали и ничего из него не брали.",
-      "logRefused": "Читать журнал банка гильдии могут только офицеры гильдии.",
+      "logUnavailable": "Журнал банка гильдии сейчас недоступен.",
       "logFormerMember": "Бывший член гильдии",
       "logDepositItem": "{actor} положил(а) {count} шт. {item}",
       "logWithdrawItem": "{actor} взял(а) {count} шт. {item}",

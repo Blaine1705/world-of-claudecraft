@@ -2122,6 +2122,8 @@ export const cs_CZ: EnTranslations = {
       "showResource": "Zobrazit manu, vztek a energii",
       "showAbsorbs": "Zobrazit absorpční štíty",
       "showAuras": "Zobrazit posílení a oslabení",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const cs_CZ: EnTranslations = {
       "guildOpenAccept": "Otevřít",
       "guildOpenNote": "Placeno z tvých vlastních peněz, ne z cechovní pokladny",
       "guildPurseShort": "Nedostatek peněz",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Uzamčené předměty nelze vybrat a brání rozpuštění cechu.",
       "guildDormantHint": "Tento předmět je v cechovní bance uzamčen a nelze ho vybrat.",
       "guildDormantAria": "{item}, množství {count}, nelze vybrat",
@@ -2481,7 +2485,7 @@ export const cs_CZ: EnTranslations = {
       "logNote": "{count} nejnovějších akcí cechovní banky.",
       "logLoading": "Načítání deníku cechovní banky...",
       "logEmpty": "Do cechovní banky ani z ní se zatím nic nepřesunulo.",
-      "logRefused": "Deník cechovní banky smí číst pouze důstojníci.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Bývalý člen cechu",
       "logDepositItem": "{actor}: vklad {count}x {item}",
       "logWithdrawItem": "{actor}: výběr {count}x {item}",

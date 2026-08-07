@@ -63,6 +63,52 @@ export function findOwnPet<T extends PetFrameUnit>(
   return null;
 }
 
+/** A pet as a PARTY ROW needs it: enough to paint a health sliver and to select the
+ *  pet by its entity id. Deliberately not `PetFrameUnit`, which is the roster-entity
+ *  shape this derives FROM. */
+export interface PartyPetInfo {
+  /** The pet's entity id, so a click on the sliver can target it. */
+  id: number;
+  name: string;
+  hp: number;
+  maxHp: number;
+  dead: boolean;
+}
+
+/**
+ * Every pet in the roster, keyed by its OWNER's entity id, so a party row can look
+ * up its member's pet by that member's pid (a party member's pid IS their entity id,
+ * which is why the row's own click can call targetEntity(pid)).
+ *
+ * Only pets the client can actually see are in here: the roster is interest-scoped,
+ * so a party member farther than the interest radius contributes nothing and their
+ * row simply shows no pet sliver. That is deliberate rather than a gap to fill from
+ * the wire: no ability in the game reaches past 35 yards, so a pet you cannot see is
+ * one you could not act on anyway.
+ *
+ * Delve companions are excluded for the same reason findOwnPet excludes them: they
+ * carry an ownerId too, and showing one as a party member's pet would be wrong.
+ * The FIRST match per owner wins, matching the sim's one-pet-per-owner rule.
+ */
+export function findPetsByOwner<T extends PetFrameUnit>(
+  entities: Iterable<T>,
+): Map<number, PartyPetInfo> {
+  const byOwner = new Map<number, PartyPetInfo>();
+  for (const e of entities) {
+    if (e.kind !== 'mob' || e.ownerId === null) continue;
+    if (DELVE_COMPANION_TEMPLATE_IDS.has(e.templateId)) continue;
+    if (byOwner.has(e.ownerId)) continue;
+    byOwner.set(e.ownerId, {
+      id: e.id,
+      name: e.name,
+      hp: e.hp,
+      maxHp: e.maxHp,
+      dead: e.dead,
+    });
+  }
+  return byOwner;
+}
+
 /**
  * Fill a caller-owned descriptor for the pet frame. Allocation-light: the caller
  * keeps one long-lived descriptor and this rewrites its fields in place.

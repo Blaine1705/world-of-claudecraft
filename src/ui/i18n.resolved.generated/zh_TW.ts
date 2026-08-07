@@ -2122,6 +2122,8 @@ export const zh_TW: EnTranslations = {
       "showResource": "顯示法力、怒氣和能量",
       "showAbsorbs": "顯示吸收護盾",
       "showAuras": "顯示增益和減益",
+      "showPets": "Show Pets",
+      "petHealth": "寵物{name}，生命值{pct}",
       "showSelf": "顯示你的框體"
     },
     "frameReset": {
@@ -2467,6 +2469,8 @@ export const zh_TW: EnTranslations = {
       "guildOpenAccept": "開啟",
       "guildOpenNote": "由你自己支付，而非公會金庫",
       "guildPurseShort": "金錢不足",
+      "guildReadOnlyNote": "只有公會幹部才能更改公會銀行。",
+      "guildUnopenedNote": "公會銀行尚未開通。",
       "guildDormantNote": "鎖定的物品無法取出，並會阻止解散公會。",
       "guildDormantHint": "該物品已鎖定在公會銀行中，無法取出。",
       "guildDormantAria": "{item}，數量 {count}，無法取出",
@@ -2481,7 +2485,7 @@ export const zh_TW: EnTranslations = {
       "logNote": "最近 {count} 筆公會銀行操作。",
       "logLoading": "正在載入公會銀行日誌...",
       "logEmpty": "公會銀行中尚未存入或取出任何物品。",
-      "logRefused": "只有公會幹部才能查看公會銀行日誌。",
+      "logUnavailable": "目前無法讀取公會銀行日誌。",
       "logFormerMember": "一位已離開的公會成員",
       "logDepositItem": "{actor} 存入了 {count} 個 {item}",
       "logWithdrawItem": "{actor} 取出了 {count} 個 {item}",

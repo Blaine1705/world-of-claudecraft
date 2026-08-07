@@ -531,6 +531,158 @@ export const TARGETS = [
     },
   },
   {
+    key: 'stun-stars',
+    label: 'Persistent stunned-star band over a stunned mob, past the cast moment',
+    // One token, and it covers the whole shipping surface: the band lives in
+    // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
+    // sequencer}.ts', all of which this prefix matches. (An earlier
+    // 'stun_stars' token named no shipping module at all, so it only ever
+    // matched the test file.)
+    when: ['render/ability_vfx'],
+    variants: [
+      // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
+      // capture pipeline spends ~0.7s between the aura poll and the shutter,
+      // and the star alpha fades over the stun's final second, so the longer
+      // stun is what keeps the shot inside the full-alpha read.
+      {
+        key: 'sundering-gavel-desktop',
+        charClass: 'paladin',
+        charName: 'Aurelius',
+        abilityId: 'hammer_of_justice',
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Stage: level to the Gavel rank 2 learn level, stand a durable mob in
+      // front of the player (pumped hp so stray aggro damage cannot kill it:
+      // the shot needs the mob ALIVE and stunned), and arm the ability on
+      // slot 1. The stun itself is applied by the real cast click below,
+      // never injected.
+      const staged = await page.evaluate((shot) => {
+        // The entry overlays can race the shared dismissal on a cold profile;
+        // clear them here too (the bags-target idiom) so they cannot sit over
+        // the world at shutter time.
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(16, player.id);
+        player.resource = player.maxResource;
+        let mob = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.hp <= 0 || e.id === player.id) continue;
+          const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+        if (!mob) return { ok: false, reason: 'no living mob in the offline world' };
+        mob.maxHp = 4000;
+        mob.hp = 4000;
+        // Re-home the mob in front of the player (spawn/leash anchors too, or
+        // its AI walks it back home during the banner wait below, out of the
+        // Gavel's 10 yd range; the corpse-target recipe's idiom).
+        mob.pos.x = player.pos.x + Math.sin(player.facing) * 6;
+        mob.pos.z = player.pos.z + Math.cos(player.facing) * 6;
+        mob.pos.y = player.pos.y;
+        if (mob.prevPos) {
+          mob.prevPos.x = mob.pos.x;
+          mob.prevPos.y = mob.pos.y;
+          mob.prevPos.z = mob.pos.z;
+        }
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        player.targetId = mob.id;
+        game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+        game.hud.saveSlotMap?.();
+        return { ok: true, mobId: mob.id };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+      // The level-up deed banners occupy mid-screen for a few seconds.
+      await wait(5200);
+
+      // Exercise the same click a player uses; poll the MOB's auras for the
+      // worn stun (kind, not id: exactly what the star band keys off).
+      let stunApplied = false;
+      for (let attempt = 0; attempt < 2 && !stunApplied; attempt++) {
+        const clicked = await page.evaluate(
+          (shot) => {
+            document.querySelector('.camera-prompt-confirm')?.click();
+            document.querySelector('.tut-skip')?.click();
+            const game = window.__game;
+            const sim = game?.sim;
+            const player = sim?.player;
+            const mob = sim?.entities?.get(shot.mobId);
+            const button = document.querySelector('.action-btn[data-hotbar-slot="1"]');
+            if (!game || !player || !mob || !button) return false;
+            // The banner wait gave the mob seconds to drift: re-place it just
+            // before the click, at melee-cast range and nudged off the facing
+            // axis so the player's own rig cannot occlude it, and pull the
+            // chase camera in so the star band reads at PR-screenshot size.
+            game.input.camDist = 6;
+            mob.pos.x = player.pos.x + Math.sin(player.facing + 0.5) * 4.5;
+            mob.pos.z = player.pos.z + Math.cos(player.facing + 0.5) * 4.5;
+            mob.pos.y = player.pos.y;
+            if (mob.prevPos) {
+              mob.prevPos.x = mob.pos.x;
+              mob.prevPos.y = mob.pos.y;
+              mob.prevPos.z = mob.pos.z;
+            }
+            mob.spawnPos = { ...mob.pos };
+            mob.leashAnchor = { ...mob.pos };
+            sim.rebucket?.(mob);
+            player.resource = player.maxResource;
+            player.targetId = shot.mobId;
+            button.click();
+            return true;
+          },
+          { ...variant, mobId: staged.mobId },
+        );
+        if (!clicked) throw new Error('primary action slot 1 is unavailable');
+        for (let poll = 0; poll < 24 && !stunApplied; poll++) {
+          await wait(200);
+          stunApplied = await page.evaluate(
+            (mobId) =>
+              !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
+            staged.mobId,
+          );
+        }
+      }
+      if (!stunApplied) throw new Error('stun aura never applied to the mob');
+
+      // Shoot PAST the sequencer's cast-moment stars (~1.8s): with the
+      // runner's own shot overhead (~0.7s) the shutter lands around 2.5s in,
+      // where what remains on screen is exactly the held, aura-driven band
+      // this change adds, and the before side of the pair shows nothing.
+      await wait(1900);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'target-auras',
     label: 'Target aura window with offensive and healing-over-time effects',
     when: ['target_auras'],
@@ -3329,6 +3481,108 @@ export const TARGETS = [
       // positioned above the stack's top edge, so a stack-clipped shot drops it
       // and cuts the player frame's health bar with it.
       return variant?.mobile ? {} : { clip: '#bottom-bar' };
+    },
+  },
+  {
+    key: 'party-pets',
+    label: 'Party frames: pet health slivers on the rows of members with pets',
+    when: ['party_frame_row', 'party_frames.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'priest', charName: 'Lumina' },
+      { key: 'mobile', charClass: 'priest', charName: 'Lumina', mobile: true },
+    ],
+    // A mixed party staged on the PartyMachine (same recipe as the class-color
+    // target below), deliberately mixing pet classes with a petless one so the shot
+    // shows both a row that grows a sliver and a row that does not. The local player
+    // is the PETLESS priest, so every sliver in frame belongs to somebody else,
+    // which is the case this change is actually about.
+    async capture(page, variant) {
+      // Party rows are ~170px wide, so a native-resolution clip of them is a
+      // postage stamp and the sliver (5px tall) is unreadable in review. Render the
+      // desktop shot at 2x device pixels: same layout and same CSS pixel geometry,
+      // just a crisper PNG. Mobile already runs at deviceScaleFactor 2.
+      if (!variant?.mobile) {
+        const vp = page.viewport() ?? { width: 1600, height: 900 };
+        await page.setViewport({ ...vp, deviceScaleFactor: 2 });
+      }
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const me = sim.primaryId;
+        const p = sim.player;
+        const pm = sim.party;
+        const roster = [
+          ['Rhoswen', 'hunter', 'forest_wolf'],
+          ['Nyxaris', 'warlock', 'emberkin'],
+          ['Thorgar', 'warrior', null],
+        ];
+        const pids = roster.map(([name, cls, pet], i) => {
+          const pid = sim.addPlayer(cls, name);
+          const e = sim.entities.get(pid);
+          if (e) {
+            e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+            e.prevPos = { ...e.pos };
+            if (pet) {
+              try {
+                sim.summonPet(e, pet);
+              } catch {}
+            }
+          }
+          return pid;
+        });
+        const party = {
+          id: pm.nextPartyId++,
+          leader: me,
+          members: [me, ...pids],
+          raid: false,
+          raidGroups: new Map(),
+          lootStrategies: {},
+        };
+        pm.parties.set(party.id, party);
+        pm.partyByPid.set(me, party.id);
+        for (const q of pids) pm.partyByPid.set(q, party.id);
+      });
+      await wait(1500);
+      // Damage each staged pet to a different fraction: a row of bars all pinned at
+      // full cannot show that the sliver tracks anything.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        const fracs = [0.42, 0.71];
+        let i = 0;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId !== null && e.ownerId !== sim.primaryId) {
+            e.hp = Math.max(1, Math.round(e.maxHp * (fracs[i % fracs.length] ?? 0.5)));
+            i++;
+          }
+        }
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Becoming party leader auto-opens Loot Settings, which sits over the party
+        // frames. The id here is the REAL one: an earlier '#party-loot-settings'
+        // matched nothing in the repo, so the hide was a silent no-op and the panel
+        // covered the very rows this target exists to show.
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      // Mobile party frames default to COLLAPSED (party_collapse.ts: anything but a
+      // stored '0' collapses), so without expanding them the mobile shot has no rows
+      // in it at all and cannot show the sliver. Expand via the real chip control.
+      if (variant?.mobile) {
+        await page.evaluate(() => {
+          const rowsVisible = () => {
+            const w = document.querySelector('.party-rows');
+            return !!w && getComputedStyle(w).display !== 'none' && w.childNodes.length > 0;
+          };
+          if (rowsVisible()) return;
+          document
+            .querySelector('#party-chip')
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+        await wait(600);
+      }
+      await wait(800);
+      return variant?.mobile ? {} : { clip: '#party-frames' };
     },
   },
   {
