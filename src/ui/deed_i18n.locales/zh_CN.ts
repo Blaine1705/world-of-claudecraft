@@ -32,6 +32,25 @@ export const table: DeedLocaleTable = {
     name: '裂隙君主',
     desc: '清除一个S级裂隙，这是裂隙传送门能够生成的最高难度等级。',
   },
+  col_reliquary_rank_2: {
+    name: '战利品保管者',
+    desc: '在圣物库达到策展人等级 2（收录 10 件不同圣物）。',
+    title: '战利品保管者',
+  },
+  col_reliquary_rank_3: {
+    name: '编目师',
+    desc: '在圣物库达到策展人等级 3（收录 25 件不同圣物）。',
+    title: '编目师',
+  },
+  col_reliquary_rank_4: {
+    name: '首席策展人',
+    desc: '在圣物库达到策展人等级 4（收录 50 件不同圣物）。',
+    title: '首席策展人',
+  },
+  col_reliquary_rank_5: {
+    name: '永恒的战利品',
+    desc: '在圣物库达到策展人等级 5（收录 100 件不同圣物）。',
+  },
   pvp_honor_sergeant: {
     name: '中士',
     desc: '生涯累计获得10,000点荣誉。花费荣誉不会剥夺你的军阶。',

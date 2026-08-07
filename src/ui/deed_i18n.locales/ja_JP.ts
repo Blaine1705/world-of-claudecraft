@@ -32,6 +32,25 @@ export const table: DeedLocaleTable = {
     name: 'リフトの君主',
     desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
   },
+  col_reliquary_rank_2: {
+    name: '戦利品の守り手',
+    desc: '聖遺物庫でキュレーターランク2に到達する（固有の聖遺物10種を収蔵）。',
+    title: '戦利品の守り手',
+  },
+  col_reliquary_rank_3: {
+    name: '目録編纂者',
+    desc: '聖遺物庫でキュレーターランク3に到達する（固有の聖遺物25種を収蔵）。',
+    title: '目録編纂者',
+  },
+  col_reliquary_rank_4: {
+    name: '首席キュレーター',
+    desc: '聖遺物庫でキュレーターランク4に到達する（固有の聖遺物50種を収蔵）。',
+    title: '首席キュレーター',
+  },
+  col_reliquary_rank_5: {
+    name: '永遠の戦利品',
+    desc: '聖遺物庫でキュレーターランク5に到達する（固有の聖遺物100種を収蔵）。',
+  },
   pvp_honor_sergeant: {
     name: '軍曹',
     desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',

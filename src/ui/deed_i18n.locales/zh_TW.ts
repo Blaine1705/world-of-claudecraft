@@ -32,6 +32,25 @@ export const table: DeedLocaleTable = {
     name: '裂隙至尊',
     desc: '清除一個S級裂隙，裂隙傳送門所能生成的最高分級。',
   },
+  col_reliquary_rank_2: {
+    name: '戰利品保管者',
+    desc: '在聖物庫達到策展人等級 2（收錄 10 種不同聖物）。',
+    title: '戰利品保管者',
+  },
+  col_reliquary_rank_3: {
+    name: '編目師',
+    desc: '在聖物庫達到策展人等級 3（收錄 25 種不同聖物）。',
+    title: '編目師',
+  },
+  col_reliquary_rank_4: {
+    name: '首席策展人',
+    desc: '在聖物庫達到策展人等級 4（收錄 50 種不同聖物）。',
+    title: '首席策展人',
+  },
+  col_reliquary_rank_5: {
+    name: '永恆的戰利品',
+    desc: '在聖物庫達到策展人等級 5（收錄 100 種不同聖物）。',
+  },
   pvp_honor_sergeant: {
     name: '中士',
     desc: '生涯累計獲得10,000點榮譽。花費榮譽不會讓你失去此階級。',

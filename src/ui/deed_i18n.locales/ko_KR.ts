@@ -32,6 +32,25 @@ export const table: DeedLocaleTable = {
     name: '균열 군주',
     desc: '균열이 생성될 수 있는 가장 어려운 등급인 S등급 균열을 정복하십시오.',
   },
+  col_reliquary_rank_2: {
+    name: '전리품 수호자',
+    desc: '성물고에서 큐레이터 등급 2를 달성하십시오 (고유 성물 10종 수록).',
+    title: '전리품 수호자',
+  },
+  col_reliquary_rank_3: {
+    name: '목록 편찬가',
+    desc: '성물고에서 큐레이터 등급 3을 달성하십시오 (고유 성물 25종 수록).',
+    title: '목록 편찬가',
+  },
+  col_reliquary_rank_4: {
+    name: '수석 큐레이터',
+    desc: '성물고에서 큐레이터 등급 4를 달성하십시오 (고유 성물 50종 수록).',
+    title: '수석 큐레이터',
+  },
+  col_reliquary_rank_5: {
+    name: '영원한 전리품',
+    desc: '성물고에서 큐레이터 등급 5를 달성하십시오 (고유 성물 100종 수록).',
+  },
   pvp_honor_sergeant: {
     name: '병장',
     desc: '평생 명예 10,000을 획득하십시오. 명예를 소비해도 계급은 사라지지 않습니다.',

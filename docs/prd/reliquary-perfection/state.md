@@ -550,7 +550,16 @@ fresh session). Update this line as phases complete.
   voskar_emberwing, the rift_* family, zone2 sister_nhalia, etc.); instance coverage
   is complete and equality-pinned, so Phase 21 owns any inclusion decisions.
 - i18n release fill: all reliquary keys pending in the 15 Latin locales; exact worklist
-  in the Phase 22 record. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
+  in the Phase 22 record. ADDED at the Phase 14 sync (v0.36.0 merge audit): the four
+  Curator-rank deeds (col_reliquary_rank_2..5, 4 names + 4 descs + 3 titles) need rows
+  in the 13 LATIN src/ui/deed_i18n.locales/ overlays; the five non-Latin fills landed
+  with the audit fix. The deed content channel has NO pending tracker, so this row is
+  the tracking mechanism: the release-tier deed arm (tests/localization_coverage.test.ts,
+  RELEASE_TIER-gated) reds on es.col_reliquary_rank_2.name until the Phase 22 fill,
+  the same expected-red class as the reliquary_i18n Latin chunks. Also for the fill:
+  hudChrome.reliquary.progressText ('{owned}/{total}', pure placeholders, no words)
+  is pending in ALL locales including the five non-Latin; it needs an exemption or a
+  literal fill at release, since a translation cannot differ from English. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
   contributor-authored fills (correct M16 mechanics, flagged for maintainer review).
   Phase 11 adds to that worklist: Latin-locale reliquary_i18n page-name chunks, ALL
   page desc fills (every locale; the manifest carries desc rows; Phase 13 NOW

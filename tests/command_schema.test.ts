@@ -43,7 +43,7 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // one-shot 'gbanklog' frame, not the snapshot), the battleground surface
 // (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
 // and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
-// This branch adds set_helm as a send + dispatch pair (the paperdoll
+// The v0.36.0 base adds set_helm as a send + dispatch pair (the paperdoll
 // helmet-visibility eye; helmHidden persists per character like weaponStowed).
 const EXPECTED_SEND_COUNT = 191;
 const EXPECTED_DISPATCH_COUNT = 204;
