@@ -3305,6 +3305,7 @@ export const da_DK: EnTranslations = {
       "recentJumpAria": "Open the page for {name}",
       "recentEmpty": "No finds yet. Relics you catalogue from now on land here.",
       "nearlyEmpty": "Pages within reach of completion gather here.",
+      "stripNoMatch": "Nothing here matches your search.",
       "shelfRecent": "Latest find: {name}",
       "shelfNoFinds": "Nothing catalogued on this shelf yet.",
       "shelfOpenAria": "Open the {name} shelf, {owned} of {total} filled",

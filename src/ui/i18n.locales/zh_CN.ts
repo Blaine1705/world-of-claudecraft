@@ -10033,6 +10033,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.recentJumpAria': '打开{name}所在的页面',
   'hudChrome.reliquary.recentEmpty': '尚无发现。此后收录的圣物都会出现在这里。',
   'hudChrome.reliquary.nearlyEmpty': '即将完成的页面会汇集于此。',
+  'hudChrome.reliquary.stripNoMatch': '此处没有符合搜索条件的内容。',
   'hudChrome.reliquary.shelfRecent': '最新发现：{name}',
   'hudChrome.reliquary.shelfNoFinds': '此书架尚未收录任何圣物。',
   'hudChrome.reliquary.shelfOpenAria': '打开{name}书架，已填入 {owned}/{total}',

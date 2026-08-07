@@ -3649,15 +3649,24 @@ export const TARGETS = [
         document.querySelector('#gpu-notice')?.remove();
         document.querySelector('.camera-prompt-confirm')?.click();
         // Seed a few catalogued discoveries so Overview is not an empty museum.
-        // Phase 14: also fill the recent ring the same way a live find would,
-        // so the recent strip shows its icon jump chips instead of the
-        // empty-ring hint (the ring is what the strip and shelf cards read).
+        // Phase 14: also fill the recent ring AND the firstFind record the
+        // same way a live find would, so the recent strip shows its icon jump
+        // chips resolving through the primary hinted path (a ring without
+        // firstFind exercises only the authored-order fallback). The pageIds
+        // are the pages that hold these items in src/sim/content/reliquary.ts.
         const game = window.__game;
         const sim = game?.sim;
         if (sim?.primary?.deedStats?.itemsDiscovered) {
-          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+          const finds = [
+            ['cryptbone_helm', 'conquerors_hollow_crypt'],
+            ['boundstone_helm', 'conquerors_gravewyrm_sanctum'],
+            ['cryptbone_pauldrons', 'conquerors_hollow_crypt'],
+          ];
+          for (const [id, pageId] of finds) {
             sim.primary.deedStats.itemsDiscovered.add(id);
             sim.primary.reliquary?.recent?.push(id);
+            const firstFind = sim.primary.reliquary?.firstFind;
+            if (firstFind && !firstFind[id]) firstFind[id] = { pageId };
           }
         }
         game?.hud?.openReliquary?.();

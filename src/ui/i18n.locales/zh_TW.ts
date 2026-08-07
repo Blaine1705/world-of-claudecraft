@@ -10035,6 +10035,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.recentJumpAria': '開啟{name}所在的頁面',
   'hudChrome.reliquary.recentEmpty': '尚無發現。此後收錄的聖物都會出現在這裡。',
   'hudChrome.reliquary.nearlyEmpty': '即將完成的頁面會匯集於此。',
+  'hudChrome.reliquary.stripNoMatch': '此處沒有符合搜尋條件的內容。',
   'hudChrome.reliquary.shelfRecent': '最新發現：{name}',
   'hudChrome.reliquary.shelfNoFinds': '此書架尚未收錄任何聖物。',
   'hudChrome.reliquary.shelfOpenAria': '開啟{name}書架，已填入 {owned}/{total}',

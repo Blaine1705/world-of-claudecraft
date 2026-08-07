@@ -3305,6 +3305,7 @@ export const ko_KR: EnTranslations = {
       "recentJumpAria": "{name} 페이지 열기",
       "recentEmpty": "아직 발견한 성물이 없습니다. 지금부터 수록하는 성물이 여기에 표시됩니다.",
       "nearlyEmpty": "완성이 가까운 페이지가 여기에 모입니다.",
+      "stripNoMatch": "여기에는 검색과 일치하는 항목이 없습니다.",
       "shelfRecent": "최근 발견: {name}",
       "shelfNoFinds": "이 선반에는 아직 수록된 성물이 없습니다.",
       "shelfOpenAria": "{name} 선반 열기, {owned}/{total} 채움",

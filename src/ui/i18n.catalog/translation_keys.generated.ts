@@ -8331,6 +8331,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.sourceStore'
   | 'hudChrome.reliquary.sourceVendor'
   | 'hudChrome.reliquary.sourceZone'
+  | 'hudChrome.reliquary.stripNoMatch'
   | 'hudChrome.reliquary.title'
   | 'hudChrome.reliquary.unknownRelic'
   | 'hudChrome.reliquary.unlockToast'

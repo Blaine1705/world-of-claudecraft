@@ -40,6 +40,8 @@ import {
   RELIQUARY_NEARLY_MIN_FRACTION,
   RELIQUARY_SHELF_ORDER,
   type ReliquaryViewInput,
+  reliquaryFillPct,
+  reliquaryFocusFallbackKey,
   reliquaryMarkFindKey,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
@@ -1269,11 +1271,37 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryOwnershipDigest(base)).toBe(baseD);
   });
 
+  it('a ring change with IDENTICAL totals still repaints: recentSig carries the card line alone', () => {
+    // The load-bearing arm of the card truth rule: when a relic that is
+    // already counted lands in the ring, no count moves (owned/total,
+    // discovered, marks, firstFind are all byte-identical), so the ring
+    // digest alone must carry the repaint that updates the card's latest
+    // line. Both halves are asserted against the SAME ownership premise.
+    const owned = ownedSet('crypt_helm', 'crypt_blade');
+    const before = buildReliquaryView(input({ recent: ['crypt_helm'], itemsDiscovered: owned }));
+    const after = buildReliquaryView(
+      input({ recent: ['crypt_helm', 'crypt_blade'], itemsDiscovered: owned }),
+    );
+    // Premise: every totals-bearing surface really is unchanged.
+    expect(after.progress.owned).toBe(before.progress.owned);
+    expect(after.shelfCards.map((c) => `${c.owned}/${c.total}`)).toEqual(
+      before.shelfCards.map((c) => `${c.owned}/${c.total}`),
+    );
+    // The card line moved anyway (newest-first), and so did the ring digest.
+    expect(before.shelfCards[0]?.recentId).toBe('crypt_helm');
+    expect(after.shelfCards[0]?.recentId).toBe('crypt_blade');
+    expect(reliquaryRecentSig(['crypt_helm', 'crypt_blade'])).not.toBe(
+      reliquaryRecentSig(['crypt_helm']),
+    );
+  });
+
   it('a new find moves the ring digest, which is what repaints the shelf cards', () => {
-    // The latest-find line on an Overview card is derived from the ring alone,
-    // so the ring digest is the ONLY signature dimension that can carry it.
-    // Both halves are asserted: the model's cards really changed, and the
-    // signature really moved, so neither could hide behind the other.
+    // The latest-find line on an Overview card is derived from the ring, and
+    // in the identical-totals case above the ring digest is the dimension
+    // that carries it (a NEW find also moves the ownership counts, which is
+    // fine: redundancy, not a gap). Both halves are asserted: the model's
+    // cards really changed, and the signature really moved, so neither could
+    // hide behind the other.
     const before = buildReliquaryView(
       input({ recent: ['crypt_helm'], itemsDiscovered: ownedSet('crypt_helm') }),
     );
@@ -1307,6 +1335,42 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryRecentSig(['a', 'b'])).toBe('a\u0001b');
     expect(reliquaryRecentSig(['a', 'b'])).not.toBe(reliquaryRecentSig(['b', 'a']));
     expect(reliquaryRecentSig([])).toBe('');
+  });
+});
+
+describe('reliquaryFillPct', () => {
+  it('rounds to a whole percent and pins the empty pair at zero', () => {
+    expect(reliquaryFillPct(0, 0)).toBe(0);
+    expect(reliquaryFillPct(0, 219)).toBe(0);
+    expect(reliquaryFillPct(1, 3)).toBe(33);
+    expect(reliquaryFillPct(2, 3)).toBe(67);
+    expect(reliquaryFillPct(219, 219)).toBe(100);
+    // Round, not floor: 0.5 percent of the way is already 1 on the meter.
+    expect(reliquaryFillPct(1, 200)).toBe(1);
+  });
+});
+
+describe('reliquaryFocusFallbackKey', () => {
+  it('maps a jump control that its own jump destroys to the destination control', () => {
+    // A card lands on its shelf, whose rail button survives; every page jump
+    // lands on a page detail, whose Back button is the nearest named control.
+    expect(reliquaryFocusFallbackKey('card:horizons')).toBe('nav:horizons');
+    expect(reliquaryFocusFallbackKey('recent:item:crypt_helm')).toBe('back');
+    expect(reliquaryFocusFallbackKey('nearly:crypt_n')).toBe('back');
+    expect(reliquaryFocusFallbackKey('page:crypt_n')).toBe('back');
+  });
+
+  it('offers no fallback for controls that survive their own activation', () => {
+    // Rail buttons, filter chips, the search field, grid cells, Back, and
+    // Close all outlive the rebuilds they trigger (or have their own restore
+    // path), so the exact-key restore owns them.
+    expect(reliquaryFocusFallbackKey(null)).toBeNull();
+    expect(reliquaryFocusFallbackKey('nav:conquerors')).toBeNull();
+    expect(reliquaryFocusFallbackKey('filter:owned')).toBeNull();
+    expect(reliquaryFocusFallbackKey('search')).toBeNull();
+    expect(reliquaryFocusFallbackKey('cell:item:crypt_helm')).toBeNull();
+    expect(reliquaryFocusFallbackKey('back')).toBeNull();
+    expect(reliquaryFocusFallbackKey('close')).toBeNull();
   });
 });
 

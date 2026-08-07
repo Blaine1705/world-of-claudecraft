@@ -799,15 +799,21 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain(
       "accountScopeNote: 'Account collection: unlocked across every character on this account.'",
     );
-    // Phase 14 Overview chrome: the jump aria, both strip hints, the two shelf
+    // Phase 14 Overview chrome: the jump aria, the strip hints, the two shelf
     // card lines, the card's own aria, and the shared-uniques reconciliation.
+    // Full key-and-value literals, never bare key names: recentJumpAria
+    // already exists under hudChrome.deeds too, so a bare-name pin can be
+    // satisfied by the wrong section.
     expect(chrome).toContain("recentJumpAria: 'Open the page for {name}'");
-    expect(chrome).toContain('recentEmpty:');
-    expect(chrome).toContain('nearlyEmpty:');
+    expect(chrome).toContain(
+      "recentEmpty: 'No finds yet. Relics you catalogue from now on land here.'",
+    );
+    expect(chrome).toContain("nearlyEmpty: 'Pages within reach of completion gather here.'");
+    expect(chrome).toContain("stripNoMatch: 'Nothing here matches your search.'");
     expect(chrome).toContain("shelfRecent: 'Latest find: {name}'");
-    expect(chrome).toContain('shelfNoFinds:');
+    expect(chrome).toContain("shelfNoFinds: 'Nothing catalogued on this shelf yet.'");
     expect(chrome).toContain("shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled'");
-    expect(chrome).toContain('sharedUniquesNote:');
+    expect(chrome).toContain("'Your overall total counts each relic once; shelf and page counts");
     // And the plural base the nearly row's "to go" readout selects on: a flat
     // key here would read wrong at count 1 in every inflecting locale.
     expect(chrome).toContain('reliquaryToGo: {');
@@ -820,10 +826,13 @@ describe('entry HTML and i18n chrome', () => {
     // end (catalog, five overlays, regenerated bundles) exactly the way
     // pageStubNote was in Phase 11.
     //
-    // Premise first: the keys that REPLACED it are really authored, so this
-    // pin cannot pass on a catalog that simply lost the whole section.
-    expect(chrome).toContain('recentEmpty:');
-    expect(chrome).toContain('nearlyEmpty:');
+    // Premise first: the keys that REPLACED it are really authored (full
+    // literals, so the wrong section cannot satisfy them), so this pin cannot
+    // pass on a catalog that simply lost the whole section.
+    expect(chrome).toContain(
+      "recentEmpty: 'No finds yet. Relics you catalogue from now on land here.'",
+    );
+    expect(chrome).toContain("nearlyEmpty: 'Pages within reach of completion gather here.'");
     expect(chrome).not.toContain('overviewEmpty');
   });
 
@@ -921,6 +930,22 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain('plan.refreshWindow && this.reliquaryWindow.isOpen');
     expect(handler).toContain('this.reliquaryWindow.refreshIfChanged()');
     expect(handler).not.toContain('this.reliquaryWindow.render()');
+    // Phase 14: the two celebration one-shots are ARMED on this drain, keyed
+    // and gated exactly. The flash key is kind:id (the grid-cell key; a bare
+    // id would collide across un-namespaced kinds) and the illumination stays
+    // null-guarded. One regex each proves the arming happens BEFORE the
+    // refresh inside the same isOpen block: consumed-by-render one-shots
+    // armed after it would ride the NEXT repaint, not the one that shows the
+    // fill, and deleting either call keeps every other pin green.
+    expect(handler).toContain(
+      'this.reliquaryWindow.flashRelics(plan.logs.map((log) => reliquaryFlashKey(log.kind, log.id)));',
+    );
+    expect(handler).toMatch(
+      /if \(plan\.illuminatedPageId !== null\) \{\s*this\.reliquaryWindow\.celebrateIllumination\(plan\.illuminatedPageId\);\s*\}/,
+    );
+    expect(handler).toMatch(
+      /flashRelics[\s\S]*celebrateIllumination[\s\S]*this\.reliquaryWindow\.refreshIfChanged\(\)/,
+    );
     // Presentation-only: never write discovery / firstFind from the event.
     expect(handler).not.toMatch(/itemsDiscovered\.(add|has)/);
     expect(handler).not.toMatch(/reliquaryFirstFind\s*=/);

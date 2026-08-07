@@ -3305,6 +3305,7 @@ export const en_XA: EnTranslations = {
       "recentJumpAria": "[Óþéñ ţĥé þáĝé ƒóŕ {name}]",
       "recentEmpty": "[Ñó ƒíñðš ýéţ. Ŕéļíçš ýóú çáţáļóĝúé ƒŕóɱ ñóŵ óñ ļáñð ĥéŕé.]",
       "nearlyEmpty": "[Þáĝéš ŵíţĥíñ ŕéáçĥ óƒ çóɱþļéţíóñ ĝáţĥéŕ ĥéŕé.]",
+      "stripNoMatch": "[Ñóţĥíñĝ ĥéŕé ɱáţçĥéš ýóúŕ šéáŕçĥ.]",
       "shelfRecent": "[Ļáţéšţ ƒíñð: {name}]",
       "shelfNoFinds": "[Ñóţĥíñĝ çáţáļóĝúéð óñ ţĥíš šĥéļƒ ýéţ.]",
       "shelfOpenAria": "[Óþéñ ţĥé {name} šĥéļƒ, {owned} óƒ {total} ƒíļļéð]",

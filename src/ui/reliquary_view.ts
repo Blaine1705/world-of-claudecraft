@@ -433,6 +433,15 @@ export interface ReliquaryViewModel {
    * itself through pageDetail.filtered.
    */
   filtered: boolean;
+  /**
+   * The needle emptied this strip: entries existed to show and the filter
+   * removed every one. Distinguishes "nothing here matches" from a
+   * STRUCTURALLY empty strip, whose own hint stays true while a needle is
+   * live; keying the painter's no-match line on mere needle presence would
+   * assert a false cause on the structurally empty strip.
+   */
+  recentEmptiedBySearch: boolean;
+  nearlyEmptiedBySearch: boolean;
 }
 
 function ownershipOpts(input: ReliquaryViewInput) {
@@ -557,14 +566,18 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     recentTotal += 1;
     let kind: ReliquaryRecentFindModel['kind'] = 'unknown';
     if (input.marks.has(id)) kind = 'mark';
-    else if (input.itemsDiscovered.has(id) || isCatalogItemId(input.pages, id)) kind = 'item';
+    else if (input.itemsDiscovered.has(id) || (relicPageIndex?.itemIds.has(id) ?? false)) {
+      kind = 'item';
+    }
     // Where the chip jumps to. The recorded first-find page wins when the
     // catalog still has it (it is where the player actually found the relic);
     // otherwise the first page in authored order that holds the slot, for any
     // relic kind the catalog places.
     const hinted = input.firstFind?.[id]?.pageId;
     const pageId =
-      hinted !== undefined && pagesById.has(hinted) ? hinted : (relicPageIndex?.get(id) ?? null);
+      hinted !== undefined && pagesById.has(hinted)
+        ? hinted
+        : (relicPageIndex?.pageOf.get(id) ?? null);
     // Shelf cards summarize a shelf, not the needle, so their latest-find line
     // is captured from the WHOLE ring before the search filter below: typing
     // must not blank a card's last find.
@@ -714,6 +727,10 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     activePage,
     pageDetail,
     filtered,
+    // With no needle each visible strip equals its unfiltered self, so both
+    // flags are necessarily false; no needle-presence check is needed.
+    recentEmptiedBySearch: recent.length === 0 && recentTotal > 0,
+    nearlyEmptiedBySearch: nearly.length === 0 && unfilteredNearly.length > 0,
   };
 }
 
@@ -738,26 +755,24 @@ function pageHasRelicMatch(
  * Slot id to the FIRST page in authored order that holds it, across every relic
  * kind the catalog places (items, marks, mounts, weapon skins, title deeds).
  * A relic listed on several pages resolves to the first, so the recent strip's
- * jump target is stable rather than dependent on iteration luck.
+ * jump target is stable rather than dependent on iteration luck. The same pass
+ * collects the item-slot ids, so classifying a ring entry needs no re-scan of
+ * the catalog per chip.
  */
-function buildRelicPageIndex(pages: readonly ReliquaryPageDef[]): Map<string, string> {
-  const index = new Map<string, string>();
+function buildRelicPageIndex(pages: readonly ReliquaryPageDef[]): {
+  pageOf: Map<string, string>;
+  itemIds: Set<string>;
+} {
+  const pageOf = new Map<string, string>();
+  const itemIds = new Set<string>();
   for (const page of pages) {
     for (const relic of page.relics) {
       const id = relicSlotId(relic);
-      if (!index.has(id)) index.set(id, page.id);
+      if (!pageOf.has(id)) pageOf.set(id, page.id);
+      if (relic.kind === 'item') itemIds.add(relic.itemId);
     }
   }
-  return index;
-}
-
-function isCatalogItemId(pages: readonly ReliquaryPageDef[], id: string): boolean {
-  for (const page of pages) {
-    for (const relic of page.relics) {
-      if (relic.kind === 'item' && relic.itemId === id) return true;
-    }
-  }
-  return false;
+  return { pageOf, itemIds };
 }
 
 function buildNearlyComplete(
@@ -1001,4 +1016,39 @@ export function reliquaryRecentSig(recent: readonly string[]): string {
 /** True when a string is a known Reliquary nav id. */
 export function isReliquaryNavId(value: string): value is ReliquaryNavId {
   return (RELIQUARY_NAV as readonly string[]).includes(value);
+}
+
+/** Whole-percent fill for an owned/total pair, the one number every Reliquary
+ *  meter draws; the empty-pair case pins at zero rather than dividing by it. */
+export function reliquaryFillPct(owned: number, total: number): number {
+  return total > 0 ? Math.round((owned / total) * 100) : 0;
+}
+
+/** The one flash/cell key shape, kind-namespaced because slot ids are not:
+ *  the Hud arms the fill flash with it and the painter matches cells on it,
+ *  so a bare-id arming can never light a same-named cell of another kind. */
+export function reliquaryFlashKey(kind: string, id: string): string {
+  return `${kind}:${id}`;
+}
+
+/**
+ * Where focus should land when the control that held it does not survive its
+ * own jump. A shelf card or a page-jump row triggers a rebuild that replaces
+ * the surface it lived on, so the exact data-focus-key restore finds nothing
+ * and would fall through to the Close button, one Enter press from closing
+ * the window a keyboard player just asked to open further. The fallback is
+ * the nearest control that names where they landed: the shelf's own rail
+ * button for a card, the Back button for any jump into a page detail.
+ */
+export function reliquaryFocusFallbackKey(focusKey: string | null): string | null {
+  if (focusKey === null) return null;
+  if (focusKey.startsWith('card:')) return `nav:${focusKey.slice('card:'.length)}`;
+  if (
+    focusKey.startsWith('recent:') ||
+    focusKey.startsWith('nearly:') ||
+    focusKey.startsWith('page:')
+  ) {
+    return 'back';
+  }
+  return null;
 }

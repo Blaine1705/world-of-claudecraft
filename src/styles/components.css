@@ -7876,16 +7876,6 @@
     font-family: var(--title-font);
     margin-top: -2px;
   }
-  /* ---------- professions ---------- */
-  /* The Professions window: a cold, read-only identity browser (identity
-     card, craft wheel, ten skill bars with tier pips, perks readout, nudges,
-     gathering rows) over IWorldProfessions. Bar widths and ring node
-     positions are build-time inline writes; ring strokes carry
-     vector-effect="non-scaling-stroke" so these pixel widths survive the
-     unit-circle viewBox. Semantic colours come from tokens; the showcase
-     hairline is the shared --color-border-showcase token, and the remaining
-     inset-card cosmetics (rgba card fills, the ring stage haze) are
-     deliberate literals shared with the char-window showcase family. */
   /* ---------- reliquary ---------- */
   /* The Reliquary: cold collection browser (summary strip, shelf rail,
      Overview recent/nearly, shelf page rows, page grids, search + filter).
@@ -8142,14 +8132,6 @@
   .reliquary-recent-item:is(button) {
     cursor: var(--cursor-point);
   }
-  .reliquary-recent-item:hover {
-    color: var(--gold);
-    border-color: var(--gold-dim);
-  }
-  .reliquary-recent-item:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
-  }
   /* A fixed icon box, so a tall or wide glyph cannot stretch the chip. Sized
      on the outer element and again on an inner one, because the icon helpers
      return either a bare <img> or a wrapper around one. */
@@ -8169,12 +8151,11 @@
     object-fit: contain;
   }
   /* A long relic name wraps inside its chip instead of truncating: an
-     ellipsis would hide the tail from sighted keyboard players, because the
-     chip is a non-interactive span the shared hover tooltip (wire()) cannot
-     reach without a pointer. The cap only bounds the line length, and
-     overflow-wrap keeps that true for an unbreakable compound (German or
-     Finnish single-word names), which would otherwise spill past the
-     chip border. */
+     ellipsis would hide the tail from keyboard players, who have no pointer
+     to fire the shared hover tooltip (wire()) that repeats the name. The cap
+     only bounds the line length, and overflow-wrap keeps that true for an
+     unbreakable compound (German or Finnish single-word names), which would
+     otherwise spill past the chip border. */
   .reliquary-recent-name {
     max-width: 160px;
     overflow-wrap: anywhere;
@@ -8196,15 +8177,23 @@
     cursor: var(--cursor-point);
     min-height: 32px;
   }
+  /* One hover keyline and one focus ring for the whole jump family: the rows,
+     the Back button, the recent chips, and the shelf cards share the surface,
+     so they share these too (the chip's hover stays on the bare class: a
+     keyline is honest on its inert span form as well). */
   .reliquary-nearly-row:hover,
   .reliquary-page-row:hover,
-  .reliquary-back:hover {
+  .reliquary-back:hover,
+  .reliquary-recent-item:hover,
+  .reliquary-shelf-card:hover {
     color: var(--gold);
     border-color: var(--gold-dim);
   }
   .reliquary-nearly-row:focus-visible,
   .reliquary-page-row:focus-visible,
-  .reliquary-back:focus-visible {
+  .reliquary-back:focus-visible,
+  .reliquary-recent-item:focus-visible,
+  .reliquary-shelf-card:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
@@ -8326,7 +8315,12 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 4px 2px 8px;
+    /* The is-illuminated frame below only recolors this transparent border:
+       keeping the box metrics identical in both states stops the whole grid
+       from jumping inward at the exact moment the celebration plays. */
+    padding: 8px 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
   }
   .reliquary-page-header {
     display: flex;
@@ -8367,9 +8361,7 @@
      fills in to match. The celebration one-shot further down the section is
      authored after this rule, so it wins the frame for the moment it plays. */
   .reliquary-page-detail.is-illuminated {
-    border: 1px solid var(--gold-dim);
-    border-radius: 8px;
-    padding: 8px 8px 10px;
+    border-color: var(--gold-dim);
     box-shadow: inset 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
   }
   .reliquary-page-detail.is-illuminated .reliquary-complete-badge {
@@ -8469,14 +8461,6 @@
     color: var(--gold-dim);
     cursor: var(--cursor-point);
   }
-  .reliquary-shelf-card:hover {
-    color: var(--gold);
-    border-color: var(--gold-dim);
-  }
-  .reliquary-shelf-card:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
-  }
   .reliquary-shelf-card-name {
     font-family: var(--title-font);
     font-weight: 700;
@@ -8508,8 +8492,7 @@
      timer. The page frame flashes gold (the .deed-card-flash pattern) while
      the grid brightens once underneath it. */
   .reliquary-page-detail.reliquary-page-celebrate {
-    animation: reliquary-page-celebrate 1.6s ease-out;
-    animation-iteration-count: 1;
+    animation: reliquary-page-celebrate 1.6s ease-out 1;
   }
   @keyframes reliquary-page-celebrate {
     0% {
@@ -8530,8 +8513,7 @@
      hides nothing, so a silhouette stays a silhouette and an owned relic stays
      legible for the whole 1.6s. */
   .reliquary-page-celebrate .reliquary-grid {
-    animation: reliquary-grid-shimmer 1.6s ease-out;
-    animation-iteration-count: 1;
+    animation: reliquary-grid-shimmer 1.6s ease-out 1;
   }
   @keyframes reliquary-grid-shimmer {
     0% {
@@ -8547,8 +8529,7 @@
   /* One cell lighting up as its relic lands: the same one-shot, shorter,
      scoped to the cell so a single find does not flash the whole page. */
   .reliquary-cell-flash {
-    animation: reliquary-cell-flash 1s ease-out;
-    animation-iteration-count: 1;
+    animation: reliquary-cell-flash 1s ease-out 1;
   }
   @keyframes reliquary-cell-flash {
     0% {
@@ -8572,6 +8553,10 @@
      cell IS owned), and a timer to shorten the wait is the one thing the
      cold painter must never own. */
   @media (prefers-reduced-motion: reduce) {
+    /* Bright --gold on purpose, NOT the deed precedent's --gold-dim: a
+       celebrating page always also wears is-illuminated, whose standing frame
+       is already --gold-dim, so a dim ring would be indistinguishable from
+       the settled state it must momentarily outshine. */
     .reliquary-page-detail.reliquary-page-celebrate {
       animation: none;
       box-shadow: inset 0 0 0 2px var(--gold);
@@ -8585,6 +8570,16 @@
       box-shadow: inset 0 0 0 2px var(--gold);
     }
   }
+  /* ---------- professions ---------- */
+  /* The Professions window: a cold, read-only identity browser (identity
+     card, craft wheel, ten skill bars with tier pips, perks readout, nudges,
+     gathering rows) over IWorldProfessions. Bar widths and ring node
+     positions are build-time inline writes; ring strokes carry
+     vector-effect="non-scaling-stroke" so these pixel widths survive the
+     unit-circle viewBox. Semantic colours come from tokens; the showcase
+     hairline is the shared --color-border-showcase token, and the remaining
+     inset-card cosmetics (rgba card fills, the ring stage haze) are
+     deliberate literals shared with the char-window showcase family. */
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);

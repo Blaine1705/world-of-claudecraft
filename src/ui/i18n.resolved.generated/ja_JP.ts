@@ -3305,6 +3305,7 @@ export const ja_JP: EnTranslations = {
       "recentJumpAria": "{name} のページを開く",
       "recentEmpty": "まだ発見はありません。これから収蔵した聖遺物がここに並びます。",
       "nearlyEmpty": "完成が近いページはここに集まります。",
+      "stripNoMatch": "ここには検索に一致するものがありません。",
       "shelfRecent": "最新の発見：{name}",
       "shelfNoFinds": "この棚にはまだ何も収蔵されていません。",
       "shelfOpenAria": "{name} の棚を開く、{owned}/{total} 埋め済み",

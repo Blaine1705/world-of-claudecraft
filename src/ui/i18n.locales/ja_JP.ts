@@ -10518,6 +10518,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.recentEmpty':
     'まだ発見はありません。これから収蔵した聖遺物がここに並びます。',
   'hudChrome.reliquary.nearlyEmpty': '完成が近いページはここに集まります。',
+  'hudChrome.reliquary.stripNoMatch': 'ここには検索に一致するものがありません。',
   'hudChrome.reliquary.shelfRecent': '最新の発見：{name}',
   'hudChrome.reliquary.shelfNoFinds': 'この棚にはまだ何も収蔵されていません。',
   'hudChrome.reliquary.shelfOpenAria': '{name} の棚を開く、{owned}/{total} 埋め済み',

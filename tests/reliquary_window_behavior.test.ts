@@ -1871,7 +1871,86 @@ describe('ReliquaryWindow: the recent-find strip jumps to the relic', () => {
     ]);
   });
 
-  it('says once, on the Overview, why the totals do not add up', () => {
+  it('explains a strip the needle emptied, and stands aside when the needle emptied both', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    // One find for the ring, and the page one relic short for the nearly strip.
+    for (const id of ids.slice(0, -1)) state.itemsDiscovered.add(id);
+    state.recent.push(ids[0] ?? '');
+    const rig = makeWindow(state, { nav: 'overview' });
+    // 'morthen' lives only in the page BLURB (the premise the shelf-list test
+    // pins), so it keeps the nearly row and empties the recent strip: exactly
+    // one strip goes empty under a live needle.
+    const needle = 'morthen';
+    expect(
+      reliquaryRelicDisplayName('item', ids[0] ?? '').toLocaleLowerCase(TAG),
+      'content premise: the ring find does not match the needle',
+    ).not.toContain(needle);
+    typeSearch(rig.el, needle);
+    expect(recentChips(rig.el)).toHaveLength(0);
+    expect(rig.el.querySelectorAll('.reliquary-nearly-row').length).toBeGreaterThan(0);
+    // The emptied strip explains itself; the whole-Overview line stays out of
+    // it because the other strip still has matches to show.
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([
+      t('hudChrome.reliquary.stripNoMatch'),
+    ]);
+    expect(rig.el.querySelector('.reliquary-empty')).toBeNull();
+
+    // A needle that empties BOTH strips hands the answer to the shared
+    // searchEmpty line: no per-strip hint doubles it.
+    typeSearch(rig.el, 'zzz_no_such_relic');
+    expect(recentChips(rig.el)).toHaveLength(0);
+    expect(rig.el.querySelectorAll('.reliquary-nearly-row')).toHaveLength(0);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([]);
+    expect(must(rig.el, '.reliquary-empty').textContent).toBe(t('hudChrome.reliquary.searchEmpty'));
+  });
+
+  it('composes both structural hints WITH the shared line on a fresh character needle', () => {
+    // Row 3 of the hint table, both strips at once: nothing was ever there to
+    // match, so each strip keeps its structural hint, and the typed needle
+    // still earns the shared acknowledgement. Four statements, all true.
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    typeSearch(rig.el, 'zzz_no_such_relic');
+    expect(recentChips(rig.el)).toHaveLength(0);
+    expect(rig.el.querySelectorAll('.reliquary-nearly-row')).toHaveLength(0);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([
+      t('hudChrome.reliquary.recentEmpty'),
+      t('hudChrome.reliquary.nearlyEmpty'),
+    ]);
+    expect(must(rig.el, '.reliquary-empty').textContent).toBe(t('hudChrome.reliquary.searchEmpty'));
+  });
+
+  it('keeps a structurally empty strip on its own hint while a needle is live', () => {
+    // One find in the ring, but the page is nowhere near completion, so the
+    // nearly strip is empty with or without a needle. A needle that keeps the
+    // recent chip must leave the nearly strip saying what it always says: a
+    // "no match" line there would assert a false cause, and clearing the
+    // search would swap it for the structural hint it should have kept.
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    const first = ids[0] ?? '';
+    state.itemsDiscovered.add(first);
+    state.recent.push(first);
+    const rig = makeWindow(state, { nav: 'overview' });
+    // Premise: the single find does not qualify the page for the nearly strip.
+    expect(rig.el.querySelectorAll('.reliquary-nearly-row')).toHaveLength(0);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([
+      t('hudChrome.reliquary.nearlyEmpty'),
+    ]);
+    const needle = reliquaryRelicDisplayName('item', first).toLocaleLowerCase(TAG);
+    typeSearch(rig.el, needle);
+    expect(recentChips(rig.el).length, 'premise: the needle keeps the chip').toBeGreaterThan(0);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([
+      t('hudChrome.reliquary.nearlyEmpty'),
+    ]);
+    expect(rig.el.querySelector('.reliquary-empty')).toBeNull();
+  });
+
+  it('says once, on the Overview, why the totals do not add up, from the first open', () => {
+    // Unconditional on purpose: the shelf denominators disagree with the
+    // catalog total at owned 0 already (every shared relic is one catalog row
+    // but a slot on each page that shows it), so the fresh Overview needs the
+    // reconciliation as much as a veteran's.
     const rig = makeWindow(baseState(), { nav: 'overview' });
     expect(must(rig.el, '.reliquary-uniques-note').textContent).toBe(
       t('hudChrome.reliquary.sharedUniquesNote'),
@@ -1929,6 +2008,42 @@ describe('ReliquaryWindow: the Overview shelf cards', () => {
     expect(pageIds(rig.el)).toEqual(
       RELIQUARY_PAGES.filter((page) => page.shelf === 'horizons').map((page) => page.id),
     );
+  });
+
+  it('lands keyboard focus on the shelf rail button a card jump opens, not on Close', () => {
+    // The card does not survive the rebuild it triggers, so the exact
+    // data-focus-key restore finds nothing; the fallback names the destination
+    // (the shelf's own rail button) instead of falling through to Close, one
+    // Enter press from closing the window the player just asked to open.
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    const card = must(rig.el, '.reliquary-shelf-card[data-nav="horizons"]');
+    card.focus();
+    expect(document.activeElement).toBe(card);
+    card.click();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.dataset.focusKey).toBe('nav:horizons');
+    expect(after?.hasAttribute('data-close')).toBe(false);
+  });
+
+  it('lands keyboard focus on Back after a jump into a page detail', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, -1)) state.itemsDiscovered.add(id);
+    state.recent.push(ids[0] ?? '');
+    const rig = makeWindow(state, { nav: 'overview' });
+    // The nearly row and the recent chip both vanish with the Overview they
+    // lived on; Back is the control that names where the jump landed.
+    const row = must(rig.el, '.reliquary-nearly-row');
+    row.focus();
+    row.click();
+    expect((document.activeElement as HTMLElement | null)?.dataset.focusKey).toBe('back');
+
+    click(rig.el, '[data-back]');
+    click(rig.el, '[data-nav="overview"]');
+    const chip = must(rig.el, `button.reliquary-recent-item`);
+    chip.focus();
+    chip.click();
+    expect((document.activeElement as HTMLElement | null)?.dataset.focusKey).toBe('back');
   });
 
   it('carries the shelf pair, its latest find, and a localized open label', () => {
@@ -2053,9 +2168,11 @@ describe('ReliquaryWindow: every bar fill rides the custom property', () => {
 // ---------------------------------------------------------------------------
 
 /** The Hud arm exactly: arm both one-shots, then refreshIfChanged (never a bare
- *  render), so what these tests drive is the production sequence. */
+ *  render), so what these tests drive is the production sequence. Flash keys
+ *  are kind:id (the grid-cell key) exactly as the Hud builds them from the
+ *  drain's logs; every relic these drains flash is an item. */
 function drainInto(rig: Rig, opts: { flash?: string[]; illuminated?: string | null }): void {
-  rig.w.flashRelics(opts.flash ?? []);
+  rig.w.flashRelics((opts.flash ?? []).map((id) => `item:${id}`));
   if (opts.illuminated) rig.w.celebrateIllumination(opts.illuminated);
   rig.w.refreshIfChanged();
 }
@@ -2107,6 +2224,37 @@ describe('ReliquaryWindow: the Illumination celebration', () => {
     click(rig.el, '[data-back]');
     click(rig.el, `[data-page="${PAGE_ID}"]`);
     expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+
+  it('stays ARMED across a repaint of its OWN page while that page still reads incomplete', () => {
+    // The online snapshot-lag shape, on the page itself: the event frame says
+    // the page illuminated, the ownership mirror has not caught up, and
+    // something else in the same snapshot (rank) makes the refresh genuinely
+    // repaint. The gate must check illuminated BEFORE consuming: the swapped
+    // order spends the one-shot on this paint and the earned celebration is
+    // lost permanently, not merely delayed.
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, -1)) state.itemsDiscovered.add(id);
+    const rig = openPage(state);
+    expect(section(rig.el).classList.contains('is-illuminated')).toBe(false);
+
+    drainInto(rig, { illuminated: PAGE_ID });
+    state.curatorRank += 1;
+    const settled = rig.el.firstElementChild;
+    rig.w.refreshIfChanged();
+    expect(rig.el.firstElementChild, 'premise: the page really repainted').not.toBe(settled);
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+
+    // The snapshot lands: the celebration the player earned plays now.
+    state.itemsDiscovered.add(ids[ids.length - 1] ?? '');
+    rig.w.refreshIfChanged();
+    const arrived = section(rig.el);
+    expect(arrived.classList.contains('is-illuminated')).toBe(true);
+    expect(
+      arrived.classList.contains('reliquary-page-celebrate'),
+      'the moment was held, not spent on the paint that could not show it',
+    ).toBe(true);
   });
 
   it('never celebrates a page other than the one that filled', () => {
@@ -2207,6 +2355,21 @@ describe('ReliquaryWindow: the fill flash', () => {
     expect(flashed(rig.el)).toEqual([]);
   });
 
+  it('matches the whole kind:id key, never the bare id', () => {
+    // Slot ids are un-namespaced across kinds, so the flash key carries the
+    // kind: a mark-keyed arming must not light an item cell that happens to
+    // share the id.
+    const state = baseState();
+    const rig = openPage(state);
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.itemsDiscovered.add(id);
+    rig.w.flashRelics([`mark:${id}`]);
+    rig.w.refreshIfChanged();
+    // The paint happened (the fill shows) but the wrong-kind key flashed nothing.
+    expect(must(rig.el, `[data-cell-id="${id}"]`).dataset.cellOwned).toBe('1');
+    expect(flashed(rig.el)).toEqual([]);
+  });
+
   it('replaces the previous drain instead of accumulating ids', () => {
     const state = baseState();
     const rig = openPage(state);
@@ -2240,6 +2403,27 @@ describe('ReliquaryWindow: the fill flash', () => {
     state.itemsDiscovered.add(id);
     rig.w.refreshIfChanged();
     expect(flashed(rig.el)).toEqual([id]);
+  });
+
+  it('close() drops a flash that never found a paint to spend it', () => {
+    // The companion of the celebration's close() case, armed so that NOTHING
+    // paints before the close: the drain's refresh elides (the snapshot-lag
+    // shape above), so the set is still pending when the window closes. A
+    // reopen after the relic is catalogued must paint it settled, not replay
+    // a stale fanfare minutes later.
+    const state = baseState();
+    const rig = openPage(state);
+    const id = relicIds(PAGE_ID)[2] ?? '';
+    const settled = rig.el.firstElementChild;
+    drainInto(rig, { flash: [id] });
+    expect(rig.el.firstElementChild, 'premise: the arming refresh really elided').toBe(settled);
+    rig.w.close();
+    state.itemsDiscovered.add(id);
+    rig.w.open();
+    click(rig.el, '[data-nav="conquerors"]');
+    click(rig.el, `[data-page="${PAGE_ID}"]`);
+    expect(must(rig.el, `[data-cell-id="${id}"]`).dataset.cellOwned).toBe('1');
+    expect(flashed(rig.el), 'a stale moment must not replay as a fanfare').toEqual([]);
   });
 });
 
@@ -2278,6 +2462,10 @@ describe('ReliquaryWindow: an elided poll touches no ownership seam', () => {
     const rig = openPage(state, UNHINTED_PAGE_ID, 'horizons');
     expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('0');
     state.mounts = [owned];
+    // Rig artifact, not a missing signature dimension: the stub's
+    // reliquaryCatalogCompletion is a hand-set literal, so the rank bump
+    // stands in for the owned-count move a real mount fill makes on both
+    // hosts (catalogRelicCompletion counts mounts in the same surfaces).
     state.curatorRank += 1;
     rig.w.refreshIfChanged();
     expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('1');

@@ -10686,6 +10686,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.recentEmpty':
     'Находок пока нет. Реликвии, которые вы каталогизируете, будут появляться здесь.',
   'hudChrome.reliquary.nearlyEmpty': 'Здесь собираются страницы, близкие к завершению.',
+  'hudChrome.reliquary.stripNoMatch': 'Здесь нет совпадений с запросом.',
   'hudChrome.reliquary.shelfRecent': 'Последняя находка: {name}',
   'hudChrome.reliquary.shelfNoFinds': 'На этой полке пока ничего не каталогизировано.',
   'hudChrome.reliquary.shelfOpenAria': 'Открыть полку {name}, заполнено {owned} из {total}',

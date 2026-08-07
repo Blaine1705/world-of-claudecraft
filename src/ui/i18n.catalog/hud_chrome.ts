@@ -4249,6 +4249,11 @@ export const hudChromeStrings = {
     recentJumpAria: 'Open the page for {name}',
     recentEmpty: 'No finds yet. Relics you catalogue from now on land here.',
     nearlyEmpty: 'Pages within reach of completion gather here.',
+    // A live needle that empties ONE strip while the other keeps matches: the
+    // whole-Overview searchEmpty line stays reserved for the nothing-anywhere
+    // case, so the emptied strip explains itself instead of sitting as a bare
+    // label over nothing.
+    stripNoMatch: 'Nothing here matches your search.',
     shelfRecent: 'Latest find: {name}',
     shelfNoFinds: 'Nothing catalogued on this shelf yet.',
     shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled',

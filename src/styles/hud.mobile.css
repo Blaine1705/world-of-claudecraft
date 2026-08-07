@@ -4241,11 +4241,14 @@
   body.mobile-touch #reliquary-window .reliquary-shelf-card {
     min-height: 48px;
   }
-  /* The recent chips are jump buttons now, so they take the window's own 48px
-     touch floor (the .reliquary-cell size, one step above the 40px the deeds
-     strip settled for) on EVERY touch device, not just short-landscape phones:
-     a landscape tablet is body.mobile-touch too. The strip wraps, and it sits
-     in the scrolling Overview, so a taller chip row cannot clip the rail. */
+  /* The recent chips take the window's own 48px touch floor (the
+     .reliquary-cell size, one step above the 40px the deeds strip settled
+     for) on EVERY touch device, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too. The bare class is deliberate: the
+     jump-button form needs the floor and the inert span form keeps the same
+     box so the wrapped strip stays visually even. The strip wraps, and it
+     sits in the scrolling Overview, so a taller chip row cannot clip the
+     rail. */
   body.mobile-touch #reliquary-window .reliquary-recent-item {
     min-width: 48px;
     min-height: 48px;

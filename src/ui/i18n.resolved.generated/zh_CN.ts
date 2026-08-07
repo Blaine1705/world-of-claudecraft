@@ -3305,6 +3305,7 @@ export const zh_CN: EnTranslations = {
       "recentJumpAria": "打开{name}所在的页面",
       "recentEmpty": "尚无发现。此后收录的圣物都会出现在这里。",
       "nearlyEmpty": "即将完成的页面会汇集于此。",
+      "stripNoMatch": "此处没有符合搜索条件的内容。",
       "shelfRecent": "最新发现：{name}",
       "shelfNoFinds": "此书架尚未收录任何圣物。",
       "shelfOpenAria": "打开{name}书架，已填入 {owned}/{total}",

@@ -60,6 +60,9 @@ import {
   type ReliquaryShelfCardModel,
   type ReliquaryViewInput,
   type ReliquaryViewModel,
+  reliquaryFillPct,
+  reliquaryFlashKey,
+  reliquaryFocusFallbackKey,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
@@ -245,13 +248,21 @@ export class ReliquaryWindow {
 
   /**
    * Arm the fill flash for the relics a drain just catalogued (one-shot).
+   * Keys are `kind:id` (the grid cell key), because slot ids are un-namespaced
+   * across kinds and a bare id would flash a same-named cell of another kind.
    * A later drain REPLACES an unpainted set rather than accumulating, and an
    * empty list clears it; the Hud call site only fires with a non-empty drain
    * (plan.refreshWindow requires logs), so the clear arm is deliberate reset
    * surface, not a reachable erasure of a pending moment.
+   *
+   * Deliberately the OPPOSITE stickiness of celebrateIllumination: the flash
+   * is consumed by whichever repaint comes next (its cells may not even be on
+   * the visible surface), while the celebration stays armed until the paint
+   * of ITS page; the pair differs because only the celebration has one true
+   * home surface to wait for.
    */
-  flashRelics(ids: readonly string[]): void {
-    this.pendingFlash = ids.length > 0 ? new Set(ids) : null;
+  flashRelics(keys: readonly string[]): void {
+    this.pendingFlash = keys.length > 0 ? new Set(keys) : null;
   }
 
   /** One-shot: true exactly once, on the first paint of the illuminated page. */
@@ -343,11 +354,14 @@ export class ReliquaryWindow {
       }
     } else if (hadFocus) {
       const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
-      const exact =
-        focusKey === null
-          ? null
-          : (keyed.find((node) => node.dataset.focusKey === focusKey) ?? null);
-      restoreFirstEnabled([exact, el.querySelector<HTMLElement>('[data-close]')]);
+      const byKey = (key: string | null): HTMLElement | null =>
+        key === null ? null : (keyed.find((node) => node.dataset.focusKey === key) ?? null);
+      const exact = byKey(focusKey);
+      // A card or page-jump control does not survive the rebuild it triggers;
+      // land on the control that names the destination (the shelf's rail
+      // button, the page's Back button) instead of falling through to Close.
+      const fallback = exact === null ? byKey(reliquaryFocusFallbackKey(focusKey)) : null;
+      restoreFirstEnabled([exact, fallback, el.querySelector<HTMLElement>('[data-close]')]);
       // A restored grid cell becomes the roving tab stop, so the one tab stop
       // follows the player's last cell instead of snapping back to the first.
       this.syncGridRoving(el, focusKey);
@@ -568,9 +582,10 @@ export class ReliquaryWindow {
     );
   }
 
-  /** Whole-percent fill for a pair, with the empty-page case pinned at zero. */
+  /** The pure core owns the percent (rounding, empty-pair zero); the painter
+   *  only threads it into barHtml. */
   private pctOf(owned: number, total: number): number {
-    return total > 0 ? Math.round((owned / total) * 100) : 0;
+    return reliquaryFillPct(owned, total);
   }
 
   private summaryHtml(model: ReliquaryViewModel): string {
@@ -578,7 +593,7 @@ export class ReliquaryWindow {
     const owned = this.fmt(p.owned);
     const total = this.fmt(p.total);
     const pctText = formatNumber(p.fraction, { style: 'percent', maximumFractionDigits: 0 });
-    const pct = Math.round(p.fraction * 100);
+    const pct = this.pctOf(p.owned, p.total);
     const rankLabel =
       p.curatorRank > 0
         ? t(curatorRankNameKey(p.curatorRank), { rank: this.fmt(p.curatorRank) })
@@ -651,21 +666,49 @@ export class ReliquaryWindow {
     // and the no-results line must agree about whether a needle is live, and
     // three separate asks are three chances to drift.
     const searching = this.searchActive();
+    // When BOTH strips sit empty under a live needle the whole-Overview
+    // searchEmpty line below renders (whether the needle emptied them or they
+    // never held anything); a strip the needle emptied announces its own
+    // stripNoMatch only while the other strip still shows matches, and a
+    // STRUCTURALLY empty strip keeps its "nothing yet" hint even while a
+    // needle is live (that hint stays true and must not flicker into a false
+    // "no match" as the player types). On a fresh character with a needle the
+    // paint is therefore both structural hints PLUS the shared line: four
+    // individually true statements, pinned as a composition.
+    const bothEmpty = model.recent.length === 0 && model.nearly.length === 0;
+    const searchEmptyShown = searching && bothEmpty;
+    const recentHint = this.stripHintKey(
+      model.recent.length === 0,
+      model.recentEmptiedBySearch,
+      searchEmptyShown,
+      'hudChrome.reliquary.recentEmpty',
+    );
+    const nearlyHint = this.stripHintKey(
+      model.nearly.length === 0,
+      model.nearlyEmptiedBySearch,
+      searchEmptyShown,
+      'hudChrome.reliquary.nearlyEmpty',
+    );
     let html = `<section class="reliquary-overview">`;
     // Why a page can be full while the catalog total is smaller than the slot
     // sum: a relic shown on two pages is ONE relic. Said once, quietly, where
-    // the two numbers sit side by side.
+    // the two numbers sit side by side. Unconditional: the shelf denominators
+    // disagree with the catalog total from the very first open (245 slots over
+    // 219 relics), so the player at 0 owned needs the explanation too.
     html += `<p class="reliquary-uniques-note">${esc(t('hudChrome.reliquary.sharedUniquesNote'))}</p>`;
-    html += this.recentStripHtml(model.recent, searching);
-    html += this.nearlyStripHtml(model.nearly, searching);
+    html += this.recentStripHtml(model.recent, recentHint);
+    html += this.nearlyStripHtml(model.nearly, nearlyHint);
     html += this.shelfCardsHtml(model.shelfCards);
-    if (searching && model.recent.length === 0 && model.nearly.length === 0) {
-      // A needle that matched nothing gets its own line, because the strips are
-      // empty for a reason the player can fix. The "nothing yet" case is
-      // answered per strip instead (recentEmpty / nearlyEmpty), where the
+    if (searching && bothEmpty) {
+      // Both strips empty under a live needle gets the one shared line, even
+      // when the strips were empty to begin with (the typed needle earns an
+      // acknowledgement either way); a needle that emptied a single strip is
+      // answered inside that strip (stripNoMatch), and the needle-less
+      // "nothing yet" case per strip (recentEmpty / nearlyEmpty), where the
       // hint sits next to the label it explains. Literal keys, never a
       // template-built key behind an `as TranslationKey`: the cast would let a
-      // catalog rename pass tsc and throw at runtime on the first missed search.
+      // catalog rename pass tsc and throw at runtime on the first missed
+      // search.
       html += `<p class="reliquary-empty">${esc(t('hudChrome.reliquary.searchEmpty'))}</p>`;
     }
     html += `</section>`;
@@ -675,19 +718,32 @@ export class ReliquaryWindow {
   /** The strip label ALWAYS renders: an Overview whose first section appears
    *  only after the first find reads as a broken window, and the hint is what
    *  tells a new player the shelf exists and how it fills. */
-  private stripHintHtml(show: boolean, key: TranslationKey): string {
-    if (!show) return '';
+  private stripHintHtml(key: TranslationKey | null): string {
+    if (key === null) return '';
     return `<span class="reliquary-strip-hint">${esc(t(key))}</span>`;
   }
 
-  private recentStripHtml(recent: readonly ReliquaryRecentFindModel[], searching: boolean): string {
+  /** Which hint an empty strip shows: the structural "nothing yet" line when
+   *  the strip would be empty with no needle too (true regardless of search),
+   *  its own no-match line when THE NEEDLE emptied it, and none when the
+   *  shared searchEmpty line already answers for both. */
+  private stripHintKey(
+    empty: boolean,
+    emptiedBySearch: boolean,
+    searchEmptyShown: boolean,
+    emptyKey: TranslationKey,
+  ): TranslationKey | null {
+    if (!empty) return null;
+    if (!emptiedBySearch) return emptyKey;
+    return searchEmptyShown ? null : 'hudChrome.reliquary.stripNoMatch';
+  }
+
+  private recentStripHtml(
+    recent: readonly ReliquaryRecentFindModel[],
+    hintKey: TranslationKey | null,
+  ): string {
     const chips = recent.map((r) => this.recentItemHtml(r)).join('');
-    // Only the genuinely empty ring gets the hint: under a live needle the
-    // strip is empty because nothing matched, which the searchEmpty line says.
-    const hint = this.stripHintHtml(
-      recent.length === 0 && !searching,
-      'hudChrome.reliquary.recentEmpty',
-    );
+    const hint = this.stripHintHtml(hintKey);
     return (
       `<div class="reliquary-recent">` +
       `<span class="reliquary-strip-label">${esc(t('hudChrome.reliquary.recentLabel'))}</span>` +
@@ -723,7 +779,10 @@ export class ReliquaryWindow {
     );
   }
 
-  private nearlyStripHtml(nearly: readonly ReliquaryNearlyPageModel[], searching: boolean): string {
+  private nearlyStripHtml(
+    nearly: readonly ReliquaryNearlyPageModel[],
+    hintKey: TranslationKey | null,
+  ): string {
     const rows = nearly
       .map((n) => {
         const progress = t('hudChrome.reliquary.progressText', {
@@ -756,10 +815,7 @@ export class ReliquaryWindow {
         );
       })
       .join('');
-    const hint = this.stripHintHtml(
-      nearly.length === 0 && !searching,
-      'hudChrome.reliquary.nearlyEmpty',
-    );
+    const hint = this.stripHintHtml(hintKey);
     return (
       `<div class="reliquary-nearly">` +
       `<span class="reliquary-strip-label">${esc(t('hudChrome.reliquary.nearlyLabel'))}</span>` +
@@ -899,7 +955,9 @@ export class ReliquaryWindow {
         ? `<p class="reliquary-empty">${esc(this.emptyGridText(page.filtered))}</p>`
         : `<span id="${GRID_HINT_ID}" class="visually-hidden">${esc(t('hudChrome.reliquary.gridKeyboardHint'))}</span>` +
           `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: pageName }))}">${page.cells
-            .map((c, i) => this.cellHtml(c, i, activeCell, flash.has(c.id)))
+            .map((c, i) =>
+              this.cellHtml(c, i, activeCell, flash.has(reliquaryFlashKey(c.kind, c.id))),
+            )
             .join('')}</div>`;
     return (
       // The celebration class is composed here and nowhere else: it rides one

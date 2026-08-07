@@ -608,7 +608,11 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { reliquaryPageName } from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
-import { buildReliquaryUnlockPlan, type ReliquaryUnlockEventModel } from './reliquary_view';
+import {
+  buildReliquaryUnlockPlan,
+  type ReliquaryUnlockEventModel,
+  reliquaryFlashKey,
+} from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
@@ -13410,7 +13414,7 @@ export class Hud {
       // instead of firing on a surface that has not caught up yet. Reduced
       // motion is handled in CSS for both, so a player who prefers less motion
       // still gets the static treatment rather than nothing.
-      this.reliquaryWindow.flashRelics(plan.logs.map((log) => log.id));
+      this.reliquaryWindow.flashRelics(plan.logs.map((log) => reliquaryFlashKey(log.kind, log.id)));
       if (plan.illuminatedPageId !== null) {
         this.reliquaryWindow.celebrateIllumination(plan.illuminatedPageId);
       }
