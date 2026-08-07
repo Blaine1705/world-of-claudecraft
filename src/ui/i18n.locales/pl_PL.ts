@@ -11170,4 +11170,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo',
   'itemUi.vendor.buyStack': 'Kup {count}',
   'itemUi.vendor.buyStackAria': 'Kup {count} {item} za {price}',
+  'hudChrome.options.waterRipples': 'Zmarszczki na wodzie (kilwater)',
+  'hudChrome.breath.label': 'Oddech',
+  'hudChrome.breath.drowning': 'Toniesz!',
 };

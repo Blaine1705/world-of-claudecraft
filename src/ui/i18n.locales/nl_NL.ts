@@ -11224,4 +11224,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts',
   'itemUi.vendor.buyStack': 'Koop {count}',
   'itemUi.vendor.buyStackAria': 'Koop {count} {item} voor {price}',
+  'hudChrome.options.waterRipples': 'Waterrimpels (kielzog)',
+  'hudChrome.breath.label': 'Adem',
+  'hudChrome.breath.drowning': 'Verdrinken!',
 };

@@ -775,6 +775,10 @@ export const vi_VN: EnTranslations = {
       "ready": "Vung Đòn",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Hơi thở",
+      "drowning": "Đang chết đuối!"
+    },
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
@@ -955,6 +959,7 @@ export const vi_VN: EnTranslations = {
       "valecup": "Cúp Thung Lũng",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Tra/Rút Vũ Khí",
+      "dive": "Swim Down",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
       "petStop": "Thú Cưng: Dừng",
@@ -1331,6 +1336,7 @@ export const vi_VN: EnTranslations = {
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
+      "waterRipples": "Gợn nước (sóng rẽ nước)",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",

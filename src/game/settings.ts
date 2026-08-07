@@ -354,6 +354,14 @@ export const BOOL_SETTINGS = {
   // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
   // and consumables); the slots stay in place and keybind-reachable either way.
   hideUnusedActionSlots: { def: false },
+  // OFF by default: the interactive water wake/ripple height-field
+  // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
+  // Purely decorative — bubbles, splash particles and the scrolling water
+  // normal maps are all independent of it — and measured-cheap (2 passes over
+  // a <=128x128 field), but it is the one water effect that runs extra GPU
+  // passes per frame, so the player who wants the quietest water gets it as
+  // an opt-in rather than an opt-out.
+  waterRipples: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

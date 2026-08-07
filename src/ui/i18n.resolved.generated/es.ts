@@ -775,6 +775,10 @@ export const es: EnTranslations = {
       "ready": "Golpe",
       "seconds": "{seconds} s"
     },
+    "breath": {
+      "label": "Aliento",
+      "drowning": "¡Ahogándose!"
+    },
     "rest": {
       "resting": "Descansando"
     },
@@ -955,6 +959,7 @@ export const es: EnTranslations = {
       "valecup": "Copa del Valle",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Envainar/Desenvainar arma",
+      "dive": "Swim Down",
       "categoryPet": "Mascota",
       "petAttack": "Mascota: atacar",
       "petStop": "Mascota: detenerse",
@@ -1331,6 +1336,7 @@ export const es: EnTranslations = {
       "lockActionBars": "Bloquear barras de acción",
       "showTargetOfTarget": "Mostrar el objetivo del objetivo",
       "showPetFrame": "Mostrar tu mascota",
+      "waterRipples": "Ondas en el agua (estelas)",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",

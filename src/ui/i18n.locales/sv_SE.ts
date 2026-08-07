@@ -11106,4 +11106,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
   'itemUi.vendor.buyStack': 'Köp {count}',
   'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
+  'hudChrome.options.waterRipples': 'Vattenkrusningar (kölvatten)',
+  'hudChrome.breath.label': 'Andning',
+  'hudChrome.breath.drowning': 'Drunknar!',
 };

@@ -11057,4 +11057,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải',
   'itemUi.vendor.buyStack': 'Mua {count}',
   'itemUi.vendor.buyStackAria': 'Mua {count} {item} với giá {price}',
+  'hudChrome.options.waterRipples': 'Gợn nước (sóng rẽ nước)',
+  'hudChrome.breath.label': 'Hơi thở',
+  'hudChrome.breath.drowning': 'Đang chết đuối!',
 };

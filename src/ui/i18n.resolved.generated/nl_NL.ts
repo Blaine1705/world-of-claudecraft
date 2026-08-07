@@ -775,6 +775,10 @@ export const nl_NL: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Adem",
+      "drowning": "Verdrinken!"
+    },
     "rest": {
       "resting": "Aan het rusten"
     },
@@ -955,6 +959,7 @@ export const nl_NL: EnTranslations = {
       "valecup": "Dalbeker",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Wapen Schede In/Uit",
+      "dive": "Swim Down",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
       "petStop": "Huisdier: Stoppen",
@@ -1331,6 +1336,7 @@ export const nl_NL: EnTranslations = {
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showPetFrame": "Je huisdier tonen",
+      "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",

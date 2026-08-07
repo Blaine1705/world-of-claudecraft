@@ -775,6 +775,10 @@ export const id_ID: EnTranslations = {
       "ready": "Ayun",
       "seconds": "{seconds}d"
     },
+    "breath": {
+      "label": "Napas",
+      "drowning": "Tenggelam!"
+    },
     "rest": {
       "resting": "Beristirahat"
     },
@@ -955,6 +959,7 @@ export const id_ID: EnTranslations = {
       "valecup": "Piala Lembah",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Sarungkan/Cabut Senjata",
+      "dive": "Swim Down",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
       "petStop": "Peliharaan: Berhenti",
@@ -1331,6 +1336,7 @@ export const id_ID: EnTranslations = {
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showPetFrame": "Tampilkan Peliharaan Anda",
+      "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",

@@ -11228,4 +11228,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Atur ulang tab {channel}: seret, atau gunakan Alt+Kiri dan Alt+Kanan',
   'itemUi.vendor.buyStack': 'Beli {count}',
   'itemUi.vendor.buyStackAria': 'Beli {count} {item} seharga {price}',
+  'hudChrome.options.waterRipples': 'Riak Air (Ombak Jejak)',
+  'hudChrome.breath.label': 'Napas',
+  'hudChrome.breath.drowning': 'Tenggelam!',
 };

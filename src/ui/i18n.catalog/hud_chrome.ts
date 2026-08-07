@@ -367,6 +367,11 @@ export const hudChromeStrings = {
     ready: 'Swing',
     seconds: '{seconds}s',
   },
+  // WoW-style underwater breath mirror bar (src/ui/breath_bar.ts).
+  breath: {
+    label: 'Breath',
+    drowning: 'Drowning!',
+  },
   rest: {
     resting: 'Resting',
   },
@@ -741,6 +746,8 @@ export const hudChromeStrings = {
     valecup: 'Vale Cup',
     bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    // Swimming: Jump swims up, this swims down.
+    dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -1324,6 +1331,11 @@ export const hudChromeStrings = {
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
     // for the M16 guard.
     showPetFrame: 'Show Your Pet',
+    // Graphics-panel opt-in (default off) for the interactive wake/ripple
+    // simulation on water surfaces; bubbles and splash particles do not key
+    // off it. It sits in the Display card beside Weather because it costs
+    // GPU passes, not because it is a comfort toggle.
+    waterRipples: 'Water Ripples (Wakes)',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.

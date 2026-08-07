@@ -64,6 +64,8 @@ const NO_INPUT: MoveInput = {
   turnLeft: false,
   turnRight: false,
   jump: false,
+  dive: false,
+  surface: false,
 };
 
 let walkerBody: Entity | null = null;

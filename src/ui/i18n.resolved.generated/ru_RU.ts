@@ -775,6 +775,10 @@ export const ru_RU: EnTranslations = {
       "ready": "Замах",
       "seconds": "{seconds} сек."
     },
+    "breath": {
+      "label": "Дыхание",
+      "drowning": "Вы тонете!"
+    },
     "rest": {
       "resting": "Отдых"
     },
@@ -955,6 +959,7 @@ export const ru_RU: EnTranslations = {
       "valecup": "Кубок Долины",
       "bgFlag": "Действие с флагом",
       "sheathe": "Убрать/обнажить оружие",
+      "dive": "Swim Down",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
       "petStop": "Питомец: стоп",
@@ -1331,6 +1336,7 @@ export const ru_RU: EnTranslations = {
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
       "showPetFrame": "Показывать вашего питомца",
+      "waterRipples": "Рябь на воде (кильватер)",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",

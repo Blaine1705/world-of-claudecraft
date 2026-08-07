@@ -775,6 +775,10 @@ export const tr_TR: EnTranslations = {
       "ready": "Vuruş",
       "seconds": "{seconds}sn"
     },
+    "breath": {
+      "label": "Nefes",
+      "drowning": "Boğuluyorsun!"
+    },
     "rest": {
       "resting": "Dinleniyor"
     },
@@ -955,6 +959,7 @@ export const tr_TR: EnTranslations = {
       "valecup": "Vadi Kupası",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
+      "dive": "Swim Down",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
       "petStop": "Yoldaş: Dur",
@@ -1331,6 +1336,7 @@ export const tr_TR: EnTranslations = {
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showPetFrame": "Yoldaşını Göster",
+      "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",

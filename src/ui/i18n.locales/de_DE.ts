@@ -11322,4 +11322,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts',
   'itemUi.vendor.buyStack': '{count} kaufen',
   'itemUi.vendor.buyStackAria': '{count} {item} für {price} kaufen',
+  'hudChrome.options.waterRipples': 'Wasserwellen (Kielwasser)',
+  'hudChrome.breath.label': 'Atem',
+  'hudChrome.breath.drowning': 'Ertrinken!',
 };

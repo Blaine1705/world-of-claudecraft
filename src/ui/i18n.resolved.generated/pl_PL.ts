@@ -775,6 +775,10 @@ export const pl_PL: EnTranslations = {
       "ready": "Zamach",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Oddech",
+      "drowning": "Toniesz!"
+    },
     "rest": {
       "resting": "Odpoczynek"
     },
@@ -955,6 +959,7 @@ export const pl_PL: EnTranslations = {
       "valecup": "Puchar Doliny",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Schowaj/Wyciągnij Broń",
+      "dive": "Swim Down",
       "categoryPet": "Zwierzę",
       "petAttack": "Zwierzę: Atak",
       "petStop": "Zwierzę: Zatrzymaj",
@@ -1331,6 +1336,7 @@ export const pl_PL: EnTranslations = {
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
       "showPetFrame": "Pokaż swoje zwierzę",
+      "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",

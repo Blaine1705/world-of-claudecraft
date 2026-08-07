@@ -11465,4 +11465,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': 'Распыление, наложение чар и разбор: применение {seconds} с',
   'guide.profPages.econ.castPaceRecharge': 'Перезарядка эффекта инструмента: применение {seconds} с',
   'guide.profPages.econ.castPaceBatch': 'Партия: до {count} за один заказ, каждое изделие со своим применением',
+  'hudChrome.options.waterRipples': 'Рябь на воде (кильватер)',
+  'hudChrome.breath.label': 'Дыхание',
+  'hudChrome.breath.drowning': 'Вы тонете!',
 };

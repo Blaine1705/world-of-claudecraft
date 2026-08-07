@@ -775,6 +775,10 @@ export const sv_SE: EnTranslations = {
       "ready": "Sving",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Andning",
+      "drowning": "Drunknar!"
+    },
     "rest": {
       "resting": "Vilar"
     },
@@ -955,6 +959,7 @@ export const sv_SE: EnTranslations = {
       "valecup": "Dalcupen",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Slida/Ta fram vapen",
+      "dive": "Swim Down",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
       "petStop": "Djur: Stanna",
@@ -1331,6 +1336,7 @@ export const sv_SE: EnTranslations = {
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
       "showPetFrame": "Visa ditt djur",
+      "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",

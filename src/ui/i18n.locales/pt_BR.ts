@@ -11236,4 +11236,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Reordenar a aba {channel}: arraste-a, ou use Alt+Esquerda e Alt+Direita',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'hudChrome.options.waterRipples': 'Ondulações na água (esteiras)',
+  'hudChrome.breath.label': 'Fôlego',
+  'hudChrome.breath.drowning': 'Afogando!',
 };
