@@ -650,10 +650,16 @@ export class PostOffice {
       this.result(meta.entityId, 'takeParcelsFirst');
       return;
     }
+    // Guarded index: `m` comes from deliveredFor over this same book, so -1
+    // is unreachable today; the guard exists because splice(-1, 1) would
+    // silently delete the LAST letter in the realm book, someone else's
+    // attachments included, if the index and the book ever drifted.
+    const idx = this.mail.indexOf(m);
+    if (idx < 0) return;
     // A delivered-and-unread letter deleted before it is read leaves the
     // unread count too (untrack re-derives every contribution).
     this.index.untrack(m, this.ctx.time);
-    this.mail.splice(this.mail.indexOf(m), 1);
+    this.mail.splice(idx, 1);
     this.bumpRev();
   }
 

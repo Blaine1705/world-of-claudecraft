@@ -125,6 +125,34 @@ describe('corder wire cadence + rebuild-only-on-change', () => {
     expect((snaps[0] as any).self.corder[0].mine).toBe(true);
   });
 
+  it('a linkdead resume re-ships the projection through the lastSent wipe, unchanged board included', () => {
+    // Pins the dependency documented at resumeSession's lastSent reset: the
+    // gate trackers (lastCorderBoardRev and friends) are deliberately NOT
+    // reset on resume; the lastSent wipe alone must force the rebuild.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 85, 'Comeback');
+    const spy = vi.spyOn(server.sim, 'commissionOrdersFor');
+    broadcast(server);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // Transport drop into linkdead grace, then a same-character re-join.
+    fc.ws.readyState = 3;
+    server.socketClosed(session, fc.ws);
+    const fc2 = fakeWs();
+    const resumed = server.join(fc2.ws, 85, 85, 'Comeback', 'warrior', null);
+    if ('error' in resumed) throw new Error(resumed.error);
+    expect(resumed).toBe(session);
+
+    // The board never changed and lastCorderBoardRev still matches, yet the
+    // fresh socket must receive the projection again: sent.corder was wiped.
+    const sent = fc2.sent.length;
+    broadcast(server);
+    expect(spy).toHaveBeenCalledTimes(2);
+    const snaps = corderSnaps(fc2.sent, sent);
+    expect(snaps).toHaveLength(1);
+  });
+
   it('every board verb advances the revision the gate polls; idle ticks do not', () => {
     const server = new GameServer();
     const fcA = fakeWs();
@@ -186,12 +214,27 @@ describe('corder wire cadence + rebuild-only-on-change', () => {
     );
     expect(rev()).toBeGreaterThan(before);
 
-    // retention sweep: force the cancelled order past its retain window
+    // retention sweep, prune arm: force the cancelled order past its retain
+    // window
     // biome-ignore lint/suspicious/noExplicitAny: reaching sim internals is the harness idiom
     (second as any).settledAt = -100_000;
     before = rev();
     for (let i = 0; i < 2; i++) server.sim.tick();
     expect(rev()).toBeGreaterThan(before);
     expect(server.sim.commissionOrderBoard.some((o) => o.id === second.id)).toBe(false);
+
+    // retention sweep, expire arm: an open order forced past
+    // ORDER_OPEN_EXPIRE_SECONDS flips to 'expired' and bumps too
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+    const third = server.sim.commissionOrderBoard.find(
+      (o) => o.requesterId === requester.pid && o.status === 'open',
+    );
+    if (!third) throw new Error('missing third order');
+    // biome-ignore lint/suspicious/noExplicitAny: reaching sim internals is the harness idiom
+    (third as any).openedAt = -100_000;
+    before = rev();
+    for (let i = 0; i < 2; i++) server.sim.tick();
+    expect(server.sim.commissionOrderBoard.find((o) => o.id === third.id)?.status).toBe('expired');
+    expect(rev()).toBeGreaterThan(before);
   });
 });

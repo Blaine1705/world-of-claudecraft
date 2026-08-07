@@ -620,6 +620,11 @@ const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
 // the plain 5x cadence win. If that rate ever materializes, the next lever is
 // the bg readout's sharedMatchView memo shape: build the viewer-identical
 // open-scope subset once per board revision and splice the per-viewer rows.
+// The mail gate below shares the realm-global-revision half of this residual
+// (any letter booked anywhere rebuilds every at-pillar viewer's inbox at up
+// to 4 Hz); cheap now that mailInfoFor is bucket-based, and the
+// per-recipient buckets make a per-recipient revision the natural follow-up.
+
 // Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
 // view is a full projection of the viewer's delivered letters (bodies
 // included) that used to re-serialize at 20 Hz for anyone standing at a raven
@@ -3841,13 +3846,15 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    // Load-bearing for every rev + cadence gate (market/corder today): wiping
-    // lastSent makes sent.market/sent.corder undefined, and each gate's
-    // `sent.X === undefined` arm forces both dueness and a rebuild on the
-    // next snapshot, so the stale lastXRev trackers need no reset here. A
-    // future resume that PRESERVES lastSent (a reconnect-bandwidth
-    // optimization) must reset those trackers instead, or the gates serve a
-    // stale view until their staleness backstops.
+    // Load-bearing for every rev + cadence gate (market, mail, corder):
+    // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
+    // each gate's `sent.X === undefined` arm forces both dueness and a
+    // rebuild on the next snapshot, so the stale lastXRev trackers need no
+    // reset here (pinned by the resume case in
+    // tests/commission_wire_cadence.test.ts). A future resume that PRESERVES
+    // lastSent (a reconnect-bandwidth optimization) must reset those
+    // trackers instead, or the gates serve a stale view until their
+    // staleness backstops.
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
@@ -5466,9 +5473,6 @@ export class GameServer {
     this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
   }
 
-  // Resolve (and memoize) the registered profiler bucket for a mob template. A
-  // templateId whose family does not resolve falls into 'other'; every result is a
-  // name registered via MOB_UPDATE_BUCKETS, so TickProfiler.add never drops it.
   // Flush the per-pass selfWireJson bucket accumulators into the profiler,
   // beside the bcastSelf total they decompose. A method (not inline in the
   // loop callback) so the flush path itself is testable: deleting it must
@@ -5481,6 +5485,9 @@ export class GameServer {
     }
   }
 
+  // Resolve (and memoize) the registered profiler bucket for a mob template. A
+  // templateId whose family does not resolve falls into 'other'; every result is a
+  // name registered via MOB_UPDATE_BUCKETS, so TickProfiler.add never drops it.
   private mobUpdateBucketName(templateId: string): string {
     let name = this.mobUpdateBucketNames.get(templateId);
     if (name === undefined) {
