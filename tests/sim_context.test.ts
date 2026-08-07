@@ -345,6 +345,7 @@ function makeFakeHost() {
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
+    bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),
     markDeedsDirty: vi.fn(),

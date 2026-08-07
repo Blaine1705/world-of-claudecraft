@@ -217,6 +217,7 @@ export const ja_JP: AdminTranslations = {
   "tickPerf.overBudget": "50msの予算を超過",
   "tickPerf.loopHeading": "ループフェーズ",
   "tickPerf.simHeading": "sim.tick() の内部フェーズ",
+  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "フェーズ",
   "tickPerf.colMean": "平均",
   "tickPerf.colP95": "p95",
