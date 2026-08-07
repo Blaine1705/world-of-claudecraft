@@ -60,6 +60,7 @@ import {
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
+import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
@@ -223,7 +224,7 @@ import {
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
-import { setDayNightPhaseOverride } from './render/day_night_clock';
+import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -251,6 +252,7 @@ import {
   ITEMS,
   isDelvePos,
   isRiftPos,
+  MOBS,
   QUESTS,
   questRewardItem,
   setActiveWorldContent,
@@ -397,8 +399,7 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
-import { formatXp } from './ui/xp_bar';
-import type { IWorld, LeaderboardEntry } from './world_api';
+import type { IWorld } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -1097,6 +1098,10 @@ async function startGame(
   // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
   // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
+  // "Stop Auto-Attack on Target Switch" (issue #1358) is authoritative on the
+  // sim, so a stored player preference must be re-pushed on every world entry
+  // (offline sim or online server), not just when the Options toggle changes.
+  world.setStopAutoAttackOnTargetSwitch(settings.get('stopAutoAttackOnTargetSwitch'));
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
@@ -1429,8 +1434,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
-  if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
   // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
@@ -1553,9 +1556,18 @@ async function startGame(
   });
   // Dev-only chat command to scrub the world day/night cycle for testing:
   //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  //   /daynight moon new|crescent|half|full|<0..1>|auto   (the lunar phase)
   // Render-only: it just overrides the shared clock phase (day_night_clock), so
   // the sky lighting and the minimap dial both jump to the chosen time of day.
   // Returns true when it handled the input (so it is not also sent to chat).
+  const MOON_PRESETS: Record<string, number> = {
+    new: 0,
+    crescent: 0.125,
+    half: 0.25,
+    quarter: 0.25,
+    gibbous: 0.375,
+    full: 0.5,
+  };
   const DAY_NIGHT_PRESETS: Record<string, number> = {
     midnight: 0,
     night: 0,
@@ -1580,6 +1592,31 @@ async function startGame(
     const arg = m[1].trim().toLowerCase();
     if (!arg) {
       hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    const moonArg = arg.match(/^moon\s*(.*)$/);
+    if (moonArg) {
+      const moonWord = moonArg[1].trim();
+      if (!moonWord || ['auto', 'off', 'real', 'resume', 'clear'].includes(moonWord)) {
+        setLunarPhaseOverride(null);
+        hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
+        return true;
+      }
+      let moonPhase: number | null = moonWord in MOON_PRESETS ? MOON_PRESETS[moonWord] : null;
+      if (moonPhase === null) {
+        const n = Number.parseFloat(moonWord);
+        if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
+      }
+      if (moonPhase === null) {
+        hud.log(
+          `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
+          '#ffcf6a',
+        );
+        return true;
+      }
+      setLunarPhaseOverride(moonPhase);
+      hud.log(`[dev] moon set to ${moonWord} (lunar phase ${moonPhase.toFixed(2)})`, '#8fd0ff');
       return true;
     }
     if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
@@ -1658,13 +1695,18 @@ async function startGame(
   chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   // One keyboard/gamepad action gate for every blocking client surface. The
-  // camera prompt lives outside Hud, so it reports its open state explicitly.
+  // camera prompt lives outside Hud, so it reports its open state explicitly, and
+  // chat reports both its presence and its focus (only the latter blocks; see
+  // gameplay_input_gate.ts).
   const gameplayInputBlocked = () =>
-    graphicsRebuildPaused ||
-    hud.isModalOpen() ||
-    hud.promptModalOpen() ||
-    cameraPromptOpen() ||
-    chatInput.style.display === 'block';
+    isGameplayInputBlocked({
+      graphicsRebuildPaused,
+      modalOpen: hud.isModalOpen(),
+      promptModalOpen: hud.promptModalOpen(),
+      cameraPromptOpen: cameraPromptOpen(),
+      chatComposerVisible: chatInput.style.display === 'block',
+      chatComposerFocused: document.activeElement === chatInput,
+    });
 
   const input = new Input(
     canvas,
@@ -1679,6 +1721,10 @@ async function startGame(
         else if (action === 'stop') world.setPetMode('passive');
         else world.setPetMode(action); // 'defensive' | 'aggressive'
       },
+      // Ctrl+6 by default: select your own pet, the keyboard route to what clicking
+      // the pet frame does (one implementation, on the Hud, which owns the roster
+      // scan that resolves the pet).
+      onTargetPet: () => hud.targetOwnPet(),
       // slot 0 (key 1) is Attack for every class, auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
       onAbility: (slot) => hud.castSlot(slot),
@@ -1732,6 +1778,9 @@ async function startGame(
             break;
           case 'valecup':
             hud.toggleValeCup();
+            break;
+          case 'bgFlag':
+            bgFlagKey();
             break;
           case 'mount':
             // Ride the pick immediately (every player always has one; the
@@ -2009,6 +2058,9 @@ async function startGame(
       case 'valecup':
         hud.toggleValeCup();
         break;
+      case 'bgFlag':
+        bgFlagKey();
+        break;
       case 'mount':
         world.toggleMounted();
         break;
@@ -2050,6 +2102,9 @@ async function startGame(
         break;
       case 'petAggressive':
         world.setPetMode('aggressive');
+        break;
+      case 'targetPet':
+        hud.targetOwnPet();
         break;
       case 'dungeonFinder':
         hud.toggleDungeonFinder();
@@ -2206,6 +2261,13 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'stopAutoAttackOnTargetSwitch') {
+      // Authoritative on the sim (issue #1358): persist locally AND mirror the
+      // live value onto the player, so the very next target switch honors it.
+      const v = settings.set('stopAutoAttackOnTargetSwitch', !!value);
+      world.setStopAutoAttackOnTargetSwitch(v);
+      return;
+    }
     if (key === 'showAttackButton') {
       // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
       // classic Attack toggle; OFF turns the first slot into a normal assignable one
@@ -2263,6 +2325,15 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
+    if (key === 'hideUnusedActionSlots') {
+      // Purely presentational (issue 2429): a body class the action-bar CSS reads
+      // to strip the empty-slot chrome. No live subsystem to update.
+      document.body.classList.toggle(
+        'hide-unused-action-slots',
+        settings.set('hideUnusedActionSlots', !!value),
+      );
+      return;
+    }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
       const visibility = resolveActionBarVisibility(
         {
@@ -2280,6 +2351,10 @@ async function startGame(
     }
     if (key === 'showTargetOfTarget') {
       hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
+      return;
+    }
+    if (key === 'showPetFrame') {
+      hud.setShowPetFrame(settings.set('showPetFrame', !!value));
       return;
     }
     if (key === 'showDailyRewardsChest') {
@@ -2611,6 +2686,10 @@ async function startGame(
       ),
     prewarmRenderer: async (next) => {
       await next.prewarmInitialScene();
+      // Same law as the boot gate: the rebuilt renderer's far grid built
+      // eagerly behind this opaque curtain; hold (bounded) so the commit
+      // reveals a finished horizon instead of easing the fog out on screen.
+      await next.farVistaReady();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);
@@ -2786,6 +2865,15 @@ async function startGame(
     online.onReconnected = () => {
       priorOnReconnected?.();
       hud.marketResyncAfterReconnect();
+      // A fresh join (as opposed to a resume within the linkdead grace window)
+      // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
+      // undefined, so the stored preference needs a re-push, the same way it is
+      // pushed once on world entry above. onReconnected fires before ClientWorld
+      // marks itself connected again, so any send from here would be silently
+      // dropped; ClientWorld owns the re-push itself (it remembers the last
+      // value passed to setStopAutoAttackOnTargetSwitch and replays it right
+      // after connected flips true, and again after spectate ends), so nothing
+      // needs to happen on this side.
     };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
     // even in a production client build, where import.meta.env.DEV is false. That
@@ -3058,6 +3146,14 @@ async function startGame(
       }
     }
   }
+  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
+  // key also routes here (the field has no other interactables), which gives
+  // the mobile interact button flag parity for free; the world owns every rule
+  // (radius, team, the return-beats-press race), so a stray press is a no-op.
+  function bgFlagKey(): void {
+    if (world.bgInfo?.match) world.bgFlagAction();
+  }
+
   // The R40 per-use effect confirm gate, shared by every gather entry point
   // (world click, interact key, gathering-tool use): the pure question from
   // the view core, the ask through the HUD's confirm-dialog family. The
@@ -3068,6 +3164,10 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(): void {
+    if (world.bgInfo?.match?.state === 'active') {
+      world.bgFlagAction();
+      return;
+    }
     stopAutorunForInteraction(
       tryNearbyInteraction(
         world,
@@ -3319,7 +3419,8 @@ async function startGame(
         }
       }
       if (best !== null) {
-        const e = world.entities.get(best)!;
+        const e = world.entities.get(best);
+        if (!e) return;
         world.targetEntity(best);
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(
@@ -4118,7 +4219,8 @@ async function startGame(
     }
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
-    const net = online!;
+    const net = online;
+    if (!net) return;
     spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
@@ -4558,6 +4660,17 @@ async function startGame(
       console.warn('Armory preview prewarm failed', err);
     }
   }
+  // The far vista has been building eagerly since the renderer was
+  // constructed, overlapping every asset wait above. Hold the curtain
+  // (bounded) until the grid can stand in for the fog, so the first visible
+  // frame carries the finished horizon; without this gate a loaded
+  // production boot starves the build and the fog lifts tens of seconds
+  // into play. On timeout the classic eased flip covers it, as before.
+  const farVistaReady = await renderer.farVistaReady();
+  entryDiagnostics.checkpoint('far-vista-ready', {
+    ...renderEntryDiagnostics(),
+    farVistaReady,
+  });
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();
@@ -4598,7 +4711,12 @@ async function startGame(
           applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
           isBlocked: () => intro !== null,
         });
-        (window as any).__game = {
+        (
+          window as Window &
+            typeof globalThis & {
+              __game?: Record<string, unknown>;
+            }
+        ).__game = {
           sim: world,
           world,
           renderer,
@@ -4609,6 +4727,11 @@ async function startGame(
           perf,
           gamepad,
           music,
+          // The live content table, for E2E rigs that stage a template state
+          // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs
+          // retags a template all-unmapped, the tests' withUnmappedTemplate
+          // idiom). Debug surface only; never written by game code.
+          MOBS,
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
@@ -5057,12 +5180,14 @@ function show(el: string): void {
   // Reset currently rendered classes to force re-render/animation when opening a panel
   for (const key of ['offline-class-details', 'charcreate-class-details']) {
     currentlyRenderedClass[key] = null;
-    if (revertTimeouts[key] !== null && revertTimeouts[key] !== undefined) {
-      window.clearTimeout(revertTimeouts[key]!);
+    const revertTimeout = revertTimeouts[key];
+    if (revertTimeout !== null && revertTimeout !== undefined) {
+      window.clearTimeout(revertTimeout);
       revertTimeouts[key] = null;
     }
-    if (hoverTimeouts[key] !== null && hoverTimeouts[key] !== undefined) {
-      window.clearTimeout(hoverTimeouts[key]!);
+    const hoverTimeout = hoverTimeouts[key];
+    if (hoverTimeout !== null && hoverTimeout !== undefined) {
+      window.clearTimeout(hoverTimeout);
       hoverTimeouts[key] = null;
     }
   }
@@ -6174,7 +6299,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = t('auth.enterWorld');
     }
   }
-  const world = new ClientWorld(api.token!, c.id, c.class, api.base, getClientSeed());
+  if (!api.token) throw new Error('online world entry requires an auth token');
+  const world = new ClientWorld(api.token, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
   // the referral provider feeds the card footer. Both are cleared on disconnect.
@@ -7822,7 +7948,7 @@ async function refreshGithubLinkStatus(): Promise<void> {
   } catch (err) {
     console.error('[github] could not load status', err);
   }
-  if (!status || status.enabled !== true) {
+  if (status?.enabled !== true) {
     group.hidden = true;
     return;
   }

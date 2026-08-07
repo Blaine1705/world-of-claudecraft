@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'De Hemel Valt Stil',
     desc: 'Versla Cindraleth de Muilmatriarch in haar kraternest boven de Drakenmuil.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Oogst op de terrassen',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Eerste ijs op het tarn',
+    desc: 'Vang een vis in de wateren van Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'De oogst van Amberfall',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Een vangst uit het grote moeras',
+    desc: 'Vang een vis in de wateren van Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'De dromende oogst',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Een rimpel op de maanbron',
+    desc: 'Vang een vis in de wateren van Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Oogst onder het bladerdak',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Een worp in de spiegelbaai',
+    desc: 'Vang een vis in de wateren van Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Oogst op het palmenstrand',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Werpen in de saffierlagune',
+    desc: 'Vang een vis in de wateren van Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'De overvloed van het parterre',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Een worp op de bloemblaadjesvijver',
+    desc: 'Vang een vis in de wateren van Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Eigen Spelregels',
     desc: 'Win een Kaartduel bij de Kaartmeester.',
@@ -876,5 +924,33 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: 'Wat de Meeuwen Weten',
     desc: 'Vang een vis in de wateren van de Verrekust.',
+  },
+  prog_engineering_rare: {
+    name: 'Precisie-ingenieurswerk',
+    desc: 'Vervaardig je eerste zeldzame stuk in Knutselwerk.',
+  },
+  prog_alchemy_rare: {
+    name: 'Een zeldzame jaargang',
+    desc: 'Vervaardig je eerste zeldzame stuk in Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Een onvergetelijk gerecht',
+    desc: 'Vervaardig je eerste zeldzame stuk in Koken.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fijn looien',
+    desc: 'Vervaardig je eerste zeldzame stuk in Leerbewerken.',
+  },
+  prog_tailoring_rare: {
+    name: 'Een meesterlijke steek',
+    desc: 'Vervaardig je eerste zeldzame stuk in Kleermaken.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Gehard tot glans',
+    desc: 'Vervaardig je eerste zeldzame stuk in Wapensmeden.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Geplaat tot perfectie',
+    desc: 'Vervaardig je eerste zeldzame stuk in Harnasmaken.',
   },
 };
