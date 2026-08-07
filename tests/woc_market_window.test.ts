@@ -1102,3 +1102,41 @@ describe('woc_market_window: bidding pays its own bond', () => {
     expect(buy).not.toContain('this.signPendingQuote()');
   });
 });
+
+describe('woc_market_window: the Sell form offers only what the format permits', () => {
+  // What shipped: every field rendered regardless of the chosen format, so an
+  // auction showed a Buy Now price box and a buy-now showed a Reserve box. The
+  // server refuses both combinations (bad_buy_now / bad_reserve), so a seller
+  // could fill one in and only learn it was impossible after pressing Submit.
+  // Worse for the auction case: the listing they wanted simply did not have the
+  // buy-now they thought they had set.
+  it('gates the reserve and buy-now fields on the selected format', () => {
+    const form = between('const form = selected', 'private activityHtml(');
+    expect(form, 'the two fields must be on opposite arms').toContain(
+      "this.sellFormat === 'auction'",
+    );
+    const auctionArm = form.slice(
+      form.indexOf("this.sellFormat === 'auction'"),
+      form.indexOf('sellDuration'),
+    );
+    const [ifTrue, ifFalse] = auctionArm.split(': `<label>');
+    expect(ifTrue, 'an auction gets the reserve').toContain('sell-reserve');
+    expect(ifTrue, 'and never a buy-now price').not.toContain('sell-buy-now');
+    expect(ifFalse, 'a buy-now gets its price').toContain('sell-buy-now');
+    expect(ifFalse, 'and never a reserve').not.toContain('sell-reserve');
+  });
+
+  it('re-renders when the format changes, or the gate never moves', () => {
+    const handler = between("if (field === 'sell-format')", "if (field === 'sell-duration')");
+    expect(handler).toContain('this.sellFormat = value');
+    expect(handler).toContain('this.render()');
+  });
+
+  it('reads an absent field as null, which is what the other format requires', () => {
+    // The whole gate rests on this: a hidden buy-now box must submit null, not
+    // zero or NaN, or an auction would carry the very field it forbids.
+    const read = between('private numberFieldCents(', '/** Typing in the combobox');
+    expect(read).toContain('if (!el || el.value.trim()');
+    expect(read).toContain('return null');
+  });
+});

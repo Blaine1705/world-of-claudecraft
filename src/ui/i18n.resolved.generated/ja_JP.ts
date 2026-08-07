@@ -3929,6 +3929,7 @@ export const ja_JP: EnTranslations = {
       "sellStart": "開始価格（USD）",
       "sellReserve": "最低落札価格（USD、任意）",
       "sellReserveNote": "入札者には金額は非表示で、到達したかどうかだけが表示されます。",
+      "sellBuyNowNote": "必須です。即決出品はこの価格で売却され、入札はありません。",
       "sellBuyNowPrice": "即決価格（USD）",
       "sellDuration": "期間",
       "sellDurationHours": "{hours} 時間",

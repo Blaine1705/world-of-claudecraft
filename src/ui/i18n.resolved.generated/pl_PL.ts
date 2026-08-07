@@ -3929,6 +3929,7 @@ export const pl_PL: EnTranslations = {
       "sellStart": "Starting bid (USD)",
       "sellReserve": "Reserve (USD, optional)",
       "sellReserveNote": "Hidden from bidders; only met or not met is shown.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
       "sellBuyNowPrice": "Buy-now price (USD)",
       "sellDuration": "Duration",
       "sellDurationHours": "{hours} hours",

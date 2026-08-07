@@ -8679,6 +8679,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': '경매 + 즉시 구매',
   'hudChrome.wocMarket.sellStart': '시작가 (USD)',
   'hudChrome.wocMarket.sellReserve': '최저가 (USD, 선택)',
+  'hudChrome.wocMarket.sellBuyNowNote':
+    '필수입니다. 즉시 구매 등록은 입찰 없이 이 가격에 판매됩니다.',
   'hudChrome.wocMarket.sellReserveNote': '입찰자에게는 금액이 숨겨지며 도달 여부만 표시됩니다.',
   'hudChrome.wocMarket.sellBuyNowPrice': '즉시 구매가 (USD)',
   'hudChrome.wocMarket.sellDuration': '기간',

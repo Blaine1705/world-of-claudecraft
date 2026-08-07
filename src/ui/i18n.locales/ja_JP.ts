@@ -8712,6 +8712,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'オークション + 即決価格',
   'hudChrome.wocMarket.sellStart': '開始価格（USD）',
   'hudChrome.wocMarket.sellReserve': '最低落札価格（USD、任意）',
+  'hudChrome.wocMarket.sellBuyNowNote':
+    '必須です。即決出品はこの価格で売却され、入札はありません。',
   'hudChrome.wocMarket.sellReserveNote':
     '入札者には金額は非表示で、到達したかどうかだけが表示されます。',
   'hudChrome.wocMarket.sellBuyNowPrice': '即決価格（USD）',

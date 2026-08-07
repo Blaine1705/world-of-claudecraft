@@ -3929,6 +3929,7 @@ export const en_XA: EnTranslations = {
       "sellStart": "[Šţáŕţíñĝ ƀíð (ÚŠÐ)]",
       "sellReserve": "[Ŕéšéŕʋé (ÚŠÐ, óþţíóñáļ)]",
       "sellReserveNote": "[Ĥíððéñ ƒŕóɱ ƀíððéŕš; óñļý ɱéţ óŕ ñóţ ɱéţ íš šĥóŵñ.]",
+      "sellBuyNowNote": "[Ŕéɋúíŕéð. Á ƀúý-ñóŵ ļíšţíñĝ šéļļš áţ ţĥíš þŕíçé ŵíţĥ ñó ƀíððíñĝ.]",
       "sellBuyNowPrice": "[Ɓúý-ñóŵ þŕíçé (ÚŠÐ)]",
       "sellDuration": "[Ðúŕáţíóñ]",
       "sellDurationHours": "[{hours} ĥóúŕš]",

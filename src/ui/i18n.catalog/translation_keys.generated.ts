@@ -10081,6 +10081,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.reserveMet'
   | 'hudChrome.wocMarket.reserveNotMet'
   | 'hudChrome.wocMarket.sellBuyNowAboveStart'
+  | 'hudChrome.wocMarket.sellBuyNowNote'
   | 'hudChrome.wocMarket.sellBuyNowPrice'
   | 'hudChrome.wocMarket.sellChoose'
   | 'hudChrome.wocMarket.sellClear'

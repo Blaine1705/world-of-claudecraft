@@ -944,9 +944,17 @@ export class WocMarketWindow {
         `<option value="buy_now" ${this.sellFormat === 'buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
         `</select></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
-        `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
-        `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>` +
-        `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
+        // Only the fields the CHOSEN format actually permits. The server refuses
+        // a reserve on a buy-now (bad_reserve) and a buy-now price on an auction
+        // (bad_buy_now), so rendering both unconditionally offered every seller
+        // two controls that would be rejected, with the refusal arriving only
+        // after they pressed the button. A missing field reads as null, which is
+        // exactly what each format requires of the other one.
+        (this.sellFormat === 'auction'
+          ? `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
+            `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>`
+          : `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" required /></label>` +
+            `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowNote'))}</p>`) +
         `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
         `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.sellOfferNext'),

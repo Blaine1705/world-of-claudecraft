@@ -3929,6 +3929,7 @@ export const ru_RU: EnTranslations = {
       "sellStart": "Стартовая ставка (USD)",
       "sellReserve": "Резервная цена (USD, необязательно)",
       "sellReserveNote": "Скрыта от участников; показывается только достигнута она или нет.",
+      "sellBuyNowNote": "Обязательно. Такой лот продаётся по этой цене без торгов.",
       "sellBuyNowPrice": "Цена выкупа (USD)",
       "sellDuration": "Длительность",
       "sellDurationHours": "{hours} ч.",

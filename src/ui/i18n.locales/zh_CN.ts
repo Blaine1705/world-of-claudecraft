@@ -8317,6 +8317,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': '拍卖并设一口价',
   'hudChrome.wocMarket.sellStart': '起拍价（美元）',
   'hudChrome.wocMarket.sellReserve': '底价（美元，可选）',
+  'hudChrome.wocMarket.sellBuyNowNote': '必填。一口价商品将以此价格出售，不接受竞价。',
   'hudChrome.wocMarket.sellReserveNote': '对出价者隐藏；只显示已达或未达。',
   'hudChrome.wocMarket.sellBuyNowPrice': '一口价（美元）',
   'hudChrome.wocMarket.sellDuration': '时长',

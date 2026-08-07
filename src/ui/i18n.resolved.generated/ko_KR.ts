@@ -3929,6 +3929,7 @@ export const ko_KR: EnTranslations = {
       "sellStart": "시작가 (USD)",
       "sellReserve": "최저가 (USD, 선택)",
       "sellReserveNote": "입찰자에게는 금액이 숨겨지며 도달 여부만 표시됩니다.",
+      "sellBuyNowNote": "필수입니다. 즉시 구매 등록은 입찰 없이 이 가격에 판매됩니다.",
       "sellBuyNowPrice": "즉시 구매가 (USD)",
       "sellDuration": "기간",
       "sellDurationHours": "{hours}시간",

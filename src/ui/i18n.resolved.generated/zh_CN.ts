@@ -3929,6 +3929,7 @@ export const zh_CN: EnTranslations = {
       "sellStart": "起拍价（美元）",
       "sellReserve": "底价（美元，可选）",
       "sellReserveNote": "对出价者隐藏；只显示已达或未达。",
+      "sellBuyNowNote": "必填。一口价商品将以此价格出售，不接受竞价。",
       "sellBuyNowPrice": "一口价（美元）",
       "sellDuration": "时长",
       "sellDurationHours": "{hours} 小时",
