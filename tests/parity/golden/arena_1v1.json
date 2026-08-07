@@ -8,8 +8,8 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 1003,
-  "drawDigest": "8df3fc44",
+  "draws": 982,
+  "drawDigest": "9ce472c2",
   "frames": [
     {
       "tick": 0,
@@ -29,8 +29,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 965,
-      "state": "3268cc7a",
-      "events": "240d50f4",
+      "state": "79700156",
+      "events": "1cb78528",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,55 +40,55 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 965,
-      "state": "eec718bb",
+      "state": "e12563e1",
       "events": "2b779084",
       "rng": {
-        "draws": 72,
-        "digest": "49b1918d"
+        "draws": 70,
+        "digest": "2db3d6b8"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 965,
-      "state": "c482bb7b",
+      "state": "55914371",
       "events": "61963ba0",
       "rng": {
-        "draws": 308,
-        "digest": "aebd624b"
+        "draws": 292,
+        "digest": "c9b87784"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 965,
-      "state": "b8565088",
+      "state": "fc60a7a2",
       "events": "39b6ed3c",
       "rng": {
-        "draws": 545,
-        "digest": "6cfd085b"
+        "draws": 529,
+        "digest": "e710594e"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 965,
-      "state": "41724ae3",
-      "events": "1eb8074e",
+      "state": "828b7157",
+      "events": "ecea5c10",
       "rng": {
-        "draws": 812,
-        "digest": "4c8ba508"
+        "draws": 787,
+        "digest": "22f85826"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
       "nextId": 965,
-      "state": "7463a962",
+      "state": "de874edc",
       "events": "741638a5",
       "rng": {
-        "draws": 1003,
-        "digest": "8df3fc44"
+        "draws": 982,
+        "digest": "9ce472c2"
       },
       "label": "final",
       "players": [
@@ -112,7 +112,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 308
+              "damageDealt": 54
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -123,22 +123,6 @@
             ]
           },
           "deedsEarned": [
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
             [
               "pvp_arena_first_match",
               ""
@@ -174,11 +158,10 @@
             }
           ],
           "lifetimeHonor": 25,
-          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 45,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -222,22 +205,6 @@
               ""
             ],
             [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
               "pvp_arena_first_match",
               ""
             ]
@@ -262,11 +229,10 @@
               "itemId": "spring_water"
             }
           ],
-          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 40,
+          "renown": 10,
           "talents": {
             "rows": {}
           },
@@ -276,7 +242,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 102,
+          "attackPower": 46,
           "auras": [
             {
               "duration": 3600,
@@ -292,16 +258,16 @@
           "blockValue": 6,
           "combatTimer": 101.05,
           "comboUntil": -1,
-          "critChance": 0.067,
+          "critChance": 0.06,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.067,
+          "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
-          "hp": 632,
+          "hp": 100,
           "id": 963,
           "kind": "player",
-          "level": 15,
+          "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 632,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -321,12 +287,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 34,
-            "armor": 340,
+            "agi": 20,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 51,
-            "str": 51
+            "sta": 23,
+            "str": 23
           },
           "templateId": "warrior",
           "weapon": {
@@ -348,10 +314,10 @@
           "fiveSecondRule": 106.1,
           "id": 964,
           "kind": "player",
-          "level": 15,
+          "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 308,
-          "maxResource": 1161,
+          "maxHp": 54,
+          "maxResource": 195,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -361,20 +327,20 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
-          "resource": 1161,
+          "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 34,
+          "spellPower": 13,
           "stats": {
             "agi": 12,
-            "armor": 113,
-            "int": 67,
-            "spi": 50,
-            "sta": 28,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
             "str": 10
           },
           "templateId": "mage",

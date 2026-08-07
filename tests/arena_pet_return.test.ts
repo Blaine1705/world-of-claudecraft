@@ -78,7 +78,7 @@ function liveBout(opts: { cls?: 'hunter' | 'warlock'; petDead?: boolean } = {}):
   hunter: number;
   foe: number;
   pet: Entity;
-  petHpAtQueue: number;
+  petHpAtActive: number;
   match: any;
 } {
   const cls = opts.cls ?? 'hunter';
@@ -90,11 +90,6 @@ function liveBout(opts: { cls?: 'hunter' | 'warlock'; petDead?: boolean } = {}):
   teleport(sim, hunter, 0, -40);
   teleport(sim, foe, 6, -40);
   const pet = cls === 'warlock' ? giveDemon(sim, hunter) : givePet(sim, hunter, opts.petDead);
-  // Captured before the pre-fight countdown ticks: out-of-combat regen can lift
-  // the pet toward its (level-scaled) max during that wait, so the hp the pet
-  // "walked in with" is the hp at queue time, not whatever it drifts to by the
-  // time the bout goes active.
-  const petHpAtQueue = pet.hp;
   arena.arenaQueueJoin(sim.ctx, hunter);
   arena.arenaQueueJoin(sim.ctx, foe);
   for (let i = 0; i < 20 * 8; i++) {
@@ -102,7 +97,15 @@ function liveBout(opts: { cls?: 'hunter' | 'warlock'; petDead?: boolean } = {}):
     const m = arena.arenaMatchFor(sim.ctx, hunter);
     if (m && m.state === 'active') break;
   }
-  return { sim, hunter, foe, pet, petHpAtQueue, match: arena.arenaMatchFor(sim.ctx, hunter) };
+  // refreshMatchPetSnapshot (pet_match_return.ts) deliberately re-reads the pet's
+  // hp when the countdown ends: out-of-combat regen can lift it toward its
+  // (level-scaled) max during that wait, and the return snapshot is meant to
+  // follow the same living entity into the active bout, not freeze it at queue
+  // time. So "the hp it walked in with" for every return-path assertion is the
+  // hp at match ACTIVE (post-refresh), which is what pet.hp reads here now that
+  // the loop above has already carried the match to 'active'.
+  const petHpAtActive = pet.hp;
+  return { sim, hunter, foe, pet, petHpAtActive, match: arena.arenaMatchFor(sim.ctx, hunter) };
 }
 
 describe('arena pet return: the snapshot', () => {
@@ -126,16 +129,16 @@ describe('arena pet return: the snapshot', () => {
   });
 
   it('seats the snapshot on the match at formation', () => {
-    const { match, hunter, foe, pet, petHpAtQueue } = liveBout();
-    expect(match.preMatchPets.get(hunter)).toMatchObject({ petId: pet.id, hp: petHpAtQueue });
+    const { match, hunter, foe, pet, petHpAtActive } = liveBout();
+    expect(match.preMatchPets.get(hunter)).toMatchObject({ petId: pet.id, hp: petHpAtActive });
     expect(match.preMatchPets.has(foe)).toBe(false); // the mage has no pet
   });
 });
 
 describe('arena pet return: a beast killed on the sands', () => {
   it('stands the pet back up beside its owner, at the hp it walked in with', () => {
-    const { sim, hunter, pet, match, petHpAtQueue } = liveBout();
-    const hpIn = petHpAtQueue;
+    const { sim, hunter, pet, match, petHpAtActive } = liveBout();
+    const hpIn = petHpAtActive;
     const maxHpIn = pet.maxHp;
     // The bout kills the beast outright.
     sim.ctx.handleDeath(pet, null);
@@ -163,8 +166,8 @@ describe('arena pet return: a beast killed on the sands', () => {
   });
 
   it('survives the owner being eliminated (the pet dies with them, both come back)', () => {
-    const { sim, hunter, foe, pet, petHpAtQueue } = liveBout();
-    const hpIn = petHpAtQueue;
+    const { sim, hunter, foe, pet, petHpAtActive } = liveBout();
+    const hpIn = petHpAtActive;
     const owner = sim.entities.get(hunter)!;
     const enemy = sim.entities.get(foe)!;
     // A real killing blow from the other side: the elimination arm marks the

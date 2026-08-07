@@ -1033,7 +1033,7 @@ export const guideStrings = {
     sanctumBody:
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
     wildheartBody:
-      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.',
+      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
@@ -1404,6 +1404,11 @@ export const guideStrings = {
     soulboundTitle: 'Soulbound: yours and yours alone',
     soulboundBody:
       'A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. Today that protection guards prize tokens such as Heroic Marks, while the gear you win is yours to trade, sell, or share freely.',
+
+    // Unique-equipped legendaries. Rule-level only: no item names or drop sources.
+    uniqueTitle: 'Unique-Equipped: one legendary of a kind',
+    uniqueBody:
+      'Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.',
 
     // Tier sets and set bonuses. Concept only: no set names, bonus numbers, or the raid boss.
     setsTitle: 'Sets and set bonuses',

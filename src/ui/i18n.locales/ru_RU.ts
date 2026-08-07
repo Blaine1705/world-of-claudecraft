@@ -595,6 +595,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': 'Враждебный',
   'hudChrome.mobTooltip.friendly': 'Дружественный',
   'hudChrome.mobTooltip.elite': 'Элита',
+  'hudChrome.mobTooltip.boss': 'Босс',
   'hudChrome.targetFrame.unlock': 'Переместить рамку цели',
   'hudChrome.targetFrame.lock': 'Закрепить рамку цели',
   'hudChrome.playerFrame.unlock': 'Переместить рамку игрока',
@@ -818,6 +819,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Чтобы задать фокус, нужно находиться в городе.',
   'hudChrome.townFocus.increaseAria': 'Увеличить фокус на {component}',
   'hudChrome.townFocus.decreaseAria': 'Уменьшить фокус на {component}',
+  'hudChrome.townFocus.respecTierLabel': 'Скорость перераспределения',
+  'hudChrome.townFocus.respecTierTimeOption': 'Бесплатно (не торопясь)',
+  'hudChrome.townFocus.respecTierPartialOption': 'Быстрее (небольшая плата)',
+  'hudChrome.townFocus.respecTierInstantOption': 'Мгновенно (полная плата)',
+  'hudChrome.townFocus.respecCostFree': 'Бесплатно',
+  'hudChrome.townFocus.respecCostLine': 'Стоит {coin} и {materials}',
   'hudChrome.theme.preset': 'Тема интерфейса',
   'hudChrome.theme.customColors': 'Настраиваемые цвета',
   'hudChrome.theme.reset': 'Сброс',
@@ -1140,6 +1147,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.graphicsFatal': 'Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.',
   'hudChrome.options.graphicsReload': 'Перезагрузить игру',
   'hudChrome.options.graphicsDraftChanged': 'Изменения графики готовы к применению.',
+  'hudChrome.options.gfxSectionQuality': 'Качество',
+  'hudChrome.options.gfxSectionWorld': 'Детализация мира',
+  'hudChrome.options.gfxSectionLighting': 'Освещение и эффекты',
+  'hudChrome.options.gfxViewDistance': 'Дальность обзора',
+  'hudChrome.options.gfxWaterQuality': 'Качество воды',
+  'hudChrome.options.gfxCharacterDetail': 'Детализация персонажей',
+  'hudChrome.options.gfxAmbientOcclusion': 'Затенение окружения',
+  'hudChrome.options.gfxBloom': 'Свечение',
+  'hudChrome.options.gfxAntiAliasing': 'Сглаживание',
+  'hudChrome.options.gfxDynamicLights': 'Динамические источники света',
+  'hudChrome.options.gfxParticleEffects': 'Эффекты частиц',
+  'hudChrome.options.gfxHalf': 'Наполовину',
+  'hudChrome.options.gfxEffectsNote':
+    'Затенение окружения, свечение и сглаживание работают через цепочку постобработки: при низком уровне «Эффекты и освещение» цепочка отключена, и эти настройки не действуют.',
+  'hudChrome.options.gfxSectionCamera': 'Камера',
+  'hudChrome.options.gfxSectionDisplay': 'Экран',
+  'hudChrome.options.gfxSectionSystem': 'Система',
+  'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
+  'hudChrome.options.gfxCustomNote':
+    'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -2542,6 +2569,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questRules': 'Нельзя продать, положить в банк или обменять.',
   'itemUi.tooltip.questOrphaned': 'Не нужен ни для одного активного задания.',
   'itemUi.tooltip.classes': 'Классы: {classes}',
+  'itemUi.tooltip.maxStack': 'Максимум в стопке: {count}',
   'itemUi.tooltip.sellPrice': 'Цена продажи: {money}',
   'itemUi.tooltip.clickBuy': 'Нажмите, чтобы купить',
   'itemUi.tooltip.clickSell': 'Нажмите, чтобы продать',
@@ -2557,6 +2585,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.',
   'itemUi.tooltip.useManaPotion':
     'Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.',
+  'itemUi.tooltip.useElixir':
+    'Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.',
+  'itemUi.tooltip.useElixirAura':
+    'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
@@ -2682,6 +2714,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': 'Ничего не ждет. Выручка и истекшие лоты собираются здесь.',
   'itemUi.market.collectNote': 'Выручка и возвращенные товары, которые Торговец хранит для вас.',
   'itemUi.market.saleProceeds': 'Выручка',
+  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, включены в общую сумму.',
   'itemUi.market.collectAll': 'Забрать все',
   'itemUi.logs.listedItem': '{item} выставлен на мировой рынок за {money}.',
   'itemUi.logs.sellerSold': '{buyer} купил ваш {item} за {money}. Заберите {proceeds} у Торговца.',
@@ -3338,6 +3371,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Осколок перезвона',
   'entities.items.gatherers_cache.name': 'Сумка собирателя',
   'entities.items.artisans_eye.name': 'Глаз ремесленника',
+  'entities.items.sharp_claw.name': 'Острый коготь',
+  'entities.items.curved_tusk.name': 'Изогнутый клык',
+  'entities.items.pristine_claw.name': 'Безупречный коготь',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',
@@ -6417,7 +6453,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
   'guide.dungeonsPage.wildheartBody':
-    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду к Зулгару.',
+    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -6841,6 +6877,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': 'Что можно надеть',
   'guide.gear.soulboundBody':
     'Многие ценные вещи персональны: они привязаны к вашему персонажу с момента получения. Персональный предмет нельзя передать, отправить почтой, продать торговцу или выставить на рынок; отныне он часть вашей истории, и никто другой не понесёт его за вас.',
+  'guide.gear.uniqueTitle': 'Уникальный (экипируется): только одна легендарка каждого вида',
+  'guide.gear.uniqueBody':
+    'Легендарные предметы уникальны при экипировке: персонаж может носить только одну копию данного легендарного предмета одновременно, и его героическая версия считается тем же предметом. Вторую копию можно держать в сумках, банке или на рынке, но попытка надеть обе сразу будет отклонена. В подсказке предмета есть золотая метка "Уникальный (экипируется)", так что вы увидите это правило до того, как построите план на два таких предмета.',
   'guide.gear.soulboundTitle': 'Персональные предметы: ваши и только ваши',
   'guide.gear.sourcesBody':
     'Большинство ваших ранних улучшений, это награды за задания, так что выгоднее выполнять задания, а не гриндить. Враги роняют снаряжение, когда вы их побеждаете, торговцы в городе продают добротную основу, ремесленники превращают собранные материалы в носимые вещи, а игровой рынок позволяет покупать у других искателей приключений. На самой вершине два вида валюты покупают снаряжение, которого не найти больше нигде: Метки Вылазок у хранителя вылазок и Героические знаки у героического интенданта.',
@@ -7572,6 +7611,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
   'hudChrome.itemSoulbound': 'Персональный',
+  'hudChrome.itemUniqueEquipped': 'Уникальный (экипируется)',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
