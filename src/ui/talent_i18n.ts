@@ -318,6 +318,8 @@ const localeTextByBase = {
       prot: 'El guardián que lidera la primera línea del combate con un escudo en alto y una voluntad inquebrantable. Resiste el asalto de innumerables enemigos, protege a sus aliados y controla el campo de batalla con autoridad. Convierte cada golpe bloqueado en una oportunidad para responder con contundencia.',
     },
     masteryDescriptions: {
+      destruction:
+        'Conflagrar otorga Desolación, que acelera considerablemente el lanzamiento de tu próxima Descarga de caos o hace caer de inmediato la primera oleada de Lluvia de Fuego.',
       arms: 'Mientras empuñas un arma a dos manos, infliges un 10% más de daño.',
       fire: 'Tus hechizos de Fuego que asestan golpes críticos aplican Ignición, que inflige un 40% del daño durante 6 s y se acumula. Aumenta además tu probabilidad de crítico un 2%.',
       arcane:
@@ -329,6 +331,8 @@ const localeTextByBase = {
   },
   fr_FR: {
     masteryDescriptions: {
+      destruction:
+        'Conflagration confère Désolation, qui raccourcit considérablement l\'incantation de votre prochain Trait de ruine ou fait tomber immédiatement la première vague de Pluie de feu.',
       arms: 'Lorsque vous maniez une arme à deux mains, tous les dégâts que vous infligez sont augmentés de 10 %.',
     },
     statLabels: {
@@ -377,6 +381,8 @@ const localeTextByBase = {
   },
   it_IT: {
     masteryDescriptions: {
+      destruction:
+        'Conflagrazione conferisce Desolazione, che riduce notevolmente il lancio del tuo prossimo Dardo della Rovina o fa cadere immediatamente la prima ondata di Pioggia di Fuoco.',
       arms: "Con un'arma a due mani in mano, tutti i danni che infliggi aumentano del 10%.",
     },
     statLabels: {
@@ -425,6 +431,8 @@ const localeTextByBase = {
   },
   de_DE: {
     masteryDescriptions: {
+      destruction:
+        'Feuersbrunst gewährt Verwüstung: Euer nächster Verderbensblitz wirkt deutlich schneller oder die erste Welle des Feuerregens fällt sofort.',
       arms: 'Solange du eine Zweihandwaffe führst, erhöht sich dein verursachter Schaden um 10 %.',
     },
     statLabels: {
@@ -472,7 +480,11 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Verringert ${target} um ${amount}${perRank}.`,
   },
   zh_CN: {
-    masteryDescriptions: { arms: '装备双手武器时，你造成的所有伤害提高 10%。' },
+    masteryDescriptions: {
+      arms: '装备双手武器时，你造成的所有伤害提高 10%。',
+      destruction:
+        '燃尽会赋予荒芜效果：大幅缩短你下一次混乱箭的施法时间，或使烈火之雨的第一波立即落下。',
+    },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -518,7 +530,11 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   zh_TW: {
-    masteryDescriptions: { arms: '揮舞雙手武器時，你造成的所有傷害提高10%。' },
+    masteryDescriptions: {
+      arms: '揮舞雙手武器時，你造成的所有傷害提高10%。',
+      destruction:
+        '燃盡會賦予荒蕪效果：大幅縮短你下一次混沌箭的施法時間，或使烈火之雨的第一波立即落下。',
+    },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -564,7 +580,11 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   ko_KR: {
-    masteryDescriptions: { arms: '양손 무기를 장착하면 주는 피해가 10% 증가합니다.' },
+    masteryDescriptions: {
+      arms: '양손 무기를 장착하면 주는 피해가 10% 증가합니다.',
+      destruction:
+        '점화 시 황폐 효과를 얻습니다. 다음 혼돈의 화살 시전이 크게 빨라지거나 불의 비의 첫 파도가 즉시 떨어집니다.',
+    },
     statLabels: {
       str: '힘',
       agi: '민첩',
@@ -611,6 +631,8 @@ const localeTextByBase = {
   },
   ja_JP: {
     masteryDescriptions: {
+      destruction:
+        'コンフラグレートがデソレーションを付与する。次のカオス・ボルトの詠唱が大幅に短縮されるか、レイン・オブ・ファイアの最初の一波が即座に降り注ぐ。',
       arms: '両手武器を装備している間、与えるダメージがすべて10%増加します。',
     },
     statLabels: {
@@ -659,6 +681,8 @@ const localeTextByBase = {
   },
   pt_BR: {
     masteryDescriptions: {
+      destruction:
+        'Conflagrar concede Desolação, que encurta consideravelmente a conjuração da sua próxima Seta da Ruína ou faz a primeira onda da Chuva de Fogo cair imediatamente.',
       arms: 'Enquanto empunha uma arma de duas mãos, o dano que você causa é aumentado em 10%.',
     },
     statLabels: {
@@ -707,6 +731,8 @@ const localeTextByBase = {
   },
   ru_RU: {
     masteryDescriptions: {
+      destruction:
+        'Поджигание дает Опустошение: следующая Стрела хаоса применяется значительно быстрее, либо первая волна Огненного дождя обрушивается немедленно.',
       arms: 'При использовании двуручного оружия весь наносимый вами урон увеличивается на 10%.',
     },
     statLabels: {
@@ -754,6 +780,86 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Снижает ${target} на ${amount}${perRank}.`,
   },
   ...TALENT_NEW,
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  cs_CZ: {
+    ...TALENT_NEW.cs_CZ,
+    masteryDescriptions: {
+      ...TALENT_NEW.cs_CZ.masteryDescriptions,
+      destruction:
+        'Vzplanutí uděluje Zpustošení: tvůj příští Zkázný šíp se sešle výrazně rychleji, nebo první vlna Ohnivého deště dopadne okamžitě.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  nl_NL: {
+    ...TALENT_NEW.nl_NL,
+    masteryDescriptions: {
+      ...TALENT_NEW.nl_NL.masteryDescriptions,
+      destruction:
+        'Ontvlamming verleent Verwoesting: je volgende Ruinenschicht wordt aanzienlijk sneller uitgesproken of de eerste golf van Vuurregen valt onmiddellijk.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  pl_PL: {
+    ...TALENT_NEW.pl_PL,
+    masteryDescriptions: {
+      ...TALENT_NEW.pl_PL.masteryDescriptions,
+      destruction:
+        'Pożoga przyznaje Spustoszenie: twój następny Pocisk Ruiny rzucany jest znacznie szybciej albo pierwsza fala Deszczu ognia spada natychmiast.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  id_ID: {
+    ...TALENT_NEW.id_ID,
+    masteryDescriptions: {
+      ...TALENT_NEW.id_ID.masteryDescriptions,
+      destruction:
+        'Kobaran Api memberikan Kehancuran: Baut Reruntuhanmu berikutnya dirapal jauh lebih cepat, atau gelombang pertama Hujan Api langsung jatuh.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  tr_TR: {
+    ...TALENT_NEW.tr_TR,
+    masteryDescriptions: {
+      ...TALENT_NEW.tr_TR.masteryDescriptions,
+      destruction:
+        'Tutuşturma, Viranlık sağlar: bir sonraki Yıkım Okun çok daha hızlı okunur ya da Ateş Yağmurunun ilk dalgası anında düşer.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  sv_SE: {
+    ...TALENT_NEW.sv_SE,
+    masteryDescriptions: {
+      ...TALENT_NEW.sv_SE.masteryDescriptions,
+      destruction:
+        'Storbrand ger Ödeläggelse: din nästa Fördärvsbult kastas avsevärt snabbare, eller så faller Eldregnets första våg omedelbart.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  vi_VN: {
+    ...TALENT_NEW.vi_VN,
+    masteryDescriptions: {
+      ...TALENT_NEW.vi_VN.masteryDescriptions,
+      destruction:
+        'Bùng Cháy trao Điêu Tàn: Tia Hủy Diệt tiếp theo của bạn thi triển nhanh hơn đáng kể, hoặc đợt đầu tiên của Mưa Lửa rơi xuống ngay lập tức.',
+    },
+  },
+  // Maintainer release-fill override: the Ruination mastery prose cannot be
+  // generated from effect data and postdates the generated new-locale text.
+  da_DK: {
+    ...TALENT_NEW.da_DK,
+    masteryDescriptions: {
+      ...TALENT_NEW.da_DK.masteryDescriptions,
+      destruction:
+        'Antændelse giver Hærgen: dit næste Undergangslyn kastes markant hurtigere, eller Ildregnens første bølge falder med det samme.',
+    },
+  },
 } satisfies Record<Exclude<SupportedLanguage, 'es_ES' | 'fr_CA'>, TalentLocaleText>;
 
 // es_ES and fr_CA are pure dialect aliases of their base locale (declared base:
@@ -1857,6 +1963,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wrathwing: 'Ala de Venganza',
   },
   fr_FR: {
+    Sentence: 'Sentence',
     'Adrenaline Junkie': "Accro à l'adrénaline",
     Aetherwell: 'Puits d’éther',
     'Aspect Mastery': 'Maîtrise des aspects',
@@ -2370,6 +2477,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wrathwing: 'Aile vengeresse',
   },
   fr_CA: {
+    Sentence: 'Sentence',
     'Adrenaline Junkie': "Accro à l'adrénaline",
     Aetherwell: 'Puits d’éther',
     'Aspect Mastery': 'Maîtrise des aspects',
@@ -2883,6 +2991,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wrathwing: 'Aile vengeresse',
   },
   it_IT: {
+    Sentence: 'Sentence',
     'Adrenaline Junkie': "Dipendente dall'adrenalina",
     Aetherwell: 'Pozzo d’Etere',
     'Aspect Mastery': 'Maestria degli aspetti',
@@ -3396,6 +3505,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wrathwing: 'Alavendetta',
   },
   de_DE: {
+    Sentence: 'Sentence',
     'Adrenaline Junkie': 'Adrenalinrausch',
     Aetherwell: 'Ätherbrunnen',
     'Aspect Mastery': 'Aspektmeisterschaft',
@@ -5961,6 +6071,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wrathwing: '復讐の翼',
   },
   pt_BR: {
+    Sentence: 'Sentence',
     'Adrenaline Junkie': 'Viciado em adrenalina',
     Aetherwell: 'Poço Etéreo',
     'Aspect Mastery': 'Maestria dos aspectos',
@@ -6988,6 +7099,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   cs_CZ: {
     ...TALENT_NEW_TITLE_OVERRIDES.cs_CZ,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Egida oddanosti',
     'Aether Surge': 'Éterický příval',
     'Aetheric Aim': 'Éterická přesnost',
@@ -7420,6 +7532,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   nl_NL: {
     ...TALENT_NEW_TITLE_OVERRIDES.nl_NL,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Egide van de toewijding',
     'Aether Surge': 'Arcane Kracht',
     'Aetheric Aim': 'Arcane Brandpunt',
@@ -7852,6 +7965,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   pl_PL: {
     ...TALENT_NEW_TITLE_OVERRIDES.pl_PL,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Egida oddania',
     'Aether Surge': 'Arkaniczna moc',
     'Aetheric Aim': 'Arkaniczne skupienie',
@@ -8284,6 +8398,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   id_ID: {
     ...TALENT_NEW_TITLE_OVERRIDES.id_ID,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Egis Pengabdian',
     'Aether Surge': 'Kekuatan Arkana',
     'Aetheric Aim': 'Fokus Arkana',
@@ -9148,6 +9263,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   sv_SE: {
     ...TALENT_NEW_TITLE_OVERRIDES.sv_SE,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Hängivenhetens egid',
     'Aether Surge': 'Arkan kraft',
     'Aetheric Aim': 'Arkant fokus',
@@ -10012,6 +10128,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   da_DK: {
     ...TALENT_NEW_TITLE_OVERRIDES.da_DK,
+    Sentence: 'Sentence',
     'Aegis of Devotion': 'Hengivenhedens ægide',
     'Aether Surge': 'Arkan Kraft',
     'Aetheric Aim': 'Arkan Fokus',
