@@ -1,18 +1,14 @@
 import * as THREE from 'three';
 import {
-  COLUMN_ZONES,
-  columnBlendAt,
   STRIP_MAX_X,
   STRIP_MIN_X,
-  STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
-import { fbm2 } from '../sim/rng';
-import type { BiomeId, ZoneDef } from '../sim/types';
-import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import type { ZoneDef } from '../sim/types';
+import { WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
@@ -50,7 +46,6 @@ const richTerrainSplat = (): boolean =>
 
 import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
-import { impactCraterTerrainBlend } from './impact_terrain';
 import {
   GRASS_BAKE_PATCH_YARDS,
   GRASS_PAINT_GAIN,
@@ -59,7 +54,6 @@ import {
 import {
   beginChunkGeometry,
   type ChunkGeometryArrays,
-  type ChunkGeometryBuildState,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';

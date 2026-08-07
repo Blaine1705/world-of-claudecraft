@@ -7,6 +7,7 @@ import {
 } from '../src/render/frost_ice_fields';
 import { planFrostIceSpireSites } from '../src/render/frost_ice_fields_core';
 import { terrainHeight } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 afterEach(() => frostIcePreloadInternalsForTest.reset());
 
@@ -29,7 +30,7 @@ describe('modeled Frostveil ice fields', () => {
     const bounds = new THREE.Box3();
     for (const part of parts) {
       part.geometry.computeBoundingBox();
-      bounds.union(part.geometry.boundingBox!);
+      bounds.union(expectDefined(part.geometry.boundingBox));
     }
     expect(source.children[0].position).toEqual(original);
     expect(bounds.min.y).toBeCloseTo(0, 6);
@@ -65,7 +66,7 @@ describe('modeled Frostveil ice fields', () => {
 
     const parts = prepareFrostIceParts(source);
     const bounds = new THREE.Box3();
-    for (const part of parts) bounds.union(part.geometry.boundingBox!);
+    for (const part of parts) bounds.union(expectDefined(part.geometry.boundingBox));
     expect(bounds.max.y - bounds.min.y).toBeCloseTo(
       frostIcePreloadInternalsForTest.targetHeight,
       3,

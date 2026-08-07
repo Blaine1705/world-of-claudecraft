@@ -34,6 +34,15 @@ import {
   marketItemMatches,
   sanitizeMarketQuery,
 } from './market_query';
+import {
+  cloneSaleLog,
+  emptySaleLog,
+  isSaleLogEmpty,
+  type MarketSaleLog,
+  mergeSaleLogs,
+  recordSale,
+  sanitizeSaleLog,
+} from './market_sale_log';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -135,6 +144,10 @@ export interface MarketListing {
 export interface MarketCollection {
   copper: number;
   items: InvSlot[];
+  /** The itemized ledger behind `copper` (market_sale_log.ts): one row per sale
+   *  still awaiting pickup. Cleared with the gold it explains, never with the
+   *  items, which are returns rather than sales. */
+  sales: MarketSaleLog;
 }
 
 // Persistable market state. `secondsLeft` is stored instead of an absolute
@@ -154,7 +167,14 @@ export interface MarketSave {
     instance?: ItemInstancePayload;
     craftedRecipeId?: string;
   }[];
-  collections: { key: string; copper: number; items: InvSlot[] }[];
+  collections: {
+    key: string;
+    copper: number;
+    items: InvSlot[];
+    /** Additive: the pending sale ledger. Absent on every pre-ledger save and on
+     *  any collection holding only returns, which load as an empty log. */
+    sales?: MarketSaleLog;
+  }[];
   nextListingId: number;
 }
 
@@ -278,7 +298,7 @@ export class Market {
   private collectionFor(key: string): MarketCollection {
     let c = this.marketCollections.get(key);
     if (!c) {
-      c = { copper: 0, items: [] };
+      c = { copper: 0, items: [], sales: emptySaleLog() };
       this.marketCollections.set(key, c);
     }
     return c;
@@ -293,6 +313,10 @@ export class Market {
     // cloneInvSlot: an instanced return's payload must never alias between the
     // merged-away bucket and the surviving one.
     to.items.push(...from.items.map(cloneInvSlot));
+    // The ledger follows its gold: the merged-away bucket's copper landed in `to`
+    // above, so the rows explaining it have to travel with it or the surviving
+    // collection would show proceeds it cannot account for.
+    mergeSaleLogs(to.sales, from.sales);
     this.marketCollections.delete(fromKey);
     this.bumpCollections();
     return true;
@@ -705,7 +729,18 @@ export class Market {
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
-      this.collectionFor(listing.sellerKey).copper += proceeds;
+      const col = this.collectionFor(listing.sellerKey);
+      col.copper += proceeds;
+      // Itemize the sale beside the gold it produced. The listing row is spliced
+      // away on the next line, so this is the last point that still knows WHAT
+      // sold; without it the seller's collection is a bare copper total.
+      recordSale(col.sales, {
+        itemId: listing.itemId,
+        count: listing.count,
+        price: listing.price,
+        proceeds,
+        buyerName: meta.name,
+      });
       this.marketListings.splice(idx, 1);
       this.bumpBook();
       const sellerMeta = this.metaByMarketSellerKey(listing.sellerKey);
@@ -784,7 +819,7 @@ export class Market {
       return;
     }
     const col = this.collectionForSeller(meta);
-    if (!col || (col.copper <= 0 && col.items.length === 0)) {
+    if (!col || (col.copper <= 0 && col.items.length === 0 && isSaleLogEmpty(col.sales))) {
       this.ctx.error(meta.entityId, 'You have nothing to collect.');
       return;
     }
@@ -802,6 +837,13 @@ export class Market {
       this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
     }
+    // The ledger clears with the GOLD, not at the end of the method: the capacity
+    // gate below can leave items behind and return early, and rows describing gold
+    // already paid out must not survive to be shown (and re-shown) next collect.
+    // Cleared unconditionally, because a sale whose proceeds floored to 0 copper
+    // (a 1-copper listing against the Merchant's cut) still logs a row, and that
+    // row would otherwise be uncollectable forever.
+    col.sales = emptySaleLog();
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected. Instance-aware on both
     // arms so a returned instanced listing keeps its payload here too.
@@ -873,7 +915,7 @@ export class Market {
     const meta = this.ctx.players.get(pid);
     if (!meta) return false;
     const col = this.collectionForSeller(meta);
-    return !!col && (col.copper > 0 || col.items.length > 0);
+    return !!col && (col.copper > 0 || col.items.length > 0 || !isSaleLogEmpty(col.sales));
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
@@ -948,6 +990,10 @@ export class Market {
       // maps) must never leak out of the escrow book. Own goods, so the full
       // payload (not the public trim) is correct here, the self inv precedent.
       collectionItems: col ? col.items.map(cloneInvSlot) : [],
+      // Cloned for the same reason as the slots above: the offline host hands this
+      // straight to the UI, and the live ledger must not be reachable from it.
+      collectionSales: col ? col.sales.entries.map((e) => ({ ...e })) : [],
+      collectionSalesOmitted: col?.sales.omitted ?? 0,
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
@@ -981,6 +1027,10 @@ export class Market {
         // cloneInvSlot, not a shallow spread: an instanced return's payload
         // must not alias between the live collection and the serialized blob.
         items: c.items.map(cloneInvSlot),
+        // Conditional + deep-cloned, the listing arm's doctrine: a collection
+        // holding only returns writes no `sales` key at all, so blobs that
+        // predate the ledger round-trip byte-identical.
+        ...(isSaleLogEmpty(c.sales) ? {} : { sales: cloneSaleLog(c.sales) }),
       })),
       nextListingId: this.nextListingId,
     };
@@ -1075,6 +1125,9 @@ export class Market {
       if (!c || typeof c.key !== 'string') continue;
       this.marketCollections.set(c.key, {
         copper: Math.max(0, Math.floor(c.copper) || 0),
+        // Untrusted blob data like every slot below it; a missing key (every
+        // pre-ledger save) sanitizes to an empty log.
+        sales: sanitizeSaleLog(c.sales),
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.

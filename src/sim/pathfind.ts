@@ -180,7 +180,8 @@ export function findPath(
   };
   const heapPop = (): number[] => {
     const top = heap[0];
-    const last = heap.pop()!;
+    const last = heap.pop();
+    if (!last) throw new Error('heap underflow');
     if (heap.length > 0) {
       heap[0] = last;
       let i = 0;

@@ -96,7 +96,7 @@ export function registerWeapon({ key, gripFamily, glbPath, iconPath, itemIds = [
   // and may be overwritten (that is a legitimate re-apply).
   const accessorySrc = read(FILES.accessory);
   const existing = accessorySrc.match(new RegExp(`^\\s*${key}: '([A-Za-z0-9_]+)',`, 'm'));
-  if (existsSync(glbDest) && (!existing || !existing[1].startsWith('VAR_'))) {
+  if (existsSync(glbDest) && !existing?.[1].startsWith('VAR_')) {
     throw new Error(
       `public/models/weapons/${key}.glb already exists and is not a pipeline variant; ` +
         'pick a different --name (overwriting a shipped KayKit weapon would break its grip)',
@@ -530,6 +530,7 @@ export function skinModelSnippet({ name, cls, theme, hasRightSlot, hasLeftSlot }
     "    clips: kaykit(['1H_Melee_Attack_Chop']),",
   ];
   if (hasRightSlot) {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: generated code snippet must contain the template placeholder.
     lines.push("    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],");
     lines.push('    weaponSlots: [0],');
   } else {

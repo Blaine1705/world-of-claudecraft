@@ -645,10 +645,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // renderer; the release's bounded ground-object reuse pool), so the merged tree
 // mints literals matching neither parent. Captures adopted verbatim from the
 // release tip; swept by remint_polish_provenance.mjs on the merged tree.
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply queue
+// and the PR-side ability VFX warm-up both move runtimeRender provenance leaves
+// (src/render/renderer.ts and src/render/prewarm_policy.ts), so the composite
+// and metadata seal both re-mint on the merged tree. No capture was retaken.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved back
+// while PR #2982's prewarm policy remains in the release. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dcf57f6d70ee1c8b472f8d1114d129005c2f0d051db925b8cfe506ad1f0b8c03';
+  'fca98bb93483ae05354afce1e5cafd8a0958058d2a4f9d2606639b268fa8a53a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
+  '5b297a49a72ed500537f7a92683051b6fc219264a8b36ae204eb62bc64d6f672';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1526,10 +1532,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
     // recomputed by remint_polish_provenance.mjs.
+    // Re-pinned for the PR #2982 merge: the first-order composite follows the
+    // release-side weapon-skin renderer changes and the PR-side ability VFX
+    // warm-up changes, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the PR #2983 revert: the swept evidence follows the
+    // reverted renderer while preserving PR #2982's prewarm-policy leaf.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0');
+    ).toBe('ff74141643633a491a4a4d33d6acdcba6f670c0bc09ffaea4507a5b315d2964b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

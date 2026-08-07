@@ -392,7 +392,7 @@ export const es: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Listo",
-      "close": "Close emotes"
+      "close": "Cerrar emotes"
     },
     "dailyRewards": {
       "title": "Recompensas diarias",
@@ -1823,7 +1823,13 @@ export const es: EnTranslations = {
       "saveButton": "Guardar enfoque",
       "notInTownHint": "Debes estar en el pueblo para fijar tu enfoque.",
       "increaseAria": "Aumentar el enfoque en {component}",
-      "decreaseAria": "Reducir el enfoque en {component}"
+      "decreaseAria": "Reducir el enfoque en {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promover a líder",
@@ -2070,8 +2076,8 @@ export const es: EnTranslations = {
       "familyDemon": "Demonio",
       "hostile": "Hostil",
       "friendly": "Amistoso",
-      "elite": "Elite",
-      "boss": "Boss"
+      "elite": "Élite",
+      "boss": "Jefe"
     },
     "targetFrame": {
       "unlock": "Mover el marco del objetivo",
@@ -2679,7 +2685,7 @@ export const es: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Encantar arma - Poder",
       "enchant_weapon_intellect": "Encantar arma - Poder de hechizo",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Encantar mano secundaria - Aguante",
       "enchant_helmet_fortitude": "Encantar yelmo - Fortaleza",
       "enchant_neck_spirit": "Encantar collar - Espíritu",
       "enchant_shoulder_agility": "Encantar hombros - Agilidad",
@@ -3169,7 +3175,7 @@ export const es: EnTranslations = {
         "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)"
       }
     },
     "deeds": {
@@ -4118,7 +4124,7 @@ export const es: EnTranslations = {
       "bastionBody": "Una fortaleza inundada perdida en la ciénaga, en poder de los defensores ahogados y de la propia marea creciente.",
       "templeBody": "Un altar sumergido junto al camino de la ciénaga, un desvío para los curiosos y los bien preparados.",
       "sanctumBody": "El oscuro corazón de Thornpeak, donde la larga labor del culto alcanza su terrible apogeo.",
-      "wildheartBody": "Una caldera selvática empapada de lluvia donde dos senderos de caza elevados rodean un cenote de jade. Cruza guaridas de bestias y ruinas ancestrales, y luego escala la pirámide ritual para enfrentarte a Zulgar.",
+      "wildheartBody": "Una caldera selvática empapada de lluvia donde dos senderos de caza elevados rodean un cenote de jade. Cruza guaridas de bestias y ruinas ancestrales, y luego escala la pirámide ritual para ver quién te espera en la cima.",
       "raidName": "La banda del final del juego",
       "raidBody": "Tras una puerta real sellada aguarda una prueba para diez jugadores: un combate de varias fases y un poder imperecedero que toda la banda debe neutralizar en conjunto. Gánate la entrada y luego trae a nueve amigos.",
       "heroicTitle": "Modo heroico",
@@ -7562,6 +7568,8 @@ export const es: EnTranslations = {
       "collectEmpty": "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.",
       "collectNote": "Ganancias y bienes devueltos que el Mercader guarda para ti.",
       "saleProceeds": "Ganancias de venta",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Recoger lote completo"
     },
     "logs": {

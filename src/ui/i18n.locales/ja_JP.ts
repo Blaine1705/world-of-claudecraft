@@ -597,6 +597,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': '敵対',
   'hudChrome.mobTooltip.friendly': '味方',
   'hudChrome.mobTooltip.elite': 'エリート',
+  'hudChrome.mobTooltip.boss': 'ボス',
   'hudChrome.targetFrame.unlock': 'ターゲットフレームを移動',
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',
@@ -817,6 +818,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'フォーカスを設定するには町にいる必要があります。',
   'hudChrome.townFocus.increaseAria': '{component}へのフォーカスを増やす',
   'hudChrome.townFocus.decreaseAria': '{component}へのフォーカスを減らす',
+  'hudChrome.townFocus.respecTierLabel': '再割り振りの速さ',
+  'hudChrome.townFocus.respecTierTimeOption': '無料（時間をかける）',
+  'hudChrome.townFocus.respecTierPartialOption': '速い（少額の費用）',
+  'hudChrome.townFocus.respecTierInstantOption': '即時（全額費用）',
+  'hudChrome.townFocus.respecCostFree': '無料',
+  'hudChrome.townFocus.respecCostLine': '{coin}と{materials}がかかります',
   'hudChrome.theme.preset': 'UIテーマ',
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',
@@ -2687,6 +2694,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '待機中のものはありません。売上と期限切れの出品はここで受け取ります。',
   'itemUi.market.collectNote': '商人が預かっている売上と返却品です。',
   'itemUi.market.saleProceeds': '売上',
+  'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':
@@ -6381,7 +6389,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.wildheartBody':
-    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。',
+    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
