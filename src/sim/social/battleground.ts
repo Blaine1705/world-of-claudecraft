@@ -30,6 +30,7 @@ import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibil
 import { BG_SLOT_COUNT, battlegroundOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import { createGroundObject } from '../entity';
 import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
+import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import {
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
@@ -923,6 +924,12 @@ function tickWaveRespawns(ctx: SimContext, match: BgMatch): void {
       e.prevPos = { ...e.pos };
       e.facing = team === 0 ? 0 : Math.PI;
       e.prevFacing = e.facing;
+      // The wave raises the FIGHTER directly and never goes through spirit.ts's
+      // shared reviveAt, so the pet hand-back has to be asked for here too.
+      // Without it a hunter, warlock or mage fights the whole rest of the match
+      // without a companion after one death, which is most of their kit, while
+      // every other class comes back whole.
+      restorePetOnOwnerRevive(ctx, e);
       ctx.emit({ type: 'respawn', pid });
     });
   }

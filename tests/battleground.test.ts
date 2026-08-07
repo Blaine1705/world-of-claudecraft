@@ -2982,3 +2982,62 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
     expect(pet.dead).toBe(false);
   });
 });
+
+describe('Thornhollow Fields: the wave brings your pet back too', () => {
+  // The wave raises fighters directly and never calls reviveAt, so the pet
+  // hand-back had to be asked for at that site as well. Without it a hunter,
+  // warlock or mage played the rest of the match without a companion after one
+  // death, while every other class came back whole.
+  const hunterInMatch = (): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? 'hunter' : 'warrior', `W${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      sim.entities.get(pid)!.level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    restorePet(sim.ctx, sim.entities.get(owner)!, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = sim.petOf(owner, true)!;
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick();
+    const match = sim.ctx.bgMatches.get(owner)!;
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands the pet back up when the wave raises its owner', () => {
+    const { sim, owner, pet } = hunterInMatch();
+    kill(sim, owner); // the owner arm kills the pet with them
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+    sim.releaseSpirit(owner); // become a ghost so the wave is eligible to raise you
+
+    // Run past a full wave period so the raise definitely lands.
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+
+    expect(sim.entities.get(owner)!.dead).toBe(false);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
+
+  it('hands nothing back to an owner who had no pet', () => {
+    // The negative that keeps the case above honest: the wave must not conjure a
+    // companion for the nine warriors it raises alongside the hunter.
+    const { sim, match, owner } = hunterInMatch();
+    const warrior = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    kill(sim, warrior);
+    sim.releaseSpirit(warrior);
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+    expect(sim.entities.get(warrior)!.dead).toBe(false);
+    expect(sim.petOf(warrior, true)).toBeFalsy();
+  });
+});
