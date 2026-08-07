@@ -9,9 +9,11 @@
 | 11 Page-name localization + i18n hygiene | complete | 2026-08-05 | 2026-08-05 |
 | 11 QA | complete | 2026-08-06 | 2026-08-06 |
 | 12 Test integrity + catalog pins + records | complete | 2026-08-06 | 2026-08-06 |
-| 12 QA | not started | | |
-| 13 Window structure + information UX | not started | | |
-| 13 QA | not started | | |
+| 12 QA | complete | 2026-08-06 | 2026-08-06 |
+| 13 Window structure + information UX | complete | 2026-08-06 | 2026-08-06 |
+| 13 QA | complete | 2026-08-06 | 2026-08-06 |
+| 13b Complete source coverage | not started | | |
+| 13b QA | not started | | |
 | 14 Overview flagship + celebration | not started | | |
 | 14 QA | not started | | |
 | 15 Deep links, chat, tracker, guide search | not started | | |
@@ -319,27 +321,34 @@ happened.
   on ReliquaryPageDef, and ONE exported resolver reliquaryRelicSource(page,
   relic) that the client (reliquary_view) calls, so exactly one precedence
   implementation exists. 183 of 242 slots resolve (137 boss, 33 deed, 11
-  profession, 2 vendor); sourceDefault on the true single-source pages
+  profession, 2 vendor) as built; Phase 13 QA retired the wyrmcult_grand_robe
+  hint (see the QA record), so the live numbers are 182 of 242 and 136 boss.
+  sourceDefault on the true single-source pages
   (hollow_crypt, nythraxis, thunzharr, the six heroics), per-relic on the four
   multi-boss dungeon pages, all SEVEN set pages (the packet docs said six),
-  the three professions pages, and horizons_titles. 59 slots are pinned in
-  SOURCE_PENDING_RULING pending a maintainer ruling (see state.md OPEN items):
-  most are precisely-known sources with no representable kind (delve chests,
-  the Drowned Litany rite, Rift progression, quest/vendor mounts, the Claudium
-  store), plus 6 genuinely two-table Gravewyrm drops, 6 corpse-harvest
-  specimens no gathering profession owns, and masterwork:first.
+  the three professions pages, and horizons_titles. 59 slots were pinned in
+  SOURCE_PENDING_RULING pending a maintainer ruling (60 after the QA
+  retirement; see state.md OPEN items): most are precisely-known sources with
+  no representable kind (delve chests, the Drowned Litany rite, Rift
+  progression, quest/vendor mounts, the Claudium store), plus the Gravewyrm
+  multi-route drops (6 as built; 7 after QA, the robe's second route being a
+  quest rather than a loot table), 6 corpse-harvest specimens no gathering
+  profession owns, and masterwork:first.
 - Content-truth pins: every authored sourceId resolves against its kind's
   live table (MOBS membership, not rank flags: the credited mid-bosses are
   elite-only); boss hints walk into MOBS[].loot / HEROIC_BOSS_LOOT (137
-  rows, 0 defects); vendor hints into DELVE_SHOPS via the board NPC;
+  rows, 0 defects; 136 after the QA retirement, and the walk is
+  difficulty-aware since the QA); vendor hints into DELVE_SHOPS via the board NPC;
   profession hints DERIVED from NODE_HARVEST_TABLE / NODE_MATERIAL_TABLE /
   MATERIAL_GRADES / gatherRareEventFlavor (0 defects); pending list pinned
   bidirectionally with page-scoped pageId:slotId keys; cross-page agreement
   for set members; multi-source pages pinned by a literal 28-page
   distinct-count map. 13 content mutations executed red-then-restored.
 - Window UX: missing-cell tooltips AND aria labels carry a localized source
-  line (tEntity/zone/dungeon/deed channels; hudChrome.reliquary.sourceLine*
-  family); page descs render under the page header (reliquaryPageDesc's first
+  line (tEntity/zone/dungeon/deed channels; the shipped key family is
+  hudChrome.reliquary.sourceBossDungeon / sourceBoss / sourceZone /
+  sourceProfession / sourceDeed / sourceVendor, not the plan's sourceLine*
+  spelling); page descs render under the page header (reliquaryPageDesc's first
   production call site) and as the shelf-row second line (CSS-truncated);
   the shelf list is a real ul/li (professions pattern); the relic grid is ONE
   roving tab stop (rovingTarget 'both', Home/End, wrap) with an SR-only usage
@@ -420,3 +429,99 @@ happened.
 - Commits stay LOCAL per the plan; push happens after Phase 13 QA passes.
   NEXT: Phase 13 QA (docs/prd/reliquary-perfection/phase-13-qa.md, ultracode,
   fresh session).
+
+## Phase 13 QA: Verify window structure + information UX (2026-08-06)
+
+- Verdict: PASS. Pushed to origin/feature/reliquary after the fix rounds
+  below; CI babysat on PR #2976.
+- Release sync: the base moved mid-QA (Fernando merged the CI/CD packet PRs
+  3020/3022/3023/3024 and the elixir tooltip PR 3021). Merged
+  origin/release/v0.35.0 at 3d94a97586 as 367f6e2968; the one conflict was
+  the generated i18n pending bundle, resolved by re-running npm run i18n:gen
+  (every other bundle reproduced byte-identically). release-merge-audit ran
+  clean: both sides intact in the four genuine overlaps (hud.ts,
+  pr_shot_targets.mjs, architecture.test.ts, localization_coverage.test.ts),
+  no premise invalidated, zero new db-mock sites.
+- Verification executed: tsc clean; the 12-file battery green pre- and
+  post-merge; npm run ci:changed exit 0; the browser a11y suite RUN LOCALLY
+  for the first time (29 passed, closing the build's one deferred acceptance
+  criterion); an all-locales scratch sweep (22 locales x every hinted slot:
+  every source line and display name non-empty, zero snake_case id leaks);
+  EIGHT new-angle mutations, each killed by named tests (hint dropped: 5
+  tests; the original wyrmcult bug re-added: the new sweep names
+  quest:q_gravewyrm; syncGridRoving deleted: the chip-reset pin; both nearly
+  boundary flips; the pre-cap filter deleted; the quest arm deleted: the
+  per-family floor; the applySearch equality guard deleted: the either-order
+  IME case).
+- QA round 1 (four fresh reviewers: frontend-seam, architecture,
+  test-coverage, qa-checklist): 0 blocking anywhere. Confirmed and fixed:
+  wyrmcult_grand_robe's boss hint violated the model's own two-comparable-
+  routes rule (quest q_gravewyrm names Korzul, the loot row names Korgath):
+  retired to SOURCE_PENDING_RULING (59 -> 60; Phase 13b authors its
+  multi-hint, boss + quest); the Overview nearly strip filtered AFTER its
+  top-five cap, hiding sixth-ranked matches: now narrows before the cap; the
+  hud unlock drain called bare render(), defeating the world-driven announce
+  guard (found independently by two reviewers in hud.ts, the one file the
+  six build rounds never re-read): now refreshIfChanged() with a source pin;
+  announce gating now asks the model what the paint narrowed (model.filtered;
+  a needle matching everything stays silent); the window-opening render is
+  silent by design (suppressAnnounceOnce; close() clears region state); IME
+  compositions are never rebuilt over (isComposing guard + composing flag
+  holding the slow band, either event order a no-op via the applier's
+  equality guard); recent chips wrap instead of truncating (ellipsis was
+  keyboard-unreachable on a non-interactive span) with overflow-wrap for
+  unbreakable compounds; a competing-route sweep now walks six award-path
+  families with per-family vacuity floors, a profession-acknowledged recipe
+  arm, curated consumed-checked exceptions for the two 250-to-1 set-member
+  trash routes, and named exclusions (Rift payout: a 13b 'rift'-kind ruling
+  QA must not pre-empt; chest pools and heroic-variant swap: zero hinted
+  overlap today); difficulty-aware boss loot truth (extracted predicate with
+  synthetic negatives); dead-sourceDefault, non-item-kind hint, pending
+  derivation-identity, and prototype-key pins; data-cell-source stamped on
+  source-bearing cells with behavior + cross-file pins replacing the shot
+  picker's English aria match; test decisiveness hardening per the
+  test-coverage audit (reset-marker exact equality, clear-silence,
+  shelf deep-match with premises, overview filtered arms each decided
+  alone including the equal-length identity swap, tabStop exactness, two
+  honest retitles incl. the Turkish platform-contract test).
+- QA round 2 (three fresh reviewers over the fix commits): tcov found the
+  one BLOCKING of the whole QA (a single 150-route floor let the vendor,
+  quest, and recipe sweep arms be deleted silently; the quest arm is the one
+  that caught the robe): closed with per-family floors, mutation-proven.
+  arch measured the Rift overlap (72 of 141 hinted slots) and verified the
+  robe's two routes independently; fe-seam caught the IME double-announce
+  ordering and the online-immediacy overclaim in the hud comment (the event
+  frame precedes the heavy snapshot online; the comment now says convergence,
+  not immediacy).
+- Refuted with the file open, not applied: the round-1 proposal to stamp
+  aria-describedby only on the active cell (the attribute is inert on
+  non-focused cells, so the proposed re-stamp announces identically; the
+  per-cell design's in-code rationale stands).
+- Considered skips, recorded not silent: the second buildNearlyComplete
+  sweep for the narrowing flag stays (cold path, honest comment, simpler
+  seam than a paired return); wrapped chips may grow the recent strip row
+  (information over fixed height; the truncation it replaced was the a11y
+  defect); the noNonNullAssertion warning in the a11y browser test keeps the
+  file's assert-then-bang idiom; close()'s lastAnnounced/marker resets are
+  belt-and-braces under the suppress branch; stampGridTabIndex write-elision
+  is behaviorally unpinnable (correct by inspection).
+- Screenshots: unchanged. The committed overview captures contain no recent
+  chips (empty demo ring) and the page captures cannot show a data
+  attribute, so the chip-wrap CSS and cell marker alter no pixels; no
+  recapture owed. docs/screenshots/reliquary-window-information/ stands.
+- Deferred to CI / E2E (pre-existing VERIFY items, unchanged by this QA):
+  the ARM 3 wall-clock perf tour and the scripts/mobile_*.mjs E2E suite. No
+  new E2E for the search flow is owed (the happy-dom behavior suite plus the
+  axe cases cover it; decision recorded per the round-1 gate).
+- Validation on the finished tree: tsc clean, 8-suite battery 468 green,
+  browser a11y 29 green, ci:changed exit 0. node scripts/gate_select.mjs:
+  every step green EXCEPT the full-suite vitest arm, which ran twice on a
+  box another session held at load 48 to 95 (16 cores) and failed 15 then 7
+  tests, every one a pure timeout in a suite this diff does not touch, with
+  the failing SET shifting between runs (the contention signature); every
+  failing file re-run green on a quiet box (173/173 for the persistent
+  four), 31810 of 31817 passed with zero assertion failures. Ruled
+  machine-contention noise per the recorded judge-by-CI policy for
+  borderline local timeouts; PR CI on clean runners is the arbiter. Full
+  history: abeafbe99c -> 367f6e2968 (sync) -> 2d084fe341 + 71d2369d76 +
+  b9777879b3 (round 1) -> 7a574c6608 (round 2) -> the docs commit.

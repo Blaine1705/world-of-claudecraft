@@ -1,6 +1,7 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
+Current phase: 13 QA complete and pushed; next: 13b (phase-13b-source-coverage.md,
+plain xhigh, fresh session). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -288,12 +289,15 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   blast-radius suites green. Stopping rules: NO uncatalogued rare+ instance drop
   remains beyond the three added (proven by the equality regime); the 51 open-world
   and Rift rare+ items are Phase 21 scope.
-- Phase 13: BUILT (2026-08-06, local, unpushed; QA next). Source hints:
+- Phase 13: COMPLETE with QA, pushed (2026-08-06). Source hints:
   ReliquarySourceHint {sourceKind: 'boss'|'zone'|'profession'|'deed'|'vendor',
   sourceId} on every relic-def arm + ReliquaryPageDef.sourceDefault + the ONE
-  resolver reliquaryRelicSource(page, relic) the view calls; 183/242 slots
-  resolve, 59 pinned in SOURCE_PENDING_RULING (see OPEN items). Truth pins on
-  all three authored arms (boss loot, vendor stock, derived professions).
+  resolver reliquaryRelicSource(page, relic) the view calls; 182/242 slots
+  resolve (183 as built; QA retired the wyrmcult_grand_robe hint), 60 pinned
+  in SOURCE_PENDING_RULING (see OPEN items). Truth pins on all three authored
+  arms (boss loot difficulty-aware, vendor stock, derived professions), plus
+  the QA's competing-route sweep (six award-path families, per-family
+  floors, named exclusions incl. the Rift payout pending the 13b ruling).
   Window: source lines in missing-cell tooltip AND aria, page descs rendered
   (reliquaryPageDesc's first production consumers: page header + shelf-row
   second line), ul/li shelf list, roving grid tab stop (per-cell
@@ -376,6 +380,35 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   Phase 21 grows the catalog and before the Phase 22 fill translates the
   sourceLine keys); per-kind truth pins against the live award paths are part
   of the phase, mutation verified.
+  Phase 13 QA additions to this ruling's worklist (2026-08-06):
+  (a) wyrmcult_grand_robe joined the pending set (its quest route names
+  Korzul while its korgath_bonus loot row names Korgath; the model's own
+  two-comparable-routes rule); 13b authors its multi-hint (boss + quest) and
+  the two-mount shrink target is unchanged. (b) The QA's competing-route
+  sweep (tests/reliquary_content.test.ts) must grow an acknowledgment arm
+  per new kind 13b lands, and its named Rift exclusion is 13b's to resolve:
+  the Rift clear pools overlap about 72 hinted five-man gear slots at
+  comparable per-clear odds, so 13b decides whether dungeon gear lists a
+  rift hint (the same standard its mounts already get) or records the
+  written exclusion as permanent. (c) Vocabulary consideration: 'boss' is
+  used for elite trash families and open-world rares today; 13b may prefer
+  'mob' when it extends the kinds. (d) The two crafted pending relics
+  (boundstone_helm, gravewyrm_gauntlets) carry a THIRD route (their
+  recipes); the sweep's recipe arm acknowledges profession-kind hints on the
+  crafting profession, so a 'profession' hint is representable for them
+  today if 13b prefers it over multi-boss.
+- Phase 15 input (Phase 13 QA, 2026-08-06): ReliquaryWindow.open(nav) sets
+  nav but does not clear pageId, and the view resolves an off-shelf pageId
+  from the full catalog, so a deep link passing a nav while a page from
+  another shelf is persisted can render that page under the wrong rail.
+  Unreachable today (no caller passes nav); clear pageId on a nav-bearing
+  open, or pass the page too, when deep links land.
+- Cross-window follow-up (Phase 13 QA, 2026-08-06): deeds_window.ts carries
+  the byte-identical pre-fix search-input shape (no isComposing guard, no
+  composing hold, no applier equality guard), so CJK IME compositions there
+  still rebuild mid-composition. Same fix, deeds-scoped change with its own
+  behavior tests; not this packet's diff (cross-window scope, the
+  .deed-search precedent).
 - Rider (Phase 12 arch review): three delve-clear readers hand-roll the sum with
   different validation (shop gate prefix-sums unguarded, deeds delveClearCount also
   accepts a bare delveId key and sums raw values, the reliquary arm is strict and

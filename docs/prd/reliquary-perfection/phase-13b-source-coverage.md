@@ -1,8 +1,10 @@
 # Phase 13b: Complete source coverage (the collection-log answer)
 
-Owns: the source-kind vocabulary extension, multi-source hints, authoring the 59
-pending slots down to the two genuine content gaps, per-kind truth pins, and the
-multi-source tooltip/aria rendering. This phase executes the maintainer ruling of
+Owns: the source-kind vocabulary extension, multi-source hints, authoring the 60
+pending slots down to the two genuine content gaps (59 at authoring time; the
+Phase 13 QA retired wyrmcult_grand_robe's hint into the set, see state.md's QA
+additions to the ruling), per-kind truth pins, and the multi-source tooltip/aria
+rendering. This phase executes the maintainer ruling of
 2026-08-06 (state.md, "RULING SETTLED (Phase 13 source hints)"): do what is best
 for the feature, at collection-log fidelity. The reference experience is the OSRS
 collection log and the WoW appearance panel: every uncollected silhouette lists
@@ -55,8 +57,12 @@ Agent A (vocabulary + authoring + truth pins, sim content and content tests):
   shape), and change the resolver to return a readonly list (empty = no line;
   relic hints win over the page default entirely, never merged with it).
   Update every existing call site and test knowingly.
-- Author the pending 57 of 59:
-  - Gravewyrm shared drops (6): BOTH dropping bosses as hints on each relic.
+- Author the pending 58 of 60:
+  - Gravewyrm shared drops (7): BOTH dropping mobs as hints on each relic;
+    wyrmcult_grand_robe carries boss (korgath_the_bound) + quest
+    (q_gravewyrm) instead, the Phase 13 QA retirement. Consult state.md's
+    "Phase 13 QA additions" for the sweep-growth contract, the Rift
+    exclusion to resolve, and the 'mob' vocabulary consideration.
   - Delve routes (8): the two shop-and-chest items carry delve + vendor hints;
     the six Drowned Litany rite rows carry a delve hint (the rite chest lives
     inside that delve; "found in" is honest).
