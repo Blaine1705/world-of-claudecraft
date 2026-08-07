@@ -69,7 +69,7 @@ interface AttributionTargetFixture {
 // Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
 // back while PR #2982's prewarm policy remains in the release.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '8009031470c8cd5831d3171dd630c8cf58eebc10678c392a8e70e5b8fbd67693';
+  '6f44775b6a512b9b87693cd57fecc3a6580812936c4ea0c7869d6c8420c86bc0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

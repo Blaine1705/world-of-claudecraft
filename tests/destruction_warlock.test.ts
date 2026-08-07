@@ -667,6 +667,15 @@ describe('Destruction finishers and target switching', () => {
     const primary = addDummy(sim, 9706);
     const branded = addDummy(sim, 9707, 3);
     p.facing = 0;
+    // Never-resist rig: a resisted bolt passes the half-power copy assertions
+    // trivially (0 === 0.5 * 0) while silently dropping its impact Ruin, and
+    // the spell-hit table keeps a 1% resist floor that hitBonus cannot
+    // suppress, so draw-order moves from content merges can flake the final
+    // count (they did on the v0.35.0 catch-up). Force only the near-certain
+    // rolls (the capped hit roll) to succeed; crit and damage rolls stay real.
+    p.hitBonus = 1;
+    const realChance = sim.rng.chance.bind(sim.rng);
+    sim.rng.chance = (chance: number) => (chance >= 0.98 ? true : realChance(chance));
 
     sim.targetEntity(branded.id);
     castAndLand(sim, 'ruinous_brand', 1);
