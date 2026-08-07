@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Cờ Trong Tay',
+    desc: 'Chiếm một lá cờ tại Cánh Đồng Trũng Gai.',
+  },
+  pvp_bg_first_win: {
+    name: 'Trũng Gai Vững Bền',
+    desc: 'Thắng một trận Cánh Đồng Trũng Gai.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Người Trấn Giữ Trũng Gai',
+    desc: 'Thắng 25 trận Cánh Đồng Trũng Gai.',
+    title: 'Người Cầm Cờ',
+  },
+  pvp_bg_captures_100: {
+    name: 'Một Trăm Lá Cờ',
+    desc: 'Chiếm 100 lá cờ tại Cánh Đồng Trũng Gai trong suốt sự nghiệp của bạn.',
+  },
+  dgn_rift: {
+    name: 'Người Đi Xuyên Rạn Nứt',
+    desc: 'Dọn sạch một Rạn Nứt bằng cách đánh bại trùm của tầng đó.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Quân Vương Rạn Nứt',
+    desc: 'Dọn sạch một Rạn Nứt hạng S, bậc khó nhất mà một cổng Rạn Nứt có thể sinh ra.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Trung Sĩ',
+    desc: 'Kiếm được 10.000 danh dự trong suốt cuộc đời nhân vật. Tiêu nó đi không bao giờ khiến bạn mất cấp bậc.',
+    title: 'Trung Sĩ',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Hiệp Sĩ Trung Úy',
+    desc: 'Kiếm được 40.000 danh dự trong suốt cuộc đời nhân vật, cả một mùa chiến tranh thực sự phía sau bạn.',
+    title: 'Hiệp Sĩ Trung Úy',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Thống Chế',
+    desc: 'Kiếm được 150.000 danh dự trong suốt cuộc đời nhân vật. Hiếm có trên bất kỳ vương quốc nào, và nó nên như vậy.',
+    title: 'Thống Chế',
+  },
   chr_drakemaw_broodlord: {
     name: 'Kẻ Phá Vỡ Ổ Trứng',
     desc: 'Hạ gục một Lãnh Chúa Bầy Drakemaw giữa bầy trứng của nó, vượt qua tiếng gầm, đòn chém bổ, và ngọn lửa.',

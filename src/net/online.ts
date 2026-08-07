@@ -1352,6 +1352,7 @@ function blankEntity(id: number): Entity {
     sitting: false,
     afk: false,
     weaponStowed: false,
+    helmHidden: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -2925,6 +2926,7 @@ export class ClientWorld implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
+      e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
@@ -4260,6 +4262,14 @@ export class ClientWorld implements IWorld {
     const p = this.entities.get(this.playerId);
     if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
     this.cmd({ cmd: 'stow_weapon' });
+  }
+  setHelmHidden(hidden: boolean): void {
+    // Optimistic local nudge (the toggleWeaponStow idiom) so the recompose and
+    // portrait re-snapshot land instantly; the next snapshot's `hh` bit
+    // reconciles. No dead-gate: a wardrobe preference, not an action.
+    const p = this.entities.get(this.playerId);
+    if (p) p.helmHidden = hidden;
+    this.cmd({ cmd: 'set_helm', hidden });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);

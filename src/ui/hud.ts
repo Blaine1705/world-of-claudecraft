@@ -18,9 +18,15 @@ import {
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
-import { CharacterPreview, type PreviewFramingName } from '../render/characters';
+import {
+  CharacterPreview,
+  modularKeyFor,
+  modularLookFor,
+  type PreviewFramingName,
+} from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
+import type { ModularLook } from '../render/characters/modular';
 import {
   onPortraitsReady,
   onPortraitUpdate,
@@ -110,6 +116,7 @@ import {
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   type ItemDef,
+  isMechWearer,
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
@@ -2274,6 +2281,15 @@ export class Hud {
       this.totFramePainter.invalidatePortrait();
     });
     onPortraitUpdate((visualKey, skin) => {
+      // The mech is not a class: a lazily-arriving chroma atlas must refresh
+      // the frame of the player wearing it (drawMech falls back to the class
+      // face until the atlas is resident).
+      if (visualKey === 'player_mech') {
+        if (isMechWearer(this.sim.player) && skin === (this.sim.player.skin ?? 0)) {
+          this.drawPlayerFramePortrait();
+        }
+        return;
+      }
       const playerClass = visualKey.startsWith('player_')
         ? (visualKey.slice('player_'.length) as PlayerClass)
         : null;
@@ -4792,6 +4808,22 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    helmHidden: () => this.sim.player?.helmHidden ?? false,
+    toggleHelm: () => {
+      const next = !(this.sim.player?.helmHidden ?? false);
+      // The choice persists PER CHARACTER through the sim's own save
+      // (CharacterState.helmHidden), like weaponStowed: no client-side mirror,
+      // or a second character on the same browser would inherit this one's
+      // wardrobe on world entry and overwrite its saved choice.
+      this.sim.setHelmHidden(next);
+      audio.click();
+      // The in-world body recomposes off the entity bit (renderer diff); the
+      // portraits are keyed on the look's full signature, so repainting the
+      // player frame and the sheet is what mints the fresh helmed/bare
+      // snapshot everywhere it shows.
+      this.drawPlayerFramePortrait();
+      this.renderCharIfOpen();
+    },
   });
   // Inspect ("Profile") window painter (inspect_view.ts pure core + inspect_window.ts
   // painter). It paints #inspect-window for both the rich in-range card (live
@@ -5034,12 +5066,26 @@ export class Hud {
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
   });
 
+  /** The player's own frame portrait.
+   *
+   *  Their COMPOSED character when they have an authored look, the face they
+   *  built, not the stock art for their class, and the class portrait
+   *  otherwise. Only the local player is composed (the look is presentation
+   *  state and is not on the wire), so this is the one frame that can do it;
+   *  the target and target-of-target frames stay on `drawClass`. */
   private drawPlayerFramePortrait(): void {
-    this.portraits.drawClass(
-      $('#pf-portrait') as unknown as HTMLCanvasElement,
-      this.sim.cfg.playerClass,
-      this.sim.player.skin ?? 0,
-    );
+    const canvas = $('#pf-portrait') as unknown as HTMLCanvasElement;
+    const cls = this.sim.cfg.playerClass;
+    const skin = this.sim.player.skin ?? 0;
+    const self = this.sim.player;
+    // A mech wearer IS the mech in the world, the frame must agree, and their
+    // `skin` is a chroma index that means nothing to the class atlas.
+    const mech = isMechWearer(self);
+    const look = self && !mech ? modularLookFor(self) : null;
+    if (self && mech) this.portraits.drawMech(canvas, skin, cls);
+    else if (self && look)
+      this.portraits.drawModularPlayer(canvas, modularKeyFor(self), look, cls, skin);
+    else this.portraits.drawClass(canvas, cls, skin);
   }
 
   // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
@@ -15827,6 +15873,10 @@ export class Hud {
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
       framing: PreviewFramingName;
+      /** Compose the turntable from this authored look instead of mounting the
+       *  stock class rig. Set for the SELF sheet, whose body must match the one
+       *  the world draws; null for a stage showing someone else. */
+      look?: ModularLook | null;
     },
   ): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
@@ -15838,7 +15888,17 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    if (opts.previewKey) {
+    if (opts.look) {
+      // The composed body wins over the class rig, exactly as it does in the
+      // world: same face, hair, kit and helmet choice, holding the real hands.
+      this.charPreview.setModular(
+        opts.look.app,
+        opts.look.worn,
+        opts.cls,
+        opts.mainhand,
+        opts.offhand,
+      );
+    } else if (opts.previewKey) {
       // Mech is class-agnostic; mirror the wearer class's hand layout so the
       // paperdoll matches the in-world render.
       const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
@@ -15861,10 +15921,17 @@ export class Hud {
     previewKey?: string,
   ): void {
     const mainhand = this.sim.equipment.mainhand ?? null;
+    // The sheet shows the body the WORLD draws, read through the same look
+    // seam the portrait uses: the player's own face, hair and kit, including
+    // the helmet-visibility choice. A Combat Mech is a whole replacement body
+    // and wins over the authored look, matching createCharacterVisual's own
+    // precedence in-world (composing over it hid a purchased cosmetic).
+    const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
     this.mountSharedPreview(container, {
       cls,
       skin,
       previewKey,
+      look,
       mainhand,
       offhand: this.sim.equipment.offhand ?? null,
       // The paperdoll wears the same Armory skin the world renders: resolved
@@ -15939,7 +16006,12 @@ export class Hud {
         this.mountCharPreview(container, cls, skin, previewKey),
       attachTooltip: (el, html) => this.attachTooltip(el, html),
       renderBags: () => this.renderBags(),
-      renderCharIfOpen: () => this.renderCharIfOpen(),
+      renderCharIfOpen: () => {
+        this.renderCharIfOpen();
+        // A chroma pick (or unequip) changes what the player IS in the world;
+        // the frame portrait must follow without waiting for a reload.
+        this.drawPlayerFramePortrait();
+      },
     };
   }
 
@@ -16697,7 +16769,7 @@ export class Hud {
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
-    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm' })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
+    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
     // Party membership actions (convert, loot, leave), the dungeon-difficulty
     // toggle, the reset-dungeons action, and close, resolved by the pure
     // selfPlayerContextActions. Leaving the party lives here now, not a
@@ -16806,7 +16878,13 @@ export class Hud {
    */
   private ctxPlayerTitleHtml(name: string, entCls: PlayerClass | null, ent?: Entity): string {
     const chip = entCls
-      ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' })
+      ? portraitChipHtml({
+          cls: entCls,
+          skin: ent?.skin ?? 0,
+          name,
+          variant: 'sm',
+          catalog: ent?.skinCatalog,
+        })
       : '';
     const label = esc(t('hudChrome.playerMenu.aiTagTitle'));
     const ai = this.isAiAccount(name, ent)

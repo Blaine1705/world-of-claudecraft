@@ -1381,6 +1381,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
+  if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
   if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
@@ -6595,6 +6596,13 @@ export class GameServer {
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
+        break;
+      // Paperdoll eye toggle: cosmetic helmet-visibility preference. Explicit
+      // boolean (not a toggle) so it is idempotent: the client sends the state
+      // its paperdoll is showing. Persistence is the character save's job
+      // (CharacterState.helmHidden), never a client-side store.
+      case 'set_helm':
+        sim.setHelmHidden(msg.hidden === true, pid);
         break;
       // Per-character action-bar layout upload (untrusted client input). Validate
       // + bound the payload; a malformed/oversized layout is dropped silently

@@ -26,6 +26,7 @@ import {
 } from './anim_state';
 import {
   applyMaterials,
+  applyModularSliderMorphs,
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
@@ -36,8 +37,10 @@ import {
   skinTexture,
   tintedFarMaterials,
 } from './assets';
+import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ModularAppearance, ModularLook } from './modular';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -356,8 +359,30 @@ export class CharacterVisual {
   private skinIndex: number;
   private weaponItemId: string | null;
   private offhandItemId: string | null;
+  /** Composition inputs for a `modular` def (null for a fixed class rig).
+   *  Changing a look means changing GEOMETRY, so callers rebuild the visual
+   *  rather than mutating it; this is kept so they can tell whether they must. */
+  private look: ModularLook | null = null;
+
+  /** The composition this visual was built from (null for a fixed class rig). */
+  get modularLook(): ModularLook | null {
+    return this.look;
+  }
+
+  /** Move the face/body sliders on the LIVE body: morph influences are
+   *  per-instance over shared geometry, so a slider drag repaints without the
+   *  dispose-and-recompose a geometry change needs (which is why the sliders
+   *  are deliberately outside `modularBuildSignature`). No-op on a fixed rig. */
+  applyModularSliders(app: ModularAppearance): void {
+    if (!this.look) return;
+    this.look = { ...this.look, app };
+    applyModularSliderMorphs(this.model, app);
+  }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  /** Long-hair secondary motion (modular styles with sway morphs; empty and
+   *  free on every other rig). */
+  private hairSway = new HairSwayDriver();
   // Skin payloads whose orientation blends to a root-relative pin (see
   // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
   // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
@@ -493,6 +518,7 @@ export class CharacterVisual {
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
+    look: ModularLook | null = null,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -517,7 +543,14 @@ export class CharacterVisual {
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
-    this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    // THE MECH IS A REPLACEMENT BODY, NOT A LAYER. Only a `modular` def can
+    // compose a character, so a look handed to a fixed rig is dropped here
+    // rather than carried: the mech cosmetic must never end up with a second
+    // body inside it (Troy, 2026-08-07). assembleModel already ignores `look`
+    // for a non-modular def, this makes the visual agree, so nothing
+    // downstream can read a look the geometry never used.
+    this.look = prep.def.modular ? look : null;
+    this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
     configureTightBoneTextures(this.model);
     applyMaterials(
       this.model,
@@ -545,6 +578,7 @@ export class CharacterVisual {
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
+    this.hairSway.build(this.model);
     this.modelWrap.add(this.model);
     this.poseWrap.add(this.modelWrap);
     this.root.add(this.poseWrap);
@@ -804,6 +838,10 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
+      // Morph influences, not bone writes, so mixer order is irrelevant, but
+      // it rides the animated branch: a throttled far rig has no business
+      // integrating a hair spring.
+      this.hairSway.update(dt, s);
     }
   }
 
