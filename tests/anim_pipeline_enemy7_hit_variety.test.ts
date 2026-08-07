@@ -55,16 +55,16 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
   });
 
   it('wires a matching animUrls entry onto both ENEMY7 consumers', () => {
-    const consumers: [string, string][] = [
-      ['mob_kobold', 'goblin_hit_variety_anims.glb'],
-      ['mob_ogre', 'giant_hit_variety_anims.glb'],
+    const consumers: [string, string, string][] = [
+      ['mob_kobold', 'goblin_hit_variety_anims.glb', 'clips: KOBOLD_ENEMY7'],
+      ['mob_ogre', 'giant_hit_variety_anims.glb', 'clips: ENEMY7'],
     ];
-    for (const [key, file] of consumers) {
+    for (const [key, file, clipsLine] of consumers) {
       const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      expect(block, key).toContain('clips: ENEMY7');
+      expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
     }
     const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;

@@ -1492,9 +1492,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
-    animUrls: [`${CREATURES}/goblin_hit_variety_anims.glb`],
     height: 2.1,
-    animUrls: [`${CREATURES}/kobold_ability_anims.glb`],
+    animUrls: [
+      `${CREATURES}/goblin_hit_variety_anims.glb`,
+      `${CREATURES}/kobold_ability_anims.glb`,
+    ],
     clips: KOBOLD_ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
