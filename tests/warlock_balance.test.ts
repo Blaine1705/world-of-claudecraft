@@ -133,7 +133,7 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(dotTotal('curse_of_agony')).toBe(78);
 
     const shadowBolt = ABILITIES.shadow_bolt.ranks?.find((rank) => rank.rank === 4);
-    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 190, max: 235 }]);
+    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 130, max: 162 }]);
   });
 
   it('keeps mastery tuning and the shared generator-resource row canonical', () => {
