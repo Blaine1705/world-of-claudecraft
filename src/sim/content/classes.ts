@@ -5188,7 +5188,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 55,
         effects: [
-          { type: 'directDamage', min: 66, max: 80 },
+          { type: 'directDamage', min: 58, max: 72 },
           { type: 'gainSoulFragments', amount: 1 },
         ],
       },
