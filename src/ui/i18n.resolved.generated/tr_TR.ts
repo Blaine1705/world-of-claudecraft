@@ -2113,7 +2113,7 @@ export const tr_TR: EnTranslations = {
       "showAbsorbs": "Soğurma Kalkanlarını Göster",
       "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {

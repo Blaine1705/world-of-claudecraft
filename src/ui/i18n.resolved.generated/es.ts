@@ -2113,7 +2113,7 @@ export const es: EnTranslations = {
       "showAbsorbs": "Mostrar escudos de absorción",
       "showAuras": "Mostrar beneficios y perjuicios",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Mostrar tu marco"
     },
     "frameReset": {

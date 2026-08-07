@@ -2113,7 +2113,7 @@ export const nl_NL: EnTranslations = {
       "showAbsorbs": "Absorptieschilden tonen",
       "showAuras": "Versterkingen en verzwakkingen tonen",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Je eigen frame tonen"
     },
     "frameReset": {

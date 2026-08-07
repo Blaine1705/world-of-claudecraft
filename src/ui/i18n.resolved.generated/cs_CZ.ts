@@ -2113,7 +2113,7 @@ export const cs_CZ: EnTranslations = {
       "showAbsorbs": "Zobrazit absorpční štíty",
       "showAuras": "Zobrazit posílení a oslabení",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {

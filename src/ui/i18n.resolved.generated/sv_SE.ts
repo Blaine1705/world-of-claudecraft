@@ -2113,7 +2113,7 @@ export const sv_SE: EnTranslations = {
       "showAbsorbs": "Visa absorptionssköldar",
       "showAuras": "Visa positiva och negativa effekter",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Visa din ram"
     },
     "frameReset": {

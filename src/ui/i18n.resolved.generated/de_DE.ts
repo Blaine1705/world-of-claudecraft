@@ -2113,7 +2113,7 @@ export const de_DE: EnTranslations = {
       "showAbsorbs": "Absorptionsschilde anzeigen",
       "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Eigenen Rahmen anzeigen"
     },
     "frameReset": {

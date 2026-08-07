@@ -2113,7 +2113,7 @@ export const vi_VN: EnTranslations = {
       "showAbsorbs": "Hiện Khiên Hấp Thụ",
       "showAuras": "Hiện Buff và Debuff",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Hiện Khung Của Bạn"
     },
     "frameReset": {

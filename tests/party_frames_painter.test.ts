@@ -860,22 +860,15 @@ describe('petRowHandlers: the pet sliver selects the pet, not the member', () =>
     expect(calls.pet).toEqual([90, 91]);
   });
 
-  it('activates on Enter and Space, and ignores other keys', () => {
-    const { calls, deps: d } = deps();
-    const h = petRowHandlers(slotFor({ id: 90 }), d);
-    for (const key of ['Enter', ' ']) {
-      h.keydown({
-        key,
-        stopPropagation: () => calls.stopped++,
-        preventDefault: () => {},
-      } as unknown as KeyboardEvent);
-    }
-    h.keydown({
-      key: 'a',
-      stopPropagation: () => calls.stopped++,
-      preventDefault: () => {},
-    } as unknown as KeyboardEvent);
-    expect(calls.pet).toEqual([90, 90]);
+  // No keyboard arm by design: the sliver carries no role/tabindex, because a nested
+  // interactive control inside the row button is the axe nested-interactive violation
+  // and ARIA makes a button's children presentational anyway. Pin the absence so a
+  // future edit cannot quietly re-add the nesting through the handler side.
+  it('exposes a click affordance only, with no keyboard arm', () => {
+    const { deps: d } = deps();
+    const handlers = petRowHandlers(slotFor({ id: 90 }), d);
+    expect(typeof handlers.click).toBe('function');
+    expect('keydown' in handlers).toBe(false);
   });
 });
 

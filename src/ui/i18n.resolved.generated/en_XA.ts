@@ -2113,7 +2113,7 @@ export const en_XA: EnTranslations = {
       "showAbsorbs": "[Šĥóŵ Áƀšóŕƀ Šĥíéļðš]",
       "showAuras": "[Šĥóŵ Ɓúƒƒš áñð Ðéƀúƒƒš]",
       "showPets": "[Šĥóŵ Þéţš]",
-      "petHealth": "[{name} {pct}]",
+      "petHealth": "[Þéţ {name}, {pct} ĥéáļţĥ]",
       "showSelf": "[Šĥóŵ Ýóúŕ Ƒŕáɱé]"
     },
     "frameReset": {

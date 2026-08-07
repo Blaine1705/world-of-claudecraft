@@ -2061,6 +2061,11 @@
   body.mobile-touch #party-frames .party-frame .pfm-pet {
     height: 3px;
     margin-top: 1px;
+    /* Makes the "the member row owns the tap" claim above actually true. At 3px this
+       is nowhere near the 40x40 touch floor, and without this a tap landing on it
+       selects the pet and stopPropagation swallows the member selection the player
+       meant. Informational on touch; the row keeps the whole tap area. */
+    pointer-events: none;
   }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;

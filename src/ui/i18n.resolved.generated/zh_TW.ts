@@ -2113,7 +2113,7 @@ export const zh_TW: EnTranslations = {
       "showAbsorbs": "顯示吸收護盾",
       "showAuras": "顯示增益和減益",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "寵物{name}，生命值{pct}",
       "showSelf": "顯示你的框體"
     },
     "frameReset": {

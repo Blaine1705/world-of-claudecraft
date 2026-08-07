@@ -2113,7 +2113,7 @@ export const ru_RU: EnTranslations = {
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Питомец {name}, здоровье {pct}",
       "showSelf": "Показывать вашу рамку"
     },
     "frameReset": {

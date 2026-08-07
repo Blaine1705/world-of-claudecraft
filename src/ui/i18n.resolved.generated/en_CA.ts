@@ -2113,7 +2113,7 @@ export const en_CA: EnTranslations = {
       "showAbsorbs": "Show Absorb Shields",
       "showAuras": "Show Buffs and Debuffs",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Show Your Frame"
     },
     "frameReset": {

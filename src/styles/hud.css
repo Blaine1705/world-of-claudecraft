@@ -6027,21 +6027,27 @@
     transform-origin: left center;
     background: linear-gradient(180deg, #6fbf5a, #3f8a33);
   }
-  .party-frame .pfm-pet.dead .pfm-pet-fill {
-    background: linear-gradient(180deg, #6a6a6a, #3a3a3a);
+  /* A dead pet is ALWAYS hp 0, so its fill is scaleX(0) and has no pixels: styling
+     the fill here rendered nothing and left a dead pet identical to an empty track.
+     The dead state goes on the TRACK, which is the part that still has area, so a
+     hunter can tell "dead, revive it" from "alive and nearly dead" at a glance. */
+  .party-frame .pfm-pet.dead {
+    background: repeating-linear-gradient(135deg, #3a3a3a, #3a3a3a 2px, #262626 2px, #262626 4px);
+    border-color: #555;
   }
   .party-frame .pfm-pet:hover {
     outline: 1px solid var(--gold-dim);
-  }
-  .party-frame .pfm-pet:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
   }
   /* Raid style compacts the row to a fixed height with overflow hidden, so the
      sliver rides as a second thin strip directly above the resource strip rather
      than in flow, where it would be clipped. */
   #party-frames.party-style-raid .party-frame .pfm-pet {
     position: absolute;
+    /* 2px is far below any usable hit target, and a stray click here would
+       stopPropagation away the member selection a healer actually meant. Raid style
+       makes the sliver purely informational; the row keeps the whole click area.
+       Keyboard focus is unaffected, so the pet stays reachable without a mouse. */
+    pointer-events: none;
     left: 0;
     right: 0;
     bottom: 3px;

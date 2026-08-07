@@ -2113,7 +2113,7 @@ export const id_ID: EnTranslations = {
       "showAbsorbs": "Tampilkan Perisai Serap",
       "showAuras": "Tampilkan Buff dan Debuff",
       "showPets": "Show Pets",
-      "petHealth": "{name} {pct}",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Tampilkan Bingkaimu"
     },
     "frameReset": {

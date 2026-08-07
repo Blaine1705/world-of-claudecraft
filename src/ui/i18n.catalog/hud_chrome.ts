@@ -2416,10 +2416,11 @@ export const hudChromeStrings = {
     // does not trip the M16 untranslated-leak guard.
     showPets: 'Show Pets',
     // The sliver's accessible name, the only way a screen-reader user gets the pet's
-    // health (the sliver itself is a bar with no visible text). {name} is the pet's
-    // name and {pct} its health percent, both substituted, so the literal part stays
-    // non-wordy for the same guard.
-    petHealth: '{name} {pct}',
+    // health (the sliver itself is a bar with no visible text), so it has to say WHAT
+    // it is, not just carry the numbers: "{name} 65%" alone named neither the pet nor
+    // the health. {name} is the pet's name, {pct} its health percent. Wordy (M16), so
+    // the five non-Latin fills land in this same change.
+    petHealth: 'Pet {name}, {pct} health',
     showSelf: 'Show Your Frame',
   },
   // Interface panel row: snap both movable unit frames back to their stock

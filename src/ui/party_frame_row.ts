@@ -132,10 +132,13 @@ export function partyRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
 }
 
 /**
- * The PET sliver's handlers, split from the row's own so the two selections cannot be
- * confused: clicking the sliver selects the member's PET, clicking anywhere else on
- * the row selects the MEMBER. Both stop propagation, or the click would bubble to the
+ * The PET sliver's click handler, split from the row's own so the two selections cannot
+ * be confused: clicking the sliver selects the member's PET, clicking anywhere else on
+ * the row selects the MEMBER. It stops propagation, or the click would bubble to the
  * row handler and immediately re-select the member over the pet.
+ *
+ * Mouse only, by design. The sliver carries no role/tabindex (see createPartyRow), so
+ * there is no keyboard arm here to go with a focus it can never receive.
  *
  * Reads the LIVE slot for the same reason the row handlers do: rows are pooled and
  * recycled to a different member, so a captured pet id would go stale. A no-op when
@@ -148,14 +151,7 @@ export function petRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
     if (!pet) return;
     deps.onTargetPet(pet.id);
   };
-  return {
-    click: select,
-    keydown: (ev: KeyboardEvent): void => {
-      if (ev.key !== 'Enter' && ev.key !== ' ') return;
-      ev.preventDefault();
-      select(ev);
-    },
-  };
+  return { click: select };
 }
 
 // A persistent, hidden-by-default state badge (skull / arena icon) the pool shows via
@@ -281,16 +277,19 @@ export function createPartyRow(
   // else on the row still selects the member, so the handler stops propagation.
   const petBar = doc.createElement('div');
   petBar.className = 'pfm-pet';
-  petBar.setAttribute('role', 'button');
-  petBar.tabIndex = 0;
   const petFill = doc.createElement('div');
   petFill.className = 'pfm-pet-fill';
   const petLabel = doc.createElement('span');
   petLabel.className = 'pfm-pet-label visually-hidden';
   petBar.append(petFill, petLabel);
-  const petHandlers = petRowHandlers(slot, deps);
-  petBar.addEventListener('click', petHandlers.click);
-  petBar.addEventListener('keydown', petHandlers.keydown);
+  // Deliberately NOT role=button / tabindex: the row itself is a button, and ARIA
+  // treats a button's children as presentational, so a nested control's semantics
+  // are unreliable in assistive tech anyway (it is also the axe nested-interactive
+  // violation). The visually-hidden label still reaches AT, as part of the row's
+  // name-from-content, which is where the pet information belongs. The click below
+  // is a MOUSE affordance only, and only where the sliver is big enough to hit:
+  // the mobile and raid variants set pointer-events: none.
+  petBar.addEventListener('click', petRowHandlers(slot, deps).click);
 
   // The member's mini aura strip (their buffs/debuffs), a per-row instance of the
   // keyed aura pool under the bars. paintAuras converts the compact wire summaries
