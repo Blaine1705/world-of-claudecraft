@@ -216,9 +216,18 @@ describe('character visual manifest', () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {
       const visual = VISUALS[key];
-      const animationNames =
-        byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
-      byUrl.set(visual.url, animationNames);
+      const baseNames = byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
+      byUrl.set(visual.url, baseNames);
+
+      // A bespoke clip (e.g. greyjaw's Greyjaw_Attack) can live in a separate
+      // mesh-free animUrls donor GLB instead of the base rig, same pattern as
+      // player_mage/mob_elemental; the runtime merges both into one clip pool
+      // (assets.ts), so the existence check must too.
+      const animationNames = new Set(baseNames);
+      for (const animUrl of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${animUrl}`);
+        for (const name of donorNames) animationNames.add(name);
+      }
 
       expect(animationNames.size).toBeGreaterThan(0);
       expect(
