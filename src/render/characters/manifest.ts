@@ -881,17 +881,14 @@ export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   player_warrior: swims({
     url: `${PLAYERS}/knight.glb`,
-    height: HUMANOID_H,
     // Every clip knight.glb ships is already wired somewhere in this block
     // (idle/walk/attack/hit/emotes account for the full shipped library, no
     // spare donor pose), so Heroic Leap (issue #2889 batch, verified against
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
-    animUrls: [
-      `${PLAYERS}/knight_hit_variety_anims.glb`,
-      `${PLAYERS}/warrior_ability_anims.glb`,
-    ],
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/warrior_ability_anims.glb`],
+    height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
@@ -972,7 +969,6 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_paladin: swims({
     url: `${PLAYERS}/paladin.glb`,
-    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1004,7 +1000,7 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
     // mesh-free clip donor GLB baked off this rig's own poses.
-    animUrls: [`${PLAYERS}/paladin_ability_anims.glb`],
+    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`, `${PLAYERS}/paladin_ability_anims.glb`],
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
@@ -1068,7 +1064,6 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_rogue: swims({
     url: `${PLAYERS}/rogue.glb`,
-    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['Dualwield_Melee_Attack_Chop']),
@@ -1122,7 +1117,7 @@ export const VISUALS: Record<string, VisualDef> = {
       },
     },
     // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
-    animUrls: [`${PLAYERS}/rogue_ability_anims.glb`],
+    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`, `${PLAYERS}/rogue_ability_anims.glb`],
     show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
@@ -1252,7 +1247,6 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_warlock: swims({
     url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
@@ -1289,7 +1283,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // poses, but its OWN clip names and timing, not a reuse of the mage's
     // mage_ability_anims.glb (the two GLBs are wired onto different
     // VisualDefs and never load together).
-    animUrls: [`${PLAYERS}/warlock_ability_anims.glb`],
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`, `${PLAYERS}/warlock_ability_anims.glb`],
     show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
@@ -1320,7 +1314,6 @@ export const VISUALS: Record<string, VisualDef> = {
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: swims({
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`,
-    animUrls: [`${PLAYERS}/Mech/characters/CombatMech_hit_variety_anims.glb`],
     height: HUMANOID_H,
     // The mech is rigged to the same KayKit Rig_Medium skeleton as every other
     // player class; its GLB shipped with no clips, so the full KayKit set is
@@ -1332,7 +1325,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // that can display a bow skin, and Bow_Draw_Shot targets the same KayKit
     // Rig_Medium bones this model uses. Without it a displayed bow falls back to
     // the melee chop (skin_attack.ts pickSkinAttackClips).
-    animUrls: [`${PLAYERS}/bow_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/Mech/characters/CombatMech_hit_variety_anims.glb`,
+      `${PLAYERS}/bow_anims.glb`,
+    ],
     // Class-agnostic cosmetic body, but it still holds the wearer's equipped
     // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
     // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
@@ -2153,7 +2149,6 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_boss: {
     url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
     height: 2.5,
     // Morthen the Gravecaller's visual (a dungeon final boss, dungeons.ts): its
     // own attack instead of the plain 2H chop skel_mage and delve_skel_varric
@@ -2162,7 +2157,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // override only attack, so skel_mage/delve_skel_varric/rift_ritualist stay
     // on the shared swing.
     clips: { ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'), attack: ['SkelBoss_Attack'] },
-    animUrls: [`${ENEMIES}/skelboss_ability_anims.glb`],
+    animUrls: [
+      `${ENEMIES}/skeleton_mage_hit_variety_anims.glb`,
+      `${ENEMIES}/skelboss_ability_anims.glb`,
+    ],
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.25,
