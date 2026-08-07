@@ -392,6 +392,7 @@ describe('i18n CLDR pluralization', () => {
       'playersOnline',
       'reliquaryRetroSummary',
       'reliquarySearchResults',
+      'reliquaryToGo',
       'secondsRemaining',
     ]);
     for (const base of bases) {

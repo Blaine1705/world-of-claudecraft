@@ -1692,6 +1692,12 @@ export const ja_JP: EnTranslations = {
         "many": "{count} 件見つかりました。",
         "other": "{count} 件見つかりました。"
       },
+      "reliquaryToGo": {
+        "one": "あと {count} 件",
+        "few": "あと {count} 件",
+        "many": "あと {count} 件",
+        "other": "あと {count} 件"
+      },
       "deedsRetroSummary": {
         "one": "年代記が追いつきました: {count} 件の功績を記録。",
         "few": "年代記が追いつきました: {count} 件の功績を記録。",
@@ -3243,7 +3249,6 @@ export const ja_JP: EnTranslations = {
       "navProfessions": "専門技能",
       "navHorizons": "地平",
       "navCountAria": "{shelf}：聖遺物 {owned}/{total} 埋め済み",
-      "overviewEmpty": "ダンジョン、レイド、深層探索で固有の聖遺物を集め、聖遺物庫を満たしましょう。",
       "shelfEmpty": "この棚にはまだページがありません。",
       "pageComplete": "照耀済み",
       "clearsLabel": "クリア {count} 回",
@@ -3297,6 +3302,13 @@ export const ja_JP: EnTranslations = {
       "filterAll": "すべて",
       "filterOwned": "収蔵済み",
       "filterMissing": "未発見",
+      "recentJumpAria": "{name} のページを開く",
+      "recentEmpty": "まだ発見はありません。これから収蔵した聖遺物がここに並びます。",
+      "nearlyEmpty": "完成が近いページはここに集まります。",
+      "shelfRecent": "最新の発見：{name}",
+      "shelfNoFinds": "この棚にはまだ何も収蔵されていません。",
+      "shelfOpenAria": "{name} の棚を開く、{owned}/{total} 埋め済み",
+      "sharedUniquesNote": "全体の合計は各聖遺物を1回だけ数えます。棚とページの数字は枠ごとに数えるため、複数のページに載る聖遺物はそれぞれのページで数えられます。",
       "charCompletionLabel": "聖遺物庫",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "キュレーター",

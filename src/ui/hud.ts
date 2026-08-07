@@ -13403,6 +13403,17 @@ export class Hud {
     // plus the slow band (the old bare render() painted the same stale
     // mirror, just noisily).
     if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
+      // Arm the celebration one-shots BEFORE the refresh, so the repaint that
+      // shows the fill is the one that carries them. Both are consumed by a
+      // render, so a refresh that elides (the online snapshot-lag case above)
+      // leaves them armed for the paint that actually shows the new state
+      // instead of firing on a surface that has not caught up yet. Reduced
+      // motion is handled in CSS for both, so a player who prefers less motion
+      // still gets the static treatment rather than nothing.
+      this.reliquaryWindow.flashRelics(plan.logs.map((log) => log.id));
+      if (plan.illuminatedPageId !== null) {
+        this.reliquaryWindow.celebrateIllumination(plan.illuminatedPageId);
+      }
       this.reliquaryWindow.refreshIfChanged();
     }
     // On-join catch-up: one localized summary line, the same treatment the

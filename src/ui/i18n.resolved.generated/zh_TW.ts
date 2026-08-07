@@ -1692,6 +1692,12 @@ export const zh_TW: EnTranslations = {
         "many": "共 {count} 筆結果。",
         "other": "共 {count} 筆結果。"
       },
+      "reliquaryToGo": {
+        "one": "還差 {count} 件",
+        "few": "還差 {count} 件",
+        "many": "還差 {count} 件",
+        "other": "還差 {count} 件"
+      },
       "deedsRetroSummary": {
         "one": "你的編年史已更新：補錄 {count} 項功績。",
         "few": "你的編年史已更新：補錄 {count} 項功績。",
@@ -3243,7 +3249,6 @@ export const zh_TW: EnTranslations = {
       "navProfessions": "專業",
       "navHorizons": "遠景",
       "navCountAria": "{shelf}：已填入 {owned}/{total} 件聖物",
-      "overviewEmpty": "從地城、團隊副本與探秘中收集獨特聖物，充實聖物庫。",
       "shelfEmpty": "此書架尚無頁面。",
       "pageComplete": "已點亮",
       "clearsLabel": "{count} 次通關",
@@ -3297,6 +3302,13 @@ export const zh_TW: EnTranslations = {
       "filterAll": "全部",
       "filterOwned": "已收錄",
       "filterMissing": "尚未獲得",
+      "recentJumpAria": "開啟{name}所在的頁面",
+      "recentEmpty": "尚無發現。此後收錄的聖物都會出現在這裡。",
+      "nearlyEmpty": "即將完成的頁面會匯集於此。",
+      "shelfRecent": "最新發現：{name}",
+      "shelfNoFinds": "此書架尚未收錄任何聖物。",
+      "shelfOpenAria": "開啟{name}書架，已填入 {owned}/{total}",
+      "sharedUniquesNote": "總計中每件聖物只計一次；書架與頁面的數字按格位統計，出現在多個頁面上的聖物會被每個頁面分別計入。",
       "charCompletionLabel": "聖物庫",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "策展人",

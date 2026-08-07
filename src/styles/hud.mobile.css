@@ -4229,6 +4229,27 @@
     width: 100%;
     max-width: 220px;
   }
+  /* The Overview shelf cards stack: three columns inside a phone-width scroll
+     column leave no room for a page name, and the card text wraps rather than
+     truncates. The min-height drops to the touch floor because a stacked card
+     is already taller than that from its own content; it is the floor, not the
+     size. Cards live inside .reliquary-scroll, so they scroll with the Overview
+     and add no pinned chrome the short-landscape clamp above has to absorb. */
+  body.mobile-touch #reliquary-window .reliquary-shelf-cards {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #reliquary-window .reliquary-shelf-card {
+    min-height: 48px;
+  }
+  /* The recent chips are jump buttons now, so they take the window's own 48px
+     touch floor (the .reliquary-cell size, one step above the 40px the deeds
+     strip settled for) on EVERY touch device, not just short-landscape phones:
+     a landscape tablet is body.mobile-touch too. The strip wraps, and it sits
+     in the scrolling Overview, so a taller chip row cannot clip the rail. */
+  body.mobile-touch #reliquary-window .reliquary-recent-item {
+    min-width: 48px;
+    min-height: 48px;
+  }
   /* ---------- mobile professions (standalone window) ---------- */
   /* The Professions window follows the deeds/bank STANDALONE full-screen
      convention on touch (no companion panel, so no 50/50 pairing): fixed

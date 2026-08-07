@@ -10667,8 +10667,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navProfessions': 'Профессии',
   'hudChrome.reliquary.navHorizons': 'Горизонты',
   'hudChrome.reliquary.navCountAria': '{shelf}: заполнено {owned} из {total} реликвий',
-  'hudChrome.reliquary.overviewEmpty':
-    'Собирайте уникальные реликвии в подземельях, рейдах и вылазках, чтобы наполнить Реликварий.',
   'hudChrome.reliquary.shelfEmpty': 'На этой полке пока нет страниц.',
   'hudChrome.reliquary.pageComplete': 'Озарено',
   'hudChrome.reliquary.clearsLabel': 'Прохождений: {count}',
@@ -10683,6 +10681,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': 'Реликвия каталогизирована: {name}',
   'hudChrome.reliquary.illuminateBanner': 'Страница озарена: {name}',
   'hudChrome.reliquary.illuminateToast': 'Все реликвии на странице {name} заполнены.',
+  'hudChrome.reliquary.recentJumpAria': 'Открыть страницу с реликвией {name}',
+  'hudChrome.reliquary.recentEmpty':
+    'Находок пока нет. Реликвии, которые вы каталогизируете, будут появляться здесь.',
+  'hudChrome.reliquary.nearlyEmpty': 'Здесь собираются страницы, близкие к завершению.',
+  'hudChrome.reliquary.shelfRecent': 'Последняя находка: {name}',
+  'hudChrome.reliquary.shelfNoFinds': 'На этой полке пока ничего не каталогизировано.',
+  'hudChrome.reliquary.shelfOpenAria': 'Открыть полку {name}, заполнено {owned} из {total}',
+  'hudChrome.reliquary.sharedUniquesNote':
+    'Общий итог считает каждую реликвию один раз; счетчики полок и страниц считают ячейки, поэтому реликвия с нескольких страниц учитывается в каждом из них.',
+  'hudChrome.plurals.reliquaryToGo.one': 'осталась {count} реликвия',
+  'hudChrome.plurals.reliquaryToGo.few': 'осталось {count} реликвии',
+  'hudChrome.plurals.reliquaryToGo.many': 'осталось {count} реликвий',
+  'hudChrome.plurals.reliquaryToGo.other': 'осталось {count} реликвии',
   'hudChrome.plurals.reliquaryRetroSummary.one':
     'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
   'hudChrome.plurals.reliquaryRetroSummary.few':

@@ -38,6 +38,17 @@ import type { TranslationKey } from './i18n';
 export const RELIQUARY_NAV = ['overview', 'conquerors', 'professions', 'horizons'] as const;
 export type ReliquaryNavId = (typeof RELIQUARY_NAV)[number];
 
+/**
+ * The three catalog shelves in nav order. One definition, because two surfaces
+ * depend on it agreeing: the shelf totals bucket and the Overview summary cards,
+ * whose array order is a contract the painter and its tests both read.
+ */
+export const RELIQUARY_SHELF_ORDER: readonly ReliquaryShelfId[] = [
+  'conquerors',
+  'professions',
+  'horizons',
+];
+
 /** Named Curator rank chrome keys (Phase 6). Falls back to numeric rank label. */
 export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
   'hudChrome.reliquary.curatorRankName1',
@@ -301,6 +312,34 @@ export interface ReliquaryRecentFindModel {
   /** Item or mark id from the recent ring. */
   id: string;
   kind: 'item' | 'mark' | 'unknown';
+  /**
+   * Page the chip jumps to: the recorded first-find page when the catalog still
+   * holds it, otherwise the first page in authored order whose relic list
+   * contains the slot. Null when nothing places the relic (a wire-only id, or
+   * content drift), and the painter then draws an inert chip rather than a
+   * button that would navigate nowhere.
+   */
+  pageId: string | null;
+}
+
+/**
+ * One Overview shelf summary card. The array these come in is ordered by
+ * RELIQUARY_SHELF_ORDER and that order is a contract: the painter draws the
+ * cards in the same order the rail lists the shelves.
+ */
+export interface ReliquaryShelfCardModel {
+  shelf: ReliquaryShelfId;
+  /** Aggregate owned/total across every page on the shelf. */
+  owned: number;
+  total: number;
+  /**
+   * Newest ring find whose derived page sits on this shelf, or null when the
+   * ring holds none. Captured from the WHOLE ring, before any search narrows
+   * the recent strip: a card summarizes its shelf, not the current needle.
+   */
+  recentId: string | null;
+  /** Kind of recentId, so the painter can name and ghost it. Null with it. */
+  recentKind: ReliquaryRecentFindModel['kind'] | null;
 }
 
 export interface ReliquaryNearlyPageModel {
@@ -378,6 +417,8 @@ export interface ReliquaryViewModel {
   recent: ReliquaryRecentFindModel[];
   nearly: ReliquaryNearlyPageModel[];
   shelves: ReliquaryNavModel[];
+  /** Overview shelf summary cards, one per shelf in RELIQUARY_SHELF_ORDER. */
+  shelfCards: ReliquaryShelfCardModel[];
   /** Pages on the active catalog shelf (empty on Overview). */
   shelfPages: ReliquaryShelfPageModel[];
   /** Active page header stub, or null when on Overview / no page selected. */
@@ -497,7 +538,17 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   const search = input.search ?? '';
   const ownedFilter = input.ownedFilter ?? 'all';
 
+  const pagesById = new Map<string, ReliquaryPageDef>();
+  for (const page of input.pages) pagesById.set(page.id, page);
+  // One pass over the catalog instead of a re-scan per chip. Built only when
+  // the ring holds something, so a fresh account pays nothing for it.
+  const relicPageIndex = input.recent.length > 0 ? buildRelicPageIndex(input.pages) : null;
+
   const recent: ReliquaryRecentFindModel[] = [];
+  const shelfLatest = new Map<
+    ReliquaryShelfId,
+    { id: string; kind: ReliquaryRecentFindModel['kind'] }
+  >();
   let recentTotal = 0;
   // Newest-first for the strip (facet is oldest-first).
   for (let i = input.recent.length - 1; i >= 0; i--) {
@@ -507,6 +558,20 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     let kind: ReliquaryRecentFindModel['kind'] = 'unknown';
     if (input.marks.has(id)) kind = 'mark';
     else if (input.itemsDiscovered.has(id) || isCatalogItemId(input.pages, id)) kind = 'item';
+    // Where the chip jumps to. The recorded first-find page wins when the
+    // catalog still has it (it is where the player actually found the relic);
+    // otherwise the first page in authored order that holds the slot, for any
+    // relic kind the catalog places.
+    const hinted = input.firstFind?.[id]?.pageId;
+    const pageId =
+      hinted !== undefined && pagesById.has(hinted) ? hinted : (relicPageIndex?.get(id) ?? null);
+    // Shelf cards summarize a shelf, not the needle, so their latest-find line
+    // is captured from the WHOLE ring before the search filter below: typing
+    // must not blank a card's last find.
+    if (pageId !== null) {
+      const shelf = pagesById.get(pageId)?.shelf;
+      if (shelf !== undefined && !shelfLatest.has(shelf)) shelfLatest.set(shelf, { id, kind });
+    }
     // The Overview strips narrow with the search too: a search field that is
     // visible on a shelf but inert on Overview is the same broken promise as a
     // pointer cursor on something that does not click.
@@ -516,7 +581,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
       // resolver arms ever stop being identical.
       if (!input.relicSearchText(kind, id).includes(search)) continue;
     }
-    recent.push({ id, kind });
+    recent.push({ id, kind, pageId });
   }
 
   // Page rows (nearly strip and shelf list alike) survive on their own text OR
@@ -525,8 +590,6 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   // localized text to match against, so the lists stay whole rather than
   // filtering everything away.
   const canMatchPages = input.pageSearchText !== undefined || input.relicSearchText !== undefined;
-  const pagesById = new Map<string, ReliquaryPageDef>();
-  for (const page of input.pages) pagesById.set(page.id, page);
   const pageMatches = (pageId: string): boolean =>
     (input.pageSearchText?.(pageId) ?? '').includes(search) ||
     pageHasRelicMatch(input, pagesById.get(pageId), search);
@@ -542,7 +605,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     nearlyMatches === undefined ? nearly : buildNearlyComplete(input.pages, opts);
 
   const shelfTotals = new Map<ReliquaryShelfId, { owned: number; total: number }>();
-  for (const shelf of ['conquerors', 'professions', 'horizons'] as const) {
+  for (const shelf of RELIQUARY_SHELF_ORDER) {
     shelfTotals.set(shelf, { owned: 0, total: 0 });
   }
   for (const page of input.pages) {
@@ -557,6 +620,20 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     if (id === 'overview') return { id, owned: 0, total: 0 };
     const t = shelfTotals.get(id) ?? { owned: 0, total: 0 };
     return { id, owned: t.owned, total: t.total };
+  });
+
+  // The same totals the rail counts, plus the shelf's newest find: one card per
+  // shelf, always all three, in nav order.
+  const shelfCards: ReliquaryShelfCardModel[] = RELIQUARY_SHELF_ORDER.map((shelf) => {
+    const totals = shelfTotals.get(shelf) ?? { owned: 0, total: 0 };
+    const latest = shelfLatest.get(shelf);
+    return {
+      shelf,
+      owned: totals.owned,
+      total: totals.total,
+      recentId: latest?.id ?? null,
+      recentKind: latest?.kind ?? null,
+    };
   });
 
   // Every page on the shelf, before the search narrows the visible list: the
@@ -632,6 +709,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     recent,
     nearly,
     shelves,
+    shelfCards,
     shelfPages,
     activePage,
     pageDetail,
@@ -654,6 +732,23 @@ function pageHasRelicMatch(
     if (resolve(relic.kind, relicSlotId(relic)).includes(search)) return true;
   }
   return false;
+}
+
+/**
+ * Slot id to the FIRST page in authored order that holds it, across every relic
+ * kind the catalog places (items, marks, mounts, weapon skins, title deeds).
+ * A relic listed on several pages resolves to the first, so the recent strip's
+ * jump target is stable rather than dependent on iteration luck.
+ */
+function buildRelicPageIndex(pages: readonly ReliquaryPageDef[]): Map<string, string> {
+  const index = new Map<string, string>();
+  for (const page of pages) {
+    for (const relic of page.relics) {
+      const id = relicSlotId(relic);
+      if (!index.has(id)) index.set(id, page.id);
+    }
+  }
+  return index;
 }
 
 function isCatalogItemId(pages: readonly ReliquaryPageDef[], id: string): boolean {
@@ -743,8 +838,11 @@ export interface ReliquaryUnlockPlan {
   /** One celebration sound per drain with at least one unlock. */
   playSound: boolean;
   /**
-   * Motion-only flourishes (fill flash, banner fade). False under reduced
-   * motion. Never gates log lines, banner text, or sound (information survives).
+   * Motion-only flourish gate, consumed by the banner fade alone since
+   * Phase 14: the window's fill flash and Illumination celebration are armed
+   * unconditionally and suppressed in CSS by the prefers-reduced-motion
+   * block. False under reduced motion. Never gates log lines, banner text,
+   * or sound (information survives).
    */
   motion: boolean;
   /** True when the open Reliquary window should force a rebuild this drain. */

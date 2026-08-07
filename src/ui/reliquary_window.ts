@@ -37,6 +37,7 @@ import { ReannounceMarker } from './live_region_reannounce';
 import type { PainterHostPresentation } from './painter_host';
 import { reliquaryPageDesc, reliquaryPageName } from './reliquary_i18n';
 import {
+  type ReliquaryRelicNameKind,
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
   reliquarySourceAriaText,
@@ -56,6 +57,7 @@ import {
   type ReliquaryOwnedFilter,
   type ReliquaryPageDetailModel,
   type ReliquaryRecentFindModel,
+  type ReliquaryShelfCardModel,
   type ReliquaryViewInput,
   type ReliquaryViewModel,
   reliquaryOwnershipDigest,
@@ -81,6 +83,17 @@ const NAV_LABEL_KEYS: Record<ReliquaryNavId, TranslationKey> = {
 // keys roving_index.ts actually owns for orientation 'both'.
 const GRID_HINT_ID = 'reliquary-grid-hint';
 const GRID_KEY_SHORTCUTS = 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End';
+
+/** Shared empty answer for "nothing flashes this paint", so the common case
+ *  (every render but the one after a catalog fill) allocates nothing. */
+const NO_FLASH: ReadonlySet<string> = new Set();
+
+/**
+ * What the art and quality ladders need from a relic: a grid cell and a recent
+ * find are the same slot shape, so both resolve through one implementation
+ * (the recent ring's wire-shaped 'unknown' kind rides along).
+ */
+type ReliquaryRelicSlot = { kind: ReliquaryRelicNameKind; id: string };
 
 const FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
   all: 'hudChrome.reliquary.filterAll',
@@ -138,6 +151,24 @@ export class ReliquaryWindow {
   // slow band holds its repaint off (refreshIfChanged) so an innerHTML wipe
   // cannot rip the composition session out from under the player.
   private composing = false;
+  /**
+   * Illumination celebration one-shot (the deeds sticky-id pattern). The id is
+   * sticky so the moment survives until the page it belongs to is actually
+   * painted (the player may be on Overview, or online the fill may land a
+   * snapshot later than the event); the pending flag is consumed by that one
+   * paint, so a later rebuild cannot replay the animation. Reduced motion is
+   * handled entirely in CSS, which is why nothing here reads matchMedia.
+   */
+  private celebratePageId: string | null = null;
+  private celebratePending = false;
+  /**
+   * Relic ids catalogued by the drain that is about to repaint, for the cell
+   * fill flash. Consumed by the very next render whatever surface that render
+   * paints, so ids never accumulate and a second drain simply replaces the
+   * first: a flash means "this just happened", and the newest drain is the one
+   * that just happened.
+   */
+  private pendingFlash: ReadonlySet<string> | null = null;
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
 
@@ -173,6 +204,12 @@ export class ReliquaryWindow {
     // "where I was", not as a filter left switched on.
     this.search = '';
     this.gridIndex = 0;
+    // Celebrations are for the live moment: an unspent Illumination or fill
+    // flash must not replay as a fanfare on a much-later visit (the banner
+    // already covered the event itself).
+    this.celebratePageId = null;
+    this.celebratePending = false;
+    this.pendingFlash = null;
     // The region must not carry a stale announcement (or a pending reannounce
     // toggle) into the next visit; the NODE persists, its state does not.
     if (this.liveEl) this.liveEl.textContent = '';
@@ -190,6 +227,38 @@ export class ReliquaryWindow {
     } else {
       this.open();
     }
+  }
+
+  /**
+   * Arm the Illumination celebration for one page. The Hud calls this on the
+   * drain that filled the page, immediately before its refreshIfChanged; the
+   * class is composed by the next paint of that page's detail and removed on
+   * animationend, so no timer, interval, or rAF is involved at any point.
+   * The Hud only arms while the window is open (the celebration banner covers
+   * the closed case), and close() clears an unspent moment: the arming is
+   * sticky across paints within one open window session, never across sessions.
+   */
+  celebrateIllumination(pageId: string): void {
+    this.celebratePageId = pageId;
+    this.celebratePending = true;
+  }
+
+  /**
+   * Arm the fill flash for the relics a drain just catalogued (one-shot).
+   * A later drain REPLACES an unpainted set rather than accumulating, and an
+   * empty list clears it; the Hud call site only fires with a non-empty drain
+   * (plan.refreshWindow requires logs), so the clear arm is deliberate reset
+   * surface, not a reachable erasure of a pending moment.
+   */
+  flashRelics(ids: readonly string[]): void {
+    this.pendingFlash = ids.length > 0 ? new Set(ids) : null;
+  }
+
+  /** One-shot: true exactly once, on the first paint of the illuminated page. */
+  private consumeCelebration(pageId: string): boolean {
+    if (!this.celebratePending || this.celebratePageId !== pageId) return false;
+    this.celebratePending = false;
+    return true;
   }
 
   /** Slow-band refresh: repaint only when the compact signature moves. */
@@ -229,13 +298,31 @@ export class ReliquaryWindow {
     const prevScrollTop = el.querySelector('.reliquary-scroll')?.scrollTop ?? 0;
 
     const input = prebuilt ?? this.buildInput();
-    const model = buildReliquaryView(input);
+    // The two ownership Sets are minted HERE, on a real repaint, never in
+    // buildInput: the slow band builds an input on every poll and elides most
+    // of them, and copying the mount list plus the account skin list on a poll
+    // that paints nothing is pure waste. Nothing on the signature path reads
+    // them (sigFromInput asks the world directly), so change detection is
+    // unaffected; the view still receives real Sets.
+    const world = this.deps.world();
+    const viewInput: ReliquaryViewInput = {
+      ...input,
+      ownedMounts: new Set(world.ownedMounts()),
+      weaponSkins: new Set(world.accountCosmetics.weaponSkinIds),
+    };
+    const model = buildReliquaryView(viewInput);
+    // One-shot, taken before the markup is built: this repaint owns the flash,
+    // and a later rebuild (a filter click, the next slow band) must not re-add
+    // it. An elided poll simply leaves it armed for the paint that shows the
+    // fill, which is the paint the player is waiting for anyway.
+    const flash = this.pendingFlash ?? NO_FLASH;
+    this.pendingFlash = null;
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.reliquary.title'))}</span>` +
       `<input type="search" class="reliquary-search" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
       `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
       this.summaryHtml(model) +
-      `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model)}</div></div>`;
+      `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model, flash)}</div></div>`;
 
     // The innerHTML write above orphaned the region; put the SAME node back so
     // the AT keeps the registration it already has, then write into it.
@@ -386,6 +473,13 @@ export class ReliquaryWindow {
     return this.search.trim() !== '';
   }
 
+  /**
+   * The CHEAP half of the input: live references and closures only, no copies.
+   * Every slow-band poll builds one of these and most of them are then elided,
+   * so the two ownership Sets the view needs are attached by render() instead
+   * (see the comment there). Both halves are the same ReliquaryViewInput type;
+   * the Set fields are simply absent here, which the optional members allow.
+   */
   private buildInput(): ReliquaryViewInput {
     const world = this.deps.world();
     const tag = languageTag(getLanguage());
@@ -414,8 +508,6 @@ export class ReliquaryWindow {
       relicSearchText: (kind, id) => reliquaryRelicSearchText(kind, id, tag),
       clearCount: (pageId) => world.reliquaryPageClearCount(pageId),
       firstFind: world.reliquaryFirstFind,
-      ownedMounts: new Set(world.ownedMounts()),
-      weaponSkins: new Set(world.accountCosmetics.weaponSkinIds),
       deedsEarned: world.deedsEarned,
     };
   }
@@ -430,7 +522,15 @@ export class ReliquaryWindow {
       const n = input.clearCount?.(page.id);
       if (n !== undefined) clearsDigest = (clearsDigest * 31 + (n + 1)) | 0;
     }
-    const firstFindCount = Object.keys(world.reliquaryFirstFind).length;
+    // Counted in place: Object.keys would mint a throwaway array of every
+    // first-find id on every slow-band poll, including the many that elide.
+    // The hasOwn guard keeps the count own-keys-only, matching what
+    // Object.keys counted (for..in alone would also walk an enumerable
+    // prototype chain if a future mirror shape ever grew one).
+    let firstFindCount = 0;
+    for (const id in world.reliquaryFirstFind) {
+      if (Object.hasOwn(world.reliquaryFirstFind, id)) firstFindCount += 1;
+    }
     const pageOwned =
       input.pageId !== null ? (world.reliquaryPageCompletion(input.pageId)?.owned ?? 0) : 0;
     const ownershipDigest = reliquaryOwnershipDigest({
@@ -454,6 +554,25 @@ export class ReliquaryWindow {
     });
   }
 
+  /**
+   * The one meter this window draws (summary, page header, nearly row, shelf
+   * card). The fill rides a custom property instead of an inline width so the
+   * stylesheet owns the geometry: it is the only inline style in the painter,
+   * and a single declaration in one rule now covers every bar.
+   */
+  private barHtml(pct: number, extraClass = ''): string {
+    const cls = extraClass === '' ? 'reliquary-bar' : `reliquary-bar ${extraClass}`;
+    return (
+      `<span class="${cls}">` +
+      `<span class="reliquary-bar-fill" style="--reliquary-fill:${pct}%"></span></span>`
+    );
+  }
+
+  /** Whole-percent fill for a pair, with the empty-page case pinned at zero. */
+  private pctOf(owned: number, total: number): number {
+    return total > 0 ? Math.round((owned / total) * 100) : 0;
+  }
+
   private summaryHtml(model: ReliquaryViewModel): string {
     const p = model.progress;
     const owned = this.fmt(p.owned);
@@ -473,7 +592,8 @@ export class ReliquaryWindow {
       `<span class="reliquary-rank-seal" aria-hidden="true"></span>` +
       `${esc(rankLabel)}</span>` +
       `<span class="reliquary-pct" role="img" aria-label="${esc(t('hudChrome.reliquary.completionAria', { owned, total }))}">` +
-      `<span class="reliquary-bar"><span class="reliquary-bar-fill" style="width:${pct}%"></span></span> ${esc(pctText)}</span>` +
+      this.barHtml(pct) +
+      ` ${esc(pctText)}</span>` +
       `</div>`
     );
   }
@@ -509,61 +629,111 @@ export class ReliquaryWindow {
     return `<nav class="reliquary-rail" aria-label="${esc(t('hudChrome.reliquary.shelvesAria'))}">${rows}</nav>`;
   }
 
-  private contentHtml(model: ReliquaryViewModel): string {
+  private contentHtml(model: ReliquaryViewModel, flash: ReadonlySet<string>): string {
     if (model.nav === 'overview') return this.overviewHtml(model);
-    if (model.pageDetail) return this.pageDetailHtml(model.pageDetail);
+    if (model.pageDetail) {
+      // The illuminated gate keeps the one-shot ARMED when the event frame
+      // outruns the snapshot (online, the model can still read incomplete on
+      // this paint): consuming then would play the celebration on a page
+      // whose standing frame is absent, and the keyframe's end state would
+      // vanish at animationend instead of settling into is-illuminated.
+      return this.pageDetailHtml(
+        model.pageDetail,
+        model.pageDetail.illuminated && this.consumeCelebration(model.pageDetail.pageId),
+        flash,
+      );
+    }
     return this.shelfListHtml(model);
   }
 
   private overviewHtml(model: ReliquaryViewModel): string {
+    // Asked ONCE for the whole Overview and handed down: the two strip hints
+    // and the no-results line must agree about whether a needle is live, and
+    // three separate asks are three chances to drift.
+    const searching = this.searchActive();
     let html = `<section class="reliquary-overview">`;
-    html += this.recentStripHtml(model.recent);
-    html += this.nearlyStripHtml(model.nearly);
-    if (model.recent.length === 0 && model.nearly.length === 0) {
-      // Under an active search the strips are empty because nothing matched,
-      // not because the player has collected nothing. Two literal keys, never a
+    // Why a page can be full while the catalog total is smaller than the slot
+    // sum: a relic shown on two pages is ONE relic. Said once, quietly, where
+    // the two numbers sit side by side.
+    html += `<p class="reliquary-uniques-note">${esc(t('hudChrome.reliquary.sharedUniquesNote'))}</p>`;
+    html += this.recentStripHtml(model.recent, searching);
+    html += this.nearlyStripHtml(model.nearly, searching);
+    html += this.shelfCardsHtml(model.shelfCards);
+    if (searching && model.recent.length === 0 && model.nearly.length === 0) {
+      // A needle that matched nothing gets its own line, because the strips are
+      // empty for a reason the player can fix. The "nothing yet" case is
+      // answered per strip instead (recentEmpty / nearlyEmpty), where the
+      // hint sits next to the label it explains. Literal keys, never a
       // template-built key behind an `as TranslationKey`: the cast would let a
       // catalog rename pass tsc and throw at runtime on the first missed search.
-      html += `<p class="reliquary-empty">${esc(
-        this.searchActive()
-          ? t('hudChrome.reliquary.searchEmpty')
-          : t('hudChrome.reliquary.overviewEmpty'),
-      )}</p>`;
+      html += `<p class="reliquary-empty">${esc(t('hudChrome.reliquary.searchEmpty'))}</p>`;
     }
     html += `</section>`;
     return html;
   }
 
-  private recentStripHtml(recent: readonly ReliquaryRecentFindModel[]): string {
-    if (recent.length === 0) return '';
-    // No title="" here: the invariant bans native title tooltips. The name
-    // wraps fully visible inside the chip (nothing truncates; the CSS pin
-    // bans it), and data-recent-name feeds the shared HUD tooltip in wire()
-    // as a pointer-hover nicety that repeats the visible text.
-    const chips = recent
-      .map((r) => {
-        const name = reliquaryRelicDisplayName(r.kind, r.id);
-        return (
-          `<span class="reliquary-recent-item" data-recent-name="${esc(name)}">` +
-          `<span class="reliquary-recent-name">${esc(name)}</span></span>`
-        );
-      })
-      .join('');
+  /** The strip label ALWAYS renders: an Overview whose first section appears
+   *  only after the first find reads as a broken window, and the hint is what
+   *  tells a new player the shelf exists and how it fills. */
+  private stripHintHtml(show: boolean, key: TranslationKey): string {
+    if (!show) return '';
+    return `<span class="reliquary-strip-hint">${esc(t(key))}</span>`;
+  }
+
+  private recentStripHtml(recent: readonly ReliquaryRecentFindModel[], searching: boolean): string {
+    const chips = recent.map((r) => this.recentItemHtml(r)).join('');
+    // Only the genuinely empty ring gets the hint: under a live needle the
+    // strip is empty because nothing matched, which the searchEmpty line says.
+    const hint = this.stripHintHtml(
+      recent.length === 0 && !searching,
+      'hudChrome.reliquary.recentEmpty',
+    );
     return (
       `<div class="reliquary-recent">` +
       `<span class="reliquary-strip-label">${esc(t('hudChrome.reliquary.recentLabel'))}</span>` +
+      hint +
       chips +
       `</div>`
     );
   }
 
-  private nearlyStripHtml(nearly: readonly ReliquaryNearlyPageModel[]): string {
-    if (nearly.length === 0) return '';
+  /**
+   * One recent find. A find the catalog can place is a real jump button (the
+   * shared [data-page] wiring takes it from here, including the cross-shelf
+   * hop); one it cannot stays an inert chip rather than a control that goes
+   * nowhere. Both carry the icon and the same tooltip.
+   *
+   * No title="" on either: the invariant bans native title tooltips. The name
+   * wraps fully visible inside the chip (nothing truncates; the CSS pin bans
+   * it), and data-recent-name feeds the shared HUD tooltip in wire().
+   */
+  private recentItemHtml(find: ReliquaryRecentFindModel): string {
+    const name = reliquaryRelicDisplayName(find.kind, find.id);
+    const body =
+      `<span class="reliquary-recent-icon" aria-hidden="true">` +
+      `${this.cellIconHtml(find, this.cellQuality(find))}</span>` +
+      `<span class="reliquary-recent-name">${esc(name)}</span>`;
+    if (find.pageId === null) {
+      return `<span class="reliquary-recent-item" data-recent-name="${esc(name)}">${body}</span>`;
+    }
+    return (
+      `<button type="button" class="reliquary-recent-item" data-page="${esc(find.pageId)}" ` +
+      `data-recent-name="${esc(name)}" data-focus-key="${esc(`recent:${find.kind}:${find.id}`)}" ` +
+      `aria-label="${esc(t('hudChrome.reliquary.recentJumpAria', { name }))}">${body}</button>`
+    );
+  }
+
+  private nearlyStripHtml(nearly: readonly ReliquaryNearlyPageModel[], searching: boolean): string {
     const rows = nearly
       .map((n) => {
         const progress = t('hudChrome.reliquary.progressText', {
           owned: this.fmt(n.owned),
           total: this.fmt(n.total),
+        });
+        // Raw count to tPlural (it is what Intl.PluralRules selects on); the
+        // VISIBLE number is the locale-formatted override.
+        const toGo = tPlural('hudChrome.plurals.reliquaryToGo', n.remaining, {
+          count: this.fmt(n.remaining),
         });
         // Page names resolve from the id at paint time (reliquary_i18n), never
         // from the model's raw catalog English.
@@ -577,16 +747,76 @@ export class ReliquaryWindow {
             }),
           )}">` +
           `<span class="reliquary-nearly-name">${esc(name)}</span>` +
-          `<span class="reliquary-progress-text">${esc(progress)}</span></button>`
+          // The meter and both readouts are inside a button whose aria-label
+          // already states the pair, so they are visual only and need no
+          // further labeling of their own.
+          this.barHtml(this.pctOf(n.owned, n.total)) +
+          `<span class="reliquary-progress-text">${esc(progress)}</span>` +
+          `<span class="reliquary-to-go">${esc(toGo)}</span></button>`
         );
       })
       .join('');
+    const hint = this.stripHintHtml(
+      nearly.length === 0 && !searching,
+      'hudChrome.reliquary.nearlyEmpty',
+    );
     return (
       `<div class="reliquary-nearly">` +
       `<span class="reliquary-strip-label">${esc(t('hudChrome.reliquary.nearlyLabel'))}</span>` +
+      hint +
       rows +
       `</div>`
     );
+  }
+
+  /**
+   * The three shelf cards: where the Overview stops being a strip of leftovers
+   * and becomes the way into the catalog. Always all three, in the model's
+   * order (which is the rail's order), each one a real nav button the shared
+   * [data-nav] wiring already drives.
+   */
+  private shelfCardsHtml(cards: readonly ReliquaryShelfCardModel[]): string {
+    const rows = cards
+      .map((card) => {
+        const owned = this.fmt(card.owned);
+        const total = this.fmt(card.total);
+        const name = t(NAV_LABEL_KEYS[card.shelf]);
+        const progress = t('hudChrome.reliquary.progressText', { owned, total });
+        // Three-way latest line, chosen so the card can never contradict the
+        // pair printed above it: the recent ring receives ONLY item and mark
+        // first-finds (pushRecent's two call sites), so a Horizons find
+        // (mounts, skins, titles) can never appear here, and a retro-seeded
+        // veteran has owned > 0 with an empty ring on every shelf. Render the
+        // find when the ring knows one, say "nothing yet" only when the count
+        // agrees (owned 0), and otherwise say nothing at all.
+        const latest =
+          card.recentId !== null && card.recentKind !== null
+            ? t('hudChrome.reliquary.shelfRecent', {
+                name: reliquaryRelicDisplayName(card.recentKind, card.recentId),
+              })
+            : card.owned === 0
+              ? t('hudChrome.reliquary.shelfNoFinds')
+              : null;
+        // The aria-label replaces the subtree as the accessible name, which
+        // would hide the latest-find line (new information, not a restatement
+        // of the pair); aria-describedby folds it back in after the name.
+        const recentDomId = `reliquary-shelf-recent-${card.shelf}`;
+        return (
+          `<button type="button" class="reliquary-shelf-card" data-nav="${esc(card.shelf)}" ` +
+          `data-focus-key="${esc(`card:${card.shelf}`)}" aria-label="${esc(
+            t('hudChrome.reliquary.shelfOpenAria', { name, owned, total }),
+          )}"${latest !== null ? ` aria-describedby="${esc(recentDomId)}"` : ''}>` +
+          `<span class="reliquary-shelf-card-name">${esc(name)}</span>` +
+          `<span class="reliquary-progress-text">${esc(progress)}</span>` +
+          this.barHtml(this.pctOf(card.owned, card.total)) +
+          (latest !== null
+            ? `<span class="reliquary-shelf-card-recent" id="${esc(recentDomId)}">${esc(latest)}</span>`
+            : '') +
+          `</button>`
+        );
+      })
+      .join('');
+    return `<div class="reliquary-shelf-cards">${rows}</div>`;
   }
 
   private shelfListHtml(model: ReliquaryViewModel): string {
@@ -631,7 +861,11 @@ export class ReliquaryWindow {
     return `<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
   }
 
-  private pageDetailHtml(page: ReliquaryPageDetailModel): string {
+  private pageDetailHtml(
+    page: ReliquaryPageDetailModel,
+    celebrate: boolean,
+    flash: ReadonlySet<string>,
+  ): string {
     const progress = t('hudChrome.reliquary.progressText', {
       owned: this.fmt(page.owned),
       total: this.fmt(page.total),
@@ -639,7 +873,7 @@ export class ReliquaryWindow {
     // Page names resolve from the id at paint time (reliquary_i18n), never from
     // the model's raw catalog English.
     const pageName = reliquaryPageName(page.pageId);
-    const pct = page.total > 0 ? Math.round((page.owned / page.total) * 100) : 0;
+    const pct = this.pctOf(page.owned, page.total);
     const clears =
       page.clears !== undefined
         ? `<p class="reliquary-page-clears">${esc(t('hudChrome.reliquary.clearsLabel', { count: this.fmt(page.clears) }))}</p>`
@@ -664,9 +898,16 @@ export class ReliquaryWindow {
       page.cells.length === 0
         ? `<p class="reliquary-empty">${esc(this.emptyGridText(page.filtered))}</p>`
         : `<span id="${GRID_HINT_ID}" class="visually-hidden">${esc(t('hudChrome.reliquary.gridKeyboardHint'))}</span>` +
-          `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: pageName }))}">${page.cells.map((c, i) => this.cellHtml(c, i, activeCell)).join('')}</div>`;
+          `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: pageName }))}">${page.cells
+            .map((c, i) => this.cellHtml(c, i, activeCell, flash.has(c.id)))
+            .join('')}</div>`;
     return (
-      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}">` +
+      // The celebration class is composed here and nowhere else: it rides one
+      // rebuild, and wire() strips it on animationend so a later rebuild of the
+      // same page paints the standing illuminated treatment instead of the
+      // arrival. Reduced motion is the stylesheet's job (a static bright frame),
+      // which is why the gate above never asks the browser about it.
+      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       `<header class="reliquary-page-header">` +
       `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${done}` +
@@ -680,7 +921,7 @@ export class ReliquaryWindow {
         }),
       )}">` +
       `<span class="reliquary-page-progress">${esc(progress)}</span>` +
-      `<span class="reliquary-bar reliquary-page-bar"><span class="reliquary-bar-fill" style="width:${pct}%"></span></span>` +
+      this.barHtml(pct, 'reliquary-page-bar') +
       `</div>${clears}${this.filterBarHtml()}${grid}` +
       `</section>`
     );
@@ -711,7 +952,12 @@ export class ReliquaryWindow {
     return `<div class="reliquary-filterbar" role="group" aria-label="${esc(t('hudChrome.reliquary.filterGroupAria'))}">${chips}</div>`;
   }
 
-  private cellHtml(cell: ReliquaryGridCellModel, index: number, activeIndex: number): string {
+  private cellHtml(
+    cell: ReliquaryGridCellModel,
+    index: number,
+    activeIndex: number,
+    flash: boolean,
+  ): string {
     const name = this.cellDisplayName(cell);
     const stateClass = cell.owned ? 'owned' : 'missing';
     const quality = this.cellQuality(cell);
@@ -726,7 +972,10 @@ export class ReliquaryWindow {
       // aria-describedby and aria-keyshortcuts ride the CELL, not the grid: a
       // description on the focused element is reliably announced, one on a
       // role="list" container is not, and the container never takes focus here.
-      `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
+      // The flash rides the same one-shot as the celebration: a class composed
+      // into this rebuild only, so a filter click or the next slow band paints
+      // the settled cell.
+      `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
       // data-cell-source marks cells with at least one RESOLVABLE source line,
       // and carries how many actually resolve, so tooling (the PR shot picker)
@@ -767,8 +1016,14 @@ export class ReliquaryWindow {
       : t('hudChrome.reliquary.cellMissingSourceAria', { name, source });
   }
 
-  private cellIconHtml(cell: ReliquaryGridCellModel, quality: string): string {
-    if (cell.kind === 'item') {
+  /**
+   * Art for one relic slot, on the grid and on a recent chip alike. Item relics
+   * get the real procedural icon; every other kind gets the quality ghost until
+   * dedicated art lands with those shelves. One implementation, so a relic
+   * cannot render as art in one place and as a silhouette in the other.
+   */
+  private cellIconHtml(cell: ReliquaryRelicSlot, quality: string): string {
+    if (cell.kind === 'item' || cell.kind === 'unknown') {
       const def = ITEMS[cell.id];
       if (def) return this.deps.itemIcon(def);
       return unknownItemIconHtml(cell.id, quality);
@@ -778,8 +1033,8 @@ export class ReliquaryWindow {
     return knownItemIconHtml({ id: cell.id, quality });
   }
 
-  private cellQuality(cell: ReliquaryGridCellModel): string {
-    if (cell.kind === 'item') {
+  private cellQuality(cell: ReliquaryRelicSlot): string {
+    if (cell.kind === 'item' || cell.kind === 'unknown') {
       const def = ITEMS[cell.id];
       if (def?.quality) return def.quality;
     }
@@ -938,6 +1193,25 @@ export class ReliquaryWindow {
       this.gridIndex = 0;
       audio.click();
       this.render();
+    });
+    // The celebration removes itself when its animation ends, so the page
+    // settles into the standing illuminated treatment with no timer anywhere in
+    // this module. Removal only: the class can never come back, because the
+    // one-shot that composed it was consumed by the render above.
+    //
+    // Under prefers-reduced-motion the stylesheet swaps the animation for a
+    // static gold frame (`animation: none`), so animationend never fires and
+    // this listener never runs. That is the .deed-card-flash contract, not a
+    // leak: the next full rebuild drops the class with the rest of the markup,
+    // because the one-shot that composed it is already spent. A timer to close
+    // the gap would be the one thing this painter must never own.
+    const celebrating = el.querySelector<HTMLElement>('.reliquary-page-celebrate');
+    celebrating?.addEventListener('animationend', (e) => {
+      // animationend bubbles: the 1s cell fill flash inside this section would
+      // end the 1.6s page celebration and grid shimmer 0.6s early without the
+      // target guard (the illuminating drain composes both in the same paint).
+      if (e.target !== celebrating) return;
+      celebrating.classList.remove('reliquary-page-celebrate');
     });
     // Recent chips: the shared HUD tooltip repeats the chip's fully visible
     // wrapped name near the pointer (a hover nicety, never the only route to

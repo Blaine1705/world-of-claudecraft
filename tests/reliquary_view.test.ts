@@ -38,6 +38,7 @@ import {
   RELIQUARY_NEARLY_MAX,
   RELIQUARY_NEARLY_MAX_REMAINING,
   RELIQUARY_NEARLY_MIN_FRACTION,
+  RELIQUARY_SHELF_ORDER,
   type ReliquaryViewInput,
   reliquaryMarkFindKey,
   reliquaryOwnershipDigest,
@@ -241,8 +242,9 @@ describe('buildReliquaryView progress and rank', () => {
       }),
     );
     expect(model.progress.owned).toBe(0);
-    // Recent still lists the id (presentation); ownership stays authoritative.
-    expect(model.recent).toEqual([{ id: 'crypt_helm', kind: 'item' }]);
+    // Recent still lists the id (presentation, with the page it would jump to);
+    // ownership stays authoritative.
+    expect(model.recent).toEqual([{ id: 'crypt_helm', kind: 'item', pageId: 'crypt_n' }]);
   });
 
   it('counts authored marks in catalog progress and profession shelf totals', () => {
@@ -354,12 +356,210 @@ describe('buildReliquaryView recent', () => {
         recent: ['mw_a'],
       }),
     );
-    expect(model.recent).toEqual([{ id: 'mw_a', kind: 'mark' }]);
+    expect(model.recent).toEqual([{ id: 'mw_a', kind: 'mark', pageId: 'prof_stub' }]);
   });
 
   it('tags non-catalog non-mark ids as unknown', () => {
     const model = buildReliquaryView(input({ recent: ['garbage_id'] }));
-    expect(model.recent).toEqual([{ id: 'garbage_id', kind: 'unknown' }]);
+    // Nothing places it, so the chip gets no jump target and the painter draws
+    // it inert rather than as a button that would navigate nowhere.
+    expect(model.recent).toEqual([{ id: 'garbage_id', kind: 'unknown', pageId: null }]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 14: recent-find jump targets and the Overview shelf cards
+// ---------------------------------------------------------------------------
+
+describe('recent find pageId (where a chip jumps)', () => {
+  it('prefers the recorded first-find page when the catalog still holds it', () => {
+    // crypt_helm sits on crypt_n in authored order, so a hint pointing at a
+    // DIFFERENT live page is the only way to prove the hint wins the scan.
+    const hinted: ReliquaryPageDef = {
+      id: 'hint_home',
+      shelf: 'conquerors',
+      name: 'Hint Home',
+      relics: [{ kind: 'item', itemId: 'crypt_helm' }],
+    };
+    const model = buildReliquaryView(
+      input({
+        pages: [...TEST_PAGES, hinted],
+        recent: ['crypt_helm'],
+        firstFind: { crypt_helm: { pageId: 'hint_home' } },
+      }),
+    );
+    // Premise: the scan alone would answer crypt_n, so this is not self-proving.
+    expect(buildReliquaryView(input({ recent: ['crypt_helm'] })).recent[0]?.pageId).toBe('crypt_n');
+    expect(model.recent[0]?.pageId).toBe('hint_home');
+  });
+
+  it('falls back to the catalog scan when the hinted page is gone from the catalog', () => {
+    // Content drift: a first-find row recorded against a page that no longer
+    // exists must not strand the chip on a page nothing can open.
+    const model = buildReliquaryView(
+      input({
+        recent: ['crypt_helm'],
+        firstFind: { crypt_helm: { pageId: 'retired_page', clears: 4 } },
+      }),
+    );
+    expect(TEST_PAGES.some((p) => p.id === 'retired_page')).toBe(false);
+    expect(model.recent[0]?.pageId).toBe('crypt_n');
+  });
+
+  it('answers with the FIRST page in authored order for a relic on two pages', () => {
+    // Same relic, two pages: the jump target has to be stable rather than
+    // dependent on iteration luck, so the answer is the earlier page both ways.
+    const shared: ReliquaryRelicDef = { kind: 'item', itemId: 'shared_relic' };
+    const first: ReliquaryPageDef = {
+      id: 'page_first',
+      shelf: 'conquerors',
+      name: 'First',
+      relics: [shared],
+    };
+    const second: ReliquaryPageDef = {
+      id: 'page_second',
+      shelf: 'conquerors',
+      name: 'Second',
+      relics: [shared],
+    };
+    expect(
+      buildReliquaryView(input({ pages: [first, second], recent: ['shared_relic'] })).recent[0]
+        ?.pageId,
+    ).toBe('page_first');
+    // Authored order, not id order: swapping the pages swaps the answer.
+    expect(
+      buildReliquaryView(input({ pages: [second, first], recent: ['shared_relic'] })).recent[0]
+        ?.pageId,
+    ).toBe('page_second');
+  });
+
+  it('places a MARK and a MOUNT, not only item relics', () => {
+    // The index covers every kind the catalog places; an items-only index would
+    // leave the professions and Horizons chips inert.
+    const model = buildReliquaryView(input({ recent: ['mw_a', 'steed_a'] }));
+    expect(model.recent.map((r) => ({ id: r.id, pageId: r.pageId }))).toEqual([
+      { id: 'steed_a', pageId: 'horiz_stub' },
+      { id: 'mw_a', pageId: 'prof_stub' },
+    ]);
+  });
+
+  it('leaves an uncatalogued id with no jump target at all', () => {
+    const model = buildReliquaryView(
+      input({ recent: ['wire_only_id'], firstFind: { wire_only_id: { clears: 1 } } }),
+    );
+    expect(model.recent[0]?.pageId).toBeNull();
+  });
+});
+
+describe('Overview shelf cards', () => {
+  it('always renders exactly three cards, in RELIQUARY_SHELF_ORDER', () => {
+    const model = buildReliquaryView(input());
+    // The array ORDER is a contract the painter draws against: assert the
+    // literal sequence, never just membership.
+    expect(model.shelfCards.map((c) => c.shelf)).toEqual(['conquerors', 'professions', 'horizons']);
+    // Cross-pin the constant itself against the rail: comparing the model to
+    // RELIQUARY_SHELF_ORDER alone would be a constant self-comparison (the
+    // production code maps over the same array), but the rail order is an
+    // independent surface.
+    expect([...RELIQUARY_SHELF_ORDER]).toEqual(RELIQUARY_NAV.slice(1));
+    // Never the virtual Overview nav id: a card per SHELF, and Overview is not
+    // a shelf.
+    expect(model.shelfCards.map((c) => c.shelf)).not.toContain('overview');
+  });
+
+  it('aggregates owned/total to the same pair the nav rail counts', () => {
+    const model = buildReliquaryView(
+      input({
+        itemsDiscovered: ownedSet('crypt_helm', 'crypt_blade', 'dl_chest'),
+        marks: ownedSet('mw_a'),
+        ownedMounts: ownedSet('steed_a'),
+      }),
+    );
+    for (const card of model.shelfCards) {
+      const nav = model.shelves.find((s) => s.id === card.shelf);
+      expect(nav, card.shelf).toBeDefined();
+      expect({ owned: card.owned, total: card.total }, card.shelf).toEqual({
+        owned: nav?.owned,
+        total: nav?.total,
+      });
+    }
+    // Pinned literals too, so a pair that drifted on BOTH surfaces at once
+    // cannot satisfy the agreement check above by matching itself.
+    expect(model.shelfCards).toEqual([
+      { shelf: 'conquerors', owned: 3, total: 9, recentId: null, recentKind: null },
+      { shelf: 'professions', owned: 1, total: 1, recentId: null, recentKind: null },
+      { shelf: 'horizons', owned: 1, total: 1, recentId: null, recentKind: null },
+    ]);
+  });
+
+  it('shows the NEWEST ring find on each shelf and ignores the other shelves', () => {
+    // Oldest-first ring spanning all three shelves, with two conqueror finds so
+    // "newest" is a real choice rather than "the only one".
+    const model = buildReliquaryView(
+      input({
+        recent: ['crypt_helm', 'mw_a', 'steed_a', 'sanctum_helm'],
+        itemsDiscovered: ownedSet('crypt_helm', 'sanctum_helm'),
+        marks: ownedSet('mw_a'),
+        ownedMounts: ownedSet('steed_a'),
+      }),
+    );
+    expect(
+      model.shelfCards.map((c) => ({ shelf: c.shelf, id: c.recentId, kind: c.recentKind })),
+    ).toEqual([
+      { shelf: 'conquerors', id: 'sanctum_helm', kind: 'item' },
+      { shelf: 'professions', id: 'mw_a', kind: 'mark' },
+      // The ring carries three kinds only: a mount the item catalog cannot
+      // claim rides as 'unknown', which is exactly what the label ladder and
+      // the ghost icon expect from a wire-shaped id.
+      { shelf: 'horizons', id: 'steed_a', kind: 'unknown' },
+    ]);
+    // Premise: the conqueror card really chose between two candidates, so
+    // "newest wins" is a decision here rather than the only available answer.
+    const conquerorPages = new Set(
+      TEST_PAGES.filter((p) => p.shelf === 'conquerors').map((p) => p.id),
+    );
+    expect(
+      model.recent.filter((r) => r.pageId !== null && conquerorPages.has(r.pageId)),
+    ).toHaveLength(2);
+  });
+
+  it('leaves recentId null on a shelf the ring never touched', () => {
+    const model = buildReliquaryView(
+      input({ recent: ['crypt_helm'], itemsDiscovered: ownedSet('crypt_helm') }),
+    );
+    const byShelf = new Map(model.shelfCards.map((c) => [c.shelf, c]));
+    expect(byShelf.get('conquerors')?.recentId).toBe('crypt_helm');
+    expect(byShelf.get('professions')?.recentId).toBeNull();
+    expect(byShelf.get('professions')?.recentKind).toBeNull();
+    expect(byShelf.get('horizons')?.recentId).toBeNull();
+    // An unplaceable find has no shelf to summarize, so it reaches no card.
+    const drift = buildReliquaryView(input({ recent: ['garbage_id'] }));
+    expect(drift.recent).toHaveLength(1);
+    expect(drift.shelfCards.every((c) => c.recentId === null)).toBe(true);
+  });
+
+  it('captures the latest find BEFORE the search filter (typing never blanks a card)', () => {
+    // One input, both surfaces: the needle narrows the recent STRIP while every
+    // card keeps its shelf's newest find. A card summarizes its shelf, not the
+    // current needle.
+    const NAMES: Record<string, string> = {
+      crypt_helm: 'casque de crypte',
+      mw_a: 'marque de maitre',
+      steed_a: 'destrier',
+    };
+    const model = buildReliquaryView(
+      input({
+        recent: ['crypt_helm', 'mw_a', 'steed_a'],
+        itemsDiscovered: ownedSet('crypt_helm'),
+        marks: ownedSet('mw_a'),
+        ownedMounts: ownedSet('steed_a'),
+        relicSearchText: (_kind, id) => NAMES[id] ?? '',
+        search: 'destrier',
+      }),
+    );
+    // Premise: the needle really did narrow the strip to one chip.
+    expect(model.recent.map((r) => r.id)).toEqual(['steed_a']);
+    expect(model.shelfCards.map((c) => c.recentId)).toEqual(['crypt_helm', 'mw_a', 'steed_a']);
   });
 });
 
@@ -824,6 +1024,44 @@ describe('buildReliquaryUnlockPlan', () => {
     expect(plan.illuminatedPageId).toBe('sanctum_n');
   });
 
+  it('arms the Illumination celebration once per drain and never into the next one', () => {
+    // The Hud calls celebrateIllumination only when this field is non-null, so
+    // "exactly once per illumination drain" is this pair: the filling drain
+    // reports the page once, and the very next drain of ordinary finds reports
+    // nothing, whatever those finds are.
+    const filling = buildReliquaryUnlockPlan(
+      [{ itemId: 'a' }, { itemId: 'b', illuminatedPageId: 'crypt_n' }],
+      false,
+    );
+    expect(filling.illuminatedPageId).toBe('crypt_n');
+    expect(filling.logs).toHaveLength(2);
+    const after = buildReliquaryUnlockPlan([{ itemId: 'c' }, { markId: 'mw_a' }], false);
+    expect(after.illuminatedPageId).toBeNull();
+    // Two events that each illuminate the SAME page still report one page id,
+    // not a list: the celebration is one moment, not one per event.
+    const twice = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', illuminatedPageId: 'crypt_n' },
+        { itemId: 'b', illuminatedPageId: 'crypt_n' },
+      ],
+      false,
+    );
+    expect(twice.illuminatedPageId).toBe('crypt_n');
+  });
+
+  it('reducedMotion keeps the Illumination armed and trims only the flourish', () => {
+    // Reduced motion is answered in CSS (a static gold frame), so the plan must
+    // still hand the page to the window: dropping it here would take the news
+    // away from the players who opted out of the animation, not just the
+    // animation.
+    const plan = buildReliquaryUnlockPlan([{ itemId: 'a', illuminatedPageId: 'crypt_n' }], true);
+    expect(plan.illuminatedPageId).toBe('crypt_n');
+    expect(plan.banner).toEqual({ kind: 'illuminate', pageId: 'crypt_n' });
+    expect(plan.refreshWindow).toBe(true);
+    expect(plan.playSound).toBe(true);
+    expect(plan.motion).toBe(false);
+  });
+
   it('skips empty payloads and never invents membership from pageIds alone', () => {
     const plan = buildReliquaryUnlockPlan(
       [{ pageIds: ['crypt_n'], illuminatedPageId: 'crypt_n' }, {}],
@@ -1029,6 +1267,40 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryOwnershipDigest({ ...base, pageOwned: 2 })).not.toBe(baseD);
     expect(reliquaryOwnershipDigest({ ...base, marksSize: 1 })).not.toBe(baseD);
     expect(reliquaryOwnershipDigest(base)).toBe(baseD);
+  });
+
+  it('a new find moves the ring digest, which is what repaints the shelf cards', () => {
+    // The latest-find line on an Overview card is derived from the ring alone,
+    // so the ring digest is the ONLY signature dimension that can carry it.
+    // Both halves are asserted: the model's cards really changed, and the
+    // signature really moved, so neither could hide behind the other.
+    const before = buildReliquaryView(
+      input({ recent: ['crypt_helm'], itemsDiscovered: ownedSet('crypt_helm') }),
+    );
+    const after = buildReliquaryView(
+      input({
+        recent: ['crypt_helm', 'mw_a'],
+        itemsDiscovered: ownedSet('crypt_helm'),
+        marks: ownedSet('mw_a'),
+      }),
+    );
+    expect(before.shelfCards.map((c) => c.recentId)).not.toEqual(
+      after.shelfCards.map((c) => c.recentId),
+    );
+    const ringBefore = reliquaryRecentSig(['crypt_helm']);
+    const ringAfter = reliquaryRecentSig(['crypt_helm', 'mw_a']);
+    expect(ringAfter).not.toBe(ringBefore);
+    const parts = {
+      owned: 2,
+      total: 11,
+      curatorRank: 1,
+      marksSize: 1,
+      nav: 'overview' as const,
+      pageId: null as string | null,
+    };
+    expect(reliquaryRefreshSig({ ...parts, recentSig: ringAfter })).not.toBe(
+      reliquaryRefreshSig({ ...parts, recentSig: ringBefore }),
+    );
   });
 
   it('reliquaryRecentSig preserves order and joins with unit separator', () => {

@@ -327,8 +327,22 @@ describe('painter hygiene', () => {
     expect(code).not.toMatch(/\bt\(`[^`]*\$\{/);
     expect(code).not.toMatch(/as TranslationKey\)/);
     expect(code).toContain("t('hudChrome.reliquary.searchEmpty')");
-    expect(code).toContain("t('hudChrome.reliquary.overviewEmpty')");
     expect(code).toContain("t('hudChrome.reliquary.shelfEmpty')");
+    // Phase 14 Overview keys. The two strip hints and the reconciliation note
+    // are the only copy on the Overview that is not a count, so each one is
+    // pinned by its literal key rather than by the section that holds it.
+    expect(code).toContain("'hudChrome.reliquary.recentEmpty'");
+    expect(code).toContain("'hudChrome.reliquary.nearlyEmpty'");
+    expect(code).toContain("t('hudChrome.reliquary.sharedUniquesNote')");
+    // The interpolated Phase 14 keys ride the same literal rule.
+    expect(code).toContain("t('hudChrome.reliquary.recentJumpAria', { name })");
+    expect(code).toContain("t('hudChrome.reliquary.shelfNoFinds')");
+    expect(code).toContain("t('hudChrome.reliquary.shelfRecent', {");
+    expect(code).toContain("t('hudChrome.reliquary.shelfOpenAria', { name, owned, total })");
+    // overviewEmpty was deleted with the strip hints that replaced it: the
+    // painter must not resurrect a key the catalog no longer authors (the
+    // catalog half of this pin lives in the i18n chrome suite below).
+    expect(code).not.toContain('overviewEmpty');
   });
 
   it('decides "search is active" one way, on the TRIMMED needle', () => {
@@ -757,7 +771,6 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("navConquerors: 'Conquerors'");
     expect(chrome).toContain("curatorUnranked: 'Unranked Curator'");
     expect(chrome).toContain("nearlyLabel: 'Nearly complete:'");
-    expect(chrome).toContain('overviewEmpty:');
     expect(chrome).toContain("clearsLabel: '{count} clears'");
     expect(chrome).toContain("reliquary: 'Reliquary'");
     // Phase 5 live UX chrome.
@@ -786,6 +799,32 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain(
       "accountScopeNote: 'Account collection: unlocked across every character on this account.'",
     );
+    // Phase 14 Overview chrome: the jump aria, both strip hints, the two shelf
+    // card lines, the card's own aria, and the shared-uniques reconciliation.
+    expect(chrome).toContain("recentJumpAria: 'Open the page for {name}'");
+    expect(chrome).toContain('recentEmpty:');
+    expect(chrome).toContain('nearlyEmpty:');
+    expect(chrome).toContain("shelfRecent: 'Latest find: {name}'");
+    expect(chrome).toContain('shelfNoFinds:');
+    expect(chrome).toContain("shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled'");
+    expect(chrome).toContain('sharedUniquesNote:');
+    // And the plural base the nearly row's "to go" readout selects on: a flat
+    // key here would read wrong at count 1 in every inflecting locale.
+    expect(chrome).toContain('reliquaryToGo: {');
+  });
+
+  it('keeps the retired overviewEmpty key deleted, the pageStubNote precedent', () => {
+    // Phase 14 replaced the one Overview blurb with the two per-strip hints
+    // that sit next to the label each explains. A key with no render site is
+    // dead weight every locale still has to carry, so it was removed end to
+    // end (catalog, five overlays, regenerated bundles) exactly the way
+    // pageStubNote was in Phase 11.
+    //
+    // Premise first: the keys that REPLACED it are really authored, so this
+    // pin cannot pass on a catalog that simply lost the whole section.
+    expect(chrome).toContain('recentEmpty:');
+    expect(chrome).toContain('nearlyEmpty:');
+    expect(chrome).not.toContain('overviewEmpty');
   });
 
   it('authors a markFind leaf for every catalogued Reliquary mark id', () => {
@@ -930,6 +969,21 @@ describe('styles and architecture registration', () => {
     expect(reliquaryCss).toContain('data-seal="grand"');
     expect(reliquaryCss).toContain('data-seal="eternal"');
     expect(reliquaryCss).toContain('prefers-reduced-motion: reduce');
+    // Declaration-level reduced-motion pins: a bare existence check on the
+    // media query would stay green with an emptied block, silently dropping
+    // the static-frame arm the acceptance criterion names. Both one-shots
+    // must swap their animation off AND the celebrate frame must keep a
+    // static gold ring inside the reduce block.
+    // Content-bound, not position-bound: [^@] cannot cross into a later media
+    // block, so each pattern binds to whichever reduce block actually contains
+    // the celebration rules, and authoring an unrelated reduce query earlier
+    // in the section cannot re-anchor these pins onto the standing rules.
+    expect(reliquaryCss).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[^@]*?\.reliquary-page-detail\.reliquary-page-celebrate \{[^}]*animation: none;[^}]*box-shadow:/,
+    );
+    expect(reliquaryCss).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[^@]*?\.reliquary-cell-flash \{[^}]*animation: none;/,
+    );
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window');
     expect(hudMobile).toContain('env(safe-area-inset-left)');
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window .reliquary-grid');

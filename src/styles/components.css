@@ -7963,7 +7963,10 @@
     font-weight: 400;
     color: var(--color-text-muted);
   }
-  /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info). */
+  /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info).
+     Phase 14 removed this block's reduced-motion box-shadow suppression on
+     purpose: the tier glows are STATIC shadows that never animate, so hiding
+     them under prefers-reduced-motion suppressed decoration, not motion. */
   .reliquary-rank-seal {
     display: none;
     width: 12px;
@@ -8005,11 +8008,6 @@
     );
     box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 70%, transparent);
   }
-  @media (prefers-reduced-motion: reduce) {
-    .reliquary-summary[data-seal] .reliquary-rank-seal {
-      box-shadow: none;
-    }
-  }
   .reliquary-pct {
     display: inline-flex;
     align-items: center;
@@ -8026,9 +8024,16 @@
     overflow: hidden;
     vertical-align: middle;
   }
+  /* One fill rule for every bar in the window (summary, page header, the
+     nearly mini bar, the shelf cards): the painter writes the percentage into
+     --reliquary-fill instead of an inline width, the range-slider track idiom
+     (var(--range-fill, 0%) in base.css). The 0% fallback keeps an unset bar
+     empty rather than full, so a bar that lost its custom property reads as no
+     progress instead of complete. */
   .reliquary-bar-fill {
     display: block;
     height: 100%;
+    width: var(--reliquary-fill, 0%);
     background: linear-gradient(to bottom, var(--gold), var(--gold-dim));
   }
   .reliquary-body {
@@ -8105,14 +8110,63 @@
     font-family: var(--title-font);
     color: var(--gold);
   }
+  /* The trailing note on a strip (what the strip is counting, or where the
+     rest of it lives). Muted against the strip's own gold-dim body so it reads
+     as an aside, and no chip chrome: it is prose, not a target. */
+  .reliquary-strip-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  /* A recent-find chip. It is a BUTTON that jumps to the relic's page, so it
+     declares its own font and colour (a button inherits neither) and the base
+     rule stays shared with the plain span form the strip still renders when
+     there is nothing to jump to. */
   .reliquary-recent-item {
     display: inline-flex;
     align-items: center;
     max-width: 100%;
     padding: 3px 8px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
     border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #171309;
+    color: var(--gold-dim);
+  }
+  /* The pointer is scoped to the button form: on the span form it would
+     promise a click that does not exist, which is the .reliquary-cell lesson.
+     Hover and focus stay on the bare class: a keyline is honest either way
+     (the span still opens the shared tooltip), and only a focusable element
+     can match :focus-visible in the first place. */
+  .reliquary-recent-item:is(button) {
+    cursor: var(--cursor-point);
+  }
+  .reliquary-recent-item:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .reliquary-recent-item:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* A fixed icon box, so a tall or wide glyph cannot stretch the chip. Sized
+     on the outer element and again on an inner one, because the icon helpers
+     return either a bare <img> or a wrapper around one. */
+  .reliquary-recent-icon {
+    display: block;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
+  .reliquary-recent-icon img,
+  .reliquary-recent-icon .item-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
   }
   /* A long relic name wraps inside its chip instead of truncating: an
      ellipsis would hide the tail from sighted keyboard players, because the
@@ -8158,6 +8212,17 @@
   body.mobile-touch .reliquary-page-row,
   body.mobile-touch .reliquary-back {
     min-height: 40px;
+  }
+  /* Inside a nearly row the bar is a glance, not the readout: the row already
+     carries the owned/total text, so the bar shrinks to a mini variant that
+     leaves room for the name to wrap. */
+  .reliquary-nearly-row .reliquary-bar {
+    width: 64px;
+    height: 6px;
+  }
+  .reliquary-to-go {
+    font-size: 11px;
+    color: var(--color-text-muted);
   }
   .reliquary-progress-text,
   .reliquary-clears {
@@ -8295,6 +8360,24 @@
   .reliquary-account-scope {
     margin-bottom: 6px;
   }
+  /* An illuminated page is the payoff of the whole window, so it keeps a
+     standing gold frame rather than the letter-spacing it used to carry alone:
+     that spacing was invisible next to an unfinished page, which left a
+     completed page looking identical to a page one relic short. The badge
+     fills in to match. The celebration one-shot further down the section is
+     authored after this rule, so it wins the frame for the moment it plays. */
+  .reliquary-page-detail.is-illuminated {
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 8px 8px 10px;
+    box-shadow: inset 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge {
+    padding: 1px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+  }
   .reliquary-page-detail.is-illuminated .reliquary-page-illuminated {
     letter-spacing: 0.06em;
   }
@@ -8353,15 +8436,154 @@
     filter: brightness(0.18) contrast(1.1);
     opacity: 0.9;
   }
-  body.mobile-touch .reliquary-cell {
-    min-width: 44px;
-    min-height: 44px;
-  }
   .reliquary-empty {
     padding: 16px 8px;
     font-size: 13px;
     color: var(--gold-dim);
     text-align: center;
+  }
+  /* Overview shelf cards: one card per shelf, three up, the flagship the
+     Overview leads with. A card is a jump button to its shelf, so it carries
+     the pointer, the row family's hover keyline, and the token focus ring. The
+     palette is the recent chip's (showcase hairline over the dark fill), not a
+     new surface. */
+  .reliquary-shelf-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .reliquary-shelf-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    min-height: 92px;
+    padding: 10px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: #171309;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+  }
+  .reliquary-shelf-card:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .reliquary-shelf-card:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-shelf-card-name {
+    font-family: var(--title-font);
+    font-weight: 700;
+    color: var(--gold);
+  }
+  /* The card bar spans the card. Without this it is a flex item under
+     align-items: flex-start and shrinks to its own 100px inline-block width. */
+  .reliquary-shelf-card .reliquary-bar {
+    width: 100%;
+  }
+  /* The newest find on the shelf. It wraps instead of truncating, the
+     .reliquary-recent-name contract: the card is a button, so an ellipsis
+     would need a hover tooltip a keyboard player has no pointer to fire. */
+  .reliquary-shelf-card-recent {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+  /* The reconciliation line under the Overview header: it says why the owned
+     count and the shelf counts added up do not have to match. */
+  .reliquary-uniques-note {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  /* Illumination celebration: the one-shots the painter fires on the repaint
+     that first sees a page complete. Every class here is added by that repaint
+     and removed on animationend, so nothing loops and the painter runs no
+     timer. The page frame flashes gold (the .deed-card-flash pattern) while
+     the grid brightens once underneath it. */
+  .reliquary-page-detail.reliquary-page-celebrate {
+    animation: reliquary-page-celebrate 1.6s ease-out;
+    animation-iteration-count: 1;
+  }
+  @keyframes reliquary-page-celebrate {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 14px 3px color-mix(in srgb, var(--gold) 55%, transparent);
+    }
+    /* Settle on the standing is-illuminated glow, not transparent: the
+       animated shadow REPLACES the standing rule for its whole run, so a
+       transparent end frame would pop back to the glow at animationend. */
+    100% {
+      box-shadow:
+        inset 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent),
+        0 0 0 0 transparent;
+    }
+  }
+  /* The grid sweep is brightness only: it lifts what is already on screen and
+     hides nothing, so a silhouette stays a silhouette and an owned relic stays
+     legible for the whole 1.6s. */
+  .reliquary-page-celebrate .reliquary-grid {
+    animation: reliquary-grid-shimmer 1.6s ease-out;
+    animation-iteration-count: 1;
+  }
+  @keyframes reliquary-grid-shimmer {
+    0% {
+      filter: brightness(1);
+    }
+    30% {
+      filter: brightness(1.35);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+  /* One cell lighting up as its relic lands: the same one-shot, shorter,
+     scoped to the cell so a single find does not flash the whole page. */
+  .reliquary-cell-flash {
+    animation: reliquary-cell-flash 1s ease-out;
+    animation-iteration-count: 1;
+  }
+  @keyframes reliquary-cell-flash {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 8px 1px color-mix(in srgb, var(--gold) 50%, transparent);
+    }
+    100% {
+      box-shadow:
+        inset 0 0 0 2px transparent,
+        0 0 0 0 transparent;
+    }
+  }
+  /* Reduced motion drops the movement and none of the news: the completed page
+     holds a static gold frame, the grid stays at its own brightness, and a
+     fresh cell keeps a static ring. animationend never fires for an animation
+     that never runs, so both classes clear on the next repaint instead (the
+     .deed-card-flash contract). That repaint is signature-driven, so on a
+     quiet world the static ring can stand for minutes: deliberate, since
+     both stuck states read as true statements (the page IS complete, the
+     cell IS owned), and a timer to shorten the wait is the one thing the
+     cold painter must never own. */
+  @media (prefers-reduced-motion: reduce) {
+    .reliquary-page-detail.reliquary-page-celebrate {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
+    .reliquary-page-celebrate .reliquary-grid {
+      animation: none;
+      filter: none;
+    }
+    .reliquary-cell-flash {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
   }
   #professions-window {
     width: 720px;

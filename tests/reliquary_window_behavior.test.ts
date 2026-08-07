@@ -161,6 +161,14 @@ interface WorldState {
   clears: Map<string, number>;
   /** reliquaryPageCompletion(pageId).owned: signature-only. */
   pageOwned: Map<string, number>;
+  /**
+   * How many times the painter actually READ each of the two ownership seams
+   * the view needs as Sets. Both are copied per repaint and must never be
+   * touched by an elided slow-band poll, so a call count is the decisive
+   * observation: a Set allocated in buildInput would show up here as a read on
+   * a poll that painted nothing.
+   */
+  reads: { ownedMounts: number; weaponSkinIds: number };
 }
 
 function baseState(): WorldState {
@@ -176,6 +184,7 @@ function baseState(): WorldState {
     curatorRank: 0,
     clears: new Map(),
     pageOwned: new Map(),
+    reads: { ownedMounts: 0, weaponSkinIds: 0 },
   };
 }
 
@@ -212,8 +221,16 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         reliquaryMarks: state.marks,
         reliquaryRecent: state.recent,
         reliquaryFirstFind: state.firstFind,
-        ownedMounts: () => state.mounts,
-        accountCosmetics: { weaponSkinIds: state.weaponSkinIds },
+        ownedMounts: () => {
+          state.reads.ownedMounts++;
+          return state.mounts;
+        },
+        accountCosmetics: {
+          get weaponSkinIds() {
+            state.reads.weaponSkinIds++;
+            return state.weaponSkinIds;
+          },
+        },
         deedsEarned: state.deedsEarned,
         reliquaryPageClearCount: (pageId: string) => state.clears.get(pageId),
         reliquaryCatalogCompletion: () => state.catalog,
@@ -1728,5 +1745,541 @@ describe('ReliquaryWindow: the roving grid tab stop', () => {
     rig.w.refreshIfChanged();
     expect((document.activeElement as HTMLElement | null)?.hasAttribute('data-close')).toBe(true);
     expect(tabStopIndex(rig.el)).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11. Overview flagship: recent jump chips, strip hints, shelf cards
+// ---------------------------------------------------------------------------
+
+/** Does the synthetic world own this relic slot? One arm per catalog kind, so
+ *  the shelf oracle below never leans on the core it is checking. */
+function ownsSlot(state: WorldState, relic: ReliquaryRelicDef): boolean {
+  if (relic.kind === 'item') return state.itemsDiscovered.has(relic.itemId);
+  if (relic.kind === 'mark') return state.marks.has(relic.markId);
+  if (relic.kind === 'mount') return state.mounts.includes(relic.mountId);
+  if (relic.kind === 'weapon_skin') return state.weaponSkinIds.includes(relic.skinId);
+  return state.deedsEarned.has(relic.deedId);
+}
+
+/** owned/total across every LIVE page on one shelf, summed here rather than
+ *  read back off the painted rail: a card and the rail agreeing on a number
+ *  both got wrong would otherwise pass. */
+function shelfAggregate(shelf: string, state: WorldState): { owned: number; total: number } {
+  let owned = 0;
+  let total = 0;
+  for (const page of RELIQUARY_PAGES) {
+    if (page.shelf !== shelf) continue;
+    for (const relic of page.relics) {
+      total += 1;
+      if (ownsSlot(state, relic)) owned += 1;
+    }
+  }
+  return { owned, total };
+}
+
+const recentChips = (el: HTMLElement): HTMLElement[] => [
+  ...el.querySelectorAll<HTMLElement>('.reliquary-recent-item'),
+];
+const shelfCards = (el: HTMLElement): HTMLElement[] => [
+  ...el.querySelectorAll<HTMLElement>('.reliquary-shelf-card'),
+];
+const textsOf = (el: HTMLElement, selector: string): (string | null)[] =>
+  [...el.querySelectorAll<HTMLElement>(selector)].map((node) => node.textContent);
+
+describe('ReliquaryWindow: the recent-find strip jumps to the relic', () => {
+  it('jumps to the find OWN page and shelf, not the shelf the player left', () => {
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.recent.push(id);
+    state.itemsDiscovered.add(id);
+    // Park the window on another shelf first, so the hop below can only land
+    // on conquerors by reading the relic's own page rather than sticky state.
+    const rig = makeWindow(state, { nav: 'horizons' });
+    expect(pageDef(PAGE_ID).shelf, 'content premise: the find lives off Horizons').not.toBe(
+      'horizons',
+    );
+    click(rig.el, '[data-nav="overview"]');
+
+    const chip = must(rig.el, '.reliquary-recent-item');
+    expect(chip.tagName).toBe('BUTTON');
+    expect(chip.dataset.page).toBe(PAGE_ID);
+    const name = reliquaryRelicDisplayName('item', id);
+    expect(chip.getAttribute('aria-label')).toBe(t('hudChrome.reliquary.recentJumpAria', { name }));
+    // The chip's own tooltip goes through the shared HUD tooltip seam, the same
+    // route every other hover surface in this window takes.
+    expect(tooltipFor(rig, chip)?.()).toContain(esc(name));
+
+    chip.click();
+    expect(must(rig.el, '[data-nav="conquerors"]').getAttribute('aria-pressed')).toBe('true');
+    expect(must(rig.el, '[data-nav="horizons"]').getAttribute('aria-pressed')).toBe('false');
+    expect(must(rig.el, '.reliquary-page-title').textContent).toBe(reliquaryPageName(PAGE_ID));
+    // The grid really painted the page the chip promised.
+    expect(cells(rig.el).map((node) => node.dataset.cellId)).toEqual(slotIds(PAGE_ID));
+  });
+
+  it('draws an INERT chip for a find no page can claim', () => {
+    const stray = 'wire_only_relic';
+    // Premise: the catalog genuinely cannot place it, so the inert arm below is
+    // the arm under test rather than an accident of a renamed relic.
+    expect(
+      RELIQUARY_PAGES.some((page) => page.relics.some((relic) => slotId(relic) === stray)),
+    ).toBe(false);
+    const state = baseState();
+    state.recent.push(stray);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const chip = must(rig.el, '.reliquary-recent-item');
+    // A button that navigates nowhere is a broken promise; the chip stays a
+    // plain element instead, keeping its icon, its name, and its tooltip.
+    expect(chip.tagName).not.toBe('BUTTON');
+    expect(chip.hasAttribute('data-page')).toBe(false);
+    const name = reliquaryRelicDisplayName('unknown', stray);
+    expect(chip.dataset.recentName).toBe(name);
+    expect(tooltipFor(rig, chip)?.()).toContain(esc(name));
+  });
+
+  it('labels both strips always, and explains each one while it is empty', () => {
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    // An Overview whose sections appear only after the first find reads as a
+    // broken window: the labels are unconditional and the hints say what will
+    // fill them.
+    expect(textsOf(rig.el, '.reliquary-strip-label')).toEqual([
+      t('hudChrome.reliquary.recentLabel'),
+      t('hudChrome.reliquary.nearlyLabel'),
+    ]);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([
+      t('hudChrome.reliquary.recentEmpty'),
+      t('hudChrome.reliquary.nearlyEmpty'),
+    ]);
+  });
+
+  it('drops each hint as soon as its own strip has something to show', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    // All but the last relic on the page: one find for the ring, and a page one
+    // relic short of Illumination for the nearly strip.
+    for (const id of ids.slice(0, -1)) state.itemsDiscovered.add(id);
+    state.recent.push(ids[0] ?? '');
+    const rig = makeWindow(state, { nav: 'overview' });
+    // Premise: both strips really painted something.
+    expect(recentChips(rig.el).length).toBeGreaterThan(0);
+    expect(rig.el.querySelectorAll('.reliquary-nearly-row').length).toBeGreaterThan(0);
+    expect(textsOf(rig.el, '.reliquary-strip-hint')).toEqual([]);
+    expect(textsOf(rig.el, '.reliquary-strip-label')).toEqual([
+      t('hudChrome.reliquary.recentLabel'),
+      t('hudChrome.reliquary.nearlyLabel'),
+    ]);
+  });
+
+  it('says once, on the Overview, why the totals do not add up', () => {
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    expect(must(rig.el, '.reliquary-uniques-note').textContent).toBe(
+      t('hudChrome.reliquary.sharedUniquesNote'),
+    );
+    // Overview only: the note explains the two numbers where they sit side by
+    // side, and would be noise on a page grid.
+    const page = openPage(baseState());
+    expect(page.el.querySelector('.reliquary-uniques-note')).toBeNull();
+  });
+
+  it('gives a nearly row its own mini bar and a localized "to go" readout', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, -2)) state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const row = must(rig.el, '.reliquary-nearly-row');
+    const owned = ids.length - 2;
+    const remaining = ids.length - owned;
+    expect(must(row, '.reliquary-to-go').textContent).toBe(
+      tPlural('hudChrome.plurals.reliquaryToGo', remaining, { count: fmt(remaining) }),
+    );
+    expect(must(row, '.reliquary-progress-text').textContent).toBe(
+      t('hudChrome.reliquary.progressText', { owned: fmt(owned), total: fmt(ids.length) }),
+    );
+    expect(must(row, '.reliquary-bar-fill').getAttribute('style')).toBe(
+      `--reliquary-fill:${Math.round((owned / ids.length) * 100)}%`,
+    );
+  });
+});
+
+describe('ReliquaryWindow: the Overview shelf cards', () => {
+  it('renders exactly three cards, in the rail order, each one a shelf jump', () => {
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    const cards = shelfCards(rig.el);
+    expect(cards.map((card) => card.dataset.nav)).toEqual([
+      'conquerors',
+      'professions',
+      'horizons',
+    ]);
+    // Same order the rail lists, minus the virtual Overview entry: a player
+    // reading the cards and then the rail sees one catalog, not two.
+    expect(
+      [...rig.el.querySelectorAll<HTMLElement>('.reliquary-rail [data-nav]')].map(
+        (node) => node.dataset.nav,
+      ),
+    ).toEqual(['overview', 'conquerors', 'professions', 'horizons']);
+  });
+
+  it('opens that shelf on a click', () => {
+    const rig = makeWindow(baseState(), { nav: 'overview' });
+    click(rig.el, '.reliquary-shelf-card[data-nav="horizons"]');
+    expect(must(rig.el, '[data-nav="horizons"]').getAttribute('aria-pressed')).toBe('true');
+    expect(rig.el.querySelector('.reliquary-shelf-cards')).toBeNull();
+    // The shelf really opened: its page list is the painted surface now.
+    expect(pageIds(rig.el)).toEqual(
+      RELIQUARY_PAGES.filter((page) => page.shelf === 'horizons').map((page) => page.id),
+    );
+  });
+
+  it('carries the shelf pair, its latest find, and a localized open label', () => {
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[2] ?? '';
+    state.recent.push(id);
+    state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const card = must(rig.el, '.reliquary-shelf-card[data-nav="conquerors"]');
+    const totals = shelfAggregate('conquerors', state);
+    expect(totals.owned).toBe(1);
+    expect(must(card, '.reliquary-shelf-card-name').textContent).toBe(
+      t('hudChrome.reliquary.navConquerors'),
+    );
+    expect(must(card, '.reliquary-progress-text').textContent).toBe(
+      t('hudChrome.reliquary.progressText', {
+        owned: fmt(totals.owned),
+        total: fmt(totals.total),
+      }),
+    );
+    expect(must(card, '.reliquary-shelf-card-recent').textContent).toBe(
+      t('hudChrome.reliquary.shelfRecent', { name: reliquaryRelicDisplayName('item', id) }),
+    );
+    expect(card.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.shelfOpenAria', {
+        name: t('hudChrome.reliquary.navConquerors'),
+        owned: fmt(totals.owned),
+        total: fmt(totals.total),
+      }),
+    );
+    // A shelf the ring never touched AND with nothing owned says so, rather
+    // than borrowing the find from the shelf next to it.
+    const quiet = must(rig.el, '.reliquary-shelf-card[data-nav="professions"]');
+    expect(shelfAggregate('professions', state).owned).toBe(0);
+    expect(must(quiet, '.reliquary-shelf-card-recent').textContent).toBe(
+      t('hudChrome.reliquary.shelfNoFinds'),
+    );
+    // The third ternary arm carries the description wiring too: a rendered
+    // shelfNoFinds line is described exactly like a rendered find line.
+    expect(quiet.getAttribute('aria-describedby')).toBe(
+      must(quiet, '.reliquary-shelf-card-recent').id,
+    );
+    // The latest line is NEW information the aria-label would otherwise
+    // replace: the button folds it back in through aria-describedby.
+    expect(card.getAttribute('aria-describedby')).toBe(
+      must(card, '.reliquary-shelf-card-recent').id,
+    );
+    expect(must(card, '.reliquary-shelf-card-recent').id).not.toBe('');
+  });
+
+  it('says nothing when relics are owned but the ring cannot know the latest', () => {
+    // Two real production shapes reach this arm: the Horizons shelf (mounts,
+    // skins, and titles never enter the recent ring: pushRecent's only call
+    // sites are the item and mark first-finds) and a retro-seeded veteran
+    // (owned counts refill silently with NO recent push, per the locked retro
+    // policy). "Nothing catalogued yet" would contradict the pair printed
+    // above the line, so the card omits the line entirely.
+    const state = baseState();
+    state.mounts.push(UNHINTED_MOUNT_ID);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const horizons = must(rig.el, '.reliquary-shelf-card[data-nav="horizons"]');
+    const totals = shelfAggregate('horizons', state);
+    expect(totals.owned, 'premise: the mount really counts as owned').toBeGreaterThan(0);
+    expect(state.recent, 'premise: the ring is empty').toEqual([]);
+    expect(horizons.querySelector('.reliquary-shelf-card-recent')).toBeNull();
+    expect(horizons.textContent).not.toContain(t('hudChrome.reliquary.shelfNoFinds'));
+    // No dangling describedby when the line it points at is not rendered.
+    expect(horizons.getAttribute('aria-describedby')).toBeNull();
+  });
+
+  it('keeps the latest-find line while a needle narrows the strip above it', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    state.recent.push(ids[0] ?? '', ids[1] ?? '');
+    state.itemsDiscovered.add(ids[0] ?? '');
+    state.itemsDiscovered.add(ids[1] ?? '');
+    const rig = makeWindow(state, { nav: 'overview' });
+    const newest = reliquaryRelicDisplayName('item', ids[1] ?? '');
+    const oldest = reliquaryRelicDisplayName('item', ids[0] ?? '');
+    // Premise: the needle picks out the OLDER find only, so a card that
+    // followed the needle would change its line.
+    expect(newest.toLocaleLowerCase(TAG), 'content premise: the two names differ').not.toContain(
+      oldest.toLocaleLowerCase(TAG),
+    );
+    typeSearch(rig.el, oldest.toLocaleLowerCase(TAG));
+    expect(recentChips(rig.el).map((chip) => chip.dataset.recentName)).toEqual([oldest]);
+    // The card summarizes the SHELF, not the search: it still reads the newest
+    // find, which the strip beside it is no longer showing.
+    expect(
+      must(rig.el, '.reliquary-shelf-card[data-nav="conquerors"] .reliquary-shelf-card-recent')
+        .textContent,
+    ).toBe(t('hudChrome.reliquary.shelfRecent', { name: newest }));
+  });
+});
+
+describe('ReliquaryWindow: every bar fill rides the custom property', () => {
+  it('writes --reliquary-fill and never an inline width, on every bar it paints', () => {
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, 2)) state.itemsDiscovered.add(id);
+    const rig = openPage(state);
+    const fills = [...rig.el.querySelectorAll<HTMLElement>('.reliquary-bar-fill')];
+    // Premise: the page really paints several bars (summary and page header at
+    // least), so the loop is not vacuous.
+    expect(fills.length).toBeGreaterThan(1);
+    for (const fill of fills) {
+      const style = fill.getAttribute('style') ?? '';
+      expect(style).toContain('--reliquary-fill:');
+      // The stylesheet owns the geometry now: an inline width would fight the
+      // one rule that covers every bar in the window.
+      expect(style).not.toContain('width:');
+    }
+    // And the value is the real percentage, not a constant.
+    expect(must(rig.el, '.reliquary-page-bar .reliquary-bar-fill').getAttribute('style')).toBe(
+      `--reliquary-fill:${Math.round((2 / ids.length) * 100)}%`,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. Illumination celebration and the fill flash (one-shots, no timers)
+// ---------------------------------------------------------------------------
+
+/** The Hud arm exactly: arm both one-shots, then refreshIfChanged (never a bare
+ *  render), so what these tests drive is the production sequence. */
+function drainInto(rig: Rig, opts: { flash?: string[]; illuminated?: string | null }): void {
+  rig.w.flashRelics(opts.flash ?? []);
+  if (opts.illuminated) rig.w.celebrateIllumination(opts.illuminated);
+  rig.w.refreshIfChanged();
+}
+
+const section = (el: HTMLElement): HTMLElement => must(el, '.reliquary-page-detail');
+const flashed = (el: HTMLElement): string[] =>
+  cells(el)
+    .filter((node) => node.classList.contains('reliquary-cell-flash'))
+    .map((node) => node.dataset.cellId ?? '');
+
+describe('ReliquaryWindow: the Illumination celebration', () => {
+  it('celebrates on the paint that fills the page, and only that paint', () => {
+    const state = baseState();
+    const rig = openPage(state);
+    const ids = relicIds(PAGE_ID);
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+
+    for (const id of ids) state.itemsDiscovered.add(id);
+    drainInto(rig, { flash: [ids[4] ?? ''], illuminated: PAGE_ID });
+    const celebrating = section(rig.el);
+    expect(celebrating.classList.contains('reliquary-page-celebrate')).toBe(true);
+    // The standing treatment lands in the same paint: the page is complete now
+    // and stays framed after the animation is over.
+    expect(celebrating.classList.contains('is-illuminated')).toBe(true);
+
+    // One-shot: the next world-driven repaint paints the settled page.
+    state.curatorRank += 1;
+    rig.w.refreshIfChanged();
+    const settled = section(rig.el);
+    expect(settled).not.toBe(celebrating);
+    expect(settled.classList.contains('reliquary-page-celebrate')).toBe(false);
+    expect(settled.classList.contains('is-illuminated')).toBe(true);
+  });
+
+  it('holds the moment until the page it belongs to is actually painted', () => {
+    // Online the event frame can arrive while the player is on Overview, or a
+    // snapshot behind. The id is sticky, so the celebration waits for the paint
+    // that shows the page instead of firing at a surface that cannot show it.
+    const state = baseState();
+    const rig = makeWindow(state, { nav: 'overview' });
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    drainInto(rig, { illuminated: PAGE_ID });
+    expect(rig.el.querySelector('.reliquary-page-celebrate')).toBeNull();
+
+    click(rig.el, '[data-nav="conquerors"]');
+    click(rig.el, `[data-page="${PAGE_ID}"]`);
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(true);
+    // Still one-shot after the wait: leaving and returning paints it settled.
+    click(rig.el, '[data-back]');
+    click(rig.el, `[data-page="${PAGE_ID}"]`);
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+
+  it('never celebrates a page other than the one that filled', () => {
+    const state = baseState();
+    const other = 'conquerors_sunken_bastion';
+    const rig = openPage(state, other);
+    expect(other).not.toBe(PAGE_ID);
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    drainInto(rig, { illuminated: PAGE_ID });
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+
+  it('removes the class on animationend, without a rebuild', () => {
+    const state = baseState();
+    const rig = openPage(state);
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    drainInto(rig, { illuminated: PAGE_ID });
+    const node = section(rig.el);
+    expect(node.classList.contains('reliquary-page-celebrate')).toBe(true);
+    node.dispatchEvent(new Event('animationend', { bubbles: true }));
+    // Removal only, in place: the same node settles rather than the window
+    // repainting itself on an animation event.
+    expect(section(rig.el)).toBe(node);
+    expect(node.classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+
+  it('survives the cell flash finishing first (bubbling animationend)', () => {
+    // The headline drain composes BOTH one-shots in the same paint: the 1s
+    // cell flash ends before the 1.6s page celebration, and animationend
+    // bubbles up through the section. Without the target guard the cell's
+    // event would strip the page class 0.6s early.
+    const state = baseState();
+    const rig = openPage(state);
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids) state.itemsDiscovered.add(id);
+    drainInto(rig, { flash: [ids[0] ?? ''], illuminated: PAGE_ID });
+    const node = section(rig.el);
+    expect(node.classList.contains('reliquary-page-celebrate')).toBe(true);
+    const flashCell = must(rig.el, '.reliquary-cell-flash');
+    flashCell.dispatchEvent(new Event('animationend', { bubbles: true }));
+    expect(node.classList.contains('reliquary-page-celebrate')).toBe(true);
+    // The section's own animationend still settles it.
+    node.dispatchEvent(new Event('animationend', { bubbles: true }));
+    expect(node.classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+
+  it('close() drops an unspent moment instead of replaying it next visit', () => {
+    const state = baseState();
+    const rig = makeWindow(state, { nav: 'overview' });
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids) state.itemsDiscovered.add(id);
+    // Armed while on Overview, so the one-shot is still pending when the
+    // player closes the window without ever visiting the page.
+    drainInto(rig, { flash: [ids[0] ?? ''], illuminated: PAGE_ID });
+    expect(rig.el.querySelector('.reliquary-page-celebrate')).toBeNull();
+    rig.w.close();
+    rig.w.open();
+    click(rig.el, '[data-nav="conquerors"]');
+    click(rig.el, `[data-page="${PAGE_ID}"]`);
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+    expect(flashed(rig.el)).toEqual([]);
+  });
+
+  it('clears on the next rebuild when animationend never fires (reduced motion)', () => {
+    // Under prefers-reduced-motion the stylesheet swaps the animation for a
+    // static frame, so animationend never arrives. The class must still not
+    // survive: the one-shot is spent, so the next rebuild simply drops it and
+    // nothing re-adds it.
+    const state = baseState();
+    const rig = openPage(state);
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    drainInto(rig, { illuminated: PAGE_ID });
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(true);
+    // A player-driven rebuild, with no animationend anywhere in between.
+    click(rig.el, '[data-filter="owned"]');
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+    click(rig.el, '[data-filter="all"]');
+    expect(section(rig.el).classList.contains('reliquary-page-celebrate')).toBe(false);
+  });
+});
+
+describe('ReliquaryWindow: the fill flash', () => {
+  it('flashes exactly the relics one drain catalogued, on exactly one paint', () => {
+    const state = baseState();
+    const rig = openPage(state);
+    const ids = relicIds(PAGE_ID);
+    expect(flashed(rig.el)).toEqual([]);
+
+    const first = ids[1] ?? '';
+    state.itemsDiscovered.add(first);
+    drainInto(rig, { flash: [first] });
+    expect(flashed(rig.el)).toEqual([first]);
+    expect(must(rig.el, `[data-cell-id="${first}"]`).dataset.cellOwned).toBe('1');
+
+    // One-shot: any later repaint shows the settled cell.
+    state.curatorRank += 1;
+    rig.w.refreshIfChanged();
+    expect(flashed(rig.el)).toEqual([]);
+  });
+
+  it('replaces the previous drain instead of accumulating ids', () => {
+    const state = baseState();
+    const rig = openPage(state);
+    const ids = relicIds(PAGE_ID);
+    const first = ids[0] ?? '';
+    const second = ids[3] ?? '';
+    // Two drains with NO paint in between (the first refresh elides, the online
+    // snapshot-lag case): if the armed ids were unioned instead of replaced,
+    // this is the only sequence where the older one could survive to the paint.
+    const settled = rig.el.firstElementChild;
+    drainInto(rig, { flash: [first] });
+    expect(rig.el.firstElementChild, 'premise: the first drain really elided').toBe(settled);
+
+    state.itemsDiscovered.add(second);
+    drainInto(rig, { flash: [second] });
+    // A flash means "this just happened", so the newest drain is the whole
+    // answer: the earlier relic must not light up alongside it.
+    expect(flashed(rig.el)).toEqual([second]);
+  });
+
+  it('waits for the paint that shows the fill when the refresh elides', () => {
+    // Online the event can land a snapshot ahead of the mirror, so the refresh
+    // elides. The armed flash must survive that and ride the paint that finally
+    // shows the relic, rather than being spent on nothing.
+    const state = baseState();
+    const rig = openPage(state);
+    const id = relicIds(PAGE_ID)[2] ?? '';
+    const settled = rig.el.firstElementChild;
+    drainInto(rig, { flash: [id] });
+    expect(rig.el.firstElementChild, 'premise: the refresh really elided').toBe(settled);
+    state.itemsDiscovered.add(id);
+    rig.w.refreshIfChanged();
+    expect(flashed(rig.el)).toEqual([id]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 13. Elided polls copy nothing (the two ownership Sets)
+// ---------------------------------------------------------------------------
+
+describe('ReliquaryWindow: an elided poll touches no ownership seam', () => {
+  it('reads ownedMounts and the account skins ONCE per real repaint, never on an elided poll', () => {
+    const state = baseState();
+    const rig = openPage(state);
+    // The open render already paid for its copies; the polls below are what a
+    // player standing still costs.
+    state.reads = { ownedMounts: 0, weaponSkinIds: 0 };
+    rig.w.refreshIfChanged();
+    rig.w.refreshIfChanged();
+    // Zero, not "few": the slow band builds an input on every poll, and copying
+    // the mount list plus the account skin list on a poll that paints nothing
+    // is pure waste. The signature path asks the world directly instead.
+    expect(state.reads).toEqual({ ownedMounts: 0, weaponSkinIds: 0 });
+
+    state.curatorRank += 1;
+    rig.w.refreshIfChanged();
+    expect(state.reads).toEqual({ ownedMounts: 1, weaponSkinIds: 1 });
+    // And a second settled poll after the repaint costs nothing again.
+    rig.w.refreshIfChanged();
+    expect(state.reads).toEqual({ ownedMounts: 1, weaponSkinIds: 1 });
+  });
+
+  it('still hands the view REAL ownership sets on the repaint', () => {
+    // The cheap half is only correct if the paint still sees the seams: a
+    // window that elided by never reading them would show an owned mount as a
+    // silhouette forever.
+    const state = baseState();
+    const owned = 'grag_bear';
+    const rig = openPage(state, UNHINTED_PAGE_ID, 'horizons');
+    expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('0');
+    state.mounts = [owned];
+    state.curatorRank += 1;
+    rig.w.refreshIfChanged();
+    expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('1');
   });
 });

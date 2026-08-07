@@ -1692,6 +1692,12 @@ export const ko_KR: EnTranslations = {
         "many": "결과 {count}개.",
         "other": "결과 {count}개."
       },
+      "reliquaryToGo": {
+        "one": "{count}개 남음",
+        "few": "{count}개 남음",
+        "many": "{count}개 남음",
+        "other": "{count}개 남음"
+      },
       "deedsRetroSummary": {
         "one": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
         "few": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
@@ -3243,7 +3249,6 @@ export const ko_KR: EnTranslations = {
       "navProfessions": "전문 기술",
       "navHorizons": "지평",
       "navCountAria": "{shelf}: 성물 {owned}/{total} 채움",
-      "overviewEmpty": "던전, 공격대, 심층에서 고유 성물을 모아 성물고를 채우세요.",
       "shelfEmpty": "이 선반에는 아직 페이지가 없습니다.",
       "pageComplete": "조명됨",
       "clearsLabel": "클리어 {count}회",
@@ -3297,6 +3302,13 @@ export const ko_KR: EnTranslations = {
       "filterAll": "전체",
       "filterOwned": "수록됨",
       "filterMissing": "아직 없음",
+      "recentJumpAria": "{name} 페이지 열기",
+      "recentEmpty": "아직 발견한 성물이 없습니다. 지금부터 수록하는 성물이 여기에 표시됩니다.",
+      "nearlyEmpty": "완성이 가까운 페이지가 여기에 모입니다.",
+      "shelfRecent": "최근 발견: {name}",
+      "shelfNoFinds": "이 선반에는 아직 수록된 성물이 없습니다.",
+      "shelfOpenAria": "{name} 선반 열기, {owned}/{total} 채움",
+      "sharedUniquesNote": "전체 합계는 각 성물을 한 번만 셉니다. 선반과 페이지의 수치는 칸 단위로 세므로, 여러 페이지에 실린 성물은 각 페이지에서 따로 집계됩니다.",
       "charCompletionLabel": "성물고",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "큐레이터",

@@ -1812,6 +1812,15 @@ export const hudChromeStrings = {
       many: '{count} results.',
       other: '{count} results.',
     },
+    // How many relics a nearly-complete page still wants. Count-neutral in
+    // English (the row already names the page and shows the pair), but CLDR so
+    // a locale that inflects the noun can say it properly.
+    reliquaryToGo: {
+      one: '{count} to go',
+      few: '{count} to go',
+      many: '{count} to go',
+      other: '{count} to go',
+    },
     deedsRetroSummary: {
       one: 'Your chronicle catches up: {count} deed recorded.',
       few: 'Your chronicle catches up: {count} deeds recorded.',
@@ -4156,7 +4165,6 @@ export const hudChromeStrings = {
     navProfessions: 'Professions',
     navHorizons: 'Horizons',
     navCountAria: '{shelf}: {owned} of {total} relics filled',
-    overviewEmpty: 'Fill unique relics from dungeons, raids, and delves to stock The Reliquary.',
     shelfEmpty: 'No pages on this shelf yet.',
     pageComplete: 'Illuminated',
     clearsLabel: '{count} clears',
@@ -4235,6 +4243,19 @@ export const hudChromeStrings = {
     filterAll: 'All',
     filterOwned: 'Catalogued',
     filterMissing: 'Missing',
+    // Phase 14: the Overview becomes the way IN to the catalog. Recent finds
+    // are jump buttons, each strip keeps its label and explains itself when
+    // empty, and three shelf cards summarize the shelves the rail lists.
+    recentJumpAria: 'Open the page for {name}',
+    recentEmpty: 'No finds yet. Relics you catalogue from now on land here.',
+    nearlyEmpty: 'Pages within reach of completion gather here.',
+    shelfRecent: 'Latest find: {name}',
+    shelfNoFinds: 'Nothing catalogued on this shelf yet.',
+    shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled',
+    // Why a page can read full while the catalog total is smaller than the sum
+    // of the page totals: a relic on two pages is one relic.
+    sharedUniquesNote:
+      'Your overall total counts each relic once; shelf and page counts list every slot, so a relic shown on more than one page is counted by each of them.',
     // Phase 9: character sheet labeled completion pair + Curator rank.
     charCompletionLabel: 'Reliquary',
     charCompletion: '{owned}/{total}',

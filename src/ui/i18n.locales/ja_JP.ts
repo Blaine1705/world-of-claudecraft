@@ -10499,8 +10499,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navProfessions': '専門技能',
   'hudChrome.reliquary.navHorizons': '地平',
   'hudChrome.reliquary.navCountAria': '{shelf}：聖遺物 {owned}/{total} 埋め済み',
-  'hudChrome.reliquary.overviewEmpty':
-    'ダンジョン、レイド、深層探索で固有の聖遺物を集め、聖遺物庫を満たしましょう。',
   'hudChrome.reliquary.shelfEmpty': 'この棚にはまだページがありません。',
   'hudChrome.reliquary.pageComplete': '照耀済み',
   'hudChrome.reliquary.clearsLabel': 'クリア {count} 回',
@@ -10515,6 +10513,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '聖遺物を収蔵：{name}',
   'hudChrome.reliquary.illuminateBanner': 'ページが照耀されました：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} の聖遺物がすべて埋まりました。',
+  'hudChrome.reliquary.recentJumpAria': '{name} のページを開く',
+  'hudChrome.reliquary.recentEmpty':
+    'まだ発見はありません。これから収蔵した聖遺物がここに並びます。',
+  'hudChrome.reliquary.nearlyEmpty': '完成が近いページはここに集まります。',
+  'hudChrome.reliquary.shelfRecent': '最新の発見：{name}',
+  'hudChrome.reliquary.shelfNoFinds': 'この棚にはまだ何も収蔵されていません。',
+  'hudChrome.reliquary.shelfOpenAria': '{name} の棚を開く、{owned}/{total} 埋め済み',
+  'hudChrome.reliquary.sharedUniquesNote':
+    '全体の合計は各聖遺物を1回だけ数えます。棚とページの数字は枠ごとに数えるため、複数のページに載る聖遺物はそれぞれのページで数えられます。',
+  'hudChrome.plurals.reliquaryToGo.one': 'あと {count} 件',
+  'hudChrome.plurals.reliquaryToGo.few': 'あと {count} 件',
+  'hudChrome.plurals.reliquaryToGo.many': 'あと {count} 件',
+  'hudChrome.plurals.reliquaryToGo.other': 'あと {count} 件',
   'hudChrome.plurals.reliquaryRetroSummary.one':
     '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
   'hudChrome.plurals.reliquaryRetroSummary.few':

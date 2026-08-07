@@ -1692,6 +1692,12 @@ export const ru_RU: EnTranslations = {
         "many": "{count} результатов.",
         "other": "{count} результатов."
       },
+      "reliquaryToGo": {
+        "one": "осталась {count} реликвия",
+        "few": "осталось {count} реликвии",
+        "many": "осталось {count} реликвий",
+        "other": "осталось {count} реликвии"
+      },
       "deedsRetroSummary": {
         "one": "Летопись наверстала упущенное: записано деяний: {count}.",
         "few": "Летопись наверстала упущенное: записано деяний: {count}.",
@@ -3243,7 +3249,6 @@ export const ru_RU: EnTranslations = {
       "navProfessions": "Профессии",
       "navHorizons": "Горизонты",
       "navCountAria": "{shelf}: заполнено {owned} из {total} реликвий",
-      "overviewEmpty": "Собирайте уникальные реликвии в подземельях, рейдах и вылазках, чтобы наполнить Реликварий.",
       "shelfEmpty": "На этой полке пока нет страниц.",
       "pageComplete": "Озарено",
       "clearsLabel": "Прохождений: {count}",
@@ -3297,6 +3302,13 @@ export const ru_RU: EnTranslations = {
       "filterAll": "Все",
       "filterOwned": "Каталогизированы",
       "filterMissing": "Не найдены",
+      "recentJumpAria": "Открыть страницу с реликвией {name}",
+      "recentEmpty": "Находок пока нет. Реликвии, которые вы каталогизируете, будут появляться здесь.",
+      "nearlyEmpty": "Здесь собираются страницы, близкие к завершению.",
+      "shelfRecent": "Последняя находка: {name}",
+      "shelfNoFinds": "На этой полке пока ничего не каталогизировано.",
+      "shelfOpenAria": "Открыть полку {name}, заполнено {owned} из {total}",
+      "sharedUniquesNote": "Общий итог считает каждую реликвию один раз; счетчики полок и страниц считают ячейки, поэтому реликвия с нескольких страниц учитывается в каждом из них.",
       "charCompletionLabel": "Реликварий",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "Хранитель",

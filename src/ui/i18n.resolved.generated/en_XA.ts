@@ -1692,6 +1692,12 @@ export const en_XA: EnTranslations = {
         "many": "[{count} ŕéšúļţš.]",
         "other": "[{count} ŕéšúļţš.]"
       },
+      "reliquaryToGo": {
+        "one": "[{count} ţó ĝó]",
+        "few": "[{count} ţó ĝó]",
+        "many": "[{count} ţó ĝó]",
+        "other": "[{count} ţó ĝó]"
+      },
       "deedsRetroSummary": {
         "one": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééð ŕéçóŕðéð.]",
         "few": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]",
@@ -3243,7 +3249,6 @@ export const en_XA: EnTranslations = {
       "navProfessions": "[Þŕóƒéššíóñš]",
       "navHorizons": "[Ĥóŕížóñš]",
       "navCountAria": "[{shelf}: {owned} óƒ {total} ŕéļíçš ƒíļļéð]",
-      "overviewEmpty": "[Ƒíļļ úñíɋúé ŕéļíçš ƒŕóɱ ðúñĝéóñš, ŕáíðš, áñð ðéļʋéš ţó šţóçķ Ţĥé Ŕéļíɋúáŕý.]",
       "shelfEmpty": "[Ñó þáĝéš óñ ţĥíš šĥéļƒ ýéţ.]",
       "pageComplete": "[Íļļúɱíñáţéð]",
       "clearsLabel": "[{count} çļéáŕš]",
@@ -3297,6 +3302,13 @@ export const en_XA: EnTranslations = {
       "filterAll": "[Áļļ]",
       "filterOwned": "[Çáţáļóĝúéð]",
       "filterMissing": "[Ɱíššíñĝ]",
+      "recentJumpAria": "[Óþéñ ţĥé þáĝé ƒóŕ {name}]",
+      "recentEmpty": "[Ñó ƒíñðš ýéţ. Ŕéļíçš ýóú çáţáļóĝúé ƒŕóɱ ñóŵ óñ ļáñð ĥéŕé.]",
+      "nearlyEmpty": "[Þáĝéš ŵíţĥíñ ŕéáçĥ óƒ çóɱþļéţíóñ ĝáţĥéŕ ĥéŕé.]",
+      "shelfRecent": "[Ļáţéšţ ƒíñð: {name}]",
+      "shelfNoFinds": "[Ñóţĥíñĝ çáţáļóĝúéð óñ ţĥíš šĥéļƒ ýéţ.]",
+      "shelfOpenAria": "[Óþéñ ţĥé {name} šĥéļƒ, {owned} óƒ {total} ƒíļļéð]",
+      "sharedUniquesNote": "[Ýóúŕ óʋéŕáļļ ţóţáļ çóúñţš éáçĥ ŕéļíç óñçé; šĥéļƒ áñð þáĝé çóúñţš ļíšţ éʋéŕý šļóţ, šó á ŕéļíç šĥóŵñ óñ ɱóŕé ţĥáñ óñé þáĝé íš çóúñţéð ƀý éáçĥ óƒ ţĥéɱ.]",
       "charCompletionLabel": "[Ŕéļíɋúáŕý]",
       "charCompletion": "[{owned}/{total}]",
       "charRankLabel": "[Çúŕáţóŕ]",

@@ -1692,6 +1692,12 @@ export const pt_BR: EnTranslations = {
         "many": "{count} results.",
         "other": "{count} results."
       },
+      "reliquaryToGo": {
+        "one": "{count} to go",
+        "few": "{count} to go",
+        "many": "{count} to go",
+        "other": "{count} to go"
+      },
       "deedsRetroSummary": {
         "one": "Your chronicle catches up: {count} deed recorded.",
         "few": "Sua crônica se põe em dia: {count} feitos registrados.",
@@ -3243,7 +3249,6 @@ export const pt_BR: EnTranslations = {
       "navProfessions": "Professions",
       "navHorizons": "Horizons",
       "navCountAria": "{shelf}: {owned} of {total} relics filled",
-      "overviewEmpty": "Fill unique relics from dungeons, raids, and delves to stock The Reliquary.",
       "shelfEmpty": "No pages on this shelf yet.",
       "pageComplete": "Illuminated",
       "clearsLabel": "{count} clears",
@@ -3297,6 +3302,13 @@ export const pt_BR: EnTranslations = {
       "filterAll": "All",
       "filterOwned": "Catalogued",
       "filterMissing": "Missing",
+      "recentJumpAria": "Open the page for {name}",
+      "recentEmpty": "No finds yet. Relics you catalogue from now on land here.",
+      "nearlyEmpty": "Pages within reach of completion gather here.",
+      "shelfRecent": "Latest find: {name}",
+      "shelfNoFinds": "Nothing catalogued on this shelf yet.",
+      "shelfOpenAria": "Open the {name} shelf, {owned} of {total} filled",
+      "sharedUniquesNote": "Your overall total counts each relic once; shelf and page counts list every slot, so a relic shown on more than one page is counted by each of them.",
       "charCompletionLabel": "Reliquary",
       "charCompletion": "{owned}/{total}",
       "charRankLabel": "Curator",

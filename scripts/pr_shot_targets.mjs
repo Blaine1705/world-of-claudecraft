@@ -3649,14 +3649,37 @@ export const TARGETS = [
         document.querySelector('#gpu-notice')?.remove();
         document.querySelector('.camera-prompt-confirm')?.click();
         // Seed a few catalogued discoveries so Overview is not an empty museum.
+        // Phase 14: also fill the recent ring the same way a live find would,
+        // so the recent strip shows its icon jump chips instead of the
+        // empty-ring hint (the ring is what the strip and shelf cards read).
         const game = window.__game;
         const sim = game?.sim;
         if (sim?.primary?.deedStats?.itemsDiscovered) {
           for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
             sim.primary.deedStats.itemsDiscovered.add(id);
+            sim.primary.reliquary?.recent?.push(id);
           }
         }
         game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-overview-fresh',
+    label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
+    when: ['ui/reliquary_view', 'ui/reliquary_window'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // Deliberately NO seeding: the acceptance shot is the fresh character's
+      // front door (both strip labels with their hints, three shelf cards, the
+      // reconciliation note, no dead-space stub).
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
       });
       const opened = await pollForSize(page, '#reliquary-window');
       if (!opened) throw new Error('reliquary window did not open');
