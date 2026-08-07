@@ -9715,6 +9715,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.trade.woc.hintClearYourItems'
   | 'hudChrome.trade.woc.hintEnterPrice'
   | 'hudChrome.trade.woc.hintGoldOffered'
+  | 'hudChrome.trade.woc.hintInsufficientBalance'
   | 'hudChrome.trade.woc.incomingAccept'
   | 'hudChrome.trade.woc.incomingBody'
   | 'hudChrome.trade.woc.incomingTitle'

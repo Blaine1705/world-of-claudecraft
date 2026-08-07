@@ -520,6 +520,7 @@ export const zh_TW: EnTranslations = {
         "accepted": "報價已接受。你的物品將被託管，直至付款完成驗證。",
         "decline": "拒絕",
         "withdraw": "撤回報價",
+        "hintInsufficientBalance": "這超出了你已連接錢包持有的 $WOC 數量。",
         "statusAwaitingBuyer": "等待買家付款。",
         "statusPayingBuyer": "正在網路上確認你的付款……",
         "statusPayingSeller": "已收到付款。正在網路上確認……",

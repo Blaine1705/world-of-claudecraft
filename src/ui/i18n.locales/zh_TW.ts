@@ -12834,6 +12834,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下遞補的席位是刻意不帶風險的：你落入的是一份與你無關的比分，因此無論勝負，這場比賽都不會觸動你的戰場評分，中途離開也不欠任何代價。當一場比賽已接近尾聲、新來者再也無法改變結果時，邀請也就不再發出，所以你絕不會被安置進別人的結局裡。',
   'hudChrome.trade.windowClosed': '交易視窗已關閉。',
+  'hudChrome.trade.woc.hintInsufficientBalance': '這超出了你已連接錢包持有的 $WOC 數量。',
   'hudChrome.trade.woc.priceLabel': '價格（美元）',
   'hudChrome.trade.woc.equivalent': '按目前匯率約為 {tokens} $WOC',
   'hudChrome.trade.woc.variableWarning':

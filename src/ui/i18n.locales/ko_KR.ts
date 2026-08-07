@@ -13082,6 +13082,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '보충 자리는 의도적으로 위험이 없습니다. 당신이 들어가는 것은 당신과 무관한 점수판이므로 이기든 지든 이 경기가 당신의 전장 레이팅을 건드리지 않으며, 도중에 떠나도 아무것도 물지 않습니다. 경기가 충분히 끝나가서 새로 온 사람이 결과를 바꿀 수 없는 시점이 되면 제안 자체가 오지 않으므로, 남의 마무리에 앉혀지는 일은 없습니다.',
   'hudChrome.trade.windowClosed': '거래 창이 닫혔습니다.',
+  'hudChrome.trade.woc.hintInsufficientBalance': '연결된 지갑의 $WOC 잔액보다 많습니다.',
   'hudChrome.trade.woc.priceLabel': '가격 (USD)',
   'hudChrome.trade.woc.equivalent': '현재 환율 기준 약 {tokens} $WOC',
   'hudChrome.trade.woc.variableWarning':

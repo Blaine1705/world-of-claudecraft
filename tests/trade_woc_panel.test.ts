@@ -35,6 +35,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     theirStaged: [slot(EPIC.id)],
     goldCopper: 0,
     partnerGoldCopper: 0,
+    walletTokens: null,
     pendingOffer: null,
     items: TABLE,
     marketEnabled: true,
@@ -601,6 +602,37 @@ describe('the wallet is skipped only on explicit server permission', () => {
     // the field were missing, which is the one mistake that must not happen.
     expect(HUD).toContain('quoted.quote.signatureRequired === false');
     expect(HUD).not.toContain('!quoted.quote.signatureRequired');
+  });
+
+  it('paints the estimate red and kills Send when the wallet is short', () => {
+    const root = paint(deps({ tokens: 6000, walletTokens: 10 }));
+    const equiv = root.querySelector('[data-woc-equiv]');
+    expect(equiv?.classList.contains('over-balance')).toBe(true);
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(true);
+    // Never colour alone: the hint states the reason in words.
+    expect(root.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
+  });
+
+  it('clears the red once the price comes back within the balance', () => {
+    // The class is toggled, not only added: a shortfall that resolves must stop
+    // looking like one.
+    const d = deps({ tokens: 6000, walletTokens: 10 });
+    const root = paint(d);
+    expect(root.querySelector('[data-woc-equiv]')?.classList.contains('over-balance')).toBe(true);
+    refreshWocTradeArm(root, wocTradeModelFrom({ ...d, tokens: 5 }));
+    expect(root.querySelector('[data-woc-equiv]')?.classList.contains('over-balance')).toBe(false);
+  });
+
+  it('leaves the estimate alone while the balance is unknown', () => {
+    const root = paint(deps({ tokens: 6000, walletTokens: null }));
+    expect(root.querySelector('[data-woc-equiv]')?.classList.contains('over-balance')).toBe(false);
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(false);
+  });
+
+  it('reads the VERIFIED balance, not a merely-connected wallet', () => {
+    // An unverified figure belongs to a wallet that will not be paying, so
+    // gating on it would refuse (or permit) the wrong offer.
+    expect(HUD).toContain('walletTokens: verifiedWocBalance()');
   });
 
   it('disables the Gold TAB once a $WOC deal stands, for either side', () => {

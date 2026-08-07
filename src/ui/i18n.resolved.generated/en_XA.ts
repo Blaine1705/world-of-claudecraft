@@ -520,6 +520,7 @@ export const en_XA: EnTranslations = {
         "accepted": "[Óƒƒéŕ áççéþţéð. Ýóúŕ íţéɱ íš ĥéļð úñţíļ þáýɱéñţ íš ʋéŕíƒíéð.]",
         "decline": "[Ðéçļíñé]",
         "withdraw": "[Ŵíţĥðŕáŵ óƒƒéŕ]",
+        "hintInsufficientBalance": "[Ţĥáţ íš ɱóŕé $ŴÓÇ ţĥáñ ýóúŕ çóññéçţéð ŵáļļéţ ĥóļðš.]",
         "statusAwaitingBuyer": "[Ŵáíţíñĝ ƒóŕ ţĥé ƀúýéŕ ţó þáý.]",
         "statusPayingBuyer": "[Çóñƒíŕɱíñĝ ýóúŕ þáýɱéñţ óñ ţĥé ñéţŵóŕķ...]",
         "statusPayingSeller": "[Þáýɱéñţ ŕéçéíʋéð. Çóñƒíŕɱíñĝ óñ ţĥé ñéţŵóŕķ...]",

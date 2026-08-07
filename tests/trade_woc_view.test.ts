@@ -61,6 +61,7 @@ function input(over: Partial<Parameters<typeof buildWocTradeModel>[0]> = {}) {
     tokens: 1234.5,
     split: { sellerCents: 4500, burnCents: 150, treasuryCents: 350 },
     goldOffered: false,
+    walletTokens: null,
     pendingOffer: null,
     ...over,
   };
@@ -206,6 +207,51 @@ describe('gold and $WOC are mutually exclusive', () => {
     const m = buildWocTradeModel(input({ selfWalletVerified: false }));
     expect(m.mode).toBe('gold');
     expect(m.goldDisabled).toBe(false);
+  });
+});
+
+describe('an offer the wallet cannot cover', () => {
+  it('refuses to send, and says so, when the quote exceeds the balance', () => {
+    const m = buildWocTradeModel(input({ tokens: 6000, walletTokens: 5999 }));
+    expect(m.insufficientBalance).toBe(true);
+    expect(m.canSend).toBe(false);
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintInsufficientBalance');
+  });
+
+  it('allows exactly the whole balance: short is short, equal is not', () => {
+    const m = buildWocTradeModel(input({ tokens: 6000, walletTokens: 6000 }));
+    expect(m.insufficientBalance).toBe(false);
+    expect(m.canSend).toBe(true);
+  });
+
+  it('compares TOKENS to tokens, never the USD price to a token balance', () => {
+    // The fee legs come out of the quoted amount rather than being added on
+    // top, so the quote is exactly what leaves the wallet. Comparing the cents
+    // figure instead would be comparing two different units, and would pass a
+    // $50 offer against a 60-token balance.
+    const m = buildWocTradeModel(input({ usdCents: 50, tokens: 6000, walletTokens: 100 }));
+    expect(m.insufficientBalance).toBe(true);
+  });
+
+  it('does NOT refuse while the balance is unknown', () => {
+    // Null is "not loaded", not "zero". Blocking here would refuse a player who
+    // can pay, on no evidence, every time the read is slow or an RPC blips.
+    const m = buildWocTradeModel(input({ tokens: 6000, walletTokens: null }));
+    expect(m.insufficientBalance).toBe(false);
+    expect(m.canSend, 'the server still re-checks at payment time').toBe(true);
+  });
+
+  it('does NOT refuse before the price has been quoted', () => {
+    // An unquoted price is not evidence of a shortfall either.
+    const m = buildWocTradeModel(input({ tokens: null, walletTokens: 0 }));
+    expect(m.insufficientBalance).toBe(false);
+  });
+
+  it('reports the EMPTIER problem first when the offer is also incomplete', () => {
+    // A shortfall is only worth naming once there is a price to be short of;
+    // "enter a price" outranks it.
+    const m = buildWocTradeModel(input({ usdCents: null, tokens: 6000, walletTokens: 0 }));
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintEnterPrice');
   });
 });
 

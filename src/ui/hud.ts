@@ -778,6 +778,7 @@ import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
+  verifiedWocBalance,
   walletConnectionView,
   walletUiEnabled,
   wocBalance,
@@ -18813,6 +18814,10 @@ export class Hud {
       // Server truth for the other side, not a local echo: their coin closes
       // this side's $WOC arm, so it has to come from the shared trade state.
       partnerGoldCopper: this.sim.tradeInfo?.theirOffer.copper ?? 0,
+      // The VERIFIED balance, not the merely-connected one: this gates an offer
+      // the account-linked wallet has to honour, and an unverified figure
+      // belongs to a wallet that will not be paying.
+      walletTokens: verifiedWocBalance(),
       items: ITEMS,
       marketEnabled: this.wocMarketHooks !== null,
       selfWalletVerified: this.wocMarketHooks?.walletLinked() === true,

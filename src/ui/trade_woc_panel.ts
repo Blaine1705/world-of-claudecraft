@@ -35,6 +35,8 @@ export interface WocTradePanelDeps {
   /** The OTHER player's staged gold. Read because the currencies are exclusive
    *  for the trade, not per side: their coin has to close your $WOC arm. */
   partnerGoldCopper: number;
+  /** The verified wallet's $WOC balance, or null when unknown. */
+  walletTokens: number | null;
   items: Readonly<Record<string, ItemDef>>;
   marketEnabled: boolean;
   selfWalletVerified: boolean;
@@ -135,6 +137,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     split: deps.split,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
+    walletTokens: deps.walletTokens,
   });
 }
 
@@ -237,6 +240,12 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
           tokens: formatNumber(model.tokens, { maximumFractionDigits: 4 }),
         }),
   );
+  // The figure itself carries the problem, not just the hint below it: the
+  // number is what the player is looking at while typing.
+  const equiv = root.querySelector<HTMLElement>('[data-woc-equiv]');
+  if (equiv && equiv.classList.contains('over-balance') !== model.insufficientBalance) {
+    equiv.classList.toggle('over-balance', model.insufficientBalance);
+  }
   // Absent split means show nothing, never a client-derived percentage: the
   // real split rounds each fee leg up and gives the seller the remainder.
   setText(

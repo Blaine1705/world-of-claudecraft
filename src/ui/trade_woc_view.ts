@@ -90,7 +90,8 @@ export type WocSendHint =
   | 'clear_your_items' // you are BUYING, so your own side must be empty
   | 'await_their_items' // they have staged nothing eligible to buy yet
   | 'enter_price'
-  | 'gold_offered';
+  | 'gold_offered'
+  | 'insufficient_balance'; // the quote is more $WOC than the wallet holds
 
 export interface WocTradeInput {
   marketEnabled: boolean;
@@ -126,6 +127,18 @@ export interface WocTradeInput {
    * pair would then have agreed a deal neither half could carry.
    */
   goldOffered: boolean;
+  /**
+   * The VERIFIED wallet's $WOC balance, or null when it is not known.
+   *
+   * Null is deliberately NOT treated as zero. The balance is fetched
+   * asynchronously and can be absent for reasons that say nothing about what the
+   * player holds (still loading, an RPC blip, a wallet connected but not yet
+   * linked). Refusing the offer then would block a player who can perfectly well
+   * pay, on no evidence. The server re-checks the balance at payment time and is
+   * the authority; this only stops the obviously-doomed offer before two people
+   * spend a round trip agreeing to it.
+   */
+  walletTokens: number | null;
   /**
    * Whether the counterparty lookup has produced an answer yet.
    *
@@ -166,6 +179,9 @@ export interface WocTradeModel {
   wocDealStanding: boolean;
   /** Whether the $WOC field must be disabled. */
   wocDisabled: boolean;
+  /** Whether the quoted amount exceeds the wallet's balance, so the figure can
+   *  be shown as the problem it is rather than as an ordinary estimate. */
+  insufficientBalance: boolean;
   tokens: number | null;
   split: WocTradeSplit | null;
   /** The live offer to review, or null while none is standing. */
@@ -212,6 +228,7 @@ const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
   await_their_items: 'hudChrome.trade.woc.hintAwaitTheirItems',
   enter_price: 'hudChrome.trade.woc.hintEnterPrice',
   gold_offered: 'hudChrome.trade.woc.hintGoldOffered',
+  insufficient_balance: 'hudChrome.trade.woc.hintInsufficientBalance',
 };
 
 /**
@@ -279,6 +296,17 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
   const offerable = block === null;
   const wocMode = offerable && input.mode === 'woc';
 
+  // The quoted tokens are what the buyer actually has to hand over, so that is
+  // the figure compared: the fee legs come OUT of this amount rather than being
+  // added on top, and comparing the USD price to a token balance would be
+  // comparing two different units.
+  //
+  // Both operands must be known. An unquoted price or an unknown balance is not
+  // evidence of a shortfall, and treating either as one refuses a player who can
+  // pay (see walletTokens).
+  const shortfall =
+    input.tokens !== null && input.walletTokens !== null && input.tokens > input.walletTokens;
+
   // Ordered the way a seller does the work: pick the item, then price it. Gold
   // comes first because it makes the whole arm unusable rather than incomplete.
   // Ordered the way a buyer hits them: clear your own side, wait for goods, then
@@ -291,7 +319,9 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
         ? 'await_their_items'
         : input.usdCents === null || input.usdCents <= 0
           ? 'enter_price'
-          : null;
+          : shortfall
+            ? 'insufficient_balance'
+            : null;
 
   return {
     // The arm stays VISIBLE while blocked: hiding it would leave a player who
@@ -321,6 +351,7 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // not yours to use: the requester's rule that the button is disabled once
     // you have an item offered. Gold from EITHER side closes it too.
     wocDisabled: !offerable || input.goldOffered || input.staged.length > 0,
+    insufficientBalance: shortfall,
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
     pendingOffer: input.pendingOffer,

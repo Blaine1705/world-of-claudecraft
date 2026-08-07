@@ -520,6 +520,7 @@ export const ja_JP: EnTranslations = {
         "accepted": "オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。",
         "decline": "辞退する",
         "withdraw": "オファーを取り下げる",
+        "hintInsufficientBalance": "接続中のウォレットの $WOC 残高を超えています。",
         "statusAwaitingBuyer": "購入者の支払いを待っています。",
         "statusPayingBuyer": "ネットワーク上で支払いを確認しています...",
         "statusPayingSeller": "支払いを受け取りました。ネットワーク上で確認しています...",

@@ -520,6 +520,7 @@ export const ko_KR: EnTranslations = {
         "accepted": "제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.",
         "decline": "거절",
         "withdraw": "제안 철회",
+        "hintInsufficientBalance": "연결된 지갑의 $WOC 잔액보다 많습니다.",
         "statusAwaitingBuyer": "구매자의 결제를 기다리는 중입니다.",
         "statusPayingBuyer": "네트워크에서 결제를 확인하는 중입니다...",
         "statusPayingSeller": "결제를 받았습니다. 네트워크에서 확인하는 중입니다...",

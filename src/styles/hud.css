@@ -7544,6 +7544,13 @@
   .trade-woc-net {
     color: var(--accent);
   }
+  /* A price the connected wallet cannot cover. The figure carries the refusal
+     itself, because that is the number being typed at; the hint below says why
+     and the Send button is disabled alongside it, so the state never rests on
+     colour alone. */
+  .trade-woc-equiv.over-balance {
+    color: var(--color-text-error);
+  }
   /* The warnings and the block reason are the copy a player acts on, so they
      stay legible rather than being dimmed to hint size. */
   .trade-woc-warn,

@@ -263,6 +263,7 @@ export const hudChromeStrings = {
       accepted: 'Offer accepted. Your item is held until payment is verified.',
       decline: 'Decline',
       withdraw: 'Withdraw offer',
+      hintInsufficientBalance: 'That is more $WOC than your connected wallet holds.',
       statusAwaitingBuyer: 'Waiting for the buyer to pay.',
       statusPayingBuyer: 'Confirming your payment on the network...',
       statusPayingSeller: 'Payment received. Confirming on the network...',

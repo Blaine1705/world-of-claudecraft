@@ -520,6 +520,7 @@ export const ru_RU: EnTranslations = {
         "accepted": "Предложение принято. Предмет удерживается до подтверждения оплаты.",
         "decline": "Отклонить",
         "withdraw": "Отозвать предложение",
+        "hintInsufficientBalance": "Это больше $WOC, чем есть в подключённом кошельке.",
         "statusAwaitingBuyer": "Ожидание оплаты от покупателя.",
         "statusPayingBuyer": "Подтверждение вашего платежа в сети...",
         "statusPayingSeller": "Платёж получен. Подтверждение в сети...",
