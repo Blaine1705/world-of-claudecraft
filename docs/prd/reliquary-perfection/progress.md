@@ -628,3 +628,88 @@ the two genuine content gaps.
 - History: 2ce5f87134 (sync) -> b7e72b7d6f (vocabulary + authoring) ->
   34cd2ce9e6 (rendering + i18n) -> e462c15718 (tests) -> the docs commit.
   Commits stay LOCAL; the Phase 13b QA session owns the push.
+
+## Phase 13b QA (2026-08-07)
+
+Verdict: PASS after one ruling and two fix rounds. 239/242 slots resolve;
+the pending set grew to three by ruling, every other claim verified.
+
+- Sync: 430347a1e0 merges release/v0.35.0 at 74315f3d68 (the ossbrain base
+  sync with the Galecrest private-scatter stream move and its seed
+  re-hunts, potion stacking, the CI required-shard and Node-pin fixes, and
+  the gathering node placement fix). An earlier session's abandoned
+  mid-conflict sync targeting a stale tip was aborted on the user's call
+  and redone fresh. Conflict resolutions: parity goldens theirs + in-merge
+  re-mint; professions_fishing taken WHOLESALE from release per the
+  recorded divergence caveat after a per-hunk resolution proved incoherent
+  (release renamed the recording constants; the release tip was verified
+  green in a throwaway worktree first, then 67/67 on the merged tree);
+  whirlwind_echo per-hunk theirs; scenarios.ts hand-merged keeping the
+  release seed-5 history plus the branch's golden-provenance paragraph.
+- Sync fallout, two commits: 462bb05658 follows the masterwork
+  signed-reagent window re-hunt (seed 151 to 21, prescribed by the test's
+  own comment); a945608a4d re-mints the FULL parity golden set (the
+  in-merge mint covered only the coverage_a/b scenario subset, leaving 38
+  goldens across parity_a..g line-spliced or release-minted; caught by the
+  9-agent release-merge-audit workflow, which also verified every changed
+  golden keeps identical event and frame counts, the state hashes moving
+  only for the branch's reliquary meta field).
+- Reviews: seven FRESH agents over the build diff (architecture, frontend
+  seam, test coverage, qa-checklist, plus content-truth, rendering
+  correctness, and i18n audits), all seven delivered; zero BLOCKING from
+  six of them. The content-truth audit hit the STOPPING RULE:
+  masterwork:engineering is unearnable (every engineering recipe is a
+  slotless statless tool; masterworkBonusStats null for all eight; the
+  proc can never fire) yet carried a Phase 13a fromProfession hint and was
+  not pended. Verified independently in the main thread (the derivation
+  re-run by hand), STOPPED, and the maintainer ruled: PEND IT (the
+  two-mounts precedent).
+- Fix round 1 (f6cc5df5ba): the pend (bare marks() entry, third
+  SOURCE_PENDING_RULING row, gear-capability pin deriving eligible crafts
+  through masterworkBonusStats, inverse sweep coverage, floors 240 to 239
+  and friends); composed source lines (bossZone, bossDungeon) degrade to
+  the surviving authored half instead of deleting a live door
+  (asymmetric: a stale page dungeon falls back to the boss sentence, a
+  stale boss drops the line); hint objects frozen at their constructors;
+  MOUNT_SOURCES / SET_MEMBER_SOURCES keys typed against the live unions;
+  withProfessions fallback made required (dead branch); sourceRift
+  reworded to the drop register (en + five fills; it is a 0.1-0.5% roll,
+  not a clear reward); zh_CN curly quotes on sourceDeed/sourceDelve/
+  sourceQuest; ja/ko masterwork term aligned to the crafting surfaces
+  with a new glossary category; test hardening (title-deed identity pin,
+  dungeon-page clearSource pin, zone-sweep shape predicate + synthetic
+  trips, owned-cell attribute-absent pin, NO_SOURCE_LINES frozen pin,
+  activity key completeness loop, comment-stripped M16 scrape, guide
+  boss-name leak pin extended to the reliquary page).
+- Fix round 2 (819e583046), from a fresh fix-round reviewer (request
+  changes: 1 blocking, 4 should-fix): the ja/ko gallery PAGE NAME lives
+  in reliquary_i18n.locales/ and still carried the retired term
+  (名作ギャラリー / 명작 갤러리 to 傑作ギャラリー / 걸작 갤러리, comments
+  and ja pin updated; the glossary note now records that this surface
+  sits outside its patterns' reach); the leak pin's derived carve-out had
+  excused Zulgar of all names, replaced by the strictly stronger
+  catalog-strip PROSE scan with no carve-out, English plus every
+  translated locale; glossary patterns grew the crafting toast/zone line,
+  both bags aria keys, and the guide masterwork prose; two comments trued
+  up. Round-2 declines: none. S4 (doc premises) is this record.
+- Mutation kills: ten this pass, all restored from saved copies with
+  proven test tallies: one per new kind (delve, rift, quest, store,
+  activity), the dual-table boss drop (content + behavioral both red),
+  un-pend engineering (gear-capability pin reds), bossZone degrade revert,
+  owned-cell stamp, and the guide prose pin (via the resolved en bundle;
+  mutating the catalog alone proved nothing, the runtime reads the
+  bundles).
+- Recorded, not implemented (state.md OPEN rulings): heroic difficulty
+  under-specification on bossDungeon lines (decide with the mounts-place
+  ruling; covers set pages and Thunzharr too); the quest class-gate
+  omission (one hint affected); the native-shell sourceStore question
+  (with the {store} interpolation rider). The arch reviewer's
+  quest-first-pickup distinction (velkhar class rewards) was examined and
+  the carve-out kept: the elision rule is consistent and now documented
+  for all four Sanctum quest elisions in the catalog comment.
+- Validation: tsc clean; the fix-round battery 948 green across 17 files;
+  parity 193/194 green post-re-mint; biome 0 errors and no format drift
+  on every touched file; no em/en dash or emoji introduced (perl scan;
+  BSD grep has no -P). SOURCE_PENDING_RULING key order is load-bearing in
+  the exact-equality pin (deliberate). The pended mark caps catalog
+  completion at 215/216 until the owner acts (recorded in state.md).

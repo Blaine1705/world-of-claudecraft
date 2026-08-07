@@ -1,7 +1,7 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 13 QA complete and pushed; next: 13b (phase-13b-source-coverage.md,
-plain xhigh, fresh session). Update this line as phases complete.
+Current phase: 13b COMPLETE with QA (2026-08-07); next: 14 (phase-14 file,
+fresh session). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -227,7 +227,10 @@ plain xhigh, fresh session). Update this line as phases complete.
   one-size genitive sentence; ko term confirmation (성물고); error.uniqueEquipped
   (release-side sim_i18n) has no locale fills; ja POI duplicate
   entities.zones.eastbrook_vale.pois.8.label renders the index-9 value; ko delve
-  strings use four different reliquary nouns (성물실/유물함/성물함/유물).
+  strings use four different reliquary nouns (성물실/유물함/성물함/유물); ja/ko
+  guide.profPages.faq.q5/a5 are reword-stale (English asks about unbinding a
+  commissioned piece; ja/ko still answer the retired masterwork-odds question;
+  13b QA fix-round find, same term family as the new masterwork glossary row).
   Phase 22 step recorded: extend the sweep's BUNDLES map when Latin chunks land
   (the sweep trips on 'has no resolved bundle' otherwise).
 - Phase 12 (2026-08-06): Test integrity + catalog pins + record corrections. Release
@@ -252,8 +255,10 @@ plain xhigh, fresh session). Update this line as phases complete.
   newest 12, per-field sanitizer negatives on catalogued ids (clears junk dropped,
   fractional floored, bogus pageId dropped entry-survives, membership-only acceptance),
   illumination scans past an incomplete first page (deathlord_warplate second-page
-  completion), masterwork proc behavioral test (shared seed-151 window with
-  professions_masterwork, same-seed no-proc control), interleaved item+mark ring test.
+  completion), masterwork proc behavioral test (the signed-reagent window shared
+  with professions_masterwork; hunted at seed 151 then, moved to seed 21 when the
+  13b QA release sync inherited the private-scatter stream shift, same-seed
+  no-proc control), interleaved item+mark ring test.
   Server/UI: profile /c/ pins for the Reliquary pair and Curator lines; the phase
   item's "hides rank line when unranked" contradicted reality, the server ALWAYS
   renders the line with an Unranked fallback, pinned as-is (no behavior change); all
@@ -316,28 +321,38 @@ plain xhigh, fresh session). Update this line as phases complete.
   in-change (M16), bundles regenerated. New behavioral suite
   tests/reliquary_window_behavior.test.ts (31/31 mutants). Six reviews, every
   finding applied or recorded in progress.md.
-- Phase 13b: BUILT, awaiting its QA (2026-08-07, commits local). Executes the
-  settled source ruling: ReliquarySourceKind + delve/rift/quest/store/activity,
-  multi-hint relics (source: one hint or a NON-EMPTY readonly list, frozen at
-  construction; reliquaryRelicSource returns a frozen readonly list, own hints
-  win wholesale), 240/242 slots resolve, SOURCE_PENDING_RULING = exactly
-  drakemaw_raptor + terrorspark_groundshaker with an inverse zero-routes sweep
-  justifying the row. Pinned id spaces exported for labels/tests:
-  RELIQUARY_STORE_SOURCE_ID 'woc_store', RELIQUARY_ACTIVITY_SOURCE_IDS,
-  RELIQUARY_RIFT_RANK_SOURCE_IDS (B/A/S). THE VOCABULARY IS NOW STABLE FOR
-  PHASE 21 GROWTH: author new relics against these ten kinds and the
-  established truth-pin arms (a new pairing of relic kind x source kind reds
-  the pairing pin until a sweep covers it). Rendering: one line per door,
-  authored order, no cap; lone boss + lone zone composes bossZone; aria folds
-  through formatList (no join key). data-cell-source carries the resolved
-  line count; the shot picker prefers the richest cell. PHASE 22 FILL
-  WORKLIST GAINS the seven sourceLine keys (sourceBossZone, sourceDelve,
-  sourceRift, sourceQuest, sourceStore, sourceActivityCorpseHarvest,
+- Phase 13b: COMPLETE with QA (2026-08-07). Executes the settled source
+  ruling: ReliquarySourceKind + delve/rift/quest/store/activity, multi-hint
+  relics (source: one hint or a NON-EMPTY readonly list, frozen at
+  construction with the hint objects frozen at their constructors;
+  reliquaryRelicSource returns a frozen readonly list, own hints win
+  wholesale), 239/242 slots resolve, SOURCE_PENDING_RULING = exactly
+  drakemaw_raptor + terrorspark_groundshaker + masterwork:engineering (the
+  third pended by the QA, see the executed-ruling entry below) with an
+  inverse zero-routes sweep justifying every row. Pinned id spaces exported
+  for labels/tests: RELIQUARY_STORE_SOURCE_ID 'woc_store',
+  RELIQUARY_ACTIVITY_SOURCE_IDS, RELIQUARY_RIFT_RANK_SOURCE_IDS (B/A/S). THE
+  VOCABULARY IS NOW STABLE FOR PHASE 21 GROWTH: author new relics against
+  these ten kinds and the established truth-pin arms (a new pairing of relic
+  kind x source kind reds the pairing pin until a sweep covers it; a
+  masterwork craft is hinted iff gear-capable, derived via
+  masterworkBonusStats). Rendering: one line per door, authored order, no
+  cap; lone boss + lone zone composes bossZone; a composed line (bossZone,
+  bossDungeon) degrades to the surviving authored half when one id goes
+  stale, never a spliced raw id; aria folds through formatList (no join
+  key). data-cell-source carries the resolved line count on missing cells
+  only; the shot picker prefers the richest cell. PHASE 22 FILL WORKLIST
+  GAINS the seven sourceLine keys (sourceBossZone, sourceDelve, sourceRift,
+  sourceQuest, sourceStore, sourceActivityCorpseHarvest,
   sourceActivityMasterworkCraft), each pending in the 15 Latin locales with
-  the five non-Latin fills already in-change. Valorsteed deviation (vendor
-  only; q_riding_lessons awards no item) and the permanent Rift GEAR-pool
-  exclusion are recorded in progress.md; the mounts-page place question is a
-  new OPEN item below.
+  the five non-Latin fills already in-change (sourceRift reworded to the
+  drop register by the QA, fills updated). The i18n glossary gains a
+  masterwork category (ja/ko gallery term aligned to the crafting surfaces,
+  page title included; the reliquary_i18n.locales page-name table sits
+  outside the glossary mechanism and is kept aligned by hand). Valorsteed
+  deviation (vendor only; q_riding_lessons awards no item) and the permanent
+  Rift GEAR-pool exclusion are recorded in progress.md; the mounts-page
+  place question plus three QA-found rulings are OPEN items below.
 - Phase 14: (pending)
 - Phase 15: (pending)
 - Phase 16: (pending)
@@ -371,11 +386,14 @@ plain xhigh, fresh session). Update this line as phases complete.
   six targets and found ONE missed block (professions_fishing :1316 still carried the
   banned wording; the true-up 58bf16476d fixed the file's other three comments but
   not this one); corrected in 314187312e with full git provenance.
-- Seed-set divergence caveat (Phase 12): professions_fishing now carries the branch's
-  own hunt (seed 1, default 2) while release/v0.35.0 carries its independent hunt of
-  the same Galecrest shift (seed 5, default 467) for the SAME suite. Whichever side
-  wins the next release merge, re-verify that suite rather than rubber-stamping the
-  conflict resolution.
+- Seed-set divergence caveat (Phase 12): EXECUTED at the 13b QA release sync
+  (2026-08-07). The caveat fired exactly as written: a per-hunk resolution
+  produced incoherent recordings, so the merge took the release side
+  wholesale (the release had re-hunted again to the seed-36 era recordings)
+  and re-verified the suite green on the merged tree (67/67; the pure
+  release tip verified green first in a throwaway worktree). The branch's
+  seed 1 / default 2 hunt is GONE; the file now carries only the release
+  lineage, so future merges have one side and the caveat is retired.
 - RULING OPEN (Phase 12 arch review): a catalogued relic acquired while its page
   clear meter reads 0 (trade, auction, mail) stamps clears: 0 and renders "first
   found on clear 0". Absent (provenance unknown, matching the retro doctrine) may be
@@ -386,10 +404,21 @@ plain xhigh, fresh session). Update this line as phases complete.
 - RULING EXECUTED by Phase 13b, 2026-08-07 (the entry below is kept for
   provenance): the vocabulary, multi-hint support, and 58-slot authoring all
   landed as ruled; the pending entry now lists exactly reins_drakemaw_raptor
-  (no acquisition path in content, owner call 2026-08-04) and
-  reins_terrorspark_groundshaker (dev-grant only), both owner decisions
-  outside this packet, and the inverse zero-routes sweep in
-  tests/reliquary_content.test.ts keeps the row honest. The QA additions were
+  (no acquisition path in content, owner call 2026-08-04),
+  reins_terrorspark_groundshaker (dev-grant only), and, added by the 13b QA
+  ruling 2026-08-07, masterwork:engineering (UNEARNABLE: every engineering
+  recipe produces a slotless statless tool, masterworkBonusStats returns
+  null for all eight, so the proc can never fire and the mark can never be
+  written; the Phase 13a hint named a door that awards nothing and the
+  ring-membership pin could not see it; the QA removed the hint, pended the
+  slot, and added a gear-capability pin deriving the eligible set through
+  the same gate the proc path uses). All owner decisions outside this
+  packet; a stats-bearing engineering craftable would un-pend the mark. One
+  consequence the owner should know: the pended mark keeps 100% catalog
+  completion unreachable (overview caps at 215/216, the gallery page at
+  5/6); curator rank and every deed are unaffected (top rank needs 100
+  owned). The inverse zero-routes sweep in tests/reliquary_content.test.ts
+  keeps every row honest. The QA additions were
   resolved: the robe is authored boss + quest; the sweep grew an
   acknowledgment arm per kind with per-family negative proofs; the Rift GEAR
   exclusion is PERMANENT with the rationale in the sweep's comment (derived
@@ -445,6 +474,37 @@ plain xhigh, fresh session). Update this line as phases complete.
   invented, but the rule change exceeds 13b's delegation). Decide before or
   with Phase 14; the reviewer rated it the largest remaining information gap
   in the new surface.
+- RULING OPEN (13b QA correctness audit, 2026-08-07), decide WITH the
+  mounts-place ruling above (same family): the bossDungeon line drops the
+  page's difficulty, so a heroic-only relic renders "Drops from Morthen in
+  Hollow Crypt", byte-identical to the normal page's line for its own
+  different relics; the tooltip and aria are standalone surfaces, so a
+  player can farm normal forever for an item that only drops on heroic.
+  Live on all six heroic pages today. A difficulty-aware key (or the same
+  ruling that settles derived places) closes it; whatever is decided must
+  also cover the set pages and Thunzharr, whose boss lines name no place at
+  all (clearSource none / deed_stat, identical shape to horizons_mounts).
+- RULING OPEN (13b QA gate review, 2026-08-07): the catalog's one quest
+  hint (wyrmcult_grand_robe, q_gravewyrm) renders unconditionally, but the
+  quest's itemRewards are class-keyed (the robe is the MAGE arm), so a
+  warrior or rogue reads a door that is closed to their class. The
+  vocabulary has no class-gate field; options are a copy caveat, a new hint
+  field (Phase 21 could carry it), or ruling class gates out of scope for
+  source lines. Recorded rather than guessed; today it affects exactly this
+  one hint.
+- RULING OPEN (13b QA frontend review, 2026-08-07): hudChrome.reliquary
+  .sourceStore ("Purchased from the WOC Store") is the page default for all
+  29 armory skins, and native iOS/Android deliberately expose no WOC Store
+  surface (no claudiumHooks; storeEnabled false), so native players get 29
+  hunting directions naming a storefront absent from their shell, which is
+  also the copy class that draws App Store anti-steering attention. The
+  route IS truthful at the account level (skins are account-scoped; a web
+  or desktop purchase appears in-game on native). Options: suppress the
+  line on native shells (the storeEnabled seam exists), reword to the
+  account-scope framing on native, or keep as-is; riding whichever is
+  chosen: the frontend nit that the sentence spells "WOC Store" literally
+  while hudChrome.wocStore.title owns the brand (an {store} interpolation
+  would single-source it).
 - Phase 15 input (Phase 13 QA, 2026-08-06): ReliquaryWindow.open(nav) sets
   nav but does not clear pageId, and the view resolves an off-shelf pageId
   from the full catalog, so a deep link passing a nav while a page from
