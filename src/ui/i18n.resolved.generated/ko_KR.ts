@@ -8517,7 +8517,7 @@ export const ko_KR: EnTranslations = {
       },
       "divine_protection": {
         "name": "신념의 결계",
-        "description": "보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다."
+        "description": "신성한 결계가 최대 생명력의 {damage}%를 {duration}초 동안 흡수합니다. 불굴의 보호가 결계를 강화합니다."
       },
       "hammer_of_justice": {
         "name": "분쇄의 망치",
@@ -8565,7 +8565,7 @@ export const ko_KR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "응보의 오라",
-        "description": "30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다."
+        "description": "죽거나 교체될 때까지 자신과 파티를 신성한 힘으로 감쌉니다. 영향을 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군의 일반 공격은 {buff}의 신성 피해를 추가로 입힙니다. 자신의 보루 헌신을 대체합니다. 다른 성기사가 응보의 오라를 시전하면 중첩되지 않고 갱신됩니다."
       },
       "tame_beast": {
         "name": "야생의 결속",
@@ -9387,7 +9387,7 @@ export const ko_KR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "마지막 기도",
-        "description": "즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)"
+        "description": "최대 생명력의 30%만큼 즉시 치유받습니다."
       },
       "deterrence": {
         "name": "가시수호",

@@ -2894,8 +2894,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     '아군 대상에게 축복을 내려 5분 동안 전투력을 {buff}만큼 증가시킵니다.',
   'entities.abilities.divine_protection.name': '신념의 결계',
-  'entities.abilities.divine_protection.description':
-    '보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다.',
+  'entities.abilities.divine_protection.description': '신성한 결계가 최대 생명력의 {damage}%를 {duration}초 동안 흡수합니다. 불굴의 보호가 결계를 강화합니다.',
   'entities.abilities.hammer_of_justice.name': '분쇄의 망치',
   'entities.abilities.hammer_of_justice.description': '대상을 {duration}초 동안 기절시킵니다.',
   'entities.abilities.lay_on_hands.name': '마지막 의식',
@@ -2917,8 +2916,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
-  'entities.abilities.retribution_aura.description':
-    '30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다.',
+  'entities.abilities.retribution_aura.description': '죽거나 교체될 때까지 자신과 파티를 신성한 힘으로 감쌉니다. 영향을 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군의 일반 공격은 {buff}의 신성 피해를 추가로 입힙니다. 자신의 보루 헌신을 대체합니다. 다른 성기사가 응보의 오라를 시전하면 중첩되지 않고 갱신됩니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
     '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
@@ -9673,8 +9671,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 저주해 12초 동안 이동 속도를 30%만큼 감소시킵니다. (흑마법사 특성)',
   'entities.abilities.death_coil.description':
     '적에게 {damage}의 암흑 피해를 입힌 뒤 3초 동안 공포에 빠뜨립니다. (흑마법사 특성)',
-  'entities.abilities.desperate_prayer.description':
-    '즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)',
+  'entities.abilities.desperate_prayer.description': '최대 생명력의 30%만큼 즉시 치유받습니다.',
   'entities.abilities.deterrence.description':
     '10초 동안 회피 확률을 50%포인트 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.earthbind.description':

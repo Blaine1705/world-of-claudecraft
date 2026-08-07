@@ -2919,8 +2919,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     '味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。',
   'entities.abilities.divine_protection.name': '信仰の守り',
-  'entities.abilities.divine_protection.description':
-    '守りの結界が10秒間{damage}ダメージを吸収します。',
+  'entities.abilities.divine_protection.description': '神聖なる結界が最大HPの{damage}%を{duration}秒間吸収する。不朽の加護が結界を強化する。',
   'entities.abilities.hammer_of_justice.name': '断裂の裁き槌',
   'entities.abilities.hammer_of_justice.description': '対象を{duration}秒間スタンさせます。',
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
@@ -2942,8 +2941,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
-  'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+  'entities.abilities.retribution_aura.description': '死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',
@@ -9689,8 +9687,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に{damage}の闇属性ダメージを与え、その後3秒間恐怖状態にする。（ウォーロックのタレント）',
   'entities.abilities.deep_freeze.description':
     '対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）',
-  'entities.abilities.desperate_prayer.description':
-    '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
+  'entities.abilities.desperate_prayer.description': '最大HPの30%を即座に回復する。',
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
   'entities.abilities.earthbind.description':

@@ -2936,8 +2936,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     'Накладывает Благословение на дружественную цель, повышая силу атаки на {buff} на 5 мин.',
   'entities.abilities.divine_protection.name': 'Оберег веры',
-  'entities.abilities.divine_protection.description':
-    'Защитный оберег поглощает {damage} ед. урона в течение 10 сек.',
+  'entities.abilities.divine_protection.description': 'Священный оберег поглощает {damage}% от максимального запаса здоровья в течение {duration} сек. Непреходящая защита усиливает оберег.',
   'entities.abilities.hammer_of_justice.name': 'Раскалывающий молот',
   'entities.abilities.hammer_of_justice.description': 'Оглушает цель на {duration} сек.',
   'entities.abilities.lay_on_hands.name': 'Последний обряд',
@@ -2959,8 +2958,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Повышает угрозу от вашего урона светлой магией на 60% на 30 мин. Основа паладина-танка.',
   'entities.abilities.retribution_aura.name': 'Аура возмездия',
-  'entities.abilities.retribution_aura.description':
-    'Окружает вас священной энергией на 30 мин и наносит 5 ед. урона светлой магией любому врагу, атакующему вас в ближнем бою.',
+  'entities.abilities.retribution_aura.description': 'Окружает вас и вашу группу святой энергией до смерти или замены. Враги, атакующие затронутых союзников в ближнем бою, получают {buff} ед. урона от светлой магии, а затронутые союзники наносят дополнительно {buff} ед. урона от светлой магии автоатаками. Заменяет вашу собственную Стойкость бастиона. Повторное применение Ауры воздаяния другим паладином обновляет её, а не суммирует.',
   'entities.abilities.tame_beast.name': 'Дикие узы',
   'entities.abilities.tame_beast.description':
     'Начинает приручать зверя в качестве спутника. Он должен быть не выше вашего уровня и не элитным. Ваш питомец следует за вами, атакует врагов и удерживает собственную угрозу. Одновременно можно иметь одного питомца.',
@@ -9836,8 +9834,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает противника, нанося {damage} ед. урона от Темной магии, а затем повергает его в ужас на 3 сек. (талант чернокнижника)',
   'entities.abilities.deep_freeze.description':
     'Глубоко замораживает цель, нанося {damage} ед. урона от льда и оглушая ее на 4 сек. (Талант мага)',
-  'entities.abilities.desperate_prayer.description':
-    'Мгновенно восстанавливает вам {damage} ед. здоровья. (талант жреца)',
+  'entities.abilities.desperate_prayer.description': 'Мгновенно восстанавливает вам 30% от максимального запаса здоровья.',
   'entities.abilities.deterrence.description':
     'Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)',
   'entities.abilities.earthbind.description':

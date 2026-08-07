@@ -8517,7 +8517,7 @@ export const ja_JP: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
+        "description": "神聖なる結界が最大HPの{damage}%を{duration}秒間吸収する。不朽の加護が結界を強化する。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
@@ -8565,7 +8565,7 @@ export const ja_JP: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
+        "description": "死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。"
       },
       "tame_beast": {
         "name": "野生の絆",
@@ -9387,7 +9387,7 @@ export const ja_JP: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後の祈り",
-        "description": "自分の体力を即座に{damage}回復する。（プリーストのタレント）"
+        "description": "最大HPの30%を即座に回復する。"
       },
       "deterrence": {
         "name": "針毛の守り",
