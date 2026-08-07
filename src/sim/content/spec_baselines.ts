@@ -99,12 +99,16 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     shadow: {
       // v0.28.x stat-identity pass: shadow is a DPS caster, so its flat stat is
       // Int (spell power), not the combat-dead Spirit it inherited.
+      // 2026-08-07 re-band: these percents were sized against the pre-#2757
+      // under-delivery (talent percents missing the SP rider); now that they
+      // apply to the whole hit, the rows shrink so delivered BiS damage lands
+      // near the 215 anchor instead of 233.
       stats: { int: 6 },
       global: { spellDmgPct: 0.15 },
       ability: [
-        { ability: 'shadow_word_pain', dmgPct: 0.45, costPct: -0.1 },
-        { ability: 'mind_blast', dmgPct: 0.5, costPct: -0.1 },
-        { ability: 'mind_flay', dmgPct: 0.6 },
+        { ability: 'shadow_word_pain', dmgPct: 0.3, costPct: -0.1 },
+        { ability: 'mind_blast', dmgPct: 0.34, costPct: -0.1 },
+        { ability: 'mind_flay', dmgPct: 0.4 },
       ],
     },
   },
