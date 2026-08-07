@@ -204,12 +204,13 @@ describe('hud.ts train window wiring (source pins)', () => {
     // separate pins stayed green. Painter sources are comment-stripped for
     // the same reason hud.ts is: prose must never satisfy the pin.
     const helper = hudMethod('private repaintOpenServiceWindows(): void {');
-    expect(helper.match(/=== 'block'/g)).toHaveLength(4);
+    expect(helper.match(/=== 'block'/g)).toHaveLength(5);
     for (const painter of [
       'vendor_window.ts',
       'heroic_vendor_window.ts',
       'train_window.ts',
       'unbind_window.ts',
+      'warfare_vendor_window.ts',
     ]) {
       const src = stripComments(
         readFileSync(resolve(__dirname, `../src/ui/hud/vendor/${painter}`), 'utf8'),

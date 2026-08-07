@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bandera en Mano',
+    desc: 'Captura una bandera en Campos Espinosos.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Hondonada Resiste',
+    desc: 'Gana una batalla en Campos Espinosos.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardián de la Hondonada',
+    desc: 'Gana 25 batallas en Campos Espinosos.',
+    title: 'Abanderado',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cien Banderas',
+    desc: 'Captura 100 banderas en Campos Espinosos a lo largo de tu carrera.',
+  },
+  dgn_rift: {
+    name: 'Caminante de la Brecha',
+    desc: 'Supera una Brecha derrotando a su jefe de piso.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Soberano de la Brecha',
+    desc: 'Supera una Brecha de rango S, el nivel más difícil que puede abrir un portal de Brecha.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sargento',
+    desc: 'Gana 10.000 de honor a lo largo de tu vida. Gastarlo nunca te cuesta el rango.',
+    title: 'Sargento',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Caballero Teniente',
+    desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
+    title: 'Caballero Teniente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Mariscal de Campo',
+    desc: 'Gana 150.000 de honor a lo largo de tu vida. Poco común en cualquier reino, y así debe ser.',
+    title: 'Mariscal de Campo',
+  },
   chr_drakemaw_broodlord: {
     name: 'Rompenidos',
     desc: 'Abate a un Señor de la Nidada de Drakemaw entre sus huevos, sorteando el grito, el tajo y el fuego.',

@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Sztandar w dłoni',
+    desc: 'Przechwyć flagę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_first_win: {
+    name: 'Kotlina się broni',
+    desc: 'Wygraj bitwę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Strażnik Kotliny',
+    desc: 'Wygraj 25 bitew na Polach Ciernistej Kotliny.',
+    title: 'Chorąży',
+  },
+  pvp_bg_captures_100: {
+    name: 'Sto Sztandarów',
+    desc: 'Przechwyć 100 flag na Polach Ciernistej Kotliny w ciągu swojej kariery.',
+  },
+  dgn_rift: {
+    name: 'Wędrowiec Szczelin',
+    desc: 'Oczyść Szczelinę, pokonując jej bossa piętra.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Władca Szczelin',
+    desc: 'Oczyść Szczelinę rangi S, najtrudniejszy poziom, jaki może wygenerować portal Szczeliny.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sierżant',
+    desc: 'Zdobądź 10 000 Honoru w ciągu całej kariery. Wydawanie go nigdy nie kosztuje cię rangi.',
+    title: 'Sierżant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Rycerz-Porucznik',
+    desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
+    title: 'Rycerz-Porucznik',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marszałek Polny',
+    desc: 'Zdobądź 150 000 Honoru w ciągu całej kariery. Rzadkość na każdym królestwie, i tak powinno być.',
+    title: 'Marszałek Polny',
+  },
   chr_drakemaw_broodlord: {
     name: 'Pogromca Wylęgu',
     desc: 'Zgładź Władcę Wylęgu Smoczej Paszczy pośród jego jaj, przez ryk, rozcinający cios i ogień.',

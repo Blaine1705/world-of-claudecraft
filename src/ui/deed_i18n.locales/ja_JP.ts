@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '手中の軍旗',
+    desc: 'ソーンホロウ平原で旗を奪う。',
+  },
+  pvp_bg_first_win: {
+    name: 'ソーンホロウ初陣を飾る',
+    desc: 'ソーンホロウ平原で勝利する。',
+  },
+  pvp_bg_wins_25: {
+    name: 'ソーンホロウの番人',
+    desc: 'ソーンホロウ平原で25回勝利する。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百の軍旗',
+    desc: 'ソーンホロウ平原で通算100枚の旗を奪う。',
+  },
+  dgn_rift: {
+    name: 'リフト踏破者',
+    desc: 'フロアボスを倒してリフトを攻略する。',
+  },
+  dgn_rift_s_rank: {
+    name: 'リフトの君主',
+    desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
+  },
+  pvp_honor_sergeant: {
+    name: '軍曹',
+    desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',
+    title: '軍曹',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '騎士中尉',
+    desc: '生涯名誉40,000を獲得する。本物の戦を一シーズン戦い抜いてきた証だ。',
+    title: '騎士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '元帥',
+    desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
+    title: '元帥',
+  },
   chr_drakemaw_broodlord: {
     name: '卵砕き',
     desc: '咆哮と薙ぎ払い、そして業火をくぐり抜け、卵に囲まれた火口の巣主を討ち取れ。',

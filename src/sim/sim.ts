@@ -461,6 +461,11 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+// By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
+import {
+  spawnWarfareQuartermaster,
+  WARFARE_QUARTERMASTER_NPC_ID,
+} from './pvp/warfare_quartermaster';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
@@ -500,6 +505,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
@@ -588,6 +594,7 @@ import * as yumiMod from './social/yumi';
 export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
+import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -1674,6 +1681,9 @@ export interface CharacterState {
   // Z-key sheathed-weapon toggle (JSONB; written only while sheathed, so pre-feature
   // saves and unsheathed characters stay byte-equal and load with the weapon drawn).
   weaponStowed?: boolean;
+  // Paperdoll helmet-visibility preference (JSONB; written only while hidden, same
+  // pre-feature byte-equality contract as weaponStowed).
+  helmHidden?: boolean;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
@@ -2371,6 +2381,16 @@ export class Sim {
         const safe = this.findSafePos(furyDef.pos.x, furyDef.pos.z, waterLevel() + 0.6);
         const fury = createNpc(FURY_ENTITY_ID, furyDef, this.groundPos(safe.x, safe.z));
         this.addEntity(fury);
+      }
+    }
+
+    // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
+    // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
+    {
+      const kole = worldContent.npcs[WARFARE_QUARTERMASTER_NPC_ID];
+      if (kole) {
+        const safe = this.findSafePos(kole.pos.x, kole.pos.z, waterLevel() + 0.6);
+        spawnWarfareQuartermaster(this.ctx, kole, safe);
       }
     }
 
@@ -3251,6 +3271,7 @@ export class Sim {
       );
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
+      if (s.helmHidden) player.helmHidden = true;
     }
 
     // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
@@ -3894,6 +3915,7 @@ export class Sim {
         : {}),
       // Absent until sheathed (back-compat + parity-stable saves).
       ...(e.weaponStowed ? { weaponStowed: true } : {}),
+      ...(e.helmHidden ? { helmHidden: true } : {}),
       // Absent until the first cup result (back-compat + parity-stable saves).
       ...(meta.vcupWins || meta.vcupLosses || meta.vcupDraws
         ? { vcupWins: meta.vcupWins, vcupLosses: meta.vcupLosses, vcupDraws: meta.vcupDraws }
@@ -4218,6 +4240,15 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     weaponStowMod.toggleWeaponStow(r.e);
+  }
+
+  /** Paperdoll eye toggle (IWorld.setHelmHidden; server `set_helm` command).
+   *  Cosmetic only: sets Entity.helmHidden, which rides the entity wire and the
+   *  renderer maps to a composed body with its kit head piece left off. */
+  setHelmHidden(hidden: boolean, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    setHelmHiddenMod(r.e, hidden);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
@@ -5711,6 +5742,14 @@ export class Sim {
         this.updateRiftTriggers(p);
         lap?.('p.move');
       }
+      // Breath runs for DEAD players too, and must: updateBreath's own reset
+      // branch is what starts the corpse run with full lungs, so gating this on
+      // !p.dead leaves a drowned player's spent breath and drown clock intact
+      // and resumes the damage the instant they resurrect at the corpse. Draws
+      // rng only through the drown pulse's dealDamage, which cannot fire for a
+      // dead player (the reset returns first), so the tick-phase draw order is
+      // unchanged for everyone who is not actively drowning.
+      updateBreath(this.ctx, p);
       // Riding-lesson driver: server-authoritative; tracks the training-steed
       // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
       // strands the session. Finishing the race credits success. Draws no rng,
@@ -6816,7 +6855,40 @@ export class Sim {
     return moved;
   }
 
+  /**
+   * The one funnel every PLAYER-sourced crowd-control application passes
+   * through: the diminishing-returns ladder, then the item-set duration
+   * reduction on top of it.
+   *
+   * The two are layered rather than fused because they are separate mechanisms.
+   * The ladder has five distinct exits inside its hostile branch and they do not
+   * all want the same treatment: stuns take an early return that exempts them
+   * from the ladder (a deliberate balance pass, see the comment at that site) but
+   * NOT from the set reduction, and a DR-immune target returns null, which means
+   * "apply nothing" and must pass through untouched rather than being multiplied.
+   * Applying the reduction at the generic ladder exit alone would silently miss
+   * stuns, which is the category the bonus most exists for, so it is applied here
+   * once, over whatever the ladder decided.
+   *
+   * The player/hostile gate is duplicated from the inner function on purpose: it
+   * is three cheap reads, it leaves the ladder's shape byte-identical to what
+   * shipped, and it makes the PvE-untouched property readable at one glance.
+   */
   private diminishedCrowdControlDuration(
+    source: Entity,
+    target: Entity,
+    category: CrowdControlDrCategory,
+    duration: number,
+  ): number | null {
+    const base = this.crowdControlDurationAfterDr(source, target, category, duration);
+    if (base === null) return null; // already DR-immune: apply nothing at all
+    if (source.kind !== 'player' || target.kind !== 'player') return base;
+    if (!this.isHostileTo(source, target)) return base;
+    const reduction = target.ccDurationReduction ?? 0;
+    return reduction > 0 ? base * (1 - reduction) : base;
+  }
+
+  private crowdControlDurationAfterDr(
     source: Entity,
     target: Entity,
     category: CrowdControlDrCategory,

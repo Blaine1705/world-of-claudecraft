@@ -15,6 +15,7 @@ import {
   type AnimActionWeight,
   type AnimState,
   advanceSwimBlend,
+  advanceTreadBlend,
   type BaseState,
   desiredBaseState,
   drivesPose,
@@ -25,6 +26,7 @@ import {
 } from './anim_state';
 import {
   applyMaterials,
+  applyModularSliderMorphs,
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
@@ -35,8 +37,10 @@ import {
   skinTexture,
   tintedFarMaterials,
 } from './assets';
+import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ModularAppearance, ModularLook } from './modular';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -191,10 +195,37 @@ const CLIMB_HANDOFF_END = 0.72;
 /** Climb phase by which the top-out stands fully upright. */
 const CLIMB_TOPOUT_END = 0.98;
 
-// Lie_Idle already lays the rig flat, a touch of extra pitch reads as a
+// Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
+// surface glide; clip-less rigs (creatures) get the full procedural prone.
+// The AUTHORED player strokes need neither: they were built prone, head
+// leading and face down, so any pitch here would over-rotate them (see
+// tmp/swim/build_swim.py). They also carry the body at hip height already,
+// so they need only a nudge of lift to break the surface rather than the
+// near-a-yard hoist Lie_Idle's ground-level pose does.
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
+const SWIM_PITCH_AUTHORED = 0;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
+const SWIM_RISE_AUTHORED = 0.3;
+// Treading is the one UPRIGHT water pose, so it needs the opposite of a lift:
+// the strokes float a body lying at hip height, while a standing one has to
+// SINK or it wades on the surface with its knees dry. Sized so the waterline
+// lands at the chest, and no deeper — the swim latch allows a bed only 0.8
+// under the line, and a diver's tucked feet have to clear it.
+const SWIM_RISE_TREAD = -0.34;
+// Nosing over reads as intent on a prone stroke and as a faceplant on an
+// upright tread, so the pitch is largely held back while treading.
+const TREAD_PITCH_SCALE = 0.35;
+// Water transitions cross whole postures — prone to upright, dry stride to
+// wade — so they get a longer crossfade than the land states, where a fast cut
+// reads as responsive.
+const WATER_FADE = 0.34;
+const WATER_STATES = new Set<BaseState>(['swim', 'swimSurface', 'swimIdle', 'wade']);
+
+/** Crossfade for a base-state edge: longer whenever water is on either side. */
+function waterFade(from: BaseState, to: BaseState): number {
+  return WATER_STATES.has(from) || WATER_STATES.has(to) ? WATER_FADE : FADE;
+}
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
@@ -328,8 +359,30 @@ export class CharacterVisual {
   private skinIndex: number;
   private weaponItemId: string | null;
   private offhandItemId: string | null;
+  /** Composition inputs for a `modular` def (null for a fixed class rig).
+   *  Changing a look means changing GEOMETRY, so callers rebuild the visual
+   *  rather than mutating it; this is kept so they can tell whether they must. */
+  private look: ModularLook | null = null;
+
+  /** The composition this visual was built from (null for a fixed class rig). */
+  get modularLook(): ModularLook | null {
+    return this.look;
+  }
+
+  /** Move the face/body sliders on the LIVE body: morph influences are
+   *  per-instance over shared geometry, so a slider drag repaints without the
+   *  dispose-and-recompose a geometry change needs (which is why the sliders
+   *  are deliberately outside `modularBuildSignature`). No-op on a fixed rig. */
+  applyModularSliders(app: ModularAppearance): void {
+    if (!this.look) return;
+    this.look = { ...this.look, app };
+    applyModularSliderMorphs(this.model, app);
+  }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  /** Long-hair secondary motion (modular styles with sway morphs; empty and
+   *  free on every other rig). */
+  private hairSway = new HairSwayDriver();
   // Skin payloads whose orientation blends to a root-relative pin (see
   // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
   // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
@@ -426,6 +479,10 @@ export class CharacterVisual {
   private leanRecoil = 0;
   private pendingDt = 0;
   private swimBlend = 0;
+  // How far into the upright TREAD posture the body is, 0..1. Separate from
+  // swimBlend because it eases between two swim poses rather than in and out of
+  // the water, and it is what keeps the body-height swap off the state edge.
+  private treadBlend = 0;
   private swimBobTime = 0;
   // Ledge-climb pose: `blend` fades the whole gesture, `phase` runs 0..1 over
   // the pull so the arms plant early and the body clears late. `target` is
@@ -461,6 +518,7 @@ export class CharacterVisual {
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
+    look: ModularLook | null = null,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -485,7 +543,14 @@ export class CharacterVisual {
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
-    this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    // THE MECH IS A REPLACEMENT BODY, NOT A LAYER. Only a `modular` def can
+    // compose a character, so a look handed to a fixed rig is dropped here
+    // rather than carried: the mech cosmetic must never end up with a second
+    // body inside it (Troy, 2026-08-07). assembleModel already ignores `look`
+    // for a non-modular def, this makes the visual agree, so nothing
+    // downstream can read a look the geometry never used.
+    this.look = prep.def.modular ? look : null;
+    this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
     configureTightBoneTextures(this.model);
     applyMaterials(
       this.model,
@@ -513,6 +578,7 @@ export class CharacterVisual {
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
+    this.hairSway.build(this.model);
     this.modelWrap.add(this.model);
     this.poseWrap.add(this.modelWrap);
     this.root.add(this.poseWrap);
@@ -634,13 +700,14 @@ export class CharacterVisual {
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
+      const previousBase = this.baseState;
       if (baseChanged) this.baseState = desired;
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), FADE, false);
       } else if (baseChanged && !this.currentIsOneShot) {
-        this.fadeTo(this.baseAction(), FADE, false);
+        this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
       }
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
@@ -679,8 +746,24 @@ export class CharacterVisual {
     }
     this.poseWrap.rotation.y = this.spinAngle;
 
-    // swim pose: Lie_Idle (when the rig has it) + pitch and surface bob
-    const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
+    // swim pose: the clip's own posture + whatever pitch and lift it still needs
+    const authoredSwim = !!this.action(this.def.clips.swimSurface);
+    const proneAngle = authoredSwim
+      ? SWIM_PITCH_AUTHORED
+      : this.action(this.def.clips.swim)
+        ? SWIM_PITCH_CLIP
+        : SWIM_PITCH_PROCEDURAL;
+    // Treading swaps the body between two postures that sit at different
+    // heights, so the swap has to EASE: switching the offset on the state edge
+    // would pop the model a third of a yard while the clips are still
+    // crossfading into each other.
+    this.treadBlend = advanceTreadBlend(
+      this.treadBlend,
+      this.baseState === 'swimIdle' && !!this.action(this.def.clips.swimIdle),
+      dt,
+    );
+    const strokeRise = authoredSwim ? SWIM_RISE_AUTHORED : SWIM_RISE;
+    const swimRise = strokeRise + (SWIM_RISE_TREAD - strokeRise) * this.treadBlend;
     this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
     this.swimBobTime += dt;
     // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
@@ -705,15 +788,22 @@ export class CharacterVisual {
     // Pitch into the wall through the pull, level out as the body tops the
     // lip so the plant lands upright.
     const climbLevel = 1 - env01(this.climbPhase, 0.62, 0.98);
-    // Both pose contributions ride the SAME channel and are additive offsets:
-    // the windup lean/recoil spring above and the ledge-climb pitch. Writing
-    // either one alone here would silently stomp the other (main's note: this
-    // line is rewritten every frame, so a pose written elsewhere is lost).
+    // ...and nose over into a dive or a climb. The renderer eased this toward
+    // the body's real vertical travel (advanceSwimPitch), so it arrives already
+    // smooth; it rides the swim blend like the prone angle it adds to, and so
+    // unwinds with the rest of the swim pose on the way out of the water.
+    // Every pose contribution on this channel is an additive offset (swim
+    // prone+pitch, the windup lean/recoil spring, the ledge-climb pitch):
+    // writing any one alone here would silently stomp the others.
+    // The dive nose-over is largely held back while treading: the same tilt
+    // that reads as aiming on a prone stroke reads as a faceplant on an
+    // upright body.
+    const swimPitch = s.swimPitch * (1 + (TREAD_PITCH_SCALE - 1) * this.treadBlend);
     this.poseWrap.rotation.x =
-      proneAngle * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
+      (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
-      this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
+      this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
 
@@ -748,6 +838,10 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
+      // Morph influences, not bone writes, so mixer order is irrelevant, but
+      // it rides the animated branch: a throttled far rig has no business
+      // integrating a hair spring.
+      this.hairSway.update(dt, s);
     }
   }
 
@@ -1826,7 +1920,19 @@ export class CharacterVisual {
     // every player ClipMap names walkBack, but baseAction() silently falls back
     // to walk when the GLB lacks it, and the machine would then hold a state
     // nothing is playing.
-    return desiredBaseState(s, !!this.action(this.def.clips.walkBack));
+    //
+    // Wading is the same rule seen from the other side: a rig with no wade
+    // cycle (every mob and NPC) must not enter the state at all, or it would
+    // play its dry walk at the WADE clip's tempo — the fallback covers the pose
+    // but nothing covers the timing.
+    // Passed as a flag rather than a doctored copy of `s`: this runs per entity
+    // per frame, and the copy allocated a fresh object every frame for every
+    // rig with no wade clip standing in a ford.
+    return desiredBaseState(
+      s,
+      !!this.action(this.def.clips.walkBack),
+      !!this.action(this.def.clips.wade),
+    );
   }
 
   /** Refill the weight scratch from the live mixer (see `weightScan`). */
@@ -2032,10 +2138,29 @@ export class CharacterVisual {
         return this.action(c.attack[0]) ?? this.action(c.idle);
       case 'swim':
         return this.action(c.swim) ?? this.action(c.idle);
+      case 'swimSurface':
+        // Rigs with one swim clip (creatures, and any body that never loaded
+        // the authored lane) swim it at every depth.
+        return this.action(c.swimSurface) ?? this.action(c.swim) ?? this.action(c.idle);
+      case 'swimIdle':
+        // No tread clip = keep stroking on the spot, which is what every rig
+        // did before the tread existed.
+        return (
+          this.action(c.swimIdle) ??
+          this.action(c.swimSurface) ??
+          this.action(c.swim) ??
+          this.action(c.idle)
+        );
+      case 'wade':
+        return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
       case 'jump':
         return this.action(c.jump) ?? this.action(c.idle);
+      case 'fall':
+        // Rigs without the authored flail (mobs, creatures) hold the jump
+        // pose for the whole fall, which is what every rig did before it.
+        return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
         return this.action(c.idle);
     }
@@ -2072,11 +2197,44 @@ export class CharacterVisual {
     prev: THREE.AnimationAction | null,
     fade: number,
   ): void {
+    // A transition can interrupt a crossfade still in flight (the stow gesture
+    // racing the waterline's base-state edge is the common case: auto-sheathe
+    // fires the moment the swim latch flips). The action that was FADING IN at
+    // that moment is neither `next` nor `prev`, so the pairwise fade below
+    // never touches it — its scheduled ramp completes and a full-weight loop
+    // is left running under every later pose. That is the "swims in mid-air /
+    // glitched swimming after jumping in from a cliff" bug. Sweep every other
+    // unpaused running action out whenever a new transition starts; the climb
+    // overlay actions run PAUSED (scrubbed by phase) and are never touched.
+    //
+    // stop(), NOT fadeOut(). `fadeOut(d)` is `_scheduleFading(d, 1, 0)`, and
+    // _updateWeight MULTIPLIES the interpolant by `this.weight`, so fading out
+    // an action caught mid-fade-in at 0.05 first RESTORES it to full weight for
+    // the frame and only then decays it: the sweep would trade a stuck loop for
+    // a full-weight flash of the stale pose, with a WATER_FADE-long tail on
+    // exactly the shoreline transitions this exists to fix. setEffectiveWeight(0)
+    // is worse still, since it zeroes `this.weight` permanently and every later
+    // fadeIn multiplies by that zero. stop() deactivates and reset()s (which
+    // stopFading()s) without touching weight, and the pairwise fade below keeps
+    // the scheduled total at 1, so the rig never dips toward BIND pose.
+    for (const a of this.actions.values()) {
+      if (a === next || a === prev || a.paused || !a.isRunning()) continue;
+      a.stop();
+    }
     if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
       next.fadeIn(fade).play();
       return;
     }
+    // A prev below the pose-drive threshold still needs its scheduled fades
+    // cancelled: it is excluded from the sweep above (as prev) and from the
+    // crossfade (below threshold), so a fade-in it was carrying would
+    // otherwise complete underneath the snap and loop at full weight.
+    // stop() for the same reason as the sweep, and doubly here: this branch
+    // exists to SNAP, and fading a near-dead prev out from weight 1 would blend
+    // it ~50/50 against the snapped `next` for the whole fade, the opposite of
+    // what the docblock above promises.
+    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.stop();
     next.setEffectiveWeight(1);
     next.play();
   }
@@ -2088,7 +2246,12 @@ export class CharacterVisual {
    *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
-    if (this.baseState === 'jump' && this.def.clips.land)
+    // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
+    // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
+    // meant a long fall silently LOOPED the pose a short hop clamps. The check
+    // is on the resolved ACTION, so a rig that does ship a flail is unaffected:
+    // its fall action is not the jump action, and the flail loops as intended.
+    if ((this.baseState === 'jump' || this.baseState === 'fall') && this.def.clips.land)
       return a === this.action(this.def.clips.jump);
     return false;
   }
@@ -2238,7 +2401,11 @@ function clipNamesOf(def: VisualDef): string[] {
     c.sitDown,
     c.sitIdle,
     c.swim,
+    c.swimSurface,
+    c.swimIdle,
+    c.wade,
     c.jump,
+    c.fall,
     c.land,
     c.walkBack,
     c.flourish,

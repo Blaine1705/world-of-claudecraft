@@ -1377,6 +1377,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
+  if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
   if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
@@ -4923,16 +4924,17 @@ export class GameServer {
    *  or refuse it.
    *
    *  THE GATE IS THE BANK'S OWN GATE, deliberately not a looser one:
-   *  `guildBankInfoFor(pid)` is non-null only for an alive, officer-plus member
-   *  of a guild whose book is loaded, standing at a banker (the shared
-   *  GUILD_BANK_RANKS allowlist). A MEMBER is refused by exactly the same
+   *  `guildBankInfoFor(pid)` is non-null only for an alive guild member (ANY
+   *  rank: the view gate is membership-wide, and the log is the trust surface
+   *  that lets the whole guild audit its officers) whose book is loaded,
+   *  standing at a banker. A NON-member is refused by exactly the same
    *  predicate that denies them the bank itself, so the log can never become a
-   *  side channel around the officer-only design, and the guild id comes from
+   *  side channel around the membership gate, and the guild id comes from
    *  the server's own membership STAMP, never from the request: a client cannot
    *  name a guild to read.
    *
    *  The gate is re-checked AFTER the awaited read, because the read may share
-   *  an in-flight query and a demotion, a leave, a death, or a walk-away can
+   *  an in-flight query and a leave, a kick, a death, or a walk-away can
    *  land in that window; the answer must reflect the authority at DELIVERY
    *  time, not at request time. A refusal is an explicit frame rather than
    *  silence, so the pane can say so instead of rendering an empty history that
@@ -6590,6 +6592,13 @@ export class GameServer {
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
+        break;
+      // Paperdoll eye toggle: cosmetic helmet-visibility preference. Explicit
+      // boolean (not a toggle) so it is idempotent: the client sends the state
+      // its paperdoll is showing. Persistence is the character save's job
+      // (CharacterState.helmHidden), never a client-side store.
+      case 'set_helm':
+        sim.setHelmHidden(msg.hidden === true, pid);
         break;
       // Per-character action-bar layout upload (untrusted client input). Validate
       // + bound the payload; a malformed/oversized layout is dropped silently
@@ -8459,11 +8468,12 @@ export class GameServer {
     // own dirty-marking commands.
     maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
     // guild bank info follows the same pattern with a stricter gate: null
-    // unless the player is alive, at a banker, AND stamped officer-plus in a
-    // guild whose book is loaded (sim guildBankInfoFor), so members and
-    // walked-away/dead/demoted/departed officers all read null. Not
-    // heavy-gated for the same reason as bank: it can change from OTHER
-    // officers' deposits, not just this session's own commands.
+    // unless the player is alive, at a banker, AND stamped into a guild whose
+    // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's
+    // canEdit flag marks officer-plus), so the guildless and walked-away/dead/
+    // departed members all read null. Not heavy-gated for the same reason as
+    // bank: it can change from OTHER members' deposits, not just this
+    // session's own commands.
     maybe('guildBank', this.sim.guildBankInfoFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays

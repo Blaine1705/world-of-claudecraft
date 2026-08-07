@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '손에 쥔 깃발',
+    desc: '쏜할로우 평원에서 깃발을 탈취하십시오.',
+  },
+  pvp_bg_first_win: {
+    name: '쏜할로우 사수',
+    desc: '쏜할로우 평원 전장에서 승리하십시오.',
+  },
+  pvp_bg_wins_25: {
+    name: '쏜할로우의 수호자',
+    desc: '쏜할로우 평원 전장에서 25회 승리하십시오.',
+    title: '기수',
+  },
+  pvp_bg_captures_100: {
+    name: '백 개의 깃발',
+    desc: '쏜할로우 평원에서 평생 깃발 100개를 탈취하십시오.',
+  },
+  dgn_rift: {
+    name: '균열 방랑자',
+    desc: '층 우두머리를 처치해 균열을 정복하십시오.',
+  },
+  dgn_rift_s_rank: {
+    name: '균열 군주',
+    desc: '균열이 생성될 수 있는 가장 어려운 등급인 S등급 균열을 정복하십시오.',
+  },
+  pvp_honor_sergeant: {
+    name: '병장',
+    desc: '평생 명예 10,000을 획득하십시오. 명예를 소비해도 계급은 사라지지 않습니다.',
+    title: '병장',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '기사-소위',
+    desc: '평생 명예 40,000을 획득하십시오. 진짜 전쟁을 한 계절 치른 셈입니다.',
+    title: '기사-소위',
+  },
+  pvp_honor_field_marshal: {
+    name: '원수',
+    desc: '평생 명예 150,000을 획득하십시오. 어느 서버에서든 드물며, 마땅히 그래야 합니다.',
+    title: '원수',
+  },
   chr_drakemaw_broodlord: {
     name: '둥지 파괴자',
     desc: '화산구의 둥지군주를 알 무더기 한복판에서, 포효와 가르기와 불길을 뚫고 처치하십시오.',

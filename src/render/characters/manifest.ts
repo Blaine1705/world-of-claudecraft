@@ -6,7 +6,7 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import type { Entity, PlayerClass } from '../../sim/types';
+import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 
@@ -33,10 +33,24 @@ export interface ClipMap {
   cast?: string;
   sitDown?: string;
   sitIdle?: string;
-  /** swim base (prone pitch is procedural on top) */
+  /** swim base. On the authored player lane this is the SUBMERGED stroke and
+   *  carries the whole prone posture; on rigs without one it is a lie-down pose
+   *  the renderer pitches procedurally (see visual.ts SWIM_PITCH_*). */
   swim?: string;
+  /** surface swim stroke, played instead of `swim` whenever the body's head is
+   *  above the waterline. Absent = the rig swims the same way at any depth. */
+  swimSurface?: string;
+  /** the swim IDLE: treading water, upright and sculling, played whenever a
+   *  swimmer stops. Absent = the stroke keeps playing in place. */
+  swimIdle?: string;
+  /** walking through water too shallow to swim in. Absent = the dry walk. */
+  wade?: string;
   /** airborne base pose while jumping/falling */
   jump?: string;
+  /** long-fall flail (arms windmilling, legs kicking), played once the body
+   *  is dropping faster than any hop can (anim_state.isFallingAtSpeed).
+   *  Absent = the jump pose holds for the whole fall, as it always did. */
+  fall?: string;
   /** Touchdown one-shot. Naming one opts the rig into the held-jump treatment:
    *  `jump` stops looping and CLAMPS on its last frame (its airborne pose) for
    *  however long the body stays off the ground, then this fires on the landing
@@ -112,6 +126,11 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
+  /** This GLB is a modular PART LIBRARY, not a finished character: every body
+   *  part, hair style and armour slot piece rides one shared rig and the
+   *  visible set is picked per entity (see modular.ts). assembleModel composes
+   *  it instead of cloning the whole scene. */
+  modular?: boolean;
   /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
    *  seated at the origin; alive shows `hide` only, and death swaps to `show`
    *  (the cracked-open shell IS the corpse). assembleModel seeds the alive
@@ -487,6 +506,8 @@ const TOLLING_BELL: ClipMap = {
 // ---------------------------------------------------------------------------
 
 const PLAYERS = 'models/chars/players';
+/** Modular part library (one GLB, every part), see modular.ts. */
+const MODULAR = 'models/chars/modular';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
@@ -582,6 +603,50 @@ const LOW_URL_ALIAS: Record<string, string> = {
 };
 
 const HUMANOID_H = 2.6;
+
+// ---------------------------------------------------------------------------
+// The authored swim lane
+//
+// Every player body rides the same Rig_Medium, so both strokes ship in ONE
+// clip-only GLB (no meshes, no skin — the bow_anims.glb precedent) that is
+// layered onto each class file through `animUrls`. Authored in Blender
+// (tmp/swim/build_swim.py) and retargeted onto the shipped rest pose by
+// scripts/build_swim_anims.mjs.
+//
+// Both clips carry the FULL prone posture (body flat, head leading, face down),
+// unlike the Lie_Idle pose the rest of the KayKit rigs still swim with — which
+// stays in every GLB and is still what mobs and creatures use.
+// ---------------------------------------------------------------------------
+const SWIM_ANIMS_URL = `${PLAYERS}/swim_anims.glb`;
+/** Submerged stroke: arms sweep out and back to centre, legs frog-kick. */
+export const SWIM_CLIP_SUBMERGED = 'Swim_Breaststroke';
+/** Surface stroke: alternating overarm crawl over a flutter kick. */
+export const SWIM_CLIP_SURFACE = 'Swim_Freestyle';
+/** The swim idle: upright, arms sculling, legs running an eggbeater. The only
+ *  UPRIGHT clip in the pack, which is why the renderer sinks the body for it
+ *  (visual.ts SWIM_RISE_TREAD) instead of floating it like the prone strokes. */
+export const SWIM_CLIP_TREAD = 'Swim_Tread';
+/** Walking through water too shallow to swim in: short, high-kneed, leaning. */
+export const WATER_CLIP_WADE = 'Water_Wade';
+/** Long-fall panic flail: upright, arched back, arms windmilling out of phase,
+ *  legs treading air (tmp/fall/build_fall.py). Rides the same clip-only GLB. */
+export const FALL_CLIP_FLAIL = 'Fall_Flail';
+
+/** Layer the authored water + fall clips onto a player body's class GLB. */
+function swims(def: VisualDef): VisualDef {
+  return {
+    ...def,
+    animUrls: [...(def.animUrls ?? []), SWIM_ANIMS_URL],
+    clips: {
+      ...def.clips,
+      swim: SWIM_CLIP_SUBMERGED,
+      swimSurface: SWIM_CLIP_SURFACE,
+      swimIdle: SWIM_CLIP_TREAD,
+      wade: WATER_CLIP_WADE,
+      fall: FALL_CLIP_FLAIL,
+    },
+  };
+}
 
 const SKINS_DIR = 'textures/skins';
 
@@ -726,7 +791,7 @@ const VELOCIRAPTOR: ClipMap = {
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
-  player_warrior: {
+  player_warrior: swims({
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
     // Every clip knight.glb ships is already wired somewhere in this block
@@ -813,8 +878,8 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  },
-  player_paladin: {
+  }),
+  player_paladin: swims({
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
     clips: {
@@ -857,8 +922,8 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  },
-  player_hunter: {
+  }),
+  player_hunter: swims({
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Ranged_Shoot']),
@@ -869,8 +934,8 @@ export const VISUALS: Record<string, VisualDef> = {
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
-  },
-  player_rogue: {
+  }),
+  player_rogue: swims({
     url: `${PLAYERS}/rogue.glb`,
     height: HUMANOID_H,
     clips: {
@@ -933,8 +998,8 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  },
-  player_priest: {
+  }),
+  player_priest: swims({
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: {
@@ -972,8 +1037,8 @@ export const VISUALS: Record<string, VisualDef> = {
     // model without hiding its base texture.
     tint: 0xf0e9d6,
     tintStrength: 0.12,
-  },
-  player_shaman: {
+  }),
+  player_shaman: swims({
     url: `${PLAYERS}/barbarian.glb`,
     height: HUMANOID_H,
     clips: {
@@ -996,8 +1061,8 @@ export const VISUALS: Record<string, VisualDef> = {
     // without hiding its base texture.
     tint: 0x6f8fc9,
     tintStrength: 0.12,
-  },
-  player_mage: {
+  }),
+  player_mage: swims({
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: {
@@ -1050,8 +1115,8 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
-  },
-  player_warlock: {
+  }),
+  player_warlock: swims({
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: {
@@ -1105,19 +1170,19 @@ export const VISUALS: Record<string, VisualDef> = {
     // without hiding its base texture.
     tint: 0x8d5fd3,
     tintStrength: 0.12,
-  },
-  player_druid: {
+  }),
+  player_druid: swims({
     url: `${PLAYERS}/druid.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     // dedicated druid model (own texture, ships a Backpack mesh)
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
-  },
+  }),
 
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
-  player_mech: {
+  player_mech: swims({
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`,
     height: HUMANOID_H,
     // The mech is rigged to the same KayKit Rig_Medium skeleton as every other
@@ -1138,7 +1203,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
     lazyPreload: true,
-  },
+  }),
 
   // -- forms ---------------------------------------------------------------
   form_sheep: {
@@ -2138,6 +2203,52 @@ export const VISUALS: Record<string, VisualDef> = {
 };
 
 // ---------------------------------------------------------------------------
+// Modular player bodies, one `player_<class>_modular` def per class, derived
+// from the class def above it. The body is COMPOSED from the shared part
+// library (modular.ts) instead of cloned from the class GLB, but everything
+// else, clips, the ability→clip mapping, held-weapon layout, the swim/fall
+// lane, is the class's own, so a composed rogue garrotes and a composed
+// hunter draws its bow exactly like the fixed rigs do.
+//
+// The class GLB rides along as a pure CLIP source (first animUrl): the
+// synthesized per-class attacks (Shield_Bash, Garrote_Choke, Kick_A, ...)
+// exist only there, and every player body shares KayKit's Rig_Medium, so its
+// clips bind onto the modular skeleton by node name, the swim/bow clip packs
+// are the precedent. No extra fetch: the class GLB is already preloaded as the
+// fixed rig every OTHER entity still wears.
+//
+// Deliberately dropped from the class def:
+//  - `show`: the composed body has no baked accessory meshes to allowlist;
+//    hats/capes are armour-slot parts picked by the loadout instead.
+//  - `tint`/`tintStrength`: the class tints (shaman blue, warlock violet) are
+//    how classes SHARING a stock model stay tellable apart. A composed body's
+//    colour belongs to the player's skin/hair wheels, and a tint over the
+//    picked skin tone repaints exactly what the player chose.
+// ---------------------------------------------------------------------------
+// Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
+// get no modular def at all and fall back to the warrior's clips through
+// modularKeyFor, silently, with no test able to see it.
+for (const cls of ALL_CLASSES) {
+  const {
+    show: _show,
+    tint: _tint,
+    tintStrength: _tintStrength,
+    ...base
+  } = VISUALS[`player_${cls}`];
+  VISUALS[`player_${cls}_modular`] = {
+    ...base,
+    url: `${MODULAR}/warrior_modular.glb`,
+    modular: true,
+    animUrls: [base.url, ...(base.animUrls ?? [])],
+  };
+}
+
+/** The composed-body variant of a class visual (every class has one). */
+export function modularVisualKey(cls: PlayerClass): string {
+  return `player_${cls}_modular`;
+}
+
+// ---------------------------------------------------------------------------
 // Dispatch: entity -> visual key (mirrors the old buildRigFor selection:
 // e.kind + e.templateId + MOBS[id].family)
 // ---------------------------------------------------------------------------
@@ -2336,6 +2447,13 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // The two WARFARE quartermasters (one stock, two placements). Both sell the
+  // game's most prestigious armor and both fell through to the tinted villager
+  // body before this, which read as a townsperson selling epics; the armored
+  // knight silhouette (helmet, cape, sword) is the same reuse captain_thessaly
+  // makes and needs no new asset.
+  warmarshal_draven_kole: 'npc_knight',
+  fury: 'npc_knight',
   loremaster_caddis: 'npc_mage',
   smith_haldren: 'npc_smith',
   armorer_hode: 'npc_smith',
@@ -2377,7 +2495,7 @@ const NPC_KEYS: Record<string, string> = {
 
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
-    if (e.skinCatalog === 'mech') return 'player_mech';
+    if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {

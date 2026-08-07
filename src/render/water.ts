@@ -393,6 +393,16 @@ export interface WaterView {
     strength?: number,
   ): void;
   /**
+   * Player toggle for the interactive wake/ripple height field (the
+   * `waterRipples` setting, threaded through Renderer.setWaterRipples because
+   * render modules never read the settings store directly). While disabled the
+   * contact feeds drop their impulses and update() draws no simulation passes;
+   * disabling mid-wake puts the live field to sleep so the surface goes calm
+   * instead of freezing a stale wake into the shader. The low tier has no
+   * field at all, so there this is a no-op.
+   */
+  setWavesEnabled(enabled: boolean): void;
+  /**
    * Editor-only: re-seat the surface at the ACTIVE waterLevel() and recompute
    * the per-vertex shore depth from the CURRENT terrainHeight (after a
    * water-level change or a sculpt near the shoreline). Updates the existing
@@ -939,6 +949,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // shared-LCG call order in textures.ts for everything generated after
   waterNormalMaps();
   const simulation = renderer ? new WaterSimulation(renderer) : null;
+  // The waterRipples setting, applied via setWavesEnabled. Starts false to
+  // match the setting's default; the renderer syncs the persisted value right
+  // after construction, so a player who opted in never sees a calm frame.
+  let wavesEnabled = false;
   const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
   // ONE material for every zone plane and the apron, so the field's uniform
   // objects (shared by reference, like uTime) drive the whole surface.
@@ -1434,9 +1448,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         pair.under.position.y = pair.front.position.y;
         pair.under.visible = under && pair.front.visible;
       }
+      if (!wavesEnabled) return 0;
       return simulation?.update(_time, cameraX, cameraZ) ?? 0;
     },
     addSplash(x: number, z: number, radius: number, strength = 1): void {
+      if (!wavesEnabled) return;
       simulation?.addSplash(x, z, radius, strength);
     },
     enterContact(
@@ -1448,6 +1464,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       axisZ: number,
       strength = 1,
     ): void {
+      if (!wavesEnabled) return;
       simulation?.enterContact(x, z, radius, halfLength, axisX, axisZ, strength);
     },
     moveContact(
@@ -1461,6 +1478,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       axisZ: number,
       strength = 1,
     ): void {
+      if (!wavesEnabled) return;
       simulation?.moveContact(oldX, oldZ, x, z, radius, halfLength, axisX, axisZ, strength);
     },
     releaseContact(
@@ -1472,7 +1490,16 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       axisZ: number,
       strength = 1,
     ): void {
+      if (!wavesEnabled) return;
       simulation?.releaseContact(x, z, radius, halfLength, axisX, axisZ, strength);
+    },
+    setWavesEnabled(enabled: boolean): void {
+      if (enabled === wavesEnabled) return;
+      wavesEnabled = enabled;
+      // A field that was mid-wake must actually go to sleep: reset() zeroes
+      // uWaveEnabled and drops pending impulses, so the shader stops sampling
+      // it this frame rather than holding the last wake forever.
+      if (!enabled) simulation?.reset();
     },
     setLevel(): void {
       simulation?.reset();
@@ -1527,6 +1554,7 @@ function buildPhongWater(): WaterView {
     enterContact: () => {},
     moveContact: () => {},
     releaseContact: () => {},
+    setWavesEnabled: () => {},
     setLevel(): void {
       for (const m of meshes) m.position.y = waterLevel();
     },
