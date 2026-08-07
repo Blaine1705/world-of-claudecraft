@@ -334,7 +334,7 @@ export const ru_RU: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Осколки душ",
-      "ruinMeter": "Ruin",
+      "ruinMeter": "Погибель",
       "ruinStatus": "Гибель: {value} из {max}"
     },
     "spectate": {
@@ -2113,7 +2113,7 @@ export const ru_RU: EnTranslations = {
       "formFireball": "Облик огненного шара: скорость повышена на {pct}%; атаки и заклинания недоступны",
       "formMoonkin": "Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%",
       "formShadow": "Сумрачный облик: урон от темной магии повышен на {pct}%",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value} из {max}",
       "formLich": "Копьё души поражает до {targets} ближайших врагов, нанося {pct}% урона",
       "afflictionEye": "Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения",
       "afflictionEyeSecondary": "Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона",
@@ -7557,7 +7557,7 @@ export const ru_RU: EnTranslations = {
     "tooltip": {
       "rank": "Ранг {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Погибели",
       "range": "Дальность {range} м",
       "rangeWithMin": "Дальность {min}-{max} м",
       "instant": "Мгновенно",
@@ -8625,7 +8625,7 @@ export const ru_RU: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Лихорадочный натяг",
-        "description": "Повышает скорость атаки на 40% на 15 сек."
+        "description": "Выпускает 6 выстрелов за 2,4 сек., не прерывая движения. Каждый выстрел наносит {damage} ед. физического урона и усиливается от силы дальнего боя."
       },
       "smite": {
         "name": "Кара",
@@ -8732,7 +8732,7 @@ export const ru_RU: EnTranslations = {
         "description": "Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек."
       },
       "evil_eye": {
-        "name": "Evil Eye",
+        "name": "Дурной глаз",
         "description": "Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек."
       },
       "maledict_gaze": {
@@ -8975,7 +8975,7 @@ export const ru_RU: EnTranslations = {
       },
       "chain_heal": {
         "name": "Цепное исцеление",
-        "description": "Исцеляет дружественную цель на большую величину, затем перескакивает на 2 ближайших союзников, исцеляя на 50% меньше с каждым прыжком. (Специализация Исцеление)"
+        "description": "Исцеляет союзника на {damage}, затем перескакивает на 2 ближайших союзников в пределах 12 м. Каждый прыжок исцеляет на 50% от предыдущего. Каждый затронутый союзник расходует ваш запас Потока исцеления и немедленно исцеляется на 125% от израсходованного. Начальное исцеление увеличивается от силы заклинаний. (специализация Исцеление)"
       },
       "galeheart_weapon": {
         "name": "Оружие сердца бури",
@@ -9079,7 +9079,7 @@ export const ru_RU: EnTranslations = {
       },
       "holy_shield": {
         "name": "Священный щит",
-        "description": "Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)"
+        "description": "Дает 30% блока и щит, поглощающий {damage}% от максимального запаса здоровья, на {duration} сек., высвобождая импульс угрозы. Божественное вознесение усиливает и продлевает защиту."
       },
       "bestial_wrath": {
         "name": "Звериный гнев",
@@ -11163,16 +11163,16 @@ export const ru_RU: EnTranslations = {
         "name": "Поводья раптора Дрейкмо"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Инеевый клык"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Остриё до мозга костей"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Шёпот сумерек"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Заточка из костяного стекла"
       },
       "moggers_hide_quiver": {
         "name": "Кожаный колчан Моггера"

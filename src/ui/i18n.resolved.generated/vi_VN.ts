@@ -322,20 +322,20 @@ export const vi_VN: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Kết Án",
+      "fateThreadsLabel": "Sợi Định Mệnh",
+      "doomMeterUnlock": "Di chuyển thanh tài nguyên Affliction",
+      "doomMeterLock": "Khóa thanh tài nguyên Affliction",
+      "doomEmptyStatus": "{value} trên {max} Kết Án.",
+      "doomStatus": "{value} trên {max} Kết Án; {remaining}.",
+      "fateThreadsStatus": "{value} trên {max} Sợi Định Mệnh.",
+      "fateThreadsConsumeReady": "Ba Sợi Định Mệnh: Nuốt Chửng có thể dệt chúng thành Kết Án bổ sung.",
+      "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
+      "soulFragmentsMeter": "Mảnh Linh Hồn",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "{value} trên {max} Ruin"
     },
     "spectate": {
       "banner": "Đang xem {name}"
@@ -1980,31 +1980,31 @@ export const vi_VN: EnTranslations = {
       "absorb": "Hấp thụ {value} sát thương",
       "healAbsorb": "Hấp thụ {value} hồi máu nhận vào",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
-      "stasis": "Immune and unable to act",
+      "stasis": "Miễn nhiễm và không thể hành động",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "imbueRange": "Vũ khí được phù chú: {min} đến {max} sát thương thêm khi dùng Verdict.",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Tăng sát thương thú nuôi thêm {pct}%",
+      "petHaste": "Tăng tốc độ hành động của thú nuôi thêm {pct}%",
+      "spellDamage": "Tăng sát thương phép thêm {pct}%",
+      "spellHaste": "Tăng tốc độ thi triển phép thêm {pct}%",
+      "sated": "Không thể hưởng thêm hiệu ứng tăng tốc nhóm khác",
+      "cauterizeFatigue": "Thiêu Đốt không thể ngăn một đòn chí mạng khác",
+      "castShield": "Việc niệm chú không thể bị ngắt quãng hoặc làm chậm bởi sát thương",
       "dmgDone": "Tăng sát thương gây ra lên {pct}%",
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
       "heatingUp": "Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần",
       "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
       "hunterFerocity": "{stacks} Hung Tính Bầy Đàn: thú nuôi của bạn gây thêm {pct}% sát thương",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
+      "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
+      "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
+      "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
+      "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
+      "internalCooldown": "Hiệu ứng này chưa thể kích hoạt lại cho đến khi hết thời gian chờ",
       "carriedFlag": "Bạn đang mang cờ địch. Hủy hiệu ứng này để thả nó xuống.",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
@@ -2019,13 +2019,13 @@ export const vi_VN: EnTranslations = {
       "revengeFree": "Phục Thù tiếp theo của bạn không tốn nộ khí",
       "victoryRush": "Đà Chiến Thắng đã sẵn sàng",
       "maxHpPct": "Tăng máu tối đa thêm {pct}%",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Sát thương gây ra tăng {damagePct}%, tốc độ đánh tăng {hastePct}%, và tốc độ di chuyển tăng {movePct}%",
+      "suddenDeath": "Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu",
+      "aoeEcho": "Còn lại {charges} lần vọng: kỹ năng đơn mục tiêu gây {pct}% sát thương cho tối đa {targets} kẻ địch gần đó",
+      "sureCrit": "Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng",
+      "temporalEcho": "Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng",
+      "arcaneCharge": "{stacks} Điện Tích Bí Thuật: Sức Mạnh Bí Thuật gây thêm {damagePct}% sát thương, thi triển nhanh hơn {castPct}%, và tốn gấp {costMult} lần mana",
+      "physicalReduction": "Giảm sát thương Vật Lý phải chịu đi {pct}%",
       "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Các phép Lửa của bạn luôn chí mạng",
@@ -2047,10 +2047,10 @@ export const vi_VN: EnTranslations = {
       "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
       "oldBlood": "Huyết Cổ: tầng {stacks} trên {max}. Các đòn đánh trúng ở Hình Sói và Hình Bruin dùng chung bể này; ở {max}, Cắn Xé Máu hoặc Nghiền Xương biến đổi",
       "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Các lần thi triển hoàn tất của Hoa Nở Hoang Dã và Nở Hoa Lần Hai tích nó; ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
+      "resourceSap": "Hồi {value} tài nguyên hiện tại của bạn mỗi {interval} giây",
+      "nextAttackCrit": "Đòn tấn công tiếp theo của bạn chắc chắn chí mạng",
+      "healEcho": "Máu giảm xuống dưới {threshold}% sẽ hồi {value} máu",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Tăng sức mạnh phép thuật lên {value}",
@@ -2089,8 +2089,8 @@ export const vi_VN: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Tăng sát thương chảy máu phải nhận thêm {pct}%",
+      "sourceVuln": "Nhận thêm {pct}% sát thương từ người đã gây hiệu ứng này",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2104,46 +2104,46 @@ export const vi_VN: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Hoàn tất chuỗi {steps} đòn của Nhịp Chiến Hồn sẽ vọng lại đòn đánh {count} lần với {pct}% sát thương dưới dạng sát thương Thiên Nhiên",
+      "elementalTrance": "Sát thương phải nhận giảm {pct}%. {mana}% toàn bộ sát thương bạn gây ra được chuyển thành mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Form: tăng máu và giáp.",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "formFireball": "Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Dạng Cú Mặt Trăng: sát thương phép tăng {pct}% và giáp tăng {armorPct}%",
+      "formShadow": "Hình Gloamveil: sát thương Bóng Tối tăng {pct}%",
+      "resourceCount": "{value} trên {max}",
+      "formLich": "Thương Linh Hồn cũng đánh trúng thêm tối đa {targets} kẻ địch gần đó với {pct}% sát thương",
+      "afflictionEye": "Ánh Nhìn Nguyền tấn công mỗi {interval} giây; hiệu ứng tại Mắt Nguyền này tạo ra {pct}% Kết Án",
+      "afflictionEyeSecondary": "Hiệu ứng tại Mắt Nguyền này tạo ra {doomPct}% Kết Án; Phán Quyết vọng lại đây với {echoPct}% sát thương",
+      "afflictionAccomplice": "Sát thương đủ điều kiện cấp {value} Kết Án, tối đa một lần mỗi {interval} giây",
+      "afflictionViolence": "Còn lại {charges} lần báo thù; một đòn tấn công của địch cấp {doom} Kết Án và phản lại {damage} sát thương Bóng Tối",
+      "afflictionVicarious": "Chuyển hướng hoặc giảm {pct}% sát thương phải nhận và có thể tạo ra tối đa {max} Kết Án",
+      "afflictionPossession": "Tăng cường Kim Định Mệnh, Nuốt Chửng, Ánh Nhìn Nguyền, và Phán Quyết",
+      "afflictionJudgment": "Mắt Nguyền chính tạo thêm {eyePct}% Kết Án; Phán Quyết gây thêm {sentencePct}% sát thương và lần đầu tiên hoàn lại {refund} Kết Án",
+      "afflictionLitany": "Mỗi lần nhận Kết Án gây {damage} sát thương Bóng Tối cho tối đa {targets} kẻ địch trong bán kính {radius} thước, một lần mỗi giây",
+      "afflictionFateThreads": "{stacks} Sợi Định Mệnh: Phán Quyết gây thêm {sentencePct}% sát thương, hoặc Nuốt Chửng nhận thêm {doom} Kết Án mỗi nhịp",
+      "afflictionConsumeThreads": "Nuốt Chửng đang tiêu thụ {stacks} Sợi Định Mệnh để nhận thêm {doom} Kết Án mỗi nhịp",
+      "necromancyHarvestMark": "Cái chết có thể tạo 1 Mảnh Linh Hồn",
+      "necromancyOssuaryMark": "Lưu trữ {storedPct}% sát thương của bạn và thuộc hạ Bất Tử của bạn, cộng thêm {lancePct}% sát thương của Thương Linh Hồn; thi triển lại để kích nổ. Khi chết sẽ nổ trong bán kính {radius} thước và tạo 1 Mảnh Linh Hồn",
+      "necromancyDeathEcho": "Vọng Âm Tử Thần cũ; hiện không có kỹ năng nào tiêu thụ nó",
+      "warlockAnchor": "Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo",
+      "formMetamorph": "Dạng quỷ: kích thước cơ thể tăng {pct}%; các phần thưởng khác đi kèm hiệu ứng riêng",
+      "energyRegen": "Tăng hồi Năng Lượng thêm {pct}%",
       "defensiveStance": "Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.",
       "righteousFury": "Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} tầng: Đòn Tàn Phế tiếp theo của bạn gây thêm {pct}% sát thương",
+      "sweepingStrikes": "Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương",
+      "fingersOfFrost": "{charges} tầng: Thương Băng xem mục tiêu của nó như đang bị đóng băng và gây thêm {pct}% sát thương đóng băng",
+      "brainFreeze": "Roi Mùa Đông tiếp theo của bạn tức thời và bỏ qua thời gian hồi chiêu",
+      "wintersChill": "{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng",
+      "icicles": "{value} trên {max} Băng Nhọn; ở {max}, có thể thi triển Chông Băng Hà",
+      "desolation": "{charges} tầng: Tia Hủy Diệt tiếp theo của bạn thi triển nhanh hơn {castPct}%, hoặc Mưa Lửa tiếp theo của bạn đổ xuống ngay lập tức",
+      "ruinousBrand": "Còn lại {charges} bản sao: phép trực tiếp sao chép {otherPct}% sát thương vào đây, hoặc {selfPct}% khi đây là mục tiêu của chúng",
+      "duskfireClaim": "Cái chết cấp {value} Ruin",
+      "pyreGuardian": "Tạo ra {ruin} Ruin mỗi {ruinInterval} giây và gây {damage} sát thương Lửa trong bán kính {radius} thước mỗi {damageInterval} giây",
+      "perfectMoment": "Phi Tiêu Ê-te không tiêu hao Điện Tích Bí Thuật",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -3979,7 +3979,7 @@ export const vi_VN: EnTranslations = {
       "none": "Không có lớp nào khớp mọi bộ lọc. Xóa bớt một cái để thấy thêm."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Chỉ định kẻ địch mà hành động và sự thống khổ của nó sẽ nuôi dưỡng Kết Án của bạn.",
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
       "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
       "hamstring": "Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.",
@@ -7384,10 +7384,10 @@ export const vi_VN: EnTranslations = {
     "pet": {
       "attack": "Tấn Công",
       "waterJet": "Phun Nước",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Tiễn Tro",
+      "abyssalChain": "Xích Vực Sâu",
+      "autocastOn": "Tự động thi triển đang bật. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để tắt.",
+      "autocastOff": "Tự động thi triển đang tắt. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật.",
       "taunt": "Khiêu Khích",
       "healDemon": "Trị Liệu Quỷ",
       "healPet": "Trị Liệu Thú",
@@ -7398,10 +7398,10 @@ export const vi_VN: EnTranslations = {
       "petAttackDesc": "Ra lệnh cho thú tấn công mục tiêu thù địch hiện tại của bạn.",
       "waterJetTitle": "Phun Nước",
       "waterJetDesc": "Ra lệnh cho Nguyên Tố Nước của bạn dồn dập một luồng nước làm chậm trong 3 giây. Thời gian hồi chiêu 8 giây. Nhấp chuột phải để tự động tung chiêu mỗi khi hết thời gian hồi chiêu.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Tiễn Tro",
+      "felboltDesc": "Ra lệnh cho Emberkin phóng thêm một Tiễn Tro vào mục tiêu của bạn. Thời gian hồi chiêu 8 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
+      "abyssalChainTitle": "Xích Vực Sâu",
+      "abyssalChainDesc": "Ra lệnh cho Gloomshade kéo một kẻ địch thường ở cách hơn 8 và tối đa 20 thước về phía mình. Không thể kéo trùm. Thời gian hồi chiêu 15 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
       "petTauntTitle": "Thú Khiêu Khích",
       "petTauntDesc": "Ra lệnh cho thú lao vào và Gầm Gừ khi trong tầm. Hồi chiêu 10 giây.",
       "healDemonDesc": "Tiêu hao mana để truyền trị liệu cho quỷ của bạn trong 5 giây.",
@@ -7568,8 +7568,8 @@ export const vi_VN: EnTranslations = {
       "unavailable": "Không khả dụng",
       "requiresLevel": "Yêu cầu cấp {level}",
       "requiresForm": "Yêu cầu Hình {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Yêu cầu ẩn thân",
+      "requiresStealthSkulduggery": "Yêu cầu ẩn thân (không cần khi đạt 3 U Ám hoặc trong Màn Bóng Tối)",
       "requiresCombo": "Tiêu hao điểm combo",
       "requiresTargetHealthBelow": "Yêu cầu mục tiêu dưới {percent}% máu",
       "requiresDodge": "Chỉ dùng được sau khi mục tiêu né đòn",
@@ -7788,7 +7788,7 @@ export const vi_VN: EnTranslations = {
       "clickDestroy": "Nhấp để hủy bỏ",
       "useFishing": "Dùng: Câu cá ở vùng nước gần đó.",
       "useHealingPotion": "Dùng: Hồi tức thời {amount} sinh lực. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 2 phút.",
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
@@ -8292,20 +8292,20 @@ export const vi_VN: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Nhát Chém Gian Tà",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Một đòn đánh tức thời gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn.",
+        "specNote_assassination": "Thêm 1 Nghi Thức Độc (tối đa 6).",
+        "specNote_combat": "Khi Redline đang hoạt động, nút này trở thành Đòn Trời Giáng: 130% sát thương vũ khí cộng 10, nhận 2 điểm liên hoàn, và thêm 1 Redline (tối đa 4)."
       },
       "eviscerate": {
         "name": "Giấc Ngủ Vùi Đất",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Chiêu kết liễu gây {damage} sát thương.",
+        "specNote_assassination": "Ở 6 Nghi Thức Độc, nút này trở thành Xé Độc: một đòn đánh lập tức gây toàn bộ sát thương chảy máu còn lại của bạn, gieo một vết thương độc mới, và hồi 20 năng lượng.",
+        "specNote_combat": "Đánh trúng đòn này với 4 điểm liên hoàn trở lên sẽ kích hoạt Redline trong 8 giây: Nhát Chém Gian Tà trở thành Đòn Trời Giáng và nút này trở thành Tắt Lịm (45 cộng 35 mỗi điểm liên hoàn, đánh mạnh hơn 25% cho mỗi nấc Redline tích được, hồi 25 năng lượng). Hãy dùng nó trước khi Redline kết thúc."
       },
       "backstab": {
         "name": "Đòn Đâm Hèn Hạ",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Đâm dao găm vào lưng mục tiêu gây 150% sát thương vũ khí cộng thêm {damage}. Phải đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "specNote_assassination": "Mỗi đòn đánh trúng thêm 1 Nghi Thức Độc (tối đa 6) và hoàn lại 15 năng lượng. Ở 6 Nghi Thức Độc, Giấc Ngủ Vùi Đất trở thành Xé Độc (gây toàn bộ sát thương chảy máu còn lại của bạn cùng lúc)."
       },
       "gouge": {
         "name": "Thọc Mắt",
@@ -8317,7 +8317,7 @@ export const vi_VN: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Nhịp Cắt Cổ",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Chiêu kết liễu tăng 30% tốc độ đánh cận chiến trong 12 giây cộng thêm 4 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 32 giây)."
       },
       "sprint": {
         "name": "Gót Chân Nhanh",
@@ -8325,17 +8325,17 @@ export const vi_VN: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Đòn Chơi Xấu",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây)."
       },
       "ambush": {
         "name": "Đòn Kẻ Rình Rập",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Xuất chiêu từ trong bóng tối gây 250% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân và từ mọi góc: lần dùng đó không tốn gì, tiêu hết 3 U Ám, kích hoạt Màn Bóng Tối 6 giây, và gây sát thương gấp đôi."
       },
       "stealth": {
         "name": "Màn Chạng Vạng",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.",
+        "specNote_subtlety": "Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3)."
       },
       "adrenaline_rush": {
         "name": "Huyết Tăng Tốc",
@@ -8343,13 +8343,13 @@ export const vi_VN: EnTranslations = {
       },
       "garrote": {
         "name": "Dây Siết Cổ",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Siết dây quanh cổ kẻ địch, gây ngay {damage} sát thương và khiến nó chảy máu {overTime} sát thương trong 18 giây. Phải đang ẩn thân. Nhận 1 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "cheap_shot": {
         "name": "Thụi Bụng",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Nhận 2 điểm liên hoàn.",
+        "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "sap": {
         "name": "Đánh Lén Mê",
@@ -8361,11 +8361,11 @@ export const vi_VN: EnTranslations = {
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Chiêu kết liễu phơi bày mục tiêu trong 30 giây: mỗi điểm liên hoàn tiêu hao giảm giáp của nó 2% (5 điểm liên hoàn: {damage}%)."
       },
       "rupture": {
         "name": "Rỉ Máu Chí Tử",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Chiêu kết liễu gây thương tích cho mục tiêu: nó chảy máu mỗi 2 giây, trong 6 giây cộng thêm 2 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 16 giây và tổng {damage} sát thương)."
       },
       "vanish": {
         "name": "Bước Khói",
@@ -8732,28 +8732,28 @@ export const vi_VN: EnTranslations = {
         "description": "Hủ hóa mục tiêu, gây {damage} sát thương Bóng Tối trong 18 giây."
       },
       "evil_eye": {
-        "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "name": "Ác Nhãn",
+        "description": "Đánh dấu một kẻ địch làm tâm điểm của những lời nguyền của bạn. Di chuyển Ác Nhãn sẽ giữ nguyên Kết Án nhưng không làm mới thời hạn 20 giây của nó."
       },
       "maledict_gaze": {
-        "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "name": "Ánh Nhìn Nguyền",
+        "description": "Mắt Nguyền của bạn tấn công Ác Nhãn chính đã chọn mỗi 2,5 giây bằng sát thương Bóng Tối. Chiếm Hữu Ác Nhãn nhân đôi tốc độ tấn công của nó."
       },
       "needle_of_fate": {
-        "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "name": "Kim Định Mệnh",
+        "description": "Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước."
       },
       "sentence": {
-        "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "name": "Phán Quyết",
+        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
       },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",
         "description": "Chuyển hóa {damage} máu thành {damage} mana."
       },
       "cursed_accomplice": {
-        "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "name": "Đồng Lõa Bị Nguyền",
+        "description": "Liên kết với Mắt Nguyền của bạn khi không có đồng minh nào được chọn, khiến Ánh Nhìn của nó tạo ra 2 Kết Án. Liên kết với một thành viên tổ đội đã chọn khiến chỉ sát thương của người đó lên Ác Nhãn của bạn mới tạo ra 3 thay vào đó. Một liên kết mới sẽ thay thế liên kết trước đó và chỉ có thể kích hoạt một lần mỗi 2 giây."
       },
       "curse_of_agony": {
         "name": "Tà Chú Thống Khổ",
@@ -8764,44 +8764,44 @@ export const vi_VN: EnTranslations = {
         "description": "Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây."
       },
       "litany_of_guilt": {
-        "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "name": "Kinh Cầu Tội Lỗi",
+        "description": "Nguyền rủa Ác Nhãn chính của bạn trong 6 giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác trong bán kính 8 thước, tối đa một lần mỗi giây. Cấp 2 kéo dài hiệu ứng này lên 8 giây và 4 kẻ địch."
       },
       "cinderhide": {
-        "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "name": "Da Than Hồng",
+        "description": "Làm cứng da bạn thành xỉ nguội trong 10 giây, giảm 25% toàn bộ sát thương phải nhận."
       },
       "umbral_anchor": {
-        "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "name": "Neo Bóng Tối",
+        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "Giếng Linh Hồn",
+        "description": "Triệu hồi một Giếng Linh Hồn trong 3 phút. Khi ngoài chiến đấu, thành viên tổ đội có thể nạp lại Đá Linh Hồn của họ tối đa 3 lần. Một Đá Linh Hồn hồi 25% máu tối đa và dùng chung thời gian hồi chiêu với thuốc."
       },
       "hex_of_violence": {
-        "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "name": "Lời Nguyền Bạo Lực",
+        "description": "Bỏ bùa kẻ địch trong 8 giây. 3 hành động gây sát thương tiếp theo của nó sẽ mỗi lần tạo ra 7 Kết Án và quất nó 16 sát thương Bóng Tối."
       },
       "cruel_pact": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "name": "Khế Ước Tàn Nhẫn",
+        "description": "Hy sinh 12% máu tối đa của bạn để hồi 1,5% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn."
       },
       "vicarious_suffering": {
-        "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "name": "Thống Khổ Sẻ Chia",
+        "description": "Liên kết nỗi đau khổ của bạn trong 8 giây và tạo ra tối đa 15 Kết Án từ các đòn tấn công thù địch. Lên chính bạn, giảm 20% sát thương phải nhận. Lên một đồng minh, chuyển hướng tối đa 20% sát thương về bạn mà không đưa máu bạn xuống dưới 15%."
       },
       "possess_evil_eye": {
-        "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Chiếm Hữu Ác Nhãn",
+        "description": "Kẻ Nguyền Rủa chiếm hữu Ác Nhãn chính của bạn trong 15 giây và tạo ra 35 Kết Án. Kim Định Mệnh thi triển trong 1 giây và tạo thêm 2 Kết Án, Nuốt Chửng có thể được dẫn phép khi đang di chuyển, và Phán Quyết gây thêm 25% sát thương và giải phóng một tiếng vọng trễ với 60% sát thương, giảm dần xuống 30% qua các cấp 17-20."
       },
       "hour_of_judgment": {
-        "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "name": "Giờ Phán Xét",
+        "description": "Giáng sự phán xét lên Ác Nhãn chính của bạn trong 15 giây, cấp 40 Kết Án và 3 Sợi Định Mệnh, kích hoạt Chiếm Hữu, nhân đôi Kết Án tạo ra qua Mắt Nguyền chính, và tăng 20% sát thương của Phán Quyết. Phán Quyết đầu tiên hoàn lại 50 Kết Án."
       },
       "coven": {
-        "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "name": "Hội Phù Thủy",
+        "description": "Tạo các Ác Nhãn phụ trên tối đa 4 kẻ địch gần đó trong 15 giây. Chúng nạp vào bể Kết Án chung ở mức 50%, và Phán Quyết vọng đến chúng với 35% sát thương."
       },
       "fear": {
         "name": "Giày Vò",
@@ -8816,13 +8816,13 @@ export const vi_VN: EnTranslations = {
         "description": "Tức thì thiêu đốt mục tiêu bằng bóng tối nung cháy gây {damage} sát thương Bóng Tối."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "Dấu Ấn Diệt Vong",
+        "description": "Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi thi triển lên mục tiêu khác."
       },
       "wrath": {
         "name": "Tia Hoang Dã",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Phóng một tia năng lượng tự nhiên gây {damage} sát thương Thiên Nhiên.",
+        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương."
       },
       "healing_touch": {
         "name": "Hàn Gắn Hoang Dã",
@@ -8834,8 +8834,8 @@ export const vi_VN: EnTranslations = {
       },
       "moonfire": {
         "name": "Bão Tố Nguyệt",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Thiêu đốt kẻ địch bằng lửa trăng gây {damage} sát thương Bí Thuật cộng thêm sát thương theo thời gian.",
+        "specNote_balance": "Giữ nó tiếp tục cháy: Nguyệt Chủng kéo dài thêm 6 giây."
       },
       "moonseed": {
         "name": "Nguyệt Chủng",
@@ -8843,8 +8843,8 @@ export const vi_VN: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Hoa Nở Hoang Dã",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Hồi máu cho mục tiêu {damage} trong 12 giây.",
+        "specNote_restoration": "Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5). Ở 5 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai."
       },
       "thorns": {
         "name": "Bụi Gai Hộ Thân",
@@ -8860,8 +8860,8 @@ export const vi_VN: EnTranslations = {
       },
       "maul": {
         "name": "Nghiền Xương",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Một đòn tấn công nghiền nát làm tăng sát thương cận chiến thêm {damage} và gây lượng thù hận lớn. Kích hoạt ở đòn đánh kế tiếp của bạn. Chỉ dùng được ở Hình Bruin.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
       },
       "growl": {
         "name": "Hăm Dọa",
@@ -8873,23 +8873,23 @@ export const vi_VN: EnTranslations = {
       },
       "claw": {
         "name": "Vuốt Cào",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "regrowth": {
         "name": "Nở Hoa Lần Hai",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 21 giây.",
+        "specNote_restoration": "Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5)."
       },
       "barkskin": {
         "name": "Da Sồi",
@@ -8905,8 +8905,8 @@ export const vi_VN: EnTranslations = {
       },
       "starfire": {
         "name": "Thiên Giáng",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Triệu gọi một tia lửa sao, gây {damage} sát thương Bí Thuật.",
+        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, nút này trở thành Vệt Dương: một đòn đánh tức thời gây 80 đến 100 sát thương Thiên Nhiên cộng thêm 45 sát thương thiêu đốt trong 9 giây, hồi 35 mana và tiêu hết cả 3."
       },
       "travel_form": {
         "name": "Hình Thần Tốc",
@@ -8922,7 +8922,7 @@ export const vi_VN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ánh Ma Trơi",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Giảm giáp của mục tiêu {damage}% trong 40 giây."
       },
       "hibernate": {
         "name": "Giấc Ngủ Sâu",
@@ -8946,8 +8946,8 @@ export const vi_VN: EnTranslations = {
       },
       "rip": {
         "name": "Xé Rách",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Chiêu kết liễu khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 36 sát thương cộng thêm 24 mỗi điểm liên hoàn tiêu hao (5 điểm liên hoàn: tổng {damage}). Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",
@@ -8998,8 +8998,8 @@ export const vi_VN: EnTranslations = {
         "description": "Giải phóng phù phép đang hoạt động trên vũ khí của bạn. Dấu Hỏa gây 54 đến 64 sát thương Lửa, nhận 30% sức mạnh phép thuật và ban 2 Sấm. Tâm Phong đánh bằng vũ khí của bạn, đẩy Nhịp Chiến Hồn tiến lên và ban 20% tốc đánh trong 6 giây. Thạch Phọc đánh gây 75% sát thương vũ khí, buộc mục tiêu tấn công bạn và giảm 20% sát thương phải chịu trong 4 giây. Suối Sinh tiêu Dòng Chữa Lành của bạn, hồi 125% lượng hồi còn lại và giảm đòn đánh kế tiếp trong 8 giây đi 50% lượng máu đã hồi."
       },
       "elemental_trance": {
-        "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "name": "Xuất Thần Nguyên Tố",
+        "description": "Bước vào trạng thái xuất thần nguyên tố trong 15 giây, giảm 30% sát thương phải nhận và chuyển hóa 20% toàn bộ sát thương bạn gây ra thành mana. (động cơ Warspirit)"
       },
       "primal_exaltation": {
         "name": "Tôn Vinh Nguyên Thủy",
@@ -9014,60 +9014,60 @@ export const vi_VN: EnTranslations = {
         "description": "Hồi máu cho một mục tiêu đồng minh {damage}. Lượng hồi tăng theo sức mạnh phép thuật. Cộng toàn bộ lượng hồi trước phần hồi thừa vào Dòng Chữa Lành, tối đa 30% lượng máu tối đa của mục tiêu."
       },
       "soul_harvest": {
-        "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "name": "Gặt Tinh Chất",
+        "description": "Xé rách linh hồn kẻ địch gây {damage} sát thương Bóng Tối và tạo 1 Mảnh Linh Hồn, tối đa 5."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "Thương Linh Hồn",
+        "description": "Phóng một ngọn giáo ma quái gây {damage} sát thương Bóng Tối. Khi nhắm vào Dấu Ấn Cốt Táng của bạn, 50% sát thương của nó được cộng thêm vào dấu ấn."
       },
       "raise_graveguard": {
-        "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "name": "Triệu Hồi Vệ Mộ",
+        "description": "Triệu hồi một người bạn đồng hành phòng thủ vĩnh viễn. Vệ Mộ tự động khiêu khích, chặn 20% sát thương của bạn qua Quân Đoàn Mộ Địa, và Mệnh Lệnh Gặt Hái khiến nó khiêu khích và nhận ít hơn 30% sát thương trong 4 giây."
       },
       "raise_skeletal_warrior": {
-        "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "name": "Triệu Hồi Chiến Binh Xương",
+        "description": "Tiêu hao 1 Mảnh Linh Hồn để thêm một Chiến Binh Xương thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Nó chém lan sang kẻ địch gần đó gây 45% sát thương mỗi 6 giây, và Mệnh Lệnh Gặt Hái ghim mục tiêu của nó bằng hiệu ứng làm chậm 40% trong 4 giây."
       },
       "raise_bone_mage": {
-        "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "name": "Triệu Hồi Pháp Sư Xương",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để thêm một Pháp Sư Xương tầm xa thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Các đòn tấn công của nó khiến mục tiêu nhận thêm 5% sát thương phép trong 6 giây, và Mệnh Lệnh Gặt Hái nâng điểm yếu đó lên 8%."
       },
       "bone_armor": {
-        "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "name": "Giáp Xương",
+        "description": "Bọc quanh bạn một lớp xương, hấp thụ sát thương bằng 20% máu tối đa của bạn."
       },
       "corpse_explosion": {
-        "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "name": "Nổ Xác",
+        "description": "Hy sinh một Pháp Sư Xương trước tiên, sau đó đến một Chiến Binh Xương, và chỉ hy sinh một Cánh Mộ như phương án cuối cùng. Trong số các bản trùng lặp, nó chọn con có thời lượng còn lại thấp nhất, rồi đến con yếu nhất, để gây {damage} sát thương Bóng Tối tại vị trí đã chọn."
       },
       "funeral_harvest": {
-        "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "name": "Thu Hoạch Tang Lễ",
+        "description": "Khi một kẻ địch vừa bị bạn hoặc thuộc hạ Bất Tử của bạn gây sát thương chết đi, bạn nhận 1 Mảnh Linh Hồn. Điều này có thể xảy ra một lần mỗi 3 giây."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "Dấu Ấn Cốt Táng",
+        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
       },
       "unholy_command": {
-        "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "name": "Mệnh Lệnh Tà Ác",
+        "description": "Tiêu hao 3 Mảnh Linh Hồn để ra lệnh cho toàn bộ thuộc hạ Bất Tử của bạn gây thêm 25% sát thương và hành động nhanh hơn 20% trong 12 giây."
       },
       "reaping_command": {
-        "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "name": "Mệnh Lệnh Gặt Hái",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng."
       },
       "sacrifice_undead": {
-        "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "name": "Hiến Tế Bất Tử",
+        "description": "Hủy diệt một thuộc hạ trong Quân Đoàn để hồi 25% máu tối đa của bạn."
       },
       "raise_gravewing": {
-        "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "name": "Triệu Hồi Cánh Mộ",
+        "description": "Tiêu hao 2 Mảnh Linh Hồn để thêm một Cánh Mộ thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Nó chém lan sang kẻ địch gần đó gây 65% sát thương mỗi 5 giây, và Mệnh Lệnh Gặt Hái khiến mọi kẻ địch bị đánh trúng nhận thêm 8% sát thương trong 5 giây."
       },
       "army_of_the_dead": {
-        "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "name": "Binh Đoàn Tử Thần",
+        "description": "Xé mở một cổng mộ để triệu hồi tạm thời một Chiến Binh Xương, một Pháp Sư Xương, và một Cánh Mộ trong 20 giây, lấp đầy những vị trí trống trong Quân Đoàn thường trực của bạn."
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -9107,15 +9107,15 @@ export const vi_VN: EnTranslations = {
       },
       "cold_blood": {
         "name": "Máu Lạnh",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Tập trung sát ý để đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)"
       },
       "blade_flurry": {
         "name": "Loạn Đao",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Tung ra một loạt đao, tăng tốc độ đánh 20% trong 12 giây. (động cơ Thuggery)"
       },
       "hemorrhage": {
         "name": "Xuất Huyết",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng thêm {damage}, gây sát thương chảy máu trong 12 giây, và tăng 40% sát thương chảy máu mà nó phải nhận. Nhận 1 điểm liên hoàn. Cứ sau 2 lần dùng thì thêm 1 U Ám (tối đa 3). (động cơ Skulduggery)"
       },
       "power_infusion": {
         "name": "Truyền Sức Mạnh",
@@ -9151,7 +9151,7 @@ export const vi_VN: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Gieo Hoa Nở Hoang Dã và Nở Hoa Lần Hai sẽ thêm Sắc Xanh; ở 5 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)"
       },
       "moonlash": {
         "name": "Nguyệt Trào",
@@ -9350,16 +9350,16 @@ export const vi_VN: EnTranslations = {
         "description": "Phóng sét vào khu vực mục tiêu, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Shaman)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "Vết Nứt Vực Thẳm",
+        "description": "Xé toạc một vết nứt tại vị trí đã chọn, kéo kẻ địch trong bán kính 8 thước về tâm của nó, gây {damage} sát thương Bóng Tối, và làm choáng chúng trong 2 giây. Trùm vẫn nhận sát thương nhưng kháng lại lực kéo và hiệu ứng choáng."
       },
       "chaos_bolt": {
         "name": "Tia Hủy Diệt",
         "description": "Phóng một luồng lửa hỗn loạn gây {damage} sát thương Lửa. (thiên phú Warlock)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "Giao Ước Huyết Sắc",
+        "description": "Hy sinh 10% máu hiện tại của bạn để hấp thụ sát thương bằng 30% máu tối đa trong 8 giây."
       },
       "cloak_of_shadows": {
         "name": "Áo Choàng Bóng",
@@ -9415,7 +9415,7 @@ export const vi_VN: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Đòn Ma Ảnh",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng thêm {damage} và tăng 15% tỉ lệ né đòn của bạn trong 7 giây. Nhận 1 điểm liên hoàn. (thiên phú Đạo Tặc)"
       },
       "hammer_of_wrath": {
         "name": "Búa Ngân Chuông",
@@ -9550,8 +9550,8 @@ export const vi_VN: EnTranslations = {
         "description": "Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "Cuộc Hành Quân Phạm Thượng",
+        "description": "Tăng 35% tốc độ di chuyển, nhưng hy sinh 2% máu tối đa của bạn mỗi giây. Thi triển lại để hủy. Tự động tắt khi máu ở mức 20%."
       },
       "spellsteal": {
         "name": "Đánh Cắp Phép",
@@ -9580,7 +9580,7 @@ export const vi_VN: EnTranslations = {
       "venom_dart": {
         "name": "Phi Tiêu Độc",
         "description": "Búng một phi tiêu tẩm độc gây {damage} sát thương tự nhiên. Cho 1 điểm liên hoàn. Knifework: kéo dài vết thương Xé Độc của bạn thêm 6 giây, tối đa 20 giây.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Thêm 1 Nghi Thức Độc và kéo dài vết thương độc của bạn thêm 6 giây (vết thương không bao giờ vượt quá 20 giây)."
       },
       "body_blow": {
         "name": "Đòn Thân",
@@ -9644,8 +9644,8 @@ export const vi_VN: EnTranslations = {
       },
       "rake": {
         "name": "Lóc Xé",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 18 giây. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "revive_pet": {
         "name": "Băng Bó",
@@ -11163,16 +11163,16 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Nanh Băng Giá"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Mũi Tủy Xương"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Thì Thầm Chạng Vạng"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Dao Nhọn Xương Kính"
       },
       "moggers_hide_quiver": {
         "name": "Ống Tên Da Của Mogger"
@@ -11202,7 +11202,7 @@ export const vi_VN: EnTranslations = {
         "name": "Bánh Đại Tiệc Được Tạo Phép"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Đá Linh Hồn"
       },
       "bristleback_maul": {
         "name": "Búa Gallowglass"
@@ -12665,16 +12665,16 @@ export const vi_VN: EnTranslations = {
         "name": "Nguyên Tố Nước"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Vệ Mộ"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Chiến Binh Xương"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Pháp Sư Xương"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Cánh Mộ"
       }
     },
     "npcs": {

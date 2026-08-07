@@ -334,7 +334,7 @@ export const zh_TW: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "靈魂碎片",
-      "ruinMeter": "Ruin",
+      "ruinMeter": "毀滅",
       "ruinStatus": "毀滅 {value}/{max}"
     },
     "spectate": {
@@ -2113,7 +2113,7 @@ export const zh_TW: EnTranslations = {
       "formFireball": "火球形態：移動速度提高 {pct}%；無法攻擊或施法",
       "formMoonkin": "月翼形態：法術傷害提高 {pct}%，護甲提高 {armorPct}%",
       "formShadow": "幽幕形態：暗影傷害提高 {pct}%",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value}/{max}",
       "formLich": "靈魂長槍還會對附近最多 {targets} 個敵人造成 {pct}% 傷害",
       "afflictionEye": "惡咒凝視每 {interval} 秒攻擊一次；此邪眼上的效果產生 {pct}% 的定罪值",
       "afflictionEyeSecondary": "此邪眼上的效果產生 {doomPct}% 的定罪值；宣判在此迴響並造成 {echoPct}% 傷害",
@@ -7557,7 +7557,7 @@ export const zh_TW: EnTranslations = {
     "tooltip": {
       "rank": "等級 {rank}",
       "cost": "{cost} 點{resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} 點毀滅",
       "range": "{range} 碼範圍",
       "rangeWithMin": "{min}-{max} 碼範圍",
       "instant": "瞬發",
@@ -8517,7 +8517,7 @@ export const zh_TW: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守護",
-        "description": "一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。"
+        "description": "神聖結界吸收最大生命值的{damage}%傷害，持續{duration}秒。持久守護會提高結界吸收量。"
       },
       "hammer_of_justice": {
         "name": "裂碎法槌",
@@ -8565,7 +8565,7 @@ export const zh_TW: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
+        "description": "以神聖能量環繞你和隊伍成員，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響的盟友普通攻擊額外造成{buff}點神聖傷害。替換你自己的壁壘堅定。另一名聖騎士施放報償光環時將刷新而非疊加。"
       },
       "tame_beast": {
         "name": "野性繫絆",
@@ -8625,7 +8625,7 @@ export const zh_TW: EnTranslations = {
       },
       "rapid_fire": {
         "name": "狂熱連射",
-        "description": "使你的攻擊速度提高 40%，持續 15 秒。"
+        "description": "在2.4秒內射出6發箭矢，期間可以移動。每發造成{damage}點物理傷害，並隨遠程攻擊強度提高。"
       },
       "smite": {
         "name": "懲擊",
@@ -8732,7 +8732,7 @@ export const zh_TW: EnTranslations = {
         "description": "腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。"
       },
       "evil_eye": {
-        "name": "Evil Eye",
+        "name": "邪眼",
         "description": "將一名敵人標記為詛咒焦點。移動邪眼會保留譴罪，但不會刷新其20秒的持續時間。"
       },
       "maledict_gaze": {
@@ -8975,7 +8975,7 @@ export const zh_TW: EnTranslations = {
       },
       "chain_heal": {
         "name": "治療鏈",
-        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）"
+        "description": "治療一個友方目標{damage}點，隨後跳躍至多2名12碼內的盟友，每次跳躍治療量為上一目標的50%。每名被跳躍到的盟友會消耗你剩餘的治癒湧流，並立即治療其消耗量的125%。初始治療量隨法術強度提高。（恢復專精招牌）"
       },
       "galeheart_weapon": {
         "name": "風心武器",
@@ -9079,7 +9079,7 @@ export const zh_TW: EnTranslations = {
       },
       "holy_shield": {
         "name": "神聖之盾",
-        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
+        "description": "獲得30%格擋，並獲得一層吸收護盾，吸收量為最大生命值的{damage}%，持續{duration}秒，同時釋放一股威脅脈衝。神聖昇華會強化並延長這層防禦。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",
@@ -9387,7 +9387,7 @@ export const zh_TW: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後祈禱",
-        "description": "立即為你恢復{damage}點生命值。（牧師天賦）"
+        "description": "立即為自己治療最大生命值的30%。"
       },
       "deterrence": {
         "name": "鬃刺守衛",
@@ -11163,16 +11163,16 @@ export const zh_TW: EnTranslations = {
         "name": "龍喉迅猛龍的韁繩"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "霜牙"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "穿髓尖刃"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "黃昏低語"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "骨璃小刀"
       },
       "moggers_hide_quiver": {
         "name": "莫格的獸皮箭袋"

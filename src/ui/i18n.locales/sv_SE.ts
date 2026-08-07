@@ -11920,4 +11920,338 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': 'Vattenkrusningar (kölvatten)',
   'hudChrome.breath.label': 'Andning',
   'hudChrome.breath.drowning': 'Drunknar!',
+  'abilityUi.tooltip.requiresStealth': 'Kräver att du är dold',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Kräver att du är dold (behövs inte vid 3 Skymningsförråd eller under Skuggslöjan)',
+  'abilityUi.tooltip.ruinCost': '{cost} Ruin',
+  'entities.abilities.abyssal_rift.description':
+    'River upp en reva på den valda platsen, drar fiender inom 8 meter till dess mitt, vållar {damage} skuggskada och bedövar dem i 2 sek. Bossar tar skada men motstår dragningen och bedövningen.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Slå till från skuggorna för 250% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold och från valfri vinkel: den användningen kostar inget, förbrukar alla 3 Skymningsförråd, startar den 6 sekunder långa Skuggslöjan och slår dubbelt så hårt.',
+  'entities.abilities.army_of_the_dead.description':
+    'River upp en gravportal för att väcka upp en tillfällig Skeletal Warrior, Bone Mage och Gravewing i 20 sek, vilket fyller de platser dina stående Herravälde-tjänare lämnar tomma.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Driv din dolk in i målets rygg för 150% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Varje slag lägger till 1 Giftritual (max 6) och återställer 15 energi. Vid 6 Giftritual blir Sista vilan till Giftrivning (den detonerar dina blödningars återstående skada på en gång).',
+  'entities.abilities.blade_flurry.description':
+    'Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 12 sek. (Thuggery-motorn)',
+  'entities.abilities.bone_armor.description':
+    'Sveper dig i ben och absorberar skada motsvarande 20% av din maximala hälsa.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan.',
+  'entities.abilities.cinderhide.description':
+    'Härdar din hud till svalnande slagg i 10 sek, vilket minskar all mottagen skada med 25%.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Vargform.',
+  'entities.abilities.claw.specNote_feral':
+    'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
+  'entities.abilities.cold_blood.description':
+    'Fokuserar ditt dödliga uppsåt så att din nästa attack blir en kritisk träff. (Knifework-motorn)',
+  'entities.abilities.corpse_explosion.description':
+    'Offrar först en Bone Mage, sedan en Skeletal Warrior, och en Gravewing endast som sista utväg. Bland dubbletter väljs den med kortast återstående varaktighet, sedan den svagaste, för att vålla {damage} skuggskada på den valda platsen.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Skapar sekundära Evil Eyes på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Sentence ekar till dem för 35% skada.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Länkar ditt Maledict Eye när ingen allierad är vald, vilket får dess Gaze att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt Evil Eye genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Offrar 10% av din nuvarande hälsa för att absorbera skada motsvarande 30% av din maximala hälsa i 8 sek.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Gå in i en elementär trans i 15 sek, vilket minskar mottagen skada med 30% och omvandlar 20% av all skada du vållar till mana. (Warspirit-motorn)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Märker en fiende som fokus för dina förbannelser. Att flytta Evil Eye bevarar Fördömelse men förnyar inte dess 20 sekunders utgång.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Avslutande drag som orsakar {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (45 plus 35 per kombopoäng, som slår 25% hårdare för varje uppbyggd Röd linje, återställer 25 energi). Förbruka den innan Röd linje tar slut.',
+  'entities.abilities.expose_armor.description':
+    'Avslutande drag som exponerar målet i 30 sek: varje förbrukat kombopoäng minskar dess rustning med 2% (5 kombopoäng: {damage}%).',
+  'entities.abilities.faerie_fire.description': 'Minskar målets rustning med {damage}% i 40 sek.',
+  'entities.abilities.ferocious_bite.description':
+    'Avslutande drag som orsakar {damage}. Endast i Vargform.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd: ett bett för 70 plus 43 per kombopoäng som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer 30 energi.',
+  'entities.abilities.funeral_harvest.description':
+    'När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Slinga en vajer runt fiendens strupe, vilket orsakar {damage} skada nu och blödning för {overTime} under 18 sek. Du måste vara dold. Ger 1 kombopoäng.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan.',
+  'entities.abilities.ghostly_strike.description':
+    'Slår fienden för vapenskada plus {damage} och ökar din chans att väja med 15% i 7 sek. Ger 1 kombopoäng. (skurktalang)',
+  'entities.abilities.hemorrhage.description':
+    'Slår fienden för vapenskada plus {damage}, orsakar blödningsskada under 12 sek och ökar mottagen blödningsskada med 40%. Ger 1 kombopoäng. Var 2:a användning lägger till 1 Skymningsförråd (max 3). (Skulduggery-motorn)',
+  'entities.abilities.hex_of_violence.description':
+    'Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 16 skuggskada.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Kallar fram dom över ditt primära Evil Eye i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Possession, fördubblar Fördömelse genererad genom det primära Eye, och ökar Sentence-skada med 20%. Den första Sentence återbetalar 50 Fördömelse.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek).',
+  'entities.abilities.litany_of_guilt.description':
+    'Förbannar ditt primära Evil Eye i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 meter, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Ditt Maledict Eye attackerar ditt valda primära Evil Eye var 2,5:e sek för skuggskada. Possess the Evil Eye fördubblar dess attackhastighet.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.',
+  'entities.abilities.maul.specNote_feral':
+    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa och återbetalar 15 raseri.',
+  'entities.abilities.moonfire.description':
+    'Bränner fienden med Månstorm för {damage} arkan skada plus skada över tid.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Håll den brinnande: Månfrö förlänger den med 6 sek.',
+  'entities.abilities.needle_of_fate.description':
+    'Genomborrar fienden för {damage} skuggskada och genererar 5 Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'Maledictorn tar över ditt primära Evil Eye i 15 sek och genererar 35 Fördömelse. Needle of Fate kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Sentence gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Förbrukar 2 Själfragment för att lägga till en beständig Bone Mage på avstånd i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Dess attacker exponerar målet för 5% mer magisk skada i 6 sek, och Reaping Command höjer den svagheten till 8%.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Väcker upp en permanent defensiv följeslagare. Graveguard hånar automatiskt, avleder 20% av din skada genom Gravherravälde, och Reaping Command får den att håna och ta 30% mindre skada i 4 sek.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Förbrukar 2 Själfragment för att lägga till en beständig Gravewing i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 65% skada var 5:e sek, och Reaping Command gör att varje träffad fiende tar 8% mer skada i 5 sek.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Förbrukar 1 Själfragment för att lägga till en beständig Skeletal Warrior i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 45% skada var 6:e sek, och Reaping Command förlångsammar dess mål med 40% i 4 sek.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Vargform.',
+  'entities.abilities.rake.specNote_feral':
+    'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
+  'entities.abilities.reaping_command.description':
+    'Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravewing sliter i alla träffade fiender.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Att plantera en NY blomning lägger till 1 Grönska (max 5).',
+  'entities.abilities.rejuvenation.description': 'Läker målet för {damage} under 12 sek.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning.',
+  'entities.abilities.rip.description':
+    'Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Vargform.',
+  'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Avslutande drag som sårar målet: det blöder var 2:e sek, i 6 sek plus 2 sek per kombopoäng (5 kombopoäng: 16 sek och {damage} total skada).',
+  'entities.abilities.sacrifice_undead.description':
+    'Förstör en tjänare från ditt Herravälde för att återställa 25% av din maximala hälsa.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description':
+    'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',
+  'entities.abilities.sinister_strike.specNote_assassination': 'Lägger till 1 Giftritual (max 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Medan Röd linje är aktiv blir denna knapp Kroppsslag: 130% vapenskada plus 10, ger 2 kombopoäng och lägger till 1 Röd linje (max 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Avslutande drag som ökar närstridens attackhastighet med 30% i 12 sek plus 4 sek per kombopoäng (5 kombopoäng: 32 sek).',
+  'entities.abilities.soul_harvest.description':
+    'River i fiendens själ för {damage} skuggskada och skapar 1 Själfragment, upp till 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Kastar en spöklik lans för {damage} skuggskada. Mot ditt Ossuary Mark läggs 50% av dess skada till märket.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Frammanar en Soulwell i 3 min. Utanför strid kan gruppmedlemmar fylla på sina Själstenar upp till 3. En Själsten återställer 25% av maximal hälsa och delar nedkylning med drycker.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Kallar ner en stråle av stjärneld, vilket orsakar {damage} arkan skada.',
+  'entities.abilities.starfire.specNote_balance':
+    'I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart slag som ger 80 till 100 naturskada plus en brännskada på 45 under 9 sek, återställer 35 mana och förbrukar alla 3.',
+  'entities.abilities.stealth.description':
+    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50% långsammare. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3).',
+  'entities.abilities.swiftmend.description':
+    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)',
+  'entities.abilities.swipe.description':
+    'Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
+  'entities.abilities.swipe.specNote_feral':
+    'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Lägger till 1 Giftritual och förlänger ditt Giftrivning-sår med 6 sek (såret går aldrig över 20 sek).',
+  'entities.abilities.vicarious_suffering.description':
+    'Länkar ditt lidande i 8 sek och genererar upp till 15 Fördömelse från fientliga träffar. På dig själv minskar den mottagen skada med 20%. På en allierad omdirigerar den upp till 20% till dig utan att ta dig under 15% hälsa.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description':
+    'Slungar en stråle av naturenergi för {damage} naturskada.',
+  'entities.abilities.wrath.specNote_balance':
+    'I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir Månfrö Månsvall och Himlafall Solspår.',
+  'entities.items.boneglass_shiv.name': 'Benglasdolk',
+  'entities.items.duskwhisper.name': 'Skymningsviskning',
+  'entities.items.marrowpoint.name': 'Märgspets',
+  'entities.items.rimefang.name': 'Rimtand',
+  'entities.items.soul_stone.name': 'Själsten',
+  'entities.mobs.graveguard.name': 'Graveguard',
+  'entities.mobs.necromancy_bone_mage.name': 'Bone Mage',
+  'entities.mobs.necromancy_gravewing.name': 'Gravewing',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletal Warrior',
+  'guide.abilityHook.evil_eye': 'Namnger fienden vars handlingar och lidande föder din Fördömelse.',
+  'hud.pet.abyssalChain': 'Abyssal Chain',
+  'hud.pet.abyssalChainDesc':
+    'Befall Gloomshade att dra en normal fiende mer än 8 och upp till 20 meter tillbaka till sig själv. Bossar kan inte dras. 15 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.',
+  'hud.pet.abyssalChainTitle': 'Abyssal Chain',
+  'hud.pet.autocastOff':
+    'Auto-kasta av. Högerklicka, tryck och håll, eller tryck Shift+Enter för att slå på det.',
+  'hud.pet.autocastOn':
+    'Auto-kasta på. Högerklicka, tryck och håll, eller tryck Shift+Enter för att stänga av det.',
+  'hud.pet.felbolt': 'Felbolt',
+  'hud.pet.felboltDesc':
+    'Befall Emberkin att avfyra en extra demonisk projektil mot ditt mål. 8 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.',
+  'hud.pet.felboltTitle': 'Felbolt',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Kvalificerande skada ger {value} Fördömelse, högst en gång var {interval}:e sek',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze attackerar var {interval}:e sek; effekter vid detta Evil Eye genererar {pct}% Fördömelse',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Effekter vid detta Evil Eye genererar {doomPct}% Fördömelse; Sentence ekar hit för {echoPct}% skada',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Ödestrådar: Sentence gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Primära Evil Eye genererar {eyePct}% mer Fördömelse; Sentence gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Fördömelse-vinster vållar {damage} skuggskada till upp till {targets} fiender inom {radius} m, en gång per sekund',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Förstärker Needle of Fate, Förtär, Maledict Gaze och Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse',
+  'hudChrome.auraEffect.afflictionViolence':
+    '{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka',
+  'hudChrome.auraEffect.aoeEcho':
+    '{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Arkanladdningar: Etersvall gör {damagePct}% mer skada, kastas {castPct}% snabbare och kostar {costMult}x mana',
+  'hudChrome.auraEffect.bleedVuln': 'Ökar mottagen blödningsskada med {pct}%',
+  'hudChrome.auraEffect.brainFreeze':
+    'Din nästa Vinterpiska är omedelbar och ignorerar sin nedkylning',
+  'hudChrome.auraEffect.castShield': 'Kastningar kan inte avbrytas eller få pushback av skada',
+  'hudChrome.auraEffect.cauterizeFatigue': 'Bränning kan inte förhindra ännu ett dödligt slag',
+  'hudChrome.auraEffect.cooldownCap':
+    '{used} av {cap} sek nedkylningsreduktion använd i detta fönster',
+  'hudChrome.auraEffect.desolation':
+    '{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart',
+  'hudChrome.auraEffect.duskfireClaim': 'Döden ger {value} Ruin',
+  'hudChrome.auraEffect.elementalTrance':
+    'Mottagen skada minskad med {pct}%. {mana}% av all skada du vållar omvandlas till mana',
+  'hudChrome.auraEffect.energyRegen': 'Ökar energiregenereringen med {pct}%',
+  'hudChrome.auraEffect.enrage':
+    'Vållad skada ökad med {damagePct}%, attackhastighet med {hastePct}% och förflyttningshastighet med {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '{charges} laddningar: Islans behandlar sitt mål som fryst och vållar {pct}% frusen skada',
+  'hudChrome.auraEffect.forbiddenReflectionLock': 'Förbjuden spegling kan inte förberedas igen än',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Din nästa kvalificerade häxmästarförmåga kan kastas igen',
+  'hudChrome.auraEffect.formLich':
+    'Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada',
+  'hudChrome.auraEffect.formMetamorph':
+    'Demonform: kroppsstorlek ökad med {pct}%; övriga bonusar hanteras av separata buffar',
+  'hudChrome.auraEffect.formMoonkin':
+    'Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%',
+  'hudChrome.auraEffect.formShadow': 'Dunkelslöja: skuggskada ökad med {pct}%',
+  'hudChrome.auraEffect.freeExecute': 'Din nästa kvalificerade avrättningsförmåga kostar ingenting',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Funeral Harvest kan inte skapa ännu ett Själfragment än',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Att fullborda {steps}-slags Krigsandens kadens ekar slaget {count} gånger för {pct}% av dess skada som naturskada',
+  'hudChrome.auraEffect.healEcho': 'Att falla under {threshold}% hälsa återställer {value} hälsa',
+  'hudChrome.auraEffect.icicles': '{value} av {max} Istappar; vid {max} kan Glaciärtagg kastas',
+  'hudChrome.auraEffect.internalCooldown':
+    'Denna effekt kan inte utlösas igen förrän timern löper ut',
+  'hudChrome.auraEffect.leadenHexLock': 'Blytung förbannelse kan inte rota fast detta mål igen än',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Föråldrat Dödseko; ingen nuvarande förmåga förbrukar det',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Döden kan skapa 1 Själfragment',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Lagrar {storedPct}% av din och dina odödas skada, plus {lancePct}% av Soul Lance-skada; kasta igen för att detonera. Döden exploderar inom {radius} m och skapar 1 Själfragment',
+  'hudChrome.auraEffect.nextAttackCrit': 'Din nästa attack blir garanterat en kritisk träff',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} laddningar: ditt nästa Stympande hugg vållar {pct}% mer skada',
+  'hudChrome.auraEffect.perfectMoment': 'Eterpilar förbrukar inte Arkanladdningar',
+  'hudChrome.auraEffect.petDamage': 'Ökar ditt husdjurs skada med {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Ökar ditt husdjurs handlingshastighet med {pct}%',
+  'hudChrome.auraEffect.physicalReduction': 'Minskar mottagen fysisk skada med {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Genererar {ruin} Ruin var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek',
+  'hudChrome.auraEffect.resourceCount': '{value} av {max}',
+  'hudChrome.auraEffect.resourceSap':
+    'Återställer {value} av din nuvarande resurs var {interval}:e sek',
+  'hudChrome.auraEffect.ruinousBrand':
+    '{charges} kopior återstår: direkta besvärjelser kopierar {otherPct}% skada hit, eller {selfPct}% när detta är deras mål',
+  'hudChrome.auraEffect.sated': 'Kan inte dra nytta av ännu en grupphastighetsvåg',
+  'hudChrome.auraEffect.sourceVuln': 'Tar {pct}% mer skada från den som orsakade den här effekten',
+  'hudChrome.auraEffect.spellDamage': 'Ökar besvärjelseskada med {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Ökar besvärjelsehastighet med {pct}%',
+  'hudChrome.auraEffect.stasis': 'Immun och oförmögen att handla',
+  'hudChrome.auraEffect.suddenDeath':
+    'Din nästa Tidig grav kostar inget raseri och ignorerar sitt hälsokrav',
+  'hudChrome.auraEffect.sureCrit':
+    '{charges} kastningar av skadeförmågor är garanterat kritiska träffar',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Enmålsslag träffar även {targets} närliggande fiende för {pct}% skada',
+  'hudChrome.auraEffect.temporalEcho':
+    'Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Kasta igen inom {range} m för att återvända hit och förbruka ankaret',
+  'hudChrome.auraEffect.wintersChill':
+    '{charges} laddningar: kompatibla besvärjelser behandlar detta mål som fryst',
+  'hudChrome.procOverlay.ruinMeter': 'Ruin',
+  'hudChrome.procOverlay.ruinStatus': '{value} av {max} Ruin',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Själfragment',
+  'hudChrome.warlock.doomEmptyStatus': '{value} av {max} Fördömelse.',
+  'hudChrome.warlock.doomLabel': 'Fördömelse',
+  'hudChrome.warlock.doomMeterLock': 'Lås resurspanelen för Vånda',
+  'hudChrome.warlock.doomMeterUnlock': 'Flytta resurspanelen för Vånda',
+  'hudChrome.warlock.doomStatus': '{value} av {max} Fördömelse; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.',
+  'hudChrome.warlock.fateThreadsLabel': 'Ödestrådar',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Tre Ödestrådar: Sentence kan förbruka dem för 18% ökad skada.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} av {max} Ödestrådar.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.',
 };

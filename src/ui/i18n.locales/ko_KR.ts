@@ -2954,7 +2954,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '신중하게 시위를 당긴 사격으로 {damage}의 피해를 입힙니다.',
   'entities.abilities.rapid_fire.name': '열광의 연사',
-  'entities.abilities.rapid_fire.description': '15초 동안 공격 속도가 40%만큼 증가합니다.',
+  'entities.abilities.rapid_fire.description': '이동하면서 2.4초에 걸쳐 6발을 발사합니다. 발당 {damage}의 물리 피해를 입히며 원거리 전투력에 따라 증가합니다.',
   'entities.abilities.smite.name': '성스러운 일격',
   'entities.abilities.smite.description': '적에게 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.lesser_heal.name': '속삭이는 기도',
@@ -2991,8 +2991,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.chain_heal.name': '연쇄 치유',
-  'entities.abilities.chain_heal.description':
-    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)',
+  'entities.abilities.chain_heal.description': '아군 대상 하나를 {damage}만큼 치유한 뒤, 12야드 내 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 이전 대상의 50%만큼 치유합니다. 연쇄된 아군은 남아 있는 치유의 흐름을 소모하고 소모량의 125%만큼 즉시 치유받습니다. 최초 치유량은 주문력에 따라 증가합니다. (복원 전문화)',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -3184,8 +3183,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
   'entities.abilities.holy_shield.name': '신성한 방패',
-  'entities.abilities.holy_shield.description':
-    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+  'entities.abilities.holy_shield.description': '30% 막기와 함께 최대 생명력의 {damage}%를 흡수하는 보호막을 {duration}초 동안 얻고, 위협 파동을 방출합니다. 신성한 승천이 이 방어를 강화하고 연장합니다.',
   'entities.abilities.bestial_wrath.name': '야수의 격노',
   'entities.abilities.bestial_wrath.description':
     '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
@@ -12069,4 +12067,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '운명의 실타래 {value}/{max}.',
   'itemUi.tooltip.useHealingPotionPct':
     '사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.',
+  'abilityUi.tooltip.ruinCost': '파멸 {cost}',
+  'entities.abilities.evil_eye.name': '사안',
+  'entities.items.boneglass_shiv.name': '뼈유리 단도',
+  'entities.items.duskwhisper.name': '황혼의 속삭임',
+  'entities.items.marrowpoint.name': '골수 송곳',
+  'entities.items.rimefang.name': '서리엄니',
+  'hudChrome.auraEffect.resourceCount': '{value}/{max}',
+  'hudChrome.procOverlay.ruinMeter': '파멸',
 };

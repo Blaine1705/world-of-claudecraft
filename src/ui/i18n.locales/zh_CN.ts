@@ -2793,8 +2793,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
-  'entities.abilities.divine_protection.description':
-    '一道守护结界吸收 {damage} 点伤害，持续 10 秒。',
+  'entities.abilities.divine_protection.description': '神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
   'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
@@ -2815,8 +2814,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
   'entities.abilities.retribution_aura.name': '报偿光环',
-  'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
+  'entities.abilities.retribution_aura.description': '以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',
@@ -2850,7 +2848,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description': '使你的攻击速度提高 40%，持续 15 秒。',
+  'entities.abilities.rapid_fire.description': '在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。',
   'entities.abilities.smite.name': '惩击',
   'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
@@ -2881,8 +2879,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.chain_heal.name': '治疗链',
-  'entities.abilities.chain_heal.description':
-    '大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）',
+  'entities.abilities.chain_heal.description': '治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）',
   'entities.abilities.earth_shock.name': '大地震击',
   'entities.abilities.earth_shock.description':
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
@@ -3061,8 +3058,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
-  'entities.abilities.holy_shield.description':
-    '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
+  'entities.abilities.holy_shield.description': '获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
@@ -9247,7 +9243,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '攻击敌人并造成{damage}点暗影伤害，随后使其恐惧3秒。（术士天赋）',
   'entities.abilities.deep_freeze.description':
     '将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）',
-  'entities.abilities.desperate_prayer.description': '立即为你恢复{damage}点生命值。（牧师天赋）',
+  'entities.abilities.desperate_prayer.description': '立即为自己治疗最大生命值的30%。',
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
   'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）',
@@ -11528,4 +11524,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
+  'abilityUi.tooltip.ruinCost': '{cost} 点毁灭',
+  'entities.abilities.evil_eye.name': '邪眼',
+  'entities.items.boneglass_shiv.name': '骨璃小刀',
+  'entities.items.duskwhisper.name': '黄昏低语',
+  'entities.items.marrowpoint.name': '穿髓尖刃',
+  'entities.items.rimefang.name': '霜牙',
+  'hudChrome.auraEffect.resourceCount': '{value}/{max}',
+  'hudChrome.procOverlay.ruinMeter': '毁灭',
 };

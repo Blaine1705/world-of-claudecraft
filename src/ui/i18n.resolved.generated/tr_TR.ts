@@ -322,20 +322,20 @@ export const tr_TR: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Mahkûmiyet",
+      "fateThreadsLabel": "Kader İplikleri",
+      "doomMeterUnlock": "Istırap kaynak çubuğunu taşı",
+      "doomMeterLock": "Istırap kaynak çubuğunu kilitle",
+      "doomEmptyStatus": "{value} / {max} Mahkûmiyet.",
+      "doomStatus": "{value} / {max} Mahkûmiyet; {remaining}.",
+      "fateThreadsStatus": "{value} / {max} Kader İpliği.",
+      "fateThreadsConsumeReady": "Üç Kader İpliği: Tüketme onları ek Mahkûmiyete dönüştürebilir.",
+      "fateThreadsSentenceReady": "Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "soulFragmentsMeter": "Ruh Parçaları",
+      "ruinMeter": "Harabiyet",
+      "ruinStatus": "{value} / {max} Harabiyet"
     },
     "spectate": {
       "banner": "{name} izleniyor"
@@ -1980,31 +1980,31 @@ export const tr_TR: EnTranslations = {
       "absorb": "{value} hasar emer",
       "healAbsorb": "Gelen iyileştirmenin {value} kadarını emer",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
-      "stasis": "Immune and unable to act",
+      "stasis": "Bağışık ve hareket edemez",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "imbueRange": "Silah güçlendirildi: Hukum ile {min} ila {max} bonus hasar",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Evcil hayvan hasarını {pct}% artırır",
+      "petHaste": "Evcil hayvan eylem hızını {pct}% artırır",
+      "spellDamage": "Büyü hasarını {pct}% artırır",
+      "spellHaste": "Büyü okuma hızını {pct}% artırır",
+      "sated": "Başka bir grup hız etkisinden yararlanamaz",
+      "cauterizeFatigue": "Dağlama başka bir öldürücü darbeyi henüz engelleyemez",
+      "castShield": "Büyü okuma hasarla kesilemez veya geciktirilemez",
       "dmgDone": "Verilen hasarı {pct}% artırır",
       "dmgDoneReduce": "Verilen hasarı {pct}% azaltır",
       "heatingUp": "Bir sonraki ardışık Ateş kurucu kritik vuruşun Sıcak Seri kazandırır; kritik olmayan bir kurucu Isınıyor'u kaldırır",
       "elementalConvergencePrimed": "Diğer element okulundan bir sonraki büyün Element Yakınsaması kazandırır",
       "hunterFerocity": "{stacks} Sürü Vahşeti: evcil hayvanın {pct}% daha fazla hasar verir",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "Bu pencerede {used} / {cap} sn bekleme süresi azaltımı kullanıldı",
+      "funeralHarvestLock": "Cenaze Hasadı henüz başka bir Ruh Parçası oluşturamaz",
+      "leadenHexLock": "Kurşun Büyüsü bu hedefi henüz yeniden kökleyemez",
+      "forbiddenReflectionReady": "Uygun bir sonraki Karabüyücü bekleme süren yeniden kullanılabilir",
+      "forbiddenReflectionLock": "Yasak Yansıma henüz yeniden hazırlanamaz",
+      "internalCooldown": "Bu etki, süre dolana kadar yeniden tetiklenemez",
       "carriedFlag": "Düşman sancağını taşıyorsun. Onu bırakmak için bu güçlendirmeyi iptal et.",
       "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
       "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
@@ -2019,13 +2019,13 @@ export const tr_TR: EnTranslations = {
       "revengeFree": "Bir sonraki İntikam hiç Öfkeye mal olmaz",
       "victoryRush": "Zafer Atılımı hazır",
       "maxHpPct": "Azami canı %{pct} artırır",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Verilen hasar {damagePct}%, saldırı hızı {hastePct}% ve hareket hızı {movePct}% artar",
+      "suddenDeath": "Bir sonraki Erken Mezar'ın hiç Öfkeye mal olmaz ve can şartını yok sayar",
+      "aoeEcho": "{charges} yankı kaldı: tek hedefli yetenekler yakındaki en fazla {targets} düşmana {pct}% hasar verir",
+      "sureCrit": "{charges} hasar veren yetenek kullanımı garanti kritik vuruş olur",
+      "temporalEcho": "Büyücünün Gizemli hasarı seni tek hedef hasarının {singlePct}%'i ya da alan hasarının {areaPct}%'i kadar iyileştirir",
+      "arcaneCharge": "{stacks} Gizemli Yük: Aether Dalgası {damagePct}% daha fazla hasar verir, {castPct}% daha hızlı okunur ve {costMult}x mana harcar",
+      "physicalReduction": "Alınan Fiziksel hasarı {pct}% azaltır",
       "temporalHourglass": "Bağışık ve eylem yapamaz; canı yeniler ve bekleme süresi iyileşmesini hızlandırır. İptal etmek için sağ tıkla.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Ateş büyülerin her zaman kritik vurur",
@@ -2047,10 +2047,10 @@ export const tr_TR: EnTranslations = {
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
       "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kurt ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Tamamlanan Yaban Çiçeği ve İkinci Çiçeklenme büyüleri onu doldurur; {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
+      "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
+      "nextAttackCrit": "Bir sonraki saldırın garanti kritik vurur",
+      "healEcho": "Canın {threshold}%'in altına düşmesi {value} can geri kazandırır",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",
@@ -2089,8 +2089,8 @@ export const tr_TR: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Alınan kanama hasarını {pct}% artırır",
+      "sourceVuln": "Bu etkiyi uygulayan büyücüden {pct}% daha fazla hasar alır",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2104,46 +2104,46 @@ export const tr_TR: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "{steps} vuruşluk Warspirit ritmini tamamlamak, vuruşu hasarının {pct}%'i kadar Doğa hasarıyla {count} kez yankılar",
+      "elementalTrance": "Alınan hasar {pct}% azalır. Verdiğin tüm hasarın {mana}%'i manaya dönüşür",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Formu: can ve zırh artışı",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Formu: hareket hızı %{pct} artar",
       "formFireball": "Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Aykuşu Formu: büyü hasarı {pct}% ve zırh {armorPct}% artar",
+      "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
+      "resourceCount": "{value} / {max}",
+      "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
+      "afflictionEye": "Kem Bakış her {interval} sn'de bir saldırır; bu Göz'deki etkiler {pct}% Mahkûmiyet üretir",
+      "afflictionEyeSecondary": "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
+      "afflictionAccomplice": "Uygun hasar {value} Mahkûmiyet kazandırır, en fazla {interval} sn'de bir",
+      "afflictionViolence": "{charges} misilleme kaldı; bir düşman saldırısı {doom} Mahkûmiyet kazandırır ve karşılığında {damage} Gölge hasarı verir",
+      "afflictionVicarious": "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
+      "afflictionPossession": "Kader İğnesi'ni, Tüketme'yi, Kem Bakış'ı ve Hüküm'ü güçlendirir",
+      "afflictionJudgment": "Birincil Göz {eyePct}% daha fazla Mahkûmiyet üretir; Hüküm {sentencePct}% daha fazla hasar verir ve ilki {refund} Mahkûmiyet geri kazandırır",
+      "afflictionLitany": "Mahkûmiyet kazançları, {radius} yarda içindeki en fazla {targets} düşmana saniyede bir {damage} Gölge hasarı verir",
+      "afflictionFateThreads": "{stacks} Kader İpliği: Hüküm {sentencePct}% daha fazla hasar verir, ya da Tüketme tur başına {doom} ekstra Mahkûmiyet kazanır",
+      "afflictionConsumeThreads": "Tüketme, tur başına {doom} ekstra Mahkûmiyet için {stacks} Kader İpliğini tüketiyor",
+      "necromancyHarvestMark": "Ölüm 1 Ruh Parçası oluşturabilir",
+      "necromancyOssuaryMark": "Senin ve ölülerinin hasarının {storedPct}%'ini, artı Ruh Mızrağı hasarının {lancePct}%'ini depolar; patlatmak için yeniden oku. Ölüm {radius} yarda içinde patlar ve 1 Ruh Parçası oluşturur",
+      "necromancyDeathEcho": "Eski Ölüm Yankısı; hiçbir mevcut yetenek onu tüketmiyor",
+      "warlockAnchor": "Buraya dönmek ve çapayı tüketmek için {range} yarda içinde yeniden oku",
+      "formMetamorph": "İblis formu: beden boyutu {pct}% artar; diğer bonuslar ayrı güçlendirmelere bağlıdır",
+      "energyRegen": "Enerji yenilenmesini {pct}% artırır",
       "defensiveStance": "Korumali Durus: alınan hasar azalır, daha fazla tehdit",
       "righteousFury": "Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} yük: bir sonraki Sakatlayan Darben {pct}% daha fazla hasar verir",
+      "sweepingStrikes": "Tek hedefli vuruşlar yakındaki {targets} düşmana da {pct}% hasarla vurur",
+      "fingersOfFrost": "{charges} yük: Buz Mızrağı hedefini donmuş sayar ve {pct}% donmuş hasarı verir",
+      "brainFreeze": "Bir sonraki Kış Kırbacı'n anında olur ve bekleme süresini yok sayar",
+      "wintersChill": "{charges} yük: uyumlu büyüler bu hedefi donmuş sayar",
+      "icicles": "{value} / {max} Buz Saçağı; {max} olduğunda Buzul Dikeni okunabilir",
+      "desolation": "{charges} yük: bir sonraki Yıkım Okun {castPct}% daha hızlı okunur ya da bir sonraki Ateş Yağmurun anında iner",
+      "ruinousBrand": "{charges} kopya kaldı: doğrudan büyüler buraya {otherPct}% hasar kopyalar, ya da hedefleri bu olduğunda {selfPct}%",
+      "duskfireClaim": "{value} Harabiyet kazandıran ölüm",
+      "pyreGuardian": "Her {ruinInterval} sn'de {ruin} Harabiyet üretir ve her {damageInterval} sn'de {radius} yarda içinde {damage} Ateş hasarı verir",
+      "perfectMoment": "Aether Okları Gizemli Yük tüketmez",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -3979,7 +3979,7 @@ export const tr_TR: EnTranslations = {
       "none": "Hiçbir sınıf her filtreye uymuyor. Daha fazlasını görmek için birini temizle."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Eylemleri ve ıstırabı Mahkûmiyetini besleyecek düşmanı adlandırır.",
       "heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
       "revenge": "Önündeki düşmanları biçer ve bir kaçınma veya savuşturmadan sonra ücretsiz olabilir.",
       "hamstring": "Bir düşmanın hareketini sakatlayarak kaçmasını engeller.",
@@ -7384,10 +7384,10 @@ export const tr_TR: EnTranslations = {
     "pet": {
       "attack": "Saldır",
       "waterJet": "Su Jeti",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Kül Oku",
+      "abyssalChain": "Uçurum Zinciri",
+      "autocastOn": "Otomatik büyü açık. Kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
+      "autocastOff": "Otomatik büyü kapalı. Açmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "taunt": "Kışkırt",
       "healDemon": "Şeytanı İyileştir",
       "healPet": "Evcili İyileştir",
@@ -7398,10 +7398,10 @@ export const tr_TR: EnTranslations = {
       "petAttackDesc": "Evciline mevcut düşman hedefine saldırmasını emret.",
       "waterJetTitle": "Su Jeti",
       "waterJetDesc": "Su Elementalinize 3 saniye boyunca yavaşlatıcı bir akıntı kanalize etmesini emredin. 8 saniyelik bekleme süresi. Bekleme süresi dolduğunda otomatik aktif etmek için sağ tıklayın.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Kül Oku",
+      "felboltDesc": "Emberkin'e hedefine ekstra bir kül oku fırlatmasını emret. 8 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
+      "abyssalChainTitle": "Uçurum Zinciri",
+      "abyssalChainDesc": "Gloomshade'e, 8 yardadan fazla ve 20 yardaya kadar uzaktaki normal bir düşmanı kendine doğru çekmesini emret. Patronlar çekilemez. 15 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "petTauntTitle": "Evcil Kışkırtması",
       "petTauntDesc": "Evciline saldırıya geçmesini ve menzile girince Hırlamasını emret. 10 saniyelik bekleme süresi.",
       "healDemonDesc": "5 saniye boyunca şeytanına iyileştirme kanalize etmek için mana harca.",
@@ -7557,7 +7557,7 @@ export const tr_TR: EnTranslations = {
     "tooltip": {
       "rank": "Kademe {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Harabiyet",
       "range": "{range} metre menzil",
       "rangeWithMin": "{min}-{max} metre menzil",
       "instant": "Anında",
@@ -7568,8 +7568,8 @@ export const tr_TR: EnTranslations = {
       "unavailable": "Kullanılamaz",
       "requiresLevel": "{level}. seviye gerektirir",
       "requiresForm": "{form} Formu gerektirir",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Gizlilik gerektirir",
+      "requiresStealthSkulduggery": "Gizlilik gerektirir (3 Alacakaranlıkta veya Gölge Perdesi sırasında gerekmez)",
       "requiresCombo": "Kombo puanı tüketir",
       "requiresTargetHealthBelow": "Hedefin canının %{percent} altında olmasını gerektirir",
       "requiresDodge": "Yalnızca hedef sıyrıldıktan sonra kullanılabilir",
@@ -7788,7 +7788,7 @@ export const tr_TR: EnTranslations = {
       "clickDestroy": "Yok etmek için tıkla",
       "useFishing": "Kullanım: Yakındaki sularda balık tut.",
       "useHealingPotion": "Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
@@ -8292,20 +8292,20 @@ export const tr_TR: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Kötücül Kesik",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.",
+        "specNote_assassination": "1 Zehir Ayini ekler (en fazla 6).",
+        "specNote_combat": "Redline etkinken, bu düğme Gövde Darbesine dönüşür: silah hasarının %130'u artı 10, 2 kombo puanı kazandırır ve 1 Redline ekler (en fazla 4)."
       },
       "eviscerate": {
         "name": "Toprak Uykusu",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "{damage} veren bitirici hamle.",
+        "specNote_assassination": "6 Zehir Ayininde bu düğme Zehir Yarığına dönüşür: kanamalarının kalan tüm hasarını anında veren, taze bir zehir yarası açan ve 20 enerji geri kazandıran bir vuruş.",
+        "specNote_combat": "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35, biriktirilen her Redline kademesinde %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca."
       },
       "backstab": {
         "name": "Korkakça Saplama",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Hançerini hedefin sırtına sapla: silah hasarının %150'si artı {damage}. Hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+        "specNote_assassination": "Her vuruş 1 Zehir Ayini ekler (en fazla 6) ve 15 enerji geri kazandırır. 6 Zehir Ayininde, Toprak Uykusu Zehir Yarığına dönüşür (kalan tüm kanama hasarını tek seferde verir)."
       },
       "gouge": {
         "name": "Göz Dürtme",
@@ -8317,7 +8317,7 @@ export const tr_TR: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Gaddar Tempo",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Yakın dövüş saldırı hızını 12 sn artı kombo puanı başına 4 sn boyunca %30 artıran bitirici hamle (5 kombo puanı: 32 sn)."
       },
       "sprint": {
         "name": "Çevik Topuklar",
@@ -8325,17 +8325,17 @@ export const tr_TR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Aşağılık Darbe",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Hedefi 1 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 6 sn)."
       },
       "ambush": {
         "name": "Pusucunun Darbesi",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Gölgelerden saldırarak silah hasarının %250'si artı {damage} vur. Gizlenmiş ve hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN ve her açıdan kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar, 6 sn'lik Gölge Perdesini başlatır ve iki kat hasar verir."
       },
       "stealth": {
         "name": "Alaca Örtüsü",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Seni gölgelerde gizler: düşmanlar seni zar zor fark eder, ama %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3)."
       },
       "adrenaline_rush": {
         "name": "Hızlanan Kan",
@@ -8343,13 +8343,13 @@ export const tr_TR: EnTranslations = {
       },
       "garrote": {
         "name": "Boğaz Teli",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Düşmanın boğazına bir tel dola: hemen {damage} hasar verir ve 18 sn boyunca {overTime} kanama hasarı verir. Gizlenmiş olmalısın. 1 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "cheap_shot": {
         "name": "Mide Yumruğu",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.",
+        "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "sap": {
         "name": "Bayıltma",
@@ -8361,11 +8361,11 @@ export const tr_TR: EnTranslations = {
       },
       "expose_armor": {
         "name": "Zırh Gediği",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage})."
       },
       "rupture": {
         "name": "Kan Kaybı",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Hedefi yaralayan bitirici hamle: 6 sn artı kombo puanı başına 2 sn boyunca her 2 sn'de kanar (5 kombo puanı: 16 sn ve toplam {damage} hasar)."
       },
       "vanish": {
         "name": "Duman Adımı",
@@ -8732,28 +8732,28 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir."
       },
       "evil_eye": {
-        "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "name": "Kem Göz",
+        "description": "Bir düşmanı lanetlerinin odağı olarak işaretler. Gözü taşımak Mahkûmiyeti korur ama 20 sn'lik süresini yenilemez."
       },
       "maledict_gaze": {
-        "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "name": "Kem Bakış",
+        "description": "Kem Bakışın, seçili birincil Kem Gözüne her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir onun saldırı hızını ikiye katlar."
       },
       "needle_of_fate": {
-        "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "name": "Kader İğnesi",
+        "description": "Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler."
       },
       "sentence": {
-        "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "name": "Hüküm",
+        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
       "life_tap": {
         "name": "Ağır Pazarlık",
         "description": "{damage} canı {damage} manaya dönüştürür."
       },
       "cursed_accomplice": {
-        "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "name": "Lanetli Suç Ortağı",
+        "description": "Hiçbir müttefik seçili değilken Kem Gözünü bağlar, böylece onun Bakışı 2 Mahkûmiyet üretir. Seçili tek bir grup üyesini bağlamak yalnızca onların Kem Gözüne verdiği hasarın 3 üretmesini sağlar. Yeni bir bağ öncekinin yerini alır ve en fazla 2 sn'de bir tetiklenebilir."
       },
       "curse_of_agony": {
         "name": "Izdırap Büyüsü",
@@ -8764,44 +8764,44 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır."
       },
       "litany_of_guilt": {
-        "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "name": "Suç Yakarışı",
+        "description": "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır."
       },
       "cinderhide": {
-        "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "name": "Kor Deri",
+        "description": "Derini 10 sn boyunca soğuyan cürufa dönüştürür, alınan tüm hasarı %25 azaltır."
       },
       "umbral_anchor": {
-        "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "name": "Gölge Çapası",
+        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "Ruh Kuyusu",
+        "description": "3 dakika süreyle bir Ruh Kuyusu çağırır. Dövüş dışındayken, grup üyeleri Ruh Taşlarını en fazla 3'e kadar doldurabilir. Bir Ruh Taşı azami canın %25'ini geri kazandırır ve iksir bekleme süresini paylaşır."
       },
       "hex_of_violence": {
-        "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "name": "Şiddet Büyüsü",
+        "description": "Düşmanı 8 sn boyunca büyüler. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 16 Gölge hasarı vurur."
       },
       "cruel_pact": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "name": "Zalim Ahit",
+        "description": "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz."
       },
       "vicarious_suffering": {
-        "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "name": "Dolaylı Istırap",
+        "description": "Istırabını 8 sn boyunca bağlar ve düşman vuruşlarından en fazla 15 Mahkûmiyet üretir. Kendi üzerinde, alınan hasarı %20 azaltır. Bir müttefik üzerinde, seni %15 canın altına düşürmeden hasarın en fazla %20'sini sana yönlendirir."
       },
       "possess_evil_eye": {
-        "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Kem Gözü Ele Geçir",
+        "description": "Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30'a geriler."
       },
       "hour_of_judgment": {
-        "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "name": "Yargı Saati",
+        "description": "Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır."
       },
       "coven": {
-        "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "name": "Cadı Meclisi",
+        "description": "Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır."
       },
       "fear": {
         "name": "Dehşet",
@@ -8816,13 +8816,13 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefi anında dağlayan gölge ile vurarak {damage} Gölge hasarı verir."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "Yıkıcı Damga",
+        "description": "Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar."
       },
       "wrath": {
         "name": "Yaban Oku",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Bir doğa enerjisi yıldırımı fırlatarak {damage} Doğa hasarı verir.",
+        "specNote_balance": "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, Ay Tohumu Ay Kabarışına, Gök Düşüşü ise Güneş İzine dönüşür."
       },
       "healing_touch": {
         "name": "Yaban Şifası",
@@ -8834,8 +8834,8 @@ export const tr_TR: EnTranslations = {
       },
       "moonfire": {
         "name": "Ay Fırtınası",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.",
+        "specNote_balance": "Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır."
       },
       "moonseed": {
         "name": "Ay Tohumu",
@@ -8843,8 +8843,8 @@ export const tr_TR: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Yaban Çiçeği",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Hedefi 12 sn boyunca {damage} iyileştirir.",
+        "specNote_restoration": "YENİ bir çiçek dikmek 1 Yeşillik ekler (en fazla 5). 5 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür."
       },
       "thorns": {
         "name": "Diken Muhafızı",
@@ -8860,8 +8860,8 @@ export const tr_TR: EnTranslations = {
       },
       "maul": {
         "name": "Kemik Kıran",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan bir parçalama saldırısı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni kalkanlar ve 15 öfke geri kazandırır."
       },
       "growl": {
         "name": "Gözdağı",
@@ -8873,23 +8873,23 @@ export const tr_TR: EnTranslations = {
       },
       "claw": {
         "name": "Pençe",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "regrowth": {
         "name": "İkinci Çiçeklenme",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Dost bir hedefi {damage} ve 21 sn boyunca ek bir miktar iyileştirir.",
+        "specNote_restoration": "YENİ bir çiçek dikmek 1 Yeşillik ekler (en fazla 5)."
       },
       "barkskin": {
         "name": "Meşe Derisi",
@@ -8905,8 +8905,8 @@ export const tr_TR: EnTranslations = {
       },
       "starfire": {
         "name": "Gök Düşüşü",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Yıldız ateşinden bir yıldırım çağırarak {damage} Gizemli hasar verir.",
+        "specNote_balance": "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: 80 ila 100 Doğa hasarı artı 9 sn boyunca 45 yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan anlık bir vuruş."
       },
       "travel_form": {
         "name": "Fleet Formu",
@@ -8922,7 +8922,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Hedefin zırhını 40 sn boyunca %{damage} azaltır."
       },
       "hibernate": {
         "name": "Derin Uyku",
@@ -8946,8 +8946,8 @@ export const tr_TR: EnTranslations = {
       },
       "rip": {
         "name": "Parçalama",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici hamle: 36 hasar artı harcanan kombo puanı başına 24 (5 kombo puanı: toplam {damage}). Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "mortal_strike": {
         "name": "Sakatlayan Darbe",
@@ -8998,8 +8998,8 @@ export const tr_TR: EnTranslations = {
         "description": "Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır."
       },
       "elemental_trance": {
-        "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "name": "Element Transı",
+        "description": "15 sn süren bir element transına gir, alınan hasarı %30 azalt ve verdiğin tüm hasarın %20'sini manaya dönüştür. (Warspirit motoru)"
       },
       "primal_exaltation": {
         "name": "İlksel Yüceltme",
@@ -9014,60 +9014,60 @@ export const tr_TR: EnTranslations = {
         "description": "Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler."
       },
       "soul_harvest": {
-        "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "name": "Öz Hasadı",
+        "description": "Düşmanın ruhunu {damage} Gölge hasarıyla parçalar ve 1 Ruh Parçası oluşturur, en fazla 5."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "Ruh Mızrağı",
+        "description": "{damage} Gölge hasarı veren hayaletimsi bir mızrak fırlatır. Kemik Damgana karşı kullanılırsa, hasarının %50'si damgaya eklenir."
       },
       "raise_graveguard": {
-        "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "name": "Mezar Muhafızı Diriltme",
+        "description": "Kalıcı, savunma amaçlı bir yoldaş diriltir. Mezar Muhafızı otomatik olarak kışkırtır, Mezar Hükümranlığı aracılığıyla hasarının %20'sini üstlenir ve Hasat Emri onu kışkırtmaya zorlar ve 4 sn boyunca %30 daha az hasar almasını sağlar."
       },
       "raise_skeletal_warrior": {
-        "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "name": "İskelet Savaşçı Diriltme",
+        "description": "1 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir İskelet Savaşçı ekler. Sana yalnızca bir tanesi hizmet edebilir. Her 6 sn'de bir yakındaki düşmanları %45 hasarla biçer ve Hasat Emri hedefini 4 sn boyunca %40 yavaşlatarak sabitler."
       },
       "raise_bone_mage": {
-        "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "name": "Kemik Büyücü Diriltme",
+        "description": "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir menzilli Kemik Büyücü ekler. Sana yalnızca bir tanesi hizmet edebilir. Saldırıları hedefi 6 sn boyunca %5 daha fazla büyü hasarına açık bırakır ve Hasat Emri bu zayıflığı %8'e çıkarır."
       },
       "bone_armor": {
-        "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "name": "Kemik Zırhı",
+        "description": "Seni kemiklerle sarar, azami canının %20'si kadar hasarı emer."
       },
       "corpse_explosion": {
-        "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "name": "Ceset Patlaması",
+        "description": "Önce bir Kemik Büyücüyü, sonra bir İskelet Savaşçıyı, bir Mezar Kanadını ise yalnızca son çare olarak feda eder. Kopyalar arasında önce en az kalan süreye, sonra en zayıfa sahip olanı seçer ve seçilen konumda {damage} Gölge hasarı verir."
       },
       "funeral_harvest": {
-        "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "name": "Cenaze Hasadı",
+        "description": "Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn'de bir gerçekleşebilir."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "Kemik Damgası",
+        "description": "Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
       },
       "unholy_command": {
-        "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "name": "Kutsuz Emir",
+        "description": "3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder."
       },
       "reaping_command": {
-        "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "name": "Hasat Emri",
+        "description": "2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar."
       },
       "sacrifice_undead": {
-        "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "name": "Ölüyü Feda Et",
+        "description": "Azami canının %25'ini geri kazanmak için bir Hükümranlık hizmetkarını yok eder."
       },
       "raise_gravewing": {
-        "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "name": "Mezar Kanadı Diriltme",
+        "description": "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir Mezar Kanadı ekler. Sana yalnızca bir tanesi hizmet edebilir. Her 5 sn'de bir yakındaki düşmanları %65 hasarla biçer ve Hasat Emri vurulan her düşmanın 5 sn boyunca %8 daha fazla hasar almasını sağlar."
       },
       "army_of_the_dead": {
-        "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "name": "Ölüler Ordusu",
+        "description": "Geçici bir İskelet Savaşçı, Kemik Büyücü ve Mezar Kanadı diriltmek için 20 sn süreyle bir mezar portalı açar; kalıcı Hükümranlık hizmetkarlarının boş bıraktığı yerleri doldurur."
       },
       "metamorphosis": {
         "name": "Metamorfoz",
@@ -9107,15 +9107,15 @@ export const tr_TR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Soğukkanlılık",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Öldürme niyetini odaklar, böylece bir sonraki saldırın kritik vuruş olur. (Knifework motoru)"
       },
       "blade_flurry": {
         "name": "Bıçak Yağmuru",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Bir bıçak fırtınası salar, saldırı hızını 12 sn boyunca %20 artırır. (Thuggery motoru)"
       },
       "hemorrhage": {
         "name": "Kanama",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Düşmana silah hasarı artı {damage} ile vurur, 12 sn boyunca kanama hasarı verir ve alınan kanama hasarını %40 artırır. 1 kombo puanı kazandırır. Her 2. kullanım 1 Alacakaranlık ekler (en fazla 3). (Skulduggery motoru)"
       },
       "power_infusion": {
         "name": "Güç Aşılaması",
@@ -9151,7 +9151,7 @@ export const tr_TR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Yaban Çiçeği ve İkinci Çiçeklenme dikimleri Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)"
       },
       "moonlash": {
         "name": "Ay Kabarışı",
@@ -9350,16 +9350,16 @@ export const tr_TR: EnTranslations = {
         "description": "Hedef alana yıldırım savurarak yakındaki düşmanlara {damage} hasar verir. (Şaman yeteneği)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "Uçurum Yarığı",
+        "description": "Seçilen konumda bir yarık açar, 8 yarda içindeki düşmanları merkezine çeker, {damage} Gölge hasarı verir ve onları 2 sn sersemletir. Patronlar hasar alır ama çekilmeye ve sersemlemeye direnir."
       },
       "chaos_bolt": {
         "name": "Yıkım Oku",
         "description": "{damage} Ateş hasarı veren kaotik bir ateş oku fırlatır. (Karabüyücü yeteneği)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "Kanlı Ahit",
+        "description": "Mevcut canının %10'unu feda ederek 8 sn boyunca azami canının %30'u kadar hasarı emer."
       },
       "cloak_of_shadows": {
         "name": "Gölge Pelerini",
@@ -9415,7 +9415,7 @@ export const tr_TR: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Hayalet Vuruş",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Düşmana silah hasarı artı {damage} ile vurur ve 7 sn boyunca kaçınma şansını %15 artırır. 1 kombo puanı kazandırır. (Haydut yeteneği)"
       },
       "hammer_of_wrath": {
         "name": "Çınlayan Çekiç",
@@ -9550,8 +9550,8 @@ export const tr_TR: EnTranslations = {
         "description": "Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "Günahkâr Yürüyüş",
+        "description": "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır."
       },
       "spellsteal": {
         "name": "Büyü Çalma",
@@ -9580,7 +9580,7 @@ export const tr_TR: EnTranslations = {
       "venom_dart": {
         "name": "Zehirli Dart",
         "description": "Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "1 Zehir Ayini ekler ve zehir yaranı 6 sn uzatır (yara asla 20 sn'nin üzerine çıkmaz)."
       },
       "body_blow": {
         "name": "Gövde Darbesi",
@@ -9644,8 +9644,8 @@ export const tr_TR: EnTranslations = {
       },
       "rake": {
         "name": "Deri Yüzme",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca kanatır. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "revive_pet": {
         "name": "Yarasını Sar",
@@ -11163,16 +11163,16 @@ export const tr_TR: EnTranslations = {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Kırağı Dişi"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "İlik Ucu"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Alacakaranlık Fısıltısı"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Kemikcam Şişi"
       },
       "moggers_hide_quiver": {
         "name": "Mogger'ın Deri Sadağı"
@@ -11202,7 +11202,7 @@ export const tr_TR: EnTranslations = {
         "name": "Sihirle Yaratılmış Ziyafet Somunu"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Ruh Taşı"
       },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"
@@ -12665,16 +12665,16 @@ export const tr_TR: EnTranslations = {
         "name": "Su Elementali"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Mezar Muhafızı"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "İskelet Savaşçı"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Kemik Büyücü"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Mezar Kanadı"
       }
     },
     "npcs": {

@@ -12050,4 +12050,344 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': 'Waterrimpels (kielzog)',
   'hudChrome.breath.label': 'Adem',
   'hudChrome.breath.drowning': 'Verdrinken!',
+  'abilityUi.tooltip.requiresStealth': 'Vereist sluiptocht',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Vereist sluiptocht (niet nodig bij 3 Schemer of tijdens de schaduwsluier)',
+  'abilityUi.tooltip.ruinCost': '{cost} Ruïne',
+  'entities.abilities.abyssal_rift.description':
+    'Scheurt een rift open op de geselecteerde locatie, trekt vijanden binnen 8 m naar het middelpunt, brengt {damage} Schaduwschade toe en verdooft ze gedurende 2 sec. Bazen lopen schade op maar weerstaan de trek en de verdoving.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Slaat toe vanuit de schaduwen voor 250% wapenschade plus {damage}. Moet in sluiptocht zijn en achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht en vanuit elke hoek: dat gebruik kost niets, verbruikt alle 3 Schemer, start de schaduwsluier van 6 sec, en slaat dubbel zo hard toe.',
+  'entities.abilities.army_of_the_dead.description':
+    'Scheurt een grafportaal open om tijdelijk een Skeletkrijger, Botmagiër en Grafvleugel op te roepen voor 20 sec, en vult de rangen die je vaste Heerschappij-dienaren leeg laten.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Boort je dolk in de rug van het doelwit voor 150% wapenschade plus {damage}. Moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Elke slag voegt 1 Gifritueel toe (max 6) en geeft 15 energie terug. Bij 6 Gifritueel wordt Zandslaap Gifscheur (het brengt al je resterende bloedingsschade in één keer toe).',
+  'entities.abilities.blade_flurry.description':
+    'Ontketent een vlaag van klingen, waardoor de aanvalssnelheid 12 sec lang met 20% toeneemt. (Thuggery-motor)',
+  'entities.abilities.bone_armor.description':
+    'Omhult je met bot, waarbij schade wordt geabsorbeerd gelijk aan 20% van je maximale gezondheid.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec.',
+  'entities.abilities.cinderhide.description':
+    'Verhardt je huid tot afkoelende sintels gedurende 10 sec, waardoor alle opgelopen schade met 25% afneemt.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
+  'entities.abilities.claw.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.cold_blood.description':
+    'Focust je moordlust zodat je volgende aanval een kritieke treffer is. (Knifework-motor)',
+  'entities.abilities.corpse_explosion.description':
+    'Offert eerst een Botmagiër op, dan een Skeletkrijger, en pas als laatste redmiddel een Grafvleugel. Bij duplicaten kiest het degene met de minste resterende duur, en anders de zwakste, om {damage} Schaduwschade toe te brengen op de gekozen locatie.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Creëert secundaire Evil Eyes op tot 4 nabije vijanden gedurende 15 sec. Ze voeden de gedeelde Verdoemenis-pool voor 50%, en Sentence weerklinkt naar hen voor 35% schade.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Verbindt je Maledict Eye wanneer geen bondgenoot is geselecteerd, waardoor de Gaze 2 Verdoemenis genereert. Het verbinden van één geselecteerd groepslid zorgt ervoor dat alleen hun schade aan je Evil Eye in plaats daarvan 3 genereert. Een nieuwe verbinding vervangt de vorige en kan hoogstens eenmaal per 2 sec activeren.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Offert 10% van je huidige gezondheid op om schade te absorberen gelijk aan 30% van je maximale gezondheid gedurende 8 sec.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Ga een elementaire trance aan gedurende 15 sec, waardoor je 30% minder schade oploopt en 20% van alle schade die je aanricht wordt omgezet in mana. (Krijgsgeest-kenmerk)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Markeert één vijand als het middelpunt van je vervloekingen. Het Oog verplaatsen behoudt de Verdoemenis, maar vernieuwt zijn vervaltijd van 20 sec niet.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Afmaakactie die {damage} veroorzaakt.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Bij 6 Gifritueel wordt deze knop Gifscheur: een slag die onmiddellijk alle schade toebrengt die je bloedingen nog zouden hebben toegebracht, een verse gifwond plant, en 20 energie herstelt.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Het landen hiervan met 4 of meer combopunten start de Rode Lijn gedurende 8 sec: Kwaadaardige Houw wordt Lichaamsstoot en deze knop wordt Knock-outslag (45 plus 35 per combopunt, 25% harder per opgebouwde Rode Lijn, herstelt 25 energie). Besteed hem voordat de Rode Lijn afloopt.',
+  'entities.abilities.expose_armor.description':
+    'Afmaakactie die het doelwit blootstelt gedurende 30 sec: elk besteed combopunt vermindert zijn pantser met 2% (5 combopunten: {damage}%).',
+  'entities.abilities.faerie_fire.description':
+    'Vermindert het pantser van het doelwit met {damage}% gedurende 40 sec.',
+  'entities.abilities.ferocious_bite.description':
+    'Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst: een beet voor 70 plus 43 per combopunt die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en 30 energie herstelt.',
+  'entities.abilities.funeral_harvest.description':
+    'Wanneer een vijand die onlangs door jou of je ondoden is beschadigd sterft, krijg je 1 Zielfragment. Dit kan hoogstens eenmaal per 3 sec gebeuren.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Slaat een draad om de keel van de vijand, waardoor het nu {damage} schade oploopt en gedurende 18 sec voor {overTime} bloedt. Moet in sluiptocht zijn. Levert 1 combopunt op.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec.',
+  'entities.abilities.ghostly_strike.description':
+    'Slaat de vijand voor wapenschade plus {damage} en verhoogt je ontwijkingskans 7 sec lang met 15%. Levert 1 combopunt op. (schurkentalent)',
+  'entities.abilities.hemorrhage.description':
+    'Slaat de vijand voor wapenschade plus {damage}, veroorzaakt bloedende schade over 12 sec, en verhoogt de opgelopen bloedingsschade met 40%. Levert 1 combopunt op. Elk 2e gebruik voegt 1 Schemer toe (max 3). (Skulduggery-motor)',
+  'entities.abilities.hex_of_violence.description':
+    'Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 16 Schaduwschade.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Roept oordeel af over je primaire Evil Eye gedurende 15 sec, wat 40 Verdoemenis en 3 Lotsdraden toekent, Possession activeert, de Verdoemenis die via het primaire Oog wordt gegenereerd verdubbelt, en de schade van Sentence met 20% verhoogt. De eerste Sentence geeft 50 Verdoemenis terug.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec).',
+  'entities.abilities.litany_of_guilt.description':
+    'Vervloekt je primaire Evil Eye gedurende 6 sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden binnen 8 m beschadigt, hoogstens eenmaal per seconde. Rang 2 verlengt dit tot 8 sec en 4 vijanden.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Je Maledict Eye valt je geselecteerde primaire Evil Eye elke 2,5 sec aan voor Schaduwschade. Possess the Evil Eye verdubbelt zijn aanvalssnelheid.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'Een verpletterende aanval die je meleeschade met {damage} verhoogt en veel dreiging veroorzaakt. Wordt geactiveerd bij je volgende slag. Alleen in Bruingedaante.',
+  'entities.abilities.maul.specNote_feral':
+    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een slag voor 78 tot 96 schade met hoge dreiging; onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid en geeft 15 woede terug.',
+  'entities.abilities.moonfire.description':
+    'Verbrandt de vijand met maanvuur voor {damage} Arcaneschade plus schade over tijd.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Houd het brandend: Maanzaad verlengt het met 6 sec.',
+  'entities.abilities.needle_of_fate.description':
+    'Doorboort de vijand voor {damage} Schaduwschade en genereert 5 Verdoemenis als het je Evil Eye draagt. Elke treffer op je primaire Evil Eye voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Evil Eye bestaat, markeert de Needle eerst zijn doelwit.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'De Maledictor bezit je primaire Evil Eye gedurende 15 sec en genereert 35 Verdoemenis. Needle of Fate wordt in 1 sec gespreukt en genereert 2 extra Verdoemenis, Verteren kan worden gekanaliseerd terwijl je beweegt, en Sentence brengt 25% meer schade toe en laat een vertraagde echo los voor 60% schade, aflopend tot 30% over de niveaus 17-20.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Besteedt 2 Zielfragmenten om een blijvende Botmagiër op afstand toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Zijn aanvallen stellen het doelwit 6 sec lang bloot aan 5% meer magische schade, en Reaping Command verhoogt die zwakte naar 8%.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Wekt een permanente verdedigende metgezel op. De Grafwacht tart automatisch, onderschept 20% van je schade via de Grafheerschappij, en Reaping Command laat hem tarten en 4 sec lang 30% minder schade oplopen.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Besteedt 2 Zielfragmenten om een blijvende Grafvleugel toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Het klieft nabije vijanden voor 65% schade elke 5 sec, en Reaping Command laat elke geraakte vijand 5 sec lang 8% meer schade oplopen.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Besteedt 1 Zielfragment om een blijvende Skeletkrijger toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Het klieft nabije vijanden voor 45% schade elke 6 sec, en Reaping Command zet zijn doelwit 4 sec lang vast met een vertraging van 40%.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
+  'entities.abilities.rake.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.reaping_command.description':
+    'Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Geneest een bevriend doelwit voor {damage} en een extra hoeveelheid over 21 sec.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5).',
+  'entities.abilities.rejuvenation.description': 'Geneest het doelwit voor {damage} over 12 sec.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5). Bij 5 Groenkracht wordt Snelle genezing Overbloei.',
+  'entities.abilities.rip.description':
+    'Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Wolfsgedaante.',
+  'entities.abilities.rip.specNote_feral': 'De gelande treffer voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Afmaakactie die het doelwit verwondt: het bloedt elke 2 sec, gedurende 6 sec plus 2 sec per combopunt (5 combopunten: 16 sec en {damage} totale schade).',
+  'entities.abilities.sacrifice_undead.description':
+    'Vernietigt één Heerschappij-dienaar om 25% van je maximale gezondheid te herstellen.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Verhoogt je bewegingssnelheid met 35%, maar offert elke seconde 2% van je maximale gezondheid op. Spreuk opnieuw om te annuleren. Het schakelt uit bij 20% gezondheid.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description':
+    'Een directe slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
+  'entities.abilities.sinister_strike.specNote_assassination': 'Voegt 1 Gifritueel toe (max 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Terwijl de Rode Lijn actief is, wordt deze knop Lichaamsstoot: 130% wapenschade plus 10, levert 2 combopunten op, en voegt 1 Rode Lijn toe (max 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Afmaakactie die de meleeaanvalssnelheid 12 sec plus 4 sec per combopunt lang met 30% verhoogt (5 combopunten: 32 sec).',
+  'entities.abilities.soul_harvest.description':
+    'Scheurt aan de ziel van de vijand voor {damage} Schaduwschade en creëert 1 Zielfragment, tot 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Werpt een spookachtige lans voor {damage} Schaduwschade. Tegen je Ossuary Mark wordt 50% van de schade aan de markering toegevoegd.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Roept een Soulwell op gedurende 3 min. Buiten gevecht kunnen groepsleden hun Zielstenen tot 3 keer bijvullen. Een Zielsteen herstelt 25% van de maximale gezondheid en deelt de afkoeltijd van drankjes.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Roept een bout van stervuur op, die {damage} Arcaneschade veroorzaakt.',
+  'entities.abilities.starfire.specNote_balance':
+    'In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt deze knop Zonnespoor: een directe slag voor 80 tot 100 Natuurschade plus een brandwond van 45 over 9 sec, die 35 mana herstelt en alle 3 verbruikt.',
+  'entities.abilities.stealth.description':
+    'Verhult je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt de Schemersluier. Spreuk opnieuw om eruit te stappen.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3).',
+  'entities.abilities.swiftmend.description':
+    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Het planten van Wildbloei en Tweede Bloei voegt Groenkracht toe; bij 5 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
+  'entities.abilities.swipe.description':
+    'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
+  'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 m om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Besteedt 3 Zielfragmenten om al je ondoden te bevelen 12 sec lang 25% meer schade toe te brengen en 20% sneller te handelen.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Voegt 1 Gifritueel toe en verlengt je gifwond met 6 sec (de wond komt nooit boven 20 sec).',
+  'entities.abilities.vicarious_suffering.description':
+    'Verbindt je lijden gedurende 8 sec en genereert tot 15 Verdoemenis van vijandige treffers. Op jezelf vermindert het de opgelopen schade met 20%. Op een bondgenoot leidt het tot 20% naar jou om, zonder je onder 15% gezondheid te brengen.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description':
+    'Werpt een bout natuurenergie voor {damage} Natuurschade.',
+  'entities.abilities.wrath.specNote_balance':
+    'In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt Maanzaad Maangolf en Hemelval Zonnespoor.',
+  'entities.items.boneglass_shiv.name': 'Bottenglas-Steekmes',
+  'entities.items.duskwhisper.name': 'Schemerfluister',
+  'entities.items.marrowpoint.name': 'Mergpunt',
+  'entities.items.rimefang.name': 'Rijptand',
+  'entities.items.soul_stone.name': 'Zielsteen',
+  'entities.mobs.graveguard.name': 'Grafwacht',
+  'entities.mobs.necromancy_bone_mage.name': 'Botmagiër',
+  'entities.mobs.necromancy_gravewing.name': 'Grafvleugel',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletkrijger',
+  'guide.abilityHook.evil_eye':
+    'Noemt de vijand wiens daden en lijden je Verdoemenis zullen voeden.',
+  'hud.pet.abyssalChain': 'Afgrondketting',
+  'hud.pet.abyssalChainDesc':
+    'Beveelt je Gloomshade om een normale vijand van meer dan 8 tot 20 m naar zichzelf te trekken. Bazen kunnen niet worden getrokken. 15 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.',
+  'hud.pet.abyssalChainTitle': 'Afgrondketting',
+  'hud.pet.autocastOff':
+    'Automatisch activeren staat uit. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om het aan te zetten.',
+  'hud.pet.autocastOn':
+    'Automatisch activeren staat aan. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om het uit te zetten.',
+  'hud.pet.felbolt': 'Felbolt',
+  'hud.pet.felboltDesc':
+    'Beveelt je Emberkin om een extra fel-projectiel naar je doelwit te lanceren. 8 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.',
+  'hud.pet.felboltTitle': 'Felbolt',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Kwalificerende schade kent {value} Verdoemenis toe, hoogstens eenmaal per {interval} sec',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Verteren verbruikt {stacks} Lotsdraden voor {doom} extra Verdoemenis per tik',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze valt elke {interval} sec aan; effecten bij dit Oog genereren {pct}% Verdoemenis',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Effecten bij dit Oog genereren {doomPct}% Verdoemenis; Sentence weerklinkt hier voor {echoPct}% schade',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Lotsdraden: Sentence brengt {sentencePct}% meer schade toe, of Verteren krijgt {doom} extra Verdoemenis per tik',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Primaire Oog genereert {eyePct}% meer Verdoemenis; Sentence brengt {sentencePct}% meer schade toe en de eerste geeft {refund} Verdoemenis terug',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Verdoemenis-winsten brengen {damage} Schaduwschade toe aan tot {targets} vijanden binnen {radius} m, eenmaal per sec',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Versterkt Needle of Fate, Verteren, Maledict Gaze en Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Leidt {pct}% van de inkomende schade om of vermindert die, en kan tot {max} Verdoemenis genereren',
+  'hudChrome.auraEffect.afflictionViolence':
+    '{charges} vergeldingen resteren; een vijandelijke aanval kent {doom} Verdoemenis toe en brengt {damage} Schaduwschade terug toe',
+  'hudChrome.auraEffect.aoeEcho':
+    '{charges} echo\'s resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Arcaneladingen: Arcanekracht brengt {damagePct}% meer schade toe, wordt {castPct}% sneller gespreukt, en kost {costMult}x mana',
+  'hudChrome.auraEffect.bleedVuln': 'Verhoogt de opgelopen bloedingsschade met {pct}%',
+  'hudChrome.auraEffect.brainFreeze':
+    'Je volgende Wintergesel is direct en negeert zijn afkoeltijd',
+  'hudChrome.auraEffect.castShield':
+    'Bezweren kan niet worden onderbroken of vertraagd door schade',
+  'hudChrome.auraEffect.cauterizeFatigue':
+    'Cauteriseren kan geen volgende dodelijke treffer voorkomen',
+  'hudChrome.auraEffect.cooldownCap':
+    '{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster',
+  'hudChrome.auraEffect.desolation':
+    '{charges} ladingen: je volgende Ruinenschicht wordt {castPct}% sneller gespreukt, of je volgende Vuurregen valt onmiddellijk neer',
+  'hudChrome.auraEffect.duskfireClaim': 'Dood kent {value} Ruïne toe',
+  'hudChrome.auraEffect.elementalTrance':
+    'Opgelopen schade verminderd met {pct}%. {mana}% van alle schade die je aanricht wordt omgezet in mana',
+  'hudChrome.auraEffect.energyRegen': 'Verhoogt de energieregeneratie met {pct}%',
+  'hudChrome.auraEffect.enrage':
+    'Aangerichte schade verhoogd met {damagePct}%, aanvalssnelheid met {hastePct}%, en bewegingssnelheid met {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '{charges} ladingen: IJslans behandelt zijn doelwit als bevroren en brengt {pct}% bevroren schade toe',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet',
+  'hudChrome.auraEffect.formLich':
+    'Soul Lance treft ook tot {targets} nabije vijanden voor {pct}% schade',
+  'hudChrome.auraEffect.formMetamorph':
+    'Demonengedaante: lichaamsgrootte verhoogd met {pct}%; overige bonussen lopen via aparte buffs',
+  'hudChrome.auraEffect.formMoonkin':
+    'Maanuilvorm: spreukschade verhoogd met {pct}% en pantser verhoogd met {armorPct}%',
+  'hudChrome.auraEffect.formShadow': 'Schaduwvorm: Schaduwschade verhoogd met {pct}%',
+  'hudChrome.auraEffect.freeExecute':
+    'Je volgende in aanmerking komende afmaakvaardigheid kost niets',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Funeral Harvest kan nog geen ander Zielfragment creëren',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Het voltooien van de {steps}-treffer Krijgsgeestcadans laat de slag {count} keer weerklinken voor {pct}% van zijn schade als Natuurschade',
+  'hudChrome.auraEffect.healEcho':
+    'Onder {threshold}% gezondheid komen herstelt {value} gezondheid',
+  'hudChrome.auraEffect.icicles':
+    '{value} van {max} IJsschilfers; bij {max} kan Gletsjerspies worden gespreukt',
+  'hudChrome.auraEffect.internalCooldown':
+    'Dit effect kan niet opnieuw worden geactiveerd voordat de timer afloopt',
+  'hudChrome.auraEffect.leadenHexLock': 'Loden vloek kan dit doelwit nog niet opnieuw vastwortelen',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Verouderde Death Echo; geen enkele huidige vaardigheid verbruikt hem',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Dood kan 1 Zielfragment creëren',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Slaat {storedPct}% van jouw en je ondode schade op, plus {lancePct}% van de schade van Soul Lance; werp opnieuw om te laten ontploffen. Dood ontploft binnen {radius} m en creëert 1 Zielfragment',
+  'hudChrome.auraEffect.nextAttackCrit': 'Je volgende aanval is gegarandeerd een kritieke treffer',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} ladingen: je volgende Verminkende Slag brengt {pct}% meer schade toe',
+  'hudChrome.auraEffect.perfectMoment': 'Aetherpijlen verbruikt geen Arcaneladingen',
+  'hudChrome.auraEffect.petDamage': 'Verhoogt huisdierschade met {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Verhoogt de actiesnelheid van je huisdier met {pct}%',
+  'hudChrome.auraEffect.physicalReduction': 'Vermindert opgelopen Fysieke schade met {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Genereert {ruin} Ruïne elke {ruinInterval} sec en brengt {damage} Vuurschade toe binnen {radius} m elke {damageInterval} sec',
+  'hudChrome.auraEffect.resourceCount': '{value} van {max}',
+  'hudChrome.auraEffect.resourceSap':
+    'Herstelt {value} van je huidige hulpbron elke {interval} sec',
+  'hudChrome.auraEffect.ruinousBrand':
+    '{charges} kopieën resteren: directe spreuken kopiëren {otherPct}% schade hierheen, of {selfPct}% wanneer dit hun doelwit is',
+  'hudChrome.auraEffect.sated': 'Kan niet profiteren van nog een groepshaast-effect',
+  'hudChrome.auraEffect.sourceVuln':
+    'Loopt {pct}% meer schade op van de werper die dit effect heeft toegepast',
+  'hudChrome.auraEffect.spellDamage': 'Verhoogt spreukschade met {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Verhoogt de bezweringssnelheid met {pct}%',
+  'hudChrome.auraEffect.stasis': 'Immuun en niet in staat te handelen',
+  'hudChrome.auraEffect.suddenDeath':
+    'Je volgende Vroeg Graf kost geen woede en negeert de gezondheidsvereiste',
+  'hudChrome.auraEffect.sureCrit':
+    '{charges} bezweringen van schadelijke vaardigheden zijn gegarandeerd kritieke treffers',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Slagen voor één doelwit treffen ook {targets} nabije vijand voor {pct}% schade',
+  'hudChrome.auraEffect.temporalEcho':
+    'De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Spreuk opnieuw binnen {range} m om hierheen terug te keren en het anker te verbruiken',
+  'hudChrome.auraEffect.wintersChill':
+    '{charges} ladingen: compatibele spreuken behandelen dit doelwit als bevroren',
+  'hudChrome.procOverlay.ruinMeter': 'Ruïne',
+  'hudChrome.procOverlay.ruinStatus': '{value} van {max} Ruïne',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Zielfragmenten',
+  'hudChrome.warlock.doomEmptyStatus': '{value} van {max} Verdoemenis.',
+  'hudChrome.warlock.doomLabel': 'Verdoemenis',
+  'hudChrome.warlock.doomMeterLock': 'Vergrendel de Kwelling-hulpbronbalk',
+  'hudChrome.warlock.doomMeterUnlock': 'Verplaats de Kwelling-hulpbronbalk',
+  'hudChrome.warlock.doomStatus': '{value} van {max} Verdoemenis; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.',
+  'hudChrome.warlock.fateThreadsLabel': 'Lotsdraden',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Drie Lotsdraden: Sentence kan ze verbruiken voor 18% meer schade.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} van {max} Lotsdraden.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.',
 };

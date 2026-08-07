@@ -322,20 +322,20 @@ export const id_ID: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Kecaman",
+      "fateThreadsLabel": "Benang Takdir",
+      "doomMeterUnlock": "Pindahkan bilah sumber daya Penderitaan",
+      "doomMeterLock": "Kunci bilah sumber daya Penderitaan",
+      "doomEmptyStatus": "{value} dari {max} Kecaman.",
+      "doomStatus": "{value} dari {max} Kecaman; {remaining}.",
+      "fateThreadsStatus": "{value} dari {max} Benang Takdir.",
+      "fateThreadsConsumeReady": "Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.",
+      "fateThreadsSentenceReady": "Tiga Benang Takdir: Sentence dapat mengonsumsinya untuk 18% kerusakan tambahan."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
+      "soulFragmentsMeter": "Serpihan Jiwa",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "{value} dari {max} Ruin"
     },
     "spectate": {
       "banner": "Menonton {name}"
@@ -1980,31 +1980,31 @@ export const id_ID: EnTranslations = {
       "absorb": "Menyerap {value} kerusakan",
       "healAbsorb": "Menyerap {value} penyembuhan masuk",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
-      "stasis": "Immune and unable to act",
+      "stasis": "Kebal dan tidak dapat bertindak",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "imbueRange": "Senjata terinfus: {min} hingga {max} kerusakan tambahan saat Vonis",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Meningkatkan kerusakan peliharaan sebesar {pct}%",
+      "petHaste": "Meningkatkan kecepatan tindakan peliharaan sebesar {pct}%",
+      "spellDamage": "Meningkatkan kerusakan sihir sebesar {pct}%",
+      "spellHaste": "Meningkatkan kecepatan rapal sihir sebesar {pct}%",
+      "sated": "Tidak dapat memperoleh manfaat dari efek percepatan kelompok lainnya",
+      "cauterizeFatigue": "Kauterisasi tidak dapat mencegah hantaman mematikan lainnya",
+      "castShield": "Rapalan tidak dapat diinterupsi atau ditunda oleh kerusakan",
       "dmgDone": "Meningkatkan kerusakan yang diberikan sebesar {pct}%",
       "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
       "heatingUp": "Serangan kritis pembangun Api berturutan berikutmu memberikan Hot Streak; pembangun yang tidak kritis menghapus Heating Up",
       "elementalConvergencePrimed": "Mantra berikutmu dari sekolah elemen lain memberikan Konvergensi Elemen",
       "hunterFerocity": "{stacks} Keganasan Kawanan: hewan peliharaanmu memberi {pct}% lebih banyak kerusakan",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini",
+      "funeralHarvestLock": "Funeral Harvest belum bisa menciptakan Serpihan Jiwa lagi",
+      "leadenHexLock": "Kutuk Timah belum bisa mengakar target ini lagi",
+      "forbiddenReflectionReady": "Jeda Penyihir Iblis berikutnya yang memenuhi syarat dapat dirapal kembali",
+      "forbiddenReflectionLock": "Pantulan Terlarang belum bisa disiapkan lagi",
+      "internalCooldown": "Efek ini tidak dapat terpicu lagi hingga penghitung waktu berakhir",
       "carriedFlag": "Kamu membawa bendera musuh. Batalkan buff ini untuk menjatuhkannya.",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
@@ -2019,13 +2019,13 @@ export const id_ID: EnTranslations = {
       "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
       "victoryRush": "Terjangan Kemenangan siap digunakan",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Kerusakan yang diberikan meningkat {damagePct}%, kecepatan serang {hastePct}%, dan kecepatan gerak {movePct}%",
+      "suddenDeath": "Ajal Dini berikutnya tidak memakan Amarah dan mengabaikan syarat nyawanya",
+      "aoeEcho": "{charges} gema tersisa: kemampuan bertarget tunggal memberikan {pct}% kerusakan kepada hingga {targets} musuh terdekat",
+      "sureCrit": "{charges} rapalan kemampuan yang merusak dijamin menjadi pukulan kritis",
+      "temporalEcho": "Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area",
+      "arcaneCharge": "{stacks} Muatan Arkana: Kekuatan Arkan memberikan {damagePct}% kerusakan lebih besar, dirapal {castPct}% lebih cepat, dan menghabiskan {costMult}x mana",
+      "physicalReduction": "Mengurangi kerusakan Fisik yang diterima sebesar {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Mantra Api-mu selalu menghasilkan serangan kritis",
@@ -2047,10 +2047,10 @@ export const id_ID: EnTranslations = {
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
       "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Serigala dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
       "verdance": "Kehijauan: tahap {stacks} dari {max}. Rapalan Mekar Liar dan Mekar Kedua yang selesai mengisinya; pada {max}, Pemulihan Cepat menjadi Mekar Raya",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
+      "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
+      "nextAttackCrit": "Seranganmu berikutnya dijamin akan menjadi pukulan kritis",
+      "healEcho": "Turun di bawah {threshold}% nyawa memulihkan {value} nyawa",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Meningkatkan daya mantra sebesar {value}",
@@ -2089,8 +2089,8 @@ export const id_ID: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Meningkatkan kerusakan pendarahan yang diterima sebesar {pct}%",
+      "sourceVuln": "Menerima {pct}% kerusakan lebih besar dari perapal yang memberikan efek ini",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2104,46 +2104,46 @@ export const id_ID: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Menyelesaikan Irama Roh Perang {steps} pukulan menggemakan serangan itu {count} kali sebesar {pct}% kerusakannya sebagai kerusakan Alam",
+      "elementalTrance": "Kerusakan yang diterima berkurang {pct}%. {mana}% dari semua kerusakan yang kamu berikan diubah menjadi mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Wujud Bruin: nyawa dan zirah meningkat",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Wujud Burung Bulan: kerusakan sihir meningkat {pct}% dan zirah meningkat {armorPct}%",
+      "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
+      "resourceCount": "{value} dari {max}",
+      "formLich": "Soul Lance juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
+      "afflictionEye": "Maledict Gaze menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman",
+      "afflictionEyeSecondary": "Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Sentence bergema di sini sebesar {echoPct}% kerusakan",
+      "afflictionAccomplice": "Kerusakan yang memenuhi syarat memberikan {value} Kecaman, paling banyak sekali setiap {interval} dtk",
+      "afflictionViolence": "{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan",
+      "afflictionVicarious": "Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman",
+      "afflictionPossession": "Memperkuat Needle of Fate, Melahap, Maledict Gaze, dan Sentence",
+      "afflictionJudgment": "Eye utama menghasilkan {eyePct}% lebih banyak Kecaman; Sentence memberikan {sentencePct}% kerusakan lebih besar dan yang pertama mengembalikan {refund} Kecaman",
+      "afflictionLitany": "Perolehan Kecaman memberikan {damage} kerusakan Bayangan kepada hingga {targets} musuh dalam radius {radius} m, sekali per detik",
+      "afflictionFateThreads": "{stacks} Benang Takdir: Sentence memberikan {sentencePct}% kerusakan lebih besar, atau Melahap memperoleh {doom} Kecaman tambahan per tik",
+      "afflictionConsumeThreads": "Melahap sedang mengonsumsi {stacks} Benang Takdir untuk {doom} Kecaman tambahan per tik",
+      "necromancyHarvestMark": "Kematian dapat menciptakan 1 Serpihan Jiwa",
+      "necromancyOssuaryMark": "Menyimpan {storedPct}% dari kerusakanmu dan mayat hidupmu, ditambah {lancePct}% dari kerusakan Soul Lance; rapal ulang untuk meledakkannya. Kematian meledak dalam radius {radius} m dan menciptakan 1 Serpihan Jiwa",
+      "necromancyDeathEcho": "Gema Kematian warisan; tidak ada kemampuan saat ini yang mengonsumsinya",
+      "warlockAnchor": "Rapal ulang dalam radius {range} m untuk kembali ke sini dan mengonsumsi jangkar",
+      "formMetamorph": "Wujud iblis: ukuran tubuh meningkat {pct}%; bonus lainnya menyertai buff terpisah",
+      "energyRegen": "Meningkatkan regenerasi Energi sebesar {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} muatan: Serangan Pelukaimu berikutnya memberikan {pct}% kerusakan lebih besar",
+      "sweepingStrikes": "Serangan bertarget tunggal juga menghantam {targets} musuh terdekat sebesar {pct}% kerusakan",
+      "fingersOfFrost": "{charges} muatan: Tombak Es memperlakukan targetnya seolah membeku dan memberikan {pct}% kerusakan beku",
+      "brainFreeze": "Cambuk Musim Dinginmu berikutnya seketika dan mengabaikan jedanya",
+      "wintersChill": "{charges} muatan: mantra yang kompatibel memperlakukan target ini seolah membeku",
+      "icicles": "{value} dari {max} Es Runcing; pada {max}, Pancang Glasial dapat dirapal",
+      "desolation": "{charges} muatan: Baut Reruntuhanmu berikutnya dirapal {castPct}% lebih cepat atau Hujan Apimu berikutnya mendarat seketika",
+      "ruinousBrand": "{charges} salinan tersisa: mantra langsung menyalin {otherPct}% kerusakan ke sini, atau {selfPct}% saat ini menjadi targetnya",
+      "duskfireClaim": "Kematian memberikan {value} Ruin",
+      "pyreGuardian": "Menghasilkan {ruin} Ruin setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk",
+      "perfectMoment": "Panah Aether tidak mengonsumsi Muatan Arkana",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -3979,7 +3979,7 @@ export const id_ID: EnTranslations = {
       "none": "Tak ada kelas yang cocok dengan semua saringan. Bersihkan satu untuk melihat lebih banyak."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.",
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
       "revenge": "Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.",
       "hamstring": "Melumpuhkan gerakan musuh agar tidak dapat melarikan diri.",
@@ -7384,10 +7384,10 @@ export const id_ID: EnTranslations = {
     "pet": {
       "attack": "Serang",
       "waterJet": "Pancaran Air",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Baut Fel",
+      "abyssalChain": "Rantai Jurang",
+      "autocastOn": "Mode otomatis aktif. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk menonaktifkannya.",
+      "autocastOff": "Mode otomatis nonaktif. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengaktifkannya.",
       "taunt": "Provokasi",
       "healDemon": "Sembuhkan Iblis",
       "healPet": "Sembuhkan Peliharaan",
@@ -7398,10 +7398,10 @@ export const id_ID: EnTranslations = {
       "petAttackDesc": "Perintahkan peliharaan Anda untuk menyerang target bermusuhan Anda saat ini.",
       "waterJetTitle": "Pancaran Air",
       "waterJetDesc": "Perintahkan Elemental Air-mu untuk menyalurkan aliran yang memperlambat selama 3 detik. Jeda 8 detik. Klik kanan untuk mengaktifkan secara otomatis setiap kali jeda selesai.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Baut Fel",
+      "felboltDesc": "Perintahkan Emberkin untuk melontarkan proyektil fel tambahan ke targetmu. Jeda 8 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
+      "abyssalChainTitle": "Rantai Jurang",
+      "abyssalChainDesc": "Perintahkan Gloomshade untuk menyeret musuh biasa dari jarak lebih dari 8 hingga 20 m kembali ke dirinya. Bos tidak bisa ditarik. Jeda 15 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -7568,8 +7568,8 @@ export const id_ID: EnTranslations = {
       "unavailable": "Tidak tersedia",
       "requiresLevel": "Membutuhkan level {level}",
       "requiresForm": "Membutuhkan Wujud {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Membutuhkan siluman",
+      "requiresStealthSkulduggery": "Membutuhkan siluman (tidak diperlukan pada 3 Gloam atau selama Tabir Bayangan)",
       "requiresCombo": "Menghabiskan poin kombo",
       "requiresTargetHealthBelow": "Membutuhkan nyawa target di bawah {percent}%",
       "requiresDodge": "Hanya bisa dipakai setelah target mengelak",
@@ -7788,7 +7788,7 @@ export const id_ID: EnTranslations = {
       "clickDestroy": "Klik untuk menghancurkan",
       "useFishing": "Pakai: Memancing di perairan terdekat.",
       "useHealingPotion": "Pakai: Memulihkan {amount} nyawa seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.",
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
@@ -8292,20 +8292,20 @@ export const id_ID: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Tebasan Keji",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.",
+        "specNote_assassination": "Menambah 1 Ritus Bisa (maks 6).",
+        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: 130% kerusakan senjata plus 10, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
       },
       "eviscerate": {
         "name": "Tidur Abadi",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Jurus penutup yang menyebabkan {damage}.",
+        "specNote_assassination": "Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.",
+        "specNote_combat": "Mendaratkan ini dengan 4 poin combo atau lebih memulai Redline selama 8 detik: Wicked Slash berubah menjadi Haymaker dan tombol ini berubah menjadi Lights Out (45 plus 35 per poin combo, menghantam 25% lebih keras untuk setiap tingkat Redline yang terkumpul, memulihkan 25 energi). Gunakan sebelum Redline berakhir."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Tancapkan belatimu ke punggung target sebesar 150% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "specNote_assassination": "Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus)."
       },
       "gouge": {
         "name": "Colok Mata",
@@ -8317,7 +8317,7 @@ export const id_ID: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Tempo Bengis",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Jurus penutup yang meningkatkan kecepatan serang jarak dekat sebesar 30% selama 12 detik plus 4 detik per poin combo (5 poin combo: 32 detik)."
       },
       "sprint": {
         "name": "Tumit Gesit",
@@ -8325,17 +8325,17 @@ export const id_ID: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Pukulan Curang",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik)."
       },
       "ambush": {
         "name": "Serangan Penyergap",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Menyerang dari bayangan sebesar 250% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman dan dari sudut mana pun: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, memulai Tabir Bayangan selama 6 detik, dan menghantam dua kali lipat."
       },
       "stealth": {
         "name": "Selubung Senja",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, tetapi kamu bergerak 50% lebih lambat. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.",
+        "specNote_subtlety": "Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3)."
       },
       "adrenaline_rush": {
         "name": "Darah Terpacu",
@@ -8343,13 +8343,13 @@ export const id_ID: EnTranslations = {
       },
       "garrote": {
         "name": "Kawat Leher",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Lilitkan kawat di leher musuh, menyebabkan {damage} kerusakan sekarang dan pendarahan sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Harus dalam siluman. Memberi 2 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "sap": {
         "name": "Bius",
@@ -8361,11 +8361,11 @@ export const id_ID: EnTranslations = {
       },
       "expose_armor": {
         "name": "Tembus Zirah",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Jurus penutup yang membuka pertahanan target selama 30 detik: setiap poin combo yang dipakai mengurangi zirahnya sebesar 2% (5 poin combo: {damage}%)."
       },
       "rupture": {
         "name": "Kehabisan Darah",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Jurus penutup yang melukai target: ia berdarah setiap 2 detik, selama 6 detik plus 2 detik per poin combo (5 poin combo: 16 detik dan {damage} total kerusakan)."
       },
       "vanish": {
         "name": "Langkah Asap",
@@ -8733,19 +8733,19 @@ export const id_ID: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Menandai satu musuh sebagai fokus kutukanmu. Memindahkan Eye mempertahankan Kecaman tetapi tidak memperbarui masa berlakunya yang 20 detik."
       },
       "maledict_gaze": {
         "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "description": "Maledict Eye-mu menyerang Evil Eye utama yang kamu pilih setiap 2,5 detik untuk kerusakan Bayangan. Possess the Evil Eye menggandakan kecepatan serangnya."
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya."
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
       },
       "life_tap": {
         "name": "Tawar Getir",
@@ -8753,7 +8753,7 @@ export const id_ID: EnTranslations = {
       },
       "cursed_accomplice": {
         "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "description": "Menautkan Maledict Eye-mu saat tidak ada sekutu yang dipilih, membuat Gaze miliknya menghasilkan 2 Kecaman. Menautkan satu anggota grup yang dipilih membuat hanya kerusakan mereka terhadap Evil Eye-mu yang menghasilkan 3 sebagai gantinya. Tautan baru menggantikan yang sebelumnya dan dapat terpicu sekali setiap 2 detik."
       },
       "curse_of_agony": {
         "name": "Tenung Derita",
@@ -8765,43 +8765,43 @@ export const id_ID: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Mengutuk Evil Eye utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 m, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh."
       },
       "cinderhide": {
         "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "description": "Mengeraskan kulitmu menjadi terak yang mendingin selama 10 detik, mengurangi semua kerusakan yang diterima sebesar 25%."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 m untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
       },
       "soulwell": {
         "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "description": "Memanggil Soulwell selama 3 menit. Selagi di luar pertempuran, anggota grup dapat mengisi ulang Batu Jiwa mereka hingga 3. Sebuah Batu Jiwa memulihkan 25% dari nyawa maksimum dan berbagi jeda ramuan."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "description": "Mengutuk musuh selama 8 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 16 kerusakan Bayangan."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
       },
       "vicarious_suffering": {
         "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "description": "Menautkan penderitaanmu selama 8 detik dan menghasilkan hingga 15 Kecaman dari pukulan bermusuhan. Pada dirimu sendiri, mengurangi kerusakan yang diterima sebesar 20%. Pada sekutu, mengalihkan hingga 20% kepadamu tanpa membuat nyawamu turun di bawah 15%."
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "description": "Maledictor merasuki Evil Eye utamamu selama 15 detik dan menghasilkan 35 Kecaman. Needle of Fate dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Sentence memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20."
       },
       "hour_of_judgment": {
         "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "description": "Memanggil penghakiman atas Evil Eye utamamu selama 15 detik, memberikan 40 Kecaman dan 3 Benang Takdir, mengaktifkan Possession, menggandakan Kecaman yang dihasilkan melalui Eye utama, dan meningkatkan kerusakan Sentence sebesar 20%. Sentence pertama mengembalikan 50 Kecaman."
       },
       "coven": {
         "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "description": "Menciptakan Evil Eye sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Sentence bergema kepada mereka sebesar 35% kerusakan."
       },
       "fear": {
         "name": "Cekaman",
@@ -8817,12 +8817,12 @@ export const id_ID: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Menandai musuh selama 15 detik. 3 mantra langsung berikutnya bergema sebesar 25% kerusakan terhadap musuh yang ditandai, atau menyalin 50% kerusakan kepadanya saat dirapalkan terhadap target lain."
       },
       "wrath": {
         "name": "Panah Liar",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Melontarkan baut energi alam sebesar {damage} kerusakan Alam.",
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, Moonseed berubah menjadi Moonsurge dan Skyfall berubah menjadi Sunwake."
       },
       "healing_touch": {
         "name": "Penyembuhan Liar",
@@ -8834,8 +8834,8 @@ export const id_ID: EnTranslations = {
       },
       "moonfire": {
         "name": "Badai Rembulan",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Membakar musuh dengan api rembulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.",
+        "specNote_balance": "Jaga agar tetap membara: Moonseed memperpanjangnya selama 6 detik."
       },
       "moonseed": {
         "name": "Benih Rembulan",
@@ -8843,8 +8843,8 @@ export const id_ID: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Mekar Liar",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Menyembuhkan target sebesar {damage} selama 12 detik.",
+        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Swiftmend berubah menjadi Overbloom."
       },
       "thorns": {
         "name": "Perisai Onak",
@@ -8860,8 +8860,8 @@ export const id_ID: EnTranslations = {
       },
       "maul": {
         "name": "Remuk Tulang",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru melindungimu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
       },
       "growl": {
         "name": "Gertakan",
@@ -8873,23 +8873,23 @@ export const id_ID: EnTranslations = {
       },
       "claw": {
         "name": "Cakar",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "regrowth": {
         "name": "Mekar Kedua",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 21 detik.",
+        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5)."
       },
       "barkskin": {
         "name": "Kulit Ek",
@@ -8905,8 +8905,8 @@ export const id_ID: EnTranslations = {
       },
       "starfire": {
         "name": "Langit Runtuh",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Memanggil turun baut api bintang, menyebabkan {damage} kerusakan Arkana.",
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
       },
       "travel_form": {
         "name": "Wujud Fleet",
@@ -8922,7 +8922,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cahaya Sihir",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Mengurangi zirah target sebesar {damage}% selama 40 detik."
       },
       "hibernate": {
         "name": "Lelap",
@@ -8946,8 +8946,8 @@ export const id_ID: EnTranslations = {
       },
       "rip": {
         "name": "Robekan",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Jurus penutup yang membuat target berdarah setiap 2 detik selama 24 detik: 36 kerusakan plus 24 per poin combo yang dipakai (5 poin combo: {damage} total). Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
@@ -8999,7 +8999,7 @@ export const id_ID: EnTranslations = {
       },
       "elemental_trance": {
         "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "description": "Memasuki trans elemental selama 15 detik, mengurangi kerusakan yang diterima sebesar 30% dan mengubah 20% dari semua kerusakan yang kamu berikan menjadi mana. (mesin Warspirit)"
       },
       "primal_exaltation": {
         "name": "Pemuliaan Purba",
@@ -9015,59 +9015,59 @@ export const id_ID: EnTranslations = {
       },
       "soul_harvest": {
         "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "description": "Mencabik jiwa musuh sebesar {damage} kerusakan Bayangan dan menciptakan 1 Serpihan Jiwa, hingga 5."
       },
       "soul_lance": {
         "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "description": "Melontarkan tombak spektral sebesar {damage} kerusakan Bayangan. Terhadap Ossuary Mark-mu, 50% kerusakannya ditambahkan ke tanda tersebut."
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "description": "Membangkitkan pendamping bertahan permanen. Graveguard secara otomatis memancing perhatian, mencegat 20% dari kerusakanmu melalui Dominasi Kubur, dan Reaping Command membuatnya memancing perhatian dan menerima 30% kerusakan lebih sedikit selama 4 detik."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "description": "Menghabiskan 1 Serpihan Jiwa untuk menambahkan Skeletal Warrior persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 45% kerusakan setiap 6 detik, dan Reaping Command menahan targetnya dengan perlambatan 40% selama 4 detik."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk menambahkan Bone Mage jarak jauh yang persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Serangannya membuat target terbuka terhadap 5% kerusakan sihir lebih besar selama 6 detik, dan Reaping Command menaikkan kelemahan itu menjadi 8%."
       },
       "bone_armor": {
         "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "description": "Menyelimutimu dengan tulang, menyerap kerusakan setara 20% dari nyawa maksimummu."
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "description": "Mengorbankan Bone Mage terlebih dahulu, lalu Skeletal Warrior, dan Gravewing hanya sebagai upaya terakhir. Di antara duplikat, ia memilih yang durasi tersisanya paling sedikit, lalu yang terlemah, untuk memberikan {damage} kerusakan Bayangan di lokasi yang dipilih."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "description": "Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik."
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa."
       },
       "unholy_command": {
         "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "description": "Menghabiskan 3 Serpihan Jiwa untuk memerintahkan semua mayat hidupmu memberikan 25% kerusakan lebih besar dan bertindak 20% lebih cepat selama 12 detik."
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk memerintahkan setiap abdi mayat hidup menyerang secara serentak. Graveguard memancing perhatian dan bersiaga, Warrior menahan, Bone Mage membuka pertahanan sihir, dan Gravewing merobek semua musuh yang terkena."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "description": "Menghancurkan satu abdi Dominasi untuk memulihkan 25% dari nyawa maksimummu."
       },
       "raise_gravewing": {
         "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk menambahkan Gravewing persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 65% kerusakan setiap 5 detik, dan Reaping Command membuat setiap musuh yang terkena menerima 8% kerusakan lebih besar selama 5 detik."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "description": "Membuka portal makam untuk membangkitkan Skeletal Warrior, Bone Mage, dan Gravewing sementara selama 20 detik, mengisi barisan yang dikosongkan oleh abdi Dominasi tetapmu."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -9107,15 +9107,15 @@ export const id_ID: EnTranslations = {
       },
       "cold_blood": {
         "name": "Darah Dingin",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Memusatkan niat membunuhmu sehingga seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)"
       },
       "blade_flurry": {
         "name": "Tebasan Bertubi",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 12 detik. (mesin Thuggery)"
       },
       "hemorrhage": {
         "name": "Pendarahan",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Menghantam musuh sebesar kerusakan senjata ditambah {damage}, menyebabkan kerusakan pendarahan selama 12 detik, dan meningkatkan kerusakan pendarahan yang diterima sebesar 40%. Memberi 1 poin combo. Setiap penggunaan ke-2 menambah 1 Gloam (maks 3). (mesin Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusi Kekuatan",
@@ -9151,7 +9151,7 @@ export const id_ID: EnTranslations = {
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Penanaman Wildbloom dan Second Bloom menambah Verdance; pada 5 Verdance tombol ini berubah menjadi Overbloom, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)"
       },
       "moonlash": {
         "name": "Gelombang Rembulan",
@@ -9351,7 +9351,7 @@ export const id_ID: EnTranslations = {
       },
       "abyssal_rift": {
         "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "description": "Membuka celah di lokasi yang dipilih, menarik musuh dalam radius 8 m ke pusatnya, memberikan {damage} kerusakan Bayangan, dan membuat mereka terpana selama 2 detik. Bos menerima kerusakan tetapi menahan tarikan dan efek terpana."
       },
       "chaos_bolt": {
         "name": "Baut Reruntuhan",
@@ -9359,7 +9359,7 @@ export const id_ID: EnTranslations = {
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "description": "Mengorbankan 10% dari nyawamu saat ini untuk menyerap kerusakan setara 30% dari nyawa maksimummu selama 8 detik."
       },
       "cloak_of_shadows": {
         "name": "Jubah Bayang",
@@ -9415,7 +9415,7 @@ export const id_ID: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Serangan Arwah",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Menghantam musuh sebesar kerusakan senjata ditambah {damage} dan meningkatkan peluang mengelakmu sebesar 15% selama 7 detik. Memberi 1 poin combo. (talenta Rogue)"
       },
       "hammer_of_wrath": {
         "name": "Palu Berdentang",
@@ -9551,7 +9551,7 @@ export const id_ID: EnTranslations = {
       },
       "sacrilegious_march": {
         "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "description": "Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa."
       },
       "spellsteal": {
         "name": "Pencurian Mantra",
@@ -9580,7 +9580,7 @@ export const id_ID: EnTranslations = {
       "venom_dart": {
         "name": "Damak Bisa",
         "description": "Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Menambah 1 Ritus Bisa dan memperpanjang luka bisamu selama 6 detik (luka itu tidak akan pernah melebihi 20 detik)."
       },
       "body_blow": {
         "name": "Pukulan Tubuh",
@@ -9644,8 +9644,8 @@ export const id_ID: EnTranslations = {
       },
       "rake": {
         "name": "Kupasan",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "revive_pet": {
         "name": "Obati",
@@ -11163,16 +11163,16 @@ export const id_ID: EnTranslations = {
         "name": "Tali Kekang Raptor Drakemaw"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Taring Beku"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Ujung Sumsum"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Bisikan Senja"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Belati Kaca Tulang"
       },
       "moggers_hide_quiver": {
         "name": "Tabung Panah Kulit Mogger"
@@ -11202,7 +11202,7 @@ export const id_ID: EnTranslations = {
         "name": "Roti Perjamuan Sihir"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Batu Jiwa"
       },
       "bristleback_maul": {
         "name": "Palu Gallowglass"

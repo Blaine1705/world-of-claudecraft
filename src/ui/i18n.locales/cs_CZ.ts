@@ -11852,4 +11852,331 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': 'Vlnky na vodě (brázdy)',
   'hudChrome.breath.label': 'Dech',
   'hudChrome.breath.drowning': 'Topíš se!',
+  'abilityUi.tooltip.requiresStealth': 'Vyžaduje skrytí',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Vyžaduje skrytí (není potřeba při 3 Šeru nebo během Stínového závoje)',
+  'abilityUi.tooltip.ruinCost': '{cost} Zkázy',
+  'entities.abilities.abyssal_rift.description':
+    'Roztrhne trhlinu na vybraném místě, přitáhne nepřátele do 8 yardů k jejímu středu, způsobí jim {damage} stínového poškození a omráčí je na 2 s. Bossové utrpí poškození, ale odolají přitažení i omráčení.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Udeř ze stínů za 250 % poškození zbraně plus {damage}. Musíš být v skrytí a za cílem. Musíš mít dýku. Udělí 1 combo bod.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí a z libovolného úhlu: takové použití nic nestojí, spotřebuje všechna 3 Šera, spustí Stínový závoj na 6 s a zasáhne dvojnásobně.',
+  'entities.abilities.army_of_the_dead.description':
+    'Otevře hrobový portál a na 20 s vzkřísí dočasného Kostlivého bojovníka, Kostěného mága a Hrobové křídlo, čímž zaplní řady, které tví stálí služebníci Panství nechávají prázdné.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Zaboduj dýkou do zad cíle za 150 % poškození zbraně plus {damage}. Musíš být za cílem. Musíš mít dýku. Udělí 1 combo bod.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Každý úder přidá 1 Jedový rituál (max 6) a vrátí 15 energie. Při 6 Jedovém rituálu se Do hrobu změní na Jedovou trhlinu (okamžitě způsobí veškeré zbývající poškození tvých krvácení).',
+  'entities.abilities.blade_flurry.description':
+    'Rozpoutá spršku čepelí a na 12 s zvýší rychlost útoku o 20 %. (klíčová schopnost Thuggery)',
+  'entities.abilities.bone_armor.description':
+    'Obalí tě kostmi a pohltí poškození ve výši 20 % tvého maximálního zdraví.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Musíš být v skrytí. Udělí 2 combo body.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s.',
+  'entities.abilities.cinderhide.description':
+    'Na 10 s ti zatvrdí kůži do chladnoucí strusky a sníží veškeré utrpěné poškození o 25 %.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze ve vlčí podobě.',
+  'entities.abilities.claw.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
+  'entities.abilities.cold_blood.description':
+    'Soustředí tvůj zabijácký záměr, takže tvůj příští útok bude kritický zásah. (klíčová schopnost Knifework)',
+  'entities.abilities.corpse_explosion.description':
+    'Nejprve obětuje Kostěného mága, poté Kostlivého bojovníka a Hrobové křídlo jen jako poslední možnost. Mezi duplicitami vybere toho s nejkratší zbývající dobou trvání, poté nejslabšího, a způsobí {damage} stínového poškození na zvoleném místě.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Vytvoří sekundární Evil Eyes až na 4 blízkých nepřátelích na 15 s. Krmí sdílenou zásobu Odsouzení z 50 % a Sentence se k nim šíří ozvěnou za 35 % poškození.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Obětuje 12 % tvého maximálního zdraví, obnoví 1,5 % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Propojí tvé Maledict Eye, když není vybraný žádný spojenec, a jeho Maledict Gaze pak generuje 2 Odsouzení. Propojení jednoho vybraného člena skupiny místo toho způsobí, že jen jeho poškození tvému Evil Eye generuje 3. Nové propojení nahradí předchozí a může se spustit nejvýše jednou za 2 s.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Obětuje 10 % tvého aktuálního zdraví a na 8 s pohltí poškození ve výši 30 % tvého maximálního zdraví.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Na 15 s vstoupíš do elementálního transu, který sníží utrpěné poškození o 30 % a promění 20 % veškerého tvého způsobeného poškození v manu. (klíčová schopnost Válečného ducha)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Označí jednoho nepřítele jako terč tvých kleteb. Přesunutí Oka zachová Odsouzení, ale neobnoví jeho 20sekundové vypršení.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Dokončovací útok, který způsobí {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Při 6 Jedovém rituálu se toto tlačítko změní na Jedovou trhlinu: úder, který okamžitě způsobí veškeré poškození, které by ještě způsobila tvá krvácení, zasadí čerstvou jedovou ránu a obnoví 20 energie.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Zásah tímto se 4 nebo více combo body spustí na 8 s Redline: Zlý sek se změní na Úder na tělo a toto tlačítko na Nokautující úder (45 plus 35 za combo bod, o 25 % tvrději za každý vybudovaný díl Redline, obnoví 25 energie). Utrať ho, než Redline skončí.',
+  'entities.abilities.expose_armor.description':
+    'Dokončovací útok, který na 30 s odhalí cíl: každý vydaný combo bod sníží jeho brnění o 2 % (5 combo bodů: {damage} %).',
+  'entities.abilities.ferocious_bite.description':
+    'Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň: kousnutí za 70 plus 43 za combo bod, které navíc okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví 30 energie.',
+  'entities.abilities.funeral_harvest.description':
+    'Když zemře nepřítel nedávno zasažený tebou nebo tvými nemrtvými, získáš 1 Úlomek duše. Může nastat nejvýše jednou za 3 s.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Ovineš nepříteli kolem hrdla strunu, což způsobí {damage} poškození ihned a krvácení za {overTime} po dobu 18 s. Musíš být v skrytí. Udělí 1 combo bod.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s.',
+  'entities.abilities.ghostly_strike.description':
+    'Zasáhne nepřítele za poškození zbraně plus {damage} a na 7 s zvýší tvou šanci na vyhnutí o 15 %. Udělí 1 combo bod. (talent tuláka)',
+  'entities.abilities.hemorrhage.description':
+    'Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí krvácení po dobu 12 s a zvýší utrpěné poškození z krvácení o 40 %. Udělí 1 combo bod. Každé 2. použití přidá 1 Šero (max 3). (klíčová schopnost Skulduggery)',
+  'entities.abilities.hex_of_violence.description':
+    'Uhrane nepřítele na 8 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 16 stínového poškození.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Na 15 s vyvolá soud nad tvým primárním Evil Eye: udělí 40 Odsouzení a 3 Nitě osudu, aktivuje Posednutí, zdvojnásobí Odsouzení generované skrze primární Oko a zvýší poškození Sentence o 20 %. První Sentence vrátí 50 Odsouzení.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s).',
+  'entities.abilities.litany_of_guilt.description':
+    'Na 6 s prokleje tvé primární Evil Eye. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele v okruhu 8 yardů, nejvýše jednou za sekundu. Stupeň 2 to prodlouží na 8 s a 4 nepřátele.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Tvé Maledict Eye útočí na tvé vybrané primární Evil Eye každých 2,5 s za stínové poškození. Possess the Evil Eye zdvojnásobí jeho rychlost útoku.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí vysokou hrozbu. Aktivuje se při tvém příštím úderu. Pouze v medvědí podobě.',
+  'entities.abilities.maul.specNote_feral':
+    'Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: úder za 78 až 96 poškození s vysokou hrozbou; pod polovinou zdraví tě místo toho ochrání štítem za 18 % tvého maximálního zdraví a vrátí 15 vzteku.',
+  'entities.abilities.moonfire.description':
+    'Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Udržuj to hořet: Měsíční semeno to prodlouží o 6 s.',
+  'entities.abilities.needle_of_fate.description':
+    'Probodne nepřítele za {damage} stínového poškození a vygeneruje 5 Odsouzení, pokud nese tvé Evil Eye. Každý zásah tvého primárního Evil Eye přidá na 12 s Nit osudu, až do 3. Pokud neexistuje žádné Evil Eye, Needle nejprve označí svůj cíl.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'Maledictor posedne tvé primární Evil Eye na 15 s a vygeneruje 35 Odsouzení. Needle of Fate se sešle za 1 s a vygeneruje 2 Odsouzení navíc, Vysát lze kanálovat za pohybu a Sentence způsobí o 25 % více poškození a uvolní opožděnou ozvěnu za 60 % poškození, která na úrovních 17-20 klesá na 30 %.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Spotřebuje 2 Úlomky duše a přidá trvalého Kostěného mága na dálku do tvého dvouslotového Panství. Sloužit ti může jen jeden. Jeho útoky na 6 s odhalí cíl vůči o 5 % vyššímu magickému poškození a Reaping Command tuto slabinu zvýší na 8 %.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Vzkřísí trvalého obranného společníka. Hrobová stráž automaticky provokuje, přes Hrobové panství zachytí 20 % tvého poškození a Reaping Command ji na 4 s přiměje provokovat a utrpět o 30 % méně poškození.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Spotřebuje 2 Úlomky duše a přidá trvalé Hrobové křídlo do tvého dvouslotového Panství. Sloužit ti může jen jedno. Každých 5 s zasáhne sekem blízké nepřátele za 65 % poškození a Reaping Command na 5 s způsobí, že každý zasažený nepřítel utrpí o 8 % více poškození.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Spotřebuje 1 Úlomek duše a přidá trvalého Kostlivého bojovníka do tvého dvouslotového Panství. Sloužit ti může jen jeden. Každých 6 s zasáhne sekem blízké nepřátele za 45 % poškození a Reaping Command na 4 s připoutá jeho cíl 40% zpomalením.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Rozpárej nepřítele za poškození zbraně plus {damage} a způsob krvácení po dobu 18 s. Udělí 1 combo bod. Pouze ve vlčí podobě.',
+  'entities.abilities.rake.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
+  'entities.abilities.reaping_command.description':
+    'Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Vyléčí přátelský cíl za {damage} a další množství po dobu 21 s.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Zasazení NOVÉHO květu přidá 1 Bujnost (max 5).',
+  'entities.abilities.rejuvenation.description': 'Vyléčí cíl za {damage} po dobu 12 s.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Zasazení NOVÉHO květu přidá 1 Bujnost (max 5). Při 5 Bujnosti se Rychlé zhojení změní na Překvět.',
+  'entities.abilities.rip.description':
+    'Dokončovací útok, po kterém cíl krvácí každé 2 s po dobu 24 s: 36 poškození plus 24 za vydaný combo bod (5 combo bodů: {damage} celkem). Pouze ve vlčí podobě.',
+  'entities.abilities.rip.specNote_feral': 'Zasažený úder přidá 1 Starou krev (max 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Dokončovací útok, který zraní cíl: krvácí každé 2 s po dobu 6 s plus 2 s za combo bod (5 combo bodů: 16 s a {damage} celkového poškození).',
+  'entities.abilities.sacrifice_undead.description':
+    'Zničí jednoho služebníka Panství a obnoví 25 % tvého maximálního zdraví.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Zvýší rychlost pohybu o 35 %, ale každou sekundu obětuje 2 % tvého maximálního zdraví. Seslej znovu pro zrušení. Při 20 % zdraví se samo vypne.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description':
+    'Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.',
+  'entities.abilities.sinister_strike.specNote_assassination': 'Přidá 1 Jedový rituál (max 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Zatímco je Redline aktivní, toto tlačítko se změní na Úder na tělo: 130 % poškození zbraně plus 10, udělí 2 combo body a přidá 1 Redline (max 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Dokončovací útok, který na 12 s plus 4 s za combo bod zvýší rychlost útoku na blízko o 30 % (5 combo bodů: 32 s).',
+  'entities.abilities.soul_harvest.description':
+    'Trhá duši nepřítele za {damage} stínového poškození a vytvoří 1 Úlomek duše, až do 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Vrhne přízračné kopí za {damage} stínového poškození. Proti tvé Ossuary Mark se 50 % jeho poškození přidá ke značce.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Na 3 min přivolá Soulwell. Mimo boj si členové skupiny mohou doplnit své Kameny duše až na 3. Kámen duše obnoví 25 % maximálního zdraví a sdílí dobu obnovy s lektvary.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Přivolá blesk hvězdného ohně a způsobí {damage} arkánního poškození.',
+  'entities.abilities.starfire.specNote_balance':
+    'V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se toto tlačítko změní na Sluneční vzedmutí: okamžitý úder za 80 až 100 přírodního poškození plus 45 hoření po dobu 9 s, obnoví 35 many a spotřebuje všechny 3.',
+  'entities.abilities.stealth.description':
+    'Ukryje tě ve stínech: nepřátelé si tě sotva všimnou, ale pohybuješ se o 50 % pomaleji. Útok nebo utrpěné poškození zruší Závoj šera. Seslej znovu pro vystoupení ven.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Každý zahajovací útok použitý ze Závoje šera přidá 1 Šero (max 3).',
+  'entities.abilities.swipe.description':
+    'Přejeď drápy přes blízké nepřátele za {damage} poškození. Způsobí extra hrozbu. Pouze v medvědí podobě.',
+  'entities.abilities.swipe.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
+  'entities.abilities.umbral_anchor.description':
+    'První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 m: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Spotřebuje 3 Úlomky duše a na 12 s přikáže všem tvým nemrtvým způsobit o 25 % více poškození a jednat o 20 % rychleji.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Přidá 1 Jedový rituál a prodlouží tvou jedovou ránu o 6 s (rána nikdy nepřesáhne 20 s).',
+  'entities.abilities.vicarious_suffering.description':
+    'Na 8 s propojí tvé utrpení a z nepřátelských zásahů vygeneruje až 15 Odsouzení. Na sobě sníží utrpěné poškození o 20 %. Na spojenci přesměruje až 20 % na tebe, aniž by tě to dostalo pod 15 % zdraví.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description':
+    'Vrhne blesk přírodní energie za {damage} přírodního poškození.',
+  'entities.abilities.wrath.specNote_balance':
+    'V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se Měsíční semeno změní na Měsíční vzedmutí a Pád nebes na Sluneční vzedmutí.',
+  'entities.items.boneglass_shiv.name': 'Kostiskelné šídlo',
+  'entities.items.duskwhisper.name': 'Šepot šera',
+  'entities.items.marrowpoint.name': 'Hrot morku',
+  'entities.items.rimefang.name': 'Jinovatkový tesák',
+  'entities.items.soul_stone.name': 'Kámen duše',
+  'entities.mobs.graveguard.name': 'Hrobová stráž',
+  'entities.mobs.necromancy_bone_mage.name': 'Kostěný mág',
+  'entities.mobs.necromancy_gravewing.name': 'Hrobové křídlo',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Kostlivý bojovník',
+  'guide.abilityHook.evil_eye': 'Pojmenuje nepřítele, jehož činy a utrpení krmí tvé Odsouzení.',
+  'hud.pet.abyssalChain': 'Propastný řetěz',
+  'hud.pet.abyssalChainDesc':
+    'Přikaž Gloomshade přitáhnout běžného nepřítele od 8 do 20 yardů zpět k sobě. Bossy nelze přitáhnout. Čas obnovy 15 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.',
+  'hud.pet.abyssalChainTitle': 'Propastný řetěz',
+  'hud.pet.autocastOff':
+    'Automatické seslání vypnuto. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro zapnutí.',
+  'hud.pet.autocastOn':
+    'Automatické seslání zapnuto. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro vypnutí.',
+  'hud.pet.felbolt': 'Běsový výstřel',
+  'hud.pet.felboltDesc':
+    'Přikaž Emberkin vypustit na tvůj cíl další běsovský projektil. Čas obnovy 8 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.',
+  'hud.pet.felboltTitle': 'Běsový výstřel',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Způsobilé poškození uděluje {value} Odsouzení, nejvýše jednou za {interval} s',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Vysát spotřebovává {stacks} Nití osudu za {doom} Odsouzení navíc za tik',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze útočí každých {interval} s; efekty na tomto Oku generují {pct} % Odsouzení',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Efekty na tomto Oku generují {doomPct} % Odsouzení; Sentence sem zasáhne ozvěnou za {echoPct} % poškození',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Nití osudu: Sentence způsobuje o {sentencePct} % více poškození, nebo Vysát získává {doom} Odsouzení navíc za tik',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Primární Oko generuje o {eyePct} % více Odsouzení; Sentence způsobuje o {sentencePct} % více poškození a první vrátí {refund} Odsouzení',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Zisky Odsouzení způsobí {damage} stínového poškození až {targets} nepřátelům v okruhu {radius} yardů, jednou za sekundu',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Posiluje Needle of Fate, Vysát, Maledict Gaze a Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Přesměruje nebo sníží {pct} % příchozího poškození a může vygenerovat až {max} Odsouzení',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Zbývá {charges} odplat: nepřátelský útok udělí {doom} Odsouzení a vrátí {damage} stínového poškození',
+  'hudChrome.auraEffect.aoeEcho':
+    'Zbývá {charges} ozvěn: schopnosti na jeden cíl zasáhnou i až {targets} blízké nepřátele za {pct} % poškození',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Éterických nábojů: Aether Surge způsobuje o {damagePct} % více poškození, sesílá se o {castPct} % rychleji a stojí {costMult}x many',
+  'hudChrome.auraEffect.bleedVuln': 'Zvyšuje utrpěné poškození z krvácení o {pct} %',
+  'hudChrome.auraEffect.brainFreeze':
+    'Tvůj příští Zimní bič je okamžitý a ignoruje svou dobu obnovy',
+  'hudChrome.auraEffect.castShield': 'Sesílání nelze přerušit ani zpozdit poškozením',
+  'hudChrome.auraEffect.cauterizeFatigue': 'Vypálení nemůže zabránit dalšímu smrtelnému zásahu',
+  'hudChrome.auraEffect.cooldownCap': 'Využito {used} z {cap} s snížení doby obnovy v tomto okně',
+  'hudChrome.auraEffect.desolation':
+    'Zbývá {charges} nabití: tvůj příští Zkázný šíp se sešle o {castPct} % rychleji, nebo tvůj příští Ohnivý déšť dopadne okamžitě',
+  'hudChrome.auraEffect.duskfireClaim': 'Smrt uděluje {value} Zkázy',
+  'hudChrome.auraEffect.elementalTrance':
+    'Utrpěné poškození sníženo o {pct} %. {mana} % veškerého způsobeného poškození se mění v manu',
+  'hudChrome.auraEffect.energyRegen': 'Zvyšuje regeneraci energie o {pct} %',
+  'hudChrome.auraEffect.enrage':
+    'Způsobené poškození zvýšeno o {damagePct} %, rychlost útoku o {hastePct} % a rychlost pohybu o {movePct} %',
+  'hudChrome.auraEffect.fingersOfFrost':
+    'Zbývá {charges} nabití: Ledové kopí považuje svůj cíl za zmrazený a způsobí {pct} % zmrazeného poškození',
+  'hudChrome.auraEffect.forbiddenReflectionLock': 'Zakázaný odraz zatím nelze znovu připravit',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Tvou příští způsobilou schopnost černokněžníka lze seslat znovu i mimo dobu obnovy',
+  'hudChrome.auraEffect.formLich':
+    'Soul Lance navíc zasáhne až {targets} blízké nepřátele za {pct} % poškození',
+  'hudChrome.auraEffect.formMetamorph':
+    'Podoba démona: velikost těla zvýšena o {pct} %; ostatní bonusy běží na samostatných efektech',
+  'hudChrome.auraEffect.formMoonkin':
+    'Podoba měsíčního křídla: poškození kouzel zvýšeno o {pct} % a brnění zvýšeno o {armorPct} %',
+  'hudChrome.auraEffect.formShadow': 'Podoba šerého závoje: stínové poškození zvýšeno o {pct} %',
+  'hudChrome.auraEffect.freeExecute': 'Tvá příští způsobilá dorážecí schopnost nic nestojí',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Funeral Harvest zatím nemůže vytvořit další Úlomek duše',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Dokončení {steps}úderové kadence Válečného ducha ozvěnou zopakuje úder {count}krát za {pct} % jeho poškození jako přírodní poškození',
+  'hudChrome.auraEffect.healEcho': 'Pokles pod {threshold} % zdraví obnoví {value} zdraví',
+  'hudChrome.auraEffect.icicles': 'Rampouchy {value} z {max}; při {max} lze seslat Ledový hrot',
+  'hudChrome.auraEffect.internalCooldown':
+    'Tento efekt nelze spustit znovu, dokud nevyprší časovač',
+  'hudChrome.auraEffect.leadenHexLock': 'Olověná kletba tento cíl zatím nemůže znovu zakořenit',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Zastaralá Ozvěna smrti; žádná současná schopnost ji nespotřebovává',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Smrt může vytvořit 1 Úlomek duše',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Ukládá {storedPct} % tvého poškození a poškození tvých nemrtvých, plus {lancePct} % poškození Soul Lance; opětovným sesláním to odpálíš. Smrt vybuchne v okruhu {radius} yardů a vytvoří 1 Úlomek duše',
+  'hudChrome.auraEffect.nextAttackCrit': 'Tvůj příští útok je zaručeně kritický zásah',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} nabití: tvůj příští Mrzačící úder způsobí o {pct} % více poškození',
+  'hudChrome.auraEffect.perfectMoment': 'Aether Darts nespotřebovávají Éterické náboje',
+  'hudChrome.auraEffect.petDamage': 'Zvyšuje poškození mazlíčka o {pct} %',
+  'hudChrome.auraEffect.petHaste': 'Zvyšuje rychlost akcí mazlíčka o {pct} %',
+  'hudChrome.auraEffect.physicalReduction': 'Snižuje utrpěné fyzické poškození o {pct} %',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Generuje {ruin} Zkázy každých {ruinInterval} s a způsobuje {damage} ohnivého poškození v okruhu {radius} yardů každých {damageInterval} s',
+  'hudChrome.auraEffect.resourceCount': '{value} z {max}',
+  'hudChrome.auraEffect.resourceSap': 'Obnoví {value} tvého aktuálního zdroje každých {interval} s',
+  'hudChrome.auraEffect.ruinousBrand':
+    'Zbývá {charges} kopií: přímá kouzla sem zopakují {otherPct} % poškození, nebo {selfPct} %, když je toto jejich cíl',
+  'hudChrome.auraEffect.sated': 'Nemůže těžit z dalšího skupinového efektu na rychlost',
+  'hudChrome.auraEffect.sourceVuln':
+    'Utrpí o {pct} % více poškození od seslatele, který tento efekt uvalil',
+  'hudChrome.auraEffect.spellDamage': 'Zvyšuje poškození kouzel o {pct} %',
+  'hudChrome.auraEffect.spellHaste': 'Zvyšuje rychlost sesílání kouzel o {pct} %',
+  'hudChrome.auraEffect.stasis': 'Nezranitelný a neschopný jednat',
+  'hudChrome.auraEffect.suddenDeath':
+    'Tvůj příští Předčasný hrob nestojí žádný vztek a ignoruje svůj požadavek na zdraví',
+  'hudChrome.auraEffect.sureCrit':
+    '{charges} seslání poškozujících schopností jsou zaručeně kritické zásahy',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Útoky na jeden cíl zasáhnou i {targets} blízké nepřátele za {pct} % poškození',
+  'hudChrome.auraEffect.temporalEcho':
+    'Seslatelovo arkánní poškození tě léčí za {singlePct} % poškození na jeden cíl nebo {areaPct} % plošného poškození',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Seslej znovu do {range} yardů: vrátíš se sem a spotřebuješ kotvu',
+  'hudChrome.auraEffect.wintersChill':
+    'Zbývá {charges} nabití: kompatibilní kouzla považují tento cíl za zmrazený',
+  'hudChrome.procOverlay.ruinMeter': 'Zkáza',
+  'hudChrome.procOverlay.ruinStatus': 'Zkáza {value} z {max}',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Úlomky duše',
+  'hudChrome.warlock.doomEmptyStatus': 'Odsouzení {value} z {max}.',
+  'hudChrome.warlock.doomLabel': 'Odsouzení',
+  'hudChrome.warlock.doomMeterLock': 'Zamknout lištu zdroje Utrpení',
+  'hudChrome.warlock.doomMeterUnlock': 'Přesunout lištu zdroje Utrpení',
+  'hudChrome.warlock.doomStatus': 'Odsouzení {value} z {max}; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.',
+  'hudChrome.warlock.fateThreadsLabel': 'Nitě osudu',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Tři Nitě osudu: Sentence je dokáže spotřebovat za 18% zvýšené poškození.',
+  'hudChrome.warlock.fateThreadsStatus': 'Nitě osudu {value} z {max}.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 2 min.',
 };

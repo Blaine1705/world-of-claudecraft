@@ -12122,4 +12122,346 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': "Increspature dell'acqua (scie)",
   'hudChrome.breath.label': 'Fiato',
   'hudChrome.breath.drowning': 'Annegamento!',
+  'abilityUi.tooltip.requiresStealth': 'Richiede furtività',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Richiede furtività (non necessaria a 3 Caligine o durante il Velo d\'Ombra)',
+  'abilityUi.tooltip.ruinCost': '{cost} Rovina',
+  'entities.abilities.abyssal_rift.description':
+    'Squarcia una faglia nel punto selezionato, attirando i nemici entro 8 metri verso il suo centro, infliggendo {damage} danni da Ombra e stordendoli per 2 sec. I boss subiscono danni ma resistono all\'attrazione e allo stordimento.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Colpisci dalle ombre per il 250% dei danni dell\'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività e da qualsiasi angolazione: quell\'uso non costa nulla, spende tutte le 3 Caligine, avvia il Velo d\'Ombra di 6 sec e colpisce per il doppio.',
+  'entities.abilities.army_of_the_dead.description':
+    'Squarcia un portale sepolcrale per evocare temporaneamente un Guerriero Scheletrico, un Mago d\'Ossa e un\'Ala Sepolcrale per 20 sec, riempiendo i ranghi che i tuoi servitori stabili del Dominio lasciano vuoti.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Conficca il tuo pugnale nella schiena del bersaglio per il 150% dei danni dell\'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta).',
+  'entities.abilities.blade_flurry.description':
+    'Scatena una raffica di lame, aumentando la velocità d\'attacco del 20% per 12 sec. (firma Thuggery)',
+  'entities.abilities.bone_armor.description':
+    'Ti avvolge nelle ossa, assorbendo danni pari al 20% della tua salute massima.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Colpisci il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell\'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d\'Ombra di 6 sec.',
+  'entities.abilities.cinderhide.description':
+    'Indurisce la tua pelle in scoria raffreddante per 10 sec, riducendo tutti i danni subiti del 25%.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Artiglia il nemico per danni dell\'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.',
+  'entities.abilities.claw.specNote_feral':
+    'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.cold_blood.description':
+    'Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)',
+  'entities.abilities.corpse_explosion.description':
+    'Sacrifica prima un Mago d\'Ossa, poi un Guerriero Scheletrico, e un\'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Crea Evil Eye secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentence riecheggia su di loro per il 35% dei danni.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Sacrifica il 12% della tua salute massima per ripristinare l\'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Collega il tuo Evil Eye quando nessun alleato è selezionato, facendo sì che il suo Maledict Gaze generi 2 Condanna. Collegare un membro del gruppo selezionato fa sì che solo i loro danni al tuo Evil Eye generino 3 invece. Un nuovo collegamento sostituisce quello precedente e può attivarsi una volta ogni 2 sec.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Sacrifica il 10% della tua salute attuale per assorbire danni pari al 30% della tua salute massima per 8 sec.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Entra in trance elementale per 15 sec, riducendo i danni subiti del 30% e convertendo il 20% di tutti i danni che infliggi in mana. (firma Warspirit)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Marchia un nemico come bersaglio delle tue maledizioni. Spostare l\'Evil Eye preserva la Condanna ma non rinnova la sua scadenza di 20 sec.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Mossa finale che infligge {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'A 6 Rituale del Veleno, questo pulsante diventa Squarcio velenoso: un colpo che infligge istantaneamente tutti i danni che i tuoi sanguinamenti avrebbero ancora inflitto, pianta una nuova ferita avvelenata e ripristina 20 energia.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Colpire con questo a 4 o più punti combo avvia la Linea Rossa per 8 sec: Fendente Malvagio diventa Colpo al corpo e questo pulsante diventa Colpo da knockout (45 più 35 per punto combo, che colpisce il 25% più forte per ogni tacca di Linea Rossa accumulata, e ripristina 25 energia). Spendilo prima che la Linea Rossa finisca.',
+  'entities.abilities.expose_armor.description':
+    'Mossa finale che espone il bersaglio per 30 sec: ogni punto combo speso riduce la sua armatura del 2% (5 punti combo: {damage}%).',
+  'entities.abilities.faerie_fire.description':
+    'Riduce l\'armatura del bersaglio del {damage}% per 40 sec.',
+  'entities.abilities.ferocious_bite.description':
+    'Mossa finale che infligge {damage}. Solo Forma del Lupo.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa: un morso per 70 più 43 per punto combo che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina 30 energia.',
+  'entities.abilities.funeral_harvest.description':
+    'Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d\'Anima. Questo può verificarsi una volta ogni 3 sec.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Avvolgi un filo intorno alla gola del nemico, infliggendo {damage} danni ora e facendolo sanguinare per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell\'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d\'Ombra di 6 sec.',
+  'entities.abilities.ghostly_strike.description':
+    'Colpisce il nemico per danni dell\'arma più {damage} e aumenta la tua probabilità di schivata del 15% per 7 sec. Conferisce 1 punto combo. (talento del Ladro)',
+  'entities.abilities.hemorrhage.description':
+    'Colpisce il nemico per danni dell\'arma più {damage}, causa danni da sanguinamento in 12 sec e aumenta i danni da sanguinamento subiti del 40%. Conferisce 1 punto combo. Ogni 2° uso aggiunge 1 Caligine (massimo 3). (firma Skulduggery)',
+  'entities.abilities.hex_of_violence.description':
+    'Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 16 danni da Ombra.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Chiama un giudizio sul tuo Evil Eye primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite l\'Evil Eye primario e aumentando i danni di Sentence del 20%. La prima Sentence rimborsa 50 Condanna.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec).',
+  'entities.abilities.litany_of_guilt.description':
+    'Maledice il tuo Evil Eye primario per 6 sec. I guadagni di Condanna rilasciano un\'onda che danneggia fino a 2 altri nemici entro 8 metri, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Il tuo Maledict Eye attacca il tuo Evil Eye primario selezionato ogni 2,5 sec per danni da Ombra. Possess the Evil Eye raddoppia la sua velocità d\'attacco.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un\'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.',
+  'entities.abilities.maul.specNote_feral':
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia.',
+  'entities.abilities.moonfire.description':
+    'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Mantienilo acceso: Seme Lunare lo estende di 6 sec.',
+  'entities.abilities.needle_of_fate.description':
+    'Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d\'Anima.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'Il Maledictor possiede il tuo Evil Eye primario per 15 sec e genera 35 Condanna. Needle of Fate si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentence infligge il 25% di danni in più e rilascia un\'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Spende 2 Frammenti d\'Anima per aggiungere un Mago d\'Ossa a distanza permanente al tuo Dominio a 2 posti. Solo uno può servirti. I suoi attacchi espongono il bersaglio a un 5% in più di danni magici per 6 sec, e Reaping Command aumenta quella debolezza all\'8%.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Solleva un compagno difensivo permanente. Il Guardiano Sepolcrale provoca automaticamente, intercetta il 20% dei tuoi danni tramite il Dominio della Tomba, e Reaping Command lo fa provocare e subire il 30% di danni in meno per 4 sec.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Spende 2 Frammenti d\'Anima per aggiungere un\'Ala Sepolcrale permanente al tuo Dominio a 2 posti. Solo una può servirti. Colpisce in area i nemici vicini per il 65% dei danni ogni 5 sec, e Reaping Command fa sì che ogni nemico colpito subisca l\'8% di danni in più per 5 sec.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Spende 1 Frammento d\'Anima per aggiungere un Guerriero Scheletrico permanente al tuo Dominio a 2 posti. Solo uno può servirti. Colpisce in area i nemici vicini per il 45% dei danni ogni 6 sec, e Reaping Command blocca il suo bersaglio con un rallentamento del 40% per 4 sec.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Scarnifica il nemico per danni dell\'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Lupo.',
+  'entities.abilities.rake.specNote_feral':
+    'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.reaping_command.description':
+    'Spende 2 Frammenti d\'Anima per comandare ogni servitore non morto a colpire all\'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d\'Ossa espongono le difese magiche, e l\'Ala Sepolcrale lacera tutti i nemici colpiti.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5).',
+  'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
+  'entities.abilities.rip.description':
+    'Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Lupo.',
+  'entities.abilities.rip.specNote_feral':
+    'Il colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Mossa finale che ferisce il bersaglio: sanguina ogni 2 sec, per 6 sec più 2 sec per punto combo (5 punti combo: 16 sec e {damage} danni totali).',
+  'entities.abilities.sacrifice_undead.description':
+    'Distrugge un servitore del Dominio per ripristinare il 25% della tua salute massima.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description':
+    'Un colpo istantaneo per danni dell\'arma più {damage}. Conferisce 1 punto combo.',
+  'entities.abilities.sinister_strike.specNote_assassination':
+    'Aggiunge 1 Rituale del Veleno (massimo 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Mentre la Linea Rossa è attiva, questo pulsante diventa Colpo al corpo: 130% dei danni dell\'arma più 10, conferisce 2 punti combo e aggiunge 1 Linea Rossa (massimo 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Mossa finale che aumenta la velocità d\'attacco in mischia del 30% per 12 sec più 4 sec per punto combo (5 punti combo: 32 sec).',
+  'entities.abilities.soul_harvest.description':
+    'Lacera l\'anima del nemico per {damage} danni da Ombra e crea 1 Frammento d\'Anima, fino a 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Scaglia una lancia spettrale per {damage} danni da Ombra. Contro il tuo Ossuary Mark, il 50% dei suoi danni viene aggiunto al marchio.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Evoca un Soulwell per 3 min. Fuori dal combattimento, i membri del gruppo possono ricaricare le loro Pietre dell\'Anima fino a 3. Una Pietra dell\'Anima ripristina il 25% della salute massima e condivide il tempo di recupero delle pozioni.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Richiama un fulmine di fuoco stellare, infliggendo {damage} danni Arcani.',
+  'entities.abilities.starfire.specNote_balance':
+    'In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3.',
+  'entities.abilities.stealth.description':
+    'Ti nasconde nell\'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
+  'entities.abilities.swiftmend.description':
+    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
+  'entities.abilities.swipe.description':
+    'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
+  'entities.abilities.swipe.specNote_feral':
+    'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l\'ancora e avviando un tempo di recupero di 45 sec.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Spende 3 Frammenti d\'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Aggiunge 1 Rituale del Veleno ed estende la tua ferita avvelenata di 6 sec (la ferita non supera mai i 20 sec).',
+  'entities.abilities.vicarious_suffering.description':
+    'Collega la tua sofferenza per 8 sec e genera fino a 15 Condanna dai colpi ostili. Su te stesso, riduce i danni subiti del 20%. Su un alleato, reindirizza fino al 20% verso di te senza farti scendere sotto il 15% di salute.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description':
+    'Scaglia un fulmine di energia naturale per {damage} danni da Natura.',
+  'entities.abilities.wrath.specNote_balance':
+    'In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare.',
+  'entities.items.boneglass_shiv.name': 'Stiletto Ossovetro',
+  'entities.items.duskwhisper.name': 'Sussurro del Crepuscolo',
+  'entities.items.marrowpoint.name': 'Punta di Midollo',
+  'entities.items.rimefang.name': 'Zanna di Brina',
+  'entities.items.soul_stone.name': 'Pietra dell\'Anima',
+  'entities.mobs.graveguard.name': 'Guardiano Sepolcrale',
+  'entities.mobs.necromancy_bone_mage.name': 'Mago d\'Ossa',
+  'entities.mobs.necromancy_gravewing.name': 'Ala Sepolcrale',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Guerriero Scheletrico',
+  'guide.abilityHook.evil_eye':
+    'Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.',
+  'hud.pet.abyssalChain': 'Catena Abissale',
+  'hud.pet.abyssalChainDesc':
+    'Ordina a Gloomshade di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l\'autolancio.',
+  'hud.pet.abyssalChainTitle': 'Catena Abissale',
+  'hud.pet.autocastOff':
+    'Autolancio disattivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivarlo.',
+  'hud.pet.autocastOn':
+    'Autolancio attivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per disattivarlo.',
+  'hud.pet.felbolt': 'Dardo di Cenere',
+  'hud.pet.felboltDesc':
+    'Ordina a Emberkin di lanciare un dardo di cenere aggiuntivo contro il tuo bersaglio. Tempo di recupero: 8 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l\'autolancio.',
+  'hud.pet.felboltTitle': 'Dardo di Cenere',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze attacca ogni {interval} sec; gli effetti su questo Evil Eye generano il {pct}% di Condanna',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Gli effetti su questo Evil Eye generano il {doomPct}% di Condanna; Sentence riecheggia qui per il {echoPct}% dei danni',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Filamenti del Fato: Sentence infligge il {sentencePct}% di danni in più, oppure Divorare guadagna {doom} Condanna extra per tick',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'L\'Evil Eye primario genera il {eyePct}% di Condanna in più; Sentence infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna',
+  'hudChrome.auraEffect.afflictionLitany':
+    'I guadagni di Condanna infliggono {damage} danni da Ombra fino a {targets} nemici entro {radius} metri, una volta al secondo',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Potenzia Needle of Fate, Divorare, Maledict Gaze e Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno',
+  'hudChrome.auraEffect.aoeEcho':
+    'Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Cariche Arcane: Potere d\'Etere infligge il {damagePct}% di danni in più, si lancia il {castPct}% più veloce e costa {costMult}x mana',
+  'hudChrome.auraEffect.bleedVuln': 'Aumenta i danni da sanguinamento subiti del {pct}%',
+  'hudChrome.auraEffect.brainFreeze':
+    'La tua prossima Sferza d\'Inverno è istantanea e ignora il suo tempo di recupero',
+  'hudChrome.auraEffect.castShield': 'Il lancio non può essere interrotto né ritardato dai danni',
+  'hudChrome.auraEffect.cauterizeFatigue':
+    'La Cauterizzazione non può prevenire un altro colpo letale',
+  'hudChrome.auraEffect.cooldownCap':
+    '{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra',
+  'hudChrome.auraEffect.desolation':
+    '{charges} cariche: il tuo prossimo Dardo della Rovina si lancia il {castPct}% più veloce, oppure la tua prossima Pioggia di Fuoco atterra immediatamente',
+  'hudChrome.auraEffect.duskfireClaim': 'La morte concede {value} Rovina',
+  'hudChrome.auraEffect.elementalTrance':
+    'Danni subiti ridotti del {pct}%. Il {mana}% di tutti i danni che infliggi viene convertito in mana',
+  'hudChrome.auraEffect.energyRegen': 'Aumenta la rigenerazione di Energia del {pct}%',
+  'hudChrome.auraEffect.enrage':
+    'Danni inflitti aumentati del {damagePct}%, velocità d\'attacco del {hastePct}%, e velocità di movimento del {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '{charges} cariche: Lancia di Ghiaccio tratta il bersaglio come congelato e infligge il {pct}% di danni da congelamento',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Il Riflesso Proibito non può ancora essere preparato di nuovo',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo',
+  'hudChrome.auraEffect.formLich':
+    'Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni',
+  'hudChrome.auraEffect.formMetamorph':
+    'Forma demoniaca: dimensioni del corpo aumentate del {pct}%; gli altri bonus viaggiano su potenziamenti separati',
+  'hudChrome.auraEffect.formMoonkin':
+    'Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%',
+  'hudChrome.auraEffect.formShadow': 'Forma d\'Ombra: danni da Ombra aumentati del {pct}%',
+  'hudChrome.auraEffect.freeExecute': 'La tua prossima abilità di esecuzione idonea non costa nulla',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Funeral Harvest non può ancora creare un altro Frammento d\'Anima',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Completare la Cadenza dello Spirito Guerriero da {steps} colpi fa risuonare il colpo {count} volte per il {pct}% dei suoi danni come danni da Natura',
+  'hudChrome.auraEffect.healEcho': 'Scendere sotto il {threshold}% di salute ripristina {value} salute',
+  'hudChrome.auraEffect.icicles':
+    '{value} su {max} Ghiaccioli; a {max}, Spuntone Glaciale può essere lanciato',
+  'hudChrome.auraEffect.internalCooldown':
+    'Questo effetto non può attivarsi di nuovo prima che il timer scada',
+  'hudChrome.auraEffect.leadenHexLock':
+    'Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Eco della Morte residuo; nessuna abilità attuale lo consuma',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'La morte può creare 1 Frammento d\'Anima',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Accumula il {storedPct}% dei tuoi danni e di quelli dei tuoi non morti, più il {lancePct}% dei danni di Soul Lance; rilancia per farla detonare. La morte esplode entro {radius} metri e crea 1 Frammento d\'Anima',
+  'hudChrome.auraEffect.nextAttackCrit': 'Il tuo prossimo attacco è garantito come colpo critico',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} cariche: il tuo prossimo Colpo Mutilante infligge il {pct}% di danni in più',
+  'hudChrome.auraEffect.perfectMoment': 'Dardi d\'Etere non consuma Cariche Arcane',
+  'hudChrome.auraEffect.petDamage': 'Aumenta i danni della mascotte del {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Aumenta la velocità d\'azione della mascotte del {pct}%',
+  'hudChrome.auraEffect.physicalReduction': 'Riduce i danni Fisici subiti del {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Genera {ruin} Rovina ogni {ruinInterval} sec e infligge {damage} danni da Fuoco entro {radius} metri ogni {damageInterval} sec',
+  'hudChrome.auraEffect.resourceCount': '{value} su {max}',
+  'hudChrome.auraEffect.resourceSap':
+    'Ripristina {value} della tua risorsa attuale ogni {interval} sec',
+  'hudChrome.auraEffect.ruinousBrand':
+    'Restano {charges} copie: gli incantesimi diretti copiano il {otherPct}% dei danni qui, o il {selfPct}% quando questo è il loro bersaglio',
+  'hudChrome.auraEffect.sated': 'Non puoi beneficiare di un altro effetto di velocità di gruppo',
+  'hudChrome.auraEffect.sourceVuln':
+    'Subisce il {pct}% di danni in più dal lanciatore che ha applicato questo effetto',
+  'hudChrome.auraEffect.spellDamage': 'Aumenta i danni degli incantesimi del {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Aumenta la velocità di lancio degli incantesimi del {pct}%',
+  'hudChrome.auraEffect.stasis': 'Immune e impossibilitato ad agire',
+  'hudChrome.auraEffect.suddenDeath':
+    'La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute',
+  'hudChrome.auraEffect.sureCrit': '{charges} lanci di abilità dannose sono colpi critici garantiti',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'I colpi a bersaglio singolo colpiscono anche {targets} nemici vicini per il {pct}% dei danni',
+  'hudChrome.auraEffect.temporalEcho':
+    'I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Rilancia entro {range} metri per tornare qui e consumare l\'ancora',
+  'hudChrome.auraEffect.wintersChill':
+    '{charges} cariche: gli incantesimi compatibili trattano questo bersaglio come congelato',
+  'hudChrome.procOverlay.ruinMeter': 'Rovina',
+  'hudChrome.procOverlay.ruinStatus': '{value} su {max} Rovina',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Frammenti d\'Anima',
+  'hudChrome.warlock.doomEmptyStatus': '{value} su {max} Condanna.',
+  'hudChrome.warlock.doomLabel': 'Condanna',
+  'hudChrome.warlock.doomMeterLock': 'Blocca la barra della risorsa Afflizione',
+  'hudChrome.warlock.doomMeterUnlock': 'Sposta la barra della risorsa Afflizione',
+  'hudChrome.warlock.doomStatus': '{value} su {max} Condanna; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.',
+  'hudChrome.warlock.fateThreadsLabel': 'Filamenti del Fato',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Tre Filamenti del Fato: Sentence può consumarli per un aumento del 18% dei danni.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} su {max} Filamenti del Fato.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.',
 };

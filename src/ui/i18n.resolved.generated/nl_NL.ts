@@ -322,20 +322,20 @@ export const nl_NL: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Verdoemenis",
+      "fateThreadsLabel": "Lotsdraden",
+      "doomMeterUnlock": "Verplaats de Kwelling-hulpbronbalk",
+      "doomMeterLock": "Vergrendel de Kwelling-hulpbronbalk",
+      "doomEmptyStatus": "{value} van {max} Verdoemenis.",
+      "doomStatus": "{value} van {max} Verdoemenis; {remaining}.",
+      "fateThreadsStatus": "{value} van {max} Lotsdraden.",
+      "fateThreadsConsumeReady": "Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.",
+      "fateThreadsSentenceReady": "Drie Lotsdraden: Sentence kan ze verbruiken voor 18% meer schade."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "soulFragmentsMeter": "Zielfragmenten",
+      "ruinMeter": "Ruïne",
+      "ruinStatus": "{value} van {max} Ruïne"
     },
     "spectate": {
       "banner": "Toeschouwer bij {name}"
@@ -1980,31 +1980,31 @@ export const nl_NL: EnTranslations = {
       "absorb": "Absorbeert {value} schade",
       "healAbsorb": "Absorbeert {value} inkomende genezing",
       "thorns": "Verursacht bei Angreifern {value} {school}schaden",
-      "stasis": "Immune and unable to act",
+      "stasis": "Immuun en niet in staat te handelen",
       "slow": "Verringert Bewegungstempo um {pct}%",
       "speed": "Erhöht Bewegungstempo um {pct}%",
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "imbueRange": "Wapen doordrongen: {min} tot {max} bonusschade bij Verdict",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Verhoogt huisdierschade met {pct}%",
+      "petHaste": "Verhoogt de actiesnelheid van je huisdier met {pct}%",
+      "spellDamage": "Verhoogt spreukschade met {pct}%",
+      "spellHaste": "Verhoogt de bezweringssnelheid met {pct}%",
+      "sated": "Kan niet profiteren van nog een groepshaast-effect",
+      "cauterizeFatigue": "Cauteriseren kan geen volgende dodelijke treffer voorkomen",
+      "castShield": "Bezweren kan niet worden onderbroken of vertraagd door schade",
       "dmgDone": "Verhoogt aangerichte schade met {pct}%",
       "dmgDoneReduce": "Vermindert aangerichte schade met {pct}%",
       "heatingUp": "Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen",
       "elementalConvergencePrimed": "Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie",
       "hunterFerocity": "{stacks} Roedelfelheid: je huisdier richt {pct}% meer schade aan",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster",
+      "funeralHarvestLock": "Funeral Harvest kan nog geen ander Zielfragment creëren",
+      "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
+      "forbiddenReflectionReady": "Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet",
+      "forbiddenReflectionLock": "Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid",
+      "internalCooldown": "Dit effect kan niet opnieuw worden geactiveerd voordat de timer afloopt",
       "carriedFlag": "Je draagt de vlag van de vijand. Zeg deze buff op om hem te laten vallen.",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
@@ -2019,13 +2019,13 @@ export const nl_NL: EnTranslations = {
       "revengeFree": "Je volgende Wraak kost geen woede",
       "victoryRush": "Overwinningsroes is gereed",
       "maxHpPct": "Verhoogt maximale gezondheid met {pct}%",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Aangerichte schade verhoogd met {damagePct}%, aanvalssnelheid met {hastePct}%, en bewegingssnelheid met {movePct}%",
+      "suddenDeath": "Je volgende Vroeg Graf kost geen woede en negeert de gezondheidsvereiste",
+      "aoeEcho": "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
+      "sureCrit": "{charges} bezweringen van schadelijke vaardigheden zijn gegarandeerd kritieke treffers",
+      "temporalEcho": "De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade",
+      "arcaneCharge": "{stacks} Arcaneladingen: Arcanekracht brengt {damagePct}% meer schade toe, wordt {castPct}% sneller gespreukt, en kost {costMult}x mana",
+      "physicalReduction": "Vermindert opgelopen Fysieke schade met {pct}%",
       "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Je Vuurspreuken treffen altijd kritiek",
@@ -2047,10 +2047,10 @@ export const nl_NL: EnTranslations = {
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
       "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Wolfs- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
+      "resourceSap": "Herstelt {value} van je huidige hulpbron elke {interval} sec",
+      "nextAttackCrit": "Je volgende aanval is gegarandeerd een kritieke treffer",
+      "healEcho": "Onder {threshold}% gezondheid komen herstelt {value} gezondheid",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Verhoogt spreukkracht met {value}",
@@ -2089,8 +2089,8 @@ export const nl_NL: EnTranslations = {
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Verhoogt de opgelopen bloedingsschade met {pct}%",
+      "sourceVuln": "Loopt {pct}% meer schade op van de werper die dit effect heeft toegepast",
       "spellVuln": "Erhöht erlittenen Magieschaden um {pct}%",
       "critVuln": "Erhöht Chance, kritisch getroffen zu werden, um {pct}%",
       "costTax": "Erhöht Fähigkeitskosten um {pct}%",
@@ -2104,46 +2104,46 @@ export const nl_NL: EnTranslations = {
       "disarm": "Entwaffnet: kann keine Waffenangriffe nutzen",
       "lockout": "Zauberschule gesperrt",
       "imbue": "Waffe mit Bonuseffekten erfüllt",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Het voltooien van de {steps}-treffer Krijgsgeestcadans laat de slag {count} keer weerklinken voor {pct}% van zijn schade als Natuurschade",
+      "elementalTrance": "Opgelopen schade verminderd met {pct}%. {mana}% van alle schade die je aanricht wordt omgezet in mana",
       "stealth": "Verborgen; Bewegungstempo um {pct}% verringert",
       "formBear": "Bruingedaante: verhoogde gezondheid en pantser",
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "formFireball": "Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Maanuilvorm: spreukschade verhoogd met {pct}% en pantser verhoogd met {armorPct}%",
+      "formShadow": "Schaduwvorm: Schaduwschade verhoogd met {pct}%",
+      "resourceCount": "{value} van {max}",
+      "formLich": "Soul Lance treft ook tot {targets} nabije vijanden voor {pct}% schade",
+      "afflictionEye": "Maledict Gaze valt elke {interval} sec aan; effecten bij dit Oog genereren {pct}% Verdoemenis",
+      "afflictionEyeSecondary": "Effecten bij dit Oog genereren {doomPct}% Verdoemenis; Sentence weerklinkt hier voor {echoPct}% schade",
+      "afflictionAccomplice": "Kwalificerende schade kent {value} Verdoemenis toe, hoogstens eenmaal per {interval} sec",
+      "afflictionViolence": "{charges} vergeldingen resteren; een vijandelijke aanval kent {doom} Verdoemenis toe en brengt {damage} Schaduwschade terug toe",
+      "afflictionVicarious": "Leidt {pct}% van de inkomende schade om of vermindert die, en kan tot {max} Verdoemenis genereren",
+      "afflictionPossession": "Versterkt Needle of Fate, Verteren, Maledict Gaze en Sentence",
+      "afflictionJudgment": "Primaire Oog genereert {eyePct}% meer Verdoemenis; Sentence brengt {sentencePct}% meer schade toe en de eerste geeft {refund} Verdoemenis terug",
+      "afflictionLitany": "Verdoemenis-winsten brengen {damage} Schaduwschade toe aan tot {targets} vijanden binnen {radius} m, eenmaal per sec",
+      "afflictionFateThreads": "{stacks} Lotsdraden: Sentence brengt {sentencePct}% meer schade toe, of Verteren krijgt {doom} extra Verdoemenis per tik",
+      "afflictionConsumeThreads": "Verteren verbruikt {stacks} Lotsdraden voor {doom} extra Verdoemenis per tik",
+      "necromancyHarvestMark": "Dood kan 1 Zielfragment creëren",
+      "necromancyOssuaryMark": "Slaat {storedPct}% van jouw en je ondode schade op, plus {lancePct}% van de schade van Soul Lance; werp opnieuw om te laten ontploffen. Dood ontploft binnen {radius} m en creëert 1 Zielfragment",
+      "necromancyDeathEcho": "Verouderde Death Echo; geen enkele huidige vaardigheid verbruikt hem",
+      "warlockAnchor": "Spreuk opnieuw binnen {range} m om hierheen terug te keren en het anker te verbruiken",
+      "formMetamorph": "Demonengedaante: lichaamsgrootte verhoogd met {pct}%; overige bonussen lopen via aparte buffs",
+      "energyRegen": "Verhoogt de energieregeneratie met {pct}%",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
       "righteousFury": "Brandende Eed: sterk verhoogde dreiging door Heilige schade",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} ladingen: je volgende Verminkende Slag brengt {pct}% meer schade toe",
+      "sweepingStrikes": "Slagen voor één doelwit treffen ook {targets} nabije vijand voor {pct}% schade",
+      "fingersOfFrost": "{charges} ladingen: IJslans behandelt zijn doelwit als bevroren en brengt {pct}% bevroren schade toe",
+      "brainFreeze": "Je volgende Wintergesel is direct en negeert zijn afkoeltijd",
+      "wintersChill": "{charges} ladingen: compatibele spreuken behandelen dit doelwit als bevroren",
+      "icicles": "{value} van {max} IJsschilfers; bij {max} kan Gletsjerspies worden gespreukt",
+      "desolation": "{charges} ladingen: je volgende Ruinenschicht wordt {castPct}% sneller gespreukt, of je volgende Vuurregen valt onmiddellijk neer",
+      "ruinousBrand": "{charges} kopieën resteren: directe spreuken kopiëren {otherPct}% schade hierheen, of {selfPct}% wanneer dit hun doelwit is",
+      "duskfireClaim": "Dood kent {value} Ruïne toe",
+      "pyreGuardian": "Genereert {ruin} Ruïne elke {ruinInterval} sec en brengt {damage} Vuurschade toe binnen {radius} m elke {damageInterval} sec",
+      "perfectMoment": "Aetherpijlen verbruikt geen Arcaneladingen",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -3979,7 +3979,7 @@ export const nl_NL: EnTranslations = {
       "none": "Geen klasse voldoet aan elk filter. Wis er een om meer te zien."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Noemt de vijand wiens daden en lijden je Verdoemenis zullen voeden.",
       "heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
       "revenge": "Raakt vijanden voor je en kan gratis worden na een ontwijking of parering.",
       "hamstring": "Belemmert de beweging van een vijand zodat die niet kan ontsnappen.",
@@ -7385,9 +7385,9 @@ export const nl_NL: EnTranslations = {
       "attack": "Aanvallen",
       "waterJet": "Waterstraal",
       "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "abyssalChain": "Afgrondketting",
+      "autocastOn": "Automatisch activeren staat aan. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om het uit te zetten.",
+      "autocastOff": "Automatisch activeren staat uit. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om het aan te zetten.",
       "taunt": "Provoceren",
       "healDemon": "Demon genezen",
       "healPet": "Huisdier genezen",
@@ -7399,9 +7399,9 @@ export const nl_NL: EnTranslations = {
       "waterJetTitle": "Waterstraal",
       "waterJetDesc": "Beveelt je Waterelementaal om gedurende 3 seconden een vertragend straalwater te kanaliseren. 8 seconden afkoeltijd. Klik met rechts om het automatisch te activeren zodra de afkoeltijd voorbij is.",
       "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltDesc": "Beveelt je Emberkin om een extra fel-projectiel naar je doelwit te lanceren. 8 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.",
+      "abyssalChainTitle": "Afgrondketting",
+      "abyssalChainDesc": "Beveelt je Gloomshade om een normale vijand van meer dan 8 tot 20 m naar zichzelf te trekken. Bazen kunnen niet worden getrokken. 15 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.",
       "petTauntTitle": "Huisdier provoceren",
       "petTauntDesc": "Beveel je huisdier om aan te vallen en te Grommen wanneer het binnen bereik is. Afkoeltijd van 10 seconden.",
       "healDemonDesc": "Besteed mana om gedurende 5 seconden genezing in je demon te kanaliseren.",
@@ -7557,7 +7557,7 @@ export const nl_NL: EnTranslations = {
     "tooltip": {
       "rank": "Rang {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Ruïne",
       "range": "{range} m bereik",
       "rangeWithMin": "{min}-{max} m bereik",
       "instant": "Direct",
@@ -7568,8 +7568,8 @@ export const nl_NL: EnTranslations = {
       "unavailable": "Niet beschikbaar",
       "requiresLevel": "Vereist niveau {level}",
       "requiresForm": "Vereist {form}-gedaante",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Vereist sluiptocht",
+      "requiresStealthSkulduggery": "Vereist sluiptocht (niet nodig bij 3 Schemer of tijdens de schaduwsluier)",
       "requiresCombo": "Verbruikt combopunten",
       "requiresTargetHealthBelow": "Vereist doelwit onder {percent}% gezondheid",
       "requiresDodge": "Alleen bruikbaar nadat het doelwit ontwijkt",
@@ -7788,7 +7788,7 @@ export const nl_NL: EnTranslations = {
       "clickDestroy": "Klik om te vernietigen",
       "useFishing": "Gebruik: Vis in nabijgelegen wateren.",
       "useHealingPotion": "Gebruik: Herstelt direct {amount} levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.",
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
@@ -8292,20 +8292,20 @@ export const nl_NL: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Kwaadaardige Houw",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Een directe slag voor wapenschade plus {damage}. Levert 1 combopunt op.",
+        "specNote_assassination": "Voegt 1 Gifritueel toe (max 6).",
+        "specNote_combat": "Terwijl de Rode Lijn actief is, wordt deze knop Lichaamsstoot: 130% wapenschade plus 10, levert 2 combopunten op, en voegt 1 Rode Lijn toe (max 4)."
       },
       "eviscerate": {
         "name": "Zandslaap",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Afmaakactie die {damage} veroorzaakt.",
+        "specNote_assassination": "Bij 6 Gifritueel wordt deze knop Gifscheur: een slag die onmiddellijk alle schade toebrengt die je bloedingen nog zouden hebben toegebracht, een verse gifwond plant, en 20 energie herstelt.",
+        "specNote_combat": "Het landen hiervan met 4 of meer combopunten start de Rode Lijn gedurende 8 sec: Kwaadaardige Houw wordt Lichaamsstoot en deze knop wordt Knock-outslag (45 plus 35 per combopunt, 25% harder per opgebouwde Rode Lijn, herstelt 25 energie). Besteed hem voordat de Rode Lijn afloopt."
       },
       "backstab": {
         "name": "Laffe Steek",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Boort je dolk in de rug van het doelwit voor 150% wapenschade plus {damage}. Moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
+        "specNote_assassination": "Elke slag voegt 1 Gifritueel toe (max 6) en geeft 15 energie terug. Bij 6 Gifritueel wordt Zandslaap Gifscheur (het brengt al je resterende bloedingsschade in één keer toe)."
       },
       "gouge": {
         "name": "Oogstoot",
@@ -8317,7 +8317,7 @@ export const nl_NL: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Moordend Tempo",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Afmaakactie die de meleeaanvalssnelheid 12 sec plus 4 sec per combopunt lang met 30% verhoogt (5 combopunten: 32 sec)."
       },
       "sprint": {
         "name": "Snelle Hielen",
@@ -8325,17 +8325,17 @@ export const nl_NL: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Lage Stoot",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec)."
       },
       "ambush": {
         "name": "Sluiperslag",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Slaat toe vanuit de schaduwen voor 250% wapenschade plus {damage}. Moet in sluiptocht zijn en achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
+        "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht en vanuit elke hoek: dat gebruik kost niets, verbruikt alle 3 Schemer, start de schaduwsluier van 6 sec, en slaat dubbel zo hard toe."
       },
       "stealth": {
         "name": "Schemersluier",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Verhult je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt de Schemersluier. Spreuk opnieuw om eruit te stappen.",
+        "specNote_subtlety": "Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3)."
       },
       "adrenaline_rush": {
         "name": "Versneld Bloed",
@@ -8343,13 +8343,13 @@ export const nl_NL: EnTranslations = {
       },
       "garrote": {
         "name": "Keeldraad",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Slaat een draad om de keel van de vijand, waardoor het nu {damage} schade oploopt en gedurende 18 sec voor {overTime} bloedt. Moet in sluiptocht zijn. Levert 1 combopunt op.",
+        "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "cheap_shot": {
         "name": "Buikstoot",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.",
+        "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "sap": {
         "name": "Verdoven",
@@ -8361,11 +8361,11 @@ export const nl_NL: EnTranslations = {
       },
       "expose_armor": {
         "name": "Pantserbres",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Afmaakactie die het doelwit blootstelt gedurende 30 sec: elk besteed combopunt vermindert zijn pantser met 2% (5 combopunten: {damage}%)."
       },
       "rupture": {
         "name": "Doodbloeden",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Afmaakactie die het doelwit verwondt: het bloedt elke 2 sec, gedurende 6 sec plus 2 sec per combopunt (5 combopunten: 16 sec en {damage} totale schade)."
       },
       "vanish": {
         "name": "Rookstap",
@@ -8733,19 +8733,19 @@ export const nl_NL: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Markeert één vijand als het middelpunt van je vervloekingen. Het Oog verplaatsen behoudt de Verdoemenis, maar vernieuwt zijn vervaltijd van 20 sec niet."
       },
       "maledict_gaze": {
         "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "description": "Je Maledict Eye valt je geselecteerde primaire Evil Eye elke 2,5 sec aan voor Schaduwschade. Possess the Evil Eye verdubbelt zijn aanvalssnelheid."
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Doorboort de vijand voor {damage} Schaduwschade en genereert 5 Verdoemenis als het je Evil Eye draagt. Elke treffer op je primaire Evil Eye voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Evil Eye bestaat, markeert de Needle eerst zijn doelwit."
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16."
       },
       "life_tap": {
         "name": "Zware Koop",
@@ -8753,7 +8753,7 @@ export const nl_NL: EnTranslations = {
       },
       "cursed_accomplice": {
         "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "description": "Verbindt je Maledict Eye wanneer geen bondgenoot is geselecteerd, waardoor de Gaze 2 Verdoemenis genereert. Het verbinden van één geselecteerd groepslid zorgt ervoor dat alleen hun schade aan je Evil Eye in plaats daarvan 3 genereert. Een nieuwe verbinding vervangt de vorige en kan hoogstens eenmaal per 2 sec activeren."
       },
       "curse_of_agony": {
         "name": "Ban van Kwelling",
@@ -8765,43 +8765,43 @@ export const nl_NL: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Vervloekt je primaire Evil Eye gedurende 6 sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden binnen 8 m beschadigt, hoogstens eenmaal per seconde. Rang 2 verlengt dit tot 8 sec en 4 vijanden."
       },
       "cinderhide": {
         "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "description": "Verhardt je huid tot afkoelende sintels gedurende 10 sec, waardoor alle opgelopen schade met 25% afneemt."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 m om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint."
       },
       "soulwell": {
         "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "description": "Roept een Soulwell op gedurende 3 min. Buiten gevecht kunnen groepsleden hun Zielstenen tot 3 keer bijvullen. Een Zielsteen herstelt 25% van de maximale gezondheid en deelt de afkoeltijd van drankjes."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "description": "Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 16 Schaduwschade."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "description": "Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid."
       },
       "vicarious_suffering": {
         "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "description": "Verbindt je lijden gedurende 8 sec en genereert tot 15 Verdoemenis van vijandige treffers. Op jezelf vermindert het de opgelopen schade met 20%. Op een bondgenoot leidt het tot 20% naar jou om, zonder je onder 15% gezondheid te brengen."
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "description": "De Maledictor bezit je primaire Evil Eye gedurende 15 sec en genereert 35 Verdoemenis. Needle of Fate wordt in 1 sec gespreukt en genereert 2 extra Verdoemenis, Verteren kan worden gekanaliseerd terwijl je beweegt, en Sentence brengt 25% meer schade toe en laat een vertraagde echo los voor 60% schade, aflopend tot 30% over de niveaus 17-20."
       },
       "hour_of_judgment": {
         "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "description": "Roept oordeel af over je primaire Evil Eye gedurende 15 sec, wat 40 Verdoemenis en 3 Lotsdraden toekent, Possession activeert, de Verdoemenis die via het primaire Oog wordt gegenereerd verdubbelt, en de schade van Sentence met 20% verhoogt. De eerste Sentence geeft 50 Verdoemenis terug."
       },
       "coven": {
         "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "description": "Creëert secundaire Evil Eyes op tot 4 nabije vijanden gedurende 15 sec. Ze voeden de gedeelde Verdoemenis-pool voor 50%, en Sentence weerklinkt naar hen voor 35% schade."
       },
       "fear": {
         "name": "Teisteren",
@@ -8817,12 +8817,12 @@ export const nl_NL: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt."
       },
       "wrath": {
         "name": "Wildbout",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Werpt een bout natuurenergie voor {damage} Natuurschade.",
+        "specNote_balance": "In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt Maanzaad Maangolf en Hemelval Zonnespoor."
       },
       "healing_touch": {
         "name": "Wildheling",
@@ -8834,8 +8834,8 @@ export const nl_NL: EnTranslations = {
       },
       "moonfire": {
         "name": "Maanstorm",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Verbrandt de vijand met maanvuur voor {damage} Arcaneschade plus schade over tijd.",
+        "specNote_balance": "Houd het brandend: Maanzaad verlengt het met 6 sec."
       },
       "moonseed": {
         "name": "Maanzaad",
@@ -8843,8 +8843,8 @@ export const nl_NL: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Wildbloei",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Geneest het doelwit voor {damage} over 12 sec.",
+        "specNote_restoration": "Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5). Bij 5 Groenkracht wordt Snelle genezing Overbloei."
       },
       "thorns": {
         "name": "Doornwacht",
@@ -8860,8 +8860,8 @@ export const nl_NL: EnTranslations = {
       },
       "maul": {
         "name": "Botverbrijzelen",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Een verpletterende aanval die je meleeschade met {damage} verhoogt en veel dreiging veroorzaakt. Wordt geactiveerd bij je volgende slag. Alleen in Bruingedaante.",
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een slag voor 78 tot 96 schade met hoge dreiging; onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid en geeft 15 woede terug."
       },
       "growl": {
         "name": "Bedreigen",
@@ -8873,23 +8873,23 @@ export const nl_NL: EnTranslations = {
       },
       "claw": {
         "name": "Klauw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.",
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
       "ferocious_bite": {
         "name": "Bloedbeet",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.",
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst: een beet voor 70 plus 43 per combopunt die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en 30 energie herstelt."
       },
       "swipe": {
         "name": "Vegende Klauwen",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.",
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
       "regrowth": {
         "name": "Tweede Bloei",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Geneest een bevriend doelwit voor {damage} en een extra hoeveelheid over 21 sec.",
+        "specNote_restoration": "Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5)."
       },
       "barkskin": {
         "name": "Eikenhuid",
@@ -8905,8 +8905,8 @@ export const nl_NL: EnTranslations = {
       },
       "starfire": {
         "name": "Hemelval",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Roept een bout van stervuur op, die {damage} Arcaneschade veroorzaakt.",
+        "specNote_balance": "In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt deze knop Zonnespoor: een directe slag voor 80 tot 100 Natuurschade plus een brandwond van 45 over 9 sec, die 35 mana herstelt en alle 3 verbruikt."
       },
       "travel_form": {
         "name": "Fleetgedaante",
@@ -8922,7 +8922,7 @@ export const nl_NL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Heksenlicht",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Vermindert het pantser van het doelwit met {damage}% gedurende 40 sec."
       },
       "hibernate": {
         "name": "Sluimer",
@@ -8946,8 +8946,8 @@ export const nl_NL: EnTranslations = {
       },
       "rip": {
         "name": "Verscheuren",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Wolfsgedaante.",
+        "specNote_feral": "De gelande treffer voegt 1 Oud Bloed toe (max 3)."
       },
       "mortal_strike": {
         "name": "Verminkende Slag",
@@ -8999,7 +8999,7 @@ export const nl_NL: EnTranslations = {
       },
       "elemental_trance": {
         "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "description": "Ga een elementaire trance aan gedurende 15 sec, waardoor je 30% minder schade oploopt en 20% van alle schade die je aanricht wordt omgezet in mana. (Krijgsgeest-kenmerk)"
       },
       "primal_exaltation": {
         "name": "Oerverheffing",
@@ -9015,59 +9015,59 @@ export const nl_NL: EnTranslations = {
       },
       "soul_harvest": {
         "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "description": "Scheurt aan de ziel van de vijand voor {damage} Schaduwschade en creëert 1 Zielfragment, tot 5."
       },
       "soul_lance": {
         "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "description": "Werpt een spookachtige lans voor {damage} Schaduwschade. Tegen je Ossuary Mark wordt 50% van de schade aan de markering toegevoegd."
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "description": "Wekt een permanente verdedigende metgezel op. De Grafwacht tart automatisch, onderschept 20% van je schade via de Grafheerschappij, en Reaping Command laat hem tarten en 4 sec lang 30% minder schade oplopen."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "description": "Besteedt 1 Zielfragment om een blijvende Skeletkrijger toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Het klieft nabije vijanden voor 45% schade elke 6 sec, en Reaping Command zet zijn doelwit 4 sec lang vast met een vertraging van 40%."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "description": "Besteedt 2 Zielfragmenten om een blijvende Botmagiër op afstand toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Zijn aanvallen stellen het doelwit 6 sec lang bloot aan 5% meer magische schade, en Reaping Command verhoogt die zwakte naar 8%."
       },
       "bone_armor": {
         "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "description": "Omhult je met bot, waarbij schade wordt geabsorbeerd gelijk aan 20% van je maximale gezondheid."
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "description": "Offert eerst een Botmagiër op, dan een Skeletkrijger, en pas als laatste redmiddel een Grafvleugel. Bij duplicaten kiest het degene met de minste resterende duur, en anders de zwakste, om {damage} Schaduwschade toe te brengen op de gekozen locatie."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "description": "Wanneer een vijand die onlangs door jou of je ondoden is beschadigd sterft, krijg je 1 Zielfragment. Dit kan hoogstens eenmaal per 3 sec gebeuren."
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "description": "Besteedt 3 Zielfragmenten om al je ondoden te bevelen 12 sec lang 25% meer schade toe te brengen en 20% sneller te handelen."
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "description": "Vernietigt één Heerschappij-dienaar om 25% van je maximale gezondheid te herstellen."
       },
       "raise_gravewing": {
         "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "description": "Besteedt 2 Zielfragmenten om een blijvende Grafvleugel toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Het klieft nabije vijanden voor 65% schade elke 5 sec, en Reaping Command laat elke geraakte vijand 5 sec lang 8% meer schade oplopen."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "description": "Scheurt een grafportaal open om tijdelijk een Skeletkrijger, Botmagiër en Grafvleugel op te roepen voor 20 sec, en vult de rangen die je vaste Heerschappij-dienaren leeg laten."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -9107,15 +9107,15 @@ export const nl_NL: EnTranslations = {
       },
       "cold_blood": {
         "name": "Koud bloed",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Focust je moordlust zodat je volgende aanval een kritieke treffer is. (Knifework-motor)"
       },
       "blade_flurry": {
         "name": "Klingenvlaag",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Ontketent een vlaag van klingen, waardoor de aanvalssnelheid 12 sec lang met 20% toeneemt. (Thuggery-motor)"
       },
       "hemorrhage": {
         "name": "Bloeding",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Slaat de vijand voor wapenschade plus {damage}, veroorzaakt bloedende schade over 12 sec, en verhoogt de opgelopen bloedingsschade met 40%. Levert 1 combopunt op. Elk 2e gebruik voegt 1 Schemer toe (max 3). (Skulduggery-motor)"
       },
       "power_infusion": {
         "name": "Krachtinfusie",
@@ -9151,7 +9151,7 @@ export const nl_NL: EnTranslations = {
       },
       "swiftmend": {
         "name": "Snelle genezing",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Het planten van Wildbloei en Tweede Bloei voegt Groenkracht toe; bij 5 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)"
       },
       "moonlash": {
         "name": "Maangolf",
@@ -9351,7 +9351,7 @@ export const nl_NL: EnTranslations = {
       },
       "abyssal_rift": {
         "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "description": "Scheurt een rift open op de geselecteerde locatie, trekt vijanden binnen 8 m naar het middelpunt, brengt {damage} Schaduwschade toe en verdooft ze gedurende 2 sec. Bazen lopen schade op maar weerstaan de trek en de verdoving."
       },
       "chaos_bolt": {
         "name": "Ruinenschicht",
@@ -9359,7 +9359,7 @@ export const nl_NL: EnTranslations = {
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "description": "Offert 10% van je huidige gezondheid op om schade te absorberen gelijk aan 30% van je maximale gezondheid gedurende 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Schaduwmantel",
@@ -9415,7 +9415,7 @@ export const nl_NL: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Spookslag",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Slaat de vijand voor wapenschade plus {damage} en verhoogt je ontwijkingskans 7 sec lang met 15%. Levert 1 combopunt op. (schurkentalent)"
       },
       "hammer_of_wrath": {
         "name": "Klinkende hamer",
@@ -9551,7 +9551,7 @@ export const nl_NL: EnTranslations = {
       },
       "sacrilegious_march": {
         "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "description": "Verhoogt je bewegingssnelheid met 35%, maar offert elke seconde 2% van je maximale gezondheid op. Spreuk opnieuw om te annuleren. Het schakelt uit bij 20% gezondheid."
       },
       "spellsteal": {
         "name": "Spreukroof",
@@ -9580,7 +9580,7 @@ export const nl_NL: EnTranslations = {
       "venom_dart": {
         "name": "Gifpijltje",
         "description": "Schiet een vergiftigd pijltje voor {damage} natuurschade. Geeft 1 combopunt. Knifework: verlengt je Gifscheur-wond met 6 sec, tot 20 sec.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Voegt 1 Gifritueel toe en verlengt je gifwond met 6 sec (de wond komt nooit boven 20 sec)."
       },
       "body_blow": {
         "name": "Lichaamsstoot",
@@ -9644,8 +9644,8 @@ export const nl_NL: EnTranslations = {
       },
       "rake": {
         "name": "Villen",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.",
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
       "revive_pet": {
         "name": "Oplappen",
@@ -11163,16 +11163,16 @@ export const nl_NL: EnTranslations = {
         "name": "Teugels van de Drakenmuil-Raptor"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Rijptand"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Mergpunt"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Schemerfluister"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Bottenglas-Steekmes"
       },
       "moggers_hide_quiver": {
         "name": "Moggers Leren Pijlkoker"
@@ -11202,7 +11202,7 @@ export const nl_NL: EnTranslations = {
         "name": "Getoverd feestbrood"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Zielsteen"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
@@ -12665,16 +12665,16 @@ export const nl_NL: EnTranslations = {
         "name": "Waterelementaal"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Grafwacht"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Skeletkrijger"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Botmagiër"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Grafvleugel"
       }
     },
     "npcs": {

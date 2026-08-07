@@ -322,20 +322,20 @@ export const cs_CZ: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Odsouzení",
+      "fateThreadsLabel": "Nitě osudu",
+      "doomMeterUnlock": "Přesunout lištu zdroje Utrpení",
+      "doomMeterLock": "Zamknout lištu zdroje Utrpení",
+      "doomEmptyStatus": "Odsouzení {value} z {max}.",
+      "doomStatus": "Odsouzení {value} z {max}; {remaining}.",
+      "fateThreadsStatus": "Nitě osudu {value} z {max}.",
+      "fateThreadsConsumeReady": "Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.",
+      "fateThreadsSentenceReady": "Tři Nitě osudu: Sentence je dokáže spotřebovat za 18% zvýšené poškození."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "soulFragmentsMeter": "Úlomky duše",
+      "ruinMeter": "Zkáza",
+      "ruinStatus": "Zkáza {value} z {max}"
     },
     "spectate": {
       "banner": "Sleduješ {name}"
@@ -1980,31 +1980,31 @@ export const cs_CZ: EnTranslations = {
       "absorb": "Absorbuje {value} poškození",
       "healAbsorb": "Absorbuje {value} příchozího léčení",
       "thorns": "Způsobuje útočníkům {value} {school} poškození",
-      "stasis": "Immune and unable to act",
+      "stasis": "Nezranitelný a neschopný jednat",
       "slow": "Snižuje rychlost pohybu o {pct} %",
       "speed": "Zvyšuje rychlost pohybu o {pct} %",
       "attackSpeedSlow": "Zpomaluje rychlost útoku o {pct} %",
       "attackSpeedFast": "Zvyšuje rychlost útoku o {pct} %",
       "haste": "Zvyšuje rychlost útoku a sesílání o {pct} %",
       "imbueRange": "Zbraň naplněna: {min} až {max} bonusového poškození při Verdiktu",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Zvyšuje poškození mazlíčka o {pct} %",
+      "petHaste": "Zvyšuje rychlost akcí mazlíčka o {pct} %",
+      "spellDamage": "Zvyšuje poškození kouzel o {pct} %",
+      "spellHaste": "Zvyšuje rychlost sesílání kouzel o {pct} %",
+      "sated": "Nemůže těžit z dalšího skupinového efektu na rychlost",
+      "cauterizeFatigue": "Vypálení nemůže zabránit dalšímu smrtelnému zásahu",
+      "castShield": "Sesílání nelze přerušit ani zpozdit poškozením",
       "dmgDone": "Zvyšuje způsobené poškození o {pct} %",
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
       "heatingUp": "Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní",
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
       "hunterFerocity": "{stacks} Zuřivosti smečky: tvůj společník způsobuje o {pct}% větší poškození",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "Využito {used} z {cap} s snížení doby obnovy v tomto okně",
+      "funeralHarvestLock": "Funeral Harvest zatím nemůže vytvořit další Úlomek duše",
+      "leadenHexLock": "Olověná kletba tento cíl zatím nemůže znovu zakořenit",
+      "forbiddenReflectionReady": "Tvou příští způsobilou schopnost černokněžníka lze seslat znovu i mimo dobu obnovy",
+      "forbiddenReflectionLock": "Zakázaný odraz zatím nelze znovu připravit",
+      "internalCooldown": "Tento efekt nelze spustit znovu, dokud nevyprší časovač",
       "carriedFlag": "Neseš nepřátelskou vlajku. Zrušením tohoto efektu ji upustíš.",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
@@ -2019,13 +2019,13 @@ export const cs_CZ: EnTranslations = {
       "revengeFree": "Tvá příští Odveta nestojí žádný vztek",
       "victoryRush": "Vítězný nápor je připraven",
       "maxHpPct": "Zvyšuje maximální zdraví o {pct} %",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Způsobené poškození zvýšeno o {damagePct} %, rychlost útoku o {hastePct} % a rychlost pohybu o {movePct} %",
+      "suddenDeath": "Tvůj příští Předčasný hrob nestojí žádný vztek a ignoruje svůj požadavek na zdraví",
+      "aoeEcho": "Zbývá {charges} ozvěn: schopnosti na jeden cíl zasáhnou i až {targets} blízké nepřátele za {pct} % poškození",
+      "sureCrit": "{charges} seslání poškozujících schopností jsou zaručeně kritické zásahy",
+      "temporalEcho": "Seslatelovo arkánní poškození tě léčí za {singlePct} % poškození na jeden cíl nebo {areaPct} % plošného poškození",
+      "arcaneCharge": "{stacks} Éterických nábojů: Aether Surge způsobuje o {damagePct} % více poškození, sesílá se o {castPct} % rychleji a stojí {costMult}x many",
+      "physicalReduction": "Snižuje utrpěné fyzické poškození o {pct} %",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
       "combustionCrit": "Tvoje ohnivá kouzla vždy kriticky zasáhnou",
@@ -2047,10 +2047,10 @@ export const cs_CZ: EnTranslations = {
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
       "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené vlčí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
       "verdance": "Zeleň: stupeň {stacks} z {max}. Dokončená sesílání Divokého květu a Druhého květu ji plní; při {max} se Rychlé zhojení mění v Překvět",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
+      "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
+      "nextAttackCrit": "Tvůj příští útok je zaručeně kritický zásah",
+      "healEcho": "Pokles pod {threshold} % zdraví obnoví {value} zdraví",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",
@@ -2089,8 +2089,8 @@ export const cs_CZ: EnTranslations = {
       "mortalWound": "Snižuje přijaté léčení o {pct} %",
       "vulnerability": "Zvyšuje obdržené poškození o {pct} %",
       "physVuln": "Zvyšuje obdržené fyzické poškození o {pct} %",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Zvyšuje utrpěné poškození z krvácení o {pct} %",
+      "sourceVuln": "Utrpí o {pct} % více poškození od seslatele, který tento efekt uvalil",
       "spellVuln": "Zvyšuje obdržené magické poškození o {pct} %",
       "critVuln": "Zvyšuje šanci na obdržený kritický zásah o {pct} %",
       "costTax": "Zvyšuje cenu schopností o {pct} %",
@@ -2104,46 +2104,46 @@ export const cs_CZ: EnTranslations = {
       "disarm": "Odzbrojení: nelze používat útoky zbraní",
       "lockout": "Škola kouzel uzamčena",
       "imbue": "Zbraň naplněna bonusovými efekty",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Dokončení {steps}úderové kadence Válečného ducha ozvěnou zopakuje úder {count}krát za {pct} % jeho poškození jako přírodní poškození",
+      "elementalTrance": "Utrpěné poškození sníženo o {pct} %. {mana} % veškerého způsobeného poškození se mění v manu",
       "stealth": "Skrytí; rychlost pohybu snížena o {pct} %",
       "formBear": "Medvědí podoba: zvýšené zdraví a brnění",
       "formCat": "Vlčí podoba: poškození na blízko a energie",
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "formFireball": "Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Podoba měsíčního křídla: poškození kouzel zvýšeno o {pct} % a brnění zvýšeno o {armorPct} %",
+      "formShadow": "Podoba šerého závoje: stínové poškození zvýšeno o {pct} %",
+      "resourceCount": "{value} z {max}",
+      "formLich": "Soul Lance navíc zasáhne až {targets} blízké nepřátele za {pct} % poškození",
+      "afflictionEye": "Maledict Gaze útočí každých {interval} s; efekty na tomto Oku generují {pct} % Odsouzení",
+      "afflictionEyeSecondary": "Efekty na tomto Oku generují {doomPct} % Odsouzení; Sentence sem zasáhne ozvěnou za {echoPct} % poškození",
+      "afflictionAccomplice": "Způsobilé poškození uděluje {value} Odsouzení, nejvýše jednou za {interval} s",
+      "afflictionViolence": "Zbývá {charges} odplat: nepřátelský útok udělí {doom} Odsouzení a vrátí {damage} stínového poškození",
+      "afflictionVicarious": "Přesměruje nebo sníží {pct} % příchozího poškození a může vygenerovat až {max} Odsouzení",
+      "afflictionPossession": "Posiluje Needle of Fate, Vysát, Maledict Gaze a Sentence",
+      "afflictionJudgment": "Primární Oko generuje o {eyePct} % více Odsouzení; Sentence způsobuje o {sentencePct} % více poškození a první vrátí {refund} Odsouzení",
+      "afflictionLitany": "Zisky Odsouzení způsobí {damage} stínového poškození až {targets} nepřátelům v okruhu {radius} yardů, jednou za sekundu",
+      "afflictionFateThreads": "{stacks} Nití osudu: Sentence způsobuje o {sentencePct} % více poškození, nebo Vysát získává {doom} Odsouzení navíc za tik",
+      "afflictionConsumeThreads": "Vysát spotřebovává {stacks} Nití osudu za {doom} Odsouzení navíc za tik",
+      "necromancyHarvestMark": "Smrt může vytvořit 1 Úlomek duše",
+      "necromancyOssuaryMark": "Ukládá {storedPct} % tvého poškození a poškození tvých nemrtvých, plus {lancePct} % poškození Soul Lance; opětovným sesláním to odpálíš. Smrt vybuchne v okruhu {radius} yardů a vytvoří 1 Úlomek duše",
+      "necromancyDeathEcho": "Zastaralá Ozvěna smrti; žádná současná schopnost ji nespotřebovává",
+      "warlockAnchor": "Seslej znovu do {range} yardů: vrátíš se sem a spotřebuješ kotvu",
+      "formMetamorph": "Podoba démona: velikost těla zvýšena o {pct} %; ostatní bonusy běží na samostatných efektech",
+      "energyRegen": "Zvyšuje regeneraci energie o {pct} %",
       "defensiveStance": "Obranný postoj: nižší obdržené poškození, větší hrozba",
       "righteousFury": "Hořící přísaha: výrazně zvýšená hrozba ze svatého poškození",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} nabití: tvůj příští Mrzačící úder způsobí o {pct} % více poškození",
+      "sweepingStrikes": "Útoky na jeden cíl zasáhnou i {targets} blízké nepřátele za {pct} % poškození",
+      "fingersOfFrost": "Zbývá {charges} nabití: Ledové kopí považuje svůj cíl za zmrazený a způsobí {pct} % zmrazeného poškození",
+      "brainFreeze": "Tvůj příští Zimní bič je okamžitý a ignoruje svou dobu obnovy",
+      "wintersChill": "Zbývá {charges} nabití: kompatibilní kouzla považují tento cíl za zmrazený",
+      "icicles": "Rampouchy {value} z {max}; při {max} lze seslat Ledový hrot",
+      "desolation": "Zbývá {charges} nabití: tvůj příští Zkázný šíp se sešle o {castPct} % rychleji, nebo tvůj příští Ohnivý déšť dopadne okamžitě",
+      "ruinousBrand": "Zbývá {charges} kopií: přímá kouzla sem zopakují {otherPct} % poškození, nebo {selfPct} %, když je toto jejich cíl",
+      "duskfireClaim": "Smrt uděluje {value} Zkázy",
+      "pyreGuardian": "Generuje {ruin} Zkázy každých {ruinInterval} s a způsobuje {damage} ohnivého poškození v okruhu {radius} yardů každých {damageInterval} s",
+      "perfectMoment": "Aether Darts nespotřebovávají Éterické náboje",
       "scale": "Velikost zvýšena o {pct} %",
       "jump": "Výška skoku zvýšena o {pct} %",
       "school": {
@@ -3979,7 +3979,7 @@ export const cs_CZ: EnTranslations = {
       "none": "Žádná třída nesplňuje všechny filtry. Vyčisti jeden a uvidíš víc."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Pojmenuje nepřítele, jehož činy a utrpení krmí tvé Odsouzení.",
       "heroic_strike": "Zařadí těžší švih, který utratí vztek při příštím zásahu.",
       "revenge": "Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.",
       "hamstring": "Zmrzačí pohyb nepřítele, aby nemohl uniknout.",
@@ -7384,10 +7384,10 @@ export const cs_CZ: EnTranslations = {
     "pet": {
       "attack": "Útok",
       "waterJet": "Vodní paprsek",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Běsový výstřel",
+      "abyssalChain": "Propastný řetěz",
+      "autocastOn": "Automatické seslání zapnuto. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro vypnutí.",
+      "autocastOff": "Automatické seslání vypnuto. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro zapnutí.",
       "taunt": "Provokace",
       "healDemon": "Léčit démona",
       "healPet": "Nakrm mazlíčka",
@@ -7398,10 +7398,10 @@ export const cs_CZ: EnTranslations = {
       "petAttackDesc": "Přikaž mazlíčkovi zaútočit na tvůj aktuální nepřátelský cíl.",
       "waterJetTitle": "Vodní paprsek",
       "waterJetDesc": "Přikaž svému vodnímu elementálovi, aby po dobu 3 sekund soustředil zpomalující proud. Čas obnovy 8 sekund. Kliknutím pravým tlačítkem aktivuješ automatické seslání, kdykoli je schopnost mimo čas obnovy.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Běsový výstřel",
+      "felboltDesc": "Přikaž Emberkin vypustit na tvůj cíl další běsovský projektil. Čas obnovy 8 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.",
+      "abyssalChainTitle": "Propastný řetěz",
+      "abyssalChainDesc": "Přikaž Gloomshade přitáhnout běžného nepřítele od 8 do 20 yardů zpět k sobě. Bossy nelze přitáhnout. Čas obnovy 15 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.",
       "petTauntTitle": "Provokace mazlíčka",
       "petTauntDesc": "Přikaž mazlíčkovi zapojit se a zavrčet, jakmile bude v dosahu. Doba obnovy 10 sekund.",
       "healDemonDesc": "Utrať manu a směruj léčení do svého démona po dobu 5 sekund.",
@@ -7557,7 +7557,7 @@ export const cs_CZ: EnTranslations = {
     "tooltip": {
       "rank": "Stupeň {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Zkázy",
       "range": "Dosah {range} yardů",
       "rangeWithMin": "Dosah {min}-{max} yardů",
       "instant": "Okamžité",
@@ -7568,8 +7568,8 @@ export const cs_CZ: EnTranslations = {
       "unavailable": "Nedostupné",
       "requiresLevel": "Vyžaduje úroveň {level}",
       "requiresForm": "Vyžaduje podobu: {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Vyžaduje skrytí",
+      "requiresStealthSkulduggery": "Vyžaduje skrytí (není potřeba při 3 Šeru nebo během Stínového závoje)",
       "requiresCombo": "Spotřebuje combo body",
       "requiresTargetHealthBelow": "Vyžaduje cíl pod {percent}% zdraví",
       "requiresDodge": "Použitelné jen poté, co se cíl vyhne",
@@ -7788,7 +7788,7 @@ export const cs_CZ: EnTranslations = {
       "clickDestroy": "Kliknutím zničíš",
       "useFishing": "Použití: Rybař v blízkých vodách.",
       "useHealingPotion": "Použití: Okamžitě obnoví {amount} zdraví. Použitelné v boji. Doba obnovy 2 min.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 2 min.",
       "useManaPotion": "Použití: Okamžitě obnoví {amount} many. Použitelné v boji. Doba obnovy 2 min.",
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
@@ -8292,20 +8292,20 @@ export const cs_CZ: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Zlý sek",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.",
+        "specNote_assassination": "Přidá 1 Jedový rituál (max 6).",
+        "specNote_combat": "Zatímco je Redline aktivní, toto tlačítko se změní na Úder na tělo: 130 % poškození zbraně plus 10, udělí 2 combo body a přidá 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Do hrobu",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Dokončovací útok, který způsobí {damage}.",
+        "specNote_assassination": "Při 6 Jedovém rituálu se toto tlačítko změní na Jedovou trhlinu: úder, který okamžitě způsobí veškeré poškození, které by ještě způsobila tvá krvácení, zasadí čerstvou jedovou ránu a obnoví 20 energie.",
+        "specNote_combat": "Zásah tímto se 4 nebo více combo body spustí na 8 s Redline: Zlý sek se změní na Úder na tělo a toto tlačítko na Nokautující úder (45 plus 35 za combo bod, o 25 % tvrději za každý vybudovaný díl Redline, obnoví 25 energie). Utrať ho, než Redline skončí."
       },
       "backstab": {
         "name": "Zbabělý výpad",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Zaboduj dýkou do zad cíle za 150 % poškození zbraně plus {damage}. Musíš být za cílem. Musíš mít dýku. Udělí 1 combo bod.",
+        "specNote_assassination": "Každý úder přidá 1 Jedový rituál (max 6) a vrátí 15 energie. Při 6 Jedovém rituálu se Do hrobu změní na Jedovou trhlinu (okamžitě způsobí veškeré zbývající poškození tvých krvácení)."
       },
       "gouge": {
         "name": "Píchnutí do oka",
@@ -8317,7 +8317,7 @@ export const cs_CZ: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Vražedné tempo",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Dokončovací útok, který na 12 s plus 4 s za combo bod zvýší rychlost útoku na blízko o 30 % (5 combo bodů: 32 s)."
       },
       "sprint": {
         "name": "Rychlé paty",
@@ -8325,17 +8325,17 @@ export const cs_CZ: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Podpásovka",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s)."
       },
       "ambush": {
         "name": "Úder z číhání",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Udeř ze stínů za 250 % poškození zbraně plus {damage}. Musíš být v skrytí a za cílem. Musíš mít dýku. Udělí 1 combo bod.",
+        "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí a z libovolného úhlu: takové použití nic nestojí, spotřebuje všechna 3 Šera, spustí Stínový závoj na 6 s a zasáhne dvojnásobně."
       },
       "stealth": {
         "name": "Závoj šera",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Ukryje tě ve stínech: nepřátelé si tě sotva všimnou, ale pohybuješ se o 50 % pomaleji. Útok nebo utrpěné poškození zruší Závoj šera. Seslej znovu pro vystoupení ven.",
+        "specNote_subtlety": "Každý zahajovací útok použitý ze Závoje šera přidá 1 Šero (max 3)."
       },
       "adrenaline_rush": {
         "name": "Zrychlená krev",
@@ -8343,13 +8343,13 @@ export const cs_CZ: EnTranslations = {
       },
       "garrote": {
         "name": "Struna na hrdlo",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Ovineš nepříteli kolem hrdla strunu, což způsobí {damage} poškození ihned a krvácení za {overTime} po dobu 18 s. Musíš být v skrytí. Udělí 1 combo bod.",
+        "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s."
       },
       "cheap_shot": {
         "name": "Rána do břicha",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Musíš být v skrytí. Udělí 2 combo body.",
+        "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s."
       },
       "sap": {
         "name": "Omráčení",
@@ -8361,11 +8361,11 @@ export const cs_CZ: EnTranslations = {
       },
       "expose_armor": {
         "name": "Průraz zbroje",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Dokončovací útok, který na 30 s odhalí cíl: každý vydaný combo bod sníží jeho brnění o 2 % (5 combo bodů: {damage} %)."
       },
       "rupture": {
         "name": "Vykrvácení",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Dokončovací útok, který zraní cíl: krvácí každé 2 s po dobu 6 s plus 2 s za combo bod (5 combo bodů: 16 s a {damage} celkového poškození)."
       },
       "vanish": {
         "name": "Kouřový krok",
@@ -8733,19 +8733,19 @@ export const cs_CZ: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Označí jednoho nepřítele jako terč tvých kleteb. Přesunutí Oka zachová Odsouzení, ale neobnoví jeho 20sekundové vypršení."
       },
       "maledict_gaze": {
         "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "description": "Tvé Maledict Eye útočí na tvé vybrané primární Evil Eye každých 2,5 s za stínové poškození. Possess the Evil Eye zdvojnásobí jeho rychlost útoku."
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Probodne nepřítele za {damage} stínového poškození a vygeneruje 5 Odsouzení, pokud nese tvé Evil Eye. Každý zásah tvého primárního Evil Eye přidá na 12 s Nit osudu, až do 3. Pokud neexistuje žádné Evil Eye, Needle nejprve označí svůj cíl."
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
       },
       "life_tap": {
         "name": "Tvrdý obchod",
@@ -8753,7 +8753,7 @@ export const cs_CZ: EnTranslations = {
       },
       "cursed_accomplice": {
         "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "description": "Propojí tvé Maledict Eye, když není vybraný žádný spojenec, a jeho Maledict Gaze pak generuje 2 Odsouzení. Propojení jednoho vybraného člena skupiny místo toho způsobí, že jen jeho poškození tvému Evil Eye generuje 3. Nové propojení nahradí předchozí a může se spustit nejvýše jednou za 2 s."
       },
       "curse_of_agony": {
         "name": "Kletba trýzně",
@@ -8765,43 +8765,43 @@ export const cs_CZ: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Na 6 s prokleje tvé primární Evil Eye. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele v okruhu 8 yardů, nejvýše jednou za sekundu. Stupeň 2 to prodlouží na 8 s a 4 nepřátele."
       },
       "cinderhide": {
         "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "description": "Na 10 s ti zatvrdí kůži do chladnoucí strusky a sníží veškeré utrpěné poškození o 25 %."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 m: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s."
       },
       "soulwell": {
         "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "description": "Na 3 min přivolá Soulwell. Mimo boj si členové skupiny mohou doplnit své Kameny duše až na 3. Kámen duše obnoví 25 % maximálního zdraví a sdílí dobu obnovy s lektvary."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "description": "Uhrane nepřítele na 8 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 16 stínového poškození."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "description": "Obětuje 12 % tvého maximálního zdraví, obnoví 1,5 % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně."
       },
       "vicarious_suffering": {
         "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "description": "Na 8 s propojí tvé utrpení a z nepřátelských zásahů vygeneruje až 15 Odsouzení. Na sobě sníží utrpěné poškození o 20 %. Na spojenci přesměruje až 20 % na tebe, aniž by tě to dostalo pod 15 % zdraví."
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "description": "Maledictor posedne tvé primární Evil Eye na 15 s a vygeneruje 35 Odsouzení. Needle of Fate se sešle za 1 s a vygeneruje 2 Odsouzení navíc, Vysát lze kanálovat za pohybu a Sentence způsobí o 25 % více poškození a uvolní opožděnou ozvěnu za 60 % poškození, která na úrovních 17-20 klesá na 30 %."
       },
       "hour_of_judgment": {
         "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "description": "Na 15 s vyvolá soud nad tvým primárním Evil Eye: udělí 40 Odsouzení a 3 Nitě osudu, aktivuje Posednutí, zdvojnásobí Odsouzení generované skrze primární Oko a zvýší poškození Sentence o 20 %. První Sentence vrátí 50 Odsouzení."
       },
       "coven": {
         "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "description": "Vytvoří sekundární Evil Eyes až na 4 blízkých nepřátelích na 15 s. Krmí sdílenou zásobu Odsouzení z 50 % a Sentence se k nim šíří ozvěnou za 35 % poškození."
       },
       "fear": {
         "name": "Děs",
@@ -8817,12 +8817,12 @@ export const cs_CZ: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození."
       },
       "wrath": {
         "name": "Šíp divočiny",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Vrhne blesk přírodní energie za {damage} přírodního poškození.",
+        "specNote_balance": "V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se Měsíční semeno změní na Měsíční vzedmutí a Pád nebes na Sluneční vzedmutí."
       },
       "healing_touch": {
         "name": "Divoké zhojení",
@@ -8834,8 +8834,8 @@ export const cs_CZ: EnTranslations = {
       },
       "moonfire": {
         "name": "Měsíční bouře",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase.",
+        "specNote_balance": "Udržuj to hořet: Měsíční semeno to prodlouží o 6 s."
       },
       "moonseed": {
         "name": "Měsíční semeno",
@@ -8843,8 +8843,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Divoký květ",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Vyléčí cíl za {damage} po dobu 12 s.",
+        "specNote_restoration": "Zasazení NOVÉHO květu přidá 1 Bujnost (max 5). Při 5 Bujnosti se Rychlé zhojení změní na Překvět."
       },
       "thorns": {
         "name": "Ostružinová stráž",
@@ -8860,8 +8860,8 @@ export const cs_CZ: EnTranslations = {
       },
       "maul": {
         "name": "Drcení kostí",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí vysokou hrozbu. Aktivuje se při tvém příštím úderu. Pouze v medvědí podobě.",
+        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: úder za 78 až 96 poškození s vysokou hrozbou; pod polovinou zdraví tě místo toho ochrání štítem za 18 % tvého maximálního zdraví a vrátí 15 vzteku."
       },
       "growl": {
         "name": "Hrozba",
@@ -8873,23 +8873,23 @@ export const cs_CZ: EnTranslations = {
       },
       "claw": {
         "name": "Dráp",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze ve vlčí podobě.",
+        "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
       },
       "ferocious_bite": {
         "name": "Krvavý skus",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.",
+        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň: kousnutí za 70 plus 43 za combo bod, které navíc okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví 30 energie."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Přejeď drápy přes blízké nepřátele za {damage} poškození. Způsobí extra hrozbu. Pouze v medvědí podobě.",
+        "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
       },
       "regrowth": {
         "name": "Druhý květ",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Vyléčí přátelský cíl za {damage} a další množství po dobu 21 s.",
+        "specNote_restoration": "Zasazení NOVÉHO květu přidá 1 Bujnost (max 5)."
       },
       "barkskin": {
         "name": "Dubová kůže",
@@ -8905,8 +8905,8 @@ export const cs_CZ: EnTranslations = {
       },
       "starfire": {
         "name": "Pád nebes",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Přivolá blesk hvězdného ohně a způsobí {damage} arkánního poškození.",
+        "specNote_balance": "V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se toto tlačítko změní na Sluneční vzedmutí: okamžitý úder za 80 až 100 přírodního poškození plus 45 hoření po dobu 9 s, obnoví 35 many a spotřebuje všechny 3."
       },
       "travel_form": {
         "name": "Svižná podoba",
@@ -8946,8 +8946,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rip": {
         "name": "Roztržení",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Dokončovací útok, po kterém cíl krvácí každé 2 s po dobu 24 s: 36 poškození plus 24 za vydaný combo bod (5 combo bodů: {damage} celkem). Pouze ve vlčí podobě.",
+        "specNote_feral": "Zasažený úder přidá 1 Starou krev (max 3)."
       },
       "mortal_strike": {
         "name": "Mrzačící úder",
@@ -8999,7 +8999,7 @@ export const cs_CZ: EnTranslations = {
       },
       "elemental_trance": {
         "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "description": "Na 15 s vstoupíš do elementálního transu, který sníží utrpěné poškození o 30 % a promění 20 % veškerého tvého způsobeného poškození v manu. (klíčová schopnost Válečného ducha)"
       },
       "primal_exaltation": {
         "name": "Prvotní povznesení",
@@ -9015,59 +9015,59 @@ export const cs_CZ: EnTranslations = {
       },
       "soul_harvest": {
         "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "description": "Trhá duši nepřítele za {damage} stínového poškození a vytvoří 1 Úlomek duše, až do 5."
       },
       "soul_lance": {
         "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "description": "Vrhne přízračné kopí za {damage} stínového poškození. Proti tvé Ossuary Mark se 50 % jeho poškození přidá ke značce."
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "description": "Vzkřísí trvalého obranného společníka. Hrobová stráž automaticky provokuje, přes Hrobové panství zachytí 20 % tvého poškození a Reaping Command ji na 4 s přiměje provokovat a utrpět o 30 % méně poškození."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "description": "Spotřebuje 1 Úlomek duše a přidá trvalého Kostlivého bojovníka do tvého dvouslotového Panství. Sloužit ti může jen jeden. Každých 6 s zasáhne sekem blízké nepřátele za 45 % poškození a Reaping Command na 4 s připoutá jeho cíl 40% zpomalením."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "description": "Spotřebuje 2 Úlomky duše a přidá trvalého Kostěného mága na dálku do tvého dvouslotového Panství. Sloužit ti může jen jeden. Jeho útoky na 6 s odhalí cíl vůči o 5 % vyššímu magickému poškození a Reaping Command tuto slabinu zvýší na 8 %."
       },
       "bone_armor": {
         "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "description": "Obalí tě kostmi a pohltí poškození ve výši 20 % tvého maximálního zdraví."
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "description": "Nejprve obětuje Kostěného mága, poté Kostlivého bojovníka a Hrobové křídlo jen jako poslední možnost. Mezi duplicitami vybere toho s nejkratší zbývající dobou trvání, poté nejslabšího, a způsobí {damage} stínového poškození na zvoleném místě."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "description": "Když zemře nepřítel nedávno zasažený tebou nebo tvými nemrtvými, získáš 1 Úlomek duše. Může nastat nejvýše jednou za 3 s."
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
       },
       "unholy_command": {
         "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "description": "Spotřebuje 3 Úlomky duše a na 12 s přikáže všem tvým nemrtvým způsobit o 25 % více poškození a jednat o 20 % rychleji."
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "description": "Zničí jednoho služebníka Panství a obnoví 25 % tvého maximálního zdraví."
       },
       "raise_gravewing": {
         "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "description": "Spotřebuje 2 Úlomky duše a přidá trvalé Hrobové křídlo do tvého dvouslotového Panství. Sloužit ti může jen jedno. Každých 5 s zasáhne sekem blízké nepřátele za 65 % poškození a Reaping Command na 5 s způsobí, že každý zasažený nepřítel utrpí o 8 % více poškození."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "description": "Otevře hrobový portál a na 20 s vzkřísí dočasného Kostlivého bojovníka, Kostěného mága a Hrobové křídlo, čímž zaplní řady, které tví stálí služebníci Panství nechávají prázdné."
       },
       "metamorphosis": {
         "name": "Děsivý zjev",
@@ -9107,15 +9107,15 @@ export const cs_CZ: EnTranslations = {
       },
       "cold_blood": {
         "name": "Klid zabijáka",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Soustředí tvůj zabijácký záměr, takže tvůj příští útok bude kritický zásah. (klíčová schopnost Knifework)"
       },
       "blade_flurry": {
         "name": "Zrcadlové čepele",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Rozpoutá spršku čepelí a na 12 s zvýší rychlost útoku o 20 %. (klíčová schopnost Thuggery)"
       },
       "hemorrhage": {
         "name": "Rudá stuha",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí krvácení po dobu 12 s a zvýší utrpěné poškození z krvácení o 40 %. Udělí 1 combo bod. Každé 2. použití přidá 1 Šero (max 3). (klíčová schopnost Skulduggery)"
       },
       "power_infusion": {
         "name": "Pomazání",
@@ -9351,7 +9351,7 @@ export const cs_CZ: EnTranslations = {
       },
       "abyssal_rift": {
         "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "description": "Roztrhne trhlinu na vybraném místě, přitáhne nepřátele do 8 yardů k jejímu středu, způsobí jim {damage} stínového poškození a omráčí je na 2 s. Bossové utrpí poškození, ale odolají přitažení i omráčení."
       },
       "chaos_bolt": {
         "name": "Zkázný šíp",
@@ -9359,7 +9359,7 @@ export const cs_CZ: EnTranslations = {
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "description": "Obětuje 10 % tvého aktuálního zdraví a na 8 s pohltí poškození ve výši 30 % tvého maximálního zdraví."
       },
       "cloak_of_shadows": {
         "name": "Stínoplášť",
@@ -9415,7 +9415,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Přízračný úder",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Zasáhne nepřítele za poškození zbraně plus {damage} a na 7 s zvýší tvou šanci na vyhnutí o 15 %. Udělí 1 combo bod. (talent tuláka)"
       },
       "hammer_of_wrath": {
         "name": "Zvonící kladivo",
@@ -9551,7 +9551,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sacrilegious_march": {
         "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "description": "Zvýší rychlost pohybu o 35 %, ale každou sekundu obětuje 2 % tvého maximálního zdraví. Seslej znovu pro zrušení. Při 20 % zdraví se samo vypne."
       },
       "spellsteal": {
         "name": "Krádež kouzla",
@@ -9580,7 +9580,7 @@ export const cs_CZ: EnTranslations = {
       "venom_dart": {
         "name": "Jedová šipka",
         "description": "Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Přidá 1 Jedový rituál a prodlouží tvou jedovou ránu o 6 s (rána nikdy nepřesáhne 20 s)."
       },
       "body_blow": {
         "name": "Úder na tělo",
@@ -9644,8 +9644,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rake": {
         "name": "Stažení z kůže",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Rozpárej nepřítele za poškození zbraně plus {damage} a způsob krvácení po dobu 18 s. Udělí 1 combo bod. Pouze ve vlčí podobě.",
+        "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
       },
       "revive_pet": {
         "name": "Ošetření",
@@ -11163,16 +11163,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Otěže raptora z Dračí tlamy"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Jinovatkový tesák"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Hrot morku"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Šepot šera"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Kostiskelné šídlo"
       },
       "moggers_hide_quiver": {
         "name": "Moggerův kožený toulec"
@@ -11202,7 +11202,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Vyčarovaný hodovní bochník"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Kámen duše"
       },
       "bristleback_maul": {
         "name": "Gallowglassské kladivo"
@@ -12665,16 +12665,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Vodní elementál"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Hrobová stráž"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Kostlivý bojovník"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Kostěný mág"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Hrobové křídlo"
       }
     },
     "npcs": {

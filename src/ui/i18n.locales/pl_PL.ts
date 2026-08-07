@@ -11994,4 +11994,340 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': 'Zmarszczki na wodzie (kilwater)',
   'hudChrome.breath.label': 'Oddech',
   'hudChrome.breath.drowning': 'Toniesz!',
+  'abilityUi.tooltip.requiresStealth': 'Wymaga ukrycia',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Wymaga ukrycia (niepotrzebne przy 3 Mroku lub podczas Zasłony Cieni)',
+  'abilityUi.tooltip.ruinCost': '{cost} Ruiny',
+  'entities.abilities.abyssal_rift.description':
+    'Rozdziera przestrzeń w wybranym miejscu, przyciągając wrogów w promieniu 8 m do jego środka, zadając {damage} obrażeń od Cienia i ogłuszając ich na 2 sekundy. Bossowie otrzymują obrażenia, ale są odporni na przyciąganie i ogłuszenie.',
+  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.ambush.description':
+    'Uderz z cienia za 250% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia i z dowolnego kąta: takie użycie nic nie kosztuje, zużywa cały Mrok, rozpoczyna 6-sekundową Zasłonę Cieni i zadaje podwójne obrażenia.',
+  'entities.abilities.army_of_the_dead.description':
+    'Rozdziera grobowy portal, by na 20 sekund wskrzesić tymczasowego Szkieletowego Wojownika, Kościanego Maga i Grobowe Skrzydło, wypełniając szeregi, które pozostawiają puste twoi stali słudzy Władzy.',
+  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+  'entities.abilities.backstab.description':
+    'Wbij sztylet w plecy celu za 150% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Każdy trafiony cios dodaje 1 Rytuał Jadu (maks. 6) i zwraca 15 energii. Przy 6 Rytuale Jadu, Wieczny sen zmienia się w Jadowite rozdarcie (zadaje od razu wszystkie pozostałe obrażenia twoich krwawień).',
+  'entities.abilities.blade_flurry.description':
+    'Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sekund. (silnik Thuggery)',
+  'entities.abilities.bone_armor.description':
+    'Owija cię kośćmi, pochłaniając obrażenia równe 20% twojego maksymalnego zdrowia.',
+  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.cheap_shot.description':
+    'Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Musisz być w ukryciu. Przyznaje 2 punkty combo.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia: takie użycie nic nie kosztuje, zużywa cały Mrok i rozpoczyna 6-sekundową Zasłonę Cieni.',
+  'entities.abilities.cinderhide.description':
+    'Utwardza twoją skórę w stygnący żużel na 10 sekund, zmniejszając wszystkie otrzymywane obrażenia o 25%.',
+  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.claw.description':
+    'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci wilka.',
+  'entities.abilities.claw.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.cold_blood.description':
+    'Skupia twój morderczy zamiar, dzięki czemu twój następny atak jest trafieniem krytycznym. (silnik Knifework)',
+  'entities.abilities.corpse_explosion.description':
+    'Poświęca najpierw Kościanego Maga, potem Szkieletowego Wojownika, a Grobowe Skrzydło tylko w ostateczności. Spośród duplikatów wybiera tego z najkrótszym pozostałym czasem trwania, a następnie najsłabszego, aby zadać {damage} obrażeń od Cienia w wybranym miejscu.',
+  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+  'entities.abilities.coven.description':
+    'Tworzy drugorzędne Evil Eye na maksymalnie 4 pobliskich wrogach na 15 sekund. Zasilają one wspólną pulę Potępienia w 50%, a Sentence odbija się do nich za 35% obrażeń.',
+  'entities.abilities.coven.name': 'Coven',
+  'entities.abilities.cruel_pact.description':
+    'Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej.',
+  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cursed_accomplice.description':
+    'Wiąże twoje Maledict Eye, gdy nie wybrano żadnego sojusznika, dzięki czemu jego Maledict Gaze generuje 2 Potępienia. Powiązanie jednego wybranego członka grupy sprawia, że zamiast tego tylko jego obrażenia zadane twojemu Evil Eye generują 3. Nowe powiązanie zastępuje poprzednie i może się uruchomić nie częściej niż raz na 2 sekundy.',
+  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+  'entities.abilities.dark_pact.description':
+    'Poświęca 10% twojego obecnego zdrowia, aby na 8 sekund pochłonąć obrażenia równe 30% twojego maksymalnego zdrowia.',
+  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.elemental_trance.description':
+    'Wchodzisz w żywiołowy trans na 15 sekund, zmniejszając otrzymywane obrażenia o 30% i zamieniając 20% wszystkich zadawanych przez ciebie obrażeń w manę. (Sygnatura Ducha Wojny)',
+  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.evil_eye.description':
+    'Oznacza jednego wroga jako ognisko twoich klątw. Przeniesienie oka zachowuje Potępienie, ale nie odświeża jego 20-sekundowego czasu wygaśnięcia.',
+  'entities.abilities.evil_eye.name': 'Evil Eye',
+  'entities.abilities.eviscerate.description': 'Umiejętność kończąca, która zadaje {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'Przy 6 Rytuale Jadu ten przycisk zmienia się w Jadowite rozdarcie: cios, który natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje krwawienia, zadaje świeżą jadowitą ranę i przywraca 20 energii.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 sekund: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (45 plus 35 za punkt combo, trafiając o 25% mocniej za każdą zbudowaną kreskę Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy.',
+  'entities.abilities.expose_armor.description':
+    'Umiejętność kończąca, która obnaża cel na 30 sekund: każdy wydany punkt combo zmniejsza jego pancerz o 2% (5 punktów combo: {damage}%).',
+  'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o {damage}% na 40 sekund.',
+  'entities.abilities.ferocious_bite.description':
+    'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci wilka.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa: ukąszenie za 70 plus 43 za punkt combo, które dodatkowo natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywraca 30 energii.',
+  'entities.abilities.funeral_harvest.description':
+    'Gdy umiera wróg, któremu niedawno zadałeś obrażenia ty lub twoi nieumarli, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 sekundy.',
+  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.garrote.description':
+    'Zapętl drut wokół gardła wroga, zadając {damage} obrażeń od razu i {overTime} obrażeń od krwawienia w ciągu 18 sekund. Musisz być w ukryciu. Przyznaje 1 punkt combo.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia: takie użycie nic nie kosztuje, zużywa cały Mrok i rozpoczyna 6-sekundową Zasłonę Cieni.',
+  'entities.abilities.ghostly_strike.description':
+    'Uderza wroga za obrażenia broni plus {damage} i zwiększa twoją szansę na unik o 15% na 7 sekund. Przyznaje 1 punkt combo. (talent Łotrzyka)',
+  'entities.abilities.hemorrhage.description':
+    'Uderza wroga za obrażenia broni plus {damage}, zadaje obrażenia od krwawienia przez 12 sekund i zwiększa otrzymywane obrażenia od krwawienia o 40%. Przyznaje 1 punkt combo. Co drugie użycie dodaje 1 Mrok (maks. 3). (silnik Skulduggery)',
+  'entities.abilities.hex_of_violence.description':
+    'Rzuca urok na wroga na 8 sekund. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 16 obrażeń od Cienia.',
+  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hour_of_judgment.description':
+    'Przywołuje sąd nad twoim głównym Evil Eye na 15 sekund, przyznając 40 Potępienia i 3 Nici Przeznaczenia, aktywując Opętanie, podwajając Potępienie generowane przez główne oko i zwiększając obrażenia Sentence o 20%. Pierwsze Sentence zwraca 50 Potępienia.',
+  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+  'entities.abilities.kidney_shot.description':
+    'Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund).',
+  'entities.abilities.litany_of_guilt.description':
+    'Rzuca klątwę na twoje główne Evil Eye na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów.',
+  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+  'entities.abilities.maledict_gaze.description':
+    'Twoje Maledict Eye atakuje wybrane główne Evil Eye co 2,5 sekundy, zadając obrażenia od Cienia. Possess the Evil Eye podwaja jego szybkość ataku.',
+  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+  'entities.abilities.maul.description':
+    'Miażdżący atak, który zwiększa obrażenia w walce wręcz o {damage} i wzbudza wysokie zagrożenie. Aktywuje się przy twoim następnym zamachu. Tylko w Postaci Bruina.',
+  'entities.abilities.maul.specNote_feral':
+    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości.',
+  'entities.abilities.moonfire.description':
+    'Podpala wroga księżycowym ogniem, zadając {damage} obrażeń od Arkanów plus obrażenia w czasie.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Utrzymuj płomień: Księżycowe nasienie przedłuża go o 6 sekund.',
+  'entities.abilities.needle_of_fate.description':
+    'Przebija wroga za {damage} obrażeń od Cienia i generuje 5 Potępienia, jeśli nosi on twoje Evil Eye. Każde trafienie w twoje główne Evil Eye dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Evil Eye, Needle najpierw oznacza swój cel.',
+  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy.',
+  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.possess_evil_eye.description':
+    'Maledyktor opętuje twoje główne Evil Eye na 15 sekund i generuje 35 Potępienia. Needle of Fate rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Sentence zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20.',
+  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+  'entities.abilities.raise_bone_mage.description':
+    'Zużywa 2 Odłamki Duszy, aby dodać trwałego dystansowego Kościanego Maga do twojej Władzy z 2 miejscami. Może ci służyć tylko jeden. Jego ataki wystawiają cel na 5% więcej obrażeń magicznych przez 6 sekund, a Reaping Command zwiększa tę słabość do 8%.',
+  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+  'entities.abilities.raise_graveguard.description':
+    'Wskrzesza trwałego obronnego towarzysza. Grobowy Strażnik automatycznie prowokuje, przechwytuje 20% twoich obrażeń dzięki Władzy Grobu, a Reaping Command sprawia, że prowokuje i otrzymuje o 30% mniej obrażeń przez 4 sekundy.',
+  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+  'entities.abilities.raise_gravewing.description':
+    'Zużywa 2 Odłamki Duszy, aby dodać trwałe Grobowe Skrzydło do twojej Władzy z 2 miejscami. Może ci służyć tylko jedno. Co 5 sekund rozcina pobliskich wrogów za 65% obrażeń, a Reaping Command sprawia, że każdy trafiony wróg otrzymuje o 8% więcej obrażeń przez 5 sekund.',
+  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Zużywa 1 Odłamek Duszy, aby dodać trwałego Szkieletowego Wojownika do twojej Władzy z 2 miejscami. Może ci służyć tylko jeden. Co 6 sekund rozcina pobliskich wrogów za 45% obrażeń, a Reaping Command przygważdża jego cel spowolnieniem o 40% na 4 sekundy.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+  'entities.abilities.rake.description':
+    'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj obrażenia od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci wilka.',
+  'entities.abilities.rake.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.reaping_command.description':
+    'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',
+  'entities.abilities.reaping_command.name': 'Reaping Command',
+  'entities.abilities.regrowth.description':
+    'Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 21 sekund.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5).',
+  'entities.abilities.rejuvenation.description': 'Leczy cel za {damage} w ciągu 12 sekund.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5). Przy 5 Zieleni, Szybkie uzdrowienie zmienia się w Nadrozkwit.',
+  'entities.abilities.rip.description':
+    'Umiejętność kończąca, która sprawia, że cel krwawi co 2 sekundy przez 24 sekundy: 36 obrażeń plus 24 za wydany punkt combo (5 punktów combo: {damage} łącznie). Tylko w Postaci wilka.',
+  'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.ruinous_brand.description':
+    'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel.',
+  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.rupture.description':
+    'Umiejętność kończąca, która rani cel: krwawi on co 2 sekundy, przez 6 sekund plus 2 sekundy za punkt combo (5 punktów combo: 16 sekund i {damage} obrażeń łącznie).',
+  'entities.abilities.sacrifice_undead.description':
+    'Niszczy jednego sługę Władzy, aby przywrócić 25% twojego maksymalnego zdrowia.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrilegious_march.description':
+    'Zwiększa szybkość poruszania się o 35%, ale poświęca 2% twojego maksymalnego zdrowia każdej sekundy. Rzuć ponownie, aby anulować. Wyłącza się przy 20% zdrowia.',
+  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sentence.description':
+    'Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie.',
+  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sinister_strike.description':
+    'Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.',
+  'entities.abilities.sinister_strike.specNote_assassination': 'Dodaje 1 Rytuał Jadu (maks. 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: 130% obrażeń broni plus 10, przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4).',
+  'entities.abilities.slice_and_dice.description':
+    'Umiejętność kończąca, która zwiększa szybkość ataku w walce wręcz o 30% na 12 sekund plus 4 sekundy za punkt combo (5 punktów combo: 32 sekundy).',
+  'entities.abilities.soul_harvest.description':
+    'Rozdziera duszę wroga za {damage} obrażeń od Cienia i tworzy 1 Odłamek Duszy, maksymalnie do 5.',
+  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_lance.description':
+    'Ciska widmową lancę, zadając {damage} obrażeń od Cienia. Przeciwko celowi noszącemu twój Ossuary Mark, 50% tych obrażeń dolicza się do znaku.',
+  'entities.abilities.soul_lance.name': 'Soul Lance',
+  'entities.abilities.soulwell.description':
+    'Przywołuje Soulwell na 3 minuty. Poza walką członkowie grupy mogą uzupełniać swoje Kamienie Duszy do 3 sztuk. Kamień Duszy przywraca 25% maksymalnego zdrowia i dzieli czas odnowienia z miksturami.',
+  'entities.abilities.soulwell.name': 'Soulwell',
+  'entities.abilities.starfire.description':
+    'Przyzywa pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.',
+  'entities.abilities.starfire.specNote_balance':
+    'W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie zadające od 80 do 100 obrażeń od Natury plus podpalenie na 45 obrażeń przez 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu.',
+  'entities.abilities.stealth.description':
+    'Ukrywa cię w cieniach: wrogowie ledwo cię zauważają, ale poruszasz się o 50% wolniej. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3).',
+  'entities.abilities.swiftmend.description':
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Zasadzenia Dzikiego rozkwitu i Drugiego rozkwitu dodają Zieleń; przy 5 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)',
+  'entities.abilities.swipe.description':
+    'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
+  'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia.',
+  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.unholy_command.description':
+    'Zużywa 3 Odłamki Duszy, rozkazując wszystkim twoim nieumarłym zadawać o 25% więcej obrażeń i działać o 20% szybciej przez 12 sekund.',
+  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Dodaje 1 Rytuał Jadu i przedłuża twoją jadowitą ranę o 6 sekund (rana nigdy nie przekracza 20 sekund).',
+  'entities.abilities.vicarious_suffering.description':
+    'Wiąże twoje cierpienie na 8 sekund i generuje do 15 Potępienia z wrogich trafień. Użyte na sobie, zmniejsza otrzymywane obrażenia o 20%. Użyte na sojuszniku, przekierowuje do 20% obrażeń na ciebie, nie obniżając twojego zdrowia poniżej 15%.',
+  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.wrath.description':
+    'Ciska pociskiem energii natury, zadając {damage} obrażeń od Natury.',
+  'entities.abilities.wrath.specNote_balance':
+    'W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie Księżycowe nasienie zmienia się w Księżycowy przybór, a Spadające niebo w Słoneczny ślad.',
+  'entities.items.boneglass_shiv.name': 'Nóż z kościanego szkła',
+  'entities.items.duskwhisper.name': 'Szept Zmierzchu',
+  'entities.items.marrowpoint.name': 'Ostrze Szpiku',
+  'entities.items.rimefang.name': 'Szronowy Kieł',
+  'entities.items.soul_stone.name': 'Kamień Duszy',
+  'entities.mobs.graveguard.name': 'Grobowy Strażnik',
+  'entities.mobs.necromancy_bone_mage.name': 'Kościany Mag',
+  'entities.mobs.necromancy_gravewing.name': 'Grobowe Skrzydło',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Szkieletowy Wojownik',
+  'guide.abilityHook.evil_eye':
+    'Wskazuje wroga, którego działania i cierpienie będą zasilać twoje Potępienie.',
+  'hud.pet.abyssalChain': 'Otchłanny łańcuch',
+  'hud.pet.abyssalChainDesc':
+    'Rozkazuje Gloomshade\'owi przyciągnąć do siebie zwykłego wroga znajdującego się dalej niż 8 i nie dalej niż 20 metrów. Bossów nie można przyciągnąć. Czas odnowienia: 15 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.',
+  'hud.pet.abyssalChainTitle': 'Otchłanny łańcuch',
+  'hud.pet.autocastOff':
+    'Automatyczne rzucanie wyłączone. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby je włączyć.',
+  'hud.pet.autocastOn':
+    'Automatyczne rzucanie włączone. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby je wyłączyć.',
+  'hud.pet.felbolt': 'Plugawy pocisk',
+  'hud.pet.felboltDesc':
+    'Rozkazuje Emberkinowi wystrzelić w twój cel dodatkowy plugawy pocisk. Czas odnowienia: 8 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.',
+  'hud.pet.felboltTitle': 'Plugawy pocisk',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Kwalifikujące się obrażenia przyznają {value} Potępienia, najwyżej raz na {interval} s',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Pochłonięcie zużywa {stacks} Nici Przeznaczenia, zyskując dodatkowe {doom} Potępienia na tik',
+  'hudChrome.auraEffect.afflictionEye':
+    'Maledict Gaze atakuje co {interval} s; efekty na tym oku generują {pct}% Potępienia',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Efekty na tym oku generują {doomPct}% Potępienia; Sentence odbija się tutaj za {echoPct}% obrażeń',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Nici Przeznaczenia: Sentence zadaje o {sentencePct}% więcej obrażeń, albo Pochłonięcie zyskuje dodatkowe {doom} Potępienia na tik',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Główne oko generuje o {eyePct}% więcej Potępienia; Sentence zadaje o {sentencePct}% więcej obrażeń, a pierwsze użycie zwraca {refund} Potępienia',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Zyski Potępienia zadają {damage} obrażeń od Cienia maksymalnie {targets} wrogom w promieniu {radius} m, raz na sekundę',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Wzmacnia Needle of Fate, Pochłonięcie, Maledict Gaze i Sentence',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Przekierowuje lub zmniejsza {pct}% otrzymywanych obrażeń i może wygenerować do {max} Potępienia',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Pozostało {charges} odwetów; atak wroga przyznaje {doom} Potępienia i zadaje mu {damage} obrażeń od Cienia',
+  'hudChrome.auraEffect.aoeEcho':
+    'Pozostało {charges} ech; zdolności jednocelowe zadają {pct}% obrażeń jeszcze {targets} pobliskim wrogom',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} Ładunków Eteru: Przypływ eteru zadaje o {damagePct}% więcej obrażeń, rzuca się o {castPct}% szybciej i kosztuje {costMult}x many',
+  'hudChrome.auraEffect.bleedVuln': 'Zwiększa otrzymywane obrażenia od krwawienia o {pct}%',
+  'hudChrome.auraEffect.brainFreeze':
+    'Twój następny Zimowy bicz jest natychmiastowy i ignoruje czas odnowienia',
+  'hudChrome.auraEffect.castShield': 'Rzucania nie można przerwać ani opóźnić obrażeniami',
+  'hudChrome.auraEffect.cauterizeFatigue':
+    'Kauteryzacja nie może ponownie zapobiec śmiertelnemu trafieniu',
+  'hudChrome.auraEffect.cooldownCap':
+    'Wykorzystano {used} z {cap} s skrócenia czasu odnowienia w tym oknie',
+  'hudChrome.auraEffect.desolation':
+    'Pozostało {charges} ładunków: twój następny Pocisk Ruiny rzuca się o {castPct}% szybciej albo twój następny Deszcz ognia trafia natychmiast',
+  'hudChrome.auraEffect.duskfireClaim': 'Śmierć celu przyznaje {value} Ruiny',
+  'hudChrome.auraEffect.elementalTrance':
+    'Otrzymywane obrażenia zmniejszone o {pct}%. {mana}% wszystkich zadawanych przez ciebie obrażeń zamienia się w manę',
+  'hudChrome.auraEffect.energyRegen': 'Zwiększa regenerację Energii o {pct}%',
+  'hudChrome.auraEffect.enrage':
+    'Zadawane obrażenia zwiększone o {damagePct}%, szybkość ataku o {hastePct}%, a szybkość poruszania się o {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    'Pozostało {charges} ładunków: Lodowa lanca traktuje cel jako zamrożony i zadaje {pct}% obrażeń zamrożonego trafienia',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Zakazane Odbicie nie może zostać jeszcze ponownie przygotowane',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Możesz ponownie rzucić swoją następną kwalifikującą się umiejętność czarnoksiężnika, mimo że jest w odnowieniu',
+  'hudChrome.auraEffect.formLich':
+    'Soul Lance trafia też do {targets} pobliskich wrogów, zadając {pct}% obrażeń',
+  'hudChrome.auraEffect.formMetamorph':
+    'Postać demona: rozmiar ciała zwiększony o {pct}%; pozostałe premie mają osobne efekty',
+  'hudChrome.auraEffect.formMoonkin':
+    'Postać księżycowej sowy: obrażenia zaklęć zwiększone o {pct}%, a pancerz o {armorPct}%',
+  'hudChrome.auraEffect.formShadow': 'Postać cienia: obrażenia od Cienia zwiększone o {pct}%',
+  'hudChrome.auraEffect.freeExecute': 'Twoja następna dostępna zdolność dobijająca nic nie kosztuje',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Funeral Harvest nie może jeszcze stworzyć kolejnego Odłamka Duszy',
+  'hudChrome.auraEffect.galeheartWeapon':
+    'Ukończenie {steps}-ciosowej kadencji Ducha Wojny odbija cios {count} razy za {pct}% jego obrażeń jako obrażenia od Natury',
+  'hudChrome.auraEffect.healEcho': 'Spadek poniżej {threshold}% zdrowia przywraca {value} zdrowia',
+  'hudChrome.auraEffect.icicles':
+    '{value} z {max} Sopli; przy {max} można rzucić Lodowcowy kolec',
+  'hudChrome.auraEffect.internalCooldown':
+    'Ten efekt nie może się ponownie uruchomić, dopóki nie upłynie jego czas',
+  'hudChrome.auraEffect.leadenHexLock':
+    'Ołowiana Klątwa nie może jeszcze ponownie unieruchomić tego celu',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Przestarzałe Echo Śmierci; żadna obecna zdolność go nie zużywa',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Śmierć może stworzyć 1 Odłamek Duszy',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Gromadzi {storedPct}% obrażeń zadanych przez ciebie i twoich nieumarłych, plus {lancePct}% obrażeń Soul Lance; rzuć ponownie, aby zdetonować. Śmierć celu powoduje eksplozję w promieniu {radius} m i tworzy 1 Odłamek Duszy',
+  'hudChrome.auraEffect.nextAttackCrit': 'Twój następny atak na pewno będzie trafieniem krytycznym',
+  'hudChrome.auraEffect.overpowerCharge':
+    'Pozostało {stacks} ładunków: twoje następne Okaleczające uderzenie zadaje o {pct}% więcej obrażeń',
+  'hudChrome.auraEffect.perfectMoment': 'Eteryczne strzały nie zużywają Ładunków Eteru',
+  'hudChrome.auraEffect.petDamage': 'Zwiększa obrażenia zwierzęcia o {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Zwiększa szybkość działania zwierzęcia o {pct}%',
+  'hudChrome.auraEffect.physicalReduction': 'Zmniejsza otrzymywane obrażenia fizyczne o {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Generuje {ruin} Ruiny co {ruinInterval} s i zadaje {damage} obrażeń od Ognia w promieniu {radius} m co {damageInterval} s',
+  'hudChrome.auraEffect.resourceCount': '{value} z {max}',
+  'hudChrome.auraEffect.resourceSap': 'Przywraca {value} twojego obecnego zasobu co {interval} s',
+  'hudChrome.auraEffect.ruinousBrand':
+    'Pozostało {charges} kopii: bezpośrednie zaklęcia kopiują tutaj {otherPct}% obrażeń, albo {selfPct}%, gdy to one są ich celem',
+  'hudChrome.auraEffect.sated': 'Nie możesz skorzystać z kolejnego grupowego efektu przyspieszenia',
+  'hudChrome.auraEffect.sourceVuln':
+    'Otrzymuje o {pct}% więcej obrażeń od rzucającego, który nałożył ten efekt',
+  'hudChrome.auraEffect.spellDamage': 'Zwiększa obrażenia zaklęć o {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Zwiększa szybkość rzucania zaklęć o {pct}%',
+  'hudChrome.auraEffect.stasis': 'Niewrażliwość, ale niezdolność do działania',
+  'hudChrome.auraEffect.suddenDeath':
+    'Twój następny Przedwczesny grób nie kosztuje Wściekłości i ignoruje wymóg dotyczący zdrowia celu',
+  'hudChrome.auraEffect.sureCrit':
+    'Kolejne {charges} rzucone zdolności zadające obrażenia to gwarantowane trafienia krytyczne',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Ciosy jednocelowe trafiają też {targets} pobliskiego wroga za {pct}% obrażeń',
+  'hudChrome.auraEffect.temporalEcho':
+    'Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Rzuć ponownie w promieniu {range} m, aby tu wrócić i zużyć kotwicę',
+  'hudChrome.auraEffect.wintersChill':
+    'Pozostało {charges} ładunków: odpowiednie zaklęcia traktują ten cel jako zamrożony',
+  'hudChrome.procOverlay.ruinMeter': 'Ruina',
+  'hudChrome.procOverlay.ruinStatus': '{value} z {max} Ruiny',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Odłamki Duszy',
+  'hudChrome.warlock.doomEmptyStatus': '{value} z {max} Potępienia.',
+  'hudChrome.warlock.doomLabel': 'Potępienie',
+  'hudChrome.warlock.doomMeterLock': 'Zablokuj pasek zasobu Udręki',
+  'hudChrome.warlock.doomMeterUnlock': 'Przesuń pasek zasobu Udręki',
+  'hudChrome.warlock.doomStatus': '{value} z {max} Potępienia; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.',
+  'hudChrome.warlock.fateThreadsLabel': 'Nici Przeznaczenia',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Trzy Nici Przeznaczenia: Sentence może je zużyć, zyskując 18% zwiększonych obrażeń.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} z {max} Nici Przeznaczenia.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.',
 };

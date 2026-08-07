@@ -334,7 +334,7 @@ export const zh_CN: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "灵魂碎片",
-      "ruinMeter": "Ruin",
+      "ruinMeter": "毁灭",
       "ruinStatus": "毁灭 {value}/{max}"
     },
     "spectate": {
@@ -2113,7 +2113,7 @@ export const zh_CN: EnTranslations = {
       "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
       "formMoonkin": "月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%",
       "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value}/{max}",
       "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
       "afflictionEye": "恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值",
       "afflictionEyeSecondary": "此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害",
@@ -7557,7 +7557,7 @@ export const zh_CN: EnTranslations = {
     "tooltip": {
       "rank": "等级 {rank}",
       "cost": "{cost} 点{resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} 点毁灭",
       "range": "{range} 码范围",
       "rangeWithMin": "{min}-{max} 码范围",
       "instant": "瞬发",
@@ -8517,7 +8517,7 @@ export const zh_CN: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守护",
-        "description": "一道守护结界吸收 {damage} 点伤害，持续 10 秒。"
+        "description": "神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。"
       },
       "hammer_of_justice": {
         "name": "碎裂法槌",
@@ -8565,7 +8565,7 @@ export const zh_CN: EnTranslations = {
       },
       "retribution_aura": {
         "name": "报偿光环",
-        "description": "以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。"
+        "description": "以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。"
       },
       "tame_beast": {
         "name": "野性羁绊",
@@ -8625,7 +8625,7 @@ export const zh_CN: EnTranslations = {
       },
       "rapid_fire": {
         "name": "狂热引弓",
-        "description": "使你的攻击速度提高 40%，持续 15 秒。"
+        "description": "在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。"
       },
       "smite": {
         "name": "惩击",
@@ -8732,7 +8732,7 @@ export const zh_CN: EnTranslations = {
         "description": "腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。"
       },
       "evil_eye": {
-        "name": "Evil Eye",
+        "name": "邪眼",
         "description": "将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。"
       },
       "maledict_gaze": {
@@ -8975,7 +8975,7 @@ export const zh_CN: EnTranslations = {
       },
       "chain_heal": {
         "name": "治疗链",
-        "description": "大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）"
+        "description": "治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）"
       },
       "galeheart_weapon": {
         "name": "风心武器",
@@ -9079,7 +9079,7 @@ export const zh_CN: EnTranslations = {
       },
       "holy_shield": {
         "name": "神圣之盾",
-        "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+        "description": "获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",
@@ -9387,7 +9387,7 @@ export const zh_CN: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最后祈祷",
-        "description": "立即为你恢复{damage}点生命值。（牧师天赋）"
+        "description": "立即为自己治疗最大生命值的30%。"
       },
       "deterrence": {
         "name": "鬃刺守卫",
@@ -11163,16 +11163,16 @@ export const zh_CN: EnTranslations = {
         "name": "龙喉迅猛龙的缰绳"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "霜牙"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "穿髓尖刃"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "黄昏低语"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "骨璃小刀"
       },
       "moggers_hide_quiver": {
         "name": "莫格的兽皮箭袋"

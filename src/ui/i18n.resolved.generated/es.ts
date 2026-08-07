@@ -324,18 +324,18 @@ export const es: EnTranslations = {
     "warlock": {
       "doomLabel": "Condena",
       "fateThreadsLabel": "Hilos del destino",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
+      "doomMeterUnlock": "Mover la barra de recursos de Aflicción",
+      "doomMeterLock": "Bloquear la barra de recursos de Aflicción",
       "doomEmptyStatus": "{value} de {max} de Condena.",
       "doomStatus": "{value} de {max} de Condena; quedan {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "fateThreadsStatus": "{value} de {max} de Hilos del destino.",
+      "fateThreadsConsumeReady": "Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.",
+      "fateThreadsSentenceReady": "Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de alma",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinMeter": "Ruina",
+      "ruinStatus": "{value} de {max} de Ruina"
     },
     "spectate": {
       "banner": "Observando a {name}"
@@ -2104,8 +2104,8 @@ export const es: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Completar los {steps} golpes de la Cadencia del Espíritu Guerrero hace eco del golpe {count} veces por un {pct}% de su daño como daño de Naturaleza",
+      "elementalTrance": "Reduce el daño recibido un {pct}%. Convierte el {mana}% de todo el daño que infliges en maná",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Forma de Bruin: salud y armadura aumentadas",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
@@ -2113,7 +2113,7 @@ export const es: EnTranslations = {
       "formFireball": "Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados",
       "formMoonkin": "Forma de ala lunar: daño con hechizos aumentado un {pct}% y armadura aumentada un {armorPct}%",
       "formShadow": "Forma de velo umbrío: daño de las Sombras aumentado un {pct}%",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value} de {max}",
       "formLich": "Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño",
       "afflictionEye": "Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena",
       "afflictionEyeSecondary": "Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño",
@@ -7384,10 +7384,10 @@ export const es: EnTranslations = {
     "pet": {
       "attack": "Atacar",
       "waterJet": "Chorro de Agua",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Descarga Vil",
+      "abyssalChain": "Cadena Abisal",
+      "autocastOn": "Lanzamiento automático activado. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para desactivarlo.",
+      "autocastOff": "Lanzamiento automático desactivado. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para activarlo.",
       "taunt": "Provocar",
       "healDemon": "Sanar demonio",
       "healPet": "Sanar mascota",
@@ -7398,10 +7398,10 @@ export const es: EnTranslations = {
       "petAttackDesc": "Ordena a tu mascota atacar a tu objetivo hostil actual.",
       "waterJetTitle": "Chorro de Agua",
       "waterJetDesc": "Ordena a tu Elemental de Agua que canalice un chorro ralentizador durante 3 segundos. Tiempo de reutilización: 8 segundos. Haz clic derecho para lanzarlo automáticamente cada vez que esté disponible.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Descarga Vil",
+      "felboltDesc": "Ordena a Emberkin lanzar un proyectil vil adicional contra tu objetivo. Reutilización de 8 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.",
+      "abyssalChainTitle": "Cadena Abisal",
+      "abyssalChainDesc": "Ordena a Gloomshade arrastrar hacia sí a un enemigo normal situado a más de 8 y hasta 20 metros. No funciona contra jefes. Reutilización de 15 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.",
       "petTauntTitle": "Provocación de mascota",
       "petTauntDesc": "Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.",
       "healDemonDesc": "Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.",
@@ -7557,7 +7557,7 @@ export const es: EnTranslations = {
     "tooltip": {
       "rank": "Rango {rank}",
       "cost": "{cost} de {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} de Ruina",
       "range": "{range} m de alcance",
       "rangeWithMin": "{min}-{max} m de alcance",
       "instant": "Instantáneo",
@@ -7568,8 +7568,8 @@ export const es: EnTranslations = {
       "unavailable": "No disponible",
       "requiresLevel": "Requiere nivel {level}",
       "requiresForm": "Requiere Forma de {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Requiere sigilo",
+      "requiresStealthSkulduggery": "Requiere sigilo (no es necesario con 3 de Penumbra ni durante el Velo de Sombras)",
       "requiresCombo": "Consume puntos de combo",
       "requiresTargetHealthBelow": "Requiere que el objetivo tenga menos de {percent}% de salud",
       "requiresDodge": "Solo puede usarse después de que el objetivo esquive",
@@ -7788,7 +7788,7 @@ export const es: EnTranslations = {
       "clickDestroy": "Haz clic para destruir",
       "useFishing": "Uso: pesca en aguas cercanas.",
       "useHealingPotion": "Uso: restaura al instante {amount} de salud. Se puede usar en combate. Reutilización de 1 min.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 2 min.",
       "useManaPotion": "Uso: restaura al instante {amount} de maná. Se puede usar en combate. Reutilización de 1 min.",
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
@@ -8292,20 +8292,20 @@ export const es: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Tajo Perverso",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Un golpe instantáneo por daño de arma más {damage}. Otorga 1 punto de combo.",
+        "specNote_assassination": "Añade 1 de Ritual de Veneno (máx. 6).",
+        "specNote_combat": "Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: 130% de daño de arma más 10, otorga 2 puntos de combo y añade 1 nivel de Redline (máx. 4)."
       },
       "eviscerate": {
         "name": "Descanso Eterno",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Movimiento final que causa {damage}.",
+        "specNote_assassination": "Con 6 de Ritual de Veneno, este botón se convierte en Desgarro venenoso: un golpe que inflige al instante todo el daño que tus sangrados aún habrían causado, planta una herida venenosa nueva y restaura 20 de energía.",
+        "specNote_combat": "Conectar este golpe con 4 o más puntos de combo activa la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (45 más 35 por punto de combo, un 25% más fuerte por cada nivel de Redline acumulado, restaura 25 de energía). Gástalo antes de que termine la Redline."
       },
       "backstab": {
         "name": "Estocada Cobarde",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Clava tu daga en la espalda del objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.",
+        "specNote_assassination": "Cada golpe añade 1 de Ritual de Veneno (máx. 6) y restaura 15 de energía. Con 6 de Ritual de Veneno, Descanso Eterno se convierte en Desgarro venenoso (inflige al instante todo el daño de sangrado que te quedaba)."
       },
       "gouge": {
         "name": "Golpe al Ojo",
@@ -8317,7 +8317,7 @@ export const es: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ritmo Degollador",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Movimiento final que aumenta la velocidad de ataque cuerpo a cuerpo un 30% durante 12 s más 4 s por punto de combo (5 puntos de combo: 32 s)."
       },
       "sprint": {
         "name": "Talones Veloces",
@@ -8325,17 +8325,17 @@ export const es: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Golpe Bajo",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s)."
       },
       "ambush": {
         "name": "Golpe del Acechador",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Golpea desde las sombras por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.",
+        "specNote_subtlety": "Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo y desde cualquier ángulo: ese uso no cuesta nada, gasta toda la Penumbra, activa el Velo de Sombras de 6 s y golpea por el doble."
       },
       "stealth": {
         "name": "Velo Crepuscular",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Te oculta entre las sombras: los enemigos apenas te notan, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.",
+        "specNote_subtlety": "Cada apertura que uses desde el Velo Crepuscular añade 1 de Penumbra (máx. 3)."
       },
       "adrenaline_rush": {
         "name": "Sangre Acelerada",
@@ -8343,13 +8343,13 @@ export const es: EnTranslations = {
       },
       "garrote": {
         "name": "Alambre al Cuello",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Enrolla un alambre en torno a la garganta del enemigo, causando {damage} de daño ahora y haciéndolo sangrar por {overTime} a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.",
+        "specNote_subtlety": "Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo: ese uso no cuesta nada, gasta toda la Penumbra y activa el Velo de Sombras de 6 s."
       },
       "cheap_shot": {
         "name": "Golpe al Vientre",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.",
+        "specNote_subtlety": "Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo: ese uso no cuesta nada, gasta toda la Penumbra y activa el Velo de Sombras de 6 s."
       },
       "sap": {
         "name": "Pasmar",
@@ -8361,11 +8361,11 @@ export const es: EnTranslations = {
       },
       "expose_armor": {
         "name": "Brecha en la Armadura",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Movimiento final que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%)."
       },
       "rupture": {
         "name": "Desangramiento",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Movimiento final que hiere al objetivo: sangra cada 2 s, durante 6 s más 2 s por punto de combo (5 puntos de combo: 16 s y {damage} de daño total)."
       },
       "vanish": {
         "name": "Paso de Humo",
@@ -8776,8 +8776,8 @@ export const es: EnTranslations = {
         "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "Pozo de Almas",
+        "description": "Invoca un Pozo de Almas durante 3 min. Fuera de combate, los miembros del grupo pueden recargar sus Piedras de Alma hasta 3 veces. Una Piedra de Alma restaura un 25% de la salud máxima y comparte el tiempo de reutilización con las pociones."
       },
       "hex_of_violence": {
         "name": "Maleficio de violencia",
@@ -8816,13 +8816,13 @@ export const es: EnTranslations = {
         "description": "Explota al instante contra el objetivo con sombra abrasadora por {damage} de daño de las Sombras."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "Marca Ruinosa",
+        "description": "Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo."
       },
       "wrath": {
         "name": "Descarga Silvestre",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Lanza un rayo de energía natural que inflige {damage} de daño de Naturaleza.",
+        "specNote_balance": "En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar."
       },
       "healing_touch": {
         "name": "Cura Silvestre",
@@ -8834,8 +8834,8 @@ export const es: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempestad Lunar",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Quema al enemigo con fuego lunar, infligiendo {damage} de daño Arcano más daño con el tiempo.",
+        "specNote_balance": "Mantenlo ardiendo: Semilla Lunar lo extiende 6 s."
       },
       "moonseed": {
         "name": "Semilla Lunar",
@@ -8843,8 +8843,8 @@ export const es: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Floración Silvestre",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Sana al objetivo por {damage} a lo largo de 12 s.",
+        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración."
       },
       "thorns": {
         "name": "Guardia de Zarzas",
@@ -8860,8 +8860,8 @@ export const es: EnTranslations = {
       },
       "maul": {
         "name": "Rompehuesos",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y genera una amenaza enorme. Se activa en tu siguiente golpe. Solo en Forma de Bruin.",
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima y restaura 15 de ira."
       },
       "growl": {
         "name": "Amenazar",
@@ -8873,23 +8873,23 @@ export const es: EnTranslations = {
       },
       "claw": {
         "name": "Zarpa",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Movimiento final que causa {damage}. Solo en Forma de lobo.",
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Barre con tus garras a los enemigos cercanos por {damage} de daño. Genera amenaza adicional. Solo en Forma de Bruin.",
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "regrowth": {
         "name": "Segundo Florecer",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 21 s.",
+        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5)."
       },
       "barkskin": {
         "name": "Piel de Roble",
@@ -8905,8 +8905,8 @@ export const es: EnTranslations = {
       },
       "starfire": {
         "name": "Caída Celeste",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Invoca un rayo de fuego estelar que causa {damage} de daño Arcano.",
+        "specNote_balance": "En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta toda la Marea Lunar."
       },
       "travel_form": {
         "name": "Forma Fleet",
@@ -8922,7 +8922,7 @@ export const es: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Fuego Fatuo",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Reduce la armadura del objetivo un {damage}% durante 40 s."
       },
       "hibernate": {
         "name": "Letargo",
@@ -8946,8 +8946,8 @@ export const es: EnTranslations = {
       },
       "rip": {
         "name": "Desgarrar",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.",
+        "specNote_feral": "El golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -8998,8 +8998,8 @@ export const es: EnTranslations = {
         "description": "Desata el encantamiento activo de tu arma. La Marca Pírica inflige de 54 a 64 de daño de Fuego, gana un 30% del poder con hechizos y otorga 2 de Trueno. El Corazón de Vendaval golpea con tu arma, avanza la Cadencia del Espíritu Guerrero y otorga un 20% de velocidad de ataque durante 6 s. El Ligado a la Piedra golpea por un 75% del daño de arma, obliga al objetivo a atacarte y reduce el daño recibido un 20% durante 4 s. El Manantial de Vida consume tu Corriente Sanadora, sana por un 125% de su sanación restante y reduce el siguiente golpe en 8 s un 50% de la salud restaurada."
       },
       "elemental_trance": {
-        "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "name": "Trance Elemental",
+        "description": "Entra en un trance elemental durante 15 s, que reduce el daño recibido un 30% y convierte el 20% de todo el daño que infliges en maná. (habilidad distintiva de Espíritu Guerrero)"
       },
       "primal_exaltation": {
         "name": "Exaltación Primigenia",
@@ -9018,8 +9018,8 @@ export const es: EnTranslations = {
         "description": "Desgarra el alma del enemigo, inflige {damage} de daño de Sombras y crea 1 fragmento de alma, hasta un máximo de 5."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "Lanza de Alma",
+        "description": "Lanza una lanza espectral que inflige {damage} de daño de las Sombras. Contra tu Marca del Osario, un 50% de su daño se añade a la marca."
       },
       "raise_graveguard": {
         "name": "Alzar guardián de tumbas",
@@ -9046,8 +9046,8 @@ export const es: EnTranslations = {
         "description": "Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "Marca del Osario",
+        "description": "Marca a un enemigo durante 12 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 fragmento de alma."
       },
       "unholy_command": {
         "name": "Mandato profano",
@@ -9107,15 +9107,15 @@ export const es: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangre fría",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Concentra tu instinto asesino para que tu siguiente ataque sea un golpe crítico. (motor de Knifework)"
       },
       "blade_flurry": {
         "name": "Aluvión de acero",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)"
       },
       "hemorrhage": {
         "name": "Hemorragia",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Golpea al enemigo con daño de arma más {damage}, causa daño de sangrado durante 12 s y aumenta el daño de sangrado recibido un 40%. Otorga 1 punto de combo. Cada segundo uso añade 1 de Penumbra (máx. 3). (motor de Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusión de poder",
@@ -9151,7 +9151,7 @@ export const es: EnTranslations = {
       },
       "swiftmend": {
         "name": "Alivio presto",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Plantar Floración Silvestre y Segundo Florecer añade Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Corazón del Bosque)"
       },
       "moonlash": {
         "name": "Oleada Lunar",
@@ -9350,16 +9350,16 @@ export const es: EnTranslations = {
         "description": "Lanza un relámpago en el área objetivo que inflige {damage} de daño a los enemigos cercanos. (talento de Chamán)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "Brecha Abisal",
+        "description": "Abre una brecha en el lugar seleccionado, que atrae hacia su centro a los enemigos en un radio de 8 m, inflige {damage} de daño de las Sombras y los aturde durante 2 s. Los jefes reciben el daño pero resisten la atracción y el aturdimiento."
       },
       "chaos_bolt": {
         "name": "Descarga de Ruina",
         "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "Pacto de Sangre",
+        "description": "Sacrifica un 10% de tu salud actual para absorber daño equivalente a un 30% de tu salud máxima durante 8 s."
       },
       "cloak_of_shadows": {
         "name": "Capa Sombría",
@@ -9415,7 +9415,7 @@ export const es: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Golpe Espectral",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Golpea al enemigo por daño de arma más {damage} y aumenta tu probabilidad de esquivar un 15% durante 7 s. Otorga 1 punto de combo. (talento de Pícaro)"
       },
       "hammer_of_wrath": {
         "name": "Martillo Tañoso",
@@ -9550,8 +9550,8 @@ export const es: EnTranslations = {
         "description": "Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "Marcha Sacrílega",
+        "description": "Aumenta la velocidad de movimiento un 35%, pero sacrifica un 2% de tu salud máxima cada segundo. Vuelve a lanzarla para cancelarla. Se desactiva al llegar al 20% de salud."
       },
       "spellsteal": {
         "name": "Robar Hechizo",
@@ -9580,7 +9580,7 @@ export const es: EnTranslations = {
       "venom_dart": {
         "name": "Dardo venenoso",
         "description": "Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Añade 1 de Ritual de Veneno y extiende tu herida de Desgarro venenoso 6 s (nunca supera los 20 s)."
       },
       "body_blow": {
         "name": "Golpe al cuerpo",
@@ -9644,8 +9644,8 @@ export const es: EnTranslations = {
       },
       "rake": {
         "name": "Desollar",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "revive_pet": {
         "name": "Remendar",
@@ -11163,16 +11163,16 @@ export const es: EnTranslations = {
         "name": "Riendas del Raptor de Drakemaw"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Colmillo de Escarcha"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Punta de Médula"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Susurro Crepuscular"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Navaja de Huesovidrio"
       },
       "moggers_hide_quiver": {
         "name": "Carcaj de cuero de Mogger"
@@ -11202,7 +11202,7 @@ export const es: EnTranslations = {
         "name": "Pan de Festín Conjurado"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Piedra de Alma"
       },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"

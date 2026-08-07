@@ -2997,7 +2997,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Тщательно натянутый выстрел, наносящий {damage} ед. урона.',
   'entities.abilities.rapid_fire.name': 'Лихорадочный натяг',
-  'entities.abilities.rapid_fire.description': 'Повышает скорость атаки на 40% на 15 сек.',
+  'entities.abilities.rapid_fire.description': 'Выпускает 6 выстрелов за 2,4 сек., не прерывая движения. Каждый выстрел наносит {damage} ед. физического урона и усиливается от силы дальнего боя.',
   'entities.abilities.smite.name': 'Кара',
   'entities.abilities.smite.description':
     'Карает врага, нанося {damage} ед. урона от светлой магии.',
@@ -3035,8 +3035,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.chain_heal.name': 'Цепное исцеление',
-  'entities.abilities.chain_heal.description':
-    'Исцеляет дружественную цель на большую величину, затем перескакивает на 2 ближайших союзников, исцеляя на 50% меньше с каждым прыжком. (Специализация Исцеление)',
+  'entities.abilities.chain_heal.description': 'Исцеляет союзника на {damage}, затем перескакивает на 2 ближайших союзников в пределах 12 м. Каждый прыжок исцеляет на 50% от предыдущего. Каждый затронутый союзник расходует ваш запас Потока исцеления и немедленно исцеляется на 125% от израсходованного. Начальное исцеление увеличивается от силы заклинаний. (специализация Исцеление)',
   'entities.abilities.earth_shock.name': 'Земной толчок',
   'entities.abilities.earth_shock.description':
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',
@@ -3229,8 +3228,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
   'entities.abilities.holy_shield.name': 'Священный щит',
-  'entities.abilities.holy_shield.description':
-    'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
+  'entities.abilities.holy_shield.description': 'Дает 30% блока и щит, поглощающий {damage}% от максимального запаса здоровья, на {duration} сек., высвобождая импульс угрозы. Божественное вознесение усиливает и продлевает защиту.',
   'entities.abilities.bestial_wrath.name': 'Звериный гнев',
   'entities.abilities.bestial_wrath.description':
     'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',
@@ -12233,4 +12231,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': 'Нити судьбы: {value} из {max}.',
   'itemUi.tooltip.useHealingPotionPct':
     'Использование: мгновенно восстанавливает {percent}% максимального здоровья. Можно использовать в бою. Восстановление 2 мин.',
+  'abilityUi.tooltip.ruinCost': '{cost} Погибели',
+  'entities.abilities.evil_eye.name': 'Дурной глаз',
+  'entities.items.boneglass_shiv.name': 'Заточка из костяного стекла',
+  'entities.items.duskwhisper.name': 'Шёпот сумерек',
+  'entities.items.marrowpoint.name': 'Остриё до мозга костей',
+  'entities.items.rimefang.name': 'Инеевый клык',
+  'hudChrome.auraEffect.resourceCount': '{value} из {max}',
+  'hudChrome.procOverlay.ruinMeter': 'Погибель',
 };

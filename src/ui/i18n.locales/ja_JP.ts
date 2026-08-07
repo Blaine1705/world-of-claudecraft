@@ -2979,7 +2979,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '慎重に引き絞った射撃で {damage} のダメージを与えます。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
-  'entities.abilities.rapid_fire.description': '15秒間、攻撃速度が40%増加します。',
+  'entities.abilities.rapid_fire.description': '移動しながら2.4秒間に6発の射撃を行う。1発ごとに{damage}の物理ダメージを与え、遠隔攻撃力で上昇する。',
   'entities.abilities.smite.name': 'スマイト',
   'entities.abilities.smite.description': '敵に {damage} の神聖ダメージを与えます。',
   'entities.abilities.lesser_heal.name': '囁きの祈り',
@@ -3015,8 +3015,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.chain_heal.name': 'チェインヒール',
-  'entities.abilities.chain_heal.description':
-    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
+  'entities.abilities.chain_heal.description': '味方1体を{damage}回復し、12ヤード以内の最大2体の味方へ連鎖する。連鎖ごとに回復量は前の対象の50%になる。連鎖した味方は残っている治癒の奔流を消費し、消費量の125%を即座に回復する。初回の回復量はスペルパワーで上昇する。（回復スペシャライゼーション）',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -3207,8 +3206,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
-  'entities.abilities.holy_shield.description':
-    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+  'entities.abilities.holy_shield.description': 'ブロック率が30%上昇し、最大HPの{damage}%を吸収するシールドを{duration}秒間獲得、ヘイトの波動を放つ。神聖なる昇天がこの防御を強化・延長する。',
   'entities.abilities.bestial_wrath.name': '野獣の怒り',
   'entities.abilities.bestial_wrath.description':
     '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
@@ -12068,4 +12066,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '運命の糸 {value}/{max}。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。',
+  'abilityUi.tooltip.ruinCost': '破滅 {cost}',
+  'entities.abilities.evil_eye.name': '邪眼',
+  'entities.items.boneglass_shiv.name': '骨硝子の小刀',
+  'entities.items.duskwhisper.name': '夕闇の囁き',
+  'entities.items.marrowpoint.name': '髄穿ち',
+  'entities.items.rimefang.name': '霜牙',
+  'hudChrome.auraEffect.resourceCount': '{value}/{max}',
+  'hudChrome.procOverlay.ruinMeter': '破滅',
 };

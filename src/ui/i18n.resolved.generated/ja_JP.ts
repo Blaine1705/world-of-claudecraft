@@ -334,7 +334,7 @@ export const ja_JP: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "魂の欠片",
-      "ruinMeter": "Ruin",
+      "ruinMeter": "破滅",
       "ruinStatus": "破滅 {value}/{max}"
     },
     "spectate": {
@@ -2113,7 +2113,7 @@ export const ja_JP: EnTranslations = {
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
       "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",
       "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value}/{max}",
       "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
       "afflictionEye": "マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する",
       "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
@@ -7557,7 +7557,7 @@ export const ja_JP: EnTranslations = {
     "tooltip": {
       "rank": "ランク{rank}",
       "cost": "{resource} {cost}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "破滅 {cost}",
       "range": "射程{range}ヤード",
       "rangeWithMin": "射程{min}-{max}ヤード",
       "instant": "即時",
@@ -8625,7 +8625,7 @@ export const ja_JP: EnTranslations = {
       },
       "rapid_fire": {
         "name": "熱狂の速射",
-        "description": "15秒間、攻撃速度が40%増加します。"
+        "description": "移動しながら2.4秒間に6発の射撃を行う。1発ごとに{damage}の物理ダメージを与え、遠隔攻撃力で上昇する。"
       },
       "smite": {
         "name": "スマイト",
@@ -8732,7 +8732,7 @@ export const ja_JP: EnTranslations = {
         "description": "対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。"
       },
       "evil_eye": {
-        "name": "Evil Eye",
+        "name": "邪眼",
         "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
       },
       "maledict_gaze": {
@@ -8975,7 +8975,7 @@ export const ja_JP: EnTranslations = {
       },
       "chain_heal": {
         "name": "チェインヒール",
-        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
+        "description": "味方1体を{damage}回復し、12ヤード以内の最大2体の味方へ連鎖する。連鎖ごとに回復量は前の対象の50%になる。連鎖した味方は残っている治癒の奔流を消費し、消費量の125%を即座に回復する。初回の回復量はスペルパワーで上昇する。（回復スペシャライゼーション）"
       },
       "galeheart_weapon": {
         "name": "疾風の武器",
@@ -9079,7 +9079,7 @@ export const ja_JP: EnTranslations = {
       },
       "holy_shield": {
         "name": "ホーリーシールド",
-        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+        "description": "ブロック率が30%上昇し、最大HPの{damage}%を吸収するシールドを{duration}秒間獲得、ヘイトの波動を放つ。神聖なる昇天がこの防御を強化・延長する。"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",
@@ -11163,16 +11163,16 @@ export const ja_JP: EnTranslations = {
         "name": "火口のラプトルの手綱"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "霜牙"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "髄穿ち"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "夕闇の囁き"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "骨硝子の小刀"
       },
       "moggers_hide_quiver": {
         "name": "モガーの革の矢筒"

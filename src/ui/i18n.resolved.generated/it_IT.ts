@@ -322,20 +322,20 @@ export const it_IT: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Condanna",
+      "fateThreadsLabel": "Filamenti del Fato",
+      "doomMeterUnlock": "Sposta la barra della risorsa Afflizione",
+      "doomMeterLock": "Blocca la barra della risorsa Afflizione",
+      "doomEmptyStatus": "{value} su {max} Condanna.",
+      "doomStatus": "{value} su {max} Condanna; {remaining}.",
+      "fateThreadsStatus": "{value} su {max} Filamenti del Fato.",
+      "fateThreadsConsumeReady": "Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.",
+      "fateThreadsSentenceReady": "Tre Filamenti del Fato: Sentence può consumarli per un aumento del 18% dei danni."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "soulFragmentsMeter": "Frammenti d'Anima",
+      "ruinMeter": "Rovina",
+      "ruinStatus": "{value} su {max} Rovina"
     },
     "spectate": {
       "banner": "Stai osservando {name}"
@@ -1980,31 +1980,31 @@ export const it_IT: EnTranslations = {
       "absorb": "Assorbe {value} danni",
       "healAbsorb": "Assorbe {value} cure ricevute",
       "thorns": "Infligge {value} danni da {school} agli attaccanti",
-      "stasis": "Immune and unable to act",
+      "stasis": "Immune e impossibilitato ad agire",
       "slow": "Riduce la velocità di movimento del {pct}%",
       "speed": "Aumenta la velocità di movimento del {pct}%",
       "attackSpeedSlow": "Rallenta la velocità di attacco del {pct}%",
       "attackSpeedFast": "Aumenta la velocità di attacco del {pct}%",
       "haste": "Aumenta la velocità di attacco e lancio del {pct}%",
       "imbueRange": "Arma infusa: da {min} a {max} danni bonus su Verdict",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Aumenta i danni della mascotte del {pct}%",
+      "petHaste": "Aumenta la velocità d'azione della mascotte del {pct}%",
+      "spellDamage": "Aumenta i danni degli incantesimi del {pct}%",
+      "spellHaste": "Aumenta la velocità di lancio degli incantesimi del {pct}%",
+      "sated": "Non puoi beneficiare di un altro effetto di velocità di gruppo",
+      "cauterizeFatigue": "La Cauterizzazione non può prevenire un altro colpo letale",
+      "castShield": "Il lancio non può essere interrotto né ritardato dai danni",
       "dmgDone": "Aumenta i danni inflitti del {pct}%",
       "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
       "heatingUp": "Il prossimo colpo critico consecutivo con un costruttore del Fuoco concede Vampata; un costruttore non critico rimuove Surriscaldamento",
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
       "hunterFerocity": "{stacks} Ferocia del Branco: il tuo famiglio infligge il {pct}% di danni in più",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "cooldownCap": "{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra",
+      "funeralHarvestLock": "Funeral Harvest non può ancora creare un altro Frammento d'Anima",
+      "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
+      "forbiddenReflectionReady": "Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo",
+      "forbiddenReflectionLock": "Il Riflesso Proibito non può ancora essere preparato di nuovo",
+      "internalCooldown": "Questo effetto non può attivarsi di nuovo prima che il timer scada",
       "carriedFlag": "Stai portando la bandiera nemica. Annulla questo effetto per lasciarla cadere.",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
@@ -2019,13 +2019,13 @@ export const it_IT: EnTranslations = {
       "revengeFree": "La tua prossima Vendetta non costa rabbia",
       "victoryRush": "Impeto della Vittoria è pronto",
       "maxHpPct": "Aumenta la salute massima del {pct}%",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Danni inflitti aumentati del {damagePct}%, velocità d'attacco del {hastePct}%, e velocità di movimento del {movePct}%",
+      "suddenDeath": "La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute",
+      "aoeEcho": "Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini",
+      "sureCrit": "{charges} lanci di abilità dannose sono colpi critici garantiti",
+      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area",
+      "arcaneCharge": "{stacks} Cariche Arcane: Potere d'Etere infligge il {damagePct}% di danni in più, si lancia il {castPct}% più veloce e costa {costMult}x mana",
+      "physicalReduction": "Riduce i danni Fisici subiti del {pct}%",
       "temporalHourglass": "Immune e impossibilitato ad agire; ripristina la salute e accelera il recupero dei tempi di recupero. Clic destro per annullare.",
       "tongues": "Aumenta il tempo di lancio del {pct}%",
       "combustionCrit": "I tuoi incantesimi del Fuoco colpiscono sempre criticamente",
@@ -2047,10 +2047,10 @@ export const it_IT: EnTranslations = {
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
       "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Lupo e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
       "verdance": "Verzura: stadio {stacks} di {max}. I lanci completati di Fioritura Selvaggia e Seconda Fioritura la riempiono; a {max}, Rapidità di Guarigione diventa Sovrafioritura",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
+      "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
+      "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
+      "healEcho": "Scendere sotto il {threshold}% di salute ripristina {value} salute",
       "increase": {
         "ap": "Aumenta la potenza di attacco di {value}",
         "sp": "Aumenta il potere degli incantesimi di {value}",
@@ -2089,8 +2089,8 @@ export const it_IT: EnTranslations = {
       "mortalWound": "Riduce le cure ricevute del {pct}%",
       "vulnerability": "Aumenta i danni subiti del {pct}%",
       "physVuln": "Aumenta i danni fisici subiti del {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Aumenta i danni da sanguinamento subiti del {pct}%",
+      "sourceVuln": "Subisce il {pct}% di danni in più dal lanciatore che ha applicato questo effetto",
       "spellVuln": "Aumenta i danni magici subiti del {pct}%",
       "critVuln": "Aumenta la probabilità di subire colpi critici del {pct}%",
       "costTax": "Aumenta i costi delle abilità del {pct}%",
@@ -2104,46 +2104,46 @@ export const it_IT: EnTranslations = {
       "disarm": "Disarmato: impossibile usare attacchi con arma",
       "lockout": "Scuola di magia bloccata",
       "imbue": "Arma infusa con effetti bonus",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Completare la Cadenza dello Spirito Guerriero da {steps} colpi fa risuonare il colpo {count} volte per il {pct}% dei suoi danni come danni da Natura",
+      "elementalTrance": "Danni subiti ridotti del {pct}%. Il {mana}% di tutti i danni che infliggi viene convertito in mana",
       "stealth": "Nascosto; velocità di movimento ridotta del {pct}%",
       "formBear": "Forma di Bruin: salute e armatura aumentate",
       "formCat": "Forma felina: danni in mischia ed energia",
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
-      "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
+      "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
+      "resourceCount": "{value} su {max}",
+      "formLich": "Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
+      "afflictionEye": "Maledict Gaze attacca ogni {interval} sec; gli effetti su questo Evil Eye generano il {pct}% di Condanna",
+      "afflictionEyeSecondary": "Gli effetti su questo Evil Eye generano il {doomPct}% di Condanna; Sentence riecheggia qui per il {echoPct}% dei danni",
+      "afflictionAccomplice": "I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec",
+      "afflictionViolence": "Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno",
+      "afflictionVicarious": "Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna",
+      "afflictionPossession": "Potenzia Needle of Fate, Divorare, Maledict Gaze e Sentence",
+      "afflictionJudgment": "L'Evil Eye primario genera il {eyePct}% di Condanna in più; Sentence infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna",
+      "afflictionLitany": "I guadagni di Condanna infliggono {damage} danni da Ombra fino a {targets} nemici entro {radius} metri, una volta al secondo",
+      "afflictionFateThreads": "{stacks} Filamenti del Fato: Sentence infligge il {sentencePct}% di danni in più, oppure Divorare guadagna {doom} Condanna extra per tick",
+      "afflictionConsumeThreads": "Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick",
+      "necromancyHarvestMark": "La morte può creare 1 Frammento d'Anima",
+      "necromancyOssuaryMark": "Accumula il {storedPct}% dei tuoi danni e di quelli dei tuoi non morti, più il {lancePct}% dei danni di Soul Lance; rilancia per farla detonare. La morte esplode entro {radius} metri e crea 1 Frammento d'Anima",
+      "necromancyDeathEcho": "Eco della Morte residuo; nessuna abilità attuale lo consuma",
+      "warlockAnchor": "Rilancia entro {range} metri per tornare qui e consumare l'ancora",
+      "formMetamorph": "Forma demoniaca: dimensioni del corpo aumentate del {pct}%; gli altri bonus viaggiano su potenziamenti separati",
+      "energyRegen": "Aumenta la rigenerazione di Energia del {pct}%",
       "defensiveStance": "Posizione Guardinga: danni subiti ridotti, più minaccia",
       "righteousFury": "Giuramento Ardente: minaccia da danni Sacri molto aumentata",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "{stacks} cariche: il tuo prossimo Colpo Mutilante infligge il {pct}% di danni in più",
+      "sweepingStrikes": "I colpi a bersaglio singolo colpiscono anche {targets} nemici vicini per il {pct}% dei danni",
+      "fingersOfFrost": "{charges} cariche: Lancia di Ghiaccio tratta il bersaglio come congelato e infligge il {pct}% di danni da congelamento",
+      "brainFreeze": "La tua prossima Sferza d'Inverno è istantanea e ignora il suo tempo di recupero",
+      "wintersChill": "{charges} cariche: gli incantesimi compatibili trattano questo bersaglio come congelato",
+      "icicles": "{value} su {max} Ghiaccioli; a {max}, Spuntone Glaciale può essere lanciato",
+      "desolation": "{charges} cariche: il tuo prossimo Dardo della Rovina si lancia il {castPct}% più veloce, oppure la tua prossima Pioggia di Fuoco atterra immediatamente",
+      "ruinousBrand": "Restano {charges} copie: gli incantesimi diretti copiano il {otherPct}% dei danni qui, o il {selfPct}% quando questo è il loro bersaglio",
+      "duskfireClaim": "La morte concede {value} Rovina",
+      "pyreGuardian": "Genera {ruin} Rovina ogni {ruinInterval} sec e infligge {damage} danni da Fuoco entro {radius} metri ogni {damageInterval} sec",
+      "perfectMoment": "Dardi d'Etere non consuma Cariche Arcane",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
       "school": {
@@ -3979,7 +3979,7 @@ export const it_IT: EnTranslations = {
       "none": "Nessuna classe corrisponde a tutti i filtri. Azzerane uno per vederne di più."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.",
       "heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
       "revenge": "Colpisce i nemici davanti a te e può diventare gratuita dopo una schivata o una parata.",
       "hamstring": "Ostacola il movimento di un nemico per impedirgli di fuggire.",
@@ -7384,10 +7384,10 @@ export const it_IT: EnTranslations = {
     "pet": {
       "attack": "Attacca",
       "waterJet": "Getto d'Acqua",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Dardo di Cenere",
+      "abyssalChain": "Catena Abissale",
+      "autocastOn": "Autolancio attivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per disattivarlo.",
+      "autocastOff": "Autolancio disattivato. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivarlo.",
       "taunt": "Provoca",
       "healDemon": "Cura demone",
       "healPet": "Cura mascotte",
@@ -7398,10 +7398,10 @@ export const it_IT: EnTranslations = {
       "petAttackDesc": "Ordina alla tua mascotte di attaccare il tuo attuale bersaglio ostile.",
       "waterJetTitle": "Getto d'Acqua",
       "waterJetDesc": "Ordina al tuo Elementale dell'Acqua di canalizzare un flusso rallentante per 3 secondi. Tempo di recupero: 8 secondi. Clic destro per lanciarlo automaticamente ogni volta che non è in recupero.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Dardo di Cenere",
+      "felboltDesc": "Ordina a Emberkin di lanciare un dardo di cenere aggiuntivo contro il tuo bersaglio. Tempo di recupero: 8 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
+      "abyssalChainTitle": "Catena Abissale",
+      "abyssalChainDesc": "Ordina a Gloomshade di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
       "petTauntTitle": "Provocazione mascotte",
       "petTauntDesc": "Ordina alla tua mascotte di ingaggiare e usare Ringhio quando è a portata. Recupero di 10 secondi.",
       "healDemonDesc": "Spendi mana per canalizzare cure nel tuo demone per 5 secondi.",
@@ -7557,7 +7557,7 @@ export const it_IT: EnTranslations = {
     "tooltip": {
       "rank": "Grado {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Rovina",
       "range": "Portata {range} m",
       "rangeWithMin": "Portata {min}-{max} m",
       "instant": "Istantaneo",
@@ -7568,8 +7568,8 @@ export const it_IT: EnTranslations = {
       "unavailable": "Non disponibile",
       "requiresLevel": "Richiede livello {level}",
       "requiresForm": "Richiede Forma di {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Richiede furtività",
+      "requiresStealthSkulduggery": "Richiede furtività (non necessaria a 3 Caligine o durante il Velo d'Ombra)",
       "requiresCombo": "Consuma punti combo",
       "requiresTargetHealthBelow": "Richiede il bersaglio sotto il {percent}% di salute",
       "requiresDodge": "Utilizzabile solo dopo una schivata del bersaglio",
@@ -7788,7 +7788,7 @@ export const it_IT: EnTranslations = {
       "clickDestroy": "Clicca per distruggere",
       "useFishing": "Uso: pesca nelle acque vicine.",
       "useHealingPotion": "Uso: ripristina istantaneamente {amount} salute. Usabile in combattimento. Recupero 1 min.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.",
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
@@ -8292,20 +8292,20 @@ export const it_IT: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Fendente Malvagio",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Un colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
+        "specNote_assassination": "Aggiunge 1 Rituale del Veleno (massimo 6).",
+        "specNote_combat": "Mentre la Linea Rossa è attiva, questo pulsante diventa Colpo al corpo: 130% dei danni dell'arma più 10, conferisce 2 punti combo e aggiunge 1 Linea Rossa (massimo 4)."
       },
       "eviscerate": {
         "name": "Sonno Eterno",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Mossa finale che infligge {damage}.",
+        "specNote_assassination": "A 6 Rituale del Veleno, questo pulsante diventa Squarcio velenoso: un colpo che infligge istantaneamente tutti i danni che i tuoi sanguinamenti avrebbero ancora inflitto, pianta una nuova ferita avvelenata e ripristina 20 energia.",
+        "specNote_combat": "Colpire con questo a 4 o più punti combo avvia la Linea Rossa per 8 sec: Fendente Malvagio diventa Colpo al corpo e questo pulsante diventa Colpo da knockout (45 più 35 per punto combo, che colpisce il 25% più forte per ogni tacca di Linea Rossa accumulata, e ripristina 25 energia). Spendilo prima che la Linea Rossa finisca."
       },
       "backstab": {
         "name": "Affondo Codardo",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Conficca il tuo pugnale nella schiena del bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "specNote_assassination": "Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta)."
       },
       "gouge": {
         "name": "Colpo all'Occhio",
@@ -8317,7 +8317,7 @@ export const it_IT: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ritmo Sanguinario",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Mossa finale che aumenta la velocità d'attacco in mischia del 30% per 12 sec più 4 sec per punto combo (5 punti combo: 32 sec)."
       },
       "sprint": {
         "name": "Calcagni Veloci",
@@ -8325,17 +8325,17 @@ export const it_IT: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Colpo Basso",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec)."
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Colpisci dalle ombre per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività e da qualsiasi angolazione: quell'uso non costa nulla, spende tutte le 3 Caligine, avvia il Velo d'Ombra di 6 sec e colpisce per il doppio."
       },
       "stealth": {
         "name": "Velo Crepuscolare",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+        "specNote_subtlety": "Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3)."
       },
       "adrenaline_rush": {
         "name": "Sangue Impetuoso",
@@ -8343,13 +8343,13 @@ export const it_IT: EnTranslations = {
       },
       "garrote": {
         "name": "Filo alla Gola",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Avvolgi un filo intorno alla gola del nemico, infliggendo {damage} danni ora e facendolo sanguinare per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d'Ombra di 6 sec."
       },
       "cheap_shot": {
         "name": "Pugno allo Stomaco",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Colpisci il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.",
+        "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività: quell'uso non costa nulla, spende tutte le 3 Caligine e avvia il Velo d'Ombra di 6 sec."
       },
       "sap": {
         "name": "Tramortimento",
@@ -8361,11 +8361,11 @@ export const it_IT: EnTranslations = {
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Mossa finale che espone il bersaglio per 30 sec: ogni punto combo speso riduce la sua armatura del 2% (5 punti combo: {damage}%)."
       },
       "rupture": {
         "name": "Dissanguamento",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Mossa finale che ferisce il bersaglio: sanguina ogni 2 sec, per 6 sec più 2 sec per punto combo (5 punti combo: 16 sec e {damage} danni totali)."
       },
       "vanish": {
         "name": "Passo di Fumo",
@@ -8733,19 +8733,19 @@ export const it_IT: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Marchia un nemico come bersaglio delle tue maledizioni. Spostare l'Evil Eye preserva la Condanna ma non rinnova la sua scadenza di 20 sec."
       },
       "maledict_gaze": {
         "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "description": "Il tuo Maledict Eye attacca il tuo Evil Eye primario selezionato ogni 2,5 sec per danni da Ombra. Possess the Evil Eye raddoppia la sua velocità d'attacco."
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio."
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
       },
       "life_tap": {
         "name": "Patto Amaro",
@@ -8753,7 +8753,7 @@ export const it_IT: EnTranslations = {
       },
       "cursed_accomplice": {
         "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "description": "Collega il tuo Evil Eye quando nessun alleato è selezionato, facendo sì che il suo Maledict Gaze generi 2 Condanna. Collegare un membro del gruppo selezionato fa sì che solo i loro danni al tuo Evil Eye generino 3 invece. Un nuovo collegamento sostituisce quello precedente e può attivarsi una volta ogni 2 sec."
       },
       "curse_of_agony": {
         "name": "Maleficio dell'Angoscia",
@@ -8765,43 +8765,43 @@ export const it_IT: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Maledice il tuo Evil Eye primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 metri, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici."
       },
       "cinderhide": {
         "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "description": "Indurisce la tua pelle in scoria raffreddante per 10 sec, riducendo tutti i danni subiti del 25%."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec."
       },
       "soulwell": {
         "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "description": "Evoca un Soulwell per 3 min. Fuori dal combattimento, i membri del gruppo possono ricaricare le loro Pietre dell'Anima fino a 3. Una Pietra dell'Anima ripristina il 25% della salute massima e condivide il tempo di recupero delle pozioni."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "description": "Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 16 danni da Ombra."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "description": "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno."
       },
       "vicarious_suffering": {
         "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "description": "Collega la tua sofferenza per 8 sec e genera fino a 15 Condanna dai colpi ostili. Su te stesso, riduce i danni subiti del 20%. Su un alleato, reindirizza fino al 20% verso di te senza farti scendere sotto il 15% di salute."
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "description": "Il Maledictor possiede il tuo Evil Eye primario per 15 sec e genera 35 Condanna. Needle of Fate si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentence infligge il 25% di danni in più e rilascia un'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20."
       },
       "hour_of_judgment": {
         "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "description": "Chiama un giudizio sul tuo Evil Eye primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite l'Evil Eye primario e aumentando i danni di Sentence del 20%. La prima Sentence rimborsa 50 Condanna."
       },
       "coven": {
         "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "description": "Crea Evil Eye secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentence riecheggia su di loro per il 35% dei danni."
       },
       "fear": {
         "name": "Tormento",
@@ -8817,12 +8817,12 @@ export const it_IT: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio."
       },
       "wrath": {
         "name": "Dardo Silvano",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Scaglia un fulmine di energia naturale per {damage} danni da Natura.",
+        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare."
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
@@ -8834,8 +8834,8 @@ export const it_IT: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempesta Lunare",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.",
+        "specNote_balance": "Mantienilo acceso: Seme Lunare lo estende di 6 sec."
       },
       "moonseed": {
         "name": "Seme Lunare",
@@ -8843,8 +8843,8 @@ export const it_IT: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Fioritura Selvaggia",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Cura il bersaglio di {damage} in 12 s.",
+        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
       "thorns": {
         "name": "Guardia di Rovi",
@@ -8860,8 +8860,8 @@ export const it_IT: EnTranslations = {
       },
       "maul": {
         "name": "Frantumaossa",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "growl": {
         "name": "Intimidazione",
@@ -8873,23 +8873,23 @@ export const it_IT: EnTranslations = {
       },
       "claw": {
         "name": "Artigliata",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa: un morso per 70 più 43 per punto combo che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina 30 energia."
       },
       "swipe": {
         "name": "Artigli Falcianti",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "regrowth": {
         "name": "Seconda Fioritura",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.",
+        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5)."
       },
       "barkskin": {
         "name": "Scorza di Quercia",
@@ -8905,8 +8905,8 @@ export const it_IT: EnTranslations = {
       },
       "starfire": {
         "name": "Caduta Celeste",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Richiama un fulmine di fuoco stellare, infliggendo {damage} danni Arcani.",
+        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3."
       },
       "travel_form": {
         "name": "Forma di Fleet",
@@ -8922,7 +8922,7 @@ export const it_IT: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luce Stregata",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec."
       },
       "hibernate": {
         "name": "Sopore",
@@ -8946,8 +8946,8 @@ export const it_IT: EnTranslations = {
       },
       "rip": {
         "name": "Squartare",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Lupo.",
+        "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "mortal_strike": {
         "name": "Colpo Mutilante",
@@ -8999,7 +8999,7 @@ export const it_IT: EnTranslations = {
       },
       "elemental_trance": {
         "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "description": "Entra in trance elementale per 15 sec, riducendo i danni subiti del 30% e convertendo il 20% di tutti i danni che infliggi in mana. (firma Warspirit)"
       },
       "primal_exaltation": {
         "name": "Esaltazione Primordiale",
@@ -9015,59 +9015,59 @@ export const it_IT: EnTranslations = {
       },
       "soul_harvest": {
         "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "description": "Lacera l'anima del nemico per {damage} danni da Ombra e crea 1 Frammento d'Anima, fino a 5."
       },
       "soul_lance": {
         "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "description": "Scaglia una lancia spettrale per {damage} danni da Ombra. Contro il tuo Ossuary Mark, il 50% dei suoi danni viene aggiunto al marchio."
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "description": "Solleva un compagno difensivo permanente. Il Guardiano Sepolcrale provoca automaticamente, intercetta il 20% dei tuoi danni tramite il Dominio della Tomba, e Reaping Command lo fa provocare e subire il 30% di danni in meno per 4 sec."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "description": "Spende 1 Frammento d'Anima per aggiungere un Guerriero Scheletrico permanente al tuo Dominio a 2 posti. Solo uno può servirti. Colpisce in area i nemici vicini per il 45% dei danni ogni 6 sec, e Reaping Command blocca il suo bersaglio con un rallentamento del 40% per 4 sec."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "description": "Spende 2 Frammenti d'Anima per aggiungere un Mago d'Ossa a distanza permanente al tuo Dominio a 2 posti. Solo uno può servirti. I suoi attacchi espongono il bersaglio a un 5% in più di danni magici per 6 sec, e Reaping Command aumenta quella debolezza all'8%."
       },
       "bone_armor": {
         "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "description": "Ti avvolge nelle ossa, assorbendo danni pari al 20% della tua salute massima."
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "description": "Sacrifica prima un Mago d'Ossa, poi un Guerriero Scheletrico, e un'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "description": "Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d'Anima. Questo può verificarsi una volta ogni 3 sec."
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
       },
       "unholy_command": {
         "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "description": "Spende 3 Frammenti d'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec."
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "description": "Distrugge un servitore del Dominio per ripristinare il 25% della tua salute massima."
       },
       "raise_gravewing": {
         "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "description": "Spende 2 Frammenti d'Anima per aggiungere un'Ala Sepolcrale permanente al tuo Dominio a 2 posti. Solo una può servirti. Colpisce in area i nemici vicini per il 65% dei danni ogni 5 sec, e Reaping Command fa sì che ogni nemico colpito subisca l'8% di danni in più per 5 sec."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "description": "Squarcia un portale sepolcrale per evocare temporaneamente un Guerriero Scheletrico, un Mago d'Ossa e un'Ala Sepolcrale per 20 sec, riempiendo i ranghi che i tuoi servitori stabili del Dominio lasciano vuoti."
       },
       "metamorphosis": {
         "name": "Metamorfosi",
@@ -9107,15 +9107,15 @@ export const it_IT: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Freddo",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)"
       },
       "blade_flurry": {
         "name": "Vortice di Lame",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)"
       },
       "hemorrhage": {
         "name": "Emorragia",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Colpisce il nemico per danni dell'arma più {damage}, causa danni da sanguinamento in 12 sec e aumenta i danni da sanguinamento subiti del 40%. Conferisce 1 punto combo. Ogni 2° uso aggiunge 1 Caligine (massimo 3). (firma Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusione di Potere",
@@ -9151,7 +9151,7 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
       },
       "moonlash": {
         "name": "Ondata Lunare",
@@ -9351,7 +9351,7 @@ export const it_IT: EnTranslations = {
       },
       "abyssal_rift": {
         "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "description": "Squarcia una faglia nel punto selezionato, attirando i nemici entro 8 metri verso il suo centro, infliggendo {damage} danni da Ombra e stordendoli per 2 sec. I boss subiscono danni ma resistono all'attrazione e allo stordimento."
       },
       "chaos_bolt": {
         "name": "Dardo della Rovina",
@@ -9359,7 +9359,7 @@ export const it_IT: EnTranslations = {
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "description": "Sacrifica il 10% della tua salute attuale per assorbire danni pari al 30% della tua salute massima per 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Manto d’Ombra",
@@ -9415,7 +9415,7 @@ export const it_IT: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Colpo Spettrale",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Colpisce il nemico per danni dell'arma più {damage} e aumenta la tua probabilità di schivata del 15% per 7 sec. Conferisce 1 punto combo. (talento del Ladro)"
       },
       "hammer_of_wrath": {
         "name": "Martello Rintoccante",
@@ -9551,7 +9551,7 @@ export const it_IT: EnTranslations = {
       },
       "sacrilegious_march": {
         "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "description": "Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute."
       },
       "spellsteal": {
         "name": "Rubamagie",
@@ -9580,7 +9580,7 @@ export const it_IT: EnTranslations = {
       "venom_dart": {
         "name": "Dardo velenoso",
         "description": "Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "specNote_assassination": "Aggiunge 1 Rituale del Veleno ed estende la tua ferita avvelenata di 6 sec (la ferita non supera mai i 20 sec)."
       },
       "body_blow": {
         "name": "Colpo al corpo",
@@ -9644,8 +9644,8 @@ export const it_IT: EnTranslations = {
       },
       "rake": {
         "name": "Scarnificare",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "revive_pet": {
         "name": "Rattoppare",
@@ -11163,16 +11163,16 @@ export const it_IT: EnTranslations = {
         "name": "Redini del Raptor di Drakemaw"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "Zanna di Brina"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "Punta di Midollo"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "Sussurro del Crepuscolo"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "Stiletto Ossovetro"
       },
       "moggers_hide_quiver": {
         "name": "Faretra di cuoio di Mogger"
@@ -11202,7 +11202,7 @@ export const it_IT: EnTranslations = {
         "name": "Pane da banchetto evocato"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Pietra dell'Anima"
       },
       "bristleback_maul": {
         "name": "Martello Gallowglass"
@@ -12665,16 +12665,16 @@ export const it_IT: EnTranslations = {
         "name": "Elementale dell'Acqua"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Guardiano Sepolcrale"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Guerriero Scheletrico"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Mago d'Ossa"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Ala Sepolcrale"
       }
     },
     "npcs": {

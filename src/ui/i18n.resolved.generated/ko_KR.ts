@@ -334,7 +334,7 @@ export const ko_KR: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "영혼 조각",
-      "ruinMeter": "Ruin",
+      "ruinMeter": "파멸",
       "ruinStatus": "파멸 {value}/{max}"
     },
     "spectate": {
@@ -2113,7 +2113,7 @@ export const ko_KR: EnTranslations = {
       "formFireball": "화염구 형상: 이동 속도 {pct}% 증가, 공격 및 주문 사용 불가",
       "formMoonkin": "달날개 변신: 주문 공격력이 {pct}%, 방어도가 {armorPct}% 증가합니다",
       "formShadow": "어스름장막 변신: 암흑 피해가 {pct}% 증가합니다",
-      "resourceCount": "{value} of {max}",
+      "resourceCount": "{value}/{max}",
       "formLich": "영혼 창이 주변 최대 {targets}명에게도 {pct}% 피해를 줍니다",
       "afflictionEye": "저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다",
       "afflictionEyeSecondary": "이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다",
@@ -7557,7 +7557,7 @@ export const ko_KR: EnTranslations = {
     "tooltip": {
       "rank": "{rank} 등급",
       "cost": "{resource} {cost}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "파멸 {cost}",
       "range": "사정거리 {range}미터",
       "rangeWithMin": "사정거리 {min}-{max}미터",
       "instant": "즉시 시전",
@@ -8625,7 +8625,7 @@ export const ko_KR: EnTranslations = {
       },
       "rapid_fire": {
         "name": "열광의 연사",
-        "description": "15초 동안 공격 속도가 40%만큼 증가합니다."
+        "description": "이동하면서 2.4초에 걸쳐 6발을 발사합니다. 발당 {damage}의 물리 피해를 입히며 원거리 전투력에 따라 증가합니다."
       },
       "smite": {
         "name": "성스러운 일격",
@@ -8732,7 +8732,7 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
       },
       "evil_eye": {
-        "name": "Evil Eye",
+        "name": "사안",
         "description": "적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다."
       },
       "maledict_gaze": {
@@ -8975,7 +8975,7 @@ export const ko_KR: EnTranslations = {
       },
       "chain_heal": {
         "name": "연쇄 치유",
-        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
+        "description": "아군 대상 하나를 {damage}만큼 치유한 뒤, 12야드 내 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 이전 대상의 50%만큼 치유합니다. 연쇄된 아군은 남아 있는 치유의 흐름을 소모하고 소모량의 125%만큼 즉시 치유받습니다. 최초 치유량은 주문력에 따라 증가합니다. (복원 전문화)"
       },
       "galeheart_weapon": {
         "name": "질풍의 무기",
@@ -9079,7 +9079,7 @@ export const ko_KR: EnTranslations = {
       },
       "holy_shield": {
         "name": "신성한 방패",
-        "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+        "description": "30% 막기와 함께 최대 생명력의 {damage}%를 흡수하는 보호막을 {duration}초 동안 얻고, 위협 파동을 방출합니다. 신성한 승천이 이 방어를 강화하고 연장합니다."
       },
       "bestial_wrath": {
         "name": "야수의 격노",
@@ -11163,16 +11163,16 @@ export const ko_KR: EnTranslations = {
         "name": "화산구 랩터의 고삐"
       },
       "rimefang": {
-        "name": "Rimefang"
+        "name": "서리엄니"
       },
       "marrowpoint": {
-        "name": "Marrowpoint"
+        "name": "골수 송곳"
       },
       "duskwhisper": {
-        "name": "Duskwhisper"
+        "name": "황혼의 속삭임"
       },
       "boneglass_shiv": {
-        "name": "Boneglass Shiv"
+        "name": "뼈유리 단도"
       },
       "moggers_hide_quiver": {
         "name": "모거의 가죽 화살통"
