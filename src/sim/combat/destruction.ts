@@ -25,7 +25,7 @@ export const RUINOUS_BRAND_DURATION = 15;
 export const PYRE_COLOSSUS_DURATION = 30;
 export const PYRE_AURA_INTERVAL = 2;
 export const PYRE_AURA_RADIUS = 8;
-export const PYRE_AURA_DAMAGE = 84;
+export const PYRE_AURA_DAMAGE = 60;
 export const PYRE_RUIN_INTERVAL = 1;
 
 const RUIN_AURA_ID = 'destruction_ruin';

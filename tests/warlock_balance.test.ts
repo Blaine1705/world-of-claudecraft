@@ -57,12 +57,13 @@ describe('warlock low-level sustained damage tuning', () => {
     const graveguardDps =
       (graveguard.dmgBase + graveguard.dmgPerLevel * 19) / graveguard.attackSpeed;
 
-    // The sub-200 re-spread overshot on optimized builds, so the 2026-08-07
-    // walk-back settles the warrior (0.75) and bone mage (0.85) per-level
-    // rates halfway home; the raw temporary-army budget sits near thirty-four.
-    expect(armyDps).toBeGreaterThan(33);
-    expect(armyDps).toBeLessThan(39);
-    expect(graveguardDps).toBeCloseTo(13.9, 1);
+    // The sub-200 re-spread overshot on optimized builds: the 2026-08-07 round
+    // walked the warrior (0.65) and bone mage (0.75) per-level rates all the
+    // way back and trimmed the gravewing, so the raw temporary-army budget
+    // sits near thirty-one now.
+    expect(armyDps).toBeGreaterThan(28);
+    expect(armyDps).toBeLessThan(34);
+    expect(graveguardDps).toBeCloseTo(12.6, 1);
   });
 
   it('uses the shared Talents V2 row jobs from mobility through capstone utility', () => {
@@ -133,7 +134,7 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(dotTotal('curse_of_agony')).toBe(78);
 
     const shadowBolt = ABILITIES.shadow_bolt.ranks?.find((rank) => rank.rank === 4);
-    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 130, max: 162 }]);
+    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 126, max: 156 }]);
   });
 
   it('keeps mastery tuning and the shared generator-resource row canonical', () => {
