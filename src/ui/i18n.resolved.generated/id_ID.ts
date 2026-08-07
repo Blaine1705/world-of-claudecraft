@@ -7417,6 +7417,7 @@ export const id_ID: EnTranslations = {
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
       "questOrphaned": "Tidak dibutuhkan untuk misi aktif mana pun.",
       "classes": "Kelas: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",
       "clickSell": "Klik untuk menjual",

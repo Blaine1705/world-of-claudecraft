@@ -7417,6 +7417,7 @@ export const sv_SE: EnTranslations = {
       "questRules": "Kan inte säljas, bankas eller bytas bort.",
       "questOrphaned": "Behövs inte för något aktivt uppdrag.",
       "classes": "Klasser: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Försäljningspris: {money}",
       "clickBuy": "Klicka för att köpa",
       "clickSell": "Klicka för att sälja",

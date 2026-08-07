@@ -7417,6 +7417,7 @@ export const de_DE: EnTranslations = {
       "questRules": "Kann nicht verkauft, eingelagert oder gehandelt werden.",
       "questOrphaned": "Für keine aktive Quest benötigt.",
       "classes": "Klassen: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Verkaufspreis: {money}",
       "clickBuy": "Zum Kaufen klicken",
       "clickSell": "Zum Verkaufen klicken",

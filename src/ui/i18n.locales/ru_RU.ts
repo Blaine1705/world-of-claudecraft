@@ -2568,6 +2568,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questRules': 'Нельзя продать, положить в банк или обменять.',
   'itemUi.tooltip.questOrphaned': 'Не нужен ни для одного активного задания.',
   'itemUi.tooltip.classes': 'Классы: {classes}',
+  'itemUi.tooltip.maxStack': 'Максимум в стопке: {count}',
   'itemUi.tooltip.sellPrice': 'Цена продажи: {money}',
   'itemUi.tooltip.clickBuy': 'Нажмите, чтобы купить',
   'itemUi.tooltip.clickSell': 'Нажмите, чтобы продать',

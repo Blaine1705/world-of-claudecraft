@@ -7417,6 +7417,7 @@ export const da_DK: EnTranslations = {
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
       "questOrphaned": "Ikke nødvendig for nogen aktiv quest.",
       "classes": "Klasser: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Salgspris: {money}",
       "clickBuy": "Klik for at købe",
       "clickSell": "Klik for at sælge",
