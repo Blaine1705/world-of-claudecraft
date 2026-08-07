@@ -21,6 +21,7 @@ import {
 } from '../sim/dawnhold_layout';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { bannerClothMaterial, isBannerKey } from './castle_kit';
 import {
   castlePavingMat,
   castleStoneBox,
@@ -229,6 +230,22 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
       }
       const v = Math.abs(Math.round(c * 7 + run.line)) % 9;
       place(run, c, v === 2 ? 'kcasWallWindow' : 'kcasWall');
+    }
+    // The module grid floors the run, and a run whose length is not a whole
+    // number of modules left an open breach beside the far corner tower (the
+    // west curtain's last three yards showed the courtyard straight through
+    // the wall). A half module closes the remainder flush to the tower shell,
+    // nudged a hair proud of the wall plane so its half-yard overlap with the
+    // neighbouring module never coplanar-fights it.
+    const rem = run.a1 - (run.a0 + count * M);
+    if (rem > 0.3) {
+      const c = run.a1 - S; // half module is 2 units at scale S
+      for (const face of [-1, 1] as const) {
+        const off = face * (skinOff + 0.02);
+        const x = run.axis === 'z' ? run.line + off : c;
+        const z = run.axis === 'z' ? c : run.line + off;
+        put('kcasWallHalf', { x, y: padY, z, rot: run.axis === 'z' ? Math.PI / 2 : 0, s: S });
+      }
     }
     // battlements outside, guard rail inside, both parted over gates
     const off = DAWNHOLD.wallTh / 2 - 0.2;
@@ -493,7 +510,10 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     const scene = scenes[key];
     if (!scene || list.length === 0) continue;
     for (const part of extractParts(scene, SKIP_PARTS[key])) {
-      const mesh = new THREE.InstancedMesh(part.geo, part.mat, list.length);
+      // banner cloth is one-sided in the kit and must read from the lawns
+      // outside the walls too, not only from the bailey (castle_kit rule)
+      const mat = isBannerKey(key) ? bannerClothMaterial(part.mat) : part.mat;
+      const mesh = new THREE.InstancedMesh(part.geo, mat, list.length);
       list.forEach((p, i) => {
         const s = p.s ?? S;
         q.setFromAxisAngle(up, p.rot);
