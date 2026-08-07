@@ -26,11 +26,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   RELIQUARY_PAGES,
   RELIQUARY_PAGES_BY_ID,
+  type ReliquaryRelicDef,
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
 import { ITEMS } from '../src/sim/data';
+import { tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
-import { formatNumber, getLanguage, languageTag, t, tPlural } from '../src/ui/i18n';
+import {
+  ensureLocaleLoaded,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  setLanguage,
+  t,
+  tPlural,
+} from '../src/ui/i18n';
 import { reliquaryPageDesc, reliquaryPageName } from '../src/ui/reliquary_i18n';
 import { reliquaryRelicDisplayName, reliquarySourceLineText } from '../src/ui/reliquary_labels';
 import { reliquarySourceLinePlan } from '../src/ui/reliquary_view';
@@ -53,9 +63,21 @@ vi.mock('../src/ui/icons', () => ({
 // a page-level sourceDefault, so its missing cells exercise the two-part
 // "bossDungeon" source arm rather than the degenerate one.
 const PAGE_ID = 'conquerors_hollow_crypt';
-// A page the catalog deliberately leaves partly un-hinted, for the missing cell
-// that must render NO source line rather than an invented one.
-const UNHINTED_PAGE_ID = 'conquerors_gravewyrm_sanctum';
+// The Horizons mounts page: seven mounts name every door that awards their
+// reins and two remain content gaps, so it is the page that exercises BOTH the
+// hinted and the un-hinted arm at once.
+const UNHINTED_PAGE_ID = 'horizons_mounts';
+// The mount the catalog leaves un-hinted (no live table awards it), for the
+// missing cell that must render NO source line rather than an invented one.
+const UNHINTED_MOUNT_ID = 'drakemaw_raptor';
+// A Sanctum relic content really awards through three comparable doors, for the
+// multi-source tooltip and the joined aria label.
+const MULTI_SOURCE_PAGE_ID = 'conquerors_gravewyrm_sanctum';
+const MULTI_SOURCE_RELIC_ID = 'boundstone_helm';
+// A set-page relic whose two hints are one rare plus the zone it camps in: the
+// pair that composes a single "Drops from {rare} in {zone}" line.
+const BOSS_ZONE_PAGE_ID = 'conquerors_set_deathlord';
+const BOSS_ZONE_RELIC_ID = 'deathlord_sabatons';
 
 const TAG = languageTag(getLanguage());
 const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
@@ -71,14 +93,52 @@ function relicIds(pageId: string): string[] {
   return pageDef(pageId).relics.map((relic) => (relic.kind === 'item' ? relic.itemId : ''));
 }
 
-/** The localized source sentence the catalog authors for one slot, derived from
- *  the live page def through the same pure arm-picker the painter uses. */
-function sourceTextFor(pageId: string, index: number): string {
+/** The SLOT id of one relic, whatever its kind (the mounts page holds no item
+ *  relics at all, so relicIds above cannot answer for it). */
+function slotId(relic: ReliquaryRelicDef): string {
+  if (relic.kind === 'item') return relic.itemId;
+  if (relic.kind === 'mark') return relic.markId;
+  if (relic.kind === 'mount') return relic.mountId;
+  if (relic.kind === 'weapon_skin') return relic.skinId;
+  return relic.deedId;
+}
+
+/** Every slot id on a page, in the catalog order the grid paints. */
+function slotIds(pageId: string): string[] {
+  return pageDef(pageId).relics.map(slotId);
+}
+
+/** Catalog order index of one relic slot on a page, by its slot id. */
+function relicIndex(pageId: string, relicId: string): number {
+  const index = slotIds(pageId).indexOf(relicId);
+  if (index < 0) throw new Error(`content premise: ${pageId} holds ${relicId}`);
+  return index;
+}
+
+/** Every localized source sentence the catalog authors for one slot, derived
+ *  from the live page def through the same pure arm-picker the painter uses.
+ *  Each line is resolved one at a time rather than through the painter's own
+ *  list helper, so a bug that drops lines inside that helper cannot cancel out. */
+function sourceLinesFor(pageId: string, index: number): string[] {
   const def = pageDef(pageId);
   const relic = def.relics[index];
   if (!relic) throw new Error(`content premise: ${pageId} has a relic at ${index}`);
-  const plan = reliquarySourceLinePlan(relic.source ?? def.sourceDefault, def.clearSource);
-  return reliquarySourceLineText(plan ?? undefined);
+  return reliquarySourceLinePlan(reliquaryRelicSource(def, relic), def.clearSource)
+    .map((plan) => reliquarySourceLineText(plan))
+    .filter((line) => line !== '');
+}
+
+/** Those lines folded the way an aria label has to fold them: through an
+ *  INDEPENDENT Intl.ListFormat instance rather than the painter's helper, so
+ *  the punctuation itself stays under test (the production fold is formatList,
+ *  which shares nothing with this oracle but CLDR). */
+function joinSourceLines(lines: readonly string[]): string {
+  if (lines.length === 0) return '';
+  if (lines.length === 1) return lines[0] ?? '';
+  return new Intl.ListFormat(languageTag(getLanguage()), {
+    style: 'long',
+    type: 'conjunction',
+  }).format(lines);
 }
 
 // ---------------------------------------------------------------------------
@@ -302,8 +362,8 @@ function captureRawMarkup(el: HTMLElement, run: () => void): string[] {
 }
 
 /** Open the window straight onto a page grid. */
-function openPage(state: WorldState, pageId = PAGE_ID): Rig {
-  const rig = makeWindow(state, { nav: 'conquerors' });
+function openPage(state: WorldState, pageId = PAGE_ID, nav: ReliquaryNavId = 'conquerors'): Rig {
+  const rig = makeWindow(state, { nav });
   click(rig.el, `[data-page="${pageId}"]`);
   return rig;
 }
@@ -677,33 +737,38 @@ describe('ReliquaryWindow: cell tooltips and aria labels', () => {
     const node = must(rig.el, `[data-cell-id="${id}"]`);
     expect(node.dataset.cellOwned).toBe('0');
     const name = reliquaryRelicDisplayName('item', id);
-    const source = sourceTextFor(PAGE_ID, 0);
-    expect(source, 'content premise: this page authors a source hint').not.toBe('');
+    const lines = sourceLinesFor(PAGE_ID, 0);
+    expect(lines.length, 'content premise: this page authors a source hint').toBeGreaterThan(0);
 
     const html = tooltipFor(rig, node)?.() ?? '';
     expect(html).toContain(esc(name));
     expect(html).toContain(esc(t('hudChrome.reliquary.missingTooltipStatus')));
-    expect(html).toContain(esc(source));
+    for (const line of lines) expect(html).toContain(esc(line));
     // Keyboard parity: the label carries the same hunting directions the hover
     // card does, so nothing actionable is mouse-only.
     expect(node.getAttribute('aria-label')).toBe(
-      t('hudChrome.reliquary.cellMissingSourceAria', { name, source }),
+      t('hudChrome.reliquary.cellMissingSourceAria', { name, source: joinSourceLines(lines) }),
     );
   });
 
   it('renders no source line at all for a relic the catalog leaves un-hinted', () => {
-    const rig = openPage(baseState(), UNHINTED_PAGE_ID);
+    const rig = openPage(baseState(), UNHINTED_PAGE_ID, 'horizons');
     const def = pageDef(UNHINTED_PAGE_ID);
     expect(
       def.sourceDefault,
       'content premise: the page authors no default source',
     ).toBeUndefined();
-    const index = def.relics.findIndex((relic) => relic.source === undefined);
-    expect(index, 'content premise: the page holds an un-hinted relic').toBeGreaterThanOrEqual(0);
-    const id =
-      def.relics[index]?.kind === 'item' ? (def.relics[index] as { itemId: string }).itemId : '';
-    const node = must(rig.el, `[data-cell-id="${id}"]`);
-    const name = reliquaryRelicDisplayName('item', id);
+    const index = relicIndex(UNHINTED_PAGE_ID, UNHINTED_MOUNT_ID);
+    const relic = def.relics[index];
+    expect(relic, `content premise: ${UNHINTED_MOUNT_ID} is a live slot`).toBeTruthy();
+    // Premise: this relic really resolves ZERO hints, so the assertions below
+    // test the un-hinted arm and not a relic that quietly gained a source.
+    expect(
+      relic ? reliquaryRelicSource(def, relic) : ['drift'],
+      'content premise: the mount is still un-hinted',
+    ).toEqual([]);
+    const node = must(rig.el, `[data-cell-id="${UNHINTED_MOUNT_ID}"]`);
+    const name = reliquaryRelicDisplayName('mount', UNHINTED_MOUNT_ID);
     // The un-hinted arm: the authored "not found yet" copy and nothing invented
     // in its place.
     expect(node.getAttribute('aria-label')).toBe(
@@ -712,6 +777,143 @@ describe('ReliquaryWindow: cell tooltips and aria labels', () => {
     const html = tooltipFor(rig, node)?.() ?? '';
     expect(html).toContain(esc(t('hudChrome.reliquary.missingTooltipStatus')));
     expect(html).toContain(esc(name));
+    // No stray empty line either: the tooltip carries the name and the status
+    // and nothing else.
+    expect(html.match(/tt-line/g) ?? []).toHaveLength(1);
+  });
+
+  it('shows EVERY door on a multi-source relic, one tooltip line each', () => {
+    const rig = openPage(baseState(), MULTI_SOURCE_PAGE_ID);
+    const def = pageDef(MULTI_SOURCE_PAGE_ID);
+    const index = relicIndex(MULTI_SOURCE_PAGE_ID, MULTI_SOURCE_RELIC_ID);
+    const relic = def.relics[index];
+    expect(relic, 'content premise: the relic is a live slot').toBeTruthy();
+    // Premise: the relic really carries THREE authored doors, so this case
+    // cannot rot into a single-source test if the catalog is trimmed.
+    expect(
+      relic ? reliquaryRelicSource(def, relic).length : 0,
+      'content premise: the relic keeps three authored sources',
+    ).toBe(3);
+    const lines = sourceLinesFor(MULTI_SOURCE_PAGE_ID, index);
+    expect(lines, 'every authored door resolves to real text').toHaveLength(3);
+    expect(new Set(lines).size, 'the three lines are distinct sentences').toBe(3);
+
+    const node = must(rig.el, `[data-cell-id="${MULTI_SOURCE_RELIC_ID}"]`);
+    expect(node.dataset.cellOwned).toBe('0');
+    const html = tooltipFor(rig, node)?.() ?? '';
+    for (const line of lines) {
+      expect(html, `tooltip carries: ${line}`).toContain(`<div class="tt-line">${esc(line)}</div>`);
+    }
+    // The label cannot carry separate lines, so the same three fold into the
+    // one {source} slot through the localized join.
+    const name = reliquaryRelicDisplayName('item', MULTI_SOURCE_RELIC_ID);
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.cellMissingSourceAria', { name, source: joinSourceLines(lines) }),
+    );
+  });
+
+  it('joins the aria source lines with the LOCALE separator, never a literal comma', async () => {
+    // ja_JP joins lists with the ideographic comma, so a painter that spelled
+    // ', ' itself would put Latin punctuation inside a Japanese sentence a
+    // screen reader then reads aloud. Rendering under ja is the only way to see
+    // the difference: an English conjunction list and a hand-rolled ', ' join
+    // agree on too many bytes to tell apart.
+    const previous = getLanguage();
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      // Oracle premise: CLDR's ja list join really differs from the ASCII
+      // fallback, so the negative assertion below can actually discriminate.
+      const jaJoin = new Intl.ListFormat('ja', { style: 'long', type: 'conjunction' }).format([
+        'A',
+        'B',
+      ]);
+      expect(jaJoin, 'locale premise: ja joins with its own comma').not.toBe('A, B');
+      const rig = openPage(baseState(), MULTI_SOURCE_PAGE_ID);
+      const index = relicIndex(MULTI_SOURCE_PAGE_ID, MULTI_SOURCE_RELIC_ID);
+      const lines = sourceLinesFor(MULTI_SOURCE_PAGE_ID, index);
+      expect(lines.length, 'premise: still a multi-source relic under ja').toBe(3);
+      const node = must(rig.el, `[data-cell-id="${MULTI_SOURCE_RELIC_ID}"]`);
+      const label = node.getAttribute('aria-label') ?? '';
+      expect(label).toBe(
+        t('hudChrome.reliquary.cellMissingSourceAria', {
+          name: reliquaryRelicDisplayName('item', MULTI_SOURCE_RELIC_ID),
+          source: joinSourceLines(lines),
+        }),
+      );
+      // Direct form of the same claim: the ASCII fallback never appears
+      // between the first two lines under ja.
+      expect(label).not.toContain(`${lines[0]}, ${lines[1]}`);
+    } finally {
+      setLanguage(previous);
+    }
+  });
+
+  it('renders a heroic reins mount with every boss AND the rift rank, one line each', () => {
+    // The acceptance criterion's second named case: a mount slot resolves its
+    // doors through the reins seam, and the rift line reaches a REAL rendered
+    // surface here (everywhere else it is only unit-tested text). grag_bear is
+    // the four-door maximum, so this also exercises the no-cap rule at today's
+    // widest authored relic.
+    const rig = openPage(baseState(), UNHINTED_PAGE_ID, 'horizons');
+    const def = pageDef(UNHINTED_PAGE_ID);
+    const index = relicIndex(UNHINTED_PAGE_ID, 'grag_bear');
+    const relic = def.relics[index];
+    expect(relic, 'content premise: grag_bear is a live slot').toBeTruthy();
+    const hints = relic ? reliquaryRelicSource(def, relic) : [];
+    expect(
+      hints.map((hint) => hint.sourceKind).sort(),
+      'content premise: three bosses plus the rift ladder',
+    ).toEqual(['boss', 'boss', 'boss', 'rift']);
+    const lines = sourceLinesFor(UNHINTED_PAGE_ID, index);
+    expect(lines, 'every door resolves to real text').toHaveLength(4);
+    expect(new Set(lines).size, 'four distinct sentences').toBe(4);
+
+    const node = must(rig.el, '[data-cell-id="grag_bear"]');
+    expect(node.dataset.cellOwned).toBe('0');
+    const html = tooltipFor(rig, node)?.() ?? '';
+    for (const line of lines) {
+      expect(html, `tooltip carries: ${line}`).toContain(`<div class="tt-line">${esc(line)}</div>`);
+    }
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.cellMissingSourceAria', {
+        name: reliquaryRelicDisplayName('mount', 'grag_bear'),
+        source: joinSourceLines(lines),
+      }),
+    );
+  });
+
+  it('composes the rare and the zone it camps in into ONE line', () => {
+    const rig = openPage(baseState(), BOSS_ZONE_PAGE_ID);
+    const def = pageDef(BOSS_ZONE_PAGE_ID);
+    const index = relicIndex(BOSS_ZONE_PAGE_ID, BOSS_ZONE_RELIC_ID);
+    const relic = def.relics[index];
+    expect(relic, 'content premise: the relic is a live slot').toBeTruthy();
+    // Premise: exactly one boss hint and one zone hint, which is the shape that
+    // composes. Anything else and this case would be testing a different rule.
+    const hints = relic ? reliquaryRelicSource(def, relic) : [];
+    expect(
+      hints.map((hint) => hint.sourceKind),
+      'content premise: the relic pairs a rare with a zone',
+    ).toEqual(['boss', 'zone']);
+    // Two hints, ONE line: the pair is one answer, not two.
+    const lines = sourceLinesFor(BOSS_ZONE_PAGE_ID, index);
+    expect(lines).toHaveLength(1);
+    const composed = t('hudChrome.reliquary.sourceBossZone', {
+      boss: tEntity({ kind: 'mob', id: hints[0]?.sourceId ?? '', field: 'name' }),
+      zone: zoneDisplayName(hints[1]?.sourceId ?? ''),
+    });
+    expect(lines[0]).toBe(composed);
+
+    const node = must(rig.el, `[data-cell-id="${BOSS_ZONE_RELIC_ID}"]`);
+    const html = tooltipFor(rig, node)?.() ?? '';
+    expect(html).toContain(`<div class="tt-line">${esc(composed)}</div>`);
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.cellMissingSourceAria', {
+        name: reliquaryRelicDisplayName('item', BOSS_ZONE_RELIC_ID),
+        source: composed,
+      }),
+    );
   });
 
   it('serves the full item tooltip for an owned item relic', () => {
@@ -1204,31 +1406,46 @@ describe('ReliquaryWindow: search filtering', () => {
     expect(liveRegion(rig.el)?.textContent).toBe(announced);
   });
 
-  it('stamps data-cell-source on exactly the cells that carry a source plan', () => {
-    // The PR shot picker selects on this attribute (scripts/pr_shot_targets),
-    // so both directions matter: present wherever a plan resolves, absent
-    // wherever the relic is pending. The Sanctum page ships both kinds.
-    const sanctumId = 'conquerors_gravewyrm_sanctum';
-    const page = RELIQUARY_PAGES_BY_ID[sanctumId];
-    expect(page, 'content premise: the sanctum page exists').toBeTruthy();
-    const rig = makeWindow(baseState(), { nav: 'conquerors' });
-    click(rig.el, `[data-page="${sanctumId}"]`);
+  it('stamps data-cell-source with the plan COUNT on exactly the hinted cells', () => {
+    // The PR shot picker selects on this attribute and now prefers the highest
+    // count (scripts/pr_shot_targets), so three things matter: present wherever
+    // a plan resolves, absent wherever the relic is a content gap, and carrying
+    // the real number in between. The mounts page ships both arms.
+    const page = RELIQUARY_PAGES_BY_ID[UNHINTED_PAGE_ID];
+    expect(page, 'content premise: the mounts page exists').toBeTruthy();
+    const rig = openPage(baseState(), UNHINTED_PAGE_ID, 'horizons');
     const grid = cells(rig.el);
     expect(grid.length).toBeGreaterThan(0);
     let withSource = 0;
     let withoutSource = 0;
     for (const node of grid) {
-      const relic = page?.relics.find((r) => r.kind === 'item' && r.itemId === node.dataset.cellId);
-      expect(relic, `catalog premise: ${node.dataset.cellId}`).toBeTruthy();
-      const hint = relic ? reliquaryRelicSource(page, relic) : null;
-      const plan = reliquarySourceLinePlan(hint ?? undefined, page?.clearSource);
-      if (plan !== null) withSource += 1;
+      const slot = node.dataset.cellId ?? '';
+      const relic = page?.relics.find((r) => r.kind === 'mount' && r.mountId === slot);
+      expect(relic, `catalog premise: ${slot}`).toBeTruthy();
+      const hints = relic && page ? reliquaryRelicSource(page, relic) : [];
+      // RESOLVED lines, not authored plans: the painter stamps what the
+      // tooltip will really paint, so a plan whose id went stale never
+      // inflates the count the shot picker chases.
+      const lines = reliquarySourceLinePlan(hints, page?.clearSource)
+        .map((plan) => reliquarySourceLineText(plan))
+        .filter((line) => line !== '');
+      if (lines.length > 0) withSource += 1;
       else withoutSource += 1;
-      expect(node.hasAttribute('data-cell-source'), `${node.dataset.cellId}`).toBe(plan !== null);
+      expect(node.hasAttribute('data-cell-source'), slot).toBe(lines.length > 0);
+      // The stamped value is the real line count, not a constant "1": the shot
+      // picker reads it as a number to find the richest cell.
+      expect(node.dataset.cellSource, slot).toBe(
+        lines.length > 0 ? String(lines.length) : undefined,
+      );
     }
-    // Premise: the page really exercises both arms.
+    // Premise: the page really exercises both arms, and at least one cell is
+    // genuinely multi-source, so the count pin above is not all ones.
     expect(withSource).toBeGreaterThan(0);
     expect(withoutSource).toBeGreaterThan(0);
+    const counts = grid.map((node) => Number(node.dataset.cellSource ?? 0));
+    expect(Math.max(...counts), 'content premise: some mount names several doors').toBeGreaterThan(
+      1,
+    );
   });
 
   it('never announces on the render that opens the window, even with a sticky chip', () => {

@@ -10,16 +10,20 @@ import {
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_MARK_IDS,
   RELIQUARY_PAGES,
+  RELIQUARY_STORE_SOURCE_ID,
+  reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
-import { DUNGEONS, ZONES } from '../src/sim/data';
+import { DELVES, DUNGEONS, QUESTS, ZONES } from '../src/sim/data';
 import { CURATOR_RANK_DEFS } from '../src/sim/reliquary';
 import { deedName } from '../src/ui/deed_i18n';
 import { dungeonDisplayName, tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
-import { languageTag } from '../src/ui/i18n';
+import { getLanguage, languageTag } from '../src/ui/i18n';
 import { MOUNT_NAME_KEYS } from '../src/ui/mount_labels';
 import {
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
+  reliquarySourceAriaText,
+  reliquarySourceLines,
   reliquarySourceLineText,
 } from '../src/ui/reliquary_labels';
 import {
@@ -1278,11 +1282,11 @@ describe('model.filtered reports a real narrowing, never mere needle presence', 
 describe('reliquarySourceLinePlan', () => {
   it('names the dungeon too when the page clear meter reads one', () => {
     expect(
-      reliquarySourceLinePlan(
-        { sourceKind: 'boss', sourceId: 'korzul' },
-        { kind: 'dungeon', dungeonId: 'crypt' },
-      ),
-    ).toEqual({ kind: 'bossDungeon', bossId: 'korzul', dungeonId: 'crypt' });
+      reliquarySourceLinePlan([{ sourceKind: 'boss', sourceId: 'korzul' }], {
+        kind: 'dungeon',
+        dungeonId: 'crypt',
+      }),
+    ).toEqual([{ kind: 'bossDungeon', bossId: 'korzul', dungeonId: 'crypt' }]);
   });
 
   it('names the boss alone for every non-dungeon clear source', () => {
@@ -1295,8 +1299,8 @@ describe('reliquarySourceLinePlan', () => {
       { kind: 'deed_stat', stat: 'thunzharrKills' } as const,
     ]) {
       expect(
-        reliquarySourceLinePlan({ sourceKind: 'boss', sourceId: 'thunzharr' }, clearSource),
-      ).toEqual({ kind: 'boss', bossId: 'thunzharr' });
+        reliquarySourceLinePlan([{ sourceKind: 'boss', sourceId: 'thunzharr' }], clearSource),
+      ).toEqual([{ kind: 'boss', bossId: 'thunzharr' }]);
     }
   });
 
@@ -1304,31 +1308,166 @@ describe('reliquarySourceLinePlan', () => {
     const dungeon = { kind: 'dungeon', dungeonId: 'crypt' } as const;
     // The dungeon clear source is passed on each so the pin proves it is read
     // ONLY by the boss arm and never leaks into the others.
-    expect(reliquarySourceLinePlan({ sourceKind: 'zone', sourceId: 'eastbrook' }, dungeon)).toEqual(
-      {
-        kind: 'zone',
-        zoneId: 'eastbrook',
-      },
-    );
     expect(
-      reliquarySourceLinePlan({ sourceKind: 'profession', sourceId: 'mining' }, dungeon),
-    ).toEqual({
-      kind: 'profession',
-      professionId: 'mining',
-    });
-    expect(reliquarySourceLinePlan({ sourceKind: 'deed', sourceId: 'col_set_x' }, dungeon)).toEqual(
-      {
-        kind: 'deed',
-        deedId: 'col_set_x',
-      },
-    );
+      reliquarySourceLinePlan([{ sourceKind: 'zone', sourceId: 'eastbrook' }], dungeon),
+    ).toEqual([{ kind: 'zone', zoneId: 'eastbrook' }]);
     expect(
-      reliquarySourceLinePlan({ sourceKind: 'vendor', sourceId: 'heroic_quartermaster' }, dungeon),
-    ).toEqual({ kind: 'vendor', npcId: 'heroic_quartermaster' });
+      reliquarySourceLinePlan([{ sourceKind: 'profession', sourceId: 'mining' }], dungeon),
+    ).toEqual([{ kind: 'profession', professionId: 'mining' }]);
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'deed', sourceId: 'col_set_x' }], dungeon),
+    ).toEqual([{ kind: 'deed', deedId: 'col_set_x' }]);
+    expect(
+      reliquarySourceLinePlan(
+        [{ sourceKind: 'vendor', sourceId: 'heroic_quartermaster' }],
+        dungeon,
+      ),
+    ).toEqual([{ kind: 'vendor', npcId: 'heroic_quartermaster' }]);
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'delve', sourceId: 'drowned_litany' }], dungeon),
+    ).toEqual([{ kind: 'delve', delveId: 'drowned_litany' }]);
+    expect(reliquarySourceLinePlan([{ sourceKind: 'rift', sourceId: 'S' }], dungeon)).toEqual([
+      { kind: 'rift', rank: 'S' },
+    ]);
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'quest', sourceId: 'q_gravewyrm' }], dungeon),
+    ).toEqual([{ kind: 'quest', questId: 'q_gravewyrm' }]);
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'store', sourceId: 'woc_store' }], dungeon),
+    ).toEqual([{ kind: 'store', storeId: 'woc_store' }]);
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'activity', sourceId: 'corpse_harvest' }], dungeon),
+    ).toEqual([{ kind: 'activity', activityId: 'corpse_harvest' }]);
   });
 
-  it('answers null with no hint (an un-authored source renders no line)', () => {
-    expect(reliquarySourceLinePlan(undefined, { kind: 'dungeon', dungeonId: 'crypt' })).toBeNull();
+  it('answers the empty list with no hints (an un-authored source renders no line)', () => {
+    expect(reliquarySourceLinePlan([], { kind: 'dungeon', dungeonId: 'crypt' })).toEqual([]);
+  });
+
+  it('renders one line per hint, in authored order, with no cap', () => {
+    // The pattern, stated as a test: a relic with four doors shows four lines,
+    // in the order the catalog authored them. No merging of the two same-page
+    // bosses, no cap, no arbitrary winner.
+    const plans = reliquarySourceLinePlan(
+      [
+        { sourceKind: 'boss', sourceId: 'first_boss' },
+        { sourceKind: 'boss', sourceId: 'second_boss' },
+        { sourceKind: 'rift', sourceId: 'A' },
+        { sourceKind: 'profession', sourceId: 'mining' },
+      ],
+      { kind: 'none' },
+    );
+    expect(plans).toEqual([
+      { kind: 'boss', bossId: 'first_boss' },
+      { kind: 'boss', bossId: 'second_boss' },
+      { kind: 'rift', rank: 'A' },
+      { kind: 'profession', professionId: 'mining' },
+    ]);
+  });
+
+  it('composes ONE boss with ONE zone at the boss position, and only then', () => {
+    // "Which rare" and "where it camps" are two halves of one open-world
+    // answer, so exactly-one-of-each folds into a single bossZone line placed
+    // where the BOSS hint was authored.
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'boss', sourceId: 'ironvein_foreman' },
+          { sourceKind: 'zone', sourceId: 'thornpeak_heights' },
+        ],
+        { kind: 'none' },
+      ),
+    ).toEqual([{ kind: 'bossZone', bossId: 'ironvein_foreman', zoneId: 'thornpeak_heights' }]);
+    // Authored zone-first: the composed line still lands at the boss position,
+    // so the order pin above is about the BOSS hint and not about index 0.
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'profession', sourceId: 'mining' },
+          { sourceKind: 'zone', sourceId: 'thornpeak_heights' },
+          { sourceKind: 'boss', sourceId: 'ironvein_foreman' },
+        ],
+        { kind: 'none' },
+      ),
+    ).toEqual([
+      { kind: 'profession', professionId: 'mining' },
+      { kind: 'bossZone', bossId: 'ironvein_foreman', zoneId: 'thornpeak_heights' },
+    ]);
+  });
+
+  it('does NOT compose when the shape is anything other than exactly one of each', () => {
+    // Two bosses and one zone: which boss would the zone belong to? Neither
+    // answer is knowable here, so all three render alone rather than guessing.
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'boss', sourceId: 'first_boss' },
+          { sourceKind: 'boss', sourceId: 'second_boss' },
+          { sourceKind: 'zone', sourceId: 'thornpeak_heights' },
+        ],
+        { kind: 'none' },
+      ),
+    ).toEqual([
+      { kind: 'boss', bossId: 'first_boss' },
+      { kind: 'boss', bossId: 'second_boss' },
+      { kind: 'zone', zoneId: 'thornpeak_heights' },
+    ]);
+    // One boss and TWO zones: same reasoning in the other direction.
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'boss', sourceId: 'first_boss' },
+          { sourceKind: 'zone', sourceId: 'thornpeak_heights' },
+          { sourceKind: 'zone', sourceId: 'eastbrook' },
+        ],
+        { kind: 'none' },
+      ),
+    ).toEqual([
+      { kind: 'boss', bossId: 'first_boss' },
+      { kind: 'zone', zoneId: 'thornpeak_heights' },
+      { kind: 'zone', zoneId: 'eastbrook' },
+    ]);
+    // A LONE zone hint (zero bosses): the bosses === 1 half of the compose
+    // guard. Dropping that half would make the loop skip the sole zone with no
+    // boss to fold it into, and the hint would silently render NO line at all.
+    expect(
+      reliquarySourceLinePlan([{ sourceKind: 'zone', sourceId: 'thornpeak_heights' }], {
+        kind: 'none',
+      }),
+    ).toEqual([{ kind: 'zone', zoneId: 'thornpeak_heights' }]);
+  });
+
+  it('keeps the page dungeon over a zone hint when both could name the place', () => {
+    // The dungeon composition wins on a dungeon page: composing bossZone
+    // instead would drop the more specific place the page already knows, and
+    // the zone still gets its own line, so no authored door is lost.
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'boss', sourceId: 'korzul' },
+          { sourceKind: 'zone', sourceId: 'thornpeak_heights' },
+        ],
+        { kind: 'dungeon', dungeonId: 'crypt' },
+      ),
+    ).toEqual([
+      { kind: 'bossDungeon', bossId: 'korzul', dungeonId: 'crypt' },
+      { kind: 'zone', zoneId: 'thornpeak_heights' },
+    ]);
+  });
+
+  it('composes every boss hint with the page dungeon, one line per boss', () => {
+    expect(
+      reliquarySourceLinePlan(
+        [
+          { sourceKind: 'boss', sourceId: 'sanctum_boneguard' },
+          { sourceKind: 'boss', sourceId: 'korgath_the_bound' },
+        ],
+        { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum' },
+      ),
+    ).toEqual([
+      { kind: 'bossDungeon', bossId: 'sanctum_boneguard', dungeonId: 'gravewyrm_sanctum' },
+      { kind: 'bossDungeon', bossId: 'korgath_the_bound', dungeonId: 'gravewyrm_sanctum' },
+    ]);
   });
 });
 
@@ -1342,17 +1481,35 @@ describe('grid cell source plans', () => {
     relics: [
       { kind: 'item', itemId: 'own_hint', source: { sourceKind: 'vendor', sourceId: 'vex' } },
       { kind: 'item', itemId: 'inherits' },
+      {
+        kind: 'item',
+        itemId: 'multi_door',
+        source: [
+          { sourceKind: 'boss', sourceId: 'first_boss' },
+          { sourceKind: 'profession', sourceId: 'mining' },
+        ],
+      },
     ],
   };
 
   it('prefers the slot hint and falls back to the page default', () => {
     const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
-    expect(cells[0].sourcePlan).toEqual({ kind: 'vendor', npcId: 'vex' });
-    expect(cells[1].sourcePlan).toEqual({
-      kind: 'bossDungeon',
-      bossId: 'page_default_boss',
-      dungeonId: 'crypt',
-    });
+    expect(cells[0].sourcePlans).toEqual([{ kind: 'vendor', npcId: 'vex' }]);
+    expect(cells[1].sourcePlans).toEqual([
+      {
+        kind: 'bossDungeon',
+        bossId: 'page_default_boss',
+        dungeonId: 'crypt',
+      },
+    ]);
+  });
+
+  it('carries every authored door onto the cell, in order', () => {
+    const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
+    expect(cells[2].sourcePlans).toEqual([
+      { kind: 'bossDungeon', bossId: 'first_boss', dungeonId: 'crypt' },
+      { kind: 'profession', professionId: 'mining' },
+    ]);
   });
 
   it('resolves the default off the INJECTED page, not a live catalog lookup', () => {
@@ -1366,12 +1523,14 @@ describe('grid cell source plans', () => {
       relics: [{ kind: 'item', itemId: 'inherits' }],
     };
     const cells = buildReliquaryPageCells(shadow, { itemsDiscovered: ownedSet() });
-    expect(cells[0].sourcePlan).toEqual({ kind: 'zone', zoneId: 'synthetic_zone' });
+    expect(cells[0].sourcePlans).toEqual([{ kind: 'zone', zoneId: 'synthetic_zone' }]);
   });
 
-  it('omits the plan entirely for an un-hinted relic on an un-hinted page', () => {
+  it('omits the plans entirely for an un-hinted relic on an un-hinted page', () => {
+    // Undefined, never an empty array: a truthiness test and a length test on
+    // the cell have to agree (the painter stamps the count off this field).
     const bare = buildReliquaryPageCells(sizedPage('bare', 1), { itemsDiscovered: ownedSet() });
-    expect(bare[0].sourcePlan).toBeUndefined();
+    expect(bare[0].sourcePlans).toBeUndefined();
   });
 });
 
@@ -1695,6 +1854,80 @@ describe('reliquarySourceLineText', () => {
     expect(reliquarySourceLineText(undefined)).toBe('');
   });
 
+  it('composes the delve and quest arms through their own entity channels', () => {
+    // The delve board and the quest log already own these names; the source
+    // line reuses those channels rather than minting a third naming ladder.
+    const delveId = Object.keys(DELVES)[0];
+    expect(reliquarySourceLineText({ kind: 'delve', delveId })).toBe(
+      `Found in the delve ${tEntity({ kind: 'delve', id: delveId, field: 'name' })}`,
+    );
+    const questId = 'q_gravewyrm';
+    expect(QUESTS[questId], 'content premise: the quest is live').toBeDefined();
+    expect(reliquarySourceLineText({ kind: 'quest', questId })).toBe(
+      `Reward from the quest ${tEntity({ kind: 'quest', id: questId, field: 'title' })}`,
+    );
+  });
+
+  it('names the Rift rank, the storefront, and each award activity', () => {
+    expect(reliquarySourceLineText({ kind: 'rift', rank: 'S' })).toBe(
+      'Awarded for clearing S-rank Rifts',
+    );
+    expect(reliquarySourceLineText({ kind: 'store', storeId: RELIQUARY_STORE_SOURCE_ID })).toBe(
+      'Purchased from the WOC Store',
+    );
+    expect(reliquarySourceLineText({ kind: 'activity', activityId: 'corpse_harvest' })).toBe(
+      'Recovered while harvesting creature corpses',
+    );
+    expect(reliquarySourceLineText({ kind: 'activity', activityId: 'masterwork_craft' })).toBe(
+      'Earned by crafting a masterwork',
+    );
+  });
+
+  it('pairs the rare with the zone it camps in, both halves or nothing', () => {
+    const boss = tEntity({ kind: 'mob', id: 'korzul_the_gravewyrm', field: 'name' });
+    const zoneId = ZONES[0].id;
+    expect(
+      reliquarySourceLineText({ kind: 'bossZone', bossId: 'korzul_the_gravewyrm', zoneId }),
+    ).toBe(`Drops from ${boss} in ${zoneDisplayName(zoneId)}`);
+    // Either half missing drops the whole line, the bossDungeon rule: half a
+    // real sentence with one raw id in it reads as content.
+    expect(
+      reliquarySourceLineText({
+        kind: 'bossZone',
+        bossId: 'korzul_the_gravewyrm',
+        zoneId: 'no_such_zone',
+      }),
+    ).toBe('');
+    expect(reliquarySourceLineText({ kind: 'bossZone', bossId: 'gorne_the_dread', zoneId })).toBe(
+      '',
+    );
+  });
+
+  it('drops the line for a fabricated id on every NEW arm too', () => {
+    // Same contract as the original five: a stale or invented id renders no
+    // line rather than splicing itself into prose.
+    expect(reliquarySourceLineText({ kind: 'delve', delveId: 'sunken_nowhere' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'quest', questId: 'q_no_such_quest' })).toBe('');
+    // 'C' is a REAL Rift rank that awards no reins, so it is off the source
+    // ladder on purpose: ranks never inherit each other's tiers.
+    expect(reliquarySourceLineText({ kind: 'rift', rank: 'C' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'rift', rank: 'Z' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'store', storeId: 'some_other_store' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'activity', activityId: 'fishing_derby' })).toBe('');
+  });
+
+  it('guards the prototype key on the new Record-backed arms', () => {
+    // DELVES and QUESTS are plain Records, so a bare index of a prototype key
+    // resolves a truthy Function whose missing fields render as "Object". The
+    // activity arm indexes its own key table too, so it takes the same sweep:
+    // its membership check runs first, and this is what pins that ordering.
+    for (const proto of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) {
+      expect(reliquarySourceLineText({ kind: 'delve', delveId: proto }), proto).toBe('');
+      expect(reliquarySourceLineText({ kind: 'quest', questId: proto }), proto).toBe('');
+      expect(reliquarySourceLineText({ kind: 'activity', activityId: proto }), proto).toBe('');
+    }
+  });
+
   it('drops the whole line rather than splice a raw id into prose (every arm)', () => {
     // The entity channels answer the RAW ID for an id they cannot place (the
     // R34 wire contract), so an un-guarded arm would render
@@ -1731,14 +1964,67 @@ describe('reliquarySourceLineText', () => {
 
   it('resolves every source hint the live catalog actually authors', () => {
     // The other direction: the guards must not be so tight that real authored
-    // content goes silent. Every hint in RELIQUARY_PAGES has to produce text.
+    // content goes silent. EVERY line of every hint list in RELIQUARY_PAGES has
+    // to produce text, so a multi-door relic cannot hide one dead id behind two
+    // live ones.
+    let checked = 0;
     for (const page of RELIQUARY_PAGES) {
       for (const relic of page.relics) {
-        const plan = reliquarySourceLinePlan(relic.source ?? page.sourceDefault, page.clearSource);
-        if (plan === null) continue;
-        expect(reliquarySourceLineText(plan), `${page.id} ${JSON.stringify(plan)}`).not.toBe('');
+        // Through the ONE resolver implementation, not a re-spelled precedence:
+        // the precedence itself has dedicated pins in reliquary_content.test.ts,
+        // and a re-spelling here would silently keep testing the old rule if it
+        // ever changed.
+        for (const plan of reliquarySourceLinePlan(
+          reliquaryRelicSource(page, relic),
+          page.clearSource,
+        )) {
+          expect(reliquarySourceLineText(plan), `${page.id} ${JSON.stringify(plan)}`).not.toBe('');
+          checked += 1;
+        }
       }
     }
+    // Premise: the sweep really visited authored content, so a catalog that
+    // stopped hinting anything could not pass this vacuously. Exact regime:
+    // 261 resolved lines measured today; update deliberately with authoring.
+    expect(checked).toBeGreaterThanOrEqual(261);
+  });
+
+  it('reliquarySourceLines drops the stale plan and keeps the live ones around it', () => {
+    // The documented partial-stale contract, pinned directly: a plan whose id
+    // went stale renders nothing, and the LIVE plans on either side survive.
+    // Without this, deleting the empty-line filter would leave every other
+    // test green while a stale id painted an empty tt-line and a dangling
+    // separator inside the aria fold.
+    const liveDelve = Object.keys(DELVES)[0];
+    const liveQuest = Object.keys(QUESTS)[0];
+    const lines = reliquarySourceLines([
+      { kind: 'delve', delveId: liveDelve },
+      { kind: 'delve', delveId: 'no_such_delve' },
+      { kind: 'quest', questId: liveQuest },
+    ]);
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toBe(reliquarySourceLineText({ kind: 'delve', delveId: liveDelve }));
+    expect(lines[1]).toBe(reliquarySourceLineText({ kind: 'quest', questId: liveQuest }));
+    expect(lines.every((line) => line !== '')).toBe(true);
+    // The degenerate arms: no plans and all-stale plans are both the empty
+    // answer, which is what lets the painter fall back to cellMissingAria.
+    expect(reliquarySourceLines(undefined)).toEqual([]);
+    expect(reliquarySourceLines([{ kind: 'delve', delveId: 'no_such_delve' }])).toEqual([]);
+  });
+
+  it('reliquarySourceAriaText folds through the locale list formatter', () => {
+    // Zero and one line are the identity arms; two-plus go through
+    // Intl.ListFormat. The oracle here is an INDEPENDENT ListFormat instance,
+    // not the production helper, so the punctuation itself stays under test
+    // (an en conjunction list reads "a, b, and c", which no hand-rolled join
+    // would produce by accident).
+    expect(reliquarySourceAriaText([])).toBe('');
+    expect(reliquarySourceAriaText(['only line'])).toBe('only line');
+    const oracle = new Intl.ListFormat(languageTag(getLanguage()), {
+      style: 'long',
+      type: 'conjunction',
+    });
+    expect(reliquarySourceAriaText(['a', 'b', 'c'])).toBe(oracle.format(['a', 'b', 'c']));
   });
 });
 

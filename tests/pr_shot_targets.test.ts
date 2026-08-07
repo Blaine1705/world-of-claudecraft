@@ -231,11 +231,24 @@ describe('classifyDiff', () => {
     // selects on the data marker the painter stamps (never English aria
     // text), so both ends must spell the same attribute or the capture
     // silently degrades to the fallback cell. The painter side is pinned
-    // behaviorally in tests/reliquary_window_behavior.test.ts.
-    const script = readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8');
+    // behaviorally in tests/reliquary_window_behavior.test.ts. Both reads are
+    // COMMENT-STRIPPED so prose mentioning the tokens can never satisfy them.
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
+    );
     expect(script).toContain("hasAttribute('data-cell-source')");
-    const painterSrc = readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8');
-    expect(painterSrc).toContain('data-cell-source="1"');
+    const painterSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8'),
+    );
+    // The attribute carries the number of source lines the cell RESOLVES, not
+    // a constant marker: the picker below reads it as a number to land the
+    // shot on the richest multi-source cell, so a painter that went back to
+    // "1" would leave the capture on an arbitrary one-line relic.
+    expect(painterSrc).toContain('data-cell-source="${sourceLines.length}"');
+    expect(script).toContain("Number.parseInt(node.getAttribute('data-cell-source')");
+    expect(script).toContain('if (count > bestCount)');
     const keys = plan.specific.map((t: { key: string }) => t.key);
     expect(keys).toContain('reliquary-window');
     expect(keys).toContain('reliquary-page');

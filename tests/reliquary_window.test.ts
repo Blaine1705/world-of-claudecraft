@@ -178,17 +178,25 @@ describe('painter hygiene', () => {
     }
   });
 
-  it('shows the source line on missing cells only, in tooltip AND label', () => {
+  it('shows the source lines on missing cells only, in tooltip AND label', () => {
     const code = stripComments(painter);
-    // Tooltip: under the status line, gated on the cell being MISSING (an owned
-    // item relic returns the full item tooltip and needs no hunting directions).
+    // Tooltip: EVERY resolved line under the status line, gated on the cell
+    // being MISSING (an owned item relic returns the full item tooltip and needs
+    // no hunting directions). The loop is the point: a relic with three doors
+    // paints three lines, not the first one.
     expect(code).toMatch(
-      /if \(!cell\.owned\) \{[\s\S]*?reliquarySourceLineText\(cell\.sourcePlan\)/,
+      /if \(!cell\.owned\) \{[\s\S]*?for \(const source of reliquarySourceLines\(cell\.sourcePlans\)\)/,
     );
     // Label: the same text, so keyboard and screen-reader users get what hover
-    // gets. Without this the source line would be a mouse-only affordance.
+    // gets. Without this the source lines would be a mouse-only affordance.
     expect(code).toContain("t('hudChrome.reliquary.cellMissingSourceAria', { name, source })");
     expect(code).toContain("t('hudChrome.reliquary.cellOwnedClearsAria'");
+    // Resolved ONCE per cell (cellHtml), then handed to the label builder: the
+    // fold goes through the locale list formatter, never punctuation this
+    // painter spells itself.
+    expect(code).toContain('reliquarySourceLines(cell.sourcePlans)');
+    expect(code).toContain('reliquarySourceAriaText(sourceLines)');
+    expect(code).not.toMatch(/\.join\(', '\)/);
     // An un-authored source renders nothing rather than an empty sentence.
     expect(code).toMatch(/source === ''\s*\?\s*t\('hudChrome\.reliquary\.cellMissingAria'/);
   });
@@ -533,19 +541,46 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
   });
 
   it('composes each source-line arm through a t() key with named entity lookups', () => {
-    expect(labels).toContain("t('hudChrome.reliquary.sourceBossDungeon'");
-    expect(labels).toContain("t('hudChrome.reliquary.sourceBoss'");
-    expect(labels).toContain("t('hudChrome.reliquary.sourceZone'");
-    expect(labels).toContain("t('hudChrome.reliquary.sourceProfession'");
-    expect(labels).toContain("t('hudChrome.reliquary.sourceDeed'");
-    expect(labels).toContain("t('hudChrome.reliquary.sourceVendor'");
-    // Entity names come from the shared channels, never a raw content field.
+    // Key pins run on the COMMENT-STRIPPED source, like every scrape below: a
+    // comment mentioning a key must never satisfy a pin about rendering it.
     const code = stripComments(labels);
+    expect(code).toContain("t('hudChrome.reliquary.sourceBossDungeon'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceBoss'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceZone'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceProfession'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceDeed'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceVendor'");
+    // The multi-source arms land on the same contract.
+    expect(code).toContain("t('hudChrome.reliquary.sourceBossZone'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceDelve'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceRift'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceQuest'");
+    expect(code).toContain("t('hudChrome.reliquary.sourceStore'");
+    expect(code).toContain("'hudChrome.reliquary.sourceActivityCorpseHarvest'");
+    expect(code).toContain("'hudChrome.reliquary.sourceActivityMasterworkCraft'");
+    // Entity names come from the shared channels, never a raw content field.
     expect(code).toContain("tEntity({ kind: 'mob', id: mobId, field: 'name' })");
     expect(code).toContain('dungeonDisplayName(dungeonId)');
     expect(code).toContain('zoneDisplayName(zoneId)');
     expect(code).toContain('deedName(deedId)');
     expect(code).toContain("tEntity({ kind: 'npc', id: npcId, field: 'name' })");
+    // Delve and quest names reuse the delve board's and the quest log's own
+    // entity channels rather than minting a third naming ladder.
+    expect(code).toContain("tEntity({ kind: 'delve', id: delveId, field: 'name' })");
+    expect(code).toContain("tEntity({ kind: 'quest', id: questId, field: 'title' })");
+    // Every new arm is membership-guarded before it localizes, exactly like the
+    // original five (a stale id renders no line, never a raw id in prose).
+    expect(code).toContain('ownEntry(DELVES, delveId)');
+    expect(code).toContain('ownEntry(QUESTS, questId)');
+    expect(code).toContain('RELIQUARY_RIFT_RANK_SOURCE_IDS');
+    expect(code).toContain('RELIQUARY_ACTIVITY_SOURCE_IDS');
+    expect(code).toContain('RELIQUARY_STORE_SOURCE_ID');
+    // The bossZone pair needs BOTH halves, the bossDungeon rule.
+    expect(code).toMatch(/if \(boss === null \|\| zone === null\) return ''/);
+    // The aria fold goes through the locale list formatter (Intl.ListFormat
+    // via formatList), never a hardcoded separator or a bespoke join key.
+    expect(code).toContain('formatList(lines)');
+    expect(code).not.toMatch(/join\(', '\)/);
   });
 
   it('stays i18n-free in the pure core: the ARM choice is the core, the TEXT is here', () => {
@@ -567,6 +602,13 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
       'sourceProfession',
       'sourceDeed',
       'sourceVendor',
+      'sourceBossZone',
+      'sourceDelve',
+      'sourceRift',
+      'sourceQuest',
+      'sourceStore',
+      'sourceActivityCorpseHarvest',
+      'sourceActivityMasterworkCraft',
       'cellMissingSourceAria',
       'cellOwnedClearsAria',
       'searchPlaceholder',
