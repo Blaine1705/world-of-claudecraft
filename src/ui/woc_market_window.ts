@@ -1559,6 +1559,7 @@ export class WocMarketWindow {
       this.render();
       return;
     }
+    let quoted = false;
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const out = await hooks.client.placeBid({
         listingId,
@@ -1577,7 +1578,22 @@ export class WocMarketWindow {
         usdCents: out.bid.bondCents,
         quote: out.bond,
       };
+      quoted = true;
     });
+    // Straight on into the wallet. The bond is not a second decision the player
+    // makes, it is what placing a bid COSTS, and stopping to ask again left them
+    // holding a listing lock they had not realised they had taken.
+    //
+    // OUTSIDE the withBusy above, not inside it: withBusy refuses to re-enter
+    // while busy, so a nested call would be silently swallowed and the player
+    // would be left staring at the quote panel after all.
+    //
+    // The signature itself cannot be skipped, and is not being skipped here:
+    // this service holds no buyer key by design. What goes is the extra click
+    // between deciding to bid and being asked to pay for it. A declined wallet
+    // still lands on the quote panel, which is now the RETRY surface rather than
+    // the happy path, with its own abandon.
+    if (quoted) await this.signPendingQuote();
   }
 
   private async buyNow(listingId: number): Promise<void> {

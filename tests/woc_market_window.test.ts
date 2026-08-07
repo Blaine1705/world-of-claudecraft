@@ -1061,3 +1061,44 @@ describe('woc_market_window: the quote countdown actually moves', () => {
     expect(sig).toContain("return ''");
   });
 });
+
+describe('woc_market_window: bidding pays its own bond', () => {
+  // The bond is not a second decision: it is what placing a bid COSTS. Stopping
+  // to ask again left the player holding a listing lock they had not realised
+  // they had taken, and the listing refusing their next bid because of it.
+  it('goes straight into the wallet once the bid is quoted', () => {
+    const bid = between('private async placeBid(', 'private async buyNow(');
+    expect(bid).toContain('this.signPendingQuote()');
+  });
+
+  it('signs OUTSIDE the busy wrapper, which refuses to re-enter', () => {
+    // withBusy returns early while busy, so a nested call would be swallowed and
+    // the player would be left on the quote panel after all: the exact bug this
+    // change exists to remove.
+    const bid = between('private async placeBid(', 'private async buyNow(');
+    // The withBusy CALLBACK's close, at method-body indentation. Matching a bare
+    // '});' finds the placeBid request object's close first, which sits INSIDE
+    // the callback: an earlier version of this test did exactly that and passed
+    // with the sign call nested, proving nothing.
+    const closeBusy = bid.indexOf('\n    });');
+    expect(closeBusy, 'the withBusy block must close').toBeGreaterThan(0);
+    expect(
+      bid.indexOf('this.signPendingQuote()'),
+      'the sign call must come after it',
+    ).toBeGreaterThan(closeBusy);
+  });
+
+  it('does not sign when the bid was REFUSED', () => {
+    // A refusal has no quote to pay, and reaching for the wallet then would ask
+    // a player to fund a bid that does not exist.
+    const bid = between('private async placeBid(', 'private async buyNow(');
+    expect(bid).toContain('if (quoted) await this.signPendingQuote()');
+  });
+
+  it('leaves BUY NOW asking, because a settlement is not a lock', () => {
+    // It carries a deadline and a documented pay-later route from Activity,
+    // rather than blocking anyone else's action while it stands.
+    const buy = between('private async buyNow(', 'private async cancelListing(');
+    expect(buy).not.toContain('this.signPendingQuote()');
+  });
+});
