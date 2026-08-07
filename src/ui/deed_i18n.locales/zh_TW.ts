@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '旗幟在手',
+    desc: '在荊谷原野奪取一面旗幟。',
+  },
+  pvp_bg_first_win: {
+    name: '荊谷凱旋',
+    desc: '贏得一場荊谷原野戰場。',
+  },
+  pvp_bg_wins_25: {
+    name: '荊谷原野守護者',
+    desc: '贏得25場荊谷原野戰場。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百面旗幟',
+    desc: '在荊谷原野生涯累計奪旗100次。',
+  },
+  dgn_rift: {
+    name: '裂隙行者',
+    desc: '擊敗裂隙的樓層首領，清除該裂隙。',
+  },
+  dgn_rift_s_rank: {
+    name: '裂隙至尊',
+    desc: '清除一個S級裂隙，裂隙傳送門所能生成的最高分級。',
+  },
+  pvp_honor_sergeant: {
+    name: '中士',
+    desc: '生涯累計獲得10,000點榮譽。花費榮譽不會讓你失去此階級。',
+    title: '中士',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '騎士中尉',
+    desc: '生涯累計獲得40,000點榮譽，象徵你已歷經一季真正的戰爭。',
+    title: '騎士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '元帥',
+    desc: '生涯累計獲得150,000點榮譽。在任何王國都極為罕見，而它本該如此。',
+    title: '元帥',
+  },
   chr_drakemaw_broodlord: {
     name: '碎巢者',
     desc: '在龍喉巢主的卵群之間將牠擊殺，撐過牠的怒吼、順劈斬與烈焰。',

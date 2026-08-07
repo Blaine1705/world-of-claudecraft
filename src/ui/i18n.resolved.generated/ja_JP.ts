@@ -128,8 +128,8 @@ export const ja_JP: EnTranslations = {
         "description": "指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。"
       },
       "biskit": {
-        "label": "BIS-20キットを装備",
-        "description": "指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。"
+        "label": "Equip BIS-20 kit",
+        "description": "Wear the best-in-slot epic set for a spec across every slot. Gear only."
       },
       "gold": {
         "label": "ゴールドを追加",
@@ -245,7 +245,7 @@ export const ja_JP: EnTranslations = {
     "hud": {
       "lowMana": "マナ低下",
       "lowEnergy": "エネルギー低下",
-      "lowFocus": "集中値低下"
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "タレント",
@@ -322,20 +322,20 @@ export const ja_JP: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "断罪",
-      "fateThreadsLabel": "運命の糸",
-      "doomMeterUnlock": "苦痛リソースバーを移動",
-      "doomMeterLock": "苦痛リソースバーを固定",
-      "doomEmptyStatus": "断罪 {value}/{max}。",
-      "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
-      "fateThreadsStatus": "運命の糸 {value}/{max}。",
-      "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
-      "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
+      "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
+      "doomEmptyStatus": "{value} of {max} Condemnation.",
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "魂の欠片",
+      "soulFragmentsMeter": "Soul Fragments",
       "ruinMeter": "Ruin",
-      "ruinStatus": "破滅 {value}/{max}"
+      "ruinStatus": "{value} of {max} Ruin"
     },
     "spectate": {
       "banner": "{name}を観戦中"
@@ -804,12 +804,12 @@ export const ja_JP: EnTranslations = {
       "resting": "休息中"
     },
     "paladin": {
-      "devotion": "献身",
-      "devotionValue": "献身 {value} / {max}",
-      "devotionAscensionCharges": "献身 {value} / {max}。昇天のチャージ数: {charges}。",
-      "devotionAscensionLast": "献身 {value} / {max}。昇天の最後のチャージ。",
-      "ascensionLastAnnouncement": "昇天の最後のチャージ",
-      "ascensionSpenderAria": "アクションスロット {slot}: {ability}。昇天のチャージを1消費する。"
+      "devotion": "Devotion",
+      "devotionValue": "Devotion {value} of {max}",
+      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
+      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
+      "ascensionLastAnnouncement": "Ascension final charge",
+      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -988,7 +988,7 @@ export const ja_JP: EnTranslations = {
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
-      "dive": "Swim Down",
+      "dive": "潜水",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -1069,8 +1069,8 @@ export const ja_JP: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1対1",
+      "bracket2v2": "2対2"
     },
     "bg": {
       "title": "ソーンホロウ平原",
@@ -1402,8 +1402,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1568,7 +1568,7 @@ export const ja_JP: EnTranslations = {
       "jewelry": "アクセサリー",
       "weapons": "武器",
       "owned": "所有済み",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
       "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"
     },
@@ -1616,7 +1616,7 @@ export const ja_JP: EnTranslations = {
         "spellCritPct": "呪文クリティカル +{value}%",
         "healthRegen": "休憩中、5秒ごとに体力が約{value}回復",
         "manaRegen": "休憩中、5秒ごとにマナが約{value}回復",
-        "manaRegenCombat": "戦闘中、5秒ごとにマナが約{value}回復",
+        "manaRegenCombat": "About {value} mana every 5 sec in combat",
         "damageReduction": "レベル{level}の攻撃者に対するダメージ軽減: {value}%",
         "dpsFromAp": "攻撃の秒間ダメージを{value}上昇させます"
       },
@@ -1975,36 +1975,36 @@ export const ja_JP: EnTranslations = {
     "auraEffect": {
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
-      "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
-      "mendingCurrentPercent": "最大体力の{pct}%分の回復量を流転の癒し用に蓄える",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "{value}のダメージを吸収する",
       "healAbsorb": "受ける回復を{value}吸収する",
       "thorns": "攻撃者に{value}の{school}ダメージを与える",
-      "stasis": "無敵になるが行動できない",
+      "stasis": "Immune and unable to act",
       "slow": "移動速度を{pct}%低下させる",
       "speed": "移動速度を{pct}%上昇させる",
       "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
       "imbueRange": "武器付与: ヴァーディクトで{min}から{max}の追加ダメージ",
-      "petDamage": "ペットのダメージが{pct}%増加する",
-      "petHaste": "ペットの行動速度が{pct}%上昇する",
-      "spellDamage": "呪文ダメージが{pct}%増加する",
-      "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
-      "sated": "別のグループ加速効果を受けられない",
-      "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
-      "castShield": "ダメージで詠唱が中断または遅延しない",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
       "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "elementalConvergencePrimed": "次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します",
-      "hunterFerocity": "群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇",
-      "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
-      "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
-      "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
-      "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
-      "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
-      "internalCooldown": "タイマー終了までこの効果は再発動しない",
+      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
@@ -2019,13 +2019,13 @@ export const ja_JP: EnTranslations = {
       "revengeFree": "次の意趣返しの怒りコストが0になる",
       "victoryRush": "勝利の追撃が使用可能",
       "maxHpPct": "最大体力を{pct}%上昇させる",
-      "enrage": "与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する",
-      "suddenDeath": "次のエグゼキュートは怒気を消費せず、体力条件を無視する",
-      "aoeEcho": "残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える",
-      "sureCrit": "次のダメージアビリティ{charges}回が必ずクリティカルになる",
-      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる",
-      "arcaneCharge": "秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる",
-      "physicalReduction": "受ける物理ダメージが{pct}%減少する",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
       "tongues": "詠唱時間を{pct}%増加させる",
       "combustionCrit": "火炎呪文が必ずクリティカルになる",
@@ -2035,22 +2035,22 @@ export const ja_JP: EnTranslations = {
       "freeCast": "次の詠唱のコストがゼロになる",
       "instantCast": "次の詠唱時間のある呪文が即時発動になる",
       "cheapCast": "次の呪文のコストが{pct}%減少する",
-      "radiantResonance": "次の癒やしの光が即時発動になる。または次の暁の抱擁のマナ消費が{pct}%減少し、詠唱時間が{castTime}秒になる",
-      "solarReprisal": "次の陽光の円盤はマナを消費せず、クールダウンを無視してダメージが{pct}%増加する。恩寵の槌はクールダウンを無視し、与えたダメージの100%を回復する。または癒やしの光が即時発動になる",
-      "dawnsWrath": "制裁の鎚: HP不問 · +1回 · CD0 · ダメージ+{pct}%",
-      "venomRitual": "毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する",
-      "gloam": "薄闇の蓄え:{stacks}/{max}段階。ダスクヴェールから使った先制技ごとに1段階進む。{max}段階で先制技がステルスなしで使用可能になり、次の1回はコストなしで3段階すべてを消費し、ヴェールストライクが始まる",
-      "redline": "レッドライン:{stacks}/{max}ピップ。「ヘイメーカー」ごとにピップが1増える。「消灯」はピップごとに{pct}%強化され、レッドラインを終了させる。先に時間切れになるとノックアウトは失われる",
-      "veilstrikeWindow": "影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する",
-      "veiledEdge": "次に放つ「潜伏者の一撃」は2倍のダメージを与える",
-      "duskEconomy": "アビリティの消費エナジーが{pct}%減少する",
-      "moontide": "月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する",
-      "oldBlood": "古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、ウルフフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する",
-      "verdance": "翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する",
-      "freeExecute": "次の対象となる処刑アビリティはコストを消費しない",
-      "resourceSap": "{interval}秒ごとに現在のリソースを{value}回復する",
-      "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
-      "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
+      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
+      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "sp": "呪文の威力を{value}上昇させる",
@@ -2089,8 +2089,8 @@ export const ja_JP: EnTranslations = {
       "mortalWound": "受ける回復量を{pct}%低下させる",
       "vulnerability": "受けるダメージを{pct}%増加させる",
       "physVuln": "受ける物理ダメージを{pct}%増加させる",
-      "bleedVuln": "受ける出血ダメージが{pct}%増加する",
-      "sourceVuln": "この効果を付与した術者から受けるダメージが{pct}%増加する",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "受ける魔法ダメージを{pct}%増加させる",
       "critVuln": "クリティカルを受ける確率を{pct}%増加させる",
       "costTax": "アビリティのコストを{pct}%増加させる",
@@ -2104,46 +2104,46 @@ export const ja_JP: EnTranslations = {
       "disarm": "武装解除: 武器攻撃を使用できない",
       "lockout": "呪文系統がロックされている",
       "imbue": "武器に追加効果が付与されている",
-      "galeheartWeapon": "ウォースピリットの{steps}連撃サイクルを完了すると、その一撃が{count}回反響し、それぞれダメージの{pct}%の自然ダメージを与える",
-      "elementalTrance": "受けるダメージが{pct}%軽減される。与えた全ダメージの{mana}%がマナに変換される",
+      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
+      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "隠密状態。移動速度が{pct}%低下する",
       "formBear": "ブルーインフォーム: 体力と防御力が上昇",
       "formCat": "キャットフォーム: 近接ダメージとエネルギー",
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
-      "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",
-      "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
-      "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
-      "afflictionEye": "マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する",
-      "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
-      "afflictionAccomplice": "対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで",
-      "afflictionViolence": "報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す",
-      "afflictionVicarious": "受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する",
-      "afflictionPossession": "ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する",
-      "afflictionJudgment": "主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する",
-      "afflictionLitany": "断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで",
-      "afflictionFateThreads": "運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する",
-      "afflictionConsumeThreads": "ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する",
-      "necromancyHarvestMark": "死亡時に魂の欠片を1個生成することがある",
-      "necromancyOssuaryMark": "あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する",
-      "necromancyDeathEcho": "旧仕様のデス・エコー。現在これを消費するアビリティはない",
-      "warlockAnchor": "{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する",
-      "formMetamorph": "悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される",
-      "energyRegen": "エネルギー回復速度が{pct}%上昇する",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "righteousFury": "バーニングオース: 神聖ダメージによる脅威度が大幅に上昇",
-      "overpowerCharge": "チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する",
-      "sweepingStrikes": "単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える",
-      "fingersOfFrost": "残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える",
-      "brainFreeze": "次のフラーリィが即時発動し、クールダウンを無視する",
-      "wintersChill": "残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする",
-      "icicles": "アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる",
-      "desolation": "残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する",
-      "ruinousBrand": "残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する",
-      "duskfireClaim": "対象の死亡時にルインを{value}得る",
-      "pyreGuardian": "{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える",
-      "perfectMoment": "エーテル・ダーツが秘術チャージを消費しない",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Ruin",
+      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
       "school": {
@@ -2235,7 +2235,7 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
-      "showPets": "Show Pets",
+      "showPets": "ペットを表示",
       "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
@@ -2253,7 +2253,7 @@ export const ja_JP: EnTranslations = {
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
       "cookingCatch": "料理材料。食べる前に調理が必要です。",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "{crafts}で使用されます。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -2944,7 +2944,7 @@ export const ja_JP: EnTranslations = {
       "qtyValueAria": "作成数、{count}",
       "batchRemaining": "残り {remaining}/{total}",
       "batchRemainingAria": "残り {remaining} 個、合計 {total} 個",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}秒",
       "durationAria": "詠唱時間: {seconds} 秒",
       "progressAria": "製作の進行",
       "announceStart": "{name} を製作中",
@@ -3979,7 +3979,7 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
-      "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
       "hamstring": "敵の移動を妨げ、逃走を阻止する。",
@@ -3990,21 +3990,21 @@ export const ja_JP: EnTranslations = {
       "holy_light": "味方や自分の体力を満タンに戻す、安定した大きめのヒールです。",
       "devotion_aura": "アーマーを上げて被弾を和らげる、持続する自己強化です。",
       "judgement": "現在のシールを消費し、近距離から敵を打ち据えます。",
-      "hammer_of_wrath": "遠距離から瀕死の敵を処刑する。翼が発動中なら、どの敵にも使用できる。",
-      "avenging_wrath": "献身を10獲得し、15秒間、能力による献身の生成量を2倍にする。",
-      "bastion_sweep": "盾で敵集団を薙ぎ払い、脅威を掌握して献身を蓄える。",
-      "oath_chain": "遠くの敵を集団へ引き寄せ、逃走を遅らせる。",
-      "veilbound_march": "敵集団をすり抜けて印を刻み、自身へのダメージを弱め、脅威を固定する。",
-      "holy_shield": "献身を消費し、一定時間のブロック、吸収効果、脅威の波動を発動する。",
-      "consecration": "周囲の地を聖別し、持続的な神聖ダメージと脅威を与える。",
-      "hammer_of_justice": "短時間の確実なスタンで敵1体を止める。",
-      "lay_on_hands": "味方が倒れかけたとき、その体力を大幅に回復する。",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
+      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
-      "pack_command": "相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。",
-      "stampede": "3体の獣を12秒間呼び出して攻撃させます。群れの獰猛さが最大の時に使うと、召喚中ずっと最大のダメージ上昇を保ちます。",
-      "measured_shot": "慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。",
+      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
+      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
       "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
       "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
@@ -4023,21 +4023,21 @@ export const ja_JP: EnTranslations = {
       "power_word_shield": "味方をシールドで包み、攻撃が当たる前に吸収します。",
       "renew": "継続して回復するヒールで、唱えてから移動を続けるのに向いています。",
       "lightning_bolt": "ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。",
-      "chain_lightning": "1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。",
-      "thunder_reservoir": "雷を蓄え、大地の衝撃か断層の目覚めで最大威力を解放します。",
+      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "武器に付与し、近接の一振りごとに重い一撃を与えます。",
       "healing_wave": "主力のヒール。自分や味方を直接回復します。",
       "earth_shock": "今すぐ必要なときに手早くネイチャーダメージを与える即時のショックです。",
       "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
       "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
-      "galeheart_weapon": "二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。",
-      "warspirit_cadence": "安定した武器のリズムを疾風の残響と即時呪文の機会に変えます。",
-      "stormsurge": "ストームキャストを消費すると、祖霊の一撃が早く戻ることがあります。",
-      "lifespring_weapon": "武器に癒やしの水を宿し、継続する回復の流れを強めます。",
-      "tidecall": "味方1体を即時に回復し、癒しの水流を最大まで蓄えます。",
-      "ancestor_return": "戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。",
-      "stoneward": "力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。",
-      "primal_exaltation": "専門分野に応じた元素の力を短時間解き放ちます。",
+      "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
+      "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
+      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
+      "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "主力のファイア火力。一撃を当て、標的を燃焼させ続けます。",
       "fireball_form": "生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。",
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
@@ -4063,7 +4063,7 @@ export const ja_JP: EnTranslations = {
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
-      "moonseed": "月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
       "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
     },
@@ -6850,7 +6850,7 @@ export const ja_JP: EnTranslations = {
       "mana": "マナ",
       "energy": "エネルギー",
       "rage": "怒り",
-      "focus": "集中値"
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -7256,7 +7256,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",
       "notEnoughMana": "マナが足りません！",
-      "notEnoughDevotion": "献身が足りない！",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "{resource}が足りません！",
       "notEnoughHealth": "体力が足りません。",
       "targetMustDodge": "対象が先に回避する必要があります。",
@@ -7384,10 +7384,10 @@ export const ja_JP: EnTranslations = {
     "pet": {
       "attack": "攻撃",
       "waterJet": "ウォータージェット",
-      "felbolt": "フェルボルト",
-      "abyssalChain": "深淵の鎖",
-      "autocastOn": "自動発動オン。右クリック、タッチ長押し、またはShift+Enterでオフにします。",
-      "autocastOff": "自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "挑発",
       "healDemon": "悪魔を治癒",
       "healPet": "ペットを治癒",
@@ -7398,10 +7398,10 @@ export const ja_JP: EnTranslations = {
       "petAttackDesc": "現在の敵対対象を攻撃するようペットに命令します。",
       "waterJetTitle": "ウォータージェット",
       "waterJetDesc": "ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。",
-      "felboltTitle": "フェルボルト",
-      "felboltDesc": "エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
-      "abyssalChainTitle": "深淵の鎖",
-      "abyssalChainDesc": "グルームシェイドに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "ペット挑発",
       "petTauntDesc": "ペットに交戦を命じ、射程内でグロウルを使わせます。クールダウン10秒。",
       "healDemonDesc": "マナを消費し、5秒かけて悪魔へ治癒をチャネルします。",
@@ -7569,7 +7569,7 @@ export const ja_JP: EnTranslations = {
       "requiresLevel": "レベル{level}が必要",
       "requiresForm": "{form}フォームが必要",
       "requiresStealth": "ステルスが必要",
-      "requiresStealthSkulduggery": "ステルスが必要（薄闇の蓄えが3段階のとき、またはヴェールストライク中は不要）",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "コンボポイントを消費",
       "requiresTargetHealthBelow": "対象の体力が{percent}%未満である必要があります",
       "requiresDodge": "対象が回避した後にのみ使用可能",
@@ -7586,8 +7586,8 @@ export const ja_JP: EnTranslations = {
       "mana": "マナ",
       "rage": "怒り",
       "energy": "エネルギー",
-      "focus": "集中値",
-      "devotion": "献身"
+      "focus": "Focus",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "熊",
@@ -7788,7 +7788,7 @@ export const ja_JP: EnTranslations = {
       "clickDestroy": "クリックして破棄",
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
-      "useHealingPotionPct": "使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
@@ -7927,7 +7927,7 @@ export const ja_JP: EnTranslations = {
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
       "collectNote": "商人が預かっている売上と返却品です。",
       "saleProceeds": "売上",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "{buyer}に売却",
       "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
       "collectAll": "すべて受け取る"
     },
@@ -8027,56 +8027,56 @@ export const ja_JP: EnTranslations = {
         "description": "対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。"
       },
       "pack_command": {
-        "name": "群れの指令",
-        "description": "生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。"
+        "name": "Pack Command",
+        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
       },
       "stampede": {
-        "name": "獣群突撃",
-        "description": "獣を3体、12秒間召喚する。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与える。表示ダメージには遠隔攻撃力の8%が含まれるが、ペットダメージボーナスは含まれない。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加する。獣群突撃がクールダウン中、群れの指令の命中は20%の確率でクールダウンをリセットし、5回連続で失敗すると必ず発動する。獣が活動中はリセットされない。（群れの王）"
+        "name": "Stampede",
+        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
       },
       "unleash_beast": {
-        "name": "獣の解放",
-        "description": "最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。"
+        "name": "Unleash Beast",
+        "description": "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target."
       },
       "measured_shot": {
-        "name": "精密射撃",
-        "description": "慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。"
+        "name": "Measured Shot",
+        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
       },
       "cold_focus": {
-        "name": "冷徹集中",
-        "description": "12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）"
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
       },
       "bloodhook": {
-        "name": "血鉤",
-        "description": "8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）"
+        "name": "Bloodhook",
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
-        "name": "榴散弾装薬",
-        "description": "対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。"
+        "name": "Shrapnel Charge",
+        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
       },
       "bloodtrail_assault": {
-        "name": "血跡強襲",
-        "description": "12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。"
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
       },
       "trailbreak": {
-        "name": "離脱跳躍",
-        "description": "専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。"
+        "name": "Trailbreak",
+        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
-        "name": "野生の心",
-        "description": "最大体力の30%を即座に回復します。"
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
       },
       "shellskin": {
-        "name": "甲殻の皮膚",
-        "description": "8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。"
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
       },
       "frostjaw_trap": {
-        "name": "霜顎の罠",
-        "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
+        "name": "Frostjaw Trap",
+        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
       },
       "pack_rally": {
-        "name": "群れの結集",
-        "description": "駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。"
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec."
       },
       "hurricane": {
         "name": "ハリケーン",
@@ -8292,20 +8292,20 @@ export const ja_JP: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪悪な斬撃",
-        "description": "武器ダメージに{damage}を加えた即時攻撃。コンボポイントを1獲得する。",
-        "specNote_assassination": "毒の儀式を1段階進める（最大6）。",
-        "specNote_combat": "レッドライン中、このボタンはヘイメーカーに変化する：武器ダメージの130%に10を加えたダメージを与え、コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。"
+        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "永の眠り",
-        "description": "{damage}を与えるフィニッシュムーブ。",
-        "specNote_assassination": "毒の儀式が6段階のとき、このボタンは毒裂きに変化する：出血効果が与えるはずだった残りダメージを即座にすべて与え、新しい毒の傷を刻み、エナジーを20回復する一撃。",
-        "specNote_combat": "コンボポイント4以上で命中させると8秒間のレッドラインが始まる：邪悪な斬撃はヘイメーカーに、このボタンは消灯に変化する（45にコンボポイントごとに35を加えたダメージ、蓄えたレッドラインのピップごとに25%強化、エナジーを25回復）。レッドラインが終わる前に使うこと。"
+        "description": "{damage}を与えるフィニッシュムーブです。",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "卑劣な突き",
-        "description": "対象の背中にダガーを突き立て、武器ダメージの150%に{damage}を加えたダメージを与える。対象の背後にいる必要がある。ダガーが必要。コンボポイントを1獲得する。",
-        "specNote_assassination": "攻撃ごとに毒の儀式を1段階進め（最大6）、エナジーを15回復する。毒の儀式が6段階のとき、永の眠りは毒裂きに変化する（出血の残りダメージを一度にすべて与える）。"
+        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "目潰し",
@@ -8317,7 +8317,7 @@ export const ja_JP: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "残忍な速攻",
-        "description": "近接攻撃速度を30%上昇させるフィニッシュムーブ。効果時間は12秒にコンボポイントごとに4秒を加えた長さ（コンボポイント5：32秒）。"
+        "description": "近接攻撃速度を30%増加させるフィニッシュムーブです。コンボポイントごとに持続時間が延びます。"
       },
       "sprint": {
         "name": "駿足",
@@ -8325,17 +8325,17 @@ export const ja_JP: EnTranslations = {
       },
       "kidney_shot": {
         "name": "急所打ち",
-        "description": "対象をスタンさせるフィニッシュムーブ。効果時間は1秒にコンボポイントごとに1秒を加えた長さ（コンボポイント5：6秒）。"
+        "description": "対象をスタンさせるフィニッシュムーブです。コンボポイントごとに1秒長く続きます。"
       },
       "ambush": {
         "name": "潜伏者の一撃",
-        "description": "影から襲いかかり、武器ダメージの250%に{damage}を加えたダメージを与える。ステルス状態で対象の背後にいる必要がある。ダガーが必要。コンボポイントを1獲得する。",
-        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。"
+        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "ダスクヴェール",
-        "description": "影に身を隠す：敵にほとんど気づかれなくなるが、移動速度が50%低下する。攻撃するかダメージを受けるとダスクヴェールは解除される。再度使用すると姿を現す。",
-        "specNote_subtlety": "ダスクヴェールから使う先制技ごとに薄闇の蓄えが1段階進む（最大3）。"
+        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "滾る血潮",
@@ -8343,13 +8343,13 @@ export const ja_JP: EnTranslations = {
       },
       "garrote": {
         "name": "喉絞めの弦",
-        "description": "敵の喉に弦を巻き付け、即座に{damage}のダメージを与え、18秒かけて{overTime}の出血ダメージを与える。ステルス状態でなければならない。コンボポイントを1獲得する。",
-        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
+        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "みぞおち強打",
-        "description": "対象を打って{damage}のダメージを与え、4秒間スタンさせる。ステルス状態でなければならない。コンボポイントを2獲得する。",
-        "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
+        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "サップ",
@@ -8361,11 +8361,11 @@ export const ja_JP: EnTranslations = {
       },
       "expose_armor": {
         "name": "装甲破り",
-        "description": "対象の守りを30秒間暴くフィニッシュムーブ：消費したコンボポイントごとにアーマーを2%低下させる（コンボポイント5：{damage}%）。"
+        "description": "対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。"
       },
       "rupture": {
         "name": "止まらぬ出血",
-        "description": "対象に傷を負わせるフィニッシュムーブ：2秒ごとに出血し、効果時間は6秒にコンボポイントごとに2秒を加えた長さ（コンボポイント5：16秒、合計{damage}ダメージ）。"
+        "description": "対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。"
       },
       "vanish": {
         "name": "煙隠れ",
@@ -8396,116 +8396,116 @@ export const ja_JP: EnTranslations = {
         "description": "味方対象の体力を {damage} 回復します。"
       },
       "divine_ascension": {
-        "name": "神聖なる昇天",
-        "description": "献身を20消費し、最大45秒間持続する昇天のチャージを5獲得する。対象となる能力はチャージを1消費し、追加効果を得る。"
+        "name": "Divine Ascension",
+        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
       },
       "aura_mastery": {
-        "name": "聖なる調和",
-        "description": "8秒間、グループ内で有効なすべての献身と報復のオーラを強化する。砦の献身はダメージを15%減少させ、報復は15の神聖ダメージを与える。複数回使用しても重複せず、持続時間が更新される。"
+        "name": "Sacred Concord",
+        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
       },
       "devotion_ward": {
-        "name": "砦の献身",
-        "description": "自身とパーティメンバーが受けるダメージを、死亡または置き換えられるまで5%減少させる。このオーラと報復のオーラだけが互いに置き換わり、光輝、暁、恩寵の献身とは共存する。"
+        "name": "Bastion Devotion",
+        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
       },
       "hammer_of_grace": {
-        "name": "恩寵の槌",
-        "description": "20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。"
+        "name": "Hammer of Grace",
+        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
       },
       "hushbrand": {
-        "name": "静寂の烙印",
-        "description": "呪文の詠唱を中断し、同系統の呪文を4秒間使用不能にする。"
+        "name": "Hushbrand",
+        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
       },
       "guardian_covenant": {
-        "name": "守護の契約",
-        "description": "味方1人と自身を守り、8秒間、受けるダメージを20%減少させる。味方を選択していない場合は自身に使用する。"
+        "name": "Guardian Covenant",
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
-        "name": "陽光の歩み",
-        "description": "2秒間、移動速度を150%増加させる。"
+        "name": "Solar Step",
+        "description": "Increase your movement speed by 150% for 2 sec."
       },
       "solar_invocation": {
-        "name": "太陽の祈願",
-        "description": "味方1人の体力を即座に{damage}回復するか、敵1体に中程度の神聖ダメージを与える。どちらも献身を1生成する。昇天中に回復として使用すると、対象から10メートル以内の味方プレイヤーも半分の量だけ回復する。"
+        "name": "Solar Invocation",
+        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
       },
       "radiant_devotion": {
-        "name": "光輝の献身",
-        "description": "30分間、自身とパーティメンバーの呪文威力を20増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。"
+        "name": "Radiant Devotion",
+        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "dawn_devotion": {
-        "name": "暁の献身",
-        "description": "30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。"
+        "name": "Dawn Devotion",
+        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist."
       },
       "grace_devotion": {
-        "name": "恩寵の献身",
-        "description": "30分間、自身とパーティメンバーは5秒ごとにマナを15回復し、マナ消費が3%減少する。自身の光輝または暁の献身を置き換えるが、他のパラディンの献身とは共存する。"
+        "name": "Grace Devotion",
+        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "recall_the_fallen": {
-        "name": "倒れし者の呼び戻し",
-        "description": "死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。"
+        "name": "Recall the Fallen",
+        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
       },
       "beacon_of_light": {
-        "name": "光の標",
-        "description": "グループメンバー1人を光の標に指定する。60メートル以内にいる別のグループメンバーへの有効な直接回復の50%が、光の標も回復する。範囲回復と継続回復は転送されない。どちらかが死亡するまで持続する。"
+        "name": "Beacon of Light",
+        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
       },
       "final_edict": {
-        "name": "最後の勅令",
-        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。"
+        "name": "Final Edict",
+        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
       },
       "dawnfall": {
-        "name": "暁落とし",
-        "description": "周囲の敵に{damage}の神聖ダメージを与え、献身を1生成する。1体以上に命中すると、最後の勅令の残りクールダウンが2秒短縮される。昇天中はダメージと範囲が増加する。"
+        "name": "Dawnfall",
+        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
       },
       "sun_gods_verdict": {
-        "name": "太陽神の裁決",
-        "description": "敵1体に30秒間、太陽神の裁決を下す。最後の勅令と暁落としが命中するたび、刻印が1つ付与される。3つ目の刻印を付与した能力が刑を決める。最後の勅令は罪人に壊滅的なダメージを与え、暁落としは裁決を爆発させて周囲の敵にダメージを与え、1.5秒間スタンさせる。"
+        "name": "Verdict of the Sun God",
+        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
       },
       "valkyrs_calling": {
-        "name": "ヴァルキュリアの召命",
-        "description": "空へ昇り、敵へ飛行する間はダメージを受けなくなる。2秒後、対象地点へ降下して{damage}の神聖ダメージを与え、献身を1生成する。昇天中は着地ダメージが50%増加し、チャージを1消費する。"
+        "name": "Valkyr's Calling",
+        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
       },
       "faithforged_guard": {
-        "name": "聖光の負債",
-        "description": "8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。"
+        "name": "Debt of Light",
+        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
       },
       "mercy_lance": {
-        "name": "慈悲の槍",
-        "description": "敵1体に{damage}の神聖ダメージを与え、命中時に献身を1生成する。昇天中はチャージを1消費し、必ずクリティカルヒットになる。"
+        "name": "Mercy Lance",
+        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
       },
       "sacred_form": {
-        "name": "聖なる姿",
-        "description": "死亡するまで聖なる状態となり、回復量が10%、呪文のクリティカル率が5%増加し、生成する脅威が50%減少する。サンメンダー専用。"
+        "name": "Sacred Form",
+        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
       },
       "dawns_embrace": {
-        "name": "暁の抱擁",
-        "description": "強力な回復を与え、献身を1生成する。光輝の共鳴により、マナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は即時発動になり、回復量が35%増加する。"
+        "name": "Dawn's Embrace",
+        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
       },
       "radiant_chorus": {
-        "name": "光輝の合唱",
-        "description": "周囲の味方を{damage}回復し、献身を1生成する。2人以上の味方を有効に回復すると光輝の共鳴を得る。次の癒やしの光が即時発動になるか、次の暁の抱擁のマナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は光輝の合唱の回復量と範囲が増加する。"
+        "name": "Radiant Chorus",
+        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
       },
       "life_covenant": {
-        "name": "生命の契約",
-        "description": "味方1人が受けるダメージを6秒間40%減少させる。昇天中はチャージを消費せず、さらに120ポイントの盾を付与する。"
+        "name": "Life Covenant",
+        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
       },
       "aegis_first_dawn": {
-        "name": "始暁の大盾",
-        "description": "5秒間詠唱し、半径10メートルの聖なるドームを作る。内部の味方は毎秒回復し、受けるダメージが50%減少する。詠唱を完了すると最後の回復を放ち、4秒間、移動速度を30%増加させる。"
+        "name": "Aegis of the First Dawn",
+        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
       },
       "vowkeeper_strike": {
-        "name": "誓守の一撃",
-        "description": "高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。"
+        "name": "Vowkeeper Strike",
+        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
       },
       "bastion_rite": {
-        "name": "砦の儀式",
-        "description": "6秒間、受ける物理ダメージを20%減少させ、ブロック率を20%増加させる。昇天中は持続時間が10秒になる。"
+        "name": "Bastion Rite",
+        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
       },
       "sunward_disc": {
-        "name": "陽光の円盤",
-        "description": "盾が必要。輝く円盤を投げ、命中後に周囲の敵へ跳ね返らせる。ダメージを与えるたびに献身を1生成する。太陽の報復により、陽光の円盤はマナを消費せず、クールダウンを無視し、ダメージが20%増加する。昇天中は5回跳ね返る。"
+        "name": "Sunward Disc",
+        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
       },
       "sacred_challenge": {
-        "name": "聖なる挑発",
-        "description": "敵1体に自身を攻撃させる。昇天中はチャージを消費せず、さらに4秒間、受けるすべてのダメージを15%減少させる。"
+        "name": "Sacred Goad",
+        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
       },
       "devotion_aura": {
         "name": "不動のオーラ",
@@ -8517,7 +8517,7 @@ export const ja_JP: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "聖なる結界が{duration}秒間、最大体力の{damage}%を吸収します。不朽の守護は結界を強化します。"
+        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
@@ -8544,20 +8544,20 @@ export const ja_JP: EnTranslations = {
         "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
       },
       "bastion_sweep": {
-        "name": "砦の薙ぎ払い",
-        "description": "装備中の盾で前方180度の敵を薙ぎ払い、{damage}の神聖ダメージと高い脅威を与え、献身を1生成する。昇天中はダメージが30%増加し、半径が8メートルになる。"
+        "name": "Bastion Sweep",
+        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
       },
       "oath_chain": {
-        "name": "誓いの鎖",
-        "description": "遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。"
+        "name": "Oath Chain",
+        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
       },
       "veilbound_march": {
-        "name": "帳縛りの行進",
-        "description": "4秒間、霊体となって移動速度が40%、防御力が30%増加し、移動不能、減速、強制移動を無効化する。すり抜けた敵には6秒間、帳の印が付与され、毎秒神聖ダメージを受け、自身へのダメージが20%減少し、自身に対する脅威が増加する。最初の印は献身を1生成する。行進終了時、周囲の印を付けた敵に最後の爆発を与える。昇天中は爆発のダメージが50%増加し、敵をわずかに引き寄せる。"
+        "name": "Veilbound March",
+        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
       },
       "veilbound_mark": {
-        "name": "帳の刻印",
-        "description": "毎秒神聖ダメージを受け、印を付けたパラディンへのダメージが20%減少し、そのパラディンに対する脅威が増加する。"
+        "name": "Veil Mark",
+        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
       },
       "righteous_fury": {
         "name": "バーニングオース",
@@ -8565,7 +8565,7 @@ export const ja_JP: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "死亡するか置き換えられるまで、自分とパーティを聖なるエネルギーで包みます。影響を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響を受けた味方は自動攻撃で{buff}の追加神聖ダメージを与えます。"
+        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
       },
       "tame_beast": {
         "name": "野生の絆",
@@ -8600,12 +8600,12 @@ export const ja_JP: EnTranslations = {
         "description": "対象が回避した後に反撃し、武器ダメージに{damage}を加えたダメージを与えます。回避されません。"
       },
       "hunting_momentum": {
-        "name": "狩猟の勢い",
-        "description": "パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）"
+        "name": "Hunting Momentum",
+        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
       },
       "fieldcraft_reentry": {
-        "name": "再突入準備",
-        "description": "パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）"
+        "name": "Armed Re-entry",
+        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
       },
       "wing_clip": {
         "name": "足枷斬り",
@@ -8625,7 +8625,7 @@ export const ja_JP: EnTranslations = {
       },
       "rapid_fire": {
         "name": "熱狂の速射",
-        "description": "移動しながら2.4秒かけて6発の高速射撃を行い、1発ごとに{damage}の物理ダメージを与えます。"
+        "description": "15秒間、攻撃速度が40%増加します。"
       },
       "smite": {
         "name": "スマイト",
@@ -8672,8 +8672,8 @@ export const ja_JP: EnTranslations = {
         "description": "稲妻の矢を放ち、{damage} の自然ダメージを与えます。"
       },
       "thunder_reservoir": {
-        "name": "雷鳴の貯蔵",
-        "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
+        "name": "Thunder Reservoir",
+        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
@@ -8733,27 +8733,27 @@ export const ja_JP: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
+        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
-        "name": "呪眼の凝視",
-        "description": "呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。"
+        "name": "Maledict Gaze",
+        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
       },
       "needle_of_fate": {
-        "name": "運命の針",
-        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。"
+        "name": "Needle of Fate",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
       },
       "sentence": {
-        "name": "宣告",
-        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
+        "name": "Sentence",
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
       },
       "life_tap": {
         "name": "過酷な取引",
         "description": "体力{damage}をマナ{damage}に変換します。"
       },
       "cursed_accomplice": {
-        "name": "呪われた共犯者",
-        "description": "味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。"
+        "name": "Cursed Accomplice",
+        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
       },
       "curse_of_agony": {
         "name": "苦悶の呪い",
@@ -8764,44 +8764,44 @@ export const ja_JP: EnTranslations = {
         "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
       },
       "litany_of_guilt": {
-        "name": "罪責の連祷",
-        "description": "主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。"
+        "name": "Litany of Guilt",
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
-        "name": "燼皮",
-        "description": "皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。"
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
       },
       "umbral_anchor": {
-        "name": "影の錨",
-        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
+        "name": "Umbral Anchor",
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
-        "name": "魂の泉",
-        "description": "魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。"
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
       },
       "hex_of_violence": {
-        "name": "暴虐の呪い",
-        "description": "敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。"
+        "name": "Hex of Violence",
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
       },
       "cruel_pact": {
-        "name": "残酷な契約",
-        "description": "最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。"
+        "name": "Cruel Pact",
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
-        "name": "苦痛の肩代わり",
-        "description": "8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。"
+        "name": "Vicarious Suffering",
+        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "邪眼憑依",
-        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。"
+        "name": "Possess the Evil Eye",
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "審判の刻",
-        "description": "主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。"
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
       },
       "coven": {
-        "name": "魔女盟約",
-        "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
+        "name": "Coven",
+        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "責め苦",
@@ -8816,13 +8816,13 @@ export const ja_JP: EnTranslations = {
         "description": "対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。"
       },
       "ruinous_brand": {
-        "name": "破滅の烙印",
-        "description": "敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。"
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "野生の稲妻",
-        "description": "自然エネルギーの矢を放ち、{damage}の自然ダメージを与える。",
-        "specNote_balance": "月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、月の種はムーンサージに、天墜は陽醒に変化する。"
+        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "野生の癒し",
@@ -8834,17 +8834,17 @@ export const ja_JP: EnTranslations = {
       },
       "moonfire": {
         "name": "月の嵐",
-        "description": "月の炎で敵を焼き、{damage}の秘術ダメージと継続ダメージを与える。",
-        "specNote_balance": "燃やし続けること：月の種が効果を6秒延長する。"
+        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
-        "name": "月の種",
-        "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。"
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
         "name": "野生の芽吹き",
-        "description": "12秒かけて対象の体力を{damage}回復する。",
-        "specNote_restoration": "新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。"
+        "description": "12秒間で対象の体力を {damage} 回復します。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "茨の守り",
@@ -8860,8 +8860,8 @@ export const ja_JP: EnTranslations = {
       },
       "maul": {
         "name": "骨砕き",
-        "description": "近接ダメージを{damage}増加させ、大量の脅威を発生させる猛攻。次のスイングで発動する。ブルーインフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。"
+        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "威嚇",
@@ -8869,27 +8869,27 @@ export const ja_JP: EnTranslations = {
       },
       "cat_form": {
         "name": "ウルフフォーム",
-        "description": "狼に変身します。敏捷性はレベルに応じて上昇し、攻撃力は8にレベルごとに2を加えた分だけ増加します。攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。"
+        "description": "狼に変身します。攻撃力はレベルに応じて上昇し、攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。"
       },
       "claw": {
-        "name": "裂き爪",
-        "description": "敵を引っかき、武器ダメージに{damage}を加えたダメージを与える。コンボポイントを1獲得する。ウルフフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
+        "name": "クロー",
+        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "血噛み",
-        "description": "{damage}を与えるフィニッシュムーブ。ウルフフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。"
+        "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "薙ぎ払う爪",
-        "description": "周囲の敵を爪で薙ぎ払い、{damage}のダメージを与える。追加の脅威を発生させる。ブルーインフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
+        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "二度目の開花",
-        "description": "味方対象の体力を{damage}回復し、さらに21秒かけて追加回復する。",
-        "specNote_restoration": "新しい花を植えると翠成が1段階進む（最大5）。"
+        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "樫の肌",
@@ -8905,8 +8905,8 @@ export const ja_JP: EnTranslations = {
       },
       "starfire": {
         "name": "天墜",
-        "description": "星の炎を呼び下ろし、{damage}の秘術ダメージを与える。",
-        "specNote_balance": "月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、このボタンは陽醒に変化する：160から190の自然ダメージに加え、9秒かけて75の炎上ダメージを与え、マナを35回復し、3段階すべてを消費する即時攻撃。"
+        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "フリートフォーム",
@@ -8922,7 +8922,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "40秒間、対象のアーマーを{damage}%低下させる。"
+        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
       },
       "hibernate": {
         "name": "微睡み",
@@ -8945,9 +8945,9 @@ export const ja_JP: EnTranslations = {
         "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
-        "name": "血の亀裂",
-        "description": "対象を24秒間、2秒ごとに出血させるフィニッシュムーブ：36に消費したコンボポイントごとに24を加えたダメージ（コンボポイント5：合計{damage}）。ウルフフォーム専用。",
-        "specNote_feral": "命中した一撃が古き血を1蓄える（最大3）。"
+        "name": "リップ",
+        "description": "12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "重傷の一撃",
@@ -8974,100 +8974,100 @@ export const ja_JP: EnTranslations = {
         "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
       },
       "chain_heal": {
-        "name": "流転の癒し",
-        "description": "味方1体の体力を{damage}回復し、12ヤード以内の味方最大2体に連鎖します。連鎖するたびに回復量は直前の対象の50%になります。届いた味方ごとに残りの癒しの水流を消費し、消費量の125%を即座に回復します。最初の回復量はスペルパワーで増加します。（スピリットメンド固有）"
+        "name": "チェインヒール",
+        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
       },
       "galeheart_weapon": {
-        "name": "疾風の武器",
-        "description": "武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。"
+        "name": "Galeheart Weapon",
+        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
       },
       "warspirit_cadence": {
-        "name": "戦霊の律動",
-        "description": "パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）"
+        "name": "Warspirit Cadence",
+        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
       },
       "stormsurge": {
-        "name": "ストームサージ",
-        "description": "パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）"
+        "name": "Stormsurge",
+        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
       },
       "lifespring_weapon": {
-        "name": "命泉の武器",
-        "description": "武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。"
+        "name": "Lifespring Weapon",
+        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
       },
       "unleash_weapon": {
-        "name": "武器解放",
-        "description": "有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。"
+        "name": "Unleash Weapon",
+        "description": "Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored."
       },
       "elemental_trance": {
-        "name": "エレメンタルトランス",
-        "description": "15秒間エレメンタルトランス状態に入り、受けるダメージを30%軽減し、与えた全ダメージの20%をマナに変換する。（ウォースピリット固有能力）"
+        "name": "Elemental Trance",
+        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
       },
       "primal_exaltation": {
-        "name": "原初の高揚",
-        "description": "専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）"
+        "name": "Primal Exaltation",
+        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
       },
       "stoneward": {
-        "name": "石の守り",
-        "description": "味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）"
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
       },
       "tidecall": {
-        "name": "潮呼び",
-        "description": "味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。"
+        "name": "Tidecall",
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health."
       },
       "soul_harvest": {
-        "name": "霊魂刈り",
-        "description": "敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。"
+        "name": "Essence Reap",
+        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
       },
       "soul_lance": {
-        "name": "魂の槍",
-        "description": "幽体の槍を投げ、{damage}のシャドウダメージを与える。納骨の印がついた対象には、そのダメージの50%が印へ蓄積される。"
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
       },
       "raise_graveguard": {
-        "name": "墓守の召喚",
-        "description": "永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。"
+        "name": "Raise Graveguard",
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
       },
       "raise_skeletal_warrior": {
-        "name": "骸骨戦士の召喚",
-        "description": "魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。"
+        "name": "Raise Skeletal Warrior",
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
       },
       "raise_bone_mage": {
-        "name": "骨魔導士の召喚",
-        "description": "魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。"
+        "name": "Raise Bone Mage",
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
       },
       "bone_armor": {
-        "name": "骨の鎧",
-        "description": "骨で身を包み、最大体力の20%に相当するダメージを吸収する。"
+        "name": "Bone Armor",
+        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
       },
       "corpse_explosion": {
-        "name": "骸の爆裂",
-        "description": "まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。"
+        "name": "Corpse Explosion",
+        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
       },
       "funeral_harvest": {
-        "name": "葬送の収穫",
-        "description": "自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。"
+        "name": "Funeral Harvest",
+        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
       },
       "ossuary_mark": {
-        "name": "納骨の印",
-        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
-        "name": "不浄の号令",
-        "description": "魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
+        "name": "Unholy Command",
+        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
       },
       "reaping_command": {
-        "name": "刈り取りの号令",
-        "description": "魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。"
+        "name": "Reaping Command",
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
       },
       "sacrifice_undead": {
-        "name": "亡者の生贄",
-        "description": "ドミニオンの従者を1体破壊し、最大体力の25%を回復する。"
+        "name": "Sacrifice Undead",
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
       },
       "raise_gravewing": {
-        "name": "墓翼の召喚",
-        "description": "魂の欠片を2個消費し、永続する墓翼を2枠のドミニオンに加える。同時に従えるのは1体まで。5秒ごとに周囲へ65%の薙ぎ払いダメージを与え、リーピング・コマンドでは命中した全敵の受けるダメージを5秒間8%増加させる。"
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
       },
       "army_of_the_dead": {
-        "name": "亡者の軍勢",
-        "description": "墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。"
+        "name": "Army of the Dead",
+        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
       },
       "metamorphosis": {
         "name": "悪魔変身",
@@ -9079,7 +9079,7 @@ export const ja_JP: EnTranslations = {
       },
       "holy_shield": {
         "name": "ホーリーシールド",
-        "description": "ブロックが30%上昇し、{duration}秒間、最大体力の{damage}%を吸収する盾を得て、脅威の波動を放ちます。昇天は防御を強化し、延長します。"
+        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",
@@ -9107,15 +9107,15 @@ export const ja_JP: EnTranslations = {
       },
       "cold_blood": {
         "name": "コールドブラッド",
-        "description": "殺意を集中し、次の攻撃を必ずクリティカルにする。（ナイフワーク特性のシグネチャ）"
+        "description": "殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）"
       },
       "blade_flurry": {
         "name": "ブレードフラリー",
-        "description": "刃の連撃を解き放ち、12秒間攻撃速度を20%上昇させる。（コンバット特性のシグネチャ）"
+        "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
       },
       "hemorrhage": {
         "name": "ヘモリッジ",
-        "description": "敵を攻撃して武器ダメージに{damage}を加えたダメージを与え、12秒間の出血ダメージを与え、対象が受ける出血ダメージを40%増加させる。コンボポイントを1獲得する。2回使用するごとに薄闇の蓄えが1段階進む（最大3）。（スカルダガリー特性のシグネチャ）"
+        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
       },
       "power_infusion": {
         "name": "パワーインフュージョン",
@@ -9151,27 +9151,27 @@ export const ja_JP: EnTranslations = {
       },
       "swiftmend": {
         "name": "スウィフトメンド",
-        "description": "味方対象にかかった継続回復効果を1つ消費し、体力を{damage}回復する。野生の芽吹きと二度目の開花を植えると翠成が溜まり、翠成が5のとき、このボタンは満開に変化する。満開は、自身の継続回復効果を持つすべての味方を、その効果の残り回復量の60%分即座に回復する。（グローヴハート特性のシグネチャ）"
+        "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）"
       },
       "moonlash": {
-        "name": "ムーンサージ",
-        "description": "月潮を3消費し、{damage}の秘術ダメージの強撃を放つ、ダメージ重視の選択肢。陽醒も同じ月潮3を消費するため、どちらか一方を選ぶこと。"
+        "name": "Moonsurge",
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
-        "name": "陽醒",
-        "description": "月潮を3消費し、{damage}の自然ダメージと、9秒かけて{overTime}の炎上ダメージを与え、マナを35回復する、マナ重視の選択肢。ムーンサージも同じ月潮3を消費するため、どちらか一方を選ぶこと。"
+        "name": "Sunwake",
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
-        "name": "血の収穫",
-        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。"
+        "name": "Redharvest",
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
-        "name": "骨髄砕き",
-        "description": "古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。"
+        "name": "Marrowbreak",
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
-        "name": "満開",
-        "description": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
+        "name": "Overbloom",
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
@@ -9195,7 +9195,7 @@ export const ja_JP: EnTranslations = {
       },
       "summon_infernal": {
         "name": "パイアコロッサスの召喚",
-        "description": "対象地点にパイアコロッサスを呼び下ろし、着地時に58-72の火炎ダメージを与えます。現在の悪魔と入れ替わらず30秒間戦い、2秒ごとに周囲の敵を焼き、1秒ごとに破滅を1生成します。"
+        "description": "パイアコロッサスを意のままに束縛します。圧倒的な近接攻撃と、あらゆる悪魔の中で最も深い生命力と防御力を備えた巨大な破壊兵器です。長い再使用時間がその純然たる力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
       },
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
@@ -9346,20 +9346,20 @@ export const ja_JP: EnTranslations = {
         "description": "30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）"
       },
       "chain_lightning": {
-        "name": "天枝の雷",
-        "description": "対象を攻撃し、10ヤード以内の敵最大2体へ跳び移り、それぞれに{damage}の自然ダメージを与える。命中すると、対象ごとではなく詠唱全体で雷霆を1つ得る。ダメージはスペルパワーで増加する。原始の熟達で即時発動になり、原始の高揚で詠唱時間が半分になる。（雷呼び）"
+        "name": "枝分かれの稲妻",
+        "description": "対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）"
       },
       "abyssal_rift": {
-        "name": "深淵の裂け目",
-        "description": "選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。"
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
       },
       "chaos_bolt": {
         "name": "破滅の矢",
         "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
       },
       "dark_pact": {
-        "name": "血の盟約",
-        "description": "現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。"
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "影まとい",
@@ -9387,7 +9387,7 @@ export const ja_JP: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後の祈り",
-        "description": "最大体力の30%を即座に回復します。"
+        "description": "自分の体力を即座に{damage}回復する。（プリーストのタレント）"
       },
       "deterrence": {
         "name": "針毛の守り",
@@ -9402,8 +9402,8 @@ export const ja_JP: EnTranslations = {
         "description": "マナを急速に回復する。（メイジタレント）"
       },
       "flurry_of_knives": {
-        "name": "短剣乱舞",
-        "description": "投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）"
+        "name": "Flurry of Knives",
+        "description": "Lash every enemy within 6 yd with thrown knives for {damage} Physical damage and gain 2 combo points. (Rogue talent)"
       },
       "frenzied_regeneration": {
         "name": "野生の癒し",
@@ -9415,7 +9415,7 @@ export const ja_JP: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "亡霊の一撃",
-        "description": "敵を攻撃して武器ダメージに{damage}を加えたダメージを与え、7秒間、回避率を15%上昇させる。コンボポイントを1獲得する。（ローグのタレント）"
+        "description": "敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）"
       },
       "hammer_of_wrath": {
         "name": "鐘鳴りの槌",
@@ -9482,8 +9482,8 @@ export const ja_JP: EnTranslations = {
         "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
       },
       "ancestor_return": {
-        "name": "祖霊の帰還",
-        "description": "グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）"
+        "name": "Ancestors' Return",
+        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "巻き戻し",
@@ -9550,8 +9550,8 @@ export const ja_JP: EnTranslations = {
         "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
       },
       "sacrilegious_march": {
-        "name": "冒涜の行軍",
-        "description": "移動速度が35%上昇しますが、毎秒、最大体力の2%を失います。もう一度使用すると解除されます。体力が20%になると自動的に切れます。"
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "魔法奪取",
@@ -9570,33 +9570,33 @@ export const ja_JP: EnTranslations = {
         "description": "詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。"
       },
       "thieves_chorus": {
-        "name": "盗賊の合唱",
-        "description": "口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）"
+        "name": "Thieves' Chorus",
+        "description": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)"
       },
       "tranquility": {
         "name": "木立の歌",
         "description": "4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）"
       },
       "venom_dart": {
-        "name": "毒針",
-        "description": "毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。",
-        "specNote_assassination": "毒の儀式を1段階進め、毒の傷を6秒延長する（傷の残り時間は20秒を超えない）。"
+        "name": "Venom Dart",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
-        "name": "ヘイメーカー",
-        "description": "武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）"
+        "name": "Haymaker",
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
-        "name": "消灯",
-        "description": "ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、蓄えたレッドラインのピップごとに25%強化され、エナジーを25回復する。レッドラインが終わる前に使わなければノックアウトは失われる。（コンバット）"
+        "name": "Lights Out",
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
-        "name": "ヴェールストライク",
-        "description": "6秒間：ダスクヴェールの先制技がステルスなしでどの角度からでも使用でき、与ダメージが10%増加し、効果中最初の潜伏者の一撃は2倍のダメージを与える。（スカルダガリー）"
+        "name": "Shadow Veil",
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
-        "name": "毒裂き",
-        "description": "毒の儀式を6段階消費する：100にコンボポイントごとに55を加えたダメージを与え、出血効果が与えるはずだった残りダメージを即座にすべて与え、その後新しい毒の傷を与える（20秒かけて120ダメージ）。エナジーを20回復する。（ナイフワーク）"
+        "name": "Venomrend",
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "タイフーン",
@@ -9607,28 +9607,28 @@ export const ja_JP: EnTranslations = {
         "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
       },
       "veilstep": {
-        "name": "ヴェイルステップ",
-        "description": "向いている方向へ帷をすり抜ける。"
+        "name": "Veilstep",
+        "description": "Step 10 yards forward through the veil."
       },
       "scouring_mercy": {
-        "name": "浄罪の慈悲",
-        "description": "敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。"
+        "name": "Scouring Mercy",
+        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
       },
       "seraphic_vigil": {
-        "name": "熾天使の見守り",
-        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
+        "name": "Seraphic Vigil",
+        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
       },
       "summon_tithefiend": {
-        "name": "タイスフィーンド招来",
-        "description": "グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。"
+        "name": "Call Tithefiend",
+        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
-        "name": "殉教者の盾",
-        "description": "味方1体が受けるダメージを8秒間40%軽減する。"
+        "name": "Martyr's Aegis",
+        "description": "Reduce one ally's incoming damage by 40% for 8 sec."
       },
       "choir_of_deliverance": {
-        "name": "救済の聖歌隊",
-        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。"
+        "name": "Choir of Deliverance",
+        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -9644,12 +9644,28 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "敵の皮を剥ぎ、武器ダメージに{damage}を加えたダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
+        "description": "ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "応急処置",
         "description": "ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。"
+      },
+      "cleansing_verdict": {
+        "name": "浄化の裁定",
+        "description": "味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。"
+      },
+      "divine_shield": {
+        "name": "光の護り",
+        "description": "聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）"
+      },
+      "holy_wrath": {
+        "name": "聖者の怒り",
+        "description": "聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）"
+      },
+      "aura_surge": {
+        "name": "曙光の跳弾",
+        "description": "曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）"
       }
     },
     "items": {
@@ -11202,7 +11218,7 @@ export const ja_JP: EnTranslations = {
         "name": "魔法の祝宴パン"
       },
       "soul_stone": {
-        "name": "魂の石"
+        "name": "Soul Stone"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
@@ -12665,16 +12681,16 @@ export const ja_JP: EnTranslations = {
         "name": "ウォーターエレメンタル"
       },
       "graveguard": {
-        "name": "墓守"
+        "name": "Graveguard"
       },
       "necromancy_skeletal_warrior": {
-        "name": "骸骨戦士"
+        "name": "Skeletal Warrior"
       },
       "necromancy_bone_mage": {
-        "name": "骨魔導士"
+        "name": "Bone Mage"
       },
       "necromancy_gravewing": {
-        "name": "墓翼"
+        "name": "Gravewing"
       }
     },
     "npcs": {
@@ -13302,12 +13318,12 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "暁縛りの聖典",
-        "text": "光はあなたの中で静かに眠ってはいない、{playerName}。あなたが死者を安らかに眠らせる姿を見てきた。今こそ、ほとんどのパラディンが学ぶことのない秘儀を授けよう。倒れた魂を現世へ呼び戻す、呼び戻しの儀式だ。その言葉は、私が預かる暁縛りの聖典に記されている。だが、この地を彷徨う死者がいる限り、本は祝福とはならない。さまよう骸骨をあと6体、土へ還しなさい。そうすれば教えを始めよう。",
-        "completion": "礼拝堂の庭は静かになった。{playerName}、あなたは言葉を学ぶ準備ができている。しかし呼び戻しの儀式は、暖かな礼拝堂で唱えるものではない。生と死の帳が薄くなった場所で歌わねばならない。私は聖典を北のミアフェン湿地へ運ぶ。そこで合流し、最後までやり遂げよう。",
+        "title": "The Dawnbound Tome",
+        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
+        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
         "objectives": {
           "0": {
-            "label": "安らかにしたさまよう骸骨"
+            "label": "Restless Bones laid to rest"
           }
         }
       },
@@ -13468,12 +13484,12 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "呼び戻しの儀式",
-        "text": "沼地までついてきたか、{playerName}。よろしい。暁縛りの聖典はここにある。この水没した地こそ、その言葉にふさわしい。死者が埋葬されたままでいられない場所ほど、生と死の帳が薄い場所はない。だが水没した死者は、詠唱の途中であなたの声を沈めようとするだろう。儀式にふさわしい場所を確保しなさい。水没した死者を8体眠らせ、共に聖別しよう。",
-        "completion": "ひざまずき、{playerName}、言葉を声に出して読みなさい。そうだ。感じるか？ あなたの手の光は、もはや生者を癒やすだけではない。彼岸へ渡った者を呼び戻すこともできる。賢明に使いなさい。絶望的な戦いへ魂を呼び戻すことは、慈悲ではなく残酷だ。立ちなさい、救済者よ。",
+        "title": "The Rite of Recall",
+        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
+        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
         "objectives": {
           "0": {
-            "label": "安らかにした水没した死者"
+            "label": "Drowned Dead laid to rest"
           }
         }
       },

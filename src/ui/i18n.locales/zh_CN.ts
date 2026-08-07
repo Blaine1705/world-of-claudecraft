@@ -13,236 +13,20 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
-  'hudChrome.paladin.devotion': '虔诚',
-  'hudChrome.paladin.devotionValue': '虔诚值 {value}/{max}',
-  'hudChrome.paladin.devotionAscensionCharges': '虔诚值 {value}/{max}。升华充能：{charges}。',
-  'hudChrome.paladin.devotionAscensionLast': '虔诚值 {value}/{max}。升华的最后一次充能。',
-  'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',
-  'hudChrome.paladin.ascensionSpenderAria': '动作栏第 {slot} 格：{ability}。消耗一次升华充能。',
-  'hudChrome.auraEffect.radiantResonance':
-    '你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒',
-  'hudChrome.auraEffect.solarReprisal':
-    '你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发',
-  'guide.abilityHook.hammer_of_wrath': '从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。',
-  'guide.abilityHook.avenging_wrath':
-    '获得 10 点虔诚，并在接下来的十五秒内使技能产生的虔诚值翻倍。',
-  'guide.abilityHook.bastion_sweep': '用盾牌横扫一群敌人，夺取仇恨并积累虔诚。',
-  'guide.abilityHook.oath_chain': '将远处的敌人拉入队伍并减缓其逃离速度。',
-  'guide.abilityHook.veilbound_march': '穿过敌群并留下印记，削弱其对你造成的伤害并牢牢锁定仇恨。',
-  'guide.abilityHook.holy_shield': '消耗虔诚，获得主动格挡时段、吸收护盾和仇恨脉冲。',
-  'guide.abilityHook.consecration': '以持续的神圣伤害和仇恨占据周围地面。',
-  'guide.abilityHook.hammer_of_justice': '以短暂而可靠的昏迷阻止一名敌人。',
-  'guide.abilityHook.lay_on_hands': '在盟友濒临倒下时为其恢复大量生命值。',
-  'hud.errors.notEnoughDevotion': '虔诚值不足！',
-  'abilityUi.resources.devotion': '虔诚',
-  'entities.abilities.divine_ascension.name': '神圣升华',
-  'entities.abilities.divine_ascension.description':
-    '消耗 20 点虔诚，获得 5 次升华充能，最多持续 45 秒。标记的技能会消耗一次充能并获得额外效果。',
-  'entities.abilities.aura_mastery.name': '神圣协律',
-  'entities.abilities.aura_mastery.description':
-    '持续 8 秒，强化小队中所有激活的虔诚光环和报偿光环。壁垒虔诚使伤害降低 15%；报偿造成 15 点神圣伤害。多次使用只会刷新效果，不会叠加。',
-  'entities.abilities.devotion_ward.name': '壁垒虔诚',
-  'entities.abilities.devotion_ward.description':
-    '使你和小队成员受到的伤害降低 5%，持续至死亡或被替换。只有此光环与报偿光环会彼此替换；辉光、黎明和恩典虔诚可以共存。',
-  'entities.abilities.hammer_of_grace.name': '恩典之锤',
-  'entities.abilities.hammer_of_grace.description':
-    '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
-  'entities.abilities.hushbrand.name': '寂静烙印',
-  'entities.abilities.hushbrand.description': '打断施法，并使目标在 4 秒内无法施放该系法术。',
-  'entities.abilities.solar_step.name': '烈阳步',
-  'entities.abilities.solar_step.description': '使你的移动速度提高 150%，持续 2 秒。',
-  'entities.abilities.solar_invocation.name': '烈阳祈唤',
-  'entities.abilities.solar_invocation.description':
-    '立即为一名盟友恢复 {damage} 点生命值，或对一名敌人造成中等神圣伤害。任一用途都会产生 1 点虔诚。升华期间，治疗施法还会治疗目标 10 米内的友方玩家，治疗量为原来的一半。',
-  'entities.abilities.radiant_devotion.name': '辉光虔诚',
-  'entities.abilities.radiant_devotion.description':
-    '使你和小队成员的法术强度提高 20 点，持续 30 分钟。会替换你自己的黎明或恩典虔诚，但可与其他圣骑士的虔诚共存。',
-  'entities.abilities.dawn_devotion.name': '黎明虔诚',
-  'entities.abilities.dawn_devotion.description':
-    '使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。',
-  'entities.abilities.grace_devotion.name': '恩典虔诚',
-  'entities.abilities.grace_devotion.description':
-    '你和小队成员每 5 秒恢复 15 点法力，且法力消耗降低 3%，持续 30 分钟。会替换你自己的辉光或黎明虔诚，但可与其他圣骑士的虔诚共存。',
-  'entities.abilities.recall_the_fallen.name': '唤回逝者',
-  'entities.abilities.recall_the_fallen.description':
-    '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
-  'entities.abilities.beacon_of_light.name': '圣光道标',
-  'entities.abilities.beacon_of_light.description':
-    '将一名小队成员标记为你的圣光道标。你对 60 米内另一名小队成员造成的有效直接治疗，有 50% 也会治疗道标目标。范围治疗和周期性治疗不会传递。持续至你或目标死亡。',
-  'entities.abilities.final_edict.name': '终末敕令',
-  'entities.abilities.final_edict.description':
-    '发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。',
-  'entities.abilities.dawnfall.name': '黎明坠击',
-  'entities.abilities.dawnfall.description':
-    '对附近敌人造成 {damage} 点神圣伤害并产生 1 点虔诚。命中至少一个敌人会使终末敕令的剩余冷却时间缩短 2 秒。升华会提高其伤害和作用半径。',
-  'entities.abilities.sun_gods_verdict.name': '太阳神裁决',
-  'entities.abilities.sun_gods_verdict.description':
-    '以太阳神裁决审判一名敌人，持续 30 秒。终末敕令和黎明坠击成功命中时会刻下一层印记。施加第三层印记的技能决定判决：终末敕令对罪人释放毁灭性伤害；黎明坠击引爆裁决，对附近敌人造成伤害并使其昏迷 1.5 秒。',
-  'entities.abilities.valkyrs_calling.name': '瓦尔基里的召唤',
-  'entities.abilities.valkyrs_calling.description':
-    '升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。',
-  'entities.abilities.faithforged_guard.name': '圣光之债',
-  'entities.abilities.faithforged_guard.description':
-    '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
-  'entities.abilities.mercy_lance.name': '慈悲圣枪',
-  'entities.abilities.mercy_lance.description':
-    '对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。',
-  'entities.abilities.sacred_form.name': '神圣形态',
-  'entities.abilities.sacred_form.description':
-    '进入持续至死亡的神圣状态，使治疗效果提高 10%、法术暴击几率提高 5%，产生的仇恨降低 50%。仅限黎明愈者。',
-  'entities.abilities.dawns_embrace.name': '黎明之拥',
-  'entities.abilities.dawns_embrace.description':
-    '施放一次强力治疗并产生 1 点虔诚。辉光共鸣使其法力消耗降低 50%，施法时间缩短至 1.5 秒。升华使其变为瞬发，且治疗量提高 35%。',
-  'entities.abilities.radiant_chorus.name': '辉光圣歌',
-  'entities.abilities.radiant_chorus.description':
-    '为附近盟友恢复 {damage} 点生命值并产生 1 点虔诚。有效治疗至少 2 名盟友会获得辉光共鸣：你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 50%，施法时间缩短至 1.5 秒。升华会提高辉光圣歌的治疗量和作用半径。',
-  'entities.abilities.life_covenant.name': '生命契约',
-  'entities.abilities.life_covenant.description':
-    '使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会给予一个可吸收 120 点伤害的护盾，且不消耗充能。',
-  'entities.abilities.aegis_first_dawn.name': '初曙圣盾',
-  'entities.abilities.aegis_first_dawn.description':
-    '引导 5 秒，创造一个半径 10 米的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完成引导时释放最终治疗，并使移动速度提高 30%，持续 4 秒。',
-  'entities.abilities.vowkeeper_strike.name': '守誓者打击',
-  'entities.abilities.vowkeeper_strike.description':
-    '发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。',
-  'entities.abilities.bastion_rite.name': '壁垒仪式',
-  'entities.abilities.bastion_rite.description':
-    '使受到的物理伤害降低 20%，格挡几率提高 20%，持续 6 秒。升华将持续时间延长至 10 秒。',
-  'entities.abilities.sunward_disc.name': '向阳飞盾',
-  'entities.abilities.sunward_disc.description':
-    '需要盾牌。掷出一面辉光飞盾，命中后在附近敌人之间弹射。每次造成伤害都会产生 1 点虔诚。烈阳反击使向阳飞盾不消耗法力、无视冷却时间且伤害提高 20%。升华会强化 5 次弹射。',
-  'entities.abilities.sacred_challenge.name': '神圣挑衅',
-  'entities.abilities.sacred_challenge.description':
-    '迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。',
-  'entities.abilities.bastion_sweep.name': '壁垒横扫',
-  'entities.abilities.bastion_sweep.description':
-    '用装备的盾牌横扫前方 180 度范围内的敌人，造成 {damage} 点高仇恨神圣伤害并产生 1 点虔诚。升华使伤害提高 30%，半径扩大至 8 米。',
-  'entities.abilities.oath_chain.name': '誓约锁链',
-  'entities.abilities.oath_chain.description':
-    '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
-  'entities.abilities.veilbound_march.name': '帷幕行军',
-  'entities.abilities.veilbound_march.description':
-    '进入灵体状态 4 秒，移动速度提高 40%，护甲提高 30%，并免疫定身、减速和位移。你穿过的敌人会获得持续 6 秒的帷幕印记，每秒受到神圣伤害，对你造成的伤害降低 20%，并对你产生额外仇恨。第一个印记会产生 1 点虔诚。行军结束时，附近带有印记的敌人会受到最终爆发伤害。升华使爆发伤害提高 50%，并将他们轻微拉向你。',
-  'entities.abilities.veilbound_mark.name': '帷幕印记',
-  'entities.abilities.veilbound_mark.description':
-    '每秒受到神圣伤害，对施加印记的圣骑士造成的伤害降低 20%，并对该圣骑士产生额外仇恨。',
-  'entities.quests.q_divine_tome.title': '缚晓圣典',
-  'entities.quests.q_divine_tome.text':
-    '圣光在你体内并非静默不语，{playerName}。我看着你让亡者安息，也相信你已经准备好学习极少有圣骑士能够掌握的仪式：唤回仪式，以此将逝去的灵魂召回人世。仪式经文记载在我保管的缚晓圣典中，但只要躁动的亡者仍在这片土地上游荡，书本便带不来祝福。再让 6 具躁动骸骨归于尘土，我便开始教你。',
-  'entities.quests.q_divine_tome.completion':
-    '礼拜堂庭院终于安静下来。你已经可以学习经文了，{playerName}，但唤回仪式不能在温暖的礼拜堂中吟诵。必须前往生死帷幕薄弱之处。我会把圣典带到北方的泥沼沼泽。到那里来找我，我们将完成这场仪式。',
-  'entities.quests.q_divine_tome.objectives.0.label': '让躁动骸骨安息',
-  'entities.quests.q_rite_of_redemption.title': '唤回仪式',
-  'entities.quests.q_rite_of_redemption.text':
-    '你果然跟随我进入了沼泽，{playerName}。很好。缚晓圣典就在这里，而这片积水之地正适合吟诵其中的经文：没有哪里比亡者不肯长眠之处更接近生死之间的帷幕。但那些溺亡者会在吟诵中途把你的声音拖入水底。先清理出适合仪式的地方：让 8 名溺亡死者安息，然后我们一同将此地圣化。',
-  'entities.quests.q_rite_of_redemption.completion':
-    '跪下，{playerName}，大声念出经文。就是这样。你感觉到了吗？你手中的圣光不再只能治愈生者，也能召回已经离世的人。请明智地使用它。将灵魂召回一场毫无希望的战斗是残忍，而非仁慈。起身吧，救赎者。',
-  'entities.quests.q_rite_of_redemption.objectives.0.label': '让溺亡死者安息',
-  'entities.abilities.guardian_covenant.name': '守护契约',
-  'entities.abilities.guardian_covenant.description':
-    '保护一名友方目标和你自己，使受到的伤害降低20%，持续8秒。未选中友方目标时，默认对你自己施放。',
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': '放大',
+  'hudChrome.controller.zoomOut': '缩小',
+  'hudChrome.crafting.durationChip': '{seconds}秒',
+  'hudChrome.keybinds.dive': '下潜',
+  'hudChrome.materialHint.usedBy': '用于制作{crafts}。',
+  'hudChrome.partyFrames.showPets': '显示宠物',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '以 {honor} 购买 {item}',
+  'itemUi.market.saleBuyer': '售予{buyer}',
   'hudChrome.deeds.recentJumpAria': '跳转到{name}',
   'hudChrome.targetAuras.all': '全部',
-  'hudChrome.warlock.doomLabel': '谴罪',
-  'hudChrome.warlock.fateThreadsLabel': '命运丝线',
-  'hudChrome.warlock.doomMeterUnlock': '移动痛苦资源条',
-  'hudChrome.warlock.doomMeterLock': '锁定痛苦资源条',
-  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 谴罪。',
-  'hudChrome.warlock.doomStatus': '{value}/{max} 谴罪；剩余 {remaining}。',
-  'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
-  'hudChrome.warlock.fateThreadsConsumeReady': '三层命运丝线：吞噬可将其编织为额外的谴罪。',
-  'hudChrome.warlock.fateThreadsSentenceReady': '三层命运丝线：裁决可消耗它们以提高18%的伤害。',
-  'hudChrome.procOverlay.ruinStatus': '毁灭 {value}/{max}',
-  'hudChrome.procOverlay.soulFragmentsMeter': '灵魂碎片',
-  'guide.abilityHook.evil_eye': '标记一个敌人，使其行动与承受的苦难为你积累谴罪。',
-  'entities.abilities.evil_eye.description':
-    '将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。',
-  'entities.abilities.maledict_gaze.name': '咒眼凝视',
-  'entities.abilities.maledict_gaze.description':
-    '你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。',
-  'entities.abilities.needle_of_fate.name': '命运之针',
-  'entities.abilities.needle_of_fate.description':
-    '刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。',
-  'entities.abilities.sentence.name': '裁决',
-  'entities.abilities.sentence.description':
-    '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
-  'entities.abilities.cursed_accomplice.name': '受咒同谋',
-  'entities.abilities.cursed_accomplice.description':
-    '未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。',
-  'entities.abilities.litany_of_guilt.name': '罪责祷文',
-  'entities.abilities.litany_of_guilt.description':
-    '诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。',
-  'entities.abilities.umbral_anchor.name': '暗影锚',
-  'entities.abilities.umbral_anchor.description':
-    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
-  'entities.abilities.soulwell.name': '灵魂之井',
-  'entities.abilities.soulwell.description':
-    '召唤一口灵魂之井，持续3分钟。脱离战斗时，小队成员最多可补充3枚灵魂石。灵魂石可恢复最大生命值的25%，并与药水共享冷却。',
-  'entities.abilities.hex_of_violence.name': '暴行咒',
-  'entities.abilities.hex_of_violence.description':
-    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。',
-  'entities.abilities.cruel_pact.name': '残酷契约',
-  'entities.abilities.cruel_pact.description':
-    '牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。',
-  'entities.abilities.vicarious_suffering.name': '苦痛转承',
-  'entities.abilities.vicarious_suffering.description':
-    '连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。',
-  'entities.abilities.possess_evil_eye.name': '附身邪眼',
-  'entities.abilities.possess_evil_eye.description':
-    '咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%。延迟回响造成60%的伤害，并在17至20级间逐步降至30%。',
-  'entities.abilities.hour_of_judgment.name': '审判时刻',
-  'entities.abilities.hour_of_judgment.description':
-    '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
-  'entities.abilities.coven.name': '巫契',
-  'entities.abilities.coven.description':
-    '在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。',
-  'entities.mobs.necromancy_gravewing.name': '墓翼',
-  'entities.abilities.soul_harvest.name': '精华收割',
-  'entities.abilities.soul_harvest.description':
-    '撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。',
-  'entities.abilities.soul_lance.name': '灵魂之枪',
-  'entities.abilities.soul_lance.description':
-    '掷出一柄幽魂之枪，造成 {damage} 点暗影伤害。对带有你的骸骨印记的目标，其中50%的伤害会累积至印记。',
-  'entities.abilities.raise_graveguard.name': '唤醒墓卫',
-  'entities.abilities.raise_graveguard.description':
-    '唤醒一名永久的防御型伙伴。墓卫会自动嘲讽，通过墓域为你拦截20%的伤害；收割号令会使其嘲讽并在4秒内受到的伤害降低30%。',
-  'entities.abilities.raise_skeletal_warrior.name': '唤醒骷髅战士',
-  'entities.abilities.raise_skeletal_warrior.description':
-    '消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。',
-  'entities.abilities.raise_bone_mage.name': '唤醒骸骨法师',
-  'entities.abilities.raise_bone_mage.description':
-    '消耗2枚灵魂碎片，将一名永久远程骸骨法师加入你的2槽统御。只能有一名为你效命。它的攻击使目标受到的魔法伤害提高5%，持续6秒；收割号令将此弱点提高至8%。',
-  'entities.abilities.bone_armor.name': '骸骨护甲',
-  'entities.abilities.bone_armor.description': '以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。',
-  'entities.abilities.corpse_explosion.name': '尸骸爆裂',
-  'entities.abilities.corpse_explosion.description':
-    '优先牺牲骸骨法师，其次是骷髅战士，只有在别无选择时才牺牲墓翼。同类仆从中先选择剩余持续时间最短者，再选择最虚弱者，对目标地点的敌人造成 {damage} 点暗影伤害。',
-  'entities.abilities.funeral_harvest.name': '葬魂收割',
-  'entities.abilities.funeral_harvest.description':
-    '当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。',
-  'entities.abilities.ossuary_mark.name': '骸骨印记',
-  'entities.abilities.ossuary_mark.description':
-    '为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
-  'entities.abilities.unholy_command.name': '邪秽号令',
-  'entities.abilities.unholy_command.description':
-    '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
-  'entities.abilities.reaping_command.name': '收割号令',
-  'entities.abilities.reaping_command.description':
-    '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
-  'entities.abilities.sacrifice_undead.name': '献祭亡灵',
-  'entities.abilities.sacrifice_undead.description': '摧毁一名统御仆从，恢复最大生命值的 25%。',
-  'entities.abilities.raise_gravewing.name': '唤醒墓翼',
-  'entities.abilities.raise_gravewing.description':
-    '消耗2枚灵魂碎片，将一只永久墓翼加入你的2槽统御。只能有一只为你效命。它每5秒对附近敌人造成65%的顺劈伤害，收割号令使所有被击中的敌人在5秒内受到的伤害提高8%。',
-  'entities.abilities.army_of_the_dead.name': '亡者军团',
-  'entities.abilities.army_of_the_dead.description':
-    '开启墓穴传送门，在你选择的统御仆从之外额外召唤一名骷髅战士、骸骨法师和墓翼，持续 20 秒。',
-  'entities.abilities.cinderhide.name': '熔渣皮肤',
-  'entities.abilities.cinderhide.description':
-    '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
-  'entities.mobs.graveguard.name': '墓卫',
-  'entities.mobs.necromancy_skeletal_warrior.name': '骷髅战士',
-  'entities.mobs.necromancy_bone_mage.name': '骸骨法师',
   'hudChrome.actionBar.done': '完成',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
@@ -374,22 +158,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤红迷雾',
   'entities.abilities.blink.name': '闪烁步',
   'entities.abilities.bloodlust.name': '战鼓',
-  'entities.abilities.chain_lightning.name': '天穹分枝',
-  'entities.abilities.abyssal_rift.name': '深渊裂隙',
-  'entities.abilities.abyssal_rift.description':
-    '在选定地点撕开一道裂隙，将8码内的敌人拉向其中心，造成{damage}点暗影伤害，并使其昏迷2秒。首领会受到伤害，但可抵抗拉扯与昏迷。',
+  'entities.abilities.chain_lightning.name': '叉状闪电',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
-  'entities.abilities.dark_pact.name': '血契',
-  'entities.abilities.dark_pact.description':
-    '牺牲当前生命值的10%，在8秒内吸收相当于最大生命值30%的伤害。',
+  'entities.abilities.cleansing_verdict.name': '净化裁决',
+  'entities.abilities.cleansing_verdict.description':
+    '净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜横扫',
   'entities.abilities.curse_of_exhaustion.name': '铅沉妖咒',
   'entities.abilities.death_coil.name': '墓穴缠卷',
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最后祈祷',
-  'entities.abilities.desperate_prayer.description': '立即恢复你最大生命值的30%。',
   'entities.abilities.deterrence.name': '鬃刺守卫',
+  'entities.abilities.divine_shield.name': '圣光守护',
   'entities.abilities.earthbind.name': '攫握大地',
   'entities.abilities.evocation.name': '以太之井',
   'entities.abilities.frenzied_regeneration.name': '野性愈合',
@@ -397,6 +178,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '幽魂打击',
   'entities.abilities.hammer_of_wrath.name': '鸣钟之锤',
   'entities.abilities.healing_stream.name': '泉涌',
+  'entities.abilities.holy_wrath.name': '圣徒之怒',
   'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
   'entities.abilities.inner_focus.name': '静心',
@@ -411,34 +193,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': '心灵尖啸',
   'entities.abilities.shadowstep.name': '影步',
   'entities.abilities.silence.name': '沉默',
-  'entities.abilities.venomrend.name': '蚀毒撕裂',
-  'entities.abilities.venomrend.description':
-    '消耗你的6层毒祭：造成100点伤害，每个连击点额外造成55点，立即引爆你的流血效果的全部剩余伤害，随后施加一个新的蚀毒伤口（20秒内造成120点伤害）。恢复20点能量。（刺杀专精）',
-  'entities.abilities.veilstrike.name': '罩影突袭',
-  'entities.abilities.veilstrike.description':
-    '持续6秒：你的暮帷先制技无需潜行即可从任意角度使用，你造成的伤害提高10%，且期间的第一次潜伏突袭造成双倍伤害。（敏锐专精）',
-  'entities.abilities.body_blow.name': '大摆拳',
-  'entities.abilities.body_blow.description':
-    '沉重的一击，造成130%武器伤害外加10点。奖励2个连击点，并使红线加深1格（最多4格）。（战斗专精）',
-  'entities.abilities.knockout_blow.name': '眼前一黑',
-  'entities.abilities.knockout_blow.description':
-    '以一记击倒终结红线：造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量。在红线耗尽前使用，否则这记击倒就会作废。（战斗专精）',
-  'entities.abilities.venom_dart.name': '毒镖',
-  'entities.abilities.venom_dart.description':
-    '弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。',
-  'entities.abilities.venom_dart.specNote_assassination':
-    '累积1层毒祭，并使你的蚀毒伤口延长6秒（伤口持续时间不会超过20秒）。',
   'entities.abilities.smoke_screen.name': '烟幕',
   'entities.abilities.smoke_screen.description': '遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。',
-  'entities.abilities.flurry_of_knives.name': '刀刃乱舞',
-  'entities.abilities.flurry_of_knives.description':
-    '掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）',
-  'entities.abilities.thieves_chorus.name': '盗贼合唱',
-  'entities.abilities.thieves_chorus.description':
-    '一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）',
-  'entities.abilities.sacrilegious_march.name': '亵渎行军',
-  'entities.abilities.sacrilegious_march.description':
-    '移动速度提高35%，但每秒牺牲最大生命值的2%。再次施放可取消。生命值降至20%时会自动关闭。',
   'entities.abilities.spellsteal.name': '夺法',
   'entities.abilities.spellsteal.description': '从敌人身上窃取一个有益魔法效果并转移到自己身上。',
   'entities.abilities.startle_shot.name': '惊扰射击',
@@ -724,16 +480,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '悬停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在选定位置放置一个时间沙漏。置于敌人脚下时，在 PvE 中使其悬停 {hostilePveDuration} 秒，在 PvP 中悬停 {hostilePvpDuration} 秒；受到任何伤害都会解除效果。置于自己或队伍盟友脚下时，进入 {duration} 秒的停滞，免疫伤害且无法行动，恢复 {healing}% 最大生命值，并使自己的冷却恢复速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置为空，沙漏会等待 {groundDuration} 秒并影响第一个踩上去的有效单位。增益光环可手动移除。',
-  'hudChrome.auraEffect.venomRitual':
-    '毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂',
-  'hudChrome.auraEffect.gloam':
-    '幽暝：第{stacks}/{max}层。从暮帷中使用的先制技各累积1层。达到{max}层时，你的先制技无需潜行即可使用，下一次先制技免费施放，消耗全部3层并开启暗影缠身',
-  'hudChrome.auraEffect.redline':
-    '红线：第{stacks}/{max}格。每次大摆拳增加1格。眼前一黑每格伤害提高{pct}%，使用后结束红线。若计时先行结束，这记击倒就会作废',
-  'hudChrome.auraEffect.veilstrikeWindow':
-    '暗影缠身：你的暮帷先制技可在明处以任意角度使用，造成的伤害提高{pct}%',
-  'hudChrome.auraEffect.veiledEdge': '你的下一次潜伏突袭造成双倍伤害',
-  'hudChrome.auraEffect.duskEconomy': '技能的能量消耗降低{pct}%',
   'hudChrome.auraEffect.temporalHourglass':
     '免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。',
   'hudChrome.auth.appleLoginCta': '通过 Apple 继续',
@@ -1264,7 +1010,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.effects.spellCritPct': '+{value}% 法术暴击',
   'hudChrome.statInfo.effects.healthRegen': '休息时每5秒约恢复 {value} 点生命值',
   'hudChrome.statInfo.effects.manaRegen': '休息时每5秒约恢复 {value} 点法力',
-  'hudChrome.statInfo.effects.manaRegenCombat': '战斗中每5秒约恢复 {value} 点法力',
   'hudChrome.statInfo.effects.damageReduction': '对{level}级攻击者的伤害减免：{value}%',
   'hudChrome.statInfo.effects.dpsFromAp': '为你的攻击增加 {value} 点每秒伤害',
   'hudChrome.statInfo.notes.minorForClass': '对你的职业益处不大。',
@@ -1482,7 +1227,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '该语言不可用。',
   'game.hud.lowMana': '法力不足',
   'game.hud.lowEnergy': '能量不足',
-  'game.hud.lowFocus': '集中值不足',
   'game.talents.title': '天赋',
   'game.talents.classTab': '职业',
   'game.talents.specTab': '专精',
@@ -1968,7 +1712,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '法力',
   'classDetails.resources.energy': '能量',
   'classDetails.resources.rage': '怒气',
-  'classDetails.resources.focus': '集中值',
   'classDetails.roles.warrior': '坦克 / 近战 DPS',
   'classDetails.roles.paladin': '治疗 / 坦克 / 近战 DPS',
   'classDetails.roles.hunter': '远程 DPS',
@@ -2551,7 +2294,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresLevel': '需要等级 {level}',
   'abilityUi.tooltip.requiresForm': '需要{form}形态',
   'abilityUi.tooltip.requiresStealth': '需要潜行',
-  'abilityUi.tooltip.requiresStealthSkulduggery': '需要潜行（幽暝达到3层或暗影缠身期间无需潜行）',
   'abilityUi.tooltip.requiresCombo': '消耗连击点',
   'abilityUi.tooltip.requiresTargetHealthBelow': '需要目标生命值低于 {percent}%',
   'abilityUi.tooltip.requiresDodge': '只能在目标闪避后使用',
@@ -2566,7 +2308,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '法力',
   'abilityUi.resources.rage': '怒气',
   'abilityUi.resources.energy': '能量',
-  'abilityUi.resources.focus': '集中值',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '钓鱼',
@@ -2728,8 +2469,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickDestroy': '点击摧毁',
   'itemUi.tooltip.useFishing': '使用：在附近水域钓鱼。',
   'itemUi.tooltip.useHealingPotion': '使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。',
-  'itemUi.tooltip.useHealingPotionPct':
-    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。',
   'itemUi.tooltip.useElixir':
     '使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。',
@@ -2940,46 +2679,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
     '向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。',
-  'entities.abilities.pack_command.name': '兽群号令',
-  'entities.abilities.pack_command.description':
-    '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
-  'entities.abilities.unleash_beast.name': '释放野兽',
-  'entities.abilities.unleash_beast.description':
-    '释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。',
-  'entities.abilities.measured_shot.name': '审慎射击',
-  'entities.abilities.measured_shot.description':
-    '一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。',
-  'entities.abilities.cold_focus.name': '冷静专注',
-  'entities.abilities.cold_focus.description':
-    '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
-  'entities.abilities.bloodhook.name': '血钩',
-  'entities.abilities.bloodhook.description':
-    '冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）',
-  'entities.abilities.shrapnel_charge.name': '榴片炸弹',
-  'entities.abilities.shrapnel_charge.description':
-    '用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。',
-  'entities.abilities.bloodtrail_assault.name': '血迹突袭',
-  'entities.abilities.bloodtrail_assault.description':
-    '持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。',
-  'entities.abilities.trailbreak.name': '断迹',
-  'entities.abilities.trailbreak.description':
-    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
-  'entities.abilities.hunting_momentum.name': '狩猎势能',
-  'entities.abilities.hunting_momentum.description':
-    '被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）',
-  'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
-  'entities.abilities.fieldcraft_reentry.description':
-    '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
-  'entities.abilities.wildheart.name': '野性之心',
-  'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
-  'entities.abilities.shellskin.name': '甲壳之肤',
-  'entities.abilities.shellskin.description': '受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。',
-  'entities.abilities.frostjaw_trap.name': '霜颚陷阱',
-  'entities.abilities.frostjaw_trap.description':
-    '在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。',
-  'entities.abilities.pack_rally.name': '兽群集结',
-  'entities.abilities.pack_rally.description':
-    '进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。',
   'entities.abilities.hurricane.name': '飓风',
   'entities.abilities.hurricane.description':
     '在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。',
@@ -3029,20 +2728,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.name': '邪恶斩击',
   'entities.abilities.sinister_strike.description':
     '立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。',
-  'entities.abilities.sinister_strike.specNote_assassination': '累积1层毒祭（最多6层）。',
-  'entities.abilities.sinister_strike.specNote_combat':
-    '红线期间，此按钮变为大摆拳：造成130%武器伤害外加10点，奖励2个连击点，并使红线加深1格（最多4格）。',
   'entities.abilities.eviscerate.name': '长眠',
   'entities.abilities.eviscerate.description': '终结技，造成 {damage}。',
-  'entities.abilities.eviscerate.specNote_assassination':
-    '毒祭达到6层时，此按钮变为蚀毒撕裂：这次打击立即引爆你的流血效果的全部剩余伤害，施加一个新的蚀毒伤口，并恢复20点能量。',
-  'entities.abilities.eviscerate.specNote_combat':
-    '以4个或更多连击点命中会开启红线，持续8秒：邪恶斩击变为大摆拳，此按钮变为眼前一黑（造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量）。在红线结束前将其打出。',
   'entities.abilities.backstab.name': '卑劣突刺',
   'entities.abilities.backstab.description':
     '背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。',
-  'entities.abilities.backstab.specNote_assassination':
-    '每次打击累积1层毒祭（最多6层）并返还15点能量。毒祭达到6层时，长眠变为蚀毒撕裂（一次性造成你的流血效果的全部剩余伤害）。',
   'entities.abilities.gouge.name': '戳眼',
   'entities.abilities.gouge.description':
     '攻击目标，造成 {damage} 点伤害，并使其瘫痪 4 秒。任何伤害都会打破效果。奖励 1 个连击点。',
@@ -3050,34 +2740,26 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description': '使你的躲闪几率提高 50%，持续 15 秒。',
   'entities.abilities.slice_and_dice.name': '割喉节奏',
   'entities.abilities.slice_and_dice.description':
-    '终结技，使近战攻击速度提高30%，持续12秒，每个连击点额外延长4秒（5个连击点：32秒）。',
+    '终结技，使近战攻击速度提高 30%。每个连击点都会延长持续时间。',
   'entities.abilities.sprint.name': '疾足',
   'entities.abilities.sprint.description': '使你的移动速度提高 70%，持续 15 秒。',
   'entities.abilities.kidney_shot.name': '下作一击',
   'entities.abilities.kidney_shot.description':
-    '终结技，使目标昏迷1秒，每个连击点额外延长1秒（5个连击点：6秒）。',
+    '终结技，使目标昏迷。每个连击点使持续时间延长 1 秒。',
   'entities.abilities.ambush.name': '潜伏突袭',
   'entities.abilities.ambush.description':
     '伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。',
-  'entities.abilities.ambush.specNote_subtlety':
-    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可从任意角度使用：该次使用不消耗能量，消耗全部3层幽暝，开启持续6秒的暗影缠身，并造成双倍伤害。',
   'entities.abilities.stealth.name': '暮帷',
   'entities.abilities.stealth.description':
     '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。',
-  'entities.abilities.stealth.specNote_subtlety':
-    '你从暮帷中使用的每个先制技累积1层幽暝（最多3层）。',
   'entities.abilities.adrenaline_rush.name': '血脉疾涌',
   'entities.abilities.adrenaline_rush.description': '热血沸腾，立即恢复 60 点能量。',
   'entities.abilities.garrote.name': '绞喉线',
   'entities.abilities.garrote.description':
     '勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。',
-  'entities.abilities.garrote.specNote_subtlety':
-    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。',
   'entities.abilities.cheap_shot.name': '击腹拳',
   'entities.abilities.cheap_shot.description':
     '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
-  'entities.abilities.cheap_shot.specNote_subtlety':
-    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
     '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',
@@ -3086,10 +2768,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
   'entities.abilities.expose_armor.name': '护甲突破',
   'entities.abilities.expose_armor.description':
-    '终结技，暴露目标的破绽，持续30秒：每消耗1个连击点使其护甲降低2%（5个连击点：{damage}%）。',
+    '终结技，暴露目标，使其护甲降低 {damage}，持续 30 秒。',
   'entities.abilities.rupture.name': '血流不止',
   'entities.abilities.rupture.description':
-    '终结技，撕裂目标：每2秒流血一次，持续6秒，每个连击点额外延长2秒（5个连击点：持续16秒，共{damage}点伤害）。',
+    '终结技，撕裂目标，使其流血，在 16 秒内受到 {damage} 点伤害。',
   'entities.abilities.vanish.name': '烟遁',
   'entities.abilities.vanish.description':
     '从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
@@ -3117,7 +2799,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
   'entities.abilities.divine_protection.description':
-    '一道神圣结界吸收相当于最大生命值{damage}%的伤害，持续{duration}秒。持久守护可强化该结界。',
+    '一道守护结界吸收 {damage} 点伤害，持续 10 秒。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
   'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
@@ -3139,7 +2821,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕你和你的队伍，直至死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响盟友的自动攻击额外造成{buff}点神圣伤害。',
+    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',
@@ -3173,8 +2855,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description':
-    '移动时在2.4秒内快速射出6箭，每箭造成{damage}点物理伤害。',
+  'entities.abilities.rapid_fire.description': '使你的攻击速度提高 40%，持续 15 秒。',
   'entities.abilities.smite.name': '惩击',
   'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
@@ -3204,24 +2885,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
-  'entities.abilities.chain_heal.name': '湍流愈合',
+  'entities.abilities.chain_heal.name': '治疗链',
   'entities.abilities.chain_heal.description':
-    '为一个友方目标恢复{damage}点生命值，随后跳跃至12码内最多2个盟友。每次跳跃的治疗量为上一个目标的50%。每个被波及的盟友都会消耗其剩余的愈合水流，并立即恢复所消耗数值125%的生命值。初始治疗量随法术强度提高。（灵愈招牌）',
-  'entities.abilities.galeheart_weapon.name': '风心武器',
-  'entities.abilities.galeheart_weapon.description':
-    '为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。',
-  'entities.abilities.lifespring_weapon.name': '活泉武器',
-  'entities.abilities.lifespring_weapon.description':
-    '为武器灌注生命之水，使愈合水流的注入量提高20%。',
-  'entities.abilities.primal_exaltation.name': '原初升华',
-  'entities.abilities.primal_exaltation.description':
-    '解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）',
-  'entities.abilities.stoneward.name': '石之守护',
-  'entities.abilities.stoneward.description':
-    '使一名盟友获得6层、持续60秒的保护。受到伤害时消耗一层，恢复5%最大生命值，每3秒最多触发一次。（萨满祭司天赋）',
-  'entities.abilities.tidecall.name': '潮汐召唤',
-  'entities.abilities.tidecall.description':
-    '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
+    '大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）',
   'entities.abilities.earth_shock.name': '大地震击',
   'entities.abilities.earth_shock.description':
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
@@ -3270,13 +2936,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮火',
   'entities.abilities.shadowburn.description': '立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。',
-  'entities.abilities.ruinous_brand.name': '毁灭烙印',
-  'entities.abilities.ruinous_brand.description':
-    '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。',
   'entities.abilities.wrath.name': '野性弹',
   'entities.abilities.wrath.description': '投掷一道自然能量箭，造成 {damage} 点自然伤害。',
-  'entities.abilities.wrath.specNote_balance':
-    '月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，月种变为月涌，天陨变为日醒。',
   'entities.abilities.healing_touch.name': '野性愈合',
   'entities.abilities.healing_touch.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.mark_of_the_wild.name': '野性守护',
@@ -3285,11 +2946,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '月光风暴',
   'entities.abilities.moonfire.description':
     '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。',
-  'entities.abilities.moonfire.specNote_balance': '让它持续燃烧：月种可将其延长6秒。',
   'entities.abilities.rejuvenation.name': '野性绽放',
   'entities.abilities.rejuvenation.description': '在 12 秒内为目标恢复 {damage} 点生命值。',
-  'entities.abilities.rejuvenation.specNote_restoration':
-    '种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。',
   'entities.abilities.thorns.name': '荆棘守护',
   'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。',
   'entities.abilities.entangling_roots.name': '缠握根须',
@@ -3300,30 +2958,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
-  'entities.abilities.maul.specNote_feral':
-    '每次命中累积1层古血；古血达到3层时，此按钮变为碎髓：一次高威胁打击，造成78至96点伤害；生命值低于一半时，改为吸收相当于你最大生命值18%的伤害，并返还15点怒气。',
   'entities.abilities.growl.name': '威吓',
   'entities.abilities.growl.description':
     '对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
   'entities.abilities.cat_form.name': '狼形态',
   'entities.abilities.cat_form.description':
-    '变形为狼：敏捷随等级提高，攻击强度提高8点并且每级再提高2点，攻击使用能量和连击点，产生的威胁值降低29%。再次施放可返回施法者形态。',
-  'entities.abilities.claw.name': '裂爪',
+    '变形为狼：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。',
+  'entities.abilities.claw.name': '爪击',
   'entities.abilities.claw.description':
     '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。',
-  'entities.abilities.claw.specNote_feral': '每次命中累积1层古血（最多3层）。',
   'entities.abilities.ferocious_bite.name': '血噬',
   'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限狼形态。',
-  'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。',
   'entities.abilities.swipe.name': '横扫利爪',
   'entities.abilities.swipe.description':
     '横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。',
-  'entities.abilities.swipe.specNote_feral': '每次命中累积1层古血（最多3层）。',
   'entities.abilities.regrowth.name': '二度绽放',
   'entities.abilities.regrowth.description':
     '为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。',
-  'entities.abilities.regrowth.specNote_restoration': '种下新的绽放会累积1层繁茂（最多5层）。',
   'entities.abilities.barkskin.name': '橡树皮',
   'entities.abilities.barkskin.description': '你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。',
   'entities.abilities.sacred_bulwark.name': '神圣壁垒',
@@ -3334,8 +2985,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。',
   'entities.abilities.starfire.name': '天陨',
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 点奥术伤害。',
-  'entities.abilities.starfire.specNote_balance':
-    '月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，此按钮变为日醒：瞬发打击，造成160至190点自然伤害，并在9秒内额外灼烧75点，恢复35点法力并消耗全部3层。',
   'entities.abilities.travel_form.name': '迅捷形态',
   'entities.abilities.travel_form.description':
     '立刻化为轻捷的迅捷形态，使移动速度提高 40%。变形状态下你无法使用其他技能，但可以在战斗中或脱离战斗时变形，非常适合逃离。',
@@ -3344,7 +2993,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震荡击',
   'entities.abilities.bash.description': '昏迷目标 2 秒。仅限巨熊形态。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description': '使目标的护甲降低 {damage}%，持续 40 秒。',
+  'entities.abilities.faerie_fire.description':
+    '使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目标陷入深度睡眠，最多持续 8 秒。任何伤害都会将其唤醒。',
@@ -3359,10 +3009,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description':
     '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
-  'entities.abilities.rip.name': '血裂',
+  'entities.abilities.rip.name': '割裂',
   'entities.abilities.rip.description':
-    '终结技，使目标每2秒流血一次，持续24秒：造成36点伤害，每消耗1个连击点额外造成24点（5个连击点：共{damage}点）。仅限狼形态。',
-  'entities.abilities.rip.specNote_feral': '命中的这一击累积1层古血（最多3层）。',
+    '终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
   'entities.abilities.mortal_strike.description':
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
@@ -3394,7 +3043,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '召唤一只听从术士命令的战魔。战魔是一种坚韧的近战恶魔，会冲入战斗并独当一面。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
   'entities.abilities.summon_infernal.name': '召唤焚炎巨像',
   'entities.abilities.summon_infernal.description':
-    '使一只焚炎巨像降临目标区域，落地时造成58-72点火焰伤害。它会战斗30秒而不取代你的恶魔，每2秒灼烧附近敌人，并且每秒生成1点毁灭。',
+    '将一只焚炎巨像束缚于你的意志之下，这是一头庞大的破坏巨兽，拥有毁灭性的近战能力，以及所有恶魔中最深厚的生命与护甲。漫长的冷却时间限制了它的原始威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
   'entities.abilities.summon_doomguard.name': '召唤亡魂裔',
   'entities.abilities.summon_doomguard.description':
     '将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -3409,8 +3058,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
-    '以武器伤害外加{damage}剐削敌人，并造成持续18秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
-  'entities.abilities.rake.specNote_feral': '每次命中累积1层古血（最多3层）。',
+    '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
@@ -3419,7 +3067,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
   'entities.abilities.holy_shield.description':
-    '获得30%格挡，以及一面吸收相当于最大生命值{damage}%伤害的护盾，持续{duration}秒，并释放一股威胁脉冲。升华可强化并延长这层防御。',
+    '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
@@ -3445,7 +3093,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）',
   'entities.abilities.hemorrhage.name': '出血',
   'entities.abilities.hemorrhage.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，在12秒内造成流血伤害，并使目标受到的流血伤害提高40%。奖励1个连击点。每使用2次累积1层幽暝（最多3层）。（敏锐专精招牌）',
+    '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
@@ -3472,7 +3120,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
-    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。种下野性绽放与二度绽放会累积繁茂；繁茂达到5层时，此按钮变为盛放，立即为每个持有你的持续治疗效果的盟友恢复其剩余治疗量的60%。（恢复专精招牌）',
+    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
@@ -6526,15 +6174,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '你的主力火焰输出，命中后让目标持续燃烧。',
   'guide.abilityHook.fireball_form': '化身为活体火球，高速穿越开阔地带。',
   'guide.abilityHook.flame_shock': '瞬发的灼烧，先打出一记，并持续灼烧目标。',
-  'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
-  'guide.abilityHook.thunder_reservoir': '积蓄雷电，直到大地震击或断层震荡能释放满额威力。',
-  'guide.abilityHook.warspirit_cadence': '将稳定的武器节奏转化为风心回响和一次瞬发法术机会。',
-  'guide.abilityHook.stormsurge': '消耗风暴施法机会后，有时会提前恢复先祖打击。',
-  'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
-  'guide.abilityHook.tidecall': '立即治疗一名盟友，并注入满额愈合水流。',
-  'guide.abilityHook.ancestor_return': '在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。',
-  'guide.abilityHook.stoneward': '升起充能石盾，将受到的伤害转化为恢复。',
-  'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
   'guide.abilityHook.frostbolt': '从远处发动攻击并减速目标，让它无法贴近你。',
   'guide.abilityHook.garrote': '从潜行中起手，用钢丝使目标持续流血。',
@@ -6548,15 +6187,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
   'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',
   'guide.abilityHook.lightning_bolt': '一次远程施法的自然伤害，是你远距离的常用手段。',
-  'guide.abilityHook.chain_lightning': '攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。',
   'guide.abilityHook.lightning_shield': '为你充能，让攻击者打中你时受到自然伤害。',
   'guide.abilityHook.mark_of_the_wild': '开战前为自己或盟友施加的持续祝福。',
-  'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
   'guide.abilityHook.mongoose_bite': '在敌人闪躲之后立即可用的反击技。',
   'guide.abilityHook.moonfire': '瞬间命中并让目标持续燃烧，移动时也很好用。',
-  'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
-  'guide.abilityHook.stampede':
-    '召唤三只野兽攻击12秒。叠满兽群凶性后使用，可让它们在整个召唤期间保持最高伤害加成。',
   'guide.abilityHook.power_word_fortitude': '提升盟友的生命上限，开怪前施放并保持它的存在。',
   'guide.abilityHook.power_word_shield': '为盟友裹上一层护盾，在伤害落地前先吸收。',
   'guide.abilityHook.raptor_strike': '一记沉重的近战挥击，用于有东西贴近你时。',
@@ -7447,9 +7081,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '锁甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 点{school}伤害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢复 {value} 点生命值',
-  'hudChrome.auraEffect.mendingCurrent': '储存 {value} 点治疗量，随时间释放或由湍流愈合消耗',
-  'hudChrome.auraEffect.mendingCurrentPercent':
-    '储存相当于最大生命值 {pct}% 的治疗量，供湍流愈合消耗',
   'hudChrome.auraEffect.absorb': '吸收 {value} 点伤害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 点受到的治疗',
   'hudChrome.auraEffect.thorns': '对攻击者造成 {value} 点{school}伤害',
@@ -7461,84 +7092,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
-  'hudChrome.auraEffect.stasis': '免疫所有效果且无法行动',
-  'hudChrome.auraEffect.petDamage': '宠物造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.petHaste': '宠物的行动速度提高 {pct}%',
-  'hudChrome.auraEffect.spellDamage': '法术伤害提高 {pct}%',
-  'hudChrome.auraEffect.spellHaste': '施法速度提高 {pct}%',
-  'hudChrome.auraEffect.sated': '无法再获得团队急速效果',
-  'hudChrome.auraEffect.cauterizeFatigue': '灸灼无法再次阻止致命伤害',
-  'hudChrome.auraEffect.castShield': '施法不会因受到伤害而中断或延迟',
-  'hudChrome.auraEffect.cooldownCap': '此时间窗已使用 {used}/{cap} 秒冷却缩减',
-  'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
-  'hudChrome.auraEffect.leadenHexLock': '铅沉妖术暂时无法再次定身此目标',
-  'hudChrome.auraEffect.forbiddenReflectionReady': '下一个符合条件的术士冷却技能可再次施放',
-  'hudChrome.auraEffect.forbiddenReflectionLock': '禁忌映像暂时无法再次准备',
-  'hudChrome.auraEffect.internalCooldown': '计时结束前此效果无法再次触发',
-  'hudChrome.auraEffect.enrage':
-    '造成的伤害提高 {damagePct}%，攻击速度提高 {hastePct}%，移动速度提高 {movePct}%',
-  'hudChrome.auraEffect.suddenDeath': '下一次斩杀不消耗怒气并无视生命值要求',
-  'hudChrome.auraEffect.aoeEcho':
-    '剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害',
-  'hudChrome.auraEffect.sureCrit': '接下来 {charges} 个伤害技能必定暴击',
-  'hudChrome.auraEffect.temporalEcho':
-    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%',
-  'hudChrome.auraEffect.arcaneCharge':
-    '{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍',
-  'hudChrome.auraEffect.physicalReduction': '受到的物理伤害降低 {pct}%',
-  'hudChrome.auraEffect.freeExecute': '下一个符合条件的斩杀技能不消耗资源',
-  'hudChrome.auraEffect.resourceSap': '每 {interval} 秒恢复 {value} 点当前资源',
-  'hudChrome.auraEffect.nextAttackCrit': '下一次攻击必定暴击',
-  'hudChrome.auraEffect.healEcho': '生命值低于 {threshold}% 时恢复 {value} 点生命值',
-  'hudChrome.auraEffect.bleedVuln': '受到的流血伤害提高 {pct}%',
-  'hudChrome.auraEffect.sourceVuln': '受到施加此效果的施法者造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.formMoonkin': '月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%',
-  'hudChrome.auraEffect.formShadow': '幽幕形态：暗影伤害提高 {pct}%',
-  'hudChrome.auraEffect.formLich': '灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害',
-  'hudChrome.auraEffect.afflictionEye':
-    '恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    '此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    '符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次',
-  'hudChrome.auraEffect.afflictionViolence':
-    '剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害',
-  'hudChrome.auraEffect.afflictionVicarious':
-    '转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值',
-  'hudChrome.auraEffect.afflictionPossession': '强化命运之针、吸取生命、恶咒凝视和宣判',
-  'hudChrome.auraEffect.afflictionJudgment':
-    '主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值',
-  'hudChrome.auraEffect.afflictionLitany':
-    '获得定罪值时，对 {radius} 码内最多 {targets} 个敌人造成 {damage} 点暗影伤害，每秒最多一次',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    '吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值',
-  'hudChrome.auraEffect.necromancyHarvestMark': '目标死亡时可生成 1 个灵魂碎片',
-  'hudChrome.auraEffect.necromancyOssuaryMark':
-    '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
-  'hudChrome.auraEffect.necromancyDeathEcho': '旧版本遗留的死亡回响；当前没有技能会消耗它',
-  'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
-  'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
-  'hudChrome.auraEffect.energyRegen': '能量恢复速度提高 {pct}%',
-  'hudChrome.auraEffect.overpowerCharge': '{stacks} 层充能：下一次致残打击伤害提高 {pct}%',
-  'hudChrome.auraEffect.sweepingStrikes': '单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害',
-  'hudChrome.auraEffect.fingersOfFrost':
-    '剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害',
-  'hudChrome.auraEffect.brainFreeze': '下一次冰风暴瞬发且无视冷却时间',
-  'hudChrome.auraEffect.wintersChill': '剩余 {charges} 层：符合条件的法术视此目标为冻结状态',
-  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺',
-  'hudChrome.auraEffect.desolation':
-    '剩余 {charges} 层：下一次混乱箭施法加快 {castPct}%，或下一次火焰之雨立即落下',
-  'hudChrome.auraEffect.ruinousBrand':
-    '剩余 {charges} 次复制：直接法术在此复制 {otherPct}% 伤害；若此目标也是主目标则复制 {selfPct}%',
-  'hudChrome.auraEffect.duskfireClaim': '目标死亡时获得 {value} 点毁灭',
-  'hudChrome.auraEffect.pyreGuardian':
-    '每 {ruinInterval} 秒产生 {ruin} 点毁灭，并每 {damageInterval} 秒对 {radius} 码内敌人造成 {damage} 点火焰伤害',
-  'hudChrome.auraEffect.perfectMoment': '以太飞弹不会消耗奥术充能',
   'hudChrome.auraEffect.carriedFlag': '你正携带敌方旗帜。取消该增益即可丢下旗帜。',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一个不同元素学派法术将触发元素汇聚',
-  'hudChrome.auraEffect.hunterFerocity': '{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.heatingUp':
     '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
@@ -9677,6 +9232,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '时光回响',
   'entities.abilities.temporal_echo.description':
     '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。',
+  'entities.abilities.aura_surge.name': '曙光弹射',
+  'entities.abilities.aura_surge.description':
+    '掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）',
   'entities.abilities.avenging_wrath.description':
@@ -9686,7 +9244,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）',
   'entities.abilities.chain_lightning.description':
-    '攻击目标，并跳向10码内最多2名敌人，对每个目标造成{damage}点自然伤害。命中时整次施法获得1层雷霆，而不是每个目标各获得1层。伤害随法术强度提高。原始掌控可使其瞬发，原始升华会使其施法时间缩短一半。（唤雷者）',
+    '向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）',
   'entities.abilities.chaos_bolt.description':
     '投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）',
   'entities.abilities.cloak_of_shadows.description':
@@ -9697,8 +9255,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '攻击敌人并造成{damage}点暗影伤害，随后使其恐惧3秒。（术士天赋）',
   'entities.abilities.deep_freeze.description':
     '将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）',
+  'entities.abilities.desperate_prayer.description': '立即为你恢复{damage}点生命值。（牧师天赋）',
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
+  'entities.abilities.divine_shield.description':
+    '以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）',
   'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）',
   'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
@@ -9706,11 +9267,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_trap.description':
     '冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）',
   'entities.abilities.ghostly_strike.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，并使你的躲闪几率提高15%，持续7秒。奖励1个连击点。（潜行者天赋）',
+    '攻击敌人，造成武器伤害加{damage}点伤害，短暂提高躲闪并获得1个连击点。（潜行者天赋）',
   'entities.abilities.hammer_of_wrath.description':
     '向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）',
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
+  'entities.abilities.holy_wrath.description':
+    '释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
   'entities.abilities.ice_block.description':
@@ -9763,16 +9326,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.pet.waterJetTitle': '水流喷射',
   'hud.pet.waterJetDesc':
     '命令你的水元素引导减速水流，持续 3 秒。冷却时间 8 秒。右键点击可在冷却结束后自动施放。',
-  'hud.pet.felbolt': '邪能箭',
-  'hud.pet.felboltTitle': '邪能箭',
-  'hud.pet.felboltDesc':
-    '命令烬裔向你的目标额外发射一枚邪能弹。冷却时间 8 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。',
-  'hud.pet.abyssalChain': '深渊锁链',
-  'hud.pet.abyssalChainTitle': '深渊锁链',
-  'hud.pet.abyssalChainDesc':
-    '命令幽影将 8 码以外、20 码以内的普通敌人拖回自己身边。首领无法被拖拽。冷却时间 15 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。',
-  'hud.pet.autocastOn': '自动施放已开启。右键点击、长按或按 Shift+Enter 可关闭。',
-  'hud.pet.autocastOff': '自动施放已关闭。右键点击、长按或按 Shift+Enter 可开启。',
   'entities.abilities.ice_lance.name': '冰枪术',
   'entities.abilities.ice_lance.description':
     '投掷一枚冰刺，造成 {damage} 点冰霜伤害；对冻结目标造成三倍伤害。消耗寒冰指或一层凛冬之寒，使目标视为已冻结。（冰霜）',
@@ -9823,7 +9376,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以原始奥术能量冲击敌人，造成 {damage} 点伤害。每次施放都会留下奥术充能，使你的下一次以太涌动伤害提高、施法加快（每层快 5%），但法力消耗也会急剧提高，最多叠加 4 层；以太飞矢会消耗这些充能。每次施放还有机会触发以太奔流，使你的下一次以太涌动不消耗法力且施法速度翻倍。',
   'entities.items.conjured_bread4.name': '魔法盛宴面包',
   'entities.items.conjured_water4.name': '魔法泉水',
-  'entities.items.soul_stone.name': '灵魂石',
   'entities.abilities.blazing_barrier.name': '炽热屏障',
   'entities.abilities.blazing_barrier.description':
     '以烈焰环绕自身，吸收 {damage} 点伤害，持续 60 秒。（火焰）',
@@ -10383,22 +9935,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '荒野生长护腿',
   'entities.items.wildsoul_maul.name': '荒野之魂重锤',
   'hudChrome.professions.skillValue': '{skill} / {max}',
-  'entities.abilities.veilstep.name': '帷幕步',
-  'entities.abilities.veilstep.description': '朝面向的方向穿越帷幕。',
-  'entities.abilities.scouring_mercy.name': '涤罪慈悲',
-  'entities.abilities.scouring_mercy.description':
-    '以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。',
-  'entities.abilities.seraphic_vigil.name': '炽天使守望',
-  'entities.abilities.seraphic_vigil.description':
-    '为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。',
-  'entities.abilities.summon_tithefiend.name': '召唤什一魔',
-  'entities.abilities.summon_tithefiend.description':
-    '消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。',
-  'entities.abilities.martyrs_aegis.name': '殉道者圣盾',
-  'entities.abilities.martyrs_aegis.description': '使一名盟友受到的伤害降低 40%，持续 8 秒。',
-  'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
-  'entities.abilities.choir_of_deliverance.description':
-    '引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。',
   'guide.profPages.toolsNote':
     '每处资源点都需要对应行业的工具放在背包里，第 1 级也不例外：没有镐就采不到矿，没有鱼竿就钓不到鱼。商人阶梯覆盖第 1 到 3 级，每个聚落只出售自己周边地形用得上的等级，因此第 1 级工具在每个区域聚落都有售，更高的等级则在需要它们的矿脉附近出售。购买这些更高等级时，商人还会要求你在该行业中具备熟练度，第 2 级需要 {tier2Prof}，第 3 级需要 {tier3Prof}，商品行会注明该要求。工具只需放在背包中即可，没有装备栏也没有耐久度，因此每件都是一次性购买，你已经拥有的工具会一直有效。只有等级会影响限制：同等级中更稀有的工具并不会多开放任何东西。不过稀有度并不只是颜色，它会让镶嵌的工具效果持续更久，装在鱼竿上还会加宽收线时机。\n\n更好的工具带来三样东西，而不是两样。它开放更高等级的地形，缩短采集时间，还会提升产出：用等级高于该区域自身材料的工具开采矿脉，收获的将是精制品级而非普通品级。该矿脉必须是这个区域的完整品级矿脉，因此区域为旅行者保留的简易矿脉依然产出普通材料。精制材料正是制作工具配方所消耗的东西，而且在任何配方或工单要求普通版本的地方，精制品级都可以顶替，所以升级永远不会让你陷入困境：只是你的铜矿石会以精制铜矿石的形式到手。\n\n在商人阶梯之上，每个行业还有两件制作工具，第 4 级和第 5 级，由工程师在工具工坊制作，或在溺诵秘所的柜台用秘境印记购买。任何商人都不会用金币出售它们。钓鱼有自己的一对鱼竿，它们需要向工具匠学习，而非一开始就会。目前没有任何资源点或水域需要超过第 3 级，因此最高的两级买到的是速度、品级和更宽松的收线时机而非准入资格，等更高等级的地形出现时，它们将成为入场券。',
   'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
@@ -10710,12 +10246,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
   'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
-  'entities.abilities.stampede.name': '兽群奔袭',
-  'entities.abilities.stampede.description':
-    '召唤3只野兽，持续12秒。每只野兽每2秒攻击一次，造成{damage}点物理伤害。显示的伤害已计入你远程攻击强度的8%，但尚未计入宠物伤害加成。野兽在召唤时会锁定兽群凶性层数，每层使其伤害提高10%。兽群奔袭处于冷却时，成功施放兽群号令有20%几率重置其冷却；连续5次未触发后必定重置。野兽存在期间无法重置。（兽群之主）',
-  'entities.abilities.ancestor_return.name': '先祖归来',
-  'entities.abilities.ancestor_return.description':
-    '呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': '委托订单',
   'hudChrome.commissionBoard.close': '关闭委托订单',
@@ -11160,8 +10690,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaBound': '{item}，数量 {count}，已绑定的副本',
   'hudChrome.itemTooltip.enchantedFallback': '已附魔',
   'devCommand.actions.kit.description': '为该专精穿上圣所前20级预设装备，背包优先。仅限装备。',
-  'devCommand.actions.biskit.label': '装备20级最佳配装',
-  'devCommand.actions.biskit.description': '为该专精在所有槽位穿上最佳史诗装备。仅限装备。',
   'devCommand.actions.kit.label': '装备新晋20级预设',
   'devCommand.fields.spec': '专精',
   'devCommand.itemChosen': '已选择：{name}',
@@ -11173,51 +10701,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '没有该 ID 对应的物品。',
   'devCommand.kitCurrentSpec': '当前专精',
   'hudChrome.enchanting.wornTag': '已装备（{slot}）',
-  'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
-  'entities.abilities.thunder_reservoir.description':
-    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
-  'entities.abilities.warspirit_cadence.name': '战魂节律',
-  'entities.abilities.warspirit_cadence.description':
-    '被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
-  'entities.abilities.stormsurge.name': '风暴涌动',
-  'entities.abilities.stormsurge.description':
-    '被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）',
-  'entities.abilities.unleash_weapon.name': '释放武器',
-  'entities.abilities.unleash_weapon.description':
-    '释放当前的武器灌注。焰烙造成54至64点火焰伤害，获得30%法术强度加成，并获得2层雷霆。风心用武器攻击，推进战魂节律，并使攻击速度提高20%，持续6秒。缚石造成75%武器伤害，迫使目标攻击你，并使你受到的伤害降低20%，持续4秒。活泉消耗目标身上的愈合水流，立即治疗其剩余治疗量的125%，并使8秒内下一次受到的伤害降低，降低量等于实际恢复生命值的50%。',
-  'hudChrome.auraEffect.dawnsWrath': '制裁之锤：无生命限制 · +1次 · 冷却0 · 伤害+{pct}%',
-  'hudChrome.auraEffect.moontide':
-    '月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层',
-  'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
-  'hudChrome.auraEffect.verdance':
-    '繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
-  'hudChrome.auraEffect.galeheartWeapon':
-    '完成战魂的{steps}连击节奏后，该次打击回响{count}次，每次造成其伤害{pct}%的自然伤害',
-  'hudChrome.auraEffect.elementalTrance':
-    '受到的伤害降低{pct}%。你造成的所有伤害的{mana}%转化为法力值',
-  'entities.abilities.moonseed.name': '月种',
-  'entities.abilities.moonseed.description':
-    '仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。',
-  'guide.abilityHook.moonseed': '在月翼形态下，推进一层月潮并延长月光风暴。',
-  'entities.abilities.moonlash.name': '月涌',
-  'entities.abilities.moonlash.description':
-    '消耗3层月潮，造成{damage}点奥术伤害的强力打击：伤害之选。与日醒消耗同一份月潮，二者只能选其一。',
-  'entities.abilities.sunlance.name': '日醒',
-  'entities.abilities.sunlance.description':
-    '消耗3层月潮，造成{damage}点自然伤害，并在9秒内额外灼烧{overTime}点，同时恢复35点法力：法力之选。与月涌消耗同一份月潮，二者只能选其一。',
-  'entities.abilities.redharvest.name': '血收',
-  'entities.abilities.redharvest.description':
-    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。',
-  'entities.abilities.marrowbreak.name': '碎髓',
-  'entities.abilities.marrowbreak.description':
-    '消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。',
-  'entities.abilities.overbloom.name': '盛放',
-  'entities.abilities.overbloom.description':
-    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。',
-  'entities.abilities.elemental_trance.name': '元素恍惚',
-  'entities.abilities.elemental_trance.description':
-    '进入元素恍惚状态，持续15秒：受到的伤害降低30%，你造成的所有伤害的20%转化为法力值。（战魂特色技能）',
   'hudChrome.continentMap.title': '世界地图',
   'hudChrome.continentMap.summary': '世界地图。选择一个地区以打开其地图。',
   'hudChrome.continentMap.toWorld': '世界地图',

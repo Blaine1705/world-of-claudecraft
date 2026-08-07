@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bannière en main',
+    desc: 'Capturez un drapeau dans les Champs de Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'Thornhollow tient bon',
+    desc: 'Remportez une bataille aux Champs de Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Gardien de Thornhollow',
+    desc: 'Remportez 25 batailles aux Champs de Thornhollow.',
+    title: 'Porte-étendard',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cent bannières',
+    desc: 'Capturez 100 drapeaux dans les Champs de Thornhollow au cours de votre carrière.',
+  },
+  dgn_rift: {
+    name: 'Marcheur des failles',
+    desc: "Nettoyez une faille en vainquant son boss d'étage.",
+  },
+  dgn_rift_s_rank: {
+    name: 'Souverain des failles',
+    desc: "Nettoyez une faille de rang S, le palier le plus difficile qu'un portail de faille puisse faire apparaître.",
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergent',
+    desc: "Gagnez 10 000 points d'honneur au cours de votre vie de personnage. Les dépenser ne vous fait jamais perdre ce rang.",
+    title: 'Sergent',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Chevalier-Lieutenant',
+    desc: "Gagnez 40 000 points d'honneur au cours de votre vie de personnage, une vraie saison de guerre derrière vous.",
+    title: 'Chevalier-Lieutenant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Maréchal',
+    desc: "Gagnez 150 000 points d'honneur au cours de votre vie de personnage. Rare sur n'importe quel royaume, et c'est voulu ainsi.",
+    title: 'Maréchal',
+  },
   chr_drakemaw_broodlord: {
     name: 'Brise-Couvée',
     desc: 'Terrassez un Seigneur de couvée du Drakemaw au milieu de ses œufs, à travers le cri, le fauchage et le feu.',

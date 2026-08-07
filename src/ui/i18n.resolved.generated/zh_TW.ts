@@ -128,8 +128,8 @@ export const zh_TW: EnTranslations = {
         "description": "為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。"
       },
       "biskit": {
-        "label": "裝備20級最佳套裝",
-        "description": "為指定專精在所有欄位穿上最佳史詩裝備。僅限裝備。"
+        "label": "Equip BIS-20 kit",
+        "description": "Wear the best-in-slot epic set for a spec across every slot. Gear only."
       },
       "gold": {
         "label": "新增金幣",
@@ -245,7 +245,7 @@ export const zh_TW: EnTranslations = {
     "hud": {
       "lowMana": "法力不足",
       "lowEnergy": "能量不足",
-      "lowFocus": "集中值不足"
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "天賦",
@@ -322,20 +322,20 @@ export const zh_TW: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "譴罪",
-      "fateThreadsLabel": "命運絲線",
-      "doomMeterUnlock": "移動痛苦資源條",
-      "doomMeterLock": "鎖定痛苦資源條",
-      "doomEmptyStatus": "{value}/{max} 譴罪。",
-      "doomStatus": "{value}/{max} 譴罪；剩餘 {remaining}。",
-      "fateThreadsStatus": "{value}/{max} 命運絲線。",
-      "fateThreadsConsumeReady": "三層命運絲線：吞噬可將其編織為額外的譴罪。",
-      "fateThreadsSentenceReady": "三層命運絲線：裁決可消耗它們以提高18%的傷害。"
+      "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
+      "doomEmptyStatus": "{value} of {max} Condemnation.",
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "靈魂碎片",
+      "soulFragmentsMeter": "Soul Fragments",
       "ruinMeter": "Ruin",
-      "ruinStatus": "毀滅 {value}/{max}"
+      "ruinStatus": "{value} of {max} Ruin"
     },
     "spectate": {
       "banner": "正在觀察 {name}"
@@ -804,12 +804,12 @@ export const zh_TW: EnTranslations = {
       "resting": "休息中"
     },
     "paladin": {
-      "devotion": "虔誠",
-      "devotionValue": "虔誠值 {value}/{max}",
-      "devotionAscensionCharges": "虔誠值 {value}/{max}。昇華充能：{charges}。",
-      "devotionAscensionLast": "虔誠值 {value}/{max}。昇華的最後一次充能。",
-      "ascensionLastAnnouncement": "昇華的最後一次充能",
-      "ascensionSpenderAria": "快捷列第 {slot} 格：{ability}。消耗一次昇華充能。"
+      "devotion": "Devotion",
+      "devotionValue": "Devotion {value} of {max}",
+      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
+      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
+      "ascensionLastAnnouncement": "Ascension final charge",
+      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -988,7 +988,7 @@ export const zh_TW: EnTranslations = {
       "valecup": "溪谷盃",
       "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
-      "dive": "Swim Down",
+      "dive": "下潛",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
       "petStop": "寵物：停止",
@@ -1402,8 +1402,8 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "放大",
+      "zoomOut": "縮小",
       "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
     },
     "perf": {
@@ -1568,7 +1568,7 @@ export const zh_TW: EnTranslations = {
       "jewelry": "飾品",
       "weapons": "武器",
       "owned": "已擁有",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
       "buyConfirmBody": "用 {honor} 購買 {item}？榮譽購買後無法退款。"
     },
@@ -1616,7 +1616,7 @@ export const zh_TW: EnTranslations = {
         "spellCritPct": "+{value}% 法術暴擊",
         "healthRegen": "休息時每 5 秒約恢復 {value} 點生命值",
         "manaRegen": "休息時每 5 秒約恢復 {value} 點法力",
-        "manaRegenCombat": "戰鬥中每 5 秒約恢復 {value} 點法力",
+        "manaRegenCombat": "About {value} mana every 5 sec in combat",
         "damageReduction": "對等級 {level} 攻擊者的傷害減免：{value}%",
         "dpsFromAp": "為你的攻擊增加 {value} 點每秒傷害"
       },
@@ -1975,36 +1975,36 @@ export const zh_TW: EnTranslations = {
     "auraEffect": {
       "dot": "每 {interval} 秒造成 {value} 點{school}傷害",
       "hot": "每 {interval} 秒恢復 {value} 點生命值",
-      "mendingCurrent": "儲存 {value} 點治療量，隨時間釋放或由湧流癒合消耗",
-      "mendingCurrentPercent": "儲存相當於最大生命值 {pct}% 的治療量，供湧流癒合消耗",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "吸收 {value} 點傷害",
       "healAbsorb": "吸收 {value} 點受到的治療",
       "thorns": "對攻擊者造成 {value} 點{school}傷害",
-      "stasis": "免疫所有效果且無法行動",
+      "stasis": "Immune and unable to act",
       "slow": "移動速度降低 {pct}%",
       "speed": "移動速度提高 {pct}%",
       "attackSpeedSlow": "攻擊速度減慢 {pct}%",
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
       "imbueRange": "武器附魔：裁決時造成 {min} 到 {max} 點額外傷害",
-      "petDamage": "寵物造成的傷害提高 {pct}%",
-      "petHaste": "寵物的行動速度提高 {pct}%",
-      "spellDamage": "法術傷害提高 {pct}%",
-      "spellHaste": "施法速度提高 {pct}%",
-      "sated": "無法再獲得團隊加速效果",
-      "cauterizeFatigue": "灸灼無法再次阻止致命傷害",
-      "castShield": "施法不會因受到傷害而中斷或延遲",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "造成的傷害提高 {pct}%",
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
       "elementalConvergencePrimed": "你的下一個不同元素學派法術將觸發元素匯聚",
-      "hunterFerocity": "{stacks} 層獸群凶性：你的寵物造成的傷害提高 {pct}%",
-      "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
-      "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
-      "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
-      "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
-      "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
-      "internalCooldown": "計時結束前此效果無法再次觸發",
+      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
@@ -2019,13 +2019,13 @@ export const zh_TW: EnTranslations = {
       "revengeFree": "你的下一次復仇不消耗怒氣",
       "victoryRush": "乘勝追擊已就緒",
       "maxHpPct": "最大生命值提高 {pct}%",
-      "enrage": "造成的傷害提高 {damagePct}%，攻擊速度提高 {hastePct}%，移動速度提高 {movePct}%",
-      "suddenDeath": "下一次斬殺不消耗怒氣並無視生命值要求",
-      "aoeEcho": "剩餘 {charges} 次迴響：單體技能對附近最多 {targets} 個敵人造成 {pct}% 傷害",
-      "sureCrit": "接下來 {charges} 個傷害技能必定造成致命一擊",
-      "temporalEcho": "施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%",
-      "arcaneCharge": "{stacks} 層秘法充能：乙太湧動傷害提高 {damagePct}%，施法加快 {castPct}%，法力消耗變為 {costMult} 倍",
-      "physicalReduction": "受到的物理傷害降低 {pct}%",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。",
       "tongues": "施法時間增加 {pct}%",
       "combustionCrit": "你的火焰法術必定造成致命一擊",
@@ -2035,22 +2035,22 @@ export const zh_TW: EnTranslations = {
       "freeCast": "下一次施法不消耗任何資源",
       "instantCast": "下一個有施法時間的法術變為瞬發",
       "cheapCast": "下一個法術消耗降低{pct}%",
-      "radiantResonance": "你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 {pct}%，施法時間縮短至 {castTime} 秒",
-      "solarReprisal": "你的下一次向陽飛盾不消耗法力、無視冷卻時間且傷害提高 {pct}%；恩典之錘無視冷卻時間並為你恢復相當於傷害量 100% 的生命值；或使治癒之光立即施放",
-      "dawnsWrath": "制裁之錘：無生命限制 · +1次 · 冷卻0 · 傷害+{pct}%",
-      "venomRitual": "毒祭：第{stacks}/{max}層。怯懦突刺、邪惡揮斬與毒鏢各累積1層。達到{max}層時，入土長眠變為蝕毒撕裂",
-      "gloam": "幽暝：第{stacks}/{max}層。自暮紗中使用先制技各累積1層。達到{max}層時，你的先制技可在明處使用，且下一次施展不消耗資源，耗盡全部3層並開啟暗影纏身",
-      "redline": "紅線：第{stacks}/{max}格。每次重磅擺拳加深一格；眼前一黑每格傷害提高{pct}%，並結束紅線。時限一到則擊倒作廢",
-      "veilstrikeWindow": "暗影纏身：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高{pct}%",
-      "veiledEdge": "你的下一次潛伏者一擊造成雙倍傷害",
-      "duskEconomy": "技能的能量消耗降低{pct}%",
-      "moontide": "月潮：第{stacks}/{max}層。月翼形態下，狂野奔雷、隕天術與月種的施法各累積1層。達到{max}層時，月種變為月湧、隕天術變為日醒，使用任一個都會耗盡全部3層",
-      "oldBlood": "古血：第{stacks}/{max}層。裂爪、剮擊、血裂、血噬、橫掃利爪與碎骨擊的命中各累積1層。達到{max}層時：狼形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓",
-      "verdance": "繁茂：第{stacks}/{max}層。每種下一個全新的野性綻放或再度綻放累積1層。達到{max}層時，迅癒變為盛放",
-      "freeExecute": "下一個符合條件的斬殺技能不消耗資源",
-      "resourceSap": "每 {interval} 秒恢復 {value} 點目前資源",
-      "nextAttackCrit": "下一次攻擊必定造成致命一擊",
-      "healEcho": "生命值低於 {threshold}% 時恢復 {value} 點生命值",
+      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
+      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "攻擊強度提高 {value}",
         "sp": "法術強度提高 {value}",
@@ -2089,8 +2089,8 @@ export const zh_TW: EnTranslations = {
       "mortalWound": "受到的治療降低 {pct}%",
       "vulnerability": "受到的傷害提高 {pct}%",
       "physVuln": "受到的物理傷害提高 {pct}%",
-      "bleedVuln": "受到的流血傷害提高 {pct}%",
-      "sourceVuln": "受到施加此效果的施法者造成的傷害提高 {pct}%",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "受到的魔法傷害提高 {pct}%",
       "critVuln": "被致命一擊的機率提高 {pct}%",
       "costTax": "技能消耗增加 {pct}%",
@@ -2104,46 +2104,46 @@ export const zh_TW: EnTranslations = {
       "disarm": "繳械：無法使用武器攻擊",
       "lockout": "法術學派被鎖定",
       "imbue": "武器被附上額外效果",
-      "galeheartWeapon": "完成戰魂的{steps}連擊節奏後，該次打擊迴響{count}次，每次造成其傷害{pct}%的自然傷害",
-      "elementalTrance": "受到的傷害降低{pct}%。你造成的所有傷害的{mana}%轉化為法力值",
+      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
+      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "隱蔽；移動速度降低 {pct}%",
       "formBear": "巨熊形態：生命值與護甲提高",
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "formFireball": "火球形態：移動速度提高 {pct}%；無法攻擊或施法",
-      "formMoonkin": "月翼形態：法術傷害提高 {pct}%，護甲提高 {armorPct}%",
-      "formShadow": "幽幕形態：暗影傷害提高 {pct}%",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
-      "formLich": "靈魂長槍還會對附近最多 {targets} 個敵人造成 {pct}% 傷害",
-      "afflictionEye": "惡咒凝視每 {interval} 秒攻擊一次；此邪眼上的效果產生 {pct}% 的定罪值",
-      "afflictionEyeSecondary": "此邪眼上的效果產生 {doomPct}% 的定罪值；宣判在此迴響並造成 {echoPct}% 傷害",
-      "afflictionAccomplice": "符合條件的傷害產生 {value} 點定罪值，每 {interval} 秒最多一次",
-      "afflictionViolence": "剩餘 {charges} 次報復；敵人攻擊會產生 {doom} 點定罪值並反擊 {damage} 點暗影傷害",
-      "afflictionVicarious": "轉移或降低 {pct}% 的受到傷害，並可產生最多 {max} 點定罪值",
-      "afflictionPossession": "強化命運之針、汲取生命、惡咒凝視和宣判",
-      "afflictionJudgment": "主邪眼產生的定罪值提高 {eyePct}%；宣判傷害提高 {sentencePct}%，第一次返還 {refund} 點定罪值",
-      "afflictionLitany": "獲得定罪值時，對 {radius} 碼內最多 {targets} 個敵人造成 {damage} 點暗影傷害，每秒最多一次",
-      "afflictionFateThreads": "{stacks} 層命運絲線：宣判傷害提高 {sentencePct}%，或使汲取生命每次額外產生 {doom} 點定罪值",
-      "afflictionConsumeThreads": "汲取生命正在消耗 {stacks} 層命運絲線，每次額外產生 {doom} 點定罪值",
-      "necromancyHarvestMark": "目標死亡時可產生 1 個靈魂碎片",
-      "necromancyOssuaryMark": "儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片",
-      "necromancyDeathEcho": "舊版本遺留的死亡迴響；目前沒有技能會消耗它",
-      "warlockAnchor": "在 {range} 碼內再次施放可返回此處並消耗錨點",
-      "formMetamorph": "惡魔形態：體型增大 {pct}%；其他加成由獨立增益提供",
-      "energyRegen": "能量恢復速度提高 {pct}%",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
-      "overpowerCharge": "{stacks} 層充能：下一次致殘打擊傷害提高 {pct}%",
-      "sweepingStrikes": "單體攻擊還會對附近 {targets} 個敵人造成 {pct}% 傷害",
-      "fingersOfFrost": "剩餘 {charges} 層：冰霜長矛視目標為凍結狀態，並造成 {pct}% 的凍結傷害",
-      "brainFreeze": "下一次冰風暴瞬發且無視冷卻時間",
-      "wintersChill": "剩餘 {charges} 層：符合條件的法術視此目標為凍結狀態",
-      "icicles": "{value}/{max} 根冰柱；達到 {max} 根時可施放冰川尖刺",
-      "desolation": "剩餘 {charges} 層：下一次混沌箭施法加快 {castPct}%，或下一次火焰之雨立即落下",
-      "ruinousBrand": "剩餘 {charges} 次複製：直接法術在此複製 {otherPct}% 傷害；若此目標也是主目標則複製 {selfPct}%",
-      "duskfireClaim": "目標死亡時獲得 {value} 點毀滅",
-      "pyreGuardian": "每 {ruinInterval} 秒產生 {ruin} 點毀滅，並每 {damageInterval} 秒對 {radius} 碼內敵人造成 {damage} 點火焰傷害",
-      "perfectMoment": "乙太飛彈不會消耗秘法充能",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Ruin",
+      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
       "school": {
@@ -2235,7 +2235,7 @@ export const zh_TW: EnTranslations = {
       "showResource": "顯示法力、怒氣和能量",
       "showAbsorbs": "顯示吸收護盾",
       "showAuras": "顯示增益和減益",
-      "showPets": "Show Pets",
+      "showPets": "顯示寵物",
       "petHealth": "寵物{name}，生命值{pct}",
       "showSelf": "顯示你的框體"
     },
@@ -2253,7 +2253,7 @@ export const zh_TW: EnTranslations = {
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
       "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "用於 {crafts}。",
       "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
       "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
       "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
@@ -2944,7 +2944,7 @@ export const zh_TW: EnTranslations = {
       "qtyValueAria": "製作數量，{count}",
       "batchRemaining": "剩餘 {remaining}/{total}",
       "batchRemainingAria": "還剩 {remaining} 個，共 {total} 個",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}秒",
       "durationAria": "施放時間：{seconds} 秒",
       "progressAria": "製作進度",
       "announceStart": "正在製作 {name}",
@@ -3979,7 +3979,7 @@ export const zh_TW: EnTranslations = {
       "none": "沒有職業符合所有篩選條件。清除一項以查看更多。"
     },
     "abilityHook": {
-      "evil_eye": "標記一名敵人，使其行動與承受的苦難為你累積譴罪。",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
       "revenge": "橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。",
       "hamstring": "妨礙敵人的移動，使其無法逃脫。",
@@ -3990,21 +3990,21 @@ export const zh_TW: EnTranslations = {
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",
       "judgement": "消耗你當前的聖印，從近距離打擊敵人。",
-      "hammer_of_wrath": "從遠處處決一名受傷的敵人，或在聖翼啟動時處決任何敵人。",
-      "avenging_wrath": "獲得 10 點虔誠，並在接下來的十五秒內使技能產生的虔誠值加倍。",
-      "bastion_sweep": "以盾牌橫掃一群敵人，奪取仇恨並累積虔誠。",
-      "oath_chain": "將遠處的敵人拉入隊伍並減緩其逃離速度。",
-      "veilbound_march": "穿過敵群並留下印記，削弱其對你造成的傷害並牢牢鎖定仇恨。",
-      "holy_shield": "消耗虔誠，獲得主動格擋時段、吸收護盾和仇恨脈衝。",
-      "consecration": "以持續的神聖傷害和仇恨占據周圍地面。",
-      "hammer_of_justice": "以短暫而可靠的昏迷阻止一名敵人。",
-      "lay_on_hands": "在盟友瀕臨倒下時為其恢復大量生命值。",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
+      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
       "blessing_of_might": "提升友方目標的攻擊強度，適合在開怪前施放。",
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
-      "pack_command": "命令你的夥伴發動攻擊，並累積兇性以釋放野獸。",
-      "stampede": "召喚三隻野獸攻擊12秒。疊滿獸群兇性後使用，可讓牠們在整個召喚期間保持最高傷害加成。",
-      "measured_shot": "一記從容瞄準的遠程射擊，為你的強力攻擊恢復集中值。",
+      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
+      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "持續維持的姿態，用來強化你的遠程攻擊強度。",
       "serpent_sting": "施加毒液，隨時間造成持續的自然傷害。",
       "arcane_shot": "從遠處射出的瞬發一擊，迅速造成額外傷害。",
@@ -4023,21 +4023,21 @@ export const zh_TW: EnTranslations = {
       "power_word_shield": "為友方罩上護盾，在傷害落下前先行吸收。",
       "renew": "隨時間持續跳動的治療，適合施放後繼續移動。",
       "lightning_bolt": "施放遠程的自然傷害，是你從遠處的慣用招式。",
-      "chain_lightning": "攻擊一個目標並跳向附近兩名敵人，整次施法產生一層雷霆。",
-      "thunder_reservoir": "積蓄雷電，直到大地震擊或斷層震盪能釋放完整威力。",
+      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "為武器附魔，讓你近戰每一擊都更沉重。",
       "healing_wave": "你主要的治療法術，直接為自己或友方回復生命。",
       "earth_shock": "瞬發震擊，在你需要時立即造成自然傷害。",
       "lightning_shield": "為自己充能，攻擊者打中你時會受到自然傷害。",
       "flame_shock": "瞬發灼燒，先給予一記前置傷害並持續灼燒。",
-      "galeheart_weapon": "為雙持武器灌注風暴之風，以穩定的攻擊節奏獲得回報。",
-      "warspirit_cadence": "將穩定的武器節奏轉化為風心回響和一次瞬發法術機會。",
-      "stormsurge": "消耗風暴施法機會後，有時會提早恢復先祖打擊。",
-      "lifespring_weapon": "為武器灌注復甦之水，強化持續的治療節奏。",
-      "tidecall": "立即治療一名盟友，並注入滿額癒合水流。",
-      "ancestor_return": "在戰鬥外長時間施法後，使所有陣亡的隊伍或團隊成員復活。",
-      "stoneward": "升起充能石盾，將受到的傷害轉化為恢復。",
-      "primal_exaltation": "短暫釋放符合你專精的元素力量。",
+      "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
+      "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
+      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
+      "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "你主要的火焰核彈，命中後讓目標持續燃燒。",
       "fireball_form": "化身為活體火球，高速穿越開闊地帶。",
       "frost_armor": "持續的自我增益，在戰鬥前強化你的護甲。",
@@ -4063,7 +4063,7 @@ export const zh_TW: EnTranslations = {
       "healing_touch": "施法時間較長的大型單體治療，用來把某人補滿。",
       "mark_of_the_wild": "戰鬥前替自己或友方施加的持久祝福。",
       "moonfire": "瞬間命中並讓目標持續燃燒，移動時也很好用。",
-      "moonseed": "在月翼形態下，推進一層月潮並延長月光風暴。",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "瞬發施放，持續為友方回復生命，讓你能繼續行動。",
       "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。"
     },
@@ -6850,7 +6850,7 @@ export const zh_TW: EnTranslations = {
       "mana": "法力",
       "energy": "能量",
       "rage": "怒氣",
-      "focus": "集中值"
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "坦克 / 近戰 DPS",
@@ -7256,7 +7256,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
       "notEnoughMana": "法力不足！",
-      "notEnoughDevotion": "虔誠值不足！",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
       "targetMustDodge": "你的目標必須先閃避。",
@@ -7384,10 +7384,10 @@ export const zh_TW: EnTranslations = {
     "pet": {
       "attack": "攻擊",
       "waterJet": "水流噴射",
-      "felbolt": "邪能箭",
-      "abyssalChain": "深淵鎖鏈",
-      "autocastOn": "自動施放已開啟。按右鍵、長按或按 Shift+Enter 可關閉。",
-      "autocastOff": "自動施放已關閉。按右鍵、長按或按 Shift+Enter 可開啟。",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "嘲諷",
       "healDemon": "治療惡魔",
       "healPet": "治療寵物",
@@ -7398,10 +7398,10 @@ export const zh_TW: EnTranslations = {
       "petAttackDesc": "命令你的寵物攻擊目前敵對目標。",
       "waterJetTitle": "水流噴射",
       "waterJetDesc": "命令你的水元素引導緩速水流，持續 3 秒。冷卻時間 8 秒。按右鍵可在冷卻結束後自動施放。",
-      "felboltTitle": "邪能箭",
-      "felboltDesc": "命令燼裔向你的目標額外發射一枚邪能彈。冷卻時間 8 秒。按右鍵、長按或按 Shift+Enter 可切換自動施放。",
-      "abyssalChainTitle": "深淵鎖鏈",
-      "abyssalChainDesc": "命令幽蔭將 8 碼以外、20 碼以內的普通敵人拖回自己身邊。首領無法被拖曳。冷卻時間 15 秒。按右鍵、長按或按 Shift+Enter 可切換自動施放。",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "寵物嘲諷",
       "petTauntDesc": "命令你的寵物接戰，並在進入範圍時使用低吼。10 秒冷卻。",
       "healDemonDesc": "消耗法力，在 5 秒內向你的惡魔引導治療。",
@@ -7569,7 +7569,7 @@ export const zh_TW: EnTranslations = {
       "requiresLevel": "需要等級 {level}",
       "requiresForm": "需要{form}形態",
       "requiresStealth": "需要潛行",
-      "requiresStealthSkulduggery": "需要潛行（幽暝達3層或暗影纏身期間除外）",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "消耗連擊點",
       "requiresTargetHealthBelow": "需要目標生命值低於 {percent}%",
       "requiresDodge": "只能在目標閃避後使用",
@@ -7586,8 +7586,8 @@ export const zh_TW: EnTranslations = {
       "mana": "法力",
       "rage": "怒氣",
       "energy": "能量",
-      "focus": "集中值",
-      "devotion": "虔誠"
+      "focus": "Focus",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "熊",
@@ -7788,7 +7788,7 @@ export const zh_TW: EnTranslations = {
       "clickDestroy": "點擊摧毀",
       "useFishing": "使用：在附近水域釣魚。",
       "useHealingPotion": "使用：立即恢復 {amount} 點生命值。戰鬥中可用。1 分鐘冷卻。",
-      "useHealingPotionPct": "使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。2 分鐘冷卻。",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。",
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
@@ -7927,7 +7927,7 @@ export const zh_TW: EnTranslations = {
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",
       "collectNote": "商人為你保管的收益和退回貨物。",
       "saleProceeds": "銷售收益",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "售予 {buyer}",
       "saleOlder": "另有 {count} 筆較早的交易，已計入總額。",
       "collectAll": "全部領取"
     },
@@ -8027,56 +8027,56 @@ export const zh_TW: EnTranslations = {
         "description": "向目標區域射出箭雨，持續 3 秒，每 0.5 秒對其中的敵人造成 {damage} 點傷害。"
       },
       "pack_command": {
-        "name": "獸群號令",
-        "description": "命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。"
+        "name": "Pack Command",
+        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
       },
       "stampede": {
-        "name": "獸群奔襲",
-        "description": "召喚3隻野獸，持續12秒。每隻野獸每2秒攻擊一次，造成{damage}點物理傷害。顯示的傷害已計入你遠程攻擊強度的8%，但尚未計入寵物傷害加成。野獸在召喚時會鎖定獸群凶性層數，每層使其傷害提高10%。獸群奔襲處於冷卻時，成功施放獸群號令有20%機率重置其冷卻；連續5次未觸發後必定重置。野獸存在期間無法重置。（獸群之主）"
+        "name": "Stampede",
+        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
       },
       "unleash_beast": {
-        "name": "釋放野獸",
-        "description": "釋放滿層獸群兇性，對主要目標發動重擊並拍擊周圍敵人，隨後使寵物短暫進入順劈狂亂。"
+        "name": "Unleash Beast",
+        "description": "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target."
       },
       "measured_shot": {
-        "name": "審慎射擊",
-        "description": "一記從容瞄準的射擊，造成 {damage} 點物理傷害，並在命中時產生 20 點集中值。"
+        "name": "Measured Shot",
+        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
       },
       "cold_focus": {
-        "name": "冷靜專注",
-        "description": "持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）"
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
       },
       "bloodhook": {
-        "name": "血鉤",
-        "description": "衝向 8 至 25 碼外的敵人，撕開一道主要傷口，在 12 秒內造成 24 點流血傷害。（野戰技藝招牌技能）"
+        "name": "Bloodhook",
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
-        "name": "榴片炸彈",
-        "description": "用榴片轟擊目標及其附近敵人，隨後從主要目標擴散一道短暫的流血。"
+        "name": "Shrapnel Charge",
+        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
       },
       "bloodtrail_assault": {
-        "name": "血跡突襲",
-        "description": "持續 12 秒，強化血鉤、撕傷、榴片炸彈以及寵物的後續攻擊。"
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
       },
       "trailbreak": {
-        "name": "斷跡",
-        "description": "向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。"
+        "name": "Trailbreak",
+        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
-        "name": "野性之心",
-        "description": "立即恢復最大生命值的 30%。"
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
       },
       "shellskin": {
-        "name": "甲殼之膚",
-        "description": "受到的傷害降低 60%，持續 8 秒，但生效期間無法攻擊。"
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
       },
       "frostjaw_trap": {
-        "name": "霜顎陷阱",
-        "description": "在選中的敵人處或腳下放置已啟動的陷阱。它會定身第一個觸發的敵人，並減速附近敵人。"
+        "name": "Frostjaw Trap",
+        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
       },
       "pack_rally": {
-        "name": "獸群集結",
-        "description": "進入駿馬之姿，並激勵附近友方，使其移動速度提高 30%、攻擊與施法速度提高 10%，持續 10 秒。"
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec."
       },
       "hurricane": {
         "name": "颶風",
@@ -8293,19 +8293,19 @@ export const zh_TW: EnTranslations = {
       "sinister_strike": {
         "name": "邪惡揮斬",
         "description": "立即攻擊，造成武器傷害加 {damage}。獎勵 1 個連擊點。",
-        "specNote_assassination": "累積 1 層毒祭（最多 6 層）。",
-        "specNote_combat": "紅線期間，此按鈕變為重磅擺拳：造成 130% 武器傷害加 10，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。"
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "入土長眠",
         "description": "終結技，造成 {damage}。",
-        "specNote_assassination": "毒祭達 6 層時，此按鈕變為蝕毒撕裂：這一擊會立即引爆你的流血效果的全部剩餘傷害，種下一道新的蝕毒傷口，並恢復 20 點能量。",
-        "specNote_combat": "以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（造成 45 點傷害，每個連擊點額外造成 35 點，紅線每格加深使傷害提高 25%，並恢復 25 點能量）。請在紅線結束前使用。"
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "怯懦突刺",
         "description": "背刺目標，造成 150% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。",
-        "specNote_assassination": "每次攻擊累積 1 層毒祭（最多 6 層）並恢復 15 點能量。毒祭達 6 層時，入土長眠變為蝕毒撕裂（一次引爆你所有流血效果的剩餘傷害）。"
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "戳眼一擊",
@@ -8317,7 +8317,7 @@ export const zh_TW: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "割喉節奏",
-        "description": "終結技，使近戰攻擊速度提高 30%，持續 12 秒，每個連擊點額外延長 4 秒（5 個連擊點：32 秒）。"
+        "description": "終結技，使近戰攻擊速度提高 30%。每個連擊點都會延長持續時間。"
       },
       "sprint": {
         "name": "疾風之足",
@@ -8325,17 +8325,17 @@ export const zh_TW: EnTranslations = {
       },
       "kidney_shot": {
         "name": "陰狠一擊",
-        "description": "終結技，使目標昏迷 1 秒，每個連擊點額外延長 1 秒（5 個連擊點：6 秒）。"
+        "description": "終結技，使目標昏迷。每個連擊點使持續時間延長 1 秒。"
       },
       "ambush": {
         "name": "潛伏者一擊",
         "description": "伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。",
-        "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處以任意角度使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，開啟 6 秒的暗影纏身，並造成雙倍傷害。"
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "暮紗",
         "description": "將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破暮紗。再次施放可現身。",
-        "specNote_subtlety": "自暮紗中使用的每個先制技累積 1 層幽暝（最多 3 層）。"
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "疾血",
@@ -8344,12 +8344,12 @@ export const zh_TW: EnTranslations = {
       "garrote": {
         "name": "勒喉鋼絲",
         "description": "勒住敵人的咽喉，立即造成 {damage} 點傷害，並使其在 18 秒內流血損失 {overTime}。必須處於潛行狀態。獎勵 1 個連擊點。",
-        "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。"
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "掏腹重擊",
         "description": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。",
-        "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。"
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "悶棍",
@@ -8361,11 +8361,11 @@ export const zh_TW: EnTranslations = {
       },
       "expose_armor": {
         "name": "裂甲",
-        "description": "終結技，使目標破綻盡露 30 秒：每消耗 1 個連擊點使其護甲降低 2%（5 個連擊點：{damage}%）。"
+        "description": "終結技，使目標破綻盡露，使其護甲降低 {damage}，持續 30 秒。"
       },
       "rupture": {
         "name": "血竭",
-        "description": "終結技，撕裂目標的傷口：使其每 2 秒流血一次，持續 6 秒，每個連擊點額外延長 2 秒（5 個連擊點：16 秒，共 {damage} 點傷害）。"
+        "description": "終結技，撕裂目標的傷口，使其在 16 秒內流血損失 {damage} 點生命。"
       },
       "vanish": {
         "name": "煙遁步",
@@ -8396,116 +8396,116 @@ export const zh_TW: EnTranslations = {
         "description": "為一個友方目標恢復 {damage} 點生命值。"
       },
       "divine_ascension": {
-        "name": "神聖昇華",
-        "description": "消耗 20 點虔誠，獲得 5 次昇華充能，最多持續 45 秒。標記的技能會消耗一次充能並獲得額外效果。"
+        "name": "Divine Ascension",
+        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
       },
       "aura_mastery": {
-        "name": "神聖協律",
-        "description": "持續 8 秒，強化隊伍中所有啟動的虔誠光環和報償光環。壁壘虔誠使傷害降低 15%；報償造成 15 點神聖傷害。多次使用只會刷新效果，不會堆疊。"
+        "name": "Sacred Concord",
+        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
       },
       "devotion_ward": {
-        "name": "壁壘虔誠",
-        "description": "使你和隊伍成員受到的傷害降低 5%，持續至死亡或被取代。只有此光環與報償光環會彼此取代；輝光、黎明和恩典虔誠可以共存。"
+        "name": "Bastion Devotion",
+        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
       },
       "hammer_of_grace": {
-        "name": "恩典之錘",
-        "description": "立即向 20 公尺內的敵人擲出聖錘，造成 {damage} 點傷害，恢復 70 點法力，為自己恢復相當於傷害量 50% 的生命值，並在造成傷害時產生 1 點虔誠。烈陽反擊會使恩典之錘無視冷卻時間，並為你恢復相當於傷害量 100% 的生命值。"
+        "name": "Hammer of Grace",
+        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
       },
       "hushbrand": {
-        "name": "寂靜烙印",
-        "description": "中斷施法，並使目標在 4 秒內無法施放該系法術。"
+        "name": "Hushbrand",
+        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
       },
       "guardian_covenant": {
-        "name": "守護契約",
-        "description": "保護一名友方目標和你自己，使受到的傷害降低20%，持續8秒。未選取友方目標時，預設對你自己施放。"
+        "name": "Guardian Covenant",
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
-        "name": "烈陽步",
-        "description": "使你的移動速度提高 150%，持續 2 秒。"
+        "name": "Solar Step",
+        "description": "Increase your movement speed by 150% for 2 sec."
       },
       "solar_invocation": {
-        "name": "烈陽祈喚",
-        "description": "立即為一名盟友恢復 {damage} 點生命值，或對一名敵人造成中等神聖傷害。任一用途都會產生 1 點虔誠。昇華期間，治療施法還會治療目標 10 公尺內的友方玩家，治療量為原來的一半。"
+        "name": "Solar Invocation",
+        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
       },
       "radiant_devotion": {
-        "name": "輝光虔誠",
-        "description": "使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠，但可與其他聖騎士的虔誠共存。"
+        "name": "Radiant Devotion",
+        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "dawn_devotion": {
-        "name": "黎明虔誠",
-        "description": "使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠，但可與其他聖騎士的虔誠及戰士的戰吼共存。"
+        "name": "Dawn Devotion",
+        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist."
       },
       "grace_devotion": {
-        "name": "恩典虔誠",
-        "description": "你和隊伍成員每 5 秒恢復 15 點法力，且法力消耗降低 3%，持續 30 分鐘。會取代你自己的輝光或黎明虔誠，但可與其他聖騎士的虔誠共存。"
+        "name": "Grace Devotion",
+        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "recall_the_fallen": {
-        "name": "喚回逝者",
-        "description": "使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。"
+        "name": "Recall the Fallen",
+        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
       },
       "beacon_of_light": {
-        "name": "聖光信標",
-        "description": "將一名隊伍成員標記為你的聖光信標。你對 60 公尺內另一名隊伍成員造成的有效直接治療，有 50% 也會治療信標目標。範圍治療和週期性治療不會傳遞。持續至你或目標死亡。"
+        "name": "Beacon of Light",
+        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
       },
       "final_edict": {
-        "name": "終末敕令",
-        "description": "發動一次沉重的武器攻擊，並在造成傷害時產生 1 點虔誠。命中後使黎明墜擊的剩餘冷卻時間縮短 2 秒。成功的自動攻擊和終末敕令命中有 15% 機率獲得持續 8 秒的黎明之怒。昇華還會在你周圍釋放神聖爆炸。"
+        "name": "Final Edict",
+        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
       },
       "dawnfall": {
-        "name": "黎明墜擊",
-        "description": "對附近敵人造成 {damage} 點神聖傷害並產生 1 點虔誠。命中至少一個敵人會使終末敕令的剩餘冷卻時間縮短 2 秒。昇華會提高其傷害和作用半徑。"
+        "name": "Dawnfall",
+        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
       },
       "sun_gods_verdict": {
-        "name": "太陽神裁決",
-        "description": "以太陽神裁決審判一名敵人，持續 30 秒。終末敕令和黎明墜擊成功命中時會刻下一層印記。施加第三層印記的技能決定判決：終末敕令對罪人釋放毀滅性傷害；黎明墜擊引爆裁決，對附近敵人造成傷害並使其昏迷 1.5 秒。"
+        "name": "Verdict of the Sun God",
+        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
       },
       "valkyrs_calling": {
-        "name": "女武神的召喚",
-        "description": "升上空中，在飛向敵人期間免疫傷害。2 秒後降臨目標區域，造成 {damage} 點神聖傷害並產生 1 點虔誠。昇華會使衝擊傷害提高 50% 並消耗 1 次充能。"
+        "name": "Valkyr's Calling",
+        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
       },
       "faithforged_guard": {
-        "name": "聖光之債",
-        "description": "在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。"
+        "name": "Debt of Light",
+        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
       },
       "mercy_lance": {
-        "name": "慈悲聖槍",
-        "description": "對一名敵人造成 {damage} 點神聖傷害，並在造成傷害時產生 1 點虔誠。昇華期間消耗 1 次充能，使其必定造成致命一擊。"
+        "name": "Mercy Lance",
+        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
       },
       "sacred_form": {
-        "name": "神聖形態",
-        "description": "進入持續至死亡的神聖狀態，使治療效果提高 10%、法術致命一擊機率提高 5%，產生的仇恨降低 50%。僅限黎明癒者。"
+        "name": "Sacred Form",
+        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
       },
       "dawns_embrace": {
-        "name": "黎明之擁",
-        "description": "施放一次強力治療並產生 1 點虔誠。輝光共鳴使其法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華使其立即施放，且治療量提高 35%。"
+        "name": "Dawn's Embrace",
+        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
       },
       "radiant_chorus": {
-        "name": "輝光聖歌",
-        "description": "為附近盟友恢復 {damage} 點生命值並產生 1 點虔誠。有效治療至少 2 名盟友會獲得輝光共鳴：你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華會提高輝光聖歌的治療量和作用半徑。"
+        "name": "Radiant Chorus",
+        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
       },
       "life_covenant": {
-        "name": "生命契約",
-        "description": "使一名盟友受到的傷害降低 40%，持續 6 秒。昇華期間還會給予一個可吸收 120 點傷害的護盾，且不消耗充能。"
+        "name": "Life Covenant",
+        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
       },
       "aegis_first_dawn": {
-        "name": "初曙聖盾",
-        "description": "引導 5 秒，創造一個半徑 10 公尺的神聖穹頂。穹頂內的盟友每秒受到治療，且受到的傷害降低 50%。完成引導時釋放最終治療，並使移動速度提高 30%，持續 4 秒。"
+        "name": "Aegis of the First Dawn",
+        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
       },
       "vowkeeper_strike": {
-        "name": "守誓者打擊",
-        "description": "發動高仇恨攻擊並產生 1 點虔誠。成功命中有 20% 機率獲得持續 8 秒的烈陽反擊；每次成功格擋有 25% 機率觸發。烈陽反擊會強化你的下一次向陽飛盾、恩典之錘或治癒之光。昇華還會給予一個小型吸收護盾。"
+        "name": "Vowkeeper Strike",
+        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
       },
       "bastion_rite": {
-        "name": "壁壘儀式",
-        "description": "使受到的物理傷害降低 20%，格擋機率提高 20%，持續 6 秒。昇華將持續時間延長至 10 秒。"
+        "name": "Bastion Rite",
+        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
       },
       "sunward_disc": {
-        "name": "向陽飛盾",
-        "description": "需要盾牌。擲出一面輝光飛盾，命中後在附近敵人之間彈射。每次造成傷害都會產生 1 點虔誠。烈陽反擊使向陽飛盾不消耗法力、無視冷卻時間且傷害提高 20%。昇華會強化 5 次彈射。"
+        "name": "Sunward Disc",
+        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
       },
       "sacred_challenge": {
-        "name": "神聖挑釁",
-        "description": "迫使一名敵人攻擊你。昇華期間還會使你受到的所有傷害降低 15%，持續 4 秒，且不消耗充能。"
+        "name": "Sacred Goad",
+        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
       },
       "devotion_aura": {
         "name": "堅定光環",
@@ -8517,7 +8517,7 @@ export const zh_TW: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守護",
-        "description": "一道神聖結界吸收相當於最大生命值{damage}%的傷害，持續{duration}秒。持久守護可強化該結界。"
+        "description": "一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。"
       },
       "hammer_of_justice": {
         "name": "裂碎法槌",
@@ -8544,20 +8544,20 @@ export const zh_TW: EnTranslations = {
         "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
       },
       "bastion_sweep": {
-        "name": "壁壘橫掃",
-        "description": "用裝備的盾牌橫掃前方 180 度範圍內的敵人，造成 {damage} 點高仇恨神聖傷害並產生 1 點虔誠。昇華使傷害提高 30%，半徑擴大至 8 公尺。"
+        "name": "Bastion Sweep",
+        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
       },
       "oath_chain": {
-        "name": "誓約鎖鏈",
-        "description": "立即用神聖鎖鏈束縛一名遠處敵人。敵人以每秒 18 公尺的速度向你移動，直至距離 3 公尺，隨後移動速度降低 50%，持續 4 秒。昇華期間還會束縛附近的第二名敵人。"
+        "name": "Oath Chain",
+        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
       },
       "veilbound_march": {
-        "name": "帷幕行軍",
-        "description": "進入靈體狀態 4 秒，移動速度提高 40%，護甲提高 30%，並免疫定身、減速和位移。你穿過的敵人會獲得持續 6 秒的帷幕印記，每秒受到神聖傷害，對你造成的傷害降低 20%，並對你產生額外仇恨。第一個印記會產生 1 點虔誠。行軍結束時，附近帶有印記的敵人會受到最終爆發傷害。昇華使爆發傷害提高 50%，並將他們輕微拉向你。"
+        "name": "Veilbound March",
+        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
       },
       "veilbound_mark": {
-        "name": "帷幕印記",
-        "description": "每秒受到神聖傷害，對施加印記的聖騎士造成的傷害降低 20%，並對該聖騎士產生額外仇恨。"
+        "name": "Veil Mark",
+        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
       },
       "righteous_fury": {
         "name": "燃燒誓言",
@@ -8565,7 +8565,7 @@ export const zh_TW: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響盟友的自動攻擊額外造成{buff}點神聖傷害。"
+        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
       },
       "tame_beast": {
         "name": "野性繫絆",
@@ -8600,12 +8600,12 @@ export const zh_TW: EnTranslations = {
         "description": "在目標閃躲後反擊，造成武器傷害加 {damage}。無法被閃躲。"
       },
       "hunting_momentum": {
-        "name": "狩獵動能",
-        "description": "被動：剖膛打擊會獲得1層狩獵動能，持續8秒，最多3層。達到3層時，反噬獠牙的打擊傷害提高45%，並消耗所有層數。（野戰技藝）"
+        "name": "Hunting Momentum",
+        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
       },
       "fieldcraft_reentry": {
-        "name": "蓄勢再入",
-        "description": "被動：斷跡會刷新狩獵動能，並使你在12秒內的下一次剖膛打擊或血鉤獲得再入強化。剖膛打擊每層造成15%額外傷害。血鉤造成18至24點額外物理傷害，每層再提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（野戰技藝）"
+        "name": "Armed Re-entry",
+        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
       },
       "wing_clip": {
         "name": "桎梏斬",
@@ -8625,7 +8625,7 @@ export const zh_TW: EnTranslations = {
       },
       "rapid_fire": {
         "name": "狂熱連射",
-        "description": "移動時在2.4秒內快速射出6箭，每箭造成{damage}點物理傷害。"
+        "description": "使你的攻擊速度提高 40%，持續 15 秒。"
       },
       "smite": {
         "name": "懲擊",
@@ -8672,8 +8672,8 @@ export const zh_TW: EnTranslations = {
         "description": "投擲一道閃電，造成 {damage} 點自然傷害。"
       },
       "thunder_reservoir": {
-        "name": "雷霆蓄能",
-        "description": "被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）"
+        "name": "Thunder Reservoir",
+        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "縛石武器",
@@ -8733,27 +8733,27 @@ export const zh_TW: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "將一名敵人標記為詛咒焦點。移動邪眼會保留譴罪，但不會刷新其20秒的持續時間。"
+        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
-        "name": "咒眼凝視",
-        "description": "你的咒眼每2.5秒攻擊所選的主要邪眼目標，造成暗影傷害。附身邪眼會使其攻擊速度加倍。"
+        "name": "Maledict Gaze",
+        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
       },
       "needle_of_fate": {
-        "name": "命運之針",
-        "description": "刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生5點譴罪；若不存在邪眼，則先標記目標。"
+        "name": "Needle of Fate",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
       },
       "sentence": {
-        "name": "裁決",
-        "description": "消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。"
+        "name": "Sentence",
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
       },
       "life_tap": {
         "name": "苛刻交易",
         "description": "將 {damage} 點生命值轉化為 {damage} 點法力值。"
       },
       "cursed_accomplice": {
-        "name": "受咒共犯",
-        "description": "未選擇友方玩家時連結你的咒眼，使其凝視產生2點譴罪；連結友方玩家時，該玩家對邪眼目標造成傷害會產生3點。每2秒最多觸發一次。"
+        "name": "Cursed Accomplice",
+        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
       },
       "curse_of_agony": {
         "name": "苦楚邪咒",
@@ -8764,44 +8764,44 @@ export const zh_TW: EnTranslations = {
         "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。"
       },
       "litany_of_guilt": {
-        "name": "罪責禱文",
-        "description": "詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。"
+        "name": "Litany of Guilt",
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
-        "name": "熔渣皮膚",
-        "description": "使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。"
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
       },
       "umbral_anchor": {
-        "name": "暗影錨",
-        "description": "首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。"
+        "name": "Umbral Anchor",
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
-        "name": "靈魂之井",
-        "description": "召喚一口靈魂之井，持續3分鐘。脫離戰鬥時，隊伍成員最多可補充3枚靈魂石。靈魂石可恢復最大生命值的25%，並與藥水共用冷卻。"
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
       },
       "hex_of_violence": {
-        "name": "暴行咒",
-        "description": "詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。"
+        "name": "Hex of Violence",
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
       },
       "cruel_pact": {
-        "name": "殘酷契約",
-        "description": "犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。"
+        "name": "Cruel Pact",
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
-        "name": "苦痛轉承",
-        "description": "連結苦痛8秒，受到敵對攻擊時最多產生15點譴罪。對自己使用時受到的傷害降低20%；對盟友使用時最多將20%的傷害轉移給你，但不會使你的生命值降至15%以下。"
+        "name": "Vicarious Suffering",
+        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "附身邪眼",
-        "description": "咒術者附身你的主要邪眼15秒，並產生35點譴罪。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導；裁決造成的傷害提高25%。延遲迴響造成60%的傷害，並在17至20級間逐步降至30%。"
+        "name": "Possess the Evil Eye",
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "審判時刻",
-        "description": "對你的主要邪眼降下持續15秒的審判，獲得40點譴罪和3層命運絲線，啟動附身，使透過主要邪眼產生的譴罪加倍，並使裁決傷害提高20%。第一次裁決返還50點譴罪。"
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
       },
       "coven": {
-        "name": "巫契",
-        "description": "在最多4名附近敵人身上製造持續15秒的次級邪眼。它們以50%的效率補充共享譴罪池，並承受裁決35%的回響傷害。"
+        "name": "Coven",
+        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "折魂",
@@ -8816,13 +8816,13 @@ export const zh_TW: EnTranslations = {
         "description": "立即以灼燒暗影轟擊目標，造成 {damage} 點暗影傷害。"
       },
       "ruinous_brand": {
-        "name": "毀滅烙印",
-        "description": "為敵人烙印15秒。你接下來的3個直接法術會對被烙印的敵人回響25%的傷害；若對其他目標施放，則會向其複製50%的傷害。"
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "狂野奔雷",
         "description": "投擲一道自然能量箭，造成 {damage} 點自然傷害。",
-        "specNote_balance": "月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，月種變為月湧、隕天術變為日醒。"
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "荒野癒合",
@@ -8835,16 +8835,16 @@ export const zh_TW: EnTranslations = {
       "moonfire": {
         "name": "月光風暴",
         "description": "以月火灼燒敵人，造成 {damage} 點秘法傷害，並附加持續傷害。",
-        "specNote_balance": "讓它持續燃燒：月種可將其延長 6 秒。"
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
-        "name": "月種",
-        "description": "僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。"
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
         "name": "野性綻放",
         "description": "在 12 秒內為目標恢復 {damage} 點生命值。",
-        "specNote_restoration": "種下全新的綻放累積 1 層繁茂（最多 5 層）。繁茂達 5 層時，迅癒變為盛放。"
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "荊棘守衛",
@@ -8861,7 +8861,7 @@ export const zh_TW: EnTranslations = {
       "maul": {
         "name": "碎骨擊",
         "description": "一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為吸收相當於最大生命值 18% 的傷害，並恢復 15 點怒氣。"
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "威嚇",
@@ -8869,27 +8869,27 @@ export const zh_TW: EnTranslations = {
       },
       "cat_form": {
         "name": "狼形態",
-        "description": "變形為狼：敏捷隨等級提高，攻擊強度提高8點並且每級再提高2點，攻擊使用能量和連擊點，產生的威脅值降低29%。再次施放可返回施法者形態。"
+        "description": "變形為狼：攻擊強度隨等級提高，攻擊使用能量和連擊點，產生的威脅值降低 29%。再次施放可返回施法者形態。"
       },
       "claw": {
-        "name": "裂爪",
+        "name": "爪擊",
         "description": "用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限狼形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "血噬",
         "description": "終結技，造成 {damage}。僅限狼形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：撕咬造成 91 點傷害，每個連擊點額外造成 55 點，並立即引爆你的剮擊與血裂的剩餘傷害，恢復 30 點能量。"
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "橫掃利爪",
         "description": "橫掃附近敵人，造成 {damage} 點傷害。造成額外威脅值。僅限巨熊形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "再度綻放",
         "description": "為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。",
-        "specNote_restoration": "種下全新的綻放累積 1 層繁茂（最多 5 層）。"
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "橡樹皮術",
@@ -8906,7 +8906,7 @@ export const zh_TW: EnTranslations = {
       "starfire": {
         "name": "隕天術",
         "description": "召下一道星辰之火，造成 {damage} 點秘法傷害。",
-        "specNote_balance": "月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成 160 至 190 點自然傷害，外加 9 秒內共 75 點灼燒傷害，恢復 35 點法力並耗盡全部 3 層。"
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "迅捷形態",
@@ -8922,7 +8922,7 @@ export const zh_TW: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目標的護甲降低 {damage}%，持續 40 秒。"
+        "description": "使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -8945,9 +8945,9 @@ export const zh_TW: EnTranslations = {
         "description": "使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。"
       },
       "rip": {
-        "name": "血裂",
-        "description": "終結技，使目標每 2 秒流血一次，持續 24 秒：造成 36 點傷害，每消耗 1 個連擊點額外造成 24 點（5 個連擊點：共 {damage} 點）。僅限狼形態。",
-        "specNote_feral": "命中的一擊累積 1 層古血（最多 3 層）。"
+        "name": "割裂",
+        "description": "終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "致殘打擊",
@@ -8974,100 +8974,100 @@ export const zh_TW: EnTranslations = {
         "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
       },
       "chain_heal": {
-        "name": "湧流癒合",
-        "description": "為一個友方目標恢復{damage}點生命值，隨後跳躍至12碼內最多2個盟友。每次跳躍的治療量為上一個目標的50%。每個被波及的盟友都會消耗其剩餘的癒合水流，並立即恢復所消耗數值125%的生命值。初始治療量隨法術強度提高。（靈癒招牌）"
+        "name": "治療鏈",
+        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）"
       },
       "galeheart_weapon": {
-        "name": "風心武器",
-        "description": "為武器灌注疾風。每第三次命中的武器攻擊會回響兩次，並觸發風暴施法。"
+        "name": "Galeheart Weapon",
+        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
       },
       "warspirit_cadence": {
-        "name": "戰魂節律",
-        "description": "被動：每第3次命中的武器攻擊會觸發2次裂風迴響，各造成50%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）"
+        "name": "Warspirit Cadence",
+        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
       },
       "stormsurge": {
-        "name": "風暴湧動",
-        "description": "被動：先祖打擊冷卻時，消耗風暴施法有25%機率重置其冷卻。連續失敗4次後必定重置。（戰魂）"
+        "name": "Stormsurge",
+        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
       },
       "lifespring_weapon": {
-        "name": "活泉武器",
-        "description": "為武器灌注生命之水，使癒合水流的注入量提高20%。"
+        "name": "Lifespring Weapon",
+        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
       },
       "unleash_weapon": {
-        "name": "釋放武器",
-        "description": "釋放目前的武器灌注。焰烙造成54至64點火焰傷害，獲得30%法術強度加成，並獲得2層雷霆。風心用武器攻擊，推進戰魂節律，並使攻擊速度提高20%，持續6秒。縛石造成75%武器傷害，迫使目標攻擊你，並使你受到的傷害降低20%，持續4秒。活泉消耗目標身上的癒合水流，立即治療其剩餘治療量的125%，並使8秒內下一次受到的傷害降低，降低量等於實際恢復生命值的50%。"
+        "name": "Unleash Weapon",
+        "description": "Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored."
       },
       "elemental_trance": {
-        "name": "元素恍惚",
-        "description": "進入元素恍惚狀態，持續15秒：受到的傷害降低30%，你造成的所有傷害的20%轉化為法力值。（戰魂特色技能）"
+        "name": "Elemental Trance",
+        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
       },
       "primal_exaltation": {
-        "name": "原初昇華",
-        "description": "解放你的專精力量，持續12秒，強化其常規循環。（薩滿祭司天賦）"
+        "name": "Primal Exaltation",
+        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
       },
       "stoneward": {
-        "name": "石之守護",
-        "description": "使一名盟友獲得6層、持續60秒的保護。受到傷害時消耗一層，恢復5%最大生命值，每3秒最多觸發一次。（薩滿祭司天賦）"
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
       },
       "tidecall": {
-        "name": "潮汐召喚",
-        "description": "為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。"
+        "name": "Tidecall",
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health."
       },
       "soul_harvest": {
-        "name": "精華收割",
-        "description": "撕裂敵人的靈魂，造成 {damage} 點暗影傷害，並產生 1 枚靈魂碎片，最多 5 枚。"
+        "name": "Essence Reap",
+        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
       },
       "soul_lance": {
-        "name": "靈魂之槍",
-        "description": "擲出一柄幽魂之槍，造成 {damage} 點暗影傷害。對帶有你的骸骨印記的目標，其中50%的傷害會累積至印記。"
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
       },
       "raise_graveguard": {
-        "name": "喚醒墓衛",
-        "description": "喚醒一名永久的防禦型夥伴。墓衛會自動嘲諷，透過墓域為你攔截20%的傷害；收割號令會使其嘲諷並在4秒內受到的傷害降低30%。"
+        "name": "Raise Graveguard",
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
       },
       "raise_skeletal_warrior": {
-        "name": "喚醒骷髏戰士",
-        "description": "消耗1枚靈魂碎片，將一名永久骷髏戰士加入你的2槽統御。只能有一名為你效命。它每6秒對附近敵人造成45%的順劈傷害，收割號令會使目標緩速40%，持續4秒。"
+        "name": "Raise Skeletal Warrior",
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
       },
       "raise_bone_mage": {
-        "name": "喚醒骸骨法師",
-        "description": "消耗2枚靈魂碎片，將一名永久遠程骸骨法師加入你的2槽統御。只能有一名為你效命。它的攻擊使目標受到的魔法傷害提高5%，持續6秒；收割號令將此弱點提高至8%。"
+        "name": "Raise Bone Mage",
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
       },
       "bone_armor": {
-        "name": "骸骨護甲",
-        "description": "以骸骨環繞自身，吸收相當於最大生命值 20% 的傷害。"
+        "name": "Bone Armor",
+        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
       },
       "corpse_explosion": {
-        "name": "屍骸爆裂",
-        "description": "優先犧牲骸骨法師，其次是骷髏戰士，只有在別無選擇時才犧牲墓翼。同類僕從中先選擇剩餘持續時間最短者，再選擇最虛弱者，對目標地點的敵人造成 {damage} 點暗影傷害。"
+        "name": "Corpse Explosion",
+        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
       },
       "funeral_harvest": {
-        "name": "葬魂收割",
-        "description": "當一個近期被你或你的亡靈傷害過的敵人死亡時，你獲得1枚靈魂碎片。每3秒最多觸發一次。"
+        "name": "Funeral Harvest",
+        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
       },
       "ossuary_mark": {
-        "name": "骸骨印記",
-        "description": "為敵人標記12秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。"
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
-        "name": "邪穢號令",
-        "description": "消耗 3 枚靈魂碎片號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。"
+        "name": "Unholy Command",
+        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
       },
       "reaping_command": {
-        "name": "收割號令",
-        "description": "消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊。墓衛嘲諷並防禦，骷髏戰士牽制目標，骸骨法師暴露魔法防禦，墓翼撕裂所有被擊中的敵人。"
+        "name": "Reaping Command",
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
       },
       "sacrifice_undead": {
-        "name": "獻祭亡靈",
-        "description": "摧毀一名統御僕從，恢復最大生命值的 25%。"
+        "name": "Sacrifice Undead",
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
       },
       "raise_gravewing": {
-        "name": "喚醒墓翼",
-        "description": "消耗2枚靈魂碎片，將一隻永久墓翼加入你的2槽統御。只能有一隻為你效命。它每5秒對附近敵人造成65%的順劈傷害，收割號令使所有被擊中的敵人在5秒內受到的傷害提高8%。"
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
       },
       "army_of_the_dead": {
-        "name": "亡者軍團",
-        "description": "開啟墓穴傳送門，在你選擇的統御僕從之外額外召喚一名骷髏戰士、骸骨法師和墓翼，持續 20 秒。"
+        "name": "Army of the Dead",
+        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
       },
       "metamorphosis": {
         "name": "惡魔變形",
@@ -9079,7 +9079,7 @@ export const zh_TW: EnTranslations = {
       },
       "holy_shield": {
         "name": "神聖之盾",
-        "description": "獲得30%格擋，以及一面吸收相當於最大生命值{damage}%傷害的護盾，持續{duration}秒，並釋放一股威脅脈衝。昇華可強化並延長這層防禦。"
+        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
       },
       "bestial_wrath": {
         "name": "狂野怒火",
@@ -9115,7 +9115,7 @@ export const zh_TW: EnTranslations = {
       },
       "hemorrhage": {
         "name": "出血",
-        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，在12秒內造成流血傷害，並使目標受到的流血傷害提高40%。獎勵1個連擊點。每使用2次累積1層幽暝（最多3層）。（敏銳專精招牌）"
+        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）"
       },
       "power_infusion": {
         "name": "能量灌注",
@@ -9151,27 +9151,27 @@ export const zh_TW: EnTranslations = {
       },
       "swiftmend": {
         "name": "迅癒",
-        "description": "吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。種下野性綻放與再度綻放會累積繁茂；繁茂達到5層時，此按鈕變為盛放：立即為每位持有你持續治療效果的盟友恢復其剩餘治療量的60%。（恢復專精招牌）"
+        "description": "吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）"
       },
       "moonlash": {
-        "name": "月湧",
-        "description": "消耗3層月潮，造成{damage}點秘法傷害的強力打擊：傷害之選。與日醒消耗同一份月潮，二者只能擇一。"
+        "name": "Moonsurge",
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
-        "name": "日醒",
-        "description": "消耗3層月潮，造成{damage}點自然傷害，外加9秒內共{overTime}點灼燒傷害，並恢復35點法力：法力之選。與月湧消耗同一份月潮，二者只能擇一。"
+        "name": "Sunwake",
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
-        "name": "血收",
-        "description": "消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復30點能量。沒有連擊點也能使用。"
+        "name": "Redharvest",
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
-        "name": "碎髓",
-        "description": "消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。"
+        "name": "Marrowbreak",
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
-        "name": "盛放",
-        "description": "消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的60%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。"
+        "name": "Overbloom",
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "召喚燼裔",
@@ -9195,7 +9195,7 @@ export const zh_TW: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召喚烈焰巨像",
-        "description": "使一隻烈焰巨像降臨目標區域，落地時造成58-72點火焰傷害。牠會戰鬥30秒而不取代你的惡魔，每2秒灼燒附近敵人，並且每秒產生1點毀滅。"
+        "description": "將一隻烈焰巨像束縛於你的意志之下，這是一頭巨大的猛獸，擁有毀滅性的近戰攻擊，以及所有惡魔中最雄厚的生命值與護甲。漫長的冷卻時間限制了牠的原始力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"
       },
       "summon_doomguard": {
         "name": "召喚怨魂裔",
@@ -9346,20 +9346,20 @@ export const zh_TW: EnTranslations = {
         "description": "使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）"
       },
       "chain_lightning": {
-        "name": "天穹分枝",
-        "description": "攻擊目標，並跳向10碼內最多2名敵人，對每個目標造成{damage}點自然傷害。命中時整次施法獲得1層雷霆，而不是每個目標各獲得1層。傷害隨法術強度提高。原始掌控可使其瞬發，原始昇華會使其施法時間縮短一半。（喚雷者）"
+        "name": "叉狀閃電",
+        "description": "向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）"
       },
       "abyssal_rift": {
-        "name": "深淵裂隙",
-        "description": "在選定地點撕開一道裂隙，將8碼內的敵人拉向其中心，造成{damage}點暗影傷害，並使其昏迷2秒。首領會受到傷害，但可抵抗拉扯與昏迷。"
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
       },
       "chaos_bolt": {
         "name": "毀滅箭",
         "description": "投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）"
       },
       "dark_pact": {
-        "name": "血契",
-        "description": "犧牲當前生命值的10%，在8秒內吸收相當於最大生命值30%的傷害。"
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
@@ -9387,7 +9387,7 @@ export const zh_TW: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後祈禱",
-        "description": "立即恢復你最大生命值的30%。"
+        "description": "立即為你恢復{damage}點生命值。（牧師天賦）"
       },
       "deterrence": {
         "name": "鬃刺守衛",
@@ -9402,8 +9402,8 @@ export const zh_TW: EnTranslations = {
         "description": "快速恢復法力。（法師天賦）"
       },
       "flurry_of_knives": {
-        "name": "刀刃亂舞",
-        "description": "擲出飛刀鞭笞6碼內的所有敵人，造成{damage}點物理傷害，並獲得2個連擊點。（潛行者天賦）"
+        "name": "Flurry of Knives",
+        "description": "Lash every enemy within 6 yd with thrown knives for {damage} Physical damage and gain 2 combo points. (Rogue talent)"
       },
       "frenzied_regeneration": {
         "name": "野性癒合",
@@ -9415,7 +9415,7 @@ export const zh_TW: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "幽魂打擊",
-        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並使你的閃躲機率提高15%，持續7秒。獎勵1個連擊點。（潛行者天賦）"
+        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，短暫提高閃躲並獲得1個連擊點。（潛行者天賦）"
       },
       "hammer_of_wrath": {
         "name": "鳴鐘之錘",
@@ -9482,8 +9482,8 @@ export const zh_TW: EnTranslations = {
         "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
       },
       "ancestor_return": {
-        "name": "先祖歸來",
-        "description": "呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
+        "name": "Ancestors' Return",
+        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "回溯",
@@ -9550,8 +9550,8 @@ export const zh_TW: EnTranslations = {
         "description": "遁入煙霧之中，使你的閃躲幾率提高30%，持續8秒。"
       },
       "sacrilegious_march": {
-        "name": "褻瀆行軍",
-        "description": "移動速度提高35%，但每秒犧牲最大生命值的2%。再次施放可取消。生命值降至20%時會自動關閉。"
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "奪法",
@@ -9570,33 +9570,33 @@ export const zh_TW: EnTranslations = {
         "description": "在施法中沉默目標，並在5秒內封鎖該法術學派。"
       },
       "thieves_chorus": {
-        "name": "盜賊合唱",
-        "description": "一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）"
+        "name": "Thieves' Chorus",
+        "description": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)"
       },
       "tranquility": {
         "name": "林地之歌",
         "description": "引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）"
       },
       "venom_dart": {
-        "name": "毒鏢",
-        "description": "彈出一枚毒鏢，造成{damage}點自然傷害。獲得1個連擊點。",
-        "specNote_assassination": "累積1層毒祭，並使你的蝕毒傷口延長6秒（傷口不會超過20秒）。"
+        "name": "Venom Dart",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
-        "name": "重磅擺拳",
-        "description": "沉重的一擊，造成130%武器傷害外加10點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）"
+        "name": "Haymaker",
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
-        "name": "眼前一黑",
-        "description": "以擊倒終結紅線：造成45點傷害，每個連擊點額外造成35點，紅線每格加深使傷害提高25%，並恢復25點能量。請在紅線結束前使用，否則擊倒便會作廢。（戰鬥）"
+        "name": "Lights Out",
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
-        "name": "罩影突襲",
-        "description": "持續6秒：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高10%，且期間第一次潛伏者一擊造成雙倍傷害。（敏銳）"
+        "name": "Shadow Veil",
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
-        "name": "蝕毒撕裂",
-        "description": "耗盡6層毒祭：造成100點傷害，每個連擊點額外造成55點，立即引爆你的流血效果的剩餘傷害，再施加一道新的蝕毒傷口（20秒內造成120點傷害）。恢復20點能量。（刺殺）"
+        "name": "Venomrend",
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "颱風",
@@ -9607,28 +9607,28 @@ export const zh_TW: EnTranslations = {
         "description": "吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。"
       },
       "veilstep": {
-        "name": "帷幕步",
-        "description": "朝面向的方向穿越帷幕。"
+        "name": "Veilstep",
+        "description": "Step 10 yards forward through the veil."
       },
       "scouring_mercy": {
-        "name": "滌罪慈悲",
-        "description": "以神聖之力淨化一名敵人，或立即救治一名友方目標。教義專屬技能。"
+        "name": "Scouring Mercy",
+        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
       },
       "seraphic_vigil": {
-        "name": "熾天使守望",
-        "description": "為一名盟友施加守望祝福，在其陷入危險時恢復生命值。賜福專屬技能。"
+        "name": "Seraphic Vigil",
+        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
       },
       "summon_tithefiend": {
-        "name": "召喚什一魔",
-        "description": "消耗幽暗什一來召喚一隻暫時存在的什一魔，追獵你的塑像。晚禱專屬技能。"
+        "name": "Call Tithefiend",
+        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
-        "name": "殉道者聖盾",
-        "description": "使一名盟友受到的傷害降低 40%，持續 8 秒。"
+        "name": "Martyr's Aegis",
+        "description": "Reduce one ally's incoming damage by 40% for 8 sec."
       },
       "choir_of_deliverance": {
-        "name": "救贖聖詠團",
-        "description": "引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。"
+        "name": "Choir of Deliverance",
+        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
       },
       "bear_charge": {
         "name": "巨熊衝鋒",
@@ -9644,12 +9644,28 @@ export const zh_TW: EnTranslations = {
       },
       "rake": {
         "name": "剮擊",
-        "description": "以武器傷害外加 {damage} 剮開敵人，並造成持續 18 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "description": "一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "修補",
         "description": "修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。"
+      },
+      "cleansing_verdict": {
+        "name": "淨化裁決",
+        "description": "淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。"
+      },
+      "divine_shield": {
+        "name": "聖光守護",
+        "description": "以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）"
+      },
+      "holy_wrath": {
+        "name": "聖徒之怒",
+        "description": "釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）"
+      },
+      "aura_surge": {
+        "name": "曙光彈射",
+        "description": "擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）"
       }
     },
     "items": {
@@ -11202,7 +11218,7 @@ export const zh_TW: EnTranslations = {
         "name": "魔法盛宴麵包"
       },
       "soul_stone": {
-        "name": "靈魂石"
+        "name": "Soul Stone"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"
@@ -12665,16 +12681,16 @@ export const zh_TW: EnTranslations = {
         "name": "水元素"
       },
       "graveguard": {
-        "name": "墓衛"
+        "name": "Graveguard"
       },
       "necromancy_skeletal_warrior": {
-        "name": "骷髏戰士"
+        "name": "Skeletal Warrior"
       },
       "necromancy_bone_mage": {
-        "name": "骸骨法師"
+        "name": "Bone Mage"
       },
       "necromancy_gravewing": {
-        "name": "墓翼"
+        "name": "Gravewing"
       }
     },
     "npcs": {
@@ -13302,12 +13318,12 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "縛曉聖典",
-        "text": "聖光在你體內並非沉默不語，{playerName}。我看著你讓亡者安息，也相信你已經準備好學習極少有聖騎士能夠掌握的儀式：喚回儀式，以此將逝去的靈魂召回人世。儀式經文記載在我保管的縛曉聖典中，但只要躁動的亡者仍在這片土地上遊蕩，書本便帶不來祝福。再讓 6 具躁動骸骨歸於塵土，我便開始教你。",
-        "completion": "禮拜堂庭院終於安靜下來。你已經可以學習經文了，{playerName}，但喚回儀式不能在溫暖的禮拜堂中吟誦。必須前往生死帷幕薄弱之處。我會把聖典帶到北方的泥沼沼澤。到那裡來找我，我們將完成這場儀式。",
+        "title": "The Dawnbound Tome",
+        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
+        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
         "objectives": {
           "0": {
-            "label": "讓躁動骸骨安息"
+            "label": "Restless Bones laid to rest"
           }
         }
       },
@@ -13468,12 +13484,12 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "喚回儀式",
-        "text": "你果然跟隨我進入了沼澤，{playerName}。很好。縛曉聖典就在這裡，而這片積水之地正適合吟誦其中的經文：沒有哪裡比亡者不肯長眠之處更接近生死之間的帷幕。但那些溺亡者會在吟誦中途把你的聲音拖入水底。先清理出適合儀式的地方：讓 8 名溺亡死者安息，然後我們一同將此地聖化。",
-        "completion": "跪下，{playerName}，大聲念出經文。就是這樣。你感覺到了嗎？你手中的聖光不再只能治癒生者，也能召回已經離世的人。請明智地使用它。將靈魂召回一場毫無希望的戰鬥是殘忍，而非仁慈。起身吧，救贖者。",
+        "title": "The Rite of Recall",
+        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
+        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
         "objectives": {
           "0": {
-            "label": "讓溺亡死者安息"
+            "label": "Drowned Dead laid to rest"
           }
         }
       },
