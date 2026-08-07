@@ -775,6 +775,10 @@ export const zh_CN: EnTranslations = {
       "ready": "挥击",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "呼吸",
+      "drowning": "溺水！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -955,6 +959,7 @@ export const zh_CN: EnTranslations = {
       "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
+      "dive": "Swim Down",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
@@ -1331,6 +1336,7 @@ export const zh_CN: EnTranslations = {
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
       "showPetFrame": "显示你的宠物",
+      "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
@@ -1526,6 +1532,16 @@ export const zh_CN: EnTranslations = {
         "assist": "助攻",
         "firstWin": "首胜"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "浏览战争套装",
+      "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
+      "jewelry": "饰品",
+      "weapons": "武器",
+      "owned": "已拥有",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
+      "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"
     },
     "charSheet": {
       "offense": "攻击",
@@ -2114,6 +2130,8 @@ export const zh_CN: EnTranslations = {
       "showResource": "显示法力、怒气和能量",
       "showAbsorbs": "显示吸收护盾",
       "showAuras": "显示增益和减益",
+      "showPets": "Show Pets",
+      "petHealth": "宠物{name}，生命值{pct}",
       "showSelf": "显示你的框体"
     },
     "frameReset": {
@@ -2459,6 +2477,8 @@ export const zh_CN: EnTranslations = {
       "guildOpenAccept": "开启",
       "guildOpenNote": "由你自己支付，而非公会金库",
       "guildPurseShort": "金钱不足",
+      "guildReadOnlyNote": "只有公会官员才能更改公会银行。",
+      "guildUnopenedNote": "公会银行尚未开通。",
       "guildDormantNote": "锁定的物品无法取出，并会阻止解散公会。",
       "guildDormantHint": "该物品已锁定在公会银行中，无法取出。",
       "guildDormantAria": "{item}，数量 {count}，无法取出",
@@ -2473,7 +2493,7 @@ export const zh_CN: EnTranslations = {
       "logNote": "最近 {count} 条公会银行操作。",
       "logLoading": "正在加载公会银行日志...",
       "logEmpty": "公会银行中尚未存入或取出任何物品。",
-      "logRefused": "只有公会官员才能查看公会银行日志。",
+      "logUnavailable": "目前无法读取公会银行日志。",
       "logFormerMember": "一位已离开的公会成员",
       "logDepositItem": "{actor} 存入了 {count} 个 {item}",
       "logWithdrawItem": "{actor} 取出了 {count} 个 {item}",
@@ -9779,6 +9799,27 @@ export const zh_CN: EnTranslations = {
       "cinderweave_slippers": {
         "name": "织烬便鞋"
       },
+      "thornhide_headdress": {
+        "name": "荆棘兜帽"
+      },
+      "thornhide_mantle": {
+        "name": "荆棘披肩"
+      },
+      "thornhide_vestment": {
+        "name": "荆棘法衣"
+      },
+      "thornhide_cinch": {
+        "name": "荆棘腰带"
+      },
+      "thornhide_leggings": {
+        "name": "荆棘护腿"
+      },
+      "thornhide_gloves": {
+        "name": "荆棘护手"
+      },
+      "thornhide_boots": {
+        "name": "荆棘软靴"
+      },
       "final_oath_medallion": {
         "name": "最终誓约勋章"
       },
@@ -12125,6 +12166,11 @@ export const zh_CN: EnTranslations = {
         "name": "怒焰",
         "title": "荣誉军需官",
         "greeting": "战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。"
+      },
+      "warmarshal_draven_kole": {
+        "name": "战帅德拉文·科尔",
+        "title": "战争军备库总管",
+        "greeting": "我只收荣誉这一种货币，战争军备库由我看守。在战场上挣得你的军阶，我便为你披上迎接下一战的甲胄。"
       },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
@@ -15257,6 +15303,36 @@ export const zh_CN: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "warfare_ashstalker": {
+        "name": "灰烬追猎者装备",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“灰烬疾行”，使移动速度提高 40%，持续 6 秒。"
+      },
+      "warfare_cinderweave": {
+        "name": "烬织法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_furyforged": {
+        "name": "怒铸战装",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“不破誓约”，吸收 200 点伤害，持续 10 秒。"
+      },
+      "warfare_stormbound": {
+        "name": "缚雷法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_thornhide": {
+        "name": "荆棘皮甲",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

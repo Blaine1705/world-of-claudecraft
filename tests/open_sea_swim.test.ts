@@ -108,6 +108,11 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  // The swim branch made the vertical stick part of the frame: neither is set
+  // on a land or surface-swim frame, but both are declared, so a hand-built
+  // MoveInput states them explicitly like every other suite does.
+  dive: false,
+  surface: false,
   ...over,
 });
 

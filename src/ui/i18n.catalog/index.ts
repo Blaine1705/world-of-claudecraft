@@ -45,10 +45,13 @@ export { questStrings } from './quests';
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
 
-type ItemSetEntityText = Record<
-  string,
-  { name: string; bonus2?: string; bonus3?: string; bonus4?: string }
->;
+/** English entity text per item set: the set `name` plus one `bonus<pieces>`
+ *  leaf for every tier the set actually authored. Keyed by the tier's PIECE
+ *  COUNT rather than a fixed bonus2/bonus3/bonus4 triple, so a family with a
+ *  different breakpoint (the WARFARE sets' 2/4/7) mints its own keys instead of
+ *  silently reusing the 4-piece one. See ItemSetBonusField in entity_i18n.ts,
+ *  which resolves the same field back to its count. */
+type ItemSetEntityText = Record<string, { name: string } & Record<string, string>>;
 
 const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
   Object.values(ITEM_SETS)
@@ -56,18 +59,11 @@ const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
     .map((set) => {
       // Only tiers the set actually has: the leveling haste kits carry a single
       // 3-piece tier, so emitting a bonus2 row would bake in an id-fallback string.
-      const bonus2 = set.bonuses.find((bonus) => bonus.pieces === 2)?.text;
-      const bonus3 = set.bonuses.find((bonus) => bonus.pieces === 3)?.text;
-      const bonus4 = set.bonuses.find((bonus) => bonus.pieces === 4)?.text;
-      return [
-        set.id,
-        {
-          name: set.name,
-          ...(bonus2 ? { bonus2 } : {}),
-          ...(bonus3 ? { bonus3 } : {}),
-          ...(bonus4 ? { bonus4 } : {}),
-        },
-      ];
+      const bonuses: Record<string, string> = {};
+      for (const bonus of [...set.bonuses].sort((a, b) => a.pieces - b.pieces)) {
+        bonuses[`bonus${bonus.pieces}`] = bonus.text;
+      }
+      return [set.id, { name: set.name, ...bonuses }];
     }),
 );
 

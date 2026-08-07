@@ -68,8 +68,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Chargement du journal de la banque de guilde...',
   'hudChrome.bank.logNote': 'Les {count} actions les plus récentes de la banque de guilde.',
   'hudChrome.bank.logOpenBank': '{actor} a ouvert la banque de guilde pour {amount}',
-  'hudChrome.bank.logRefused':
-    'Seuls les officiers de la guilde peuvent consulter le journal de la banque de guilde.',
   'hudChrome.bank.logWithdrawItem': '{actor} a retiré {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} a retiré {amount}',
   'hudChrome.bank.personalTab': 'Personnel',
@@ -11439,4 +11437,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'auth.browAngled': 'Inclinés',
   'hudChrome.paperdoll.hideHelmAria': 'Masquer le casque',
   'hudChrome.paperdoll.showHelmAria': 'Afficher le casque',
+  'hudChrome.options.waterRipples': "Ondulations de l'eau (sillages)",
+  'hudChrome.breath.label': 'Souffle',
+  'hudChrome.breath.drowning': 'Noyade !',
 };

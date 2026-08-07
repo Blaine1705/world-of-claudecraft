@@ -54,7 +54,7 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
   });
 
   it('wires the donor GLB into animUrls and keeps every pre-existing attackByAbility entry', () => {
-    const block = manifestBlock('player_warrior: {', 'player_paladin: {');
+    const block = manifestBlock('player_warrior: swims({', 'player_paladin: swims({');
     expect(block).toContain('warrior_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of WARRIOR_NEW_CLIPS) expect(block).toContain(`'${clip}'`);
@@ -83,7 +83,7 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
   });
 
   it('every mapped ability id is a real warrior ability, and every referenced clip is a shipped or pre-existing donor', () => {
-    const warriorBlock = manifestBlock('player_warrior: {', 'player_paladin: {');
+    const warriorBlock = manifestBlock('player_warrior: swims({', 'player_paladin: swims({');
     const abilityStart = warriorBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = warriorBlock.indexOf('\n      },', abilityStart);

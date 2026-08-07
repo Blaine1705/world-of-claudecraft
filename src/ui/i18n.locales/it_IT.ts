@@ -69,8 +69,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Caricamento del registro della banca della gilda...',
   'hudChrome.bank.logNote': 'Le {count} azioni più recenti della banca della gilda.',
   'hudChrome.bank.logOpenBank': '{actor} ha aperto la banca della gilda per {amount}',
-  'hudChrome.bank.logRefused':
-    'Solo gli ufficiali della gilda possono leggere il registro della banca della gilda.',
   'hudChrome.bank.logWithdrawItem': '{actor} ha ritirato {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} ha ritirato {amount}',
   'hudChrome.bank.personalTab': 'Personale',
@@ -11353,4 +11351,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'auth.browAngled': 'Inclinate',
   'hudChrome.paperdoll.hideHelmAria': 'Nascondi elmo',
   'hudChrome.paperdoll.showHelmAria': 'Mostra elmo',
+  'hudChrome.options.waterRipples': "Increspature dell'acqua (scie)",
+  'hudChrome.breath.label': 'Fiato',
+  'hudChrome.breath.drowning': 'Annegamento!',
 };

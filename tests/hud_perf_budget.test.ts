@@ -880,6 +880,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/vendor/warfare_vendor_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   // A body/wrap rect pair, read once when the mail body is laid out to fit.
   { file: 'mailbox_window.ts', reflowAllow: { '.getBoundingClientRect': 2 }, driverAllow: {} },
   // The trigger + popover rect pair that positions a filter popover, plus the two border

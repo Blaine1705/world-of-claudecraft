@@ -39,7 +39,7 @@ import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
-import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { groundHeight, waterLevel, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -112,7 +112,11 @@ import {
   setWeaponVfxViewportHeight,
 } from './characters';
 import {
+  advanceSwimPitch,
+  isFallingAtSpeed,
+  isSubmergedAtDepth,
   isSwimmingAtDepth,
+  isWadingAtDepth,
   SWIM_ENTER_FEET_DEPTH,
   SWIM_EXIT_FEET_DEPTH,
   shouldTriggerWaterImpact,
@@ -410,6 +414,12 @@ import { sparkleTexture } from './textures';
 import { targetIntensityFromValues } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import {
+  UNDERWATER_FOG_COLOR,
+  UNDERWATER_FOG_FAR,
+  UNDERWATER_FOG_NEAR,
+  UnderwaterView,
+} from './underwater';
+import {
   BALL_RADIUS,
   buildValeCupBall,
   rollBallSpinner,
@@ -577,6 +587,15 @@ const FOOT_STRIDE_RUN = 1.55;
 // is intentionally longer than an on-foot stride and leaves the one-shot tail clear.
 const MOUNT_STRIDE_RUN = 5.8;
 const SWIM_STRIDE = 2.4;
+// Surface kick: beats per second at a standstill, quickening with swim speed,
+// and how far behind the pivot the prone body's feet trail (as a fraction of
+// stand height — the authored stroke lays the legs out behind the hips).
+const SWIM_KICK_HZ = 2.6;
+const SWIM_FOOT_TRAIL = 0.19;
+// Depth below the waterline over which the underwater wash fades fully in.
+const UNDERWATER_FADE_DEPTH = 0.45;
+// How far under the line the chase camera is pulled while the player is submerged.
+const UNDERWATER_CAMERA_DIP = 0.5;
 const FOOT_RUN_SPEED = 4.5; // u/s — matches the run threshold in characters/anim_state.ts
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
@@ -1009,6 +1028,10 @@ export interface EntityView {
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
+  // ...and the vertical one, which only swimming reads: it drives how far the
+  // body noses over into a dive or a climb (anim_state.advanceSwimPitch).
+  lastY: number;
+  swimPitch: number;
   // locomotion-state hysteresis so a one-frame speed dip can't reset the
   // walk clip (see locomotion.ts)
   loco: LocoTrack;
@@ -1023,6 +1046,14 @@ export interface EntityView {
   waterContactAccum: number;
   wasAirborne: boolean;
   wasSwimming: boolean;
+  // feet under the waterline but the ground still under them (the wade latch)
+  wasWading: boolean;
+  // head under the waterline (the stroke + VFX latch, hysteresis in anim_state)
+  wasSubmerged: boolean;
+  // long-fall flail latch (hysteresis in anim_state.isFallingAtSpeed)
+  wasFalling: boolean;
+  // surface-kick beat, 0..1 per splash (never advanced while submerged)
+  swimKickPhase: number;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
   // mount summon/dismount transition edge-detects. lastMountKey fires the summon
@@ -1482,12 +1513,16 @@ export class Renderer {
     moving: false,
     running: false,
     airborne: false,
+    falling: false,
     backwards: false,
     reverseBackpedal: false,
     dead: false,
     casting: false,
     spinning: false,
     swimming: false,
+    submerged: false,
+    swimPitch: 0,
+    wading: false,
     sitting: false,
   };
   // Second scratch for the mount rig: the rider's state minus the rider-only
@@ -1497,11 +1532,15 @@ export class Renderer {
     moving: false,
     running: false,
     airborne: false,
+    falling: false,
     backwards: false,
     reverseBackpedal: false,
     dead: false,
     casting: false,
     swimming: false,
+    submerged: false,
+    swimPitch: 0,
+    wading: false,
     sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
@@ -1552,6 +1591,11 @@ export class Renderer {
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private waterView: WaterView;
   private lastWaterSimulationPasses = 0;
+  // The waterRipples setting (default off), threaded in via setWaterRipples
+  // because render modules never read the settings store directly. Held here
+  // so an editor water rebuild re-applies the player's choice to the fresh
+  // WaterView.
+  private waterRipplesEnabled = false;
   private terrainView: TerrainView;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
@@ -1586,6 +1630,13 @@ export class Renderer {
   private gardenFeatures: GardenFeaturesView | null = null;
   private galeFeatures: GaleFeaturesView | null = null;
   private fogScratch = new THREE.Color();
+  // Blue wash + bubbles while the CAMERA is under a waterline, and the eased
+  // 0..1 that drives them (and the fog override in updateUnderwater).
+  private underwaterView!: UnderwaterView;
+  private underwaterBlend = 0;
+  // Last frame's submerged read for the LOCAL player, set in sync(). Drives the
+  // camera dip below; one frame of lag is invisible at swim speeds.
+  private selfSubmerged = false;
   // world day/night grade, recomputed each frame from the UTC-anchored clock in
   // updateAmbience and consumed by the outdoor fog/light easing, the sky dome,
   // and the IBL intensity. Defaults to full day for the frames before the first
@@ -2278,6 +2329,7 @@ export class Renderer {
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
     freezeStaticSubtreeMatrices(this.waterView.group); // water animates via uniforms, never transforms
+    this.waterView.setWavesEnabled(this.waterRipplesEnabled);
     bd('water');
 
     this.foliage = buildFoliage(this.sim.cfg.seed, this.webgl);
@@ -2717,6 +2769,8 @@ export class Renderer {
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
+    this.underwaterView = new UnderwaterView(this.lowGfx);
+    this.scene.add(this.underwaterView.group);
     this.abilityVfxFx = new AbilityVfxFx(
       this.scene,
       this.camera,
@@ -4515,6 +4569,7 @@ export class Renderer {
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
+    this.updateUnderwater(dt);
     this.budgetFireLights(p.pos.x, p.pos.z);
     const fogFar = this.subsystemCullFar();
     // The foliage handoff keys off distance planes (foliage_impostor_core.ts /
@@ -7282,6 +7337,9 @@ export class Renderer {
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
+      lastY: e.pos.y,
+      swimPitch: 0,
+      wasWading: false,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
       offhandItemId: e.offhandItemId,
@@ -7304,6 +7362,9 @@ export class Renderer {
       waterContactAccum: 0,
       wasAirborne: false,
       wasSwimming: false,
+      wasSubmerged: false,
+      wasFalling: false,
+      swimKickPhase: 0,
       airborneHeurFrames: 0,
       lastMountKey: e.mountKey,
       wasMountCasting: e.mountCastRemaining > 0,
@@ -8590,6 +8651,30 @@ export class Renderer {
     }
   }
 
+  // The camera under a waterline: a blue wash, shortened fog, and a rising
+  // bubble stream. Keyed off the CAMERA, not the player, so a third-person boom
+  // that dips below the surface reads right, and a swimmer at the surface with
+  // the camera under it still sees water rather than air.
+  private updateUnderwater(dt: number): void {
+    const cam = this.camera.position;
+    const level = waterLevelAt(cam.x, cam.z, this.sim.cfg.seed);
+    // Fade across the first half-yard under the line, so breaking the surface
+    // is a wash lifting rather than a switch flipping.
+    const depth = Number.isFinite(level) ? level - cam.y : -1;
+    const target = Math.min(1, Math.max(0, depth / UNDERWATER_FADE_DEPTH));
+    this.underwaterBlend += (target - this.underwaterBlend) * (1 - Math.exp(-dt * 7));
+    this.underwaterView.update(this.camera, this.underwaterBlend, dt);
+    if (this.underwaterBlend <= 0.002) return;
+    // Ride ON TOP of whatever the biome fog easing just wrote. The easing pulls
+    // back toward the zone preset every frame and this pulls toward the water,
+    // so surfacing restores the biome's own fog with no state to unwind.
+    const fog = this.scene.fog as THREE.Fog;
+    const b = this.underwaterBlend;
+    fog.color.lerp(this.fogScratch.setHex(UNDERWATER_FOG_COLOR), b);
+    fog.near += (UNDERWATER_FOG_NEAR - fog.near) * b;
+    fog.far += (UNDERWATER_FOG_FAR - fog.far) * b;
+  }
+
   // Hand the prefiltered environment map to the dominant eased sky biome.
   // PMREMs cannot cross-fade, so their shared core fades the current IBL to a
   // low contribution, authorizes the texture/rotation swap, then restores the
@@ -9418,13 +9503,6 @@ export class Renderer {
       const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
       v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
 
-      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
-      // props between the hands and the on-back pose (self or a peer)
-      if (e.weaponStowed !== v.weaponStowed) {
-        v.weaponStowed = e.weaponStowed;
-        v.visual.setWeaponStowed(e.weaponStowed);
-      }
-
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
       // rig, click proxy, and any form visual grow/shrink together.
       if (e.scale !== v.liveScale) {
@@ -9603,10 +9681,47 @@ export class Renderer {
           ? wl - groundHeight(ax, az, this.sim.cfg.seed)
           : Number.NEGATIVE_INFINITY;
       const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
+      // ...and the band under it, where the feet are wet but the ground is
+      // still doing the work. Read off the SAME displayed depth as the swim
+      // latch, so a body crossing a shoreline can never be both at once.
+      const wading = isWadingAtDepth(v.wasWading, swimming, e.dead, feetDepth);
+      v.wasWading = wading;
+
+      // Sheathe, from the Z key OR from being in the water: nobody swims with a
+      // sword in their hand. Swimming is an OVERLAY on the sim's cosmetic
+      // weaponStowed bit rather than a write to it — the player's own sheathe
+      // choice is untouched, so wading back out restores exactly what they had
+      // drawn, and a peer's weapon rides their back the moment they start
+      // swimming without any wire traffic. (This diff sits here, after the swim
+      // latch, precisely so both halves are known in the same frame.)
+      const stowed = e.weaponStowed || swimming;
+      if (stowed !== v.weaponStowed) {
+        v.weaponStowed = stowed;
+        v.visual.setWeaponStowed(stowed);
+      }
+      // Which stroke, and whether the body still breaks the surface at all. The
+      // sim owns the DEPTH (players dive with the dive key); this is the
+      // presentation read of it, taken off the same displayed coordinates as
+      // the swim latch so pose and splash can never disagree.
+      const submerged = isSubmergedAtDepth(
+        v.wasSubmerged,
+        swimming,
+        feetDepth,
+        active.height * e.scale,
+      );
       const vx = ax - v.lastX,
         vz = az - v.lastZ;
+      // Vertical travel, off the SAME displayed coordinates: how hard the body
+      // noses over into its dive or its climb. Taken from motion rather than
+      // from the local camera on purpose — peers pitch the same way with no
+      // wire traffic, and the pose can never disagree with the descent it is
+      // drawn against (at the bed, or held at the line, it levels out by
+      // itself). Only players ever leave the surface, so mobs skip it.
+      const vy = dt > 0 ? (ay - v.lastY) / dt : 0;
       v.lastX = ax;
       v.lastZ = az;
+      v.lastY = ay;
+      v.swimPitch = advanceSwimPitch(v.swimPitch, vy, swimming && e.kind === 'player', dt);
       const loco = updateLocomotionInto(v.locoState, v.loco, vx, vz, facing, dt);
       const moving = loco.moving;
       v.fireballTravelVisual = syncFireballTravelVisual(
@@ -9728,6 +9843,12 @@ export class Renderer {
       const logicallyMounted = e.mountKey !== '';
       const riderMounted = v.mountLift > 0;
       st.airborne = airborne && !riderMounted;
+      // Long-fall flail: displayed vertical speed past what any hop reaches
+      // (the same displayed-motion discipline as swimPitch, so peers flail
+      // identically with no wire traffic). Mounted riders never flail:
+      // st.airborne is already held false for them.
+      v.wasFalling = isFallingAtSpeed(v.wasFalling, st.airborne, vy);
+      st.falling = v.wasFalling;
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
@@ -9740,6 +9861,10 @@ export class Renderer {
         e.castingAbility !== null &&
         ABILITIES[e.castingAbility]?.selfCentered === true;
       st.swimming = swimming;
+      st.submerged = submerged;
+      st.swimPitch = v.swimPitch;
+      st.wading = wading;
+      if (isSelf) this.selfSubmerged = submerged && !visuallyDead;
       // A mounted rider holds the seated pose (the sit loop reads as riding);
       // swim/cast still outrank it in desiredBaseState, so mounted casting
       // and swimming animate normally.
@@ -9820,6 +9945,9 @@ export class Renderer {
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
       }
+      // Capture the flight's peak fall speed before the landing reset: the
+      // water-entry splash below scales with how hard the body came down.
+      const entryFallSpeed = v.fallSpeed;
       // Reset the flight's peak fall speed once grounded, so the next landing
       // is measured from its own drop and not the last one.
       if (!airborne) v.fallSpeed = 0;
@@ -9874,7 +10002,14 @@ export class Renderer {
           swimming,
         );
         if (waterImpact) {
-          const splashStrength = Math.min(1.65, 0.82 + loco.speed * 0.08 + contactImmersion * 0.25);
+          // Impact weight: only speed BEYOND a flat hop's landing (~6-7 yd/s)
+          // counts, so stepping or hopping in keeps the modest splash it
+          // always had while a flail-height plunge reads as a real burst.
+          const impactWeight = Math.max(0, entryFallSpeed - 7);
+          const splashStrength = Math.min(
+            2.4,
+            0.82 + loco.speed * 0.08 + contactImmersion * 0.25 + impactWeight * 0.11,
+          );
           this.waterView.enterContact(
             ax,
             az,
@@ -9893,7 +10028,7 @@ export class Renderer {
             az,
             entryDirX,
             entryDirZ,
-            contactRadius * 1.45,
+            contactRadius * (1.45 + Math.min(0.8, impactWeight * 0.055)),
             splashStrength,
           );
           v.waterContactActive = true;
@@ -9953,8 +10088,26 @@ export class Renderer {
         v.waterContactX = ax;
         v.waterContactZ = az;
       }
+      // Surface swimmers churn the water where their feet kick. A SUBMERGED
+      // swimmer emits nothing at all: there is no surface up there to break,
+      // and the quiet is the point of going under.
+      if (swimming && !submerged && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
+        v.swimKickPhase += dt * SWIM_KICK_HZ * (0.55 + Math.min(1.1, loco.speed / 3.2));
+        if (v.swimKickPhase >= 1) {
+          v.swimKickPhase -= 1;
+          const trail = active.height * e.scale * SWIM_FOOT_TRAIL;
+          const footX = ax - contactAxisX * trail;
+          const footZ = az - contactAxisZ * trail;
+          const kick = Math.min(1.3, 0.5 + loco.speed * 0.09);
+          this.vfx.swimKickSplash(footX, wl, footZ, contactAxisX, contactAxisZ, kick);
+          this.waterView.addSplash(footX, footZ, contactRadius * 0.8, kick * 0.5);
+        }
+      } else {
+        v.swimKickPhase = 0;
+      }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
+      v.wasSubmerged = submerged;
       // Distance-tiered mixer updates: near = every frame, mid = every Nth, the
       // animated far band = every 4th to 6th (the rig is still articulated, so
       // this is visible motion, just at a lower pose rate), and the frozen band
@@ -10588,6 +10741,7 @@ export class Renderer {
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
+    this.updateUnderwater(dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
@@ -11111,6 +11265,7 @@ export class Renderer {
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
     freezeStaticSubtreeMatrices(this.waterView.group);
+    this.waterView.setWavesEnabled(this.waterRipplesEnabled);
     for (const zone of ZONES) {
       if (!this.preparedZones.has(zone.id)) continue;
       void this.waterView.ensureZone(zone).then((meshes) => {
@@ -11238,6 +11393,20 @@ export class Renderer {
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
 
+    // Follow a submerged swimmer UNDER the surface: a height CEILING folded
+    // into the one cy assignment below (the graphics-overhaul contract pins
+    // that the chase camera's coordinates are each assigned exactly once).
+    // The chase boom rides well above the avatar, and the built-in lakes are
+    // only three or four yards deep, so left alone the camera stays dry
+    // however far you dive - and the whole underwater pass (blue wash,
+    // bubbles, the breaststroke you are actually playing) would only ever be
+    // visible from a zoomed-in view. The ground clamp below still keeps the
+    // camera off the lake bed.
+    const swimWaterLevel = waterLevelAt(selfPos.x, selfPos.z, seed);
+    const underwaterCeilingY =
+      this.selfSubmerged && Number.isFinite(swimWaterLevel)
+        ? swimWaterLevel - UNDERWATER_CAMERA_DIP
+        : Infinity;
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance; registered
     // obstructors fade through their subsystem's occluder-fade pass.
@@ -11246,7 +11415,7 @@ export class Renderer {
     const pz = this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    const cy = eyeY + Math.sin(pose.pitch) * pose.dist;
+    const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);
     const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // On a raised rift tier the flat ground clamp would let the camera sink
@@ -11565,6 +11734,15 @@ export class Renderer {
     slot.mat.color.setHex(colorHex ?? SCHOOL_COLORS[school] ?? 0xffffff);
     if (!this.lowGfx) slot.mat.color.multiplyScalar(SELECTION_RING_BOOST);
     slot.ring.visible = true;
+  }
+
+  /** Apply the waterRipples setting: whether movement and splashes in water
+   *  feed the interactive wake height field (water_simulation.ts). Off (the
+   *  default) draws zero simulation passes; bubbles and splash particles are
+   *  unaffected. Live-safe: flipping it off mid-wake puts the field to sleep. */
+  setWaterRipples(enabled: boolean): void {
+    this.waterRipplesEnabled = enabled;
+    this.waterView.setWavesEnabled(enabled);
   }
 
   setGroundAimReticle(

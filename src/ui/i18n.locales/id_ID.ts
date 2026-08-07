@@ -54,7 +54,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Memuat log bank guild...',
   'hudChrome.bank.logNote': '{count} tindakan bank guild terbaru.',
   'hudChrome.bank.logOpenBank': '{actor} membuka bank guild seharga {amount}',
-  'hudChrome.bank.logRefused': 'Hanya perwira guild yang dapat membaca log bank guild.',
   'hudChrome.bank.logWithdrawItem': '{actor} menarik {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} menarik {amount}',
   'hudChrome.bank.personalTab': 'Pribadi',
@@ -11290,4 +11289,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'auth.browAngled': 'Miring',
   'hudChrome.paperdoll.hideHelmAria': 'Sembunyikan helm',
   'hudChrome.paperdoll.showHelmAria': 'Tampilkan helm',
+  'hudChrome.options.waterRipples': 'Riak Air (Ombak Jejak)',
+  'hudChrome.breath.label': 'Napas',
+  'hudChrome.breath.drowning': 'Tenggelam!',
 };

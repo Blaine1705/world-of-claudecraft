@@ -165,6 +165,32 @@ export function waterLevelAt(x: number, z: number, seed: number): number {
   return isOpenSeaAt(x, z, seed) ? waterLevel() : -Infinity;
 }
 
+/** True when an authored height stamp reaches (x, z). Empty in the built-in
+ *  world (its only stamp is the off-world jail pad), so this costs nothing
+ *  there; on a custom map it is the same bucketed index applyEditLayer uses. */
+export function inAuthoredHeightStamp(x: number, z: number): boolean {
+  const edits = getActiveWorldContent().terrainEdits;
+  if (!edits || edits.length === 0) return false;
+  let index = terrainEditIndexCache.get(edits);
+  if (!index || index.length !== edits.length) {
+    index = buildTerrainEditIndex(edits);
+    terrainEditIndexCache.set(edits, index);
+  }
+  const hit = (e: HeightStamp): boolean => (x - e.x) ** 2 + (z - e.z) ** 2 < e.radius ** 2;
+  if (index.linear) return edits.some(hit);
+  const bucket = index.buckets.get(
+    `${Math.floor(x / EDIT_INDEX_CELL)},${Math.floor(z / EDIT_INDEX_CELL)}`,
+  );
+  return bucket ? bucket.some((i) => hit(edits[i])) : false;
+}
+
+// NOTE: the player-only sea-aware water seam (playerWaterLevelAt /
+// playerWaterLevelForGround) that the swimming branch carried here is gone:
+// since the v0.35.0 water overhaul `waterLevelAt` above is ITSELF sea-aware
+// (isOpenSeaAt, with a per-cell memo and the authored-stamp exclusion this
+// seam existed to provide), so the narrow/wide split it created no longer
+// exists and every caller reads `waterLevelAt(x, z, seed)`.
+
 // Every declared lake across the active content's zones, in render/authoring
 // footprint (radius already includes the basin blend margin). Used to draw
 // water only where it is actually declared.

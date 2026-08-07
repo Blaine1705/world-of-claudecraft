@@ -67,7 +67,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Protokoll der Gildenbank wird geladen...',
   'hudChrome.bank.logNote': 'Die {count} letzten Aktionen der Gildenbank.',
   'hudChrome.bank.logOpenBank': '{actor} hat die Gildenbank für {amount} eröffnet',
-  'hudChrome.bank.logRefused': 'Nur Gildenoffiziere können das Protokoll der Gildenbank einsehen.',
   'hudChrome.bank.logWithdrawItem': '{actor} hat {count} {item} entnommen',
   'hudChrome.bank.logWithdrawMoney': '{actor} hat {amount} abgehoben',
   'hudChrome.bank.personalTab': 'Persönlich',
@@ -11384,4 +11383,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'auth.browAngled': 'Schräg',
   'hudChrome.paperdoll.hideHelmAria': 'Helm verbergen',
   'hudChrome.paperdoll.showHelmAria': 'Helm anzeigen',
+  'hudChrome.options.waterRipples': 'Wasserwellen (Kielwasser)',
+  'hudChrome.breath.label': 'Atem',
+  'hudChrome.breath.drowning': 'Ertrinken!',
 };

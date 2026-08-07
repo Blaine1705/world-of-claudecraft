@@ -56,7 +56,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Wczytywanie dziennika banku gildii...',
   'hudChrome.bank.logNote': '{count} najnowszych działań w banku gildii.',
   'hudChrome.bank.logOpenBank': '{actor} otworzył bank gildii za {amount}',
-  'hudChrome.bank.logRefused': 'Tylko oficerowie gildii mogą odczytać dziennik banku gildii.',
   'hudChrome.bank.logWithdrawItem': '{actor} wyjął {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} wypłacił {amount}',
   'hudChrome.bank.personalTab': 'Osobiste',
@@ -11232,4 +11231,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'auth.browAngled': 'Skośne',
   'hudChrome.paperdoll.hideHelmAria': 'Ukryj hełm',
   'hudChrome.paperdoll.showHelmAria': 'Pokaż hełm',
+  'hudChrome.options.waterRipples': 'Zmarszczki na wodzie (kilwater)',
+  'hudChrome.breath.label': 'Oddech',
+  'hudChrome.breath.drowning': 'Toniesz!',
 };

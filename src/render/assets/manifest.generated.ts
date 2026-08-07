@@ -292,6 +292,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/rogue.glb": "/media/models/chars/players/rogue.821bf642863c.glb",
   "models/chars/players/rogue_ability_anims.glb": "/media/models/chars/players/rogue_ability_anims.2850446cc437.glb",
   "models/chars/players/rogue_hooded.glb": "/media/models/chars/players/rogue_hooded.876d60366dc2.glb",
+  "models/chars/players/swim_anims.glb": "/media/models/chars/players/swim_anims.6021e6fc7132.glb",
   "models/chars/players/warlock_ability_anims.glb": "/media/models/chars/players/warlock_ability_anims.3c9ce0f27de6.glb",
   "models/chars/players/warrior_ability_anims.glb": "/media/models/chars/players/warrior_ability_anims.5cabf7ef81b8.glb",
   "models/city/wall_tower.glb": "/media/models/city/wall_tower.f492b537c35f.glb",

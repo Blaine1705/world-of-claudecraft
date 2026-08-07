@@ -53,7 +53,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Načítání deníku cechovní banky...',
   'hudChrome.bank.logNote': '{count} nejnovějších akcí cechovní banky.',
   'hudChrome.bank.logOpenBank': '{actor}: otevření cechovní banky za {amount}',
-  'hudChrome.bank.logRefused': 'Deník cechovní banky smí číst pouze důstojníci.',
   'hudChrome.bank.logWithdrawItem': '{actor}: výběr {count}x {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor}: výběr {amount}',
   'hudChrome.bank.personalTab': 'Osobní',
@@ -11096,4 +11095,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'auth.earWide': 'Široké',
   'hudChrome.paperdoll.hideHelmAria': 'Skrýt přilbu',
   'hudChrome.paperdoll.showHelmAria': 'Zobrazit přilbu',
+  'hudChrome.options.waterRipples': 'Vlnky na vodě (brázdy)',
+  'hudChrome.breath.label': 'Dech',
+  'hudChrome.breath.drowning': 'Topíš se!',
 };

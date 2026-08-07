@@ -563,6 +563,14 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  // WARFARE capstone (7-piece) signature procs, item_sets.ts. PvP-gated, so they
+  // only ever appear on a hostile-player kill or cast, but they render in the
+  // same four places every other set proc does: buff frame, buff tooltip, combat
+  // log gain and fade, and the death recap.
+  'aura.unbrokenOath': 'Unbroken Oath',
+  'aura.ashenStep': 'Ashen Step',
+  'aura.emberward': 'Emberward',
+  'aura.thornguard': 'Thornguard',
   // The Drakelands dragonkin brood (v0.35 rework): mechanic labels and the
   // player-facing burn/ward/stun aura names.
   'mechanic.broodCleave': 'Brood Cleave',
@@ -8234,6 +8242,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
+  // 7-piece WARFARE capstone procs (item_sets.ts), same surfaces as the four
+  // piece procs above.
+  'Unbroken Oath': 'aura.unbrokenOath',
+  'Ashen Step': 'aura.ashenStep',
+  Emberward: 'aura.emberward',
+  Thornguard: 'aura.thornguard',
   // Frost mage proc engine (src/sim/combat/frost_mage.ts): the two self
   // procs and the target debuff; buff bar, target frame and combat log.
   'Fingers of Frost': 'aura.fingersOfFrost',

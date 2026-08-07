@@ -775,6 +775,10 @@ export const en_CA: EnTranslations = {
       "ready": "Swing",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Breath",
+      "drowning": "Drowning!"
+    },
     "rest": {
       "resting": "Resting"
     },
@@ -955,6 +959,7 @@ export const en_CA: EnTranslations = {
       "valecup": "Vale Cup",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Sheathe/Unsheathe Weapon",
+      "dive": "Swim Down",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
       "petStop": "Pet: Stop",
@@ -1331,6 +1336,7 @@ export const en_CA: EnTranslations = {
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
       "showPetFrame": "Show Your Pet",
+      "waterRipples": "Water Ripples (Wakes)",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
@@ -1526,6 +1532,16 @@ export const en_CA: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Offense",
@@ -2114,6 +2130,8 @@ export const en_CA: EnTranslations = {
       "showResource": "Show Mana, Rage, and Energy",
       "showAbsorbs": "Show Absorb Shields",
       "showAuras": "Show Buffs and Debuffs",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Show Your Frame"
     },
     "frameReset": {
@@ -2459,6 +2477,8 @@ export const en_CA: EnTranslations = {
       "guildOpenAccept": "Open",
       "guildOpenNote": "Paid from your own money, not the guild treasury",
       "guildPurseShort": "Not enough money",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
       "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
       "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
@@ -2473,7 +2493,7 @@ export const en_CA: EnTranslations = {
       "logNote": "The {count} most recent guild bank actions.",
       "logLoading": "Loading the guild bank log...",
       "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "A former guild member",
       "logDepositItem": "{actor} deposited {count} {item}",
       "logWithdrawItem": "{actor} withdrew {count} {item}",
@@ -9779,6 +9799,27 @@ export const en_CA: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Cinderweave Slippers"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Medallion of the Final Oath"
       },
@@ -12125,6 +12166,11 @@ export const en_CA: EnTranslations = {
         "name": "FURY",
         "title": "Honor Quartermaster",
         "greeting": "The sands remember every victory. Spend your honor well."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "Loremaster Caddis",
@@ -15257,6 +15303,36 @@ export const en_CA: EnTranslations = {
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",
         "bonus3": "Increases attack and casting speed by 7.5%."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",
