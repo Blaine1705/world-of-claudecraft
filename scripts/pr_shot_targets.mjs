@@ -171,6 +171,128 @@ async function stubDesktopUpdateBridge(page) {
   })()`);
 }
 
+// ---------------------------------------------------------------------------
+// The Reliquary HUD tracker (#reliquary-tracker) bring-up, shared by every
+// variant of the reliquary-tracker target below. The strip paints only when it
+// HAS lines, so a capture has to earn them the way a player does: fill a few
+// pages part-way, then pin them through the window's own pin buttons (the real
+// path, storage and repaint included) rather than poking the view core.
+// ---------------------------------------------------------------------------
+
+/** Pages the capture pins. Under RELIQUARY_TRACK_CAP on purpose, so the shot
+ *  shows a tracked set rather than the cap refusal. */
+const RELIQUARY_TRACKER_PINS = 3;
+
+/** Share of a page's item relics to grant, so every tracked line shows a
+ *  PARTIAL bar: an empty one proves nothing and a full one illuminates the
+ *  page, which retires it from the strip. */
+const RELIQUARY_TRACKER_FILL = 0.5;
+
+/** Wipe the per-character pin store before the document loads. The harness
+ *  profile's localStorage outlives page.close, so an earlier variant's pins
+ *  would otherwise decide what the next one shows, and the pin control is a
+ *  TOGGLE: a second click on an already-pinned page unpins it. */
+async function clearReliquaryPins(page) {
+  await page.evaluateOnNewDocument(
+    `try { for (const k of Object.keys(localStorage)) { if (k.indexOf('woc_reliquary_pins') === 0) localStorage.removeItem(k); } } catch {}`,
+  );
+}
+
+/** Open The Reliquary on the Conquerors shelf and return its page ids in shelf
+ *  order. That shelf is item-only, which is what makes the partial fill below
+ *  predictable (marks, mounts, titles and skins live in other stores). */
+async function openReliquaryConquerorsShelf(page) {
+  await page.evaluate(() => {
+    document.querySelector('#gpu-notice')?.remove();
+    document.querySelector('.camera-prompt-confirm')?.click();
+    window.__game?.hud?.openReliquary?.();
+  });
+  const opened = await pollForSize(page, '#reliquary-window');
+  if (!opened) throw new Error('reliquary window did not open');
+  await page.evaluate(() => {
+    document.querySelector('#reliquary-window [data-nav="conquerors"]')?.click();
+  });
+  await wait(300);
+  return page.evaluate(() =>
+    [...document.querySelectorAll('#reliquary-window .reliquary-page-row')].map(
+      (row) => row.dataset.page,
+    ),
+  );
+}
+
+/** Grant part of one page's item relics by reading the page detail's OWN cells
+ *  (data-cell-id / data-cell-kind), never a hard-coded relic list that content
+ *  re-authoring would rot, then return to the shelf. Returns how many landed. */
+async function fillReliquaryPagePartway(page, pageId) {
+  await page.evaluate((id) => {
+    document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+  }, pageId);
+  await wait(250);
+  const granted = await page.evaluate((fraction) => {
+    const cells = [...document.querySelectorAll('#reliquary-window .reliquary-cell')];
+    const missing = [];
+    for (const cell of cells) {
+      if (cell.dataset.cellKind === 'item' && cell.dataset.cellOwned === '0') missing.push(cell);
+    }
+    // itemsDiscovered is the set every completion read folds; the offline Sim
+    // hands out the live object, so adding to it is exactly what a real find
+    // does minus the event.
+    const discovered = window.__game?.sim?.deedStats?.itemsDiscovered;
+    const want = Math.min(missing.length, Math.max(1, Math.round(cells.length * fraction)));
+    let count = 0;
+    for (const cell of missing) {
+      if (count >= want) break;
+      const relicId = cell.dataset.cellId;
+      if (!relicId) continue;
+      discovered?.add(relicId);
+      count++;
+    }
+    document.querySelector('#reliquary-window [data-back]')?.click();
+    return count;
+  }, RELIQUARY_TRACKER_FILL);
+  await wait(250);
+  return granted;
+}
+
+/** Fill and pin RELIQUARY_TRACKER_PINS pages, leaving the window OPEN on the
+ *  shelf list with its pin buttons in their pinned state. Small pages first, so
+ *  every bar reads as progress rather than a sliver on a thirty-slot page. */
+async function pinReliquaryTrackerPages(page) {
+  const pageIds = await openReliquaryConquerorsShelf(page);
+  if (pageIds.length === 0) throw new Error('reliquary shelf listed no pages');
+  const sized = await page.evaluate((ids) => {
+    const sim = window.__game?.sim;
+    const rows = [];
+    for (const id of ids) {
+      const c = sim?.reliquaryPageCompletion?.(id);
+      if (!c || c.complete || c.total < 4 || c.total > 14) continue;
+      rows.push({ pageId: id, total: c.total });
+    }
+    rows.sort((a, b) => a.total - b.total || (a.pageId < b.pageId ? -1 : 1));
+    return rows;
+  }, pageIds);
+  const picks = (sized.length > 0 ? sized.map((r) => r.pageId) : pageIds).slice(
+    0,
+    RELIQUARY_TRACKER_PINS,
+  );
+  for (const pageId of picks) await fillReliquaryPagePartway(page, pageId);
+  // Pin only what is NOT already pinned: the control toggles, so a blind click
+  // on a pinned page would take the line straight back off the strip.
+  const pinned = await page.evaluate((ids) => {
+    let count = 0;
+    for (const id of ids) {
+      const btn = document.querySelector(`#reliquary-window [data-pin="${id}"]`);
+      if (!btn || btn.disabled || btn.getAttribute('aria-pressed') === 'true') continue;
+      btn.click();
+      count++;
+    }
+    return count;
+  }, picks);
+  if (pinned === 0) throw new Error('no reliquary page could be pinned');
+  await wait(400);
+  return picks;
+}
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -3772,6 +3894,69 @@ export const TARGETS = [
       });
       await wait(300);
       return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-tracker',
+    label: 'The Reliquary HUD tracker: pinned pages with live progress, and its compact count chip',
+    // Scoped to the tracker's own two modules. The window targets above already
+    // cover the shelf and page surfaces, and a wider when list would double the
+    // capture set of every Reliquary window change.
+    when: ['ui/reliquary_tracker_view', 'ui/reliquary_tracker_painter'],
+    variants: [
+      // The strip itself, expanded, with a line per pinned page.
+      { key: 'desktop', beforeLoad: clearReliquaryPins },
+      // The same frame uncropped: where the strip actually sits in the HUD,
+      // under the quest and deed trackers in #right-tracker-stack.
+      { key: 'hud-desktop', beforeLoad: clearReliquaryPins },
+      // Compact touch tier (844x390 landscape lands there): the rows fold away
+      // and the header becomes a count chip that opens The Reliquary.
+      { key: 'mobile', mobile: true, beforeLoad: clearReliquaryPins },
+      // The pin control that feeds all of the above, on its shelf rows.
+      { key: 'pin-desktop', beforeLoad: clearReliquaryPins },
+    ],
+    async capture(page, variant) {
+      const picks = await pinReliquaryTrackerPages(page);
+      if (variant?.key === 'pin-desktop') {
+        // Land the shelf on the rows that are actually pinned: the list is long
+        // and its top rows are all unpinned, which would show the control in
+        // one state only. Held on an interval because the window repaints on
+        // world changes and a repaint resets the scroll (the char-window
+        // target's idiom), cleared after 5s.
+        await page.evaluate((pageId) => {
+          const pin = () => {
+            document
+              .querySelector(`#reliquary-window [data-pin="${pageId}"]`)
+              ?.scrollIntoView({ block: 'center' });
+          };
+          pin();
+          const iv = setInterval(pin, 50);
+          setTimeout(() => clearInterval(iv), 5000);
+        }, picks[0]);
+        await wait(400);
+        return { clip: '#reliquary-window' };
+      }
+      // Close the window: the tracker is the always-on surface, and the open
+      // window covers it.
+      await page.evaluate(() => window.__game?.hud?.toggleReliquary?.());
+      await wait(600);
+      const shown = await pollForSize(page, '#reliquary-tracker');
+      if (!shown) throw new Error('reliquary tracker painted no lines');
+      if (variant?.key === 'mobile') {
+        // Prove the compact tier is really on before shooting it: without
+        // hud-mobile-compact this is the desktop disclosure strip, not the chip.
+        const chip = await page.evaluate(
+          () =>
+            document.body.classList.contains('mobile-touch') &&
+            document.body.classList.contains('hud-mobile-compact') &&
+            document
+              .querySelector('#reliquary-tracker .dt-header')
+              ?.getAttribute('aria-haspopup') === 'dialog',
+        );
+        if (!chip) throw new Error('reliquary tracker is not in compact chip mode');
+        return {};
+      }
+      return variant?.key === 'desktop' ? { clip: '#reliquary-tracker' } : {};
     },
   },
   {
