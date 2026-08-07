@@ -147,6 +147,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     eating: null,
     drinking: null,
     weaponStowed: false,
+    helmHidden: false,
     afk: false,
     aiState: 'idle',
     tappedById: null,

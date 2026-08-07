@@ -108,6 +108,7 @@ import {
   type CharacterVisual,
   createCharacterVisual,
   createMountVisual,
+  modularLookFor,
   setWeaponVfxViewportHeight,
 } from './characters';
 import {
@@ -956,6 +957,7 @@ export interface EntityView {
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
+  helmHidden: boolean; // last-rendered paperdoll eye toggle, diffed to recompose the kit helm
   /** unscaled height, nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -7213,6 +7215,9 @@ export class Renderer {
       // Born false so the per-frame diff below sheathes an already-stowed entity
       // (a peer entering interest) on its first sync.
       weaponStowed: false,
+      // Born with the CURRENT bit: unlike the stow pose there is no transition
+      // to replay — createCharacterVisual composed with it just now.
+      helmHidden: e.helmHidden,
       liveScale: e.scale,
       loco: newLocoTrack(),
       locoState: newLocoState(),
@@ -9209,6 +9214,19 @@ export class Renderer {
         iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
       }
 
+      // live helm toggle (the paperdoll eye): the kit's head piece is part of
+      // the composed geometry, not a texture, so flipping it means recomposing
+      // the body. Nulling the remembered key makes updateBaseVisual's next-key
+      // diff read as a base-visual swap, reusing its whole replace path
+      // (click-target handoff, compile gating). Composed entities only: a
+      // fixed class rig has no kit helm to take off.
+      if (e.helmHidden !== v.helmHidden) {
+        v.helmHidden = e.helmHidden;
+        // Mech wearers keep the mech body (index.ts skips their look), so a
+        // helm toggle must not force a pointless dispose/rebuild of it.
+        const mech = e.kind === 'player' && e.skinCatalog === 'mech';
+        if (!mech && modularLookFor(e)) v.visualKey = null;
+      }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);

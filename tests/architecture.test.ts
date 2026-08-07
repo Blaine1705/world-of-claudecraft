@@ -1468,6 +1468,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
@@ -1499,6 +1500,10 @@ const UI_DOM_MODULES = [
   'src/ui/gpu_notice_toast.ts',
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
+  // The paperdoll eye toggle's memory: owns the localStorage key on purpose
+  // (the stored choice IS its state), so it registers here rather than
+  // injecting the store from the caller.
+  'src/ui/helm_pref.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

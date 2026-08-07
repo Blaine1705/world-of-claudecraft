@@ -25,4 +25,9 @@ export interface IWorldCosmetics {
   // Z-key sheathe toggle: held weapons render stowed on the back (cosmetic; the
   // sim clears it on any deliberate combat action, WoW-style).
   toggleWeaponStow(): void;
+  // Paperdoll eye toggle: render the composed body without its kit's head piece.
+  // A standing wardrobe preference that rides the entity wire (`hh`) so peers
+  // and portraits present the chosen look; explicit boolean so the client's
+  // stored choice re-asserts idempotently on world entry.
+  setHelmHidden(hidden: boolean): void;
 }

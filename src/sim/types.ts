@@ -675,6 +675,26 @@ export type ItemSlot = EquipSlot | 'ring';
 
 export type SkinCatalog = 'class' | 'mech';
 
+/**
+ * Is this entity wearing the Combat Mech cosmetic?
+ *
+ * The ONE definition of the rule. The mech is a whole replacement body, not a
+ * layer: nothing of the wearer's composed character may render with it, or the
+ * two bodies occupy the same space and intersect. Every site that has to know
+ * (visual construction, the character-sheet preview, the frame portrait, the
+ * title chip) asks this rather than re-deriving `skinCatalog === 'mech'`, so a
+ * new site cannot quietly get it wrong.
+ *
+ * Lives here, beside the catalog type, rather than in the render layer: the UI
+ * panels need it too and they are barred from importing `src/render/*`
+ * (tests/char_window.test.ts pins that boundary).
+ */
+export function isMechWearer(
+  e: { kind?: string; skinCatalog?: SkinCatalog } | null | undefined,
+): boolean {
+  return !!e && e.kind === 'player' && e.skinCatalog === 'mech';
+}
+
 // Season 1 Armory weapon-skin cosmetics (src/sim/content/weapon_skins.ts). The
 // loadout is the account-wide "applied skin per weapon type" selection; a skin
 // only shows while a weapon of its type is equipped (weapon_skin_rules.ts).
@@ -3647,6 +3667,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Z-key cosmetic toggle: held weapons render sheathed on the back. Cleared by
   // any deliberate combat action (auto-attack engage, ability cast), WoW-style.
   weaponStowed: boolean;
+  // Paperdoll eye toggle: the composed body renders without its kit's head
+  // piece. A standing wardrobe preference (never auto-cleared), it rides the
+  // entity wire (`hh` bit) so peers and portraits present the chosen look.
+  helmHidden: boolean;
   // /afk display mirror: true while this player's PlayerMeta.away is in `afk`
   // mode. Kept in lockstep with meta.away by src/sim/social/away.ts so the flag
   // rides the entity (wire `ak` bit) to other clients' nameplates and the social

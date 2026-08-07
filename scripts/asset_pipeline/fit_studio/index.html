@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>WOC Fit Studio</title>
+<link rel="stylesheet" href="/fit_studio/style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⚒️</text></svg>" />
+</head>
+<body>
+<!-- The shell is just named containers; every control inside them is built by
+     the modules in /fit_studio/*.js so widgets stay consistent. -->
+<div id="app">
+  <header id="topbar"></header>
+  <aside id="library">
+    <div id="lib-search"></div>
+    <div id="lib-sections"></div>
+  </aside>
+  <main id="viewport">
+    <div id="readout" hidden></div>
+    <div id="vp-hint"></div>
+  </main>
+  <aside id="inspector">
+    <div id="insp-tabs"></div>
+    <div id="insp-body"></div>
+  </aside>
+  <footer id="statusbar"></footer>
+</div>
+<div id="toasts"></div>
+<div id="cheat"></div>
+<script type="module" src="/fit_studio/main.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import type { Entity, PlayerClass } from '../../sim/types';
+import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 
@@ -112,6 +112,11 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
+  /** This GLB is a modular PART LIBRARY, not a finished character: every body
+   *  part, hair style and armour slot piece rides one shared rig and the
+   *  visible set is picked per entity (see modular.ts). assembleModel composes
+   *  it instead of cloning the whole scene. */
+  modular?: boolean;
   /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
    *  seated at the origin; alive shows `hide` only, and death swaps to `show`
    *  (the cracked-open shell IS the corpse). assembleModel seeds the alive
@@ -487,6 +492,8 @@ const TOLLING_BELL: ClipMap = {
 // ---------------------------------------------------------------------------
 
 const PLAYERS = 'models/chars/players';
+/** Modular part library (one GLB, every part) — see modular.ts. */
+const MODULAR = 'models/chars/modular';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
@@ -2138,6 +2145,60 @@ export const VISUALS: Record<string, VisualDef> = {
 };
 
 // ---------------------------------------------------------------------------
+// Modular player bodies — one `player_<class>_modular` def per class, derived
+// from the class def above it. The body is COMPOSED from the shared part
+// library (modular.ts) instead of cloned from the class GLB, but everything
+// else — clips, the ability→clip mapping, held-weapon layout, the swim/fall
+// lane — is the class's own, so a composed rogue garrotes and a composed
+// hunter draws its bow exactly like the fixed rigs do.
+//
+// The class GLB rides along as a pure CLIP source (first animUrl): the
+// synthesized per-class attacks (Shield_Bash, Garrote_Choke, Kick_A, ...)
+// exist only there, and every player body shares KayKit's Rig_Medium, so its
+// clips bind onto the modular skeleton by node name — the swim/bow clip packs
+// are the precedent. No extra fetch: the class GLB is already preloaded as the
+// fixed rig every OTHER entity still wears.
+//
+// Deliberately dropped from the class def:
+//  - `show`: the composed body has no baked accessory meshes to allowlist;
+//    hats/capes are armour-slot parts picked by the loadout instead.
+//  - `tint`/`tintStrength`: the class tints (shaman blue, warlock violet) are
+//    how classes SHARING a stock model stay tellable apart. A composed body's
+//    colour belongs to the player's skin/hair wheels, and a tint over the
+//    picked skin tone repaints exactly what the player chose.
+// ---------------------------------------------------------------------------
+const MODULAR_CLASSES: readonly PlayerClass[] = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+];
+for (const cls of MODULAR_CLASSES) {
+  const {
+    show: _show,
+    tint: _tint,
+    tintStrength: _tintStrength,
+    ...base
+  } = VISUALS[`player_${cls}`];
+  VISUALS[`player_${cls}_modular`] = {
+    ...base,
+    url: `${MODULAR}/warrior_modular.glb`,
+    modular: true,
+    animUrls: [base.url, ...(base.animUrls ?? [])],
+  };
+}
+
+/** The composed-body variant of a class visual (every class has one). */
+export function modularVisualKey(cls: PlayerClass): string {
+  return `player_${cls}_modular`;
+}
+
+// ---------------------------------------------------------------------------
 // Dispatch: entity -> visual key (mirrors the old buildRigFor selection:
 // e.kind + e.templateId + MOBS[id].family)
 // ---------------------------------------------------------------------------
@@ -2377,7 +2438,7 @@ const NPC_KEYS: Record<string, string> = {
 
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
-    if (e.skinCatalog === 'mech') return 'player_mech';
+    if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {
