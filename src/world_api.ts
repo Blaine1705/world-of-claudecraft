@@ -42,7 +42,8 @@
 //                                            content + basic crafting action landed in #1127)
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
-//   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (officer-plus,
+//   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (guild-wide view
+//                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
@@ -544,24 +545,30 @@ export const COMMAND_NAMES = [
   // Profiler-only server authority: idempotently prevents incoming damage while
   // preserving normal outgoing damage and incoming hit presentation.
   'dev_profiler_invulnerable',
-  // The Guild Bank cluster (officer-plus shared treasury + item store,
-  // src/sim/guild_bank.ts). Its own guild_bank_* tokens forever, NEVER a reuse
+  // The Guild Bank cluster (shared treasury + item store, viewable guild-wide,
+  // EDITABLE officer-plus only: every token below is a mutating op the sim
+  // refuses for a plain member, src/sim/guild_bank.ts). Its own guild_bank_*
+  // tokens forever, NEVER a reuse
   // of the personal bank_* strings (state.md decision; pinned by
   // tests/command_facets.test.ts). `slot` is a container index and `count`
   // optional (the bank_* wire idiom); `amount` is copper. The Sim owns every
-  // gameplay rule (banker proximity, officer-plus rank, quest-bind, caps,
-  // table price); the server validates shape only.
+  // gameplay rule (banker proximity, officer-plus rank on edits, quest-bind,
+  // caps, table price); the server validates shape only.
   'guild_bank_deposit_gold',
   'guild_bank_withdraw_gold',
   'guild_bank_deposit',
   'guild_bank_withdraw',
   'guild_bank_buy_slots',
-  // The guild bank ACTIVITY LOG request (the officer-visible history of the
-  // append-only bank_ledger rows). A pure READ token: it mutates nothing, and
+  // The guild bank ACTIVITY LOG request (the guild-visible history of the
+  // append-only bank_ledger rows; readable by every member since the v0.35
+  // member read-only view). A pure READ token: it mutates nothing, and
   // its answer comes back on its own one-shot 'gbanklog' frame rather than the
-  // 20 Hz snapshot, because the payload is cold, identical for every officer of
+  // 20 Hz snapshot, because the payload is cold, identical for every member of
   // the guild, and 50 rows wide. Sent only while the log view is open.
   'guild_bank_log',
+  // Paperdoll eye toggle: helmet-visibility preference on the composed body.
+  // Appended because wire tokens are never reordered.
+  'set_helm',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -697,6 +704,7 @@ export const COMMAND_FACETS = {
   unequip_mech_chroma: 'IWorldCosmetics',
   change_weapon_skin: 'IWorldCosmetics',
   stow_weapon: 'IWorldCosmetics',
+  set_helm: 'IWorldCosmetics',
   // IWorldPet: hunter-pet commands (snake_case wire strings, by design; pet state
   // mirrors on the owned-mob entity wire, not a self-snapshot field).
   pet_abandon: 'IWorldPet',

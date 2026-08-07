@@ -2536,8 +2536,11 @@ describe('client HTML shell', () => {
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {
+    // The WARFARE shop joined this centered-sheet group, so the pinned run grew
+    // with it rather than being narrowed around it: keeping the new window inside
+    // the assertion is what makes this guard cover it too.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #quest-dialog',
+      'body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #warfare-window,\n  body.mobile-touch #quest-dialog',
     );
     expect(hudMobileCss).toContain('width: clamp(320px, 76vw, 680px);');
     expect(hudMobileCss).toContain('max-width: calc(100vw - 20px);');
@@ -2631,12 +2634,53 @@ describe('pet cluster layout', () => {
         (r): r is { selector: string; body: string } =>
           r !== null && /left:\s*calc\(50%/.test(r.body) && r.selector.includes('#castbar'),
       );
-    // Vacuity floor: the five known column nudges must actually be found (compact,
-    // compact left-handed, their two narrow-phone variants, and the tablet tier).
-    expect(nudges.length).toBeGreaterThanOrEqual(5);
+    // Vacuity floor: all SIX column nudges must actually be found, which is the count
+    // on the release base too (compact, compact left-handed, their two narrow-phone
+    // variants, and the tablet tier plus its left-handed mirror). This change adds no
+    // rule; it adds the pet strip to the ones that already existed.
+    expect(nudges.length).toBeGreaterThanOrEqual(6);
     for (const rule of nudges) {
       expect(rule.selector).toContain('#pet-frame');
     }
+  });
+
+  // The sliver's own CSS, pinned because nothing else reads it: the class exists,
+  // raid style re-seats it absolutely (its rows are fixed-height with overflow hidden,
+  // so an in-flow strip would be clipped), and the two variants too small to hit are
+  // made non-interactive. That last one is the load-bearing pin: without
+  // pointer-events the sliver is a 3px (mobile) or 2px (raid) click target whose
+  // handler stopPropagations away the member selection the player actually meant.
+  it('gives the pet sliver its own class rather than reusing .bar', () => {
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet {');
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet-fill {');
+    // `.bar` would be caught by pf-hide-resource and by the raid strip positioning.
+    expect(hudCssSrc).not.toMatch(/\.party-frame \.bar\.pfm-pet/);
+  });
+
+  it('re-seats the sliver absolutely in raid style and makes it non-interactive', () => {
+    const raid = hudCssSrc.slice(
+      hudCssSrc.indexOf('#party-frames.party-style-raid .party-frame .pfm-pet {'),
+    );
+    const block = raid.slice(0, raid.indexOf('}'));
+    expect(block).toContain('position: absolute');
+    expect(block).toContain('pointer-events: none');
+  });
+
+  it('shrinks the sliver on mobile and makes it non-interactive there too', () => {
+    const m = hudMobileSrc.slice(
+      hudMobileSrc.indexOf('body.mobile-touch #party-frames .party-frame .pfm-pet {'),
+    );
+    const block = m.slice(0, m.indexOf('}'));
+    expect(block).toMatch(/height:\s*3px/);
+    expect(block).toContain('pointer-events: none');
+  });
+
+  // A dead pet is always hp 0, so its FILL is scaleX(0) and has no pixels: the dead
+  // state has to sit on the track or it renders nothing at all, which is the one
+  // state a hunter needs to tell apart in order to revive.
+  it('puts the dead-pet styling on the track, not the zero-width fill', () => {
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet.dead {');
+    expect(hudCssSrc).not.toContain('.party-frame .pfm-pet.dead .pfm-pet-fill');
   });
 
   // display:contents dissolves the wrapper so each child keeps its own fixed seat.

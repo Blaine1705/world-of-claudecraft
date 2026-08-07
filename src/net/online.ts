@@ -43,6 +43,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
+import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import type { ResolvedAbility } from '../sim/sim';
@@ -1220,6 +1221,7 @@ function blankEntity(id: number): Entity {
     petOwnerHpBonus: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    ccDurationReduction: 0,
     pos: { x: 0, y: 0, z: 0 },
     prevPos: { x: 0, y: 0, z: 0 },
     facing: 0,
@@ -1230,7 +1232,11 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    swimStroke: 0,
+    swimDiving: false,
     fatigueTicks: 0,
+    breathUsedTicks: 0,
+    drownTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -1332,6 +1338,7 @@ function blankEntity(id: number): Entity {
     sitting: false,
     afk: false,
     weaponStowed: false,
+    helmHidden: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1527,12 +1534,12 @@ export class ClientWorld implements IWorld {
   bankInfo: BankInfo | null = null;
   // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
   // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
-  // for member rank, and outside a guild (proximity + officer-plus gated by
-  // the server), so it only rides the wire for an officer actually standing
-  // at a bursar. ---
+  // and outside a guild (proximity + membership gated by the server; ANY rank
+  // sees it and `canEdit` marks officer-plus), so it only rides the wire for
+  // a guild member actually standing at a bursar. ---
   guildBankInfo: GuildBankInfo | null = null;
   // The guild bank ACTIVITY LOG mirror. Deliberately NOT a snapshot key: it is
-  // cold, identical for every officer of the guild, and 50 rows wide, so it
+  // cold, identical for every member of the guild, and 50 rows wide, so it
   // rides its own on-demand request/response pair (`guild_bank_log` ->
   // `gbanklog`) that the guildBankLog() read below issues while the log view is
   // open. `guildBankLogAt` is the SEND time of the last request and is the ONE
@@ -2129,6 +2136,12 @@ export class ClientWorld implements IWorld {
       mi.strafeLeft ? 1 : 0,
       mi.strafeRight ? 1 : 0,
       mi.jump ? 1 : 0,
+      mi.dive ? 1 : 0,
+      mi.surface ? 1 : 0,
+      // Quantised upstream (input.ts SWIM_STEER_STEPS) precisely so that it can
+      // sit in the change-detection signature without a mouse-move resending
+      // the frame every time the camera twitches.
+      mi.swimSteer ?? 1,
       facing,
     ].join(',');
   }
@@ -2158,8 +2171,18 @@ export class ClientWorld implements IWorld {
         sl: mi.strafeLeft ? 1 : 0,
         sr: mi.strafeRight ? 1 : 0,
         j: mi.jump ? 1 : 0,
+        dv: mi.dive ? 1 : 0,
+        sf: mi.surface ? 1 : 0,
       },
     };
+    // The camera steer rides along only when it actually GRADES something.
+    // Absent means full rate on the far side (swimSteerRate), which is both the
+    // old behaviour and what every land frame wants — so walking around sends
+    // exactly the bytes it always did, and the field appears only while a
+    // swimmer is easing the view into a dive or a climb.
+    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
+      (msg.mi as Record<string, number>).ss = mi.swimSteer;
+    }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
     this.lastInputSentAt = now;
@@ -2883,6 +2906,7 @@ export class ClientWorld implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
+      e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
@@ -3376,16 +3400,18 @@ export class ClientWorld implements IWorld {
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
       // `guildBank` follows the same delta contract; the server encodes null
-      // away from a banker, on death, for member rank, and outside a guild
-      // (the proximity + officer-plus gate lives in sim guildBankInfoFor).
+      // away from a banker, on death, and outside a guild (the proximity +
+      // membership gate lives in sim guildBankInfoFor; any rank sees it, the
+      // snapshot's canEdit flag marks officer-plus).
       if (s.guildBank !== undefined) {
         // BOTH EDGES of the gate reset the activity log, not just the losing
-        // one. Losing it (walked away, died, demoted to member, left or
-        // switched guild) invalidates the rows: they are one guild's history
-        // read under a rank this client may no longer hold, so they are dropped
-        // rather than left to paint into the next pane that opens. REGAINING it
+        // one. Losing it (walked away, died, left or switched guild)
+        // invalidates the rows: they are one guild's history
+        // read under a membership this client may no longer hold, so they are
+        // dropped rather than left to paint into the next pane that opens.
+        // REGAINING it
         // has to reset too, because the answer this client is holding was taken
-        // while the gate was shut: an officer who opened the log away from the
+        // while the gate was shut: a member who opened the log away from the
         // banker got a `refused`, and without this the pane went on saying
         // refused for the rest of the TTL after they walked up. Re-arming on
         // the transition makes it self-correct in one frame.
@@ -3807,8 +3833,8 @@ export class ClientWorld implements IWorld {
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
   }
-  setTownFocus(allocation: Record<string, number>): void {
-    this.cmd({ cmd: 'set_town_focus', allocation });
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
+    this.cmd({ cmd: 'set_town_focus', allocation, tier });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
@@ -4075,6 +4101,15 @@ export class ClientWorld implements IWorld {
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Same re-resolve the offline Sim does (setPlayerSkin): the body decides
+      // which skin types apply, so the optimistic local view must swap the
+      // displayed skin with the body rather than wait for the next snapshot.
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        p.weaponSkinLoadout,
+        catalog,
+      );
     }
     this.cmd({ cmd: 'change_skin', skin: idx, catalog });
   }
@@ -4198,6 +4233,14 @@ export class ClientWorld implements IWorld {
     if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
     this.cmd({ cmd: 'stow_weapon' });
   }
+  setHelmHidden(hidden: boolean): void {
+    // Optimistic local nudge (the toggleWeaponStow idiom) so the recompose and
+    // portrait re-snapshot land instantly; the next snapshot's `hh` bit
+    // reconciles. No dead-gate: a wardrobe preference, not an action.
+    const p = this.entities.get(this.playerId);
+    if (p) p.helmHidden = hidden;
+    this.cmd({ cmd: 'set_helm', hidden });
+  }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
     const skin = mechChromaSkinIndex(chromaId);
@@ -4210,6 +4253,16 @@ export class ClientWorld implements IWorld {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
+        // Dropping the chroma drops the wearer OFF the mech body, so this is a
+        // body change and re-resolves like changeSkin and Sim.setPlayerSkin do.
+        // Without it a mech hunter's sword skin stayed displayed on a class rig
+        // that cannot render one, until the next authoritative snapshot.
+        current.weaponSkinId = resolveActiveWeaponSkin(
+          current.templateId,
+          current.mainhandItemId,
+          current.weaponSkinLoadout,
+          current.skinCatalog,
+        );
       }
       const existing = this.inventory.find((slot) => slot.itemId === itemId);
       this.inventory = existing
@@ -4238,7 +4291,12 @@ export class ClientWorld implements IWorld {
       } else delete next[type];
       if (!def) p.weaponSkinLoadout = next;
       const appliedLoadout = p.weaponSkinLoadout;
-      p.weaponSkinId = resolveActiveWeaponSkin(p.templateId, p.mainhandItemId, appliedLoadout);
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        appliedLoadout,
+        p.skinCatalog ?? 'class',
+      );
       const loadout: Record<string, string> = {};
       for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
       this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };
