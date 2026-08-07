@@ -704,7 +704,14 @@ export const TARGETS = [
           { ...variant, mobId: staged.mobId },
         );
         if (!clicked) throw new Error('primary action slot 1 is unavailable');
-        for (let poll = 0; poll < 24 && !ccApplied; poll++) {
+        // 12s of polling, not the 4.8s an instant stun needed. Two of these
+        // three abilities have a 1.5s cast, and the offline sim advances on
+        // the client's own frame loop, which under headless SwiftShader runs
+        // in stalled bursts: a measured Gripping Roots cast took over 4s of
+        // wall clock to spend its first 1.1s of cast time. The old window
+        // expired mid-cast and reported "aura never applied", which reads as
+        // a target-data bug rather than a slow host.
+        for (let poll = 0; poll < 60 && !ccApplied; poll++) {
           await wait(200);
           ccApplied = await page.evaluate(
             (shot) =>
