@@ -54,7 +54,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Indlæser laugsbankens log...',
   'hudChrome.bank.logNote': 'De {count} seneste handlinger i laugsbanken.',
   'hudChrome.bank.logOpenBank': '{actor} åbnede laugsbanken for {amount}',
-  'hudChrome.bank.logRefused': 'Kun laugsofficerer kan læse laugsbankens log.',
   'hudChrome.bank.logWithdrawItem': '{actor} tog {count} {item} ud',
   'hudChrome.bank.logWithdrawMoney': '{actor} tog {amount} ud',
   'hudChrome.bank.personalTab': 'Personlig',

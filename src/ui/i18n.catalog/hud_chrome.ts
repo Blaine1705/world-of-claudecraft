@@ -2854,6 +2854,16 @@ export const hudChromeStrings = {
     guildOpenAccept: 'Open',
     guildOpenNote: 'Paid from your own money, not the guild treasury',
     guildPurseShort: 'Not enough money',
+    // The read-only legend a plain member sees: every guild member can VIEW
+    // the bank (v0.35), only officer-plus can act, and the pane says so up
+    // front instead of leaving dead buttons to be discovered. Always-visible
+    // text, the dormant-note precedent.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    guildReadOnlyNote: 'Only guild officers can make changes to the guild bank.',
+    // The member-facing line of the UNOPENED pane: the officer pane explains
+    // that state through the open-the-bank row, which a read-only viewer does
+    // not get, and a treasury with no grid and no explanation reads as broken.
+    guildUnopenedNote: 'The guild bank has not been opened yet.',
     guildDormantNote: 'Locked items cannot be withdrawn and prevent disbanding the guild.',
     guildDormantHint: 'This item is locked in the guild bank and cannot be withdrawn.',
     guildDormantAria: '{item}, quantity {count}, cannot be withdrawn',
@@ -2867,8 +2877,9 @@ export const hudChromeStrings = {
     // all right now (empty purse on deposit, full treasury, empty treasury).
     guildGoldCannotMove: 'That amount cannot be moved right now.',
     // The Guild pane's Contents / Log sub-strip and the ACTIVITY LOG itself.
-    // The log is the social trust mechanism the officer-only design rests on:
-    // every op already writes an audit row, and this is what lets the guild see
+    // The log is the social trust mechanism the officer-only EDIT design rests
+    // on: every op already writes an audit row, and this is what lets the
+    // whole guild (every member reads it, v0.35) see
     // who moved shared property. Sentences are plain language with the actor
     // spliced as a VALUE (a player-authored character name is never a key), the
     // time rendered by the i18n date formatter, and money by formatMoney.
@@ -2883,9 +2894,14 @@ export const hudChromeStrings = {
     logNote: 'The {count} most recent guild bank actions.',
     logLoading: 'Loading the guild bank log...',
     logEmpty: 'Nothing has been moved in or out of the guild bank yet.',
-    // A refusal is deliberately NOT an empty list: "you may not read this" and
-    // "nobody has done anything" are opposite facts.
-    logRefused: 'Only guild officers can read the guild bank log.',
+    // A refusal is deliberately NOT an empty list: "you cannot read this right
+    // now" and "nobody has done anything" are opposite facts. The log is
+    // readable by EVERY guild member (v0.35: the bank view went guild-wide),
+    // so a refusal means the gate dropped mid-view (walked away, died, lost
+    // the guild), never a rank. A NEW key replacing logRefused, because that
+    // key's shipped locale rows promise the retired officers-only rule.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    logUnavailable: 'The guild bank log cannot be read right now.',
     // The stand-in when a row's character no longer exists.
     logFormerMember: 'A former guild member',
     logDepositItem: '{actor} deposited {count} {item}',

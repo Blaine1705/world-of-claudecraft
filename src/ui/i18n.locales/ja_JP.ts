@@ -9125,6 +9125,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildOpenAccept': '開設',
   'hudChrome.bank.guildOpenNote': 'ギルド金庫ではなく、あなた自身の所持金から支払われます',
   'hudChrome.bank.guildPurseShort': '所持金不足',
+  'hudChrome.bank.guildReadOnlyNote': 'ギルド銀行を変更できるのはギルド役員のみです。',
+  'hudChrome.bank.guildUnopenedNote': 'ギルド銀行はまだ開設されていません。',
   'hudChrome.bank.guildDormantNote':
     'ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。',
   'hudChrome.bank.guildDormantHint': 'このアイテムはギルド銀行にロックされており、引き出せません。',
@@ -9140,7 +9142,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logNote': '直近{count}件のギルド銀行の操作です。',
   'hudChrome.bank.logLoading': 'ギルド銀行のログを読み込んでいます...',
   'hudChrome.bank.logEmpty': 'ギルド銀行にはまだ何も出し入れされていません。',
-  'hudChrome.bank.logRefused': 'ギルド銀行のログを閲覧できるのはギルド役員のみです。',
+  'hudChrome.bank.logUnavailable': '現在、ギルド銀行のログを閲覧できません。',
   'hudChrome.bank.logFormerMember': '元ギルドメンバー',
   'hudChrome.bank.logDepositItem': '{actor} が {item} を {count} 個預けました',
   'hudChrome.bank.logWithdrawItem': '{actor} が {item} を {count} 個引き出しました',
