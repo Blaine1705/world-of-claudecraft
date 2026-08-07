@@ -38,10 +38,12 @@ export const table: ReliquaryLocaleTable = {
   conquerors_set_nighttalon: { name: '흉포송곳니 가죽장비' },
   conquerors_set_soulflame: { name: '망령불꽃 의복' },
   conquerors_set_stormcallers: { name: '강풍부름 의복' },
-  // Professions pages: 명작 is the Reliquary's own masterwork noun (the markFind
-  // labels these pages hold), 희귀한 발견 the guide's rare-finds heading, 표본 the
+  // Professions pages: 걸작 is the one masterwork noun everywhere (crafting
+  // toast/seal, the markFind labels these pages hold, and this title; the
+  // 2026-08-07 QA retired the gallery's former 명작 coinage, see the masterwork
+  // glossary row), 희귀한 발견 the guide's rare-finds heading, 표본 the
   // perfect-specimen mark's noun.
-  professions_masterwork: { name: '명작 갤러리' },
+  professions_masterwork: { name: '걸작 갤러리' },
   professions_field_notes: { name: '희귀한 발견 기록' },
   professions_specimens: { name: '주요 표본' },
   // Horizons pages: the shipped HUD labels for the same three collections.

@@ -199,8 +199,11 @@ export function reliquarySourceLinePlan(
     }
   }
   // Both sole-hint guards are symmetric even though the counts already imply
-  // them: if either count check ever loosened, the compose would degrade to
-  // separate lines rather than silently losing a half.
+  // them. The insurance is one-directional and cheap: if bosses === 1 ever
+  // loosened DOWNWARD to admit zero bosses, the null guard keeps the compose
+  // off so the lone zone hint still renders its own line instead of being
+  // skipped by the loop below (an upward loosening folds into the last-seen
+  // hint instead; the count checks are what rule that out).
   const composeBossZone =
     clearSource?.kind !== 'dungeon' &&
     bosses === 1 &&

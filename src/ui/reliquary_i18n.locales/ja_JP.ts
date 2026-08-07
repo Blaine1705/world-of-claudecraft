@@ -38,10 +38,12 @@ export const table: ReliquaryLocaleTable = {
   conquerors_set_nighttalon: { name: 'ダイアファングの革装束' },
   conquerors_set_soulflame: { name: 'レイスファイアの法衣' },
   conquerors_set_stormcallers: { name: 'ゲイルコールの法衣' },
-  // Professions pages: 名作 is the Reliquary's own masterwork noun (the
-  // markFind labels these pages hold), 珍しい発見 the guide's rare-finds
-  // heading, 標本 the perfect-specimen mark's noun.
-  professions_masterwork: { name: '名作ギャラリー' },
+  // Professions pages: 傑作 is the one masterwork noun everywhere (crafting
+  // toast/seal, the markFind labels these pages hold, and this title; the
+  // 2026-08-07 QA retired the gallery's former 名作 coinage, see the
+  // masterwork glossary row), 珍しい発見 the guide's rare-finds heading,
+  // 標本 the perfect-specimen mark's noun.
+  professions_masterwork: { name: '傑作ギャラリー' },
   professions_field_notes: { name: '珍しい発見の記録' },
   professions_specimens: { name: '主要な標本' },
   // Horizons pages: the shipped HUD labels for the same three collections.

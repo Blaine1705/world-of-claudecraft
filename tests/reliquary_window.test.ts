@@ -581,8 +581,12 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     // The bossZone pair composes when both halves resolve, degrades to the
     // surviving half's own sentence when one is stale (each half is an
     // authored hint the composition consumed), and drops only on both-stale.
+    // All three behaviors pinned: the compose via the sourceBossZone key
+    // above, both degrades, and the terminal both-stale ''.
     expect(code).toMatch(/if \(boss !== null\) return t\('hudChrome\.reliquary\.sourceBoss'/);
-    expect(code).toMatch(/if \(zone !== null\) return t\('hudChrome\.reliquary\.sourceZone'/);
+    expect(code).toMatch(
+      /if \(zone !== null\) return t\('hudChrome\.reliquary\.sourceZone', \{ zone \}\);\s*\n\s*return '';/,
+    );
     // The aria fold goes through the locale list formatter (Intl.ListFormat
     // via formatList), never a hardcoded separator or a bespoke join key.
     expect(code).toContain('formatList(lines)');

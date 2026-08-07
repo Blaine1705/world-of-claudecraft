@@ -1131,37 +1131,35 @@ describe('Guide deeds cross-page surfaces', () => {
     }
   });
 
-  it('never leaks a boss personal name into the reliquary page beyond the catalog names', () => {
+  it('never leaks a boss personal name into the reliquary page PROSE', () => {
     // The same withhold-the-name standard, extended to the newest public
-    // guide surface. The reliquary guide renders GENERATED catalog fields
-    // (page names and relic names), and some catalog names legitimately carry
-    // a boss name (the raid page IS 'Nythraxis Raid'), so those are derived
-    // as the allowed set rather than hand-listed; any boss personal name
-    // outside them (guide-authored prose, headings, future intro copy) is a
-    // leak, exactly like the dungeons page below.
+    // guide surface. The catalog sections legitimately carry some boss names
+    // (the raid page IS 'Nythraxis Raid'; relic names like 'Fangknife of
+    // Zulgar' name their boss), so the scan strips the embedded
+    // reliquaryCatalogSections output verbatim and holds the REMAINDER (the
+    // guide-authored prose, headings, and any future intro copy) to the
+    // withhold-the-name rule for EVERY boss, no carve-out: a per-name
+    // allowlist here would excuse exactly the prose the dungeons-page pin
+    // below exists to protect.
     setLanguage('en');
     const html = reliquaryPage.render({
       params: [],
       sub: 'reliquary',
       titleKey: 'guide.nav.reliquary',
     });
-    const catalogText = GUIDE_RELIQUARY.map(
-      (page) => `${page.name} ${page.relics.map((r) => r.name).join(' ')}`,
-    ).join(' ');
-    let scanned = 0;
+    const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Premise: the strip really removed the catalog block, so the prose
+    // remainder is what is scanned (an embedding change would make the scan
+    // silently re-cover catalog names and fail on the raid pages).
+    expect(html.includes(catalogHtml)).toBe(true);
+    const prose = html.replace(catalogHtml, '');
     for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
       const personalName = boss.name.split(',')[0];
-      if (catalogText.includes(personalName)) continue;
-      scanned += 1;
       expect(
-        html.includes(personalName),
-        `boss personal name "${personalName}" leaked into the reliquary page`,
+        prose.includes(personalName),
+        `boss personal name "${personalName}" leaked into the reliquary page prose`,
       ).toBe(false);
     }
-    // Premise: the carve-out stays narrow; the scan still covers most bosses
-    // (19 today; only ones a catalog page or relic NAME carries are excused,
-    // e.g. the Nythraxis raid pages and the Staff of Velkhar).
-    expect(scanned).toBeGreaterThanOrEqual(15);
   });
 
   it('never leaks a boss personal name into the dungeons page card copy', () => {
@@ -1237,6 +1235,20 @@ describe('Guide deeds cross-page surfaces', () => {
       expect(
         html.includes(forbidden),
         `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
+      ).toBe(false);
+      // The reliquary page holds the same standard per locale (its English-only
+      // sibling above records why prose-only): the catalog strip is recomputed
+      // HERE because section headings localize, so the block differs per locale.
+      const reliquaryHtml = reliquaryPage.render({
+        params: [],
+        sub: 'reliquary',
+        titleKey: 'guide.nav.reliquary',
+      });
+      const localeCatalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+      expect(reliquaryHtml.includes(localeCatalogHtml), locale).toBe(true);
+      expect(
+        reliquaryHtml.replace(localeCatalogHtml, '').includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} reliquary page prose`,
       ).toBe(false);
     }
     setLanguage('en');

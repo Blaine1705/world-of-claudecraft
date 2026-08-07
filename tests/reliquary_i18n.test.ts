@@ -165,7 +165,7 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     try {
       setLanguage('ja_JP');
       expect(reliquaryPageName('conquerors_hollow_crypt')).toBe('虚ろの墓所');
-      expect(reliquaryPageName('professions_masterwork')).toBe('名作ギャラリー');
+      expect(reliquaryPageName('professions_masterwork')).toBe('傑作ギャラリー');
       setLanguage('ru_RU');
       expect(reliquaryPageName('conquerors_set_deathlord')).toBe('Боевой доспех Владыки Кургана');
       expect(reliquaryPageName('conquerors_nythraxis')).toBe('Рейд Нитраксиса');

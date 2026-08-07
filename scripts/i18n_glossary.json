@@ -90,16 +90,22 @@
       "keyPatterns": ["hudChrome.epic.*", "apiError.epic.*"]
     },
     "masterwork": {
-      "note": "The masterwork craft-proc term, ONE form per locale on every surface (crafting toast/seal, bags aria, Reliquary gallery, guide): zh_CN 杰作, zh_TW 傑作, ja 傑作, ko 걸작, ru шедевр. The 2026-08-07 QA aligned the Reliquary gallery to the crafting surfaces' form (ja had coined 名作, ko 명작); never re-coin a per-surface variant.",
+      "note": "The masterwork craft-proc term, ONE form per locale on every surface: zh_CN 杰作, zh_TW 傑作, ja 傑作, ko 걸작, ru шедевр. The 2026-08-07 QA aligned the Reliquary gallery to the crafting surfaces' form (ja had coined 名作, ko 명작); never re-coin a per-surface variant. One surface these patterns cannot police: the Reliquary PAGE NAMES live in src/ui/reliquary_i18n.locales/ (not the catalog), so the gallery title must be kept aligned by hand (its overlay comments point back here).",
       "keyPatterns": [
         "hudChrome.crafting.masterworkSeal",
+        "hudChrome.crafting.masterworkToast",
+        "hudChrome.crafting.masterworkZoneLine",
+        "hudChrome.bags.itemAriaMasterwork",
+        "itemUi.bags.unknownItemAriaMasterwork",
         "hudChrome.reliquary.markFind.masterwork_first",
         "hudChrome.reliquary.markFind.masterwork_weaponcrafting",
         "hudChrome.reliquary.markFind.masterwork_armorcrafting",
         "hudChrome.reliquary.markFind.masterwork_tailoring",
         "hudChrome.reliquary.markFind.masterwork_leatherworking",
         "hudChrome.reliquary.markFind.masterwork_engineering",
-        "hudChrome.reliquary.sourceActivityMasterworkCraft"
+        "hudChrome.reliquary.sourceActivityMasterworkCraft",
+        "guide.profPages.masterworkHeading",
+        "guide.profPages.masterworkBody"
       ]
     }
   }
