@@ -775,6 +775,10 @@ export const en: EnTranslations = {
       "ready": "Swing",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Breath",
+      "drowning": "Drowning!"
+    },
     "rest": {
       "resting": "Resting"
     },
@@ -955,6 +959,7 @@ export const en: EnTranslations = {
       "valecup": "Vale Cup",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Sheathe/Unsheathe Weapon",
+      "dive": "Swim Down",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
       "petStop": "Pet: Stop",
@@ -1331,6 +1336,7 @@ export const en: EnTranslations = {
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
       "showPetFrame": "Show Your Pet",
+      "waterRipples": "Water Ripples (Wakes)",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",

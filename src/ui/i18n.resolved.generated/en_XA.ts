@@ -775,6 +775,10 @@ export const en_XA: EnTranslations = {
       "ready": "[Šŵíñĝ]",
       "seconds": "[{seconds}š]"
     },
+    "breath": {
+      "label": "[Ɓŕéáţĥ]",
+      "drowning": "[Ðŕóŵñíñĝ!]"
+    },
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
@@ -955,6 +959,7 @@ export const en_XA: EnTranslations = {
       "valecup": "[Ʋáļé Çúþ]",
       "bgFlag": "[Ɓáţţļéĝŕóúñð Ƒļáĝ Áçţíóñ]",
       "sheathe": "[Šĥéáţĥé/Úñšĥéáţĥé Ŵéáþóñ]",
+      "dive": "[Šŵíɱ Ðóŵñ]",
       "categoryPet": "[Þéţ]",
       "petAttack": "[Þéţ: Áţţáçķ]",
       "petStop": "[Þéţ: Šţóþ]",
@@ -1331,6 +1336,7 @@ export const en_XA: EnTranslations = {
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "showPetFrame": "[Šĥóŵ Ýóúŕ Þéţ]",
+      "waterRipples": "[Ŵáţéŕ Ŕíþþļéš (Ŵáķéš)]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",

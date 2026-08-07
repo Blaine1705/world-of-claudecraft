@@ -775,6 +775,10 @@ export const it_IT: EnTranslations = {
       "ready": "Attacco",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Fiato",
+      "drowning": "Annegamento!"
+    },
     "rest": {
       "resting": "A riposo"
     },
@@ -955,6 +959,7 @@ export const it_IT: EnTranslations = {
       "valecup": "Coppa della Valle",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Fodera/Sfodera Arma",
+      "dive": "Swim Down",
       "categoryPet": "Famiglio",
       "petAttack": "Famiglio: attacca",
       "petStop": "Famiglio: fermo",
@@ -1331,6 +1336,7 @@ export const it_IT: EnTranslations = {
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "showPetFrame": "Mostra il tuo famiglio",
+      "waterRipples": "Increspature dell'acqua (scie)",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",

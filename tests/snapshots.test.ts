@@ -1623,7 +1623,7 @@ describe('online movement input lifetime', () => {
       JSON.stringify({
         t: 'input',
         seq: 1,
-        mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0 },
+        mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
       }),
     );
     const meta = server.sim.meta(session.pid)!;
@@ -1941,10 +1941,12 @@ describe('client-side delta merge', () => {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       });
       expect(client.flushInput(100)).toBe(true);
       expect(sent).toEqual([
-        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } },
+        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 } },
       ]);
 
       expect(client.flushInput(105)).toBe(false);
@@ -1958,8 +1960,48 @@ describe('client-side delta merge', () => {
       expect(sent.at(-1)).toEqual({
         t: 'input',
         seq: 2,
-        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0 },
+        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  // The camera swim steer is the one graded movement field, and it rides along
+  // only when it actually grades something: absent means full rate on the far
+  // side (swimSteerRate), so a land frame — and a full-rate keyboard dive — must
+  // stay byte-identical to what this client always sent.
+  it('sends the swim steer only while it grades the dive', () => {
+    const client = bareClient(1);
+    const sent: any[] = [];
+    (client as any).ws = {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      const last = () => sent[sent.length - 1].mi;
+      Object.assign(client.moveInput, { forward: true });
+      expect(client.flushInput(100)).toBe(true);
+      expect(last().ss).toBeUndefined(); // walking: unchanged payload
+
+      Object.assign(client.moveInput, { dive: true, swimSteer: 1 });
+      expect(client.flushInput(200)).toBe(true);
+      expect(last().dv).toBe(1);
+      expect(last().ss).toBeUndefined(); // full rate is the default
+
+      Object.assign(client.moveInput, { swimSteer: 0.5 });
+      expect(client.flushInput(300)).toBe(true);
+      expect(last().ss).toBe(0.5); // ...and a feathered one is carried
+
+      // A steer CHANGE is a movement change: the signature has to notice, or
+      // the rate would stick at whatever the last sent frame said.
+      Object.assign(client.moveInput, { swimSteer: 0.5 });
+      expect(client.flushInput(400)).toBe(false);
+      Object.assign(client.moveInput, { swimSteer: 1 });
+      expect(client.flushInput(500)).toBe(true);
+      expect(last().ss).toBeUndefined();
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }

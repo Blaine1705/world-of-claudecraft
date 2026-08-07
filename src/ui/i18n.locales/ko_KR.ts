@@ -11234,4 +11234,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
   'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
   'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
+  'hudChrome.options.waterRipples': '수면 물결 (물살)',
+  'hudChrome.breath.label': '숨',
+  'hudChrome.breath.drowning': '익사 중!',
 };

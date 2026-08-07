@@ -3404,7 +3404,18 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  // Seconds of held underwater travel. Ramps the dive speed from its slow
+  // opening pace to the cruise across one stroke (see player_motion.ts
+  // swimSpeedMult); zero whenever the body is not submerged.
+  swimStroke: number;
+  // The player chose to be under the surface (the dive input has been held since
+  // entering this body of water). Buoyancy floats a swimmer who did NOT choose
+  // it straight back to the line, so a teleport, a spawn or a knockback into a
+  // lake never strands anyone on the bed; a diver holds their depth hands-free.
+  swimDiving: boolean;
   fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
+  breathUsedTicks: number; // ticks of the lungful spent underwater (sim/breath.ts)
+  drownTicks: number; // ticks submerged past an empty lungful (paces the drown pulses)
   hp: number;
   maxHp: number;
   resource: number;
@@ -5569,6 +5580,22 @@ export interface MoveInput {
   strafeLeft: boolean;
   strafeRight: boolean;
   jump: boolean;
+  /** Swim DOWN. Only ever read while swimming, where it is the mirror of
+   *  `surface` below: together they are the vertical stick that lets a player
+   *  leave the surface and travel underwater. Ignored on land. Set by the dive
+   *  key AND by pitching the camera down (see input.ts readMoveInput). */
+  dive: boolean;
+  /** Swim UP. Distinct from `jump`, which ALSO rises but hops you out onto a
+   *  bank once you reach the line — holding a look-up camera at the surface
+   *  must not launch you out of the water over and over. Ignored on land. */
+  surface: boolean;
+  /** How STEEPLY the camera is aimed into the dive or the climb, 0..1, as a
+   *  quantised step (see SWIM_STEER_STEPS in input.ts). It scales the vertical
+   *  rate, so easing the view down eases you down and burying it plunges: the
+   *  boolean above says WHETHER, this says HOW MUCH. Optional on the wire — the
+   *  key binding, a bot, and any client that never sends it all read as 1
+   *  (`swimSteerRate`), which is exactly the old on/off behaviour. */
+  swimSteer?: number;
 }
 
 // A bounded height edit (the sculpt brush stamp), applied inside terrainHeight()
@@ -5860,6 +5887,8 @@ export function emptyMoveInput(): MoveInput {
     strafeLeft: false,
     strafeRight: false,
     jump: false,
+    dive: false,
+    surface: false,
   };
 }
 

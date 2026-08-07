@@ -775,6 +775,10 @@ export const cs_CZ: EnTranslations = {
       "ready": "Úder",
       "seconds": "{seconds} s"
     },
+    "breath": {
+      "label": "Dech",
+      "drowning": "Topíš se!"
+    },
     "rest": {
       "resting": "Odpočinek"
     },
@@ -955,6 +959,7 @@ export const cs_CZ: EnTranslations = {
       "valecup": "Pohár údolí",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Zasunout/Vytasit zbraň",
+      "dive": "Swim Down",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
       "petStop": "Mazlíček: Zastavit",
@@ -1331,6 +1336,7 @@ export const cs_CZ: EnTranslations = {
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showPetFrame": "Zobrazit tvého mazlíčka",
+      "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",

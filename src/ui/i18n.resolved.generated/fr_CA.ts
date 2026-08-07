@@ -775,6 +775,10 @@ export const fr_CA: EnTranslations = {
       "ready": "Coup",
       "seconds": "{seconds} s"
     },
+    "breath": {
+      "label": "Souffle",
+      "drowning": "Noyade !"
+    },
     "rest": {
       "resting": "Au repos"
     },
@@ -955,6 +959,7 @@ export const fr_CA: EnTranslations = {
       "valecup": "Coupe du Val",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Ranger/Dégainer l'arme",
+      "dive": "Swim Down",
       "categoryPet": "Familier",
       "petAttack": "Familier : attaquer",
       "petStop": "Familier : arrêter",
@@ -1331,6 +1336,7 @@ export const fr_CA: EnTranslations = {
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
       "showPetFrame": "Afficher votre familier",
+      "waterRipples": "Ondulations de l'eau (sillages)",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",

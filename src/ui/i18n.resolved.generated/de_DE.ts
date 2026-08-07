@@ -775,6 +775,10 @@ export const de_DE: EnTranslations = {
       "ready": "Schwung",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Atem",
+      "drowning": "Ertrinken!"
+    },
     "rest": {
       "resting": "Erholung"
     },
@@ -955,6 +959,7 @@ export const de_DE: EnTranslations = {
       "valecup": "Talpokal",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Waffe einstecken/ziehen",
+      "dive": "Swim Down",
       "categoryPet": "Begleiter",
       "petAttack": "Begleiter: Angreifen",
       "petStop": "Begleiter: Stopp",
@@ -1331,6 +1336,7 @@ export const de_DE: EnTranslations = {
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "showPetFrame": "Euren Begleiter anzeigen",
+      "waterRipples": "Wasserwellen (Kielwasser)",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",

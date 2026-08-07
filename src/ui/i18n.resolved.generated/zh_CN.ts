@@ -775,6 +775,10 @@ export const zh_CN: EnTranslations = {
       "ready": "挥击",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "呼吸",
+      "drowning": "溺水！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -955,6 +959,7 @@ export const zh_CN: EnTranslations = {
       "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
+      "dive": "Swim Down",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
@@ -1331,6 +1336,7 @@ export const zh_CN: EnTranslations = {
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
       "showPetFrame": "显示你的宠物",
+      "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",

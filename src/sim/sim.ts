@@ -500,6 +500,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
@@ -5671,6 +5672,7 @@ export class Sim {
         this.updateRiftTriggers(p);
         updatePortalTriggers(this.ctx, p);
         updateSwimFatigue(this.ctx, p);
+        updateBreath(this.ctx, p);
         lap?.('p.doors');
         this.updateCasting(p, meta);
         lap?.('p.casting');

@@ -14,6 +14,7 @@ import {
   REALM_ZONE,
 } from '../src/sim/content/realm';
 import { zoneAt } from '../src/sim/data';
+import { FATIGUE_FIRST_BITE_TICKS } from '../src/sim/fatigue';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { hollowLandness, terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -138,8 +139,11 @@ describe('open-sea swim fatigue', () => {
     p.pos.y = -4.6; // treading at the surface
     p.prevPos = { ...p.pos };
     let warned = false;
-    // swim until the sea has bitten once (staying past that is lethal by design)
-    for (let t = 0; t < 20 * 16 && p.hp === 1000; t++) {
+    // Swim until the sea has bitten once (staying past that is lethal by
+    // design). The bound follows the fatigue module's own pacing plus a margin,
+    // so re-pacing the clock cannot quietly turn this into a no-op.
+    const limit = Math.round(FATIGUE_FIRST_BITE_TICKS * 1.25);
+    for (let t = 0; t < limit && p.hp === 1000; t++) {
       const events = sim.tick();
       if (events.some((e) => e.type === 'log' && e.text.includes('open sea'))) warned = true;
       p.pos.x = 160;

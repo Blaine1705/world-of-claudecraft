@@ -1474,6 +1474,7 @@ const UI_DOM_MODULES = [
   'src/ui/bags_window.ts',
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_window.ts',
+  'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
   'src/ui/camera_prompt.ts',
   'src/ui/char_skin_window.ts',

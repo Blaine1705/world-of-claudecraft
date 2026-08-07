@@ -775,6 +775,10 @@ export const ko_KR: EnTranslations = {
       "ready": "공격",
       "seconds": "{seconds}초"
     },
+    "breath": {
+      "label": "숨",
+      "drowning": "익사 중!"
+    },
     "rest": {
       "resting": "휴식 중"
     },
@@ -955,6 +959,7 @@ export const ko_KR: EnTranslations = {
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
+      "dive": "Swim Down",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -1331,6 +1336,7 @@ export const ko_KR: EnTranslations = {
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
       "showPetFrame": "내 펫 표시",
+      "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",

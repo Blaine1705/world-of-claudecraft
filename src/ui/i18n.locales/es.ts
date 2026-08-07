@@ -11302,4 +11302,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Reordenar la pestaña {channel}: arrástrala, o usa Alt+Izquierda y Alt+Derecha',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'hudChrome.options.waterRipples': 'Ondas en el agua (estelas)',
+  'hudChrome.breath.label': 'Aliento',
+  'hudChrome.breath.drowning': '¡Ahogándose!',
 };

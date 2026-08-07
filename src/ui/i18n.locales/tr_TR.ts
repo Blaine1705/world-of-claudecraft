@@ -11120,4 +11120,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '{channel} sekmesini yeniden sırala: sürükleyin veya Alt+Sol ve Alt+Sağ tuşlarını kullanın',
   'itemUi.vendor.buyStack': '{count} adet satın al',
   'itemUi.vendor.buyStackAria': '{item} eşyasından {count} adet, {price} karşılığında satın al',
+  'hudChrome.options.waterRipples': 'Su Dalgacıkları (İz Dalgaları)',
+  'hudChrome.breath.label': 'Nefes',
+  'hudChrome.breath.drowning': 'Boğuluyorsun!',
 };

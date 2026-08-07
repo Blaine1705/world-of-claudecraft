@@ -775,6 +775,10 @@ export const da_DK: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Åndedræt",
+      "drowning": "Drukner!"
+    },
     "rest": {
       "resting": "Hviler"
     },
@@ -955,6 +959,7 @@ export const da_DK: EnTranslations = {
       "valecup": "Dalpokalen",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Gem/fremvis våben",
+      "dive": "Swim Down",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
       "petStop": "Kæledyr: Stop",
@@ -1331,6 +1336,7 @@ export const da_DK: EnTranslations = {
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
       "showPetFrame": "Vis dit kæledyr",
+      "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",

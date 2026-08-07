@@ -1231,7 +1231,11 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    swimStroke: 0,
+    swimDiving: false,
     fatigueTicks: 0,
+    breathUsedTicks: 0,
+    drownTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -2130,6 +2134,12 @@ export class ClientWorld implements IWorld {
       mi.strafeLeft ? 1 : 0,
       mi.strafeRight ? 1 : 0,
       mi.jump ? 1 : 0,
+      mi.dive ? 1 : 0,
+      mi.surface ? 1 : 0,
+      // Quantised upstream (input.ts SWIM_STEER_STEPS) precisely so that it can
+      // sit in the change-detection signature without a mouse-move resending
+      // the frame every time the camera twitches.
+      mi.swimSteer ?? 1,
       facing,
     ].join(',');
   }
@@ -2159,8 +2169,18 @@ export class ClientWorld implements IWorld {
         sl: mi.strafeLeft ? 1 : 0,
         sr: mi.strafeRight ? 1 : 0,
         j: mi.jump ? 1 : 0,
+        dv: mi.dive ? 1 : 0,
+        sf: mi.surface ? 1 : 0,
       },
     };
+    // The camera steer rides along only when it actually GRADES something.
+    // Absent means full rate on the far side (swimSteerRate), which is both the
+    // old behaviour and what every land frame wants — so walking around sends
+    // exactly the bytes it always did, and the field appears only while a
+    // swimmer is easing the view into a dive or a climb.
+    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
+      (msg.mi as Record<string, number>).ss = mi.swimSteer;
+    }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
     this.lastInputSentAt = now;

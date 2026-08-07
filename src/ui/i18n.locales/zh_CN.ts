@@ -10738,4 +10738,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔与拆解：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceBatch': '批量制作：单次最多 {count} 件，逐件施放',
+  'hudChrome.options.waterRipples': '水面涟漪（尾波）',
+  'hudChrome.breath.label': '呼吸',
+  'hudChrome.breath.drowning': '溺水！',
 };
