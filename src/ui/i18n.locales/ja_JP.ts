@@ -13122,4 +13122,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。',
   'hudChrome.trade.woc.decline': '辞退する',
   'hudChrome.trade.woc.withdraw': 'オファーを取り下げる',
+  'hudChrome.trade.woc.statusAwaitingBuyer': '購入者の支払いを待っています。',
+  'hudChrome.trade.woc.statusPayingBuyer': 'ネットワーク上で支払いを確認しています...',
+  'hudChrome.trade.woc.statusPayingSeller':
+    '支払いを受け取りました。ネットワーク上で確認しています...',
+  'hudChrome.trade.woc.paidSeller': '{item} の代金 {price} を受け取りました。',
+  'hudChrome.trade.woc.paidBuyer': '{item} の代金 {price} を支払いました。',
 };

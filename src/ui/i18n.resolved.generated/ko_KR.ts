@@ -518,7 +518,12 @@ export const ko_KR: EnTranslations = {
         "accept": "제안 수락",
         "accepted": "제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.",
         "decline": "거절",
-        "withdraw": "제안 철회"
+        "withdraw": "제안 철회",
+        "statusAwaitingBuyer": "구매자의 결제를 기다리는 중입니다.",
+        "statusPayingBuyer": "네트워크에서 결제를 확인하는 중입니다...",
+        "statusPayingSeller": "결제를 받았습니다. 네트워크에서 확인하는 중입니다...",
+        "paidSeller": "{item}에 대한 {price} 결제를 받았습니다.",
+        "paidBuyer": "{item}에 대해 {price}를 결제했습니다."
       }
     },
     "wocStore": {

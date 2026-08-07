@@ -667,6 +667,9 @@ function offerView(offer: WocDirectedOfferRow, viewer: number | null) {
     expiresAtMs: offer.expiresAtMs,
     listingStatus: offer.listingStatus,
     listingResolution: offer.listingResolution,
+    // A coarse lifecycle word, never the signature or any amount: it says only
+    // that money is moving, which is what the other side needs to see.
+    settlementState: offer.settlementState,
     buyerAccepted: offer.buyerAccepted,
     sellerAccepted: offer.sellerAccepted,
     // Which side the caller is on, so the client picks accept/decline versus

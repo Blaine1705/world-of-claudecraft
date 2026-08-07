@@ -98,6 +98,9 @@ export interface WocOfferView {
   /** The directed listing's own state once one exists; drives the payment phase. */
   listingStatus: string | null;
   listingResolution: string | null;
+  /** The live settlement's coarse state, so the SELLER can see a payment that is
+   *  in flight rather than staring at "waiting" until the item vanishes. */
+  settlementState: string | null;
   buyerAccepted: boolean;
   sellerAccepted: boolean;
 }

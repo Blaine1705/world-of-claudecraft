@@ -13277,4 +13277,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.accepted': 'Предложение принято. Предмет удерживается до подтверждения оплаты.',
   'hudChrome.trade.woc.decline': 'Отклонить',
   'hudChrome.trade.woc.withdraw': 'Отозвать предложение',
+  'hudChrome.trade.woc.statusAwaitingBuyer': 'Ожидание оплаты от покупателя.',
+  'hudChrome.trade.woc.statusPayingBuyer': 'Подтверждение вашего платежа в сети...',
+  'hudChrome.trade.woc.statusPayingSeller': 'Платёж получен. Подтверждение в сети...',
+  'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
+  'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
 };

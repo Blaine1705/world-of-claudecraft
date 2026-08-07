@@ -518,7 +518,12 @@ export const en_XA: EnTranslations = {
         "accept": "[Áççéþţ óƒƒéŕ]",
         "accepted": "[Óƒƒéŕ áççéþţéð. Ýóúŕ íţéɱ íš ĥéļð úñţíļ þáýɱéñţ íš ʋéŕíƒíéð.]",
         "decline": "[Ðéçļíñé]",
-        "withdraw": "[Ŵíţĥðŕáŵ óƒƒéŕ]"
+        "withdraw": "[Ŵíţĥðŕáŵ óƒƒéŕ]",
+        "statusAwaitingBuyer": "[Ŵáíţíñĝ ƒóŕ ţĥé ƀúýéŕ ţó þáý.]",
+        "statusPayingBuyer": "[Çóñƒíŕɱíñĝ ýóúŕ þáýɱéñţ óñ ţĥé ñéţŵóŕķ...]",
+        "statusPayingSeller": "[Þáýɱéñţ ŕéçéíʋéð. Çóñƒíŕɱíñĝ óñ ţĥé ñéţŵóŕķ...]",
+        "paidSeller": "[Ýóú ĥáʋé ŕéçéíʋéð á þáýɱéñţ óƒ {price} ƒóŕ ýóúŕ {item}.]",
+        "paidBuyer": "[Ýóú ĥáʋé šéñţ á þáýɱéñţ óƒ {price} ƒóŕ {item}.]"
       }
     },
     "wocStore": {

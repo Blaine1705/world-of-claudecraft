@@ -52,9 +52,12 @@ export interface WocTradePanelDeps {
 
 /** USD cents as a localized money string. Cents in: the caller parses the
  *  field once and owns the number, so nothing economic is derived here. */
-function usd(cents: number): string {
+/** USD cents as "$1.00". Exported because the HUD's completion message names
+ *  the same price, and two spellings of one figure in one trade is a defect. */
+export function wocUsdText(cents: number): string {
   return `$${formatNumber(cents / 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+const usd = wocUsdText;
 
 /**
  * The standing offer as it reads in the trade window's Money row.
@@ -81,14 +84,37 @@ export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
  * offer says only "agreed": what decides whether money is still owed is the
  * LISTING, which exists from acceptance and closes when the sale settles.
  */
-export function wocOfferPhase(row: {
-  listingId: number | null;
-  listingStatus: string | null;
-  listingResolution: string | null;
-}): WocOfferPhase {
+export function wocOfferPhase(
+  row: {
+    listingId: number | null;
+    listingStatus: string | null;
+    listingResolution: string | null;
+    settlementState?: string | null;
+  },
+  /** The viewer's own payment is in flight locally. The buyer knows this before
+   *  any server round trip, and waiting for the poll to catch up is a visible
+   *  gap where their click appears to have done nothing. */
+  payingLocally = false,
+): WocOfferPhase {
   if (row.listingId === null) return 'review';
   if (row.listingResolution === 'sold' || row.listingStatus === 'closed') return 'settled';
+  if (payingLocally || SETTLING_STATES.has(row.settlementState ?? '')) return 'paying';
   return 'awaiting_payment';
+}
+
+/**
+ * Settlement states that mean money is moving.
+ *
+ * 'offered' is deliberately ABSENT: a quote exists but nothing has been signed,
+ * so the buyer still has to act and their button must stay live. Treating it as
+ * in-flight would show a spinner to a player whose next move is to press Pay.
+ */
+const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering']);
+
+/** Whether a settlement state means the payment is still in flight. Exported so
+ *  the HUD does not announce delivery while the chain is still confirming. */
+export function wocSettlementInFlight(state: string | null | undefined): boolean {
+  return SETTLING_STATES.has(state ?? '');
 }
 
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
@@ -134,18 +160,24 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
         <p class="trade-woc-done">${esc(t('hudChrome.trade.woc.settled'))}</p>
       </div>`;
     }
-    if (o.phase === 'awaiting_payment') {
-      // The goods are already in escrow. The buyer signs; the seller can do
-      // nothing at all, so their face says exactly that rather than offering a
-      // control that would not work.
+    if (o.phase === 'awaiting_payment' || o.phase === 'paying') {
+      // The goods are already in escrow. Exactly one face here is actionable:
+      // the buyer's Pay button, and only while the payment has not started. Every
+      // other combination is a WAIT, and each says whose wait it is, because the
+      // seller watching a confirmation and the buyer watching their own
+      // transaction are not the same sentence.
+      //
+      // The status line is announced: a state the player cannot see change (a
+      // chain confirmation) is exactly the case a screen reader must be told
+      // about, and it replaces the only feedback a sighted player gets.
       const body =
-        o.role === 'buyer'
+        model.canPay && o.role === 'buyer'
           ? `<button type="button" class="btn trade-woc-pay" data-woc-pay>${esc(
               t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }),
             )}</button>`
-          : `<p class="trade-woc-waiting"><span class="trade-woc-spinner" aria-hidden="true"></span>${esc(
-              t('hudChrome.trade.woc.awaitingPayment'),
-            )}</p>`;
+          : `<p class="trade-woc-waiting" role="status">${
+              model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
+            }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       return `<div class="trade-woc-arm">${modeTabs}
         ${body}
         <p class="trade-woc-hint" data-woc-hint></p>

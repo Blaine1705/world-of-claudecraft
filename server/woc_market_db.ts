@@ -331,6 +331,20 @@ const OFFER_COLS =
   'item_ref, item_id, usd_cents, status, listing_id, created_at, expires_at, ' +
   'buyer_accepted, seller_accepted';
 
+/**
+ * How long a SETTLED offer stays readable after its listing closes.
+ *
+ * The completion moment has to survive long enough for both clients to observe
+ * it on their own poll (2s) and act on it: show the outcome, then close. Sized
+ * with a wide margin over that, because the cost of being generous is only that
+ * a finished deal lingers in a read, while the cost of being tight is a sale
+ * that silently disappears, which is the bug this exists to fix.
+ *
+ * It does NOT gate starting a fresh trade: each client retires an offer id once
+ * it has shown the outcome, so the window's length is invisible to players.
+ */
+export const SETTLED_OFFER_GRACE_MS = 90_000;
+
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
   'bond_cents, bond_state, bond_reference, bond_quote_expires, placed_at';
@@ -401,6 +415,7 @@ function toOffer(row: Row): WocDirectedOfferRow {
     sellerAccepted: row.seller_accepted === true,
     listingStatus: (row.listing_status ?? null) as string | null,
     listingResolution: (row.listing_resolution ?? null) as string | null,
+    settlementState: (row.settlement_state ?? null) as string | null,
   };
 }
 
@@ -706,7 +721,11 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
-  async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
+  async directedOffersForAccount(
+    realm: string,
+    account: number,
+    nowMs: number = Date.now(),
+  ): Promise<WocDirectedOfferRow[]> {
     // 'accepted' rides along with 'pending' because the deal is not over when it
     // is agreed: the buyer still has to pay, and BOTH windows need to show that
     // phase. The listing's own status comes with it so the seller can tell
@@ -715,19 +734,39 @@ export class PgWocMarketDb implements WocMarketDb {
       .map((c) => `o.${c}`)
       .join(', ');
     const res = await this.pool.query(
-      `SELECT ${cols}, l.status AS listing_status, l.resolution AS listing_resolution
+      `SELECT ${cols}, l.status AS listing_status, l.resolution AS listing_resolution,
+              s.state AS settlement_state
          FROM woc_market_directed_offers o
          LEFT JOIN woc_market_listings l ON l.id = o.listing_id
+         -- The LATEST settlement for the listing, which is the one in flight.
+         -- A buyer may retry after a failure, so the newest row is the only one
+         -- that describes what is happening now; older attempts are history.
+         LEFT JOIN LATERAL (
+           SELECT state FROM woc_market_settlements
+            WHERE listing_id = o.listing_id
+            ORDER BY id DESC LIMIT 1
+         ) s ON o.listing_id IS NOT NULL
         WHERE o.realm = $1
           AND o.status IN ('pending', 'accepted')
           AND (o.buyer_account = $2 OR o.seller_account = $2)
-          -- A finished sale is history, not a live deal. Without this a
-          -- completed offer stays in both trade windows forever, showing "Paid"
-          -- and blocking the pair from starting a fresh one: the arm believes a
-          -- deal is already standing. The listing closing is what ends it.
-          AND (o.listing_id IS NULL OR l.status <> 'closed')
+          -- A finished sale is history, not a live deal: left visible forever a
+          -- completed offer sits in both trade windows showing "Paid" and blocks
+          -- the pair from starting a fresh one, because the arm believes a deal
+          -- is already standing.
+          --
+          -- But dropping it the INSTANT the listing closes is the opposite bug,
+          -- and it is the one that shipped: 'settled' became unreachable, so
+          -- neither side ever saw the sale complete. The window simply emptied,
+          -- which reads as the item being sent for nothing. A closed listing
+          -- therefore stays visible for a short grace window, long enough for
+          -- both clients to poll it, show the outcome and close themselves.
+          AND (
+            o.listing_id IS NULL
+            OR l.status <> 'closed'
+            OR l.updated_at > $3
+          )
         ORDER BY o.created_at DESC LIMIT 50`,
-      [realm, account],
+      [realm, account, new Date(nowMs - SETTLED_OFFER_GRACE_MS)],
     );
     return res.rows.map(toOffer);
   }

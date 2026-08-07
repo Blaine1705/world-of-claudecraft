@@ -518,7 +518,12 @@ export const ja_JP: EnTranslations = {
         "accept": "オファーを承諾",
         "accepted": "オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。",
         "decline": "辞退する",
-        "withdraw": "オファーを取り下げる"
+        "withdraw": "オファーを取り下げる",
+        "statusAwaitingBuyer": "購入者の支払いを待っています。",
+        "statusPayingBuyer": "ネットワーク上で支払いを確認しています...",
+        "statusPayingSeller": "支払いを受け取りました。ネットワーク上で確認しています...",
+        "paidSeller": "{item} の代金 {price} を受け取りました。",
+        "paidBuyer": "{item} の代金 {price} を支払いました。"
       }
     },
     "wocStore": {

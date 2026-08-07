@@ -518,7 +518,12 @@ export const ru_RU: EnTranslations = {
         "accept": "Принять предложение",
         "accepted": "Предложение принято. Предмет удерживается до подтверждения оплаты.",
         "decline": "Отклонить",
-        "withdraw": "Отозвать предложение"
+        "withdraw": "Отозвать предложение",
+        "statusAwaitingBuyer": "Ожидание оплаты от покупателя.",
+        "statusPayingBuyer": "Подтверждение вашего платежа в сети...",
+        "statusPayingSeller": "Платёж получен. Подтверждение в сети...",
+        "paidSeller": "Вы получили платёж {price} за ваш предмет {item}.",
+        "paidBuyer": "Вы отправили платёж {price} за {item}."
       }
     },
     "wocStore": {

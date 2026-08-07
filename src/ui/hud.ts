@@ -742,9 +742,11 @@ import {
   type WocTradePanelDeps,
   wireWocTradeArm,
   wocOfferPhase,
+  wocSettlementInFlight,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
+  wocUsdText,
 } from './trade_woc_panel';
 import {
   inventoryIndexOfStaged,
@@ -5220,6 +5222,15 @@ export class Hud {
   /** Re-entry guard: a second click mid-signature would take two lock+quote
    *  round trips for one purchase. */
   private wocTradePaying = false;
+  /**
+   * Offer ids whose outcome this client has already shown.
+   *
+   * A settled offer stays readable server-side for a grace window, so both
+   * players can observe the sale complete. Once THIS client has said so and
+   * closed the window, re-adopting the row would reopen it and, worse, block the
+   * pair from starting a fresh deal until the window elapsed.
+   */
+  private readonly wocTradeFinished = new Set<number>();
   private readonly wocMarketWindow = new WocMarketWindow({
     root: () => $('#woc-market-window'),
     attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -18840,13 +18851,25 @@ export class Hud {
       const mine = res.offers.find(
         (o) =>
           (o.status === 'pending' || o.status === 'accepted') &&
-          (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
+          (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName &&
+          // Already reported and closed. The row lingers for a grace window so
+          // both sides can see the sale finish; re-adopting it here would reopen
+          // the window we just closed and block the next deal.
+          !this.wocTradeFinished.has(o.id),
       );
       if (!mine) {
         if (this.wocTradeOffer !== null) {
           this.wocTradeOffer = null;
           this.lastTradeSig = '';
         }
+        return;
+      }
+      const phase = wocOfferPhase(mine, this.wocTradePaying && mine.role === 'buyer');
+      // The deal is DONE. Say so, in this side's own words, and get out of the
+      // way: the window has nothing left to offer and leaving it open reads as
+      // an unfinished trade. Reported exactly once per offer.
+      if (phase === 'settled') {
+        this.finishWocTrade(mine);
         return;
       }
       // Compare the phase AND the acceptance flags, not just the id. One side
@@ -18856,7 +18879,7 @@ export class Hud {
       const cur = this.wocTradeOffer;
       if (
         cur?.id === mine.id &&
-        cur.phase === wocOfferPhase(mine) &&
+        cur.phase === phase &&
         cur.buyerAccepted === mine.buyerAccepted &&
         cur.sellerAccepted === mine.sellerAccepted
       ) {
@@ -18870,13 +18893,55 @@ export class Hud {
         usdCents: mine.usdCents,
         tokens: est?.amount?.tokens ?? null,
         role: mine.role,
-        phase: wocOfferPhase(mine),
+        phase,
         listingId: mine.listingId,
         buyerAccepted: mine.buyerAccepted,
         sellerAccepted: mine.sellerAccepted,
       };
       this.lastTradeSig = '';
     });
+  }
+
+  /**
+   * The completion moment, for whichever side is looking.
+   *
+   * Both players get a line naming the price and the item, because "it is gone"
+   * and "it sold for this" are different pieces of news and only the second one
+   * closes the loop. The buyer's balance is re-read rather than assumed: the
+   * tokens left their wallet on-chain, and the bag footer would otherwise keep
+   * showing the pre-purchase figure until something else happened to refresh it.
+   */
+  private finishWocTrade(row: {
+    id: number;
+    usdCents: number;
+    role: 'buyer' | 'seller';
+    itemId: string | null;
+  }): void {
+    if (this.wocTradeFinished.has(row.id)) return;
+    this.wocTradeFinished.add(row.id);
+    // knownItemDef, not a bare index: a stale client can be handed an id this
+    // bundle predates, and a prototype-key id must take the unknown arm (R34).
+    const item = row.itemId === null ? undefined : knownItemDef(ITEMS, row.itemId);
+    this.log(
+      t(
+        row.role === 'seller' ? 'hudChrome.trade.woc.paidSeller' : 'hudChrome.trade.woc.paidBuyer',
+        {
+          price: wocUsdText(row.usdCents),
+          // The raw id is a last resort, not a blank: a message naming no item at
+          // all is worse than one naming an id the player can at least search.
+          item: item ? itemDisplayName(item) : (row.itemId ?? ''),
+        },
+      ),
+      '#7fdc4f',
+    );
+    // Both sides: the seller was paid and the buyer spent, so neither footer is
+    // still correct.
+    this.optionsHooks?.refreshWocBalance();
+    this.wocTradeOffer = null;
+    this.lastTradeSig = '';
+    // Closing the trade itself is the sim's call, not a display change: the
+    // other player's client must learn the trade is over too.
+    this.sim.tradeCancel();
   }
 
   private async acceptWocTradeOffer(): Promise<void> {
@@ -18949,6 +19014,11 @@ export class Hud {
     const offer = this.wocTradeOffer;
     if (!hooks || !offer || offer.listingId === null || this.wocTradePaying) return;
     this.wocTradePaying = true;
+    // Show the pending face NOW, not when the next poll happens to notice. The
+    // wallet takes over the screen from here, and coming back to a Pay button
+    // that still looks pressable is what made a successful payment read as a
+    // click that did nothing.
+    this.wocTradeOffer = { ...offer, phase: 'paying' };
     this.lastTradeSig = '';
     try {
       const bought = await hooks.client.buyNow({
@@ -18996,7 +19066,14 @@ export class Hud {
         this.log(userFacingApiError({ code: done.code }), '#ff6b6b');
         return;
       }
-      this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+      // "On its way by mail" is a claim about DELIVERY, so it waits for a state
+      // that means delivery. A correct payment can come back still confirming
+      // (finality takes tens of seconds), and announcing arrival then is the
+      // same mistake in reverse as rejecting it: the poll finishes the deal when
+      // the chain does, and the pending face stays up until it has.
+      if (!wocSettlementInFlight(done.state)) {
+        this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+      }
     } finally {
       this.wocTradePaying = false;
       this.lastTradeSig = '';

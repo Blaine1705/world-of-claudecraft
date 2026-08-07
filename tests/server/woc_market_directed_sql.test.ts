@@ -12,18 +12,21 @@
 
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
-import { PgWocMarketDb } from '../../server/woc_market_db';
+import { PgWocMarketDb, SETTLED_OFFER_GRACE_MS } from '../../server/woc_market_db';
 
 const REALM = 'Claudemoon';
 
-/** A pool that records every statement and answers with no rows. */
-function recordingPool(): { pool: Pool; sql: () => string[] } {
+/** A pool that records every statement (and its bound parameters) and answers
+ *  with no rows. */
+function recordingPool(): { pool: Pool; sql: () => string[]; params: () => unknown[][] } {
   const seen: string[] = [];
-  const query = vi.fn(async (text: string) => {
+  const bound: unknown[][] = [];
+  const query = vi.fn(async (text: string, values?: unknown[]) => {
     seen.push(text);
+    bound.push(values ?? []);
     return { rows: [], rowCount: 0 };
   });
-  return { pool: { query } as unknown as Pool, sql: () => seen };
+  return { pool: { query } as unknown as Pool, sql: () => seen, params: () => bound };
 }
 
 const browseQuery = {
@@ -128,5 +131,37 @@ describe('a finished sale stops being a live offer', () => {
     expect(text).toContain("l.status <> 'closed'");
     // And an offer with no listing yet (still under review) must survive it.
     expect(text).toContain('o.listing_id IS NULL');
+  });
+
+  it('keeps a JUST-closed sale readable, so both sides can see it complete', async () => {
+    // The exclusion above, taken alone, is the opposite bug and it shipped: an
+    // offer vanished the instant its listing closed, so the client's 'settled'
+    // phase was unreachable and the trade window simply emptied. That reads as
+    // the item being sent without payment. The grace window is what makes the
+    // completion observable, so it is pinned as a THIRD arm of the predicate,
+    // not merely as a parameter.
+    const { pool, sql, params } = recordingPool();
+    const now = 1_800_000_000_000;
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7, now);
+    const [text] = sql();
+    expect(text).toContain('l.updated_at > $3');
+    // Bound to the constant, not to a number repeated here: a test that restates
+    // the literal passes when the two drift apart, which is the whole failure.
+    expect(params()[0]?.[2]).toEqual(new Date(now - SETTLED_OFFER_GRACE_MS));
+    // Long enough that both clients (2s poll) observe it before it drops.
+    expect(SETTLED_OFFER_GRACE_MS).toBeGreaterThan(10_000);
+  });
+
+  it('joins the LATEST settlement, so a payment in flight is visible', async () => {
+    // Without this the seller cannot distinguish a buyer signing in their wallet
+    // from a buyer who walked away: both look like "waiting for payment" until
+    // the item disappears. ORDER BY id DESC because a buyer may retry, and only
+    // the newest attempt describes what is happening now.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7);
+    const [text] = sql();
+    expect(text).toContain('s.state AS settlement_state');
+    expect(text).toContain('woc_market_settlements');
+    expect(text).toContain('ORDER BY id DESC LIMIT 1');
   });
 });

@@ -13121,4 +13121,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.accepted': '제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.',
   'hudChrome.trade.woc.decline': '거절',
   'hudChrome.trade.woc.withdraw': '제안 철회',
+  'hudChrome.trade.woc.statusAwaitingBuyer': '구매자의 결제를 기다리는 중입니다.',
+  'hudChrome.trade.woc.statusPayingBuyer': '네트워크에서 결제를 확인하는 중입니다...',
+  'hudChrome.trade.woc.statusPayingSeller': '결제를 받았습니다. 네트워크에서 확인하는 중입니다...',
+  'hudChrome.trade.woc.paidSeller': '{item}에 대한 {price} 결제를 받았습니다.',
+  'hudChrome.trade.woc.paidBuyer': '{item}에 대해 {price}를 결제했습니다.',
 };

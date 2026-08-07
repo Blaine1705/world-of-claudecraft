@@ -122,6 +122,15 @@ export interface WocDirectedOfferRow {
    *  "waiting for payment" from "paid" without a second round trip. */
   listingStatus: string | null;
   listingResolution: string | null;
+  /**
+   * The latest settlement's state for this listing, or null while none exists.
+   *
+   * This is what lets the SELLER see that a payment is in flight. Without it
+   * their window shows "waiting for payment" from the moment they accept until
+   * the item silently vanishes, so a buyer signing in their wallet and a buyer
+   * who walked away look identical for as long as confirmation takes.
+   */
+  settlementState: string | null;
 }
 
 export type WocBondState =

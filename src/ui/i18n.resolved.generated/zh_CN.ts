@@ -518,7 +518,12 @@ export const zh_CN: EnTranslations = {
         "accept": "接受报价",
         "accepted": "报价已接受。你的物品将被托管，直至付款完成验证。",
         "decline": "拒绝",
-        "withdraw": "撤回报价"
+        "withdraw": "撤回报价",
+        "statusAwaitingBuyer": "等待买家付款。",
+        "statusPayingBuyer": "正在网络上确认你的付款……",
+        "statusPayingSeller": "已收到付款。正在网络上确认……",
+        "paidSeller": "你的 {item} 已收到 {price} 的付款。",
+        "paidBuyer": "你已为 {item} 支付 {price}。"
       }
     },
     "wocStore": {

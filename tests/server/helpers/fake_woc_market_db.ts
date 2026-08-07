@@ -263,6 +263,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       sellerAccepted: false,
       listingStatus: null,
       listingResolution: null,
+      settlementState: null,
     };
     this.offers.set(row.id, row);
     return row;

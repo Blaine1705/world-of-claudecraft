@@ -12863,4 +12863,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.accepted': '报价已接受。你的物品将被托管，直至付款完成验证。',
   'hudChrome.trade.woc.decline': '拒绝',
   'hudChrome.trade.woc.withdraw': '撤回报价',
+  'hudChrome.trade.woc.statusAwaitingBuyer': '等待买家付款。',
+  'hudChrome.trade.woc.statusPayingBuyer': '正在网络上确认你的付款……',
+  'hudChrome.trade.woc.statusPayingSeller': '已收到付款。正在网络上确认……',
+  'hudChrome.trade.woc.paidSeller': '你的 {item} 已收到 {price} 的付款。',
+  'hudChrome.trade.woc.paidBuyer': '你已为 {item} 支付 {price}。',
 };

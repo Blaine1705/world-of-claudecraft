@@ -35,15 +35,22 @@ export interface WocTradeSplit {
 export type WocTradeMode = 'gold' | 'woc';
 
 /**
- * Where a $WOC deal has got to. The window shows one of three faces.
+ * Where a $WOC deal has got to. The window shows one of four faces.
  *
  *  - review: agreed price on the table, each side yet to accept.
  *  - awaiting_payment: both accepted, the goods are in escrow, and the BUYER
  *    still has to sign. The seller can do nothing but wait, which is exactly
  *    what their face should say.
+ *  - paying: the payment is in flight. The buyer has signed and the chain has
+ *    not finished confirming, which takes tens of seconds on mainnet.
  *  - settled: paid; the item is on its way by mail.
+ *
+ * `paying` is not cosmetic. Without it the window sat on `awaiting_payment`
+ * through the whole confirmation and then emptied, so a buyer signing in their
+ * wallet and a buyer who walked away looked identical to the seller, and the
+ * sale appeared to complete with no payment ever shown.
  */
-export type WocOfferPhase = 'review' | 'awaiting_payment' | 'settled';
+export type WocOfferPhase = 'review' | 'awaiting_payment' | 'paying' | 'settled';
 
 /** A sent-but-unresolved $WOC offer, as both sides see it. */
 export interface WocPendingOffer {
@@ -152,7 +159,27 @@ export interface WocTradeModel {
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
   sendHint: TranslationKey | null;
+  /**
+   * What the standing deal is doing, in words, for the VIEWER's side. Null when
+   * there is nothing to say (no offer, or the offer is theirs to act on and the
+   * button already says so).
+   *
+   * Per role, not just per phase: while a payment confirms, the buyer is waiting
+   * on their own transaction and the seller is waiting on someone else's, and
+   * one sentence cannot honestly describe both.
+   */
+  statusKey: TranslationKey | null;
+  /** Whether to show the pending indicator beside that line. */
+  busy: boolean;
 }
+
+/** The status line per phase and side. Only the states where SOMETHING is
+ *  happening that the player cannot act on need one. */
+const STATUS_KEYS: Partial<Record<`${WocOfferPhase}:${'buyer' | 'seller'}`, TranslationKey>> = {
+  'awaiting_payment:seller': 'hudChrome.trade.woc.statusAwaitingBuyer',
+  'paying:buyer': 'hudChrome.trade.woc.statusPayingBuyer',
+  'paying:seller': 'hudChrome.trade.woc.statusPayingSeller',
+};
 
 const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   market_disabled: 'hudChrome.trade.woc.blockDisabled',
@@ -283,5 +310,13 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
+    statusKey:
+      input.pendingOffer === null
+        ? null
+        : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
+    // Only the payment itself spins. Waiting on the other player to press a
+    // button is not progress and must not look like it, or every wait reads as
+    // "something is happening" and the player never knows when to act.
+    busy: input.pendingOffer?.phase === 'paying',
   };
 }

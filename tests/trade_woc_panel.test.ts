@@ -329,6 +329,52 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     ).toBe('settled');
   });
 
+  it('reports a payment IN FLIGHT, so a wait is distinguishable from an absence', () => {
+    // The shipped gap: from acceptance until the item vanished, the seller saw
+    // one unchanging "waiting" face whether the buyer was signing in their
+    // wallet or had walked away. The settlement state is what separates them.
+    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
+    for (const state of ['confirming', 'confirmed', 'delivering']) {
+      expect(wocOfferPhase({ ...live, settlementState: state }), state).toBe('paying');
+    }
+  });
+
+  it("does NOT spin on 'offered': the buyer still has to press Pay", () => {
+    // A quote exists but nothing is signed. Showing progress here would put a
+    // spinner in front of a player whose next move is to act, which is the
+    // opposite of what the indicator means.
+    expect(
+      wocOfferPhase({
+        listingId: 41,
+        listingStatus: 'active',
+        listingResolution: null,
+        settlementState: 'offered',
+      }),
+    ).toBe('awaiting_payment');
+  });
+
+  it('lets the BUYER see their own payment before the server confirms it', () => {
+    // The wallet takes over the screen; coming back to a live-looking Pay button
+    // is what made a successful payment read as a click that did nothing. The
+    // local flag closes that gap without waiting for a poll.
+    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
+    expect(wocOfferPhase(live, true)).toBe('paying');
+    expect(wocOfferPhase(live, false)).toBe('awaiting_payment');
+  });
+
+  it('a CLOSED listing outranks any in-flight settlement state', () => {
+    // Delivery is the last word. A stale 'delivering' row alongside a closed
+    // listing must not strand both windows on a spinner that never resolves.
+    expect(
+      wocOfferPhase({
+        listingId: 41,
+        listingStatus: 'closed',
+        listingResolution: 'sold',
+        settlementState: 'delivering',
+      }),
+    ).toBe('settled');
+  });
+
   it('gives the BUYER a pay button naming the agreed price', () => {
     const root = paint(deps({ pendingOffer: paying }));
     const btn = root.querySelector('[data-woc-pay]');
@@ -378,6 +424,50 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     );
     expect(wocTradeModelFrom(deps({ pendingOffer: paying })).canPay).toBe(true);
   });
+
+  it('takes the Pay button away once the payment is in flight', () => {
+    // Otherwise a buyer watching a slow confirmation can press it again, which
+    // takes a second lock and quote for one purchase.
+    const model = wocTradeModelFrom(deps({ pendingOffer: { ...paying, phase: 'paying' } }));
+    expect(model.canPay).toBe(false);
+    expect(model.busy).toBe(true);
+  });
+
+  it('shows BOTH sides a pending face, in their own words', () => {
+    // One sentence cannot honestly cover both: the buyer is waiting on their own
+    // transaction, the seller on someone else's money.
+    for (const role of ['buyer', 'seller'] as const) {
+      const root = paint(deps({ pendingOffer: { ...paying, role, phase: 'paying' } }));
+      const line = root.querySelector('.trade-woc-waiting');
+      expect(line, role).not.toBeNull();
+      expect(line?.textContent ?? '', role).not.toBe('');
+      // Announced, because a chain confirmation is exactly the change a screen
+      // reader user cannot otherwise perceive.
+      expect(line?.getAttribute('role'), role).toBe('status');
+      expect(root.querySelector('.trade-woc-spinner'), role).not.toBeNull();
+      expect(root.querySelector('[data-woc-pay]'), role).toBeNull();
+    }
+    // And the two sides do NOT read the same, which is the point of the split.
+    const buyerText = paint(
+      deps({ pendingOffer: { ...paying, role: 'buyer', phase: 'paying' } }),
+    ).querySelector('.trade-woc-waiting')?.textContent;
+    const sellerText = paint(
+      deps({ pendingOffer: { ...paying, role: 'seller', phase: 'paying' } }),
+    ).querySelector('.trade-woc-waiting')?.textContent;
+    expect(buyerText).not.toBe(sellerText);
+  });
+
+  it('does not spin while merely waiting on the other player to act', () => {
+    // Waiting on a human is not progress. A spinner there teaches the player
+    // that the indicator means nothing.
+    const seller = wocTradeModelFrom(
+      deps({ pendingOffer: { ...paying, role: 'seller', phase: 'awaiting_payment' } }),
+    );
+    expect(seller.busy).toBe(false);
+    expect(seller.statusKey).not.toBeNull();
+    const root = paint(deps({ pendingOffer: { ...paying, role: 'seller' } }));
+    expect(root.querySelector('.trade-woc-spinner')).toBeNull();
+  });
 });
 
 describe('the window follows a $WOC deal THROUGH acceptance', () => {
@@ -407,6 +497,61 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // reading it left the button saying "Accept" after the player had accepted.
     expect(HUD).toContain('wocModel.pendingOffer.buyerAccepted');
     expect(HUD).toContain('wocModel.pendingOffer.sellerAccepted');
+  });
+
+  it('closes the loop for BOTH sides when the sale completes', () => {
+    // What shipped: the window simply emptied. Nothing said the payment had
+    // landed, so the item looked like it had been sent for free.
+    //
+    // The CALL first, then the body. Asserting only on the method's contents
+    // passes with nothing invoking it, which is the same silent no-op as the
+    // bug: verified by deleting the call and watching this stay green.
+    const poll = HUD.slice(
+      HUD.indexOf('private pollWocTradeOffer'),
+      HUD.indexOf('private finishWocTrade'),
+    );
+    expect(poll, 'the poll must act on the settled phase').toContain("phase === 'settled'");
+    expect(poll).toContain('this.finishWocTrade(mine)');
+    const finish = HUD.slice(
+      HUD.indexOf('private finishWocTrade'),
+      HUD.indexOf('private async acceptWocTradeOffer'),
+    );
+    expect(finish, 'a seller line and a buyer line, not one shared line').toContain(
+      'hudChrome.trade.woc.paidSeller',
+    );
+    expect(finish).toContain('hudChrome.trade.woc.paidBuyer');
+    // The tokens moved on-chain, so the footer figure is stale for both of them.
+    expect(finish, 'the bag balance must be re-read').toContain('refreshWocBalance');
+    // And the window goes away, since it has nothing left to offer.
+    expect(finish).toContain('tradeCancel');
+  });
+
+  it('reports a finished sale exactly once, and never re-opens it', () => {
+    // The row lingers server-side for a grace window so both clients can see it
+    // complete. Without a retired-id set the poll re-adopts it every 2s: the
+    // window reopens, the message repeats, and the pair cannot start a new deal.
+    expect(HUD).toContain('wocTradeFinished');
+    const finish = HUD.slice(
+      HUD.indexOf('private finishWocTrade'),
+      HUD.indexOf('private async acceptWocTradeOffer'),
+    );
+    expect(finish, 'an early return on an already-reported id').toContain(
+      'if (this.wocTradeFinished.has(row.id)) return;',
+    );
+    expect(HUD, 'and the poll must skip retired ids').toContain('!this.wocTradeFinished.has(o.id)');
+  });
+
+  it('does not announce DELIVERY while the chain is still confirming', () => {
+    // The mirror of the loss that cost real money: a correct payment can come
+    // back still confirming, and "on its way by mail" is a claim about delivery.
+    const pay = HUD.slice(
+      HUD.indexOf('private async payWocTradeOffer'),
+      HUD.indexOf('private async cancelWocTradeOffer'),
+    );
+    expect(pay).toContain('wocSettlementInFlight(done.state)');
+    // And the buyer sees the pending face the instant they commit, not when a
+    // poll next happens to notice.
+    expect(pay).toContain("phase: 'paying'");
   });
 });
 

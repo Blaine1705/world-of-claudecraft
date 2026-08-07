@@ -518,7 +518,12 @@ export const pl_PL: EnTranslations = {
         "accept": "Accept offer",
         "accepted": "Offer accepted. Your item is held until payment is verified.",
         "decline": "Decline",
-        "withdraw": "Withdraw offer"
+        "withdraw": "Withdraw offer",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "Payment received. Confirming on the network...",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}."
       }
     },
     "wocStore": {
