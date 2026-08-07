@@ -8,7 +8,7 @@ import {
   paddedOutlineDuty,
 } from '../src/render/dashed_ring_core';
 
-const SPEC: DashedRingSpec = { inner: 0.62, outer: 0.74, dashes: 12, duty: 0.55, segments: 4 };
+const SPEC: DashedRingSpec = { inner: 0.65, outer: 0.74, dashes: 12, duty: 0.55, segments: 4 };
 
 function radii(positions: Float32Array): number[] {
   const out: number[] = [];

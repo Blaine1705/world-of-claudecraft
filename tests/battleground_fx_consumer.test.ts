@@ -2,7 +2,7 @@
 // from buildBattlegroundObject, with a burst-recording Vfx stub and a
 // hand-rolled BgInfo. This is the consumer-side coverage the pure-core test
 // (tests/battleground_fx.test.ts) cannot give: the userData.bg handshake, the
-// carrier ring toggling, lean apply/reset, gem pose application, burst
+// lean apply/reset, gem pose application, burst
 // anchors/colors per transition, and the track-invalidation rules. The BgInfo
 // fixture shape is identical for the offline Sim and the wire mirror (one
 // facet type), so a single fixture covers both worlds.
@@ -137,11 +137,10 @@ describe('BattlegroundFx.update', () => {
     expect(gem.rotation.y).toBe(spun); // early return: untouched
   });
 
-  it('toggles the carrier ring and lean with the carried state, yawed to the carrier', () => {
+  it('leans the pole over the carrier and resets it on drop, yawed to the carrier', () => {
     const h = makeHarness();
     const crimson = h.refs(h.crimsonFlag.group);
     h.fx.update(0.1);
-    expect(crimson.ring.visible).toBe(false);
     expect(crimson.lean.rotation.x).toBe(0);
     // an azure raider (pid 55) picks up the crimson flag
     const carrier = {
@@ -150,7 +149,8 @@ describe('BattlegroundFx.update', () => {
     h.views.set(55, carrier as never);
     h.sim.bgInfo = bgInfo([flagInfo('carried', 55), flagInfo('home')]);
     h.fx.update(0.2);
-    expect(crimson.ring.visible).toBe(true);
+    // The lean IS the carry tell now: the pole tips over the carrier's shoulder
+    // and there is no ground ring beneath them any more.
     expect(crimson.lean.rotation.x).toBeLessThan(0);
     expect(crimson.lean.rotation.y).toBeCloseTo(1.2, 5);
     // the pole mounts BEHIND the carrier along their facing, slightly raised
@@ -164,7 +164,6 @@ describe('BattlegroundFx.update', () => {
     // dropped: everything resets
     h.sim.bgInfo = bgInfo([flagInfo('dropped'), flagInfo('home')]);
     h.fx.update(0.4);
-    expect(crimson.ring.visible).toBe(false);
     expect(crimson.lean.rotation.x).toBe(0);
     expect(crimson.lean.rotation.y).toBe(0);
     expect(crimson.lean.position.x).toBe(0);
@@ -337,7 +336,8 @@ describe('BattlegroundFx.update', () => {
     h.sim.bgInfo = bgInfo([flagInfo('carried', 55), flagInfo('home')]);
     h.fx.update(0.3);
     expect(h.bursts).toHaveLength(0); // first sighting after the gap, silent
-    expect(h.refs(h.crimsonFlag.group).ring.visible).toBe(true); // but the ring shows
+    // but the lean applies, which is the carry tell
+    expect(h.refs(h.crimsonFlag.group).lean.rotation.x).toBeLessThan(0);
   });
 
   it('leaving the match resets tracks: re-entry never replays a stale transition', () => {

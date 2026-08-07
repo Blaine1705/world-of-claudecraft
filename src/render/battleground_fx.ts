@@ -56,10 +56,13 @@ export const BG_RING_ENEMY = 0xe8392b;
 // Thinner than the old 0.55-to-0.74 annulus, thinned INWARD so the mark keeps
 // its original footprint (players read the ring's outer edge as the unit's
 // ground circle) while the stroke stops competing with the reticle's weight.
-const TEAM_RING_INNER = 0.62;
+// 0.09 rather than the first pass's 0.12: still legible at fighting distance on
+// every tier, but light enough that the identity mark reads as a hint under the
+// feet instead of a second reticle.
+const TEAM_RING_INNER = 0.65;
 const TEAM_RING_OUTER = 0.74;
 // 12 dashes at a 0.55 duty: each dash is roughly 0.2 yd of arc against a 0.16 yd
-// gap, so it stays comfortably longer than the 0.12 yd stroke is thick (a dash
+// gap, so it stays comfortably longer than the 0.09 yd stroke is thick (a dash
 // shorter than it is wide reads as a dotted smear) while the gaps are wide
 // enough not to close up into a solid ring at fighting distance.
 export const BG_RING_DASH_SPEC: DashedRingSpec = {
@@ -169,7 +172,6 @@ export class BattlegroundFx {
       if (!flag) continue;
       seen[bg.team] = true;
       const carried = flag.state === 'carried';
-      bg.ring.visible = carried;
       const prev = this.tracks[bg.team];
       let yaw = 0;
       if (carried) {
