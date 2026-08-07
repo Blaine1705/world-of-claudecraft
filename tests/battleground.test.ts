@@ -2895,3 +2895,59 @@ describe('the outcome log stays observability-only', () => {
     ]);
   });
 });
+
+describe('Thornhollow Fields: a drawn match is recorded, not swallowed', () => {
+  // A draw moved the ladder (eloDelta at score 0.5) but incremented no counter,
+  // so the match vanished from the player's record entirely: someone with one
+  // win and one draw read "1-0". It is now the third figure of W-L-D.
+  it('counts a draw for every fighter and leaves wins and losses alone', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const fighter = match.teams[0][0];
+    const before = sim.ctx.players.get(fighter)!;
+    expect(before.bgDraws).toBe(0);
+
+    endBgMatch(sim.ctx, match, null, 'timeout'); // null winner = drawn
+
+    for (const pid of pids) {
+      const meta = sim.ctx.players.get(pid)!;
+      expect(meta.bgDraws).toBe(1);
+      // Decisive against the old behavior, which would have moved neither and
+      // against a naive fix that counts a draw as a loss for one side.
+      expect(meta.bgWins).toBe(0);
+      expect(meta.bgLosses).toBe(0);
+    }
+  });
+
+  it('surfaces the draw on the readout the record is rendered from', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, null, 'timeout');
+    expect(sim.bgInfoFor(pids[0], [])!.draws).toBe(1);
+  });
+
+  it('persists the draw across a save and load', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, null, 'timeout');
+
+    const state = sim.serializeCharacter(pids[0]);
+    if (!state) throw new Error('failed to serialize the fighter');
+    const restored = makeWorld();
+    const reloaded = restored.addPlayer('warrior', 'Reloaded', { state });
+    expect(restored.ctx.players.get(reloaded)!.bgDraws).toBe(1);
+  });
+
+  it('writes no draws field for a character who has never drawn', () => {
+    // The saves of every existing character must stay byte-equal, which is the
+    // parity-stable rule the battleground block already followed.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Fresh');
+    const state = sim.serializeCharacter(pid) as unknown as Record<string, unknown>;
+    expect(state.bgDraws).toBeUndefined();
+    expect(state.arena1v1Draws).toBeUndefined();
+  });
+});

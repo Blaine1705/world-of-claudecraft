@@ -37,6 +37,7 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   rating: 1500,
   wins: 0,
   losses: 0,
+  draws: 0,
   captures: 0,
   queued: false,
   queueSize: 0,
@@ -113,6 +114,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'rating',
     'wins',
     'losses',
+    'draws',
     'captures',
     'queued',
     'queueSize',
@@ -121,7 +123,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'match',
     'ladder',
   ].map((k) => `.${k}`),
-  ...['pid', 'name', 'cls', 'rating', 'wins', 'losses'].map((k) => `ladder[].${k}`),
+  ...['pid', 'name', 'cls', 'rating', 'wins', 'losses', 'draws'].map((k) => `ladder[].${k}`),
   ...[
     'state',
     'myTeam',
@@ -322,7 +324,9 @@ describe('battleground window view (pure core)', () => {
       match: baseMatch(),
       // Non-empty so the live-ladder rows are really walked by the proxy: an
       // empty array would let a misnamed row field pass unnoticed.
-      ladder: [{ pid: 7, name: 'Ravven', cls: 'warrior', rating: 1616, wins: 4, losses: 1 }],
+      ladder: [
+        { pid: 7, name: 'Ravven', cls: 'warrior', rating: 1616, wins: 4, losses: 1, draws: 0 },
+      ],
     }) as BgInfo & Record<string, unknown>;
     // Sim-side baggage the wire cannot carry, on the object AND on its prototype.
     live.simOnlyUndefined = undefined;
@@ -363,8 +367,8 @@ describe('battleground window view (pure core)', () => {
     const v = buildBgWindowView({
       info: baseInfo({
         ladder: [
-          { pid: 4, name: 'Top', cls: 'mage', rating: 1800, wins: 12, losses: 3 },
-          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 },
+          { pid: 4, name: 'Top', cls: 'mage', rating: 1800, wins: 12, losses: 3, draws: 0 },
+          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2, draws: 0 },
           {
             pid: 5,
             name: 'Odd',
@@ -372,6 +376,7 @@ describe('battleground window view (pure core)', () => {
             rating: 1400,
             wins: 0,
             losses: 5,
+            draws: 0,
           },
         ],
       }),
@@ -393,7 +398,9 @@ describe('battleground window view (pure core)', () => {
     // A ladder move re-renders: the signature carries the raw rows.
     const moved = buildBgWindowView({
       info: baseInfo({
-        ladder: [{ pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 }],
+        ladder: [
+          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2, draws: 0 },
+        ],
       }),
       playerName: 'Top',
       playerLevel: 20,

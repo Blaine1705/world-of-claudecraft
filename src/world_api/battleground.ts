@@ -78,12 +78,16 @@ export interface BgLadderEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level. Rendered as the third figure of the W-L-D
+   *  record; counted only since that change, so an older character reads 0. */
+  draws: number;
 }
 
 export interface BgInfo {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
   captures: number; // career flag captures
   queued: boolean;
   queueSize: number; // champions waiting across all groups

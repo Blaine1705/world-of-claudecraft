@@ -36,6 +36,9 @@ export interface ArenaAllTimeEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Absent on a board served by a realm that predates the W-L-D
+   *  change, so the consumer defaults it rather than rendering NaN. */
+  draws?: number;
 }
 
 /** A live-ladder row: rank + the raw class id (painter localizes when known). */
@@ -49,6 +52,8 @@ export interface ArenaLadderRow {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level, the third figure of the W-L-D record. */
+  draws: number;
 }
 
 /** An all-time ladder row: a ladder row plus the player level the title shows. */
@@ -151,6 +156,10 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     rating: r.rating,
     wins: r.wins,
     losses: r.losses,
+    // `?? 0` for the rolling-deploy reason the map guard below records: a
+    // snapshot from a server predating this field carries no draws, and an
+    // undefined would render as NaN in the W-L-D record.
+    draws: r.draws ?? 0,
   }));
 
   let partySection: ArenaPartySection = { kind: 'none' };
@@ -215,6 +224,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
         rating: r.rating,
         wins: r.wins,
         losses: r.losses,
+        draws: r.draws ?? 0,
         level: r.level,
       }))
     : null;
