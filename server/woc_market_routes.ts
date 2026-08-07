@@ -490,7 +490,9 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
     stringField(body.signature, 256),
   );
   if (!out.ok) throwRefusal(out.reason);
-  json(ctx.res, 200, { standing: out.standing });
+  // `pending` is the honest third answer: paid, but the chain has not decided.
+  // Collapsing it into standing:false would read as "outbid" to the client.
+  json(ctx.res, 200, { standing: out.standing, pending: out.pending === true });
 }
 
 async function buyNowHandler(ctx: Ctx): Promise<void> {

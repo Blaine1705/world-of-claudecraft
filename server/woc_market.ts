@@ -155,6 +155,9 @@ export interface WocBidRow {
   bondState: WocBondState;
   bondReference: string | null;
   bondQuoteExpiresAtMs: number | null;
+  /** The signature the bidder handed back, recorded before the chain decides so
+   *  an undecided bond can be re-checked instead of refused. */
+  bondSignature: string | null;
   placedAtMs: number;
 }
 
@@ -374,6 +377,15 @@ export interface WocMarketDb {
       }
   >;
   setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void>;
+  /** Record the bidder's signature while the chain is still deciding. */
+  submitBondSignature(
+    bidId: number,
+    signature: string,
+  ): Promise<'recorded' | 'not_pending' | 'signature_reused'>;
+  /** Paid-but-undecided bonds, for the sweep to re-check. */
+  confirmingBonds(realm: string, limit: number): Promise<WocBidRow[]>;
+  /** A bond the chain decided against: the bid lapses and the bond voids. */
+  lapseBid(bidId: number): Promise<void>;
   bidById(id: number): Promise<WocBidRow | null>;
   /** pending_bond -> cancelled for the bidder who never funded it. */
   abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean>;
@@ -645,6 +657,8 @@ export interface WocSweepPassStats {
   closed: number;
   expired: number;
   polled: number;
+  /** Bonds paid but not yet decided by the chain, re-checked this pass. */
+  polledBonds: number;
   delivered: number;
   reconciled: number;
   returned: number;
@@ -1196,7 +1210,7 @@ export class WocMarketService {
     account: number,
     bidId: number,
     signature: string,
-  ): Promise<{ ok: true; standing: boolean } | Refused> {
+  ): Promise<{ ok: true; standing: boolean; pending?: boolean } | Refused> {
     if (!this.cfg.enabled) return refuse('disabled');
     const bid = await this.deps.db.bidById(bidId);
     if (!bid) return refuse('not_found');
@@ -1208,14 +1222,58 @@ export class WocMarketService {
     if (bid.bondQuoteExpiresAtMs !== null && bid.bondQuoteExpiresAtMs <= this.now()) {
       return refuse('quote_expired');
     }
+    // Record the signature BEFORE asking the chain. An undecided verdict has to
+    // leave something behind that the sweep can re-check, or the only available
+    // answer is a refusal with the bidder's money already spent.
+    const submitted = await this.deps.db.submitBondSignature(bid.id, signature);
+    if (submitted === 'not_pending') return refuse('not_pending');
+    if (submitted === 'signature_reused') return refuse('signature_reused');
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
-    if (confirmed.pending) return refuse('confirm_failed');
-    if (!confirmed.settled) return refuse('confirm_failed');
-    await this.deps.db.markBondHeld(bid.id);
-    const activated = await this.deps.db.activateBid(bid.id, this.now());
+    if (confirmed.settled) return this.holdBondAndActivate(bid.id);
+    if (confirmed.pending) {
+      // UNDECIDED, not refused. The payment may be perfectly good and merely
+      // unfinalized (tens of seconds on mainnet), so the bid stays pending with
+      // its signature and pollConfirmingBonds finishes it. Refusing here is the
+      // mistake that cost a real settlement its money before the same shape was
+      // found in this leg.
+      return { ok: true, standing: false, pending: true };
+    }
+    return refuse('confirm_failed');
+  }
+
+  /** The two writes a decided, settled bond owes: hold it, then let it stand. */
+  private async holdBondAndActivate(bidId: number): Promise<{ ok: true; standing: boolean }> {
+    await this.deps.db.markBondHeld(bidId);
+    const activated = await this.deps.db.activateBid(bidId, this.now());
     // A racer confirmed a higher bid first: this bond flips straight to
     // refund_due inside activateBid's superseded arm.
     return { ok: true, standing: activated === 'activated' };
+  }
+
+  /**
+   * Bonds paid but not yet decided by the chain, re-checked on the sweep.
+   *
+   * The bid leg's twin of pollConfirmingSettlements. `continue` on an undecided
+   * verdict is the load-bearing line: the row stays exactly as it is and the
+   * next pass asks again, which is what makes waiting for finality free.
+   */
+  private async pollConfirmingBonds(): Promise<number> {
+    const bonds = await this.deps.db.confirmingBonds(this.cfg.realm, SWEEP_BATCH);
+    for (const bid of bonds) {
+      if (bid.bondReference === null || bid.bondSignature === null) continue;
+      const confirmed = await this.deps.economy
+        .confirm(bid.bondReference, bid.bondSignature)
+        .catch(() => null);
+      if (!confirmed || confirmed.pending) continue;
+      if (confirmed.settled) {
+        await this.holdBondAndActivate(bid.id);
+      } else {
+        // Decided AGAINST: the bond never landed, so the bid lapses and its
+        // bond voids. Only a decided verdict may end it.
+        await this.deps.db.lapseBid(bid.id);
+      }
+    }
+    return bonds.length;
   }
 
   // -------------------------------------------------------------------------
@@ -1472,6 +1530,9 @@ export class WocMarketService {
       closed: await this.closeDueAuctions(nowMs),
       expired: await this.expireOverdueSettlements(nowMs),
       polled: await this.pollConfirmingSettlements(),
+      // BEFORE the lapse arm above would matter: a paid-but-undecided bond is
+      // excluded from lapsing by its signature, and this is what resolves it.
+      polledBonds: await this.pollConfirmingBonds(),
       delivered: await this.deliverConfirmedSettlements(),
       reconciled: await this.reconcileDelivering(),
       returned: await this.returnUndisposedItems(),

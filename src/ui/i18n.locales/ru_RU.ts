@@ -8799,6 +8799,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signFailed':
     'Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.',
   'hudChrome.wocMarket.confirming': 'Подтверждение в сети...',
+  'hudChrome.wocMarket.bidBondConfirming': 'Залог отправлен. Идёт подтверждение в сети; после него ваша ставка вступит в силу.',
   'hudChrome.wocMarket.bidPlacedStanding': 'Ваша ставка принята. Вы лидируете в торгах.',
   'hudChrome.wocMarket.bidPlacedOutbid': 'Ваш залог подтверждён, но кто-то успел поставить больше.',
   'hudChrome.wocMarket.purchaseComplete':

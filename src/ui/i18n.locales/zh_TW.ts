@@ -8290,6 +8290,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': '等待錢包確認...',
   'hudChrome.wocMarket.signFailed': '你的錢包未能完成付款。請檢查錢包後重試。',
   'hudChrome.wocMarket.confirming': '正在鏈上確認...',
+  'hudChrome.wocMarket.bidBondConfirming':
+    '保證金已支付。正在網路上確認；確認完成後你的出價即生效。',
   'hudChrome.wocMarket.bidPlacedStanding': '你的出價已生效，你是目前最高出價者。',
   'hudChrome.wocMarket.bidPlacedOutbid': '你的保證金已確認，但有人搶先出了更高的價。',
   'hudChrome.wocMarket.purchaseComplete': '購買完成。物品將經烏鴉郵局寄達。',

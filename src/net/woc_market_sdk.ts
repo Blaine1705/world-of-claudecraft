@@ -416,8 +416,8 @@ export class WocMarketClient {
   async confirmBond(
     bidId: number,
     signature: string,
-  ): Promise<{ ok: true; standing: boolean } | WocMarketFail> {
-    const out = await this.request<{ standing: boolean }>(
+  ): Promise<{ ok: true; standing: boolean; pending?: boolean } | WocMarketFail> {
+    const out = await this.request<{ standing: boolean; pending?: boolean }>(
       'POST',
       `/api/woc-market/bids/${bidId}/bond`,
       { signature },

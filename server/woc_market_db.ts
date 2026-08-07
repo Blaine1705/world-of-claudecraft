@@ -153,6 +153,22 @@ CREATE INDEX IF NOT EXISTS woc_market_bids_bond_due
 CREATE INDEX IF NOT EXISTS woc_market_bids_pending
   ON woc_market_bids(realm, placed_at)
   WHERE status = 'pending_bond';
+-- The signature the bidder handed back for their bond, recorded BEFORE the
+-- chain has decided. Without somewhere to keep it, a bond that had landed but
+-- not yet finalized could only be refused, and the money was already gone: the
+-- settlement leg learned this the expensive way and the bid leg had the same
+-- hole. UNIQUE for the same reason the settlement's is: one broadcast pays for
+-- one thing, and a replayed signature must not fund a second bond.
+ALTER TABLE woc_market_bids
+  ADD COLUMN IF NOT EXISTS bond_signature TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS woc_market_bids_bond_signature
+  ON woc_market_bids(bond_signature)
+  WHERE bond_signature IS NOT NULL;
+-- The awaiting-finality queue: pending bonds that HAVE a signature are re-checked
+-- by the sweep, and are exactly the rows the lapse sweep must not reap.
+CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming
+  ON woc_market_bids(realm, placed_at)
+  WHERE status = 'pending_bond' AND bond_signature IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS woc_market_settlements (
   id BIGSERIAL PRIMARY KEY,
@@ -351,7 +367,7 @@ export const SETTLED_OFFER_GRACE_MS = 90_000;
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
-  'bond_cents, bond_state, bond_reference, bond_quote_expires, placed_at';
+  'bond_cents, bond_state, bond_reference, bond_quote_expires, bond_signature, placed_at';
 
 const SETTLEMENT_COLS =
   'id, listing_id, bid_id, attempt, buyer_account, buyer_character, buyer_name, buyer_wallet, ' +
@@ -437,6 +453,7 @@ function toBid(row: Row): WocBidRow {
     bondState: row.bond_state as WocBondState,
     bondReference: row.bond_reference ?? null,
     bondQuoteExpiresAtMs: msOrNull(row.bond_quote_expires),
+    bondSignature: row.bond_signature ?? null,
     placedAtMs: ms(row.placed_at),
   };
 }
@@ -1150,6 +1167,56 @@ export class PgWocMarketDb implements WocMarketDb {
     });
   }
 
+  /**
+   * Record the signature a bidder handed back, BEFORE the chain has decided.
+   *
+   * Mirrors submitSettlementSignature, and for the same reason: a bond that has
+   * landed but not finalized must stay re-checkable rather than be refused with
+   * the money already gone. The UNIQUE index on the column is what makes a
+   * replayed signature a diagnosable refusal instead of a second funded bond.
+   */
+  async submitBondSignature(
+    bidId: number,
+    signature: string,
+  ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
+    try {
+      const res = await this.pool.query(
+        `UPDATE woc_market_bids SET bond_signature = $2
+          WHERE id = $1 AND status = 'pending_bond'
+            AND (bond_signature IS NULL OR bond_signature = $2)`,
+        [bidId, signature],
+      );
+      return (res.rowCount ?? 0) > 0 ? 'recorded' : 'not_pending';
+    } catch (err) {
+      // 23505: the unique index caught this signature against ANOTHER bid.
+      if ((err as { code?: string }).code === '23505') return 'signature_reused';
+      throw err;
+    }
+  }
+
+  /** Bonds that were paid but whose chain verdict was still undecided. The
+   *  sweep re-checks these; without the signature there is nothing to re-check,
+   *  so the predicate matches the partial index exactly. */
+  async confirmingBonds(realm: string, limit: number): Promise<WocBidRow[]> {
+    const res = await this.pool.query(
+      `SELECT ${BID_COLS} FROM woc_market_bids
+        WHERE realm = $1 AND status = 'pending_bond' AND bond_signature IS NOT NULL
+        ORDER BY placed_at LIMIT $2`,
+      [realm, limit],
+    );
+    return res.rows.map(toBid);
+  }
+
+  /** One bond the chain decided against. Narrowed to pending_bond so a bid that
+   *  activated in the meantime is never torn down by a late verdict. */
+  async lapseBid(bidId: number): Promise<void> {
+    await this.pool.query(
+      `UPDATE woc_market_bids SET status = 'lapsed', bond_state = 'void'
+        WHERE id = $1 AND status = 'pending_bond'`,
+      [bidId],
+    );
+  }
+
   async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void> {
     await this.pool.query(
       `UPDATE woc_market_bids
@@ -1261,6 +1328,9 @@ export class PgWocMarketDb implements WocMarketDb {
           SELECT id FROM woc_market_bids
            WHERE realm = $1
              AND status = 'pending_bond' AND placed_at <= to_timestamp($2 / 1000.0)
+             -- A bond with a signature is PAID and merely awaiting the chain's
+             -- verdict. Lapsing it would void a bond the bidder already funded.
+             AND bond_signature IS NULL
            ORDER BY placed_at
            LIMIT $3
            FOR UPDATE SKIP LOCKED)`,

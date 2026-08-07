@@ -1308,6 +1308,153 @@ describe('sweep close', () => {
   });
 });
 
+describe('a bond payment awaiting finality', () => {
+  /** An economy whose confirm is UNDECIDED: paid, but the chain has not said so
+   *  yet. Exactly what a real confirm returns for tens of seconds after a
+   *  mainnet broadcast. */
+  function undecided(h: Harness): WocMarketEconomy {
+    return {
+      ...h.economy,
+      confirm: async () => ({ settled: false, pending: true, reason: 'awaiting_finality' }),
+    };
+  }
+
+  it('does NOT refuse it: the money has already left the wallet', async () => {
+    // The defect this pins cost a real settlement its money once, and the same
+    // shape survived in the bid leg: an undecided verdict was reported as
+    // confirm_failed, so a good payment was answered with "could not be
+    // confirmed" while the tokens were gone.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const svc = new WocMarketService({ ...h.deps, economy: undecided(h) });
+    const out = await svc.confirmBond(BUYER_A, placed.bid.id, 'sig-bond-pending');
+    expect(out, 'accepted, and honestly reported as not yet standing').toEqual({
+      ok: true,
+      standing: false,
+      pending: true,
+    });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status, 'the bid stays alive to be resolved').toBe('pending_bond');
+    expect(bid.bondSignature, 'with the signature kept for the re-check').toBe('sig-bond-pending');
+  });
+
+  it('activates the bid once the sweep sees the chain decide', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const svc = new WocMarketService({ ...h.deps, economy: undecided(h) });
+    await svc.confirmBond(BUYER_A, placed.bid.id, 'sig-bond-pending');
+    // The chain decides in the player's favour; the ordinary sweep finishes it.
+    await h.service.sweepPass();
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('active');
+    expect(bid.bondState).toBe('held');
+    expect((await getListing(h, listing.id)).currentBidId).toBe(placed.bid.id);
+  });
+
+  it('lapses the bid when the chain decides AGAINST it', async () => {
+    // Only a DECIDED verdict may end it. A refusal is a real answer and the bid
+    // must not linger holding a seat it never paid for.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const svc = new WocMarketService({ ...h.deps, economy: undecided(h) });
+    await svc.confirmBond(BUYER_A, placed.bid.id, 'sig-bond-pending');
+    const refusing = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: false, reason: 'refused' }),
+      },
+    });
+    await refusing.sweepPass();
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('lapsed');
+    expect(bid.bondState).toBe('void');
+  });
+
+  it('never lapses a PAID bond on the TTL sweep while it awaits finality', async () => {
+    // The lapse arm reaps unconfirmed bonds past their TTL. A bond with a
+    // signature is funded, so reaping it would void money the bidder has
+    // already spent while the chain was still thinking.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const svc = new WocMarketService({ ...h.deps, economy: undecided(h) });
+    await svc.confirmBond(BUYER_A, placed.bid.id, 'sig-bond-pending');
+    // Well past the pending-bond TTL.
+    h.setNow(BASE_MS + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000 + 60_000);
+    await svc.sweepPass();
+    expect((await getBid(h, placed.bid.id)).status, 'still awaiting the chain').toBe(
+      'pending_bond',
+    );
+  });
+
+  it('refuses a signature already spent on another bid', async () => {
+    // One broadcast pays for one thing. Replaying it must not fund a second
+    // bond, which is what the unique index on the column enforces.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const first = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const second = unwrap(
+      await placeBid(h, {
+        account: BUYER_B,
+        characterId: CHAR_B,
+        listingId: listing.id,
+        amountCents: 6000,
+      }),
+      'placeBid',
+    );
+    const svc = new WocMarketService({ ...h.deps, economy: undecided(h) });
+    await svc.confirmBond(BUYER_A, first.bid.id, 'sig-shared');
+    expect(await svc.confirmBond(BUYER_B, second.bid.id, 'sig-shared')).toEqual({
+      ok: false,
+      reason: 'signature_reused',
+    });
+  });
+});
+
 describe('settlement happy path', () => {
   it('quote then confirm delivers eagerly, records the sale, and refunds the bond on the next sweep', async () => {
     const h = makeHarness();

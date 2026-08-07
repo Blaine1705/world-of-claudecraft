@@ -201,3 +201,45 @@ describe('a finished sale stops being a live offer', () => {
     expect(text).toContain('ORDER BY id DESC LIMIT 1');
   });
 });
+
+describe('the bond finality queue, in SQL', () => {
+  it('excludes a SIGNED bond from the TTL lapse sweep', async () => {
+    // The fake models this too, so the statement is pinned separately: reaping
+    // a bond the bidder has already funded voids their money while the chain is
+    // still deciding.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).lapsePendingBids(REALM, 1_000, 50);
+    expect(sql()[0]).toContain('bond_signature IS NULL');
+  });
+
+  it('re-checks only bonds that HAVE a signature', async () => {
+    // Without one there is nothing to ask the chain about, and the row belongs
+    // to the TTL arm instead.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).confirmingBonds(REALM, 50);
+    const [text] = sql();
+    expect(text).toContain("status = 'pending_bond'");
+    expect(text).toContain('bond_signature IS NOT NULL');
+  });
+
+  it('records a signature only against a still-pending bid', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).submitBondSignature(7, 'sig');
+    const [text] = sql();
+    expect(text).toContain("status = 'pending_bond'");
+    // Idempotent on a retry of the SAME signature, so a client re-send is not
+    // mistaken for a reuse.
+    expect(text).toContain('bond_signature IS NULL OR bond_signature = $2');
+  });
+
+  it('lapses a decided-against bond only while it is still pending', async () => {
+    // A bid that activated in the meantime must not be torn down by a late
+    // verdict arriving after the fact.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).lapseBid(7);
+    const [text] = sql();
+    expect(text).toContain("status = 'lapsed'");
+    expect(text).toContain("bond_state = 'void'");
+    expect(text).toContain("status = 'pending_bond'");
+  });
+});

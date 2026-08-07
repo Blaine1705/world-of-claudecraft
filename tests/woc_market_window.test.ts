@@ -1033,3 +1033,31 @@ describe('woc_market_window: a price the wallet cannot cover', () => {
     expect(select).toContain('this.buyNowTokens = null');
   });
 });
+
+describe('woc_market_window: the quote countdown actually moves', () => {
+  // What shipped: "Quote expires in x seconds" rendered once and then sat
+  // frozen while the quote ran out underneath the player. The window is cold
+  // and repaints only when its digest changes; the pending quote is WINDOW
+  // state, so the pure model's digest could never move for it.
+  it('folds the quote countdown into the repaint signature', () => {
+    const refresh = between('refreshIfChanged(): void {', 'private quoteCountdownSig');
+    expect(refresh, 'the model digest alone cannot see a pending quote').toContain(
+      'this.quoteCountdownSig()',
+    );
+  });
+
+  it('latches the SAME composite it compares', () => {
+    // Latching only the model half leaves the two permanently unequal, so every
+    // poll rebuilds the window and takes the caret and hover card with it.
+    const render = between('this.lastModel = model;', 'this.rendering = true');
+    expect(render).toContain('this.quoteCountdownSig()');
+  });
+
+  it('keys on SECONDS, matching the resolution the countdown is displayed at', () => {
+    // A finer key would rebuild many times per second for an unchanged string.
+    const sig = between('private quoteCountdownSig()', '/** Language fan-out arm');
+    expect(sig).toContain('/ 1000');
+    // And no pending quote means no key at all, so an idle window still rests.
+    expect(sig).toContain("return ''");
+  });
+});

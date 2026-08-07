@@ -324,9 +324,27 @@ export class WocMarketWindow {
     // would then freeze the browse countdowns for the rest of the session, which
     // is a worse failure than the flicker it prevents.
     if (this.tab === 'sell' && this.sellOpen) return;
-    const sig = wocMarketViewSig(this.buildModel());
+    const sig = `${wocMarketViewSig(this.buildModel())}|${this.quoteCountdownSig()}`;
     if (sig === this.lastSig) return;
     this.render();
+  }
+
+  /**
+   * The pending quote's own repaint key.
+   *
+   * The quote panel is WINDOW state, so it never reaches the pure model and the
+   * model's digest cannot move for it. Without this the "expires in" countdown
+   * rendered once and then sat there, frozen, while the quote it described ran
+   * out underneath the player.
+   *
+   * Second resolution, matching every other countdown in that digest: the
+   * display has no finer grain, so a finer key would rebuild the window many
+   * times per second for a string that did not change.
+   */
+  private quoteCountdownSig(): string {
+    const expiresAtMs = this.pendingQuote?.quote.expiresAtMs;
+    if (expiresAtMs === undefined || expiresAtMs === null) return '';
+    return String(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)));
   }
 
   /** Language fan-out arm: self-gated, one rebuild, signature re-latched. */
@@ -388,7 +406,10 @@ export class WocMarketWindow {
     }
     const model = this.buildModel();
     this.lastModel = model;
-    this.lastSig = wocMarketViewSig(model);
+    // The SAME composite refreshIfChanged compares. Latching only the model half
+    // would leave the two permanently unequal, so every poll would rebuild the
+    // window: the caret, the hover card and the scroll position with it.
+    this.lastSig = `${wocMarketViewSig(model)}|${this.quoteCountdownSig()}`;
     this.rendering = true;
     try {
       this.renderInner(root, model);
@@ -1773,10 +1794,15 @@ export class WocMarketWindow {
           this.fail(out.code);
           return;
         }
+        // Three outcomes, not two. "Not standing" used to cover both being
+        // outbid and the chain simply not having decided yet, which told a
+        // player their good payment had lost.
         this.ok(
-          out.standing
-            ? 'hudChrome.wocMarket.bidPlacedStanding'
-            : 'hudChrome.wocMarket.bidPlacedOutbid',
+          out.pending
+            ? 'hudChrome.wocMarket.bidBondConfirming'
+            : out.standing
+              ? 'hudChrome.wocMarket.bidPlacedStanding'
+              : 'hudChrome.wocMarket.bidPlacedOutbid',
         );
       } else {
         const out = await hooks.client.confirmSettlement(pending.settlementId, signature);

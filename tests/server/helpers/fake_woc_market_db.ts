@@ -588,6 +588,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       bondState: 'pending',
       bondReference: null,
       bondQuoteExpiresAtMs: null,
+      bondSignature: null,
       placedAtMs: args.nowMs,
     };
     this.bids.set(id, rec);
@@ -599,6 +600,38 @@ export class FakeWocMarketDb implements WocMarketDb {
       this.touchListing(row.id);
     }
     return { ok: true, bid: this.bidOut(rec) };
+  }
+
+  /** Mirrors the real UPDATE: narrowed to pending_bond, idempotent on the same
+   *  signature, and refusing one already recorded against a DIFFERENT bid (the
+   *  unique index's 23505). */
+  async submitBondSignature(
+    bidId: number,
+    signature: string,
+  ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
+    for (const [id, other] of this.bids) {
+      if (id !== bidId && other.bondSignature === signature) return 'signature_reused';
+    }
+    const bid = this.bids.get(bidId);
+    if (!bid || bid.status !== 'pending_bond') return 'not_pending';
+    if (bid.bondSignature !== null && bid.bondSignature !== signature) return 'not_pending';
+    bid.bondSignature = signature;
+    return 'recorded';
+  }
+
+  async confirmingBonds(realm: string, limit: number): Promise<WocBidRow[]> {
+    return [...this.bids.values()]
+      .filter((b) => b.realm === realm && b.status === 'pending_bond' && b.bondSignature !== null)
+      .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id)
+      .slice(0, limit)
+      .map((b) => this.bidOut(b));
+  }
+
+  async lapseBid(bidId: number): Promise<void> {
+    const bid = this.bids.get(bidId);
+    if (!bid || bid.status !== 'pending_bond') return;
+    bid.status = 'lapsed';
+    bid.bondState = 'void';
   }
 
   async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void> {
@@ -671,7 +704,14 @@ export class FakeWocMarketDb implements WocMarketDb {
   async lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number> {
     const due = [...this.bids.values()]
       .filter(
-        (bid) => bid.realm === realm && bid.status === 'pending_bond' && bid.placedAtMs <= cutoffMs,
+        (bid) =>
+          bid.realm === realm &&
+          bid.status === 'pending_bond' &&
+          bid.placedAtMs <= cutoffMs &&
+          // A signed bond is PAID and merely awaiting the chain: the real SQL
+          // excludes it, and a fake that reaped it would hide the very defect
+          // this arm exists to prevent.
+          bid.bondSignature === null,
       )
       .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id)
       .slice(0, limit);
