@@ -109,7 +109,27 @@ const raw = readFileSync('docs/x.md', 'utf8');`);
       'dynamic-import',
       'gltf-transform',
       'sharp',
+      'generated-i18n',
     ]);
+  });
+
+  it('floors a suite that imports or path-references the generated i18n artifacts', () => {
+    // Import specifier form (relative, extensionless) and fs-path string form
+    // both fire. This is the BELT over the related-leg pass-through (the
+    // artifacts are INSIDE the module graph and feed `related` directly): a
+    // direct artifact-naming consumer keeps running even on diffs that carry
+    // no artifact at all.
+    for (const text of [
+      `import { en } from '../src/ui/i18n.resolved.generated/en';`,
+      `const p = 'src/admin/i18n.resolved.generated/de_DE.ts';`,
+      `import { TRANSLATION_KEYS } from '../src/ui/i18n.catalog/translation_keys.generated';`,
+    ]) {
+      const v = classifyTestSource(text);
+      expect(v.reasons).toContain('generated-i18n');
+      expect(['blind', 'partial']).toContain(v.klass);
+    }
+    // A suite that merely uses the ordinary i18n API stays graph-visible.
+    expect(classifyTestSource(`import { t } from '../src/ui/i18n';`).klass).toBe('graph');
   });
 
   it('folds classifications into a sorted always-run set with reasons', () => {
@@ -191,6 +211,9 @@ describe('selective gate planning', () => {
     expect(plan.mode).toBe('selective');
     expect(plan.relatedSources).toEqual([]);
     expect(plan.alwaysRunFiles).toEqual(ALWAYS);
+    // Exact-string pin: this arm's audit line lost its verbatim assertion when
+    // the artifact-only case moved to the fed-to-related arm.
+    expect(plan.reason).toBe('no code or test changes: always-run set only');
   });
 
   // Declaration files are type-only and check:types runs in full regardless, so
@@ -203,17 +226,138 @@ describe('selective gate planning', () => {
     },
   );
 
-  it('classifies paths into the four planner buckets', () => {
+  it('classifies paths into the five planner buckets', () => {
     const c = classifySelectPaths([
       'src/sim/sim.ts',
       'tests/threat.test.ts',
       'package.json',
       'docs/x.md',
+      'src/ui/i18n.resolved.generated/en.ts',
     ]);
     expect(c.relatedSources).toEqual(['src/sim/sim.ts']);
     expect(c.testFiles).toEqual(['tests/threat.test.ts']);
     expect(c.broadConfigs).toEqual(['package.json']);
     expect(c.nonCode).toEqual(['docs/x.md']);
+    expect(c.generatedI18n).toEqual(['src/ui/i18n.resolved.generated/en.ts']);
+  });
+
+  // Generated i18n artifacts: never widen while present (pr-checks and the
+  // full local gate rerun i18n:gen and diff exactly these paths, so a
+  // hand-edited or stale artifact is a red check regardless of selection),
+  // unprovable when absent (regeneration recreates a deleted file UNTRACKED,
+  // invisible to that diff). Coverage rides the graph FROM the artifacts:
+  // they join the related leg, because their consumers hang off the artifact
+  // side of the import graph (the catalog/overlay driving sources reach the
+  // runtime only through type-erased edges and select almost nothing).
+  it.each([
+    ['src/ui/i18n.resolved.generated/de_DE.ts'],
+    ['src/ui/i18n.resolved.generated/pending.ts'],
+    ['src/admin/i18n.resolved.generated/loaders.ts'],
+    ['src/ui/i18n.catalog/translation_keys.generated.ts'],
+  ])('keeps a present artifact (%s) selective and feeds it to related', (artifact) => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.catalog/tooltips.ts', artifact],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.relatedSources).toEqual(['src/ui/i18n.catalog/tooltips.ts', artifact]);
+    expect(plan.reason).toContain(
+      '1 generated i18n artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('feeds an artifact-only diff to related with the audit note in the reason', () => {
+    // The counts stay honest (the artifact is not a "changed source file")
+    // while the related leg still walks the graph from the artifact, which is
+    // exactly what selects the consumers a full run would have caught.
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/en.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.relatedSources).toEqual(['src/ui/i18n.resolved.generated/en.ts']);
+    expect(plan.reason).toBe(
+      '0 changed source file(s), 0 changed test file(s); 1 generated i18n artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('truncates the missing-artifact reason list past three entries', () => {
+    const missing = [
+      'src/ui/i18n.resolved.generated/aa.ts',
+      'src/ui/i18n.resolved.generated/bb.ts',
+      'src/ui/i18n.resolved.generated/cc.ts',
+      'src/ui/i18n.resolved.generated/dd.ts',
+    ];
+    const plan = buildSelectPlan({
+      changedPaths: missing,
+      alwaysRunFiles: ALWAYS,
+      exists: () => false,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('src/ui/i18n.resolved.generated/cc.ts');
+    expect(plan.reason).toContain(', ...');
+    expect(plan.reason).not.toContain('dd.ts');
+  });
+
+  it('keeps a SUBDIRECTORY path under an artifact dir an unclassified widen', () => {
+    // The generator's orphan sweep does not recurse, so a nested file is not
+    // freshness-provable and must not inherit the artifact standing.
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/sub/en.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('broad/unclassified change');
+  });
+
+  it('wires the live existence probe at both planner entrypoints', () => {
+    // The probe is the fail-closed default's escape hatch: without `exists:`
+    // in the call, every artifact-carrying local gate widens to full and the
+    // rule's local benefit silently dies. Source-text pin, same convention as
+    // the gate step-list pins.
+    for (const entry of ['scripts/gate_select.mjs', 'scripts/gate_shadow.mjs']) {
+      const text = readFileSync(path.join(REPO_ROOT, entry), 'utf8');
+      const call = text.slice(text.indexOf('buildSelectPlan({'));
+      expect(call.slice(0, call.indexOf('})')), entry).toContain('exists:');
+    }
+  });
+
+  it('falls back to the FULL suite when a changed artifact is missing from the tree', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: (p) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('generated i18n artifact(s) removed');
+  });
+
+  it('falls back to the FULL suite when the caller cannot verify artifact existence', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+      alwaysRunFiles: ALWAYS,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('existence cannot be verified');
+  });
+
+  it('keeps every other generated tree a full-suite widen', () => {
+    for (const p of [
+      'src/game/sfx_manifest.generated.ts',
+      'src/guide/content.generated.ts',
+      'src/ui/map_bg_manifest.generated.ts',
+    ]) {
+      const plan = buildSelectPlan({
+        changedPaths: [p],
+        alwaysRunFiles: ALWAYS,
+        exists: () => true,
+      });
+      expect(plan.mode).toBe('full');
+      expect(plan.reason).toContain('broad/unclassified change');
+    }
   });
 });
 
@@ -547,6 +691,16 @@ describe('always-run set over the real suite', () => {
     expect(alwaysRun).toContain('tests/boar_asset.test.ts');
     expect(alwaysRun).toContain('tests/arena_render.test.ts');
     expect(alwaysRun).toContain('tests/continent_map_view.test.ts');
+    // Generated-i18n belt pattern: these witnesses are floored SOLELY by the
+    // generated-i18n visibility entry (verified against the real reason sets:
+    // every other pattern misses them), so deleting that entry turns exactly
+    // these assertions red. The artifact consumers reachable only through the
+    // src/ui/i18n.ts re-export seam are covered by the related-leg
+    // pass-through instead, not by this floor.
+    expect(alwaysRun).toContain('tests/i18n_lazy_loader.test.ts');
+    expect(alwaysRun).toContain('tests/i18n_dialect_resolution.test.ts');
+    expect(alwaysRun).toContain('tests/i18n_build_gapfill.test.ts');
+    expect(alwaysRun).toContain('tests/collective_reversal.test.ts');
     // Sanity floor: classification collapsing to "everything is graph-visible"
     // is the exact regression that would make selection unsafe.
     expect(alwaysRun.length).toBeGreaterThan(300);

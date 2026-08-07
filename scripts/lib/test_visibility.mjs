@@ -74,6 +74,21 @@ export const OUT_OF_GRAPH_PATTERNS = Object.freeze([
   // these import signals joined the list (Phase 2 adversarial audit).
   ['gltf-transform', /from\s*['"]@gltf-transform\//],
   ['sharp', /from\s*['"]sharp['"]|require\(\s*['"]sharp['"]\s*\)/],
+  // Generated i18n artifacts (the resolved locale slices and the
+  // TranslationKey union): the selective planner classifies them into their
+  // own never-widen bucket (lib/gate_select_plan.mjs) and feeds the changed
+  // artifact paths to `vitest related` as graph nodes, which is what selects
+  // their consumers (the artifacts are INSIDE the module graph, and are its
+  // most-connected i18n node; the catalog/overlay sources reach the runtime
+  // only through type-erased edges). This entry is the BELT over that
+  // mechanism, not the mechanism: it floors the handful of suites that
+  // name the artifacts in their own text, so a direct consumer keeps running
+  // even on PRs whose diff carries no artifact at all, and even if a future
+  // import shape ever fell out of vitest's graph walk. Matches the artifact
+  // NAMES, not the exact paths: an import specifier is relative
+  // ('./i18n.resolved.generated/en') and a moved artifact tree should keep
+  // flooring its consumers.
+  ['generated-i18n', /i18n\.resolved\.generated|translation_keys\.generated/],
 ]);
 
 /**

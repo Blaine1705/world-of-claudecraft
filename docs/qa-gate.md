@@ -159,8 +159,12 @@ scans from disk joins it the moment it lands.
 
 **Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
 a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
-to the full suite. Selection is an optimization for changes we understand; everything else
-gets the old bar. Failing toward *more* tests is the only safe direction, which is also why
+to the full suite. One deliberate carve-out: the regenerated i18n artifacts never widen;
+they classify into their own bucket and are fed to `related` as graph nodes (see
+"Generated i18n artifacts" under the CI section below; the same shared classifier serves
+both arms, and the local gate's own i18n freshness step is the local half of the safety
+argument). Selection is an optimization for changes we understand; everything else gets
+the old bar. Failing toward *more* tests is the only safe direction, which is also why
 an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
 changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
 `GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
@@ -227,6 +231,50 @@ read safely. Selection never applies off `pull_request` events: a merge-queue ru
 (`merge_group`) always takes `test_mode=full` (the queue is the last pre-merge bar),
 `release-gate` keeps the unconditional full 8-shard run line, and the nightly gate
 re-proves the tips daily.
+
+**Generated i18n artifacts.** The regenerated i18n artifacts (the per-locale resolved
+slices directly under `src/ui/i18n.resolved.generated/` and
+`src/admin/i18n.resolved.generated/`, and
+`src/ui/i18n.catalog/translation_keys.generated.ts`) classify into their own bucket
+(`isGeneratedI18nArtifactPath` in `scripts/lib/gate_select_plan.mjs`) instead of the
+unrecognized-widen-to-full catch-all, so a PR that carries a routine regeneration no
+longer forces the full suite: before this rule they were the single dominant full
+trigger (8 of the 25 PRs replayed in Phase 2 went full SOLELY on them). The standing
+rests on three structural facts, each pinned:
+
+1. **Integrity is owned by the freshness step, which selection never touches.** The
+   `pr-checks` job (and `release-checks`, and the full local gate's i18n step) reruns
+   `npm run i18n:gen` and fails on `git diff --exit-code` over EXACTLY the artifact
+   paths, gated only on `code` (any `src/` change), never on `test_mode`. A hand-edited
+   or stale artifact is therefore a red check in every mode. `tests/ci_workflow.test.ts`
+   pins the classifier's path list to the workflow's freshness-diff list AND to the
+   local gate's `I18N_ARTIFACTS` list, so the copies cannot drift apart silently.
+2. **Coverage is owned by the import graph, with the artifacts as entry nodes.** The
+   artifacts are INSIDE the module graph, and are its most-connected i18n node
+   (`src/ui/i18n.ts` statically imports and re-exports the resolved barrel); their
+   DRIVING sources (catalog modules, locale overlays) are build inputs the runtime
+   reaches only through type-erased edges, so `related` over a driving source selects
+   almost nothing. Both arms therefore feed the changed artifact paths THEMSELVES to
+   `vitest related`, which walks the real graph to every consumer, including suites
+   that pin resolved-table content through the `src/ui/i18n.ts` re-export seam without
+   ever naming an artifact (measured: a single resolved slice reaches about 240 of the
+   2296 suites; a locale-fill PR runs the floor plus that set instead of everything).
+   The `generated-i18n` entry in `OUT_OF_GRAPH_PATTERNS` is a belt over this, not the
+   mechanism: it floors the direct artifact-naming importers on every selective run,
+   with witnesses floored SOLELY by it (`tests/i18n_lazy_loader.test.ts`,
+   `tests/i18n_dialect_resolution.test.ts`) pinned in `tests/gate_select_plan.test.ts`.
+   Each `npm test` leg's pretest also regenerates the artifacts, so selected suites
+   always assert over fresh content.
+3. **Deletions and unprovable shapes widen.** The freshness diff cannot flag a
+   deleted-then-regenerated file (regeneration recreates it UNTRACKED, and `git diff`
+   never shows untracked files), so a removed or renamed-away artifact forces full in
+   the mode decision (statuses), the shard plan re-proves presence with the checkout the
+   changes job lacks, and the local planner takes an existence probe and widens without
+   one. Membership is top-level only: the generator's orphan sweep does not recurse, so
+   a SUBDIRECTORY path under an artifact dir is not freshness-provable and keeps the
+   unrecognized widen. Every OTHER `.generated` tree keeps the old behavior:
+   unrecognized, widen. Do not extend the artifact list without a freshness-equivalent
+   proof AND the `tests/ci_workflow.test.ts` coupling.
 
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
 `[ci-shard]` in each shard: mode, reason, floor size, related sources, and the
