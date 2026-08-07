@@ -19,7 +19,6 @@ export function planReleaseVersion(input: {
   gradle: string;
   pbxproj: string;
   desktopModule: string;
-  otaNativeBuild: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 }): {
@@ -27,7 +26,6 @@ export function planReleaseVersion(input: {
   gradle: string;
   pbxproj: string;
   desktopModule: string;
-  otaNativeBuild: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 };
@@ -38,25 +36,6 @@ export function collectReleaseVersionFailures(input: {
   gradle: string;
   pbxproj: string;
   desktopModule: string;
-  otaNativeBuild: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 }): string[];
-
-export function setNativeBuildBridge(
-  source: string,
-  version: string,
-  iosBuild: number,
-  androidBuild: number,
-): string;
-
-export function readNativeBuildBridge(source: string): {
-  version: string | null;
-  ios: number | null;
-  android: number | null;
-};
-
-export function readNativeBuildNumbers(
-  gradle: string,
-  pbxproj: string,
-): { ios: number | null; android: number | null };

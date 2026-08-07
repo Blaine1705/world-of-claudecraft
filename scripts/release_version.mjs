@@ -31,7 +31,6 @@ const PATHS = {
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
   desktopModule: 'src/game/desktop_download.ts',
-  otaNativeBuild: 'server/ota_native_build.ts',
   htmlFiles: ['index.html', 'play.html'],
   readmeRoot: 'README.md',
   readmeDir: 'docs/i18n',
@@ -136,67 +135,17 @@ export function setReadmeVersionBadge(markdown, version, path) {
   );
 }
 
-const BRIDGE_VERSION_RE = /(version:\s*')(\d+\.\d+\.\d+)(')/;
-const BRIDGE_IOS_RE = /(ios:\s*)(\d+)/;
-const BRIDGE_ANDROID_RE = /(android:\s*)(\d+)/;
-
-/**
- * Keep server/ota_native_build.ts in lockstep with the native build numbers.
- * The OTA endpoint uses it to map a device's build NUMBER (which is all a
- * store-fresh device reports) onto a marketing version; a stale bridge stops
- * offering updates silently, so it is a release surface like any other.
- */
-export function setNativeBuildBridge(source, version, iosBuild, androidBuild) {
-  for (const [name, re] of [
-    ['version', BRIDGE_VERSION_RE],
-    ['ios', BRIDGE_IOS_RE],
-    ['android', BRIDGE_ANDROID_RE],
-  ]) {
-    if (!re.test(source)) {
-      throw new Error(`${PATHS.otaNativeBuild} is missing its ${name} field`);
-    }
-  }
-  return source
-    .replace(BRIDGE_VERSION_RE, `$1${normalizeVersion(version)}$3`)
-    .replace(BRIDGE_IOS_RE, `$1${iosBuild}`)
-    .replace(BRIDGE_ANDROID_RE, `$1${androidBuild}`);
-}
-
-export function readNativeBuildBridge(source) {
-  const version = BRIDGE_VERSION_RE.exec(source)?.[2] ?? null;
-  const ios = BRIDGE_IOS_RE.exec(source)?.[2] ?? null;
-  const android = BRIDGE_ANDROID_RE.exec(source)?.[2] ?? null;
-  return {
-    version,
-    ios: ios === null ? null : Number(ios),
-    android: android === null ? null : Number(android),
-  };
-}
-
-export function readNativeBuildNumbers(gradle, pbxproj) {
-  const android = /^\s*versionCode\s+(\d+)/m.exec(gradle)?.[1] ?? null;
-  const iosMatches = [...pbxproj.matchAll(/CURRENT_PROJECT_VERSION\s*=\s*(\d+)\s*;/g)].map((m) =>
-    Number(m[1]),
-  );
-  const ios = iosMatches.length > 0 && new Set(iosMatches).size === 1 ? iosMatches[0] : null;
-  return { ios, android: android === null ? null : Number(android) };
-}
-
 export function planReleaseVersion({
   version,
   packageJson,
   gradle,
   pbxproj,
   desktopModule,
-  otaNativeBuild,
   htmlFiles,
   readmeFiles,
 }) {
   const normalized = normalizeVersion(version);
   const nativePlan = planVersionSync({ version: normalized, gradle, pbxproj });
-  // Read the build numbers back out of the BUMPED files so the bridge records
-  // what actually shipped, never the pre-bump values.
-  const bumped = readNativeBuildNumbers(nativePlan.gradle, nativePlan.pbxproj);
   const nextHtmlFiles = Object.fromEntries(
     Object.entries(htmlFiles).map(([path, html]) => [
       path,
@@ -215,7 +164,6 @@ export function planReleaseVersion({
     gradle: nativePlan.gradle,
     pbxproj: nativePlan.pbxproj,
     desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
-    otaNativeBuild: setNativeBuildBridge(otaNativeBuild, normalized, bumped.ios, bumped.android),
     htmlFiles: nextHtmlFiles,
     readmeFiles: nextReadmeFiles,
   };
@@ -245,7 +193,6 @@ export function collectReleaseVersionFailures({
   gradle,
   pbxproj,
   desktopModule,
-  otaNativeBuild,
   htmlFiles,
   readmeFiles,
 }) {
@@ -280,30 +227,6 @@ export function collectReleaseVersionFailures({
   if (desktopVersion !== expected) {
     failures.push(
       `${PATHS.desktopModule} DESKTOP_VERSION is ${desktopVersion}, expected ${expected}`,
-    );
-  }
-
-  // The OTA build bridge: a stale one silently stops offering updates to every
-  // store-fresh device, so it is checked against the SAME files it maps between.
-  const bridge = readNativeBuildBridge(otaNativeBuild);
-  const native = readNativeBuildNumbers(gradle, pbxproj);
-  if (bridge.version !== expected) {
-    failures.push(`${PATHS.otaNativeBuild} version is ${bridge.version}, expected ${expected}`);
-  }
-  if (native.ios === null) {
-    failures.push(
-      'ios/App/App.xcodeproj/project.pbxproj CURRENT_PROJECT_VERSION is missing or inconsistent',
-    );
-  } else if (bridge.ios !== native.ios) {
-    failures.push(
-      `${PATHS.otaNativeBuild} ios build is ${bridge.ios}, expected ${native.ios} (CURRENT_PROJECT_VERSION)`,
-    );
-  }
-  if (native.android === null) {
-    failures.push('android/app/build.gradle versionCode is missing');
-  } else if (bridge.android !== native.android) {
-    failures.push(
-      `${PATHS.otaNativeBuild} android build is ${bridge.android}, expected ${native.android} (versionCode)`,
     );
   }
 
@@ -366,7 +289,6 @@ function readReleaseFiles() {
     gradle: readFileSync(resolve(ROOT, PATHS.gradle), 'utf8'),
     pbxproj: readFileSync(resolve(ROOT, PATHS.pbxproj), 'utf8'),
     desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
-    otaNativeBuild: readFileSync(resolve(ROOT, PATHS.otaNativeBuild), 'utf8'),
     htmlFiles: Object.fromEntries(
       PATHS.htmlFiles.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
     ),
@@ -381,7 +303,6 @@ function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.gradle), plan.gradle);
   writeFileSync(resolve(ROOT, PATHS.pbxproj), plan.pbxproj);
   writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);
-  writeFileSync(resolve(ROOT, PATHS.otaNativeBuild), plan.otaNativeBuild);
   for (const [path, html] of Object.entries(plan.htmlFiles)) {
     writeFileSync(resolve(ROOT, path), html);
   }
