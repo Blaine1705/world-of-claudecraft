@@ -23,6 +23,7 @@ import {
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { bannerClothMaterial, isBannerKey } from './castle_kit';
 import { castleStoneBox, castleStoneMat } from './castle_stone';
 import { GFX } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
@@ -780,7 +781,10 @@ export function buildCastleFeatures(): CastleFeaturesView {
     const scene = castleScenes[key];
     if (!scene || list.length === 0) continue;
     for (const part of extractParts(scene, SKIP_PARTS[key])) {
-      const mesh = new THREE.InstancedMesh(part.geo, part.mat, list.length);
+      // banner cloth is one-sided in the kit and must read from the field
+      // outside the walls too, not only from the bailey (castle_kit rule)
+      const mat = isBannerKey(key) ? bannerClothMaterial(part.mat) : part.mat;
+      const mesh = new THREE.InstancedMesh(part.geo, mat, list.length);
       list.forEach((p, i) => {
         const s = p.s ?? S;
         q.setFromAxisAngle(up, p.rot);
