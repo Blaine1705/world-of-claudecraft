@@ -3273,6 +3273,9 @@ export const id_ID: EnTranslations = {
       "toZone": "Peta zona",
       "toggleAria": "Beralih antara peta dunia dan peta zona",
       "levels": "Level {min} hingga {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

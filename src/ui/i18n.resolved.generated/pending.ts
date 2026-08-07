@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "es_ES": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "fr_FR": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "fr_CA": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "de_DE": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "nl_NL": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "pl_PL": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "id_ID": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "tr_TR": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "sv_SE": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "vi_VN": [
+    "hudChrome.arenaGate.minLevelNote"
+  ],
+  "da_DK": [
+    "hudChrome.arenaGate.minLevelNote"
+  ]
 };

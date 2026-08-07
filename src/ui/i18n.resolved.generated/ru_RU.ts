@@ -3273,6 +3273,9 @@ export const ru_RU: EnTranslations = {
       "toZone": "Карта региона",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Требуется уровень {level}"
     }
   },
   "gatherEvent": {

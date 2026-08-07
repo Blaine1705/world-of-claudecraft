@@ -3273,6 +3273,9 @@ export const cs_CZ: EnTranslations = {
       "toZone": "Mapa oblasti",
       "toggleAria": "Přepnout mezi mapou světa a mapou oblasti",
       "levels": "Úrovně {min} až {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {
