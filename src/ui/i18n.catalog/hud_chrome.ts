@@ -367,6 +367,11 @@ export const hudChromeStrings = {
     ready: 'Swing',
     seconds: '{seconds}s',
   },
+  // WoW-style underwater breath mirror bar (src/ui/breath_bar.ts).
+  breath: {
+    label: 'Breath',
+    drowning: 'Drowning!',
+  },
   rest: {
     resting: 'Resting',
   },
@@ -741,6 +746,8 @@ export const hudChromeStrings = {
     valecup: 'Vale Cup',
     bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    // Swimming: Jump swims up, this swims down.
+    dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -1207,6 +1214,29 @@ export const hudChromeStrings = {
     graphicsFatal: 'Graphics recovery failed. Reload the game to continue.',
     graphicsReload: 'Reload Game',
     graphicsDraftChanged: 'Graphics changes are ready to apply.',
+    // Graphics panel card titles (the wide two-column card form), the
+    // per-system dial labels the hud.options block does not already carry,
+    // and the notes under the dials.
+    gfxSectionQuality: 'Quality',
+    gfxSectionWorld: 'World Detail',
+    gfxSectionLighting: 'Lighting & Effects',
+    gfxSectionCamera: 'Camera',
+    gfxSectionDisplay: 'Display',
+    gfxSectionSystem: 'System',
+    gfxSectionTouch: 'Touch Controls',
+    gfxViewDistance: 'View Distance',
+    gfxWaterQuality: 'Water Quality',
+    gfxCharacterDetail: 'Character Detail',
+    gfxAmbientOcclusion: 'Ambient Occlusion',
+    gfxBloom: 'Bloom',
+    gfxAntiAliasing: 'Anti-Aliasing',
+    gfxDynamicLights: 'Dynamic Lights',
+    gfxParticleEffects: 'Particle Effects',
+    gfxHalf: 'Half',
+    gfxCustomNote:
+      'Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.',
+    gfxEffectsNote:
+      'Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',
@@ -1301,6 +1331,11 @@ export const hudChromeStrings = {
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
     // for the M16 guard.
     showPetFrame: 'Show Your Pet',
+    // Graphics-panel opt-in (default off) for the interactive wake/ripple
+    // simulation on water surfaces; bubbles and splash particles do not key
+    // off it. It sits in the Display card beside Weather because it costs
+    // GPU passes, not because it is a comfort toggle.
+    waterRipples: 'Water Ripples (Wakes)',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.
@@ -1540,6 +1575,33 @@ export const hudChromeStrings = {
       firstWin: 'First Win',
     },
   },
+  // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
+  // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
+  // live here: the honor price, the honor balance, the panel title, the close
+  // label and the confirm dialog's title/accept/cancel are all reused from
+  // hudChrome.warfare, itemUi.vendor and heroicShop rather than duplicated.
+  warfareShop: {
+    // The gossip row that opens this window. A flagged NPC keeps its ordinary
+    // goods row too (selling and buyback still have to be reachable), so this
+    // row carries its OWN label and accessible name rather than a second
+    // "Browse Goods" the player cannot tell apart.
+    gossipOption: 'Browse Warfare Sets',
+    gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
+    jewelry: 'Jewelry',
+    weapons: 'Weapons',
+    // Marks a piece the viewer already wears or carries. The tile still sells.
+    owned: 'Owned',
+    // The buy tile's accessible name, as ONE key per arm rather than a base name
+    // with an "owned" fragment concatenated on: an aria-label REPLACES the
+    // button's content, so the marker has to sit inside a sentence a translator
+    // can reorder.
+    buyAria: 'Buy {item} for {honor}',
+    buyOwnedAria: 'Buy {item} for {honor}, already owned',
+    // Honor purchases record no buyback, so a mis-tap is unrefundable: the
+    // confirm gate matches the Heroic Marks shop's, whose title, accept and
+    // cancel labels are currency-neutral and reused verbatim.
+    buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
+  },
   // Character sheet showcase layout: the two titled stat-panel headings under the
   // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
   // statInfo.names.* labels below; only these two group headings are new here.
@@ -1753,6 +1815,10 @@ export const hudChromeStrings = {
   paperdoll: {
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    // The helmet-visibility eye on the head socket: each string is the action
+    // the press performs (so the shown-state button says "Hide helmet").
+    hideHelmAria: 'Hide helmet',
+    showHelmAria: 'Show helmet',
   },
   // Home-page account portal (the logged-in "Account" nav tab). Lives here in the
   // English-only hud_chrome domain so an English-only PR compiles; translations
@@ -1955,6 +2021,16 @@ export const hudChromeStrings = {
     notInTownHint: 'You must be in town to set your focus.',
     increaseAria: 'Increase focus on {component}',
     decreaseAria: 'Decrease focus on {component}',
+    // #1144 re-spec cost model: the payment-tier picker and its cost preview,
+    // shown above Save. {coin}/{materials} are pre-formatted (formatMoney /
+    // formatNumber + the material item's localized name), matching the
+    // pre-formatted-placeholder idiom budgetLabel/tierHint already use above.
+    respecTierLabel: 'Re-spec speed',
+    respecTierTimeOption: 'Free (take your time)',
+    respecTierPartialOption: 'Faster (small cost)',
+    respecTierInstantOption: 'Instant (full cost)',
+    respecCostFree: 'Free',
+    respecCostLine: 'Costs {coin} and {materials}',
   },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
@@ -2321,7 +2397,7 @@ export const hudChromeStrings = {
   // Friendly/Hostile reaction line (green/red, from Entity.hostile). All the
   // wordy ones (M16) are filled in the five non-Latin locales in this same
   // change; "Boss" is not wordy (no four-plus consecutive-lowercase run) so
-  // it stays pending like the rest of a plain-word English addition.
+  // it is also filled in the locale overlays by the release repair.
   mobTooltip: {
     levelFamily: 'Level {level} {family}',
     // The one MobFamily with no guide.family.* bestiary entry (demons are
@@ -2378,6 +2454,16 @@ export const hudChromeStrings = {
     showResource: 'Show Mana, Rage, and Energy',
     showAbsorbs: 'Show Absorb Shields',
     showAuras: 'Show Buffs and Debuffs',
+    // Interface toggle for the pet health sliver on a party member's row. Kept
+    // NON-WORDY (no run of four+ lowercase) so an English-filled non-Latin locale
+    // does not trip the M16 untranslated-leak guard.
+    showPets: 'Show Pets',
+    // The sliver's accessible name, the only way a screen-reader user gets the pet's
+    // health (the sliver itself is a bar with no visible text), so it has to say WHAT
+    // it is, not just carry the numbers: "{name} 65%" alone named neither the pet nor
+    // the health. {name} is the pet's name, {pct} its health percent. Wordy (M16), so
+    // the five non-Latin fills land in this same change.
+    petHealth: 'Pet {name}, {pct} health',
     showSelf: 'Show Your Frame',
   },
   // Interface panel row: snap both movable unit frames back to their stock
@@ -2821,6 +2907,16 @@ export const hudChromeStrings = {
     guildOpenAccept: 'Open',
     guildOpenNote: 'Paid from your own money, not the guild treasury',
     guildPurseShort: 'Not enough money',
+    // The read-only legend a plain member sees: every guild member can VIEW
+    // the bank (v0.35), only officer-plus can act, and the pane says so up
+    // front instead of leaving dead buttons to be discovered. Always-visible
+    // text, the dormant-note precedent.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    guildReadOnlyNote: 'Only guild officers can make changes to the guild bank.',
+    // The member-facing line of the UNOPENED pane: the officer pane explains
+    // that state through the open-the-bank row, which a read-only viewer does
+    // not get, and a treasury with no grid and no explanation reads as broken.
+    guildUnopenedNote: 'The guild bank has not been opened yet.',
     guildDormantNote: 'Locked items cannot be withdrawn and prevent disbanding the guild.',
     guildDormantHint: 'This item is locked in the guild bank and cannot be withdrawn.',
     guildDormantAria: '{item}, quantity {count}, cannot be withdrawn',
@@ -2834,8 +2930,9 @@ export const hudChromeStrings = {
     // all right now (empty purse on deposit, full treasury, empty treasury).
     guildGoldCannotMove: 'That amount cannot be moved right now.',
     // The Guild pane's Contents / Log sub-strip and the ACTIVITY LOG itself.
-    // The log is the social trust mechanism the officer-only design rests on:
-    // every op already writes an audit row, and this is what lets the guild see
+    // The log is the social trust mechanism the officer-only EDIT design rests
+    // on: every op already writes an audit row, and this is what lets the
+    // whole guild (every member reads it, v0.35) see
     // who moved shared property. Sentences are plain language with the actor
     // spliced as a VALUE (a player-authored character name is never a key), the
     // time rendered by the i18n date formatter, and money by formatMoney.
@@ -2850,9 +2947,14 @@ export const hudChromeStrings = {
     logNote: 'The {count} most recent guild bank actions.',
     logLoading: 'Loading the guild bank log...',
     logEmpty: 'Nothing has been moved in or out of the guild bank yet.',
-    // A refusal is deliberately NOT an empty list: "you may not read this" and
-    // "nobody has done anything" are opposite facts.
-    logRefused: 'Only guild officers can read the guild bank log.',
+    // A refusal is deliberately NOT an empty list: "you cannot read this right
+    // now" and "nobody has done anything" are opposite facts. The log is
+    // readable by EVERY guild member (v0.35: the bank view went guild-wide),
+    // so a refusal means the gate dropped mid-view (walked away, died, lost
+    // the guild), never a rank. A NEW key replacing logRefused, because that
+    // key's shipped locale rows promise the retired officers-only rule.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    logUnavailable: 'The guild bank log cannot be read right now.',
     // The stand-in when a row's character no longer exists.
     logFormerMember: 'A former guild member',
     logDepositItem: '{actor} deposited {count} {item}',

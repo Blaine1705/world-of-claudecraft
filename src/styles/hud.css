@@ -605,21 +605,16 @@
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
-     sits absolutely like the target frame and drops to the target frame's
-     compact bar width, so the two frames read as a pair. Desktop only; the
-     mobile stylesheet owns its own placement (the controller clears the inline
-     position and this class on the mobile layout). */
+     sits absolutely like the target frame while keeping the full player-frame
+     width. Desktop only; the mobile stylesheet owns its own placement (the
+     controller clears the inline position and this class on the mobile layout). */
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: auto;
+    width: 612px;
     margin: 0;
     justify-content: flex-start;
     z-index: 6;
-  }
-  #player-frame.pf-detached .uf-bars {
-    flex: none;
-    width: 190px;
   }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
      left and the pet's health frame on the right. Stacking the two as separate rows
@@ -3736,16 +3731,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;
@@ -6010,6 +6006,57 @@
     background: color-mix(in srgb, var(--color-friendly) 55%, transparent);
     pointer-events: none;
   }
+  /* The pet health sliver on a member's row. NOT class `bar` on purpose: the two
+     rules just below select every non-hp `.bar` child, so a `.bar` here would be
+     hidden by the Show Resource toggle and collapsed onto the resource bar by raid
+     style. Thinner than the member's own bars so it reads as subordinate, and it is
+     its own clickable control (clicking it selects the pet, not the member). */
+  .party-frame .pfm-pet {
+    position: relative;
+    height: 5px;
+    margin-top: 2px;
+    background: #0c0c14;
+    border: 1px solid #000;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: var(--cursor-point);
+  }
+  .party-frame .pfm-pet-fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: linear-gradient(180deg, #6fbf5a, #3f8a33);
+  }
+  /* A dead pet is ALWAYS hp 0, so its fill is scaleX(0) and has no pixels: styling
+     the fill here rendered nothing and left a dead pet identical to an empty track.
+     The dead state goes on the TRACK, which is the part that still has area, so a
+     hunter can tell "dead, revive it" from "alive and nearly dead" at a glance. */
+  .party-frame .pfm-pet.dead {
+    background: repeating-linear-gradient(135deg, #3a3a3a, #3a3a3a 2px, #262626 2px, #262626 4px);
+    border-color: #555;
+  }
+  .party-frame .pfm-pet:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  /* Raid style compacts the row to a fixed height with overflow hidden, so the
+     sliver rides as a second thin strip directly above the resource strip rather
+     than in flow, where it would be clipped. */
+  #party-frames.party-style-raid .party-frame .pfm-pet {
+    position: absolute;
+    /* 2px is far below any usable hit target, and a stray click here would
+       stopPropagation away the member selection a healer actually meant. Raid style
+       makes the sliver purely informational; the row keeps the whole click area.
+       Keyboard focus is unaffected, so the pet stays reachable without a mouse. */
+    pointer-events: none;
+    left: 0;
+    right: 0;
+    bottom: 3px;
+    height: 2px;
+    margin: 0;
+    z-index: 4;
+    border: 0;
+    border-radius: 0;
+  }
   .party-frame.pf-hide-resource > .bar:not(.hp),
   .party-frame.pf-hide-auras .pfm-auras {
     display: none;
@@ -7634,4 +7681,60 @@ body.reduce-motion #proc-overlay.frost .frost-crystal,
 body.reduce-motion #proc-overlay.frost .frost-bird::before,
 body.reduce-motion #proc-overlay.frost .frost-bird::after {
   animation: none !important;
+}
+
+/* WoW-style breath mirror bar (src/ui/breath_bar.ts): top-center, blue,
+   only present while the lungful is spent or refilling. */
+.breath-bar {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 16px;
+  background: rgba(8, 14, 24, 0.72);
+  border: 1px solid rgba(150, 190, 230, 0.55);
+  border-radius: 4px;
+  overflow: hidden;
+  display: none;
+  pointer-events: none;
+  z-index: 30;
+}
+.breath-bar.breath-bar-show {
+  display: block;
+}
+.breath-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
+  transition: width 0.12s linear;
+}
+.breath-bar.breath-bar-drowning .breath-bar-fill {
+  background: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
+}
+.breath-bar.breath-bar-drowning {
+  animation: breath-drown-pulse 1s ease-in-out infinite;
+}
+@keyframes breath-drown-pulse {
+  0%,
+  100% {
+    border-color: rgba(255, 120, 100, 0.9);
+  }
+  50% {
+    border-color: rgba(255, 60, 40, 0.4);
+  }
+}
+.breath-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #eaf4ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+body.reduce-motion .breath-bar.breath-bar-drowning {
+  animation: none;
 }

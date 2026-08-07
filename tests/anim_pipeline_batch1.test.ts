@@ -46,14 +46,14 @@ describe('mage ability-specific spellcasts (issue #2889 batch 1)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_mage: {', 'player_warlock: {');
+    const block = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
     expect(block).toContain('mage_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of MAGE_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real mage ability, and every referenced clip is shipped', () => {
-    const mageBlock = manifestBlock('player_mage: {', 'player_warlock: {');
+    const mageBlock = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
     const abilityStart = mageBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = mageBlock.indexOf('\n      },', abilityStart);
@@ -99,10 +99,13 @@ describe('elemental family bespoke attack (issue #2889 batch 1)', () => {
     const floatingConstBlock = manifestBlock('const FLOATING: ClipMap = {', '};');
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
-    // Every other VisualDef still pointing at the shared constant is untouched:
-    // exactly 8 remaining direct `clips: FLOATING,` usages (9 originally, minus
-    // the one migrated to ELEMENTAL_FLOATING above).
+    // Every other VisualDef still pointing at the shared constant is untouched
+    // by THIS migration. The exact count also reflects any other family this
+    // same batched initiative (issue #2889) has since migrated off FLOATING
+    // in this branch (see tests/anim_pipeline_warlock_nightkin.test.ts for
+    // the nightkin migration), so this pin tracks this branch's own state,
+    // not a repo-wide invariant other batches must hold to.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(8);
+    expect(remaining).toBe(7);
   });
 });

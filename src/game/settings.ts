@@ -17,9 +17,11 @@ export const SETTING_RANGES = {
   // localStorage during startup because tier choice controls preload. def is MEDIUM (a safe
   // middle, also the Reset target): on a player's FIRST run main.ts probes the device and
   // PERSISTS a device-appropriate preset over this default when the GPU is recognized
-  // (resolveDefaultGraphicsPreset in gfx.ts), so a weak phone is not stuck on a tier it cannot
-  // run and a strong desktop is not capped below what it can drive. A masked/inconclusive device
-  // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
+  // (resolveDefaultGraphicsPreset in gfx.ts), so a phone is not stuck on a tier it cannot enter
+  // the world at and a strong desktop is not capped below what it can drive. EVERY touch device
+  // resolves to LOW there, so a phone is persisted at 1 on its first boot and never re-detected.
+  // A masked/inconclusive DESKTOP stays on this medium default and keeps re-detecting on later
+  // boots (see graphicsDefaultApplied).
   // An explicit player choice (stored here) is never overridden.
   // max 6: 1 low .. 4 ultra, 5 advanced, 6 insane (the everything-on showcase;
   // manual opt-in only, hardware detection never selects it).
@@ -44,6 +46,19 @@ export const SETTING_RANGES = {
   // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
   // Insane), new in round 10: the town-street frame-cost dial.
   surfaceDetail: { min: 0, max: 2, def: 1 },
+  // Round-12 per-effect dials (Advanced-preset sub-settings like the block
+  // above; the options panel shows them for every preset and switches to
+  // Advanced when one is edited). The binaries read 0 Off / 1 On;
+  // ambientOcclusion adds the 0.5 half-resolution middle; the two ladders
+  // reuse the 0/0.5/1/2 level scale mapped onto whole render tiers.
+  antiAliasing: { min: 0, max: 1, def: 1 },
+  bloomQuality: { min: 0, max: 1, def: 1 },
+  ambientOcclusion: { min: 0, max: 1, def: 1 },
+  viewDistance: { min: 0, max: 2, def: 1 },
+  waterQuality: { min: 0, max: 2, def: 1 },
+  characterDetail: { min: 0, max: 1, def: 1 },
+  dynamicLights: { min: 0, max: 1, def: 1 },
+  particleEffects: { min: 0, max: 1, def: 1 },
   // vertical camera field of view in degrees. def 60 keeps the shipped look;
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
@@ -231,6 +246,11 @@ export const BOOL_SETTINGS = {
   partyFrameShowResource: { def: true },
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
+  // on by default: a thin pet health sliver on the row of any party member who has a
+  // pet out (hunter / warlock / mage). The pet is read from the client's own entity
+  // roster, so it appears only for pets in interest range, which is far wider than
+  // any ability's reach. Clicking the sliver selects that pet.
+  partyFrameShowPets: { def: true },
   partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
@@ -334,6 +354,14 @@ export const BOOL_SETTINGS = {
   // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
   // and consumables); the slots stay in place and keybind-reachable either way.
   hideUnusedActionSlots: { def: false },
+  // OFF by default: the interactive water wake/ripple height-field
+  // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
+  // Purely decorative — bubbles, splash particles and the scrolling water
+  // normal maps are all independent of it — and measured-cheap (2 passes over
+  // a <=128x128 field), but it is the one water effect that runs extra GPU
+  // passes per frame, so the player who wants the quietest water gets it as
+  // an opt-in rather than an opt-out.
+  waterRipples: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

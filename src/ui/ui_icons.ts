@@ -79,7 +79,9 @@ export type UiIconName =
   | 'makers-mark'
   | 'enchant-rune'
   | 'bond-link'
-  | 'download';
+  | 'download'
+  | 'eye'
+  | 'eye-off';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -180,6 +182,12 @@ const ICONS: Record<UiIconName, string> = {
   // matching the jump glyph weight
   download:
     '<path d="M236 72h40v196h84L256 372 156 268h80z"/><rect x="116" y="408" width="280" height="40" rx="14"/>',
+  // hand-authored eye (the paperdoll helmet-visibility toggle): almond outline
+  // cut open around a solid pupil (evenodd ring, like the vibrate case)
+  eye: '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/>',
+  // the eye behind a diagonal slash bar (helm hidden state)
+  'eye-off':
+    '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/><path d="M106 42 470 406l-40 40L66 82z" stroke="rgba(40,26,20,0.85)" stroke-width="26"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',

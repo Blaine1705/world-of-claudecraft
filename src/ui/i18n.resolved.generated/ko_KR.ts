@@ -775,6 +775,10 @@ export const ko_KR: EnTranslations = {
       "ready": "공격",
       "seconds": "{seconds}초"
     },
+    "breath": {
+      "label": "숨",
+      "drowning": "익사 중!"
+    },
     "rest": {
       "resting": "휴식 중"
     },
@@ -955,6 +959,7 @@ export const ko_KR: EnTranslations = {
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
+      "dive": "아래로 수영",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -1035,8 +1040,8 @@ export const ko_KR: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1대1",
+      "bracket2v2": "2대2"
     },
     "bg": {
       "title": "쏜할로우 평원",
@@ -1278,6 +1283,24 @@ export const ko_KR: EnTranslations = {
       "graphicsFatal": "그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.",
       "graphicsReload": "게임 다시 불러오기",
       "graphicsDraftChanged": "그래픽 변경 사항을 적용할 수 있습니다.",
+      "gfxSectionQuality": "품질",
+      "gfxSectionWorld": "세계 디테일",
+      "gfxSectionLighting": "조명 및 효과",
+      "gfxSectionCamera": "카메라",
+      "gfxSectionDisplay": "디스플레이",
+      "gfxSectionSystem": "시스템",
+      "gfxSectionTouch": "터치 조작",
+      "gfxViewDistance": "시야 거리",
+      "gfxWaterQuality": "수면 품질",
+      "gfxCharacterDetail": "캐릭터 디테일",
+      "gfxAmbientOcclusion": "주변광 차폐",
+      "gfxBloom": "블룸",
+      "gfxAntiAliasing": "안티앨리어싱",
+      "gfxDynamicLights": "동적 광원",
+      "gfxParticleEffects": "입자 효과",
+      "gfxHalf": "절반",
+      "gfxCustomNote": "다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. \"높음\" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.",
+      "gfxEffectsNote": "주변광 차폐, 블룸, 안티앨리어싱은 후처리 체인에 의존합니다. 효과 및 조명이 낮음이면 체인이 꺼져 이 옵션들은 효과가 없습니다.",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",
@@ -1313,6 +1336,7 @@ export const ko_KR: EnTranslations = {
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
       "showPetFrame": "내 펫 표시",
+      "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -1349,8 +1373,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "확대",
+      "zoomOut": "축소",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -1509,6 +1533,16 @@ export const ko_KR: EnTranslations = {
         "firstWin": "첫 승리"
       }
     },
+    "warfareShop": {
+      "gossipOption": "워페어 세트 둘러보기",
+      "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
+      "jewelry": "장신구",
+      "weapons": "무기",
+      "owned": "보유 중",
+      "buyAria": "{honor}에 {item} 구매",
+      "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
+      "buyConfirmBody": "{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다."
+    },
     "charSheet": {
       "offense": "공격",
       "defense": "방어"
@@ -1666,7 +1700,9 @@ export const ko_KR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
-      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제"
+      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",
+      "hideHelmAria": "투구 숨기기",
+      "showHelmAria": "투구 표시"
     },
     "account": {
       "title": "계정",
@@ -1805,7 +1841,13 @@ export const ko_KR: EnTranslations = {
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
       "increaseAria": "{component}에 대한 집중 증가",
-      "decreaseAria": "{component}에 대한 집중 감소"
+      "decreaseAria": "{component}에 대한 집중 감소",
+      "respecTierLabel": "재배분 속도",
+      "respecTierTimeOption": "무료 (시간이 걸림)",
+      "respecTierPartialOption": "빠름 (소량 비용)",
+      "respecTierInstantOption": "즉시 (전액 비용)",
+      "respecCostFree": "무료",
+      "respecCostLine": "{coin} 및 {materials} 소모"
     },
     "party": {
       "promoteLeader": "파티장으로 지정",
@@ -2053,7 +2095,7 @@ export const ko_KR: EnTranslations = {
       "hostile": "적대",
       "friendly": "아군",
       "elite": "정예",
-      "boss": "Boss"
+      "boss": "우두머리"
     },
     "targetFrame": {
       "unlock": "대상 프레임 이동",
@@ -2088,6 +2130,8 @@ export const ko_KR: EnTranslations = {
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
+      "showPets": "펫 표시",
+      "petHealth": "펫 {name}, 체력 {pct}",
       "showSelf": "내 프레임 표시"
     },
     "frameReset": {
@@ -2104,7 +2148,7 @@ export const ko_KR: EnTranslations = {
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "{crafts}에 사용됩니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2433,6 +2477,8 @@ export const ko_KR: EnTranslations = {
       "guildOpenAccept": "개설",
       "guildOpenNote": "길드 금고가 아닌 본인의 소지금에서 지불됩니다",
       "guildPurseShort": "소지금 부족",
+      "guildReadOnlyNote": "길드 장교만 길드 은행을 변경할 수 있습니다.",
+      "guildUnopenedNote": "길드 은행이 아직 개설되지 않았습니다.",
       "guildDormantNote": "잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.",
       "guildDormantHint": "이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.",
       "guildDormantAria": "{item}, 수량 {count}, 꺼낼 수 없음",
@@ -2447,7 +2493,7 @@ export const ko_KR: EnTranslations = {
       "logNote": "최근 길드 은행 활동 {count}건입니다.",
       "logLoading": "길드 은행 기록을 불러오는 중...",
       "logEmpty": "아직 길드 은행에 넣거나 뺀 것이 없습니다.",
-      "logRefused": "길드 장교만 길드 은행 기록을 볼 수 있습니다.",
+      "logUnavailable": "지금은 길드 은행 기록을 볼 수 없습니다.",
       "logFormerMember": "탈퇴한 길드원",
       "logDepositItem": "{actor}님이 {item} {count}개를 넣었습니다",
       "logWithdrawItem": "{actor}님이 {item} {count}개를 꺼냈습니다",
@@ -2793,7 +2839,7 @@ export const ko_KR: EnTranslations = {
       "qtyValueAria": "제작 수량, {count}",
       "batchRemaining": "남은 수 {remaining}/{total}",
       "batchRemainingAria": "{total}개 중 {remaining}개 남음",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}초",
       "durationAria": "시전 시간: {seconds}초",
       "progressAria": "제작 진행",
       "announceStart": "{name} 제작 중",
@@ -4100,7 +4146,7 @@ export const ko_KR: EnTranslations = {
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
-      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드의 줄가르와 맞서라.",
+      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -5374,6 +5420,199 @@ export const ko_KR: EnTranslations = {
     "realm": "월드",
     "newCharacter": "새 캐릭터",
     "appearance": "외형",
+    "customize": "커스터마이즈",
+    "body": "체형",
+    "genderMale": "남성",
+    "genderFemale": "여성",
+    "hair": "헤어",
+    "brows": "눈썹",
+    "skinTone": "피부색",
+    "hairColor": "머리 색",
+    "lightness": "밝기",
+    "colorWheelAria": "{label} 색상환: 드래그하여 색조와 채도를 선택하세요",
+    "lightnessAria": "{label} 밝기",
+    "customColor": "사용자 지정",
+    "colorPresetAria": "{label} 프리셋 {n}",
+    "beard": "수염",
+    "face": "얼굴",
+    "faceNose": "코",
+    "faceEyes": "눈 크기",
+    "faceJaw": "턱",
+    "faceBrow": "눈썹",
+    "faceCheeks": "볼",
+    "faceChin": "턱끝",
+    "bodyShoulders": "어깨",
+    "bodyChest": "가슴",
+    "bodyHips": "엉덩이",
+    "bodyHands": "손 크기",
+    "bodyElbows": "팔꿈치",
+    "bodyKnees": "무릎",
+    "bodyFeet": "발",
+    "mouth": "입",
+    "mouthNeutral": "기본",
+    "mouthLips": "도톰한 입술",
+    "mouthSmile": "미소",
+    "mouthFrown": "찡그림",
+    "mouthWide": "넓게",
+    "mouthPout": "삐죽",
+    "mouthGrin": "활짝 웃음",
+    "mouthOpen": "벌림",
+    "mouthAwe": "놀람",
+    "faceEars": "귀",
+    "faceSmirk": "비웃음",
+    "eyeShape": "눈 모양",
+    "eyeColor": "눈 색깔",
+    "earShape": "귀 모양",
+    "lashes": "속눈썹",
+    "lashesOn": "켜기",
+    "lashesOff": "끄기",
+    "lashColor": "속눈썹 색",
+    "outfit": "의상 색상",
+    "outfitClassic": "클래식",
+    "outfitCrimson": "진홍색",
+    "outfitEmber": "잉걸불",
+    "outfitGold": "금색",
+    "outfitForest": "숲색",
+    "outfitEmerald": "에메랄드",
+    "outfitTeal": "청록색",
+    "outfitAzure": "하늘색",
+    "outfitRoyal": "로열 블루",
+    "outfitViolet": "보라색",
+    "outfitMagenta": "마젠타",
+    "outfitRose": "장미색",
+    "outfitOnyx": "오닉스",
+    "outfitIvory": "아이보리",
+    "outfitGilded": "금장",
+    "outfitBonewrought": "뼈세공",
+    "outfitObsidian": "흑요석",
+    "outfitVerdigris": "녹청",
+    "outfitBloodforged": "피의 단조",
+    "lipstick": "립스틱",
+    "blush": "블러셔",
+    "eyeshadow": "아이섀도",
+    "makeupNone": "없음",
+    "shadeRose": "로즈",
+    "shadeCoral": "코랄",
+    "shadeRuby": "루비",
+    "shadeBerry": "베리",
+    "shadePlum": "플럼",
+    "shadeNude": "누드",
+    "shadePeach": "피치",
+    "shadeWarm": "웜",
+    "shadeMauve": "모브",
+    "shadeSmoke": "스모크",
+    "shadeBronze": "브론즈",
+    "shadeTeal": "틸",
+    "randomize": "외모 무작위 설정",
+    "randomizeShort": "무작위",
+    "helmPreview": "투구 표시",
+    "style": "스타일",
+    "resetLook": "외형 초기화",
+    "resetShort": "초기화",
+    "browFlat": "일자",
+    "browArched": "아치",
+    "browThin": "얇게",
+    "browBushy": "짙게",
+    "browWorried": "팔자",
+    "browSharp": "날카롭게",
+    "browRound": "둥글게",
+    "eyeRound": "둥근눈",
+    "eyeAlmond": "아몬드",
+    "eyeNarrow": "가는눈",
+    "eyeWide": "큰눈",
+    "eyeSharp": "매서운눈",
+    "eyeDroopy": "처진눈",
+    "eyeSleepy": "졸린눈",
+    "eyeWideset": "넓은간격",
+    "eyeCat": "고양이눈",
+    "eyeDoe": "사슴눈",
+    "earRound": "둥근귀",
+    "earPointed": "뾰족귀",
+    "earSmall": "작은귀",
+    "earWide": "넓은귀",
+    "hairBald": "민머리",
+    "hairBuzz": "스포츠컷",
+    "hairCrew": "크루컷",
+    "hairCrewcut": "텍스처 크루컷",
+    "hairPixie": "픽시 컷",
+    "hairSweptpixie": "스웹트 픽시",
+    "hairQuiff": "올려 빗은 퀴프",
+    "hairSidepart": "클래식 가르마",
+    "hairMessy": "헝클어진 뾰족머리",
+    "hairCurlycap": "짧은 곱슬",
+    "hairPompadour": "퐁파두르",
+    "hairSweptback": "미디엄 스웹트백",
+    "hairFauxhawk": "페이크 모히칸",
+    "hairMohawk": "모히칸",
+    "hairTopknot": "상투",
+    "hairWarriorbraid": "전사의 땋은 머리",
+    "hairHighbun": "높은 올림머리",
+    "hairLowbun": "낮은 올림머리",
+    "hairBraidcrown": "땋은 크라운",
+    "hairAfro": "아프로",
+    "hairCurlyafro": "곱슬 아프로",
+    "hairChinbob": "턱선 단발",
+    "hairBluntbangs": "일자 앞머리 단발",
+    "hairWavybob": "웨이브 단발",
+    "hairAsymbob": "비대칭 단발",
+    "hairCurtains": "커튼 가르마",
+    "hairHighpony": "높은 포니테일",
+    "hairSidepony": "옆 포니테일",
+    "hairHalfbun": "반묶음 머리",
+    "hairLayered": "어깨 길이 레이어드",
+    "hairCurls": "느슨한 컬",
+    "hairLongwavy": "긴 웨이브",
+    "hairLongcenterpart": "긴 가운데 가르마",
+    "hairLongpart": "긴 생머리 가운데 가르마",
+    "hairMullet": "청키 멀릿",
+    "hairTwinbraids": "양갈래 땋은 머리",
+    "hairLowpony": "낮은 포니테일",
+    "hairFantasybraid": "판타지 땋은 머리",
+    "beardNone": "없음",
+    "beardStubble": "수염 자국",
+    "beardScruff": "짧은 수염",
+    "beardMutton": "머튼찹",
+    "beardGoatee": "염소수염",
+    "beardChinpuff": "턱수염 뭉치",
+    "beardStache": "콧수염",
+    "beardHorseshoe": "호스슈",
+    "beardShortbox": "박스드",
+    "beardFull": "풀 비어드",
+    "beardVikingb": "땋은 수염",
+    "beardWizard": "마법사 수염",
+    "beardStubbleBeard": "짙은 수염",
+    "browNone": "없음",
+    "browSoft": "부드럽게",
+    "browThick": "짙게",
+    "browAngled": "치켜올림",
+    "earrings": "귀걸이",
+    "jewelMaterial": "장신구 재질",
+    "jewelDefault": "원본 그대로",
+    "jewelGold": "황금",
+    "jewelSilver": "은",
+    "jewelBone": "뼈",
+    "jewelIron": "철",
+    "jewelCopper": "구리",
+    "jewelBronze": "청동",
+    "jewelObsidian": "흑요석",
+    "jewelJade": "비취",
+    "jewelAmethyst": "자수정",
+    "jewelRuby": "루비",
+    "jewelPearl": "진주",
+    "jewelTurquoise": "터키석",
+    "earNone": "없음",
+    "earStud": "스터드",
+    "earHoop": "링",
+    "earBone": "뼈 장식",
+    "earBonehoop": "뼈 링",
+    "earMoon": "초승달",
+    "earMoonstar": "달빛 별",
+    "earRunic": "룬 스톤",
+    "earChain": "구슬 드롭",
+    "earSeptum": "코걸이",
+    "earWarden": "파수꾼의 강철",
+    "earCuff": "이어커프",
+    "earFeather": "깃털",
     "class": "직업",
     "name": "이름",
     "chromaOption": "색상 {n}",
@@ -7386,11 +7625,14 @@ export const ko_KR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
+      "useElixir": "사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
+      "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
       "questItem": "퀘스트 아이템",
       "questRelated": "퀘스트: {quest}",
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
       "questOrphaned": "진행 중인 퀘스트에 필요하지 않습니다.",
       "classes": "직업: {classes}",
+      "maxStack": "최대 중첩: {count}",
       "sellPrice": "판매 가격: {money}",
       "clickBuy": "클릭하여 구매",
       "clickSell": "클릭하여 판매",
@@ -7541,6 +7783,8 @@ export const ko_KR: EnTranslations = {
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
       "collectNote": "상인이 보관 중인 수익과 반환된 상품입니다.",
       "saleProceeds": "판매 대금",
+      "saleBuyer": "{buyer}에게 판매",
+      "saleOlder": "이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.",
       "collectAll": "모두 수령"
     },
     "logs": {
@@ -9555,6 +9799,27 @@ export const ko_KR: EnTranslations = {
       "cinderweave_slippers": {
         "name": "불씨매듭 덧신"
       },
+      "thornhide_headdress": {
+        "name": "가시가죽 두건"
+      },
+      "thornhide_mantle": {
+        "name": "가시가죽 어깨망토"
+      },
+      "thornhide_vestment": {
+        "name": "가시가죽 예복"
+      },
+      "thornhide_cinch": {
+        "name": "가시가죽 허리띠"
+      },
+      "thornhide_leggings": {
+        "name": "가시가죽 다리보호대"
+      },
+      "thornhide_gloves": {
+        "name": "가시가죽 장갑"
+      },
+      "thornhide_boots": {
+        "name": "가시가죽 발덮개"
+      },
       "final_oath_medallion": {
         "name": "최후의 맹세 메달"
       },
@@ -10319,6 +10584,15 @@ export const ko_KR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "흉포송곳니 화살통"
+      },
+      "sharp_claw": {
+        "name": "날카로운 발톱"
+      },
+      "curved_tusk": {
+        "name": "휘어진 엄니"
+      },
+      "pristine_claw": {
+        "name": "온전한 발톱"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -11892,6 +12166,11 @@ export const ko_KR: EnTranslations = {
         "name": "퓨리",
         "title": "명예 병참장교",
         "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
+      "warmarshal_draven_kole": {
+        "name": "전쟁원수 드레이븐 콜",
+        "title": "워페어 보급창 관리관",
+        "greeting": "내가 받는 화폐는 명예뿐이며, 워페어 보급창은 내가 지킨다. 전장에서 계급을 얻어라. 다음 전투를 위해 갑주를 갖춰 주겠다."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",
@@ -15024,6 +15303,36 @@ export const ko_KR: EnTranslations = {
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "warfare_ashstalker": {
+        "name": "잿빛추적자의 장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"잿빛 질주\"가 발동하여 6초 동안 이동 속도가 40% 증가합니다."
+      },
+      "warfare_cinderweave": {
+        "name": "잿불직물 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_furyforged": {
+        "name": "분노벼림 전투장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"꺾이지 않는 맹세\"가 발동하여 10초 동안 200의 피해를 흡수합니다."
+      },
+      "warfare_stormbound": {
+        "name": "폭풍결속 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_thornhide": {
+        "name": "가시가죽 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"가시 방호\"가 발동하여 6초 동안 회피 확률이 15% 증가합니다."
       },
       "wyrmshadow": {
         "name": "밤송곳니 의복",

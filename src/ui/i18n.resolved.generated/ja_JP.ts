@@ -775,6 +775,10 @@ export const ja_JP: EnTranslations = {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "息",
+      "drowning": "溺れています！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -955,6 +959,7 @@ export const ja_JP: EnTranslations = {
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
+      "dive": "潜水",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -1035,8 +1040,8 @@ export const ja_JP: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1対1",
+      "bracket2v2": "2対2"
     },
     "bg": {
       "title": "ソーンホロウ平原",
@@ -1278,6 +1283,24 @@ export const ja_JP: EnTranslations = {
       "graphicsFatal": "グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。",
       "graphicsReload": "ゲームを再読み込み",
       "graphicsDraftChanged": "グラフィックの変更を適用できます。",
+      "gfxSectionQuality": "画質",
+      "gfxSectionWorld": "ワールド詳細",
+      "gfxSectionLighting": "ライティングとエフェクト",
+      "gfxSectionCamera": "カメラ",
+      "gfxSectionDisplay": "表示",
+      "gfxSectionSystem": "システム",
+      "gfxSectionTouch": "タッチ操作",
+      "gfxViewDistance": "描画距離",
+      "gfxWaterQuality": "水面品質",
+      "gfxCharacterDetail": "キャラクター詳細",
+      "gfxAmbientOcclusion": "アンビエントオクルージョン",
+      "gfxBloom": "ブルーム",
+      "gfxAntiAliasing": "アンチエイリアス",
+      "gfxDynamicLights": "動的ライト",
+      "gfxParticleEffects": "パーティクル効果",
+      "gfxHalf": "半分",
+      "gfxCustomNote": "ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。",
+      "gfxEffectsNote": "アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。",
       "interfaceMode": "操作モード",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "デスクトップ",
@@ -1313,6 +1336,7 @@ export const ja_JP: EnTranslations = {
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showPetFrame": "自分のペットを表示",
+      "waterRipples": "水面の波紋（航跡）",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
@@ -1349,8 +1373,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1509,6 +1533,16 @@ export const ja_JP: EnTranslations = {
         "firstWin": "初勝利"
       }
     },
+    "warfareShop": {
+      "gossipOption": "ウォーフェアセットを見る",
+      "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
+      "jewelry": "アクセサリー",
+      "weapons": "武器",
+      "owned": "所有済み",
+      "buyAria": "{item}を{honor}で購入",
+      "buyOwnedAria": "{item}を{honor}で購入、所有済み",
+      "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"
+    },
     "charSheet": {
       "offense": "攻撃",
       "defense": "防御"
@@ -1666,7 +1700,9 @@ export const ja_JP: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
-      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
+      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
+      "hideHelmAria": "兜を隠す",
+      "showHelmAria": "兜を表示"
     },
     "account": {
       "title": "アカウント",
@@ -1805,7 +1841,13 @@ export const ja_JP: EnTranslations = {
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
       "increaseAria": "{component}へのフォーカスを増やす",
-      "decreaseAria": "{component}へのフォーカスを減らす"
+      "decreaseAria": "{component}へのフォーカスを減らす",
+      "respecTierLabel": "再割り振りの速さ",
+      "respecTierTimeOption": "無料（時間をかける）",
+      "respecTierPartialOption": "速い（少額の費用）",
+      "respecTierInstantOption": "即時（全額費用）",
+      "respecCostFree": "無料",
+      "respecCostLine": "{coin}と{materials}がかかります"
     },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
@@ -2053,7 +2095,7 @@ export const ja_JP: EnTranslations = {
       "hostile": "敵対",
       "friendly": "味方",
       "elite": "エリート",
-      "boss": "Boss"
+      "boss": "ボス"
     },
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",
@@ -2088,6 +2130,8 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
+      "showPets": "ペットを表示",
+      "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
@@ -2104,7 +2148,7 @@ export const ja_JP: EnTranslations = {
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
       "cookingCatch": "料理材料。食べる前に調理が必要です。",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "{crafts}で使用されます。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -2433,6 +2477,8 @@ export const ja_JP: EnTranslations = {
       "guildOpenAccept": "開設",
       "guildOpenNote": "ギルド金庫ではなく、あなた自身の所持金から支払われます",
       "guildPurseShort": "所持金不足",
+      "guildReadOnlyNote": "ギルド銀行を変更できるのはギルド役員のみです。",
+      "guildUnopenedNote": "ギルド銀行はまだ開設されていません。",
       "guildDormantNote": "ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。",
       "guildDormantHint": "このアイテムはギルド銀行にロックされており、引き出せません。",
       "guildDormantAria": "{item}、数量 {count}、引き出し不可",
@@ -2447,7 +2493,7 @@ export const ja_JP: EnTranslations = {
       "logNote": "直近{count}件のギルド銀行の操作です。",
       "logLoading": "ギルド銀行のログを読み込んでいます...",
       "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
-      "logRefused": "ギルド銀行のログを閲覧できるのはギルド役員のみです。",
+      "logUnavailable": "現在、ギルド銀行のログを閲覧できません。",
       "logFormerMember": "元ギルドメンバー",
       "logDepositItem": "{actor} が {item} を {count} 個預けました",
       "logWithdrawItem": "{actor} が {item} を {count} 個引き出しました",
@@ -2793,7 +2839,7 @@ export const ja_JP: EnTranslations = {
       "qtyValueAria": "作成数、{count}",
       "batchRemaining": "残り {remaining}/{total}",
       "batchRemainingAria": "残り {remaining} 個、合計 {total} 個",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}秒",
       "durationAria": "詠唱時間: {seconds} 秒",
       "progressAria": "製作の進行",
       "announceStart": "{name} を製作中",
@@ -4100,7 +4146,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。",
+      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -5374,6 +5420,199 @@ export const ja_JP: EnTranslations = {
     "realm": "ワールド",
     "newCharacter": "新規キャラクター",
     "appearance": "外見",
+    "customize": "カスタマイズ",
+    "body": "体型",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "hair": "髪型",
+    "brows": "眉",
+    "skinTone": "肌の色",
+    "hairColor": "髪の色",
+    "lightness": "明るさ",
+    "colorWheelAria": "{label}のカラーホイール：ドラッグして色相と彩度を選択",
+    "lightnessAria": "{label}の明るさ",
+    "customColor": "カスタム",
+    "colorPresetAria": "{label}のプリセット {n}",
+    "beard": "ひげ",
+    "face": "顔",
+    "faceNose": "鼻",
+    "faceEyes": "目の大きさ",
+    "faceJaw": "あご",
+    "faceBrow": "まゆ",
+    "faceCheeks": "ほお",
+    "faceChin": "あご先",
+    "bodyShoulders": "肩",
+    "bodyChest": "胸",
+    "bodyHips": "腰まわり",
+    "bodyHands": "手の大きさ",
+    "bodyElbows": "ひじ",
+    "bodyKnees": "ひざ",
+    "bodyFeet": "足",
+    "mouth": "口",
+    "mouthNeutral": "ふつう",
+    "mouthLips": "厚い唇",
+    "mouthSmile": "笑顔",
+    "mouthFrown": "しかめ面",
+    "mouthWide": "大きめ",
+    "mouthPout": "とがり口",
+    "mouthGrin": "歯見せ笑い",
+    "mouthOpen": "開き",
+    "mouthAwe": "驚き",
+    "faceEars": "耳",
+    "faceSmirk": "にやり",
+    "eyeShape": "目の形",
+    "eyeColor": "目の色",
+    "earShape": "耳の形",
+    "lashes": "まつげ",
+    "lashesOn": "あり",
+    "lashesOff": "なし",
+    "lashColor": "まつげの色",
+    "outfit": "衣装カラー",
+    "outfitClassic": "クラシック",
+    "outfitCrimson": "クリムゾン",
+    "outfitEmber": "エンバー",
+    "outfitGold": "ゴールド",
+    "outfitForest": "フォレスト",
+    "outfitEmerald": "エメラルド",
+    "outfitTeal": "ティール",
+    "outfitAzure": "アジュール",
+    "outfitRoyal": "ロイヤルブルー",
+    "outfitViolet": "バイオレット",
+    "outfitMagenta": "マゼンタ",
+    "outfitRose": "ローズ",
+    "outfitOnyx": "オニキス",
+    "outfitIvory": "アイボリー",
+    "outfitGilded": "黄金装飾",
+    "outfitBonewrought": "骨細工",
+    "outfitObsidian": "黒曜石",
+    "outfitVerdigris": "緑青",
+    "outfitBloodforged": "血鍛造",
+    "lipstick": "口紅",
+    "blush": "チーク",
+    "eyeshadow": "アイシャドウ",
+    "makeupNone": "なし",
+    "shadeRose": "ローズ",
+    "shadeCoral": "コーラル",
+    "shadeRuby": "ルビー",
+    "shadeBerry": "ベリー",
+    "shadePlum": "プラム",
+    "shadeNude": "ヌード",
+    "shadePeach": "ピーチ",
+    "shadeWarm": "ウォーム",
+    "shadeMauve": "モーヴ",
+    "shadeSmoke": "スモーク",
+    "shadeBronze": "ブロンズ",
+    "shadeTeal": "ティール",
+    "randomize": "ランダムな外見",
+    "randomizeShort": "ランダム",
+    "helmPreview": "ヘルムを表示",
+    "style": "スタイル",
+    "resetLook": "外見をリセット",
+    "resetShort": "リセット",
+    "browFlat": "平ら",
+    "browArched": "アーチ",
+    "browThin": "細め",
+    "browBushy": "太め",
+    "browWorried": "困り眉",
+    "browSharp": "鋭角",
+    "browRound": "丸み",
+    "eyeRound": "丸目",
+    "eyeAlmond": "アーモンド",
+    "eyeNarrow": "切れ長",
+    "eyeWide": "ぱっちり",
+    "eyeSharp": "鋭角",
+    "eyeDroopy": "たれ目",
+    "eyeSleepy": "ねむ目",
+    "eyeWideset": "離れ目",
+    "eyeCat": "ネコ目",
+    "eyeDoe": "タレ目がち",
+    "earRound": "丸耳",
+    "earPointed": "とがり耳",
+    "earSmall": "小さめ",
+    "earWide": "大きめ",
+    "hairBald": "坊主",
+    "hairBuzz": "丸刈り",
+    "hairCrew": "ショート",
+    "hairCrewcut": "クルーカット",
+    "hairPixie": "ピクシーカット",
+    "hairSweptpixie": "流しピクシー",
+    "hairQuiff": "クイッフ",
+    "hairSidepart": "サイドパート",
+    "hairMessy": "無造作ツンツン",
+    "hairCurlycap": "ショートカール",
+    "hairPompadour": "リーゼント",
+    "hairSweptback": "ミディアム流し",
+    "hairFauxhawk": "ソフトモヒカン",
+    "hairMohawk": "モヒカン",
+    "hairTopknot": "お団子",
+    "hairWarriorbraid": "戦士の編み込み",
+    "hairHighbun": "高めのお団子",
+    "hairLowbun": "低めのお団子",
+    "hairBraidcrown": "編み込みクラウン",
+    "hairAfro": "アフロ",
+    "hairCurlyafro": "カーリーアフロ",
+    "hairChinbob": "あご丈ボブ",
+    "hairBluntbangs": "ぱっつん前髪ボブ",
+    "hairWavybob": "ウェーブボブ",
+    "hairAsymbob": "アシンメトリーボブ",
+    "hairCurtains": "カーテンヘア",
+    "hairHighpony": "ハイポニーテール",
+    "hairSidepony": "サイドポニーテール",
+    "hairHalfbun": "ハーフお団子",
+    "hairLayered": "肩までのレイヤー",
+    "hairCurls": "ゆるふわカール",
+    "hairLongwavy": "ロングウェーブ",
+    "hairLongcenterpart": "ロングセンターパート",
+    "hairLongpart": "ロングセンターパート",
+    "hairMullet": "ウルフカット",
+    "hairTwinbraids": "ツイン三つ編み",
+    "hairLowpony": "ローポニーテール",
+    "hairFantasybraid": "ファンタジー三つ編み",
+    "beardNone": "なし",
+    "beardStubble": "無精ひげ",
+    "beardScruff": "薄ひげ",
+    "beardMutton": "ほおひげ",
+    "beardGoatee": "ヤギひげ",
+    "beardChinpuff": "あご下ひげ",
+    "beardStache": "口ひげ",
+    "beardHorseshoe": "馬蹄ひげ",
+    "beardShortbox": "ボックス",
+    "beardFull": "フルビアード",
+    "beardVikingb": "編みひげ",
+    "beardWizard": "魔道士髭",
+    "beardStubbleBeard": "濃い無精髭",
+    "browNone": "なし",
+    "browSoft": "やわらかめ",
+    "browThick": "太め",
+    "browAngled": "つり眉",
+    "earrings": "ピアス",
+    "jewelMaterial": "装飾品の素材",
+    "jewelDefault": "そのまま",
+    "jewelGold": "ゴールド",
+    "jewelSilver": "シルバー",
+    "jewelBone": "ボーン",
+    "jewelIron": "アイアン",
+    "jewelCopper": "カッパー",
+    "jewelBronze": "ブロンズ",
+    "jewelObsidian": "オブシディアン",
+    "jewelJade": "ヒスイ",
+    "jewelAmethyst": "アメジスト",
+    "jewelRuby": "ルビー",
+    "jewelPearl": "パール",
+    "jewelTurquoise": "ターコイズ",
+    "earNone": "なし",
+    "earStud": "スタッド",
+    "earHoop": "フープ",
+    "earBone": "骨の護符",
+    "earBonehoop": "骨のリング",
+    "earMoon": "三日月",
+    "earMoonstar": "月光の星",
+    "earRunic": "ルーンストーン",
+    "earChain": "ビーズドロップ",
+    "earSeptum": "鼻リング",
+    "earWarden": "守人の鉄",
+    "earCuff": "イヤーカフ",
+    "earFeather": "フェザー",
     "class": "クラス",
     "name": "名前",
     "chromaOption": "カラー {n}",
@@ -7386,11 +7625,14 @@ export const ja_JP: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
+      "useElixir": "使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。",
+      "useElixirAura": "使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。",
       "questItem": "クエストアイテム",
       "questRelated": "クエスト：{quest}",
       "questRules": "売却、銀行預け入れ、取引はできません。",
       "questOrphaned": "進行中のクエストでは必要ありません。",
       "classes": "クラス: {classes}",
+      "maxStack": "スタック上限: {count}",
       "sellPrice": "売却価格: {money}",
       "clickBuy": "クリックして購入",
       "clickSell": "クリックして売却",
@@ -7541,6 +7783,8 @@ export const ja_JP: EnTranslations = {
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
       "collectNote": "商人が預かっている売上と返却品です。",
       "saleProceeds": "売上",
+      "saleBuyer": "{buyer}に売却",
+      "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
       "collectAll": "すべて受け取る"
     },
     "logs": {
@@ -9555,6 +9799,27 @@ export const ja_JP: EnTranslations = {
       "cinderweave_slippers": {
         "name": "熾火織りの上履き"
       },
+      "thornhide_headdress": {
+        "name": "ソーンハイドの頭巾"
+      },
+      "thornhide_mantle": {
+        "name": "ソーンハイドの肩衣"
+      },
+      "thornhide_vestment": {
+        "name": "ソーンハイドの法衣"
+      },
+      "thornhide_cinch": {
+        "name": "ソーンハイドの腰帯"
+      },
+      "thornhide_leggings": {
+        "name": "ソーンハイドの脚当て"
+      },
+      "thornhide_gloves": {
+        "name": "ソーンハイドの手甲"
+      },
+      "thornhide_boots": {
+        "name": "ソーンハイドの足袋"
+      },
       "final_oath_medallion": {
         "name": "最後の誓いのメダリオン"
       },
@@ -10319,6 +10584,15 @@ export const ja_JP: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "ダイアファングの矢筒"
+      },
+      "sharp_claw": {
+        "name": "鋭い鉤爪"
+      },
+      "curved_tusk": {
+        "name": "曲がった牙"
+      },
+      "pristine_claw": {
+        "name": "無傷の鉤爪"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -11892,6 +12166,11 @@ export const ja_JP: EnTranslations = {
         "name": "フューリー",
         "title": "名誉補給官",
         "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
+      },
+      "warmarshal_draven_kole": {
+        "name": "戦元帥ドレイヴン・コール",
+        "title": "ウォーフェア軍需庫の管理者",
+        "greeting": "私が受け取る通貨は名誉だけだ。ウォーフェア軍需庫は私が守っている。戦場で階級を勝ち取れ。次の戦いに備えて武具を整えてやろう。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",
@@ -15024,6 +15303,36 @@ export const ja_JP: EnTranslations = {
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "warfare_ashstalker": {
+        "name": "アッシュストーカーの装備",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アッシェンステップ」が発動し、6秒間、移動速度が40%上昇します。"
+      },
+      "warfare_cinderweave": {
+        "name": "シンダーウィーヴの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_furyforged": {
+        "name": "フューリーフォージの戦装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アンブロークンオース」が発動し、10秒間200ダメージを吸収します。"
+      },
+      "warfare_stormbound": {
+        "name": "ストームバウンドの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_thornhide": {
+        "name": "ソーンハイドの装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。"
       },
       "wyrmshadow": {
         "name": "ナイトファングの装束",

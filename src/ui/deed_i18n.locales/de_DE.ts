@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banner in der Hand',
+    desc: 'Erobere eine Flagge in den Thornhollow-Feldern.',
+  },
+  pvp_bg_first_win: {
+    name: 'Die Senke hält',
+    desc: 'Gewinne ein Schlachtfeld in den Thornhollow-Feldern.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Wärter der Senke',
+    desc: 'Gewinne 25 Schlachtfelder in den Thornhollow-Feldern.',
+    title: 'Fahnenträger',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundert Banner',
+    desc: 'Erobere im Laufe deiner Karriere 100 Flaggen in den Thornhollow-Feldern.',
+  },
+  dgn_rift: {
+    name: 'Risswandler',
+    desc: 'Bereinige einen Riss, indem du seinen Boss besiegst.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Rissherrscher',
+    desc: 'Bereinige einen Riss vom Rang S, der schwersten Stufe, die ein Rissportal erzeugen kann.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Verdiene im Laufe deines Lebens 10.000 Ehre. Sie auszugeben kostet dich nie den Rang.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ritter-Leutnant',
+    desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
+    title: 'Ritter-Leutnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Feldmarschall',
+    desc: 'Verdiene im Laufe deines Lebens 150.000 Ehre. Selten auf jedem Reich, und das sollte es auch sein.',
+    title: 'Feldmarschall',
+  },
   chr_drakemaw_broodlord: {
     name: 'Gelegebrecher',
     desc: 'Einen Drakenrachen-Brutfürsten inmitten seiner Eier erlegen, durch Schrei, Hieb und Feuer hindurch.',
@@ -14,6 +54,54 @@ export const table: DeedLocaleTable = {
   chr_maw_matriarch: {
     name: 'Der Himmel verstummt',
     desc: 'Cindraleth, die Rachen-Matriarchin, in ihrem Kraterhorst über dem Drakenrachen erlegen.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Ernte auf den Terrassen',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Erstes Eis auf dem Bergsee',
+    desc: 'Fange einen Fisch in den Gewassern des Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Die Ernte von Amberfall',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ein Fang aus dem Grossen Moor',
+    desc: 'Fange einen Fisch in den Gewassern von Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Die traumende Ernte',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ein Ring auf dem Mondbrunnen',
+    desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Ernte unter dem Blatterdach',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ein Wurf in der Spiegelbucht',
+    desc: 'Fange einen Fisch in den Gewassern des Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Ernte am Palmenstrand',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Wurf in die Saphirlagune',
+    desc: 'Fange einen Fisch in den Gewassern von Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Die Gabe des Parterres',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Ein Wurf auf dem Blutenteich',
+    desc: 'Fange einen Fisch in den Gewassern von Evergarden.',
   },
   pvp_card_duel_first_win: {
     name: 'Nach eigenen Regeln',

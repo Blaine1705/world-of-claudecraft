@@ -18,9 +18,15 @@ import {
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
-import { CharacterPreview, type PreviewFramingName } from '../render/characters';
+import {
+  CharacterPreview,
+  modularKeyFor,
+  modularLookFor,
+  type PreviewFramingName,
+} from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
+import type { ModularLook } from '../render/characters/modular';
 import {
   onPortraitsReady,
   onPortraitUpdate,
@@ -53,6 +59,7 @@ import {
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
+  ITEM_SETS,
   ITEMS,
   MOBS,
   NPCS,
@@ -70,7 +77,12 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
+import {
+  computeRespecCost,
+  FOCUS_POINT_BUDGET,
+  isInTownZone,
+  type RespecPaymentTier,
+} from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
@@ -104,6 +116,7 @@ import {
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   type ItemDef,
+  isMechWearer,
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
@@ -248,6 +261,7 @@ import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
+import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
 import {
   applyEnchantResultToast,
@@ -259,6 +273,7 @@ import {
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
+  itemSetBonusField,
   knownLetterId,
   riftFloorLabel,
   tEntity,
@@ -437,6 +452,9 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
+import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
+import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -542,7 +560,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
-import { findOwnPet, petFrameDescriptorInto } from './pet_frame_view';
+import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -600,6 +618,7 @@ import {
 } from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
+import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
 import {
   type BuffStatSource,
@@ -1495,7 +1514,7 @@ export class Hud {
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
   private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the 20-minute cycle
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -1553,6 +1572,18 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  // The WARFARE quartermaster's sectioned honor shop. Its own window
+  // (#warfare-window), NOT a third tenant of the shared #vendor-window
+  // container: the sectioned layout is structurally different and wider.
+  private openWarfareVendorNpcId: number | null = null;
+  // A STANDALONE trapping window (the train / unbind / crafting shape), NOT the
+  // vendor's non-trapping arrangement: that exception exists only because
+  // #vendor-window pairs with the #bags companion and a trap would fight it.
+  // The honor shop has no bags companion (its stock is soulbound with no sell
+  // value), and a flagged NPC still offers the ordinary goods row for the
+  // bags-paired window, so trapping Tab here costs nothing.
+  private readonly warfareWindowFocus = this.windowFocus('#warfare-window');
+  private warfareVendorOpenerFocus: HTMLElement | null = null;
   // The show-jumping race: a slim, non-interactive bottom strip painted from the
   // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
   // the event routing, the start/finish banners, and show/hide.
@@ -2074,6 +2105,7 @@ export class Hud {
       openChronicles: () => this.openDeeds('chronicle'),
       openVendor: (npcId, opener) => this.openVendor(npcId, opener),
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
+      openWarfareVendor: (npcId, opener) => this.openWarfareVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
@@ -2239,6 +2271,15 @@ export class Hud {
       this.totFramePainter.invalidatePortrait();
     });
     onPortraitUpdate((visualKey, skin) => {
+      // The mech is not a class: a lazily-arriving chroma atlas must refresh
+      // the frame of the player wearing it (drawMech falls back to the class
+      // face until the atlas is resident).
+      if (visualKey === 'player_mech') {
+        if (isMechWearer(this.sim.player) && skin === (this.sim.player.skin ?? 0)) {
+          this.drawPlayerFramePortrait();
+        }
+        return;
+      }
       const playerClass = visualKey.startsWith('player_')
         ? (visualKey.slice('player_'.length) as PlayerClass)
         : null;
@@ -2392,8 +2433,8 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
-    // day/night dial on the minimap rim: a decorative canvas showing the 12h
-    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    // day/night dial on the minimap rim: a decorative canvas showing the
+    // world day/night cycle. Same UI-only wall-clock allowance as the clock above.
     const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
     this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
@@ -3317,6 +3358,9 @@ export class Hud {
         this.closeVendor();
         this.closeHeroicVendor();
         break;
+      case 'warfare-window':
+        this.closeWarfareVendor();
+        break;
       case 'train-window':
         this.closeTrain();
         break;
@@ -3423,9 +3467,9 @@ export class Hud {
   // move/lock button, pointer drag, localStorage persistence) lives in the
   // shared MovableFrame controller (movable_frame.ts); the pure position math
   // in target_frame_pos.ts. Two instances: the target frame keeps its stock
-  // look wherever it lands; the player frame DETACHES from the action-bar
-  // stack once moved (pf-detached: position fixed + the compact target-frame
-  // bar width), so it can sit anywhere and read like the target frame.
+  // look wherever it lands; the player frame DETACHES from the action-bar stack
+  // once moved (pf-detached: absolute positioning with its full configured
+  // width), so it can sit anywhere without shrinking the primary health frame.
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
@@ -4144,6 +4188,14 @@ export class Hud {
       onHover: (pid) => {
         this.hoveredPartyPid = pid;
       },
+      // A party member's pet is an ordinary targetable entity, so selecting it is
+      // the same call the row itself makes, just with the pet's id.
+      onTargetPet: (entityId) => this.sim.targetEntity(entityId),
+      petLabel: (name, frac) =>
+        t('hudChrome.partyFrames.petHealth', {
+          name,
+          pct: formatNumber(frac, { style: 'percent', maximumFractionDigits: 0 }),
+        }),
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
       onToggleCollapse: () => this.togglePartyCollapsed(),
       partyAuras: this.partyAurasDeps,
@@ -4727,6 +4779,22 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    helmHidden: () => this.sim.player?.helmHidden ?? false,
+    toggleHelm: () => {
+      const next = !(this.sim.player?.helmHidden ?? false);
+      // The choice persists PER CHARACTER through the sim's own save
+      // (CharacterState.helmHidden), like weaponStowed: no client-side mirror,
+      // or a second character on the same browser would inherit this one's
+      // wardrobe on world entry and overwrite its saved choice.
+      this.sim.setHelmHidden(next);
+      audio.click();
+      // The in-world body recomposes off the entity bit (renderer diff); the
+      // portraits are keyed on the look's full signature, so repainting the
+      // player frame and the sheet is what mints the fresh helmed/bare
+      // snapshot everywhere it shows.
+      this.drawPlayerFramePortrait();
+      this.renderCharIfOpen();
+    },
   });
   // Inspect ("Profile") window painter (inspect_view.ts pure core + inspect_window.ts
   // painter). It paints #inspect-window for both the rich in-range card (live
@@ -4969,12 +5037,26 @@ export class Hud {
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
   });
 
+  /** The player's own frame portrait.
+   *
+   *  Their COMPOSED character when they have an authored look, the face they
+   *  built, not the stock art for their class, and the class portrait
+   *  otherwise. Only the local player is composed (the look is presentation
+   *  state and is not on the wire), so this is the one frame that can do it;
+   *  the target and target-of-target frames stay on `drawClass`. */
   private drawPlayerFramePortrait(): void {
-    this.portraits.drawClass(
-      $('#pf-portrait') as unknown as HTMLCanvasElement,
-      this.sim.cfg.playerClass,
-      this.sim.player.skin ?? 0,
-    );
+    const canvas = $('#pf-portrait') as unknown as HTMLCanvasElement;
+    const cls = this.sim.cfg.playerClass;
+    const skin = this.sim.player.skin ?? 0;
+    const self = this.sim.player;
+    // A mech wearer IS the mech in the world, the frame must agree, and their
+    // `skin` is a chroma index that means nothing to the class atlas.
+    const mech = isMechWearer(self);
+    const look = self && !mech ? modularLookFor(self) : null;
+    if (self && mech) this.portraits.drawMech(canvas, skin, cls);
+    else if (self && look)
+      this.portraits.drawModularPlayer(canvas, modularKeyFor(self), look, cls, skin);
+    else this.portraits.drawClass(canvas, cls, skin);
   }
 
   // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
@@ -5655,6 +5737,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    // Battle elixirs: the temporary stat-buff quaffing grants (sim/items.ts
+    // useItem), from the pure sibling view so bags, bank, crafting, vendor,
+    // and market all state what the elixir does.
+    html += elixirTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
@@ -5691,6 +5777,10 @@ export class Hud {
     html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
     html += instanceMakersMarkLine(instance, item.kind);
+    // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
+    // player holding a single potion learns more copies will share the slot;
+    // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.
+    html += stackSizeTooltipLine(item, instance);
     // Gated on the SAME pair the vendor path refuses on (src/sim/items.ts
     // sellItem), never on sellValue alone: a def can carry a sellValue it will
     // never be paid, and advertising a price the server is about to deny is a
@@ -5784,8 +5874,14 @@ export class Hud {
     const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
     let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
     for (const tier of model.bonusTiers) {
-      const field = tier.pieces === 2 ? 'bonus2' : tier.pieces === 3 ? 'bonus3' : 'bonus4';
-      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
+      // The field NAMES its tier's piece count (itemSetBonusField): the old
+      // 2/3/4 ternary chain silently painted the 4-piece text for any other
+      // breakpoint, which is what a 7-piece tier would have shipped as.
+      const text = tEntity({
+        kind: 'itemSet',
+        id: model.setId,
+        field: itemSetBonusField(tier.pieces),
+      });
       html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
     }
     return html;
@@ -5952,6 +6048,13 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    // The player unit frame's hp/resource text is memoized on the raw value,
+    // which does not change on a locale switch, so clear the memo to force
+    // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
+    this.lastPlayerFrameHp = Number.NaN;
+    this.lastPlayerFrameMaxHp = Number.NaN;
+    this.lastPlayerFrameResource = Number.NaN;
+    this.lastPlayerFrameMaxResource = Number.NaN;
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
@@ -8364,7 +8467,7 @@ export class Hud {
     if (p.hp !== this.lastPlayerFrameHp || p.maxHp !== this.lastPlayerFrameMaxHp) {
       this.lastPlayerFrameHp = p.hp;
       this.lastPlayerFrameMaxHp = p.maxHp;
-      playerFrame.hpText = `${p.hp} / ${p.maxHp}`;
+      playerFrame.hpText = unitFrameCurrentMaxText(p.hp, p.maxHp);
     }
     playerFrame.resourceKind = p.resourceType;
     playerFrame.resFrac = p.resource / Math.max(1, p.maxResource);
@@ -8374,7 +8477,7 @@ export class Hud {
     ) {
       this.lastPlayerFrameResource = p.resource;
       this.lastPlayerFrameMaxResource = p.maxResource;
-      playerFrame.resText = `${Math.round(p.resource)} / ${p.maxResource}`;
+      playerFrame.resText = unitFrameCurrentMaxText(Math.round(p.resource), p.maxResource);
     }
     if (p.level !== this.lastPlayerFrameLevel) {
       this.lastPlayerFrameLevel = p.level;
@@ -8476,7 +8579,9 @@ export class Hud {
         const targetFrame = this.targetFrameDescriptor;
         targetFrame.present = true;
         targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
-        targetFrame.hpText = target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`;
+        targetFrame.hpText = target.dead
+          ? t('hud.core.dead')
+          : unitFrameCurrentMaxText(target.hp, target.maxHp);
         targetFrame.showAbsorbText = !target.dead;
         // The target's power bar (classic target frame): players and caster
         // mobs show their mana/rage/energy; a resource-less target (a plain
@@ -8493,7 +8598,7 @@ export class Hud {
         targetFrame.resText =
           target.dead || !target.resourceType
             ? ''
-            : `${Math.round(target.resource)} / ${target.maxResource}`;
+            : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
         targetFrame.levelText = String(target.level);
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
@@ -8582,7 +8687,9 @@ export class Hud {
           const totFrame = this.totFrameDescriptor;
           totFrame.present = true;
           totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
-          totFrame.hpText = tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`;
+          totFrame.hpText = tot.dead
+            ? t('hud.core.dead')
+            : unitFrameCurrentMaxText(tot.hp, tot.maxHp);
           totFrame.showAbsorbText = false;
           totFrame.resourceKind = 'none';
           totFrame.resFrac = 0;
@@ -8990,6 +9097,10 @@ export class Hud {
       if (this.openHeroicVendorNpcId !== null) {
         const npc = sim.entities.get(this.openHeroicVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeHeroicVendor();
+      }
+      if (this.openWarfareVendorNpcId !== null) {
+        const npc = sim.entities.get(this.openWarfareVendorNpcId);
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeWarfareVendor();
       }
       if (this.openTrainNpcId !== null) {
         const npc = sim.entities.get(this.openTrainNpcId);
@@ -9723,7 +9834,7 @@ export class Hud {
     this.lastDayNightDrawAt = 0;
   }
 
-  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // Draw the minimap day/night dial: a ring painted with the world sky cycle
   // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
   // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
   // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
@@ -9732,17 +9843,17 @@ export class Hud {
     const ctx = this.dayNightCtx;
     if (!ctx) return;
     const now = Date.now();
-    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    if (now - this.lastDayNightDrawAt < 1000) return; // the marker crawls; ~1Hz is ample
     this.lastDayNightDrawAt = now;
 
-    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const S = 88; // backing resolution (CSS shows it at 44px, so 2x for crispness)
     const cx = S / 2;
     const cy = S / 2;
-    const rMid = 23; // ring centreline radius
-    const ringW = 8;
+    const rMid = 34; // ring centreline radius
+    const ringW = 11;
     const rInner = rMid - ringW / 2 - 2; // centre disc radius
     // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
-    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    // clockwise once per cycle. angle = pi/2 + phase*2pi (canvas y is down).
     const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
     const rgb = (c: readonly [number, number, number]): string =>
       `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
@@ -9775,36 +9886,43 @@ export class Hud {
     if (daynessNow >= 0.5) {
       ctx.fillStyle = '#ffd45a';
       ctx.beginPath();
-      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#ffd45a';
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 2;
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
-        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.moveTo(cx + Math.cos(a) * 11.5, cy + Math.sin(a) * 11.5);
+        ctx.lineTo(cx + Math.cos(a) * 15.5, cy + Math.sin(a) * 15.5);
         ctx.stroke();
       }
     } else {
       // crescent: a pale disc minus an offset disc repainted in the sky color
       ctx.fillStyle = '#e2e8f6';
       ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = rgb(skyNow);
       ctx.beginPath();
-      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.arc(cx + 4.4, cy - 3.2, 8.8, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // the "now" marker: a bright pip riding the ring at the current phase
+    // the "now" marker: a glowing pip riding the ring at the current phase,
+    // sized and haloed so the cycle position reads at a glance
     const am = angleForPhase(phaseNow);
+    ctx.save();
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
-    ctx.lineWidth = 1.4;
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
+    ctx.lineWidth = 2;
     ctx.strokeStyle = '#000';
     ctx.stroke();
   }
@@ -11710,6 +11828,12 @@ export class Hud {
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
           if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
+          // An Honor purchase rides the same 'vendor' event, and OFFLINE nothing
+          // else repaints this window (onInventoryChanged fires only from bank
+          // ops and the online net path), so without this arm the balance, the
+          // per-offer affordability and the Owned marks all stayed stale until a
+          // close and reopen.
+          if (this.openWarfareVendorNpcId !== null) this.renderWarfareVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -14439,6 +14563,88 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // WARFARE quartermaster shop (#warfare-window)
+  // -------------------------------------------------------------------------
+  // The honor stock rendered as one section per family (plus jewelry and
+  // weapons) instead of one flat grid. Gated on the NpcDef warfareVendor FLAG (resolved
+  // in the gossip dialog), never a hard-coded npc id, so a second honor
+  // quartermaster needs no constant widened. Purchases reuse the existing
+  // buyItem command: no new wire command, no new IWorld member.
+
+  // opener: see openVendor's comment; the gossip dialog hides itself before
+  // routing here, so the still-live element has to be handed in.
+  openWarfareVendor(npcId: number, opener?: HTMLElement | null): void {
+    this.closeOtherWindows('#warfare-window');
+    this.openWarfareVendorNpcId = npcId;
+    this.renderWarfareVendor();
+    // Install the standalone Tab trap (train / unbind / crafting shape) and take
+    // its capture as the opener, EXCEPT on the gossip route, which hides
+    // #quest-dialog before calling and therefore hands its own opener in.
+    const captured = this.warfareWindowFocus.captureFocus();
+    this.warfareVendorOpenerFocus = opener !== undefined ? opener : captured;
+  }
+
+  private renderWarfareVendor(): void {
+    if (this.openWarfareVendorNpcId === null) return;
+    const npc = this.sim.entities.get(this.openWarfareVendorNpcId);
+    if (!npc) return;
+    renderWarfareVendorWindow(
+      $('#warfare-window'),
+      entityDisplayName(npc),
+      // The honor balance, the worn ids and the worn-or-carried ids are derived
+      // in the pure core (warfareShopViewer), which reads only IWorld and is
+      // driven against both world shapes by tests/warfare_vendor_view.test.ts.
+      buildWarfareVendorView(npc.vendorItems, ITEMS, ITEM_SETS, {
+        ...warfareShopViewer(this.sim),
+        setMemberCounts: itemSetMemberCounts(),
+      }),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onBuy: (itemId) => this.requestWarfarePurchase(npc.id, itemId),
+        onClose: () => this.closeWarfareVendor(),
+      },
+    );
+  }
+
+  closeWarfareVendor(): void {
+    if (this.openWarfareVendorNpcId === null) return;
+    $('#warfare-window').style.display = 'none';
+    this.openWarfareVendorNpcId = null;
+    this.hideTooltip();
+    // Release the Tab trap and return focus to the opener (WCAG 2.4.3); mirrors
+    // closeTrain / closeUnbind, the standalone trapping-window family.
+    this.warfareWindowFocus.restoreFocus(this.warfareVendorOpenerFocus);
+    this.warfareVendorOpenerFocus = null;
+  }
+
+  // Honor purchases debit an unrefundable currency and record no buyback
+  // (gold vendors are the only buyback source), exactly like Heroic Marks, so
+  // the buy command fires ONLY from the confirm callback.
+  private requestWarfarePurchase(npcId: number, itemId: string): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    // COUPLING: the title / accept / cancel labels are BORROWED from the Heroic
+    // Marks shop because they are currency-neutral today. Specializing any of
+    // the three heroicShop.buyConfirm* values for Marks would silently retitle
+    // this Honor dialog; mint warfareShop.* replacements here if that happens.
+    this.confirmDialog(
+      t('heroicShop.buyConfirmTitle'),
+      t('hudChrome.warfareShop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        honor: t('hudChrome.warfare.honorAmount', {
+          amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
+            maximumFractionDigits: 0,
+          }),
+        }),
+      }),
+      t('heroicShop.buyConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => this.sim.buyItem(npcId, itemId),
+    );
+  }
+
+  // -------------------------------------------------------------------------
   // Recipe training (Professions 2.0): a station master teaches
   // trainer-acquisition recipes for a tier-priced copper fee. Opens ONLY from
   // the master's gossip dialog (no side-rail button; the rail is at
@@ -14574,6 +14780,11 @@ export class Hud {
 
   private townFocusDraft: Record<string, number> | null = null;
 
+  /** The #1144 re-spec payment tier the panel's Save will charge. Defaults to
+   *  'time', the free tier, so an untouched picker never surprises the player
+   *  with a charge; reset alongside townFocusDraft on every fresh open. */
+  private townFocusRespecTier: RespecPaymentTier = 'time';
+
   /** The signature of what the panel currently shows (#2500). `''` until the
    *  first paint arms it, which no real signature can spell (every one carries
    *  the in-town flag, the budget and a row per component). */
@@ -14604,6 +14815,7 @@ export class Hud {
     }
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
+    this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
     // the opener (the minimap button) and installs the trap over a root that is
@@ -14626,23 +14838,36 @@ export class Hud {
     // actually on screen rather than against the last thing the probe itself
     // painted.
     this.lastTownFocusSig = townFocusRenderSig(view);
-    renderTownFocusWindow($('#town-focus-window'), view, {
-      onStep: (component, delta) => {
-        this.townFocusDraft = stepTownFocus(
-          this.townFocusDraft ?? this.sim.townFocus,
-          component,
-          delta,
-          FOCUS_POINT_BUDGET,
-        );
-        this.renderTownFocus();
+    // #1144: the cost preview for the CHOSEN tier, priced off the committed
+    // allocation vs the draft (never the raw request), the same pair
+    // Sim.setTownFocus charges against server-side.
+    const cost = computeRespecCost(this.sim.townFocus, allocation, this.townFocusRespecTier);
+    renderTownFocusWindow(
+      $('#town-focus-window'),
+      view,
+      { tier: this.townFocusRespecTier, cost },
+      {
+        onStep: (component, delta) => {
+          this.townFocusDraft = stepTownFocus(
+            this.townFocusDraft ?? this.sim.townFocus,
+            component,
+            delta,
+            FOCUS_POINT_BUDGET,
+          );
+          this.renderTownFocus();
+        },
+        onTierChange: (tier) => {
+          this.townFocusRespecTier = tier;
+          this.renderTownFocus();
+        },
+        onSave: () => {
+          this.sim.setTownFocus(this.townFocusDraft ?? {}, this.townFocusRespecTier);
+          this.townFocusDraft = null;
+          this.closeTownFocus();
+        },
+        onClose: () => this.closeTownFocus(),
       },
-      onSave: () => {
-        this.sim.setTownFocus(this.townFocusDraft ?? {});
-        this.townFocusDraft = null;
-        this.closeTownFocus();
-      },
-      onClose: () => this.closeTownFocus(),
-    });
+    );
   }
 
   /** Slow-band staleness check for an OPEN panel (#2500). The panel used to
@@ -14747,9 +14972,11 @@ export class Hud {
       if (scroller) scroller.scrollTop = 0;
       // The gossip route reaches here after the dialog released its focus
       // trap WITHOUT restoring (the successor-window premise): land keyboard
-      // focus on the selected tab (onSelectCraft's refocus target) so the
-      // handoff never strands focus on body.
+      // focus on the selected tab (onSelectCraft's refocus target) after the
+      // crafting trap is installed so the handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
+    } else {
+      this.focusManager.focusFirst($('#crafting-window'));
     }
   }
 
@@ -15305,16 +15532,18 @@ export class Hud {
   }
 
   /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
-   *  training ladder, unbind list) behind its own open-plus-shown guard. All
-   *  four price their rows against the purse or a bag count, so the language
-   *  switch and the authoritative inventory hook repaint the family through
-   *  this one method; the per-site copies of the guard pack earned the
-   *  extraction (rule of three). */
+   *  WARFARE quartermaster, training ladder, unbind list) behind its own
+   *  open-plus-shown guard. All five price their rows against the purse or a
+   *  bag count, so the language switch and the authoritative inventory hook
+   *  repaint the family through this one method; the per-site copies of the
+   *  guard pack earned the extraction (rule of three). */
   private repaintOpenServiceWindows(): void {
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
     if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderHeroicVendor();
+    if (this.openWarfareVendorNpcId !== null && $('#warfare-window').style.display === 'block')
+      this.renderWarfareVendor();
     if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
@@ -15518,6 +15747,10 @@ export class Hud {
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
       framing: PreviewFramingName;
+      /** Compose the turntable from this authored look instead of mounting the
+       *  stock class rig. Set for the SELF sheet, whose body must match the one
+       *  the world draws; null for a stage showing someone else. */
+      look?: ModularLook | null;
     },
   ): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
@@ -15529,7 +15762,17 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    if (opts.previewKey) {
+    if (opts.look) {
+      // The composed body wins over the class rig, exactly as it does in the
+      // world: same face, hair, kit and helmet choice, holding the real hands.
+      this.charPreview.setModular(
+        opts.look.app,
+        opts.look.worn,
+        opts.cls,
+        opts.mainhand,
+        opts.offhand,
+      );
+    } else if (opts.previewKey) {
       // Mech is class-agnostic; mirror the wearer class's hand layout so the
       // paperdoll matches the in-world render.
       const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
@@ -15552,10 +15795,17 @@ export class Hud {
     previewKey?: string,
   ): void {
     const mainhand = this.sim.equipment.mainhand ?? null;
+    // The sheet shows the body the WORLD draws, read through the same look
+    // seam the portrait uses: the player's own face, hair and kit, including
+    // the helmet-visibility choice. A Combat Mech is a whole replacement body
+    // and wins over the authored look, matching createCharacterVisual's own
+    // precedence in-world (composing over it hid a purchased cosmetic).
+    const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
     this.mountSharedPreview(container, {
       cls,
       skin,
       previewKey,
+      look,
       mainhand,
       offhand: this.sim.equipment.offhand ?? null,
       // The paperdoll wears the same Armory skin the world renders: resolved
@@ -15564,6 +15814,7 @@ export class Hud {
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
+        this.sim.player.skinCatalog ?? 'class',
       ),
       framing: 'sheet',
     });
@@ -15629,7 +15880,12 @@ export class Hud {
         this.mountCharPreview(container, cls, skin, previewKey),
       attachTooltip: (el, html) => this.attachTooltip(el, html),
       renderBags: () => this.renderBags(),
-      renderCharIfOpen: () => this.renderCharIfOpen(),
+      renderCharIfOpen: () => {
+        this.renderCharIfOpen();
+        // A chroma pick (or unequip) changes what the player IS in the world;
+        // the frame portrait must follow without waiting for a reload.
+        this.drawPlayerFramePortrait();
+      },
     };
   }
 
@@ -16334,16 +16590,23 @@ export class Hud {
       showResource: settings?.get('partyFrameShowResource') ?? true,
       showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
       showAuras: settings?.get('partyFrameShowAuras') ?? true,
+      showPets: settings?.get('partyFrameShowPets') ?? true,
       presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
       healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
       sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
     };
+    // Party members' pets, resolved from the SAME roster the pet frame uses. Built
+    // before the signature because the signature folds pet health: a pet losing health
+    // moves no wire field on the party payload, so without it the sliver would freeze.
+    // Skipped entirely when the option is off, so a player who hides pets pays nothing.
+    const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
     const sig = partyFrameSignature(
       info,
       this.sim.playerId,
       this.sim.player.pos,
       undefined,
       config,
+      pets,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -16353,6 +16616,7 @@ export class Hud {
       this.sim.player.pos,
       undefined,
       config,
+      pets,
     );
     this.partyFramesPainter.sync(others, info.leader, info.raid, config);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
@@ -16376,7 +16640,7 @@ export class Hud {
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
-    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm' })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
+    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
     // Party membership actions (convert, loot, leave), the dungeon-difficulty
     // toggle, the reset-dungeons action, and close, resolved by the pure
     // selfPlayerContextActions. Leaving the party lives here now, not a
@@ -16485,7 +16749,13 @@ export class Hud {
    */
   private ctxPlayerTitleHtml(name: string, entCls: PlayerClass | null, ent?: Entity): string {
     const chip = entCls
-      ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' })
+      ? portraitChipHtml({
+          cls: entCls,
+          skin: ent?.skin ?? 0,
+          name,
+          variant: 'sm',
+          catalog: ent?.skinCatalog,
+        })
       : '';
     const label = esc(t('hudChrome.playerMenu.aiTagTitle'));
     const ai = this.isAiAccount(name, ent)
