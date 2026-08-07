@@ -1,14 +1,17 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 13b COMPLETE with QA (2026-08-07); next: 14 (phase-14 file,
-fresh session). Update this line as phases complete.
+Current phase: 14 COMPLETE (2026-08-07), commits LOCAL awaiting the Phase 14
+QA session (phase-14-qa.md, fresh session, ultracode), which owns the push.
+Base is release/v0.36.0 since this phase (PR #2976 retargeted). Update this
+line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
   Titles page = every NON-hidden title-reward deed (36 after the v0.35.0 warfare titles).
 - No weapon-skin reward at rank 5 (maintainer, 2026-08-05).
 - Delivery: extend PR #2976; after each QA PASS, `git push origin HEAD:feature/reliquary`
-  (never force). Local branch: `feature/reliquary-perfection` in
+  (never force). Integration base: release/v0.36.0 since Phase 14 (PR retargeted at the
+  2026-08-07 rollover); every sync and re-fetch uses v0.36.0. Local branch: `feature/reliquary-perfection` in
   `/Users/fernando/Documents/wocc-reliquary-review`. The maintainer's `wocc-reliquary`
   worktree owns the local `feature/reliquary` ref: never check it out or mutate it.
 - Per-relic obtain counts supersede the design doc's per-drop-history deferral in the
@@ -19,8 +22,9 @@ fresh session). Update this line as phases complete.
 - Reward doctrine stands: cosmetic only, Renown 0 on every reliquary-sourced deed, luck
   never scores Renown, no pity/drop-rate/power. Anti-proposals stay vetoed.
 - Re-pin policy: a seed or golden re-pin must state its real cause in the adjacent
-  comment. "Inherited red from release/v0.35.0" is a valid cause and must be named as
-  such; "feature-branch world-gen shift" is disproven and must not reappear.
+  comment. "Inherited red from the release base" (v0.35.0 then, v0.36.0 since the
+  Phase 14 rollover) is a valid cause and must be named as such; "feature-branch
+  world-gen shift" is disproven and must not reappear.
 
 ## Non-negotiable constraints
 - Determinism: all sim randomness via Rng; no Math.random / Date.now / performance.now
@@ -355,7 +359,33 @@ fresh session). Update this line as phases complete.
   deviation (vendor only; q_riding_lessons awards no item) and the permanent
   Rift GEAR-pool exclusion are recorded in progress.md; the mounts-page
   place question plus three QA-found rulings are OPEN items below.
-- Phase 14: (pending)
+- Phase 14: COMPLETE (2026-08-07), full record in progress.md. Base rollover
+  to release/v0.36.0 (sync aa824dc814: parity pin 307/79/228 with the
+  release's setHelmHidden; two audit-fallout commits: the defer_launcher
+  boot-pin reflow-proof and the four Curator-rank deed fills in the five
+  non-Latin deed_i18n overlays, Latin tracked on the Phase 22 worklist
+  below). Overview flagship: recent strip = icon jump buttons via data-page
+  (ReliquaryRecentFindModel.pageId: firstFind hint, catalog-order fallback,
+  null = inert chip), per-strip hints, nearly mini bars + the
+  hudChrome.plurals.reliquaryToGo base, shelfCards on RELIQUARY_SHELF_ORDER
+  (data-nav, aria-describedby carries the latest line), sharedUniquesNote,
+  overviewEmpty DELETED end to end. New keys: hudChrome.reliquary.
+  {recentJumpAria, recentEmpty, nearlyEmpty, shelfRecent, shelfNoFinds,
+  shelfOpenAria, sharedUniquesNote} + the plural base; five non-Latin fills
+  in-change, Latin pending (Phase 22). Celebration classes:
+  reliquary-page-celebrate, reliquary-cell-flash, upgraded standing
+  is-illuminated; celebrateIllumination(pageId) sticky one-shot gated on
+  model completeness, flashRelics(ids), animationend removal with a
+  bubbling-target guard, close() clears, reduced motion = static frames
+  (content-bound declaration pins). Elide: ownership Sets built only on a
+  real repaint (elided polls read neither ownership seam, call-count
+  pinned), hasOwn-guarded first-find count, all bars on --reliquary-fill.
+  THE CARD TRUTH RULE: the latest line renders the ring find, says
+  shelfNoFinds only at owned 0, and is OMITTED when owned > 0 with no ring
+  find (Horizons always, retro veterans everywhere): the ring only receives
+  item and mark first-finds. Follow-up option (not built): derive Horizons
+  latest from firstFind. Observation: Horizons ownership rides the single
+  reliquaryCatalogCompletion().owned signature dimension.
 - Phase 15: (pending)
 - Phase 16: (pending)
 - Phase 17: (pending)
@@ -475,7 +505,9 @@ fresh session). Update this line as phases complete.
   than inventing a place" for non-dungeon pages (a derived dungeon is not
   invented, but the rule change exceeds 13b's delegation). Decide before or
   with Phase 14; the reviewer rated it the largest remaining information gap
-  in the new surface.
+  in the new surface. SURFACED to the maintainer at Phase 14 start
+  (2026-08-07) per the phase brief; no call received in-session, so the
+  ruling stays OPEN and Phase 14 implemented nothing against it.
 - RULING OPEN (13b QA correctness audit, 2026-08-07), decide WITH the
   mounts-place ruling above (same family): the bossDungeon line drops the
   page's difficulty, so a heroic-only relic renders "Drops from Morthen in
@@ -486,6 +518,7 @@ fresh session). Update this line as phases complete.
   ruling that settles derived places) closes it; whatever is decided must
   also cover the set pages and Thunzharr, whose boss lines name no place at
   all (clearSource none / deed_stat, identical shape to horizons_mounts).
+  SURFACED with its sibling at Phase 14 start (2026-08-07); still OPEN.
 - RULING OPEN (13b QA gate review, 2026-08-07): the catalog's one quest
   hint (wyrmcult_grand_robe, q_gravewyrm) renders unconditionally, but the
   quest's itemRewards are class-keyed (the robe is the MAGE arm), so a

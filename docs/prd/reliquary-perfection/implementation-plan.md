@@ -11,10 +11,11 @@ frontier default (Opus 4.8 or newer) at xhigh effort; `ultracode` where a phase 
    `feature/reliquary-perfection`. Verify `git status` is clean; if dirty, ask the user
    (concurrent sessions share this machine; the maintainer's own `wocc-reliquary`
    worktree holds the local `feature/reliquary` ref and must NEVER be touched).
-2. Sync the integration base:
-   `git fetch origin release/v0.35.0` then
-   `git merge origin/release/v0.35.0` (a merge commit with a body, e.g.
-   `merge(release/v0.35.0): sync before phase NN`).
+2. Sync the integration base (release/v0.36.0 since Phase 14; the v0.35.0 base
+   closed at the 2026-08-07 rollover and PR #2976 was retargeted):
+   `git fetch origin release/v0.36.0` then
+   `git merge origin/release/v0.36.0` (a merge commit with a body, e.g.
+   `merge(release/v0.36.0): sync before phase NN`).
    If the merge brought release-side changes into branch-owned files, run the
    `release-merge-audit` skill before phase work. If the merged tip is red on inherited
    suites, record which failures are inherited (do not silently re-pin; Phase 12 owns

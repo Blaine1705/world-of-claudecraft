@@ -724,3 +724,111 @@ the pending set grew to three by ruling, every other claim verified.
   re-run gate is PASS, all 8 steps green: full suite 32088 tests across
   2315 files (2 expected fail, 108 skipped), browser suite 110 green,
   builds, i18n freshness, biome, and the malware scan all clean.
+
+## Phase 14 (2026-08-07)
+
+Overview flagship + Illumination celebration + refresh-elide cleanup.
+Base ROLLOVER: this phase moved the integration base to release/v0.36.0
+(PR #2976 retargeted on GitHub; implementation-plan.md Step 0 and the
+state.md delivery decision trued up in this record's commit).
+
+- Sync aa824dc814 merges release/v0.36.0 at 911325a95f: the v0.35.0
+  release i18n fill (6510 rows), the modular character creator with the
+  setHelmHidden cosmetics member (parity pin re-unioned 307/79/228), the
+  boot preload/locale-fetch overlap, the js-yaml pin. Generated i18n
+  resolved by regeneration (branch reliquary rows stay pending); parity
+  goldens untouched by the merge and verified green (193/194), so no
+  re-mint was needed. The 13b stale-suspect seed suites (masterwork
+  window, professions_fishing, fear_break_chance) were green in
+  isolation this time.
+- Release-merge audit (three read-only agents plus the skill steps):
+  every both-sides file verified a lossless union. Two fallout commits:
+  4fd5dba7ea reflow-proofs the release-authored defer_launcher_preloads
+  boot pin (its one-line literal predated the branch's Phase 11
+  multi-line loader block; red only at the merge combination), and
+  42f10972b7 fills the four Curator-rank deeds (col_reliquary_rank_2..5)
+  in the five non-Latin deed_i18n.locales overlays: the release fill
+  sized itself to the release-side catalog (262) and never saw the
+  branch's four deeds, and the deed content channel has NO pending
+  tracker, so the 13 Latin overlays are now tracked on the state.md
+  Phase 22 worklist (release-tier deed arm reds on
+  es.col_reliquary_rank_2.name until that fill, the reliquary_i18n
+  Latin-chunk precedent). Also trued up the command_schema set_helm
+  comment the merge falsified.
+- Feature ef48d80446 (one commit, not the phase file's three: render()
+  interleaves the flash consumption with the elide restructure line by
+  line, so a split would have fabricated untested intermediate states):
+  recent strip = icon jump buttons on the existing data-page wiring
+  (view model gains pageId: firstFind hint wins, catalog-order scan
+  falls back, null renders an inert chip), per-strip hints
+  (recentEmpty, nearlyEmpty), nearly mini bars + reliquaryToGo plural,
+  three shelf cards (RELIQUARY_SHELF_ORDER, data-nav, aria-describedby
+  folds the latest line into the accessible name), sharedUniquesNote,
+  and the retired overviewEmpty key deleted end to end (pageStubNote
+  precedent). New keys: hudChrome.reliquary.{recentJumpAria,
+  recentEmpty, nearlyEmpty, shelfRecent, shelfNoFinds, shelfOpenAria,
+  sharedUniquesNote} + hudChrome.plurals.reliquaryToGo, all with five
+  non-Latin fills, Latin pending for Phase 22. Celebration classes:
+  reliquary-page-celebrate (1.6s page frame + grid brightness shimmer),
+  reliquary-cell-flash (1s fill pulse), standing is-illuminated gold
+  frame + filled badge replacing the letter-spacing-only rule; sticky
+  one-shot celebrateIllumination(pageId) gated on the model reporting
+  the page complete, flashRelics(ids) cleared by the consuming render,
+  animationend removal with a bubbling-target guard, close() drops
+  unspent moments, reduced motion = static frames (declaration-level
+  content-bound pins). Elide: ownership Sets out of buildInput (an
+  elided poll reads NEITHER ownership seam, call-count pinned; the
+  signature never read those sets, so semantics are unchanged),
+  first-find count allocation-free with Object.hasOwn, both bars plus
+  the two new meters on --reliquary-fill.
+- The Horizons truth rule (QA blocking find, fixed): the recent ring
+  receives ONLY item and mark first-finds (pushRecent's two call
+  sites), so a Horizons find (mounts, skins, titles) can never reach
+  it, and a retro-seeded veteran has owned > 0 with an empty ring on
+  any shelf. The card's latest line is three-way: the find when the
+  ring knows one, shelfNoFinds only when owned is 0, otherwise omitted.
+  Follow-up option recorded, not built: derive the Horizons latest from
+  firstFind (which does record mounts/skins/titles) if the card should
+  regain a third line there.
+- Reviews: frontend-seam (0 blocking, 4 should-fix, 11 nits),
+  qa-checklist (2 blocking: the Horizons rule above and the then-absent
+  screenshots/docs; 5 should-fix, 6 nits), and a FRESH fix-round
+  reviewer over the applied fixes (0 blocking, 3 should-fix, 5 nits).
+  Every finding applied except recorded decisions: the seal-rule
+  reduced-motion deletion is DELIBERATE and was never dead (it
+  suppressed a STATIC glow, decoration not motion; rationale now sits
+  at the seal rules, and the phase file's "dead query" premise was
+  wrong); shelf cards do NOT narrow under an active search (cards are
+  navigation, not results; pinned by two tests); the reduced-motion
+  static ring standing until the next signature-driven repaint is the
+  deeds contract and reads only true statements (comment updated); the
+  unknown-kind recovery idea is moot after the three-way rule (the
+  latest line only renders for real ring finds); the fourth #171309 is
+  the section's recorded surface-literal debt; the ru sharedUniquesNote
+  phrasing nit was noted for the release fill's native pass. The
+  "allocates nothing" acceptance wording is recorded here precisely:
+  the elided poll performs no ownership-seam reads and no O(catalog)
+  copies; small constant-size locals (the input literal, closures, the
+  signature strings) remain.
+- Observations recorded for later phases: Horizons ownership rides ONE
+  signature dimension (reliquaryCatalogCompletion().owned; genuinely
+  covered on both hosts today, but a future cached/narrowed read would
+  stale the card with nothing else to catch it); mutating an existing
+  firstFind row's pageId in place would not move the signature (only
+  the count is digested; unreachable in production).
+- Screenshots 2558a0da94: docs/screenshots/reliquary-phase14/, desktop
+  and mobile, fresh (hints + cards vs the old stub) and seeded (icon
+  chips, mini bar, to-go, truthful card lines). The capture tooling
+  gained a reliquary-overview-fresh target and the seeded target now
+  fills the recent ring the way a live find would.
+- Validation: tsc clean; the seven-suite battery 465 green post-fixes;
+  ci:changed exit 0; i18n equivalence green on the committed tree (its
+  two reds pre-commit were the documented uncommitted-tree artifact).
+  Mutation proofs: six by the test agent (celebration one-shot, elide
+  zero-call, pre-filter capture, flash one-shot, bar contract, plus the
+  accumulation-across-elided-poll rewrite that caught its own first
+  version being gameable), all restored with hash-verified copies.
+- Commits: aa824dc814 (sync) -> 4fd5dba7ea (boot pin) -> 42f10972b7
+  (deed fills) -> ef48d80446 (feature) -> 2558a0da94 (screenshots) ->
+  the docs commit. Commits stay LOCAL; the Phase 14 QA session owns the
+  push.
