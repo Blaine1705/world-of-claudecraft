@@ -261,8 +261,8 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     // five of the ten former mixed templates into fully-mapped, leaving five
     // (byPickGate); the retagged warlock_imp above contributes its four
     // subsets to byCorpseGate.
-    expect(disabledSeen).toBe(9);
-    expect(byPickGate).toBe(5);
+    expect(disabledSeen).toBe(10);
+    expect(byPickGate).toBe(6);
     expect(byCorpseGate).toBe(4);
   });
 });

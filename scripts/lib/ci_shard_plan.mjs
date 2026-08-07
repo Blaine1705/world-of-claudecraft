@@ -203,6 +203,23 @@ function resolveSelectiveInputs({ changedPaths, alwaysRun, testFiles, exists }) 
     };
   }
 
+  // Generated i18n artifacts are inert only while PRESENT in the merge tree:
+  // the freshness diff cannot flag a deleted-then-regenerated file (it comes
+  // back untracked), and this job has the checkout the mode decision lacked,
+  // so presence is re-proven here whatever the relayed statuses said.
+  const missingArtifacts = buckets.generatedI18n.filter((p) => !exists(p));
+  if (missingArtifacts.length > 0) {
+    return {
+      fallback: `generated i18n artifact(s) missing from the tree (${missingArtifacts.slice(0, 3).join(', ')}${missingArtifacts.length > 3 ? ', ...' : ''}): failing closed to the full suite`,
+    };
+  }
+  // Present artifacts join the related leg as graph nodes (the header in
+  // lib/gate_select_plan.mjs): their consumers hang off the ARTIFACT side of
+  // the import graph, not off the catalog/overlay sources that drove the
+  // regeneration, so this union is what keeps a locale-fill or catalog PR's
+  // consumer suites selected.
+  const relatedSources = [...buckets.relatedSources, ...buckets.generatedI18n];
+
   const { floor, missingGuards } = buildFloor({
     alwaysRun,
     testFiles,
@@ -213,7 +230,7 @@ function resolveSelectiveInputs({ changedPaths, alwaysRun, testFiles, exists }) 
       fallback: `guard suite(s) missing from the collected tree (${missingGuards.join(', ')}): failing closed to the full suite`,
     };
   }
-  return { floor, relatedSources: buckets.relatedSources };
+  return { floor, relatedSources };
 }
 
 /**
@@ -299,7 +316,10 @@ export function buildShardPlan({
     // here (duplicate work, never a gap), exactly the overlap contract the two
     // selective legs already have with each other.
     legs.push({
-      name: `vitest related (${liveSources.length} changed source file(s), shard ${shard.index}/${shard.total})`,
+      // "path(s)", not "changed source file(s)": liveSources is the union of
+      // changed sources and fed-through generated i18n artifacts; the mode
+      // reason carries the split counts.
+      name: `vitest related (${liveSources.length} path(s), shard ${shard.index}/${shard.total})`,
       cmd: 'npx',
       args: [
         '--no-install',

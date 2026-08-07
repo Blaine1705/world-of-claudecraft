@@ -605,21 +605,16 @@
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
-     sits absolutely like the target frame and drops to the target frame's
-     compact bar width, so the two frames read as a pair. Desktop only; the
-     mobile stylesheet owns its own placement (the controller clears the inline
-     position and this class on the mobile layout). */
+     sits absolutely like the target frame while keeping the full player-frame
+     width. Desktop only; the mobile stylesheet owns its own placement (the
+     controller clears the inline position and this class on the mobile layout). */
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: auto;
+    width: 612px;
     margin: 0;
     justify-content: flex-start;
     z-index: 6;
-  }
-  #player-frame.pf-detached .uf-bars {
-    flex: none;
-    width: 190px;
   }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
      left and the pet's health frame on the right. Stacking the two as separate rows

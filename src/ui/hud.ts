@@ -71,7 +71,12 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
+import {
+  computeRespecCost,
+  FOCUS_POINT_BUDGET,
+  isInTownZone,
+  type RespecPaymentTier,
+} from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
@@ -442,6 +447,7 @@ import {
 import { renderVendorWindow } from './hud/vendor/vendor_window';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
+import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -3444,9 +3450,9 @@ export class Hud {
   // move/lock button, pointer drag, localStorage persistence) lives in the
   // shared MovableFrame controller (movable_frame.ts); the pure position math
   // in target_frame_pos.ts. Two instances: the target frame keeps its stock
-  // look wherever it lands; the player frame DETACHES from the action-bar
-  // stack once moved (pf-detached: position fixed + the compact target-frame
-  // bar width), so it can sit anywhere and read like the target frame.
+  // look wherever it lands; the player frame DETACHES from the action-bar stack
+  // once moved (pf-detached: absolute positioning with its full configured
+  // width), so it can sit anywhere without shrinking the primary health frame.
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
@@ -5983,6 +5989,13 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    // The player unit frame's hp/resource text is memoized on the raw value,
+    // which does not change on a locale switch, so clear the memo to force
+    // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
+    this.lastPlayerFrameHp = Number.NaN;
+    this.lastPlayerFrameMaxHp = Number.NaN;
+    this.lastPlayerFrameResource = Number.NaN;
+    this.lastPlayerFrameMaxResource = Number.NaN;
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
@@ -8395,7 +8408,7 @@ export class Hud {
     if (p.hp !== this.lastPlayerFrameHp || p.maxHp !== this.lastPlayerFrameMaxHp) {
       this.lastPlayerFrameHp = p.hp;
       this.lastPlayerFrameMaxHp = p.maxHp;
-      playerFrame.hpText = `${p.hp} / ${p.maxHp}`;
+      playerFrame.hpText = unitFrameCurrentMaxText(p.hp, p.maxHp);
     }
     playerFrame.resourceKind = p.resourceType;
     playerFrame.resFrac = p.resource / Math.max(1, p.maxResource);
@@ -8405,7 +8418,7 @@ export class Hud {
     ) {
       this.lastPlayerFrameResource = p.resource;
       this.lastPlayerFrameMaxResource = p.maxResource;
-      playerFrame.resText = `${Math.round(p.resource)} / ${p.maxResource}`;
+      playerFrame.resText = unitFrameCurrentMaxText(Math.round(p.resource), p.maxResource);
     }
     if (p.level !== this.lastPlayerFrameLevel) {
       this.lastPlayerFrameLevel = p.level;
@@ -8507,7 +8520,9 @@ export class Hud {
         const targetFrame = this.targetFrameDescriptor;
         targetFrame.present = true;
         targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
-        targetFrame.hpText = target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`;
+        targetFrame.hpText = target.dead
+          ? t('hud.core.dead')
+          : unitFrameCurrentMaxText(target.hp, target.maxHp);
         targetFrame.showAbsorbText = !target.dead;
         // The target's power bar (classic target frame): players and caster
         // mobs show their mana/rage/energy; a resource-less target (a plain
@@ -8524,7 +8539,7 @@ export class Hud {
         targetFrame.resText =
           target.dead || !target.resourceType
             ? ''
-            : `${Math.round(target.resource)} / ${target.maxResource}`;
+            : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
         targetFrame.levelText = String(target.level);
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
@@ -8613,7 +8628,9 @@ export class Hud {
           const totFrame = this.totFrameDescriptor;
           totFrame.present = true;
           totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
-          totFrame.hpText = tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`;
+          totFrame.hpText = tot.dead
+            ? t('hud.core.dead')
+            : unitFrameCurrentMaxText(tot.hp, tot.maxHp);
           totFrame.showAbsorbText = false;
           totFrame.resourceKind = 'none';
           totFrame.resFrac = 0;
@@ -14704,6 +14721,11 @@ export class Hud {
 
   private townFocusDraft: Record<string, number> | null = null;
 
+  /** The #1144 re-spec payment tier the panel's Save will charge. Defaults to
+   *  'time', the free tier, so an untouched picker never surprises the player
+   *  with a charge; reset alongside townFocusDraft on every fresh open. */
+  private townFocusRespecTier: RespecPaymentTier = 'time';
+
   /** The signature of what the panel currently shows (#2500). `''` until the
    *  first paint arms it, which no real signature can spell (every one carries
    *  the in-town flag, the budget and a row per component). */
@@ -14734,6 +14756,7 @@ export class Hud {
     }
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
+    this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
     // the opener (the minimap button) and installs the trap over a root that is
@@ -14756,23 +14779,36 @@ export class Hud {
     // actually on screen rather than against the last thing the probe itself
     // painted.
     this.lastTownFocusSig = townFocusRenderSig(view);
-    renderTownFocusWindow($('#town-focus-window'), view, {
-      onStep: (component, delta) => {
-        this.townFocusDraft = stepTownFocus(
-          this.townFocusDraft ?? this.sim.townFocus,
-          component,
-          delta,
-          FOCUS_POINT_BUDGET,
-        );
-        this.renderTownFocus();
+    // #1144: the cost preview for the CHOSEN tier, priced off the committed
+    // allocation vs the draft (never the raw request), the same pair
+    // Sim.setTownFocus charges against server-side.
+    const cost = computeRespecCost(this.sim.townFocus, allocation, this.townFocusRespecTier);
+    renderTownFocusWindow(
+      $('#town-focus-window'),
+      view,
+      { tier: this.townFocusRespecTier, cost },
+      {
+        onStep: (component, delta) => {
+          this.townFocusDraft = stepTownFocus(
+            this.townFocusDraft ?? this.sim.townFocus,
+            component,
+            delta,
+            FOCUS_POINT_BUDGET,
+          );
+          this.renderTownFocus();
+        },
+        onTierChange: (tier) => {
+          this.townFocusRespecTier = tier;
+          this.renderTownFocus();
+        },
+        onSave: () => {
+          this.sim.setTownFocus(this.townFocusDraft ?? {}, this.townFocusRespecTier);
+          this.townFocusDraft = null;
+          this.closeTownFocus();
+        },
+        onClose: () => this.closeTownFocus(),
       },
-      onSave: () => {
-        this.sim.setTownFocus(this.townFocusDraft ?? {});
-        this.townFocusDraft = null;
-        this.closeTownFocus();
-      },
-      onClose: () => this.closeTownFocus(),
-    });
+    );
   }
 
   /** Slow-band staleness check for an OPEN panel (#2500). The panel used to
@@ -14877,9 +14913,11 @@ export class Hud {
       if (scroller) scroller.scrollTop = 0;
       // The gossip route reaches here after the dialog released its focus
       // trap WITHOUT restoring (the successor-window premise): land keyboard
-      // focus on the selected tab (onSelectCraft's refocus target) so the
-      // handoff never strands focus on body.
+      // focus on the selected tab (onSelectCraft's refocus target) after the
+      // crafting trap is installed so the handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
+    } else {
+      this.focusManager.focusFirst($('#crafting-window'));
     }
   }
 
@@ -15436,11 +15474,10 @@ export class Hud {
 
   /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
    *  WARFARE quartermaster, training ladder, unbind list) behind its own
-   *  open-plus-shown guard. All
-   *  five price their rows against the purse or a bag count, so the language
-   *  switch and the authoritative inventory hook repaint the family through
-   *  this one method; the per-site copies of the guard pack earned the
-   *  extraction (rule of three). */
+   *  open-plus-shown guard. All five price their rows against the purse or a
+   *  bag count, so the language switch and the authoritative inventory hook
+   *  repaint the family through this one method; the per-site copies of the
+   *  guard pack earned the extraction (rule of three). */
   private repaintOpenServiceWindows(): void {
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
@@ -15697,6 +15734,7 @@ export class Hud {
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
+        this.sim.player.skinCatalog ?? 'class',
       ),
       framing: 'sheet',
     });

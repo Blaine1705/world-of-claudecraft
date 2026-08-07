@@ -392,7 +392,7 @@ export const pt_BR: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Concluído",
-      "close": "Close emotes"
+      "close": "Fechar emotes"
     },
     "dailyRewards": {
       "title": "Recompensas Diárias",
@@ -1833,7 +1833,13 @@ export const pt_BR: EnTranslations = {
       "saveButton": "Salvar Foco",
       "notInTownHint": "Você precisa estar na cidade para definir seu foco.",
       "increaseAria": "Aumentar o foco em {component}",
-      "decreaseAria": "Diminuir o foco em {component}"
+      "decreaseAria": "Diminuir o foco em {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promover a Líder",
@@ -2081,7 +2087,7 @@ export const pt_BR: EnTranslations = {
       "hostile": "Hostil",
       "friendly": "Amistoso",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Chefe"
     },
     "targetFrame": {
       "unlock": "Mover quadro do alvo",
@@ -2689,7 +2695,7 @@ export const pt_BR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Encantar Arma - Força",
       "enchant_weapon_intellect": "Encantar Arma - Poder Mágico",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Encantar Mão Secundária - Vigor",
       "enchant_helmet_fortitude": "Encantar Elmo - Fortitude",
       "enchant_neck_spirit": "Encantar Colar - Espírito",
       "enchant_shoulder_agility": "Encantar Ombros - Agilidade",
@@ -3179,7 +3185,7 @@ export const pt_BR: EnTranslations = {
         "soul_rend": "Rasgão de Alma (jogadores marcados devem se dispersar e ser curados)",
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
         "wardstones": "Canalizações das pedras de guarda (transição de fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)"
       }
     },
     "deeds": {
@@ -4128,7 +4134,7 @@ export const pt_BR: EnTranslations = {
       "bastionBody": "Uma fortaleza inundada perdida para o pântano, mantida por defensores afogados e pela própria maré crescente.",
       "templeBody": "Um santuário submerso fora da estrada do pântano, um caminho alternativo para os curiosos e os bem preparados.",
       "sanctumBody": "O coração sombrio de Thornpeak, onde a longa obra do culto atinge seu terrível auge.",
-      "wildheartBody": "Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para enfrentar Zulgar.",
+      "wildheartBody": "Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para ver quem espera no topo.",
       "raidName": "O raide de fim de jogo",
       "raidBody": "Além de uma porta real selada aguarda um desafio de dez jogadores: uma luta de várias fases e um poder imortal que o raide inteiro precisa neutralizar em conjunto. Conquiste sua entrada e depois traga nove amigos.",
       "heroicTitle": "Modo heroico",
@@ -7571,6 +7577,8 @@ export const pt_BR: EnTranslations = {
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
       "collectNote": "Receitas e bens devolvidos que o Mercador guarda para você.",
       "saleProceeds": "Receitas da venda",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Coletar tudo"
     },
     "logs": {

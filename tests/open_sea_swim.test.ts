@@ -18,6 +18,7 @@ import {
   WATER_LEVEL,
   waterLevelAt,
 } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // The seas are real water now. The renderer has always painted every zone
 // strip and the horizon apron at the waterline, but waterLevelAt() used to be
@@ -111,9 +112,11 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
 });
 
 function hold(sim: Sim, input: MoveInput, ticks: number, onTick?: () => void): void {
-  const meta = (sim as unknown as { players: Map<number, { moveInput: MoveInput }> }).players.get(
-    (sim as unknown as { playerId: number }).playerId,
-  )!;
+  const meta = expectDefined(
+    (sim as unknown as { players: Map<number, { moveInput: MoveInput }> }).players.get(
+      (sim as unknown as { playerId: number }).playerId,
+    ),
+  );
   for (let i = 0; i < ticks; i++) {
     Object.assign(meta.moveInput, input);
     sim.tick();

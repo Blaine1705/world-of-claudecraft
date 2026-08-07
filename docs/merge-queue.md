@@ -107,7 +107,6 @@ Never require these, deliberately:
   `Release checks (freshness, typecheck, builds)`, `Release version gate`):
   release-process lanes, legitimately red or skipped mid-cycle. Release i18n in
   particular is red by design until the release-time locale fill.
-- The AI-assist checks (`PR AI assist` jobs): standing policy, they never gate.
 - `Dependency audit`: its workflow is path-filtered to dependency changes, so
   on most PRs (and on every queue run) the check never reports at all, and a
   required check that never reports blocks the merge forever. Skipped jobs

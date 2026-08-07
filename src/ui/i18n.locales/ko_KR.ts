@@ -598,6 +598,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': '적대',
   'hudChrome.mobTooltip.friendly': '아군',
   'hudChrome.mobTooltip.elite': '정예',
+  'hudChrome.mobTooltip.boss': '우두머리',
   'hudChrome.targetFrame.unlock': '대상 프레임 이동',
   'hudChrome.targetFrame.lock': '대상 프레임 고정',
   'hudChrome.playerFrame.unlock': '플레이어 프레임 이동',
@@ -815,6 +816,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': '집중을 설정하려면 마을에 있어야 합니다.',
   'hudChrome.townFocus.increaseAria': '{component}에 대한 집중 증가',
   'hudChrome.townFocus.decreaseAria': '{component}에 대한 집중 감소',
+  'hudChrome.townFocus.respecTierLabel': '재배분 속도',
+  'hudChrome.townFocus.respecTierTimeOption': '무료 (시간이 걸림)',
+  'hudChrome.townFocus.respecTierPartialOption': '빠름 (소량 비용)',
+  'hudChrome.townFocus.respecTierInstantOption': '즉시 (전액 비용)',
+  'hudChrome.townFocus.respecCostFree': '무료',
+  'hudChrome.townFocus.respecCostLine': '{coin} 및 {materials} 소모',
   'hudChrome.theme.preset': 'UI 테마',
   'hudChrome.theme.customColors': '사용자 지정 색상',
   'hudChrome.theme.reset': '초기화',
@@ -2672,6 +2679,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.',
   'itemUi.market.collectNote': '상인이 보관 중인 수익과 반환된 상품입니다.',
   'itemUi.market.saleProceeds': '판매 대금',
+  'itemUi.market.saleOlder': '이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.',
   'itemUi.market.collectAll': '모두 수령',
   'itemUi.logs.listedItem': '{item}을(를) {money}에 세계 시장에 등록했습니다.',
   'itemUi.logs.sellerSold':
@@ -6377,7 +6385,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
   'guide.dungeonsPage.wildheartBody':
-    '따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드의 줄가르와 맞서라.',
+    '따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
   'guide.dungeonsPage.raidBody':
     '봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.',

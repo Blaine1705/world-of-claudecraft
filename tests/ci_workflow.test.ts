@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
-import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
+import {
+  GENERATED_I18N_ARTIFACT_FILES,
+  GENERATED_I18N_ARTIFACT_PREFIXES,
+  isGeneratedI18nArtifactPath,
+} from '../scripts/lib/gate_select_plan.mjs';
+import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -301,6 +306,56 @@ describe('CI workflow parity', () => {
     expect(gate).not.toContain('src/ui/i18n.status.summary.json');
   });
 
+  it('pins the inert generated-i18n classifier to exactly the freshness-diffed paths', () => {
+    // The selective planner may treat a generated i18n artifact as inert ONLY
+    // because this workflow reruns i18n:gen and `git diff --exit-code`s the
+    // artifact paths on every code PR (pr-checks) and on the release push
+    // (release-checks). This holds the two lists to each other: widening the
+    // classifier without widening the freshness diff, or narrowing the diff
+    // without narrowing the classifier, must fail HERE, not as a silent
+    // selection escape in production.
+    const classifierPaths = [
+      ...GENERATED_I18N_ARTIFACT_PREFIXES.map((p) => p.replace(/\/$/, '')),
+      ...GENERATED_I18N_ARTIFACT_FILES,
+    ].sort();
+    // The LOCAL gate's freshness list must agree too: gate_select treats the
+    // classifier's paths as never-widening on the strength of the local i18n
+    // freshness step covering them, and that step builds its argv from
+    // I18N_ARTIFACTS. Without this coupling, narrowing I18N_ARTIFACTS would
+    // silently orphan the local half of the safety argument (the step's own
+    // test compares the argv to the same constant, which pins nothing).
+    expect([...I18N_ARTIFACTS].sort()).toEqual(classifierPaths);
+    for (const jobName of ['pr-checks', 'release-checks']) {
+      const job = jobSource(jobName);
+      // Anchored to the src/ prefix so a future unrelated `git diff
+      // --exit-code` step added above this one cannot re-point the pin.
+      const m = job.match(/run: git diff --exit-code -- (src\/[^\n]+)/);
+      expect(m, `${jobName} must carry the freshness diff step`).not.toBeNull();
+      const freshnessPaths = (m as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      expect(classifierPaths).toEqual(freshnessPaths);
+      // Regenerate BEFORE diff, inside the same job, so the diff proves the
+      // committed artifacts against the PR's own sources. Trailing newline so
+      // a renamed `i18n:gen:something` cannot satisfy the pin.
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeGreaterThan(0);
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeLessThan(
+        job.indexOf('run: git diff --exit-code --'),
+      );
+    }
+    // The freshness job is gated on the code output only, never the test mode:
+    // artifact-carrying PRs are src/ paths, so code=true and the
+    // regenerate-and-diff runs whatever the shards were told to run.
+    const prChecks = jobSource('pr-checks');
+    expect(prChecks).toContain("needs.changes.outputs.code != 'false'");
+    expect(prChecks).not.toContain('test_mode');
+    // The predicate agrees with the pinned path classes on both sides.
+    expect(isGeneratedI18nArtifactPath('src/ui/i18n.resolved.generated/en.ts')).toBe(true);
+    expect(isGeneratedI18nArtifactPath('src/admin/i18n.resolved.generated/loaders.ts')).toBe(true);
+    expect(isGeneratedI18nArtifactPath('src/ui/i18n.catalog/translation_keys.generated.ts')).toBe(
+      true,
+    );
+    expect(isGeneratedI18nArtifactPath('src/guide/content.generated.ts')).toBe(false);
+  });
+
   it('runs the release tier against a release-to-main pull request merge result', () => {
     const prGate = jobSource('pr-gate');
     const prLongSims = jobSource('pr-long-sims');
@@ -436,12 +491,16 @@ describe('CI workflow parity', () => {
     const changes = jobSource('changes');
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
     // Phase 2: the selection decision rides the same job's outputs, from the
     // same single classifier step, so the two decisions cannot come from
     // different listing snapshots.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode: ${{ steps.filter.outputs.test_mode }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('changed_files: ${{ steps.filter.outputs.changed_files }}');
     // Anchored, not toContain: a YAML-commented-out step keeps the substring
     // but loses the indented shape, and this one line is the whole classifier.
@@ -466,6 +525,7 @@ describe('CI workflow parity', () => {
     expect(changes).toMatch(/\n {4}timeout-minutes: [1-9]\n/);
     // The API call authenticates with the workflow token via env (never
     // secrets.* and never string-interpolated into the run line).
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('GITHUB_TOKEN: ${{ github.token }}');
     // changes must always run (no job-level if). Gating it to pull_request only
     // would leave needs.changes dependents skipped on push to main/dev.
@@ -476,6 +536,7 @@ describe('CI workflow parity', () => {
     expect(detectEntry).toContain("from './lib/ci_change_classify.mjs'");
     expect(detectEntry).toContain('detectCode');
     expect(detectEntry).toContain('GITHUB_OUTPUT');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('code=${code}');
     // Phase 2 wiring: the entry derives the test mode from the SAME listing
     // (lib/ci_test_select.mjs) and writes all three selection outputs; the
@@ -483,6 +544,7 @@ describe('CI workflow parity', () => {
     // tests/ci_change_classify.test.ts.
     expect(detectEntry).toContain("from './lib/ci_test_select.mjs'");
     expect(detectEntry).toContain('decideTestMode');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('test_mode=${modeDecision.mode}');
     expect(detectEntry).toContain('changed_files=${JSON.stringify(');
     for (const [, sample] of CODE_PATH_SAMPLES) {

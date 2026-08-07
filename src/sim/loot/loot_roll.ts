@@ -410,7 +410,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
 // apply: disabled, below threshold, a solo looter, or no resolvable looter.
 function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
   const strategies = partyLootStrategiesForMob(ctx, mob);
-  if (!strategies || !strategies.master.enabled) return false;
+  if (!strategies?.master.enabled) return false;
   const def = ITEMS[itemId];
   if (!meetsMasterThreshold(def?.quality, strategies.master.threshold)) return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);

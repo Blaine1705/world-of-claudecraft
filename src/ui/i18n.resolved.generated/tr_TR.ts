@@ -392,7 +392,7 @@ export const tr_TR: EnTranslations = {
     "emoteEditor": {
       "title": "İfadeler",
       "done": "Tamam",
-      "close": "Close emotes"
+      "close": "İfadeleri kapat"
     },
     "dailyRewards": {
       "title": "Günlük Ödüller",
@@ -1833,7 +1833,13 @@ export const tr_TR: EnTranslations = {
       "saveButton": "Odağı Kaydet",
       "notInTownHint": "Odağını ayarlamak için kasabada olmalısın.",
       "increaseAria": "{component} odağını artır",
-      "decreaseAria": "{component} odağını azalt"
+      "decreaseAria": "{component} odağını azalt",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Lider Yap",
@@ -2080,8 +2086,8 @@ export const tr_TR: EnTranslations = {
       "familyDemon": "İblis",
       "hostile": "Düşman",
       "friendly": "Dost",
-      "elite": "Elite",
-      "boss": "Boss"
+      "elite": "Seçkin",
+      "boss": "Patron"
     },
     "targetFrame": {
       "unlock": "Hedef çerçevesini taşı",
@@ -2689,7 +2695,7 @@ export const tr_TR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Silah Büyüsü - Güç",
       "enchant_weapon_intellect": "Silah Büyüsü - Büyü Gücü",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "İkincil El Büyüsü - Dayanıklılık",
       "enchant_helmet_fortitude": "Miğfer Büyüsü - Metanet",
       "enchant_neck_spirit": "Kolye Büyüsü - Ruh",
       "enchant_shoulder_agility": "Omuzluk Büyüsü - Çeviklik",
@@ -3179,7 +3185,7 @@ export const tr_TR: EnTranslations = {
         "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
         "wardstones": "Koruma taşı kanalları (faz geçişi)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)"
       }
     },
     "deeds": {
@@ -4128,7 +4134,7 @@ export const tr_TR: EnTranslations = {
       "bastionBody": "Bataklığa kapılmış sular altındaki bir kale; boğulmuş savunucuların ve yükselen suyun kendisinin elinde tutuluyor.",
       "templeBody": "Zirvelerin yükseklerinde, ışıldayan bir göletin altına gömülmüş, soğuk ışıktan bir geçitle ulaşılan ay ışığıyla aydınlanmış bir tapınak. Boğulmuş bir tarikat çürümüş cüppeleriyle hâlâ orada aşağıda şarkı söylüyor ve kıyıya kazınmış uyarılar, aşağıdaki bir şeyin yalnızca uyuduğunu söylüyor. Meraklılar ve iyi hazırlananlar için, ana hikâyeden ayrı duran, kendi içinde bir gizem.",
       "sanctumBody": "Tarikatın uzun emeğinin korkunç doruğuna ulaştığı, Dikenzirve'nin karanlık kalbi.",
-      "wildheartBody": "İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından Zulgar ile yüzleşmek için ritüel piramidine tırman.",
+      "wildheartBody": "İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından zirvede kimin seni beklediğini görmek için ritüel piramidine tırman.",
       "raidName": "Son oyun akını",
       "raidBody": "Mühürlü bir kraliyet kapısının ardında on oyunculu bir sınav bekler: çok aşamalı bir savaş ve tüm akının birlikte durdurması gereken, ölümsüz bir güç. İçeri girme hakkını kazanın, sonra dokuz arkadaşınızı getirin.",
       "heroicTitle": "Kahramanca mod",
@@ -7571,6 +7577,8 @@ export const tr_TR: EnTranslations = {
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",
       "collectNote": "Tüccar'ın senin için tuttuğu kazançlar ve geri dönen mallar.",
       "saleProceeds": "Satış geliri",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Hepsini Topla"
     },
     "logs": {

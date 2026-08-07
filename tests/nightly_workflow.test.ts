@@ -75,9 +75,8 @@ describe('nightly gate workflow', () => {
       const job = jobSource(name);
       // A wedged runner must fail the job, not eat the night.
       expect(job).toMatch(/\n {4}timeout-minutes: \d+\n/);
-      // No checkout leaves a token in .git/config (pr-ai.yml precedent): the
-      // write-scoped report job must not persist one, and the lanes are where
-      // arbitrary-ref code runs.
+      // No checkout leaves a token in .git/config: the write-scoped report job
+      // must not persist one, and the lanes are where arbitrary-ref code runs.
       expect(job).toContain('persist-credentials: false');
     }
     expect(workflow.match(/persist-credentials: false/g)).toHaveLength(JOB_NAMES.length);

@@ -33,7 +33,6 @@ import {
   ZONES,
 } from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
 import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { meshTerrainHeight } from './terrain_mesh_height';

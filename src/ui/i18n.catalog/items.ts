@@ -261,6 +261,10 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
+      // The itemized ledger under the proceeds line. saleOlder covers the rows the
+      // ledger cap dropped, whose gold IS still in the total above.
+      saleBuyer: 'Sold to {buyer}',
+      saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
     },
     logs: {

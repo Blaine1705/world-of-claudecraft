@@ -392,7 +392,7 @@ export const fr_FR: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Terminé",
-      "close": "Close emotes"
+      "close": "Fermer les emotes"
     },
     "dailyRewards": {
       "title": "Récompenses quotidiennes",
@@ -1833,7 +1833,13 @@ export const fr_FR: EnTranslations = {
       "saveButton": "Enregistrer les priorités",
       "notInTownHint": "Vous devez être en ville pour définir vos priorités.",
       "increaseAria": "Augmenter la priorité de {component}",
-      "decreaseAria": "Réduire la priorité de {component}"
+      "decreaseAria": "Réduire la priorité de {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promouvoir chef",
@@ -2080,7 +2086,7 @@ export const fr_FR: EnTranslations = {
       "familyDemon": "Démon",
       "hostile": "Hostile",
       "friendly": "Amical",
-      "elite": "Elite",
+      "elite": "Élite",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2689,7 +2695,7 @@ export const fr_FR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Enchantement Arme - Puissance",
       "enchant_weapon_intellect": "Enchantement Arme - Puissance des sorts",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Enchantement Main gauche - Endurance",
       "enchant_helmet_fortitude": "Enchantement Casque - Fortitude",
       "enchant_neck_spirit": "Enchantement Collier - Esprit",
       "enchant_shoulder_agility": "Enchantement Épaulières - Agilité",
@@ -3179,7 +3185,7 @@ export const fr_FR: EnTranslations = {
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
         "wardstones": "Canaux des pierres de garde (transition de phase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)"
       }
     },
     "deeds": {
@@ -4128,7 +4134,7 @@ export const fr_FR: EnTranslations = {
       "bastionBody": "Une forteresse inondée perdue dans le marais, tenue par des défenseurs noyés et par la marée montante elle-même.",
       "templeBody": "Un sanctuaire englouti à l'écart de la route du marais, un détour pour les curieux et les bien préparés.",
       "sanctumBody": "Le cœur ténébreux de Thornpeak, où la longue œuvre du culte atteint son terrible apogée.",
-      "wildheartBody": "Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour affronter Zulgar.",
+      "wildheartBody": "Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour voir qui vous attend au sommet.",
       "raidName": "Le raid de fin de jeu",
       "raidBody": "Au-delà d'une porte royale scellée attend une épreuve à dix joueurs : un combat en plusieurs phases et un pouvoir immortel que tout le raid doit neutraliser de concert. Méritez votre entrée, puis amenez neuf compagnons.",
       "heroicTitle": "Mode héroïque",
@@ -7571,6 +7577,8 @@ export const fr_FR: EnTranslations = {
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
       "collectNote": "Recettes et biens retournés que le Marchand garde pour vous.",
       "saleProceeds": "Recettes de vente",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Tout récupérer"
     },
     "logs": {
