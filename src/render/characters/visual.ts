@@ -1887,10 +1887,13 @@ export class CharacterVisual {
     // cycle (every mob and NPC) must not enter the state at all, or it would
     // play its dry walk at the WADE clip's tempo — the fallback covers the pose
     // but nothing covers the timing.
-    const wading = s.wading && !!this.action(this.def.clips.wade);
+    // Passed as a flag rather than a doctored copy of `s`: this runs per entity
+    // per frame, and the copy allocated a fresh object every frame for every
+    // rig with no wade clip standing in a ford.
     return desiredBaseState(
-      wading === s.wading ? s : { ...s, wading },
+      s,
       !!this.action(this.def.clips.walkBack),
+      !!this.action(this.def.clips.wade),
     );
   }
 
@@ -2165,9 +2168,20 @@ export class CharacterVisual {
     // glitched swimming after jumping in from a cliff" bug. Sweep every other
     // unpaused running action out whenever a new transition starts; the climb
     // overlay actions run PAUSED (scrubbed by phase) and are never touched.
+    //
+    // stop(), NOT fadeOut(). `fadeOut(d)` is `_scheduleFading(d, 1, 0)`, and
+    // _updateWeight MULTIPLIES the interpolant by `this.weight`, so fading out
+    // an action caught mid-fade-in at 0.05 first RESTORES it to full weight for
+    // the frame and only then decays it: the sweep would trade a stuck loop for
+    // a full-weight flash of the stale pose, with a WATER_FADE-long tail on
+    // exactly the shoreline transitions this exists to fix. setEffectiveWeight(0)
+    // is worse still, since it zeroes `this.weight` permanently and every later
+    // fadeIn multiplies by that zero. stop() deactivates and reset()s (which
+    // stopFading()s) without touching weight, and the pairwise fade below keeps
+    // the scheduled total at 1, so the rig never dips toward BIND pose.
     for (const a of this.actions.values()) {
       if (a === next || a === prev || a.paused || !a.isRunning()) continue;
-      a.fadeOut(fade);
+      a.stop();
     }
     if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
@@ -2178,7 +2192,11 @@ export class CharacterVisual {
     // cancelled: it is excluded from the sweep above (as prev) and from the
     // crossfade (below threshold), so a fade-in it was carrying would
     // otherwise complete underneath the snap and loop at full weight.
-    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.fadeOut(fade);
+    // stop() for the same reason as the sweep, and doubly here: this branch
+    // exists to SNAP, and fading a near-dead prev out from weight 1 would blend
+    // it ~50/50 against the snapped `next` for the whole fade, the opposite of
+    // what the docblock above promises.
+    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.stop();
     next.setEffectiveWeight(1);
     next.play();
   }
@@ -2190,7 +2208,12 @@ export class CharacterVisual {
    *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
-    if (this.baseState === 'jump' && this.def.clips.land)
+    // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
+    // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
+    // meant a long fall silently LOOPED the pose a short hop clamps. The check
+    // is on the resolved ACTION, so a rig that does ship a flail is unaffected:
+    // its fall action is not the jump action, and the flail loops as intended.
+    if ((this.baseState === 'jump' || this.baseState === 'fall') && this.def.clips.land)
       return a === this.action(this.def.clips.jump);
     return false;
   }

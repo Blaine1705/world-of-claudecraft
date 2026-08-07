@@ -108,6 +108,62 @@ describe('underwater breath', () => {
     expect(p.dead).toBe(true);
   });
 
+  // updateBreath's reset branch has to actually RUN on a dead player. It was
+  // called from inside the tick's `if (!p.dead)` arm, so the branch was
+  // unreachable and both counters survived death: the corpse of a drowned
+  // player kept a spent lungful and a live drown clock, and resurrecting at an
+  // underwater corpse resumed the damage on the spot, with a 1-in-20 chance of
+  // a pulse landing on the very first tick back.
+  it('resets the lungful and the drown clock on death, so the corpse run starts fresh', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    hold(sim, mi({ dive: true }), TPS * 2);
+    p.breathUsedTicks = BREATH_TICKS;
+    p.hp = p.maxHp;
+
+    // Stop ON the killing tick: both counters have to still be loaded there, or
+    // the reset assertion below would pass against a player who never drowned.
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('missing player meta');
+    Object.assign(meta.moveInput, mi({ dive: true }));
+    for (let i = 0; i < TPS * 14 && !p.dead; i++) sim.tick();
+    Object.assign(meta.moveInput, mi());
+    expect(p.dead).toBe(true);
+    expect(p.drownTicks).toBeGreaterThan(0);
+    expect(p.breathUsedTicks).toBe(BREATH_TICKS);
+
+    // One more tick as a corpse is all it takes: the reset runs for the dead.
+    sim.tick();
+    expect(p.breathUsedTicks).toBe(0);
+    expect(p.drownTicks).toBe(0);
+  });
+
+  it('does not resume drowning damage the instant a corpse is resurrected underwater', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    hold(sim, mi({ dive: true }), TPS * 2);
+    p.breathUsedTicks = BREATH_TICKS;
+    p.hp = p.maxHp;
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('missing player meta');
+    Object.assign(meta.moveInput, mi({ dive: true }));
+    for (let i = 0; i < TPS * 14 && !p.dead; i++) sim.tick();
+    Object.assign(meta.moveInput, mi());
+    expect(p.dead).toBe(true);
+    sim.tick(); // the corpse tick that clears the lungs
+
+    // Rez in place, still under the surface. The first live tick must spend a
+    // fresh lungful, not pick the drown clock back up where it left off.
+    p.dead = false;
+    p.ghost = false;
+    p.hp = p.maxHp;
+    expect(isSubmerged(p, SEED)).toBe(true);
+    hold(sim, mi({ dive: true }), 1);
+    expect(p.hp).toBe(p.maxHp);
+    expect(p.drownTicks).toBe(0);
+    expect(p.breathUsedTicks).toBe(1);
+  });
+
   it('refills ten times as fast at the surface and stops the drown clock', () => {
     const sim = makeSim();
     const p = sim.player;

@@ -332,7 +332,20 @@ export function shouldPlayLanding(
   return hasLandClip && wasAirborne && !airborne && !dead;
 }
 
-export function desiredBaseState(s: AnimState, hasWalkBackClip: boolean): BaseState {
+/**
+ * `hasWadeClip` defaults TRUE so the state machine's own rule (wading beats the
+ * dry gait) is what a caller gets by default. A rig with no wade cycle passes
+ * false: it must not enter the state at all, because `baseAction` would cover
+ * the POSE with the dry walk while `locomotionTimeScale` still ran it at the
+ * wade tempo. It is a parameter rather than a doctored `AnimState` because the
+ * caller is a per-entity per-frame path, and cloning the state to override one
+ * flag allocated a fresh object every frame for every rig standing in a ford.
+ */
+export function desiredBaseState(
+  s: AnimState,
+  hasWalkBackClip: boolean,
+  hasWadeClip = true,
+): BaseState {
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth — surface crawl above
@@ -348,7 +361,7 @@ export function desiredBaseState(s: AnimState, hasWalkBackClip: boolean): BaseSt
   if (s.moving) {
     // Shallow water is still walking, just against resistance: one cycle covers
     // both gaits, because nobody sprints through knee-deep water.
-    if (s.wading) return 'wade';
+    if (s.wading && hasWadeClip) return 'wade';
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
     return s.running ? 'run' : 'walk';
   }

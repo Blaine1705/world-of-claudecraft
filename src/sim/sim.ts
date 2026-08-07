@@ -5672,7 +5672,6 @@ export class Sim {
         this.updateRiftTriggers(p);
         updatePortalTriggers(this.ctx, p);
         updateSwimFatigue(this.ctx, p);
-        updateBreath(this.ctx, p);
         lap?.('p.doors');
         this.updateCasting(p, meta);
         lap?.('p.casting');
@@ -5713,6 +5712,14 @@ export class Sim {
         this.updateRiftTriggers(p);
         lap?.('p.move');
       }
+      // Breath runs for DEAD players too, and must: updateBreath's own reset
+      // branch is what starts the corpse run with full lungs, so gating this on
+      // !p.dead leaves a drowned player's spent breath and drown clock intact
+      // and resumes the damage the instant they resurrect at the corpse. Draws
+      // rng only through the drown pulse's dealDamage, which cannot fire for a
+      // dead player (the reset returns first), so the tick-phase draw order is
+      // unchanged for everyone who is not actively drowning.
+      updateBreath(this.ctx, p);
       // Riding-lesson driver: server-authoritative; tracks the training-steed
       // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
       // strands the session. Finishing the race credits success. Draws no rng,
