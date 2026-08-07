@@ -51,7 +51,6 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `realm.ts` | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
 | `ratelimit.ts` | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
 | `internal.ts` | secret-gated `/internal/*` ops endpoints (e.g. restart-countdown trigger) |
-| `ota_updates.ts` / `ota_native_build.ts` | self-hosted OTA update check for the native shells (`POST /api/ota/updates`): reads the published manifest through a single-flight cache and decides the offer / the build bridge it decides against. A device reports `version_build` as a native BUILD NUMBER (CFBundleVersion, versionCode), never a semver, so a store-fresh device (`version_name: 'builtin'`) is only comparable through the bridge; `scripts/release_version.mjs` writes the bridge on `release:prepare` and fails `release:check` when it drifts. A stale or bypassed bridge does not error, it silently stops offering updates to every store install. Details: `docs/ota-updates.md` |
 | `woc_balance.ts` | the sole Solana RPC reader: holder-tier flair and connected-wallet balance, cached |
 | `player_card.ts` | shareable player-card PNGs, Open Graph unfurl, referral capture |
 | `bank_ledger.ts` | append-only `bank_ledger` observer: diffs `Sim.bankInfoFor` around each bank dispatch and writes the moved delta via a fire-and-forget FIFO (audited offline by `scripts/bank_audit.mjs`) |
