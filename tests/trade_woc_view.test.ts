@@ -161,6 +161,46 @@ describe('gold and $WOC are mutually exclusive', () => {
     expect(m.canSend).toBe(false);
   });
 
+  it('closes gold for BOTH sides once a $WOC deal is standing', () => {
+    // The seller is in GOLD mode and has typed nothing, yet a deal priced in
+    // $WOC is on the table between them. Leaving their coin fields live would
+    // let them add gold to a settlement that has no copper field to carry it.
+    const standing = {
+      id: 7,
+      usdCents: 100,
+      tokens: null,
+      role: 'seller' as const,
+      phase: 'review' as const,
+      listingId: null,
+      buyerAccepted: false,
+      sellerAccepted: false,
+    };
+    const m = buildWocTradeModel(input({ mode: 'gold', pendingOffer: standing }));
+    expect(m.goldDisabled, 'the coin inputs are dead').toBe(true);
+    expect(m.wocDealStanding, 'and gone from the window entirely').toBe(true);
+  });
+
+  it('keeps the Gold tab live while a price is merely being COMPOSED', () => {
+    // The tab is the way back. Disabling it the moment the arm opens would trap
+    // a player who only wanted to look at what a $WOC price would be.
+    const m = buildWocTradeModel(input({ mode: 'woc', usdCents: 500 }));
+    expect(m.goldDisabled, 'the fields still close, so nothing is half-entered').toBe(true);
+    expect(m.wocDealStanding, 'but the tab stays reachable').toBe(false);
+  });
+
+  it('closes $WOC when the OTHER player has put gold down', () => {
+    // goldOffered is a property of the TABLE, not of your own half. A rule that
+    // watched only your side offered you the $WOC arm while your counterparty
+    // had coin on the table.
+    const m = buildWocTradeModel(input({ mode: 'gold', goldOffered: true }));
+    expect(m.wocDisabled, 'the tab cannot be entered').toBe(true);
+    // And a player already inside the arm is told WHY, rather than getting a
+    // dead Send button with no reason.
+    const inside = buildWocTradeModel(input({ mode: 'woc', goldOffered: true }));
+    expect(inside.canSend).toBe(false);
+    expect(inside.sendHint).toBe('hudChrome.trade.woc.hintGoldOffered');
+  });
+
   it('falls back to gold mode whenever the arm is blocked', () => {
     // A blocked arm must never leave the window in a mode it cannot act on.
     const m = buildWocTradeModel(input({ selfWalletVerified: false }));

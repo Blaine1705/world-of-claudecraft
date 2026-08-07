@@ -32,6 +32,9 @@ export interface WocTradePanelDeps {
   staged: readonly InvSlot[];
   theirStaged: readonly InvSlot[];
   goldCopper: number;
+  /** The OTHER player's staged gold. Read because the currencies are exclusive
+   *  for the trade, not per side: their coin has to close your $WOC arm. */
+  partnerGoldCopper: number;
   items: Readonly<Record<string, ItemDef>>;
   marketEnabled: boolean;
   selfWalletVerified: boolean;
@@ -131,7 +134,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     tokens: deps.tokens,
     split: deps.split,
     pendingOffer: deps.pendingOffer,
-    goldOffered: deps.goldCopper > 0,
+    goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
   });
 }
 
@@ -142,7 +145,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   if (!model.armVisible) return '';
   const modeTabs = `
     <div class="trade-woc-modes" role="tablist" aria-label="${esc(t('hudChrome.trade.woc.tabWoc'))}">
-      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold">${esc(t('hudChrome.trade.woc.tabGold'))}</button>
+      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
       <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'woc' ? ' active' : ''}" aria-selected="${model.mode === 'woc'}" data-woc-mode="woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
     </div>`;
 

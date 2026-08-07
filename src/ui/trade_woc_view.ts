@@ -117,7 +117,14 @@ export interface WocTradeInput {
    * agreeing IS the trade, and closing it would leave both players guessing.
    */
   pendingOffer: WocPendingOffer | null;
-  /** True once the seller's gold offer is non-zero. */
+  /**
+   * True once gold sits on the table from EITHER side.
+   *
+   * Either, not just your own: the two currencies are exclusive for the whole
+   * trade, not per player, and a rule that only watched your own side let one
+   * player put gold down while the other was still offered the $WOC arm. The
+   * pair would then have agreed a deal neither half could carry.
+   */
   goldOffered: boolean;
   /**
    * Whether the counterparty lookup has produced an answer yet.
@@ -143,8 +150,20 @@ export interface WocTradeModel {
   eligible: readonly InvSlot[];
   /** Staged items that may not, so the window can say which and why. */
   ineligible: readonly InvSlot[];
-  /** Whether the gold field must be disabled (the two are exclusive). */
+  /** Whether the coin INPUTS must be disabled (the two currencies are
+   *  exclusive). Covers composing a $WOC price as well as a standing deal; the
+   *  Gold TAB is gated by wocDealStanding instead. */
   goldDisabled: boolean;
+  /**
+   * Whether a $WOC deal is standing for either side.
+   *
+   * ONE cause with two effects, which is why it is one flag: the Gold tab is
+   * disabled and the coin inputs come off screen entirely. Distinct from
+   * goldDisabled, which also covers merely COMPOSING a price: the tab must stay
+   * live then, or a player who opened the $WOC arm to look at it can never get
+   * back to gold.
+   */
+  wocDealStanding: boolean;
   /** Whether the $WOC field must be disabled. */
   wocDisabled: boolean;
   tokens: number | null;
@@ -287,10 +306,20 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // Mutual exclusivity is enforced here as a DISPLAY rule only. The structural
     // guarantee is elsewhere and stronger: a $WOC deal is a directed listing,
     // which has no copper field at all, so no reachable state carries both.
-    goldDisabled: wocMode,
+    //
+    // A STANDING offer closes gold for BOTH players, not just the one composing
+    // it: the deal on the table is priced in $WOC, and the other side being
+    // able to add coin to it would offer them a trade the settlement cannot
+    // carry.
+    goldDisabled: wocMode || input.pendingOffer !== null,
+    // Hidden rather than merely greyed once a deal is standing. A disabled coin
+    // field still reads as part of the offer, and the money row above it is
+    // already showing the agreed $WOC figure, so leaving three dead inputs under
+    // it invites the question of which number counts.
+    wocDealStanding: input.pendingOffer !== null,
     // Holding items means you are the SELLER in this trade, so the $WOC tab is
     // not yours to use: the requester's rule that the button is disabled once
-    // you have an item offered.
+    // you have an item offered. Gold from EITHER side closes it too.
     wocDisabled: !offerable || input.goldOffered || input.staged.length > 0,
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,

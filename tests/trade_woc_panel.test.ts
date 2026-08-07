@@ -34,6 +34,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     staged: [],
     theirStaged: [slot(EPIC.id)],
     goldCopper: 0,
+    partnerGoldCopper: 0,
     pendingOffer: null,
     items: TABLE,
     marketEnabled: true,
@@ -602,9 +603,47 @@ describe('the wallet is skipped only on explicit server permission', () => {
     expect(HUD).not.toContain('!quoted.quote.signatureRequired');
   });
 
-  it('hides the coin inputs when a $WOC amount takes the Money row', () => {
+  it('disables the Gold TAB once a $WOC deal stands, for either side', () => {
+    const standing = {
+      id: 7,
+      usdCents: 100,
+      tokens: null,
+      role: 'seller' as const,
+      phase: 'review' as const,
+      listingId: null,
+      buyerAccepted: false,
+      sellerAccepted: false,
+    };
+    for (const role of ['buyer', 'seller'] as const) {
+      const root = paint(deps({ mode: 'gold', pendingOffer: { ...standing, role } }));
+      expect(root.querySelector<HTMLButtonElement>('[data-woc-mode="gold"]')?.disabled, role).toBe(
+        true,
+      );
+    }
+  });
+
+  it('leaves the Gold tab pressable while a price is only being composed', () => {
+    // The way back out of the arm. Losing it was a regression this pins.
+    const root = paint(deps({ mode: 'woc', usdCents: 500 }));
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-mode="gold"]')?.disabled).toBe(false);
+  });
+
+  it('disables the $WOC tab when only the PARTNER has gold down', () => {
+    // Their coin, not yours: the arm still has to close.
+    const root = paint(deps({ mode: 'gold', goldCopper: 0, partnerGoldCopper: 500 }));
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-mode="woc"]')?.disabled).toBe(true);
+  });
+
+  it('reads the partner gold from the shared trade state, not a local echo', () => {
+    expect(HUD).toContain('partnerGoldCopper: this.sim.tradeInfo?.theirOffer.copper ?? 0');
+  });
+
+  it('hides the coin inputs for BOTH sides once a $WOC deal stands', () => {
     // Gold and $WOC are mutually exclusive, so the fields are removed rather
-    // than left greyed beside an amount in another currency.
-    expect(HUD).toContain('class="trade-coins"${wocMoneyMine');
+    // than left greyed beside an amount in another currency. Keyed on the DEAL,
+    // not on whose money row shows the figure: the seller's row shows nothing,
+    // so the earlier wocMoneyMine test left their coin fields on screen under a
+    // deal priced in $WOC.
+    expect(HUD).toContain('class="trade-coins"${wocModel.wocDealStanding');
   });
 });

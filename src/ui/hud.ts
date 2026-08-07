@@ -18810,6 +18810,9 @@ export class Hud {
       staged: this.stagedTrade.items,
       theirStaged: this.sim.tradeInfo?.theirOffer.items ?? [],
       goldCopper: this.stagedTrade.copper,
+      // Server truth for the other side, not a local echo: their coin closes
+      // this side's $WOC arm, so it has to come from the shared trade state.
+      partnerGoldCopper: this.sim.tradeInfo?.theirOffer.copper ?? 0,
       items: ITEMS,
       marketEnabled: this.wocMarketHooks !== null,
       selfWalletVerified: this.wocMarketHooks?.walletLinked() === true,
@@ -19303,7 +19306,7 @@ export class Hud {
             <h4>${esc(t('hud.trade.yourOffer'))}</h4>
             <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
             <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>${wocMoneyMine}
-              <span class="trade-coins"${wocMoneyMine ? ' hidden' : ''}>
+              <span class="trade-coins"${wocModel.wocDealStanding ? ' hidden' : ''}>
                 <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
                 <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
                 <input class="coininput" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
