@@ -3330,17 +3330,37 @@ export const TARGETS = [
       await wait(200);
       await page.evaluate(() => {
         // Prefer a missing cell that actually HAS an authored source, so the
-        // capture shows the Phase 13 source line rather than a relic still on
-        // the pending-ruling list (which paints the plain missing tooltip and
-        // makes the screenshot look like the feature did not land). The
-        // painter stamps data-cell-source on exactly those cells; selecting on
-        // it survives copy rewords and non-English capture locales, where the
-        // old aria-text match ('Drops from') silently degraded to the
-        // fallback. Falls back to the first missing cell.
+        // capture shows the source lines rather than a relic still on the
+        // pending-ruling list (which paints the plain missing tooltip and makes
+        // the screenshot look like the feature did not land). The painter stamps
+        // data-cell-source on exactly those cells, carrying HOW MANY lines they
+        // resolve; selecting on it survives copy rewords and non-English capture
+        // locales, where the old aria-text match ('Drops from') silently
+        // degraded to the fallback.
+        //
+        // Highest count wins, so the shot lands on a genuinely multi-source
+        // relic (gravewyrm_gauntlets at three lines on this page) instead of a
+        // one-line cell that shows nothing the previous release did not. A cell
+        // with the attribute but no parseable number still beats one without,
+        // and the first missing cell remains the last resort.
         const missing = [
           ...document.querySelectorAll('#reliquary-window .reliquary-cell[data-cell-owned="0"]'),
         ];
-        const cell = missing.find((node) => node.hasAttribute('data-cell-source')) ?? missing[0];
+        const sourceCount = (node) => {
+          if (!node.hasAttribute('data-cell-source')) return 0;
+          const parsed = Number.parseInt(node.getAttribute('data-cell-source') ?? '', 10);
+          return Number.isNaN(parsed) ? 1 : parsed;
+        };
+        let best = null;
+        let bestCount = 0;
+        for (const node of missing) {
+          const count = sourceCount(node);
+          if (count > bestCount) {
+            best = node;
+            bestCount = count;
+          }
+        }
+        const cell = best ?? missing[0];
         if (cell) {
           // attachTooltip binds mouseenter/focusin (never pointerenter); focus
           // is the sturdier trigger here since no synthetic pointerdown has set

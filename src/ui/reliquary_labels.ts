@@ -25,14 +25,19 @@
 // "unknownRelic" copy, which is honest in every language.
 
 import { DEEDS } from '../sim/content/deeds';
+import {
+  RELIQUARY_ACTIVITY_SOURCE_IDS,
+  RELIQUARY_RIFT_RANK_SOURCE_IDS,
+  RELIQUARY_STORE_SOURCE_ID,
+} from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from '../sim/data';
+import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 import { localizeWeaponSkin } from './armory_labels';
 import { craftNameKey } from './craft_name_view';
 import { deedName, deedTitleText } from './deed_i18n';
 import { dungeonDisplayName, itemDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
-import { hasTranslation, type TranslationKey, t } from './i18n';
+import { formatList, hasTranslation, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import { MOUNT_NAME_KEYS } from './mount_labels';
 import {
@@ -139,6 +144,37 @@ function sourceDeedName(deedId: string): string | null {
   return ownEntry(DEEDS, deedId) ? deedName(deedId) : null;
 }
 
+/** The delve board's own name channel (tEntity kind 'delve'), membership-guarded
+ *  first for the same reason every arm here is. */
+function delveSourceName(delveId: string): string | null {
+  return ownEntry(DELVES, delveId) ? tEntity({ kind: 'delve', id: delveId, field: 'name' }) : null;
+}
+
+/** The quest log's own name channel (tEntity kind 'quest', field 'title'). */
+function questSourceName(questId: string): string | null {
+  return ownEntry(QUESTS, questId) ? tEntity({ kind: 'quest', id: questId, field: 'title' }) : null;
+}
+
+/** Rift ranks are a closed authored ladder, not a live content table: an id off
+ *  it names a rank that awards nothing, so the line is dropped rather than
+ *  promising reins from a rank that never rolls them.
+ *
+ *  The rank letter renders as-is by design, not by string surgery: rank
+ *  letters are the game's own untranslated designators, the same channel as
+ *  hudChrome.itemTooltip.riftTier ('{tier}-rank Rift item'), which hud.ts
+ *  feeds the raw instance tier. */
+function riftRankLabel(rank: string): string | null {
+  return (RELIQUARY_RIFT_RANK_SOURCE_IDS as readonly string[]).includes(rank) ? rank : null;
+}
+
+/** One key per authored award ACTIVITY. A new activity id with no key here
+ *  renders no line at all rather than a generic sentence that would be wrong
+ *  for whatever the new activity actually is. */
+const ACTIVITY_SOURCE_KEYS: Readonly<Record<string, TranslationKey>> = {
+  corpse_harvest: 'hudChrome.reliquary.sourceActivityCorpseHarvest',
+  masterwork_craft: 'hudChrome.reliquary.sourceActivityMasterworkCraft',
+};
+
 /** Localized profession name for a source hint, or '' for an id on neither the
  *  craft ring nor the gathering table (no honest name means no source line
  *  rather than an invented one).
@@ -191,5 +227,71 @@ export function reliquarySourceLineText(plan: ReliquarySourceLinePlan | undefine
       const vendor = vendorName(plan.npcId);
       return vendor === null ? '' : t('hudChrome.reliquary.sourceVendor', { vendor });
     }
+    case 'bossZone': {
+      const boss = bossName(plan.bossId);
+      const zone = zoneName(plan.zoneId);
+      // Both halves or nothing, the bossDungeon rule: an open-world rare paired
+      // with a raw zone id would read as content just the same.
+      if (boss === null || zone === null) return '';
+      return t('hudChrome.reliquary.sourceBossZone', { boss, zone });
+    }
+    case 'delve': {
+      const delve = delveSourceName(plan.delveId);
+      return delve === null ? '' : t('hudChrome.reliquary.sourceDelve', { delve });
+    }
+    case 'rift': {
+      const rank = riftRankLabel(plan.rank);
+      return rank === null ? '' : t('hudChrome.reliquary.sourceRift', { rank });
+    }
+    case 'quest': {
+      const quest = questSourceName(plan.questId);
+      return quest === null ? '' : t('hudChrome.reliquary.sourceQuest', { quest });
+    }
+    case 'store': {
+      // One storefront, so the sentence needs no placeholder; the id is still
+      // checked so a future second store cannot silently render as this one.
+      return plan.storeId === RELIQUARY_STORE_SOURCE_ID ? t('hudChrome.reliquary.sourceStore') : '';
+    }
+    case 'activity': {
+      const key = (RELIQUARY_ACTIVITY_SOURCE_IDS as readonly string[]).includes(plan.activityId)
+        ? ACTIVITY_SOURCE_KEYS[plan.activityId]
+        : undefined;
+      return key === undefined ? '' : t(key);
+    }
   }
+}
+
+/**
+ * Every source line one relic can honestly show, in plan order, with the arms
+ * that resolve to nothing dropped. The empty array is the un-hinted answer AND
+ * the "every id went stale" answer: both leave the surfaces with no line to
+ * paint, which is the same correct outcome.
+ */
+export function reliquarySourceLines(
+  plans: readonly ReliquarySourceLinePlan[] | undefined,
+): string[] {
+  if (plans === undefined) return [];
+  const lines: string[] = [];
+  for (const plan of plans) {
+    const line = reliquarySourceLineText(plan);
+    if (line !== '') lines.push(line);
+  }
+  return lines;
+}
+
+/**
+ * Fold resolved source lines into ONE string for an aria label, which cannot
+ * carry the separate elements the tooltip paints.
+ *
+ * The join is formatList (Intl.ListFormat, the material_profession_hint_view
+ * Used-by precedent), never a hardcoded ', ': ja joins with the ideographic
+ * comma, both Chinese locales with the fullwidth one, and locales whose FINAL
+ * separator differs from the medial one (ru "A, B и C") get that from
+ * CLDR, which a pairwise key could never express. Conjunction is the honest
+ * type: the routes coexist (the relic drops from A AND from B AND is
+ * craftable), so the reader hears a list of facts, not a choice.
+ */
+export function reliquarySourceAriaText(lines: readonly string[]): string {
+  if (lines.length === 0) return '';
+  return formatList(lines);
 }

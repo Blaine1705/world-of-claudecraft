@@ -12,10 +12,11 @@
 // missing. Unlock toast / Illumination celebration are planned pure in
 // reliquary_view and applied by a thin Hud arm.
 //
-// Phase 13: a silhouette tells you where to get it (the source line, in the
-// missing-cell tooltip AND its aria-label so keyboard reaches what hover
-// reaches), a page tells you what it is (reliquaryPageDesc on the header and
-// the shelf row), the grid is one roving tab stop instead of N, and the shelf
+// Phase 13: a silhouette tells you where to get it (one source line per
+// authored door, in the missing-cell tooltip AND folded into its aria-label so
+// keyboard reaches what hover reaches), a page tells you what it is
+// (reliquaryPageDesc on the header and the shelf row), the grid is one roving
+// tab stop instead of N, and the shelf
 // list is a real ul/li. Relic names come from reliquary_labels.ts, the one
 // ladder hud.ts's unlock sites share; page names still come from
 // reliquaryPageName(pageId). Search and the owned/missing chips are painter
@@ -38,7 +39,8 @@ import { reliquaryPageDesc, reliquaryPageName } from './reliquary_i18n';
 import {
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
-  reliquarySourceLineText,
+  reliquarySourceAriaText,
+  reliquarySourceLines,
 } from './reliquary_labels';
 import {
   buildReliquaryView,
@@ -714,6 +716,10 @@ export class ReliquaryWindow {
     const stateClass = cell.owned ? 'owned' : 'missing';
     const quality = this.cellQuality(cell);
     const icon = this.cellIconHtml(cell, quality);
+    // Resolved ONCE per cell per rebuild: the aria label and the count stamp
+    // both read it, and the search path rebuilds the grid per keystroke.
+    // Owned cells never show hunting directions, so they skip the resolution.
+    const sourceLines = cell.owned ? [] : reliquarySourceLines(cell.sourcePlans);
     // data-cell-id + data-cell-kind drive tooltip wiring after rebuild.
     // Roving tabindex: one tab stop per grid, Arrow/Home/End move it (wire()).
     return (
@@ -722,12 +728,17 @@ export class ReliquaryWindow {
       // role="list" container is not, and the container never takes focus here.
       `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
-      // data-cell-source marks cells with a resolvable source line so tooling
-      // (the PR shot picker) can find one without matching English aria text.
-      `${cell.sourcePlan !== undefined ? 'data-cell-source="1" ' : ''}` +
+      // data-cell-source marks cells with at least one RESOLVABLE source line,
+      // and carries how many actually resolve, so tooling (the PR shot picker)
+      // can find the richest multi-source cell without matching English aria
+      // text. Resolved lines, not authored plans: a plan whose id went stale
+      // renders nothing, and the attribute must never promise lines the
+      // tooltip will not paint. Any count is truthy as an attribute, so every
+      // present/absent selector still holds.
+      `${sourceLines.length > 0 ? `data-cell-source="${sourceLines.length}" ` : ''}` +
       `data-focus-key="${esc(`cell:${cell.kind}:${cell.id}`)}" ` +
       `aria-describedby="${GRID_HINT_ID}" aria-keyshortcuts="${GRID_KEY_SHORTCUTS}" ` +
-      `aria-label="${esc(this.cellAria(cell, name))}">` +
+      `aria-label="${esc(this.cellAria(cell, name, sourceLines))}">` +
       `<span class="reliquary-cell-art" aria-hidden="true">${icon}</span>` +
       `</div>`
     );
@@ -735,10 +746,13 @@ export class ReliquaryWindow {
 
   /**
    * Keyboard parity with hover: the label carries everything the tooltip shows
-   * a mouse (the source line for a missing relic, the first-find clear number
-   * for an owned one), so nothing actionable is hover-only.
+   * a mouse (EVERY source line for a missing relic, the first-find clear number
+   * for an owned one), so nothing actionable is hover-only. A label cannot carry
+   * the tooltip's separate lines, so they fold into the one {source} slot
+   * through the localized join (reliquarySourceAriaText), never punctuation
+   * spelled here.
    */
-  private cellAria(cell: ReliquaryGridCellModel, name: string): string {
+  private cellAria(cell: ReliquaryGridCellModel, name: string, sourceLines: string[]): string {
     if (cell.owned) {
       return cell.firstFindClears !== undefined
         ? t('hudChrome.reliquary.cellOwnedClearsAria', {
@@ -747,7 +761,7 @@ export class ReliquaryWindow {
           })
         : t('hudChrome.reliquary.cellOwnedAria', { name });
     }
-    const source = reliquarySourceLineText(cell.sourcePlan);
+    const source = reliquarySourceAriaText(sourceLines);
     return source === ''
       ? t('hudChrome.reliquary.cellMissingAria', { name })
       : t('hudChrome.reliquary.cellMissingSourceAria', { name, source });
@@ -801,12 +815,16 @@ export class ReliquaryWindow {
       : t('hudChrome.reliquary.missingTooltipStatus');
     let body = `<div class="tt-name q-${esc(this.cellQuality(cell))}">${esc(name)}</div>`;
     body += `<div class="tt-line">${esc(status)}</div>`;
-    // A silhouette tells you where to get it. Missing cells only: an owned item
-    // relic returns the full item tooltip below, and a player who already has it
-    // does not need the hunting directions.
+    // A silhouette tells you where to get it: EVERY door on its own line, the
+    // way a collection log reads, so a relic with three routes shows three
+    // rather than one arbitrary winner. Missing cells only: an owned item relic
+    // returns the full item tooltip below, and a player who already has it does
+    // not need the hunting directions. Nothing extra renders when the lines all
+    // resolve empty, exactly like the un-hinted arm.
     if (!cell.owned) {
-      const source = reliquarySourceLineText(cell.sourcePlan);
-      if (source !== '') body += `<div class="tt-line">${esc(source)}</div>`;
+      for (const source of reliquarySourceLines(cell.sourcePlans)) {
+        body += `<div class="tt-line">${esc(source)}</div>`;
+      }
     }
     if (cell.kind === 'weapon_skin') {
       body += `<div class="tt-line">${esc(t('hudChrome.reliquary.accountScopeBadge'))}</div>`;

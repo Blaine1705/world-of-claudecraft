@@ -4120,6 +4120,24 @@ export const hudChromeStrings = {
     sourceProfession: 'Earned through {profession}',
     sourceDeed: 'Awarded by the deed {deed}',
     sourceVendor: 'Sold by {vendor}',
+    // A relic with several live routes shows one line per route, so these read
+    // as siblings of the six above rather than as a summary of them.
+    // {boss} here is the open-world rare and {zone} where it camps: half an
+    // answer either way, which is why they share one line.
+    sourceBossZone: 'Drops from {boss} in {zone}',
+    sourceDelve: 'Found in the delve {delve}',
+    // "{rank}-rank" matches the established Rift wording (itemTooltip.riftTier,
+    // sim.rift.raceWorldWin), and the reins come off the CLEAR, not one boss.
+    sourceRift: 'Awarded for clearing {rank}-rank Rifts',
+    sourceQuest: 'Reward from the quest {quest}',
+    sourceStore: 'Purchased from the WOC Store',
+    // Award activities: the player action itself is the source, with no mob,
+    // vendor, or quest in between.
+    sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
+    sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
+    // The aria label folds the lines through formatList (Intl.ListFormat), so
+    // there is no join key to translate: CLDR owns the separators per locale,
+    // including the final-conjunction shapes a pairwise key cannot express.
     // Missing cells fold the source line into the label so a keyboard or screen
     // reader user gets everything a hover tooltip shows; owned cells fold in the
     // first-find clear number on the same rule.

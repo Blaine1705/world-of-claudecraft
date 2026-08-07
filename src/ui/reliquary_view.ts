@@ -8,8 +8,8 @@
 // seal chrome, and rank-up celebration plan.
 //
 // Phase 13: the nearly-complete predicate (either arm, both inclusive), the
-// source-line ARM choice (reliquarySourceLinePlan, ids only), and the search /
-// ownership filter. The i18n-free contract in the first line still holds and is
+// source-line ARM choice (reliquarySourceLinePlan, ids only, one line per
+// authored door), and the search / ownership filter. The i18n-free contract in the first line still holds and is
 // load-bearing: this core decides WHICH source arm and WHICH cells survive a
 // filter, while every localized string stays one layer out. Filtering therefore
 // matches on display text the painter injects (pageSearchText / relicSearchText,
@@ -96,31 +96,38 @@ export function isReliquaryOwnedFilter(value: string): value is ReliquaryOwnedFi
 }
 
 /**
- * Where a relic comes from, resolved to ids only: the pure half of the source
- * line. The localized half (mob/dungeon/zone/npc/deed/craft names plus the
- * sentence key) lives in reliquary_labels.ts, so this core stays i18n-free and
- * a Vitest can assert WHICH arm a hint selects without a language loaded.
+ * Where a relic comes from, resolved to ids only: the pure half of one source
+ * line. The localized half (mob/dungeon/zone/npc/deed/craft/delve/quest names
+ * plus the sentence key) lives in reliquary_labels.ts, so this core stays
+ * i18n-free and a Vitest can assert WHICH arm a hint selects without a language
+ * loaded.
  */
 export type ReliquarySourceLinePlan =
   | { kind: 'bossDungeon'; bossId: string; dungeonId: string }
+  | { kind: 'bossZone'; bossId: string; zoneId: string }
   | { kind: 'boss'; bossId: string }
   | { kind: 'zone'; zoneId: string }
   | { kind: 'profession'; professionId: string }
   | { kind: 'deed'; deedId: string }
-  | { kind: 'vendor'; npcId: string };
+  | { kind: 'vendor'; npcId: string }
+  | { kind: 'delve'; delveId: string }
+  | { kind: 'rift'; rank: string }
+  | { kind: 'quest'; questId: string }
+  | { kind: 'store'; storeId: string }
+  | { kind: 'activity'; activityId: string };
 
-/**
- * Pick the source-line arm for one relic hint. A boss hint on a page whose
- * clear meter reads a dungeon names both ("in {dungeon}"); a boss on a raid or
- * world-boss page (delve / deed_stat / none / no clear source) names the boss
- * alone rather than inventing a place. No hint means no line at all: an
- * un-authored source renders nothing, never a guess.
- */
-export function reliquarySourceLinePlan(
-  hint: ReliquarySourceHint | undefined,
+/** Shared frozen empty answer, so "no source" never allocates (the
+ *  NO_SOURCE_HINTS idiom on the catalog side of this pair). */
+const NO_SOURCE_LINES: readonly ReliquarySourceLinePlan[] = Object.freeze([]);
+
+/** The arm one hint takes on its own, before any composition. A boss hint on a
+ *  page whose clear meter reads a dungeon names both ("in {dungeon}"); a boss on
+ *  a raid, world-boss, or delve page names the boss alone rather than inventing
+ *  a place. */
+function sourceLineForHint(
+  hint: ReliquarySourceHint,
   clearSource: ReliquaryClearSource | undefined,
-): ReliquarySourceLinePlan | null {
-  if (hint === undefined) return null;
+): ReliquarySourceLinePlan {
   switch (hint.sourceKind) {
     case 'boss':
       return clearSource?.kind === 'dungeon'
@@ -134,7 +141,79 @@ export function reliquarySourceLinePlan(
       return { kind: 'deed', deedId: hint.sourceId };
     case 'vendor':
       return { kind: 'vendor', npcId: hint.sourceId };
+    case 'delve':
+      return { kind: 'delve', delveId: hint.sourceId };
+    case 'rift':
+      return { kind: 'rift', rank: hint.sourceId };
+    case 'quest':
+      return { kind: 'quest', questId: hint.sourceId };
+    case 'store':
+      return { kind: 'store', storeId: hint.sourceId };
+    case 'activity':
+      return { kind: 'activity', activityId: hint.sourceId };
   }
+}
+
+/**
+ * Plan every source line one relic shows, from the hints the catalog authors
+ * for it. THE one pattern, stated once so a reader never has to guess which
+ * shape produces which line count:
+ *
+ *   ONE LINE PER HINT, in authored order, with no cap. Composition happens in
+ *   exactly two places, both of which fold a PLACE into a line that would
+ *   otherwise name only a source:
+ *     - a boss hint on a dungeon-clear page becomes "in {dungeon}" (unchanged
+ *       from the single-hint world), and
+ *     - a list holding EXACTLY ONE boss hint and EXACTLY ONE zone hint (on a
+ *       page with no dungeon of its own) composes them into one bossZone line
+ *       at the BOSS hint's authored position, because "which rare" and "where
+ *       it camps" are two halves of one open-world answer.
+ *   Every other hint in the list still renders its own line either way, and the
+ *   dungeon composition wins where both could apply: dropping the page's own
+ *   dungeon to name a zone instead would lose the more specific place.
+ *
+ * An empty list is a real answer ("content names no source") and produces no
+ * line at all, never a guess.
+ *
+ * Same-dungeon boss pairs are deliberately NOT merged into an "either boss"
+ * line. One line per door is the pattern everywhere else in this function, and
+ * a reader who has learned to count doors by counting lines should not have to
+ * unlearn it for the one shape where the doors happen to share a roof.
+ */
+export function reliquarySourceLinePlan(
+  hints: readonly ReliquarySourceHint[],
+  clearSource: ReliquaryClearSource | undefined,
+): readonly ReliquarySourceLinePlan[] {
+  if (hints.length === 0) return NO_SOURCE_LINES;
+  let soleBoss: ReliquarySourceHint | null = null;
+  let soleZone: ReliquarySourceHint | null = null;
+  let bosses = 0;
+  let zones = 0;
+  for (const hint of hints) {
+    if (hint.sourceKind === 'boss') {
+      bosses += 1;
+      soleBoss = hint;
+    } else if (hint.sourceKind === 'zone') {
+      zones += 1;
+      soleZone = hint;
+    }
+  }
+  const composeBossZone =
+    clearSource?.kind !== 'dungeon' && bosses === 1 && zones === 1 && soleZone !== null;
+  const lines: ReliquarySourceLinePlan[] = [];
+  for (const hint of hints) {
+    if (composeBossZone && soleZone !== null) {
+      // The pair renders once, at the boss's position; the zone half is folded
+      // in rather than repeated as a line of its own.
+      if (hint === soleZone) continue;
+      if (hint === soleBoss) {
+        lines.push({ kind: 'bossZone', bossId: hint.sourceId, zoneId: soleZone.sourceId });
+        continue;
+      }
+    }
+    lines.push(sourceLineForHint(hint, clearSource));
+  }
+  return lines;
 }
 
 /** Sparse first-find meta (mirrors IWorld.reliquaryFirstFind). */
@@ -251,10 +330,12 @@ export interface ReliquaryGridCellModel {
    */
   firstFindClears?: number;
   /**
-   * Where this relic comes from, ids only (reliquarySourceLinePlan). Undefined
-   * when the catalog authors no hint for the slot and none for the page.
+   * Every door this relic comes through, ids only and in authored order
+   * (reliquarySourceLinePlan). Undefined when the catalog authors no hint for
+   * the slot and none for the page; never an empty list, so a truthiness test
+   * and a length test agree.
    */
-  sourcePlan?: ReliquarySourceLinePlan;
+  sourcePlans?: readonly ReliquarySourceLinePlan[];
 }
 
 /** Full page view: header progress plus ordered grid cells. */
@@ -372,15 +453,12 @@ export function buildReliquaryPageCells(
       owned,
       index: i,
     };
-    // Slot hint first, then the page default, through the ONE implementation of
+    // Slot hints first, then the page default, through the ONE implementation of
     // that precedence (reliquaryRelicSource). It takes the INJECTED page def,
     // never a catalog lookup by id, so a synthetic test page resolves its own
     // sourceDefault instead of a live RELIQUARY_PAGES row that shares its id.
-    const plan = reliquarySourceLinePlan(
-      reliquaryRelicSource(page, relic) ?? undefined,
-      page.clearSource,
-    );
-    if (plan !== null) cell.sourcePlan = plan;
+    const plans = reliquarySourceLinePlan(reliquaryRelicSource(page, relic), page.clearSource);
+    if (plans.length > 0) cell.sourcePlans = plans;
     if (owned && relic.kind === 'item') {
       const clears = opts.firstFind?.[id]?.clears;
       if (clears !== undefined) cell.firstFindClears = clears;
