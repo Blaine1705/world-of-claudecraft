@@ -22,6 +22,7 @@ import {
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
+import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
@@ -186,7 +187,10 @@ export interface AbilityVfxEntityState {
   // wire's kind/rem), and dead gates it off a corpse; optional so tests can
   // omit them.
   auras: readonly { id: string; kind?: string; remaining?: number; breakThreshold?: number }[];
+  // dead + hp gate the stun tell off a corpse through isVisuallyDead; both
+  // optional so tests can omit them (an absent hp reads as alive).
   dead?: boolean;
+  hp?: number;
   kind?: string;
   templateId?: string;
   // On-next-swing queue (heroic-strike style ability id while armed). Present
@@ -1333,9 +1337,12 @@ export class AbilityVfx {
     // budget, every quality tier keeps it, and the fx engine sweeps it the
     // frame the aura fades. A dead body sheds it (an unbreakable stun can
     // survive death by design, e.g. the Nythraxis transition ghosts; a corpse
-    // must not wear a frozen band). One uniform yellow for every source, the
-    // classic dizzy-stars read (STUN_STAR_COLOR in the core owns the why).
-    if (e.dead !== true) {
+    // must not wear a frozen band). Deadness is the renderer's own
+    // isVisuallyDead rule, not a bare `dead` flag: a mob at 0 hp whose flag
+    // has not landed yet would otherwise keep the band for that window. One
+    // uniform yellow for every source, the classic dizzy-stars read
+    // (STUN_STAR_COLOR in the core owns the why).
+    if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
       const stunAt = wornStunIndex(e.auras);
       if (stunAt >= 0) fx.holdStunStars(e.id, e.auras[stunAt].remaining ?? 1);
     }

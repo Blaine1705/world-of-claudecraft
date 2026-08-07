@@ -3,6 +3,7 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
+  insertStunBandPick,
   MAX_STUN_STAR_BANDS,
   STUN_STAR_ALPHA_FLOOR,
   STUN_STAR_BRIGHTNESS,
@@ -12,6 +13,7 @@ import {
   STUN_STAR_RADIUS,
   STUN_STAR_RATE,
   STUN_STAR_SIZE,
+  stunBandRankKey,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
@@ -49,6 +51,7 @@ export type ParticleBurst = (
 
 const camPosScratch = new THREE.Vector3();
 const camRightScratch = new THREE.Vector3();
+const camFwdScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
 // primitive families ported from the Ability VFX Gallery (ribbon trails, shock
@@ -310,11 +313,17 @@ export class AbilityVfxFx implements SequencerHost {
   private orbitBandCount = 0;
   // Persistent stunned-star bands (holdStunStars), one entry per stunned
   // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
-  // the MAX_STUN_STAR_BANDS entities nearest the camera per frame (the two
-  // fixed pick arrays are the selection scratch, reused every frame).
-  private stunStars = new Map<number, { remaining: number; stamp: number }>();
+  // the MAX_STUN_STAR_BANDS best-ranked entities per frame (the fixed pick
+  // arrays are the selection scratch, reused every frame). hx/hy/hz cache the
+  // frame's resolved head anchor so the draw never re-resolves it (the
+  // renderer's anchor delegate allocates a Vector3 per call).
+  private stunStars = new Map<
+    number,
+    { remaining: number; stamp: number; hx: number; hy: number; hz: number }
+  >();
   private stunPickIds: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
-  private stunPickDist: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
+  private stunPickKeys: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
+  private stunPickCount = 0;
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
@@ -859,13 +868,20 @@ export class AbilityVfxFx implements SequencerHost {
     return this.anchor(id, frac);
   }
 
-  // True while the aura-driven stunned-star band is live for this entity
-  // (fed this frame; the sweep has not run when the sequencer asks, because
-  // sequencer.update runs inside this update's own frame). The sequencer's
-  // cast-moment ccStars stand down for it.
+  // True when the aura-driven stunned-star band actually WON a draw slot in
+  // the latest frame, which is what the sequencer's cast-moment ccStars stand
+  // down for. Membership in the pick set, deliberately not "was fed": the
+  // band count is capped, and answering on fed-ness suppressed the
+  // cast-moment band for a capped-out victim whose held band was never drawn,
+  // leaving it with no overhead read at all (worse than before this feature
+  // existed). The pick set is rebuilt at the top of every update(), before
+  // sequencer.update() consults it, so the sequencer always reads the set for
+  // the frame it is drawing.
   heldStunStars(targetId: number): boolean {
-    const s = this.stunStars.get(targetId);
-    return s !== undefined && s.stamp === this.frame;
+    for (let i = 0; i < this.stunPickCount; i++) {
+      if (this.stunPickIds[i] === targetId) return true;
+    }
+    return false;
   }
 
   groundYAt(x: number, z: number): number {
@@ -1378,7 +1394,7 @@ export class AbilityVfxFx implements SequencerHost {
   holdStunStars(entityId: number, remaining: number): void {
     let s = this.stunStars.get(entityId);
     if (!s) {
-      s = { remaining, stamp: this.frame };
+      s = { remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
       this.stunStars.set(entityId, s);
       return;
     }
@@ -1387,20 +1403,18 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // One held star band (the drawOrbit sibling): STUN_STAR_COUNT sprites
-  // orbiting the entity's head on the shared time base. Alpha reads the
+  // orbiting the head anchor the pick loop already resolved. Alpha reads the
   // stun's remaining time but never falls below the floor while the aura
   // lives: the fade above the floor is the duration read, the floor is the
   // fairness rule (an active stun tell must stay readable to the last tick).
-  private drawStunStars(entityId: number, s: { remaining: number }): void {
-    const head = this.anchorOf(entityId, 1.0);
-    if (!head) return;
+  private drawStunStars(s: { remaining: number; hx: number; hy: number; hz: number }): void {
     const alpha = Math.max(STUN_STAR_ALPHA_FLOOR, Math.min(1, s.remaining));
     for (let k = 0; k < STUN_STAR_COUNT; k++) {
       const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
       this.overlay.push(
-        head.x + Math.cos(a) * STUN_STAR_RADIUS,
-        head.y + STUN_STAR_LIFT,
-        head.z + Math.sin(a) * STUN_STAR_RADIUS,
+        s.hx + Math.cos(a) * STUN_STAR_RADIUS,
+        s.hy + STUN_STAR_LIFT,
+        s.hz + Math.sin(a) * STUN_STAR_RADIUS,
         STUN_STAR_COLOR,
         STUN_STAR_SIZE,
         OVERLAY_CELL.star,
@@ -1417,6 +1431,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
     this.camera.getWorldPosition(camPosScratch);
     camRightScratch.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
+    // camera forward, for the stun-band in-front-of-camera ranking below
+    camFwdScratch.set(0, 0, -1).applyQuaternion(this.camera.quaternion);
     const rightLen = Math.hypot(camRightScratch.x, camRightScratch.z);
     if (rightLen > 1e-4) {
       this.camRightX = camRightScratch.x / rightLen;
@@ -1457,26 +1473,28 @@ export class AbilityVfxFx implements SequencerHost {
       }
       const head = this.anchorOf(id, 1.0);
       if (!head) continue;
+      s.hx = head.x;
+      s.hy = head.y;
+      s.hz = head.z;
       const dx = head.x - camPosScratch.x;
       const dy = head.y - camPosScratch.y;
       const dz = head.z - camPosScratch.z;
-      const d = dx * dx + dy * dy + dz * dz;
-      // Insertion into the fixed nearest-N scratch (ascending by distance).
-      if (stunPicks < MAX_STUN_STAR_BANDS || d < this.stunPickDist[stunPicks - 1]) {
-        let i = Math.min(stunPicks, MAX_STUN_STAR_BANDS - 1);
-        while (i > 0 && this.stunPickDist[i - 1] > d) {
-          this.stunPickIds[i] = this.stunPickIds[i - 1];
-          this.stunPickDist[i] = this.stunPickDist[i - 1];
-          i--;
-        }
-        this.stunPickIds[i] = id;
-        this.stunPickDist[i] = d;
-        if (stunPicks < MAX_STUN_STAR_BANDS) stunPicks++;
-      }
+      const inFront = dx * camFwdScratch.x + dy * camFwdScratch.y + dz * camFwdScratch.z > 0;
+      const key = stunBandRankKey(dx * dx + dy * dy + dz * dz, inFront);
+      stunPicks = insertStunBandPick(
+        this.stunPickIds,
+        this.stunPickKeys,
+        stunPicks,
+        id,
+        key,
+        MAX_STUN_STAR_BANDS,
+      );
     }
+    // Published BEFORE sequencer.update below, which asks heldStunStars.
+    this.stunPickCount = stunPicks;
     for (let i = 0; i < stunPicks; i++) {
       const s = this.stunStars.get(this.stunPickIds[i]);
-      if (s) this.drawStunStars(this.stunPickIds[i], s);
+      if (s) this.drawStunStars(s);
     }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
@@ -1545,6 +1563,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.orbits.clear();
     this.orbitBandCount = 0;
     this.stunStars.clear();
+    this.stunPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
   }
 

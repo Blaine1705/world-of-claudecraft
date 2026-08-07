@@ -18,10 +18,13 @@ import { OVERLAY_CELL } from '../src/render/ability_vfx/fx_textures';
 import type { AbilityVfxDeps, AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import {
+  insertStunBandPick,
   MAX_STUN_STAR_BANDS,
   STUN_STAR_ALPHA_FLOOR,
+  STUN_STAR_BRIGHTNESS,
   STUN_STAR_COLOR,
   STUN_STAR_COUNT,
+  stunBandRankKey,
   wornStunIndex,
 } from '../src/render/ability_vfx_core';
 import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
@@ -65,7 +68,7 @@ afterEach(() => {
 
 interface FxProbe {
   stunStars: Map<number, { remaining: number; stamp: number }>;
-  overlay: { count: number; alpha: Float32Array; cell: Float32Array };
+  overlay: { count: number; alpha: Float32Array; cell: Float32Array; col: Float32Array };
   sequencer: {
     slots: { active: boolean; targetId: number; ccStars: number; impactDone: boolean }[];
   };
@@ -73,14 +76,16 @@ interface FxProbe {
 
 // The anchor spreads entities along x by id so the nearest-camera selection
 // has real distances to rank (camera sits at the origin looking down -z).
-function makeFx(): { fx: AbilityVfxFx; probe: FxProbe } {
+function makeFx(anchor?: (id: number) => THREE.Vector3): { fx: AbilityVfxFx; probe: FxProbe } {
   installCanvasStub();
+  // Identity rotation, so the camera sits at the origin looking down -z:
+  // z < 0 is in front of it, z > 0 is behind.
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
   camera.updateMatrixWorld();
   const fx = new AbilityVfxFx(
     new THREE.Scene(),
     camera,
-    (id: number) => new THREE.Vector3(id, 1.8, -5),
+    anchor ?? ((id: number) => new THREE.Vector3(id, 1.8, -5)),
     () => 0,
   );
   return { fx, probe: fx as unknown as FxProbe };
@@ -170,8 +175,75 @@ describe('wornStunIndex (pure core)', () => {
     expect(wornStunIndex([{ kind: 'stun', remaining: 0 }])).toBe(-1);
   });
 
-  it('pins the one uniform dizzy-stars yellow for every stun source', () => {
+  it('pins the constant itself to the classic dizzy-stars yellow', () => {
     expect(STUN_STAR_COLOR).toBe(0xffd700);
+  });
+});
+
+describe('band selection (pure core)', () => {
+  // Drive the ranking + bounded insertion directly, rather than only through
+  // the frame path, so the ordering rules are pinned on their own.
+  function pick(entries: { id: number; dist2: number; inFront: boolean }[], max: number): number[] {
+    const ids: number[] = new Array(Math.max(max, 1)).fill(0);
+    const keys: number[] = new Array(Math.max(max, 1)).fill(0);
+    let count = 0;
+    for (const e of entries) {
+      count = insertStunBandPick(ids, keys, count, e.id, stunBandRankKey(e.dist2, e.inFront), max);
+    }
+    return ids.slice(0, count);
+  }
+
+  it('orders by distance and drops the worst once full', () => {
+    expect(
+      pick(
+        [
+          { id: 1, dist2: 90, inFront: true },
+          { id: 2, dist2: 10, inFront: true },
+          { id: 3, dist2: 50, inFront: true },
+        ],
+        2,
+      ),
+    ).toEqual([2, 3]);
+  });
+
+  it('puts every in-front band ahead of every behind-camera band, however near', () => {
+    expect(
+      pick(
+        [
+          { id: 1, dist2: 0.01, inFront: false },
+          { id: 2, dist2: 9000, inFront: true },
+        ],
+        2,
+      ),
+    ).toEqual([2, 1]);
+    // and the behind-camera one loses outright when slots are scarce
+    expect(
+      pick(
+        [
+          { id: 1, dist2: 0.01, inFront: false },
+          { id: 2, dist2: 9000, inFront: true },
+        ],
+        1,
+      ),
+    ).toEqual([2]);
+  });
+
+  it('keeps behind-camera bands ranked among themselves', () => {
+    expect(
+      pick(
+        [
+          { id: 1, dist2: 800, inFront: false },
+          { id: 2, dist2: 40, inFront: false },
+        ],
+        2,
+      ),
+    ).toEqual([2, 1]);
+  });
+
+  it('is a no-op at zero capacity and never exceeds max', () => {
+    expect(pick([{ id: 1, dist2: 1, inFront: true }], 0)).toEqual([]);
+    const many = Array.from({ length: 40 }, (_, i) => ({ id: i, dist2: i, inFront: true }));
+    expect(pick(many, MAX_STUN_STAR_BANDS)).toHaveLength(MAX_STUN_STAR_BANDS);
   });
 });
 
@@ -221,6 +293,15 @@ describe('painter feeds the stun tell from the aura KIND, not the spec table', (
     expect(fx.holdStunStars).not.toHaveBeenCalled();
   });
 
+  it('holds nothing at 0 hp before the dead flag has landed', () => {
+    const { painter, fx } = makePainter();
+    const e = ent([{ id: 'storm_bolt_stun', kind: 'stun', remaining: 3 }]);
+
+    painter.syncEntity({ ...e, hp: 0 });
+
+    expect(fx.holdStunStars).not.toHaveBeenCalled();
+  });
+
   it('sleeps instead of holding when presentation is gated off', () => {
     const { painter, fx } = makePainter();
 
@@ -240,6 +321,29 @@ describe('fx engine draws and sweeps the held star band', () => {
 
     expect(probe.overlay.count).toBe(STUN_STAR_COUNT);
     for (let k = 0; k < STUN_STAR_COUNT; k++) expect(probe.overlay.alpha[k]).toBeCloseTo(0.5);
+  });
+
+  it('draws the band in STUN_STAR_COLOR, identically for a spec-backed and an unspec-backed stun', () => {
+    const { fx, probe } = makeFx();
+    // Expected channels come from the constant through the same conversion
+    // OverlaySprites.push applies, so a hardcoded colour at the push site
+    // fails this even though the constant is untouched.
+    const want = new THREE.Color().setHex(STUN_STAR_COLOR).multiplyScalar(STUN_STAR_BRIGHTNESS);
+
+    // id 7 stands in for a spec-backed stun (storm_bolt_stun), id 8 for one
+    // with no vfx spec at all (a mob stomp): the painter passes no colour for
+    // either, so the drawn channels must be byte-identical.
+    fx.holdStunStars(7, 3);
+    fx.holdStunStars(8, 3);
+    fx.update(0.05);
+
+    expect(probe.overlay.count).toBe(2 * STUN_STAR_COUNT);
+    for (let i = 0; i < probe.overlay.count; i++) {
+      expect(probe.overlay.col[i * 3]).toBeCloseTo(want.r, 5);
+      expect(probe.overlay.col[i * 3 + 1]).toBeCloseTo(want.g, 5);
+      // no blue: the additive overbright must clamp toward yellow, not white
+      expect(probe.overlay.col[i * 3 + 2]).toBeCloseTo(0, 5);
+    }
   });
 
   it('clamps alpha to 1 above a second remaining and to the floor near expiry', () => {
@@ -289,6 +393,57 @@ describe('fx engine draws and sweeps the held star band', () => {
     expect(probe.overlay.count).toBe(MAX_STUN_STAR_BANDS * STUN_STAR_COUNT);
     // Every held entry survives the cap; only the draw is bounded.
     expect(probe.stunStars.size).toBe(MAX_STUN_STAR_BANDS + 6);
+  });
+
+  it('does not claim the read for a band the cap dropped, so its cast-moment stars still draw', () => {
+    const { fx, probe } = makeFx();
+
+    // Saturate the cap with nearer victims, then a far one that loses its slot.
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS; id++) fx.holdStunStars(id, 3);
+    const dropped = 900;
+    fx.holdStunStars(dropped, 3);
+    fx.update(0.05);
+
+    // It is held and fed, but it did not win a slot, so the sequencer must NOT
+    // stand down for it: answering "was fed" here left the 9th victim with no
+    // overhead read at all, which is worse than before the feature existed.
+    expect(probe.stunStars.has(dropped)).toBe(true);
+    expect(fx.heldStunStars(dropped)).toBe(false);
+    expect(fx.heldStunStars(1)).toBe(true);
+  });
+
+  it('keeps a FAR on-screen victim over a NEAR one behind the camera', () => {
+    // Negative ids sit close behind the camera (z > 0); the rest sit far in
+    // front. Ranking on raw camera distance would evict an on-screen band for
+    // the much nearer behind-camera one, which is the preset-dependent
+    // unfairness: on low, offscreen non-actionable rigs are culled before
+    // they ever compete, on medium and above they all do.
+    const { fx } = makeFx((id) =>
+      id < 0 ? new THREE.Vector3(0, 1.8, 2) : new THREE.Vector3(0, 1.8, -50),
+    );
+
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS; id++) fx.holdStunStars(id, 3);
+    fx.holdStunStars(-1, 3);
+    fx.update(0.05);
+
+    // Every far in-front victim keeps its slot; the near behind-camera one
+    // loses, despite being 25x closer.
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS; id++) {
+      expect(fx.heldStunStars(id)).toBe(true);
+    }
+    expect(fx.heldStunStars(-1)).toBe(false);
+  });
+
+  it('still ranks by distance among bands on the same side of the camera', () => {
+    const { fx } = makeFx((id) => new THREE.Vector3(0, 1.8, -id));
+
+    // ids 1..N+2 all in front at increasing distance; the two farthest lose.
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS + 2; id++) fx.holdStunStars(id, 3);
+    fx.update(0.05);
+
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS; id++) expect(fx.heldStunStars(id)).toBe(true);
+    expect(fx.heldStunStars(MAX_STUN_STAR_BANDS + 1)).toBe(false);
+    expect(fx.heldStunStars(MAX_STUN_STAR_BANDS + 2)).toBe(false);
   });
 
   it('the held band OWNS the read over a live cast-moment ccStars slot: 4 sprites, full alpha, never 8', () => {
@@ -395,14 +550,18 @@ describe('online mirror parity', () => {
 });
 
 describe('sequencer handoff surface', () => {
-  it('heldStunStars reports a band fed this frame, for that entity only', () => {
+  it('heldStunStars reports the drawn pick set, for that entity only, and lapses on release', () => {
     const { fx } = makeFx();
 
+    // Nothing is claimed until a frame has actually chosen its picks.
     fx.holdStunStars(7, 3);
+    expect(fx.heldStunStars(7)).toBe(false);
+
+    fx.update(0.05);
     expect(fx.heldStunStars(7)).toBe(true);
     expect(fx.heldStunStars(8)).toBe(false);
 
-    // After the frame advances without a re-feed the claim lapses.
+    // A frame with no feed drops the band, and the claim with it.
     fx.update(0.05);
     expect(fx.heldStunStars(7)).toBe(false);
   });

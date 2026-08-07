@@ -533,10 +533,12 @@ export const TARGETS = [
   {
     key: 'stun-stars',
     label: 'Persistent stunned-star band over a stunned mob, past the cast moment',
-    // 'stun_stars' matches the paired test/module names so a focused diff can
-    // imply exactly this target; 'render/ability_vfx' keeps it firing for any
-    // subsystem-wide change.
-    when: ['render/ability_vfx', 'stun_stars'],
+    // One token, and it covers the whole shipping surface: the band lives in
+    // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
+    // sequencer}.ts', all of which this prefix matches. (An earlier
+    // 'stun_stars' token named no shipping module at all, so it only ever
+    // matched the test file.)
+    when: ['render/ability_vfx'],
     variants: [
       // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
       // capture pipeline spends ~0.7s between the aura poll and the shutter,

@@ -61,10 +61,17 @@ describe('classifyDiff', () => {
     const plan = classifyDiff(['src/render/ability_vfx/fx.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('stun-stars');
-    // A focused stun_stars module path implies exactly this target, so a
-    // narrow diff never drags the whole subsystem tour along.
-    const focused = classifyDiff(['src/render/stun_stars.ts']);
-    expect(focused.specific.map((t: { key: string }) => t.key)).toEqual(['stun-stars']);
+    // Every module the band actually ships in resolves the target, the core
+    // included (its `when` prefix must not silently cover only the directory).
+    for (const path of [
+      'src/render/ability_vfx_core.ts',
+      'src/render/ability_vfx/painter.ts',
+      'src/render/ability_vfx/sequencer.ts',
+    ]) {
+      expect(classifyDiff([path]).specific.map((t: { key: string }) => t.key)).toContain(
+        'stun-stars',
+      );
+    }
     const target = plan.specific.find((t: { key: string }) => t.key === 'stun-stars');
     expect(target.variants).toEqual([
       {
