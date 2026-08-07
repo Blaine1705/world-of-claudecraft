@@ -3386,6 +3386,9 @@ export const tr_TR: EnTranslations = {
       "toZone": "Bölge haritası",
       "toggleAria": "Dünya haritası ile bölge haritası arasında geçiş yap",
       "levels": "Seviye {min} ile {max} arası"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

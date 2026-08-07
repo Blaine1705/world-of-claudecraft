@@ -3386,6 +3386,9 @@ export const de_DE: EnTranslations = {
       "toZone": "Zonenkarte",
       "toggleAria": "Zwischen Weltkarte und Zonenkarte wechseln",
       "levels": "Stufe {min} bis {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

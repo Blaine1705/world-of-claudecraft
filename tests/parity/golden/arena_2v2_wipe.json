@@ -29,8 +29,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "8b7c6fbf",
-      "events": "3a7da939",
+      "state": "3a2cf26b",
+      "events": "375f7547",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "2e683b90",
+      "state": "3fa3ef02",
       "events": "224cbfd9",
       "rng": {
         "draws": 94,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "3205f606",
+      "state": "9284a41e",
       "events": "969ec561",
       "rng": {
         "draws": 290,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "5c59ea49",
+      "state": "ef6dd2c7",
       "events": "507341c9",
       "rng": {
         "draws": 513,
@@ -73,7 +73,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 967,
-      "state": "0b0d9068",
+      "state": "47a68a82",
       "events": "74c0894d",
       "rng": {
         "draws": 525,
@@ -108,6 +108,24 @@
               "worn_sword"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 963,
@@ -125,12 +143,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -163,6 +183,24 @@
               "spring_water"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 964,
@@ -183,12 +221,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -220,6 +260,24 @@
               "rusty_dagger"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 965,
@@ -237,12 +295,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -275,6 +335,24 @@
               "spring_water"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 966,
@@ -295,12 +373,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -310,7 +390,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 102,
           "auras": [
             {
               "duration": 3600,
@@ -326,16 +406,16 @@
           "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.067,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.067,
           "fiveSecondRule": 104.05,
-          "hp": 100,
+          "hp": 632,
           "id": 963,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 100,
+          "maxHp": 632,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -355,12 +435,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 20,
-            "armor": 144,
+            "agi": 34,
+            "armor": 340,
             "int": 10,
             "spi": 11,
-            "sta": 23,
-            "str": 23
+            "sta": 51,
+            "str": 51
           },
           "templateId": "warrior",
           "weapon": {
@@ -378,13 +458,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
-          "hp": 54,
+          "hp": 308,
           "id": 964,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 308,
+          "maxResource": 1161,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -394,20 +474,20 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
+          "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 34,
           "stats": {
             "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
+            "armor": 113,
+            "int": 67,
+            "spi": 50,
+            "sta": 28,
             "str": 10
           },
           "templateId": "mage",
@@ -419,21 +499,21 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 42,
+          "attackPower": 98,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.0625,
+          "critChance": 0.0835,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
+          "dodgeChance": 0.0835,
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 62,
+          "hp": 385,
           "id": 965,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 62,
+          "maxHp": 385,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -460,12 +540,12 @@
           },
           "spellPower": 6,
           "stats": {
-            "agi": 25,
-            "armor": 104,
+            "agi": 67,
+            "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 17,
-            "str": 17
+            "sta": 31,
+            "str": 31
           },
           "templateId": "rogue",
           "weapon": {
@@ -485,13 +565,13 @@
           "dodgeChance": 0.0555,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 51,
+          "hp": 282,
           "id": 966,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
+          "maxHp": 282,
+          "maxResource": 959,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -501,20 +581,20 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
-          "resource": 175,
+          "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 12,
+          "spellPower": 26,
           "stats": {
             "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
+            "armor": 106,
+            "int": 51,
+            "spi": 66,
+            "sta": 27,
             "str": 10
           },
           "templateId": "priest",
@@ -530,8 +610,8 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 967,
-      "state": "8f2f918b",
-      "events": "96c714ad",
+      "state": "70e13c52",
+      "events": "22ada79d",
       "rng": {
         "draws": 531,
         "digest": "bc30bbc0"
@@ -557,7 +637,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 62
+              "damageDealt": 385
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -567,6 +647,24 @@
               "worn_sword"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 963,
@@ -584,12 +682,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -622,6 +722,24 @@
               "spring_water"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 964,
@@ -642,12 +760,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -687,6 +807,22 @@
             [
               "cmb_first_fall",
               ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
             ]
           ],
           "delveClears": {},
@@ -706,13 +842,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 35,
           "talents": {
             "rows": {}
           },
@@ -745,6 +882,24 @@
               "spring_water"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 966,
@@ -765,12 +920,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
+          "renown": 30,
           "talents": {
             "rows": {}
           },
@@ -780,7 +937,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 102,
           "auras": [
             {
               "duration": 3600,
@@ -796,16 +953,16 @@
           "blockValue": 6,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.067,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.067,
           "fiveSecondRule": 104.1,
-          "hp": 100,
+          "hp": 632,
           "id": 963,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 100,
+          "maxHp": 632,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -825,12 +982,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 20,
-            "armor": 144,
+            "agi": 34,
+            "armor": 340,
             "int": 10,
             "spi": 11,
-            "sta": 23,
-            "str": 23
+            "sta": 51,
+            "str": 51
           },
           "templateId": "warrior",
           "weapon": {
@@ -848,13 +1005,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.1,
-          "hp": 54,
+          "hp": 308,
           "id": 964,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 308,
+          "maxResource": 1161,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -864,20 +1021,20 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
+          "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 34,
           "stats": {
             "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
+            "armor": 113,
+            "int": 67,
+            "spi": 50,
+            "sta": 28,
             "str": 10
           },
           "templateId": "mage",
@@ -889,21 +1046,21 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 42,
+          "attackPower": 98,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.0625,
+          "critChance": 0.0835,
           "dead": true,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
+          "dodgeChance": 0.0835,
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
           "id": 965,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 62,
+          "maxHp": 385,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -930,12 +1087,12 @@
           },
           "spellPower": 6,
           "stats": {
-            "agi": 25,
-            "armor": 104,
+            "agi": 67,
+            "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 17,
-            "str": 17
+            "sta": 31,
+            "str": 31
           },
           "templateId": "rogue",
           "weapon": {
@@ -955,13 +1112,13 @@
           "dodgeChance": 0.0555,
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
-          "hp": 51,
+          "hp": 282,
           "id": 966,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
+          "maxHp": 282,
+          "maxResource": 959,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -971,20 +1128,20 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
-          "resource": 175,
+          "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 12,
+          "spellPower": 26,
           "stats": {
             "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
+            "armor": 106,
+            "int": 51,
+            "spi": 66,
+            "sta": 27,
             "str": 10
           },
           "templateId": "priest",
@@ -1000,8 +1157,8 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 967,
-      "state": "6a9fa47c",
-      "events": "b97f8b79",
+      "state": "02803578",
+      "events": "d16bc573",
       "rng": {
         "draws": 538,
         "digest": "989640f4"
@@ -1028,7 +1185,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 113
+              "damageDealt": 667
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1039,6 +1196,22 @@
             ]
           },
           "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
             [
               "pvp_arena_first_match",
               ""
@@ -1074,13 +1247,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -1115,6 +1289,22 @@
             ]
           },
           "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
             [
               "pvp_arena_first_match",
               ""
@@ -1153,13 +1343,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -1202,6 +1393,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -1223,13 +1430,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -1273,6 +1481,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -1297,13 +1521,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -1313,7 +1538,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 102,
           "auras": [
             {
               "duration": 3600,
@@ -1329,16 +1554,16 @@
           "blockValue": 6,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.067,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.067,
           "fiveSecondRule": 104.15,
-          "hp": 100,
+          "hp": 632,
           "id": 963,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 100,
+          "maxHp": 632,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -1358,12 +1583,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 20,
-            "armor": 144,
+            "agi": 34,
+            "armor": 340,
             "int": 10,
             "spi": 11,
-            "sta": 23,
-            "str": 23
+            "sta": 51,
+            "str": 51
           },
           "templateId": "warrior",
           "weapon": {
@@ -1381,13 +1606,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.15,
-          "hp": 54,
+          "hp": 308,
           "id": 964,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 308,
+          "maxResource": 1161,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1397,20 +1622,20 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
+          "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 34,
           "stats": {
             "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
+            "armor": 113,
+            "int": 67,
+            "spi": 50,
+            "sta": 28,
             "str": 10
           },
           "templateId": "mage",
@@ -1422,21 +1647,21 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 42,
+          "attackPower": 98,
           "combatTimer": 99.1,
           "comboUntil": -1,
-          "critChance": 0.0625,
+          "critChance": 0.0835,
           "dead": true,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
+          "dodgeChance": 0.0835,
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
           "id": 965,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 62,
+          "maxHp": 385,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -1463,12 +1688,12 @@
           },
           "spellPower": 6,
           "stats": {
-            "agi": 25,
-            "armor": 104,
+            "agi": 67,
+            "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 17,
-            "str": 17
+            "sta": 31,
+            "str": 31
           },
           "templateId": "rogue",
           "weapon": {
@@ -1491,10 +1716,10 @@
           "fiveSecondRule": 104.15,
           "id": 966,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
+          "maxHp": 282,
+          "maxResource": 959,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1504,20 +1729,20 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
-          "resource": 175,
+          "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 12,
+          "spellPower": 26,
           "stats": {
             "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
+            "armor": 106,
+            "int": 51,
+            "spi": 66,
+            "sta": 27,
             "str": 10
           },
           "templateId": "priest",
@@ -1533,7 +1758,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "5b886800",
+      "state": "a1c2f55a",
       "events": "741638a5",
       "rng": {
         "draws": 754,
@@ -1544,7 +1769,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "c6514f8c",
+      "state": "b0b347ec",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -1555,7 +1780,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 967,
-      "state": "e481c1d5",
+      "state": "a9f65f3b",
       "events": "741638a5",
       "rng": {
         "draws": 1349,
@@ -1566,7 +1791,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 967,
-      "state": "8b147889",
+      "state": "dca08c77",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -1577,7 +1802,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 967,
-      "state": "dc335628",
+      "state": "1ab6d01c",
       "events": "de7d14f9",
       "rng": {
         "draws": 1860,
@@ -1588,7 +1813,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "4e527839",
+      "state": "4160fe3d",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -1616,7 +1841,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 113
+              "damageDealt": 667
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1630,6 +1855,22 @@
             ]
           },
           "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
             [
               "pvp_arena_first_match",
               ""
@@ -1665,13 +1906,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -1710,6 +1952,22 @@
           },
           "deedsEarned": [
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ],
@@ -1747,13 +2005,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -1799,6 +2058,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -1820,13 +2095,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -1873,6 +2149,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -1897,13 +2189,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -1913,7 +2206,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 102,
           "auras": [
             {
               "duration": 3600,
@@ -1929,17 +2222,17 @@
           "blockValue": 6,
           "combatTimer": 101,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.067,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.067,
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
-          "hp": 100,
+          "hp": 632,
           "id": 963,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 100,
+          "maxHp": 632,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -1959,12 +2252,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 20,
-            "armor": 144,
+            "agi": 34,
+            "armor": 340,
             "int": 10,
             "spi": 11,
-            "sta": 23,
-            "str": 23
+            "sta": 51,
+            "str": 51
           },
           "templateId": "warrior",
           "weapon": {
@@ -1983,13 +2276,13 @@
           "dodgeChance": 0.056,
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
-          "hp": 54,
+          "hp": 308,
           "id": 964,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 308,
+          "maxResource": 1161,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2000,20 +2293,20 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
+          "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 34,
           "stats": {
             "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
+            "armor": 113,
+            "int": 67,
+            "spi": 50,
+            "sta": 28,
             "str": 10
           },
           "templateId": "mage",
@@ -2025,21 +2318,21 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 42,
+          "attackPower": 98,
           "combatTimer": 101,
           "comboUntil": -1,
-          "critChance": 0.0625,
+          "critChance": 0.0835,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
+          "dodgeChance": 0.0835,
           "dualWielding": true,
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
-          "hp": 62,
+          "hp": 385,
           "id": 965,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 62,
+          "maxHp": 385,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -2067,12 +2360,12 @@
           },
           "spellPower": 6,
           "stats": {
-            "agi": 25,
-            "armor": 104,
+            "agi": 67,
+            "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 17,
-            "str": 17
+            "sta": 31,
+            "str": 31
           },
           "templateId": "rogue",
           "weapon": {
@@ -2092,13 +2385,13 @@
           "dodgeChance": 0.0555,
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
-          "hp": 51,
+          "hp": 282,
           "id": 966,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
+          "maxHp": 282,
+          "maxResource": 959,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2109,20 +2402,20 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
-          "resource": 175,
+          "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 12,
+          "spellPower": 26,
           "stats": {
             "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
+            "armor": 106,
+            "int": 51,
+            "spi": 66,
+            "sta": 27,
             "str": 10
           },
           "templateId": "priest",
@@ -2138,7 +2431,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "4e527839",
+      "state": "4160fe3d",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -2166,7 +2459,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 113
+              "damageDealt": 667
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2180,6 +2473,22 @@
             ]
           },
           "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
             [
               "pvp_arena_first_match",
               ""
@@ -2215,13 +2524,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -2260,6 +2570,22 @@
           },
           "deedsEarned": [
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ],
@@ -2297,13 +2623,14 @@
             }
           ],
           "lifetimeHonor": 50,
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 45,
           "talents": {
             "rows": {}
           },
@@ -2349,6 +2676,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -2370,13 +2713,14 @@
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -2423,6 +2767,22 @@
               ""
             ],
             [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
               "pvp_arena_first_match",
               ""
             ]
@@ -2447,13 +2807,14 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 40,
           "talents": {
             "rows": {}
           },
@@ -2463,7 +2824,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 102,
           "auras": [
             {
               "duration": 3600,
@@ -2479,17 +2840,17 @@
           "blockValue": 6,
           "combatTimer": 101,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.067,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.067,
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
-          "hp": 100,
+          "hp": 632,
           "id": 963,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 100,
+          "maxHp": 632,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -2509,12 +2870,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 20,
-            "armor": 144,
+            "agi": 34,
+            "armor": 340,
             "int": 10,
             "spi": 11,
-            "sta": 23,
-            "str": 23
+            "sta": 51,
+            "str": 51
           },
           "templateId": "warrior",
           "weapon": {
@@ -2533,13 +2894,13 @@
           "dodgeChance": 0.056,
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
-          "hp": 54,
+          "hp": 308,
           "id": 964,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 308,
+          "maxResource": 1161,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2550,20 +2911,20 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
+          "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 34,
           "stats": {
             "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
+            "armor": 113,
+            "int": 67,
+            "spi": 50,
+            "sta": 28,
             "str": 10
           },
           "templateId": "mage",
@@ -2575,21 +2936,21 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 42,
+          "attackPower": 98,
           "combatTimer": 101,
           "comboUntil": -1,
-          "critChance": 0.0625,
+          "critChance": 0.0835,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
+          "dodgeChance": 0.0835,
           "dualWielding": true,
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
-          "hp": 62,
+          "hp": 385,
           "id": 965,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 62,
+          "maxHp": 385,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -2617,12 +2978,12 @@
           },
           "spellPower": 6,
           "stats": {
-            "agi": 25,
-            "armor": 104,
+            "agi": 67,
+            "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 17,
-            "str": 17
+            "sta": 31,
+            "str": 31
           },
           "templateId": "rogue",
           "weapon": {
@@ -2642,13 +3003,13 @@
           "dodgeChance": 0.0555,
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
-          "hp": 51,
+          "hp": 282,
           "id": 966,
           "kind": "player",
-          "level": 1,
+          "level": 15,
           "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
+          "maxHp": 282,
+          "maxResource": 959,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2659,20 +3020,20 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
-          "resource": 175,
+          "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 12,
+          "spellPower": 26,
           "stats": {
             "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
+            "armor": 106,
+            "int": 51,
+            "spi": 66,
+            "sta": 27,
             "str": 10
           },
           "templateId": "priest",

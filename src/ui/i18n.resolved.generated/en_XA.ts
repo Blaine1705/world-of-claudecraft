@@ -3386,6 +3386,9 @@ export const en_XA: EnTranslations = {
       "toZone": "[Žóñé ɱáþ]",
       "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ áñð ţĥé žóñé ɱáþ]",
       "levels": "[Ļéʋéļš {min} ţó {max}]"
+    },
+    "arenaGate": {
+      "minLevelNote": "[Ŕéɋúíŕéš ļéʋéļ {level}]"
     }
   },
   "gatherEvent": {

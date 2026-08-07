@@ -3386,6 +3386,9 @@ export const nl_NL: EnTranslations = {
       "toZone": "Gebiedskaart",
       "toggleAria": "Schakel tussen de wereldkaart en de gebiedskaart",
       "levels": "Niveaus {min} tot {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {
