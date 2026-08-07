@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banér i hand',
+    desc: 'Erövra en flagga i Törnhålefälten.',
+  },
+  pvp_bg_first_win: {
+    name: 'Hålan håller',
+    desc: 'Vinn en drabbning i Törnhålefälten.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Hålans väktare',
+    desc: 'Vinn 25 drabbningar i Törnhålefälten.',
+    title: 'Flaggbärare',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundra banér',
+    desc: 'Erövra 100 flaggor i Törnhålefälten under din karriär.',
+  },
+  dgn_rift: {
+    name: 'Revvandrare',
+    desc: 'Rensa en reva genom att besegra dess våningsboss.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Revhärskare',
+    desc: 'Rensa en reva av grad S, den svåraste graden en revportal kan skapa.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Tjäna in 10 000 heder under din livstid. Att spendera den kostar dig aldrig rangen.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Riddarlöjtnant',
+    desc: 'Tjäna in 40 000 heder under din livstid, en säsong av verkligt krig bakom dig.',
+    title: 'Riddarlöjtnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Fältmarskalk',
+    desc: 'Tjäna in 150 000 heder under din livstid. Sällsynt i alla riken, och så borde det vara.',
+    title: 'Fältmarskalk',
+  },
   chr_drakemaw_broodlord: {
     name: 'Kullbrytaren',
     desc: 'Fäll en Drakgapets kullherre bland dess ägg, genom vrålet, klyvhugget och elden.',

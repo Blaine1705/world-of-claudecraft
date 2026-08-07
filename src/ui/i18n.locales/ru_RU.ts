@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': 'Приблизить',
+  'hudChrome.controller.zoomOut': 'Отдалить',
+  'hudChrome.crafting.durationChip': '{seconds} сек.',
+  'hudChrome.keybinds.dive': 'Нырнуть',
+  'hudChrome.materialHint.usedBy': 'Используется в {crafts}.',
+  'hudChrome.partyFrames.showPets': 'Показывать питомцев',
+  'hudChrome.pvp.bracket1v1': '1 на 1',
+  'hudChrome.pvp.bracket2v2': '2 на 2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': 'Купить {item} за {honor}',
+  'itemUi.market.saleBuyer': 'Продано: {buyer}',
   'hudChrome.deeds.recentJumpAria': 'Перейти к {name}',
   'hudChrome.targetAuras.all': 'Все',
   'hudChrome.actionBar.done': 'Готово',

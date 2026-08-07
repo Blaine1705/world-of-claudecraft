@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banner i Hånden',
+    desc: 'Erobr et flag i Tornehulemarkerne.',
+  },
+  pvp_bg_first_win: {
+    name: 'Den Hule Holder Stand',
+    desc: 'Vind en Tornehulemarkerne-slagmark.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Hulens Vogter',
+    desc: 'Vind 25 Tornehulemarkerne-slagmarke.',
+    title: 'Flagbærer',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundrede Bannere',
+    desc: 'Erobr 100 flag i Tornehulemarkerne i løbet af din karriere.',
+  },
+  dgn_rift: {
+    name: 'Riftvandrer',
+    desc: 'Ryd en Rift ved at besejre dens etageboss.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Riftsuveræn',
+    desc: 'Ryd en S-rangs Rift, det hårdeste niveau en Rift-portal kan spawne.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergent',
+    desc: 'Optjen 10.000 Ære i din levetid. At bruge den koster dig aldrig rangen.',
+    title: 'Sergent',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ridderløjtnant',
+    desc: 'Optjen 40.000 Ære i din levetid, en hel sæsons rigtig krig bag dig.',
+    title: 'Ridderløjtnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Feltmarskal',
+    desc: 'Optjen 150.000 Ære i din levetid. Sjælden på ethvert rige, og sådan bør det være.',
+    title: 'Feltmarskal',
+  },
   chr_drakemaw_broodlord: {
     name: 'Yngelknuseren',
     desc: 'Dræb en Dragegabets Yngelherre midt blandt dens æg, gennem brølet, kløvningen og ilden.',

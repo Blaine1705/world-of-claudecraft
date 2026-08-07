@@ -959,7 +959,7 @@ export const ja_JP: EnTranslations = {
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
-      "dive": "Swim Down",
+      "dive": "潜水",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -1040,8 +1040,8 @@ export const ja_JP: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1対1",
+      "bracket2v2": "2対2"
     },
     "bg": {
       "title": "ソーンホロウ平原",
@@ -1373,8 +1373,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1539,7 +1539,7 @@ export const ja_JP: EnTranslations = {
       "jewelry": "アクセサリー",
       "weapons": "武器",
       "owned": "所有済み",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
       "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"
     },
@@ -2130,7 +2130,7 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
-      "showPets": "Show Pets",
+      "showPets": "ペットを表示",
       "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
@@ -2148,7 +2148,7 @@ export const ja_JP: EnTranslations = {
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
       "cookingCatch": "料理材料。食べる前に調理が必要です。",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "{crafts}で使用されます。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -2839,7 +2839,7 @@ export const ja_JP: EnTranslations = {
       "qtyValueAria": "作成数、{count}",
       "batchRemaining": "残り {remaining}/{total}",
       "batchRemainingAria": "残り {remaining} 個、合計 {total} 個",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}秒",
       "durationAria": "詠唱時間: {seconds} 秒",
       "progressAria": "製作の進行",
       "announceStart": "{name} を製作中",
@@ -7783,7 +7783,7 @@ export const ja_JP: EnTranslations = {
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
       "collectNote": "商人が預かっている売上と返却品です。",
       "saleProceeds": "売上",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "{buyer}に売却",
       "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
       "collectAll": "すべて受け取る"
     },

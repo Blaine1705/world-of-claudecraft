@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '旗帜在手',
+    desc: '在荆谷原野夺取一面旗帜。',
+  },
+  pvp_bg_first_win: {
+    name: '荆谷首胜',
+    desc: '赢得一场荆谷原野战场。',
+  },
+  pvp_bg_wins_25: {
+    name: '荆谷守护者',
+    desc: '赢得25场荆谷原野战场。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百面战旗',
+    desc: '生涯累计在荆谷原野夺取100面旗帜。',
+  },
+  dgn_rift: {
+    name: '裂隙行者',
+    desc: '击败裂隙的楼层首领，清除该裂隙。',
+  },
+  dgn_rift_s_rank: {
+    name: '裂隙君主',
+    desc: '清除一个S级裂隙，这是裂隙传送门能够生成的最高难度等级。',
+  },
+  pvp_honor_sergeant: {
+    name: '中士',
+    desc: '生涯累计获得10,000点荣誉。花费荣誉不会剥夺你的军阶。',
+    title: '中士',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '骑士中尉',
+    desc: '生涯累计获得40,000点荣誉，那是一整个赛季真枪实弹的战争。',
+    title: '骑士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '陆军元帅',
+    desc: '生涯累计获得150,000点荣誉。在任何王国都十分罕见，理应如此。',
+    title: '陆军元帅',
+  },
   chr_drakemaw_broodlord: {
     name: '碎卵者',
     desc: '在满是龙卵的巢穴中击杀一头龙喉巢主，挺过它的怒吼、顺劈与烈焰。',

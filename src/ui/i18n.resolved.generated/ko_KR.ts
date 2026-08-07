@@ -959,7 +959,7 @@ export const ko_KR: EnTranslations = {
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
-      "dive": "Swim Down",
+      "dive": "아래로 수영",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -1040,8 +1040,8 @@ export const ko_KR: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1대1",
+      "bracket2v2": "2대2"
     },
     "bg": {
       "title": "쏜할로우 평원",
@@ -1373,8 +1373,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "확대",
+      "zoomOut": "축소",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -1539,7 +1539,7 @@ export const ko_KR: EnTranslations = {
       "jewelry": "장신구",
       "weapons": "무기",
       "owned": "보유 중",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "{honor}에 {item} 구매",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
       "buyConfirmBody": "{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다."
     },
@@ -2130,7 +2130,7 @@ export const ko_KR: EnTranslations = {
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
-      "showPets": "Show Pets",
+      "showPets": "펫 표시",
       "petHealth": "펫 {name}, 체력 {pct}",
       "showSelf": "내 프레임 표시"
     },
@@ -2148,7 +2148,7 @@ export const ko_KR: EnTranslations = {
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "{crafts}에 사용됩니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2839,7 +2839,7 @@ export const ko_KR: EnTranslations = {
       "qtyValueAria": "제작 수량, {count}",
       "batchRemaining": "남은 수 {remaining}/{total}",
       "batchRemainingAria": "{total}개 중 {remaining}개 남음",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}초",
       "durationAria": "시전 시간: {seconds}초",
       "progressAria": "제작 진행",
       "announceStart": "{name} 제작 중",
@@ -7783,7 +7783,7 @@ export const ko_KR: EnTranslations = {
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
       "collectNote": "상인이 보관 중인 수익과 반환된 상품입니다.",
       "saleProceeds": "판매 대금",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "{buyer}에게 판매",
       "saleOlder": "이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.",
       "collectAll": "모두 수령"
     },

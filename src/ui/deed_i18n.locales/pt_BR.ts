@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bandeira em Mãos',
+    desc: 'Capture uma bandeira em Campos de Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'O Vale Resiste',
+    desc: 'Vença uma partida em Campos de Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardião do Vale',
+    desc: 'Vença 25 partidas em Campos de Thornhollow.',
+    title: 'Portador da Bandeira',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cem Bandeiras',
+    desc: 'Capture 100 bandeiras em Campos de Thornhollow ao longo da sua carreira.',
+  },
+  dgn_rift: {
+    name: 'Andarilho da Fenda',
+    desc: 'Limpe uma Fenda derrotando o chefe do andar.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Soberano da Fenda',
+    desc: 'Limpe uma Fenda de nível S, o grau mais difícil que um portal de Fenda pode gerar.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sargento',
+    desc: 'Ganhe 10.000 de Honra ao longo da vida. Gastá-la nunca custa o posto.',
+    title: 'Sargento',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Cavaleiro-Tenente',
+    desc: 'Ganhe 40.000 de Honra ao longo da vida, uma temporada de guerra de verdade nas costas.',
+    title: 'Cavaleiro-Tenente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marechal de Campo',
+    desc: 'Ganhe 150.000 de Honra ao longo da vida. Raro em qualquer reino, e deveria ser.',
+    title: 'Marechal de Campo',
+  },
   chr_drakemaw_broodlord: {
     name: 'Quebra-Ninhada',
     desc: 'Derrote um Senhor da Ninhada de Drakemaw em meio aos seus ovos, enfrentando o brado, o golpe em arco e o fogo.',

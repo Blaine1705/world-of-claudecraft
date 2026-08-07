@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': 'ズームイン',
+  'hudChrome.controller.zoomOut': 'ズームアウト',
+  'hudChrome.crafting.durationChip': '{seconds}秒',
+  'hudChrome.keybinds.dive': '潜水',
+  'hudChrome.materialHint.usedBy': '{crafts}で使用されます。',
+  'hudChrome.partyFrames.showPets': 'ペットを表示',
+  'hudChrome.pvp.bracket1v1': '1対1',
+  'hudChrome.pvp.bracket2v2': '2対2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '{item}を{honor}で購入',
+  'itemUi.market.saleBuyer': '{buyer}に売却',
   'hudChrome.deeds.recentJumpAria': '{name}へ移動',
   'hudChrome.targetAuras.all': 'すべて',
   'hudChrome.actionBar.done': '完了',

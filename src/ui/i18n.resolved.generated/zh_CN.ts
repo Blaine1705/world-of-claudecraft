@@ -959,7 +959,7 @@ export const zh_CN: EnTranslations = {
       "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
-      "dive": "Swim Down",
+      "dive": "下潜",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
@@ -1373,8 +1373,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
       "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
@@ -1539,7 +1539,7 @@ export const zh_CN: EnTranslations = {
       "jewelry": "饰品",
       "weapons": "武器",
       "owned": "已拥有",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "以 {honor} 购买 {item}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
       "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"
     },
@@ -2130,7 +2130,7 @@ export const zh_CN: EnTranslations = {
       "showResource": "显示法力、怒气和能量",
       "showAbsorbs": "显示吸收护盾",
       "showAuras": "显示增益和减益",
-      "showPets": "Show Pets",
+      "showPets": "显示宠物",
       "petHealth": "宠物{name}，生命值{pct}",
       "showSelf": "显示你的框体"
     },
@@ -2148,7 +2148,7 @@ export const zh_CN: EnTranslations = {
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
       "cookingCatch": "烹饪材料。必须先烹饪后才能食用。",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "用于制作{crafts}。",
       "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",
       "arcaneEssence": "附魔材料。分解精良品质的装备可得。",
       "arcaneShard": "附魔材料。分解史诗和传说品质的装备可得。",
@@ -2839,7 +2839,7 @@ export const zh_CN: EnTranslations = {
       "qtyValueAria": "制作数量，{count}",
       "batchRemaining": "剩余 {remaining}/{total}",
       "batchRemainingAria": "还剩 {remaining} 个，共 {total} 个",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds}秒",
       "durationAria": "施放时间：{seconds} 秒",
       "progressAria": "制作进度",
       "announceStart": "正在制作 {name}",
@@ -7783,7 +7783,7 @@ export const zh_CN: EnTranslations = {
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
       "collectNote": "商人为你保管的收益和退回货物。",
       "saleProceeds": "销售收益",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "售予{buyer}",
       "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
       "collectAll": "全部领取"
     },

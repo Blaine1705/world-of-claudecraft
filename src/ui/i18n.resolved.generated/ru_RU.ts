@@ -959,7 +959,7 @@ export const ru_RU: EnTranslations = {
       "valecup": "Кубок Долины",
       "bgFlag": "Действие с флагом",
       "sheathe": "Убрать/обнажить оружие",
-      "dive": "Swim Down",
+      "dive": "Нырнуть",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
       "petStop": "Питомец: стоп",
@@ -1040,8 +1040,8 @@ export const ru_RU: EnTranslations = {
     "pvp": {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
-      "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket1v1": "1 на 1",
+      "bracket2v2": "2 на 2"
     },
     "bg": {
       "title": "Терновая Лощина",
@@ -1373,8 +1373,8 @@ export const ru_RU: EnTranslations = {
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",
       "menuAction": "Игровое меню",
-      "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out",
+      "zoomIn": "Приблизить",
+      "zoomOut": "Отдалить",
       "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
     },
     "perf": {
@@ -1539,7 +1539,7 @@ export const ru_RU: EnTranslations = {
       "jewelry": "Украшения",
       "weapons": "Оружие",
       "owned": "Получено",
-      "buyAria": "Buy {item} for {honor}",
+      "buyAria": "Купить {item} за {honor}",
       "buyOwnedAria": "Купить {item} за {honor}, уже получено",
       "buyConfirmBody": "Купить {item} за {honor}? Покупки за честь не подлежат возврату."
     },
@@ -2130,7 +2130,7 @@ export const ru_RU: EnTranslations = {
       "showResource": "Показывать ману, ярость и энергию",
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
-      "showPets": "Show Pets",
+      "showPets": "Показывать питомцев",
       "petHealth": "Питомец {name}, здоровье {pct}",
       "showSelf": "Показывать вашу рамку"
     },
@@ -2148,7 +2148,7 @@ export const ru_RU: EnTranslations = {
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
       "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
-      "usedBy": "Used by {crafts}.",
+      "usedBy": "Используется в {crafts}.",
       "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",
       "arcaneEssence": "Реагент для наложения чар. Выпадает при распылении редкого снаряжения.",
       "arcaneShard": "Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.",
@@ -2839,7 +2839,7 @@ export const ru_RU: EnTranslations = {
       "qtyValueAria": "Количество, {count}",
       "batchRemaining": "Осталось {remaining} из {total}",
       "batchRemainingAria": "Осталось {remaining} из {total} созданий",
-      "durationChip": "{seconds}s",
+      "durationChip": "{seconds} сек.",
       "durationAria": "Время применения: {seconds} с",
       "progressAria": "Прогресс изготовления",
       "announceStart": "Изготавливается: {name}",
@@ -7783,7 +7783,7 @@ export const ru_RU: EnTranslations = {
       "collectEmpty": "Ничего не ждет. Выручка и истекшие лоты собираются здесь.",
       "collectNote": "Выручка и возвращенные товары, которые Торговец хранит для вас.",
       "saleProceeds": "Выручка",
-      "saleBuyer": "Sold to {buyer}",
+      "saleBuyer": "Продано: {buyer}",
       "saleOlder": "Ещё {count} более ранних продаж, включены в общую сумму.",
       "collectAll": "Забрать все"
     },

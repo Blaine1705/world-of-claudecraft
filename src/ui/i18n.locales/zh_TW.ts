@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': '放大',
+  'hudChrome.controller.zoomOut': '縮小',
+  'hudChrome.crafting.durationChip': '{seconds}秒',
+  'hudChrome.keybinds.dive': '下潛',
+  'hudChrome.materialHint.usedBy': '用於 {crafts}。',
+  'hudChrome.partyFrames.showPets': '顯示寵物',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '以 {honor} 購買 {item}',
+  'itemUi.market.saleBuyer': '售予 {buyer}',
   'hudChrome.deeds.recentJumpAria': '跳至 {name}',
   'hudChrome.targetAuras.all': '全部',
   'hudChrome.actionBar.done': '完成',

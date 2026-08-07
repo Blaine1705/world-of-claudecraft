@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': '확대',
+  'hudChrome.controller.zoomOut': '축소',
+  'hudChrome.crafting.durationChip': '{seconds}초',
+  'hudChrome.keybinds.dive': '아래로 수영',
+  'hudChrome.materialHint.usedBy': '{crafts}에 사용됩니다.',
+  'hudChrome.partyFrames.showPets': '펫 표시',
+  'hudChrome.pvp.bracket1v1': '1대1',
+  'hudChrome.pvp.bracket2v2': '2대2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '{honor}에 {item} 구매',
+  'itemUi.market.saleBuyer': '{buyer}에게 판매',
   'hudChrome.deeds.recentJumpAria': '{name}(으)로 이동',
   'hudChrome.targetAuras.all': '전체',
   'hudChrome.actionBar.done': '완료',
