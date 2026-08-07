@@ -121,7 +121,11 @@ try {
   process.exit(1);
 }
 
-const plan = buildSelectPlan({ changedPaths, alwaysRunFiles: alwaysRun });
+const plan = buildSelectPlan({
+  changedPaths,
+  alwaysRunFiles: alwaysRun,
+  exists: (f) => existsSync(path.join(repoRoot, f)),
+});
 console.log(`[gate:shadow] base=${base} (${baseReason}); plan mode=${plan.mode} (${plan.reason})`);
 if (plan.mode === 'full') {
   console.log('[gate:shadow] planner already falls back to the full suite: no escape possible.');

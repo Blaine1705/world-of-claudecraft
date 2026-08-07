@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
-import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
+import {
+  GENERATED_I18N_ARTIFACT_FILES,
+  GENERATED_I18N_ARTIFACT_PREFIXES,
+  isGeneratedI18nArtifactPath,
+} from '../scripts/lib/gate_select_plan.mjs';
+import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -299,6 +304,56 @@ describe('CI workflow parity', () => {
     expect(jobSource('pr-gate')).not.toContain('run: node scripts/i18n_coverage_summary.mjs');
     expect(jobSource('release-gate')).not.toContain('run: node scripts/i18n_coverage_summary.mjs');
     expect(gate).not.toContain('src/ui/i18n.status.summary.json');
+  });
+
+  it('pins the inert generated-i18n classifier to exactly the freshness-diffed paths', () => {
+    // The selective planner may treat a generated i18n artifact as inert ONLY
+    // because this workflow reruns i18n:gen and `git diff --exit-code`s the
+    // artifact paths on every code PR (pr-checks) and on the release push
+    // (release-checks). This holds the two lists to each other: widening the
+    // classifier without widening the freshness diff, or narrowing the diff
+    // without narrowing the classifier, must fail HERE, not as a silent
+    // selection escape in production.
+    const classifierPaths = [
+      ...GENERATED_I18N_ARTIFACT_PREFIXES.map((p) => p.replace(/\/$/, '')),
+      ...GENERATED_I18N_ARTIFACT_FILES,
+    ].sort();
+    // The LOCAL gate's freshness list must agree too: gate_select treats the
+    // classifier's paths as never-widening on the strength of the local i18n
+    // freshness step covering them, and that step builds its argv from
+    // I18N_ARTIFACTS. Without this coupling, narrowing I18N_ARTIFACTS would
+    // silently orphan the local half of the safety argument (the step's own
+    // test compares the argv to the same constant, which pins nothing).
+    expect([...I18N_ARTIFACTS].sort()).toEqual(classifierPaths);
+    for (const jobName of ['pr-checks', 'release-checks']) {
+      const job = jobSource(jobName);
+      // Anchored to the src/ prefix so a future unrelated `git diff
+      // --exit-code` step added above this one cannot re-point the pin.
+      const m = job.match(/run: git diff --exit-code -- (src\/[^\n]+)/);
+      expect(m, `${jobName} must carry the freshness diff step`).not.toBeNull();
+      const freshnessPaths = (m as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      expect(classifierPaths).toEqual(freshnessPaths);
+      // Regenerate BEFORE diff, inside the same job, so the diff proves the
+      // committed artifacts against the PR's own sources. Trailing newline so
+      // a renamed `i18n:gen:something` cannot satisfy the pin.
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeGreaterThan(0);
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeLessThan(
+        job.indexOf('run: git diff --exit-code --'),
+      );
+    }
+    // The freshness job is gated on the code output only, never the test mode:
+    // artifact-carrying PRs are src/ paths, so code=true and the
+    // regenerate-and-diff runs whatever the shards were told to run.
+    const prChecks = jobSource('pr-checks');
+    expect(prChecks).toContain("needs.changes.outputs.code != 'false'");
+    expect(prChecks).not.toContain('test_mode');
+    // The predicate agrees with the pinned path classes on both sides.
+    expect(isGeneratedI18nArtifactPath('src/ui/i18n.resolved.generated/en.ts')).toBe(true);
+    expect(isGeneratedI18nArtifactPath('src/admin/i18n.resolved.generated/loaders.ts')).toBe(true);
+    expect(isGeneratedI18nArtifactPath('src/ui/i18n.catalog/translation_keys.generated.ts')).toBe(
+      true,
+    );
+    expect(isGeneratedI18nArtifactPath('src/guide/content.generated.ts')).toBe(false);
   });
 
   it('runs the release tier against a release-to-main pull request merge result', () => {

@@ -218,6 +218,15 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
       'guard suite missing from the tree',
       { testFiles: COLLECTED.filter((f) => f !== 'tests/world_api_parity.test.ts') },
     ],
+    [
+      // The one artifact shape the freshness diff cannot flag: deleted in the
+      // PR, recreated untracked by the shard's own regeneration.
+      'generated i18n artifact missing from the tree',
+      {
+        changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+        exists: (p: string) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
+      },
+    ],
   ])('%s falls back to the full leg', (_label, overrides) => {
     const plan = buildShardPlan({ ...BASE, ...overrides });
     expect(plan.mode).toBe('full');
@@ -228,6 +237,37 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
         args: ['test', '--', '--shard=3/8', '--maxWorkers=2'],
       },
     ]);
+  });
+
+  it('keeps a PRESENT generated i18n artifact selective and IN the related leg', () => {
+    // The artifact is a graph node: its consumers (including suites that pin
+    // resolved-table content through the src/ui/i18n.ts re-export seam) are
+    // reachable only from the artifact side, so dropping it from the argv is
+    // the silent-unselect failure mode this pin exists to catch.
+    const plan = buildShardPlan({
+      ...BASE,
+      changedPaths: ['src/ui/unit_portrait.ts', 'src/ui/i18n.resolved.generated/da_DK.ts'],
+    });
+    expect(plan.mode).toBe('selective');
+    const related = plan.legs.find((l) => l.args.includes('related'));
+    expect(related).toBeDefined();
+    expect(related?.args).toContain('src/ui/unit_portrait.ts');
+    expect(related?.args).toContain('src/ui/i18n.resolved.generated/da_DK.ts');
+    expect(plan.relatedCount).toBe(2);
+  });
+
+  it('truncates the missing-artifact fallback reason past three entries', () => {
+    const missing = [
+      'src/ui/i18n.resolved.generated/aa.ts',
+      'src/ui/i18n.resolved.generated/bb.ts',
+      'src/ui/i18n.resolved.generated/cc.ts',
+      'src/ui/i18n.resolved.generated/dd.ts',
+    ];
+    const plan = buildShardPlan({ ...BASE, changedPaths: missing, exists: () => false });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('generated i18n artifact(s) missing');
+    expect(plan.reason).toContain('src/ui/i18n.resolved.generated/cc.ts, ...');
+    expect(plan.reason).not.toContain('dd.ts');
   });
 });
 
@@ -369,6 +409,10 @@ describe('the long-sims lane (Phase 4)', () => {
       { changedPaths: ['package.json'] },
       { alwaysRun: ['tests/architecture.test.ts'] },
       { testFiles: LANE_BASE.testFiles.filter((f) => f !== 'tests/world_api_parity.test.ts') },
+      {
+        changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+        exists: (p: string) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
+      },
     ]) {
       const shardPlan = buildShardPlan({ ...LANE_BASE, ...overrides });
       const lanePlan = buildLanePlan({ ...LANE_BASE, ...overrides });
