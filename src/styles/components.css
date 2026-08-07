@@ -16358,6 +16358,7 @@
     margin-bottom: 6px;
   }
   #woc-market-window .wm-estimate,
+  #woc-market-window .wm-bid-equiv,
   #woc-market-window .wm-min-next {
     color: var(--color-text-muted);
     font-size: 12px;

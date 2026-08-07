@@ -476,6 +476,12 @@ async function bondQuoteHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { bond: quoteView(out.bond) });
 }
 
+async function abandonBidHandler(ctx: Ctx): Promise<void> {
+  const out = await useService().abandonBid(ctxAccountId(ctx), idParam(ctx));
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { abandoned: true });
+}
+
 async function confirmBondHandler(ctx: Ctx): Promise<void> {
   const body = bodyOf(ctx);
   const out = await useService().confirmBond(
@@ -878,6 +884,17 @@ export const routes: RouteDef[] = [
     middleware: [activeAccount, rateLimit(WOC_MARKET_CONFIRM_POLICY), withBody(), ownedBid],
     meta: OWNED_ACCOUNT,
     handler: confirmBondHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/bids/:id/abandon',
+    surface: 'api',
+    // The QUOTE policy, not CONFIRM: giving up costs the economy service
+    // nothing, and a player retrying an abandon must not be rate-limited into
+    // keeping a lock they are trying to release.
+    middleware: [activeAccount, rateLimit(WOC_MARKET_QUOTE_POLICY), ownedBid],
+    meta: OWNED_ACCOUNT,
+    handler: abandonBidHandler,
   },
   {
     method: 'POST',

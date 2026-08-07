@@ -121,6 +121,42 @@ describe('the listing-id stamp is reachable on an already-accepted offer', () =>
   });
 });
 
+describe('abandoning a bid is a compare-and-set, not a read-then-write', () => {
+  it('narrows on the owner AND the pending status in the statement', async () => {
+    // Both arms matter and neither is decorative. The owner arm stops one player
+    // cancelling another's bid; the status arm is what makes the button safe to
+    // press at all, since a bond can land while the player is reaching for "Not
+    // now", and cancelling THEN would drop a bid the auction already counts.
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).abandonPendingBid(REALM, 12, 34);
+    const [text] = sql();
+    expect(text).toContain("status = 'cancelled'");
+    expect(text).toContain("bond_state = 'void'");
+    expect(text).toContain("status = 'pending_bond'");
+    expect(text).toContain('account = $3');
+    expect(text).toContain('realm = $1');
+    expect(params()[0]).toEqual([REALM, 12, 34]);
+  });
+
+  it('reports whether it actually matched, so the service can refuse', async () => {
+    // rowCount is the only evidence the row was still pending. Returning true
+    // unconditionally would tell a player their bid was withdrawn while it was
+    // still holding the listing lock.
+    const seen: string[] = [];
+    const zero = {
+      query: vi.fn(async (t: string) => {
+        seen.push(t);
+        return { rows: [], rowCount: 0 };
+      }),
+    } as unknown as Pool;
+    expect(await new PgWocMarketDb(zero).abandonPendingBid(REALM, 12, 34)).toBe(false);
+    const one = {
+      query: vi.fn(async () => ({ rows: [], rowCount: 1 })),
+    } as unknown as Pool;
+    expect(await new PgWocMarketDb(one).abandonPendingBid(REALM, 12, 34)).toBe(true);
+  });
+});
+
 describe('a finished sale stops being a live offer', () => {
   it('excludes offers whose listing has closed', async () => {
     // Otherwise a completed deal stays in both trade windows forever, showing

@@ -693,6 +693,84 @@ describe('placeBid', () => {
     expect((await getListing(h, listing.id)).currentBidId).toBeNull();
   });
 
+  it('abandoning a pending bid frees the seat it was holding', async () => {
+    // The dead end this closes: declining the wallet left the bid pending, and
+    // every further bid on that listing was refused with a message telling the
+    // player to abandon it, through a control that did not exist. Their only
+    // escape was waiting out the five-minute TTL.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const first = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(
+      await h.service.abandonBid(BUYER_A, first.bid.id),
+      'the bidder may withdraw their own unfunded bid',
+    ).toEqual({ ok: true });
+    expect((await getBid(h, first.bid.id)).status).toBe('cancelled');
+    // Nothing was ever transferred for a pending bond, so there is no refund leg.
+    expect((await getBid(h, first.bid.id)).bondState).toBe('void');
+    // And the seat is genuinely free again: the SAME account can bid once more.
+    const again = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 6000,
+    });
+    expect(again.ok, 'a fresh bid must now be accepted').toBe(true);
+  });
+
+  it('refuses to let one player abandon another player’s bid', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const first = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(await h.service.abandonBid(BUYER_B, first.bid.id)).toEqual({
+      ok: false,
+      reason: 'not_yours',
+    });
+    expect((await getBid(h, first.bid.id)).status).toBe('pending_bond');
+  });
+
+  it('refuses to abandon a bid that is no longer pending', async () => {
+    // The race the status arm exists for: a bond that lands while the player is
+    // reaching for "Not now" must keep its bid, not lose it to the click.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const first = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    unwrap(
+      await h.service.confirmBond(BUYER_A, first.bid.id, `sig-bond-${first.bid.id}`),
+      'confirmBond',
+    );
+    expect((await getBid(h, first.bid.id)).status).toBe('active');
+    expect(await h.service.abandonBid(BUYER_A, first.bid.id)).toEqual({
+      ok: false,
+      reason: 'not_pending',
+    });
+    expect((await getBid(h, first.bid.id)).status, 'the live bid survives').toBe('active');
+  });
+
   it('refuses insufficient_balance when the wallet cannot cover bid plus bond', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);

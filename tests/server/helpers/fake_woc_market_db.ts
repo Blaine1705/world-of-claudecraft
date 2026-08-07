@@ -606,6 +606,19 @@ export class FakeWocMarketDb implements WocMarketDb {
     return bid ? this.bidOut(bid) : null;
   }
 
+  /** Mirrors the real UPDATE's predicate exactly (realm + id + account +
+   *  status). A fake that checked fewer arms would let the service's tests pass
+   *  over SQL that never matched, which this suite has been bitten by before. */
+  async abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean> {
+    const bid = this.bids.get(bidId);
+    if (!bid || bid.realm !== realm || bid.account !== account || bid.status !== 'pending_bond') {
+      return false;
+    }
+    bid.status = 'cancelled';
+    bid.bondState = 'void';
+    return true;
+  }
+
   async activateBid(
     bidId: number,
     nowMs: number,

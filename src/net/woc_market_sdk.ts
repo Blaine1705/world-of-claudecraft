@@ -404,6 +404,15 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
+  /** Give up on a bid whose bond was never paid, releasing the listing lock. */
+  async abandonBid(bidId: number): Promise<{ ok: true } | WocMarketFail> {
+    const out = await this.request<{ abandoned: boolean }>(
+      'POST',
+      `/api/woc-market/bids/${bidId}/abandon`,
+    );
+    return out.ok ? { ok: true } : out;
+  }
+
   async confirmBond(
     bidId: number,
     signature: string,

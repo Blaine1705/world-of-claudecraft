@@ -371,6 +371,8 @@ export interface WocMarketDb {
   >;
   setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void>;
   bidById(id: number): Promise<WocBidRow | null>;
+  /** pending_bond -> cancelled for the bidder who never funded it. */
+  abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean>;
   /** pending_bond -> active; the previous active bid (if any) flips to
    *  'outbid' with bond refund_due, and the listing's standing bid updates.
    *  Refuses when the listing is no longer active or the amount no longer
@@ -1121,6 +1123,32 @@ export class WocMarketService {
     }
     await this.deps.db.setBidBondQuote(inserted.bid.id, intent.reference, intent.expiresAtMs);
     return { ok: true, bid: { ...inserted.bid, bondReference: intent.reference }, bond: intent };
+  }
+
+  /**
+   * Withdraw a bid whose bond was never paid.
+   *
+   * The counterpart the refusal text already promised: placing a bid takes a
+   * listing-wide lock ("Confirm or abandon your pending bid on this listing
+   * first"), and until this existed the only abandon was waiting out a
+   * five-minute TTL. A player who declined the wallet was told to do something
+   * the client could not do, on their own bid, with their own money untouched.
+   *
+   * Deliberately NOT gated on market health. Every other bid path needs a live
+   * price because it quotes one; giving up needs nothing, and refusing to let a
+   * player release their own listing lock because the oracle is unhappy would
+   * strand them for exactly as long as the outage lasts.
+   */
+  async abandonBid(account: number, bidId: number): Promise<{ ok: true } | Refused> {
+    if (!this.cfg.enabled) return refuse('disabled');
+    const bid = await this.deps.db.bidById(bidId);
+    if (!bid) return refuse('not_found');
+    if (bid.account !== account) return refuse('not_yours');
+    if (bid.status !== 'pending_bond') return refuse('not_pending');
+    // The status is re-checked inside the UPDATE, so a bond that landed between
+    // the read and the write keeps its bid rather than losing it to this call.
+    const done = await this.deps.db.abandonPendingBid(this.cfg.realm, bidId, account);
+    return done ? { ok: true } : refuse('not_pending');
   }
 
   /** A fresh bond quote for a still-pending bid whose previous quote expired. */

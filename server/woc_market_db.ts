@@ -1155,6 +1155,28 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toBid(res.rows[0]) : null;
   }
 
+  /**
+   * Withdraw a bid the bidder never funded.
+   *
+   * Compare-and-set on BOTH the owner and the status, in the statement rather
+   * than around it. The status arm is what makes this safe to call from a UI
+   * button: a bid that activated a moment ago (the bond landed while the player
+   * was reaching for "Not now") matches nothing and stays a real bid, instead of
+   * being cancelled out from under an auction that already counts it.
+   *
+   * Nothing was ever transferred for a pending bond, so the bond goes straight
+   * to 'void' with no refund leg.
+   */
+  async abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE woc_market_bids
+          SET status = 'cancelled', bond_state = 'void'
+        WHERE realm = $1 AND id = $2 AND account = $3 AND status = 'pending_bond'`,
+      [realm, bidId, account],
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
   async activateBid(
     bidId: number,
     nowMs: number,

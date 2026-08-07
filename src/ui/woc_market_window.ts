@@ -174,6 +174,13 @@ export class WocMarketWindow {
   private sellOfferNext = false;
   private acceptTerms = false;
   private pendingQuote: PendingQuote | null = null;
+  /** The bid preview's timer-free coalescing (see onBidPriceInput): the price
+   *  still awaiting an estimate, and whether one is already out. */
+  private bidEstimateWanted: number | null = null;
+  private bidEstimateInFlight = false;
+  /** The server-quoted tokens for the price currently typed, or null when there
+   *  is no figure to show. Rendered, never written into the DOM directly. */
+  private bidEquivalentTokens: number | null = null;
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   private notice: { text: string; error: boolean } | null = null;
@@ -262,6 +269,10 @@ export class WocMarketWindow {
     this.detail = null;
     this.estimate = null;
     this.sales = null;
+    // A different listing means a different bid: carrying the previous one's
+    // token figure across would put a stale rate under an empty price field.
+    this.bidEquivalentTokens = null;
+    this.bidEstimateWanted = null;
     this.render();
     const seq = this.renderSeq;
     const detail = await hooks.client.detail(id);
@@ -714,6 +725,15 @@ export class WocMarketWindow {
       `<input type="number" inputmode="decimal" min="0" step="0.25" data-field="bid-usd" data-focus-key="wm-bid-usd" placeholder="${esc(
         t('hudChrome.wocMarket.bidPlaceholder'),
       )}" /></label>` +
+      // Empty until the server has quoted the typed price, so it never claims a
+      // rate it does not have.
+      (this.bidEquivalentTokens === null
+        ? ''
+        : `<p class="wm-bid-equiv">${esc(
+            t('hudChrome.trade.woc.equivalent', {
+              tokens: formatNumber(this.bidEquivalentTokens, { maximumFractionDigits: 2 }),
+            }),
+          )}</p>`) +
       this.confirmFieldsHtml(model) +
       `<p class="wm-note">${esc(
         // The bond figure is SERVER-computed and shipped on the listing view:
@@ -1074,6 +1094,10 @@ export class WocMarketWindow {
   /** Typing in the combobox filters and opens the listbox. */
   private onInput(e: Event): void {
     const target = e.target as HTMLElement | null;
+    if (target?.getAttribute('data-field') === 'bid-usd') {
+      this.onBidPriceInput();
+      return;
+    }
     if (target?.getAttribute('data-field') !== 'sell-search') return;
     this.sellSearch = (target as HTMLInputElement).value;
     this.sellOpen = true;
@@ -1081,6 +1105,63 @@ export class WocMarketWindow {
     // pointing at whatever now happens to sit in that position.
     this.sellActive = -1;
     this.render();
+  }
+
+  /**
+   * The bid's $WOC preview, on the same terms as the p2p trade's.
+   *
+   * Written IN PLACE into its own line rather than through render(): a rebuild
+   * would replace the input under the caret on every keystroke, which is the
+   * bug the trade arm already had to solve.
+   *
+   * Coalesced WITHOUT a timer, unlike the trade arm's 350ms debounce. This file
+   * is a cold window and holds a no-self-scheduling contract that its own suite
+   * pins by scanning for the token, so a `setTimeout` debounce is not available
+   * here. Keeping at most one request in flight and chasing the latest value on
+   * completion gets the same property: typing fast costs about one request per
+   * round trip rather than one per character, and it needs no clock at all.
+   *
+   * The figure is the SERVER's, like every other money number here; the client
+   * multiplies nothing.
+   */
+  private onBidPriceInput(): void {
+    const cents = this.numberFieldCents('[data-field="bid-usd"]');
+    if (cents === null || cents <= 0) {
+      // Nothing to preview, and an emptied field must not keep showing the rate
+      // for the number that used to be there.
+      this.bidEstimateWanted = null;
+      if (this.bidEquivalentTokens !== null) {
+        this.bidEquivalentTokens = null;
+        this.render();
+      }
+      return;
+    }
+    this.bidEstimateWanted = cents;
+    this.pumpBidEstimate();
+  }
+
+  private pumpBidEstimate(): void {
+    const cents = this.bidEstimateWanted;
+    const hooks = this.deps.hooks();
+    if (cents === null || this.bidEstimateInFlight || !hooks) return;
+    this.bidEstimateInFlight = true;
+    void hooks.client.estimate(cents).then((est) => {
+      this.bidEstimateInFlight = false;
+      // Stale: the player typed on while this was out. Leave the line alone and
+      // chase the number they actually have now.
+      if (this.bidEstimateWanted !== cents) {
+        this.pumpBidEstimate();
+        return;
+      }
+      this.bidEstimateWanted = null;
+      this.bidEquivalentTokens = est?.amount?.tokens ?? null;
+      // Through render(), not a raw write into the line. This window rebuilds
+      // its whole subtree and already carries the caret and the typed value
+      // across with captureFormDraft/captureFocusKey, so the price being typed
+      // survives; poking textContent directly would dodge the file's own
+      // no-raw-write rule for no benefit.
+      this.render();
+    });
   }
 
   /**
@@ -1376,8 +1457,7 @@ export class WocMarketWindow {
         void this.refreshPendingQuote();
         break;
       case 'quote-cancel':
-        this.pendingQuote = null;
-        this.render();
+        void this.cancelPendingQuote();
         break;
       default:
         break;
@@ -1579,6 +1659,37 @@ export class WocMarketWindow {
         usdCents: settlement?.amountCents ?? null,
         quote: out.quote,
       };
+    });
+  }
+
+  /**
+   * "Not now", meaning it on the server too.
+   *
+   * A BOND quote holds a listing-wide lock: the bid exists as pending_bond, and
+   * every further bid on that listing is refused until it resolves. Dropping
+   * only the client's copy left the player locked out of the auction they were
+   * trying to enter, told to abandon a bid through a control that did not
+   * exist, for the whole five-minute TTL.
+   *
+   * A SETTLEMENT quote is not the same and is deliberately left alone: the item
+   * is already theirs to pay for, the Activity tab offers Pay now, and there is
+   * a deadline rather than a lock. Cancelling that would throw away a purchase.
+   */
+  private async cancelPendingQuote(): Promise<void> {
+    const pending = this.pendingQuote;
+    const hooks = this.deps.hooks();
+    this.pendingQuote = null;
+    if (!hooks || pending?.kind !== 'bond') {
+      this.render();
+      return;
+    }
+    await this.withBusy('hudChrome.wocMarket.confirming', async () => {
+      const out = await hooks.client.abandonBid(pending.bidId);
+      // A failure here is worth saying out loud rather than swallowing: the bid
+      // is still holding the lock, and the player needs to know why their next
+      // bid is refused. The TTL remains the backstop either way.
+      if (!out.ok) this.fail(out.code);
+      await this.reload();
     });
   }
 

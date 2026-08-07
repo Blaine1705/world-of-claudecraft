@@ -931,3 +931,71 @@ describe('woc_market_window: the listbox must stay in flow', () => {
     expect(rule).toContain('overflow-y: auto');
   });
 });
+
+describe('woc_market_window: "Not now" releases the listing lock', () => {
+  // The dead end this closes: placing a bid creates a pending_bond row that
+  // blocks every further bid on that listing, and "Not now" only dropped the
+  // CLIENT's copy of the quote. The player was then refused with "Confirm or
+  // abandon your pending bid on this listing first" and had no way to abandon
+  // it, for the whole five-minute TTL.
+  it('tells the server, rather than only forgetting the quote locally', () => {
+    const cancel = between(
+      'private async cancelPendingQuote()',
+      'private async refreshPendingQuote',
+    );
+    expect(cancel, 'a bond quote must be abandoned server-side').toContain(
+      'client.abandonBid(pending.bidId)',
+    );
+    // And the activity/detail views must re-read, or the window keeps showing
+    // the bid it just withdrew.
+    expect(cancel).toContain('this.reload()');
+  });
+
+  it('leaves a SETTLEMENT quote alone: that is a purchase, not a lock', () => {
+    // The item is already the buyer's to pay for, Activity offers Pay now, and
+    // the constraint is a deadline rather than a listing-wide lock. Abandoning
+    // it here would throw away a purchase they still want.
+    const cancel = between(
+      'private async cancelPendingQuote()',
+      'private async refreshPendingQuote',
+    );
+    expect(cancel).toContain("pending?.kind !== 'bond'");
+  });
+
+  it('routes the Not now button through that path, not a bare state clear', () => {
+    const handler = between("case 'quote-cancel':", 'default:');
+    expect(handler).toContain('this.cancelPendingQuote()');
+    expect(handler, 'a bare local clear is what shipped the bug').not.toContain(
+      'this.pendingQuote = null',
+    );
+  });
+});
+
+describe('woc_market_window: the bid $WOC preview', () => {
+  it('quotes the SERVER for the typed price, never multiplying locally', () => {
+    const pump = between('private pumpBidEstimate()', 'private onKeyDown');
+    expect(pump).toContain('client.estimate(cents)');
+    expect(pump).toContain('est?.amount?.tokens');
+  });
+
+  it('coalesces without a timer, which this cold window may not own', () => {
+    // One request in flight at a time, chasing the latest value on completion.
+    // A setTimeout debounce (what the p2p trade arm uses) is unavailable here:
+    // the cold-window contract above scans this file for the token.
+    const pump = between('private pumpBidEstimate()', 'private onKeyDown');
+    expect(pump).toContain('this.bidEstimateInFlight');
+    expect(pump, 'a stale reply must chase the newer value').toContain(
+      'this.bidEstimateWanted !== cents',
+    );
+  });
+
+  it('reuses the trade arm’s wording so the two surfaces read identically', () => {
+    expect(painter).toContain("t('hudChrome.trade.woc.equivalent'");
+  });
+
+  it('shows nothing at all until the server has quoted a figure', () => {
+    // An empty or cleared field must not keep displaying the rate for the number
+    // that used to be there.
+    expect(painter).toContain('this.bidEquivalentTokens === null');
+  });
+});
