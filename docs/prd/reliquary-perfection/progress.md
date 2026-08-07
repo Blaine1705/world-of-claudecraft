@@ -525,3 +525,106 @@ happened.
   borderline local timeouts; PR CI on clean runners is the arbiter. Full
   history: abeafbe99c -> 367f6e2968 (sync) -> 2d084fe341 + 71d2369d76 +
   b9777879b3 (round 1) -> 7a574c6608 (round 2) -> the docs commit.
+
+## Phase 13b: Complete source coverage (2026-08-07)
+
+Executes the settled source ruling plus the Phase 13 QA's additions: every
+silhouette now lists every real door, and SOURCE_PENDING_RULING holds exactly
+the two genuine content gaps.
+
+- Sync: 2ce5f87134 merges release/v0.35.0 at 7a7132e15c (the CI/CD packet tail
+  plus the market wire cadence). release-merge-audit clean: the three
+  branch-owned overlaps (server/game.ts, src/sim/sim.ts, src/ui/CLAUDE.md)
+  keep both sides' intent, no new routes, no stale db-mock shape, no premise
+  invalidated.
+- Vocabulary (b7e72b7d6f): ReliquarySourceKind gains delve, rift, quest,
+  store, and activity; a relic's source accepts one hint or a NON-EMPTY
+  readonly list (tsc rejects an authored empty list); reliquaryRelicSource
+  returns a frozen readonly list, own hints winning wholesale over the page
+  default. Pinned id spaces: RELIQUARY_STORE_SOURCE_ID ('woc_store'),
+  RELIQUARY_ACTIVITY_SOURCE_IDS (corpse_harvest, masterwork_craft),
+  RELIQUARY_RIFT_RANK_SOURCE_IDS (B, A, S; C rolls no mount). 'boss' KEPT as
+  the mob-loot arm name (the QA's 'mob' consideration declined: the id space
+  is MOBS either way, the rendered copy never says "boss", and a rename would
+  churn 136 authored rows for zero player-visible change).
+- Authoring, 58 of 60 (all verified against live tables): the seven Sanctum
+  shared drops (both mobs each; the two crafted combo pieces add their
+  recipe's own craft; wyrmcult_grand_robe carries korgath_the_bound plus
+  q_gravewyrm); the Collapsed Reliquary pair (delve + vendor); the six
+  Drowned Litany rite rows (delve); masterwork:first and the six
+  corpse-harvest trophies (activity); seven of nine mounts (heroic reins name
+  every dropping boss plus their rift rank, the epic pair rift-only,
+  valorsteed vendor-only); all 29 skins via the skins page's store
+  sourceDefault; the two open-world rares add their camp zone.
+- DEVIATION from the phase prose, listed per the stopping rules: valorsteed
+  carries NO quest hint. q_riding_lessons awards no item (itemRewards is
+  empty; the reins are a separate 10g purchase from Marla), so the prescribed
+  quest hint would fail its own truth pin. The stale mounts_training.ts
+  header claiming the quest grants the reins is corrected in the same change.
+- RULING (delegated to 13b, recorded as permanent): the Rift clear GEAR pools
+  stay excluded from source lines. riftNormalClearPool / riftHeroicClearPool
+  are derived mirrors of the whole five-man tier paid as one uniform pick, so
+  they are the tier's background luck, not a route a player can aim at one
+  relic; the rift MOUNT ladder names its exact reins per rank and IS listed.
+  The sweep's rift arm walks the reins tables, and a liveness pin keeps the
+  excluded pools' catalog overlap measured (69 of 73 pool ids are hinted
+  slots today).
+- Rendering (34cd2ce9e6): reliquarySourceLinePlan is list-in/list-out, one
+  line per door in authored order with no cap (grag_bear and
+  stalkglider_snail are the four-line maximum); exactly one boss plus exactly
+  one zone composes the single bossZone line at the boss position, and the
+  page dungeon wins where both could apply; no either-boss merging (one line
+  per door everywhere). Tooltip paints every resolved line; the aria label
+  folds them through formatList (Intl.ListFormat conjunction) so CLDR owns
+  every locale's separators including the final-conjunction shapes a pairwise
+  key cannot express (the interim sourceAriaJoin key was retired inside the
+  phase after review). Seven new hudChrome.reliquary keys with five non-Latin
+  fills each (M16), bundles regenerated in-change. data-cell-source now
+  carries the RESOLVED line count and scripts/pr_shot_targets.mjs prefers the
+  richest cell, so the flagship capture lands on gravewyrm_gauntlets at three
+  lines.
+- Tests (e462c15718): per-kind truth pins with exact floors (boss 159 with a
+  10-floor mount arm through the reins seam, vendor 5, profession 8 with the
+  recipe-derived crafted arm, delve 8 enumerated behaviorally over every
+  tier/class/bountiful/rng branch, rift 6 rank-exact, quest 1 with the
+  q_riding_lessons negative premise, store 29, activity 7 bidirectional, zone
+  2 through camp centers and the production zoneContaining requiring exactly
+  one boss and one zone). The acknowledgment sweep walks nine families via a
+  module-scope pure judge; per-family doctored-miss negatives prove every arm
+  can fail; the delve-fronting vendor disjunct has positive coverage; the two
+  pending mounts carry an inverse zero-routes sweep plus watch rows in the
+  self-checking exclusions (heroic vendor stock, dungeon ground objects,
+  RIFT_ITEMS, each with a liveness floor). Behavioral: the three-door helm
+  and four-door reins render every line in tooltip and joined aria, the
+  bossZone pair renders one line, the un-hinted mount renders nothing, and
+  the ja case pins the locale join against an independent Intl.ListFormat
+  oracle. Mutation kills: nine content-side (one per new kind plus freeze,
+  always-true judge family, swapped activities) and three UI-side (dropped
+  tooltip line, hardcoded join, unguarded arm), all restored from saved
+  copies.
+- Reviews: five dispatched, five delivered (architecture, frontend seam,
+  test coverage, qa-checklist, plus a fresh fix-round auditor), zero BLOCKING
+  anywhere; every SHOULD-FIX and nit applied except three recorded decisions:
+  the combo-craft relics name only their recipe's home craft (two "Earned
+  through" lines would imply either craft alone suffices); the dungeon name
+  repeats per boss line on dungeon pages (the phase file mandates the
+  bossDungeon composition per line; eyeballed in the capture, reads fine);
+  reliquarySourceLinePlan keeps its singular name (cosmetic, the pins spell
+  it). The mounts-page place question (boss lines name no dungeon on
+  horizons_mounts) is recorded in state.md as a maintainer call.
+- Validation on the committed tree: tsc clean, the 11-suite battery 566
+  green, ci:changed exit 0, browser-independent i18n freshness proven
+  byte-identical by the QA reviewer pre-commit and by the gate's own arm
+  post-commit. node scripts/gate_select.mjs: every step green EXCEPT the
+  full-suite vitest arm, which failed 7 files, every one a 20-to-230-second
+  pure timeout in a suite this diff does not touch (charge recharge, dungeon
+  finder, eastbrook integration, escort ambush, frost procs, physics
+  zonewalls, respawn policy); all seven re-run green in isolation (142/142).
+  Ruled machine-contention noise per the recorded judge-by-CI policy, the
+  same signature and ruling as the Phase 13 QA's gate runs.
+- Screenshots: docs/screenshots/reliquary-phase13b/ before/after, desktop
+  and mobile. The before shows the old picker settling for a single-line
+  cell; the after shows the gauntlets' three-line collection-log entry.
+- History: 2ce5f87134 (sync) -> b7e72b7d6f (vocabulary + authoring) ->
+  34cd2ce9e6 (rendering + i18n) -> e462c15718 (tests) -> the docs commit.
+  Commits stay LOCAL; the Phase 13b QA session owns the push.

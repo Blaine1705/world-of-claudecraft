@@ -316,6 +316,28 @@ plain xhigh, fresh session). Update this line as phases complete.
   in-change (M16), bundles regenerated. New behavioral suite
   tests/reliquary_window_behavior.test.ts (31/31 mutants). Six reviews, every
   finding applied or recorded in progress.md.
+- Phase 13b: BUILT, awaiting its QA (2026-08-07, commits local). Executes the
+  settled source ruling: ReliquarySourceKind + delve/rift/quest/store/activity,
+  multi-hint relics (source: one hint or a NON-EMPTY readonly list, frozen at
+  construction; reliquaryRelicSource returns a frozen readonly list, own hints
+  win wholesale), 240/242 slots resolve, SOURCE_PENDING_RULING = exactly
+  drakemaw_raptor + terrorspark_groundshaker with an inverse zero-routes sweep
+  justifying the row. Pinned id spaces exported for labels/tests:
+  RELIQUARY_STORE_SOURCE_ID 'woc_store', RELIQUARY_ACTIVITY_SOURCE_IDS,
+  RELIQUARY_RIFT_RANK_SOURCE_IDS (B/A/S). THE VOCABULARY IS NOW STABLE FOR
+  PHASE 21 GROWTH: author new relics against these ten kinds and the
+  established truth-pin arms (a new pairing of relic kind x source kind reds
+  the pairing pin until a sweep covers it). Rendering: one line per door,
+  authored order, no cap; lone boss + lone zone composes bossZone; aria folds
+  through formatList (no join key). data-cell-source carries the resolved
+  line count; the shot picker prefers the richest cell. PHASE 22 FILL
+  WORKLIST GAINS the seven sourceLine keys (sourceBossZone, sourceDelve,
+  sourceRift, sourceQuest, sourceStore, sourceActivityCorpseHarvest,
+  sourceActivityMasterworkCraft), each pending in the 15 Latin locales with
+  the five non-Latin fills already in-change. Valorsteed deviation (vendor
+  only; q_riding_lessons awards no item) and the permanent Rift GEAR-pool
+  exclusion are recorded in progress.md; the mounts-page place question is a
+  new OPEN item below.
 - Phase 14: (pending)
 - Phase 15: (pending)
 - Phase 16: (pending)
@@ -361,6 +383,20 @@ plain xhigh, fresh session). Update this line as phases complete.
   recorded-ruling comment; decide before Phase 17 ships obtain counts. Phase 13
   widened the blast radius knowingly: the owned-cell aria-label now mirrors the
   tooltip's firstFindClears line, so the ruling's outcome changes both surfaces.
+- RULING EXECUTED by Phase 13b, 2026-08-07 (the entry below is kept for
+  provenance): the vocabulary, multi-hint support, and 58-slot authoring all
+  landed as ruled; the pending entry now lists exactly reins_drakemaw_raptor
+  (no acquisition path in content, owner call 2026-08-04) and
+  reins_terrorspark_groundshaker (dev-grant only), both owner decisions
+  outside this packet, and the inverse zero-routes sweep in
+  tests/reliquary_content.test.ts keeps the row honest. The QA additions were
+  resolved: the robe is authored boss + quest; the sweep grew an
+  acknowledgment arm per kind with per-family negative proofs; the Rift GEAR
+  exclusion is PERMANENT with the rationale in the sweep's comment (derived
+  tier-mirror pools paid as one uniform pick are not a route a player can aim
+  at one relic; the reins ladder is, and is listed); 'boss' kept over 'mob'
+  (declined with rationale in progress.md); the crafted pair carries the
+  recipe's own craft as a third hint rather than replacing multi-boss.
 - RULING SETTLED (Phase 13 source hints, maintainer 2026-08-06): do what is
   best for the feature at collection-log fidelity (the OSRS collection log /
   WoW appearance panel standard: an uncollected silhouette lists EVERY real
@@ -397,6 +433,18 @@ plain xhigh, fresh session). Update this line as phases complete.
   recipes); the sweep's recipe arm acknowledges profession-kind hints on the
   crafting profession, so a 'profession' hint is representable for them
   today if 13b prefers it over multi-boss.
+- RULING OPEN (Phase 13b QA-gate review, 2026-08-07): the Horizons mounts
+  page names no PLACE for its ten boss lines ("Drops from Morthen" with no
+  dungeon), because bossDungeon composition keys off the page's own
+  clearSource and horizons_mounts has none. A boss-to-dungeon mapping is
+  derivable from HEROIC_BOSS_LOOT plus DUNGEONS, so a derived-dungeon
+  fallback for boss hints on clearSource-none pages is implementable; it
+  would also change the set pages' and Thunzharr's line shapes, and the
+  Phase 13 rendering rule deliberately says "names the boss alone rather
+  than inventing a place" for non-dungeon pages (a derived dungeon is not
+  invented, but the rule change exceeds 13b's delegation). Decide before or
+  with Phase 14; the reviewer rated it the largest remaining information gap
+  in the new surface.
 - Phase 15 input (Phase 13 QA, 2026-08-06): ReliquaryWindow.open(nav) sets
   nav but does not clear pageId, and the view resolves an off-shelf pageId
   from the full catalog, so a deep link passing a nav while a page from
