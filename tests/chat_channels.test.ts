@@ -441,7 +441,7 @@ describe('chat channel tabs — pure model', () => {
   });
 });
 
-describe('chat channel tabs — the battleground channel', () => {
+describe('chat channel tabs: the battleground channel', () => {
   // /bg reaches BOTH teams in the match. Before it existed the only way to say
   // anything to the opposing side was General, which broadcasts realm-wide.
   it('is a bindable tab channel with its own prefix and needs no /join', () => {
