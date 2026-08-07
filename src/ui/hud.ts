@@ -15673,15 +15673,21 @@ export class Hud {
       // 500ms band cancel out), and five live reads sit comfortably inside the
       // slow-band budget, so the pages the player explicitly chose get the exact
       // answer and the whole-catalog scan gets the cheap one. Accepted with it:
-      // Sim.ownedMounts() allocates a fresh array per read, which is fine at
-      // this cadence and at this count (ClientWorld returns a stored field).
-      ownershipSig: reliquaryTrackerOwnershipSig({
-        itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
-        marks: this.sim.reliquaryMarks.size,
-        deedsEarned: this.sim.deedsEarned.size,
-        mounts: this.sim.ownedMounts().length,
-        weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
-      }),
+      // the mount count is the expensive read here, not a cheap one. Offline,
+      // Sim.ownedMounts() copies the whole bags-plus-bank array before scanning
+      // it, and every completion() call above pays that copy again through
+      // Sim.reliquaryOwnershipSurfaces(); online, ClientWorld returns a stored
+      // field. Accepted because this is the 500ms band with at most five pinned
+      // reads. A thunk, not a value, so the signature (and that copy) is skipped
+      // entirely while the player has pins: only the default branch reads it.
+      ownershipSig: () =>
+        reliquaryTrackerOwnershipSig({
+          itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
+          marks: this.sim.reliquaryMarks.size,
+          deedsEarned: this.sim.deedsEarned.size,
+          mounts: this.sim.ownedMounts().length,
+          weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
+        }),
       collapsed,
     });
     // Compact touch tier: the rows are folded away (hud.mobile.css) and the header

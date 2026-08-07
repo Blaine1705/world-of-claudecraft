@@ -364,6 +364,39 @@ describe('open(nav): the shelf deep link', () => {
     expect(document.activeElement).not.toBe(navButton(el, 'overview'));
   });
 
+  it('clears a needle and an ownership chip that could empty the landed shelf', () => {
+    // The openWithPage contract, owed by the shelf link for the same reason: a
+    // rank-up click that parks the reading position on a rail whose rows are
+    // all filtered away by a needle from ten minutes ago reads as a dead link.
+    // The ownership chips live on a page detail, so the state is set up there.
+    const { w, el } = makeWindow(baseState());
+    w.openWithPage(CRYPT_PAGE);
+    click(el, '[data-filter="missing"]');
+    typeSearch(el, 'zzzz-no-such-relic');
+    expect(searchField(el).value).toBe('zzzz-no-such-relic');
+    expect(el.querySelector('[data-filter="missing"]')?.getAttribute('aria-pressed')).toBe('true');
+
+    w.open('professions');
+    expect(activeNav(el)).toBe('professions');
+    expect(searchField(el).value).toBe('');
+    // Back onto a page detail the IN-WINDOW way, which keeps whatever chip the
+    // player had on: 'all' here can therefore only be the deep link's doing.
+    click(el, `.reliquary-page-row[data-page="${NOTES_PAGE}"]`);
+    expect(el.querySelector('[data-filter="all"]')?.getAttribute('aria-pressed')).toBe('true');
+    expect(el.querySelector('[data-filter="missing"]')?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('leaves the needle alone when the player clicks a rail button in-window', () => {
+    // The contrast that makes the clear above a DEEP-LINK rule rather than a
+    // shelf-change rule: the same shelf move, made from inside the window, is
+    // navigation within a search the player is running.
+    const { el } = makeWindow(baseState(), { nav: 'conquerors' });
+    typeSearch(el, 'zzzz-no-such-relic');
+    click(el, '.reliquary-nav[data-nav="professions"]');
+    expect(activeNav(el)).toBe('professions');
+    expect(searchField(el).value).toBe('zzzz-no-such-relic');
+  });
+
   it('a NO-ARG open arms nothing and still parks on Close', () => {
     // The nav arm is what makes the jump; a plain open() is "where I was", and
     // arming it unconditionally would move focus on every keybind press.

@@ -21,7 +21,9 @@
 // for an always-on strip. The scan therefore re-runs only when the cheap
 // ownership signature moves (reliquaryTrackerOwnershipSig), which is exactly
 // when a page's progress can have changed; pinned pages, capped at
-// RELIQUARY_TRACK_CAP, are read live on every build.
+// RELIQUARY_TRACK_CAP, are read live on every build. The signature arrives as a
+// thunk so a player WITH pins never pays for it at all: gathering it costs the
+// host five live ownership reads that only the default branch consults.
 //
 // The container is REUSED across builds, so it is also the delta source: the
 // previous build's owned count per page is what decides the fill flash. No
@@ -103,8 +105,14 @@ export interface ReliquaryTrackerInput {
   pageIds: readonly string[];
   /** Page progress read (the IWorldReliquary facet member, both hosts). */
   completion(pageId: string): ReliquaryPageCompletion | null;
-  /** Cheap ownership signature; the default scan re-runs only when it moves. */
-  ownershipSig: number;
+  /**
+   * Cheap ownership signature; the default scan re-runs only when it moves.
+   * A THUNK, not a number, because only the nothing-pinned branch reads it: the
+   * host has to gather five live ownership counts to produce one (one of them a
+   * bags-plus-bank copy), and a player with pins would otherwise pay for a
+   * signature nothing consults. Called at most once per build.
+   */
+  ownershipSig(): number;
   collapsed: boolean;
 }
 
@@ -299,7 +307,8 @@ function findPrev(out: ReliquaryTrackerView, pageId: string): ReliquaryTrackerPr
  * gated: see the module comment on what one completion() call actually costs.
  */
 function refreshDefaultRows(out: ReliquaryTrackerView, input: ReliquaryTrackerInput): void {
-  if (out.memoSig === input.ownershipSig) return;
+  const sig = input.ownershipSig();
+  if (out.memoSig === sig) return;
   const candidates: ReliquaryTrackerRow[] = [];
   for (const pageId of input.pageIds) {
     const c = input.completion(pageId);
@@ -314,5 +323,5 @@ function refreshDefaultRows(out: ReliquaryTrackerView, input: ReliquaryTrackerIn
     out.memoRows[i].total = ranked[i].total;
   }
   out.memoCount = kept;
-  out.memoSig = input.ownershipSig;
+  out.memoSig = sig;
 }

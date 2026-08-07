@@ -52,7 +52,7 @@ function build(
     pinned: new Set(opts.pinned ?? []),
     pageIds: Object.keys(progress),
     completion: completionFrom(progress),
-    ownershipSig: opts.sig ?? 0,
+    ownershipSig: () => opts.sig ?? 0,
     collapsed: opts.collapsed ?? false,
   });
 }
@@ -303,12 +303,16 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
       return completionFrom(progress)(pageId);
     };
     const view = makeReliquaryTrackerView();
+    let sigCalls = 0;
     const run = (sig: number): void => {
       buildReliquaryTrackerViewInto(view, {
         pinned: new Set(),
         pageIds: Object.keys(progress),
         completion: counting,
-        ownershipSig: sig,
+        ownershipSig: () => {
+          sigCalls++;
+          return sig;
+        },
         collapsed: false,
       });
     };
@@ -321,9 +325,12 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
     // Ownership moved: the ranking is stale by definition, so it re-runs.
     run(2);
     expect(calls).toBe(cold * 2);
+    // The default branch does need the signature, but exactly once per build:
+    // it is the memo key, not something to be re-gathered mid-scan.
+    expect(sigCalls).toBe(4);
   });
 
-  it('reads pinned pages live on every build, memo or not', () => {
+  it('reads pinned pages live on every build, memo or not, and never asks for the signature', () => {
     // The pages the player explicitly chose are never served from a memo: their
     // counts are the whole point of the strip.
     const progress: Progress = { page: { owned: 4, total: 10 } };
@@ -332,17 +339,26 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
       calls++;
       return completionFrom(progress)(pageId);
     };
+    let sigCalls = 0;
     const view = makeReliquaryTrackerView();
     for (let i = 0; i < 3; i++) {
       buildReliquaryTrackerViewInto(view, {
         pinned: new Set(['page']),
         pageIds: ['page'],
         completion: counting,
-        ownershipSig: 7,
+        ownershipSig: () => {
+          sigCalls++;
+          return 7;
+        },
         collapsed: false,
       });
     }
     expect(calls).toBe(3);
+    // The signature is a thunk for exactly this: producing one costs the host
+    // five live ownership reads (one of them a bags-plus-bank copy), and the
+    // pinned branch never consults it, so a pinned player must not pay for it
+    // on every 500ms band.
+    expect(sigCalls).toBe(0);
   });
 
   it('picks the default ranking up the moment the last pin is removed', () => {

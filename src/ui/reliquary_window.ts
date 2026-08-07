@@ -234,6 +234,13 @@ export class ReliquaryWindow {
       // landed). A no-arg open() still keeps where-I-was exactly.
       this.pageId = null;
       this.gridIndex = 0;
+      // And the needle and ownership chip go with it, exactly as openWithPage
+      // clears them: an external link that lands the player on a shelf whose
+      // rows are all filtered away reads as a broken link. Only the EXTERNAL
+      // jump clears these; the in-window [data-nav] rail buttons are navigation
+      // within a search the player is running and keep both.
+      this.search = '';
+      this.ownedFilter = 'all';
       // A shelf deep link is a navigation, so arm the rail button for it (see
       // focusNavId). This is what makes the ALREADY-OPEN branch below do
       // something a non-sighted player can perceive.
@@ -256,9 +263,11 @@ export class ReliquaryWindow {
     this.suppressAnnounceOnce = true;
     this.render();
     this.deps.root().style.display = 'flex';
-    // The page jump outranks the shelf jump: only a page target can be armed
-    // alongside a nav one (openWithPage into a closed window), and the page is
-    // the more specific promise of the two.
+    // The page jump outranks the shelf jump. Today at most ONE of the two is
+    // ever armed: openWithPage arms focusPageId and then calls open() with no
+    // argument, so that path never arms a nav, and a nav-bearing open arms only
+    // focusNavId. The || is what settles it if a future caller ever arms both,
+    // and it settles it on the page, the more specific promise of the two.
     const landed =
       (jumpPageId !== null && this.spotlightPage(this.deps.root(), jumpPageId)) ||
       (jumpNav !== null && this.spotlightNav(this.deps.root(), jumpNav));
@@ -375,6 +384,13 @@ export class ReliquaryWindow {
     this.celebratePageId = null;
     this.celebratePending = false;
     this.pendingFlash = null;
+    // Same family, same reason: an armed jump is for the visit it was armed in.
+    // Every path arms one immediately before the paint that consumes it, so
+    // these are already null here; clearing them bounds the one case that is not
+    // (a render that threw between the arm and the consume) to that visit,
+    // rather than yanking focus on some unrelated later open.
+    this.focusPageId = null;
+    this.focusNavId = null;
     // The region must not carry a stale announcement (or a pending reannounce
     // toggle) into the next visit; the NODE persists, its state does not.
     if (this.liveEl) this.liveEl.textContent = '';

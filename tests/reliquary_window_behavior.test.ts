@@ -2740,6 +2740,13 @@ describe('pinning a page to the HUD tracker', () => {
   });
 
   it('resets to empty for a stored value that is not an array', () => {
+    // Positive control first, because an empty answer is what a WRONG KEY looks
+    // like too: seed the same key with a valid list and watch it load, so the
+    // two refusals below are refusals rather than a store nobody ever read.
+    localStorage.setItem(PIN_KEY, JSON.stringify([PAGE_ID]));
+    expect([...makeWindow(baseState(), { open: false }).w.pinned]).toEqual([PAGE_ID]);
+    document.body.innerHTML = '';
+
     // Two corrupt shapes, because they fail at different points: a value that
     // PARSES to a non-array (an older shape, or another key's value) has to be
     // refused by the shape check, and one that does not parse at all has to be

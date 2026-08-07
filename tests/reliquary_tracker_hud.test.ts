@@ -16,6 +16,13 @@
 // container-reuse contract being what makes the immediate-assert style below
 // necessary: the painter is handed the same object every build, so a captured
 // reference is never a snapshot.
+//
+// The stub world is SIM-SHAPED only (the offline shapes: a Map of earned deeds,
+// an ownedMounts() call, live Sets), and that is enough for this file, because
+// nothing here is a shape contract: the method reads five sizes plus a
+// completion callback and hands the pure core plain numbers, so the online
+// ClientWorld half is covered where it belongs (the IWorld parity pin) and the
+// core's own suite covers what it does with those numbers.
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
@@ -33,13 +40,24 @@ const PINNED_PAGE = 'conquerors_gravewyrm_sanctum';
 // numbers came from the stubbed completion read, not from the content table.
 const OWNED = 3;
 const TOTAL = 7;
+// Two more live pages, for the nothing-pinned default ranking. Real ids because
+// the default scan walks RELIQUARY_PAGE_ORDER: a fabricated id would simply
+// never be asked about.
+const CANDIDATE_A = 'conquerors_hollow_crypt';
+const CANDIDATE_B = 'professions_field_notes';
+
+/** Page progress the stubbed completion read answers from. */
+type Progress = Record<string, { owned: number; total: number }>;
 
 interface TrackerHarness {
   sim: {
     reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null;
     deedStats: { itemsDiscovered: Set<string> };
     reliquaryMarks: Set<string>;
-    deedsEarned: Set<string>;
+    // A Map, the shape both real worlds expose (deed id to earned date). Only
+    // .size is read here, but a Set would misteach the contract to the next
+    // reader of this rig.
+    deedsEarned: Map<string, string>;
     ownedMounts(): string[];
     accountCosmetics: { weaponSkinIds: string[] };
   };
@@ -58,12 +76,24 @@ interface TrackerRig {
   settings: Record<string, unknown>;
   /** Every view the painter was handed, in call order (same container each time). */
   painted: ReliquaryTrackerView[];
+  /** Live page progress: a test moves this the way a relic drain moves it. */
+  progress: Progress;
+  /** The mount keys ownedMounts() answers with (one ownership surface). */
+  mounts: string[];
+  /** How often the method asked for each read whose cost the design bounds. */
+  counts: { ownedMounts: number };
 }
 
 function makeRig(): TrackerRig {
   const hud = Object.create(Hud.prototype) as unknown as TrackerHarness;
   const settings: Record<string, unknown> = {};
   const painted: ReliquaryTrackerView[] = [];
+  // Only the pinned page starts with progress: every other catalog page reads
+  // as absent, so the nothing-pinned default scan finds nothing and cannot
+  // quietly supply the line a pin assertion is looking for.
+  const progress: Progress = { [PINNED_PAGE]: { owned: OWNED, total: TOTAL } };
+  const mounts: string[] = [];
+  const counts = { ownedMounts: 0 };
   hud.optionsHooks = {
     settings: {
       get: (key) => settings[key],
@@ -73,15 +103,18 @@ function makeRig(): TrackerRig {
     },
   };
   hud.sim = {
-    // Only the pinned page has progress: every other catalog page reads as
-    // absent, so the nothing-pinned default scan finds nothing and cannot
-    // quietly supply the line a pin assertion is looking for.
-    reliquaryPageCompletion: (pageId) =>
-      pageId === PINNED_PAGE ? { owned: OWNED, total: TOTAL, complete: false } : null,
+    reliquaryPageCompletion: (pageId) => {
+      const p = progress[pageId];
+      if (!p) return null;
+      return { owned: p.owned, total: p.total, complete: p.total > 0 && p.owned >= p.total };
+    },
     deedStats: { itemsDiscovered: new Set<string>() },
     reliquaryMarks: new Set<string>(),
-    deedsEarned: new Set<string>(),
-    ownedMounts: () => [],
+    deedsEarned: new Map<string, string>(),
+    ownedMounts: () => {
+      counts.ownedMounts++;
+      return mounts;
+    },
     accountCosmetics: { weaponSkinIds: [] },
   };
   hud.reliquaryWindow = { pinned: new Set<string>() };
@@ -91,15 +124,21 @@ function makeRig(): TrackerRig {
       painted.push(view);
     },
   };
-  return { hud, settings, painted };
+  return { hud, settings, painted, progress, mounts, counts };
 }
+
+/** The page ids the strip is actually showing, in display order. */
+const shown = (view: ReliquaryTrackerView): string[] =>
+  view.lines.slice(0, view.count).map((line) => line.pageId);
 
 beforeEach(() => {
   document.body.className = '';
   // Content premise: a page rename would leave every pin assertion below
   // passing over a page the player can never actually pin.
-  if (!RELIQUARY_PAGES_BY_ID[PINNED_PAGE]) {
-    throw new Error(`content premise: ${PINNED_PAGE} is a live Reliquary page`);
+  for (const pageId of [PINNED_PAGE, CANDIDATE_A, CANDIDATE_B]) {
+    if (!RELIQUARY_PAGES_BY_ID[pageId]) {
+      throw new Error(`content premise: ${pageId} is a live Reliquary page`);
+    }
   }
 });
 
@@ -196,5 +235,69 @@ describe('Hud.updateReliquaryTracker: the window pin store', () => {
     hud.updateReliquaryTracker();
     expect(painted[0].count).toBe(0);
     expect(painted[0].visible).toBe(false);
+  });
+});
+
+describe('Hud.updateReliquaryTracker: the ownership signature feed', () => {
+  // Five surfaces fold into a page's owned count, and the default scan re-runs
+  // only when the signature this method feeds moves. The source pins in
+  // tests/reliquary_tracker_view.test.ts name each line; this is the behavioral
+  // half, which survives a rename: drop any ONE surface from the feed and the
+  // strip holds a stale ranking straight through the fill that should have
+  // re-ranked it.
+  const SURFACES: { name: string; move(rig: TrackerRig): void }[] = [
+    {
+      name: 'itemsDiscovered',
+      move: (rig) => rig.hud.sim.deedStats.itemsDiscovered.add('some_relic'),
+    },
+    { name: 'marks', move: (rig) => rig.hud.sim.reliquaryMarks.add('some_mark') },
+    { name: 'deedsEarned', move: (rig) => rig.hud.sim.deedsEarned.set('some_deed', '2026-01-01') },
+    { name: 'mounts', move: (rig) => rig.mounts.push('some_mount') },
+    { name: 'weaponSkins', move: (rig) => rig.hud.sim.accountCosmetics.weaponSkinIds.push('skin') },
+  ];
+
+  it('re-ranks the nothing-pinned default rows when ANY single surface moves', () => {
+    for (const surface of SURFACES) {
+      // A fresh rig per surface: the memo is per container, so a rig reused
+      // across surfaces would carry the previous one's signature into the next.
+      const rig = makeRig();
+      // A is one relic from Illumination, B is four away: fewest remaining wins.
+      rig.progress[CANDIDATE_A] = { owned: 9, total: 10 };
+      rig.progress[CANDIDATE_B] = { owned: 16, total: 20 };
+      rig.hud.updateReliquaryTracker();
+      expect(shown(rig.painted[0]), surface.name).toEqual([CANDIDATE_A, CANDIDATE_B]);
+
+      // The find lands on B: now also one away, and at the higher fraction, so
+      // the two have to trade places. The progress read alone cannot cause that
+      // (the default scan is memoized); only the moved surface reaching the
+      // signature releases the memo.
+      rig.progress[CANDIDATE_B] = { owned: 19, total: 20 };
+      surface.move(rig);
+      rig.hud.updateReliquaryTracker();
+      expect(shown(rig.painted[1]), surface.name).toEqual([CANDIDATE_B, CANDIDATE_A]);
+    }
+  });
+});
+
+describe('Hud.updateReliquaryTracker: the lazy ownership signature', () => {
+  it('skips the bags-plus-bank mount read entirely while the player has pins', () => {
+    // Sim.ownedMounts() copies bags plus bank before scanning it, and only the
+    // nothing-pinned branch consults the signature it feeds. A pinned player
+    // pays nothing for it, on a surface that rebuilds every 500ms for the whole
+    // session.
+    const rig = makeRig();
+    rig.hud.reliquaryWindow.pinned.add(PINNED_PAGE);
+    rig.hud.updateReliquaryTracker();
+    rig.hud.updateReliquaryTracker();
+    expect(rig.counts.ownedMounts).toBe(0);
+
+    // And the other arm, or "lazy" could just mean "dropped": the default
+    // branch still gathers the signature, once per build, or its memo would
+    // freeze on whatever ranking it first computed.
+    rig.hud.reliquaryWindow.pinned.clear();
+    rig.hud.updateReliquaryTracker();
+    expect(rig.counts.ownedMounts).toBe(1);
+    rig.hud.updateReliquaryTracker();
+    expect(rig.counts.ownedMounts).toBe(2);
   });
 });
