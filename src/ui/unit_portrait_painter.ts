@@ -121,7 +121,7 @@ export class UnitPortraitPainter {
     else this.drawCrest(canvas, `class_${cls}`);
   }
 
-  /** Paint the Combat Mech cosmetic body in its worn chroma — what a mech
+  /** Paint the Combat Mech cosmetic body in its worn chroma, what a mech
    *  wearer actually looks like in the world. Falls back to the class portrait
    *  (skin 0: `skin` is a CHROMA index here, not a class-atlas index) until
    *  the lazily-loaded mech assets can render a portrait. */
@@ -132,8 +132,8 @@ export class UnitPortraitPainter {
   }
 
   /**
-   * Paint a headshot of a COMPOSED character — this player's own face, hair and
-   * colours — rather than the stock portrait for their class.
+   * Paint a headshot of a COMPOSED character, this player's own face, hair and
+   * colours, rather than the stock portrait for their class.
    *
    * Falls back through the class portrait and then the crest, because a look
    * can be unpaintable for a frame or two: the modular GLB is streamed like any

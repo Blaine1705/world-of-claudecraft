@@ -23,7 +23,7 @@
 //   cheeks morph  theta  77..126, peak theta 94 az 81 (M) / 93, 79 (F)
 //   mouth part    theta 120..127, |az| <= 20
 //
-// So the lid is the gap between the eye and the brow — theta 80..92 — and the
+// So the lid is the gap between the eye and the brow, theta 80..92, and the
 // cheek's apple sits below and inboard of the cheekbone's peak. Both shapes are
 // stated in those angles, which is why one set of numbers fits both heads: the
 // frame is each head's own bounding box mapped to the unit sphere, so the ~3%
@@ -57,7 +57,7 @@ const DEG = 180 / Math.PI;
  * A soft ellipse in (theta, azimuth), mirrored onto both sides of the face.
  *
  * `power` above 2 flattens the top so the patch reads as a swept shape rather
- * than a circular dot — the same superellipse trick the lip mask in stubble.ts
+ * than a circular dot, the same superellipse trick the lip mask in stubble.ts
  * uses, and for the same reason: a plain ellipse sized to reach the corners
  * swallows everything between them.
  */
@@ -94,7 +94,7 @@ function patchCoverage(p: Patch, theta: number, az: number): number {
  *
  * Centred a little ABOVE the eye's own band (which runs theta 90..100) so the
  * colour reads as sitting on the lid rather than as a ring round the eye, and
- * tilted so the outer end lifts — which is what every swept eyeshadow does and
+ * tilted so the outer end lifts, which is what every swept eyeshadow does and
  * what stops it reading as a bruise.
  */
 const SHADOW_PATCH: Patch = {
@@ -109,7 +109,7 @@ const SHADOW_PATCH: Patch = {
 };
 
 /**
- * Blush: the apple of the cheek — below the eye and inboard of the cheekbone's
+ * Blush: the apple of the cheek, below the eye and inboard of the cheekbone's
  * peak (theta 94, az 81), which is out at the ear and would read as war paint.
  */
 const BLUSH_PATCH: Patch = {
@@ -147,7 +147,7 @@ export const MAKEUP_REGION: DecalRegion = {
 // Unlike the stubble map, the COLOURS are baked in rather than left to the
 // material tint: there are two layers here in two different colours, and one
 // material cannot carry both. The material is left white and multiplies
-// through. That makes the cache key the pair of shades — which is fine, there
+// through. That makes the cache key the pair of shades, which is fine, there
 // are 4x5 = 20 of them at most and the map is small.
 
 /** Side of the generated map. A quarter of the stubble map's: these patches
@@ -310,7 +310,7 @@ export function buildMakeupDecal(
   decal.receiveShadow = head.receiveShadow;
   decal.bindMode = head.bindMode;
   decal.bind(head.skeleton, head.bindMatrix);
-  // Same targets, same names — applyMorphs drives both off the head's own
+  // Same targets, same names, applyMorphs drives both off the head's own
   // dictionary, so a face slider moves the skin and the paint on it together.
   if (head.morphTargetDictionary) {
     decal.morphTargetDictionary = head.morphTargetDictionary;

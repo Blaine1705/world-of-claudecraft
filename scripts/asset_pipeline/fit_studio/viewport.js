@@ -125,7 +125,7 @@ export function applyLighting(patch = {}, { markCustom = true } = {}) {
     scene.environment = envTexture;
     scene.environmentIntensity = lighting.env;
   } else {
-    // Older three: no per-scene intensity — all or nothing.
+    // Older three: no per-scene intensity, all or nothing.
     scene.environment = lighting.env > 0.05 ? envTexture : null;
   }
   hemi.intensity = lighting.hemi;

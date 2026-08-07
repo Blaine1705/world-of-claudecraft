@@ -135,11 +135,11 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 A `VisualDef` with `modular: true` points at a PART LIBRARY, not a finished
 character: `models/chars/modular/warrior_modular.glb` carries both base bodies,
 their underclothing, every hair/brow, and ALL SEVEN class kits cut into equip
-slots — all on the one shared `Rig_Medium`, which is why no cross-file skeleton
+slots, all on the one shared `Rig_Medium`, which is why no cross-file skeleton
 matching is ever needed.
 `assembleModel` routes those defs to `assembleModular`, which prunes the parsed
 scene to the picked node names (`modularPartNames`), runs the SAME
-`mergeSkinnedParts` pass, and caches the result per part set — so a kitted body
+`mergeSkinnedParts` pass, and caches the result per part set, so a kitted body
 is ~1 draw per material (skin/hair/eye/cloth + one atlas per set worn), not one
 per part.
 - Slots may be MIXED across sets, and a set does not have to fill every slot: the
@@ -155,20 +155,20 @@ per part.
 - The FACE is morph targets, not geometry variants: eight paired sliders
   (`nose_up`/`nose_dn` ...) resolved by `morphInfluences()` and applied per
   instance in `applyMorphs`. Geometry stays shared, so the face must never enter
-  `modularGeometryKey` — only the signature. `mergeSkinnedParts` leaves
+  `modularGeometryKey`, only the signature. `mergeSkinnedParts` leaves
   morph-carrying parts unmerged by design, which is what makes this work at all.
 - The MOUTH is a part (`M_Mouth_<style>` / `F_Mouth_<style>`), not a morph. It
   used to be a crease in the head driven by exclusive presets, and measured,
   neither head had a mouth worth the name: a 15mm dent on the male that faded to
-  nothing by x=0.06, and none at all on the female — what she was showing was
+  nothing by x=0.06, and none at all on the female, what she was showing was
   the shading of her triangulation, which is why hers looked the cleaner of the
   two. A 13-vertex band cannot hold a mouth, so it became a projected part like
   the eyes. That buys lips that stand PROUD of the skin (a dent only goes
   inward), symmetry by construction (every sample is taken at |x| and
-  reflected), and open styles that are a different MESH — aperture, dark cavity
-  and their own teeth — rather than a deformation of a closed one. Unlike the
+  reflected), and open styles that are a different MESH, aperture, dark cavity
+  and their own teeth, rather than a deformation of a closed one. Unlike the
   ears it survives a helm, for the reason the eyes do: every helm is open at the
-  face. The head keeps its `mouth_*` targets even though nothing drives them —
+  face. The head keeps its `mouth_*` targets even though nothing drives them,
   `stubble.ts` reads them to locate the lips.
 - A part with more than one MATERIAL (only the mouth: lips, mouth line, teeth)
   exports as a multi-primitive glTF mesh, and GLTFLoader expands that into a
@@ -180,7 +180,7 @@ per part.
   recoloured with the HAIR colour). See the section below. The GLB's old
   `M_Fuzz_buzz` / `M_Stub_stubble` layers are dead and nothing picks them.
 - Eyes, ears, lashes and teeth are their own parts, not islands inside the head
-  — that is what lets eyes and ears be swapped and scaled at all. They are body
+ that is what lets eyes and ears be swapped and scaled at all. They are body
   parts no armour slot hides. Brows/eyes/lashes/stubble are PROJECTED onto the
   head surface at authoring time (`tmp/modular/features.py`), so they cannot
   float off it.
@@ -196,7 +196,7 @@ per part.
   authoring time, so what a part carries says which sliders actually reach it.
 - The eyelash is the flick KayKit models into the rogue head, rebuilt per eye
   shape so it always leaves the corner that eye actually has. It rides
-  `mod_hair` and so has no colour of its own — a lash is hair. `lashes` is a
+  `mod_hair` and so has no colour of its own, a lash is hair. `lashes` is a
   plain on/off in the appearance, defaulting ON so a look saved before it
   existed does not read as "shaved".
 - The eye material is recoloured per character like skin and hair; teeth
@@ -211,7 +211,7 @@ per part.
 - Colours are material-level: `mod_skin`/`mod_hair` are swapped for a recoloured
   clone BEFORE `applyMaterials` snapshots the source, so the tint survives the
   low-graphics Lambert path. Only PLATE gets `userData.bodyMesh`, keeping the
-  per-class skin-atlas swap (`SKINS`) off the colour-picked body — `bodyMesh` is
+  per-class skin-atlas swap (`SKINS`) off the colour-picked body, `bodyMesh` is
   keyed off `isArmorMaterial`, so a new set MUST be added to `ARMOR_MATERIALS`
   or its plate silently stops responding to skins.
 - A look change is a GEOMETRY change: callers rebuild the visual (as
@@ -239,7 +239,7 @@ painted with a generated RGBA map.
   a bare face is exactly the head.
 - The head frame is the head's own BOUNDING BOX mapped to the unit sphere. Every
   primitive in the GLB is meshopt-quantized into its own integer range (see
-  `rig_merge.ts`), so the two heads do not even share a coordinate system —
+  `rig_merge.ts`), so the two heads do not even share a coordinate system,
   normalizing by the box makes one set of angles describe both.
 - The unwrap is AZIMUTHAL EQUIDISTANT about the head centre, which is continuous
   and injective everywhere but one direction (straight down, which `TRIM_THETA`
@@ -252,16 +252,16 @@ painted with a generated RGBA map.
 - The NOSE OVERHANGS the philtrum, so a directional unwrap sends the nostril
   underside and the skin below it to the same texel. The overhang is removed
   from the decal surface (`isNoseUnderside`, applied after subdividing so its
-  edge is fine) — that is what lets the beard line be the measured one and still
+  edge is fine), that is what lets the beard line be the measured one and still
   keep the nose clean. The general form of that test ("is anything closer to the
   head centre along this ray") is WRONG: it carved a rectangle out of the skin
   under the lower lip, off the mouth crease's inner wall at 0.58 of the chin's
-  radius. (`mouth_seat` has since smoothed that crease away — the mouth is its
-  own part — but the general test is still the wrong shape of test.)
+  radius. (`mouth_seat` has since smoothed that crease away, the mouth is its
+  own part, but the general test is still the wrong shape of test.)
 - The stipple is a jittered lattice over the SPHERE OF DIRECTIONS, with a whole
   number of columns per ring so it closes on itself (no grain seam at the nape).
-  Dots must be a texel or two across — at 1024 texels over 360 degrees a
-  "realistic" 0.2-degree dot is sub-texel and reads as noise — and the ring
+  Dots must be a texel or two across, at 1024 texels over 360 degrees a
+  "realistic" 0.2-degree dot is sub-texel and reads as noise, and the ring
   above and below has to be tested too, or every dot sits near its ring centre
   and the field reads as horizontal rows.
 - RGB is written in EVERY texel, alpha only where there is growth: three
@@ -275,7 +275,7 @@ painted with a generated RGBA map.
 - A plain `map` and not a shader ON PURPOSE: `tintedMaterial` rebuilds every
   character material as Lambert on the low graphics tier, so an injected shader
   (the `addRimGlow` hook) silently vanishes there. That path now also carries
-  `depthWrite` / `polygonOffset` across, which it did not before — they are
+  `depthWrite` / `polygonOffset` across, which it did not before, they are
   blend state, not shading.
 
 ## Gotchas / never

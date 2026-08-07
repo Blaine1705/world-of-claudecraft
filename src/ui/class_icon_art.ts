@@ -1,9 +1,9 @@
-// Painted class emblems — one 256px WebP per class under public/ui/classes/<id>.webp,
+// Painted class emblems, one 256px WebP per class under public/ui/classes/<id>.webp,
 // normalized by scripts/convert_class_icons_webp.mjs (`npm run assets:classes`).
 //
 // These are the "pick a class" marks: the crossed sword and axe, the totem, the antlered
 // crescent. They read at a glance in a rail of nine, which is what the class picker on the
-// character screens needs — the 3D headshot it used to show was the same subject as the
+// character screens needs, the 3D headshot it used to show was the same subject as the
 // turntable standing right above it, so the rail said "pick a face" rather than "pick a
 // class".
 //
@@ -14,7 +14,7 @@
 // cannot wait on an image decode. This art is for the surfaces that draw an <img> and can
 // afford the bytes.
 //
-// The id set is CLOSED — it is exactly PlayerClass — so this is a plain literal Set with no
+// The id set is CLOSED, it is exactly PlayerClass, so this is a plain literal Set with no
 // fs at runtime, mirroring chrome_icon_art.ts. tests/class_icons.test.ts gates it against
 // the committed .webp files in both directions and against ALL_CLASSES, so a dropped file,
 // a new class, or a typo reds the suite.

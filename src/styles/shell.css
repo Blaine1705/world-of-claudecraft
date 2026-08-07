@@ -8166,7 +8166,7 @@
 
    A compact tabbed panel in the register of a AAA creator: panel chrome
    (title + whole-look tools), a Body/Face/Hair/Style tab rail, and one
-   scrolling page of rows per tab — stepper capsules for the long style lists,
+   scrolling page of rows per tab, stepper capsules for the long style lists,
    centre-notched sliders for the morph pairs, switches for booleans, swatch
    strips for makeup, HSL wheels for colours. These rules live OUTSIDE
    @layer shell on purpose (like the dock rules they replace): the docks must
@@ -8473,7 +8473,7 @@
 }
 
 /* The popup list is drawn by the platform, which does NOT inherit the panel's
-   colours — without this the options come out as dark text on a dark menu on
+   colours, without this the options come out as dark text on a dark menu on
    some platforms and are unreadable. */
 .appearance-customizer .ac-step-value option {
   color: #e8dcc0;
@@ -8866,7 +8866,7 @@
    absolute layer at z-index 1, and the customizer docks over its left edge as
    a fixed column, clear of the centred name entry above and the class rail
    below. z-index 3 is what the panels' other docks use to sit above the
-   canvas — without it the canvas swallows every click. The panel is a fixed
+   canvas, without it the canvas swallows every click. The panel is a fixed
    dock and the page area inside it scrolls, so the column never collides with
    the rail whatever a tab holds. */
 @media (min-width: 861px) {

@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 //
-// Two product decisions about the character creator that live in the DOM and
-// nowhere else, so a refactor can undo either without a single type error.
+// Product decisions about the character creator that live in the DOM and
+// nowhere else, so a refactor can undo one without a single type error, plus
+// the entry-document parity the customizer needs to mount at all.
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   BODY_SLIDERS,
@@ -127,5 +130,45 @@ describe('creator: colour rows lead with presets', () => {
     expect(drawer.hidden).toBe(true);
     ui.destroy();
     host.remove();
+  });
+});
+
+// Both build entries (index.html at / and play.html at /play) load the same
+// src/main.ts, and renderClassDetails('charcreate-class-details', ...) runs on
+// both. syncAppearanceUi resolves its host with querySelector and returns
+// early when it is missing, while refreshOnlineSkins empties the legacy skin
+// row unconditionally: an entry without the mount point loses the customizer
+// AND the row it replaced, leaving a bare "Appearance" header. Silent, because
+// nothing throws. Regression: the mount div shipped to index.html only.
+// tests/entry_window_parity.test.ts does not cover it (this is a plain div
+// inside an existing panel, not a `.window panel`), so it is pinned here.
+describe('creator: the customizer mount point exists on every entry that creates', () => {
+  // cwd, not import.meta.url: this suite runs under jsdom, where import.meta.url
+  // is an http:// document URL and `new URL('../x', ...)` resolves to /x.
+  const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
+  const hostIds = (src: string): string[] => {
+    const block = src.match(/const APPEARANCE_HOSTS[^=]*=\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+    return [...block.matchAll(/'#([\w-]+)'/g)].map((m) => m[1]);
+  };
+
+  it('declares a host per creation panel in main.ts', () => {
+    // The pin below is only as good as this list, so fail loudly if the map
+    // is renamed or emptied rather than silently checking nothing.
+    expect(hostIds(read('src/main.ts'))).toEqual(['charcreate-appearance', 'offline-appearance']);
+  });
+
+  it('index.html carries both hosts (it owns the offline flow too)', () => {
+    const html = read('index.html');
+    for (const id of hostIds(read('src/main.ts'))) {
+      expect(html, id).toContain(`id="${id}"`);
+    }
+  });
+
+  it('play.html carries the online host (it is the online-only entry)', () => {
+    // #offline-appearance is legitimately index-only: play.html has no
+    // #offline-select panel (see ENTRY_ONLY_PANEL_IDS in entry_window_parity).
+    const html = read('play.html');
+    expect(html).toContain('id="charcreate-appearance"');
+    expect(html).not.toContain('id="offline-select"');
   });
 });

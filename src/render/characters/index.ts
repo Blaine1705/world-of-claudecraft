@@ -18,7 +18,7 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 // that maps an entity to its authored look, and anything it does not claim
 // keeps the fixed class rig it has always used. Kept as a seam rather than a
 // sim/network field because the appearance is presentation-only and the wire
-// format has no place for it yet — only the LOCAL player is composed today.
+// format has no place for it yet, only the LOCAL player is composed today.
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
 /** Install (or clear, with null) the entity-to-look mapping. */
@@ -60,7 +60,7 @@ export function createCharacterVisual(
 ): CharacterVisual | null {
   // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
   // only apply to the base body
-  // Shapeshift forms are their own model and never compose — and neither does a
+  // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
   // must win over the authored look (composing over it hid a purchased skin).
   const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);

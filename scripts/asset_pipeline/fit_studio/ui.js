@@ -1,7 +1,7 @@
 // Widget toolkit: tiny DOM builder, an inline icon set, and the handful of
 // controls every panel is made of (sections, drag-scrub number fields,
 // sliders, selects, switches, segmented groups, swatch grids, toasts).
-// No framework on purpose — the studio is one page and the widgets are few.
+// No framework on purpose, the studio is one page and the widgets are few.
 
 export function h(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -21,7 +21,7 @@ export function h(tag, props = {}, ...children) {
 }
 
 // ---------------------------------------------------------------------------
-// Preferences (localStorage) — declared first: section() reads them at
+// Preferences (localStorage), declared first: section() reads them at
 // module-init time.
 // ---------------------------------------------------------------------------
 const PREFS_KEY = 'fitstudio.prefs.v2';
@@ -48,7 +48,7 @@ export function savePrefs(patch) {
 }
 
 // ---------------------------------------------------------------------------
-// Icons — 16x16 strokes, drawn to match at 1.5px weight.
+// Icons, 16x16 strokes, drawn to match at 1.5px weight.
 // ---------------------------------------------------------------------------
 const P = {
   move: 'M8 1v14M1 8h14M8 1 6 3M8 1l2 2M8 15l-2-2M8 15l2-2M1 8l2-2M1 8l2 2M15 8l-2-2M15 8l-2 2',
@@ -84,7 +84,7 @@ const P = {
   body: 'M8 1.5A1.8 1.8 0 1 0 8 5a1.8 1.8 0 0 0 0-3.5ZM3 6.5h10M8 6v4.5m0 0L5 14.5M8 10.5l3 4',
   hair: 'M3 14V7a5 5 0 0 1 10 0v7M3 9c2-.5 3-2 3.4-4M13 9c-2-.5-3-2-3.4-4M8 3v3',
   gem: 'M4.5 2h7L14 6l-6 8.5L2 6l2.5-4ZM2 6h12M6 2 5 6l3 8.5M10 2l1 4-3 8.5',
-  // hair band: a cuff seen slightly from above — a wrapped ring, not a hoop
+  // hair band: a cuff seen slightly from above, a wrapped ring, not a hoop
   ring: 'M8 2.6c3 0 5.4 1.2 5.4 2.6S11 7.8 8 7.8 2.6 6.6 2.6 5.2 5 2.6 8 2.6Zm-5.4 2.6v5.6c0 1.4 2.4 2.6 5.4 2.6s5.4-1.2 5.4-2.6V5.2',
   brush: 'M9.5 2.5 13.5 6.5 6 14H2v-4l7.5-7.5ZM8 4l4 4',
   eye: 'M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Zm6.5-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z',
@@ -125,7 +125,7 @@ export function btn({ label, ic, tip, kind = '', onClick }) {
   return b;
 }
 
-/** options: [{value, label?, ic?, tip?}] — returns {root, set(v), get()} */
+/** options: [{value, label?, ic?, tip?}], returns {root, set(v), get()} */
 export function segmented(options, value, onChange, { mini = false } = {}) {
   const root = h('div', { class: `seg${mini ? ' mini' : ''}` });
   let cur = value;
@@ -177,7 +177,7 @@ export function section(id, title, { open = true, count = null, actions = null }
 // ---------------------------------------------------------------------------
 /** Drag horizontally to scrub, click to type. step = change per pixel.
  *  Returns {root, set(v), get()}; onInput fires on every change, onCommit once
- *  a gesture (drag or edit) ends — the undo hook. */
+ *  a gesture (drag or edit) ends, the undo hook. */
 export function numField({
   axis = null,
   value = 0,
@@ -362,7 +362,7 @@ export function switchRow({ label, value = false, onChange }) {
 // ---------------------------------------------------------------------------
 // Swatch grid
 // ---------------------------------------------------------------------------
-/** items: [{key, css, label?, tip?}] — returns {root, set(key)} */
+/** items: [{key, css, label?, tip?}], returns {root, set(key)} */
 export function swatchGrid(items, value, onChange) {
   const root = h('div', { class: 'swatches' });
   let cur = value;

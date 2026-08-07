@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { applyModularSliderMorphs } from '../src/render/characters/assets';
 import {
   type ClipMap,
   modularVisualKey,
@@ -13,6 +15,7 @@ import {
   ARMOR_SETS,
   allModularNodes,
   BEARD_STYLES,
+  BODY_SLIDERS,
   BROW_STYLES,
   bandMaterialSpec,
   classArmorSet,
@@ -32,8 +35,10 @@ import {
   KNIGHT_FULL,
   MATERIAL_COLORWAY_IDS,
   MODULAR_WARRIOR_KEY,
+  MORPH_SLIDER_TARGETS,
   MOUTH_STYLES,
   type ModularAppearance,
+  modularBuildSignature,
   modularGeometryKey,
   modularPartNames,
   modularSignature,
@@ -53,7 +58,7 @@ import {
 } from '../src/render/characters/modular';
 import { UNDERHAIR } from '../src/render/characters/underhair.generated';
 import type { PlayerClass } from '../src/sim/types';
-import { isMechWearer } from '../src/sim/types';
+import { ALL_CLASSES, isMechWearer } from '../src/sim/types';
 
 const app = (over: Partial<ModularAppearance> = {}): ModularAppearance => ({
   ...DEFAULT_APPEARANCE,
@@ -87,7 +92,7 @@ describe('modularPartNames', () => {
     // ...and the female's bare body is the same list F-tagged, plus the lash
     // once it is asked for. (Asked for explicitly here: `app()` spreads
     // DEFAULT_APPEARANCE, whose lashes:false is the MALE default and counts as
-    // an opinion — the gender default only fills a value that is absent, which
+    // an opinion, the gender default only fills a value that is absent, which
     // is what the customizer's gender row and a fresh save go through.)
     const fem = modularPartNames(
       app({ gender: 'female', hair: 'bald', brows: 'none', lashes: true }),
@@ -144,7 +149,7 @@ describe('modularPartNames', () => {
     expect(parts).toContain('M_LegR');
   });
 
-  it('layers the cape over the torso — `back` is the additive slot', () => {
+  it('layers the cape over the torso, `back` is the additive slot', () => {
     const parts = modularPartNames(app(), { back: 'knight' });
     expect(parts).toContain('Armor_knight_Back');
     expect(parts).toContain('M_Torso');
@@ -345,14 +350,14 @@ describe('face morphs', () => {
   });
 
   // ...but the mouth is a PART, so unlike the sliders it must reach the geometry
-  // key — it names a different node and cannot share a cached variant.
+  // key, it names a different node and cannot share a cached variant.
   it('keys geometry on the mouth, which is a part rather than a slider', () => {
     expect(modularGeometryKey(app({ mouth: 'open' }))).not.toBe(modularGeometryKey(app()));
   });
 });
 
 // buzz / crew / stubble / scruff are a texture decal on the bare head, not
-// geometry (see stubble.ts). So they add NO part — which is exactly what has to
+// geometry (see stubble.ts). So they add NO part, which is exactly what has to
 // be gated, because the failure mode is silent: a stale table naming the dead
 // `M_Fuzz_buzz` node would keep rendering the old flat-alpha layer under the new
 // decal, and switching the style off would leave the face wearing the other one.
@@ -386,8 +391,8 @@ describe('the shortest cuts are a decal, not a part', () => {
     // A hair VOLUME is worn over growth: the shell has a hairline at its rim
     // and gaps between its strands, and what shows through both is scalp;
     // without this a spiky cut shows bare head between the spikes. The DEFAULT
-    // growth is the buzz decal itself — the same stubble the picker gives you
-    // when buzz is the whole style — for every style the Fit Studio has not
+    // growth is the buzz decal itself, the same stubble the picker gives you
+    // when buzz is the whole style, for every style the Fit Studio has not
     // authored an under-layer for. Picked dynamically: which styles carry an
     // authored entry is designer data that grows over time.
     const unauthored = HAIR_STYLES.find(
@@ -411,7 +416,7 @@ describe('the shortest cuts are a decal, not a part', () => {
       beard: null,
     });
     // ...but bald is the one look that means NO growth, and buzz/crew are
-    // already a scalp decal — giving those roots as well would draw two.
+    // already a scalp decal, giving those roots as well would draw two.
     expect(stubbleDecals(app({ hair: 'bald', beard: 'none' }))).toEqual({
       scalp: null,
       beard: null,
@@ -426,7 +431,7 @@ describe('the shortest cuts are a decal, not a part', () => {
       else if (UNDERHAIR[hair]) expect(scalp, hair).toBe(UNDERHAIR[hair]);
       else expect(scalp, hair).toBe('buzz');
     }
-    // The SCALP decal survives every kind of headgear — it is the head's own
+    // The SCALP decal survives every kind of headgear, it is the head's own
     // surface a fraction of a millimetre out, and what shows of the head shows
     // the growth with it.
     expect(stubbleDecals(app({ hair: 'buzz', beard: 'scruff' }), KNIGHT_FULL).scalp).toBe('buzz');
@@ -566,7 +571,7 @@ describe('normalizeAppearance', () => {
   // A RETIRED style, not an invented one: this is the case that actually
   // happens. `spiky` was a real choice until the parametric library was
   // replaced by sculpts, and every character created before that has it stored
-  // on their appearance — so loading them must land on the default rather than
+  // on their appearance, so loading them must land on the default rather than
   // throw or leave them with a style that no longer names a node.
   it('falls back rather than throwing on unknown styles', () => {
     const a = normalizeAppearance({ hair: 'spiky', brows: 'monobrow' } as never);
@@ -635,7 +640,7 @@ describe('earring materials', () => {
   });
 
   // A hair band rides the same picker and the same E2_ material path, but it
-  // is worn with the HAIR — so unlike an earring it must not be gated on the
+  // is worn with the HAIR, so unlike an earring it must not be gated on the
   // earring slot, or a player with no piercings could never change the metal
   // on their ponytail tie.
   it('paints a hair band from the same picker even with no piercings worn', () => {
@@ -715,7 +720,7 @@ describe('outfit colorways', () => {
         expect(dye.rules.length, `${set}/${id}`).toBeGreaterThanOrEqual(3);
         expect(dye.rules.length, `${set}/${id}`).toBeLessThanOrEqual(5);
         // at least one rule reaches into the near-gray steel the legacy dye
-        // gated out — that is the whole point of a material colorway
+        // gated out, that is the whole point of a material colorway
         expect(
           dye.rules.some(
             (r) => r.sat[0] < 0.1 && (r.satAdd !== 0 || r.satMul !== 1 || r.valMul !== 1),
@@ -762,7 +767,7 @@ describe('outfit colorways', () => {
 // ---------------------------------------------------------------------------
 // Asset contract: modular.ts picks parts BY NODE NAME. A rename (or a dropped
 // part) in a re-export makes that part silently vanish from every composed
-// character — nothing throws, the body just loses a limb. This gate compares
+// character, nothing throws, the body just loses a limb. This gate compares
 // the tables against the GLB actually served out of public/.
 // ---------------------------------------------------------------------------
 const GLB_MAGIC = 0x46546c67;
@@ -802,7 +807,7 @@ describe('modular GLB contract', () => {
     expect(missing, `missing from ${def.url}`).toEqual([]);
   });
 
-  // The mouth line and the open cavity are near-black, and so is the eye — but
+  // The mouth line and the open cavity are near-black, and so is the eye, but
   // `recolored()` routes mod_eye through the player's EYE wheel, so sharing that
   // material painted the mouth line to match the irises. It is its own material
   // now, and the exporter MERGES materials whose settings are identical, so the
@@ -880,7 +885,7 @@ describe('modular GLB contract', () => {
 });
 
 // The brows are the one part where asymmetry is immediately obvious on a face,
-// and the generator gets there by mirroring an azimuth — so every OTHER
+// and the generator gets there by mirroring an azimuth, so every OTHER
 // per-vertex quantity has to be side-independent. The first version tilted the
 // brow's height by `sgn * f`, lifting the outer end on one side and the inner
 // end on the other; it looked wonky and nothing caught it. This decodes the
@@ -1004,7 +1009,7 @@ describe('head shading', () => {
   //
   // Heads only. The stubble and the scalp caps are SUBDIVIDED copies of head
   // triangles, so their sub-triangles are coplanar by construction and a
-  // smooth normal there is indistinguishable from a flat one — the heuristic
+  // smooth normal there is indistinguishable from a flat one, the heuristic
   // reports ~23% on a mesh Blender confirms is 100% smooth. On the heads it
   // separates cleanly: 0.3% when right and 30% when broken.
   it.each(['M_Head', 'F_Head'])('%s ships smooth normals, not per-face ones', async (node) => {
@@ -1022,7 +1027,7 @@ describe('head shading', () => {
     };
     // A flat-shaded triangle has all three corner normals equal to its own
     // face normal. Some genuinely planar regions do too, so this bounds the
-    // SHARE rather than demanding zero — the defect was a third of a mesh.
+    // SHARE rather than demanding zero, the defect was a third of a mesh.
     let flat = 0;
     for (const [a, b, c] of tris) {
       const fn = unit(cross(sub(P[b], P[a]), sub(P[c], P[a])));
@@ -1042,7 +1047,7 @@ describe('randomizeAppearance', () => {
     };
   };
 
-  // "after picking gender" — the body is the one choice the roll must respect.
+  // "after picking gender", the body is the one choice the roll must respect.
   it('keeps the gender and rolls everything else', () => {
     const base = app({ gender: 'female', hair: 'bald', brows: 'none' });
     const rolled = randomizeAppearance(base, seeded());
@@ -1124,11 +1129,11 @@ describe('randomizeAppearance', () => {
 
 // ---------------------------------------------------------------------------
 // Per-class modular defs: every class composes through its own
-// `player_<class>_modular` def, derived from the class def — same clips,
+// `player_<class>_modular` def, derived from the class def, same clips,
 // ability mapping and hand layout, body swapped for the shared part library.
 // The class GLB rides along as a clip source, so the per-class synthesized
 // attacks (Shield_Bash, Garrote_Choke, the bow draws) must all RESOLVE against
-// the union of the part library's clips and the anim sources — a clip that
+// the union of the part library's clips and the anim sources, a clip that
 // does not is a silent T-pose in game, nothing throws.
 // ---------------------------------------------------------------------------
 function glbClipNames(publicPath: string): Set<string> {
@@ -1163,17 +1168,9 @@ function referencedClips(clips: ClipMap): string[] {
 }
 
 describe('per-class modular defs', () => {
-  const PLAYER_CLASSES: PlayerClass[] = [
-    'warrior',
-    'paladin',
-    'hunter',
-    'rogue',
-    'priest',
-    'shaman',
-    'mage',
-    'warlock',
-    'druid',
-  ];
+  // ALL_CLASSES, not a local copy: the defs are generated from that same list,
+  // so a tenth class arrives in this suite instead of quietly skipping it.
+  const PLAYER_CLASSES: PlayerClass[] = ALL_CLASSES;
 
   it.each(PLAYER_CLASSES)('player_%s_modular mirrors its class def', (cls) => {
     const key = modularVisualKey(cls);
@@ -1210,5 +1207,118 @@ describe('per-class modular defs', () => {
   it('gives every class a real default kit, knight when unknown', () => {
     for (const cls of PLAYER_CLASSES) expect(ARMOR_SETS).toContain(classArmorSet(cls));
     expect(classArmorSet('not_a_class')).toBe('knight');
+  });
+});
+
+// A face slider is a per-instance morph influence over SHARED geometry, so
+// moving one must not force a rebuild: the creator emits on every `input`
+// event (5% steps, so about 40 per drag) and on every colour-wheel
+// `pointermove`, and each rebuild disposes the character and clones a fresh
+// one. The two signatures encode that split, so pin the split itself.
+describe('slider morphs move on the live body, not through a rebuild', () => {
+  const NEUTRAL = app();
+  const SHAPED = app({ face: { ...DEFAULT_APPEARANCE.face, nose: 0.6 } });
+  const BUILT = app({ hair: 'curlycap' }); // DEFAULT_APPEARANCE.hair is 'crew'
+
+  it('leaves the BUILD signature alone when only a face slider moves', () => {
+    expect(modularBuildSignature(SHAPED)).toBe(modularBuildSignature(NEUTRAL));
+  });
+
+  it('still separates them in the FULL signature (the portrait key)', () => {
+    // Same body, different face: one cached headshot must not serve both.
+    expect(modularSignature(SHAPED)).not.toBe(modularSignature(NEUTRAL));
+  });
+
+  it('rebuilds for anything that is not a slider', () => {
+    expect(modularBuildSignature(BUILT)).not.toBe(modularBuildSignature(NEUTRAL));
+  });
+
+  it('covers every slider a player can move, both directions', () => {
+    // The in-place writer walks this list, so a slider missing from it would
+    // move the preview and never come back to neutral.
+    for (const key of FACE_SLIDERS) {
+      expect(MORPH_SLIDER_TARGETS, key).toContain(`${key}_up`);
+      expect(MORPH_SLIDER_TARGETS, key).toContain(`${key}_dn`);
+    }
+    for (const key of BODY_SLIDERS) {
+      expect(MORPH_SLIDER_TARGETS, key).toContain(`body_${key}_up`);
+      expect(MORPH_SLIDER_TARGETS, key).toContain(`body_${key}_dn`);
+    }
+  });
+
+  it('every target the writer knows is one a slider can actually produce', () => {
+    // Both directions, so a renamed pair fails here rather than silently
+    // writing zeros onto a target the sliders no longer drive.
+    const reachable = new Set<string>();
+    for (const key of FACE_SLIDERS) {
+      for (const v of [1, -1])
+        for (const n of morphInfluences(
+          app({ face: { ...DEFAULT_APPEARANCE.face, [key]: v } }),
+        ).keys())
+          reachable.add(n);
+    }
+    for (const key of BODY_SLIDERS) {
+      for (const v of [1, -1])
+        for (const n of morphInfluences(
+          app({ body: { ...DEFAULT_APPEARANCE.body, [key]: v } }),
+        ).keys())
+          reachable.add(n);
+    }
+    for (const name of MORPH_SLIDER_TARGETS) expect(reachable, name).toContain(name);
+  });
+});
+
+describe('applyModularSliderMorphs', () => {
+  const meshWith = (names: string[]): THREE.Mesh => {
+    const mesh = new THREE.Mesh();
+    mesh.morphTargetDictionary = Object.fromEntries(names.map((n, i) => [n, i]));
+    mesh.morphTargetInfluences = names.map(() => 0);
+    return mesh;
+  };
+
+  it('writes the active half of a pair', () => {
+    const mesh = meshWith(['nose_up', 'nose_dn']);
+    applyModularSliderMorphs(mesh, app({ face: { ...DEFAULT_APPEARANCE.face, nose: 0.5 } }));
+    expect(mesh.morphTargetInfluences).toEqual([0.5, 0]);
+  });
+
+  it('CLEARS an influence when the slider returns to neutral', () => {
+    // The build path only writes the non-zero half, which is right on a fresh
+    // clone and wrong here: this runs over a body that already carries the
+    // old value, so dragging back to centre has to zero it.
+    const mesh = meshWith(['nose_up', 'nose_dn']);
+    applyModularSliderMorphs(mesh, app({ face: { ...DEFAULT_APPEARANCE.face, nose: 0.5 } }));
+    applyModularSliderMorphs(mesh, app());
+    expect(mesh.morphTargetInfluences).toEqual([0, 0]);
+  });
+
+  it('flips to the other half of the pair on a negative value', () => {
+    const mesh = meshWith(['jaw_up', 'jaw_dn']);
+    applyModularSliderMorphs(mesh, app({ face: { ...DEFAULT_APPEARANCE.face, jaw: -0.25 } }));
+    expect(mesh.morphTargetInfluences).toEqual([0, 0.25]);
+  });
+
+  it('leaves morph targets it does not own untouched', () => {
+    // ear_small / jewel_f are part-driven, not slider-driven: they change only
+    // with the part set, which rebuilds anyway. Clearing them here would undo
+    // the seat the build applied.
+    const mesh = meshWith(['ear_small', 'nose_up']);
+    mesh.morphTargetInfluences = [1, 0];
+    applyModularSliderMorphs(mesh, app());
+    expect(mesh.morphTargetInfluences).toEqual([1, 0]);
+  });
+
+  it('reaches meshes anywhere under the root, and skips those with no morphs', () => {
+    const root = new THREE.Object3D();
+    const child = new THREE.Object3D();
+    const mesh = meshWith(['nose_up', 'nose_dn']);
+    const plain = new THREE.Mesh();
+    child.add(mesh);
+    root.add(child);
+    root.add(plain);
+    expect(() =>
+      applyModularSliderMorphs(root, app({ face: { ...DEFAULT_APPEARANCE.face, nose: 1 } })),
+    ).not.toThrow();
+    expect(mesh.morphTargetInfluences).toEqual([1, 0]);
   });
 });

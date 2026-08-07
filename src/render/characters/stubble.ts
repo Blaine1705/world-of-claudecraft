@@ -1,6 +1,6 @@
 // Stubble, scruff, buzz and crew as a TEXTURE DECAL on the bare head.
 //
-// These four styles are not hair you can see the shape of — they are skin you
+// These four styles are not hair you can see the shape of, they are skin you
 // can see through hair. Modelled as geometry (a shell) they read as a helmet;
 // modelled as a flat-coloured translucent copy of the head's own faces (what
 // shipped before this) they read as a smudge, because a constant alpha over a
@@ -12,13 +12,13 @@
 //   * the head's own surface, trimmed to the region a decal can reach,
 //     subdivided for UV accuracy and lifted a fraction of a millimetre;
 //   * unwrapped by an AZIMUTHAL EQUIDISTANT projection about the head's own
-//     centre — a whole-head map with no seam and exactly one singular direction
+//     centre, a whole-head map with no seam and exactly one singular direction
 //     (straight down, under the jaw), which the trim removes;
 //   * painted with a generated RGBA texture whose alpha carries both the
 //     footprint (analytic, evaluated per texel, so a hairline is crisp at a
 //     resolution the mesh could never afford) and the stipple.
 //
-// Everything here is derived from the head geometry at runtime — no authoring
+// Everything here is derived from the head geometry at runtime, no authoring
 // pass, no new asset, and nothing in the GLB. The four layers the GLB still
 // carries (`M_Fuzz_buzz`, `M_Stub_stubble`, …) are dead and no longer picked.
 //
@@ -35,8 +35,8 @@
 // -------------------------------------------------------------
 // The footprints below were MEASURED off the layers that shipped before
 // (tmp/_head_profile.mjs), and the facial landmarks they have to respect were
-// measured off the head's own morph targets — `mouth_*` moves exactly the lip
-// ring, `nose_up` exactly the nose — so "leave the lips bare" and "stop under
+// measured off the head's own morph targets, `mouth_*` moves exactly the lip
+// ring, `nose_up` exactly the nose, so "leave the lips bare" and "stop under
 // the nose" are numbers, not guesses. Evaluating that per texel is what makes
 // the line clean: the old clip ran per FACE on a mesh whose lower half is a
 // handful of big triangles, and no amount of subdivision fixed the sawtooth.
@@ -55,7 +55,7 @@ import {
 //
 // Every primitive in the modular GLB is meshopt-quantized into its OWN integer
 // range (see rig_merge.ts), so "head local space" is a different space for the
-// male and the female head — and neither is Blender's. Deriving the frame from
+// male and the female head, and neither is Blender's. Deriving the frame from
 // the head's own bounding box sidesteps all of it: the box maps to the unit
 // sphere, so one set of angles describes both heads (their proportions differ
 // by ~3%) whatever units the asset is in.
@@ -101,7 +101,7 @@ export function headFrame(
   };
 }
 
-/** Head height in the geometry's own units — the scale every offset here is
+/** Head height in the geometry's own units, the scale every offset here is
  *  expressed as a fraction of, so the lift is the same real distance on both
  *  heads however each was quantized. */
 export function headHeight(f: HeadFrame): number {
@@ -140,7 +140,7 @@ export function headAngles(f: HeadFrame, x: number, y: number, z: number): [numb
 // Here the only bad direction is straight down under the jaw, and `TRIM_THETA`
 // removes the faces around it before they can be drawn.
 //
-// It is not area-preserving — the tangential stretch is theta/sin(theta), so
+// It is not area-preserving, the tangential stretch is theta/sin(theta), so
 // the underside of the jaw spends far more texels than its area deserves. That
 // costs nothing but texture space, because the stipple is evaluated from the
 // DIRECTION rather than in texel space, so its dots stay round wherever they
@@ -167,7 +167,7 @@ function smoothstep(a: number, b: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** Cosine-interpolated lookup over a flat `[x0, y0, x1, y1, ...]` table — C1 at
+/** Cosine-interpolated lookup over a flat `[x0, y0, x1, y1, ...]` table, C1 at
  *  the samples, so a boundary traced from one has no kinks where the table
  *  changes slope. Flat because this runs per texel over a megapixel. */
 function curve(table: Float64Array, x: number): number {
@@ -198,11 +198,11 @@ function curve(table: Float64Array, x: number): number {
  * the header): the front of the cut is a good 20 degrees higher than the sides,
  * and the blend between them tracks how much of the direction faces forward.
  */
-/** The full under-hair pattern library (UNDERHAIR_STYLES in modular.ts — the
+/** The full under-hair pattern library (UNDERHAIR_STYLES in modular.ts, the
  *  compiler holds these Records complete). Beyond the base line:
  *  `peak` extends the hairline DOWN at the centre (a widow's peak, degrees),
  *  `temple` moves it at ±35° of azimuth (negative = receded temples, the
- *  M-shaped line), `band` bares the crown — growth only past that polar angle
+ *  M-shaped line), `band` bares the crown, growth only past that polar angle
  *  (the horseshoe), `taper` widens the fade band above the line (fades). */
 const SCALP_CUTS: Record<
   UnderhairStyle,
@@ -233,7 +233,7 @@ const SCALP_CUTS: Record<
  *  stipple's dots. Buzz runs dense (Troy, 2026-08-05: the under-hair growth
  *  read too sparse at the hairline): the floor is what carries density at a
  *  distance, the dots ride on top of it. floor 1 = a SOLID wash (no stipple
- *  modulation — the per-dot colour noise still keeps it organic). */
+ *  modulation, the per-dot colour noise still keeps it organic). */
 const SCALP_SPECS: Record<UnderhairStyle, { alpha: number; floor: number }> = {
   buzz: { alpha: 0.84, floor: 0.44 },
   crew: { alpha: 0.8, floor: 0.3 },
@@ -284,7 +284,7 @@ export function scalpCoverage(style: UnderhairStyle, theta: number, az: number):
  *
  * Measured off the layer that shipped before this (which was itself clipped to
  * the full beard's silhouette): a shallow dip under the cheek climbing into the
- * sideburn, then falling away behind the ear. It is the measurement unchanged —
+ * sideburn, then falling away behind the ear. It is the measurement unchanged,
  * the nose it appears to run into is dealt with by removing the overhang from
  * the decal surface (`isNoseUnderside`) rather than by moving the line, because
  * moving the line far enough to clear the nose costs the whole moustache.
@@ -304,8 +304,8 @@ const BEARD_BOTTOM_END = TRIM_THETA;
  *
  * Straight off the head's own mouth morphs, which move exactly the lip ring:
  * theta 119..126 at the midline, narrowing to a single vertex at 120 out at 30
- * degrees of azimuth. That is a lens with a RISE — a mouth line turning up at
- * the corners — and a plain ellipse cannot hold it: sized to reach the corners
+ * degrees of azimuth. That is a lens with a RISE, a mouth line turning up at
+ * the corners, and a plain ellipse cannot hold it: sized to reach the corners
  * it swallows the chin, and sized to the midline it leaves the corners of the
  * mouth painted. So the centre line rises with azimuth and the falloff is a
  * superellipse, which is flat-topped enough to follow the ring without spilling
@@ -352,7 +352,7 @@ export function beardCoverage(style: BeardDecal, theta: number, az: number): num
 // ---------------------------------------------------------------------------
 //
 // Stubble is thousands of points, not a wash, and the points have to be round
-// and evenly spaced ON THE HEAD — which rules out a dot field laid out in UV
+// and evenly spaced ON THE HEAD, which rules out a dot field laid out in UV
 // space, because the projection stretches the jaw by three to four times and
 // every dot down there would come out as a streak.
 //
@@ -399,7 +399,7 @@ function hash(a: number, b: number, salt: number): number {
 const FIELD = 1 / 1023;
 
 /**
- * Stipple at a direction, 0..1 — 1 at the core of a dot, 0 between them.
+ * Stipple at a direction, 0..1 to 1 at the core of a dot, 0 between them.
  *
  * `theta`/`az` in degrees, and distances are measured as ARC (the azimuth
  * shrinks by sin(theta)), or the dots stretch into arcs toward the crown.
@@ -445,7 +445,7 @@ export function stipple(theta: number, az: number): number {
 // ---------------------------------------------------------------------------
 
 /** Side of the generated decal map. The whole head lands in the inscribed disc,
- *  so a degree of arc is `SIZE/360` texels across the face — fine enough for a
+ *  so a degree of arc is `SIZE/360` texels across the face, fine enough for a
  *  hairline to be a line rather than a staircase. */
 export const DECAL_TEX_SIZE = 1024;
 
@@ -460,7 +460,7 @@ export function decalKey(sel: StubbleSelection): string {
  * variation, so the material's own colour (the hair colour) decides the hue and
  * a single generated map serves every character.
  *
- * Pure and synchronous — a test can assert the mask lands where the face is
+ * Pure and synchronous, a test can assert the mask lands where the face is
  * without a GL context.
  */
 export function decalTextureData(
@@ -470,7 +470,7 @@ export function decalTextureData(
   const out = new Uint8Array(new ArrayBuffer(size * size * 4));
   // RGB is filled EVERYWHERE, alpha only where there is growth. three multiplies
   // the whole texel into the fragment, so a transparent texel left at black
-  // bleeds through bilinear filtering and rings every dot with a dark halo — the
+  // bleeds through bilinear filtering and rings every dot with a dark halo, the
   // colour channel of an alpha map has to stay valid outside the shape.
   const BASE = 232;
   for (let i = 0; i < size * size; i++) {
@@ -594,7 +594,7 @@ export function decalMaterial(sel: StubbleSelection): THREE.MeshStandardMaterial
  *  that a smooth-shaded dome's wandering normals cannot poke through it, small
  *  enough that it cannot self-intersect in the mouth crease. (The old layer sat
  *  at nearly twice this and folded through itself wherever the face is concave
- *  tighter than the offset — an alpha layer crossed twice is visibly darker,
+ *  tighter than the offset, an alpha layer crossed twice is visibly darker,
  *  which is most of what "it's kinda not uniform" was.) */
 export const DECAL_LIFT = 0.004;
 /** Subdivision levels. The UV is exact at the vertices and interpolated across
@@ -643,7 +643,7 @@ function inRegion(r: Region, theta: number, az: number): boolean {
  * The head is not star-shaped and the nose is where that bites: it OVERHANGS
  * the philtrum, so the nostril underside and the skin below it point in the
  * same direction to within a degree or two. A directional unwrap sends both to
- * the same texel and no mask can separate them — which is the whole reason the
+ * the same texel and no mask can separate them, which is the whole reason the
  * layer that shipped before this had to choose between painting the underside
  * of the nose and having no moustache at all.
  *
@@ -651,7 +651,7 @@ function inRegion(r: Region, theta: number, az: number): boolean {
  * then be the one that was measured off the old footprint, the philtrum gets
  * its growth, and the nose stays clean because there is nothing there to draw.
  *
- * The test is deliberately narrow — a window around the nose, and a face
+ * The test is deliberately narrow, a window around the nose, and a face
  * pointing steeply down inside it. The general form ("is another surface closer
  * to the head centre along this ray") sounds better and is wrong: the mouth is
  * modelled as a deep crease, so its inner wall sits at 0.58 of the radius of
@@ -677,7 +677,7 @@ const CARRIED = ['position', 'normal', 'skinIndex', 'skinWeight'] as const;
  *
  * Cut, not projected: every decal vertex is a barycentric combination of head
  * vertices, so applying that same combination to the head's morph deltas keeps
- * the offset from the DEFORMED head exactly what it was in the rest pose — and
+ * the offset from the DEFORMED head exactly what it was in the rest pose, and
  * a midpoint of a triangle edge is still on that triangle, which is why
  * subdividing first costs nothing in fidelity. Re-deriving the deltas by
  * evaluating a deformation at the decal's own position (the obvious thing) does
@@ -686,7 +686,7 @@ const CARRIED = ['position', 'normal', 'skinIndex', 'skinWeight'] as const;
  * true field separates from it by more than the lift.
  *
  * Here the combination is a plain edge midpoint, so "apply it to the deltas" is
- * just averaging them — exact, and it falls out of the subdivision for free.
+ * just averaging them, exact, and it falls out of the subdivision for free.
  */
 export function buildDecalGeometry(
   head: THREE.BufferGeometry,
@@ -720,7 +720,7 @@ export function buildRegionDecalGeometry(
   }
 
   // 2. keep a face when ANY corner is in the region, but never one that reaches
-  //    past the trim — a face spanning the antipode has no sane UV.
+  //    past the trim, a face spanning the antipode has no sane UV.
   const faces: number[][] = [];
   for (let f = 0; f < triCount; f++) {
     const a = index ? index.getX(f * 3) : f * 3;
@@ -782,8 +782,8 @@ export function buildRegionDecalGeometry(
       // The skinning is a (bone -> weight) MAP, not four numbers to average:
       // averaging the indices of bones 3 and 7 gives bone 5, which is a
       // different bone. Merge the two influence sets, keep the four heaviest,
-      // renormalize. (On this head it changes nothing — the whole decal region
-      // rides one bone — but a rig where it mattered would fail silently and
+      // renormalize. (On this head it changes nothing, the whole decal region
+      // rides one bone, but a rig where it mattered would fail silently and
       // look like a skinning bug in the asset.)
       const si = attrs.get('skinIndex');
       const sw = attrs.get('skinWeight');
@@ -970,7 +970,7 @@ export function buildStubbleDecal(
   decal.receiveShadow = head.receiveShadow;
   decal.bindMode = head.bindMode;
   decal.bind(head.skeleton, head.bindMatrix);
-  // Same targets, same names — applyMorphs drives both off the head's own
+  // Same targets, same names, applyMorphs drives both off the head's own
   // dictionary, so a slider moves the skin and the stubble on it together.
   if (head.morphTargetDictionary) {
     decal.morphTargetDictionary = head.morphTargetDictionary;

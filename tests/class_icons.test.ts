@@ -10,7 +10,7 @@ import { CLASS_ART_IDS, classIconUrl, hasClassIconArt } from '../src/ui/class_ic
 // scripts/convert_class_icons_webp.mjs), served as a plain <img src> by the class picker on
 // both character screens.
 //
-// The id set here is CLOSED — it is exactly PlayerClass — so the guard is a three-way
+// The id set here is CLOSED, it is exactly PlayerClass, so the guard is a three-way
 // bijection plus a validity pass:
 //   A) CLASS_ART_IDS is exact set-equality with the committed .webp files, BOTH directions;
 //   B) CLASS_ART_IDS is exact set-equality with ALL_CLASSES, BOTH directions, so adding a

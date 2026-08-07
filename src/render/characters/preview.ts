@@ -8,7 +8,7 @@ import {
   type ArmorLoadout,
   type ModularAppearance,
   type ModularLook,
-  modularSignature,
+  modularBuildSignature,
 } from './modular';
 import {
   appearanceSignature,
@@ -199,7 +199,7 @@ export class CharacterPreview {
    *  a class: its modular def carries the class clips and hand layout, and the
    *  starter weapons default from the class. Any change to gender/hair/brows/
    *  colour is a geometry or material change on a shared cached variant, so
-   *  this just rebuilds — the variant cache makes a repeat selection nearly
+   *  this just rebuilds, the variant cache makes a repeat selection nearly
    *  free. */
   setModular(
     app: ModularAppearance,
@@ -218,6 +218,11 @@ export class CharacterPreview {
     const offhand =
       offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
     this.setVisualKey(modularVisualKey(cls), weapon, null, offhand);
+    // The face/body sliders ride the live body rather than the rebuild
+    // signature (see modularBuildSignature): the creator emits on every `input`
+    // event, so a drag would otherwise dispose and recompose the character per
+    // 5% step. Harmless after a rebuild, which composed with these already.
+    this.currentVisual?.applyModularSliders(app);
   }
 
   setVisualKey(
@@ -233,7 +238,7 @@ export class CharacterPreview {
       weaponItemId,
       weaponOverride,
       offhandItemId,
-      look ? modularSignature(look.app, look.worn) : null,
+      look ? modularBuildSignature(look.app, look.worn) : null,
     ]);
     if (this.currentVisual && this.currentVisualSig === nextSig) return;
     this.closeupCache.clear();

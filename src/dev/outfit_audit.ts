@@ -99,7 +99,7 @@ export interface ShotOpts {
    *  the shape changes, so every shot lands at a different scale and the
    *  comparison shows the framing rather than the change. */
   fixedFrame?: boolean;
-  /** [minY, maxY, halfXZ] of the fixed box — e.g. the head only, for a face
+  /** [minY, maxY, halfXZ] of the fixed box, e.g. the head only, for a face
    *  slider. Implies fixedFrame. */
   fixedBox?: [number, number, number];
   label?: string;
@@ -130,7 +130,7 @@ export async function shoot(opts: ShotOpts): Promise<string> {
     o.frustumCulled = false;
     const mesh = o as THREE.Mesh;
     if (opts.pink && mesh.isMesh) {
-      // clone before painting — the originals are the game's shared material
+      // clone before painting, the originals are the game's shared material
       // cache, and mutating them leaks pink into every later render
       const paint = (m: THREE.Material): THREE.Material => {
         if (!(m?.name ?? '').toLowerCase().includes('skin')) return m;

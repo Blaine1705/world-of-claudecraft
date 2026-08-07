@@ -29,7 +29,7 @@ import { decalUv } from '../src/render/characters/stubble';
 const app = (over: Partial<ModularAppearance> = {}): ModularAppearance =>
   normalizeAppearance({ ...DEFAULT_APPEARANCE, ...over });
 
-// Every landmark below was MEASURED off the shipped head, not invented — the
+// Every landmark below was MEASURED off the shipped head, not invented, the
 // morph targets via tmp/_head_feats.mjs and the parts projected into the head's
 // own angles via tmp/_head_map.mjs. They agree on both heads.
 const EYE = { minTheta: 90, maxTheta: 100, minAz: 20, maxAz: 40 };
@@ -47,7 +47,7 @@ describe('makeup shades', () => {
       expect(wearsMakeup(makeupSelection(a))).toBe(false);
       expect(makeupKey(a)).toBe('');
     }
-    // ...on a female body too — makeup is opt-in on every body
+    // ...on a female body too, makeup is opt-in on every body
     const fem = randomizeAppearance(app({ gender: 'female' }));
     expect([fem.lipstick, fem.blush, fem.eyeshadow]).toEqual(['none', 'none', 'none']);
   });
@@ -91,7 +91,7 @@ describe('makeup shades', () => {
 });
 
 describe('makeup footprints', () => {
-  it('puts eyeshadow on the lid — under the brow, over the eye', () => {
+  it('puts eyeshadow on the lid, under the brow, over the eye', () => {
     // strongest somewhere in the gap between the brow's bottom and the eye's top
     let best = 0;
     let bestTheta = 0;
@@ -114,7 +114,7 @@ describe('makeup footprints', () => {
     expect(eyeshadowCoverage(88, 0)).toBe(0);
   });
 
-  it('puts blush on the cheek — below the eye and inboard of the ear', () => {
+  it('puts blush on the cheek, below the eye and inboard of the ear', () => {
     let best = 0;
     let bestTheta = 0;
     for (let th = 80; th < 140; th += 0.5) {

@@ -25,6 +25,7 @@ import {
 } from './anim_state';
 import {
   applyMaterials,
+  applyModularSliderMorphs,
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
@@ -38,7 +39,7 @@ import {
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
-import type { ModularLook } from './modular';
+import type { ModularAppearance, ModularLook } from './modular';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -339,6 +340,16 @@ export class CharacterVisual {
   get modularLook(): ModularLook | null {
     return this.look;
   }
+
+  /** Move the face/body sliders on the LIVE body: morph influences are
+   *  per-instance over shared geometry, so a slider drag repaints without the
+   *  dispose-and-recompose a geometry change needs (which is why the sliders
+   *  are deliberately outside `modularBuildSignature`). No-op on a fixed rig. */
+  applyModularSliders(app: ModularAppearance): void {
+    if (!this.look) return;
+    this.look = { ...this.look, app };
+    applyModularSliderMorphs(this.model, app);
+  }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
@@ -504,7 +515,7 @@ export class CharacterVisual {
     // compose a character, so a look handed to a fixed rig is dropped here
     // rather than carried: the mech cosmetic must never end up with a second
     // body inside it (Troy, 2026-08-07). assembleModel already ignores `look`
-    // for a non-modular def — this makes the visual agree, so nothing
+    // for a non-modular def, this makes the visual agree, so nothing
     // downstream can read a look the geometry never used.
     this.look = prep.def.modular ? look : null;
     this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
@@ -771,7 +782,7 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
-      // Morph influences, not bone writes, so mixer order is irrelevant — but
+      // Morph influences, not bone writes, so mixer order is irrelevant, but
       // it rides the animated branch: a throttled far rig has no business
       // integrating a hair spring.
       this.hairSway.update(dt, s);

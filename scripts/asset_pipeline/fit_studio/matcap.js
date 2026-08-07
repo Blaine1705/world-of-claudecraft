@@ -1,9 +1,9 @@
 // Procedural matcaps for hair shading previews. Each preset bakes a 256px
 // sphere-shading image analytically (wrap diffuse + Blinn lobes + sheen
-// bands + rim) — no binary assets, and the recipes stay editable here.
+// bands + rim), no binary assets, and the recipes stay editable here.
 // They are kept near-grayscale on purpose: MeshMatcapMaterial multiplies the
 // texture by material.color, so the appearance panel's hair wheel keeps
-// working — the matcap contributes only the light, never the dye.
+// working, the matcap contributes only the light, never the dye.
 import { THREE } from '/three.bundle.js';
 
 const SIZE = 256;
@@ -18,24 +18,24 @@ const norm3 = (x, y, z) => {
   return [x / l, y / l, z / l];
 };
 const dot3 = (n, l) => n[0] * l[0] + n[1] * l[1] + n[2] * l[2];
-/** Lambert softened by a wrap term — w=0 is hard Lambert, 1 is full wrap. */
+/** Lambert softened by a wrap term, w=0 is hard Lambert, 1 is full wrap. */
 const wrapDiff = (n, L, w) => clamp((dot3(n, L) + w) / (1 + w));
 /** Blinn specular with the matcap's fixed view V=(0,0,1). */
 const blinn = (n, L, p) => clamp(dot3(n, norm3(L[0], L[1], L[2] + 1))) ** p;
-/** Smooth bump centred at c with half-width w — the hair "sheen band". */
+/** Smooth bump centred at c with half-width w, the hair "sheen band". */
 const band = (y, c, w) => {
   const t = clamp(1 - Math.abs(y - c) / w);
   return t * t * (3 - 2 * t);
 };
 
 // Each shade(nx, ny, nz) returns a linear luminance (or [r,g,b]) with lit
-// areas near 1 and cores near 0.2–0.4, so a matcap'd style reads about as
+// areas near 1 and cores near 0.2 to 0.4, so a matcap'd style reads about as
 // bright as the standard-lit one at the same tint.
 export const MATCAP_PRESETS = [
   {
     key: 'velvet',
     label: 'Velvet',
-    tip: 'Velvet — soft matte wrap',
+    tip: 'Velvet: soft matte wrap',
     shade: (nx, ny, nz) => {
       const L = norm3(-0.4, 0.55, 0.73);
       return 0.3 + 0.62 * wrapDiff([nx, ny, nz], L, 0.55) + 0.1 * (1 - nz) ** 2.2;
@@ -44,7 +44,7 @@ export const MATCAP_PRESETS = [
   {
     key: 'silk',
     label: 'Silk',
-    tip: 'Silk — soft anisotropic sheen',
+    tip: 'Silk: soft anisotropic sheen',
     shade: (nx, ny, nz) => {
       const n = [nx, ny, nz];
       const base = 0.26 + 0.44 * wrapDiff(n, norm3(-0.3, 0.45, 0.85), 0.45);
@@ -57,7 +57,7 @@ export const MATCAP_PRESETS = [
   {
     key: 'anime',
     label: 'Anime',
-    tip: 'Anime — cel tones + angel band',
+    tip: 'Anime: cel tones + angel band',
     shade: (nx, ny, nz) => {
       const n = [nx, ny, nz];
       const lit = sstep(0.45, 0.53, wrapDiff(n, norm3(-0.42, 0.5, 0.76), 0.35));
@@ -70,7 +70,7 @@ export const MATCAP_PRESETS = [
   {
     key: 'gloss',
     label: 'Gloss',
-    tip: 'Gloss — wet-look hotspot',
+    tip: 'Gloss: wet-look hotspot',
     shade: (nx, ny, nz) => {
       const n = [nx, ny, nz];
       const d = wrapDiff(n, norm3(-0.35, 0.5, 0.79), 0.2);
@@ -84,7 +84,7 @@ export const MATCAP_PRESETS = [
   {
     key: 'pearl',
     label: 'Pearl',
-    tip: 'Pearl — bright with a faint iridescent drift',
+    tip: 'Pearl: bright with a faint iridescent drift',
     shade: (nx, ny, nz) => {
       const n = [nx, ny, nz];
       const L = norm3(-0.3, 0.5, 0.81);
@@ -100,7 +100,7 @@ export const MATCAP_PRESETS = [
   {
     key: 'noir',
     label: 'Noir',
-    tip: 'Noir — dark core, hot back rim',
+    tip: 'Noir: dark core, hot back rim',
     shade: (nx, ny, nz) => {
       const n = [nx, ny, nz];
       let v = 0.14 + 0.26 * wrapDiff(n, norm3(-0.35, 0.45, 0.83), 0.25);
@@ -125,7 +125,7 @@ function bake(preset) {
   const px = img.data;
   for (let y = 0; y < SIZE; y++) {
     // Canvas row 0 is the top; flipY on CanvasTexture puts it back at uv.y=1,
-    // which is where three's matcap shader looks for "world up" — so ny is
+    // which is where three's matcap shader looks for "world up", so ny is
     // +1 on the first row.
     const ny0 = 1 - (2 * (y + 0.5)) / SIZE;
     for (let x = 0; x < SIZE; x++) {
@@ -166,7 +166,7 @@ export function matcapTexture(key) {
   return t;
 }
 
-/** CSS background for the picker swatch — the baked sphere itself. */
+/** CSS background for the picker swatch, the baked sphere itself. */
 export function matcapSwatchCss(key) {
   const preset = MATCAP_PRESETS.find((p) => p.key === key);
   if (!preset) return '#444';

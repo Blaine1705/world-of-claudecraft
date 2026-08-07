@@ -1500,10 +1500,6 @@ const UI_DOM_MODULES = [
   'src/ui/gpu_notice_toast.ts',
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
-  // The paperdoll eye toggle's memory: owns the localStorage key on purpose
-  // (the stored choice IS its state), so it registers here rather than
-  // injecting the store from the caller.
-  'src/ui/helm_pref.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

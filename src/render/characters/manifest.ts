@@ -6,7 +6,7 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 
@@ -492,7 +492,7 @@ const TOLLING_BELL: ClipMap = {
 // ---------------------------------------------------------------------------
 
 const PLAYERS = 'models/chars/players';
-/** Modular part library (one GLB, every part) — see modular.ts. */
+/** Modular part library (one GLB, every part), see modular.ts. */
 const MODULAR = 'models/chars/modular';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
@@ -2145,17 +2145,17 @@ export const VISUALS: Record<string, VisualDef> = {
 };
 
 // ---------------------------------------------------------------------------
-// Modular player bodies — one `player_<class>_modular` def per class, derived
+// Modular player bodies, one `player_<class>_modular` def per class, derived
 // from the class def above it. The body is COMPOSED from the shared part
 // library (modular.ts) instead of cloned from the class GLB, but everything
-// else — clips, the ability→clip mapping, held-weapon layout, the swim/fall
-// lane — is the class's own, so a composed rogue garrotes and a composed
+// else, clips, the ability→clip mapping, held-weapon layout, the swim/fall
+// lane, is the class's own, so a composed rogue garrotes and a composed
 // hunter draws its bow exactly like the fixed rigs do.
 //
 // The class GLB rides along as a pure CLIP source (first animUrl): the
 // synthesized per-class attacks (Shield_Bash, Garrote_Choke, Kick_A, ...)
 // exist only there, and every player body shares KayKit's Rig_Medium, so its
-// clips bind onto the modular skeleton by node name — the swim/bow clip packs
+// clips bind onto the modular skeleton by node name, the swim/bow clip packs
 // are the precedent. No extra fetch: the class GLB is already preloaded as the
 // fixed rig every OTHER entity still wears.
 //
@@ -2167,18 +2167,10 @@ export const VISUALS: Record<string, VisualDef> = {
 //    colour belongs to the player's skin/hair wheels, and a tint over the
 //    picked skin tone repaints exactly what the player chose.
 // ---------------------------------------------------------------------------
-const MODULAR_CLASSES: readonly PlayerClass[] = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'shaman',
-  'mage',
-  'warlock',
-  'druid',
-];
-for (const cls of MODULAR_CLASSES) {
+// Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
+// get no modular def at all and fall back to the warrior's clips through
+// modularKeyFor, silently, with no test able to see it.
+for (const cls of ALL_CLASSES) {
   const {
     show: _show,
     tint: _tint,

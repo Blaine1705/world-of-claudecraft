@@ -58,6 +58,8 @@ import {
   MAT_SKIN,
   MAT_SKIN_DETAIL,
   MAT_STUBBLE,
+  MORPH_SLIDER_TARGETS,
+  type ModularAppearance,
   type ModularLook,
   makeupSelection,
   modularPartNames,
@@ -898,7 +900,7 @@ function optimizedScene(url: string): THREE.Object3D {
 // The modular GLB carries EVERY part (both genders, every hair/brow, every
 // armour slot piece) on one shared Rig_Medium. A composed body is the parsed
 // scene pruned to the picked nodes and then run through the same
-// mergeSkinnedParts pass as a class rig — so a fully-kitted character still
+// mergeSkinnedParts pass as a class rig, so a fully-kitted character still
 // costs one draw per MATERIAL (skin / hair / eye / plate), not one per part.
 // The pruned+merged result is cached per part set, because most players share a
 // handful of loadouts; only the recolour below is per character, and that is a
@@ -911,6 +913,8 @@ function optimizedScene(url: string): THREE.Object3D {
 // still drawn from it. Growth is bounded by the part-set combinatorics
 // (gender x hair x brows x worn slots), and creation only walks a few dozen.
 const modularVariantCache = new Map<string, THREE.Object3D>();
+/** Dev-only tripwire on that growth (see the warn at the bottom of the builder). */
+const MODULAR_VARIANT_WARN_AT = 64;
 
 function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
   const key = `${url}|${names.join(',')}`;
@@ -924,7 +928,7 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
     if (keep.has(o.name)) return;
     // A part with more than one MATERIAL exports as a multi-primitive glTF mesh,
     // and GLTFLoader expands that into a GROUP named after the node holding one
-    // SkinnedMesh per primitive — each named after the mesh datablock, not the
+    // SkinnedMesh per primitive, each named after the mesh datablock, not the
     // node. The mouth is the only such part (skin for the lips, dark for the
     // mouth line and cavity, white for the teeth), and matching on the mesh's
     // own name alone dropped every one of them: the parts list asks for
@@ -942,14 +946,26 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
   mergeSkinnedParts(root);
   primeSkinnedSortSpheres(root);
   modularVariantCache.set(key, root);
+  // No silent growth: the key is the whole discrete part set (gender x eyes x
+  // lashes x mouth x ears x brows x hair x beard x earrings x worn slots), and
+  // Randomize rolls most of those at once, so a long creation session keeps a
+  // merged body per combination it visited. Eviction is not the fix (clones
+  // share geometry with the cached variant, so dropping one strands any live
+  // character drawn from it): if this ever fires in anger the answer is a
+  // variant budget on the creator. Say so rather than growing quietly.
+  if (import.meta.env?.DEV && modularVariantCache.size === MODULAR_VARIANT_WARN_AT) {
+    console.warn(
+      `[modular] ${MODULAR_VARIANT_WARN_AT} composed variants cached this session (never evicted)`,
+    );
+  }
   return root;
 }
 
 // Bounded, because a colour WHEEL is a continuous input: dragging it emits a
 // new hex every pointermove, and each distinct hex would otherwise strand a
 // material here forever (and a second one in tintedMaterial's cache, which is
-// keyed off this material's uuid). An LRU keeps a drag's worth of shades warm —
-// re-picking a recent colour is still free — and disposes what falls out.
+// keyed off this material's uuid). An LRU keeps a drag's worth of shades warm,
+// re-picking a recent colour is still free, and disposes what falls out.
 const RECOLOR_CACHE_MAX = 48;
 const recolorCache = new Map<string, THREE.Material>();
 
@@ -957,12 +973,12 @@ const recolorCache = new Map<string, THREE.Material>();
  * The outfit-colorway dye, as a shader layer on a clone of an armour material.
  *
  * The class atlases ship ktx2-compressed, so a colorway cannot be painted into
- * the pixels — instead the fragment stage remaps HSV zones of the atlas right
+ * the pixels, instead the fragment stage remaps HSV zones of the atlas right
  * after the map sample. A spec is a list of up to MAX_DYE_RULES rules; each
  * selects a zone (hue band + sat/val smoothstep windows, measured off the
- * atlases — steel, gold trim, leather, the set's cloth band) and remaps
+ * atlases, steel, gold trim, leather, the set's cloth band) and remaps
  * hue/sat/val inside it. The additive sat/val terms are what let near-gray
- * steel take real gold or bone colour — a legacy hue colorway is one rule
+ * steel take real gold or bone colour, a legacy hue colorway is one rule
  * whose windows reproduce the old single-band dye exactly.
  *
  * Every rule is evaluated from the ORIGINAL texel and the results are blended
@@ -1015,7 +1031,7 @@ function dyeUniforms(dye: ArmorDyeSpec): {
 /** Attach the dye hook to a material IN PLACE, recording a JSON-safe spec in
  *  userData: Material.clone() copies userData but silently DROPS
  *  onBeforeCompile (the worn_stone precedent), and tintedMaterial() clones
- *  again downstream of recolored() — so every clone site re-attaches from the
+ *  again downstream of recolored(), so every clone site re-attaches from the
  *  spec it finds. */
 function attachArmorDye(mat: THREE.MeshStandardMaterial, dye: ArmorDyeSpec): void {
   mat.userData.armorDye = {
@@ -1057,7 +1073,7 @@ vec3 wocHsv2Rgb(vec3 c) {
 }
 // The dye works in sRGB: diffuseColor is LINEAR after map_fragment, and the
 // zone selectors are calibrated against the atlases' sRGB values (a pale
-// gold that measures s=0.31 in sRGB reads s=0.57 in linear — selectors
+// gold that measures s=0.31 in sRGB reads s=0.57 in linear, selectors
 // written for one space silently miss in the other).
 vec3 wocLin2Srgb(vec3 c) { return pow(max(c, vec3(0.0)), vec3(1.0 / 2.2)); }
 vec3 wocSrgb2Lin(vec3 c) { return pow(max(c, vec3(0.0)), vec3(2.2)); }
@@ -1117,7 +1133,7 @@ function recolored(
   // which is what gives a set its authored per-piece metals; when the player
   // names a material instead, the whole set becomes that one substance (what
   // the Fit Studio bakes when a designer names a preset). Caught here rather
-  // than by material name because the material IS the shared atlas — the E2
+  // than by material name because the material IS the shared atlas, the E2
   // node name is the only thing that distinguishes an earring from a pauldron.
   //
   // A hair band is on the same path but answers to bandMaterialSpec, which
@@ -1151,7 +1167,7 @@ function recolored(
   }
   // LIPSTICK. The mouth part carries the lip body on `mod_skin` (so a bare mouth
   // matches the face) and the mouth line on `mod_mouth`. Painting the first of
-  // those is the whole feature — the shape is already a pair of lips, so there
+  // those is the whole feature, the shape is already a pair of lips, so there
   // is nothing to mask and nothing to add. It has to be caught HERE rather than
   // by a decal because the part stands proud of the head: paint on the head at
   // the lip band renders behind the lips.
@@ -1191,8 +1207,8 @@ function recolored(
   if (hex !== null) mat.color.setHex(hex);
   // HAIR IS DOUBLE-SIDED. The sculpts ship as the designer anchored them
   // (hairimp.FAITHFUL_SCULPT), and a sculpt is a one-sided open shell: seen
-  // from inside — through the gaps between strands, up under a fringe, along
-  // the hollow of a ponytail — a single-sided face is simply not drawn and
+  // from inside, through the gaps between strands, up under a fringe, along
+  // the hollow of a ponytail, a single-sided face is simply not drawn and
   // reads as a hole in the hair. The Fit Studio previews these sculpts
   // DoubleSide for the same reason, so this is also what makes the game match
   // the tool. It replaces the build-time inner wall (close_shell), which cost
@@ -1207,7 +1223,7 @@ function recolored(
     recolorCache.delete(oldestKey);
     // Safe to drop: any live clone derived from one owns its own instance, and
     // the only map any of these carries (the stubble decal's) is shared and
-    // owned by stubble.ts — Material.dispose() never touches a texture.
+    // owned by stubble.ts, Material.dispose() never touches a texture.
     oldest?.dispose();
   }
   return mat;
@@ -1240,7 +1256,7 @@ function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
 }
 
 /**
- * Blush and eyeshadow, on the same terms as the stubble decal above — cut from
+ * Blush and eyeshadow, on the same terms as the stubble decal above, cut from
  * the head's own surface at compose time, added as a SIBLING of the head, and
  * driven by the head's morph dictionary so a face slider moves the paint with
  * the skin.
@@ -1282,7 +1298,7 @@ export function assembleModular(
     // skin-atlas swap (SKINS/skinTexture), which must never repaint the
     // colour-picked skin and hair.
     if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
-    // The mouth part is the one place `mod_skin` must not be the skin tone —
+    // The mouth part is the one place `mod_skin` must not be the skin tone,
     // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
     // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
     const onMouth = mesh.name.includes('_Mouth_');
@@ -1305,7 +1321,7 @@ export function assembleModular(
  * Safe to do on the shared-geometry clone: three copies `morphTargetInfluences`
  * per instance in Mesh.copy(), so two characters can wear different faces off
  * one buffer. That is the whole reason the face is morphs rather than a CPU
- * deform — a deform would mint a cache entry per slider position, and the
+ * deform: a deform would mint a cache entry per slider position, and the
  * variant cache is never evicted.
  */
 function applyMorphs(root: THREE.Object3D, look: ModularLook): void {
@@ -1319,6 +1335,34 @@ function applyMorphs(root: THREE.Object3D, look: ModularLook): void {
     for (const [name, value] of want) {
       const i = dict[name];
       if (i !== undefined) infl[i] = value;
+    }
+  });
+}
+
+/**
+ * Re-push the face/body SLIDER morphs onto a body that is already built.
+ *
+ * The reason the sliders are out of `modularBuildSignature`: they are
+ * per-instance influences over shared geometry, so moving one is a few float
+ * writes rather than a dispose plus a fresh clone, materials and decals. The
+ * creation turntable emits on every `input` event (a face slider steps in 5%,
+ * so one drag is about 40 of them), which rebuilt the whole character each
+ * time.
+ *
+ * Writes EVERY slider target rather than only the non-zero half the build path
+ * uses: this runs over a body that already carries influences, so a slider
+ * returning to neutral has to clear the one it set.
+ */
+export function applyModularSliderMorphs(root: THREE.Object3D, app: ModularAppearance): void {
+  const want = morphInfluences(app);
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    const dict = mesh.morphTargetDictionary;
+    const infl = mesh.morphTargetInfluences;
+    if (!dict || !infl) return;
+    for (const name of MORPH_SLIDER_TARGETS) {
+      const i = dict[name];
+      if (i !== undefined) infl[i] = want.get(name) ?? 0;
     }
   });
 }
@@ -1621,7 +1665,7 @@ export function tintedMaterial(
   if (GFX.standardMaterials) {
     mat = s.clone();
     // The clone dropped any dye hook recolored() attached (clone keeps
-    // userData, not onBeforeCompile) — put the outfit colorway back before the
+    // userData, not onBeforeCompile), put the outfit colorway back before the
     // rim/detail layers compose over it.
     const dyeSpec = (mat.userData as { armorDye?: ArmorDyeSpec }).armorDye;
     if (dyeSpec) attachArmorDye(mat, dyeSpec);

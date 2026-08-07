@@ -10,8 +10,9 @@
 
 import type { Entity } from './types';
 
-/** Apply the preference. Idempotent by design (the client re-asserts its
- *  stored choice on every world entry), so this is a setter, not a toggle. */
+/** Apply the preference. A setter rather than a toggle so it is idempotent:
+ *  the paperdoll sends the state it is showing, and a click that races a
+ *  snapshot cannot flip the flag back by being applied twice. */
 export function setHelmHidden(e: Entity, hidden: boolean): void {
   e.helmHidden = hidden;
 }

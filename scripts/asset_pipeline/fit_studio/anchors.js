@@ -1,7 +1,7 @@
 // Placing hair sculpts, jewellery and hair bands on the character: the gizmo,
 // the numeric transform panel, ghosts of the current build, the jewel material
 // presets, dirty tracking, and save/reset against /api/fit. The matrix stored
-// is the composed wrap·inner local matrix in glTF Y-up space —
+// is the composed wrap·inner local matrix in glTF Y-up space,
 // hairimp.anchor_matrix does the Blender-side conjugation; nothing here is
 // pre-converted.
 
@@ -28,7 +28,7 @@ import { THREE, TransformControls } from '/three.bundle.js';
 // ---------------------------------------------------------------------------
 // During animation preview the fitted piece rides the head bone: `follow`
 // carries headWorld · headRest⁻¹ (identity when the animation is off), so the
-// designer keeps authoring in REST space — the saved anchor never changes —
+// designer keeps authoring in REST space, the saved anchor never changes,
 // while the piece visibly sticks to the moving head the way the skinned
 // build will.
 export const follow = new THREE.Group();
@@ -100,8 +100,8 @@ gizmo.addEventListener('dragging-changed', (e) => {
 });
 gizmo.addEventListener('objectChange', () => {
   if (gizmo.mode === 'scale' && gizmoState.uniform && dragStart) {
-    // One factor for all three axes — the factor of whichever axis the drag
-    // moved furthest — so a squashed saved anchor scales without shearing.
+    // One factor for all three axes, the factor of whichever axis the drag
+    // moved furthest, so a squashed saved anchor scales without shearing.
     const s0 = dragStart.scale;
     const r = new THREE.Vector3(
       wrap.scale.x / (s0.x || 1e-9),
@@ -177,10 +177,10 @@ let clipboard = null; // {kind, matrix}
 // allowlist in lib/fit_studio.mjs.
 export const UNDERHAIR_OPTIONS = [
   { value: 'none', label: 'None (bare scalp)' },
-  { value: 'buzz', label: 'Buzz — classic' },
-  { value: 'crew', label: 'Crew — high line' },
+  { value: 'buzz', label: 'Buzz: classic' },
+  { value: 'crew', label: 'Crew: high line' },
   { value: 'solid', label: 'Solid' },
-  { value: 'solid_high', label: 'Solid — high line' },
+  { value: 'solid_high', label: 'Solid: high line' },
   { value: 'widow', label: 'Widow’s peak' },
   { value: 'receded', label: 'Receded temples' },
   { value: 'low_fade', label: 'Low fade' },
@@ -193,7 +193,7 @@ let beforeSelectHook = () => {};
 export function setBeforeSelectHook(fn) {
   beforeSelectHook = fn;
 }
-// Injection points for the hair shape brush (hairbrush.js) — wired by main.js
+// Injection points for the hair shape brush (hairbrush.js), wired by main.js
 // so this module never has to import it.
 let hairLoadedHook = () => {};
 export function setHairLoadedHook(fn) {
@@ -217,7 +217,7 @@ function currentJewelMaterialState() {
 }
 
 // 'dirty' = values changed (update dots/readout/save button, do NOT rebuild
-// panels — a rebuild mid-scrub would replace the field being dragged);
+// panels, a rebuild mid-scrub would replace the field being dragged);
 // 'selection' = structure changed (rebuild the Fit panel).
 function onEdited() {
   if (!current.key) return;
@@ -368,7 +368,7 @@ export async function selectHair(keyName) {
   const loader = new GLTFLoader(hairLoader);
   const gltf = await loader.loadAsync(`/repo/tmp/modular/hair_src/${keyName}.glb`);
   if (current.kind !== 'hair' || current.key !== keyName) return; // stale load
-  // Show the sculpt the colour it will BE — the mod_hair tint — not Tripo's
+  // Show the sculpt the colour it will BE, the mod_hair tint, not Tripo's
   // pale bake. DoubleSide because the raw sculpts are single-sided shells:
   // the build closes them, but here a flat panel of hair would otherwise
   // vanish from behind. Named mod_hair so the appearance wheel recolours it.
@@ -400,12 +400,12 @@ export async function selectHair(keyName) {
   inner.position.copy(rawCenter).negate();
   inner.updateMatrix();
   inner.add(gltf.scene);
-  // The fresh preview material must wear the picked hair shading too — the
+  // The fresh preview material must wear the picked hair shading too, the
   // scene-wide sweep only runs on appearance changes, not on selection, and
   // it can only see the sculpt once it hangs under `follow` in the scene.
   character.applyHairShading();
   // The OLD style must not linger while the new one is placed (Troy,
-  // 2026-08-05): hide the built H2 outright — no translucent ghost. Its bbox
+  // 2026-08-05): hide the built H2 outright, no translucent ghost. Its bbox
   // is still read below for the first-touch placement.
   const builtMeshes = character.meshesByStem.get(`H2_${keyName}`) ?? [];
   for (const m of builtMeshes) {
@@ -469,7 +469,7 @@ export async function selectHair(keyName) {
 // Jewel selection + materials
 // ---------------------------------------------------------------------------
 // Preset table twinned with JEWEL_MATERIALS in tmp/modular/jewel.py and the
-// allowlist in lib/fit_studio.mjs — keep the three in sync. Colours are the
+// allowlist in lib/fit_studio.mjs, keep the three in sync. Colours are the
 // LINEAR factors the GLB will carry; three tone-maps them the same way.
 export const JEWEL_MATERIALS = {
   gold: { color: [0.83, 0.6, 0.18], metallic: 1.0, rough: 0.34 },
@@ -607,7 +607,7 @@ export function selectJewel(keyName) {
 // save. Rebuilding from the spec makes the screen and the build agree by
 // construction.
 
-/** Superellipse-profile torus, twinned with _ring_grid() in bands.py — the
+/** Superellipse-profile torus, twinned with _ring_grid() in bands.py, the
  *  segment counts and exponent must match or the studio previews a ring the
  *  build does not produce. Space is glTF Y-up, same as the spec. */
 function bandRingGrid(center, axis, R, tr, ta, seg = 20, prof = 8, exp = 3) {
@@ -674,7 +674,7 @@ function bandMaterial() {
   return new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: 1, roughness: 0.34 });
 }
 
-/** The volume a band ties, as a character selection — so picking a band shows
+/** The volume a band ties, as a character selection, so picking a band shows
  *  the tail it is meant to bite instead of a bare head. */
 function showBandHost(node) {
   if (node.startsWith('H2_')) character.setCharField('builtHair', node.slice(3));
@@ -699,7 +699,7 @@ export function selectBand(keyName) {
   inner.position.copy(center).negate();
   inner.updateMatrix();
   // Every authored ring, because the build applies the one delta to all of
-  // them — a spec that grows a second cuff further down a braid has to show
+  // them, a spec that grows a second cuff further down a braid has to show
   // both here or the gizmo would be moving more than the screen admits. A
   // `mirror` ring is drawn ONCE and reflected: the designer places the
   // right-hand cuff and the twin follows, the same contract jewellery has,
@@ -774,7 +774,7 @@ export async function saveCurrent() {
   // Shape tweaks ride the same Save: one button commits seat AND shape.
   if (current.kind === 'hair' && hairShapeSaver) await hairShapeSaver(current.key);
   current.dirty = false;
-  toast(`Saved ${current.kind}/${current.key} — rebuild picks it up`, 'good');
+  toast(`Saved ${current.kind}/${current.key}, rebuild picks it up`, 'good');
   emit('selection');
 }
 
@@ -793,7 +793,7 @@ export async function resetCurrent() {
   if (state.anchors[current.kind]) delete state.anchors[current.kind][current.key];
   working.delete(`${current.kind}/${current.key}`);
   const k = current.key;
-  toast(`${k}: anchor removed — solver/built position again`);
+  toast(`${k}: anchor removed, solver/built position again`);
   if (current.kind === 'hair') selectHair(k);
   else if (current.kind === 'band') selectBand(k);
   else selectJewel(k);
@@ -1075,14 +1075,14 @@ export function renderFitPanel() {
     // Beards ride the 'hair' kind (same fit machinery, same anchor section) but
     // they are not worn ON a scalp, so the Underhair row has nothing to say
     // about one and the section is left out for them. The sculpt brush below
-    // still applies — a beard wants reshaping as much as a fringe does.
+    // still applies, a beard wants reshaping as much as a fringe does.
     const isBeard = String(current.key).startsWith('beard_');
     const sSec = section('fit-hair', 'Hair options', { open: true });
     // The Sway row is hidden while hair animation is off for the release: there
     // is nothing to preview and no reason to ask the designer for a decision
     // the runtime ignores. `swayValue` is deliberately left wired to load/save
     // below, so any override already in anchors.json still round-trips
-    // untouched — putting the row back is the only step to restore the control.
+    // untouched, putting the row back is the only step to restore the control.
     const underhairSel = selectRow({
       label: 'Underhair',
       options: UNDERHAIR_OPTIONS,
@@ -1117,7 +1117,7 @@ export function renderFitPanel() {
       h(
         'div',
         { class: 'note' },
-        'The scalp worn under this style, in game too — saved with the anchor. Solid picks wash the scalp in the hair colour; fades, hairlines and the horseshoe change the line.',
+        'The scalp worn under this style, in game too, saved with the anchor. Solid picks wash the scalp in the hair colour; fades, hairlines and the horseshoe change the line.',
       ),
     );
     if (!isBeard) host.append(sSec.root);
@@ -1133,7 +1133,7 @@ export function renderFitPanel() {
         { class: 'row' },
         h('label', {}, 'Ties'),
         h('span', { class: 'grow' }),
-        h('b', {}, spec?.node ?? '—'),
+        h('b', {}, spec?.node ?? '-'),
       ),
       h(
         'div',
@@ -1255,7 +1255,7 @@ export function tickFollow() {
   if ((current.kind === 'jewel' || current.kind === 'band') && mirror.children.length) {
     // The mirror group holds the RIGHT-side geometry, so the left preview is
     // reflect(designer transform · p): S · M, an ODD number of reflections.
-    // S·M·S is the build-side rule for the ORIGINAL left vertices — applied
+    // S·M·S is the build-side rule for the ORIGINAL left vertices, applied
     // here it rendered an unmirrored copy drifting off into space.
     mirror.matrix.copy(MIRROR_X).multiply(S_TMP.copy(effectiveMatrix()));
     mirror.visible = true;

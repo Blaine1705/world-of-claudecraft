@@ -21,6 +21,6 @@ export { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 export { HairSwayDriver } from '../../src/render/characters/hair_sway.ts';
 export { MAT_STUBBLE } from '../../src/render/characters/modular.ts';
 // The game's own stubble decal, bundled for the Fit Studio so the scalp worn
-// under a fitted hair sculpt is the SAME growth the game composes — not a
+// under a fitted hair sculpt is the SAME growth the game composes, not a
 // lookalike. Pure three + data code; esbuild erases the TS types.
 export { buildStubbleDecal } from '../../src/render/characters/stubble.ts';

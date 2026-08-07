@@ -2,7 +2,7 @@
 // plane, inflate pushes along the stroke-start normals, smooth relaxes toward
 // the neighbour average. Every stroke is one undo step. Save diffs the touched
 // meshes against their loaded REST positions and POSTs per-part
-// [restPos, delta] rows (glTF axes) to body_sculpt.json — keyed by POSITION,
+// [restPos, delta] rows (glTF axes) to body_sculpt.json, keyed by POSITION,
 // not index, so the Blender rebuild can re-apply them onto its own vertex
 // order (and exporter-split duplicates move together for free).
 
@@ -97,7 +97,7 @@ export function exitSculpt() {
 // triangles. Built lazily per mesh, on the REST positions.
 // ---------------------------------------------------------------------------
 /** Weld duplicated verts by (rest) position and read neighbours off the
- *  triangles. Pure — the hair brush builds its own over the sculpt mesh. */
+ *  triangles. Pure, the hair brush builds its own over the sculpt mesh. */
 export function weldAdjacency(pos, geometry) {
   const count = pos.length / 3;
   const keyOf = (i) =>
@@ -382,7 +382,7 @@ export async function saveSculptNow() {
   }
   sculptState.dirty = false;
   if (current.kind === 'sculpt') current.dirty = false;
-  toast(`Sculpt saved — ${saved} vertex deltas. Rebuild applies them.`, 'good');
+  toast(`Sculpt saved, ${saved} vertex deltas. Rebuild applies them.`, 'good');
   emit('selection');
 }
 
@@ -406,7 +406,7 @@ export async function clearSculpt() {
 }
 
 /** Re-apply saved sculpt deltas to the freshly loaded body, matching by rest
- *  position — the same rule the Blender side uses. */
+ *  position, the same rule the Blender side uses. */
 export function applySavedSculpt(parts) {
   for (const [part, entries] of Object.entries(parts ?? {})) {
     for (const mesh of character.meshesByStem.get(part) ?? []) {

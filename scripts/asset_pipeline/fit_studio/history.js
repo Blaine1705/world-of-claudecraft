@@ -1,4 +1,4 @@
-// Undo/redo. Entries are {label, undo(), redo()} closures — each captures
+// Undo/redo. Entries are {label, undo(), redo()} closures, each captures
 // whatever context it needs (selection key, matrices, vertex arrays), so the
 // stack itself knows nothing about the tools. `merge` lets rapid edits of the
 // same control coalesce into one step (nudge keys, slider scrubs).
@@ -14,7 +14,7 @@ function emit() {
 }
 
 export const history = {
-  /** entry: {label, undo, redo, merge?: string} — merge entries with the same
+  /** entry: {label, undo, redo, merge?: string}, merge entries with the same
    *  key within 900ms update the previous entry's redo instead of stacking. */
   push(entry) {
     const now = performance.now();

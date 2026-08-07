@@ -109,7 +109,7 @@ function buildTopbar() {
 // POST starts the server-side chain (headless hair rebuild from the saved
 // anchors -> ktx swap -> copy into public/); the button then polls status
 // until it lands. Saves are already on disk (⌘S writes anchors.json), so
-// whatever is SAVED is what publishes — a live unsaved gizmo drag is not.
+// whatever is SAVED is what publishes, a live unsaved gizmo drag is not.
 let publishPoll = null;
 
 async function startPublishToGame() {
@@ -121,7 +121,7 @@ async function startPublishToGame() {
     toast(String(err.message ?? err), 'error');
     return;
   }
-  toast('Publishing to game — rebuilding hair (~2 min)…');
+  toast('Publishing to game, rebuilding hair (~2 min)…');
   publishBtn.disabled = true;
   publishBtn.classList.add('busy');
   clearInterval(publishPoll);
@@ -130,7 +130,7 @@ async function startPublishToGame() {
     try {
       s = await (await fetch('/api/fit/publish-status')).json();
     } catch {
-      return; // transient — keep polling
+      return; // transient, keep polling
     }
     if (s.running) return;
     clearInterval(publishPoll);
@@ -138,7 +138,7 @@ async function startPublishToGame() {
     publishBtn.disabled = false;
     publishBtn.classList.remove('busy');
     if (s.ok) {
-      toast('Published — reload the game tab to see the new hair', 'ok');
+      toast('Published, reload the game tab to see the new hair', 'ok');
     } else {
       const tail = (s.log ?? []).slice(-3).join(' · ');
       toast(`Publish failed: ${tail || 'see server log'}`, 'error');
@@ -601,7 +601,7 @@ function buildOverlays() {
   xrayToggle = h(
     'button',
     {
-      'data-tip': 'X-ray body (V) — sculpt through the head',
+      'data-tip': 'X-ray body (V), sculpt through the head',
       onclick: () => {
         character.setXray(!character.xrayPrefs.on);
         refreshOverlays();
@@ -682,9 +682,9 @@ function buildStatusbar() {
 function refreshStatus() {
   const c = anchors.current;
   if (c.kind === 'sculpt') {
-    statusMsg.textContent = 'Sculpting the body — drag to pull, ⌘Z undoes a stroke';
+    statusMsg.textContent = 'Sculpting the body, drag to pull, ⌘Z undoes a stroke';
   } else if (c.key) {
-    statusMsg.textContent = `Editing ${c.kind}/${c.key}${c.dirty ? ' — unsaved changes' : ''}`;
+    statusMsg.textContent = `Editing ${c.kind}/${c.key}${c.dirty ? ', unsaved changes' : ''}`;
   } else {
     statusMsg.textContent = 'Pick a style from the library';
   }
@@ -742,7 +742,7 @@ function buildCheat() {
           'div',
           {},
           h('h3', {}, 'Camera'),
-          key('1–6', 'Front · Back · Left · Right · Top · ¾'),
+          key('1 to 6', 'Front · Back · Left · Right · Top · ¾'),
           key('F', 'Frame the head'),
           key('T', 'Turntable'),
           key('Double-click', 'Orbit around that point'),
@@ -843,7 +843,7 @@ async function boot() {
   const state = await (await fetch('/api/fit/state')).json();
   anchors.setState(state);
   if (!state.characterGlb) {
-    statusMsg.textContent = 'No character GLB — run the modular rebuild first';
+    statusMsg.textContent = 'No character GLB: run the modular rebuild first';
     toast('No character GLB found: run the modular rebuild', 'bad');
     return;
   }
@@ -913,7 +913,7 @@ async function boot() {
   const jewelCount = character.variantOptions().jewel.length;
   const bandCount = Object.keys(state.bands ?? {}).length;
   const tally = `${hairCount} hair styles, ${beardCount} beards, ${bandCount} hair bands, ${jewelCount} piercing sets`;
-  statusMsg.textContent = `Ready — ${tally}`;
+  statusMsg.textContent = `Ready: ${tally}`;
   toast(`Loaded ${tally}`, 'good');
 }
 
@@ -926,7 +926,7 @@ boot().catch((err) => {
 // ---------------------------------------------------------------------------
 // Scripted access for e2e checks (the wizard's window.LiveViewer pattern):
 // lets a headless probe select a style, set an exact transform, save, and
-// force a frame. Field names are stable — older probes rely on them.
+// force a frame. Field names are stable, older probes rely on them.
 // ---------------------------------------------------------------------------
 window.__fit = {
   selectHair: (k) => anchors.selectHair(k),

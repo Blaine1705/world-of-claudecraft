@@ -155,8 +155,8 @@ export function visualPortraitDataUrl(
 }
 
 /**
- * A headshot of a COMPOSED character — the player's own body, hair, face and
- * makeup — rather than the generic portrait for their class.
+ * A headshot of a COMPOSED character, the player's own body, hair, face and
+ * makeup, rather than the generic portrait for their class.
  *
  * Keyed on the look's full signature, which is what makes "the picture of me is
  * me" true after every change in the customizer. That key is unbounded (a
@@ -193,7 +193,7 @@ export function modularPortraitDataUrl(
 }
 
 /** Render one visual into the offscreen rig and return it as a PNG data URL.
- *  Shared by the class portraits and the composed ones — the only difference
+ *  Shared by the class portraits and the composed ones, the only difference
  *  between them is which CharacterVisual gets built. */
 function capture(
   key: string,

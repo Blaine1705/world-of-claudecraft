@@ -49,11 +49,11 @@ export interface PortraitChipOpts {
   deferSource?: boolean;
   /** Draw this chip as the COMPOSED character rather than the stock art for
    *  `cls`. Only the local player has an authored look (it is presentation
-   *  state and is not on the wire), so this is set on the player's own chips —
-   *  their Character sheet — and left off for everyone else's. */
+   *  state and is not on the wire), so this is set on the player's own chips,
+   *  their Character sheet, and left off for everyone else's. */
   look?: ModularLook | null;
   /** Which skin catalog `skin` indexes. Under `'mech'` the chip draws the
-   *  Combat Mech body in that chroma — `skin` is a chroma index there, not a
+   *  Combat Mech body in that chroma, `skin` is a chroma index there, not a
    *  class-atlas index, and any `look` is ignored (the world shows the mech,
    *  so the chip must too). */
   catalog?: SkinCatalog;

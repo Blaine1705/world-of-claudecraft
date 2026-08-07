@@ -7,7 +7,7 @@
 // a Custom chip for the colours no preset names. Owns all of its DOM
 // and reports a normalized ModularAppearance on every change; the caller wires
 // that to CharacterPreview.setModular so the turntable updates live.
-// Persistence is the caller's job — this component is stateless across mounts
+// Persistence is the caller's job, this component is stateless across mounts
 // apart from the value it is constructed with.
 import {
   type ArmorSetId,
@@ -179,7 +179,7 @@ const FACE_LABEL: Record<FaceSlider, TranslationKey> = {
 // concern, not a player one: they are sculpted once in the Fit Studio
 // (scripts/asset_pipeline fit) and baked into the shipped body, and the game's
 // creator must not offer a second, contradictory set of them. `BodyShape` stays
-// in the appearance model — the data and its morphs are untouched — and the
+// in the appearance model, the data and its morphs are untouched, and the
 // auth.body* strings stay in the catalog, so the row set can come back without
 // re-authoring anything if that decision ever changes.
 
@@ -260,11 +260,11 @@ const SHADOW_LABEL: Record<ShadowShade, TranslationKey> = {
 const WHEEL_PX = 64;
 
 /** A colour preset: the same (hue°, saturation, lightness) triple the wheel
- *  writes, so picking a swatch and picking by hand produce identical values —
+ *  writes, so picking a swatch and picking by hand produce identical values,
  *  a preset is a shortcut, never a separate kind of colour. */
 type ColorPreset = readonly [h: number, s: number, l: number];
 
-/** Skin ladder, fair → deep. Every entry sits in the warm 18–34° band because
+/** Skin ladder, fair → deep. Every entry sits in the warm 18 to 34° band because
  *  that is where the skin material reads as skin; the wheel behind Custom still
  *  reaches everything else for anyone who wants it. */
 const SKIN_PRESETS: readonly ColorPreset[] = [
@@ -335,7 +335,7 @@ const LASH_PRESETS: readonly ColorPreset[] = [
 
 /** Whether a stored colour IS a preset, within a tolerance that survives the
  *  float round-trip through storage. Hue is compared the short way around the
- *  circle, and skipped entirely for greys — at zero saturation every hue is the
+ *  circle, and skipped entirely for greys, at zero saturation every hue is the
  *  same colour, so comparing it would strand a grey on Custom. */
 function matchesPreset(p: ColorPreset, h: number, s: number, l: number): boolean {
   if (Math.abs(p[1] - s) > 0.02 || Math.abs(p[2] - l) > 0.02) return false;
@@ -447,11 +447,11 @@ export interface AppearanceCustomizerOptions {
   onChange(next: ModularAppearance): void;
   /** Whether the preview currently shows the set's helm. This is a view of the
    *  character, not a property OF the character, so it is not part of the
-   *  appearance and is not persisted with it — the caller owns it. Omit the
+   *  appearance and is not persisted with it, the caller owns it. Omit the
    *  handler and the row is not drawn. */
   helm?: boolean;
   onHelm?(on: boolean): void;
-  /** The armour set the outfit swatches preview against — a GETTER because the
+  /** The armour set the outfit swatches preview against, a GETTER because the
    *  panel mounts once and survives class switches. Defaults to the knight kit
    *  when omitted. */
   armorSet?: () => ArmorSetId;
@@ -532,7 +532,7 @@ export function mountAppearanceCustomizer(
     'auth.randomize',
     diceIcon(),
     () => {
-      // randomizeAppearance rolls the body proportions too — that is the right
+      // randomizeAppearance rolls the body proportions too, that is the right
       // model-level behaviour and the Fit Studio wants it. In the game there is
       // no body row to see it on and no way to dial it back, so a rolled
       // silhouette would be an invisible, unfixable change: keep the body.
@@ -668,7 +668,7 @@ export function mountAppearanceCustomizer(
   // The workhorse row: ‹ value › over a real <select>. The arrows cycle with
   // wraparound for one-handed browsing against the live preview; the select is
   // the same list as a popup for jumping straight to a named style, and it is
-  // the control assistive tech and the keyboard land on — which is why the
+  // the control assistive tech and the keyboard land on, which is why the
   // arrow buttons are aria-hidden and out of the tab order rather than
   // labelled "previous/next".
   function stepper<T extends string>(
@@ -793,7 +793,7 @@ export function mountAppearanceCustomizer(
   // OFF is a swatch too and the row needs no separate on/off control.
   // A chip's colour may be one hex (a flat swatch) or several (a material
   // colorway chip, drawn as a diagonal gradient of the treatments its rules
-  // give the set's steel/trim/cloth — an honest multi-material preview).
+  // give the set's steel/trim/cloth, an honest multi-material preview).
   function chipBackground(hex: number | readonly number[]): string {
     const hexes = typeof hex === 'number' ? [hex] : hex;
     const css = hexes.map((x) => `#${x.toString(16).padStart(6, '0')}`);
@@ -839,7 +839,7 @@ export function mountAppearanceCustomizer(
       const btn = el('button', hex === null ? 'ac-mk-swatch ac-mk-none' : 'ac-mk-swatch');
       btn.type = 'button';
       // The colour is the label, so the NAME has to reach assistive tech some
-      // other way — a chip with no text is a chip with no accessible name.
+      // other way, a chip with no text is a chip with no accessible name.
       btn.setAttribute('aria-label', t(nameFor(o)));
       btn.title = t(nameFor(o));
       btn.setAttribute('aria-pressed', 'false');
@@ -864,7 +864,7 @@ export function mountAppearanceCustomizer(
   // Presets carry the row: a player picking hair colour wants "black" or
   // "auburn", and finding it should cost one click, not a hunt around a wheel
   // for the same shade everyone else already agreed on. The wheel is still
-  // there for the player who wants a colour nobody agreed on — it just lives
+  // there for the player who wants a colour nobody agreed on, it just lives
   // behind the Custom chip instead of taking a third of the panel by default.
   //
   // The picker is an inline drawer rather than a floating popover on purpose:
@@ -1044,7 +1044,7 @@ export function mountAppearanceCustomizer(
     () => value.gender,
     (g) => {
       // Lashes follow the body. They are the female standard and off on the
-      // male, and a stored appearance carries whatever the LAST body wanted —
+      // male, and a stored appearance carries whatever the LAST body wanted,
       // so without this, switching to female leaves her without them and the
       // "standard" is only true of a character created from scratch. The
       // switch on the Face tab still overrides it either way.
@@ -1177,7 +1177,7 @@ export function mountAppearanceCustomizer(
     },
   );
 
-  // Style: the finishing pass — the outfit's colorway, makeup applied to a
+  // Style: the finishing pass, the outfit's colorway, makeup applied to a
   // face rather than part of one, jewellery, and the helm view of the
   // finished look.
   //
@@ -1242,7 +1242,7 @@ export function mountAppearanceCustomizer(
       value = { ...value, earrings: e };
     },
   );
-  // What the worn set is MADE of — the Fit Studio's designer-side preset list,
+  // What the worn set is MADE of, the Fit Studio's designer-side preset list,
   // handed to the player. `default` is the authored atlas ride and leads the
   // row as the no-choice chip, the same shape the makeup rows use for 'none'.
   swatches<EarringMaterial>(

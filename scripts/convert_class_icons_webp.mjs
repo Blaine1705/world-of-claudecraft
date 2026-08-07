@@ -11,7 +11,7 @@
 // Re-running with everything already WebP is a byte-stable no-op.
 //
 // Sibling of scripts/convert_profession_icons_webp.mjs; behavior is identical except that
-// the id set is CLOSED — there are exactly nine playable classes, so an unrecognized
+// the id set is CLOSED, there are exactly nine playable classes, so an unrecognized
 // basename is a typo, not a new asset, and the batch is refused before touching disk.
 //
 // Flag: --quality <n> overrides the default 82 (e.g. --quality 90 for finer art).
@@ -78,7 +78,7 @@ async function main() {
   // Refuse the whole batch before touching disk on either failure mode: a basename that is
   // not a class id (art that would never be reachable), or two foreign sources sharing one
   // basename (foo.png + foo.jpg both map to foo.webp, so the second encode overwrites the
-  // first and both originals are unlinked — silent data loss).
+  // first and both originals are unlinked, silent data loss).
   const unknown = sources.filter((src) => !CLASS_IDS.has(path.basename(src, path.extname(src))));
   if (unknown.length > 0) {
     console.error('[assets:classes] refusing to convert: basename is not a class id');

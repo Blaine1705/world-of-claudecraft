@@ -2,7 +2,7 @@
 // (gender, armor, face variants, beard, built hair), the morph sliders, the
 // appearance tints (the same HSL-wheel model the game stores), and animation
 // preview. The character is the loaded GLB scene itself with per-node
-// visibility — not re-baked meshes — so the raw authoring export and the
+// visibility, not re-baked meshes, so the raw authoring export and the
 // shipped KTX/meshopt GLB both display correctly.
 
 import { history } from '/fit_studio/history.js';
@@ -52,7 +52,7 @@ export const BODY_PARTS = [
  *  A mesh registers under its OWN stem and its parent group's: three names
  *  multi-primitive children after the mesh DATABLOCK, which on imported
  *  armour can still be a source name (RAW_paladin_ArmLeft002) no gate
- *  recognises — the node name lives on the parent Group. */
+ *  recognises, the node name lives on the parent Group. */
 export const meshesByStem = new Map();
 export const meshStems = new Map(); // mesh -> [stems]
 /** anchors.js parks ghost/preview visibility decisions here so
@@ -71,7 +71,7 @@ function stemOf(name) {
 }
 
 // ---------------------------------------------------------------------------
-// What is worn — drives applyVisibility()
+// What is worn, drives applyVisibility()
 // ---------------------------------------------------------------------------
 export const charState = {
   gender: 'M',
@@ -117,7 +117,7 @@ export function variantOptions() {
     eyeShape: strip(`${g}_Eye_`),
     mouth: strip(`${g}_Mouth_`),
     // Hair bands ride the E2_ prefix too (it is what routes them through the
-    // jewel material path in game — see bands.py), but they are a different
+    // jewel material path in game, see bands.py), but they are a different
     // slot with a different library section, so they are not piercing sets.
     jewel: strip('E2_').filter((s) => !s.startsWith('band_')),
   };
@@ -288,14 +288,14 @@ export async function loadCharacter(repoPath) {
 }
 
 // ---------------------------------------------------------------------------
-// Scalp underhair — the game's own decal, worn under every fitted style
+// Scalp underhair, the game's own decal, worn under every fitted style
 // ---------------------------------------------------------------------------
 // buildStubbleDecal is the game's stubble.ts bundled verbatim: a subdivided
 // copy of the head's surface lifted a fraction of a millimetre, bound to the
 // same skeleton and morph dictionary, wearing the generated pattern texture.
 // Its material is named mod_stubble, so the hair wheel recolours it exactly
 // as recolored() does in game. WHICH pattern shows follows the selected
-// style's per-anchor choice — anchors.js calls setUnderhair on select/save.
+// style's per-anchor choice, anchors.js calls setUnderhair on select/save.
 const scalpDecals = new Map(); // gender -> decal mesh
 let underhairPattern = 'buzz';
 
@@ -316,7 +316,7 @@ function attachScalpDecals() {
   }
 }
 
-/** Swap the previewed under-hair pattern. Patterns are the game's own —
+/** Swap the previewed under-hair pattern. Patterns are the game's own,
  *  materials and textures come from stubble.ts's caches, so they are never
  *  disposed here; only the cut-surface geometry is ours to free. */
 export function setUnderhair(pattern) {
@@ -370,7 +370,7 @@ export function setAnimation(name) {
     // Stopping leaves the last sampled pose in the bones; the designer
     // anchors against the REST pose, so put it back exactly.
     restoreRestPose();
-    // The sway driver owned the sway morphs while the clip played — hand
+    // The sway driver owned the sway morphs while the clip played, hand
     // them back to the panel sliders and settle the wobble.
     mini.phase = 0;
     mini.lat = 0;
@@ -400,7 +400,7 @@ export function setAnimSpeed(v) {
 // Hair sway during animation preview
 // ---------------------------------------------------------------------------
 // The game's own driver runs the BUILT styles' hair_sway morphs; a parallel
-// copy of its spring (same constants — the driver keeps its state private)
+// copy of its spring (same constants, the driver keeps its state private)
 // feeds `swaySignal`, which anchors.js turns into a crown-pivot wobble on the
 // RAW sculpt being fitted, so the piece in hand moves with the gait too.
 const swayDriver = new HairSwayDriver();
@@ -421,7 +421,7 @@ function clipSpeed(name) {
 export const swaySignal = { lat: 0, back: 0 };
 const mini = { phase: 0, lat: 0, latVel: 0, back: 0 };
 /** Hair animation is off for the release, so the raw sculpt in hand must sit
- *  still too — the game driver is already switched off at the source
+ *  still too, the game driver is already switched off at the source
  *  (hair_sway.ts HAIR_SWAY_ENABLED), and this is its twin for the piece being
  *  fitted. Left at 0 the crown wobble in anchors.js is a no-op. */
 const SWAY_PREVIEW_ENABLED = false;
@@ -431,7 +431,7 @@ function tickSwaySignal(dt, speed) {
     swaySignal.back = 0;
     return;
   }
-  // Twin of HairSwayDriver.update (hair_sway.ts) — keep the constants in sync.
+  // Twin of HairSwayDriver.update (hair_sway.ts), keep the constants in sync.
   const moving = speed > 0.2;
   const gait = Math.min(1, speed / 7);
   mini.phase += dt * (2.2 + (8.4 - 2.2) * gait);
@@ -515,7 +515,7 @@ export function morphValue(name) {
   return morphValues.get(name) ?? 0;
 }
 
-/** The ear STYLE also has a morph twin so piercings follow the chosen ear —
+/** The ear STYLE also has a morph twin so piercings follow the chosen ear,
  *  see the morph gate in jewel.py. */
 function applyEarShapeMorphs() {
   for (const m of Object.values(EAR_SHAPE)) setRawMorph(m, 0);
@@ -534,7 +534,7 @@ export function resetMorphs({ body = true, face = true } = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Appearance — the game's HSL wheels, applied to the mod_* materials
+// Appearance, the game's HSL wheels, applied to the mod_* materials
 // ---------------------------------------------------------------------------
 export const appearance = {
   // DEFAULT_APPEARANCE in src/render/characters/modular.ts
@@ -546,7 +546,7 @@ export const appearance = {
 
 const APPEARANCE_TARGETS = {
   skin: ['mod_skin', 'mod_skin_detail'],
-  // mod_stubble is the scalp decal — the game's recolour sweep paints it the
+  // mod_stubble is the scalp decal, the game's recolour sweep paints it the
   // hair colour, so the wheel here does the same.
   hair: ['mod_hair', 'mod_stubble'],
   eye: ['mod_eye'],
@@ -564,7 +564,7 @@ function captureMaterialDefaults() {
 }
 
 /** Identical math to hslToHex in modular.ts (standard HSL), then setHex's
- *  sRGB->linear conversion — the exact colour the game would render. */
+ *  sRGB->linear conversion, the exact colour the game would render. */
 export function hslHex(hh, ss, ll) {
   const c = new THREE.Color();
   c.setHSL((((hh % 360) + 360) % 360) / 360, ss, ll, THREE.SRGBColorSpace);
@@ -587,20 +587,20 @@ export function applyAppearance() {
     }
   });
   savePrefs({ appearance: JSON.parse(JSON.stringify(appearance)) });
-  // Hair meshes may have (re)loaded since the last pass — re-assert the
+  // Hair meshes may have (re)loaded since the last pass, re-assert the
   // matcap swap so a fresh standard material never lingers under it.
   applyHairShading();
   emit('appearance');
 }
 
 // ---------------------------------------------------------------------------
-// Hair shading — optional matcap looks over every mod_hair mesh
+// Hair shading, optional matcap looks over every mod_hair mesh
 // ---------------------------------------------------------------------------
 // Preview-only for now: 'standard' is the game's lit material; a matcap key
 // swaps every mod_hair mesh (built styles, beards, the raw sculpt preview)
 // onto a MeshMatcapMaterial wearing a baked-in-page texture. The swap layer
 // stays clear of the two existing material systems: ghosting only ever wraps
-// E2 jewels (never mod_hair), and x-ray mutates whatever material is live —
+// E2 jewels (never mod_hair), and x-ray mutates whatever material is live,
 // so we re-run applyXray after swapping to let it adopt the new one.
 export const hairShadingState = { key: loadPrefs().hairShading ?? 'standard' };
 const matcapMats = new Map(); // `${key}|${side}|${vertexColors}` -> material
@@ -639,7 +639,7 @@ export function applyHairShading() {
     if (!matcapOriginal.has(o)) matcapOriginal.set(o, o.material);
     const orig = matcapOriginal.get(o);
     // The sculpt preview is a one-sided shell shown DoubleSide; built hair
-    // carries the COLOR_0 cavity bake — both survive the swap.
+    // carries the COLOR_0 cavity bake, both survive the swap.
     o.material = matcapMatFor(key, orig.side, !!o.geometry?.getAttribute('color'));
   });
   // A style that unloaded takes its swap record with it.
@@ -754,7 +754,7 @@ export function buildCharacterPanel(host) {
     h(
       'div',
       { class: 'note' },
-      'Built hair shows a finished style for context — handy while placing piercings.',
+      'Built hair shows a finished style for context, handy while placing piercings.',
     ),
   );
 
@@ -806,7 +806,7 @@ export function buildCharacterPanel(host) {
   const animSec = section('char-anim', 'Animation', { open: true });
   const animSel = selectRow({
     label: 'Clip',
-    options: [{ value: '', label: 'off — rest pose' }, ...characterClips.map((c) => c.name)],
+    options: [{ value: '', label: 'off: rest pose' }, ...characterClips.map((c) => c.name)],
     value: charState.anim,
     onChange: (v) => setAnimation(v),
   });
@@ -957,7 +957,7 @@ export function buildAppearancePanel(host) {
           {
             key: 'standard',
             css: 'radial-gradient(circle at 35% 30%, #8a8f98, #34383f)',
-            tip: "Standard — the game's lit material",
+            tip: "Standard: the game's lit material",
           },
           ...MATCAP_PRESETS.map((p) => ({ key: p.key, css: matcapSwatchCss(p.key), tip: p.tip })),
         ],
@@ -969,7 +969,7 @@ export function buildAppearancePanel(host) {
         h(
           'div',
           { class: 'note' },
-          'Matcap looks are studio-only previews — they ignore the Scene lights. Standard is what ships in game.',
+          'Matcap looks are studio-only previews, they ignore the Scene lights. Standard is what ships in game.',
         ),
       );
       onCharacterChange((what) => {
@@ -1034,7 +1034,7 @@ export function buildMorphsPanel(host) {
     h(
       'div',
       { class: 'note' },
-      'Sway morphs only exist on hanging styles — pick one as Built hair to see them.',
+      'Sway morphs only exist on hanging styles, pick one as Built hair to see them.',
     ),
   );
 

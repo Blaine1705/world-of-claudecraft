@@ -373,7 +373,7 @@ export const en = {
     realm: 'World',
     newCharacter: 'New Character',
     appearance: 'Appearance',
-    // Modular character customization (warrior test bed): the body is composed
+    // Modular character customization (every class): the body is composed
     // from parts, so these pick the parts and recolour skin/hair.
     customize: 'Customize',
     body: 'Body',

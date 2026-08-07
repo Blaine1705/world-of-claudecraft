@@ -38,7 +38,7 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
@@ -7216,7 +7216,7 @@ export class Renderer {
       // (a peer entering interest) on its first sync.
       weaponStowed: false,
       // Born with the CURRENT bit: unlike the stow pose there is no transition
-      // to replay — createCharacterVisual composed with it just now.
+      // to replay, createCharacterVisual composed with it just now.
       helmHidden: e.helmHidden,
       liveScale: e.scale,
       loco: newLocoTrack(),
@@ -9223,9 +9223,9 @@ export class Renderer {
       if (e.helmHidden !== v.helmHidden) {
         v.helmHidden = e.helmHidden;
         // Mech wearers keep the mech body (index.ts skips their look), so a
-        // helm toggle must not force a pointless dispose/rebuild of it.
-        const mech = e.kind === 'player' && e.skinCatalog === 'mech';
-        if (!mech && modularLookFor(e)) v.visualKey = null;
+        // helm toggle must not force a pointless dispose/rebuild of it. Asked
+        // through isMechWearer, the one definition of the rule.
+        if (!isMechWearer(e) && modularLookFor(e)) v.visualKey = null;
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;

@@ -1,7 +1,7 @@
 // Shape brushes for the SELECTED hair sculpt: grab (drag along the view
 // plane) and smooth (relax toward neighbours), mirrored across the sculpt's
 // own midline. Every sculpt in the set mirrors about its local x=0 (measured
-// in hairimp.py), so symmetry is a plain x-flip in SCULPT-LOCAL space — the
+// in hairimp.py), so symmetry is a plain x-flip in SCULPT-LOCAL space, the
 // brush works in that space throughout, converting the world-space hit and
 // drag through the live anchor transform.
 //
@@ -63,7 +63,7 @@ export function onHairLoaded(styleKey, list, savedRows) {
   if (hairBrush.active) suppressGizmo(true);
 }
 
-/** Re-apply rows onto the freshly loaded mesh by rest-position match — the
+/** Re-apply rows onto the freshly loaded mesh by rest-position match, the
  *  same bucketed rule apply_hair_sculpt uses in Blender. */
 function applyRows(rows, tol = 2e-3) {
   const cell = tol * 2;
@@ -160,7 +160,7 @@ function diffRows() {
 }
 
 // ---------------------------------------------------------------------------
-// Activation — the gizmo yields while the brush is live
+// Activation, the gizmo yields while the brush is live
 // ---------------------------------------------------------------------------
 function suppressGizmo(on) {
   anchors.gizmo.enabled = !on;
@@ -396,7 +396,7 @@ window.addEventListener('pointerup', () => {
   anchors.markEdited();
   const rowsAfter = workingShape.get(styleAt);
   // Undo restores BOTH the live vertex arrays (when this style is still the
-  // selection) and the working-row maps (always) — so undoing a stroke after
+  // selection) and the working-row maps (always), so undoing a stroke after
   // switching styles still takes effect the moment the style is reopened.
   const restore = (byMesh, rows, dirty) => {
     if (style === styleAt) {
@@ -440,7 +440,7 @@ export async function saveShape(styleKey) {
   else delete anchors.state.hairSculpt[styleKey];
   workingShape.delete(styleKey);
   shapeDirty.delete(styleKey);
-  if (entries.length) toast(`Shape saved — ${entries.length} vertex deltas`, 'good');
+  if (entries.length) toast(`Shape saved, ${entries.length} vertex deltas`, 'good');
 }
 
 export async function resetShape() {
@@ -474,15 +474,15 @@ export async function resetShape() {
 // ---------------------------------------------------------------------------
 // NOT a rigid wobble (that read as a tilting helmet): a per-vertex bend that
 // leaves the scalp untouched and ramps toward the tips, the same shape the
-// baked hair_sway morphs give built styles. Weights follow the game's rule —
+// baked hair_sway morphs give built styles. Weights follow the game's rule,
 // zero above character height RAMP_TOP, rising to 1 at the sculpt's lowest
-// point — and a style with too little hanging length doesn't move at all.
+// point, and a style with too little hanging length doesn't move at all.
 // A no-clip guard keeps displaced verts from entering the head/neck/torso:
 // each vertex may never end up DEEPER inside a guard sphere than it started.
 const RAMP_TOP = 1.52; // character height the bend starts below (the game's)
 const LOW_Y = 1.34; // a style needs enough verts below this to sway at all
 const MIN_LOW_VERTS = 24;
-const TIP_EXP = 1.8; // weight curve — the very tips carry most of the motion
+const TIP_EXP = 1.8; // weight curve, the very tips carry most of the motion
 const LAT_AMP = 0.05; // metres of lateral drift at a full-run swing, at the tip
 const BACK_AMP = 0.09; // metres of backward stream at full run, at the tip
 const GUARDS = [
@@ -700,7 +700,7 @@ export function buildPanel(host) {
         { class: 'note' },
         shapeDirty.has(style)
           ? `${workRows} unsaved shape deltas`
-          : `${savedRows} shape deltas saved — the rebuild applies them`,
+          : `${savedRows} shape deltas saved, the rebuild applies them`,
       ),
     );
     sec.body.append(

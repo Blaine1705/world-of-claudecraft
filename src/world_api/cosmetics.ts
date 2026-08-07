@@ -27,7 +27,7 @@ export interface IWorldCosmetics {
   toggleWeaponStow(): void;
   // Paperdoll eye toggle: render the composed body without its kit's head piece.
   // A standing wardrobe preference that rides the entity wire (`hh`) so peers
-  // and portraits present the chosen look; explicit boolean so the client's
-  // stored choice re-asserts idempotently on world entry.
+  // and portraits present the chosen look, and persists per character through
+  // the sim's own save. Explicit boolean, not a toggle, so it is idempotent.
   setHelmHidden(hidden: boolean): void;
 }

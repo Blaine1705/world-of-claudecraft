@@ -4,14 +4,14 @@
 //
 // Morphs, not bones or shaders, on purpose: the hair rides the head bone as a
 // single skinned part, and the shared tintedMaterial path rebuilds materials
-// as Lambert on the low graphics tier — a shader sway would silently vanish
+// as Lambert on the low graphics tier, a shader sway would silently vanish
 // there (the rim-glow lesson), while morph targets work on every material
 // three ships. Carrying morphs also keeps the part out of mergeSkinnedParts,
 // so only the styles that actually hang pay their extra draw.
 //
 // The driver is a stride oscillator into a lateral spring (so a stop SETTLES,
 // swinging through a couple of diminishing arcs, instead of freezing mid-sway)
-// plus a smoothed backward stream that rises with gait — subtle by design:
+// plus a smoothed backward stream that rises with gait, subtle by design:
 // influences cap well under 1, and idle carries only a breath of motion.
 //
 // Cost: a handful of scalar ops per frame plus writing three floats per hair
@@ -31,10 +31,10 @@ interface SwayRig {
 /** Master switch for hair secondary motion. OFF for the current release: the
  *  hair library is shipping before the animation pass, so every style is static
  *  rather than half-tuned. The driver below is untouched and comes back by
- *  setting this to true (no rebuild needed — it reads morphs off the GLB). */
+ *  setting this to true (no rebuild needed, it reads morphs off the GLB). */
 const HAIR_SWAY_ENABLED = false;
 
-/** Gait that reaches full sway (yd/s) — the run reference. */
+/** Gait that reaches full sway (yd/s), the run reference. */
 const FULL_GAIT_SPEED = 7;
 /** Stride oscillator, rad/s at idle drift and at full run. */
 const PHASE_IDLE = 2.2;
@@ -58,7 +58,7 @@ export class HairSwayDriver {
   private back = 0;
 
   /** Collect the meshes of a freshly composed model that carry sway morphs.
-   *  Meshes without all three targets are skipped whole — a partial write
+   *  Meshes without all three targets are skipped whole, a partial write
    *  would bend a style sideways with no way back. */
   build(root: THREE.Object3D): void {
     this.rigs.length = 0;
@@ -66,7 +66,7 @@ export class HairSwayDriver {
     // hair library first, animate it after). This is the whole switch: with no
     // rigs collected, update() returns on its length check and every style is
     // static, whether or not its GLB carries the morphs. Flip HAIR_SWAY_ENABLED
-    // back to true to restore the driver — nothing else here changed.
+    // back to true to restore the driver, nothing else here changed.
     if (!HAIR_SWAY_ENABLED) return;
     root.traverse((o) => {
       const mesh = o as THREE.Mesh;

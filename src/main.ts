@@ -347,7 +347,6 @@ import {
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
 import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
-import { storedHelmHidden } from './ui/helm_pref';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -1360,9 +1359,6 @@ async function startGame(
         ? inWorldLookFor(e.templateId as PlayerClass, e.helmHidden)
         : null,
     );
-    // Re-assert the stored helmet preference (idempotent; see helm_pref.ts):
-    // the sim treats it as session state, so relog resets it to shown.
-    if (storedHelmHidden()) world.setHelmHidden(true);
     renderer = new Renderer(world, canvas, nameplates);
     rendererReady = true;
     renderer.setAudioSink(sfx);
@@ -5054,12 +5050,33 @@ function readStoredAppearance(): ModularAppearance {
   }
 }
 
-function storeAppearance(a: ModularAppearance): void {
+// The creator emits on every `input` and every `pointermove` (the colour
+// wheels), and localStorage.setItem is synchronous: a wheel drag would pay a
+// stringify plus a store write per pointer sample. Coalesce to one trailing
+// write, flushed on pagehide so a refresh mid-drag still keeps the look.
+const APPEARANCE_STORE_DEBOUNCE_MS = 200;
+let appearancePendingStore: ModularAppearance | null = null;
+let appearanceStoreTimer: number | null = null;
+
+function flushAppearanceStore(): void {
+  if (appearanceStoreTimer !== null) {
+    window.clearTimeout(appearanceStoreTimer);
+    appearanceStoreTimer = null;
+  }
+  const pending = appearancePendingStore;
+  appearancePendingStore = null;
+  if (!pending) return;
   try {
-    localStorage.setItem(MODULAR_APPEARANCE_KEY, JSON.stringify(a));
+    localStorage.setItem(MODULAR_APPEARANCE_KEY, JSON.stringify(pending));
   } catch {
     /* storage unavailable: the look still applies for this session */
   }
+}
+
+function storeAppearance(a: ModularAppearance): void {
+  appearancePendingStore = a;
+  if (appearanceStoreTimer !== null) return;
+  appearanceStoreTimer = window.setTimeout(flushAppearanceStore, APPEARANCE_STORE_DEBOUNCE_MS);
 }
 
 /** Which kit a class's composed body wears: its own class kit by default
@@ -10563,6 +10580,7 @@ function wireStartScreens(): void {
     refreshPlayMarker(Date.now());
     stopActiveEntryDiagnostics();
     clearEntryProbe();
+    flushAppearanceStore();
   });
   window.addEventListener('error', (event) => {
     const errorType = event.error instanceof Error ? event.error.name : 'unknown';

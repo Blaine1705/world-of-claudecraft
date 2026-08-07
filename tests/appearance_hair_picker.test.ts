@@ -5,7 +5,7 @@
 // the part a refactor must not lose: it is what lets a player jump straight to
 // a named style instead of arrowing through nineteen of them, and it is the
 // control the keyboard and assistive tech land on (the stepper arrows are
-// aria-hidden pointer sugar). That difference is easy to lose in a refactor —
+// aria-hidden pointer sugar). That difference is easy to lose in a refactor,
 // so it is asserted here rather than left to review.
 import { describe, expect, it } from 'vitest';
 import { HAIR_STYLES, type ModularAppearance } from '../src/render/characters/modular';
@@ -57,7 +57,7 @@ describe('appearance customizer: the hair picker', () => {
     sel.dispatchEvent(new Event('change'));
     expect(changed()?.hair).toBe('warriorbraid');
 
-    // A programmatic set has to repaint the control too — otherwise Randomize
+    // A programmatic set has to repaint the control too, otherwise Randomize
     // rolls a style the select goes on showing the old name for.
     ui.set({ hair: 'mullet' });
     expect(sel.value).toBe('mullet');

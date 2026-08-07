@@ -42,7 +42,7 @@ describe('beard footprint', () => {
     for (const style of ['stubble', 'scruff'] as const) {
       expect(beardCoverage(style, CHIN.theta, CHIN.az), `${style} chin`).toBeGreaterThan(0.5);
       expect(beardCoverage(style, 130, 40), `${style} jaw`).toBeGreaterThan(0.5);
-      // the cheekbone is where the sideburn tops out — just under it is growth
+      // the cheekbone is where the sideburn tops out, just under it is growth
       expect(
         beardCoverage(style, CHEEKBONE.theta + 4, CHEEKBONE.az),
         `${style} sideburn`,
@@ -148,14 +148,14 @@ describe('the unwrap', () => {
   // The reason for an azimuthal projection over the obvious lat-long one: a
   // lat-long seam down the back of the head lands inside a buzz cut's footprint,
   // and a triangle straddling it interpolates its UV across the whole texture.
-  it('has no seam — neighbouring directions stay neighbours, including at ±180', () => {
+  it('has no seam, neighbouring directions stay neighbours, including at ±180', () => {
     const step = 0.5;
     for (let theta = 5; theta <= 165; theta += 5) {
       for (let az = -180; az < 180; az += 3) {
         const a = decalUv(theta, az);
         const b = decalUv(theta, az + step);
         const c = decalUv(theta + step, az);
-        // the azimuthal step in UV is the arc of a circle of radius theta/360 —
+        // the azimuthal step in UV is the arc of a circle of radius theta/360,
         // the same everywhere on the ring, INCLUDING across ±180
         const arc = (theta / 360) * (step / (180 / Math.PI));
         expect(Math.hypot(a[0] - b[0], a[1] - b[1]), `az ${az}`).toBeLessThan(arc * 1.001);
@@ -276,7 +276,7 @@ describe('decal geometry', () => {
   });
 
   // The trim is sized to the footprint, and a buzz hairline sits 11 degrees
-  // lower than a crew one — so the surface a buzz needs is strictly bigger, and
+  // lower than a crew one, so the surface a buzz needs is strictly bigger, and
   // the two cannot share a cache entry keyed on "has a scalp decal" or a buzz
   // gets the crew cut's surface and its hairline ends on a flat shelf.
   it('cuts a bigger surface for the styles that reach further', () => {
@@ -397,7 +397,7 @@ describe('decal geometry on the shipped head', () => {
 
   // The head's own morph targets say where the face IS. `mouth_pout` moves
   // exactly the lip ring, so "the lips stay bare" is checkable rather than
-  // asserted — this is the gate that stopped the wash burying the mouth line.
+  // asserted, this is the gate that stopped the wash burying the mouth line.
   it.each(['M_Head', 'F_Head'])('%s: no growth on the lips', async (node) => {
     const { geo, targets } = await load(node);
     const frame = headFrame(geo.getAttribute('position') as THREE.BufferAttribute);
@@ -504,7 +504,7 @@ describe('decal geometry on the shipped head', () => {
     if (!index) throw new Error('unindexed decal');
     // Un-lift first: the UV is keyed to the SKIN under the decal, not to the
     // floated vertex, so the lift is not drift. Measuring it as drift hides the
-    // thing this is actually gating — with the lift in, more subdivision looks
+    // thing this is actually gating, with the lift in, more subdivision looks
     // like it buys nothing (1.89 -> 1.82 degrees) when it in fact buys
     // everything (1.10 -> 0.30).
     const lift = frame.hy * 2 * DECAL_LIFT;
@@ -538,7 +538,7 @@ describe('decal geometry on the shipped head', () => {
     }
     // Drop a subdivision level and this is 3.7 degrees. What is left is
     // concentrated in the mouth crease, where the head folds inward far enough
-    // that a triangle across it spans a wide arc from the head centre — and it
+    // that a triangle across it spans a wide arc from the head centre, and it
     // is a SMOOTH deviation that is zero at every vertex, so a beard line
     // wanders slightly rather than turning into the sawtooth this replaced.
     expect(worst, `${node} worst UV drift (degrees)`).toBeLessThan(1.5);

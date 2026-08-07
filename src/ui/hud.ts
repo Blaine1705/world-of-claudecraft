@@ -315,7 +315,6 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
-import { storeHelmHidden } from './helm_pref';
 import { honorFloatText } from './honor_float_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
@@ -2259,7 +2258,7 @@ export class Hud {
       // the frame of the player wearing it (drawMech falls back to the class
       // face until the atlas is resident).
       if (visualKey === 'player_mech') {
-        if (this.sim.player.skinCatalog === 'mech' && skin === (this.sim.player.skin ?? 0)) {
+        if (isMechWearer(this.sim.player) && skin === (this.sim.player.skin ?? 0)) {
           this.drawPlayerFramePortrait();
         }
         return;
@@ -4755,8 +4754,11 @@ export class Hud {
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {
       const next = !(this.sim.player?.helmHidden ?? false);
+      // The choice persists PER CHARACTER through the sim's own save
+      // (CharacterState.helmHidden), like weaponStowed: no client-side mirror,
+      // or a second character on the same browser would inherit this one's
+      // wardrobe on world entry and overwrite its saved choice.
       this.sim.setHelmHidden(next);
-      storeHelmHidden(next);
       audio.click();
       // The in-world body recomposes off the entity bit (renderer diff); the
       // portraits are keyed on the look's full signature, so repainting the
@@ -5009,8 +5011,8 @@ export class Hud {
 
   /** The player's own frame portrait.
    *
-   *  Their COMPOSED character when they have an authored look — the face they
-   *  built, not the stock art for their class — and the class portrait
+   *  Their COMPOSED character when they have an authored look, the face they
+   *  built, not the stock art for their class, and the class portrait
    *  otherwise. Only the local player is composed (the look is presentation
    *  state and is not on the wire), so this is the one frame that can do it;
    *  the target and target-of-target frames stay on `drawClass`. */
@@ -5019,7 +5021,7 @@ export class Hud {
     const cls = this.sim.cfg.playerClass;
     const skin = this.sim.player.skin ?? 0;
     const self = this.sim.player;
-    // A mech wearer IS the mech in the world — the frame must agree, and their
+    // A mech wearer IS the mech in the world, the frame must agree, and their
     // `skin` is a chroma index that means nothing to the class atlas.
     const mech = isMechWearer(self);
     const look = self && !mech ? modularLookFor(self) : null;

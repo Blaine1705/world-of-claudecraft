@@ -1,4 +1,4 @@
-// Modular character composition — pure data + selection math, no three.js.
+// Modular character composition, pure data + selection math, no three.js.
 //
 // The modular warrior ships as ONE GLB (`models/chars/modular/warrior_modular.glb`)
 // holding every body part, hair style, face part and armour slot piece, all
@@ -13,7 +13,7 @@
 
 import { UNDERHAIR } from './underhair.generated';
 
-/** Visual key of the modular warrior (manifest.ts VISUALS) — the fallback for
+/** Visual key of the modular warrior (manifest.ts VISUALS), the fallback for
  *  a claimed look whose class has no modular def of its own. Every real class
  *  resolves through manifest.ts modularVisualKey instead. */
 export const MODULAR_WARRIOR_KEY = 'player_warrior_modular';
@@ -38,13 +38,13 @@ export const ARMOR_SLOTS: readonly ArmorSlot[] = [
  * Every haircut, in the order the picker lists them: no hair, the two clipper
  * lengths, then sixteen sculpts running short to long.
  *
- * `bald`, `buzz` and `crew` are not geometry — they are a texture decal on the
+ * `bald`, `buzz` and `crew` are not geometry, they are a texture decal on the
  * bare head (stubble.ts), because at that length what you are looking at is
  * scalp THROUGH hair rather than a shape with a silhouette.
  *
  * Everything else is a SCULPT, imported from tmp/modular/hair_src/ and fitted
- * to both heads by tmp/modular/hairimp.py. The library used to be parametric —
- * volumes generated on the skull ellipsoid by hair2.py — which gave twenty-odd
+ * to both heads by tmp/modular/hairimp.py. The library used to be parametric,
+ * volumes generated on the skull ellipsoid by hair2.py, which gave twenty-odd
  * styles that were all correct and all interchangeable, because a puff profile
  * and a coverage triple cannot describe the thing that makes a haircut a
  * haircut. Those are gone. `messy` is the one style that spans both eras: it
@@ -146,19 +146,19 @@ export const FACE_SLIDERS: readonly FaceSlider[] = [
   // The base is symmetric now and this dials it in on purpose.
   'smirk',
 ];
-/** The mouth is its OWN PART, like the eyes — it used to be a crease in the head
+/** The mouth is its OWN PART, like the eyes, it used to be a crease in the head
  *  driven by exclusive morphs.
  *
  *  Measured, neither head actually had a mouth: a 15mm dent on the male that had
  *  faded to nothing by x=0.06, and none at all on the female. What the female
  *  was showing was the shading of her triangulation, which is why hers "looked
- *  cleaner" — there was less there to look wrong. A 13-vertex band cannot hold a
+ *  cleaner", there was less there to look wrong. A 13-vertex band cannot hold a
  *  mouth, so no amount of morph tuning was going to make one even.
  *
  *  As a part it can have lips that stand PROUD of the skin (a dent only goes
  *  inward), it is mirror-symmetric by construction rather than by two ray casts
- *  agreeing, and the open styles can be a different mesh — with an aperture, a
- *  dark cavity and their own teeth — rather than a deformation of a closed one. */
+ *  agreeing, and the open styles can be a different mesh, with an aperture, a
+ *  dark cavity and their own teeth, rather than a deformation of a closed one. */
 export type MouthStyle =
   | 'neutral'
   | 'lips'
@@ -195,8 +195,8 @@ export const NEUTRAL_FACE: FaceShape = {
 /** Body sliders, the face sliders' pattern on the trunk and limbs: each maps
  *  to a `body_<key>_up` / `body_<key>_dn` shape-key pair baked by
  *  tmp/modular/bodykeys.py onto the body parts. They are silhouette bulges,
- *  never bone moves — the hand grows about the wrist, the hips widen in
- *  place — so weapon grips and the walk cycle are untouched. Parts carrying
+ *  never bone moves, the hand grows about the wrist, the hips widen in
+ *  place, so weapon grips and the walk cycle are untouched. Parts carrying
  *  morphs stay out of mergeSkinnedParts, and only the LOCAL player composes
  *  a modular body, so the extra draws never multiply across a crowd. */
 export type BodySlider = 'shoulders' | 'chest' | 'hips' | 'hands' | 'elbows' | 'knees' | 'feet';
@@ -220,8 +220,8 @@ export const NEUTRAL_BODY: BodyShape = {
   feet: 0,
 };
 /** Jewellery: earrings, and on some sets a face piercing too. One slot, because
- *  a set is a LOOK — the elf's crescent comes with the brow bar that matches it
- *  — and because a second picker row for two pieces of metal is not a feature.
+ *  a set is a LOOK, the elf's crescent comes with the brow bar that matches it
+ * and because a second picker row for two pieces of metal is not a feature.
  *
  *  Rebuilt 2026-08-03 (tmp/modular/jewel.py). The old set was ten variations on
  *  a hoop, and none of them touched the ear: every piece hung from a
@@ -245,7 +245,7 @@ export type EarringStyle =
 // --- makeup ----------------------------------------------------------------
 //
 // Three layers, each a short list of named shades with `none` first, so one
-// control carries both "is it on" and "which colour" — and OFF is simply the
+// control carries both "is it on" and "which colour", and OFF is simply the
 // first swatch. A colour WHEEL would be wrong here: skin, hair and eyes are
 // continuous because any value of them is a person, whereas makeup is a product
 // you own in a few shades.
@@ -255,7 +255,7 @@ export type EarringStyle =
 // (see the mouth notes above), so a decal painted on the head at the lip band
 // lands BEHIND the lips and is never seen. The part already carries the lip
 // body on `mod_skin` and the mouth line on `mod_mouth`, so recolouring the
-// first of those is the whole feature — no geometry, no texture, no draw call.
+// first of those is the whole feature, no geometry, no texture, no draw call.
 // Blush and eyeshadow have no part in the way (cheek and eyelid are bare head
 // skin) and are a decal: see makeup.ts.
 
@@ -282,7 +282,7 @@ export const SHADOW_SHADES: readonly ShadowShade[] = [
   'rose',
 ];
 
-/** sRGB hex per shade. `none` carries no colour and is never looked up — the
+/** sRGB hex per shade. `none` carries no colour and is never looked up, the
  *  swatch for it is drawn as an empty chip by the customizer. */
 export const LIP_COLORS: Record<Exclude<LipShade, 'none'>, number> = {
   rose: 0xc4677a,
@@ -448,7 +448,7 @@ export interface ModularAppearance {
    *  own part here so it can be switched off, and its own MATERIAL so it can be
    *  coloured apart from the hair.
    *
-   *  Standard on the FEMALE body and off on the male — see {@link defaultLashes}.
+   *  Standard on the FEMALE body and off on the male, see {@link defaultLashes}.
    *  Still a free toggle either way; only the default and the randomiser are
    *  gendered. */
   lashes: boolean;
@@ -459,11 +459,11 @@ export interface ModularAppearance {
   eyeSat: number;
   eyeLight: number;
   /** Makeup. All three are OFF by default (`'none'`) and are picked from a
-   *  short list of shades rather than a colour wheel — see MAKEUP_SHADES. */
+   *  short list of shades rather than a colour wheel, see MAKEUP_SHADES. */
   lipstick: LipShade;
   blush: BlushShade;
   eyeshadow: ShadowShade;
-  /** The colorway the worn armour is dyed with — `classic` is the atlas as
+  /** The colorway the worn armour is dyed with, `classic` is the atlas as
    *  authored. One choice re-dyes whatever set (or mix of sets) is worn, each
    *  material through its own set's band; see OUTFIT_COLORWAYS. */
   outfit: OutfitColorway;
@@ -509,7 +509,7 @@ export const DEFAULT_APPEARANCE: ModularAppearance = {
  *  to the same body (see tmp/modular/classfit.py). A set does not have to fill
  *  every slot: the sets with no helmet leave `head` alone so the character's own
  *  hair shows, and the mage has no `hands` piece because KayKit models its hands
- *  as bare flesh — wearing it should show the player's hands, not a peach mitten
+ *  as bare flesh, wearing it should show the player's hands, not a peach mitten
  *  painted from the mage atlas. */
 export type ArmorSetId = 'knight' | 'barbarian' | 'druid' | 'mage' | 'paladin' | 'ranger' | 'rogue';
 
@@ -527,7 +527,7 @@ export const ARMOR_SETS: readonly ArmorSetId[] = [
  *  and the bare body shows through. */
 export type ArmorLoadout = Partial<Record<ArmorSlot, ArmorSetId | null>>;
 
-/** The kit a class wears out of the box — the same pairing the fixed class
+/** The kit a class wears out of the box, the same pairing the fixed class
  *  rigs already ship (the shaman wears the barbarian model, the priest and
  *  warlock the mage's robes, the hunter the ranger leathers), so a composed
  *  character reads as their class at a glance until real armour mapping
@@ -571,7 +571,7 @@ export const KNIGHT_FULL: ArmorLoadout = fullSet('knight');
  *  This is the FULL kit, helm included, because prepareVisual() measures the
  *  normalization scale off it: `normScale = def.height / measuredHeight`, so
  *  measuring a bare-headed body would scale the whole warrior up ~9% to make
- *  the shorter silhouette reach `def.height` — a modular warrior would stand
+ *  the shorter silhouette reach `def.height`, a modular warrior would stand
  *  visibly chunkier than a paladin. Measuring the helmed silhouette (exactly
  *  what `player_warrior` measures, since its `show` keeps Knight_Helmet) keeps
  *  BODY scale identical between the two, and removing the helm then simply
@@ -605,7 +605,7 @@ const BODY_BY_SLOT: Record<Gender, Record<ArmorSlot, readonly string[]>> = {
   },
 };
 
-/** Underclothing, and the slot whose armour REPLACES it — or `null` for a piece
+/** Underclothing, and the slot whose armour REPLACES it, or `null` for a piece
  *  armour never replaces.
  *
  *  The loincloth is not additive: under a set of tassets it pokes through them,
@@ -613,8 +613,8 @@ const BODY_BY_SLOT: Record<Gender, Record<ArmorSlot, readonly string[]>> = {
  *  only while `legs` is bare.
  *
  *  The chest wrap is the exception (Troy, 2026-08-03) and answers to no slot at
- *  all. Several sets are cut open at the chest or the midriff — the druid and
- *  the rogue most of all — and replacing the wrap with them puts a bare chest
+ *  all. Several sets are cut open at the chest or the midriff, the druid and
+ *  the rogue most of all, and replacing the wrap with them puts a bare chest
  *  under the gap rather than armour over the wrap. It is clamped against every
  *  set in turn at authoring time (garment.py), so it fits under the closed ones
  *  too. */
@@ -637,7 +637,7 @@ export function slotCovered(worn: ArmorLoadout, slot: ArmorSlot): boolean {
 // --- helm kinds --------------------------------------------------------------
 //
 // Headgear is not one thing (Troy, 2026-08-06). A FULL helm is a closed shell:
-// it swallows the hair, the ears and the earrings on them, and the beard —
+// it swallows the hair, the ears and the earrings on them, and the beard,
 // nothing of the head's dressing survives it. A HAT sits ON the head: the ears
 // stay (and the piercings with them), the beard stays, and the hair follows
 // the length rule below. The sets with no head piece are neither.
@@ -646,10 +646,10 @@ export function slotCovered(worn: ArmorLoadout, slot: ArmorSlot): boolean {
 export type HelmKind = 'none' | 'hat' | 'full';
 
 /** Every head piece in the kit, classified. The knight's helm has a visor and
- *  the paladin's is a crusader bucket — closed shells both. The barbarian's
+ *  the paladin's is a crusader bucket, closed shells both. The barbarian's
  *  bear hood and the mage's pointed hat are hats: open at the face AND at the
  *  sides, so the ears are genuinely on screen. A set absent here has no head
- *  piece at all. An unknown future set defaults to `full` in helmKind() — the
+ *  piece at all. An unknown future set defaults to `full` in helmKind(), the
  *  conservative read, since a closed shell showing hair through it is the worse
  *  artifact. */
 export const HELM_KIND_BY_SET: Partial<Record<ArmorSetId, 'hat' | 'full'>> = {
@@ -667,11 +667,11 @@ export function helmKind(worn: ArmorLoadout): HelmKind {
   return HELM_KIND_BY_SET[worn.head as ArmorSetId] ?? 'full';
 }
 
-/** Styles whose fall hangs clear of a hat's rim — chin-length and below. Under
+/** Styles whose fall hangs clear of a hat's rim, chin-length and below. Under
  *  a hat these render as `layered` (shoulder-length loose hair): the hat
  *  swallows the styled top, but hair that long must still BE there below it.
- *  Everything else — the decal cuts, the short shells, and the updos (buns,
- *  topknot, braidcrown, whose whole shape is hair pulled UP into the hat) —
+ *  Everything else, the decal cuts, the short shells, and the updos (buns,
+ *  topknot, braidcrown, whose whole shape is hair pulled UP into the hat),
  *  renders as no volume at all, scalp growth showing as usual. */
 const LONG_HAIR = new Set<HairStyle>([
   'chinbob',
@@ -777,7 +777,7 @@ const ARMOR_BY_SET: Record<ArmorSetId, Record<ArmorSlot, readonly string[]>> = {
 };
 
 /** Every style but the three shortest is one imported sculpt, fitted to both
- *  heads (tmp/modular/hairimp.py) and shipped as a single `H2_*` node — one
+ *  heads (tmp/modular/hairimp.py) and shipped as a single `H2_*` node, one
  *  mesh for both genders, which is true because the fit clamps the shell clear
  *  of BOTH heads rather than because the two skulls are alike.
  *
@@ -788,9 +788,9 @@ const ARMOR_BY_SET: Record<ArmorSetId, Record<ArmorSlot, readonly string[]>> = {
  *  its own surface at compose time. */
 // A tailed style lists its E2_band_* cuff next to the volume: the band is the
 // metal tie the tail hangs from (tmp/modular/bands.py), worn whenever the hair
-// is. The E2_ prefix routes it through the jewel material path in assets.ts —
+// is. The E2_ prefix routes it through the jewel material path in assets.ts,
 // knight-atlas gold by default, the player's piercing preset when one is
-// picked — whether or not any earring is worn.
+// picked, whether or not any earring is worn.
 const HAIR_NODES: Record<HairStyle, readonly string[]> = {
   bald: [],
   buzz: [],
@@ -833,7 +833,7 @@ const HAIR_NODES: Record<HairStyle, readonly string[]> = {
 };
 
 /** Beards are their own slot: a style can pair any beard with any hair.
- *  Every volume is a Fit Studio sculpt (BI_*) — the parametric B2_ placeholder
+ *  Every volume is a Fit Studio sculpt (BI_*), the parametric B2_ placeholder
  *  set is retired; saved looks that wore one land on the nearest sculpt via
  *  BEARD_LEGACY. */
 const BEARD_NODES: Record<BeardStyle, readonly string[]> = {
@@ -899,7 +899,7 @@ function hairNodes(_gender: Gender, style: HairStyle): readonly string[] {
 
 /** Eyes, brows, lashes and ears are their own parts (they used to be islands
  *  inside the head mesh, which is why none of them could be swapped or scaled)
- *  — and every one of them is built PER HEAD.
+ * and every one of them is built PER HEAD.
  *
  *  They are projected onto the face they sit on, and the two heads are separate
  *  sculpts rather than one scaled copy, so a part built against the male head
@@ -938,8 +938,8 @@ function beardNodes(_gender: Gender, style: BeardStyle): readonly string[] {
 // --- decal styles ----------------------------------------------------------
 //
 // Four styles are growth too short to have a shape of its own: at buzz/stubble
-// length you are looking at scalp THROUGH hair. They used to ship as geometry —
-// a flat-alpha copy of the head's own faces, lifted a few millimetres — which
+// length you are looking at scalp THROUGH hair. They used to ship as geometry,
+// a flat-alpha copy of the head's own faces, lifted a few millimetres, which
 // gave a wash with no grain and an outline that landed wherever the head's
 // coarse triangles fell. They are a texture decal now (stubble.ts), so they
 // name no part: the selection below is all the picking they need, and with none
@@ -951,7 +951,7 @@ export type ScalpDecal = 'buzz' | 'crew';
 export type BeardDecal = 'stubble' | 'scruff';
 
 /**
- * The under-hair scalp patterns a hair volume can wear — the two clipper cuts
+ * The under-hair scalp patterns a hair volume can wear, the two clipper cuts
  * plus solid washes, shaped hairlines and fades. Twinned with SCALP_CUTS /
  * SCALP_SPECS in stubble.ts (the compiler holds those Records complete) and
  * with the allowlist in scripts/asset_pipeline/lib/fit_studio.mjs.
@@ -979,7 +979,7 @@ export const SCALP_DECALS: Partial<Record<HairStyle, ScalpDecal>> = {
  * The scalp decal worn UNDER a hair volume.
  *
  * A hair volume is a shell around the skull with a hairline at its rim, and
- * between the rim and the strands you can see bare scalp — most obviously
+ * between the rim and the strands you can see bare scalp, most obviously
  * through a spiky style, where the gaps between the spikes ARE the style.
  * Painting growth under the shell fills those in, so a gap reads as hair rather
  * than as a hole in the head.
@@ -987,17 +987,17 @@ export const SCALP_DECALS: Partial<Record<HairStyle, ScalpDecal>> = {
  * That growth is the BUZZ decal itself, not a lookalike (Troy, 2026-08-03): the
  * stubble under a haircut has to be the same stubble you get by picking the
  * buzz cut on its own. It was briefly its own `roots` variant with its own
- * density, which made it a second texture that merely resembled the first —
+ * density, which made it a second texture that merely resembled the first,
  * exactly the thing to avoid, and a duplicate 1024² map in the cache for no
  * visual difference. Returning `buzz` makes them the same by construction.
  *
- * Every style qualifies except `bald` — the one look that means "no growth", so
- * giving it stubble would take the only shaved head away — and except the two
+ * Every style qualifies except `bald`, the one look that means "no growth", so
+ * giving it stubble would take the only shaved head away, and except the two
  * that already ARE a scalp decal, which would otherwise be drawn twice.
  *
  * WHICH pattern a style wears is the designer's per-style call, authored with
  * the style's anchor in the Fit Studio and shipped via underhair.generated.ts
- * (written by lib/fit_studio.mjs on save — never hand-edit it). `'none'`
+ * (written by lib/fit_studio.mjs on save, never hand-edit it). `'none'`
  * switches the under-layer off for that style; an unknown or missing entry
  * falls back to the classic buzz growth.
  */
@@ -1025,15 +1025,15 @@ export interface StubbleSelection {
  * Which decals a look wears.
  *
  * The scalp growth survives every kind of headgear: a decal is the head's own
- * surface a fraction of a millimetre out, and what shows of the head — the
- * face opening of a full helm, everything below a hat's rim — shows the
+ * surface a fraction of a millimetre out, and what shows of the head, the
+ * face opening of a full helm, everything below a hat's rim, shows the
  * growth with it. Dropping it made a character's stubble come and go with
  * their headgear.
  *
  * The BEARD follows the helm kind (Troy, 2026-08-06):
  * - full helm: no beard at all. The shell closes over the jaw, so neither the
  *   volume nor the growth it would leave has anywhere to show.
- * - hat: the beard is untouched — the volume stays on (see modularPartNames),
+ * - hat: the beard is untouched, the volume stays on (see modularPartNames),
  *   so the decal rule here is exactly the bare-headed one.
  */
 export function stubbleDecals(app: ModularAppearance, worn: ArmorLoadout = {}): StubbleSelection {
@@ -1042,7 +1042,7 @@ export function stubbleDecals(app: ModularAppearance, worn: ArmorLoadout = {}): 
   return { scalp: baseScalpDecal(app.hair), beard };
 }
 
-/** `''` when the look wears no decal — the whole selection in one cache key. */
+/** `''` when the look wears no decal, the whole selection in one cache key. */
 export function stubbleDecalKey(app: ModularAppearance, worn: ArmorLoadout = {}): string {
   const sel = stubbleDecals(app, worn);
   if (!sel.scalp && !sel.beard) return '';
@@ -1058,10 +1058,10 @@ export interface MakeupSelection {
 
 /** Makeup survives a helm, for the same reason the growth decals do: every helm
  *  in the set is open at the face, so the lips, cheeks and lids it paints are
- *  all still on screen. (Troy, 2026-08-03 — it used to be dropped.)
+ *  all still on screen. (Troy, 2026-08-03, it used to be dropped.)
  *
  *  `_worn` is unread for exactly that reason, and stays in the signature so
- *  this matches every other selector here — and so a closed-face helm, if one
+ *  this matches every other selector here, and so a closed-face helm, if one
  *  is ever added, has somewhere to be handled. */
 export function makeupSelection(app: ModularAppearance, _worn: ArmorLoadout = {}): MakeupSelection {
   return {
@@ -1071,7 +1071,7 @@ export function makeupSelection(app: ModularAppearance, _worn: ArmorLoadout = {}
   };
 }
 
-/** Whether anything is painted on at all — the cheap gate before building a
+/** Whether anything is painted on at all, the cheap gate before building a
  *  decal or cloning a material. */
 export function wearsMakeup(sel: MakeupSelection): boolean {
   return sel.lipstick !== 'none' || sel.blush !== 'none' || sel.eyeshadow !== 'none';
@@ -1083,7 +1083,7 @@ export function wearsFaceDecal(sel: MakeupSelection): boolean {
   return sel.blush !== 'none' || sel.eyeshadow !== 'none';
 }
 
-/** `''` when the face is bare — the whole makeup selection in one cache key. */
+/** `''` when the face is bare, the whole makeup selection in one cache key. */
 export function makeupKey(app: ModularAppearance, worn: ArmorLoadout = {}): string {
   const sel = makeupSelection(app, worn);
   if (!wearsMakeup(sel)) return '';
@@ -1107,25 +1107,25 @@ export const MAT_LASH = 'mod_lash';
 export const MAT_CLOTH = 'mod_cloth';
 /** The stubble/buzz decal. Built at runtime rather than shipped in the GLB, but
  *  recoloured with the HAIR colour on the same path as everything else that is
- *  hair — it is alpha-blended, so it cannot share the hair material. */
+ *  hair, it is alpha-blended, so it cannot share the hair material. */
 export const MAT_STUBBLE = 'mod_stubble';
 /** Blush and eyeshadow. Like the stubble decal it is built at runtime rather
- *  than shipped in the GLB — but unlike it, the COLOURS are baked into the map
+ *  than shipped in the GLB, but unlike it, the COLOURS are baked into the map
  *  (two layers, two shades, one material), so this one is never tinted. */
 export const MAT_MAKEUP = 'mod_makeup';
-/** Teeth. Never recoloured — they are teeth. */
+/** Teeth. Never recoloured, they are teeth. */
 export const MAT_TOOTH = 'mod_tooth';
 /** The mouth line and the inside of an open mouth.
  *
  *  NOT `mod_eye`, even though both are near-black: `recolored()` routes mod_eye
  *  through the player's EYE wheel, so sharing it painted the mouth line to match
- *  the irises — pick blue eyes and you got a blue mouth. Its colour also has to
+ *  the irises, pick blue eyes and you got a blue mouth. Its colour also has to
  *  differ from mod_eye's for a second reason: the glTF exporter merges materials
  *  whose settings are identical, so an exact copy comes back out of the asset AS
  *  mod_eye and the bug returns silently. */
 export const MAT_MOUTH = 'mod_mouth';
 
-/** Armour materials — one per class atlas, plus the paladin's second (metallic)
+/** Armour materials, one per class atlas, plus the paladin's second (metallic)
  *  slot, whose per-face split is what gives that set its metal highlights. */
 export const ARMOR_MATERIALS: ReadonlySet<string> = new Set<string>([
   ...ARMOR_SETS,
@@ -1147,7 +1147,7 @@ export function isArmorMaterial(name: string | undefined | null): boolean {
 // Runtime rather than build time, because it is now a per-character choice:
 // `assembleModular` swaps the material on the `E2_*` meshes only. `default`
 // keeps the authored atlas ride, which is the one look that varies WITHIN a
-// set (the runic set is iron with a gold stud) — every named material is one
+// set (the runic set is iron with a gold stud), every named material is one
 // substance across the whole set, exactly as the studio bakes it.
 //
 // Colours are the sRGB form of jewel.py's LINEAR baseColorFactor values
@@ -1175,7 +1175,7 @@ export interface JewelMaterialSpec {
 }
 
 /** Twinned with JEWEL_MATERIALS in tmp/modular/jewel.py and the preset table
- *  in scripts/asset_pipeline/fit_studio/anchors.js — keep the three in sync. */
+ *  in scripts/asset_pipeline/fit_studio/anchors.js, keep the three in sync. */
 export const EARRING_MATERIALS: Record<Exclude<EarringMaterial, 'default'>, JewelMaterialSpec> = {
   gold: { color: 0xebcb76, metalness: 1.0, roughness: 0.34 },
   silver: { color: 0xdadee3, metalness: 1.0, roughness: 0.28 },
@@ -1205,8 +1205,8 @@ export function earringMaterialSpec(app: ModularAppearance): JewelMaterialSpec |
 
 /** The material a HAIR BAND wears.
  *
- *  The same picker as the piercings — a band rides the jewel material path
- *  because its node is `E2_band_*` — but it must NOT be gated on the earring
+ *  The same picker as the piercings, a band rides the jewel material path
+ *  because its node is `E2_band_*`, but it must NOT be gated on the earring
  *  slot the way earringMaterialSpec is. A band is worn with the HAIR, so a
  *  player wearing no piercings at all still has a tie in their chosen metal,
  *  and moving the picker has to repaint it (Troy, 2026-08-07: "the jewellery
@@ -1231,19 +1231,19 @@ export function earringSwatchHex(id: EarringMaterial): number | null {
 
 // --- outfit colorways --------------------------------------------------------
 //
-// Each class atlas keeps its leather, wood and metal in the 0–30° hue band and
+// Each class atlas keeps its leather, wood and metal in the 0 to 30° hue band and
 // puts the set's SIGNATURE cloth in one distinct accent band (measured from
 // the shipped atlases): the knight's crimson, the paladin's and ranger's teal,
 // the rogue's green, the mage's violet-through-pink, the druid's leaf range.
-// A colorway re-dyes that band ONLY — rotate its hue to a target, scale its
-// saturation and lightness — so straps stay leather and plate stays steel
+// A colorway re-dyes that band ONLY, rotate its hue to a target, scale its
+// saturation and lightness, so straps stay leather and plate stays steel
 // while the outfit itself changes colour. The shader does the work at draw
 // time (assets.ts armorDyed): the atlases ship ktx2-compressed, so there are
 // no pixels to edit on the CPU, and one uniform-driven program serves every
 // set and every colorway.
 
 /** Where a set's dyeable cloth lives in its atlas: band centre + half-width,
- *  in degrees of hue. `paladin_metallic` shares the paladin's band — it is the
+ *  in degrees of hue. `paladin_metallic` shares the paladin's band, it is the
  *  same atlas through a second (metallic) material. */
 export const ARMOR_DYE_BANDS: Record<ArmorSetId, { ref: number; band: number }> = {
   knight: { ref: 350, band: 28 },
@@ -1312,8 +1312,8 @@ export const OUTFIT_COLORWAYS: readonly OutfitColorwayDef[] = [
 // (h~26 s~0.32 v~0.96), brown LEATHER (h~17 s~0.55 v~0.66), near-gray STEEL
 // at several values (s <= ~0.10), and each set's saturated accent CLOTH in
 // its ARMOR_DYE_BANDS band. A material colorway re-dresses each of those
-// zones with its own rule — bright plate to gold, steel to bronze, leather to
-// mahogany — so every part of a set reads as a different material instead of
+// zones with its own rule, bright plate to gold, steel to bronze, leather to
+// mahogany, so every part of a set reads as a different material instead of
 // one flat repaint. Rules select in HSV (hue band + sat/val trapezoids, all
 // measured off the atlas, never guessed) and remap hue/sat/val; the shader
 // (assets.ts attachArmorDye) evaluates every rule from the ORIGINAL texel so
@@ -1321,7 +1321,7 @@ export const OUTFIT_COLORWAYS: readonly OutfitColorwayDef[] = [
 
 /** One dye rule: an HSV zone selector plus the remap applied inside it.
  *  Selector edges are smoothstep pairs; omit a bound to leave it open.
- *  JSON-safe on purpose — specs ride Material.userData across clones. */
+ *  JSON-safe on purpose, specs ride Material.userData across clones. */
 export interface DyeRule {
   /** hue selector: band centre + width, weight 1 inside 0.7*band falling to 0
    *  at band (the legacy dye's curve). A band >= 400 selects every hue. */
@@ -1333,15 +1333,15 @@ export interface DyeRule {
   /** value (brightness) window, same shape. */
   val: readonly [number, number, number, number];
   /** hue remap: 'keep' leaves the texel's hue; 'abs' pins hue to `hue` (what
-   *  gray steel needs — its native hue is noise); 'rel' rotates the band so
+   *  gray steel needs, its native hue is noise); 'rel' rotates the band so
    *  in-band variation survives (the legacy dye's behaviour). */
   hueMode: 'keep' | 'abs' | 'rel';
   hue: number;
-  /** sat' = clamp(sat * satMul + satAdd) — the ADD is what lets near-gray
+  /** sat' = clamp(sat * satMul + satAdd), the ADD is what lets near-gray
    *  steel take real gold saturation (a multiplier of gray stays gray). */
   satMul: number;
   satAdd: number;
-  /** val' = clamp(val * valMul + valAdd) — the ADD compresses toward a target
+  /** val' = clamp(val * valMul + valAdd), the ADD compresses toward a target
    *  (bone from dark iron AND bright steel) instead of scaling past white. */
   valMul: number;
   valAdd: number;
@@ -1363,7 +1363,7 @@ interface DyeZoneSel {
 }
 interface SetDyeZones {
   steel: DyeZoneSel;
-  /** the dark recesses of the steel zone (joints, chainmail shadow) — listed
+  /** the dark recesses of the steel zone (joints, chainmail shadow), listed
    *  AFTER steel so its treatment wins where the two overlap. */
   steelShadow: DyeZoneSel;
   bright: DyeZoneSel;
@@ -1375,7 +1375,7 @@ function zonesFor(set: ArmorSetId): SetDyeZones {
   const accent = ARMOR_DYE_BANDS[set];
   // Selector edges are WIDE feathers on purpose (2026-08-07, Troy: "blocky
   // textures"): the atlases ship basis-compressed, whose 4x4 blocks jitter
-  // sat/val by up to ~0.04, and the KayKit swatches are vertical gradients —
+  // sat/val by up to ~0.04, and the KayKit swatches are vertical gradients,
   // a narrow smoothstep edge turns both into hard patchwork at the boundary.
   // Every edge below sits in a measured gap between texel clusters (UV-
   // sampled histograms of the shipped atlases) with enough feather that a
@@ -1383,7 +1383,7 @@ function zonesFor(set: ArmorSetId): SetDyeZones {
   //
   // barbarian: the fur pelt lives at s 0.11-0.20 right above the true steel
   // (studs/buckles, s <= 0.05). The old gate [0.09,0.13] sliced the fur's own
-  // gradient in half — half-dyed fur was the visible blockiness. The gate now
+  // gradient in half, half-dyed fur was the visible blockiness. The gate now
   // closes UNDER the fur so the whole pelt stays fur.
   // ([0.06,0.12] and not lower: the set's blued-steel trim measures s~0.09
   // cool-hued and still wants ~half the treatment; the fur's brightest tips
@@ -1413,11 +1413,11 @@ function zonesFor(set: ArmorSetId): SetDyeZones {
       val: [...OPEN_LO, 0.45, 0.6],
     },
     // the DOMINANT surface on every set (measured 20-60% of vertices): the
-    // warm pale swatch KayKit paints plate brights, robes and pads with —
+    // warm pale swatch KayKit paints plate brights, robes and pads with,
     // this zone is where a colorway's signature material has to land or the
     // armour visibly doesn't change. The sat window reaches 0.72-0.80 so the
-    // paladin's SATURATED gold trim (h 31-43, s 0.6-0.7, v 0.9+) — measured
-    // in no zone at all before, so it sat undyed next to dyed plate — lands
+    // paladin's SATURATED gold trim (h 31-43, s 0.6-0.7, v 0.9+), measured
+    // in no zone at all before, so it sat undyed next to dyed plate, lands
     // here; the val floor reaches down the swatch gradient instead of
     // cutting across it.
     bright: { ref: 26, band: 34, sat: [0.2, 0.26, 0.72, 0.8], val: [0.72, 0.84, ...OPEN_HI] },
@@ -1552,7 +1552,7 @@ export function outfitDye(
         band,
         // Cloth-only gate. This was the legacy metal gate smoothstep(0.10,
         // 0.22, sat), which let the ranger/paladin/barbarian SHIRT's cool
-        // near-gray shading texels (h~180-210, s 0.09-0.15 — inside the teal
+        // near-gray shading texels (h~180-210, s 0.09-0.15, inside the teal
         // accent band) catch partial dye and read as blocky patches on the
         // cream cloth (Troy, 2026-08-07). Every set's true accent cloth
         // measures s >= 0.41, so the floor sits well above the grays with a
@@ -1578,7 +1578,7 @@ function smoothstep(a: number, b: number, x: number): number {
 }
 
 /** TS mirror of the shader: one texel (h,s,v) through a rule list. Used only
- *  to render honest swatch chips — the chip shows the actual treatment the
+ *  to render honest swatch chips, the chip shows the actual treatment the
  *  zone's measured anchor colour would get. */
 function applyDyeRules(
   rules: readonly DyeRule[],
@@ -1677,14 +1677,14 @@ export function allModularNodes(): string[] {
  *
  * A worn slot swaps its base parts out for the armour piece, so nothing is ever
  * drawn twice and the bare body never z-fights through plate. `back` is the one
- * additive slot. Hair and brows are dropped under a helm — KayKit's helmet is a
+ * additive slot. Hair and brows are dropped under a helm, KayKit's helmet is a
  * closed shell and loose hair pokes straight through it.
  */
 export function modularPartNames(app: ModularAppearance, worn: ArmorLoadout = {}): string[] {
   const body = BODY_BY_SLOT[app.gender] ?? BODY_BY_SLOT.male;
   const out: string[] = [];
   // Eyes are body and no headgear in the set covers them, so they are always
-  // drawn. The EARS survive a hat (it sits above them) but not a full helm —
+  // drawn. The EARS survive a hat (it sits above them) but not a full helm,
   // the shell sits where the ear is and the ear pokes straight out through it,
   // so a closed-helm character loses the ears (and with them the earrings,
   // which hang off the lobe). helmKind() tests for an actual head PIECE, not
@@ -1716,7 +1716,7 @@ export function modularPartNames(app: ModularAppearance, worn: ArmorLoadout = {}
   // as a mannequin behind the visor.
   out.push(...browNodes(app.gender, app.brows));
   // Hair follows the helm kind: its own volume bare-headed, nothing under a
-  // closed helm (the shell swallows it), and under a hat the length rule —
+  // closed helm (the shell swallows it), and under a hat the length rule,
   // short cuts and updos tuck away to nothing, long falls render as `layered`
   // hanging below the brim (see effectiveHairStyle).
   const hair = effectiveHairStyle(app.hair, helm);
@@ -1736,12 +1736,25 @@ export function modularGeometryKey(app: ModularAppearance, worn: ArmorLoadout = 
   return modularPartNames(app, worn).join(',');
 }
 
-/** Identity of the whole look, colours included — for "did the preview change?".
+/** Every morph target a face or body SLIDER can drive, both halves of each
+ *  pair. The in-place writer needs the whole list, not just the non-zero half:
+ *  returning a slider to neutral has to clear the influence it set. */
+export const MORPH_SLIDER_TARGETS: readonly string[] = [
+  ...FACE_SLIDERS.flatMap((k) => [`${k}_up`, `${k}_dn`]),
+  ...BODY_SLIDERS.flatMap((k) => [`body_${k}_up`, `body_${k}_dn`]),
+];
+
+/** The part of the look a REBUILD depends on: geometry, decals, materials.
+ *
+ *  Everything the slider morphs do not cover, which is why they are excluded:
+ *  three copies morphTargetInfluences per instance, so a slider moves on the
+ *  live body (CharacterVisual.applyModularSliders) instead of disposing it and
+ *  cloning a new one per 5% step of a drag.
  *
  *  The decal styles belong HERE and not in the geometry key: they add no part,
  *  so buzz and bald compose the same cached variant, but they are absolutely a
  *  visible change and the preview has to rebuild for them. */
-export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}): string {
+export function modularBuildSignature(app: ModularAppearance, worn: ArmorLoadout = {}): string {
   return [
     modularGeometryKey(app, worn),
     stubbleDecalKey(app, worn),
@@ -1751,11 +1764,6 @@ export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}
     app.hairHue.toFixed(1),
     app.hairSat.toFixed(3),
     app.hairLight.toFixed(3),
-    // geometry is shared across face shapes (morphs are per-instance), so the
-    // face belongs in the SIGNATURE but never in modularGeometryKey
-    FACE_SLIDERS.map((k) => (app.face?.[k] ?? 0).toFixed(2)).join(','),
-    // the body sliders are morphs too, same rule
-    BODY_SLIDERS.map((k) => (app.body?.[k] ?? 0).toFixed(2)).join(','),
     // the mouth is a PART, so modularGeometryKey above already carries it
     // the jewellery material only repaints the E2 meshes, so like the outfit
     // colorway it is a signature field and never a geometry one
@@ -1769,7 +1777,7 @@ export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}
     // Makeup belongs here and NOT in modularGeometryKey for the same reason the
     // decals do: lipstick only recolours a part the look already has, and the
     // blush/eyeshadow decal is cut from the head at compose time. Neither adds
-    // a node, so the geometry is shared with a bare face — but a shade change
+    // a node, so the geometry is shared with a bare face, but a shade change
     // still has to rebuild the variant, or the creation turntable looks dead.
     makeupKey(app, worn),
     // The outfit colorway is a material dye on the armour pieces: no node
@@ -1778,10 +1786,26 @@ export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}
   ].join('|');
 }
 
+/** Identity of the WHOLE look, sliders included: "is this the same character?".
+ *
+ *  What a cached artefact of the finished body (a portrait snapshot) keys on,
+ *  as opposed to modularBuildSignature, which answers the narrower "does the
+ *  body have to be rebuilt?". Composed from it so the two cannot drift. */
+export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}): string {
+  return [
+    modularBuildSignature(app, worn),
+    // geometry is shared across face shapes (morphs are per-instance), so the
+    // face belongs in the SIGNATURE but never in modularGeometryKey
+    FACE_SLIDERS.map((k) => (app.face?.[k] ?? 0).toFixed(2)).join(','),
+    // the body sliders are morphs too, same rule
+    BODY_SLIDERS.map((k) => (app.body?.[k] ?? 0).toFixed(2)).join(','),
+  ].join('|');
+}
+
 /**
  * Morph-target influences for a look, by target NAME.
  *
- * A slider maps to a PAIR — `nose_up` at +v, `nose_dn` at -v — because a morph
+ * A slider maps to a PAIR, `nose_up` at +v, `nose_dn` at -v, because a morph
  * influence cannot go negative. Only the non-zero half is emitted, so a neutral
  * face costs nothing.
  *
@@ -1806,13 +1830,13 @@ export function morphInfluences(app: ModularAppearance): Map<string, number> {
   }
   // The ear STYLE is a part swap, but an earring cannot be swapped with it
   // without shipping one earring per ear per style. It carries a morph per
-  // style instead, moving it onto that ear's lobe — the lobe travels 32mm up
+  // style instead, moving it onto that ear's lobe, the lobe travels 32mm up
   // for `small` and 15mm down and 20mm out for `wide`, so a fixed earring hangs
   // in mid air. `round` is the base shape and so has no morph, like the neutral
   // mouth. Only the earring meshes carry these; applyMorphs ignores the rest.
   if (app.ears && app.ears !== 'round') out.set(`ear_${app.ears}`, 1);
   // The FACE piercings (septum ring, nostril stud, brow bar) are built once
-  // against the male head like the earrings are — but unlike the ears, the two
+  // against the male head like the earrings are, but unlike the ears, the two
   // heads' noses genuinely differ (the female septum sits ~17mm higher), so a
   // male-seated ring hangs in open air under her nose. `jewel_f` reseats just
   // those pieces; only the sets that have one carry the target.
@@ -1868,13 +1892,13 @@ export function eyeColor(app: ModularAppearance): number {
 // --- randomiser style pools --------------------------------------------------
 //
 // These gate the DICE ONLY. The customizer's own pickers still offer every
-// style to every body — a female character can still be given a full beard or
+// style to every body, a female character can still be given a full beard or
 // a flat-top by hand, and that is deliberate. What the randomiser owes the
 // player is a plausible character on the first roll, and rolling a beard onto
 // a female body (Troy, 2026-08-07) reads as a bug rather than as a choice.
 //
 // Anything not named in either set is UNISEX and rolls for both, which is
-// where most of the library sits — the two lists are the leaning tails, not a
+// where most of the library sits, the two lists are the leaning tails, not a
 // partition.
 const MASCULINE_ROLL_HAIR = new Set<HairStyle>([
   'bald',
@@ -1914,7 +1938,7 @@ export function randomHairStyles(gender: Gender): readonly HairStyle[] {
  * Pure, and takes its randomness as an argument, so a test can pin it. Colours
  * are drawn from RANGES rather than uniformly over the wheel: hair and eyes get
  * the whole hue circle (this is a game with purple-haired warriors in it), but
- * skin stays inside a believable arc — a uniform hue there just produces green
+ * skin stays inside a believable arc, a uniform hue there just produces green
  * people, which reads as a bug rather than as a choice.
  */
 export function randomizeAppearance(
@@ -1927,20 +1951,20 @@ export function randomizeAppearance(
   const hairHue = span(0, 360);
   const hairSat = span(0.05, 0.85);
   const hairLight = span(0.05, 0.8);
-  // Facial hair is rolled for the MALE body only (Troy, 2026-08-07) — and
+  // Facial hair is rolled for the MALE body only (Troy, 2026-08-07), and
   // that covers the painted stubble/scruff decals too, since those are
   // facial hair the same as a volume is. A female roll is always clean; the
   // beard picker still reaches her if the player wants one.
   // Among male rolls most still come out clean-shaven: a beard should feel
   // like a result, not the default.
   // Both draws happen either way so the random STREAM does not depend on the
-  // gender — a seeded test rolling the same sequence gets the same eyes and
+  // gender, a seeded test rolling the same sequence gets the same eyes and
   // skin on both bodies, and only the facial hair differs.
   const beardRoll = rand();
   const beardPick = of(BEARD_STYLES);
   const beard = base.gender === 'female' || beardRoll < 0.34 ? 'none' : beardPick;
   // the lash usually follows the hair, because that is what it does on a real
-  // head — the wheel exists for the times it should not
+  // head, the wheel exists for the times it should not
   const matchLash = rand() < 0.7;
   return normalizeAppearance({
     ...base,
@@ -1985,7 +2009,7 @@ export function randomizeAppearance(
 }
 
 /** Whether a body wears lashes unless told otherwise: the female standard, and
- *  off on the male. It is only the DEFAULT that is gendered — the customizer's
+ *  off on the male. It is only the DEFAULT that is gendered, the customizer's
  *  toggle still reaches both, so a male character can wear them on purpose. The
  *  gender row applies this on a switch, which is what makes "standard on the
  *  female" true of a body you change your mind about. */

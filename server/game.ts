@@ -6593,8 +6593,9 @@ export class GameServer {
         sim.toggleWeaponStow(pid);
         break;
       // Paperdoll eye toggle: cosmetic helmet-visibility preference. Explicit
-      // boolean (not a toggle) so the client's stored choice can be re-asserted
-      // idempotently on every world entry.
+      // boolean (not a toggle) so it is idempotent: the client sends the state
+      // its paperdoll is showing. Persistence is the character save's job
+      // (CharacterState.helmHidden), never a client-side store.
       case 'set_helm':
         sim.setHelmHidden(msg.hidden === true, pid);
         break;
