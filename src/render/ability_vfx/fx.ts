@@ -1459,12 +1459,13 @@ export class AbilityVfxFx implements SequencerHost {
     // The stunned-star bands draw FIRST in the frame's overlay batch: the
     // stun tell is actionable information, so capacity contention with the
     // decorative sprites that follow must never be able to drop it. The band
-    // count is itself bounded (MAX_STUN_STAR_BANDS nearest the camera), so a
-    // raid-wide mass stun cannot starve the windup telegraphs and worn-debuff
-    // bands drawn after it. While an entity's band is live, the sequencer's
-    // cast-moment ccStars stand down for it (heldStunStars below; same
-    // constants, same time base, painter-matched accent), so the two are one
-    // continuous read, never a double draw and never a fade-out dip.
+    // count is itself bounded (MAX_STUN_STAR_BANDS), so a raid-wide mass stun
+    // cannot starve the windup telegraphs and worn-debuff bands drawn after
+    // it, and the slots go to bands IN FRONT of the camera before any behind
+    // it (stunBandRankKey owns why that is a fairness rule, not polish).
+    // The sequencer's cast-moment ccStars stand down only for the bands that
+    // actually win a slot here, so the two are one continuous read for a
+    // drawn band, and a band the cap drops still reads through the burst.
     let stunPicks = 0;
     for (const [id, s] of this.stunStars) {
       if (s.stamp !== this.frame) {

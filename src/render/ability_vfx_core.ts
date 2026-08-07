@@ -358,9 +358,10 @@ export function planImpact(
 // aura KIND, never the spec table, so every stun source (player abilities,
 // mob stomps, traps) reads without authoring a spec. The sequencer's
 // cast-moment ccStars band shares these constants and the same time base and
-// STANDS DOWN while this band is live for the same victim (heldStunStars on
-// the SequencerHost seam): never a double draw, and never a dip where the
-// cast band's fade-out tail hides the held band's full alpha. A stun is
+// STANDS DOWN for any victim whose band actually WINS a draw slot this frame
+// (heldStunStars on the SequencerHost seam): never a double draw, never a dip
+// where the cast band's fade-out tail hides the held band's full alpha, and
+// never a capped-out victim left with no overhead read at all. A stun is
 // actionable information (the PvP "why can't I act"
 // read), so the painter feeds it outside the cast budget, no quality tier
 // sheds it, and the alpha floor keeps it readable for the stun's whole life
