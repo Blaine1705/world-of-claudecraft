@@ -75,7 +75,15 @@ export function refreshMatchPetSnapshot(
  */
 export function noteMatchPetUnravelled(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
-  notePetReturnUnravelled(ctx.arenaMatches.get(pet.ownerId)?.preMatchPets?.get(pet.ownerId), pet);
+  // Both match kinds, because a demon's corpse is the ONLY signal the rebuild
+  // arm has: an owner can be in one match at a time, but a lookup that knows
+  // about only one of them silently strands the other's demon. That is exactly
+  // what happened while the battleground carried no pet round trip at all, and
+  // the arm fails quietly (the entity id is simply gone by restore time), so
+  // it is worth naming here rather than leaving to the reader.
+  const owner = pet.ownerId;
+  notePetReturnUnravelled(ctx.arenaMatches.get(owner)?.preMatchPets?.get(owner), pet);
+  notePetReturnUnravelled(ctx.bgMatches.get(owner)?.preMatchPets?.get(owner), pet);
 }
 
 /**

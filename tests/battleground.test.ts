@@ -7,6 +7,7 @@ import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invis
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
+import { restorePet, summonPet } from '../src/sim/pet/pet_commands';
 import {
   awardBattlegroundHonor,
   BATTLEGROUND_ASSIST_HONOR,
@@ -49,7 +50,7 @@ import {
   drainBgOutcomes,
   recordBgOutcome,
 } from '../src/sim/social/battleground_outcomes';
-import { DT, type SimEvent } from '../src/sim/types';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // The staged 5v5 arms (graveyard no-auto-release, the 720s cap, the fairness
@@ -2893,5 +2894,91 @@ describe('the outcome log stays observability-only', () => {
       'src/sim/sim_context.ts', // the live view
       'src/sim/social/battleground.ts', // the one write site
     ]);
+  });
+});
+
+describe('Thornhollow Fields: a pet that walks in alive walks back out alive', () => {
+  // The arena has kept this parenthesis since issue #1600 (ArenaMatch.preMatchPets),
+  // but the battleground never had it, and a wave respawn raises only the fighter.
+  // So a hunter, warlock or mage who lost their companion mid-match left the field
+  // still without it: most of their kit gone for one death, in rated content.
+  const petOwnerInMatch = (
+    cls: 'hunter' | 'warlock',
+  ): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? cls : 'warrior', `P${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      sim.entities.get(pid)!.level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    const pet =
+      cls === 'hunter'
+        ? (restorePet(sim.ctx, sim.entities.get(owner)!, {
+            templateId: 'wild_boar',
+            name: 'Rip',
+            level: 20,
+            hp: 40,
+            dead: false,
+            mode: 'defensive',
+          }),
+          sim.petOf(owner, true)!)
+        : (summonPet(sim.ctx, sim.entities.get(owner)!, 'emberkin'), sim.petOf(owner)!);
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick();
+    const match = sim.ctx.bgMatches.get(owner)!;
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands a beast back up beside its owner when the match ends', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    kill(sim, pet.id);
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+    // Beside the owner at their return spot, never left out on the field.
+    const ownerEntity = sim.entities.get(owner)!;
+    expect(
+      Math.hypot(back!.pos.x - ownerEntity.pos.x, back!.pos.z - ownerEntity.pos.z),
+    ).toBeLessThan(12);
+  });
+
+  it('rebuilds a warlock demon, whose corpse does not survive its death', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('warlock');
+    const originalId = pet.id;
+    kill(sim, pet.id);
+    // Let the demon's corpse unravel: this is the arm that cannot revive in place.
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+    expect(back!.id).not.toBe(originalId); // a rebuild, not a revive in place
+  });
+
+  it('hands the pet back to a deserter too, since leaving is also an exit', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    kill(sim, pet.id);
+    bgResolveDesertion(sim.ctx, owner);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
+
+  it('never hands back a pet that was already a corpse on the way in', () => {
+    // Only what the match took is owed back, the same rule the arena applies.
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    const other = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    expect(match.preMatchPets.has(other)).toBe(false);
+    expect(pet.dead).toBe(false);
   });
 });
