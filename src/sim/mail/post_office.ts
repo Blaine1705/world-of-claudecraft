@@ -157,11 +157,21 @@ export class PostOffice {
   // pillar (the same gate mailInfoFor applies), else the current revision.
   // Server-only, never IWorld (the market browseRevFor precedent).
   mailRevFor(pid: number): number | null {
+    if (!this.mailboxViewer(pid)) return null;
+    return this.rev;
+  }
+
+  // The ONE viewer gate the mailbox view and its change signal share: a
+  // resolvable player standing near a raven pillar. mailRevFor and mailInfoFor
+  // both read through this so the two can never drift apart (a one-sided
+  // condition added later, the dead-gate mailTake already applies being the
+  // likely candidate, would ship a stale non-null inbox or a spurious null).
+  private mailboxViewer(pid: number): { meta: PlayerMeta; e: Entity } | null {
     const meta = this.ctx.players.get(pid);
     const e = this.ctx.entities.get(pid);
     if (!meta || !e) return null;
     if (!this.nearMailbox(e)) return null;
-    return this.rev;
+    return { meta, e };
   }
 
   // Public tick entry: the Sim tick calls this in the end-of-tick system block
@@ -554,11 +564,17 @@ export class PostOffice {
       return;
     }
     const hadAttachments = m.copper > 0 || m.items.length > 0;
+    // Bump only when something observable moved: the revision is realm-global,
+    // so an unconditional bump would let a repeat-take on an already-emptied,
+    // already-read letter force an inbox rebuild for every near-pillar viewer
+    // per command, at the command-lane rate.
+    let mutated = false;
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       meta.copper += m.copper;
       this.result(meta.entityId, 'collected', { value: m.copper });
       m.copper = 0;
+      mutated = true;
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
@@ -586,12 +602,14 @@ export class PostOffice {
         kept.push(s);
       }
     }
+    if (kept.length !== m.items.length) mutated = true;
     m.items = kept;
     // Tending the letter marks it read (drops it from the unread index once).
-    this.index.markRead(m, this.ctx.time);
-    // One bump covers every take outcome (coin collected, parcels granted or
-    // kept, the read flip): each changes what mailInfoFor shows.
-    this.bumpRev();
+    if (!m.read) {
+      this.index.markRead(m, this.ctx.time);
+      mutated = true;
+    }
+    if (mutated) this.bumpRev();
     if (kept.length > 0) {
       // Attachments remain: expiresAt is untouched here, so the letter's
       // existing clock keeps running. That is Infinity for system/npc mail
@@ -606,6 +624,8 @@ export class PostOffice {
     // system/npc mail, the attachment window for player parcels, either way a
     // returned letter included) and starts the standard emptied-letter window.
     // Only the take that empties it fires, so a repeat take never extends it.
+    // No extra bump for the expiry-clock write: reaching here means the take
+    // emptied real attachments, so `mutated` already bumped above.
     if (hadAttachments) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
   }
 
@@ -740,12 +760,12 @@ export class PostOffice {
   }
 
   mailInfoFor(pid: number): import('../../world_api').MailInfo | null {
-    const meta = this.ctx.players.get(pid);
-    const e = this.ctx.entities.get(pid);
-    if (!meta || !e) return null;
     // The post is a place you visit: only stream it while standing at a raven
-    // pillar, which also bounds the per-snapshot wire cost.
-    if (!this.nearMailbox(e)) return null;
+    // pillar (the shared mailboxViewer gate, lockstep with mailRevFor), which
+    // also bounds the per-snapshot wire cost.
+    const viewer = this.mailboxViewer(pid);
+    if (!viewer) return null;
+    const meta = viewer.meta;
     const mine = this.deliveredFor(meta).sort((a, b) => b.deliverAt - a.deliverAt || b.id - a.id);
     return {
       messages: mine.map((m) => ({

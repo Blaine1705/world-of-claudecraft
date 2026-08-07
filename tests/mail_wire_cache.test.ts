@@ -136,6 +136,35 @@ describe('the mail revision signal (mailRevFor)', () => {
     expect(rawRev(sim)).toBeGreaterThan(rev);
   });
 
+  it('a take that observably moves nothing does not bump (repeat take, refused take)', () => {
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    const bob = sim.addPlayer('mage', 'Bob');
+    sim.mailSendResolved({ key: String(bob), name: 'Bob' }, 'Coin', 'Words.', 40, [], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+    const info = sim.mailInfoFor(bob);
+    const coin = info?.messages.find((m) => m.subject === 'Coin');
+    if (!coin) throw new Error('missing letter');
+
+    // First take moves the coin and flips read: one bump.
+    let rev = rawRev(sim);
+    sim.mailTake(coin.id, bob);
+    expect(rawRev(sim)).toBeGreaterThan(rev);
+
+    // Repeat take on the emptied, already-read letter: nothing observable
+    // moves, so the realm-global revision must hold (a spammed take must not
+    // force inbox rebuilds for every near-pillar viewer).
+    rev = rawRev(sim);
+    sim.mailTake(coin.id, bob);
+    expect(rawRev(sim)).toBe(rev);
+
+    // A refused take (no such letter) holds too.
+    rev = rawRev(sim);
+    sim.mailTake(999_999, bob);
+    expect(rawRev(sim)).toBe(rev);
+  });
+
   it('advances when the sweep expires a letter and when a parcel flies home', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
