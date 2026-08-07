@@ -159,9 +159,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '전쟁 북',
   'entities.abilities.chain_lightning.name': '갈래 번개',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
-  'entities.abilities.cleansing_verdict.name': '정화의 심판',
-  'entities.abilities.cleansing_verdict.description':
-    '아군 대상의 해로운 마법 효과 하나를 정화하고 생명력을 {damage}만큼 회복합니다.',
   'entities.abilities.cloak_of_shadows.name': '그림자망토',
   'entities.abilities.cone_of_cold.name': '서리휩쓸기',
   'entities.abilities.curse_of_exhaustion.name': '납빛 저주',
@@ -171,7 +168,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)',
   'entities.abilities.desperate_prayer.name': '마지막 기도',
   'entities.abilities.deterrence.name': '가시수호',
-  'entities.abilities.divine_shield.name': '빛의 수호',
   'entities.abilities.earthbind.name': '붙드는 대지',
   'entities.abilities.evocation.name': '에테르샘',
   'entities.abilities.frenzied_regeneration.name': '야성 치유',
@@ -179,7 +175,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '망령의 일격',
   'entities.abilities.hammer_of_wrath.name': '울림 망치',
   'entities.abilities.healing_stream.name': '샘물',
-  'entities.abilities.holy_wrath.name': '성자의 분노',
   'entities.abilities.howl_of_terror.name': '공포의 울부짖음',
   'entities.abilities.ice_block.name': '차가운 관',
   'entities.abilities.inner_focus.name': '고요한 마음',
@@ -9660,9 +9655,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
     '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
-  'entities.abilities.aura_surge.name': '여명의 도탄',
-  'entities.abilities.aura_surge.description':
-    '여명으로 벼린 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, 10미터 안의 추가 적 최대 2명에게 튕기며 도탄마다 75%의 피해를 입힙니다. (성기사 특성)',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description':
@@ -9687,8 +9679,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)',
   'entities.abilities.deterrence.description':
     '10초 동안 회피 확률을 50%포인트 증가시킵니다. (사냥꾼 특성)',
-  'entities.abilities.divine_shield.description':
-    '신성한 힘으로 자신을 보호해 8초 동안 900의 피해를 흡수합니다. (성기사 특성)',
   'entities.abilities.earthbind.description':
     '주위 적을 대지에 묶어 2초 동안 이동하지 못하게 합니다. (주술사 특성)',
   'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
@@ -9702,8 +9692,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만일 때만 사용할 수 있습니다. (성기사 특성)',
   'entities.abilities.healing_stream.description':
     '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
-  'entities.abilities.holy_wrath.description':
-    '신성한 힘을 방출해 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
   'entities.abilities.howl_of_terror.description':
     '주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)',
   'entities.abilities.ice_block.description':

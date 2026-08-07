@@ -9650,22 +9650,6 @@ export const ja_JP: EnTranslations = {
       "revive_pet": {
         "name": "応急処置",
         "description": "ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。"
-      },
-      "cleansing_verdict": {
-        "name": "浄化の裁定",
-        "description": "味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。"
-      },
-      "divine_shield": {
-        "name": "光の護り",
-        "description": "聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）"
-      },
-      "holy_wrath": {
-        "name": "聖者の怒り",
-        "description": "聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）"
-      },
-      "aura_surge": {
-        "name": "曙光の跳弾",
-        "description": "曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）"
       }
     },
     "items": {

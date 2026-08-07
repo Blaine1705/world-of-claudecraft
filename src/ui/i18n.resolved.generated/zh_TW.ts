@@ -9650,22 +9650,6 @@ export const zh_TW: EnTranslations = {
       "revive_pet": {
         "name": "修補",
         "description": "修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。"
-      },
-      "cleansing_verdict": {
-        "name": "淨化裁決",
-        "description": "淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。"
-      },
-      "divine_shield": {
-        "name": "聖光守護",
-        "description": "以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）"
-      },
-      "holy_wrath": {
-        "name": "聖徒之怒",
-        "description": "釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）"
-      },
-      "aura_surge": {
-        "name": "曙光彈射",
-        "description": "擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）"
       }
     },
     "items": {

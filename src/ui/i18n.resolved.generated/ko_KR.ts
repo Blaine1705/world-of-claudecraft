@@ -9650,22 +9650,6 @@ export const ko_KR: EnTranslations = {
       "revive_pet": {
         "name": "응급 처치",
         "description": "소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다."
-      },
-      "cleansing_verdict": {
-        "name": "정화의 심판",
-        "description": "아군 대상의 해로운 마법 효과 하나를 정화하고 생명력을 {damage}만큼 회복합니다."
-      },
-      "divine_shield": {
-        "name": "빛의 수호",
-        "description": "신성한 힘으로 자신을 보호해 8초 동안 900의 피해를 흡수합니다. (성기사 특성)"
-      },
-      "holy_wrath": {
-        "name": "성자의 분노",
-        "description": "신성한 힘을 방출해 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)"
-      },
-      "aura_surge": {
-        "name": "여명의 도탄",
-        "description": "여명으로 벼린 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, 10미터 안의 추가 적 최대 2명에게 튕기며 도탄마다 75%의 피해를 입힙니다. (성기사 특성)"
       }
     },
     "items": {

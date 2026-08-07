@@ -159,9 +159,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戦の太鼓',
   'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
-  'entities.abilities.cleansing_verdict.name': '浄化の裁定',
-  'entities.abilities.cleansing_verdict.description':
-    '味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。',
   'entities.abilities.cloak_of_shadows.name': '影まとい',
   'entities.abilities.cone_of_cold.name': '霜払い',
   'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
@@ -169,7 +166,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後の祈り',
   'entities.abilities.deterrence.name': '針毛の守り',
-  'entities.abilities.divine_shield.name': '光の護り',
   'entities.abilities.earthbind.name': '大地の縛り',
   'entities.abilities.evocation.name': 'エーテルの井戸',
   'entities.abilities.frenzied_regeneration.name': '野生の癒し',
@@ -177,7 +173,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '亡霊の一撃',
   'entities.abilities.hammer_of_wrath.name': '鐘鳴りの槌',
   'entities.abilities.healing_stream.name': '湧き水',
-  'entities.abilities.holy_wrath.name': '聖者の怒り',
   'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
   'entities.abilities.ice_block.name': '冷たき棺',
   'entities.abilities.inner_focus.name': '静まる心',
@@ -9674,9 +9669,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '時の残響',
   'entities.abilities.temporal_echo.description':
     'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
-  'entities.abilities.aura_surge.name': '曙光の跳弾',
-  'entities.abilities.aura_surge.description':
-    '曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）',
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
@@ -9703,8 +9695,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
-  'entities.abilities.divine_shield.description':
-    '聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）',
   'entities.abilities.earthbind.description':
     '周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）',
   'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
@@ -9718,8 +9708,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
-  'entities.abilities.holy_wrath.description':
-    '聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）',
   'entities.abilities.howl_of_terror.description':
     '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':

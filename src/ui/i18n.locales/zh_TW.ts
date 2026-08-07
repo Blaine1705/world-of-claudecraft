@@ -160,9 +160,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戰鼓',
   'entities.abilities.chain_lightning.name': '叉狀閃電',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
-  'entities.abilities.cleansing_verdict.name': '淨化裁決',
-  'entities.abilities.cleansing_verdict.description':
-    '淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜橫掃',
   'entities.abilities.curse_of_exhaustion.name': '鉛沉妖咒',
@@ -170,7 +167,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後祈禱',
   'entities.abilities.deterrence.name': '鬃刺守衛',
-  'entities.abilities.divine_shield.name': '聖光守護',
   'entities.abilities.earthbind.name': '攫握大地',
   'entities.abilities.evocation.name': '乙太之井',
   'entities.abilities.frenzied_regeneration.name': '野性癒合',
@@ -178,7 +174,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '幽魂打擊',
   'entities.abilities.hammer_of_wrath.name': '鳴鐘之錘',
   'entities.abilities.healing_stream.name': '泉湧',
-  'entities.abilities.holy_wrath.name': '聖徒之怒',
   'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
   'entities.abilities.inner_focus.name': '靜心',
@@ -9231,9 +9226,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '時光迴響',
   'entities.abilities.temporal_echo.description':
     '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。',
-  'entities.abilities.aura_surge.name': '曙光彈射',
-  'entities.abilities.aura_surge.description':
-    '擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
   'entities.abilities.avenging_wrath.description':
@@ -9257,8 +9249,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.desperate_prayer.description': '立即為你恢復{damage}點生命值。（牧師天賦）',
   'entities.abilities.deterrence.description':
     '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
-  'entities.abilities.divine_shield.description':
-    '以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）',
   'entities.abilities.earthbind.description': '將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）',
   'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
@@ -9271,8 +9261,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
   'entities.abilities.healing_stream.description':
     '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
-  'entities.abilities.holy_wrath.description':
-    '釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
   'entities.abilities.ice_block.description':

@@ -157,9 +157,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
   'entities.abilities.chain_lightning.name': 'Разветвленная молния',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
-  'entities.abilities.cleansing_verdict.name': 'Очищающий приговор',
-  'entities.abilities.cleansing_verdict.description':
-    'Рассеивает вредоносный магический эффект с союзника и восстанавливает ему {damage} ед. здоровья.',
   'entities.abilities.cloak_of_shadows.name': 'Плащ теней',
   'entities.abilities.cone_of_cold.name': 'Ледяной взмах',
   'entities.abilities.curse_of_exhaustion.name': 'Свинцовое проклятие',
@@ -167,7 +164,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Мертвый мороз',
   'entities.abilities.desperate_prayer.name': 'Последняя молитва',
   'entities.abilities.deterrence.name': 'Колючий страж',
-  'entities.abilities.divine_shield.name': 'Световой оберег',
   'entities.abilities.earthbind.name': 'Хватка земли',
   'entities.abilities.evocation.name': 'Эфирный колодец',
   'entities.abilities.frenzied_regeneration.name': 'Дикое исцеление',
@@ -175,7 +171,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Призрачный удар',
   'entities.abilities.hammer_of_wrath.name': 'Звонкий молот',
   'entities.abilities.healing_stream.name': 'Источник',
-  'entities.abilities.holy_wrath.name': 'Гнев святого',
   'entities.abilities.howl_of_terror.name': 'Вой ужаса',
   'entities.abilities.ice_block.name': 'Холодный гроб',
   'entities.abilities.inner_focus.name': 'Утихший разум',
@@ -9821,9 +9816,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': 'Временное эхо',
   'entities.abilities.temporal_echo.description':
     'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его.',
-  'entities.abilities.aura_surge.name': 'Рикошет рассвета',
-  'entities.abilities.aura_surge.description':
-    'Бросает выкованный на рассвете щит, наносящий {damage} ед. урона от Света и лишающий основную цель возможности произносить заклинания на 2 сек. Затем щит отскакивает не более чем к 2 другим противникам в радиусе 10 м, нанося 75% урона за отскок. (талант паладина)',
   'entities.abilities.aspect_of_the_wild.description':
     'Воодушевляет союзников в радиусе 30 м дикой силой, повышая их силу атаки на 45 и скорость атаки на 5% на 5 мин. (талант охотника)',
   'entities.abilities.avenging_wrath.description':
@@ -9850,8 +9842,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно восстанавливает вам {damage} ед. здоровья. (талант жреца)',
   'entities.abilities.deterrence.description':
     'Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)',
-  'entities.abilities.divine_shield.description':
-    'Защищает вас святой силой, поглощающей 900 ед. урона в течение 8 сек. (талант паладина)',
   'entities.abilities.earthbind.description':
     'Привязывает ближайших противников к земле, обездвиживая их на 2 сек. (талант шамана)',
   'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
@@ -9865,8 +9855,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бросает священный молот в раненого противника, нанося {damage} ед. урона от Света. Можно использовать только при запасе здоровья ниже 20%. (талант паладина)',
   'entities.abilities.healing_stream.description':
     'Восстанавливает союзной цели 120 ед. здоровья за 12 сек. (талант шамана)',
-  'entities.abilities.holy_wrath.description':
-    'Высвобождает святую силу, нанося ближайшим противникам {damage} ед. урона. (талант паладина)',
   'entities.abilities.howl_of_terror.description':
     'Пугает ближайших противников на срок до 3 сек. Урон может прервать эффект. (талант чернокнижника)',
   'entities.abilities.ice_block.description':
