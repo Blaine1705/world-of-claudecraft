@@ -551,7 +551,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   for (const page of input.pages) pagesById.set(page.id, page);
   // One pass over the catalog instead of a re-scan per chip. Built only when
   // the ring holds something, so a fresh account pays nothing for it.
-  const relicPageIndex = input.recent.length > 0 ? buildRelicPageIndex(input.pages) : null;
+  const relicPageIndex = input.recent.length > 0 ? reliquaryRelicPageIndex(input.pages) : null;
 
   const recent: ReliquaryRecentFindModel[] = [];
   const shelfLatest = new Map<
@@ -569,15 +569,11 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     else if (input.itemsDiscovered.has(id) || (relicPageIndex?.itemIds.has(id) ?? false)) {
       kind = 'item';
     }
-    // Where the chip jumps to. The recorded first-find page wins when the
-    // catalog still has it (it is where the player actually found the relic);
-    // otherwise the first page in authored order that holds the slot, for any
-    // relic kind the catalog places.
-    const hinted = input.firstFind?.[id]?.pageId;
+    // Where the chip jumps to, through the shared resolver the unlock chat
+    // line also calls (reliquaryRelicPageId): first-find page, else the first
+    // authored page holding the slot, else null.
     const pageId =
-      hinted !== undefined && pagesById.has(hinted)
-        ? hinted
-        : (relicPageIndex?.pageOf.get(id) ?? null);
+      relicPageIndex === null ? null : reliquaryRelicPageId(relicPageIndex, input.firstFind, id);
     // Shelf cards summarize a shelf, not the needle, so their latest-find line
     // is captured from the WHOLE ring before the search filter below: typing
     // must not blank a card's last find.
@@ -751,28 +747,65 @@ function pageHasRelicMatch(
   return false;
 }
 
+/** The three catalog lookups a relic id needs (see reliquaryRelicPageIndex). */
+export type ReliquaryRelicPageIndex = {
+  /** Slot id to the first page in authored order that holds it. */
+  pageOf: ReadonlyMap<string, string>;
+  /** Every item-slot id the catalog places, for classifying a ring entry. */
+  itemIds: ReadonlySet<string>;
+  /** Every authored page id, for checking a recorded first-find hint. */
+  pageIds: ReadonlySet<string>;
+};
+
 /**
  * Slot id to the FIRST page in authored order that holds it, across every relic
  * kind the catalog places (items, marks, mounts, weapon skins, title deeds).
- * A relic listed on several pages resolves to the first, so the recent strip's
- * jump target is stable rather than dependent on iteration luck. The same pass
- * collects the item-slot ids, so classifying a ring entry needs no re-scan of
- * the catalog per chip.
+ * A relic listed on several pages resolves to the first, so a jump target is
+ * stable rather than dependent on iteration luck. The same pass collects the
+ * item-slot ids, so classifying a ring entry needs no re-scan of the catalog
+ * per chip, and the page ids, so a first-find hint can be checked against what
+ * the catalog still holds.
+ *
+ * Built once per surface (one view build, one unlock drain) and handed to
+ * reliquaryRelicPageId.
  */
-function buildRelicPageIndex(pages: readonly ReliquaryPageDef[]): {
-  pageOf: Map<string, string>;
-  itemIds: Set<string>;
-} {
+export function reliquaryRelicPageIndex(
+  pages: readonly ReliquaryPageDef[],
+): ReliquaryRelicPageIndex {
   const pageOf = new Map<string, string>();
   const itemIds = new Set<string>();
+  const pageIds = new Set<string>();
   for (const page of pages) {
+    pageIds.add(page.id);
     for (const relic of page.relics) {
       const id = relicSlotId(relic);
       if (!pageOf.has(id)) pageOf.set(id, page.id);
       if (relic.kind === 'item') itemIds.add(relic.itemId);
     }
   }
-  return { pageOf, itemIds };
+  return { pageOf, itemIds, pageIds };
+}
+
+/**
+ * Where a relic's jump lands: the recorded first-find page when the catalog
+ * still holds it (that is where the player actually found the relic),
+ * otherwise the first authored page that lists the slot. Null means the
+ * catalog no longer places the relic at all, and the caller renders an inert
+ * surface (the recent strip's unclickable chip, a plain chat line) instead of
+ * promising a page that is not there.
+ *
+ * The ONE answer to "where does this relic live": the Overview recent chip and
+ * the unlock chat line share it, so a chip and its own announcement can never
+ * point at different pages.
+ */
+export function reliquaryRelicPageId(
+  index: ReliquaryRelicPageIndex,
+  firstFind: ReliquaryFirstFindLookup | undefined,
+  relicId: string,
+): string | null {
+  const hinted = firstFind?.[relicId]?.pageId;
+  if (hinted !== undefined && index.pageIds.has(hinted)) return hinted;
+  return index.pageOf.get(relicId) ?? null;
 }
 
 function buildNearlyComplete(

@@ -47,6 +47,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
+import { RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -612,6 +613,8 @@ import {
   buildReliquaryUnlockPlan,
   type ReliquaryUnlockEventModel,
   reliquaryFlashKey,
+  reliquaryRelicPageId,
+  reliquaryRelicPageIndex,
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
@@ -13353,18 +13356,52 @@ export class Hud {
   private handleReliquaryUnlocks(events: ReliquaryUnlockEventModel[]): void {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const plan = buildReliquaryUnlockPlan(events, reducedMotion);
+    // One catalog index for the whole drain, feeding the SAME resolution the
+    // Reliquary's own recent strip uses (reliquaryRelicPageId: the recorded
+    // first-find page while the catalog still holds it, else the first authored
+    // page listing the slot). A chip and its own announcement therefore cannot
+    // point at different pages.
+    const pageIndex = reliquaryRelicPageIndex(RELIQUARY_PAGES);
+    const firstFind = this.sim.reliquaryFirstFind;
     for (const log of plan.logs) {
       // One shared resolver for chat, banner, and every window surface: the two
       // ladders here each carried their own humanized fallback, and only one of
       // them stripped a colon namespace, so `mount:swift_gryphon` printed
       // differently in the log than on the banner for the same unlock.
       const name = reliquaryRelicDisplayName(log.kind, log.id);
-      this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
+      const pageId = reliquaryRelicPageId(pageIndex, firstFind, log.id);
+      if (pageId === null) {
+        // A relic the catalog no longer places has nowhere to jump, so the line
+        // stays plain rather than offering a link that opens nothing (the
+        // recent strip's inert-chip policy).
+        this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
+        continue;
+      }
+      // The durable gold line, with the relic name spliced in as a clickable
+      // jump to the page that holds it.
+      this.logNodes(
+        deedLineNodes(
+          document,
+          t('hudChrome.reliquary.unlockToast', { name: DEED_NAME_TOKEN }),
+          () => deedChatLinkEl(document, name, () => this.reliquaryWindow.openWithPage(pageId)),
+        ),
+        '#ffd100',
+      );
     }
     // Durable Illumination log survives even when rank-up claims the banner slot.
     if (plan.illuminatedPageId && plan.banner?.kind !== 'illuminate') {
       const pageName = reliquaryPageName(plan.illuminatedPageId);
-      this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+      // Captured for the link closure: a property narrowing does not survive
+      // into a callback, and the jump target is exactly the illuminated page.
+      const jumpId = plan.illuminatedPageId;
+      this.logNodes(
+        deedLineNodes(
+          document,
+          t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+          () => deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+        ),
+        '#ffd100',
+      );
     }
     if (plan.banner) {
       const banner = plan.banner;
@@ -13375,17 +13412,35 @@ export class Hud {
           rank: formatNumber(banner.rank),
           name: rankName,
         });
-        this.log(
-          t('hudChrome.reliquary.rankUpToast', {
-            rank: formatNumber(banner.rank),
-            name: rankName,
-          }),
+        // The rank is the whole collection's, so its link lands on Overview,
+        // the one surface that shows the seal and the catalog total.
+        this.logNodes(
+          deedLineNodes(
+            document,
+            t('hudChrome.reliquary.rankUpToast', {
+              rank: formatNumber(banner.rank),
+              name: DEED_NAME_TOKEN,
+            }),
+            () => deedChatLinkEl(document, rankName, () => this.reliquaryWindow.open('overview')),
+          ),
           '#ffd100',
         );
       } else if (banner.kind === 'illuminate') {
         const pageName = reliquaryPageName(banner.pageId);
         bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });
-        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+        // The banner's own Illumination line is clickable too: this is the
+        // branch that fires when Illumination OWNS the banner slot, and a
+        // single-site conversion would leave it plain.
+        const jumpId = banner.pageId;
+        this.logNodes(
+          deedLineNodes(
+            document,
+            t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+            () =>
+              deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+          ),
+          '#ffd100',
+        );
       } else {
         const relic = banner.relic;
         const name = reliquaryRelicDisplayName(relic.kind, relic.id);

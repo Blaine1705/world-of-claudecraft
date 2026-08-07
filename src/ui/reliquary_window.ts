@@ -172,6 +172,14 @@ export class ReliquaryWindow {
    * that just happened.
    */
   private pendingFlash: ReadonlySet<string> | null = null;
+  /**
+   * Deep-link one-shot: the page whose header the next paint parks the reading
+   * position on (openWithPage, the chat relic and Illumination links). Consumed
+   * by that paint whatever it managed to show, so a page the surface could not
+   * paint cannot leave the jump latched and yank focus at some arbitrary later
+   * render (the deeds focusDeedId contract).
+   */
+  private focusPageId: string | null = null;
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
 
@@ -180,7 +188,20 @@ export class ReliquaryWindow {
   }
 
   open(nav?: ReliquaryNavId): void {
-    if (nav !== undefined) this.nav = nav;
+    if (nav !== undefined) {
+      this.nav = nav;
+      // A nav-bearing open is a deep link to a SHELF, so the persisted page has
+      // to go: the view resolves an open pageId from the WHOLE catalog, so a
+      // page belonging to another shelf would otherwise paint under the shelf
+      // just asked for (the Phase 13 QA contract, unreachable until deep links
+      // landed). A no-arg open() still keeps where-I-was exactly.
+      this.pageId = null;
+      this.gridIndex = 0;
+    }
+    // Captured before render() consumes the one-shot: a cold deep link parks
+    // focus on the target page header instead of Close, and has to re-place it
+    // once the root is actually visible (the deeds cold-jump pattern).
+    const jumpPageId = this.focusPageId;
     if (this.opened) {
       this.render();
       return;
@@ -192,8 +213,75 @@ export class ReliquaryWindow {
     this.suppressAnnounceOnce = true;
     this.render();
     this.deps.root().style.display = 'flex';
-    (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    const landed = jumpPageId !== null && this.spotlightPage(this.deps.root(), jumpPageId);
+    if (!landed) {
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    }
     audio.click();
+  }
+
+  /**
+   * Open (or refocus) the Reliquary on one page: the chat relic-link and
+   * Illumination-link jump, the Book of Deeds openWithDeed shape. Switches to
+   * the page's OWN shelf and clears the needle and ownership chip so the page
+   * the link promised is guaranteed visible, then parks the reading position
+   * on its header after the paint. An id the catalog no longer holds (content
+   * drift, a forged wire id) opens the window wherever it last was, unfocused,
+   * exactly as a still-masked deed does.
+   */
+  openWithPage(pageId: string): void {
+    if (this.gotoPage(pageId)) {
+      this.gridIndex = 0;
+      // A needle typed on Overview or a Catalogued chip left on from the last
+      // visit can hide the page entirely; the deeds jump clears both for the
+      // same reason.
+      this.search = '';
+      this.ownedFilter = 'all';
+      this.focusPageId = pageId;
+    }
+    if (!this.opened) {
+      this.open();
+      return;
+    }
+    this.render();
+  }
+
+  /**
+   * Move the window onto a catalog page: the ONE state transition the in-window
+   * [data-page] rows (recent chips, nearly rows, shelf rows) and the external
+   * openWithPage deep link share. The shelf comes from the page record and
+   * never from the current rail, so a cross-shelf jump cannot leave the rail
+   * pointing at the wrong shelf. False for an id the catalog does not hold.
+   *
+   * The grid cursor reset is the CALLER's: the in-window rows reset it even for
+   * an id that failed to resolve, the deep link only on the arm that moved.
+   */
+  private gotoPage(pageId: string): boolean {
+    const page = RELIQUARY_PAGES.find((p) => p.id === pageId);
+    if (!page) return false;
+    this.nav = page.shelf;
+    this.pageId = page.id;
+    return true;
+  }
+
+  /**
+   * Park the reading position on a page header after paint (the deeds
+   * spotlightCard shape): a programmatic tab stop, focus, and a guarded scroll,
+   * no flash class (the page detail is the whole surface, not a card in a
+   * list). False when that page is not what got painted, so a cold open falls
+   * back to its Close park instead of leaving focus nowhere.
+   */
+  private spotlightPage(el: HTMLElement, pageId: string): boolean {
+    if (this.pageId !== pageId) return false;
+    const header = el.querySelector<HTMLElement>('.reliquary-page-header');
+    if (!header) return false;
+    header.tabIndex = -1;
+    header.focus({ preventScroll: true });
+    // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
+    if (typeof header.scrollIntoView === 'function') {
+      header.scrollIntoView({ block: 'center' });
+    }
+    return true;
   }
 
   close(): void {
@@ -366,6 +454,12 @@ export class ReliquaryWindow {
       // follows the player's last cell instead of snapping back to the first.
       this.syncGridRoving(el, focusKey);
     }
+    // The deep-link one-shot, taken LAST so the jump outranks the key-based
+    // restore above, and released whatever this paint managed to show. A cold
+    // open re-places it once the root is visible (see open()).
+    const jumpPageId = this.focusPageId;
+    this.focusPageId = null;
+    if (jumpPageId !== null) this.spotlightPage(el, jumpPageId);
   }
 
   /** The persistent polite region (see liveEl), minted once from the root's own
@@ -1236,11 +1330,11 @@ export class ReliquaryWindow {
       btn.addEventListener('click', () => {
         const pageId = btn.dataset.page;
         if (!pageId) return;
-        const page = RELIQUARY_PAGES.find((p) => p.id === pageId);
-        if (page) {
-          this.nav = page.shelf;
-          this.pageId = page.id;
-        }
+        // The same transition the chat deep link takes (gotoPage), so an
+        // in-window jump and an external one cannot resolve a shelf
+        // differently. In-window rows keep their own state: the needle and the
+        // ownership chip are the player's, only the external jump clears them.
+        this.gotoPage(pageId);
         this.gridIndex = 0;
         audio.click();
         this.render();

@@ -266,12 +266,19 @@ describe('painter hygiene', () => {
     // just the chip: a stale index would leave the tab stop pointing at a slot
     // that no longer holds the relic the player was standing on. wire() has
     // four such arms (nav, filter, page, back) plus the search input.
-    expect(code.match(/this\.gridIndex = 0;/g)?.length).toBe(6);
+    //
+    // 6 to 8 in Phase 15: the two DEEP-LINK entries repaint a different set of
+    // cells from outside wire() and so owe the same reset. A nav-bearing open()
+    // drops the persisted page (a whole surface change), and openWithPage lands
+    // on another page's grid entirely.
+    expect(code.match(/this\.gridIndex = 0;/g)?.length).toBe(8);
     for (const arm of [
       /dataset\.nav[\s\S]*?this\.gridIndex = 0;/,
       /dataset\.filter[\s\S]*?this\.gridIndex = 0;/,
       /dataset\.page[\s\S]*?this\.gridIndex = 0;/,
       /\[data-back\][\s\S]*?this\.gridIndex = 0;/,
+      /if \(nav !== undefined\) \{[\s\S]*?this\.gridIndex = 0;/,
+      /openWithPage\(pageId: string\)[\s\S]*?this\.gridIndex = 0;/,
     ]) {
       expect(code, String(arm)).toMatch(arm);
     }
@@ -904,6 +911,50 @@ describe('entry HTML and i18n chrome', () => {
     // Exactly the live-find banner push plus the retro push: a stray or
     // duplicated announcement cannot hide (the deeds sibling pins the same).
     expect(handler?.match(/combatAnnouncer\.push/g)?.length).toBe(2);
+    // Phase 15: a relic gain in chat is ONE CLICK from its Reliquary page.
+    // Four node-built lines, no more and no fewer: the per-relic unlock, the
+    // durable Illumination line (rank-up owns the banner), the Illumination
+    // line from the banner branch itself, and the curator rank-up. The count
+    // is what stops the known single-site conversion trap, where only one of
+    // the two illuminateToast emitters gets its link and the other silently
+    // stays plain prose. The two ladder counts above are unchanged by this
+    // conversion (the name resolvers and the announcer pushes did not move).
+    expect(handler?.match(/this\.logNodes\(/g)?.length).toBe(4);
+    expect(handler?.match(/deedLineNodes\(/g)?.length).toBe(4);
+    expect(handler?.match(/deedChatLinkEl\(/g)?.length).toBe(4);
+    // Every converted template renders its name slot to the sentinel, or
+    // deedLineNodes has nothing to split on and the link lands appended at the
+    // end of the sentence in every locale.
+    expect(handler).toContain("t('hudChrome.reliquary.unlockToast', { name: DEED_NAME_TOKEN })");
+    expect(handler).toContain(
+      "t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN })",
+    );
+    expect(handler).toMatch(
+      /rankUpToast',\s*\{\s*rank: formatNumber\(banner\.rank\),\s*name: DEED_NAME_TOKEN,\s*\}/,
+    );
+    // Where each family lands. The relic line jumps to the page holding the
+    // relic, resolved through the SHARED recent-strip resolver rather than a
+    // second ladder that could drift; both Illumination lines jump to the page
+    // that filled; the rank line opens Overview, the one surface that shows the
+    // seal (open('overview') now clears a persisted off-shelf page).
+    expect(handler).toContain('const pageIndex = reliquaryRelicPageIndex(RELIQUARY_PAGES);');
+    expect(handler).toContain('const firstFind = this.sim.reliquaryFirstFind;');
+    expect(handler).toContain('const pageId = reliquaryRelicPageId(pageIndex, firstFind, log.id);');
+    expect(handler).toContain(
+      'deedChatLinkEl(document, name, () => this.reliquaryWindow.openWithPage(pageId))',
+    );
+    expect(handler?.match(/openWithPage\(jumpId\)/g)?.length).toBe(2);
+    expect(handler).toContain(
+      "deedChatLinkEl(document, rankName, () => this.reliquaryWindow.open('overview'))",
+    );
+    // A relic the catalog no longer places keeps a PLAIN line: a link that
+    // opens nothing is worse than no link (the recent strip's inert chip).
+    expect(handler).toMatch(
+      /if \(pageId === null\) \{\s*this\.log\(t\('hudChrome\.reliquary\.unlockToast', \{ name \}\), '#ffd100'\);\s*continue;\s*\}/,
+    );
+    // The retro catch-up summary stays plain by design (it names no single
+    // relic to jump to), so nothing after the retroCount gate may go node-built.
+    expect(handler).not.toMatch(/plan\.retroCount > 0[\s\S]*logNodes/);
     // Shared key table (window export) so toast/banner cannot desync from Overview.
     expect(hud).toContain('curatorRankNameKey');
     // Pure-core definition (view) + re-export from the painter for existing imports.
