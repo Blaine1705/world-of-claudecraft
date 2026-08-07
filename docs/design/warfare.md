@@ -76,11 +76,21 @@ Armor mitigation and weapon damage are the slot's inherent baseline rather than
 budget-derived, and both sit on the item-level-31 curve beside the same-slot,
 same-armor-type PvE epics.
 
-Jewelry is held lower on purpose. At the armor fraction a Warfare ring would
-reach 12 primary points against the badge ring's 11 and a Warfare neck 13 against
-the badge neck's 12, overtaking the only other jewelry source in the game. At
-0.75 the ring lands on 10 and the neck on 11, and the badge-jewelry guard in
-`tests/pvp_honor_gear.test.ts` passes untouched.
+Jewelry is held lower on purpose. What it is calibrated against is the Heroic
+Quartermaster's badge jewelry, which sits at item level 26, five levels below
+this tier, and carries 25 of a combat rating on every piece. At the armor
+fraction a Warfare ring would reach 12 primary points against the badge ring's 11
+and a Warfare neck 13 against the badge neck's 12, overtaking a source five item
+levels lower on raw stats. At 0.75 the ring lands on 10 and the neck on 11, and
+the badge-jewelry guard in `tests/pvp_honor_gear.test.ts` passes untouched.
+
+Badge jewelry is not the only other jewelry source. The rift epic ring
+`abysswrought_band` (`src/sim/content/rift/items.ts`) is item level 31, level
+with this tier, and carries 13 primary points and 25 Haste Rating against the
+Warfare ring's 10 and no rating. A ring above the honor ring therefore already
+exists and is farmable. The 0.75 fraction still stands on the reasoning above: it
+is what keeps the honor ring from out-statting a lower tier, and a same-tier PvE
+ring sitting above it is the ladder working rather than a hole in it.
 
 The rule this tier is built to, which **replaces** the older assertion that honor
 gear "never out-stats same-tier PvE gear" (that sentence was written when item
@@ -109,6 +119,17 @@ tuning argument:
 So the honor kit in PvE is a stat-only kit at a 10 percent discount with no
 ratings and no set. That is a legitimate floor for a fresh level 20 and it is not
 a substitute for the heroic tier.
+
+One qualification on that discount: it is a throughput discount, not a
+survivability one. On the Strength-mail profile the harness gears
+(`tests/warfare_balance_harness.test.ts`), the honor kit carries about 9 percent
+fewer primary stat points than a same-tier five-man PvE kit (160 against 176) and
+yet has MORE effective health in PvE, 3,524 against 3,217, because Warfare armor
+sits on the same item-level-31 armor curve while the kit's budget is weighted
+toward Stamina. What the honor kit actually gives up is attack power and crit,
+which is where the PvE tier spends its extra budget and all of its ratings. A
+player who takes the honor kit into PvE is trading damage for durability, not
+taking a uniformly worse kit.
 
 ## The four Warfare sets
 
@@ -185,11 +206,21 @@ main hand can carry closes a two-tier item-level gap, and raising it would not
 help: a complete kit already sits at the cap, so rating above 300 is discarded
 and the first slot dropped is nearly free.
 
+It also loses inside its own tier, which the item-level argument above does not
+reach. Holding the Warfare armor fixed and varying only the main hand against the
+harness's PvE reference (lower is better for the honor side), the honor
+one-hander measures 0.988x against the same-tier five-man one-hander's 1.004x
+(`gravewyrm_cleaver`), so it is the correct ONE-HANDER at its item level. The
+same-tier five-man TWO-HANDER (`greatfang_of_the_basin`) measures 0.884x: a
+farmable item-level-31 drop beats the honor weapon outright, and the honor weapon
+carries the joint highest price in the catalog while losing to it. Further up,
+the item-level-33 raid two-hander measures 0.856x and the legendary 0.781x.
+
 This is accepted rather than fought. It is classic-authentic (PvP sets were
 armor; weapons came from raids), it is a real build decision, and the honor
-weapon remains the correct weapon for the large majority of players. Jewelry, by
-contrast, lands almost exactly even against badge jewelry, which is the right
-shape for a choice.
+weapon remains the correct main hand for a player who has not yet farmed a
+two-hander at this item level or above. Jewelry, by contrast, lands almost
+exactly even against badge jewelry, which is the right shape for a choice.
 
 ## Arena and duels
 
@@ -302,17 +333,46 @@ likely to be replaced by a raid drop, so charging the tier's highest price for
 its most replaceable item would be a trap. Rings and the neck stay the cheapest
 slots so a new PvP player gets a real upgrade on the first day.
 
-Against planning figures of about 900 honor for a committed day of Thornhollow
-Fields and 450 for a lighter session, the seven-piece set is roughly 6 days of
-committed play and the complete kit roughly 8.4. Prices are tunable and should be
-revisited against live battleground throughput. The first thing to look at is
-queue variety: result honor decays per opposing team identity per UTC day, so on
-a thin realm the grind runs materially longer than on a healthy one. That is a
+Item ids are frozen and this is a retune in place, so a player already holding an
+old-tier piece receives the item-level-31 stats for free at merge, without paying
+the rise. That is an accepted consequence of retuning existing ids rather than
+minting new ones.
+
+The planning figures this schedule was set against were about 900 honor for a
+committed day of Thornhollow Fields and 450 for a lighter session, which put the
+seven-piece set at roughly 6 days of committed play and the complete kit at 8.4.
+Those figures assume a mostly fresh opposing roster each match, and at this
+game's live population that does not hold: a 5v5 queue recycles the same rosters,
+so `BATTLEGROUND_RESULT_DR` sits at its 0.25 floor as the NORMAL case rather than
+the tail. Result honor is then about 15 for a win and 5 for a played-out loss,
+not 60 and 20. With the kill and assist drip on top, a match pays nearer 30 to 40
+honor than the 60 to 80 the 900 figure implies, so the same session length is
+worth nearer 400 honor a day: the seven-piece set is roughly 13 days of committed
+play and the complete kit roughly 19.
+
+Prices are not changing for this. They were set against the optimistic figure and
+are being kept deliberately, so the correction above is a documentation accuracy
+fix rather than a retune. Prices stay tunable and should still be revisited
+against live battleground throughput. The first thing to look at is queue
+variety: result honor decays per opposing team identity per UTC day, so on a thin
+realm the grind runs materially longer than on a healthy one. That is a
 matchmaking property, not a pricing one, and the response is not a price change.
 
-The current equipment model has main hand, helmet, neck, shoulder, chest, waist,
-legs, gloves, feet, and two ring positions. It does not yet have cloak, wrist,
-trinket, offhand, or ranged equipment positions.
+The current equipment model has main hand, offhand, helmet, neck, shoulder,
+chest, waist, legs, gloves, feet, and two ring positions (`EquipSlot` in
+`src/sim/types.ts`). It does not yet have cloak, wrist, trinket, or ranged
+equipment positions. FURY sells nothing for the offhand; the PvE tables do fill
+it, with shields, held offhands, quivers, and their heroic variants.
+
+That leaves a property of the tier worth recording, since it is a consequence of
+the schedule rather than an oversight. All three Warfare weapons omit `hand` in
+their weapon block, and `weaponHand` in `src/sim/equipment_rules.ts` defaults an
+omitted `hand` to `onehand`, so every honor main hand is a one-hander. An honor
+buyer therefore keeps an open offhand for whatever the class can put there, while
+a two-handed PvE main hand benches the offhand outright for every class except
+the Fury warrior's two-hand pairing. Whether the tier should sell an offhand, or
+whether the honor weapon should stay a one-hander, is a later decision; this
+paragraph records the property and decides nothing.
 
 The same stock list is sold from two placements: FURY in Eastbrook and the named
 quartermaster in Highwatch. One stock, two vendors.

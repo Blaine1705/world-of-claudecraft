@@ -23,6 +23,9 @@ import { LAUNCH_PAPERDOLL_SLOTS } from '../src/sim/launch_paperdoll_slots';
 import { pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { EquipSlot, PlayerClass } from '../src/sim/types';
 
+/** The item level the whole WARFARE catalog sits at after the retune. */
+const WARFARE_ILVL = 31;
+
 const SLOT_PRICES: Record<string, number> = {
   mainhand: 1_200,
   helmet: 900,
@@ -216,22 +219,52 @@ describe('FURY WARFARE item budgets', () => {
     }
   });
 
-  it('never lets PvP jewelry out-stat the PvE badge (heroic marks) jewelry in PvE', async () => {
+  it('never lets PvP jewelry out-stat ANY other jewelry source in PvE', async () => {
     // Jewelry itemScore excludes WARFARE (and combat ratings), so it measures the
     // PvE-relevant power. Every PvP ring/amulet must score strictly BELOW the
-    // weakest PvE badge piece of the same slot: a PvP jewelry piece is never a PvE
-    // upgrade over the badge vendor's gear.
+    // weakest competing piece of the same slot: a PvP jewelry piece is never a PvE
+    // upgrade.
+    //
+    // Scope corrected after review. This compared only against HEROIC_VENDOR_ITEMS,
+    // the badge vendor, which sits at item level 26. That made the guard read as
+    // "never beats the only other jewelry source" when it is not the only one:
+    // rift epics such as abysswrought_band are item-level-31 rings carrying more
+    // primary stats AND a combat rating. The 0.75 jewelry fraction is calibrated
+    // against the badge pieces, so the badge comparison stays the binding one, but
+    // a guard that never looked above item level 26 could not see a regression
+    // arriving from the tier the WARFARE gear now actually sits in.
     const { HEROIC_VENDOR_ITEMS } = await import('../src/sim/content/heroic_vendor');
+    const warfareIds = new Set<string>(FURY_STOCK);
     for (const slot of ['ring', 'neck'] as const) {
       const pvp = FURY_STOCK.map((id) => ITEMS[id]).filter((i) => i.slot === slot);
       const badge = Object.values(HEROIC_VENDOR_ITEMS).filter((i) => i.slot === slot);
+      // Every other jewelry piece of this slot AT OR ABOVE the WARFARE tier, not
+      // just the badge vendor's. Scoped by item level on purpose: a level-31 epic
+      // outscoring some low-level ring is correct and expected, so comparing
+      // against the whole catalog would assert something false (abyssal_loop
+      // scores 9 against the WARFARE ring's 10). The claim worth guarding is that
+      // honor jewelry is never a PvE upgrade over PvE jewelry of its own tier or
+      // better, which is where a real regression would come from.
+      const rivals = Object.values(ITEMS).filter(
+        (i) =>
+          i.slot === slot &&
+          !warfareIds.has(i.id) &&
+          !i.heroicOf &&
+          (itemLevel(i) ?? 0) >= WARFARE_ILVL,
+      );
       expect(pvp.length, slot).toBeGreaterThan(0);
       expect(badge.length, slot).toBeGreaterThan(0);
+      expect(rivals.length, `${slot}: same-or-higher-tier rivals must exist`).toBeGreaterThan(0);
       const bestPvp = Math.max(...pvp.map(itemScore));
       const worstBadge = Math.min(...badge.map(itemScore));
       expect(bestPvp, `${slot}: best PvP ${bestPvp} vs worst badge ${worstBadge}`).toBeLessThan(
         worstBadge,
       );
+      // And below every same-or-higher-tier rival, which is the claim that matters.
+      for (const rival of rivals) {
+        const score = itemScore(rival);
+        expect(bestPvp, `${slot}: best PvP ${bestPvp} vs ${rival.id} ${score}`).toBeLessThan(score);
+      }
     }
   });
 

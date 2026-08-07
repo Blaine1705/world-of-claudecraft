@@ -15,6 +15,17 @@
 // Reported as a PvE ADVANTAGE RATIO, the ratio of the two time-to-kill values:
 // above 1.00 the PvE-geared character wins, below 1.00 the honor-geared one does.
 //
+// TWO THINGS THIS MODEL CANNOT DO, stated so no one reads a number out of it that
+// it did not measure:
+//  - It is AUTO-ATTACK ONLY, so it cannot compare a melee kit against a caster
+//    kit. Every ratio below is within one archetype, melee against melee. A
+//    cross-archetype row would be meaningless, not merely imprecise.
+//  - A ratio between two FULL kits conflates the armor source with the WEAPON
+//    tier, because the two kits carry different weapons. That is a fair picture
+//    of a real matchup and a poor instrument for judging armor, so the primary
+//    assertion below holds the weapon identical on both sides and the full-kit
+//    row is kept, clearly labelled, as the realistic-matchup figure.
+//
 // It models auto-attacks only. Abilities also scale off attack power so the
 // direction holds, and the 4-piece crowd-control reduction and the 7-piece
 // signature proc are excluded, both of which favour the honor-geared character.
@@ -127,6 +138,19 @@ function timeToKill(attacker: Entity, aKit: Kit, defender: Entity): number {
   return defender.maxHp / incoming;
 }
 
+/**
+ * The armor-only comparison: identical weapon on BOTH sides, so the ratio moves
+ * with armor and jewelry alone. This is the instrument for "is WARFARE armor
+ * best in slot for PvP", which is what docs/design/warfare.md actually claims.
+ */
+function armorAdvantage(honorArmor: Kit, pveArmor: Kit, weapon: string): number {
+  const honorKit = { ...honorArmor, mainhand: weapon };
+  const pveKit = { ...pveArmor, mainhand: weapon };
+  const honor = geared(honorKit);
+  const pve = geared(pveKit);
+  return timeToKill(honor, honorKit, pve) / timeToKill(pve, pveKit, honor);
+}
+
 /** Above 1.00 the PvE-geared warrior wins; below 1.00 the honor-geared one does. */
 function pveAdvantage(honorKit: Kit, pveKit: Kit): number {
   const honor = geared(honorKit);
@@ -138,32 +162,59 @@ function gearWarfareRating(kit: Kit): number {
   return Object.values(kit).reduce((sum, id) => sum + (ITEMS[id]?.pvpOffenseRating ?? 0), 0);
 }
 
+/** Strip the weapon so a kit can be used as an armor-and-jewelry set. */
+const ARMOR_ONLY = (kit: Kit): Kit => {
+  const { mainhand: _weapon, ...armorAndJewelry } = kit;
+  return armorAndJewelry;
+};
+
 describe('WARFARE balance re-check (merge blocker)', () => {
-  it('lands the complete kit plus capstone near parity with the reference warrior', () => {
-    const ratio = pveAdvantage(WARFARE_KIT, PVE_T1_T2);
-    // 00-analysis.md predicted 1.03x for the SHIPPING configuration (0.90 armor,
-    // 0.75 jewelry), not the 1.00x of the clean 0.90-everywhere sweep row. The
-    // implementation measures 0.988x. Every stat line in that document reproduces
-    // exactly (260 attack power, 1,722 health, 7.0% crit against 444 / 1,972 /
-    // 10.2%), so the gap is not a stat error: it is ARMOR. The sweep pins attack
-    // power and health for its proposed rows but never armor, and section 2.2 of
-    // 02-gear-and-sets.md requires WARFARE armor be matched to the same-slot
-    // ilvl-31 PvE epic curve, which lifts the kit from the 2,021 that document
-    // measured "as shipped" to 2,198. A tougher defender lengthens the PvE
-    // character's time to kill and pushes the ratio down by about that 0.04.
+  it('puts WARFARE ARMOR ahead of the best PvE armor, weapon held identical', () => {
+    // THE PRIMARY SIGNAL, and the only one docs/design/warfare.md makes a claim
+    // about: WARFARE armor is meant to be genuinely best in slot for PvP.
+    // Measured with the SAME weapon on both sides, so the ratio cannot absorb a
+    // weapon-tier gap.
     //
-    // Inside the model's own stated 0.05x noise floor, and nearer a dead-even
-    // fight than the prediction was. The band is deliberately wider than the gap
-    // so a routine armor or budget nudge does not red this spuriously; what it
-    // still catches is a real regression to either blowout.
-    // Band centred on the MEASURED 0.988x at the model's own stated 0.05x noise
-    // floor, not on the prediction. Deliberately near symmetric: an earlier band
-    // of 0.95 to 1.10 left 0.112 of slack above and only 0.038 below, so a drift
-    // back toward "the PvE-geared character wins" (precisely the regression this
-    // program exists to fix) had three times the room of the opposite direction.
-    // 1.03x, what the packet predicted, still passes.
-    expect(ratio, `measured PvE advantage vs T1+T2 was ${ratio.toFixed(3)}x`).toBeGreaterThan(0.94);
-    expect(ratio, `measured PvE advantage vs T1+T2 was ${ratio.toFixed(3)}x`).toBeLessThan(1.04);
+    // An earlier revision asserted a PARITY band on the full-kit ratio instead.
+    // That was a confound: the honor kit carries an item-level-31 one-hander at
+    // 15.9 weapon dps while the PvE reference carries an item-level-33 two-hander
+    // at 19.1, so roughly half of what read as "parity" was weapon deficit, and
+    // the band asserted a target the design doc does not actually hold. Two
+    // artifacts disagreeing about the goal is worse than either being wrong,
+    // because the live tuning pass reads whichever it finds first.
+    const honorArmor = ARMOR_ONLY(WARFARE_KIT);
+    const pveArmor = ARMOR_ONLY(PVE_T1_T2);
+    for (const weapon of [
+      'final_argument_greatblade', // the honor tier's own one-hander
+      'deathless_greatblade', // item-level-33 raid epic
+      'heroic_kingsbane_last_oath', // item-level-37 rift legendary
+    ]) {
+      const ratio = armorAdvantage(honorArmor, pveArmor, weapon);
+      const label = `${weapon}: armor-only PvE advantage was ${ratio.toFixed(3)}x`;
+      // Below 1.00 means the WARFARE-armored character wins. Ahead on every
+      // weapon and by a margin that does not run away: measured 0.930, 0.856 and
+      // 0.844 against the strongest PvE armor in the game.
+      expect(ratio, label).toBeLessThan(1);
+      expect(ratio, label).toBeGreaterThan(0.8);
+    }
+  });
+
+  it('reports the realistic full-kit matchup, weapon tier included', () => {
+    const ratio = pveAdvantage(WARFARE_KIT, PVE_T1_T2);
+    // NOT a parity target and NOT the armor claim: each side carries its own
+    // weapon here, so this is what a duel between a fully honor-geared and a
+    // fully raid-geared warrior actually looks like, weapon tier and all. Kept
+    // deliberately, because it is the number a player experiences, but the armor
+    // case above is the one that judges the tier.
+    //
+    // Measured 0.988x. The original model predicted 1.03x; that gap is armor,
+    // which the model never rescaled for its proposed rows while the retune
+    // matches WARFARE armor to the same-slot item-level-31 PvE epic curve (2,198
+    // against the 2,021 it assumed). Every other stat line reproduced exactly.
+    // The band is wide because this row carries two variables, not one.
+    const label = `full-kit PvE advantage vs T1+T2 was ${ratio.toFixed(3)}x`;
+    expect(ratio, label).toBeGreaterThan(0.9);
+    expect(ratio, label).toBeLessThan(1.08);
   });
 
   it('pins the four stat lines the ratio is computed from', () => {

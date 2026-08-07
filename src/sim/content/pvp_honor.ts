@@ -9,7 +9,9 @@
 //     weapons, so a WARFARE piece stays visibly below a same-slot PvE epic.
 //   - WARFARE_JEWELRY_STAT_FRACTION on neck and rings, which is what keeps a
 //     WARFARE ring or amulet scoring below the Heroic Quartermaster's badge
-//     jewelry, the only other jewelry source in the game.
+//     jewelry, five item levels lower and carrying a combat rating per piece.
+//     Badge jewelry is not the only other jewelry source: the rift epic ring
+//     abysswrought_band is level with this tier and out-stats the WARFARE ring.
 //   - WARFARE_RATING_FRACTION on every slot: the FULL slot budget again,
 //     expressed as WARFARE Offense and Defense Rating.
 // Armor mitigation and weapon DPS are the slot's inherent baseline rather than
@@ -57,11 +59,16 @@ export const WARFARE_SOURCE_LEVEL = 25;
 // structural half of "honor gear is not a PvE shortcut"; the other half is that
 // no WARFARE piece carries a combat rating.
 export const WARFARE_STAT_FRACTION = 0.9;
-// Jewelry is held lower on purpose. At the armor fraction a WARFARE ring reaches
-// 12 primary points against the badge ring's 11 and a WARFARE neck 13 against the
-// badge neck's 12, which would overtake the only other jewelry source in the game
-// and break the guard in tests/pvp_honor_gear.test.ts. At this fraction the ring
-// lands on 10 and the neck on 11.
+// Jewelry is held lower on purpose. What it is calibrated against is the Heroic
+// Quartermaster's badge jewelry, which sits at item level 26, five below this
+// tier, and carries 25 of a combat rating per piece. At the armor fraction a
+// WARFARE ring reaches 12 primary points against the badge ring's 11 and a WARFARE
+// neck 13 against the badge neck's 12, which would overtake that lower tier on raw
+// stats and break the guard in tests/pvp_honor_gear.test.ts. At this fraction the
+// ring lands on 10 and the neck on 11. Badge jewelry is NOT the only other jewelry
+// source: the rift epic ring abysswrought_band (content/rift/items.ts) is item
+// level 31, level with this tier, and carries 13 primary points and 25 Haste
+// Rating, so a ring above the WARFARE ring already exists and is farmable.
 export const WARFARE_JEWELRY_STAT_FRACTION = 0.75;
 // WARFARE Offense and Defense Rating per piece, as a share of the same slot
 // budget: the full budget, on every slot, unchanged from the shipped rule. The
