@@ -1038,7 +1038,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 972,
-      "state": "afa3ce3c",
+      "state": "06765570",
       "events": "6558e5e8",
       "rng": {
         "draws": 974,
@@ -1049,7 +1049,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 972,
-      "state": "b50adbf1",
+      "state": "4aff9ea1",
       "events": "3fc12c5c",
       "rng": {
         "draws": 1204,
@@ -1060,7 +1060,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 972,
-      "state": "a43dd2b1",
+      "state": "11461ac1",
       "events": "741638a5",
       "rng": {
         "draws": 1466,
@@ -1071,8 +1071,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 972,
-      "state": "526e533a",
-      "events": "618bb292",
+      "state": "cbe4013f",
+      "events": "f2131c96",
       "rng": {
         "draws": 1748,
         "digest": "e9dd5047"
@@ -1082,8 +1082,8 @@
       "tick": 220,
       "time": 11,
       "nextId": 972,
-      "state": "fcd761e4",
-      "events": "89f8be4a",
+      "state": "2a98607d",
+      "events": "f814c43e",
       "rng": {
         "draws": 1917,
         "digest": "692f46af"
@@ -1093,7 +1093,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 972,
-      "state": "f97d5574",
+      "state": "cdfb7b59",
       "events": "741638a5",
       "rng": {
         "draws": 2061,
@@ -1104,8 +1104,8 @@
       "tick": 260,
       "time": 13,
       "nextId": 972,
-      "state": "796315ba",
-      "events": "2702ed84",
+      "state": "facb7bc2",
+      "events": "8bd69934",
       "rng": {
         "draws": 2234,
         "digest": "b6490cd9"
@@ -1115,8 +1115,8 @@
       "tick": 280,
       "time": 14,
       "nextId": 972,
-      "state": "fdd331af",
-      "events": "1c0f92ac",
+      "state": "0800e797",
+      "events": "248213d1",
       "rng": {
         "draws": 2428,
         "digest": "aba2c90e"
@@ -1126,7 +1126,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 972,
-      "state": "87778b22",
+      "state": "b5df202e",
       "events": "741638a5",
       "rng": {
         "draws": 2626,
@@ -1137,7 +1137,7 @@
       "tick": 301,
       "time": 15.05,
       "nextId": 972,
-      "state": "2cdb89f4",
+      "state": "0f7a09ea",
       "events": "741638a5",
       "rng": {
         "draws": 2638,
@@ -1541,12 +1541,12 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 538
+            "damageDealt": 488
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 538
+              "dummyDamage": 488
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1967,7 +1967,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 0.3,
-              "value": 47
+              "value": 43
             },
             {
               "duration": 10.5,
@@ -1988,7 +1988,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49593,
+          "hp": 49619,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
@@ -2028,7 +2028,7 @@
             ],
             [
               967,
-              283
+              257
             ]
           ],
           "weapon": {
@@ -2048,7 +2048,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 1.8,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 1.2,
@@ -2059,7 +2059,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49818,
+          "hp": 49832,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
@@ -2095,7 +2095,7 @@
             ],
             [
               967,
-              151
+              137
             ]
           ],
           "weapon": {
@@ -2115,7 +2115,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 0.45,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 1.2,
@@ -2126,7 +2126,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49896,
+          "hp": 49906,
           "id": 970,
           "inCombat": true,
           "kind": "mob",
@@ -2158,7 +2158,7 @@
           "threat": [
             [
               967,
-              104
+              94
             ]
           ],
           "weapon": {
@@ -2234,8 +2234,8 @@
       "tick": 320,
       "time": 16,
       "nextId": 973,
-      "state": "6298e166",
-      "events": "78c31ae5",
+      "state": "b70330bc",
+      "events": "b3e6188d",
       "rng": {
         "draws": 2835,
         "digest": "a2f0921e"
@@ -2245,8 +2245,8 @@
       "tick": 340,
       "time": 17,
       "nextId": 973,
-      "state": "383dd7cc",
-      "events": "5bc8d8c0",
+      "state": "6244c6f3",
+      "events": "5be6fde4",
       "rng": {
         "draws": 3044,
         "digest": "d5141bdc"
@@ -2256,7 +2256,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 973,
-      "state": "1b2b8946",
+      "state": "3d80f586",
       "events": "d2549420",
       "rng": {
         "draws": 3239,
@@ -2267,8 +2267,8 @@
       "tick": 380,
       "time": 19,
       "nextId": 973,
-      "state": "4639c8b9",
-      "events": "9f713b33",
+      "state": "a82341c2",
+      "events": "2d9cae93",
       "rng": {
         "draws": 3402,
         "digest": "259c371c"
@@ -2278,7 +2278,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 973,
-      "state": "02f2f0f9",
+      "state": "cd71dcdd",
       "events": "73fb7227",
       "rng": {
         "draws": 3509,
@@ -2682,12 +2682,12 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 797
+            "damageDealt": 727
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 797
+              "dummyDamage": 727
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3099,7 +3099,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 1.7,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -3110,7 +3110,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49412,
+          "hp": 49446,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
@@ -3150,7 +3150,7 @@
             ],
             [
               967,
-              377
+              343
             ],
             [
               972,
@@ -3174,7 +3174,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 0.2,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -3185,7 +3185,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49759,
+          "hp": 49777,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
@@ -3221,7 +3221,7 @@
             ],
             [
               967,
-              210
+              192
             ]
           ],
           "weapon": {
@@ -3241,7 +3241,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 1.85,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -3252,7 +3252,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49790,
+          "hp": 49808,
           "id": 970,
           "inCombat": true,
           "kind": "mob",
@@ -3284,7 +3284,7 @@
           "threat": [
             [
               967,
-              210
+              192
             ]
           ],
           "weapon": {
@@ -3360,7 +3360,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 973,
-      "state": "02f2f0f9",
+      "state": "cd71dcdd",
       "events": "741638a5",
       "rng": {
         "draws": 3509,
@@ -3764,12 +3764,12 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 797
+            "damageDealt": 727
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 797
+              "dummyDamage": 727
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -4181,7 +4181,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 1.7,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -4192,7 +4192,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49412,
+          "hp": 49446,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
@@ -4232,7 +4232,7 @@
             ],
             [
               967,
-              377
+              343
             ],
             [
               972,
@@ -4256,7 +4256,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 0.2,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -4267,7 +4267,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49759,
+          "hp": 49777,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
@@ -4303,7 +4303,7 @@
             ],
             [
               967,
-              210
+              192
             ]
           ],
           "weapon": {
@@ -4323,7 +4323,7 @@
               "sourceId": 967,
               "tickInterval": 3,
               "tickTimer": 1.85,
-              "value": 47
+              "value": 43
             }
           ],
           "combatTimer": 0.1,
@@ -4334,7 +4334,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49790,
+          "hp": 49808,
           "id": 970,
           "inCombat": true,
           "kind": "mob",
@@ -4366,7 +4366,7 @@
           "threat": [
             [
               967,
-              210
+              192
             ]
           ],
           "weapon": {
