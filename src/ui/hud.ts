@@ -53,6 +53,7 @@ import {
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
+  ITEM_SETS,
   ITEMS,
   MOBS,
   NPCS,
@@ -265,6 +266,7 @@ import {
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
+  itemSetBonusField,
   knownLetterId,
   riftFloorLabel,
   tEntity,
@@ -443,6 +445,8 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
+import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
@@ -1561,6 +1565,18 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  // The WARFARE quartermaster's sectioned honor shop. Its own window
+  // (#warfare-window), NOT a third tenant of the shared #vendor-window
+  // container: the sectioned layout is structurally different and wider.
+  private openWarfareVendorNpcId: number | null = null;
+  // A STANDALONE trapping window (the train / unbind / crafting shape), NOT the
+  // vendor's non-trapping arrangement: that exception exists only because
+  // #vendor-window pairs with the #bags companion and a trap would fight it.
+  // The honor shop has no bags companion (its stock is soulbound with no sell
+  // value), and a flagged NPC still offers the ordinary goods row for the
+  // bags-paired window, so trapping Tab here costs nothing.
+  private readonly warfareWindowFocus = this.windowFocus('#warfare-window');
+  private warfareVendorOpenerFocus: HTMLElement | null = null;
   // The show-jumping race: a slim, non-interactive bottom strip painted from the
   // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
   // the event routing, the start/finish banners, and show/hide.
@@ -2082,6 +2098,7 @@ export class Hud {
       openChronicles: () => this.openDeeds('chronicle'),
       openVendor: (npcId, opener) => this.openVendor(npcId, opener),
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
+      openWarfareVendor: (npcId, opener) => this.openWarfareVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
@@ -3324,6 +3341,9 @@ export class Hud {
       case 'vendor-window':
         this.closeVendor();
         this.closeHeroicVendor();
+        break;
+      case 'warfare-window':
+        this.closeWarfareVendor();
         break;
       case 'train-window':
         this.closeTrain();
@@ -5800,8 +5820,14 @@ export class Hud {
     const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
     let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
     for (const tier of model.bonusTiers) {
-      const field = tier.pieces === 2 ? 'bonus2' : tier.pieces === 3 ? 'bonus3' : 'bonus4';
-      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
+      // The field NAMES its tier's piece count (itemSetBonusField): the old
+      // 2/3/4 ternary chain silently painted the 4-piece text for any other
+      // breakpoint, which is what a 7-piece tier would have shipped as.
+      const text = tEntity({
+        kind: 'itemSet',
+        id: model.setId,
+        field: itemSetBonusField(tier.pieces),
+      });
       html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
     }
     return html;
@@ -9018,6 +9044,10 @@ export class Hud {
         const npc = sim.entities.get(this.openHeroicVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeHeroicVendor();
       }
+      if (this.openWarfareVendorNpcId !== null) {
+        const npc = sim.entities.get(this.openWarfareVendorNpcId);
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeWarfareVendor();
+      }
       if (this.openTrainNpcId !== null) {
         const npc = sim.entities.get(this.openTrainNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeTrain();
@@ -11744,6 +11774,12 @@ export class Hud {
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
           if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
+          // An Honor purchase rides the same 'vendor' event, and OFFLINE nothing
+          // else repaints this window (onInventoryChanged fires only from bank
+          // ops and the online net path), so without this arm the balance, the
+          // per-offer affordability and the Owned marks all stayed stale until a
+          // close and reopen.
+          if (this.openWarfareVendorNpcId !== null) this.renderWarfareVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -14473,6 +14509,88 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // WARFARE quartermaster shop (#warfare-window)
+  // -------------------------------------------------------------------------
+  // The honor stock rendered as one section per family (plus jewelry and
+  // weapons) instead of one flat grid. Gated on the NpcDef warfareVendor FLAG (resolved
+  // in the gossip dialog), never a hard-coded npc id, so a second honor
+  // quartermaster needs no constant widened. Purchases reuse the existing
+  // buyItem command: no new wire command, no new IWorld member.
+
+  // opener: see openVendor's comment; the gossip dialog hides itself before
+  // routing here, so the still-live element has to be handed in.
+  openWarfareVendor(npcId: number, opener?: HTMLElement | null): void {
+    this.closeOtherWindows('#warfare-window');
+    this.openWarfareVendorNpcId = npcId;
+    this.renderWarfareVendor();
+    // Install the standalone Tab trap (train / unbind / crafting shape) and take
+    // its capture as the opener, EXCEPT on the gossip route, which hides
+    // #quest-dialog before calling and therefore hands its own opener in.
+    const captured = this.warfareWindowFocus.captureFocus();
+    this.warfareVendorOpenerFocus = opener !== undefined ? opener : captured;
+  }
+
+  private renderWarfareVendor(): void {
+    if (this.openWarfareVendorNpcId === null) return;
+    const npc = this.sim.entities.get(this.openWarfareVendorNpcId);
+    if (!npc) return;
+    renderWarfareVendorWindow(
+      $('#warfare-window'),
+      entityDisplayName(npc),
+      // The honor balance, the worn ids and the worn-or-carried ids are derived
+      // in the pure core (warfareShopViewer), which reads only IWorld and is
+      // driven against both world shapes by tests/warfare_vendor_view.test.ts.
+      buildWarfareVendorView(npc.vendorItems, ITEMS, ITEM_SETS, {
+        ...warfareShopViewer(this.sim),
+        setMemberCounts: itemSetMemberCounts(),
+      }),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onBuy: (itemId) => this.requestWarfarePurchase(npc.id, itemId),
+        onClose: () => this.closeWarfareVendor(),
+      },
+    );
+  }
+
+  closeWarfareVendor(): void {
+    if (this.openWarfareVendorNpcId === null) return;
+    $('#warfare-window').style.display = 'none';
+    this.openWarfareVendorNpcId = null;
+    this.hideTooltip();
+    // Release the Tab trap and return focus to the opener (WCAG 2.4.3); mirrors
+    // closeTrain / closeUnbind, the standalone trapping-window family.
+    this.warfareWindowFocus.restoreFocus(this.warfareVendorOpenerFocus);
+    this.warfareVendorOpenerFocus = null;
+  }
+
+  // Honor purchases debit an unrefundable currency and record no buyback
+  // (gold vendors are the only buyback source), exactly like Heroic Marks, so
+  // the buy command fires ONLY from the confirm callback.
+  private requestWarfarePurchase(npcId: number, itemId: string): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    // COUPLING: the title / accept / cancel labels are BORROWED from the Heroic
+    // Marks shop because they are currency-neutral today. Specializing any of
+    // the three heroicShop.buyConfirm* values for Marks would silently retitle
+    // this Honor dialog; mint warfareShop.* replacements here if that happens.
+    this.confirmDialog(
+      t('heroicShop.buyConfirmTitle'),
+      t('hudChrome.warfareShop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        honor: t('hudChrome.warfare.honorAmount', {
+          amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
+            maximumFractionDigits: 0,
+          }),
+        }),
+      }),
+      t('heroicShop.buyConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => this.sim.buyItem(npcId, itemId),
+    );
+  }
+
+  // -------------------------------------------------------------------------
   // Recipe training (Professions 2.0): a station master teaches
   // trainer-acquisition recipes for a tier-priced copper fee. Opens ONLY from
   // the master's gossip dialog (no side-rail button; the rail is at
@@ -15360,16 +15478,18 @@ export class Hud {
   }
 
   /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
-   *  training ladder, unbind list) behind its own open-plus-shown guard. All
-   *  four price their rows against the purse or a bag count, so the language
-   *  switch and the authoritative inventory hook repaint the family through
-   *  this one method; the per-site copies of the guard pack earned the
-   *  extraction (rule of three). */
+   *  WARFARE quartermaster, training ladder, unbind list) behind its own
+   *  open-plus-shown guard. All five price their rows against the purse or a
+   *  bag count, so the language switch and the authoritative inventory hook
+   *  repaint the family through this one method; the per-site copies of the
+   *  guard pack earned the extraction (rule of three). */
   private repaintOpenServiceWindows(): void {
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
     if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderHeroicVendor();
+    if (this.openWarfareVendorNpcId !== null && $('#warfare-window').style.display === 'block')
+      this.renderWarfareVendor();
     if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')

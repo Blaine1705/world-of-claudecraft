@@ -2336,6 +2336,13 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // The two WARFARE quartermasters (one stock, two placements). Both sell the
+  // game's most prestigious armor and both fell through to the tinted villager
+  // body before this, which read as a townsperson selling epics; the armored
+  // knight silhouette (helmet, cape, sword) is the same reuse captain_thessaly
+  // makes and needs no new asset.
+  warmarshal_draven_kole: 'npc_knight',
+  fury: 'npc_knight',
   loremaster_caddis: 'npc_mage',
   smith_haldren: 'npc_smith',
   armorer_hode: 'npc_smith',

@@ -1527,6 +1527,16 @@ export const ko_KR: EnTranslations = {
         "firstWin": "첫 승리"
       }
     },
+    "warfareShop": {
+      "gossipOption": "워페어 세트 둘러보기",
+      "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
+      "jewelry": "장신구",
+      "weapons": "무기",
+      "owned": "보유 중",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
+      "buyConfirmBody": "{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다."
+    },
     "charSheet": {
       "offense": "공격",
       "defense": "방어"
@@ -9584,6 +9594,27 @@ export const ko_KR: EnTranslations = {
       "cinderweave_slippers": {
         "name": "불씨매듭 덧신"
       },
+      "thornhide_headdress": {
+        "name": "가시가죽 두건"
+      },
+      "thornhide_mantle": {
+        "name": "가시가죽 어깨망토"
+      },
+      "thornhide_vestment": {
+        "name": "가시가죽 예복"
+      },
+      "thornhide_cinch": {
+        "name": "가시가죽 허리띠"
+      },
+      "thornhide_leggings": {
+        "name": "가시가죽 다리보호대"
+      },
+      "thornhide_gloves": {
+        "name": "가시가죽 장갑"
+      },
+      "thornhide_boots": {
+        "name": "가시가죽 발덮개"
+      },
       "final_oath_medallion": {
         "name": "최후의 맹세 메달"
       },
@@ -11930,6 +11961,11 @@ export const ko_KR: EnTranslations = {
         "name": "퓨리",
         "title": "명예 병참장교",
         "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
+      "warmarshal_draven_kole": {
+        "name": "전쟁원수 드레이븐 콜",
+        "title": "워페어 보급창 관리관",
+        "greeting": "내가 받는 화폐는 명예뿐이며, 워페어 보급창은 내가 지킨다. 전장에서 계급을 얻어라. 다음 전투를 위해 갑주를 갖춰 주겠다."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",
@@ -15062,6 +15098,36 @@ export const ko_KR: EnTranslations = {
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "warfare_ashstalker": {
+        "name": "잿빛추적자의 장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"잿빛 질주\"가 발동하여 6초 동안 이동 속도가 40% 증가합니다."
+      },
+      "warfare_cinderweave": {
+        "name": "잿불직물 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_furyforged": {
+        "name": "분노벼림 전투장비",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 \"꺾이지 않는 맹세\"가 발동하여 10초 동안 200의 피해를 흡수합니다."
+      },
+      "warfare_stormbound": {
+        "name": "폭풍결속 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_thornhide": {
+        "name": "가시가죽 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"가시 방호\"가 발동하여 6초 동안 회피 확률이 15% 증가합니다."
       },
       "wyrmshadow": {
         "name": "밤송곳니 의복",

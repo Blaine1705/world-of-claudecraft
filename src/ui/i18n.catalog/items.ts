@@ -2162,6 +2162,13 @@ const ITEM_ENTITY_IDS = [
   'cinderweave_legwraps',
   'cinderweave_handwraps',
   'cinderweave_slippers',
+  'thornhide_headdress',
+  'thornhide_mantle',
+  'thornhide_vestment',
+  'thornhide_cinch',
+  'thornhide_leggings',
+  'thornhide_gloves',
+  'thornhide_boots',
   'final_oath_medallion',
   'razorwind_torque',
   'cinder_sigil_pendant',
@@ -2535,6 +2542,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   sharp_claw: 'Sharp Claw',
   curved_tusk: 'Curved Tusk',
   pristine_claw: 'Pristine Claw',
+  // Thornhide Garb, the leather caster WARFARE family. English-appended like the
+  // quivers above until the release fill folds them into the per-locale arrays.
+  thornhide_headdress: 'Thornhide Headdress',
+  thornhide_mantle: 'Thornhide Mantle',
+  thornhide_vestment: 'Thornhide Vestment',
+  thornhide_cinch: 'Thornhide Cinch',
+  thornhide_leggings: 'Thornhide Leggings',
+  thornhide_gloves: 'Thornhide Gloves',
+  thornhide_boots: 'Thornhide Boots',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

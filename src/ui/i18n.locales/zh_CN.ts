@@ -839,6 +839,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '击杀',
   'hudChrome.warfare.floatReasons.assist': '助攻',
   'hudChrome.warfare.floatReasons.firstWin': '首胜',
+  'hudChrome.warfareShop.gossipOption': '浏览战争套装',
+  'hudChrome.warfareShop.gossipOptionAria': '浏览 {name} 提供的战争套装商店',
+  'hudChrome.warfareShop.jewelry': '饰品',
+  'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.owned': '已拥有',
+  'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 购买 {item}，已拥有',
+  'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 购买 {item}？荣誉购买后无法退款。',
   'hudChrome.keybinds.bgFlag': '战场夺旗动作',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '荆谷原野',
@@ -7180,6 +7187,36 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法师法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻击速度和施法速度提高 15%。',
+  'entities.itemSets.warfare_ashstalker.name': '灰烬追猎者装备',
+  'entities.itemSets.warfare_ashstalker.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    '战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“灰烬疾行”，使移动速度提高 40%，持续 6 秒。',
+  'entities.itemSets.warfare_cinderweave.name': '烬织法衣',
+  'entities.itemSets.warfare_cinderweave.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    '战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。',
+  'entities.itemSets.warfare_furyforged.name': '怒铸战装',
+  'entities.itemSets.warfare_furyforged.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    '战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“不破誓约”，吸收 200 点伤害，持续 10 秒。',
+  'entities.itemSets.warfare_stormbound.name': '缚雷法衣',
+  'entities.itemSets.warfare_stormbound.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    '战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。',
+  'entities.itemSets.warfare_thornhide.name': '荆棘皮甲',
+  'entities.itemSets.warfare_thornhide.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 点，致命一击几率提高 2%。',
@@ -8623,6 +8660,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '织烬裹腿',
   'entities.items.cinderweave_handwraps.name': '织烬裹手',
   'entities.items.cinderweave_slippers.name': '织烬便鞋',
+  'entities.items.thornhide_headdress.name': '荆棘兜帽',
+  'entities.items.thornhide_mantle.name': '荆棘披肩',
+  'entities.items.thornhide_vestment.name': '荆棘法衣',
+  'entities.items.thornhide_cinch.name': '荆棘腰带',
+  'entities.items.thornhide_leggings.name': '荆棘护腿',
+  'entities.items.thornhide_gloves.name': '荆棘护手',
+  'entities.items.thornhide_boots.name': '荆棘软靴',
   'entities.items.final_oath_medallion.name': '最终誓约勋章',
   'entities.items.razorwind_torque.name': '剃风颈环',
   'entities.items.cinder_sigil_pendant.name': '烬印坠饰',
@@ -8638,6 +8682,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '怒焰',
   'entities.npcs.fury.title': '荣誉军需官',
   'entities.npcs.fury.greeting': '战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。',
+  'entities.npcs.warmarshal_draven_kole.name': '战帅德拉文·科尔',
+  'entities.npcs.warmarshal_draven_kole.title': '战争军备库总管',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '我只收荣誉这一种货币，战争军备库由我看守。在战场上挣得你的军阶，我便为你披上迎接下一战的甲胄。',
   'guide.economy.bankBody':
     '每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。',
   'guide.economy.bankHow':

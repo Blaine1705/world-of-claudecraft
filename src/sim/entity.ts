@@ -87,6 +87,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     blockValue: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    ccDurationReduction: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -498,7 +499,14 @@ export function recalcPlayerStats(
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
-  const warfare = pvpFractionsFromRatings(bonusPvpOffenseRating, bonusPvpDefenseRating);
+  // Set-granted WARFARE ratings join the per-item totals BEFORE the single
+  // resolve below, so the cap clamps the combined value exactly once. Clamping
+  // the set contribution separately first would produce a different number and
+  // disagree with the character sheet, which reads these same two fields.
+  const warfare = pvpFractionsFromRatings(
+    bonusPvpOffenseRating + setEff.pvpOffenseRating,
+    bonusPvpDefenseRating + setEff.pvpDefenseRating,
+  );
   e.stats.pvpOffense = warfare.offense;
   e.stats.pvpDefense = warfare.defense;
   // An over-level mainhand is inert like any other gear: fall back to unarmed
@@ -642,6 +650,7 @@ export function recalcPlayerStats(
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
+  e.ccDurationReduction = setEff.ccDurationReduction;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 
