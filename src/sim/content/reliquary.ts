@@ -29,33 +29,89 @@ export type ReliquaryClearSource =
   | { kind: 'deed_stat'; stat: string }
   | { kind: 'none' };
 
-/** Which live id space a source hint's `sourceId` is drawn from. */
-export type ReliquarySourceKind = 'boss' | 'zone' | 'profession' | 'deed' | 'vendor';
+/**
+ * Which live id space a source hint's `sourceId` is drawn from.
+ *
+ * 'boss' is the mob-loot arm, and the name is broader than it reads: the
+ * catalog credits mid-bosses, elite trash FAMILIES (sanctum_boneguard,
+ * sanctum_drakonid), and open-world rares through it, because all three award
+ * loot the same way, off a MobTemplate.loot row keyed by a MOBS id.
+ */
+export type ReliquarySourceKind =
+  | 'boss'
+  | 'zone'
+  | 'profession'
+  | 'deed'
+  | 'vendor'
+  | 'delve'
+  | 'rift'
+  | 'quest'
+  | 'store'
+  | 'activity';
 
 /**
  * Authored answer to "where do I get this?" for one relic. Structured ids
  * only, never prose: the client re-localizes from the id, the same way every
  * other Reliquary name crosses the boundary.
  *
- * A hint is authored ONLY where content proves a single source. A relic whose
- * acquisition genuinely has two comparable routes (or a route this vocabulary
- * cannot name, like a delve chest) carries NO hint and is listed in
- * SOURCE_PENDING_RULING in tests/reliquary_content.test.ts, so the gap is a
- * visible maintainer decision rather than an invented answer.
+ * A relic with several comparable live routes names ALL of them (see
+ * ReliquarySourceHints): the honest answer to "where do I hunt this" is every
+ * door, not a guess at the best one. A relic carries NO hint only where content
+ * names no route at all; those slots are listed in SOURCE_PENDING_RULING in
+ * tests/reliquary_content.test.ts, so the gap stays a visible maintainer
+ * decision rather than an invented answer.
  */
 export interface ReliquarySourceHint {
   readonly sourceKind: ReliquarySourceKind;
   readonly sourceId: string;
 }
 
+/** One relic's authored source: a single hint, or an ordered list when content
+ *  really awards it through several comparable routes. The list arm is a
+ *  NON-EMPTY tuple on purpose: an authored empty array would carry the
+ *  `source` key and so suppress a page default while saying nothing, which is
+ *  never a meaning anyone intends, so it fails tsc at the authoring site
+ *  instead of waiting for the runtime pin. A one-door relic may be authored
+ *  as either shape (the resolver normalizes); the catalog convention is the
+ *  bare hint, so `Array.isArray(relic.source)` is NOT a valid "is this
+ *  multi-door" test anywhere. The tuple also rejects a WIDENED
+ *  `readonly ReliquarySourceHint[]` on purpose: a future helper that computes
+ *  its door list (a .map over ids) must assert non-emptiness explicitly
+ *  rather than hand the catalog a list that could be empty. */
+export type ReliquarySourceHints =
+  | ReliquarySourceHint
+  | readonly [ReliquarySourceHint, ...ReliquarySourceHint[]];
+
+/** The account storefront that grants Armory weapon skins
+ *  (grantWeaponSkinsToAccount in server/game.ts, driven by server/claudium.ts).
+ *  Its own id space of exactly one entry: there is one storefront. */
+export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
+
+/**
+ * Award ACTIVITIES: player actions that write a trophy directly, with no mob,
+ * vendor, or quest in between. Each id names its live write site:
+ * - corpse_harvest: src/sim/interaction.ts writes gather_event:perfect_specimen
+ *   and grants the HARVEST_COMPONENT_SPECIMENS items on a signed jackpot roll.
+ * - masterwork_craft: src/sim/professions/crafting.ts writes masterwork:first on
+ *   the first lifetime masterwork proc, from ANY of the gear crafts.
+ */
+export const RELIQUARY_ACTIVITY_SOURCE_IDS = ['corpse_harvest', 'masterwork_craft'] as const;
+export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
+
+/** Rift ranks that award mount reins (RIFT_GREEN / BLUE / EPIC_MOUNT_REINS,
+ *  src/sim/rift/progression.ts). C is excluded because its clear rolls no
+ *  mount at all: ranks do not inherit each other's tiers. */
+export const RELIQUARY_RIFT_RANK_SOURCE_IDS = ['B', 'A', 'S'] as const;
+export type ReliquaryRiftRank = (typeof RELIQUARY_RIFT_RANK_SOURCE_IDS)[number];
+
 /** One unique slot on a page. Item relics own via itemsDiscovered; other kinds
  *  use authored marks or existing ownership tables (mounts, skins, titles). */
 export type ReliquaryRelicDef =
-  | { kind: 'item'; itemId: string; source?: ReliquarySourceHint }
-  | { kind: 'mark'; markId: string; source?: ReliquarySourceHint }
-  | { kind: 'mount'; mountId: string; source?: ReliquarySourceHint }
-  | { kind: 'weapon_skin'; skinId: string; source?: ReliquarySourceHint }
-  | { kind: 'title'; deedId: string; source?: ReliquarySourceHint };
+  | { kind: 'item'; itemId: string; source?: ReliquarySourceHints }
+  | { kind: 'mark'; markId: string; source?: ReliquarySourceHints }
+  | { kind: 'mount'; mountId: string; source?: ReliquarySourceHints }
+  | { kind: 'weapon_skin'; skinId: string; source?: ReliquarySourceHints }
+  | { kind: 'title'; deedId: string; source?: ReliquarySourceHints };
 
 export interface ReliquaryPageDef {
   id: string;
@@ -67,7 +123,9 @@ export interface ReliquaryPageDef {
   /** Clear-count source; omit or `none` when the page has no clear meter. */
   clearSource?: ReliquaryClearSource;
   /** Source every un-hinted relic on this page inherits. Authored only where
-   *  EVERY relic on the page really shares one source. */
+   *  EVERY relic on the page really shares ONE source, which is why it stays a
+   *  single hint rather than a list: a page whose relics need several routes
+   *  needs them per relic, not page-wide. */
   sourceDefault?: ReliquarySourceHint;
   /** Ordered relic slots for the page grid. */
   relics: readonly ReliquaryRelicDef[];
@@ -77,17 +135,25 @@ export interface ReliquaryPageDef {
 // Item-relic helpers (keep page tables readable; no engine behavior)
 // ---------------------------------------------------------------------------
 
-/** A page-table entry: a bare id, or an id paired with its own source hint. */
-type RelicEntry = string | readonly [string, ReliquarySourceHint];
+/** A page-table entry: a bare id, or an id paired with its own source hint (or
+ *  the list of hints, when content really awards it several ways). */
+type RelicEntry = string | readonly [string, ReliquarySourceHints];
 
 function entryId(entry: RelicEntry): string {
   return typeof entry === 'string' ? entry : entry[0];
 }
 
 /** Omits the key entirely when un-hinted, so an un-authored relic never
- *  carries a `source: undefined` the resolver would have to special-case. */
+ *  carries a `source: undefined` the resolver would have to special-case.
+ *
+ *  Authored LISTS are frozen here, at the one construction chokepoint: the
+ *  resolver answers a multi-door relic with that exact array by reference, so
+ *  an unfrozen one would let a caller's in-place sort or push rewrite the
+ *  module-level catalog for the whole process, server included. */
 function withSource(def: ReliquaryRelicDef, entry: RelicEntry): ReliquaryRelicDef {
-  return typeof entry === 'string' ? def : { ...def, source: entry[1] };
+  if (typeof entry === 'string') return def;
+  const source = entry[1];
+  return { ...def, source: 'sourceKind' in source ? source : Object.freeze(source) };
 }
 
 const fromBoss = (mobId: string): ReliquarySourceHint => ({ sourceKind: 'boss', sourceId: mobId });
@@ -98,6 +164,32 @@ const fromVendor = (npcId: string): ReliquarySourceHint => ({
 const fromProfession = (professionId: string): ReliquarySourceHint => ({
   sourceKind: 'profession',
   sourceId: professionId,
+});
+const fromDelve = (delveId: string): ReliquarySourceHint => ({
+  sourceKind: 'delve',
+  sourceId: delveId,
+});
+/** Rank typed against the live ladder, so a rift hint cannot name a rank that
+ *  awards no reins (C) without failing tsc. */
+const fromRift = (rank: ReliquaryRiftRank): ReliquarySourceHint => ({
+  sourceKind: 'rift',
+  sourceId: rank,
+});
+const fromQuest = (questId: string): ReliquarySourceHint => ({
+  sourceKind: 'quest',
+  sourceId: questId,
+});
+const fromStore = (): ReliquarySourceHint => ({
+  sourceKind: 'store',
+  sourceId: RELIQUARY_STORE_SOURCE_ID,
+});
+const fromActivity = (activityId: ReliquaryActivitySourceId): ReliquarySourceHint => ({
+  sourceKind: 'activity',
+  sourceId: activityId,
+});
+const fromZone = (zoneId: string): ReliquarySourceHint => ({
+  sourceKind: 'zone',
+  sourceId: zoneId,
 });
 
 function items(...entries: readonly RelicEntry[]): ReliquaryRelicDef[] {
@@ -141,6 +233,65 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'drakemaw_raptor',
   'terrorspark_groundshaker',
 ] as const;
+
+// Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
+// `mount` === the mount key), so every hint below is really a claim about where
+// those reins drop: HEROIC_BOSS_LOOT rows (src/sim/content/heroic_loot.ts) for
+// the boss arms, the rank's own reins table for the rift arms
+// (RIFT_GREEN / BLUE / EPIC_MOUNT_REINS, src/sim/rift/progression.ts), and
+// NPC vendorItems for Marla.
+//
+// valorsteed names ONLY the vendor, deliberately: q_riding_lessons awards no
+// item at all (its itemRewards is empty; it gates the Riding skill and the
+// reins are a separate 10 gold purchase from Marla afterwards, see the quest
+// def in content/zone3.ts), so a quest hint there would name a door that hands
+// out nothing.
+//
+// drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
+// the answer: no live table awards either (drakemaw_raptor has no acquisition
+// path, terrorspark_groundshaker is dev-grant only). They are the catalog's two
+// remaining SOURCE_PENDING_RULING slots.
+const MOUNT_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
+  // One-door mounts are authored as bare hints per the ReliquarySourceHints
+  // convention (a one-element list would mean the same thing; the catalog
+  // never encodes meaning in the shape).
+  valorsteed: fromVendor('stablemaster_marla'),
+  stormfeather_griffin: [
+    fromBoss('morthen'),
+    fromBoss('nythraxis_scourge_of_thornpeak'),
+    fromRift('B'),
+  ],
+  shadowjump_toad: [
+    fromBoss('vael_the_mistcaller'),
+    fromBoss('nythraxis_scourge_of_thornpeak'),
+    fromRift('B'),
+  ],
+  grag_bear: [
+    fromBoss('ysolei'),
+    fromBoss('wildheart_high_priest'),
+    fromBoss('nythraxis_scourge_of_thornpeak'),
+    fromRift('A'),
+  ],
+  stalkglider_snail: [
+    fromBoss('korzul_the_gravewyrm'),
+    fromBoss('wildheart_high_priest'),
+    fromBoss('nythraxis_scourge_of_thornpeak'),
+    fromRift('A'),
+  ],
+  aether_hover_cycle: fromRift('S'),
+  thunderstrut_gobbler: fromRift('S'),
+};
+
+/** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
+ *  left the single authority on membership and order. A mount with no row falls
+ *  through bare rather than inventing a route. */
+function mountEntries(ids: readonly string[]): RelicEntry[] {
+  return ids.map((id) => {
+    // Own-property read, same reasoning as setMembers below.
+    const source = Object.hasOwn(MOUNT_SOURCES, id) ? MOUNT_SOURCES[id] : undefined;
+    return source ? ([id, source] as const) : id;
+  });
+}
 
 export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'guildmark_arming_sword',
@@ -270,7 +421,8 @@ export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
 /** Field-note flavor to the gathering profession that works its node type
  *  (gatherRareEventFlavor plus NODE_HARVEST_TABLE, src/sim/professions/).
  *  gather_event:perfect_specimen is absent on purpose: it fires on corpse
- *  harvest, which belongs to no gathering profession. */
+ *  harvest, which belongs to no gathering profession and takes the
+ *  corpse_harvest ACTIVITY hint instead. */
 const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = {
   'gather_event:pristine_vein': 'mining',
   'gather_event:ancient_heartwood': 'logging',
@@ -278,24 +430,29 @@ const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = {
 };
 
 /** Specimen jackpot to its gathering profession. The five corpse-harvest
- *  pristine specimens are absent for the same reason as perfect_specimen. */
+ *  pristine specimens are absent for the same reason as perfect_specimen, and
+ *  take the same corpse_harvest activity hint. */
 const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = {
   fine_thorium_ore: 'mining',
   fine_elderwood_log: 'logging',
   fine_sunpetal_herb: 'herbalism',
 };
 
-/** Ids carrying a profession hint where the map has one, and left bare (so the
- *  resolver answers null) where it deliberately does not. Keeps the curated id
- *  lists above the single authority on membership and order. */
+/** Ids carrying a profession hint where the map has one, and the `fallback`
+ *  hint (the activity that really awards them) everywhere it deliberately does
+ *  not. Keeps the curated id lists above the single authority on membership and
+ *  order; without a fallback the unmapped ids stay bare and the resolver
+ *  answers the empty list. */
 function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
+  fallback?: ReliquarySourceHint,
 ): RelicEntry[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
-    return professionId ? ([id, fromProfession(professionId)] as const) : id;
+    if (professionId) return [id, fromProfession(professionId)] as const;
+    return fallback ? ([id, fallback] as const) : id;
   });
 }
 
@@ -359,11 +516,13 @@ export const RELIQUARY_SET_MEMBERS = {
 // relics credited to a rare rather than a boss: each drops from its named
 // rare's dedicated chase roll group at 0.25, versus a 0.001 trickle off common
 // zone trash, so the rare is the source a player actually farms, not a coin
-// flip between two routes.
-const SET_MEMBER_SOURCES: Readonly<Record<string, ReliquarySourceHint>> = {
+// flip between two routes. Each pairs its rare with the ZONE that rare camps
+// in, because "which rare" is only half the answer for an open-world drop: the
+// other half is where to go looking for it.
+const SET_MEMBER_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
   deathlord_warplate: fromBoss('korzul_the_gravewyrm'),
   deathlord_legguards: fromBoss('grand_necromancer_velkhar'),
-  deathlord_sabatons: fromBoss('ironvein_foreman'),
+  deathlord_sabatons: [fromBoss('ironvein_foreman'), fromZone('thornpeak_heights')],
   deathlords_dread_visage: fromBoss('korzul_the_gravewyrm'),
   wyrmshadow_harness: fromBoss('korzul_the_gravewyrm'),
   wyrmshadow_treads: fromBoss('korgath_the_bound'),
@@ -371,7 +530,7 @@ const SET_MEMBER_SOURCES: Readonly<Record<string, ReliquarySourceHint>> = {
   wyrmshadow_talongrips: fromBoss('korzul_the_gravewyrm'),
   necromancers_starshroud: fromBoss('korzul_the_gravewyrm'),
   necromancers_soulsteps: fromBoss('grand_necromancer_velkhar'),
-  necromancers_legwraps: fromBoss('marrowlord_varkas'),
+  necromancers_legwraps: [fromBoss('marrowlord_varkas'), fromZone('thornpeak_heights')],
   necromancers_soulspire_mantle: fromBoss('korzul_the_gravewyrm'),
   crownforged_gauntlets: fromBoss('thunzharr_waking_peak'),
   crownforged_girdle: fromBoss('thunzharr_waking_peak'),
@@ -551,34 +710,52 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     desc: 'Rare and epic spoils from the Sanctum bosses and Korzul the Gravewyrm.',
     clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'normal' },
     // FIVE live LOOT TABLES drop this page's relics (sanctum_boneguard and
-    // sanctum_drakonid trash plus the three bosses), of which FOUR are authored
-    // as hints here; recipes and quests add further non-loot routes below.
-    // sanctum_boneguard is absent on purpose: the only two relic ids it
-    // drops, boundstone_helm and boundstone_girdle, are among the seven rows
-    // left un-hinted below, so it never wins a slot outright.
+    // sanctum_drakonid elite trash plus the three bosses), and all five are
+    // authored here; recipes and quests add further non-loot routes.
     //
-    // Six of those seven sit on TWO OR MORE comparable live routes with no
-    // primary: a trash family and a boss or two mid-bosses for all six, plus a
-    // crafting recipe for boundstone_helm (recipe_ironbound_warplate_helm) and
-    // gravewyrm_gauntlets (recipe_forgeguard_bulwark_gauntlets), and a
-    // guaranteed quest reward (q_velkhar) for staff_of_velkhar and
-    // shadowmeld_tunic. The seventh, wyrmcult_grand_robe, has two routes that
-    // name two DIFFERENT mobs: the guaranteed mage reward of q_gravewyrm
-    // (objective: korzul_the_gravewyrm) and a korgath_bonus loot row at 0.1.
-    // All seven are pinned in SOURCE_PENDING_RULING in
-    // tests/reliquary_content.test.ts awaiting a maintainer ruling rather than
-    // being assigned by guess.
+    // The seven rows that used to sit un-hinted were never a single-source
+    // question: each really is awarded through two or three comparable doors,
+    // so each names all of them rather than picking a winner.
+    // - boundstone_helm: boneguard_bonus 0.04, korgath_bonus 0.08, and the
+    //   armorcrafting recipe recipe_ironbound_warplate_helm.
+    // - boundstone_girdle: boneguard_bonus 0.04 and korzul_bonus 0.05.
+    // - gravewyrm_mantle: drakonid_bonus 0.05 and korgath_bonus 0.08.
+    // - gravewyrm_gauntlets: drakonid_bonus 0.05, korzul_bonus 0.05, and the
+    //   WEAPONcrafting recipe recipe_forgeguard_bulwark_gauntlets (the combo
+    //   pair authored it on the weapon side; see content/recipes.ts).
+    // - staff_of_velkhar and shadowmeld_tunic: korgath_bonus 0.1 and
+    //   velkhar_bonus 0.1. q_velkhar's guaranteed mage / rogue reward needs no
+    //   hint of its own: its kill objective IS grand_necromancer_velkhar, so
+    //   the quest is the same door the velkhar hint already names.
+    // - wyrmcult_grand_robe: korgath_bonus 0.1 plus the guaranteed mage reward
+    //   of q_gravewyrm, whose kill objective is korzul instead. Those are two
+    //   DIFFERENT doors, so the quest is named directly rather than folded into
+    //   a mob hint that would send half its finders to the wrong boss.
     relics: items(
       // Mid-boss and trash chase (rare+)
-      'boundstone_helm',
-      'boundstone_girdle',
-      'gravewyrm_mantle',
-      'gravewyrm_gauntlets',
+      [
+        'boundstone_helm',
+        [
+          fromBoss('sanctum_boneguard'),
+          fromBoss('korgath_the_bound'),
+          fromProfession('armorcrafting'),
+        ],
+      ],
+      ['boundstone_girdle', [fromBoss('sanctum_boneguard'), fromBoss('korzul_the_gravewyrm')]],
+      ['gravewyrm_mantle', [fromBoss('sanctum_drakonid'), fromBoss('korgath_the_bound')]],
+      [
+        'gravewyrm_gauntlets',
+        [
+          fromBoss('sanctum_drakonid'),
+          fromBoss('korzul_the_gravewyrm'),
+          fromProfession('weaponcrafting'),
+        ],
+      ],
       ['gravewyrm_thornmaul', fromBoss('sanctum_drakonid')],
       ['korgaths_chainwraps', fromBoss('korgath_the_bound')],
-      'staff_of_velkhar',
-      'shadowmeld_tunic',
-      'wyrmcult_grand_robe',
+      ['staff_of_velkhar', [fromBoss('korgath_the_bound'), fromBoss('grand_necromancer_velkhar')]],
+      ['shadowmeld_tunic', [fromBoss('korgath_the_bound'), fromBoss('grand_necromancer_velkhar')]],
+      ['wyrmcult_grand_robe', [fromBoss('korgath_the_bound'), fromQuest('q_gravewyrm')]],
       ['gravewyrm_sabatons', fromBoss('korgath_the_bound')],
       ['wyrmcult_soulsteps', fromBoss('korgath_the_bound')],
       ['wyrmshadow_treads', fromBoss('korgath_the_bound')],
@@ -700,11 +877,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     name: 'The Collapsed Reliquary',
     desc: 'Signature rares from the Collapsed Reliquary lockpick chest.',
     clearSource: { kind: 'delve', delveId: 'collapsed_reliquary' },
-    // Both rares have TWO live routes at once: the lockpick chest function and
-    // Brother Halven's heroicClear Marks stock. Neither is the answer on its
-    // own, and the chest is not a boss, a vendor, or a zone, so the page is
-    // left un-hinted pending a maintainer ruling (SOURCE_PENDING_RULING).
-    relics: items('deacon_reliquary_helm', 'varric_shadow_cowl'),
+    // Both rares have TWO live routes at once, and both are named: the lockpick
+    // chest (delveChestItemsForTier, content/delves/lockpick_tiers.ts) and
+    // Brother Halven's heroicClear Marks stock (content/delves/shop.ts). The
+    // 'delve' kind is what makes the chest sayable: the chest is not a boss, so
+    // the honest answer is the delve it lives in, which is also this delve's
+    // boardNpcId home for the vendor half.
+    relics: items(
+      ['deacon_reliquary_helm', [fromDelve('collapsed_reliquary'), fromVendor('brother_halven')]],
+      ['varric_shadow_cowl', [fromDelve('collapsed_reliquary'), fromVendor('brother_halven')]],
+    ),
   },
   {
     id: 'conquerors_drowned_litany',
@@ -712,17 +894,20 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     name: 'The Drowned Litany',
     desc: 'Rare and epic spoils from the Drowned Litany.',
     clearSource: { kind: 'delve', delveId: 'drowned_litany' },
-    // The first six come only from the Rite reliquary chest, which the loot
-    // vocabulary cannot name (it is opened by the Rite puzzle, not a boss
-    // kill), so they stay un-hinted in SOURCE_PENDING_RULING. The last two are
-    // Marks-stock only, with no chest route at all, so their vendor is certain.
+    // The first six come only from the Drowned Reliquary Rite chest
+    // (drownedLitanyChestItemsForTier, content/delves/drowned_litany_loot.ts,
+    // RARE and EPIC pools). No boss kill opens it, the Rite puzzle does
+    // (src/sim/delves/drowned_litany_rite.ts), so the delve itself is the
+    // honest answer: the chest lives inside the Drowned Litany and nowhere
+    // else. The last two are Marks-stock only, with no chest route at all, so
+    // their vendor is certain.
     relics: items(
-      'nhalias_bell_maul',
-      'widow_silk_hood',
-      'nhalias_litany_rod',
-      'blackwater_vanguard_chest',
-      'siltstep_leggings',
-      'sunken_reliquary_hood',
+      ['nhalias_bell_maul', fromDelve('drowned_litany')],
+      ['widow_silk_hood', fromDelve('drowned_litany')],
+      ['nhalias_litany_rod', fromDelve('drowned_litany')],
+      ['blackwater_vanguard_chest', fromDelve('drowned_litany')],
+      ['siltstep_leggings', fromDelve('drowned_litany')],
+      ['sunken_reliquary_hood', fromDelve('drowned_litany')],
       ['sister_nhalia_choir_plate', fromVendor('brother_halven_marsh')],
       ['drowned_choir_fang', fromVendor('brother_halven_marsh')],
     ),
@@ -792,11 +977,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     name: 'Masterwork Gallery',
     desc: 'Lifetime trophies for first masterworks. Empty until the next proc if a veteran predates the gallery (no invented craft history).',
     clearSource: { kind: 'none' },
-    // Each per-craft mark names its craft. masterworkFirst is deliberately
-    // un-hinted: it fires on the first masterwork from ANY of the five gear
-    // crafts, so no single profession id is its source (SOURCE_PENDING_RULING).
+    // Each per-craft mark names its craft. masterworkFirst names the ACTIVITY
+    // instead: it fires on the first masterwork from ANY of the five gear
+    // crafts (src/sim/professions/crafting.ts), so no single profession id is
+    // its source, but "land a masterwork proc" is exactly the thing a player
+    // does to earn it.
     relics: marks(
-      RELIQUARY_PROFESSION_MARKS.masterworkFirst,
+      [RELIQUARY_PROFESSION_MARKS.masterworkFirst, fromActivity('masterwork_craft')],
       ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map(
         (markId) => [markId, fromProfession(markId.slice('masterwork:'.length))] as const,
       ),
@@ -812,10 +999,15 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     // node type to the flavor, and NODE_HARVEST_TABLE maps that node type to
     // the profession that works it: ore to mining, wood to logging, herb to
     // herbalism. perfect_specimen is the corpse-harvest flavor instead, and
-    // corpse harvest belongs to no gathering profession, so it stays un-hinted
-    // (SOURCE_PENDING_RULING).
+    // corpse harvest belongs to no gathering profession, so it names the
+    // corpse_harvest activity (the src/sim/interaction.ts write site) rather
+    // than a profession it does not have.
     relics: marks(
-      ...withProfessions(RELIQUARY_PROFESSION_MARKS.fieldNotes, FIELD_NOTE_PROFESSIONS),
+      ...withProfessions(
+        RELIQUARY_PROFESSION_MARKS.fieldNotes,
+        FIELD_NOTE_PROFESSIONS,
+        fromActivity('corpse_harvest'),
+      ),
     ),
   },
   {
@@ -828,9 +1020,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     // that works its node family (MATERIAL_GRADES in
     // src/sim/professions/material_grades.ts pairs the base material with its
     // fine id). The five pristine specimens come from corpse harvest, which no
-    // gathering profession owns, so they stay un-hinted
-    // (SOURCE_PENDING_RULING), same ruling as gather_event:perfect_specimen.
-    relics: items(...withProfessions(RELIQUARY_PROFESSION_SPECIMEN_ITEMS, SPECIMEN_PROFESSIONS)),
+    // gathering profession owns, so they name the corpse_harvest activity, the
+    // same answer gather_event:perfect_specimen gives (one write site,
+    // src/sim/interaction.ts, awards the mark and these five items together).
+    relics: items(
+      ...withProfessions(
+        RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
+        SPECIMEN_PROFESSIONS,
+        fromActivity('corpse_harvest'),
+      ),
+    ),
   },
 
   // ---- Horizons shelf (Phase 8): mounts, account weapon skins, deed titles ----
@@ -840,16 +1039,14 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // No mount carries a hint, and that is a finding rather than an omission:
-    // every one has either several live routes at once or none at all. The
-    // four heroic reins each drop from two or three different HEROIC_BOSS_LOOT
-    // bosses AND from Rift progression (RIFT_GREEN/BLUE/EPIC_MOUNT_REINS,
-    // src/sim/rift/progression.ts); valorsteed is both Stablemaster Marla's
-    // vendor stock and the q_riding_lessons reward; drakemaw_raptor has NO
-    // acquisition path today (see the def comment in content/drakelands.ts)
-    // and terrorspark_groundshaker is dev-grant only. The whole page is pinned
-    // in SOURCE_PENDING_RULING until a maintainer rules.
-    relics: mounts(...RELIQUARY_HORIZON_MOUNTS),
+    // Seven of the nine mounts name every door that awards their reins (see
+    // MOUNT_SOURCES above): the four heroic reins each drop from two or three
+    // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
+    // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
+    // pending ruling that used to cover all nine is executed; the two that
+    // remain (drakemaw_raptor, terrorspark_groundshaker) are content gaps, not
+    // vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
+    relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },
   {
     id: 'horizons_weapon_skins',
@@ -859,9 +1056,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     clearSource: { kind: 'none' },
     // Armory skins are granted only by Claudium store purchases
     // (grantWeaponSkinsToAccount, server/game.ts, driven by server/claudium.ts).
-    // That is an account-level storefront, not a boss, zone, profession, deed,
-    // or in-world vendor NPC, so this vocabulary cannot name it and no skin
-    // carries a hint (SOURCE_PENDING_RULING).
+    // That is an account-level storefront rather than a boss, zone, profession,
+    // deed, or in-world vendor NPC, and the 'store' kind now names it. One
+    // storefront awards every skin on the page, which is exactly the condition
+    // a page default is for, so the default carries all 29 rows.
+    sourceDefault: fromStore(),
     relics: weaponSkins(...RELIQUARY_HORIZON_WEAPON_SKINS),
   },
   {
@@ -930,10 +1129,20 @@ export function isCataloguedRelicMark(markId: string): boolean {
   return RELIQUARY_MARK_IDS.has(markId);
 }
 
+/** Shared frozen empty answer, so "no source" never allocates and never gets
+ *  mutated by a caller that mistook it for its own array. */
+const NO_SOURCE_HINTS: readonly ReliquarySourceHint[] = Object.freeze([]);
+
 /**
- * The source hint a relic answers with on a given page: its own hint, else the
- * page default, else null. Null is a real answer ("content does not name one
- * source"), not a missing value the caller should paper over with prose.
+ * The source hints a relic answers with on a given page: its OWN hints, else
+ * the page default as a one-element list, else the empty list. The empty list
+ * is a real answer ("content names no source"), not a missing value the caller
+ * should paper over with prose.
+ *
+ * A relic's own hints win WHOLESALE over the page default: they are never
+ * merged. A page default says "unless a relic knows better", and a relic that
+ * lists its doors knows better about all of them, so folding the default back
+ * in could only append a route the authoring deliberately left out.
  *
  * THE one implementation of that precedence: every production caller, the
  * client view included, goes through here rather than re-spelling
@@ -949,6 +1158,18 @@ export function isCataloguedRelicMark(markId: string): boolean {
 export function reliquaryRelicSource(
   page: ReliquaryPageDef | undefined,
   relic: ReliquaryRelicDef,
-): ReliquarySourceHint | null {
-  return relic.source ?? page?.sourceDefault ?? null;
+): readonly ReliquarySourceHint[] {
+  const own = relic.source;
+  // `in` rather than Array.isArray: it narrows the readonly-array arm without
+  // the any[] widening Array.isArray brings to a readonly union.
+  //
+  // Every arm answers a FROZEN list: the list arm is the catalog's own array
+  // (frozen at construction in withSource), and the two wrapper arms freeze
+  // their fresh one-element list so a caller cannot learn to mutate the answer
+  // on the cheap arms and then corrupt the shared one. The freeze is shallow
+  // by design: the hint OBJECTS inside stay runtime-mutable, and the readonly
+  // fields on ReliquarySourceHint are what guard them for typed callers.
+  if (own !== undefined) return 'sourceKind' in own ? Object.freeze([own]) : own;
+  const fallback = page?.sourceDefault;
+  return fallback ? Object.freeze([fallback]) : NO_SOURCE_HINTS;
 }
