@@ -380,6 +380,16 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   jump: 'Jump',
 };
 
+// The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
+// #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
+// Wildheart Basin mobs. This clip is baked off wildheart_stalker.glb's own donor poses
+// (a compressed re-timing of its own Attack clip into a spear-throw lunge), so only
+// mob_wildheart_stalker gets it; the other 4 Wildheart mobs are untouched.
+const WILDHEART_STALKER: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_Stalker_Attack'],
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1673,7 +1683,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/wildheart_stalker.glb`,
     height: 2.5,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_STALKER,
+    // Wildheart_Stalker_Attack clip donor (scripts/build_wildheart_stalker_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/wildheart_stalker_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
