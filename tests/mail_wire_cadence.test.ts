@@ -79,7 +79,32 @@ function mailboxServer(): { server: GameServer; fc: FakeClient; session: ClientS
   return { server, fc, session };
 }
 
+// Book an authored letter straight through the tracked booking path, with a
+// distinct letterId so per-target inboxes are tellable apart in the spectate
+// pin below.
+function bookAuthoredLetter(server: GameServer, pid: number, letterId: string): void {
+  const meta = server.sim.players.get(pid);
+  if (!meta) throw new Error('missing meta');
+  // biome-ignore lint/suspicious/noExplicitAny: reaching the post office is the harness idiom
+  const post = (server.sim as any).postOffice;
+  post.sendLetter(
+    post.mailKeyFor(meta),
+    meta.name,
+    { letterId, senderName: 'Postmaster', subject: 'Probe', body: 'A line.', delaySeconds: 0 },
+    'npc',
+  );
+}
+
 describe('mail wire cadence + rebuild-only-on-change', () => {
+  it('pins the tuned cadence literally: 5-tick interval, 40-tick backstop', () => {
+    // The imported constants drive the loop mechanics above; these literal
+    // pins keep a server-side retune (say MAIL_WIRE_HZ = 20, reverting the
+    // cadence layer) from leaving the suite green while it asserts a window
+    // that no longer exists.
+    expect(MAIL_WIRE_INTERVAL_TICKS).toBe(5);
+    expect(MAIL_REFRESH_TICKS).toBe(40);
+  });
+
   it('rebuilds once for the join, then never again while nothing changes (until the backstop)', () => {
     const { server, fc } = mailboxServer();
     // Settle the welcome letter's announce sweep first: it flips a runtime
@@ -135,6 +160,16 @@ describe('mail wire cadence + rebuild-only-on-change', () => {
       sender.pid,
     );
 
+    // Mid-window: the booking already advanced the revision, but the cadence
+    // gate is not due yet (one tick into the 5-tick window), so a broadcast
+    // here must ship nothing and pay no rebuild. Deleting the mailDue branch
+    // would rebuild right here and redden this pin.
+    server.sim.tick();
+    const midWindow = fc.sent.length;
+    broadcast(server);
+    expect(mailSnaps(fc.sent, midWindow)).toHaveLength(0);
+    expect(spy.mock.calls.filter(([pid]) => pid === session.pid).length).toBe(0);
+
     // Fly the raven home: 45 sim-seconds of ticks, broadcasting on cadence.
     for (let i = 0; i < 46 * 20; i++) server.sim.tick();
     const sent = fc.sent.length;
@@ -160,6 +195,55 @@ describe('mail wire cadence + rebuild-only-on-change', () => {
     expect(snaps).toHaveLength(1);
     // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
     expect((snaps[0] as any).self.mail.messages[0].read).toBe(true);
+  });
+
+  it("a spectate anchor switch re-ships the NEW target's inbox on the next snapshot", () => {
+    // Mirror of the corder spectate pin: the mail revision is realm-global
+    // with no target identity, so an anchor change that missed both the
+    // lastSent wipe and the tracker resets would leave a moderator reading
+    // player A's inbox while spectating B until the staleness backstop.
+    const server = new GameServer();
+    const fcMod = fakeWs();
+    const mod = joinServer(server, fcMod, 76, 'Watcher');
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 77, 'Anna');
+    const fcB = fakeWs();
+    const bela = joinServer(server, fcB, 78, 'Bela');
+    placeAtMailbox(server, a.pid);
+    placeAtMailbox(server, bela.pid);
+    bookAuthoredLetter(server, a.pid, 'qa_spectate_a');
+    bookAuthoredLetter(server, bela.pid, 'qa_spectate_b');
+    for (let i = 0; i < 2; i++) server.sim.tick();
+    broadcast(server);
+
+    // Enter: anchored on Anna, her letter and not Bela's.
+    let before = fcMod.sent.length;
+    // biome-ignore lint/suspicious/noExplicitAny: the spectate entry is private by design
+    (server as any).enterSpectate(mod, a);
+    broadcast(server);
+    let snaps = mailSnaps(fcMod.sent, before);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    let inbox = (snaps[0] as any).self.mail;
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect(inbox.messages.some((m: any) => m.letterId === 'qa_spectate_a')).toBe(true);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect(inbox.messages.some((m: any) => m.letterId === 'qa_spectate_b')).toBe(false);
+
+    // Switch to Bela with the book UNCHANGED: only the wipe/reset pair can
+    // carry the re-anchored inbox through the gate.
+    before = fcMod.sent.length;
+    // biome-ignore lint/suspicious/noExplicitAny: the spectate entry is private by design
+    (server as any).enterSpectate(mod, bela);
+    broadcast(server);
+    snaps = mailSnaps(fcMod.sent, before);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    inbox = (snaps[0] as any).self.mail;
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect(inbox.messages.some((m: any) => m.letterId === 'qa_spectate_b')).toBe(true);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect(inbox.messages.some((m: any) => m.letterId === 'qa_spectate_a')).toBe(false);
   });
 
   it('walking away nulls the key at cadence; returning re-ships the full view', () => {

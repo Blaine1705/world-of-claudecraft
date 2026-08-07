@@ -42,7 +42,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 describe('bcastSelf per-key-group breakdown', () => {
   it('names one self.* bucket per contiguous key group and registers each in the profiler', () => {
-    expect(SELF_WIRE_PHASES.length).toBeGreaterThanOrEqual(15);
+    expect(SELF_WIRE_PHASES).toHaveLength(16);
     for (const name of SELF_WIRE_PHASES) expect(name.startsWith('self.')).toBe(true);
     // The corder and market groups exist by name: the two shipped incidents
     // this breakdown exists to catch must never fold into a broader bucket.
@@ -56,6 +56,22 @@ describe('bcastSelf per-key-group breakdown', () => {
     for (const name of SELF_WIRE_PHASES) {
       expect(profile.phases[name], `${name} must be a registered profiler phase`).toBeDefined();
     }
+  });
+
+  it('the loop callback drives the flush and the per-pass reset (source pin)', () => {
+    // The interval body is not drivable from a unit test, so the two wiring
+    // sites are pinned in source: deleting the flush call leaves every
+    // behavior test green while the admin table zeroes forever, and deleting
+    // the clear makes the accumulators inflate monotonically across passes.
+    const source = readFileSync(join(ROOT, 'server', 'game.ts'), 'utf8');
+    expect(source).toMatch(/this\.selfWireNs\.clear\(\);/);
+    const flushIdx = source.indexOf('this.flushSelfWirePhases();');
+    expect(flushIdx).toBeGreaterThan(-1);
+    // The flush sits directly beside the bcastSelf total it decomposes.
+    const bcastIdx = source.indexOf("this.tickProfiler.add('bcastSelf'");
+    expect(bcastIdx).toBeGreaterThan(-1);
+    expect(flushIdx).toBeGreaterThan(bcastIdx);
+    expect(flushIdx - bcastIdx).toBeLessThan(500);
   });
 
   it('the selfLap probe sequence in selfWireJson equals SELF_WIRE_PHASES, in order', () => {

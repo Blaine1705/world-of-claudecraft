@@ -62,6 +62,15 @@ function viewerServer(): { server: GameServer; fc: FakeClient; session: ClientSe
 }
 
 describe('corder wire cadence + rebuild-only-on-change', () => {
+  it('pins the tuned cadence literally: 5-tick interval, 40-tick backstop', () => {
+    // The imported constants drive the loop mechanics above; these literal
+    // pins keep a server-side retune (say CORDER_WIRE_HZ = 20, reverting the
+    // cadence layer) from leaving the suite green while it asserts a window
+    // that no longer exists.
+    expect(CORDER_WIRE_INTERVAL_TICKS).toBe(5);
+    expect(CORDER_BOARD_REFRESH_TICKS).toBe(40);
+  });
+
   it('rebuilds once at join, then never again while the board is unchanged (until the backstop)', () => {
     const { server, fc } = viewerServer();
     const spy = vi.spyOn(server.sim, 'commissionOrdersFor');
@@ -83,13 +92,23 @@ describe('corder wire cadence + rebuild-only-on-change', () => {
   });
 
   it("another player's open order reaches the viewer on their next due pass", () => {
-    const { server, fc } = viewerServer();
+    const { server, fc, session } = viewerServer();
     broadcast(server);
     const spy = vi.spyOn(server.sim, 'commissionOrdersFor');
 
     const fc2 = fakeWs();
     const requester = joinServer(server, fc2, 82, 'Requester');
     server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+
+    // Mid-window: the open already advanced the revision, but the viewer's
+    // cadence gate is not due yet (one tick into the 5-tick window), so a
+    // broadcast here must ship nothing and pay no rebuild for them. Deleting
+    // the corderDue branch would rebuild right here and redden this pin.
+    server.sim.tick();
+    const midWindow = fc.sent.length;
+    broadcast(server);
+    expect(corderSnaps(fc.sent, midWindow)).toHaveLength(0);
+    expect(spy.mock.calls.filter(([pid]) => pid === session.pid).length).toBe(0);
 
     const sent = fc.sent.length;
     duePass(server);
@@ -123,6 +142,45 @@ describe('corder wire cadence + rebuild-only-on-change', () => {
     expect(snaps).toHaveLength(1);
     // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
     expect((snaps[0] as any).self.corder[0].mine).toBe(true);
+  });
+
+  it("a spectate anchor switch re-ships the NEW target's projection on the next snapshot", () => {
+    // The revisions are realm-global with no target identity, so an
+    // anchor-changing path that missed BOTH protections (the lastSent wipe
+    // and the tracker resets) would leave a moderator reading player A's
+    // projection while spectating B for up to the staleness backstop. This
+    // pins the observable property through the real enterSpectate path, for
+    // both the enter and the switch.
+    const server = new GameServer();
+    const fcMod = fakeWs();
+    const mod = joinServer(server, fcMod, 86, 'Watcher');
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 87, 'Anna');
+    const fcB = fakeWs();
+    const bela = joinServer(server, fcB, 88, 'Bela');
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, a.pid);
+    broadcast(server);
+
+    // Enter: anchored on Anna, the order reads as HERS (mine: true).
+    let before = fcMod.sent.length;
+    // biome-ignore lint/suspicious/noExplicitAny: the spectate entry is private by design
+    (server as any).enterSpectate(mod, a);
+    broadcast(server);
+    let snaps = corderSnaps(fcMod.sent, before);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect((snaps[0] as any).self.corder[0].mine).toBe(true);
+
+    // Switch to Bela with the board UNCHANGED: only the wipe/reset pair can
+    // carry the re-anchored projection through the gate.
+    before = fcMod.sent.length;
+    // biome-ignore lint/suspicious/noExplicitAny: the spectate entry is private by design
+    (server as any).enterSpectate(mod, bela);
+    broadcast(server);
+    snaps = corderSnaps(fcMod.sent, before);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    expect((snaps[0] as any).self.corder[0].mine).toBe(false);
   });
 
   it('a linkdead resume re-ships the projection through the lastSent wipe, unchanged board included', () => {
