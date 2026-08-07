@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 // The Node major every deploy and CI carrier must agree on, and the exact runtime
@@ -147,6 +148,60 @@ describe('deploy and CI Node version pin', () => {
   // lies about the image the healthcheck runs in.
   it('keeps the docker-compose healthcheck comment on the target base tag', () => {
     expect(compose).toContain(`(${TARGET_TAG})`);
+  });
+
+  // The whole-directory closer: the per-file arms above each pin a KNOWN carrier, so a
+  // NEW workflow carrying its own Node toolchain would land unpinned and drift silently.
+  // ota-publish.yml did exactly that (Node 22 with no recorded decision, inherited from
+  // desktop-publish, until the 2026-08-07 bump). Enumerate .github/workflows and hold
+  // every declared node-version to the target major unless the file is in the named
+  // exemption list below. The read is single-level by GitHub's own contract: Actions
+  // registers only top-level workflow files, so a YAML parked in a subdirectory is inert
+  // to CI and a flat read matches the real registration surface rather than narrowing it.
+  const WORKFLOW_DIR = '.github/workflows';
+  const workflowFiles = readdirSync(WORKFLOW_DIR)
+    .filter((name) => /\.ya?ml$/.test(name))
+    .sort();
+
+  // Workflows allowed off the target major, each with its recorded reason. An entry must
+  // BOTH exist and still diverge (second test below), so an exemption cannot rot into a
+  // blanket waiver after the divergence it covered is gone.
+  const NODE_MAJOR_EXEMPTIONS: Record<string, string> = {
+    'desktop-publish.yml':
+      'Steam/Electron publish path deliberately held on Node 22 until separately revisited',
+  };
+
+  it('holds every workflow node-version to the target major or a named exemption', () => {
+    // Vacuity floor: the enumeration must see the known carriers before "every" means much.
+    expect(workflowFiles).toContain('ci.yml');
+    expect(workflowFiles).toContain('desktop-publish.yml');
+    expect(workflowFiles).toContain('ota-publish.yml');
+    for (const file of workflowFiles) {
+      if (file in NODE_MAJOR_EXEMPTIONS) continue;
+      const values = nodeVersionValues(readFileSync(join(WORKFLOW_DIR, file), 'utf8'));
+      for (const value of values) {
+        expect(
+          value,
+          `${file} declares node-version ${value}; the target major is ${TARGET_MAJOR}. ` +
+            'Bump it or add a reasoned NODE_MAJOR_EXEMPTIONS entry.',
+        ).toBe(TARGET_MAJOR);
+      }
+    }
+  });
+
+  it('keeps every exemption naming a real, still-divergent workflow', () => {
+    for (const [file, reason] of Object.entries(NODE_MAJOR_EXEMPTIONS)) {
+      expect(reason.trim().length, `${file} exemption needs a recorded reason`).toBeGreaterThan(0);
+      expect(workflowFiles, `stale exemption: ${file} is not in ${WORKFLOW_DIR}`).toContain(file);
+      const values = nodeVersionValues(readFileSync(join(WORKFLOW_DIR, file), 'utf8'));
+      expect(values.length, `${file} declares no node-version; drop the exemption`).toBeGreaterThan(
+        0,
+      );
+      expect(
+        values.some((value) => value !== TARGET_MAJOR),
+        `${file} sits on the target major now; drop the exemption`,
+      ).toBe(true);
+    }
   });
 
   // DEPLOY.md's tsc-gate carries a prose aside for the host that already has Node on PATH
