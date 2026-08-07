@@ -29,6 +29,15 @@ export type FctSpawnSource =
       readonly crit: boolean;
       readonly isPlayerSource: boolean;
       readonly isPlayerTarget: boolean;
+      /**
+       * The whole hit landed inside an absorb shield: zero damage got through, and
+       * an absorb floater is being spawned for it separately. The NUMBER is then
+       * suppressed, because a bare "0" beside "Absorbed (240)" is the misleading
+       * half of the pair: it reads as a broken attack rather than a soaked one.
+       * Heals already work this way (their call site guards on `amount > 0`);
+       * damage simply never got the same guard.
+       */
+      readonly fullyAbsorbed?: boolean;
     }
   | {
       /**
@@ -67,6 +76,11 @@ export interface FctSpawnShape {
 export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
   switch (src.type) {
     case 'damage': {
+      // A fully soaked hit floats no number on EITHER side: the absorb floater is
+      // the honest report, and the zero beside it says the opposite of the truth.
+      // Checked before the avoidance words on purpose, since those carry no amount
+      // and can never be fully absorbed.
+      if (src.fullyAbsorbed) return null;
       // Avoidance words always float; self vs other only flips the colour token.
       // Parry reuses the dodge colour token (its own word is spread on at the call site).
       if (

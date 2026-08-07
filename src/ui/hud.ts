@@ -10936,6 +10936,9 @@ export class Hud {
             crit: ev.crit,
             isPlayerSource,
             isPlayerTarget,
+            // Nothing got through and the absorb floater above already said so,
+            // so the number is suppressed rather than shown as a bare 0.
+            fullyAbsorbed: ev.amount === 0 && (ev.absorbed ?? 0) > 0,
           });
           if (
             hitShape &&

@@ -297,3 +297,39 @@ describe('fctSpawnShape: determinism (same input -> same output)', () => {
     expect(fctSpawnShape(src)).toEqual(fctSpawnShape(src));
   });
 });
+
+describe('a fully absorbed hit floats no number', () => {
+  // The bare "0" is the misleading half of the pair: beside "Absorbed (240)" it
+  // reads as a broken attack rather than a soaked one. Heals already guard on
+  // amount > 0; damage never got the same guard.
+  const hit = (over = {}) =>
+    fctSpawnShape({
+      type: 'damage',
+      damageKind: 'hit',
+      ability: false,
+      crit: false,
+      isPlayerSource: true,
+      isPlayerTarget: false,
+      ...over,
+    });
+
+  it('suppresses the number on both sides when the shield ate all of it', () => {
+    expect(hit({ fullyAbsorbed: true })).toBeNull();
+    expect(hit({ fullyAbsorbed: true, isPlayerSource: false, isPlayerTarget: true })).toBeNull();
+  });
+
+  it('still floats the number when damage got through', () => {
+    // The negative that makes the case above decisive: a partial absorb is a real
+    // hit and must keep reporting what landed.
+    expect(hit({ fullyAbsorbed: false })).not.toBeNull();
+    expect(hit()).not.toBeNull();
+  });
+
+  it('leaves the avoidance words alone', () => {
+    // Miss/dodge/parry carry no amount, so they can never be fully absorbed and
+    // must not be caught by the new guard.
+    for (const kind of ['miss', 'dodge', 'parry', 'resist', 'evade'] as const) {
+      expect(hit({ damageKind: kind })).not.toBeNull();
+    }
+  });
+});
