@@ -22,6 +22,7 @@ standard at `DESIGN.md`.
 | Illumination | Completing every relic on a page (first-time celebration). |
 | Curator rank | Cosmetic completion tiers over total unique relics filled. |
 | First find | Optional metadata on a filled relic: clear# (and source) at first obtain. |
+| Obtain count | How many times a filled relic has been taken from the world. Information on a tooltip, never a score. |
 
 Do not call this a "collection log" in player copy. Do not reference other
 games products in code comments, docs, commits, or player strings.
@@ -96,7 +97,8 @@ sparse Reliquary fields; no per-relic SQL table and no per-drop save storm.
 | No second full discovery set | Item ownership = `itemsDiscovered`. Do not dual-write a parallel set of every item id. |
 | Sparse first-find | `firstFind` / equivalent maps store entries **only** for catalogued relic item ids on first fill. Zero-default omit on serialize. |
 | Bounded profession marks | Lifetime profession trophies are authored mark ids (recipe, event flavor, milestone), not every craft. Prefer reusing `visited` namespaces (`gather_event:*`) when they already exist. |
-| Wire thrift | Presentation: id-only `reliquaryUnlock` (or reuse a narrow discovery signal). Do not re-send full inventory on every loot when the id was already known. Heavy self may carry a **small** sparse Reliquary blob that changes only when membership grows. Prefer digests / counts for overview while the window is closed. |
+| Wire thrift | Presentation: id-only `reliquaryUnlock` (or reuse a narrow discovery signal). Do not re-send full inventory on every loot when the id was already known. Heavy self may carry a **small** sparse Reliquary blob that changes only when membership grows. Prefer digests / counts for overview while the window is closed. The blob is **memoized** (`reliquaryWireJson`): built once per state CHANGE, not once per heavy tick, so a staggered refresh with nothing moved re-serializes nothing. Delta semantics are unchanged by that: an absent key still means "unchanged, keep the mirror". |
+| Obtain counts cost | Read this production-absolute, not against the branch: the Reliquary has never shipped, so **no production row carries the key at all today** and every byte below is new. Measured worst case, a veteran with the whole catalog as of v0.36.0 (135 item relics then, 10 marks, a full recent ring; the byte figures date the same way and re-measure at catalog growth): the character row grows about **+1,772 stored bytes, roughly +17 percent**, under pglz, and character autosave rewrites the full JSONB, so that is paid every `AUTOSAVE_SECONDS` (30) per online session rather than once. Raw size lands about 15 percent below the pre-fix branch shape, which is the half that helps: cheaper detoast for the seq-scan readers. Carrier vector to watch: for a character whose relics were discovered before the Reliquary ships, the re-obtain carrier entry is the ONLY way `firstFind` entries ever accrue, bounded by the catalog size (v0.36.0: about 2.2 KB stored when full). Intra-branch, kept for the design record: counts cost 371 bytes where dropping the dead `pageId` stamp and the zero-clears entries gave back 881, which is why the tally folds onto the first-find entry instead of shipping as a sibling map. |
 | Cold UI | Window is cold: signature-gated rebuild when open (Book of Deeds pattern). No per-frame full grid rebuild. Optional always-on tracker (if any) is a separate pure core + write-elided painter. |
 | Catalog growth is the bound | Every new relic id is a permanent potential blob key for veterans who obtain it. Author pages deliberately; do not auto-include every loot table row without review. |
 
@@ -147,7 +149,29 @@ it), optional links to deeds (`col_*`, clear milestones).
 
 ## Deliberately deferred (do not "fix" by shipping)
 
-- Per-drop full loot history (quantity streams, every common).
+- Per-drop full loot history: quantity streams, every common, one entry per
+  drop, and any timestamp on any of them. Still deferred, and the counts below
+  are not a foot in its door.
+  - **Sanctioned instead (maintainer, locked decision): grant-time per-relic
+    obtain COUNTS.** The counts-only form supersedes this deferral; the history
+    form does not become shippable with it. A count is one integer per relic
+    and answers "how many", never "when" or "which drop".
+  - The rules that keep it counts-only, all of them binding:
+    - Catalogued relic ITEM ids only: `isCataloguedRelicItem` gates every
+      write, so no common, no mark, no mount, skin, or title has a tally.
+    - World-sourced grants only. `noteRelicObtain` runs at the grant hub for
+      every acquisition EXCEPT the ones flagged `movement: true`: a trade, a
+      mail delivery, a market purchase, a vendor buyback reclaim, an enchant
+      re-mint, an unbind stack split, a returned commission. Two players
+      handing one relic back and forth must never watch both tallies climb,
+      and that is the reading the flag exists to refuse.
+    - No timestamps and no per-drop entries, ever. One integer per relic.
+    - Sparse and omit-empty on serialize. An absent id costs nothing and
+      means "no counted obtain", which is deliberately NOT the same claim as
+      "never obtained"; the UI answers it by rendering no line at all.
+    - Folded onto the first-find entry on the wire, never a second map.
+    - Rule 1 still binds: counts feed no completion, rank, drop rate, deed,
+      or reward. They are shown, and nothing consumes them.
 - Power rewards, pity timers, or drop-rate buffs for incomplete pages.
 - Account-wide item discovery merge (character-scoped like deeds v1 unless
   a later account lane lands).
@@ -161,6 +185,7 @@ it), optional links to deeds (`col_*`, clear milestones).
 | Runtime | `src/sim/reliquary.ts`, `src/sim/content/reliquary.ts` |
 | UI | `src/ui/reliquary_view.ts`, `src/ui/reliquary_window.ts`, `src/ui/reliquary_sheet_view.ts` |
 | Discovery hub | `src/sim/deeds.ts` `markItemDiscovered` |
+| Obtain counts | `src/sim/reliquary.ts` (state, serialize, `reliquaryWireJson`), `IWorldReliquary.reliquaryObtainCounts`, `src/ui/reliquary_view.ts` `reliquaryObtainCountsDigest` |
 | Clear counts | `DeedStats.dungeonClears`, `PlayerMeta.delveClears` |
 | Heroic uniques | `src/sim/content/heroic_loot.ts` |
 | Sets | `src/sim/content/item_sets.ts` |
