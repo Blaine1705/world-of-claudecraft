@@ -6355,15 +6355,15 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
-        "name": "Sergeant"
+        "name": "Linebreaker"
       },
       {
         "kind": "title",
-        "name": "Knight-Lieutenant"
+        "name": "Fieldreaver"
       },
       {
         "kind": "title",
-        "name": "Field Marshal"
+        "name": "Warcrowned"
       }
     ]
   }
