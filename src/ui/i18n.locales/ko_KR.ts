@@ -6923,6 +6923,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': '파티 찾기.',
   'guide.social.chanLfgBody':
     '던전을 함께 돌 사람을 찾기 위한, 선택 참여형 렐름 전체 채널입니다. 해당 탭을 열어 참여하세요.',
+  'guide.social.chanBattleground': '전장.',
+  'guide.social.chanBattlegroundBody':
+    '전장에 있는 모든 전투원과 대화합니다. 양 팀 모두에게 전달되며, 경기 중에만 사용할 수 있습니다.',
   'guide.social.chanParty': '파티.',
   'guide.social.chanPartyBody': '아무리 흩어져 있어도 파티원 모두에게 이야기할 수 있습니다.',
   'guide.social.chanSay': '말하기.',

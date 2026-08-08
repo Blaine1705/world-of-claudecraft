@@ -208,22 +208,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "zh_CN": [
-    "guide.social.chanBattleground",
-    "guide.social.chanBattlegroundBody"
-  ],
-  "zh_TW": [
-    "guide.social.chanBattleground",
-    "guide.social.chanBattlegroundBody"
-  ],
-  "ko_KR": [
-    "guide.social.chanBattleground",
-    "guide.social.chanBattlegroundBody"
-  ],
-  "ja_JP": [
-    "guide.social.chanBattleground",
-    "guide.social.chanBattlegroundBody"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "guide.social.chanBattleground",
     "guide.social.chanBattlegroundBody",
@@ -257,10 +245,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "ru_RU": [
-    "guide.social.chanBattleground",
-    "guide.social.chanBattlegroundBody"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "guide.social.chanBattleground",
     "guide.social.chanBattlegroundBody",

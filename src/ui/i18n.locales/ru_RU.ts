@@ -7030,6 +7030,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'Поиск группы.',
   'guide.social.chanLfgBody':
     'Добровольный канал на всё королевство, чтобы найти людей для прохождения подземелья. Откройте его вкладку, чтобы присоединиться.',
+  'guide.social.chanBattleground': 'Поле боя.',
+  'guide.social.chanBattlegroundBody':
+    'Разговор со всеми бойцами на поле боя, с обеими сторонами. Только пока идёт бой.',
   'guide.social.chanParty': 'Группа.',
   'guide.social.chanPartyBody':
     'Говорите со всеми в своей группе, как бы далеко друг от друга вы ни разошлись.',

@@ -6933,6 +6933,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'パーティ募集。',
   'guide.social.chanLfgBody':
     'ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。',
+  'guide.social.chanBattleground': '戦場。',
+  'guide.social.chanBattlegroundBody':
+    '戦場にいるすべての戦士と、敵味方を問わず話せます。試合中のみ利用できます。',
   'guide.social.chanParty': 'パーティ。',
   'guide.social.chanPartyBody': 'どれだけ離れていても、グループの全員に話しかけられます。',
   'guide.social.chanSay': 'セイ。',
