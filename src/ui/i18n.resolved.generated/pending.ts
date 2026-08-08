@@ -12,33 +12,75 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -47,47 +89,110 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ]
 };
