@@ -244,6 +244,7 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
+import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
   GFX,
@@ -3629,7 +3630,16 @@ export class Renderer {
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
-    this.scene.add(view.group);
+    // Attach hidden until the live gate links the group's programs (the same
+    // contract as dungeon interiors): a lazily built biome feature otherwise
+    // links its freshly minted materials synchronously on its first visible
+    // frame. Registration into the fog-cull sweep is deferred to the reveal,
+    // because updateZoneFeatureVisibility writes .visible every frame and
+    // would flip the hidden group back on mid-compile.
+    const gate = this.asyncCompileSupported
+      ? (target: THREE.Object3D) => this.compileGate(target)
+      : undefined;
+    const attached = attachSceneGroupGated(this.scene, view.group, gate);
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
     // (the Sowfield brazier rule). A light left inside the group leaves the
     // render light list whenever the distance cull hides its ancestor, so the
@@ -3653,25 +3663,36 @@ export class Renderer {
     // A view spanning several regions registers each child for the distance
     // cull instead of the whole group: one world-wide footprint can never be
     // culled (water-flora was 10.96M triangles submitted from every realm).
-    for (const cullGroup of view.cullGroups ?? [view.group]) {
-      // Footprints are measured ONCE at attach, so an InstancedMesh whose
-      // matrices are still factory zeros poisons the measurement silently
-      // (the seabird flock parked a footprint at the world origin this way).
-      cullGroup.traverse((obj) => {
-        const inst = obj as THREE.InstancedMesh;
-        if (!inst.isInstancedMesh) return;
-        if (hasUnseededInstanceMatrix(inst.instanceMatrix.array, inst.count)) {
-          console.error(
-            `attachZoneFeature: "${cullGroup.name}" holds an InstancedMesh with unseeded ` +
-              'instance matrices; seed placements before attach or its cull footprint is wrong',
-          );
-        }
-      });
-      this.zoneFeatureGroups.push({
-        group: cullGroup,
-        footprint: measureFeatureFootprint(cullGroup),
-      });
+    const registerCullGroups = (): void => {
+      for (const cullGroup of view.cullGroups ?? [view.group]) {
+        // Footprints are measured ONCE at attach, so an InstancedMesh whose
+        // matrices are still factory zeros poisons the measurement silently
+        // (the seabird flock parked a footprint at the world origin this way).
+        cullGroup.traverse((obj) => {
+          const inst = obj as THREE.InstancedMesh;
+          if (!inst.isInstancedMesh) return;
+          if (hasUnseededInstanceMatrix(inst.instanceMatrix.array, inst.count)) {
+            console.error(
+              `attachZoneFeature: "${cullGroup.name}" holds an InstancedMesh with unseeded ` +
+                'instance matrices; seed placements before attach or its cull footprint is wrong',
+            );
+          }
+        });
+        this.zoneFeatureGroups.push({
+          group: cullGroup,
+          footprint: measureFeatureFootprint(cullGroup),
+        });
+      }
+    };
+    if (!gate) {
+      registerCullGroups();
+      return;
     }
+    const generation = this.lifecycleGeneration;
+    void attached.then(() => {
+      if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+      registerCullGroups();
+    });
   }
 
   // Hide feature groups the fog has already swallowed. Terrain and foliage both

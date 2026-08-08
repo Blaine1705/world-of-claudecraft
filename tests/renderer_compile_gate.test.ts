@@ -8,6 +8,23 @@ interface CompileGateHarness {
   gateSwapOnCompile(target: THREE.Object3D): void;
   gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
   compileGate(target: THREE.Object3D): Promise<unknown>;
+  attachZoneFeature(
+    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
+    freeze?: boolean,
+  ): void;
+}
+
+function zoneFeatureHarness(): CompileGateHarness & Record<string, unknown> {
+  const renderer = harness();
+  const added: THREE.Object3D[] = [];
+  renderer.scene = { add: (o: THREE.Object3D) => added.push(o) };
+  renderer.sceneAdded = added;
+  renderer.tmpV = new THREE.Vector3();
+  renderer.fireLights = [];
+  renderer.lastAttachedFeatureGroups = [];
+  renderer.zoneFeatureGroups = [];
+  renderer.lightRankDirty = false;
+  return renderer;
 }
 
 function harness(): CompileGateHarness & Record<string, unknown> {
@@ -164,6 +181,42 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
     expect(gateMethod).toContain('this.compileSkinnedShadowPrograms(target)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
+  });
+
+  it('gates a zone feature attach and defers its distance-cull registration', async () => {
+    const renderer = zoneFeatureHarness();
+    let release!: () => void;
+    renderer.compileGate = () => new Promise<void>((resolve) => (release = resolve));
+    const group = new THREE.Group();
+
+    renderer.attachZoneFeature({ group });
+
+    expect(renderer.sceneAdded).toContain(group);
+    expect(group.visible).toBe(false);
+    // The per-frame fog sweep (updateZoneFeatureVisibility) must not see the
+    // group until reveal, or it flips the hidden group visible mid-compile.
+    expect(renderer.zoneFeatureGroups).toEqual([]);
+
+    release();
+    await flushGate();
+    await flushGate();
+
+    expect(group.visible).toBe(true);
+    expect((renderer.zoneFeatureGroups as unknown[]).length).toBe(1);
+  });
+
+  it('attaches a zone feature directly when async compile is unsupported', () => {
+    const renderer = zoneFeatureHarness();
+    renderer.asyncCompileSupported = false;
+    renderer.compileGate = () => {
+      throw new Error('must not gate without async compile support');
+    };
+    const group = new THREE.Group();
+
+    renderer.attachZoneFeature({ group });
+
+    expect(group.visible).toBe(true);
+    expect((renderer.zoneFeatureGroups as unknown[]).length).toBe(1);
   });
 
   it('routes every dungeon interior build through the gate-injected constructor', () => {
