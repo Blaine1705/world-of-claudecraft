@@ -279,6 +279,14 @@ describe('painted HUD-chrome launcher icons', () => {
     // membership itself so dropping the row is a red, not a silent downgrade.
     expect(hasChromeIconArt('crown')).toBe(true);
     expect(chromeIconUrl('crown')).toBe('/ui/chrome/crown.webp');
+    // Guard D only proves SOME placeholder exists; tie the crown to the
+    // RELIQUARY buttons specifically (the professions crosshair precedent), so
+    // re-iconing the launcher cannot leave this green by accident.
+    for (const doc of entryDocs) {
+      const html = readEntry(doc);
+      expect(html, `${doc} side rail`).toMatch(/id="mm-reliquary"[^>]*data-icon="crown"/);
+      expect(html, `${doc} More tray`).toMatch(/id="mobile-reliquary"[^>]*data-icon="crown"/);
+    }
   });
 
   it('keeps the crown webp in lockstep with its committed SVG source', () => {

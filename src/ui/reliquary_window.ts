@@ -1395,9 +1395,12 @@ export class ReliquaryWindow {
   }
 
   private cellQuality(cell: ReliquaryArtSlot): string {
-    // Each table read goes through its own canonical resolver (knownItemDef /
-    // mountDef / ownEntry), matching cellIconHtml's own-property discipline:
-    // cell ids arrive off the wire on the recent ring.
+    // Each table read goes through its own canonical resolver: knownItemDef
+    // and ownEntry are own-property gated (cell ids arrive off the wire on the
+    // recent ring); mountDef is the content module's total accessor and is NOT
+    // own-property gated, which is harmless here because a prototype key
+    // resolves a Function with no .rarity and falls through to 'common' (and
+    // the recent ring never carries a mount kind anyway).
     if (cell.kind === 'item' || cell.kind === 'unknown') {
       const def = knownItemDef(ITEMS, cell.id);
       if (def?.quality) return def.quality;

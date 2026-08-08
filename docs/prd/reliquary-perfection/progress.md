@@ -1281,3 +1281,24 @@ owns the push.
   newly committed crown.svg (untracked files are invisible to
   ci:changed, so the pre-commit manual run could not see it); fixed with
   the title element and the gate re-ran fully green.
+- Coverage audit (test-coverage-auditor, fresh agent, centered on the QA
+  fix round): PASS, zero blocking, 3 should-fix + 7 nice-to-have, all
+  applied in a second reviewed round: the CSS-to-markup join is now BY
+  CONSTRUCTION (the skin arm reads the carve-out selector out of the live
+  components.css and feeds it to img.matches, so the two pins cannot
+  drift independently), the cellQuality arms gained rung pins (skin img
+  q-uncommon; mount CELL frame q-epic, distinct from the reins img rung),
+  the mountDef comment now states accurately that it is NOT own-property
+  gated and why that is harmless, the crest-pending title list is DERIVED
+  from deedImageUrl with a floor (self-maintaining as commissioned art
+  lands), the titles-shelf totality arm pins every cell paints an img
+  (making the crestIconSrc swallow explicit), the specimen glyph gained a
+  sha256 byte pin, the mount-agreement arm asserts the reins def exists
+  before comparing, FIELD_NOTE_PROFESSIONS's freeze is pinned, and the
+  crown is tied to the mm-reliquary / mobile-reliquary buttons in both
+  entry documents (guard D only proves SOME placeholder). The lockstep
+  concern resolved cleanly: re-running render_source.mjs + assets:chrome
+  from the titled SVG reproduces the committed webp BYTE-IDENTICALLY
+  (sharp is deterministic; the title element does not raster), so the
+  pinned pair is genuinely produced from the pinned source and no hash
+  moved.

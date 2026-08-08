@@ -19,6 +19,7 @@
 // canvas. The procedural crest fall-back is asserted at the DESCRIPTOR level
 // (the crest id), which is where the decision actually lives.
 
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -131,7 +132,12 @@ describe('mount relics resolve their reins item', () => {
     for (const [key, def] of Object.entries(MOUNTS)) {
       const reinsId = mountItemId(key);
       expect(reinsId, key).not.toBeNull();
-      expect(ITEMS[reinsId as string]?.quality ?? 'common', key).toBe(def.rarity);
+      const reins = ITEMS[reinsId as string];
+      // Assert the def exists before comparing: the `?? 'common'` fallback
+      // below matches common defs that omit quality, and must never stand in
+      // for a deleted reins item on the one common-rarity mount.
+      expect(reins, key).toBeDefined();
+      expect(reins?.quality ?? 'common', key).toBe(def.rarity);
     }
   });
 });
@@ -174,22 +180,23 @@ describe('title relics resolve the deed crest', () => {
   });
 
   it('answers for every crest-pending title on the shelf', () => {
-    // The seven titles whose commissioned crest art has not landed. Each must
-    // still paint its category crest; a null here is a ghosted title shelf.
-    const pending = [
-      'pvp_bg_wins_25',
-      'col_reliquary_rank_2',
-      'col_reliquary_rank_3',
-      'col_reliquary_rank_4',
-      'pvp_honor_sergeant',
-      'pvp_honor_knight_lieutenant',
-      'pvp_honor_field_marshal',
-    ];
+    // DERIVED, not hardcoded: whichever titles have no committed crest art
+    // today must still paint their category crest (a null here is a ghosted
+    // title shelf). Deriving keeps the arm self-maintaining when the
+    // commissioned art lands; if EVERY title crest ever ships, the arm
+    // legitimately retires and the floor below should move to the painted arm.
+    const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
+    expect(pending.length, 'floor: the category-crest tier still has producers').toBeGreaterThan(0);
+    // Today's premise (2026-08-08): the three curator-rank bridges plus four
+    // pvp titles, 7 rows. Count-pinned loosely so ONE painted crest landing
+    // does not red this file, while a mass change still asks for a look.
+    expect(pending.length).toBeLessThanOrEqual(7);
     for (const id of pending) {
-      expect(deedImageUrl(`deed_${id}`), `${id} premise: crest art still pending`).toBeNull();
+      const category = DEEDS[id]?.category;
+      expect(category, `${id} premise: a catalogued title deed`).toBeDefined();
       expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
         kind: 'crest',
-        crestId: `deed_cat_${id.startsWith('pvp_') ? 'pvp' : 'collection'}`,
+        crestId: `deed_cat_${category}`,
       });
     }
   });
@@ -217,6 +224,9 @@ describe('profession mark relics resolve the profession sheet', () => {
   it('routes each rare field note to the gathering profession that works its node', () => {
     // The pairing is the catalog's (FIELD_NOTE_PROFESSIONS); asserted here as a
     // premise so a content change to the map cannot silently redirect the art.
+    // The map is frozen at the source (it now escapes its module and rides the
+    // client bundle); pin the freeze so a refactor cannot quietly drop it.
+    expect(Object.isFrozen(FIELD_NOTE_PROFESSIONS)).toBe(true);
     expect(FIELD_NOTE_PROFESSIONS['gather_event:pristine_vein']).toBe('mining');
     expect(reliquaryCellArt({ kind: 'mark', id: 'gather_event:pristine_vein' })).toEqual({
       kind: 'url',
@@ -235,6 +245,8 @@ describe('profession mark relics resolve the profession sheet', () => {
 
 describe('the corpse-harvest specimen glyph', () => {
   const SPECIMEN_ID = 'gather_event:perfect_specimen';
+  // sha256 of the full data URL; re-pin here on a deliberate art edit.
+  const SPECIMEN_GLYPH_SHA256 = 'd8f1dd69de9efa193f5bf1131184abd7b8c09d873c5447df8de682f399e02091';
 
   it('is the authored SVG, not a borrowed profession image', () => {
     // The premise the whole glyph exists for: this mark belongs to no gathering
@@ -246,6 +258,12 @@ describe('the corpse-harvest specimen glyph', () => {
     expect(RELIQUARY_SPECIMEN_GLYPH_URL.startsWith('data:image/svg+xml,')).toBe(true);
     expect(RELIQUARY_SPECIMEN_GLYPH_URL).toContain('woc-specimen-glyph');
     expect(RELIQUARY_SPECIMEN_GLYPH_ID).toBe('woc-specimen-glyph');
+    // Byte pin on the authored art itself (the equality above compares the
+    // constant to its own import, which cannot see a redraw). To update after
+    // a deliberate art edit, re-pin this digest in the same commit.
+    expect(createHash('sha256').update(RELIQUARY_SPECIMEN_GLYPH_URL).digest('hex')).toBe(
+      SPECIMEN_GLYPH_SHA256,
+    );
   });
 
   it('is NOT the procedural unknown-icon ghost the slot used to get', () => {
@@ -454,6 +472,12 @@ describe('ReliquaryWindow cell markup', () => {
     expect(img.getAttribute('src')).toBe('/ui/items/reins_terrorspark_groundshaker.webp');
     expect(img.getAttribute('alt')).toBe('');
     expect(img.getAttribute('draggable')).toBe('false');
+    // The CELL frame's rung comes from cellQuality's mountDef arm (the img's
+    // comes from the reins ItemDef); deleting that arm frames q-common.
+    const cell = rig.el.querySelector<HTMLElement>(
+      '.reliquary-cell[data-cell-id="terrorspark_groundshaker"]',
+    );
+    expect(cell?.className, 'cell frame rung').toContain('q-epic');
   });
 
   it('paints a profession mark cell as the profession art', () => {
@@ -491,22 +515,36 @@ describe('ReliquaryWindow cell markup', () => {
     const img = cellArt(rig, 'prog_veteran');
     expect(img.getAttribute('class')).toBe('item-icon q-epic');
     expect(img.getAttribute('src')).toBe('/ui/deeds/prog_veteran.webp');
+    // Shelf totality: EVERY title cell paints an art img (which also pins the
+    // crestIconSrc never-a-throw swallow explicitly: the 35 category-crest
+    // cells composite, happy-dom has no 2D context, and the swallow is what
+    // keeps each of them a painted-or-blank img rather than a render throw).
+    const cells = rig.el.querySelectorAll('.reliquary-cell').length;
+    expect(cells).toBeGreaterThan(30);
+    expect(rig.el.querySelectorAll('.reliquary-cell .reliquary-cell-art img').length).toBe(cells);
   });
 
   it('paints a weapon-skin cell in the exact shape the missing-state carve-out targets', () => {
     // Joins the CSS declaration pin (reliquary_window.test.ts) to real cell
-    // output: the carve-out selector must MATCH the painted markup, or the
-    // opaque Armory card renders as the black tile the rule exists to fix.
+    // output BY CONSTRUCTION: the selector is read out of the live stylesheet,
+    // so renaming it in CSS while updating only the declaration pin cannot
+    // leave this arm green against a stale literal. The opaque Armory card
+    // renders as a black tile whenever this match breaks.
+    const componentsCss = readFileSync(join(REPO_ROOT, 'src/styles/components.css'), 'utf8');
+    const selectorMatch = componentsCss.match(
+      /^\s*(\.[^{}]*data-cell-kind[^{}]*weapon_skin[^{}]*)\{/m,
+    );
+    if (!selectorMatch) throw new Error('contract: the skin missing-state carve-out rule exists');
+    const liveSelector = selectorMatch[1].trim();
+    expect(liveSelector).toContain('.reliquary-cell--missing');
     const rig = makeRig();
     openPage(rig, 'horizons', 'horizons_weapon_skins');
     const img = cellArt(rig, 'brasscap_axe');
     expect(img.getAttribute('src')).toBe('/ui/store/armory/brasscap_axe.webp');
-    const cell = rig.el.querySelector<HTMLElement>('.reliquary-cell[data-cell-id="brasscap_axe"]');
-    if (!cell) throw new Error('contract: the skins page paints the brasscap_axe cell');
-    expect(cell.matches('.reliquary-cell--missing[data-cell-kind="weapon_skin"]')).toBe(true);
-    expect(img.matches('.reliquary-cell--missing[data-cell-kind="weapon_skin"] .item-icon')).toBe(
-      true,
-    );
+    // The rung comes from cellQuality's WEAPON_SKINS arm (brasscap_axe is a
+    // guildmark uncommon); deleting that arm paints q-common and reds here.
+    expect(img.getAttribute('class')).toBe('item-icon q-uncommon');
+    expect(img.matches(liveSelector)).toBe(true);
   });
 
   it('shares the resolver with the Overview recent strip', () => {
