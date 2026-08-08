@@ -52,7 +52,7 @@ function baseSnapshot(): PerfSnapshot {
           maxPointLights: 8,
           activePointLights: 4,
           shadowMap: 2048,
-          nativeIosMemoryProfile: false,
+          iosMemoryProfile: false,
         },
       },
       autoGovernor: true,
@@ -111,7 +111,9 @@ function baseSnapshot(): PerfSnapshot {
         total: digest(9),
       },
       renderDiagnostics: {} as never,
+      nightAmount: 0,
       prewarm: null,
+      gpuQueue: { units: 0, totalSyncMs: 0, worstSyncMs: 0, slowest: [] },
     },
     hud: { hotDomWrites: 10, hotDomSkippedWrites: 90, hotDomSkipRate: 0.9 },
     assets: {
@@ -122,6 +124,7 @@ function baseSnapshot(): PerfSnapshot {
     network: null,
     netPipeline: null,
     heapSawtooth: null,
+    hitchForensics: [],
     input: {
       intents: 20,
       lastKind: 'move',

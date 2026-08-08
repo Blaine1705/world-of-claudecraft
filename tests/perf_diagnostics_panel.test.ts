@@ -41,6 +41,7 @@ function snapshot(): PerfSnapshot {
     network: null,
     netPipeline: null,
     heapSawtooth: null,
+    hitchForensics: [],
     input: {
       intents: 0,
       lastKind: '',
