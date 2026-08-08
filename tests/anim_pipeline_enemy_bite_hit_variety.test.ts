@@ -67,13 +67,15 @@ describe('ENEMY_BITE hit-reaction stagger (issue #2889 round 2)', () => {
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      // mob_crab wires its own CRAB_ENEMY_BITE (`{ ...ENEMY_BITE, attack: [...] }`,
-      // issue #2889): it inherits ENEMY_BITE's hit array unchanged, so it still
-      // qualifies as an ENEMY_BITE consumer for HitRecieve_Dazed.
-      const clipsOk =
-        key === 'mob_crab'
-          ? block.includes('clips: CRAB_ENEMY_BITE')
-          : block.includes('clips: ENEMY_BITE');
+      // mob_crab wires its own CRAB_ENEMY_BITE and mob_treant its own
+      // TREANT_ENEMY_BITE (both `{ ...ENEMY_BITE, attack: [...] }`, issue
+      // #2889): each inherits ENEMY_BITE's hit array unchanged, so both still
+      // qualify as ENEMY_BITE consumers for HitRecieve_Dazed.
+      const ENEMY_BITE_VARIANTS: Record<string, string> = {
+        mob_crab: 'CRAB_ENEMY_BITE',
+        mob_treant: 'TREANT_ENEMY_BITE',
+      };
+      const clipsOk = block.includes(`clips: ${ENEMY_BITE_VARIANTS[key] ?? 'ENEMY_BITE'}`);
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
@@ -82,7 +84,9 @@ describe('ENEMY_BITE hit-reaction stagger (issue #2889 round 2)', () => {
     // BIPED14 families independently wire their own `_hit_variety_anims.glb`
     // donors in the same batch, issue #2889, so this only counts ENEMY_BITE
     // consumers, not every `_hit_variety_anims.glb` occurrence repo-wide.)
-    const occurrences = [...MANIFEST_SRC.matchAll(/clips: (ENEMY_BITE|CRAB_ENEMY_BITE),/g)].length;
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/clips: (ENEMY_BITE|CRAB_ENEMY_BITE|TREANT_ENEMY_BITE),/g),
+    ].length;
     expect(occurrences).toBe(2);
   });
 });
