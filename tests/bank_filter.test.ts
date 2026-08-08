@@ -152,10 +152,12 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
 });
 
 describe('filterBankSlots: sorting preserves slotIndex', () => {
-  it('sorts by quality descending (legendary first), ties keep insertion order', () => {
+  it('sorts by quality descending (legendary first), ties on the clean-up ladder', () => {
+    // Within the common band the canonical ladder orders potion, rod, keystone
+    // (consumable, tool, quest), matching the bags' quality view.
     const out = filterBankSlots(MODELS, lookup, state({ sort: 'quality' }), nameOf);
-    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'keystone', 'rod', 'pelt']);
-    expect(indices(out)).toEqual([7, 3, 2, 5, 8, 1, 0]);
+    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'rod', 'keystone', 'pelt']);
+    expect(indices(out)).toEqual([7, 3, 2, 5, 1, 8, 0]);
   });
 
   it('sorts by the LOCALIZED name (order differs from the English item.name)', () => {

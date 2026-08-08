@@ -16,6 +16,7 @@
 // boat, IS registered now: phase 19 gave it a runtime sim import
 // (material_taxonomy), so its purity is scanned.
 
+import { compareBagStacks } from '../sim/inventory_sort';
 import {
   type BagFilterState,
   type ItemLookup,
@@ -61,9 +62,15 @@ export function filterBankSlots(
       const item = lookup(m.itemId);
       return item ? qualityRank(item) : UNKNOWN_QUALITY_RANK;
     };
-    filtered.sort((a, b) => rank(a) - rank(b));
+    // Ties break on the sim's canonical clean-up ladder (like the bags'
+    // quality view): same-item stacks sit adjacent and a fine material grade
+    // sits beside its base grade. BankSlotModel carries itemId + count, the
+    // whole shape the comparator reads, and slotIndex rides through untouched.
+    filtered.sort((a, b) => rank(a) - rank(b) || compareBagStacks(a, b, lookup));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => nameOf(a.itemId).localeCompare(nameOf(b.itemId)));
+    filtered.sort(
+      (a, b) => nameOf(a.itemId).localeCompare(nameOf(b.itemId)) || compareBagStacks(a, b, lookup),
+    );
   }
   return filtered;
 }
