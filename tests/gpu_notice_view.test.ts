@@ -5,6 +5,7 @@ import {
   type GpuNoticeComponent,
   gpuNoticeBodyKey,
   gpuNoticeComponents,
+  gpuNoticeVerdictsEqual,
   LEGACY_DISMISSED_VALUE,
   mergeGpuNoticeVerdicts,
   parseGpuNoticeSignature,
@@ -40,6 +41,16 @@ describe('mergeGpuNoticeVerdicts', () => {
   });
 });
 
+describe('gpuNoticeVerdictsEqual', () => {
+  it('is true only when BOTH components match (one negative per dimension)', () => {
+    expect(gpuNoticeVerdictsEqual(BOTH, { ...BOTH })).toBe(true);
+    expect(gpuNoticeVerdictsEqual(NONE, { ...NONE })).toBe(true);
+    expect(gpuNoticeVerdictsEqual(SOFTWARE, BOTH)).toBe(false);
+    expect(gpuNoticeVerdictsEqual(DISCRETE, BOTH)).toBe(false);
+    expect(gpuNoticeVerdictsEqual(SOFTWARE, DISCRETE)).toBe(false);
+  });
+});
+
 describe('gpu notice dismissal signature', () => {
   it('formats a sorted, order-proof value', () => {
     const reversed: GpuNoticeComponent[] = ['software', 'discrete-inactive'];
@@ -56,6 +67,15 @@ describe('gpu notice dismissal signature', () => {
     expect(parseGpuNoticeSignature('software')).toEqual(['software']);
     expect(parseGpuNoticeSignature('')).toEqual([]);
     expect(parseGpuNoticeSignature('bogus,software')).toEqual(['software']);
+  });
+
+  it('treats an oversized stored value as junk (no dismissal) without splitting it', () => {
+    // The bound is the guard; a value past it must parse as "nothing dismissed"
+    // (the notice shows), the same verdict as any other unparseable junk.
+    const oversized = `software,${'x'.repeat(80)}`;
+    expect(oversized.length).toBeGreaterThan(64);
+    expect(parseGpuNoticeSignature(oversized)).toEqual([]);
+    expect(resolveGpuNotice({ ...SOFTWARE, dismissedSignature: oversized }).shown).toBe(true);
   });
 
   it('parses the legacy shipped value as a software dismissal', () => {

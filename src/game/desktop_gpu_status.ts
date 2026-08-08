@@ -36,7 +36,9 @@ export function normalizeDesktopGpuStatus(raw: unknown): DesktopGpuStatus | null
   return {
     softwareRendering: candidate.softwareRendering,
     discreteInactive: candidate.discreteInactive,
-    adapter: typeof candidate.adapter === 'string' ? candidate.adapter : '',
+    // Re-apply the shell's 64-char cap: the shell is an independently updated
+    // binary, so the bound must hold on this side of the boundary too.
+    adapter: typeof candidate.adapter === 'string' ? candidate.adapter.slice(0, 64) : '',
   };
 }
 

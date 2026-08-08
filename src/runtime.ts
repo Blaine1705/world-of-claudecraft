@@ -69,7 +69,11 @@ export interface DesktopRendererErrorReport {
 // The shell's GPU verdict for this machine (electron pushes it once the GPU
 // info is known): whether Chromium fell back to a software rasterizer, and
 // whether a machine with a dedicated GPU is running the session on the
-// power-saving one. `adapter` is the shell's adapter description, for logs.
+// power-saving one. `adapter` is the shell's GL adapter description (capped at
+// 64 chars on both sides of the bridge) and is deliberately UNREAD today: it is
+// a device-fingerprint string, so do not log, render, or transmit it. It rides
+// along so a future opt-in diagnostics surface can show it without a bridge
+// change.
 export interface DesktopGpuStatus {
   softwareRendering: boolean;
   discreteInactive: boolean;

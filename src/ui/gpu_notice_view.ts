@@ -59,6 +59,11 @@ export function mergeGpuNoticeVerdicts(a: GpuNoticeVerdict, b: GpuNoticeVerdict)
   };
 }
 
+/** Component-wise equality, so the toast can skip no-change re-resolves. */
+export function gpuNoticeVerdictsEqual(a: GpuNoticeVerdict, b: GpuNoticeVerdict): boolean {
+  return a.softwareRendering === b.softwareRendering && a.discreteInactive === b.discreteInactive;
+}
+
 /**
  * The persisted-dismissal VALUE for a component set: sorted and comma-joined,
  * so the stored signature can be compared against a later verdict. Sorting
@@ -76,6 +81,11 @@ export function formatGpuNoticeSignature(components: readonly GpuNoticeComponent
  * something they already closed. Unknown parts are dropped.
  */
 export function parseGpuNoticeSignature(stored: string): GpuNoticeComponent[] {
+  // Bound the parse: a legitimate signature is at most the full component set
+  // (26 chars today). A longer value is hand-edited junk; treat it like any
+  // other junk (no dismissal at all, the notice shows) without splitting a
+  // possibly huge string first.
+  if (stored.length > 64) return [];
   if (stored === LEGACY_DISMISSED_VALUE) return ['software'];
   const known = new Set<string>(GPU_NOTICE_COMPONENTS);
   return stored

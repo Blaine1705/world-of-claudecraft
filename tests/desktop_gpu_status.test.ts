@@ -62,6 +62,17 @@ describe('normalizeDesktopGpuStatus', () => {
     ).toEqual({ softwareRendering: true, discreteInactive: false, adapter: '' });
   });
 
+  it('re-applies the 64-char adapter cap against an out-of-contract shell', async () => {
+    const { status } = await boot();
+    const normalized = status.normalizeDesktopGpuStatus({
+      softwareRendering: false,
+      discreteInactive: true,
+      adapter: 'a'.repeat(65),
+    });
+    expect(normalized?.adapter).toBe('a'.repeat(64));
+    expect(normalized?.adapter.length).toBe(64);
+  });
+
   it('drops anything without both booleans rather than coercing a false verdict', async () => {
     const { status } = await boot();
     expect(status.normalizeDesktopGpuStatus(null)).toBeNull();

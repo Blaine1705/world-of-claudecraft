@@ -22,6 +22,7 @@ import {
   type GpuNoticeState,
   type GpuNoticeVerdict,
   gpuNoticeBodyKey,
+  gpuNoticeVerdictsEqual,
   mergeGpuNoticeVerdicts,
   resolveGpuNotice,
 } from './gpu_notice_view';
@@ -61,10 +62,16 @@ let shellVerdict: GpuNoticeVerdict = NO_VERDICT;
 // The live notice instance's re-resolve hook, or null before initGpuNotice runs.
 let applyShellVerdict: ((verdict: GpuNoticeVerdict) => void) | null = null;
 
-// Which components were actually DISPLAYED this session, latched true and never
-// cleared by a dismissal: the perf-nudge sibling suppresses its redundant arms
-// on "the boot notice already said this" (packet 0 ruling R16), which stays
-// true after the player closes the notice. Reset by initGpuNotice (a new boot).
+// Which components the shown notice ACCOUNTED FOR this session, latched true
+// and never cleared by a dismissal: the perf-nudge sibling suppresses its
+// redundant arms on "the boot notice already said this" (packet 0 ruling R16),
+// which stays true after the player closes the notice. When both components
+// are armed, the software body wins the copy yet BOTH count as accounted for,
+// on purpose: the software copy carries the identical remedy (update drivers,
+// Windows High performance), so the integrated-GPU nudge would be redundant
+// there, and its copy claims the desktop shell picked the gaming GPU, which is
+// exactly false on such a machine (the post-crash WARP-flip shape reports both
+// components at once). Reset by initGpuNotice (a new boot).
 let displayed: GpuNoticeVerdict = NO_VERDICT;
 
 /** Which verdict components this session actually showed the player. */
@@ -90,6 +97,9 @@ export function initGpuNotice(input: {
   desktopShell: boolean;
 }): boolean {
   // A fresh boot: drop any previous instance and per-session display latch.
+  // shellVerdict is deliberately KEPT: it carries a verdict that arrived before
+  // this init (the common order, the shell integration boots with the page),
+  // so it is cross-instance state, not instance state.
   applyShellVerdict = null;
   displayed = NO_VERDICT;
 
@@ -153,11 +163,7 @@ export function initGpuNotice(input: {
 
   applyShellVerdict = (next: GpuNoticeVerdict): void => {
     const merged = mergeGpuNoticeVerdicts(localVerdict, next);
-    if (
-      merged.softwareRendering === verdict.softwareRendering &&
-      merged.discreteInactive === verdict.discreteInactive
-    )
-      return;
+    if (gpuNoticeVerdictsEqual(merged, verdict)) return;
     verdict = merged;
     state = resolveGpuNotice({ ...verdict, dismissedSignature: dismissedSignature() });
     render();
