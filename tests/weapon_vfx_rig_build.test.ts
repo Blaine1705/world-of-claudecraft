@@ -279,14 +279,14 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     const names = new Set<string>();
     let lights = 0;
     let visibleLights = 0;
-    let shells = 0;
+    const shells: THREE.Object3D[] = [];
     group.traverse((object) => {
       if (object.name) names.add(object.name);
       if ((object as THREE.PointLight).isPointLight) {
         lights++;
         if (object.visible) visibleLights++;
       }
-      if (object.userData.__vfx) shells++;
+      if (object.userData.__vfx) shells.push(object);
     });
 
     for (const name of ['vfx_coreSprite', 'vfx_motes', 'vfx_drift', 'vfx_twinkles', 'vfx_aurora']) {
@@ -294,7 +294,15 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     }
     // The fresnel rim shell parents itself to the host mesh instead of the rig
     // group, so it is counted by its tag rather than a name.
-    expect(shells).toBeGreaterThan(0);
+    expect(shells.length).toBeGreaterThan(0);
+    // Every shell must carry the applyMaterials skip tag itself: userData is
+    // per object, never inherited, and visual.ts only tags the rig group's own
+    // subtree. A shell without it is silently re-owned by a ShaderMaterial
+    // clone on the next material sweep, so the rig's uTime/uStr uniform writes
+    // stop reaching the rendered material.
+    for (const shell of shells) {
+      expect(shell.userData.weaponVfxMesh, 'shell missing the applyMaterials skip tag').toBe(true);
+    }
     // The ground pool rides sceneExtras, which the group carries too.
     expect(names).toContain('weapon_vfx_extras');
     // A visible light would change the scene's light counts, and those counts

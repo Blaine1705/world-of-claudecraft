@@ -1639,7 +1639,9 @@ function applyLowReadabilityLift(
 function applyWeaponMaterialPolish(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
 ): void {
-  mat.color.lerp(weaponHighlight, 0.08);
+  // Same guard as the tint step in tintedMaterial: a shader-derived clone on a
+  // weapon-tagged mesh has no color property.
+  if (mat.color) mat.color.lerp(weaponHighlight, 0.08);
   const std = mat as THREE.MeshStandardMaterial;
   if (std.isMeshStandardMaterial) {
     std.roughness = Math.min(std.roughness, 0.55);
