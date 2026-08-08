@@ -148,6 +148,7 @@ export const IWORLD_MEMBERS = [
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
+  { name: 'sortInventory', kind: 'method' },
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
@@ -560,10 +561,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // class-overhauls wave: Paladin Consecration ground-state, priest marker
     // projections, and the controlled Warlock pet's pet-bar mirror add three
     // data members; the pet's signature-skill command and autocast toggle add
-    // two methods, leaving 305.
-    expect(IWORLD_MEMBERS.length).toBe(305);
+    // two methods (305). The bag clean-up button adds sortInventory
+    // (IWorldInventory, a method), leaving 306.
+    expect(IWORLD_MEMBERS.length).toBe(306);
     expect(DATA_MEMBERS.length).toBe(79);
-    expect(METHOD_MEMBERS.length).toBe(226);
+    expect(METHOD_MEMBERS.length).toBe(227);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -837,6 +839,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stationPlacements',
@@ -1162,6 +1165,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'slotToolEffect',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
@@ -1330,6 +1334,7 @@ const FACET_INVENTORY = [
   'equipItem',
   'equipItemToSlot',
   'moveInventoryItem',
+  'sortInventory',
   'unequipItem',
   'useItem',
   'discardItem',
@@ -1777,8 +1782,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(305);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(305);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(306);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(306);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -44,11 +44,13 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
 // stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358),
 // the controlled Warlock pet's signature-skill command and autocast toggle
-// (+2 send/dispatch from the class-overhauls integration), and set_helm as a
+// (+2 send/dispatch from the class-overhauls integration), set_helm as a
 // send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
-// persists per character like weaponStowed).
-const EXPECTED_SEND_COUNT = 193;
-const EXPECTED_DISPATCH_COUNT = 206;
+// persists per character like weaponStowed), and inv_sort as a send +
+// dispatch pair (the one-shot bag clean-up; no payload, the sim re-derives
+// the whole arrangement deterministically).
+const EXPECTED_SEND_COUNT = 194;
+const EXPECTED_DISPATCH_COUNT = 207;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch
