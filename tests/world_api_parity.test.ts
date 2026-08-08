@@ -148,6 +148,7 @@ export const IWORLD_MEMBERS = [
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
+  { name: 'sortInventory', kind: 'method' },
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
@@ -562,12 +563,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (data) plus openCommissionOrder/cancelCommissionOrder/
     // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 298
     // (plus deedsRecent already in the base for 299 on pure release). The
-    // v0.36.0 sync's paperdoll helmet-visibility eye adds setHelmHidden
-    // (IWorldCosmetics, a method), for 300 on pure release. The Reliquary
-    // facet adds seven members (3 data + 4 methods), leaving 307.
-    expect(IWORLD_MEMBERS.length).toBe(307);
+    // v0.36.0 base's paperdoll helmet-visibility eye adds setHelmHidden
+    // (IWorldCosmetics, a method), for 300 on pure release, and its bag
+    // clean-up button adds sortInventory (IWorldInventory, a method), for
+    // 301 on pure release. The Reliquary facet adds seven members
+    // (3 data + 4 methods), leaving 308.
+    expect(IWORLD_MEMBERS.length).toBe(308);
     expect(DATA_MEMBERS.length).toBe(79);
-    expect(METHOD_MEMBERS.length).toBe(228);
+    expect(METHOD_MEMBERS.length).toBe(229);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -843,6 +846,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stationPlacements',
@@ -1170,6 +1174,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'slotToolEffect',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
@@ -1336,6 +1341,7 @@ const FACET_INVENTORY = [
   'equipItem',
   'equipItemToSlot',
   'moveInventoryItem',
+  'sortInventory',
   'unequipItem',
   'useItem',
   'discardItem',
@@ -1796,8 +1802,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(307);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(307);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(308);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(308);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
