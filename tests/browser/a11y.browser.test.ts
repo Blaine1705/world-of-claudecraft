@@ -1108,6 +1108,10 @@ describe('axe: professions window tool-effect controls', () => {
 describe('axe: reliquary window search, filters, and relic grid', () => {
   function reliquaryWorld() {
     return {
+      // The Phase 15 pin store keys per character (pinKey reads BOTH), so the
+      // stub carries the identity members every real world has.
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'AxeTester' },
       deedStats: { itemsDiscovered: new Set<string>() },
       reliquaryMarks: new Set<string>(),
       reliquaryRecent: [] as string[],
