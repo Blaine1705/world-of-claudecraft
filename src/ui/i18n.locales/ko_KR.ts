@@ -9609,6 +9609,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.',
+  'hudChrome.wiki.confirmTitle': '위키를 열까요?',
+  'hudChrome.wiki.confirmBody':
+    'World of ClaudeCraft 위키를 브라우저에서 엽니다. 게임은 계속 실행됩니다.',
+  'hudChrome.wiki.confirmOpen': '위키 열기',
+  'hudChrome.wiki.confirmCancel': '취소',
   'hudChrome.unstuck.menuButton': '갇힘 탈출',
   'hudChrome.unstuck.help':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.',

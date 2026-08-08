@@ -9186,6 +9186,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
+  'hudChrome.wiki.confirmTitle': '打开维基？',
+  'hudChrome.wiki.confirmBody': '将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。',
+  'hudChrome.wiki.confirmOpen': '打开维基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':

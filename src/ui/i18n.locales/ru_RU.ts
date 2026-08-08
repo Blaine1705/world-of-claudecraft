@@ -9772,6 +9772,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness': 'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.',
+  'hudChrome.wiki.confirmTitle': 'Открыть вики?',
+  'hudChrome.wiki.confirmBody':
+    'Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.',
+  'hudChrome.wiki.confirmOpen': 'Открыть вики',
+  'hudChrome.wiki.confirmCancel': 'Отмена',
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
