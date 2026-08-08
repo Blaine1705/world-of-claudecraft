@@ -374,6 +374,27 @@ async function main() {
     page.on('pageerror', (e) => console.log('  [pageerror]', String(e).slice(0, 120)));
     console.log('entering world (render client)...');
     await enterWorld(page);
+    if (process.env.CROWD_AT) {
+      // Move the whole scenario to a named spot (CROWD_AT="x,z"): the observer
+      // teleports through the server dev command (needs ALLOW_DEV_COMMANDS=1)
+      // and the bots cluster on the position read back below. A town center
+      // measures the environment-plus-crowd case the spawn meadow cannot.
+      const [atX, atZ] = process.env.CROWD_AT.split(',').map(Number);
+      if (!Number.isFinite(atX) || !Number.isFinite(atZ)) {
+        throw new Error(`CROWD_AT must be "x,z", got "${process.env.CROWD_AT}"`);
+      }
+      await page.evaluate((x, z) => window.__game.world.chat(`/dev tp ${x} ${z}`), atX, atZ);
+      await page.waitForFunction(
+        (x, z) => {
+          const p = window.__game.world.player;
+          return Math.abs(p.pos.x - x) < 30 && Math.abs(p.pos.z - z) < 30;
+        },
+        { timeout: 20000, polling: 300 },
+        atX,
+        atZ,
+      );
+      await sleep(SETTLE_MS);
+    }
     const center = await page.evaluate(() => ({
       x: window.__game.world.player.pos.x,
       z: window.__game.world.player.pos.z,
