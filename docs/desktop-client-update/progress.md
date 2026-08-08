@@ -5,7 +5,7 @@
 | Phase | Title | Status | Started | Completed |
 |---|---|---|---|---|
 | 1 | Electron runtime plumbing | done | 2026-08-08 | 2026-08-08 |
-| 1 QA | Verify phase 1 | not started | | |
+| 1 QA | Verify phase 1 | done | 2026-08-08 | 2026-08-08 |
 | 2 | Shell startup and window polish | not started | | |
 | 2 QA | Verify phase 2 | not started | | |
 | 3 | Hybrid-GPU visibility | not started | | |
@@ -114,3 +114,50 @@ Phase 1 (2026-08-08, commits fff0a2898e + 18da4ef8cc):
   final lockfile. Until then those 8 suites are the accepted per-phase gate
   exception; everything else must stay green. tests/profile_mode.test.mjs is
   environmental only (no system Chrome; green with BROWSER_PATH, see state.md).
+
+Phase 1 QA (2026-08-08, verdict PASS-WITH-FOLLOWUPS, all findings fixed same day):
+- QA-start base merge 4ccfc41805 (origin/release/v0.36.0 at 81804a179e, wiki v0.36
+  round2): guide/i18n/screenshot files only, no electron/desktop/package surface;
+  electron plus desktop suites (27 files) and tsc re-verified green at that HEAD.
+- Audit ran as a workflow: context loader, then parallel correctness / pin-quality
+  (test-coverage-auditor) / qa-checklist auditors, then an exclusive real-file
+  mutation probe plus a vendor regen probe, then two adversarial skeptics per
+  finding. One infrastructure note: the first correctness agent died on an API
+  connection error; its charter was re-covered by the qa-checklist agent's
+  independent verification plus a lite re-verifier in the continuation run.
+- Independently re-confirmed (not trusted from phase 1 prose): node_modules resolve
+  electron 43.3.0 / electron-builder 26.15.7 / app-builder-lib 26.15.7; lockfile
+  diff moves only the electron plus electron-builder family; exactly one
+  registerSchemesAsPrivileged call with codeCache inside the app privileges object;
+  pack smoke banner in main.log (electron 43.3.0, chrome 150.0.7871.212, packaged,
+  PRIME relaunch) and the profile's Code Cache/js populated on disk (96K in js, 228K
+  whole Code Cache dir), which is stronger runtime proof than the recorded
+  --code-cache-schemes flag; phase 1's four mutation kills re-run for real (each
+  red with the named failing test, restore green each time).
+- Vendor bundles: no baseline hashes were recorded in phase 1, so byte-identity was
+  unverifiable as written (finding). Closed two ways: regen stability proven
+  (re-running scripts/electron-vendor.mjs reproduced identical bytes) and the sha256
+  baselines are now recorded in state.md's inventory.
+- Findings: 0 BLOCKING; 5 SHOULD-FIX, all fixed: two pin gaps in the new test (a
+  second privileged scheme could ride in beside the app entry unpinned; call
+  position unpinned although Electron only honors the call before app ready), the
+  stale phase-1 ledger (docs commit and base merge unrecorded), the unfalsifiable
+  vendor claim (baselines now recorded), and the phase file's impossible
+  git-status vendor instruction (now the hash recipe). Plus block-comment,
+  trailing-comment, substring-value, and quoted-key stripping/scanning holes folded
+  into the same test hardening (commit 042ba0a766).
+- Hardened pin re-verified with an 11-dimension mutation matrix on the real files
+  (drop, flip-false, line-comment, extra privilege, block-comment, second scheme
+  entry, non-top-level call, ready-ordering decoy, quoted key, value expression,
+  trailing comment): all KILLED with named failing tests, final rerun green, tree
+  restored clean each round.
+- Gate at QA HEAD (BROWSER_PATH exported, biome defaultBranch pinned for the run
+  and reverted, never committed): i18n + wiki + sfx artifacts, i18n freshness,
+  malware, and biome changed-files all green; vitest full suite (planner fell back
+  on the lockfile) red ONLY on the 8 accepted asset-seal suites, every failure a
+  sourceFingerprint/hash mismatch; typecheck + env/server/bot builds and the
+  client build green via turbo after the vitest abort. Count correction to the
+  phase 1 note: the accepted seal red set is 11 tests across those 8 suites, not
+  10; nothing asset-relevant changed since phase 1, so the phase 1 figure was a
+  miscount of the same set. Electron + desktop suites 27 files / 381 tests green
+  and tsc clean at the final QA commits.

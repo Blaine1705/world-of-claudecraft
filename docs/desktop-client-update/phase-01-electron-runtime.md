@@ -34,7 +34,9 @@ Deliverables:
   `pnpm -C <worktree> add -D electron@^43.3.0 electron-builder@^26.15.7`. Verify
   installed versions resolve to 43.3.0 / 26.15.7.
 - Re-run `node scripts/electron-vendor.mjs` (electron-log/electron-updater did not
-  move, so the vendor bundles must come out unchanged; verify with git status).
+  move, so the vendor bundles must come out unchanged; electron/vendor/ is gitignored,
+  so git status can never show this: verify by hashing `electron/vendor/*.cjs` before
+  and after and comparing, and record the hashes in the phase notes).
 - Add `codeCache: true` to the app:// privileges in registerSchemesAsPrivileged in
   electron/main.cjs (requires standard:true, already set). Do NOT add stream or any
   other privilege.

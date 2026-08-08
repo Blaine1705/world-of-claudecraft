@@ -6,8 +6,13 @@ may drift; re-verify by symbol name before relying on one.
 
 ## Current phase
 
-Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc); next up is phase 1 QA
-(phase-01-qa.md). See progress.md for the live table and the phase 1 notes.
+Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc + docs a8544d6b57) and
+phase 1 QA done (2026-08-08, verdict PASS-WITH-FOLLOWUPS, fixes in commits 042ba0a766
+test hardening + the QA docs commit); next up is phase 2 (phase-02-shell-startup-polish.md).
+QA-start base merge: 4ccfc41805 merged origin/release/v0.36.0 (81804a179e, wiki v0.36
+round2, guide/i18n/screenshot files only, no electron/desktop surface); electron plus
+desktop suites and tsc re-verified green at that HEAD. See progress.md for the live
+table and the phase notes.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -128,13 +133,21 @@ New bridge methods / IPC channels: (none yet)
 New settings keys: (none yet)
 New i18n keys: (none yet)
 New tests: tests/electron_scheme_privileges.test.ts, the app:// scheme privileges pin
-(app-entry-anchored, comment-stripped, per-key explicit-true plus exact key-set
-equality as the deny-list; single-registration count pin). Mutation-verified on all
-four dimensions (phase 1).
+(app-entry-anchored, block/line/trailing-comment-stripped, per-key explicit-true as
+whole-line values, exact key-set equality with a quoted-key-aware scanner as the
+deny-list, single-entry pin inside the call, single-registration count pin, and
+top-level-before-app.whenReady position pins). Mutation-verified on eleven dimensions
+in phase 1 QA: drop, flip-false, line-comment, extra privilege, block-comment,
+second scheme entry, non-top-level call, ready-ordering decoy, quoted key,
+value expression, trailing comment (harness: the phase 1 QA notes in progress.md).
 Dependency moves: electron 43.1.1 to 43.3.0 and the electron-builder family
 (electron-builder, app-builder-lib, dmg-builder, electron-builder-squirrel-windows)
 26.15.6 to 26.15.7, via pnpm add -D, devDependencies only; vendor bundles
 (electron-log/main, electron-updater) byte-identical across the bump (phase 1).
+Vendor bundle sha256 baselines (recorded by phase 1 QA; regen-stability verified,
+rebuild reproduced identical bytes): electron_log_main.cjs
+784caa8281339772203a5881f442bbf4199163d6ef0914fc5d26eca8e3a967bd, electron_updater.cjs
+0605218d342a1c1b219677cebf64c848a1b55ff5d865daf8c71b70395c83287f.
 Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path recorded here)
 
 ## Known gotchas for this packet
