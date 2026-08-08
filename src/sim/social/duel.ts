@@ -86,6 +86,10 @@ export function duelAccept(ctx: SimContext, pid?: number): void {
     b: r.meta.entityId,
     state: 'countdown',
     timer: DUEL_COUNTDOWN,
+    controlled: new Map([
+      [invite.fromPid, new Set<number>()],
+      [r.meta.entityId, new Set<number>()],
+    ]),
   };
   ctx.duels.set(duel.a, duel);
   ctx.duels.set(duel.b, duel);
@@ -141,6 +145,15 @@ export function updateDuels(ctx: SimContext): void {
       }
       continue;
     }
+    // Remember what each side CONTROLS while it is still resolvable. An Aura
+    // carries only `sourceId`, so once a pet despawns nothing can map its dot
+    // back to the owner; the clamp meanwhile treats that dot as the opponent's
+    // for the whole bout. Recording the id here is what lets the end clear
+    // exactly what the clamp was protecting against.
+    for (const dPid of [duel.a, duel.b]) {
+      const pet = ctx.petOf(dPid);
+      if (pet) duel.controlled?.get(dPid)?.add(pet.id);
+    }
     // forfeit by running away or dying to something else
     if (dist2d(ea.pos, eb.pos) > DUEL_FORFEIT_DISTANCE) {
       endDuel(ctx, duel, null);
@@ -177,6 +190,7 @@ function clearAurasFromController(
   ctx: SimContext,
   target: Entity | undefined,
   controllerPid: number,
+  controlled: ReadonlySet<number> | undefined,
 ): void {
   if (!target) return;
   const sources = new Set<number>();
@@ -187,9 +201,12 @@ function clearAurasFromController(
     // that died or was dismissed between the last tick and the end) there is
     // nothing left to resolve, so fall back to the raw id comparison this
     // replaced: never clear less than the old code did.
-    if (src ? ctx.pvpController(src)?.id === controllerPid : a.sourceId === controllerPid) {
-      sources.add(a.sourceId);
-    }
+    const byController = src
+      ? ctx.pvpController(src)?.id === controllerPid
+      : a.sourceId === controllerPid;
+    // ...or it came from something the opponent controlled at any point in the
+    // bout, which is the only way to catch a source that has since despawned.
+    if (byController || controlled?.has(a.sourceId)) sources.add(a.sourceId);
   }
   for (const sourceId of sources) ctx.clearAurasFromSource(target, sourceId);
 }
@@ -220,8 +237,8 @@ export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | nu
   // own entity id left a pet's dot ticking on a body handed back at 1 hp with no
   // clamp left, and the next tick killed for real. Two halves of one duel must
   // not disagree about whose doing something was.
-  clearAurasFromController(ctx, ea, duel.b);
-  clearAurasFromController(ctx, eb, duel.a);
+  clearAurasFromController(ctx, ea, duel.b, duel.controlled?.get(duel.b));
+  clearAurasFromController(ctx, eb, duel.a, duel.controlled?.get(duel.a));
   if (winnerPid !== null && aMeta && bMeta) {
     const winner = winnerPid === duel.a ? aMeta : bMeta;
     const loser = winnerPid === duel.a ? bMeta : aMeta;

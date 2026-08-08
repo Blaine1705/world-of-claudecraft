@@ -164,4 +164,49 @@ describe('what a duel leaves behind', () => {
       "the opponent's own dot is cleared whether or not their entity survives",
     ).toBe(false);
   });
+
+  it('clears a pet dot even when the PET DESPAWNED before the duel ended', () => {
+    // The residual the controller lookup could not reach: an Aura carries only
+    // sourceId, so once the pet entity is gone nothing can map its dot back to
+    // the owner. The clamp treated that dot as the opponent's for the whole
+    // bout, so leaving it behind handed the loser back at 1 hp with a live
+    // killer on them, which is the original bug for a narrower trigger.
+    //
+    // The duel now records what each side controlled while it was still
+    // resolvable, and clears against that.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b)!;
+    const pet = sim.entities.get(sim.addPlayer('hunter', 'PetOwner', { autoEquip: true }))!;
+    pet.kind = 'mob';
+    pet.ownerId = a;
+    sim.ctx.petOf = ((pid: number) => (pid === a ? pet : null)) as typeof sim.ctx.petOf;
+
+    // One tick with the pet alive is all the duel needs to remember it.
+    sim.tick();
+    loser.auras.push({
+      id: 'ghost_pet_bleed',
+      name: 'Rip',
+      kind: 'dot',
+      remaining: 30,
+      duration: 30,
+      value: 40,
+      tickInterval: 1,
+      tickTimer: 1,
+      sourceId: pet.id,
+      school: 'physical',
+    } as Aura);
+
+    // ...and now the pet is gone, exactly as a dismiss or a corpse decay leaves it.
+    sim.entities.delete(pet.id);
+    expect(sim.ctx.entities.get(pet.id), 'the source really is unresolvable').toBeUndefined();
+
+    fightToTheEnd(sim, a, b);
+
+    expect(
+      loser.auras.some((x) => x.id === 'ghost_pet_bleed'),
+      'a despawned pet dot must not ride out of the duel',
+    ).toBe(false);
+    for (let i = 0; i < 20 * 8; i++) sim.tick();
+    expect(loser.dead, 'so it cannot kill the loser at 1 hp afterwards').toBe(false);
+  });
 });
