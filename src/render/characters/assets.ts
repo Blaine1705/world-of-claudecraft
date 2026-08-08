@@ -18,7 +18,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
-import { loadGltf, loadTexture } from '../assets/loader';
+import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
@@ -35,6 +35,7 @@ import {
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
+  SKINS_DIR,
   VISUALS,
   type VisualDef,
   visibleAttachmentsForGraphics,
@@ -616,9 +617,21 @@ export function startStreamedCharacterPreloads(): number {
 const skinTexByUrl = new Map<string, THREE.Texture>();
 const skinEmisTexByUrl = new Map<string, THREE.Texture>();
 
+// scripts/assets/compress_standalone_textures.mjs ships a `.ktx2` sibling next
+// to every atlas under this prefix, so those ~34 1024x1024 atlases stay
+// GPU-compressed in memory instead of decoding to full RGBA bitmaps (the
+// eagerSkinAtlases comment below has the numbers). The player_mech chromas
+// (MECH_DIR) are not under this prefix, stay on the plain PNG path, and are
+// out of scope here: they are lazyPreload-only, never part of the eager boot
+// sweep this pass targets.
+const KTX2_ATLAS_PREFIX = `${SKINS_DIR}/`;
+
 /** Load a skin/emissive atlas with the glTF body-UV conventions (sRGB, no flip). */
 function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise<void> {
-  return loadTexture(url, { srgb: true }).then((t) => {
+  const load = url.startsWith(KTX2_ATLAS_PREFIX)
+    ? loadKtx2Texture(`${url.slice(0, -'.png'.length)}.ktx2`)
+    : loadTexture(url, { srgb: true });
+  return load.then((t) => {
     t.flipY = false;
     t.needsUpdate = true;
     into.set(url, t);
