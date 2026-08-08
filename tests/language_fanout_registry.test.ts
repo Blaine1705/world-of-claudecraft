@@ -387,6 +387,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'prevReadOnly gates nothing that is drawn: it is the demotion-edge detector deciding only whether the read-only note carries live-region semantics on THIS paint (a mid-view rank loss is voiced once; steady read-only repaints stay silent, the guild_bank_log_window lastAnnounced shape). The note text and every other string are rebuilt unconditionally on each paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives, so a locale switch relocalizes the whole Guild tab by itself. The edge cannot fire from a locale switch either: readOnly derives from the snapshot canEdit flag, not from any text.',
   },
   {
+    file: 'bags_window.ts',
+    memos: ['lastGridSignature'],
+    reason:
+      'lastGridSignature gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, keyed on the painted content changing because online the tidied grid arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; at worst a locale switch inside the 3-second settle window plays the ripple once, which draws no text.',
+  },
+  {
     file: 'deed_tracker_painter.ts',
     memos: ['lastChip'],
     reason:
@@ -594,7 +600,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-    ).toBe(6);
+      // 7 as of the bags Sort button: bags_window's `lastGridSignature` gates
+      // only whether the one-shot settle ANIMATION plays (which draws no
+      // text); fillGrid rebuilds every cell unconditionally and the existing
+      // bags fan-out arm repaints the window wholesale on a locale switch.
+    ).toBe(7);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
