@@ -10,54 +10,144 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "es_ES": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "fr_FR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "fr_CA": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "de_DE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "nl_NL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "pl_PL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "id_ID": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "tr_TR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "sv_SE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "vi_VN": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ],
   "da_DK": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bgOffer.accept",
+    "hudChrome.bgOffer.accepted",
+    "hudChrome.bgOffer.acceptedWait",
+    "hudChrome.bgOffer.decline",
+    "hudChrome.bgOffer.remaining",
+    "hudChrome.bgOffer.title"
   ]
 };

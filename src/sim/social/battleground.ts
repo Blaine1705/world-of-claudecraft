@@ -42,6 +42,15 @@ import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { recordBgOutcome } from './battleground_outcomes';
 import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './battleground_party';
+import {
+  type BgProposal,
+  bgProposalFor,
+  bgProposalRemaining,
+  bgProposalRespond,
+  bgRequeueLockedUntil,
+  openBgProposal,
+  sweepBgProposals,
+} from './battleground_proposal';
 
 // --- Thornhollow Fields tuning consts (rating reuses the arena's exported eloDelta) ---
 export const BG_BASE_RATING = 1500; // every character starts here on the ladder
@@ -303,6 +312,18 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
     ctx.error(id, 'You cannot queue for Thornhollow Fields while in another match.');
     return;
   }
+  const lockedUntil = bgRequeueLockedUntil(ctx, id);
+  if (lockedUntil > 0) {
+    ctx.error(
+      id,
+      `You must wait ${Math.max(1, Math.ceil(lockedUntil - ctx.time))} seconds before queueing for Thornhollow Fields again.`,
+    );
+    return;
+  }
+  if (bgProposalFor(ctx, id)) {
+    ctx.error(id, 'You have a Thornhollow Fields invitation waiting. Answer it first.');
+    return;
+  }
   if (!opts?.bypassLevel && r.e.level < BG_MIN_LEVEL) {
     ctx.error(id, `Thornhollow Fields requires level ${BG_MIN_LEVEL}.`);
     return;
@@ -423,6 +444,10 @@ function dist2d(a: Vec3, b: Vec3): number {
 }
 
 export function updateBattleground(ctx: SimContext): void {
+  // Lapsed offers resolve BEFORE the matchmaker runs, so the slot and the
+  // returning groups are back in play on the same tick they are released rather
+  // than sitting out until the next one.
+  sweepBgProposals(ctx);
   matchmakeBg(ctx);
   const seen = new Set<BgMatch>();
   for (const match of ctx.bgMatches.values()) {
@@ -577,15 +602,38 @@ function matchmakeBg(ctx: SimContext): void {
     if (bgQueueSize(ctx) < BG_TEAM_SIZE * 2 || freeBgSlot(ctx) === null) return;
     const picked = pickBgTeams(ctx);
     if (!picked) return;
+    const slot = freeBgSlot(ctx);
+    if (slot === null) return; // re-checked: the loop above may have taken the last one
     ctx.bgQueue = ctx.bgQueue.filter((g) => !picked.used.includes(g));
-    // The QUEUED-GROUP provenance, which only the matchmaker holds: a group of
-    // 2+ queued together. Live party membership is NOT the same question (a
-    // solo queuer can accept an invite while waiting, and a queued party can
-    // dissolve mid-wait), so it is read here rather than from partyOf at start.
-    startBgMatch(ctx, picked.teams[0], picked.teams[1], {
-      grouped: picked.used.some((g) => g.pids.length > 1),
-    });
+    // A pick is now an OFFER, not a seat: it is held as a proposal until all ten
+    // accept (battleground_proposal.ts). The QUEUED-GROUP provenance, which only
+    // the matchmaker holds, rides along on it: a group of 2+ queued together.
+    // Live party membership is NOT the same question (a solo queuer can accept
+    // an invite while waiting, and a queued party can dissolve mid-wait), so it
+    // is read here rather than from partyOf at start.
+    openBgProposal(
+      ctx,
+      picked.teams,
+      picked.used,
+      slot,
+      picked.used.some((g) => g.pids.length > 1),
+    );
   }
+}
+
+/** Seat an accepted proposal on the slot it has been holding. */
+function seatBgProposal(ctx: SimContext, proposal: BgProposal): void {
+  ctx.bgProposals.splice(ctx.bgProposals.indexOf(proposal), 1);
+  startBgMatch(ctx, proposal.teams[0], proposal.teams[1], {
+    grouped: proposal.grouped,
+    slot: proposal.slot,
+  });
+}
+
+/** Answer a live queue-pop proposal; a full house seats the match immediately. */
+export function bgRespond(ctx: SimContext, accept: boolean, pid?: number): void {
+  const ready = bgProposalRespond(ctx, accept, pid);
+  if (ready) seatBgProposal(ctx, ready);
 }
 
 /** One candidate pairing, plus the numbers the fairness rules read off it. */
@@ -709,9 +757,12 @@ export function startBgMatch(
   ctx: SimContext,
   teamA: number[],
   teamB: number[],
-  opts?: { rated?: boolean; grouped?: boolean },
+  opts?: { rated?: boolean; grouped?: boolean; slot?: number },
 ): void {
-  const slot = freeBgSlot(ctx);
+  // A seat coming out of an accepted proposal brings the slot the proposal
+  // reserved when it opened, so the field it has been holding for thirty seconds
+  // cannot be taken out from under it here.
+  const slot = opts?.slot ?? freeBgSlot(ctx);
   if (slot === null) {
     // Hand the seats back as two TEAM-SIZED groups: a single welded ten-group
     // could never be packed into 5v5 teams again by the matchmaker.
@@ -1784,6 +1835,7 @@ export function bgInfoFor(
     };
   }
   const group = bgGroupContaining(ctx, pid);
+  const proposal = bgProposalFor(ctx, pid);
   return {
     rating: meta.bgRating,
     wins: meta.bgWins,
@@ -1792,6 +1844,20 @@ export function bgInfoFor(
     queued: group !== null,
     queueSize: bgQueueSize(ctx),
     queuedParty: group?.pids.length ?? 1,
+    // The live queue-pop offer. Counts only, never names: the ten have not been
+    // introduced yet, and a decline must not leak who was on the other side.
+    proposal: proposal
+      ? {
+          id: proposal.id,
+          size: proposal.teams[0].length + proposal.teams[1].length,
+          accepted: proposal.accepted.size,
+          myResponse: proposal.accepted.has(pid) ? ('accepted' as const) : ('pending' as const),
+          remaining: bgProposalRemaining(ctx, proposal),
+        }
+      : null,
+    // Whole seconds until this character may queue again after failing to
+    // answer an offer (0 = clear).
+    requeueIn: Math.max(0, Math.ceil(bgRequeueLockedUntil(ctx, pid) - ctx.time)),
     // The first-win-of-the-day bonus is still on the table for this character.
     // A READ, never the rollover: `bgFirstWinBonusAvailable` reports a stored
     // date that is not today as re-armed without writing anything, because a

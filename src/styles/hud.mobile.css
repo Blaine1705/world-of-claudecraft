@@ -5871,4 +5871,8 @@
     min-height: 40px;
     box-sizing: border-box;
   }
+  body.mobile-touch #bg-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
 }
