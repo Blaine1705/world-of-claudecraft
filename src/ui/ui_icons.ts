@@ -81,7 +81,8 @@ export type UiIconName =
   | 'bond-link'
   | 'download'
   | 'eye'
-  | 'eye-off';
+  | 'eye-off'
+  | 'wiki';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -218,6 +219,11 @@ const ICONS: Record<UiIconName, string> = {
   // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
   professions:
     '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // hand-authored question mark (the Wiki launcher): a stroked hook over a dot,
+  // the universal "look it up" affordance, drawn bold so it reads at
+  // micro-button size and stays tellable apart from the emote speech bubble
+  // (a filled balloon) and the deeds book (a solid tome)
+  wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.

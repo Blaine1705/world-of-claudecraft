@@ -709,6 +709,7 @@ import {
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
+import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
   isWindowDragPreviewMutation,
@@ -2912,6 +2913,7 @@ export class Hud {
     });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
+    $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
@@ -4929,6 +4931,7 @@ export class Hud {
       onPlacementChange: (listener) => this.auraOverlayController.onPlacementChange(listener),
     }),
     bugReport: () => this.bugReportHooks,
+    openWiki: () => this.openWiki(),
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
       const ability = this.abilityForSlot(slot);
@@ -18067,6 +18070,16 @@ export class Hud {
 
   toggleOptionsMenu(): void {
     this.optionsWindow.toggle();
+  }
+
+  /** Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray): the
+   *  confirm-first external hop in src/ui/wiki_link.ts, riding the one shared
+   *  confirm-dialog family so focus trap and key activation are inherited. */
+  openWiki(): void {
+    promptWikiVisit({
+      confirm: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
+    });
   }
 
   closeOptions(): void {

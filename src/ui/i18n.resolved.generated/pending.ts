@@ -136,6 +136,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "es_ES": [
@@ -265,6 +269,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "fr_FR": [
@@ -394,6 +402,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "fr_CA": [
@@ -523,6 +535,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "en_CA": [],
@@ -653,6 +669,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "de_DE": [
@@ -782,6 +802,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "zh_CN": [
@@ -923,6 +947,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "ru_RU": [
@@ -1055,6 +1083,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "nl_NL": [
@@ -1184,6 +1216,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "pl_PL": [
@@ -1313,6 +1349,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "id_ID": [
@@ -1442,6 +1482,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "tr_TR": [
@@ -1571,6 +1615,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "sv_SE": [
@@ -1700,6 +1748,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "vi_VN": [
@@ -1829,6 +1881,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ],
   "da_DK": [
@@ -1958,6 +2014,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast",
     "hudChrome.reliquary.unpin",
     "hudChrome.reliquary.unpinAria",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle",
     "loading.tips.reliquary"
   ]
 };

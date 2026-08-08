@@ -1443,8 +1443,14 @@ export const TARGETS = [
   },
   {
     key: 'bank-instance-marks',
-    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
-    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
+    when: [
+      'ui/bank_window',
+      'ui/guild_bank_window',
+      'ui/item_instance_glyph_mark',
+      'ui/bag_fine_mark',
+      'ui/bag_corner_mark',
+    ],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
@@ -1453,7 +1459,9 @@ export const TARGETS = [
         // One copy per corner-mark kind plus a plain control stack, so the
         // vault shows the masterwork seal and the enchanted / signed / bound
         // glyphs beside an unmarked cell. The personal bank has no transfer
-        // lock, so every copy deposits.
+        // lock, so every copy deposits. A fine grade beside its base material
+        // shows the fine rim/wash/seal surviving deposit against the unmarked
+        // base stack (the bags `inventory` target's contrast idiom).
         try {
           sim?.addItemInstance?.('worn_sword', {
             signer: 'Thorgar',
@@ -1465,6 +1473,8 @@ export const TARGETS = [
           // so a quest-flagged fixture would silently drop the bound cell.
           sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
           sim?.addItem?.('baked_bread', 3);
+          sim?.addItem?.('copper_ore', 2);
+          sim?.addItem?.('fine_copper_ore', 2);
         } catch {}
         // Stand beside the banker so the proximity-gated bank snapshot is
         // live (bankInfo is null out of reach; the bank-chips recipe idiom).
@@ -1494,8 +1504,10 @@ export const TARGETS = [
           if (idx < 0) break;
           world.bankDeposit(idx);
         }
-        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
-        if (plain >= 0) world.bankDeposit(plain);
+        for (const id of ['baked_bread', 'copper_ore', 'fine_copper_ore']) {
+          const at = world.inventory.findIndex((s) => s?.itemId === id);
+          if (at >= 0) world.bankDeposit(at);
+        }
       });
       // Poll for the deposited cells, not the marks: the same recipe shoots
       // the BEFORE tree, where the bank paints no corner mark at all.
@@ -8338,6 +8350,51 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
       return {};
+    },
+  },
+  {
+    key: 'wiki-launcher',
+    label: 'Wiki launcher: micro-bar button, Esc game-menu row, confirm dialog, mobile More tray',
+    when: ['ui/wiki_link'],
+    variants: [
+      { key: 'microbar' },
+      { key: 'game-menu' },
+      { key: 'confirm' },
+      { key: 'more-tray', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.key ?? 'microbar';
+      if (scene === 'microbar') {
+        const ready = await pollForSize(page, '#side-buttons');
+        if (!ready) return { skip: 'the micro-button bar never became visible' };
+        return { clip: '#side-buttons' };
+      }
+      if (scene === 'game-menu') {
+        await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+        const ready = await pollForSize(page, '#options-menu');
+        if (!ready) return { skip: 'the game menu never became visible' };
+        return { clip: '#options-menu' };
+      }
+      if (scene === 'confirm') {
+        // Guarded so a BEFORE capture on the base build (no hud.openWiki yet)
+        // skips cleanly instead of throwing.
+        const opened = await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          if (!hud?.openWiki) return { ok: false, reason: 'hud.openWiki is not present' };
+          hud.openWiki();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#confirm-dialog');
+        if (!ready) return { skip: 'the wiki confirm dialog never became visible' };
+        return { clip: '#confirm-dialog' };
+      }
+      // more-tray (mobile): open the tray through the real More button handler,
+      // the same path a player taps, so the shot proves the binding is live.
+      await page.evaluate(() => document.getElementById('mobile-more')?.click());
+      const ready = await pollForSize(page, '#mobile-extra-controls');
+      if (!ready) return { skip: 'the mobile More tray never opened' };
+      return { clip: '#mobile-extra-controls' };
     },
   },
 ];

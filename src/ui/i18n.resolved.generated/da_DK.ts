@@ -336,6 +336,12 @@ export const da_DK: EnTranslations = {
       "healerConfirmAccept": "Genopliv mig",
       "healerConfirmCancel": "Annuller"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Frigørelse",
       "help": "Redning: /unstuck starter en stillestående nedtælling, der flytter dig til et nærliggende tilgængeligt sikkert sted.",
