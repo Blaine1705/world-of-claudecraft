@@ -8,9 +8,15 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function make(cls: string) {
-  const sim = new Sim({ seed: 5, playerClass: cls as any, autoEquip: true });
+  const sim = new Sim({
+    seed: 5,
+    playerClass: cls as any,
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   if (cls === 'paladin') expect(sim.setSpec('protection')).toBe(true);
   const pid = sim.playerId;
@@ -63,7 +69,7 @@ function advanceArena(sim: Sim, pid: number): ArenaMatch {
 }
 
 function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const classes: PlayerClass[] =
     format === '1v1'
       ? ['paladin', 'warrior']
@@ -314,7 +320,7 @@ describe('Generic guardian ward infrastructure', () => {
       let sourcePid: number;
       let match: ArenaMatch | null = null;
       if (mode === 'duel') {
-        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
         victimPid = sim.addPlayer('paladin', 'Paladin');
         sourcePid = sim.addPlayer('warrior', 'Warrior');
         const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };

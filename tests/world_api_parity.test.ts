@@ -105,6 +105,7 @@ export const IWORLD_MEMBERS = [
   { name: 'prestigeRank', kind: 'data' },
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
+  { name: 'playtimeSeconds', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
@@ -562,9 +563,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // projections, and the controlled Warlock pet's pet-bar mirror add three
     // data members; the pet's signature-skill command and autocast toggle add
     // two methods (305). The bag clean-up button adds sortInventory
-    // (IWorldInventory, a method), leaving 306.
-    expect(IWORLD_MEMBERS.length).toBe(306);
-    expect(DATA_MEMBERS.length).toBe(79);
+    // (IWorldInventory, a method, 306), and the character sheet's Time Played
+    // line adds playtimeSeconds (IWorldProgressionXp, data), leaving 307.
+    expect(IWORLD_MEMBERS.length).toBe(307);
+    expect(DATA_MEMBERS.length).toBe(80);
     expect(METHOD_MEMBERS.length).toBe(227);
   });
   it('has no duplicate member names', () => {
@@ -789,6 +791,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -945,6 +948,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'petSpecialCommandsSupported',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1382,6 +1386,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
   'leaderboard',
@@ -1782,8 +1787,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(306);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(306);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(307);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(307);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

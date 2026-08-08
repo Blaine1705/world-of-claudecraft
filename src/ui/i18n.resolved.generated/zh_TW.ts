@@ -1348,6 +1348,7 @@ export const zh_TW: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。",
       "showWalletOnCharacterScreen": "在角色畫面顯示錢包",
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
+      "showPlaytime": "在角色畫面顯示遊戲時長",
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",
@@ -1580,7 +1581,13 @@ export const zh_TW: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻擊",
-      "defense": "防禦"
+      "defense": "防禦",
+      "playtimeLabel": "遊戲時長",
+      "playtimeParts": "{major}{minor}",
+      "playtimeUnderMinute": "不到一分鐘",
+      "playtimeHidden": "已隱藏",
+      "showPlaytimeAria": "顯示遊戲時長",
+      "hidePlaytimeAria": "隱藏遊戲時長"
     },
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
@@ -1702,6 +1709,24 @@ export const zh_TW: EnTranslations = {
         "few": "剩餘 {count} 秒",
         "many": "剩餘 {count} 秒",
         "other": "剩餘 {count} 秒"
+      },
+      "playtimeDays": {
+        "one": "{count} 天",
+        "few": "{count} 天",
+        "many": "{count} 天",
+        "other": "{count} 天"
+      },
+      "playtimeHours": {
+        "one": "{count} 小時",
+        "few": "{count} 小時",
+        "many": "{count} 小時",
+        "other": "{count} 小時"
+      },
+      "playtimeMinutes": {
+        "one": "{count} 分鐘",
+        "few": "{count} 分鐘",
+        "many": "{count} 分鐘",
+        "other": "{count} 分鐘"
       },
       "playersOnline": {
         "one": "查詢：{realm} 上有 {count} 名玩家在線上。",
