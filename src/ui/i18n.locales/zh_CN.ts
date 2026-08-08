@@ -11027,4 +11027,69 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': '水面涟漪（尾波）',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 性能医生',
+  'hudChrome.perf.diagnostics.subtitle': '针对游戏的扫描，提供证据和代码级修复建议。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '实时性能测量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '诊断扫描进度',
+  'hudChrome.perf.diagnostics.aria.findings': '按优先级排序的诊断结果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展开',
+  'hudChrome.perf.diagnostics.controls.start': '开始 15 秒扫描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '刷新场景统计',
+  'hudChrome.perf.diagnostics.controls.copyReport': '复制清晰报告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下载报告',
+  'hudChrome.perf.diagnostics.controls.scanning': '扫描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '扫描另一个区域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '报告已记录到控制台',
+  'hudChrome.perf.diagnostics.controls.copied': '已复制',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '复制受阻：报告已记录',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低画质重新测试',
+  'hudChrome.perf.diagnostics.instruction':
+    '为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此标签页隐藏时扫描已暂停。返回后扫描将重新开始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已加载。正在等待第一个可操作帧。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此标签页隐藏时扫描已暂停。请返回游戏以继续。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待有代表性的游戏帧：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在采集活跃游戏：现在请穿过问题区域。',
+  'hudChrome.perf.diagnostics.status.ready': '已准备扫描。按开始并重现卡顿。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待游戏世界。请选择离线游戏或进入一个在线角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '渲染器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '场景统计：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡顿归因：进入世界时已启用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 置信度',
+  'hudChrome.perf.diagnostics.sections.evidence': '证据',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即尝试',
+  'hudChrome.perf.diagnostics.sections.codeFix': '代码修复',
+  'hudChrome.perf.diagnostics.sections.source': '相关源文件',
+  'hudChrome.perf.diagnostics.severity.critical': '严重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '信息',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
 };

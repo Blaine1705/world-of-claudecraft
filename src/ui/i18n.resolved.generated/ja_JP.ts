@@ -1454,6 +1454,75 @@ export const ja_JP: EnTranslations = {
       "badges": {
         "backgrounded": "バックグラウンド",
         "offline": "オフライン"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft パフォーマンス診断",
+        "title": "ClaudeCraft パフォーマンス診断",
+        "subtitle": "ゲーム固有のスキャンで、根拠とコードレベルの修正案を提示します。",
+        "aria": {
+          "liveMeasurements": "リアルタイムのパフォーマンス測定",
+          "scanProgress": "診断スキャンの進行状況",
+          "findings": "優先度順の診断結果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展開",
+          "start": "15 秒スキャンを開始",
+          "refreshCensus": "シーン集計を更新",
+          "copyReport": "明確なレポートをコピー",
+          "downloadReport": "レポートをダウンロード",
+          "scanning": "スキャン中...",
+          "scanAnother": "別のエリアをスキャン",
+          "reportLogged": "レポートをコンソールに記録しました",
+          "copied": "コピーしました",
+          "copyBlocked": "コピーできません：レポートを記録しました",
+          "retestLowGraphics": "低画質で再テスト"
+        },
+        "instruction": "最も正確な結果を得るには、オフラインプレイに入り、重い場所を移動してカメラを回し、スキャン中にカクつく効果を発生させてください。",
+        "status": {
+          "pausedHiddenRestart": "このタブが非表示のためスキャンを一時停止しました。戻ると再開します。",
+          "restoredRestart": "タブが復帰しました。15 秒間のアクティブなゲームプレイ収集を最初からやり直します。",
+          "worldLoaded": "ワールドを読み込みました。操作可能な最初のフレームを待っています。",
+          "pausedHiddenContinue": "このタブが非表示のためスキャンを一時停止しました。続けるにはゲームに戻ってください。",
+          "collectingRemaining": {
+            "one": "アクティブなゲームプレイを収集中：残り {seconds} 秒",
+            "other": "アクティブなゲームプレイを収集中：残り {seconds} 秒"
+          },
+          "waitingFrames": "代表的なゲームプレイフレームを待機中：{current}/{minimum}",
+          "collectingNow": "アクティブなゲームプレイを収集中：問題のあるエリアを今すぐ移動してください。",
+          "ready": "スキャンの準備ができました。開始を押して遅延を再現してください。",
+          "waitingWorld": "ゲームワールドを待っています。オフラインプレイを選ぶか、オンラインキャラクターで入ってください。"
+        },
+        "metrics": {
+          "waitingRenderer": "レンダラー：待機中",
+          "waitingCensus": "シーン集計：待機中",
+          "waitingHitch": "カクつきの原因判定：ワールド進入時に有効",
+          "recent": "直近  {fps} FPS | p95 {p95} ミリ秒 | 50 ミリ秒超 {longFrames}",
+          "render": "描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒",
+          "scene": "シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー",
+          "hitches": "カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "待機中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "対処可能なしきい値は検出されませんでした。短いカクつきが気になる場合は、発生する正確な移動経路でもう一度スキャンしてください。",
+        "findingMeta": "{severity} | 信頼度 {confidence}",
+        "sections": {
+          "evidence": "根拠",
+          "tryNow": "今すぐ試す",
+          "codeFix": "コード修正",
+          "source": "関連ソース"
+        },
+        "severity": {
+          "critical": "重大",
+          "warning": "警告",
+          "info": "情報"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        }
       }
     },
     "auraOverlay": {

@@ -11030,4 +11030,69 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': '水面漣漪（尾波）',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 效能醫生',
+  'hudChrome.perf.diagnostics.subtitle': '針對遊戲的掃描，提供證據與程式碼層級修正建議。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '即時效能測量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '診斷掃描進度',
+  'hudChrome.perf.diagnostics.aria.findings': '依優先順序排列的診斷結果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展開',
+  'hudChrome.perf.diagnostics.controls.start': '開始 15 秒掃描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '重新整理場景統計',
+  'hudChrome.perf.diagnostics.controls.copyReport': '複製清晰報告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下載報告',
+  'hudChrome.perf.diagnostics.controls.scanning': '掃描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '掃描另一個區域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '報告已記錄至主控台',
+  'hudChrome.perf.diagnostics.controls.copied': '已複製',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '複製受阻：報告已記錄',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低畫質重新測試',
+  'hudChrome.perf.diagnostics.instruction':
+    '為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此分頁隱藏時掃描已暫停。返回後掃描將重新開始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已載入。正在等待第一個可操作影格。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此分頁隱藏時掃描已暫停。請返回遊戲以繼續。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待具代表性的遊戲影格：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在擷取活躍遊戲：現在請穿過問題區域。',
+  'hudChrome.perf.diagnostics.status.ready': '已準備掃描。按開始並重現卡頓。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '算繪器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '場景統計：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡頓歸因：進入世界時已啟用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 信心度',
+  'hudChrome.perf.diagnostics.sections.evidence': '證據',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即嘗試',
+  'hudChrome.perf.diagnostics.sections.codeFix': '程式碼修正',
+  'hudChrome.perf.diagnostics.sections.source': '相關來源檔案',
+  'hudChrome.perf.diagnostics.severity.critical': '嚴重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '資訊',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
 };

@@ -1454,6 +1454,75 @@ export const zh_CN: EnTranslations = {
       "badges": {
         "backgrounded": "后台运行",
         "offline": "离线"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 性能诊断",
+        "title": "ClaudeCraft 性能医生",
+        "subtitle": "针对游戏的扫描，提供证据和代码级修复建议。",
+        "aria": {
+          "liveMeasurements": "实时性能测量",
+          "scanProgress": "诊断扫描进度",
+          "findings": "按优先级排序的诊断结果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展开",
+          "start": "开始 15 秒扫描",
+          "refreshCensus": "刷新场景统计",
+          "copyReport": "复制清晰报告",
+          "downloadReport": "下载报告",
+          "scanning": "扫描中...",
+          "scanAnother": "扫描另一个区域",
+          "reportLogged": "报告已记录到控制台",
+          "copied": "已复制",
+          "copyBlocked": "复制受阻：报告已记录",
+          "retestLowGraphics": "使用低画质重新测试"
+        },
+        "instruction": "为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。",
+        "status": {
+          "pausedHiddenRestart": "此标签页隐藏时扫描已暂停。返回后扫描将重新开始。",
+          "restoredRestart": "标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。",
+          "worldLoaded": "世界已加载。正在等待第一个可操作帧。",
+          "pausedHiddenContinue": "此标签页隐藏时扫描已暂停。请返回游戏以继续。",
+          "collectingRemaining": {
+            "one": "正在采集活跃游戏：剩余 {seconds} 秒",
+            "other": "正在采集活跃游戏：剩余 {seconds} 秒"
+          },
+          "waitingFrames": "正在等待有代表性的游戏帧：{current}/{minimum}",
+          "collectingNow": "正在采集活跃游戏：现在请穿过问题区域。",
+          "ready": "已准备扫描。按开始并重现卡顿。",
+          "waitingWorld": "正在等待游戏世界。请选择离线游戏或进入一个在线角色。"
+        },
+        "metrics": {
+          "waitingRenderer": "渲染器：等待中",
+          "waitingCensus": "场景统计：等待中",
+          "waitingHitch": "卡顿归因：进入世界时已启用",
+          "recent": "最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}",
+          "render": "渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒",
+          "scene": "场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图",
+          "hitches": "卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "等待中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。",
+        "findingMeta": "{severity} | {confidence} 置信度",
+        "sections": {
+          "evidence": "证据",
+          "tryNow": "立即尝试",
+          "codeFix": "代码修复",
+          "source": "相关源文件"
+        },
+        "severity": {
+          "critical": "严重",
+          "warning": "警告",
+          "info": "信息"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        }
       }
     },
     "auraOverlay": {

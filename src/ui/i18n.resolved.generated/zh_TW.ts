@@ -1454,6 +1454,75 @@ export const zh_TW: EnTranslations = {
       "badges": {
         "backgrounded": "背景執行中",
         "offline": "離線"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 效能診斷",
+        "title": "ClaudeCraft 效能醫生",
+        "subtitle": "針對遊戲的掃描，提供證據與程式碼層級修正建議。",
+        "aria": {
+          "liveMeasurements": "即時效能測量",
+          "scanProgress": "診斷掃描進度",
+          "findings": "依優先順序排列的診斷結果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展開",
+          "start": "開始 15 秒掃描",
+          "refreshCensus": "重新整理場景統計",
+          "copyReport": "複製清晰報告",
+          "downloadReport": "下載報告",
+          "scanning": "掃描中...",
+          "scanAnother": "掃描另一個區域",
+          "reportLogged": "報告已記錄至主控台",
+          "copied": "已複製",
+          "copyBlocked": "複製受阻：報告已記錄",
+          "retestLowGraphics": "使用低畫質重新測試"
+        },
+        "instruction": "為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。",
+        "status": {
+          "pausedHiddenRestart": "此分頁隱藏時掃描已暫停。返回後掃描將重新開始。",
+          "restoredRestart": "分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。",
+          "worldLoaded": "世界已載入。正在等待第一個可操作影格。",
+          "pausedHiddenContinue": "此分頁隱藏時掃描已暫停。請返回遊戲以繼續。",
+          "collectingRemaining": {
+            "one": "正在擷取活躍遊戲：剩餘 {seconds} 秒",
+            "other": "正在擷取活躍遊戲：剩餘 {seconds} 秒"
+          },
+          "waitingFrames": "正在等待具代表性的遊戲影格：{current}/{minimum}",
+          "collectingNow": "正在擷取活躍遊戲：現在請穿過問題區域。",
+          "ready": "已準備掃描。按開始並重現卡頓。",
+          "waitingWorld": "正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。"
+        },
+        "metrics": {
+          "waitingRenderer": "算繪器：等待中",
+          "waitingCensus": "場景統計：等待中",
+          "waitingHitch": "卡頓歸因：進入世界時已啟用",
+          "recent": "最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}",
+          "render": "算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒",
+          "scene": "場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖",
+          "hitches": "卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "等待中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。",
+        "findingMeta": "{severity} | {confidence} 信心度",
+        "sections": {
+          "evidence": "證據",
+          "tryNow": "立即嘗試",
+          "codeFix": "程式碼修正",
+          "source": "相關來源檔案"
+        },
+        "severity": {
+          "critical": "嚴重",
+          "warning": "警告",
+          "info": "資訊"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        }
       }
     },
     "auraOverlay": {

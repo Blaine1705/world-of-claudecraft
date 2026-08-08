@@ -294,4 +294,34 @@ describe('PerfDiagnosticsPanel', () => {
     expect(status?.hidden).toBe(false);
     expect(progress?.hidden).toBe(false);
   });
+
+  it('renders panel-owned chrome through the active locale catalog', async () => {
+    history.replaceState(null, '', '/?diagnostics=1&lang=en_XA');
+    vi.resetModules();
+    const { PerfDiagnosticsPanel: PseudoLocalizedPanel } = await import(
+      '../src/game/perf_diagnostics_panel'
+    );
+    const panel = new PseudoLocalizedPanel({
+      startMeasurement: vi.fn(),
+      snapshot,
+      runSceneCensus: vi.fn(() => null),
+    });
+
+    panel.update(snapshot());
+
+    const root = document.querySelector<HTMLElement>('#woc-diagnostics-panel');
+    const panelText = root?.textContent ?? '';
+    const panelAria = root?.getAttribute('aria-label') ?? '';
+    const buttons = [...(root?.querySelectorAll('button') ?? [])];
+    const metrics = root?.children.item(2);
+
+    expect(panelAria).toMatch(/^\[.*\]$/);
+    expect(buttons).not.toHaveLength(0);
+    expect(buttons.every((item) => /^\[.*\]$/.test(item.textContent ?? ''))).toBe(true);
+    expect(panelText).not.toContain('ClaudeCraft Performance Doctor');
+    expect(panelText).not.toContain('Waiting for the game world');
+    expect(panelText).not.toContain('renderer: waiting');
+    expect(panelText).not.toContain('recent  60 FPS');
+    expect(metrics?.getAttribute('aria-label')).not.toBe('Live performance measurements');
+  });
 });

@@ -11525,4 +11525,72 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': '수면 물결 (물살)',
   'hudChrome.breath.label': '숨',
   'hudChrome.breath.drowning': '익사 중!',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 성능 진단',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 성능 진단',
+  'hudChrome.perf.diagnostics.subtitle':
+    '게임에 맞춘 스캔으로 근거와 코드 수준의 수정안을 제공합니다.',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '실시간 성능 측정',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '진단 스캔 진행률',
+  'hudChrome.perf.diagnostics.aria.findings': '우선순위별 진단 결과',
+  'hudChrome.perf.diagnostics.controls.minimize': '최소화',
+  'hudChrome.perf.diagnostics.controls.expand': '펼치기',
+  'hudChrome.perf.diagnostics.controls.start': '15초 스캔 시작',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '장면 통계 새로 고침',
+  'hudChrome.perf.diagnostics.controls.copyReport': '명확한 보고서 복사',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '보고서 다운로드',
+  'hudChrome.perf.diagnostics.controls.scanning': '스캔 중...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '다른 지역 스캔',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '보고서를 콘솔에 기록했습니다',
+  'hudChrome.perf.diagnostics.controls.copied': '복사됨',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '복사 차단됨: 보고서를 기록했습니다',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '낮은 그래픽으로 다시 테스트',
+  'hudChrome.perf.diagnostics.instruction':
+    '가장 정확한 결과를 얻으려면 오프라인 플레이에 들어가 느린 지역을 이동하고 카메라를 돌린 뒤, 스캔 중 끊김을 일으키는 효과를 실행하세요.',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '이 탭이 숨겨져 스캔을 일시 중지했습니다. 돌아오면 다시 시작합니다.',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '탭이 복원되었습니다. 15초 활성 게임플레이 수집을 처음부터 다시 시작합니다.',
+  'hudChrome.perf.diagnostics.status.worldLoaded':
+    '월드를 불러왔습니다. 조작 가능한 첫 프레임을 기다리는 중입니다.',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '이 탭이 숨겨져 스캔을 일시 중지했습니다. 계속하려면 게임으로 돌아오세요.',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '활성 게임플레이 수집 중: {seconds}초 남음',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '활성 게임플레이 수집 중: {seconds}초 남음',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '대표 게임플레이 프레임 대기 중: {current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow':
+    '활성 게임플레이 수집 중: 지금 문제 지역을 지나가세요.',
+  'hudChrome.perf.diagnostics.status.ready': '스캔 준비 완료. 시작을 누르고 느려짐을 재현하세요.',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '게임 월드를 기다리는 중입니다. 오프라인 플레이를 선택하거나 온라인 캐릭터로 입장하세요.',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '렌더러: 대기 중',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '장면 통계: 대기 중',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '끊김 원인 추적: 월드 입장 시 활성화됨',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '최근  {fps} FPS | p95 {p95}밀리초 | 50밀리초 초과 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '대기 중',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100: {headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '조치 가능한 임계값이 감지되지 않았습니다. 짧은 끊김이 계속 거슬리면 끊김을 일으키는 정확한 이동 경로에서 다시 스캔하세요.',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | 신뢰도 {confidence}',
+  'hudChrome.perf.diagnostics.sections.evidence': '근거',
+  'hudChrome.perf.diagnostics.sections.tryNow': '지금 시도',
+  'hudChrome.perf.diagnostics.sections.codeFix': '코드 수정',
+  'hudChrome.perf.diagnostics.sections.source': '관련 소스',
+  'hudChrome.perf.diagnostics.severity.critical': '심각',
+  'hudChrome.perf.diagnostics.severity.warning': '경고',
+  'hudChrome.perf.diagnostics.severity.info': '정보',
+  'hudChrome.perf.diagnostics.confidence.high': '높음',
+  'hudChrome.perf.diagnostics.confidence.medium': '중간',
+  'hudChrome.perf.diagnostics.confidence.low': '낮음',
 };

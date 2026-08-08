@@ -1,4 +1,5 @@
 import type { SceneCensusReport } from '../render/scene_census_core';
+import { formatNumber, t, tPlural } from '../ui/i18n';
 import type { PerfSnapshot } from './perf';
 import {
   diagnosePerfSnapshot,
@@ -10,6 +11,8 @@ import {
 const SCAN_MS = 15_000;
 const MIN_SCAN_FRAMES = 30;
 const DEFAULT_STATUS_COLOR = '#bae6fd';
+const INTEGER_NUMBER_FORMAT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
+const ONE_DECIMAL_NUMBER_FORMAT: Intl.NumberFormatOptions = { maximumFractionDigits: 1 };
 
 export function localDiagnosticsCaptureEnabled(search: string, hostname: string): boolean {
   if (new URLSearchParams(search).get('diagnosticsCapture') !== '1') return false;
@@ -80,6 +83,18 @@ function severityColor(finding: PerfDiagnosisFinding): string {
   return '#7dd3fc';
 }
 
+function severityLabel(severity: PerfDiagnosisFinding['severity']): string {
+  if (severity === 'critical') return t('hudChrome.perf.diagnostics.severity.critical');
+  if (severity === 'warning') return t('hudChrome.perf.diagnostics.severity.warning');
+  return t('hudChrome.perf.diagnostics.severity.info');
+}
+
+function confidenceLabel(confidence: PerfDiagnosisFinding['confidence']): string {
+  if (confidence === 'high') return t('hudChrome.perf.diagnostics.confidence.high');
+  if (confidence === 'medium') return t('hudChrome.perf.diagnostics.confidence.medium');
+  return t('hudChrome.perf.diagnostics.confidence.low');
+}
+
 export class PerfDiagnosticsPanel {
   private readonly root = el('section');
   private readonly status = el('div');
@@ -114,8 +129,7 @@ export class PerfDiagnosticsPanel {
       }
       this.activeSegmentStartedAt = null;
       this.scanInterrupted = true;
-      this.status.textContent =
-        'Scan paused while this tab is hidden. It will restart when you return.';
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.pausedHiddenRestart');
       return;
     }
     if (this.scanInterrupted) {
@@ -123,13 +137,12 @@ export class PerfDiagnosticsPanel {
       this.activeElapsedMs = 0;
       this.activeSegmentStartedAt = now;
       this.options.startMeasurement();
-      this.startButton.textContent = 'Scanning...';
+      this.startButton.textContent = t('hudChrome.perf.diagnostics.controls.scanning');
       setButtonDisabled(this.startButton, true);
       this.progressFill.style.width = '0';
       this.progress.setAttribute('aria-valuenow', '0');
       this.status.style.color = DEFAULT_STATUS_COLOR;
-      this.status.textContent =
-        'Tab restored. Restarting a clean 15-second active-gameplay capture.';
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.restoredRestart');
       return;
     }
     this.activeSegmentStartedAt = now;
@@ -138,7 +151,7 @@ export class PerfDiagnosticsPanel {
   constructor(private readonly options: PerfDiagnosticsPanelOptions) {
     document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.root.id = 'woc-diagnostics-panel';
-    this.root.setAttribute('aria-label', 'World of ClaudeCraft performance diagnostics');
+    this.root.setAttribute('aria-label', t('hudChrome.perf.diagnostics.panelAria'));
     this.root.style.cssText = [
       'position:fixed',
       'left:14px',
@@ -162,17 +175,19 @@ export class PerfDiagnosticsPanel {
     header.style.cssText = 'display:flex;align-items:flex-start;gap:10px';
     const titleWrap = el('div');
     titleWrap.style.flex = '1';
-    const title = el('h2', 'ClaudeCraft Performance Doctor');
+    const title = el('h2', t('hudChrome.perf.diagnostics.title'));
     title.style.cssText = 'margin:0;color:#f8fafc;font:700 17px/1.2 system-ui,sans-serif';
-    const subtitle = el('div', 'A game-specific scan with evidence and code-level fixes.');
+    const subtitle = el('div', t('hudChrome.perf.diagnostics.subtitle'));
     subtitle.style.cssText = 'margin-top:3px;color:#93c5fd';
     titleWrap.append(title, subtitle);
-    const collapse = button('Minimize', () => {
+    const collapse = button(t('hudChrome.perf.diagnostics.controls.minimize'), () => {
       const collapsed = collapse.getAttribute('aria-expanded') === 'true';
       for (const child of Array.from(this.root.children).slice(1)) {
         (child as HTMLElement).hidden = collapsed;
       }
-      collapse.textContent = collapsed ? 'Expand' : 'Minimize';
+      collapse.textContent = collapsed
+        ? t('hudChrome.perf.diagnostics.controls.expand')
+        : t('hudChrome.perf.diagnostics.controls.minimize');
       collapse.setAttribute('aria-expanded', String(!collapsed));
     });
     collapse.setAttribute('aria-controls', 'woc-diagnostics-panel');
@@ -203,7 +218,7 @@ export class PerfDiagnosticsPanel {
       'white-space:pre-wrap',
       'color:#cbd5e1',
     ].join(';');
-    this.metrics.setAttribute('aria-label', 'Live performance measurements');
+    this.metrics.setAttribute('aria-label', t('hudChrome.perf.diagnostics.aria.liveMeasurements'));
     this.root.appendChild(this.metrics);
 
     this.progress.style.cssText = [
@@ -217,7 +232,7 @@ export class PerfDiagnosticsPanel {
       'width:0;height:100%;background:#38bdf8;transition:width .25s';
     this.progress.appendChild(this.progressFill);
     this.progress.setAttribute('role', 'progressbar');
-    this.progress.setAttribute('aria-label', 'Diagnostic scan progress');
+    this.progress.setAttribute('aria-label', t('hudChrome.perf.diagnostics.aria.scanProgress'));
     this.progress.setAttribute('aria-valuemin', '0');
     this.progress.setAttribute('aria-valuemax', '100');
     this.progress.setAttribute('aria-valuenow', '0');
@@ -225,10 +240,16 @@ export class PerfDiagnosticsPanel {
 
     const controls = el('div');
     controls.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px;margin-top:10px';
-    this.startButton = button('Start 15-second scan', () => this.start());
-    this.censusButton = button('Refresh scene census', () => this.refreshSceneCensus());
-    this.copyButton = button('Copy clear report', () => this.copy());
-    this.downloadButton = button('Download report', () => this.download());
+    this.startButton = button(t('hudChrome.perf.diagnostics.controls.start'), () => this.start());
+    this.censusButton = button(t('hudChrome.perf.diagnostics.controls.refreshCensus'), () =>
+      this.refreshSceneCensus(),
+    );
+    this.copyButton = button(t('hudChrome.perf.diagnostics.controls.copyReport'), () =>
+      this.copy(),
+    );
+    this.downloadButton = button(t('hudChrome.perf.diagnostics.controls.downloadReport'), () =>
+      this.download(),
+    );
     setButtonDisabled(this.startButton, true);
     setButtonDisabled(this.censusButton, true);
     setButtonDisabled(this.copyButton, true);
@@ -236,15 +257,12 @@ export class PerfDiagnosticsPanel {
     controls.append(this.startButton, this.censusButton, this.copyButton, this.downloadButton);
     this.root.appendChild(controls);
 
-    const instruction = el(
-      'p',
-      'For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.',
-    );
+    const instruction = el('p', t('hudChrome.perf.diagnostics.instruction'));
     instruction.style.cssText = 'margin:10px 0 0;color:#94a3b8';
     this.root.appendChild(instruction);
 
     this.results.style.marginTop = '12px';
-    this.results.setAttribute('aria-label', 'Ranked diagnostic findings');
+    this.results.setAttribute('aria-label', t('hudChrome.perf.diagnostics.aria.findings'));
     this.root.appendChild(this.results);
     document.body.appendChild(this.root);
     this.renderWaiting();
@@ -261,7 +279,7 @@ export class PerfDiagnosticsPanel {
     }
     setButtonDisabled(this.startButton, !this.playable);
     if (this.state === 'waiting')
-      this.status.textContent = 'World loaded. Waiting for the first playable frame.';
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.worldLoaded');
   }
 
   onMonitorReset(): void {
@@ -285,16 +303,23 @@ export class PerfDiagnosticsPanel {
     this.progress.setAttribute('aria-valuenow', String(progressPercent));
     const recent = snapshot.windows.last10s;
     if (snapshot.browser.visibilityState !== 'visible') {
-      this.status.textContent =
-        'Scan paused while this tab is hidden. Return to the game to continue.';
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.pausedHiddenContinue');
       return;
     }
     if (activeMs < SCAN_MS) {
-      this.status.textContent = `Collecting active gameplay: ${Math.max(0, Math.ceil((SCAN_MS - activeMs) / 1000))} seconds remaining`;
+      const remainingSeconds = Math.max(0, Math.ceil((SCAN_MS - activeMs) / 1000));
+      this.status.textContent = tPlural(
+        'hudChrome.perf.diagnostics.status.collectingRemaining',
+        remainingSeconds,
+        { seconds: formatNumber(remainingSeconds, INTEGER_NUMBER_FORMAT) },
+      );
       return;
     }
     if (recent.frames < MIN_SCAN_FRAMES) {
-      this.status.textContent = `Waiting for representative gameplay frames: ${recent.frames}/${MIN_SCAN_FRAMES}`;
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.waitingFrames', {
+        current: formatNumber(recent.frames, INTEGER_NUMBER_FORMAT),
+        minimum: formatNumber(MIN_SCAN_FRAMES, INTEGER_NUMBER_FORMAT),
+      });
       return;
     }
     this.options.runSceneCensus();
@@ -320,7 +345,7 @@ export class PerfDiagnosticsPanel {
     this.diagnosis = null;
     this.finalSnapshot = null;
     this.completedAt = null;
-    this.startButton.textContent = 'Scanning...';
+    this.startButton.textContent = t('hudChrome.perf.diagnostics.controls.scanning');
     setButtonDisabled(this.startButton, true);
     setButtonDisabled(this.censusButton, true);
     setButtonDisabled(this.copyButton, true);
@@ -329,7 +354,7 @@ export class PerfDiagnosticsPanel {
     this.progressFill.style.width = '0';
     this.progress.setAttribute('aria-valuenow', '0');
     this.status.style.color = DEFAULT_STATUS_COLOR;
-    this.status.textContent = 'Collecting active gameplay: move through the problem area now.';
+    this.status.textContent = t('hudChrome.perf.diagnostics.status.collectingNow');
   }
 
   private complete(): void {
@@ -344,7 +369,7 @@ export class PerfDiagnosticsPanel {
     this.completedAt = new Date().toISOString();
     this.progressFill.style.width = '100%';
     this.progress.setAttribute('aria-valuenow', '100');
-    this.startButton.textContent = 'Scan another area';
+    this.startButton.textContent = t('hudChrome.perf.diagnostics.controls.scanAnother');
     setButtonDisabled(this.startButton, false);
     setButtonDisabled(this.censusButton, false);
     setButtonDisabled(this.copyButton, false);
@@ -371,16 +396,19 @@ export class PerfDiagnosticsPanel {
     this.diagnosis = null;
     this.finalSnapshot = null;
     this.completedAt = null;
-    this.startButton.textContent = 'Start 15-second scan';
+    this.startButton.textContent = t('hudChrome.perf.diagnostics.controls.start');
     setButtonDisabled(this.censusButton, true);
     setButtonDisabled(this.copyButton, true);
     setButtonDisabled(this.downloadButton, true);
     this.status.style.color = DEFAULT_STATUS_COLOR;
     this.status.textContent = this.ready
-      ? 'Ready to scan. Press Start and reproduce the slowdown.'
-      : 'Waiting for the game world. Choose Play Offline or enter an online character.';
-    this.metrics.textContent =
-      'renderer: waiting\nscene census: waiting\nhitch attribution: armed on world entry';
+      ? t('hudChrome.perf.diagnostics.status.ready')
+      : t('hudChrome.perf.diagnostics.status.waitingWorld');
+    this.metrics.textContent = [
+      t('hudChrome.perf.diagnostics.metrics.waitingRenderer'),
+      t('hudChrome.perf.diagnostics.metrics.waitingCensus'),
+      t('hudChrome.perf.diagnostics.metrics.waitingHitch'),
+    ].join('\n');
     this.results.replaceChildren();
     this.progressFill.style.width = '0';
     this.progress.setAttribute('aria-valuenow', '0');
@@ -390,11 +418,32 @@ export class PerfDiagnosticsPanel {
     const renderer = snapshot.renderer;
     const hitches = snapshot.hitches;
     this.metrics.textContent = [
-      `recent  ${snapshot.windows.last10s.fps} FPS | p95 ${snapshot.windows.last10s.frameMs.p95} ms | >50 ms ${snapshot.windows.last10s.frameMs.long50}`,
-      `render  submit ${renderer?.phaseMs.submit.p95 ?? 0} ms | world ${renderer?.phaseMs.world.p95 ?? 0} ms | entities ${renderer?.phaseMs.entities.p95 ?? 0} ms`,
-      `scene   ${renderer?.calls ?? 0} calls | ${(renderer?.triangles ?? 0).toLocaleString('en-US')} tris | ${renderer?.views ?? 0} views`,
-      `hitches ${hitches?.hitches ?? 0} | shaders ${hitches?.byCause['shader-compile'] ?? 0} | uploads ${hitches?.byCause['texture-upload'] ?? 0} | views ${hitches?.byCause['view-create'] ?? 0}`,
-      `GPU     ${renderer?.glRenderer?.slice(0, 74) ?? 'waiting'}`,
+      t('hudChrome.perf.diagnostics.metrics.recent', {
+        fps: formatNumber(snapshot.windows.last10s.fps, ONE_DECIMAL_NUMBER_FORMAT),
+        p95: formatNumber(snapshot.windows.last10s.frameMs.p95, ONE_DECIMAL_NUMBER_FORMAT),
+        longFrames: formatNumber(snapshot.windows.last10s.frameMs.long50, INTEGER_NUMBER_FORMAT),
+      }),
+      t('hudChrome.perf.diagnostics.metrics.render', {
+        submit: formatNumber(renderer?.phaseMs.submit.p95 ?? 0, ONE_DECIMAL_NUMBER_FORMAT),
+        world: formatNumber(renderer?.phaseMs.world.p95 ?? 0, ONE_DECIMAL_NUMBER_FORMAT),
+        entities: formatNumber(renderer?.phaseMs.entities.p95 ?? 0, ONE_DECIMAL_NUMBER_FORMAT),
+      }),
+      t('hudChrome.perf.diagnostics.metrics.scene', {
+        calls: formatNumber(renderer?.calls ?? 0, INTEGER_NUMBER_FORMAT),
+        triangles: formatNumber(renderer?.triangles ?? 0, INTEGER_NUMBER_FORMAT),
+        views: formatNumber(renderer?.views ?? 0, INTEGER_NUMBER_FORMAT),
+      }),
+      t('hudChrome.perf.diagnostics.metrics.hitches', {
+        hitches: formatNumber(hitches?.hitches ?? 0, INTEGER_NUMBER_FORMAT),
+        shaders: formatNumber(hitches?.byCause['shader-compile'] ?? 0, INTEGER_NUMBER_FORMAT),
+        uploads: formatNumber(hitches?.byCause['texture-upload'] ?? 0, INTEGER_NUMBER_FORMAT),
+        views: formatNumber(hitches?.byCause['view-create'] ?? 0, INTEGER_NUMBER_FORMAT),
+      }),
+      t('hudChrome.perf.diagnostics.metrics.gpu', {
+        renderer:
+          renderer?.glRenderer?.slice(0, 74) ??
+          t('hudChrome.perf.diagnostics.metrics.waitingValue'),
+      }),
     ].join('\n');
   }
 
@@ -406,17 +455,17 @@ export class PerfDiagnosticsPanel {
         : diagnosis.status === 'needs-attention'
           ? '#fbbf24'
           : '#4ade80';
-    this.status.textContent = `${diagnosis.score}/100: ${diagnosis.headline}`;
+    this.status.textContent = t('hudChrome.perf.diagnostics.scoreHeadline', {
+      score: formatNumber(diagnosis.score, INTEGER_NUMBER_FORMAT),
+      headline: diagnosis.headline,
+    });
     this.status.style.color = statusColor;
     const summary = el('p', diagnosis.summary);
     summary.style.cssText = 'margin:0 0 10px;color:#dbeafe';
     this.results.appendChild(summary);
 
     if (diagnosis.findings.length === 0) {
-      const healthy = el(
-        'div',
-        'No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.',
-      );
+      const healthy = el('div', t('hudChrome.perf.diagnostics.healthyNoFindings'));
       healthy.style.cssText = 'padding:10px;border-left:3px solid #4ade80;background:#071d18';
       this.results.appendChild(healthy);
       return;
@@ -432,22 +481,27 @@ export class PerfDiagnosticsPanel {
         'border-radius:7px',
         'background:rgba(15,23,42,.86)',
       ].join(';');
-      const title = el('h3', `${index + 1}. ${finding.title}`);
+      const title = el('h3', `${formatNumber(index + 1, INTEGER_NUMBER_FORMAT)}. ${finding.title}`);
       title.style.cssText = `margin:0;color:${color};font:700 13px/1.3 system-ui,sans-serif`;
       const confidence = el(
         'div',
-        `${finding.severity.toUpperCase()} | ${finding.confidence} confidence`,
+        t('hudChrome.perf.diagnostics.findingMeta', {
+          severity: severityLabel(finding.severity),
+          confidence: confidenceLabel(finding.confidence),
+        }),
       );
       confidence.style.cssText = 'margin-top:3px;color:#94a3b8;font-size:10px;letter-spacing:.04em';
       const cause = el('p', finding.cause);
       cause.style.cssText = 'margin:7px 0;color:#e2e8f0';
       card.append(title, confidence, cause);
-      card.appendChild(list('Evidence', finding.evidence));
-      card.appendChild(list('Try now', finding.immediateFixes));
-      card.appendChild(list('Code fix', finding.codeFixes));
-      card.appendChild(list('Relevant source', finding.sourceFiles));
+      card.appendChild(list(t('hudChrome.perf.diagnostics.sections.evidence'), finding.evidence));
+      card.appendChild(
+        list(t('hudChrome.perf.diagnostics.sections.tryNow'), finding.immediateFixes),
+      );
+      card.appendChild(list(t('hudChrome.perf.diagnostics.sections.codeFix'), finding.codeFixes));
+      card.appendChild(list(t('hudChrome.perf.diagnostics.sections.source'), finding.sourceFiles));
       if (finding.action) {
-        const action = el('a', finding.action.label);
+        const action = el('a', t('hudChrome.perf.diagnostics.controls.retestLowGraphics'));
         action.href = finding.action.href;
         action.style.cssText = 'display:inline-block;margin-top:8px;color:#7dd3fc;font-weight:700';
         card.appendChild(action);
@@ -482,24 +536,24 @@ export class PerfDiagnosticsPanel {
     const write = navigator.clipboard?.writeText(text);
     if (!write) {
       console.info('World of ClaudeCraft diagnosis:', text);
-      this.copyButton.textContent = 'Report logged to console';
+      this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.reportLogged');
       window.setTimeout(() => {
-        this.copyButton.textContent = 'Copy clear report';
+        this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.copyReport');
       }, 1400);
       return;
     }
     void write.then(
       () => {
-        this.copyButton.textContent = 'Copied';
+        this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.copied');
         window.setTimeout(() => {
-          this.copyButton.textContent = 'Copy clear report';
+          this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.copyReport');
         }, 1400);
       },
       () => {
         console.info('World of ClaudeCraft diagnosis:', text);
-        this.copyButton.textContent = 'Copy blocked: report logged';
+        this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.copyBlocked');
         window.setTimeout(() => {
-          this.copyButton.textContent = 'Copy clear report';
+          this.copyButton.textContent = t('hudChrome.perf.diagnostics.controls.copyReport');
         }, 1400);
       },
     );
