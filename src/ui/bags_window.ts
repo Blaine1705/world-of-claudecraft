@@ -239,7 +239,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** Equip a touch-dragged stack into the socket it was released on. The character
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
-  dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  dropOnEquipSlot(itemId: string, slot: EquipSlot, target?: { slotIndex: number }): void;
   /** Place a touch-dragged stack on a hotbar seat (the desktop drop's item
    *  branch, reached by finger): `slot` is the 1-based bar slot a desktop
    *  row button stamps. The HUD owns eligibility (isHotbarItemId) and the
@@ -1061,8 +1061,15 @@ export class BagsWindow {
           // The paperdoll drop belongs to the character window (it owns the sockets
           // and the equip refusals); the world drop belongs here, where the destroy
           // prompt lives. Releasing anywhere else is a plain cancel.
-          if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
-          else if (target.kind === 'bagCell')
+          if (target.kind === 'equip') {
+            // `index` above is bagStackIndex over the live inventory, so it names
+            // the exact stack this drag started from.
+            this.deps.dropOnEquipSlot(
+              s.itemId,
+              target.slot,
+              index >= 0 ? { slotIndex: index } : undefined,
+            );
+          } else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
           else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
           else if (target.kind === 'actionRingSlot')
@@ -1477,7 +1484,9 @@ export class BagsWindow {
         this.deps.showError(t('hud.pet.petEatsFoodOnly'));
         return;
       case 'petFeed':
-        this.deps.world().feedPet(s.itemId);
+        this.deps.world().feedPet(s.itemId, {
+          slotIndex: bagStackIndex(this.deps.world().inventory, s),
+        });
         this.deps.setPendingPetFeed(false);
         this.deps.resetPetBarSig();
         this.render();
@@ -1486,7 +1495,9 @@ export class BagsWindow {
         this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
         break;
       case 'equipBag':
-        this.deps.world().equipBag(s.itemId);
+        this.deps.world().equipBag(s.itemId, undefined, {
+          slotIndex: bagStackIndex(this.deps.world().inventory, s),
+        });
         this.deps.hideTooltip();
         this.render();
         break;
@@ -1494,7 +1505,11 @@ export class BagsWindow {
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
-        if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
+        if (!item || !this.deps.useGatherTool(item)) {
+          this.deps.world().useItem(s.itemId, {
+            slotIndex: bagStackIndex(this.deps.world().inventory, s),
+          });
+        }
         this.render();
         this.deps.renderCharIfOpen();
         break;
@@ -1653,7 +1668,9 @@ export class BagsWindow {
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else {
-      this.deps.world().sellItem(slot.itemId);
+      this.deps.world().sellItem(slot.itemId, undefined, {
+        slotIndex: bagStackIndex(this.deps.world().inventory, slot),
+      });
     }
   }
 
