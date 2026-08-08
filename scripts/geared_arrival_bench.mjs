@@ -612,6 +612,14 @@ async function main() {
       await sleep(3000);
     }
 
+    // BENCH_SCREENSHOT=<path>: capture the settled crowd from the observer
+    // after the last wave (PR evidence shots).
+    if (process.env.BENCH_SCREENSHOT) {
+      await sleep(2000);
+      await page.screenshot({ path: process.env.BENCH_SCREENSHOT });
+      console.log(`screenshot: ${process.env.BENCH_SCREENSHOT}`);
+    }
+
     const evidence = {
       label: LABEL,
       headSha,
