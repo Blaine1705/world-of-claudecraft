@@ -33,9 +33,11 @@ function world(): Sim {
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const a = sim.addPlayer('warrior', 'Aleph', { characterId: 101 });
   const b = sim.addPlayer('mage', 'Bet', { characterId: 202 });
+  sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, a);
+  sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, b);
   sim.arenaQueueJoin(a);
   sim.arenaQueueJoin(b);
   for (let i = 0; i < 20 * 8; i++) {
@@ -48,9 +50,10 @@ function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
 
 function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Ranked${i}`, { characterId: 500 + i }));
+  for (const pid of pids) sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, pid);
   for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
   for (let i = 0; i < 20 * 8; i++) {
     sim.tick();
@@ -62,7 +65,7 @@ function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
 
 function liveFiesta(): { sim: Sim; match: ArenaMatch; pids: number[] } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Fiesta${i}`, { characterId: 300 + i }));
   for (const pid of pids) sim.arenaQueueJoin(pid, 'fiesta');
@@ -153,6 +156,41 @@ describe('ranked Arena honor', () => {
     expect(sim.meta(b)!.arenaWins).toBe(0);
   });
 
+  it('pays no honor for a forfeit win but still moves rating, win count, and Deeds', () => {
+    // Mirrors Fiesta's own reason !== 'forfeit' guard on completion honor: a
+    // forfeit (an opponent disconnect) must not be a free Honor farm, but the
+    // rating swing and win/loss ledger stay forfeit-inclusive (deliberately,
+    // per src/sim/deeds.ts's own comment) so a disconnect cannot grief the
+    // survivor's ladder standing.
+    const { sim, a, b, match } = liveArena();
+    const ratingBefore = sim.meta(a)!.arenaRating;
+
+    arena.endArenaMatch(sim.ctx, match, 'A', 'forfeit');
+
+    expect(sim.meta(a)!.honor).toBe(0);
+    expect(sim.meta(b)!.honor).toBe(0);
+    expect(sim.meta(a)!.arenaWins).toBe(1);
+    expect(sim.meta(b)!.arenaLosses).toBe(1);
+    expect(sim.meta(a)!.arenaRating).toBeGreaterThan(ratingBefore);
+  });
+
+  it('pays no honor for a 2v2 forfeit win but still moves rating and win count', () => {
+    const { sim, match } = liveArena2v2();
+    const ratingBefore = sim.meta(match.teamA[0])!.arena2v2Rating;
+
+    arena.endArenaMatch(sim.ctx, match, 'A', 'forfeit');
+
+    for (const pid of match.teamA) {
+      expect(sim.meta(pid)!.honor).toBe(0);
+      expect(sim.meta(pid)!.arena2v2Wins).toBe(1);
+    }
+    for (const pid of match.teamB) {
+      expect(sim.meta(pid)!.honor).toBe(0);
+      expect(sim.meta(pid)!.arena2v2Losses).toBe(1);
+    }
+    expect(sim.meta(match.teamA[0])!.arena2v2Rating).toBeGreaterThan(ratingBefore);
+  });
+
   it('awards the 2v2 faucet to both winners through a real ranked result', () => {
     const { sim, match } = liveArena2v2();
     arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
@@ -171,7 +209,7 @@ describe('ranked Arena honor', () => {
 
   it('applies repeat-opponent DR, the daily taper, and UTC rollover deterministically', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('warrior', 'Climber');
     const meta = sim.meta(pid)!;
 
@@ -181,7 +219,7 @@ describe('ranked Arena honor', () => {
     expect(repeat).toEqual([25, 0, 0, 0]);
 
     const fresh = world();
-    fresh.utcDay = '2026-07-11';
+    fresh.resetDay = '2026-07-11';
     const freshPid = fresh.addPlayer('warrior', 'Taper');
     const freshMeta = fresh.meta(freshPid)!;
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
@@ -189,18 +227,18 @@ describe('ranked Arena honor', () => {
     }
     expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(12);
 
-    fresh.utcDay = '2026-07-12';
+    fresh.resetDay = '2026-07-12';
     expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(25);
   });
 
   it('does not reset a persisted daily window when the host has no UTC day', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('warrior', 'Replay');
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
     expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(25);
-    sim.utcDay = '';
+    sim.resetDay = '';
     expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(0);
   });
 });
@@ -227,7 +265,7 @@ describe('Fiesta honor', () => {
 
   it('applies per-victim kill DR and repeat-opposition completion DR', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('rogue', 'Fighter');
     const meta = sim.meta(pid)!;
     const pairs = new Map<string, number>();
@@ -284,7 +322,7 @@ describe('Fiesta honor', () => {
 describe('Thornhollow Fields honor income', () => {
   function bgPlayer(): { sim: Sim; meta: NonNullable<ReturnType<Sim['meta']>> } {
     const sim = world();
-    sim.utcDay = '2026-08-06';
+    sim.resetDay = '2026-08-06';
     const pid = sim.addPlayer('warrior', 'Fielder', { characterId: 700 });
     return { sim, meta: sim.meta(pid)! };
   }
@@ -364,7 +402,7 @@ describe('Thornhollow Fields honor income', () => {
 
   it('leaves Fiesta awards on the shared zero-floor curve', () => {
     const sim = world();
-    sim.utcDay = '2026-08-06';
+    sim.resetDay = '2026-08-06';
     const pid = sim.addPlayer('rogue', 'Partygoer', { characterId: 701 });
     const meta = sim.meta(pid)!;
     const pairs = new Map<string, number>();
