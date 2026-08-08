@@ -143,6 +143,9 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(spec('affliction').mastery.effect.ability).toEqual([
       { ability: 'needle_of_fate', dmgPct: 0.1 },
       { ability: 'sentence', dmgPct: 0.1 },
+      // Owner ruling 2026-08-08: Litany joined the mastery so its authored
+      // 5/9/14 resolve at the 6/10/15 the viability tests always expected.
+      { ability: 'litany_of_guilt', dmgPct: 0.1 },
     ]);
     expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBeUndefined();
     expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBeUndefined();

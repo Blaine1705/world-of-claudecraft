@@ -75,6 +75,9 @@ describe('spec masteries', () => {
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.1 },
         { ability: 'sentence', dmgPct: 0.1 },
+        // Owner ruling 2026-08-08: the viability pass authored Litany's ranks
+        // expecting the mastery on top; the wiring was missed when it landed.
+        { ability: 'litany_of_guilt', dmgPct: 0.1 },
       ],
     });
     // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a

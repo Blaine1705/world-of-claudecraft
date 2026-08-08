@@ -236,7 +236,8 @@ describe('Affliction Warlock', () => {
       expect.arrayContaining([expect.objectContaining({ type: 'afflictionLitany', damage: 14 })]),
     );
     expect(litany?.duration).toBe(8);
-    expect(litany?.value).toBe(14);
+    // 14 authored, 15 resolved: the Hexcraft mastery covers Litany now.
+    expect(litany?.value).toBe(15);
     expect(litany?.value2).toBe(8);
     expect(litany?.value3).toBe(4);
     const friendly = addTarget(sim, 11.5);
@@ -257,7 +258,7 @@ describe('Affliction Warlock', () => {
 
     expect(doomValue(sim.player)).toBe(5);
     expect(litanyHits).toHaveLength(4);
-    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([14]));
+    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([15]));
     expect(new Set(litanyHits.map((event) => event.targetId))).toEqual(
       new Set(nearby.slice(0, 4).map((target) => target.id)),
     );

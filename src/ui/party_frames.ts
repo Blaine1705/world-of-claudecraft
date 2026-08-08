@@ -19,7 +19,11 @@ import type { PartyPetInfo } from './pet_frame_view';
  * wall reads as reachable and the cast refuses. That is a separate surface, not
  * something a distance threshold can express.
  */
-export const PARTY_FRAME_RANGE_YD = 30;
+// 40, not 30: the warlock overhaul's cursed_accomplice and
+// vicarious_suffering are friendly casts at 40 yd, and the doctrine test
+// derives this constant from the longest friendly-castable range in the
+// ability table.
+export const PARTY_FRAME_RANGE_YD = 40;
 
 /** A member row's data. `pet` is attached CLIENT-SIDE from the entity roster
  *  (findPetsByOwner), not from the party wire: absent when the member has no pet,
