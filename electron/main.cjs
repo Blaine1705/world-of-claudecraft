@@ -262,6 +262,12 @@ function lockDownPermissions() {
   defaultSession.setDevicePermissionHandler(() => false);
 }
 
+// How long the shell waits for the renderer's first paint before showing the
+// window anyway. Long enough that a cold start on a slow disk still shows a
+// painted first frame, short enough that a wedged renderer does not read as a
+// launch failure.
+const READY_TO_SHOW_FALLBACK_MS = 4000;
+
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -270,6 +276,9 @@ function createMainWindow() {
     minHeight: 720,
     title: 'World of ClaudeCraft',
     backgroundColor: '#05070a',
+    // Created hidden and revealed on 'ready-to-show' below, so the player never
+    // sees an unpainted white or empty frame before the client boots.
+    show: false,
     icon: path.join(__dirname, '..', 'build', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -299,6 +308,39 @@ function createMainWindow() {
       webviewTag: false,
       disableBlinkFeatures: 'Autofill',
     },
+  });
+
+  // Show once, and only a window that is still alive and still hidden: the
+  // fallback timer and 'ready-to-show' race by design, and crash recovery
+  // reloads this same window's webContents (electron/crash_guard.cjs), so a
+  // late refire must be a no-op rather than a second show. Captured `win`, not
+  // the module-level mainWindow: createMainWindow can run again (macOS
+  // 'activate'), and this window's timer must never act on a successor window.
+  const win = mainWindow;
+  const showMainWindow = () => {
+    if (win.isDestroyed() || win.isVisible()) return false;
+    win.show();
+    return true;
+  };
+  // A renderer that wedges before its first paint must not leave the player
+  // with no window at all, so showing is armed on a timer as well. Armed once
+  // per window creation (never re-armed on a crash-recovery reload) and cleared
+  // both by 'ready-to-show' and by 'closed', so no timer outlives its window.
+  let readyToShowFallback = setTimeout(() => {
+    readyToShowFallback = null;
+    if (!showMainWindow()) return;
+    log.warn(
+      `[shell] ready-to-show did not fire within ${READY_TO_SHOW_FALLBACK_MS}ms; the fallback showed the window`,
+    );
+  }, READY_TO_SHOW_FALLBACK_MS);
+  const clearReadyToShowFallback = () => {
+    if (readyToShowFallback === null) return;
+    clearTimeout(readyToShowFallback);
+    readyToShowFallback = null;
+  };
+  mainWindow.once('ready-to-show', () => {
+    clearReadyToShowFallback();
+    showMainWindow();
   });
 
   // The application menu is nulled for win32/linux at module scope, before app ready (see the
@@ -405,6 +447,7 @@ function createMainWindow() {
   }
 
   mainWindow.on('closed', () => {
+    clearReadyToShowFallback();
     mainWindow = null;
   });
 }
