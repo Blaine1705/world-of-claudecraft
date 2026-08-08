@@ -357,7 +357,7 @@ const BIPED14: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Punch', 'Weapon'],
-  hit: ['HitReact'],
+  hit: ['HitReact', 'HitReact_Heavy'],
   death: 'Death',
 };
 
@@ -483,6 +483,18 @@ const ENEMY_BITE: ClipMap = {
   attack: ['Bite_Front'],
   hit: ['HitRecieve'],
   death: 'Death',
+};
+
+// The crab's own attack (scripts/build_crab_anims.mjs, issue #2889 round 2):
+// crabenemy.glb ships several unused bonus donor clips (Bite_InPlace, Dance,
+// No, Yes, Jump) alongside the shared Bite_Front every ENEMY_BITE family
+// plays; this blends Dance's side-to-side wiggle into Bite_InPlace's
+// in-place snap for a pincer-click flourish before the bite lands, distinct
+// from the plain forward-lunging Bite_Front every other ENEMY_BITE family
+// (mob_treant) still plays.
+const CRAB_ENEMY_BITE: ClipMap = {
+  ...ENEMY_BITE,
+  attack: ['Crab_Attack'],
 };
 
 // Procedurally authored Water Elemental. Node transforms ripple its layered
@@ -1622,6 +1634,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // brown-tinted yeti rig, same recipe as the druid Bear form.
   mob_bear: {
     url: `${CREATURES}/yetialt.glb`,
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`],
     height: 2.2,
     clips: BIPED14,
     tint: 0x5a4030,
@@ -1633,8 +1646,9 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.5,
     clips: YETI_BIPED14,
     // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/yeti_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`, `${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
@@ -1647,6 +1661,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_murloc: {
     url: `${CREATURES}/frog.glb`,
+    animUrls: [`${CREATURES}/frog_hit_variety_anims.glb`],
     height: 1.7,
     clips: BIPED14,
     tint: 'entity',
@@ -1685,8 +1700,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // faint wash only — 0.35 flooded every material with the template green
     clips: TROLL_BIPED14,
     // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
+    // baked off this same rig's own poses. The second donor GLB
+    // (scripts/build_biped14_hit_variety_anims.mjs) donates the second
+    // BIPED14 hit-reaction clip, HitReact_Heavy.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`, `${CREATURES}/orc_hit_variety_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
@@ -1874,6 +1891,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 1.8,
     clips: BIPED14,
     tint: 'entity',
@@ -1960,7 +1978,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_crab: {
     url: `${CREATURES}/crabenemy.glb`,
     height: 1.7,
-    clips: ENEMY_BITE,
+    clips: CRAB_ENEMY_BITE,
+    // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/crab_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -1989,6 +2010,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 2.1,
     clips: BIPED14,
     tint: 'entity',
