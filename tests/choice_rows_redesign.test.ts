@@ -8,6 +8,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -20,7 +22,7 @@ function rig(
   rows: Record<number, string>,
   seed = 11,
 ) {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -241,7 +243,12 @@ describe('druid Lifesap redesign', () => {
     // and without the sap and difference them. The v0.29 druid tree moved the
     // Lifesap unlock to the row 17 pick.
     const run = (withSap: boolean): { resource: number; cd: number } => {
-      const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+      const sim = new Sim({
+        seed: 11,
+        playerClass: 'druid',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       expect(
         sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),
@@ -267,7 +274,12 @@ describe('druid Lifesap redesign', () => {
   });
 
   it('carries across a form shift and fills Rage in Bruin Form', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
       true,

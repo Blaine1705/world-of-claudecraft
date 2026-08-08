@@ -14,6 +14,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -126,7 +127,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('consumes a scoped cheap-cast aura at the authoritative cost boundary', () => {
-    const sim = harness(new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.resource = player.maxResource;
@@ -163,7 +166,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {
-    const sim = harness(new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(11, 'war_row_lingering_dread')).toBe(true);
     const player = sim.player;
@@ -196,7 +201,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {
-        const sim = harness(new Sim({ seed: 2615, playerClass: cls, autoEquip: false }));
+        const sim = harness(
+          new Sim({ seed: 2615, playerClass: cls, autoEquip: false, world: EMPTY_TEST_WORLD }),
+        );
         sim.setPlayerLevel(20);
         expect(sim.selectTalentRow(level, optionId)).toBe(true);
         return sim;
@@ -227,7 +234,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   );
 
   it('does not grant cheat death without the selected row', () => {
-    const sim = harness(new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.hp = 100;

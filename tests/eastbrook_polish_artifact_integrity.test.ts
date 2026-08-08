@@ -665,10 +665,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
 // follows the anchor seam, the weapon-skin fade and the census tag. No capture
 // was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b4cebacd70f39215c6a9ccc8e0d9157c66d01a75e098f31ed3024e75a9f880c5';
+  'efc8f52c79b9997c14646243242653db0bce022d9fc38a0e9063840b8c708522';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1f33fe351e45b5804dbb920a6bbd2902c252a4c2073093fdff664ba27c9b66f1';
+  'fc2d858f1f6c099d400ca5d31dbe1653993fd1ac7433a3cea6b9e1b5c7a026bd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1558,10 +1561,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // follows the renderer's anchor seam, weapon-skin fade and census tag,
     // then this second-order seal follows the swept evidence bytes. No capture
     // was retaken.
+    // Re-pinned for the iOS WebKit memory-profile fix: the first-order composite
+    // follows renderer.ts's nativeIosMemoryProfile -> iosMemoryProfile rename,
+    // landing on top of the VFX per-frame cost work already on this release
+    // branch, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('5a315760802746b76e9f5610b8fbbd290333e13ee44ca5ac3f67f3c65733620a');
+    ).toBe('1d0bcc373f1c53b97e30c6d48bd7dff997c6681f1f8706332fc1d73860a95a61');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
