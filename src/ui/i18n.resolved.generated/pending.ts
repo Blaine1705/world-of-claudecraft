@@ -214,34 +214,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "zh_CN": [
-    "hudChrome.professions.craftingProgress",
-    "hudChrome.professions.disenchantingProgress",
-    "hudChrome.professions.enchantingProgress",
-    "hudChrome.professions.rechargingToolEffectProgress",
-    "hudChrome.professions.salvagingProgress"
-  ],
-  "zh_TW": [
-    "hudChrome.professions.craftingProgress",
-    "hudChrome.professions.disenchantingProgress",
-    "hudChrome.professions.enchantingProgress",
-    "hudChrome.professions.rechargingToolEffectProgress",
-    "hudChrome.professions.salvagingProgress"
-  ],
-  "ko_KR": [
-    "hudChrome.professions.craftingProgress",
-    "hudChrome.professions.disenchantingProgress",
-    "hudChrome.professions.enchantingProgress",
-    "hudChrome.professions.rechargingToolEffectProgress",
-    "hudChrome.professions.salvagingProgress"
-  ],
-  "ja_JP": [
-    "hudChrome.professions.craftingProgress",
-    "hudChrome.professions.disenchantingProgress",
-    "hudChrome.professions.enchantingProgress",
-    "hudChrome.professions.rechargingToolEffectProgress",
-    "hudChrome.professions.salvagingProgress"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -276,13 +252,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "ru_RU": [
-    "hudChrome.professions.craftingProgress",
-    "hudChrome.professions.disenchantingProgress",
-    "hudChrome.professions.enchantingProgress",
-    "hudChrome.professions.rechargingToolEffectProgress",
-    "hudChrome.professions.salvagingProgress"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
