@@ -6,7 +6,7 @@
 |---|---|---|---|---|
 | 1 | Electron runtime plumbing | done | 2026-08-08 | 2026-08-08 |
 | 1 QA | Verify phase 1 | done | 2026-08-08 | 2026-08-08 |
-| 2 | Shell startup and window polish | not started | | |
+| 2 | Shell startup and window polish | done | 2026-08-08 | 2026-08-08 |
 | 2 QA | Verify phase 2 | not started | | |
 | 3 | Hybrid-GPU visibility | not started | | |
 | 3 QA | Verify phase 3 | not started | | |
@@ -32,10 +32,10 @@ Phase 1: [x] electron 43.3.0 + electron-builder 26.15.7 moved via pnpm, lockfile
 regenerated, vendor bundles re-verified; [x] codeCache:true on the app:// scheme with a
 text-scan pin; [x] pack smoke recorded.
 
-Phase 2: [ ] show:false + ready-to-show with a safety-show fallback; [ ] second
-instance focuses/restores the window (deep-link path unchanged); [ ] application menu
-nulled on Win/Linux before ready, macOS default menu kept; [ ] DESKTOP_VERSION derived
-or pinned to package.json with a test.
+Phase 2: [x] show:false + ready-to-show with a safety-show fallback; [x] second
+instance focuses/restores the window (deep-link path unchanged); [x] application menu
+nulled on Win/Linux before ready, macOS default menu kept; [x] DESKTOP_VERSION derived
+or pinned to package.json with a test (derived, plus the equality pin).
 
 Phase 3: [ ] desktop-gpu-status push channel (main verdict -> renderer); [ ] gpu notice
 triggers off the shell verdict, discrete-inactive body added (M16 fills); [ ] ipc pins
@@ -161,3 +161,55 @@ Phase 1 QA (2026-08-08, verdict PASS-WITH-FOLLOWUPS, all findings fixed same day
   10; nothing asset-relevant changed since phase 1, so the phase 1 figure was a
   miscount of the same set. Electron + desktop suites 27 files / 381 tests green
   and tsc clean at the final QA commits.
+
+Phase 2 (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focus +
+7ed6a6fac4 version):
+- Base merge: origin/release/v0.36.0 was already merged at phase start (the phase 1 QA
+  base merge had taken 81804a179e, still the release tip); trivial no-op, no suite
+  re-run required.
+- show:false + ready-to-show + a 4000 ms logged fallback (READY_TO_SHOW_FALLBACK_MS in
+  electron/main.cjs). The show helpers act on a captured window instance, so a stale
+  timer can never touch a successor window. Verified BEFORE implementation that crash
+  recovery reloads the same webContents and nothing calls hide(), so the change cannot
+  re-hide a shown window on the crash path.
+- focusMainWindow() dedupes the restore+focus sites (login deep link, wallet deep link,
+  second-instance) and also reveals a still-hidden window, because deep links and second
+  launches can arrive during the pre-paint hidden phase; app 'activate' with a live
+  window now routes through it too (a dock click during the hidden phase used to no-op).
+- Menu.setApplicationMenu(null) at module scope behind a win32/linux allowlist; the
+  per-window setMenu(null) is gone. macOS behavior is UNCHANGED: setMenu was already a
+  no-op there, the default menu was present before and after (the implementer report
+  claimed a macOS behavior change; checked against the Electron API surface and wrong).
+- DESKTOP_VERSION now derives from package.json through the existing __APP_VERSION__
+  define. Probe-verified the define IS applied under vitest (the "no Vite define"
+  comment in tests/app_version.test.ts is about the standalone browser config only).
+  scripts/release_version.mjs dropped its desktop-module arm in the same change (its
+  check/prepare would otherwise throw on the vanished literal at the next release), and
+  the hidden CI coupling the version agent found, a literal grep in
+  .github/workflows/desktop-publish.yml that would have failed every publish, became a
+  pair of derive-mechanism greps (tag pushes never run the vitest pin, so the workflow
+  keeps its own guard). New pins: module version equals package.json read fresh from
+  disk, not-the-'0.0.0'-fallback, and the real index.html/play.html hrefs cross-checked
+  against the module for every platform link (play.html's deliberate no-Linux exemption
+  pinned too).
+- privacy-security-review (fresh agent, coverage prompt): 0 blocking, 3 should-fix, 4
+  nits. All three should-fix and three of the nits fixed in-session pre-commit (hidden
+  window focus, activate no-op, workflow guard, captured instance, fallback-naming pin,
+  exact call-site count). Deferred: a build-output check that dist never ships the
+  '0.0.0' define fallback; candidate for phase 11 alongside the seal re-mint.
+- Validation at final HEAD: electron+desktop+version suites 31 files / 429 tests green;
+  tsc clean; biome clean over the true delta plus the new pin file checked explicitly
+  (untracked files escape --changed sweeps). The electron implementer mutation-probed
+  its pins before handoff: 12/12 killed on backed-up copies, tree restored byte-clean.
+- Pack smoke at final HEAD (linux-unpacked, PRIME relaunch): banner electron 43.3.0;
+  ZERO ready-to-show fallback lines in a fresh main.log, so the window came up via the
+  intended path; a second launch exited into the single-instance lock in 109 ms; zero
+  exceptions; teardown clean. Focus movement itself is visual-only and rests on the
+  pins.
+- Gate at final HEAD (BROWSER_PATH exported; biome defaultBranch pinned to the release
+  branch for the run and reverted, never committed): i18n + wiki + sfx artifacts, i18n
+  freshness, malware, and biome changed-files all green; the vitest full-suite fallback
+  (42 changed paths, planner fell back on biome.json/package.json/pnpm-lock.yaml) red
+  ONLY on the 8 accepted asset-seal suites (11 tests, every failure a fingerprint
+  mismatch, phase 11 re-mint deferral); typecheck + env/server/bot builds and the
+  client bundle proven green via turbo after the vitest abort.

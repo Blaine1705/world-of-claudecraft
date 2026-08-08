@@ -31,7 +31,10 @@ Confirmed gaps this packet closes:
   detection.
 - No native notifications, no display-mode options (the only display setting is a
   browser-fullscreen boolean), no Rich Presence, update toast has no what's-new surface,
-  stale DESKTOP_VERSION constant (0.35.1 on a 0.36.0 branch).
+  stale DESKTOP_VERSION constant (0.35.1 on a 0.36.0 branch). [Corrected by phase 1 QA
+  and resolved in phase 2: the constant was never stale, package.json was also 0.35.1
+  (release-owned hand-bump not yet run); phase 2 removed the constant entirely, the
+  version now derives from package.json via the __APP_VERSION__ define.]
 - LOW graphics preset renders MORE than MEDIUM on several axes (details below).
 
 ## 2. Version currency (verified live 2026-08-08)

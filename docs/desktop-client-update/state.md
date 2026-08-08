@@ -6,13 +6,13 @@ may drift; re-verify by symbol name before relying on one.
 
 ## Current phase
 
-Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc + docs a8544d6b57) and
-phase 1 QA done (2026-08-08, verdict PASS-WITH-FOLLOWUPS, fixes in commits 042ba0a766
-test hardening + the QA docs commit); next up is phase 2 (phase-02-shell-startup-polish.md).
-QA-start base merge: 4ccfc41805 merged origin/release/v0.36.0 (81804a179e, wiki v0.36
-round2, guide/i18n/screenshot files only, no electron/desktop surface); electron plus
-desktop suites and tsc re-verified green at that HEAD. See progress.md for the live
-table and the phase notes.
+Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc + docs a8544d6b57), phase 1
+QA done (2026-08-08, PASS-WITH-FOLLOWUPS, fixes 042ba0a766 + docs db885d81bb), and
+phase 2 done (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focus
++ 7ed6a6fac4 version + the docs commit); next up is phase 2 QA (phase-02-qa.md).
+Phase 2 start merge of origin/release/v0.36.0 was a no-op (tip already
+merged at 81804a179e). The phase 2 review fixes (privacy-security-review W1/W2/W3 and
+three nits) are folded into the four commits, not separate; see progress.md notes.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -128,7 +128,8 @@ table and the phase notes.
 
 ## Inventory (append as phases land)
 
-New files created: tests/electron_scheme_privileges.test.ts (phase 1)
+New files created: tests/electron_scheme_privileges.test.ts (phase 1),
+tests/electron_shell_startup.test.ts (phase 2)
 New bridge methods / IPC channels: (none yet)
 New settings keys: (none yet)
 New i18n keys: (none yet)
@@ -140,6 +141,27 @@ top-level-before-app.whenReady position pins). Mutation-verified on eleven dimen
 in phase 1 QA: drop, flip-false, line-comment, extra privilege, block-comment,
 second scheme entry, non-top-level call, ready-ordering decoy, quoted key,
 value expression, trailing comment (harness: the phase 1 QA notes in progress.md).
+Phase 2 additions: tests/electron_shell_startup.test.ts pins the shell startup wiring
+in electron/main.cjs as comment-stripped text (hidden create with show:false plus the
+dark backgroundColor, one ready-to-show registration that clears the fallback and
+shows, the captured-instance show helper, the top-level READY_TO_SHOW_FALLBACK_MS 4000
+constant feeding the setTimeout, timer cleared on ready-to-show and closed,
+second-instance focus POSITIONED before the deep-link scan, focusMainWindow defined
+once with an exact call-site count of five (login, wallet, second-instance, activate,
+plus the definition), the win32/linux-allowlist Menu.setApplicationMenu(null) guard
+before app.whenReady() with darwin never named, and zero setMenu(null) occurrences).
+Mutation-probed by the implementer 12/12 killed pre-commit; phase 2 QA should re-verify
+on the committed tree. VERSION MECHANISM (phase 2): src/game/desktop_download.ts
+derives DESKTOP_VERSION from the __APP_VERSION__ vite define (typeof-guarded, '0.0.0'
+fallback for the define-less standalone browser config; the define IS applied under
+normal vitest, probe-verified). scripts/release_version.mjs no longer owns the module
+(html hrefs + game-version + README badges remain its surfaces);
+.github/workflows/desktop-publish.yml's verify job greps for the derive mechanism
+instead of a version literal; tests/desktop_download.test.ts pins module version ==
+package.json read fresh from disk and != '0.0.0'; tests/desktop_download_dom.test.ts
+cross-checks every real index.html/play.html platform href against the module and pins
+play.html's deliberate no-Linux exemption. Deferred (review nit I4): a build-output
+check that dist never ships the '0.0.0' fallback; fold into phase 11.
 Dependency moves: electron 43.1.1 to 43.3.0 and the electron-builder family
 (electron-builder, app-builder-lib, dmg-builder, electron-builder-squirrel-windows)
 26.15.6 to 26.15.7, via pnpm add -D, devDependencies only; vendor bundles
