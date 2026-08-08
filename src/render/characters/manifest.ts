@@ -475,6 +475,18 @@ const NIGHTKIN_FLOATING: ClipMap = {
   attack: ['Nightkin_Attack'],
 };
 
+// The glub family's own attack (scripts/build_glub_anims.mjs, issue #2889
+// round 2): FLOATING's Headbutt/Punch is shared by reference across 8
+// unrelated families (mob_dragonkin, mob_choir_thrall, mob_demon_flying,
+// mob_nightkin, mob_ghost, mob_glimmerwisp, mob_duskwisp, mob_glub among
+// them). This "spore burst" clip is baked off glubevolved.glb's own donor
+// poses (Punch's forward lunge blended through its two unused gesture
+// clips, No and Yes), so only mob_glub gets it.
+const GLUB_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Glub_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -1970,7 +1982,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/glubevolved.glb`,
     height: 1.4,
     hover: 0.15,
-    clips: FLOATING,
+    clips: GLUB_FLOATING,
+    // Glub_Attack clip donor (scripts/build_glub_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/glub_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.45,
   },
