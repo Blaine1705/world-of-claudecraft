@@ -73,6 +73,7 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
 import {
+  cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
@@ -889,30 +890,15 @@ export class BagsWindow {
       );
       // Exactly one corner treatment ever renders (cornerMark is a single
       // discriminant): masterwork seal, quest seal, fine seal, or an instance
-      // glyph/tab. Composes with the bottom-right count badge, always visible
-      // without hover on desktop and touch, identical on every graphics preset
-      // (no --fx gate). Ready seals share the seal markup and brighten via
+      // glyph/tab, all minted through the shared cornerMarkHtml dispatch
+      // (item_instance_glyph_mark.ts) so bank/guild-bank cells paint the same
+      // art and no painter re-derives the corner from the raw glyph kind.
+      // Composes with the bottom-right count badge, always visible without
+      // hover on desktop and touch, identical on every graphics preset (no
+      // --fx gate). Ready seals share the seal markup and brighten via
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
-      // The masterwork seal and the per-copy glyph/tab are minted through the
-      // shared item_instance_glyph_mark helper so bank/guild-bank cells paint
-      // the same art; the quest and fine seals stay bag-only.
-      const masterworkSeal = cornerMark === 'masterwork' ? instanceGlyphMarkHtml('masterwork') : '';
-      const questSeal =
-        cornerMark === 'quest'
-          ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
-          : '';
-      const fineSeal =
-        cornerMark === 'fine'
-          ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
-          : '';
-      const instanceMark =
-        cornerMark === 'generic' ||
-        cornerMark === 'enchanted' ||
-        cornerMark === 'signed' ||
-        cornerMark === 'bound'
-          ? instanceGlyphMarkHtml(cornerMark)
-          : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}${fineSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
+      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
