@@ -120,6 +120,29 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
   return { instance: undefined, craftedRecipeId: undefined };
 }
 
+/**
+ * Resolve the bag slot the caller NAMED without consuming anything, for actions
+ * that MUTATE a copy in place rather than destroying it (the rift forge upgrades,
+ * enchants and sockets the slot's own payload).
+ *
+ * Same tri-state as the consuming walk, and the same reason for it: `null` is an
+ * invalid selection the caller must refuse, `undefined` means none was given.
+ * Kept separate from the consuming version rather than folded into it, because a
+ * mutating caller that accidentally consumed its target would destroy the item it
+ * was asked to improve.
+ */
+export function selectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
+  slotIndex: number | undefined,
+): InvSlot | undefined | null {
+  if (slotIndex === undefined) return undefined;
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
+  const slot = inventory[slotIndex];
+  if (slot.itemId !== itemId || slot.count < 1) return null;
+  return slot;
+}
+
 /** What a resolve did, so a caller can tell a refusal from a fallback. */
 export type ItemCopyOutcome =
   | { kind: 'selected'; unit: InventoryUnit }

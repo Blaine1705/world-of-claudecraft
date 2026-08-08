@@ -26,6 +26,7 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import { ITEMS } from './data';
+import { consumeSelectedInventorySlot } from './item_copy_ref';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -381,7 +382,13 @@ const inRange = (socket: number): boolean =>
  *  occupied socket swaps: the old bag returns to the slot the new one freed, so
  *  the swap itself never needs spare room; only a capacity SHRINK (smaller bag)
  *  is guarded so the pooled inventory never ends up above budget via a swap. */
-export function equipBag(ctx: SimContext, itemId: string, socket?: number, pid?: number): void {
+export function equipBag(
+  ctx: SimContext,
+  itemId: string,
+  socket?: number,
+  pid?: number,
+  slotIndex?: number,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
@@ -411,7 +418,15 @@ export function equipBag(ctx: SimContext, itemId: string, socket?: number, pid?:
     ctx.error(meta.entityId, 'You have too many items to swap to that bag.');
     return;
   }
-  ctx.removeItem(itemId, 1, meta.entityId);
+  // A named slot consumes exactly that copy; an id-only call keeps the legacy
+  // newest-first walk (ctx.removeItem) untouched.
+  if (slotIndex !== undefined) {
+    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) return;
+    ctx.onInventoryChangedForQuests?.(meta);
+  } else {
+    ctx.removeItem(itemId, 1, meta.entityId);
+  }
+
   if (old) addStacked(meta.inventory, old, 1);
   meta.bags[target] = itemId;
   ctx.onInventoryChangedForQuests(meta);

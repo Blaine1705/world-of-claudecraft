@@ -16,6 +16,7 @@ import {
   consumeSelectedInventorySlot,
   itemCopyPin,
   itemCopyStillPinned,
+  selectedInventorySlot,
 } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
 
@@ -134,6 +135,40 @@ describe('consumeNewestInventoryUnit: the legacy fallback, unchanged', () => {
       craftedRecipeId: undefined,
     });
     expect(inv).toHaveLength(1);
+  });
+});
+
+describe('selectedInventorySlot: resolve without consuming', () => {
+  it('returns the named slot and leaves the bag untouched', () => {
+    // The mutating callers (the rift forge) improve the slot in place, so a
+    // resolver that consumed would destroy the item it was asked to upgrade.
+    const inv = [enchanted('girdle', 'power'), plain('girdle')];
+    const slot = selectedInventorySlot(inv, 'girdle', 0);
+    expect(slot?.instance).toEqual({ enchantId: 'power' });
+    expect(inv, 'nothing consumed').toHaveLength(2);
+    expect(inv[0].count).toBe(1);
+  });
+
+  it('returns the live slot object, so a caller mutating it edits the bag', () => {
+    const inv = [enchanted('girdle', 'power')];
+    const slot = selectedInventorySlot(inv, 'girdle', 0);
+    expect(slot).toBe(inv[0]);
+  });
+
+  it.each([
+    ['out of range', 9],
+    ['negative', -1],
+    ['not an integer', 0.5],
+  ])('refuses an index that is %s', (_label, index) => {
+    expect(selectedInventorySlot([plain('girdle')], 'girdle', index as number)).toBeNull();
+  });
+
+  it('refuses when the named slot holds a different item', () => {
+    expect(selectedInventorySlot([plain('boots')], 'girdle', 0)).toBeNull();
+  });
+
+  it('returns undefined for no selection, so the caller falls back', () => {
+    expect(selectedInventorySlot([plain('girdle')], 'girdle', undefined)).toBeUndefined();
   });
 });
 
