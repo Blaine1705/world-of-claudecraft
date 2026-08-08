@@ -1695,10 +1695,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/yetialt.glb`,
     // Bear_Attack clip donor (scripts/build_bear_anims.mjs): mesh-free,
     // baked off this same rig's own poses.
-    animUrls: [
-      `${CREATURES}/yetialt_hit_variety_anims.glb`,
-      `${CREATURES}/bear_ability_anims.glb`,
-    ],
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`, `${CREATURES}/bear_ability_anims.glb`],
     height: 2.2,
     clips: BEAR_BIPED14,
     tint: 0x5a4030,
