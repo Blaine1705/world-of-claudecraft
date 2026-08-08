@@ -62,13 +62,43 @@ describe('arena leaderboard', () => {
   it('coerces numeric rating/record fields from JSONB strings', async () => {
     dbMock.query.mockResolvedValueOnce({
       rows: [
-        { name: 'Thrall', class: 'shaman', level: 60, rating: '1832', wins: '12', losses: '3' },
+        {
+          name: 'Thrall',
+          class: 'shaman',
+          level: 60,
+          rating: '1832',
+          wins: '12',
+          losses: '3',
+          draws: '2',
+        },
       ],
     });
 
     await expect(topArenaRatings(5)).resolves.toEqual([
-      { name: 'Thrall', class: 'shaman', level: 60, rating: 1832, wins: 12, losses: 3 },
+      { name: 'Thrall', class: 'shaman', level: 60, rating: 1832, wins: 12, losses: 3, draws: 2 },
     ]);
+  });
+
+  it('selects the draws column and counts it toward ladder eligibility', () => {
+    // Pinned to the SQL TEXT, the same way the battleground ladder is: a draw
+    // moves rating, so a draw-only player belongs on the ladder. Without the
+    // eligibility half, someone whose whole record is draws is invisible.
+    return (async () => {
+      dbMock.query.mockResolvedValueOnce({ rows: [] });
+      await topArenaRatings(5);
+      const [sql] = dbMock.query.mock.calls[0];
+      expect(sql).toContain("COALESCE((state->>'arena1v1Draws')::int, 0)");
+      expect(sql).toContain('AS draws');
+      // The eligibility half, pinned to the literal rather than a loose regex:
+      // a draw moves rating, so a player whose whole record is draws must not be
+      // invisible on the ladder. A regex over "draws" would match the SELECT
+      // alias and prove nothing about the WHERE.
+      expect(sql.replace(/\s+/g, ' ')).toContain(
+        "COALESCE((state->>'arena1v1Wins')::int, (state->>'arenaWins')::int, 0) + " +
+          "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0) + " +
+          "COALESCE((state->>'arena1v1Draws')::int, 0) > 0",
+      );
+    })();
   });
 
   it('uses legacy-compatible 1v1 state fields by default', async () => {
