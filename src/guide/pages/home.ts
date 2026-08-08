@@ -120,7 +120,10 @@ function faqHtml(): string {
     ['guide.home.faq.q3', t('guide.home.faq.a3')],
     [
       'guide.home.faq.q4',
-      t('guide.home.faq.a4Count', { cap: formatNumber(LEVEL_CAP), zones: formatNumber(ZONE_COUNT) }),
+      t('guide.home.faq.a4Count', {
+        cap: formatNumber(LEVEL_CAP),
+        zones: formatNumber(ZONE_COUNT),
+      }),
     ],
   ] as const;
   const items = qa

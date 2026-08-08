@@ -307,7 +307,10 @@ function faqNode(): Record<string, unknown> {
       name: t(q),
       acceptedAnswer: {
         '@type': 'Answer',
-        text: hasCap || hasZones ? t(a, { ...(hasCap ? { cap } : {}), ...(hasZones ? { zones } : {}) }) : t(a),
+        text:
+          hasCap || hasZones
+            ? t(a, { ...(hasCap ? { cap } : {}), ...(hasZones ? { zones } : {}) })
+            : t(a),
       },
     })),
   };

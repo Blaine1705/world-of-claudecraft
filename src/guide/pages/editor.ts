@@ -40,7 +40,7 @@ export const editor: GuidePage = {
 
         ${section(
           'guide.editorPage.buildTitle',
-          paras('guide.editorPage.buildBody') + `<div class="guide-beat-grid">${tools}</div>`,
+          `${paras('guide.editorPage.buildBody')}<div class="guide-beat-grid">${tools}</div>`,
         )}
 
         ${section('guide.editorPage.viewsTitle', paras('guide.editorPage.viewsBody'))}
