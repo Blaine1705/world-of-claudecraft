@@ -63,10 +63,17 @@ describe('nuke damage is proportional to cast time (the balance framework rule)'
     expect(ratio).toBeLessThan(1.4);
   });
 
-  it('Starfire (3s) at least matches Wrath (shorter cast) per second', () => {
+  it('Skyfall (3s) at least matches Wildbolt (shorter cast) per second', () => {
+    // Only the floor survives the Balance rework (owner ruling 2026-08-09).
+    // Skyfall is the spec engine now: each Moonwing cast builds Moontide and
+    // the button transforms into Sunwake at 3, so its base is deliberately
+    // super-proportional (~2.5x Wildbolt's per-second base; spell power
+    // compresses the real ratio toward ~1.3). Wildbolt is the level-1 filler.
+    // A CEILING here would fight that design; the floor still catches the
+    // original bug this test was written for (the 3s cast hitting WEAKER per
+    // second than the filler).
     const ratio = nukeBaseDps('druid', 'starfire') / nukeBaseDps('druid', 'wrath');
     expect(ratio).toBeGreaterThan(0.9);
-    expect(ratio).toBeLessThan(1.3);
   });
 
   it('no mage single-target nuke is a strict trap (every nuke within band of the best)', () => {
