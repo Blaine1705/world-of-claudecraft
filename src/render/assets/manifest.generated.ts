@@ -302,6 +302,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/bear_form.glb": "/media/models/creatures/bear_form.bff8bb3c9419.glb",
   "models/creatures/bull.glb": "/media/models/creatures/bull.a00c2c292526.glb",
   "models/creatures/chicken_cow.glb": "/media/models/creatures/chicken_cow.b1235f3a04bf.glb",
+  "models/creatures/crab_ability_anims.glb": "/media/models/creatures/crab_ability_anims.6591a4034735.glb",
   "models/creatures/crabenemy.glb": "/media/models/creatures/crabenemy.8d3c9c7a231c.glb",
   "models/creatures/demon.glb": "/media/models/creatures/demon.5a26751441d5.glb",
   "models/creatures/demonalt.glb": "/media/models/creatures/demonalt.2ade9fc07ae9.glb",
