@@ -28,7 +28,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
     "hudChrome.arenaGate.minLevelNote",
@@ -49,7 +53,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
     "hudChrome.arenaGate.minLevelNote",
@@ -70,7 +78,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
     "hudChrome.arenaGate.minLevelNote",
@@ -91,7 +103,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -113,7 +129,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
     "hudChrome.arenaGate.minLevelNote",
@@ -134,7 +154,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -159,7 +183,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -181,7 +209,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
     "hudChrome.arenaGate.minLevelNote",
@@ -202,7 +234,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
     "hudChrome.arenaGate.minLevelNote",
@@ -223,7 +259,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
     "hudChrome.arenaGate.minLevelNote",
@@ -244,7 +284,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
     "hudChrome.arenaGate.minLevelNote",
@@ -265,7 +309,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
     "hudChrome.arenaGate.minLevelNote",
@@ -286,7 +334,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
     "hudChrome.arenaGate.minLevelNote",
@@ -307,7 +359,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
     "hudChrome.arenaGate.minLevelNote",
@@ -328,6 +384,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playtimeMinutes.few",
     "hudChrome.plurals.playtimeMinutes.many",
     "hudChrome.plurals.playtimeMinutes.one",
-    "hudChrome.plurals.playtimeMinutes.other"
+    "hudChrome.plurals.playtimeMinutes.other",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ]
 };

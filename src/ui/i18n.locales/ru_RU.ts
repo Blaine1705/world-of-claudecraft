@@ -9823,6 +9823,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': 'Остановитесь, прежде чем выбираться.',
   'hudChrome.unstuck.busy': 'Завершите текущее действие, прежде чем выбираться.',
   'hudChrome.unstuck.unavailable': 'В текущем состоянии выбраться нельзя.',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': 'Открыть вики?',
+  'hudChrome.wiki.confirmBody':
+    'Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.',
+  'hudChrome.wiki.confirmOpen': 'Открыть вики',
+  'hudChrome.wiki.confirmCancel': 'Отмена',
   'guide.abilityHook.revenge':
     'Поражает противников перед вами и может не требовать затрат после уклонения или парирования.',
   'guide.abilityHook.hamstring': 'Ограничивает передвижение противника, не позволяя ему сбежать.',
