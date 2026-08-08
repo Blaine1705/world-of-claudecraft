@@ -3,7 +3,7 @@ import { stackSizeOf } from '../src/sim/bags';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
 import { ITEMS as REAL_ITEMS } from '../src/sim/data';
-import { layoutBagCells } from '../src/sim/inventory_order';
+import { layoutBagCells, moveStackToCell } from '../src/sim/inventory_order';
 import {
   compareBagStacks,
   consolidateBagStacks,
@@ -364,6 +364,37 @@ describe('sortInventoryStacks', () => {
     const logCounts = inv.filter((s) => s.itemId === 'elderwood_log').map((s) => s.count);
     expect(logCounts.reduce((a, b) => a + b, 0)).toBe(31);
     expect(logCounts).toEqual([20, 11]);
+  });
+});
+
+describe('sortInventoryStacks with the manual-arrangement layer (dense hints)', () => {
+  it('a drag after a sort still trades exactly two cells (dense hints all honored)', () => {
+    // After a sort EVERY stack carries a hint for the first time; the manual
+    // move must keep operating cell-for-cell on top of that dense set.
+    const inv = [slot('pelt', 3), slot('blade'), slot('keystone')];
+    sortInventoryStacks(inv, lookup, cap);
+    // blade cell 0, keystone cell 1, pelt cell 2. Drag the pelt onto cell 0.
+    const peltIndex = inv.findIndex((s) => s.itemId === 'pelt');
+    expect(moveStackToCell(inv, peltIndex, 0, 16)).toBe(true);
+    expect(cellIds(inv, 16).slice(0, 3)).toEqual(['pelt', 'keystone', 'blade']);
+  });
+
+  it('new loot lands in the first cell past the sorted block, never inside it', () => {
+    const inv = [slot('blade'), slot('keystone')];
+    sortInventoryStacks(inv, lookup, cap);
+    inv.push(slot('potion', 2)); // a fresh drop carries no hint
+    expect(cellIds(inv, 16).slice(0, 3)).toEqual(['blade', 'keystone', 'potion']);
+  });
+
+  it('a legacy over-capacity inventory keeps every stack visible after a sort', () => {
+    const inv = [slot('pelt', 1), slot('blade'), slot('keystone'), slot('potion', 2)];
+    sortInventoryStacks(inv, lookup, cap);
+    // Capacity 2: the two best ranks own the grid; the rest append past it
+    // (layoutBagCells's tolerated-overflow path), nothing vanishes.
+    const cells = layoutBagCells(inv, 2);
+    expect(cells.length).toBe(4);
+    expect(cells.filter(Boolean).length).toBe(4);
+    expect(cells.slice(0, 2).map((s) => s?.itemId)).toEqual(['blade', 'potion']);
   });
 });
 
