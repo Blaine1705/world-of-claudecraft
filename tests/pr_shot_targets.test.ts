@@ -317,6 +317,7 @@ describe('classifyDiff', () => {
     // The staging drives the window's markup: the pin toggle (skipped when
     // refused in EITHER form, or pressed), and the shelf rows' data-page.
     expect(windowSrc).toContain('data-pin="${esc(pageId)}"');
+    expect(script).toContain('[data-pin=');
     expect(windowSrc).toContain('aria-pressed="${pinned}"');
     expect(windowSrc).toContain('aria-disabled="true"');
     expect(script).toContain("getAttribute('aria-disabled') === 'true'");

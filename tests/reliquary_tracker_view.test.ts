@@ -410,6 +410,17 @@ describe('reliquaryTrackerOwnershipSig', () => {
   it('is stable for an unchanged set of counts', () => {
     expect(reliquaryTrackerOwnershipSig(base)).toBe(reliquaryTrackerOwnershipSig({ ...base }));
   });
+
+  it('still moves at magnitudes where float accumulation rounds a step away', () => {
+    // The Math.imul rationale, pinned: under the pre-imul float expression
+    // these two inputs COLLIDE (both -712415344; the +1 on weaponSkins is
+    // rounded away once the intermediate passes 2^53), so this case reddens on
+    // a revert to a single trailing |0 over float products.
+    const big = { itemsDiscovered: 8691, marks: 1, deedsEarned: 2, mounts: 4, weaponSkins: 5 };
+    expect(reliquaryTrackerOwnershipSig({ ...big, weaponSkins: 6 })).not.toBe(
+      reliquaryTrackerOwnershipSig(big),
+    );
+  });
 });
 
 describe('rankNearlyComplete', () => {
@@ -528,6 +539,17 @@ describe('pruneReliquaryPins', () => {
     expect(pins.size).toBe(4);
   });
 
+  it('keeps the survivors walked BEFORE the first drop, in order', () => {
+    // The single-pass back-fill arm: with the drop in the middle, survivors on
+    // both sides must land, in pin order. A broken back-fill silently unpins
+    // everything the player pinned before the completed page, and a drop-first
+    // input (like the case above) never exercises it.
+    const wide: Progress = { ...progress, live2: { owned: 2, total: 9 } };
+    const result = pruneReliquaryPins(new Set(['live', 'done', 'live2']), completionFrom(wide));
+    expect(result.changed).toBe(true);
+    expect([...result.pinned]).toEqual(['live', 'live2']);
+  });
+
   it('applies the same skip predicate the tracker build applies', () => {
     // The two must never disagree: a page the strip refuses to show but the
     // store keeps would hold a cap slot no button can release.
@@ -580,6 +602,9 @@ describe('tracker chrome', () => {
       'itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,',
     );
     expect(trackerBody, 'reliquaryMarks').toContain('marks: this.sim.reliquaryMarks.size,');
+    // The input object is minted once and reused (the deed tracker's
+    // allocation-free drive precedent): the lazy-init spelling is the pin.
+    expect(trackerBody, 'reused input').toContain('this.reliquaryTrackerInput ??= {');
     expect(trackerBody, 'deedsEarned').toContain('deedsEarned: this.sim.deedsEarned.size,');
     expect(trackerBody, 'ownedMounts').toContain('mounts: this.sim.ownedMounts().length,');
     expect(trackerBody, 'weaponSkinIds').toContain(
@@ -620,8 +645,12 @@ describe('tracker chrome', () => {
     expect(arm).toContain('e.preventDefault();');
     expect(arm).toContain('e.stopPropagation();');
     // Keys landing anywhere else in the strip (a row, the bar) must not toggle
-    // the collapse: only the header is the control.
-    expect(arm).toContain(".closest('.dt-header')");
+    // the collapse: only the header is the control. The WHOLE guard statement,
+    // comment-stripped, so a prose mention or a captured-but-unused closest()
+    // cannot satisfy it.
+    expect(stripComments(arm)).toContain(
+      "if (!(e.target as HTMLElement).closest('.dt-header')) return;",
+    );
     // The same compact-touch branch as the click delegation: the count chip
     // opens the window, the desktop header toggles the collapse. Ordered, so
     // nothing says openReliquary merely appears somewhere in the arm.
@@ -639,8 +668,11 @@ describe('tracker chrome', () => {
     expect(arm).toMatch(
       /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openReliquary\(\);/,
     );
-    // Clicks landing anywhere else in the strip must not toggle the collapse.
-    expect(arm).toContain(".closest('.dt-header')");
+    // Clicks landing anywhere else in the strip must not toggle the collapse:
+    // the whole guard statement, comment-stripped (see the keydown arm).
+    expect(stripComments(arm)).toContain(
+      "if (!(e.target as HTMLElement).closest('.dt-header')) return;",
+    );
   });
 
   it('persists the tracker collapse as its own settings row', () => {

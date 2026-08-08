@@ -74,6 +74,22 @@ describe('painter hygiene', () => {
       expect(src).not.toMatch(/governor/);
       expect(src).not.toMatch(/ui_effects_profile|fxTier|data-fx-level/);
     }
+    // Positive anchors so the negative scans above are self-auditing: a moved
+    // or renamed tracker file would otherwise scan an empty read forever.
+    expect(trackerPainter).toContain('export class ReliquaryTrackerPainter');
+    expect(trackerView).toContain('RELIQUARY_TRACK_CAP');
+  });
+
+  it('dims the at-cap pin in BOTH refusal spellings and excludes it from hover', () => {
+    // The control no longer carries native disabled, so the whole "refused
+    // looks refused" affordance rests on the attribute selector.
+    const reliquaryCss = sectionCss('reliquary');
+    expect(reliquaryCss).toMatch(
+      /\.reliquary-pin:disabled,\s*\.reliquary-pin\[aria-disabled="true"\] \{\s*opacity: 0\.5;/,
+    );
+    expect(reliquaryCss).toContain(
+      '.reliquary-pin:hover:not(:disabled):not([aria-disabled="true"])',
+    );
   });
 
   it('elides slow-band repaints through the pure refresh signature', () => {
@@ -437,9 +453,9 @@ describe('painter hygiene', () => {
     // The at-cap pin note rides the same re-append (class-held, root-document
     // minted): every refused pin control's aria-describedby must resolve on
     // every paint, so minting it inside the innerHTML string would orphan the
-    // reference the AT already followed.
+    // reference the AT already followed. (The behavioral half, node identity
+    // across rebuilds, lives in reliquary_window_behavior.test.ts.)
     expect(code).toContain('el.append(live, this.ensureCapNote(el))');
-    expect(code).not.toMatch(/reliquary-pin-cap-note[^\n]*innerHTML/);
     expect(code).not.toMatch(/\bdocument\s*[.[]/);
     // Two keystrokes narrowing to the SAME count must still re-read, which an
     // unchanged textContent will not do.

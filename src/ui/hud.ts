@@ -13449,10 +13449,14 @@ export class Hud {
       // Captured for the link closure: a property narrowing does not survive
       // into a callback, and the jump target is exactly the illuminated page.
       const jumpId = plan.illuminatedPageId;
+      // Membership via the array scan, not RELIQUARY_PAGES_BY_ID: the record
+      // has a normal prototype, so a forged id like "constructor" would pass
+      // an `in`/truthiness check. 28 entries on a rare event path.
       if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
-        // A page the catalog no longer holds (client/server catalog drift) has
-        // nowhere to jump, so the line stays plain: the relic line's
-        // inert-link policy above, applied to both Illumination emitters.
+        // A page the catalog no longer holds (client/server catalog drift)
+        // would jump to a window that opens un-navigated, so the line stays
+        // plain instead of carrying a dead link: the relic line's inert-link
+        // policy above, applied to both Illumination emitters.
         this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
       } else {
         this.logNodes(
@@ -13497,7 +13501,10 @@ export class Hud {
         const jumpId = banner.pageId;
         if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
           // Same drift guard as the durable arm: a catalog-unknown page gets
-          // the plain line, never a link that opens nothing.
+          // the plain line, never a link that would open un-navigated. The
+          // banner prose above keeps the (fallback) name on purpose: it is
+          // text, not a jump, and a drift drain is a dev/ops anomaly worth
+          // seeing.
           this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
         } else {
           this.logNodes(

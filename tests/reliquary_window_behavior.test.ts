@@ -2605,22 +2605,46 @@ describe('pinning a page to the HUD tracker', () => {
       t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) }),
     );
     expect(refused.hasAttribute('title')).toBe(false);
+    // The note is ONE node and keeps its clip-only class across the paints
+    // that got the window here: visible cap prose on every open would be the
+    // regression the class loss causes.
+    expect(rig.el.querySelectorAll('#reliquary-pin-cap-note')).toHaveLength(1);
+    expect(
+      rig.el.querySelector('#reliquary-pin-cap-note')?.classList.contains('visually-hidden'),
+    ).toBe(true);
+    const capText = t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) });
+    // The region does not carry the refusal yet, so the announce below is
+    // provably the click's own doing.
+    expect(liveRegion(rig.el)?.textContent ?? '').not.toContain(capText);
     const nudges = rig.counts.pinChanged;
+    const stored = localStorage.getItem(PIN_KEY);
     refused.click();
     expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP);
     expect(rig.counts.pinChanged).toBe(nudges);
+    // "Nothing to persist" is literal: the refusal writes no storage.
+    expect(localStorage.getItem(PIN_KEY)).toBe(stored);
     // A reachable control that answers a click with nothing reads as broken,
     // so the refused activation announces through the polite region (the
     // reannounce marker may pad the text; the payload must be present).
-    expect(liveRegion(rig.el)?.textContent).toContain(
-      t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) }),
-    );
+    const firstAnnounce = liveRegion(rig.el)?.textContent ?? '';
+    expect(firstAnnounce).toContain(capText);
+    // A SECOND identical refusal must still re-announce: byte-identical live
+    // text is silent to a reader, which is the one reason the write goes
+    // through the reannounce marker instead of a plain assignment.
+    refused.click();
+    const secondAnnounce = liveRegion(rig.el)?.textContent ?? '';
+    expect(secondAnnounce).toContain(capText);
+    expect(secondAnnounce).not.toBe(firstAnnounce);
     // An UNPIN at the cap still works, which is what makes the cap navigable.
     pinButton(rig.el, shelfPages[0].id).click();
     expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP - 1);
     const freed = pinButton(rig.el, extra.id) as HTMLButtonElement;
     expect(freed.hasAttribute('aria-disabled')).toBe(false);
     expect(freed.hasAttribute('aria-describedby')).toBe(false);
+    // And with no at-cap control on this paint, the shared note goes EMPTY:
+    // the clip-only class keeps it in the accessibility tree, and browse mode
+    // must not read a false full state.
+    expect(rig.el.querySelector('#reliquary-pin-cap-note')?.textContent).toBe('');
   });
 
   it('persists the pins per character across window instances', () => {
@@ -2687,20 +2711,31 @@ describe('pinning a page to the HUD tracker', () => {
 
   it('keeps the pins working in-session when persisting throws (private mode)', () => {
     const rig = makeWindow(baseState(), { nav: 'conquerors' });
-    const original = Storage.prototype.setItem;
-    const denied = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    const before = rig.counts.pinChanged;
+    // Spy on the INSTANCE: happy-dom's localStorage does not dispatch setItem
+    // through a shared Storage.prototype, so a prototype spy never fires (the
+    // first draft of this test proved that by passing vacuously).
+    const denied = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new DOMException('denied', 'QuotaExceededError');
     });
     try {
       pinButton(rig.el, PAGE_ID).click();
-      // The toggle still lands in memory and the strip still gets nudged; only
+      // The write was really attempted: a debounced or flag-gated persist
+      // would leave this test green while exercising nothing.
+      expect(denied).toHaveBeenCalled();
+      // The toggle still lands in memory and the strip still gets nudged
+      // EXACTLY once; an uncaught throw would leave the count unmoved. Only
       // the cross-session copy is lost, which is all private mode can offer.
       expect([...rig.w.pinned]).toEqual([PAGE_ID]);
-      expect(rig.counts.pinChanged).toBeGreaterThan(0);
+      expect(rig.counts.pinChanged).toBe(before + 1);
     } finally {
       denied.mockRestore();
-      expect(Storage.prototype.setItem).toBe(original);
     }
+    // Outside the finally (an assert in there would supersede a real failure
+    // from the try body), and behavioral: the restored store really stores.
+    localStorage.setItem('woc_restore_probe', '1');
+    expect(localStorage.getItem('woc_restore_probe')).toBe('1');
+    localStorage.removeItem('woc_restore_probe');
   });
 
   it('keeps focus on the pin control across the repaint its own click triggers', () => {

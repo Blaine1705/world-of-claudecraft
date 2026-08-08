@@ -3,6 +3,8 @@
 // the grouped presentation order. The DOM combobox glue stays browser-tested; these
 // pins target the pure functions the panel renders from.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { GUIDE_CLASSES, GUIDE_DEEDS, GUIDE_RELIQUARY } from '../src/guide/content.generated';
 import { reliquaryCatalogSections } from '../src/guide/pages/reliquary';
@@ -44,6 +46,23 @@ describe('guide search ranking', () => {
     const index = [entry('Anything')];
     expect(rank(index, '')).toEqual([]);
     expect(rank(index, '   ')).toEqual([]);
+  });
+});
+
+describe('guide search tie-break collation', () => {
+  it('tags the tie-break with the active locale, hoisted out of the comparator', () => {
+    // The ranking tests above use ASCII labels no supported locale reorders,
+    // so the tag cannot be pinned behaviorally here; the source pin mirrors
+    // how fold() tags the SAME way, and the hoist keeps a per-keystroke sort
+    // from re-deriving the tag per comparison. Comment-stripped so prose
+    // cannot satisfy it.
+    const src = readFileSync(join(__dirname, '../src/guide/search.ts'), 'utf8')
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
+    expect(src).toContain('const tag = languageTag(getLanguage());');
+    expect(src).toContain('a.e.label.localeCompare(b.e.label, tag)');
+    expect(src).not.toMatch(/localeCompare\(b\.e\.label\)/);
   });
 });
 
@@ -105,11 +124,20 @@ describe('guide search index contents', () => {
     // Every slot, not every distinct name: a relic shown on two pages is indexed
     // once per page so each hit deep-links to the catalog the reader lands on.
     expect(relicHits.length).toBe(relicTotal);
-    // Dual-page relics must EXIST for "once per page" to mean anything: were a
+    // Dual-PAGE relics must EXIST for "once per page" to mean anything: were a
     // content change to collapse every dual listing, the slot parity above
-    // would silently degrade to a distinct-name count.
-    const distinctNames = new Set(GUIDE_RELIQUARY.flatMap((p) => p.relics.map((r) => r.name))).size;
-    expect(relicTotal).toBeGreaterThan(distinctNames);
+    // would silently degrade to a distinct-name count. Counted per page id,
+    // not per duplicate name (two slots on ONE page would not qualify).
+    const pagesByName = new Map<string, Set<string>>();
+    for (const p of GUIDE_RELIQUARY) {
+      for (const r of p.relics) {
+        const bucket = pagesByName.get(r.name) ?? new Set<string>();
+        bucket.add(p.id);
+        pagesByName.set(r.name, bucket);
+      }
+    }
+    const dualPageNames = [...pagesByName.values()].filter((pages) => pages.size > 1).length;
+    expect(dualPageNames).toBeGreaterThan(0);
     const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
     // EVERY page and every slot, not a first-five sample: the count parities above
     // only say how MANY entries exist, so a page whose relics all carry a neighbour's

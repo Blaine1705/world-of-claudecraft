@@ -238,6 +238,23 @@ describe('Hud.updateReliquaryTracker: the window pin store', () => {
     expect(painted[0].count).toBe(0);
     expect(painted[0].visible).toBe(false);
   });
+
+  it('re-reads the pin set REFERENCE every build, not a captured one', () => {
+    // Production reassigns ReliquaryWindow.pinnedSet to a NEW Set on every
+    // accepted toggle and on every prune, so the reused-input drive must
+    // refresh input.pinned per build. Mutating one shared Set (like every
+    // other test here) cannot tell a live re-read from a stale capture; only
+    // a wholesale replacement can, and dropping the refresh line freezes the
+    // strip at whatever was pinned when the input was first minted.
+    const rig = makeRig();
+    rig.hud.reliquaryWindow.pinned.add(PINNED_PAGE);
+    rig.hud.updateReliquaryTracker();
+    expect(shown(rig.painted[0])).toEqual([PINNED_PAGE]);
+    rig.progress[CANDIDATE_A] = { owned: 1, total: 8 };
+    rig.hud.reliquaryWindow.pinned = new Set([CANDIDATE_A]);
+    rig.hud.updateReliquaryTracker();
+    expect(shown(rig.painted[1])).toEqual([CANDIDATE_A]);
+  });
 });
 
 describe('Hud.updateReliquaryTracker: the ownership signature feed', () => {
@@ -304,15 +321,16 @@ describe('Hud.updateReliquaryTracker: the lazy ownership signature', () => {
   });
 });
 
-describe('Hud.updateReliquaryTracker: the cold ClientWorld mirror', () => {
-  it('paints the hidden strip from the pre-first-snapshot online shape, pinned or not', () => {
-    // Before the first snapshot lands, ClientWorld answers with every surface
-    // EMPTY (src/net/online.ts mints deedsEarned/deedStats/reliquaryMarks
-    // empty, accountCosmetics with weaponSkinIds: [], and ownedMounts() over
-    // the stored field) and reliquaryPageCompletion knows no page. The method
-    // reads .size off two Sets and a Map and .length off two arrays across
-    // five facets, so the all-empty mirror is the shape most likely to
-    // surface an undefined read; it must produce the hidden strip instead.
+describe('Hud.updateReliquaryTracker: the all-empty cold shape', () => {
+  it('paints the hidden strip when every surface is empty and no page resolves, pinned or not', () => {
+    // The shape a cold ClientWorld mirror presents before its first snapshot:
+    // every surface empty and reliquaryPageCompletion answering null for
+    // every page. (That premise is a reading of src/net/online.ts's
+    // at-declaration initializers, not something this stub can prove; the
+    // IWorld parity pin owns the member shapes.) The method reads .size off
+    // two Sets and a Map and .length off two arrays across five facets, so
+    // all-empty is the shape most likely to surface an undefined read; it
+    // must produce the hidden strip instead.
     const rig = makeRig();
     for (const key of Object.keys(rig.progress)) delete rig.progress[key];
     rig.hud.updateReliquaryTracker();

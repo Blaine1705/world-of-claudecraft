@@ -149,22 +149,39 @@ describe('ReliquaryTrackerPainter: rows', () => {
     // Through the REAL eliding facet: a hide path that skipped the clear would
     // leave the class on the pooled node AND 'on' in the multi-slot cache, so
     // the next page recycled into this slot could never flash again (the
-    // toggle would elide against the stale entry).
+    // toggle would elide against the stale entry). The shrink is a core-
+    // reachable shape (five tracked lines dropping to two, visible stays
+    // true), so a clear scoped to slot 0 or gated on emptiness fails here.
+    const fiveLit = (flashSlot: number): ReliquaryTrackerView => {
+      const v = makeReliquaryTrackerView();
+      v.visible = true;
+      v.count = 5;
+      for (let i = 0; i < 5; i++) {
+        v.lines[i].pageId = `page_${i}`;
+        v.lines[i].owned = 3;
+        v.lines[i].total = 10;
+        v.lines[i].flash = i === flashSlot;
+      }
+      return v;
+    };
     const root = document.createElement('div');
     const { writers } = countingWriters();
     const painter = new ReliquaryTrackerPainter({ root: () => root, writers });
-    const line = root.querySelector('.dt-line') as HTMLElement;
-    painter.update(view({ flash: true }));
-    expect(line.classList.contains('dt-flash')).toBe(true);
-    const empty = makeReliquaryTrackerView();
-    empty.visible = true;
-    painter.update(empty);
-    expect(line.classList.contains('dt-flash')).toBe(false);
-    // A different page recycled into the slot flashes for real.
-    const next = view({ flash: true });
-    next.lines[0].pageId = 'conquerors_hollow_crypt';
-    painter.update(next);
-    expect(line.classList.contains('dt-flash')).toBe(true);
+    const lines = [...root.querySelectorAll<HTMLElement>('.dt-line')];
+    painter.update(fiveLit(4));
+    expect(lines[4].classList.contains('dt-flash')).toBe(true);
+    const shrunk = fiveLit(-1);
+    shrunk.count = 2;
+    painter.update(shrunk);
+    // The hidden slot lost the class with the row (the pin the fix earns).
+    expect(lines[4].classList.contains('dt-flash')).toBe(false);
+    expect(lines[4].style.display).toBe('none');
+    // A different page recycled into the slot pulses for real: the cache was
+    // cleared, so this toggle writes instead of eliding.
+    const recycled = fiveLit(4);
+    recycled.lines[4].pageId = 'page_recycled';
+    painter.update(recycled);
+    expect(lines[4].classList.contains('dt-flash')).toBe(true);
   });
 });
 

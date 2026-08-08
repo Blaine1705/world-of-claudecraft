@@ -246,13 +246,16 @@ describe('the Illumination line (both emitters)', () => {
     // locale with nothing else red.
     expect(hud.combatAnnouncer.push).toHaveBeenCalledWith(
       t('hudChrome.reliquary.illuminateBanner', { name: pageLabel }),
-      expect.anything(),
+      expect.any(Number),
     );
   });
 
   it('leaves the BANNER-branch line plain when the illuminated page left the catalog', () => {
     // The relic line's inert-link policy, applied to the Illumination arms: a
     // drifted (or forged) wire id must not render a link that opens nothing.
+    // Premise first: were this id ever authored, both drift tests would drive
+    // the live-catalog arm and pass over an untested guard.
+    expect(RELIQUARY_PAGES_BY_ID['page_the_catalog_forgot']).toBeUndefined();
     const hud = makeHud();
     hud.handleReliquaryUnlocks([
       { itemId: RELIC_ID, illuminatedPageId: 'page_the_catalog_forgot' },
@@ -269,6 +272,7 @@ describe('the Illumination line (both emitters)', () => {
 
   it('leaves the DURABLE line plain when the illuminated page left the catalog', () => {
     // Same policy on the other emitter (rank-up owns the banner slot here).
+    expect(RELIQUARY_PAGES_BY_ID['page_the_catalog_forgot']).toBeUndefined();
     const hud = makeHud();
     hud.handleReliquaryUnlocks([
       { itemId: RELIC_ID, illuminatedPageId: 'page_the_catalog_forgot', curatorRank: RANK },
@@ -334,7 +338,7 @@ describe('the Curator rank-up line', () => {
     // the Illumination banner pin for the trap this closes).
     expect(hud.combatAnnouncer.push).toHaveBeenCalledWith(
       t('hudChrome.reliquary.rankUpBanner', { rank: formatNumber(RANK), name: label }),
-      expect.anything(),
+      expect.any(Number),
     );
   });
 });

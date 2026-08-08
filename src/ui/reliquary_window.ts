@@ -156,6 +156,9 @@ export class ReliquaryWindow {
   private liveEl: HTMLElement | null = null;
   /** The shared at-cap pin description target (see ensureCapNote). */
   private capNoteEl: HTMLElement | null = null;
+  /** Raised by pinButtonHtml while a paint renders any at-cap control; decides
+   *  whether ensureCapNote carries the cap sentence this paint. */
+  private anyAtCap = false;
   /** Last LOGICAL (pre-marker) announcement, so a world-driven repaint with an
    *  unchanged count never re-marks the region (see announceResults). */
   private lastAnnounced = '';
@@ -512,6 +515,11 @@ export class ReliquaryWindow {
     // fill, which is the paint the player is waiting for anyway.
     const flash = this.pendingFlash ?? NO_FLASH;
     this.pendingFlash = null;
+    // Reset before the markup builds: pinButtonHtml raises it for every at-cap
+    // control this paint renders, and ensureCapNote (after the build) writes
+    // the cap sentence only when one exists. An unconditional note would leave
+    // browse-mode AT reading a false "tracker is full" state on every open.
+    this.anyAtCap = false;
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.reliquary.title'))}</span>` +
       `<input type="search" class="reliquary-search" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
@@ -587,7 +595,12 @@ export class ReliquaryWindow {
    *  refused pin control names via aria-describedby, minted once like the live
    *  region and re-appended after each innerHTML rebuild so the references
    *  always resolve. The text is rewritten per render (cold path) so a
-   *  language switch relabels it. */
+   *  language switch relabels it, and it is EMPTY on a paint with no at-cap
+   *  control: the clip-only class keeps the node in the accessibility tree, so
+   *  an unconditional sentence would read a false full state to browse-mode
+   *  AT. The id is document-global by construction: Hud instantiates this
+   *  window exactly once per document (the deed-tracker precedent), and a
+   *  second instance would need a root-derived id. */
   private ensureCapNote(el: HTMLElement): HTMLElement {
     let node = this.capNoteEl;
     if (!node) {
@@ -596,7 +609,9 @@ export class ReliquaryWindow {
       node.id = 'reliquary-pin-cap-note';
       this.capNoteEl = node;
     }
-    node.textContent = t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) });
+    node.textContent = this.anyAtCap
+      ? t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) })
+      : '';
     return node;
   }
 
@@ -1145,6 +1160,7 @@ export class ReliquaryWindow {
     this.ensurePinsLoaded();
     const pinned = this.pinnedSet.has(pageId);
     const atCap = !pinned && this.pinnedSet.size >= RELIQUARY_TRACK_CAP;
+    if (atCap) this.anyAtCap = true;
     const name = reliquaryPageName(pageId);
     const label = t(pinned ? 'hudChrome.reliquary.unpin' : 'hudChrome.reliquary.pin');
     // The accessible name stays the ACTION (so it always contains the visible

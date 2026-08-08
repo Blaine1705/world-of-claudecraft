@@ -283,7 +283,9 @@ async function pinReliquaryTrackerPages(page) {
     for (const id of ids) {
       const btn = document.querySelector(`#reliquary-window [data-pin="${id}"]`);
       // The at-cap refusal renders aria-disabled (still clickable, refused in
-      // the handler), so honor both forms or a full tracker flips a stale pin.
+      // the handler), so honor both forms: a refused click would inflate the
+      // pinned count and defeat the nothing-pinned throw below. (An at-cap
+      // control is by construction unpinned, so no stale pin can flip.)
       if (
         !btn ||
         btn.disabled ||
