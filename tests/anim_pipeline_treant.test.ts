@@ -82,10 +82,11 @@ describe('mob_treant bespoke attack (issue #2889 round 2)', () => {
     const enemyBiteConstBlock = manifestBlock('const ENEMY_BITE: ClipMap = {', '};');
     expect(enemyBiteConstBlock).toContain("attack: ['Bite_Front']");
 
-    // Exactly 1 remaining direct `clips: ENEMY_BITE,` usage (2 as of this
-    // branch's base off upstream/release/v0.35.0, minus the one migrated to
-    // TREANT_ENEMY_BITE above): mob_crab.
+    // Exactly 0 remaining direct `clips: ENEMY_BITE,` usages (2 as of this
+    // branch's base off upstream/release/v0.35.0: mob_crab was migrated to
+    // CRAB_ENEMY_BITE in parallel, and mob_treant is migrated to
+    // TREANT_ENEMY_BITE above).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: ENEMY_BITE,/g)].length;
-    expect(remaining).toBe(1);
+    expect(remaining).toBe(0);
   });
 });
