@@ -8,8 +8,10 @@ import { describe, expect, it } from 'vitest';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/chars/forms/metamorphosis.glb');
-const ASSET_BYTES = 399_432;
-const ASSET_SHA256 = '8149f5a11f7cb39f6350e21f9d8533afc865e27c45d917b7278720998a758810';
+// Re-pinned for the KTX2 texture conversion (scripts/assets/
+// compress_glb_textures.mjs): larger on disk, ~8x smaller resident on GPU.
+const ASSET_BYTES = 500_172;
+const ASSET_SHA256 = '7d722a6a0a9b5116449497135b4fffbc33956a9197cffc1100a74bb3ab93e449';
 
 async function readAsset() {
   await MeshoptDecoder.ready;
@@ -36,7 +38,7 @@ describe('Warlock Metamorphosis asset', () => {
         .listExtensionsUsed()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'EXT_texture_webp', 'KHR_mesh_quantization']);
+    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization', 'KHR_texture_basisu']);
 
     for (const name of [
       'Armature',
@@ -111,9 +113,9 @@ describe('Warlock Metamorphosis asset', () => {
     expect(materials[0].getNormalTexture()).not.toBeNull();
     expect(materials[0].getMetallicRoughnessTexture()).not.toBeNull();
     expect(root.listTextures().map((texture) => texture.getMimeType())).toEqual([
-      'image/webp',
-      'image/webp',
-      'image/webp',
+      'image/ktx2',
+      'image/ktx2',
+      'image/ktx2',
     ]);
 
     const joints = root.listSkins()[0].listJoints();

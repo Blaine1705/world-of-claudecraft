@@ -11,8 +11,10 @@ import type { IWorld } from '../src/world_api';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/maledict_eye.glb');
-const ASSET_BYTES = 96_304;
-const ASSET_SHA256 = '8c8cfa095629e97e72b36dc194e6844b9dd0b2a974f2ca749843afa81ad70f41';
+// Re-pinned for the KTX2 texture conversion (scripts/assets/
+// compress_glb_textures.mjs): larger on disk, ~8x smaller resident on GPU.
+const ASSET_BYTES = 201_436;
+const ASSET_SHA256 = '0c1ad6838925ae4202af8e7cedbfb750e1122daa7c3f3c34d8d2aefeb14531a1';
 
 function afflictionWorld(player: Entity): IWorld {
   return {
@@ -28,7 +30,9 @@ describe('Affliction Maledict Eye familiar', () => {
     const bytes = readFileSync(ASSET_PATH);
     expect(bytes.length).toBe(ASSET_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(ASSET_SHA256);
-    expect(bytes.length).toBeLessThanOrEqual(150 * 1024);
+    // 200 KiB, was 150: KTX2 textures trade disk bytes for ~8x smaller GPU
+    // residency (the glb_texture_compression gate requires the conversion).
+    expect(bytes.length).toBeLessThanOrEqual(200 * 1024);
 
     const document = await new NodeIO().registerExtensions(ALL_EXTENSIONS).read(ASSET_PATH);
     const root = document.getRoot();
@@ -39,9 +43,9 @@ describe('Affliction Maledict Eye familiar', () => {
     expect((primitives[0].getIndices()?.getCount() ?? 0) / 3).toBe(1_577);
     expect(primitives[0].getAttribute('POSITION')?.getCount()).toBe(1_386);
     expect(root.listTextures().map((texture) => texture.getMimeType())).toEqual([
-      'image/webp',
-      'image/webp',
-      'image/webp',
+      'image/ktx2',
+      'image/ktx2',
+      'image/ktx2',
     ]);
   });
 
@@ -97,7 +101,8 @@ describe('Affliction Maledict Eye familiar', () => {
     const rendererSource = readFileSync(path.join(REPO_ROOT, 'src/render/renderer.ts'), 'utf8');
     expect(familiarSource).toContain("const MODEL_URL = '/models/props/maledict_eye.glb'");
     expect(familiarSource).toContain('loadGltf(MODEL_URL)');
-    expect(familiarSource).toContain('registerPreload(');
+    // Deferred, never eager: the launch-burst OOM lane (defer_launcher_preloads).
+    expect(familiarSource).toContain('registerDeferredPreload(');
     expect(rendererSource).toContain('new AfflictionFamiliar()');
     expect(rendererSource).toContain(
       'this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time)',
