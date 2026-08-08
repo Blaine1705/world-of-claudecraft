@@ -45,6 +45,8 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
+import { bagFineMark } from './bag_fine_mark_view';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -58,6 +60,7 @@ import {
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
+  fineSealMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
@@ -716,16 +719,24 @@ export class BankWindow {
       const item = knownItemDef(ITEMS, slot.itemId);
       const cell = document.createElement('button');
       cell.type = 'button';
-      cell.className = `bank-item q-${slot.qualityKey}`;
+      // Fine-grade mark (bag_fine_mark_view.ts): a banked fine_* stack keeps the
+      // .bag-fine rim/wash bags gave it, so the grade never disappears on
+      // deposit. Id-based, so no def is needed; a stale-client unknown id is
+      // never in the local grade table and simply stays unmarked.
+      const fineMark = bagFineMark(slot.itemId);
+      cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      // Per-copy corner marks (masterwork seal, enchanted / signed / bound glyph,
-      // or the generic wedge): same shared helper bags use so a banked masterwork
-      // keeps its seal visible at a glance. Aria-hidden mark; the cell name
-      // carries the per-copy fact. Quest items cannot enter the bank, so no
-      // quest seal composes here.
+      // Corner marks (masterwork seal, fine seal, enchanted / signed / bound
+      // glyph, or the generic wedge): same shared helpers and priority core
+      // bags use (bag_corner_mark_view.ts), so a banked masterwork or fine
+      // stack keeps its seal visible at a glance. Aria-hidden mark; the cell
+      // name carries the per-copy fact (the fine grade rides the item NAME).
+      // Quest items cannot enter the bank, so the quest arm is always null.
       const glyphKind = bagInstanceGlyphKind(slot.instance);
-      const instanceMark = instanceGlyphMarkHtml(glyphKind);
+      const cornerMark = bagCornerMark(glyphKind, null, fineMark);
+      const instanceMark =
+        cornerMark === 'fine' ? fineSealMarkHtml() : instanceGlyphMarkHtml(glyphKind);
       // Stale-client guard (R34): an id this bundle predates still holds a
       // real, counted bank slot, so it renders (fallback icon, raw id as the
       // label) instead of vanishing. The withdraw click stays live because the

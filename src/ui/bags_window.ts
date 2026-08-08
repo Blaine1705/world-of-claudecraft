@@ -72,6 +72,7 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
 import {
+  fineSealMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
@@ -801,18 +802,17 @@ export class BagsWindow {
       // without hover on desktop and touch, identical on every graphics preset
       // (no --fx gate). Ready seals share the seal markup and brighten via
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
-      // The masterwork seal and the per-copy glyph/tab are minted through the
-      // shared item_instance_glyph_mark helper so bank/guild-bank cells paint
-      // the same art; the quest and fine seals stay bag-only.
+      // The masterwork seal, the per-copy glyph/tab, and the fine seal are all
+      // minted through the shared item_instance_glyph_mark helpers so
+      // bank/guild-bank cells paint the same art; only the quest seal stays
+      // bag-only (quest items cannot enter either bank), so its markup lives
+      // here beside its questReady state.
       const masterworkSeal = cornerMark === 'masterwork' ? instanceGlyphMarkHtml('masterwork') : '';
       const questSeal =
         cornerMark === 'quest'
           ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
           : '';
-      const fineSeal =
-        cornerMark === 'fine'
-          ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
-          : '';
+      const fineSeal = cornerMark === 'fine' ? fineSealMarkHtml() : '';
       const instanceMark =
         cornerMark === 'generic' ||
         cornerMark === 'enchanted' ||

@@ -1,13 +1,20 @@
 // Shared corner-mark HTML + accessible-name keys for every inventory cell that
-// paints an instanced copy (bags, personal bank, guild bank). The KIND priority
-// lives in bag_instance_glyph_view.ts (pure core); this is the thin markup so
-// every surface paints the same masterwork seal, enchanted/signed/bound glyph,
-// or generic wedge. The mark is aria-hidden: the cell's accessible name carries
-// the per-copy fact via INSTANCE_GLYPH_ARIA_KEYS (or the unknown-id siblings).
+// paints an owned item stack (bags, personal bank, guild bank). The KIND
+// priorities live in the pure cores (bag_instance_glyph_view.ts for per-copy
+// kinds, bag_corner_mark_view.ts for the cross-mark corner priority); this is
+// the thin markup so every surface paints the same masterwork seal,
+// enchanted/signed/bound glyph, generic wedge, or fine-grade seal. Marks are
+// aria-hidden: the cell's accessible name carries the per-copy fact via
+// INSTANCE_GLYPH_ARIA_KEYS (or the unknown-id siblings); the fine grade needs
+// no aria arm because the item NAME carries the grade word in every locale.
 //
-// Quest-purpose seals stay bag-only (quest items cannot enter the bank), so the
-// bags painter composes masterwork > quest > other instance marks itself. This
-// helper only mints ONE instance mark from a resolved kind.
+// The mark FAMILY is all-surfaces by rule: a new mark (grade, purpose, or
+// per-copy) is minted here and painted by bags, bank, AND guild bank in the
+// same change, never inlined into one window (the fine seal shipped bag-only
+// once and the bank gap was a reported defect). The one exception is the
+// quest-purpose seal, which stays bag-only because quest items cannot enter
+// either bank; its markup lives in the bags painter beside its questReady
+// state. Each helper mints ONE mark from a resolved kind.
 
 import type { BagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { TranslationKey } from './i18n';
@@ -44,6 +51,14 @@ export const UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS: Readonly<
   bound: 'itemUi.bags.unknownItemAriaBound',
   generic: 'itemUi.bags.unknownItemAriaInstanced',
 };
+
+/** Fine-grade corner seal (bag_fine_mark_view.ts decides WHICH stacks wear it,
+ *  bag_corner_mark_view.ts decides when it wins the corner): a small crafting
+ *  glyph in refined teal, identical on every surface. Aria-hidden; a fine id's
+ *  item NAME already announces the grade, so no aria key exists for it. */
+export function fineSealMarkHtml(): string {
+  return `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`;
+}
 
 /** Corner-mark HTML for one resolved kind, or '' when null (plain fungible). */
 export function instanceGlyphMarkHtml(kind: BagInstanceGlyphKind): string {
