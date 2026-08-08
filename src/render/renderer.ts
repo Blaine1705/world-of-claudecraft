@@ -148,6 +148,7 @@ import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
   animCadenceFrames,
+  CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
   showsStaticFarMesh,
@@ -432,6 +433,7 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import { createVfxAnchor } from './vfx_anchor';
 import {
   finishViewCandidates,
   type ViewCandidate,
@@ -457,6 +459,7 @@ import {
   type WeaponSkinApplyDecision,
   WeaponSkinApplyQueue,
 } from './weapon_vfx_apply_queue_core';
+import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
@@ -547,7 +550,8 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // beyond this, the articulated rig swaps for its single-draw merged far LOD.
 // Keep the full rig just past nameplate range so nearby characters and held
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
-const ENTITY_LOD_RANGE_SQ = 58 * 58;
+// The literal lives in `crowd_lod.ts` beside the factors that scale it.
+const ENTITY_LOD_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 
 // Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
 // animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
@@ -2288,8 +2292,8 @@ export class Renderer {
     const bd = (phase: string): void => {
       const now = performance.now();
       // Gated like [load-diag] and the residency table: dev browsers plus the
-      // native iOS profile under diagnosis, never the production web console.
-      if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+      // iOS WebKit profile under diagnosis, never the production web console.
+      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
         console.info(
           `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
         );
@@ -2533,10 +2537,10 @@ export class Renderer {
     // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
     // Scene first so shared buffers/images attribute to the live world, then
     // the caches so only their EXCLUSIVE retention shows as theirs. Gated to
-    // dev browsers and the native iOS profile under diagnosis: the walk
+    // dev browsers and the iOS WebKit profile under diagnosis: the walk
     // allocates identity sets over every buffer at the peak-memory instant,
     // which the production web population must not pay.
-    if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+    if (import.meta.env.DEV || GFX.iosMemoryProfile) {
       console.info(
         formatResidencyBudget(
           residencyBudget([
@@ -2759,13 +2763,16 @@ export class Renderer {
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    const vfxAnchor = (id: number, frac: number) => {
+    const vfxAnchor = createVfxAnchor((id, pose) => {
       const v = this.views.get(id);
-      if (!v) return null;
+      if (!v) return false;
       const e = this.sim.entities.get(id);
-      const h = v.height * (e?.scale ?? 1) * frac;
-      return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    };
+      pose.x = v.group.position.x;
+      pose.y = v.group.position.y;
+      pose.z = v.group.position.z;
+      pose.height = v.height * (e?.scale ?? 1);
+      return true;
+    });
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
@@ -3914,7 +3921,7 @@ export class Renderer {
         maxPointLights: number;
         activePointLights: number;
         shadowMap: number;
-        nativeIosMemoryProfile: boolean;
+        iosMemoryProfile: boolean;
       };
     };
     autoGovernor: boolean;
@@ -3964,7 +3971,7 @@ export class Renderer {
           maxPointLights: GFX.maxPointLights,
           activePointLights: this.effectivePointLights || GFX.maxPointLights,
           shadowMap: GFX.shadowMap,
-          nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+          iosMemoryProfile: GFX.iosMemoryProfile,
         },
       },
       autoGovernor: GFX.autoGovernor,
@@ -10127,8 +10134,12 @@ export class Renderer {
       if (runCharacterPresentation) active.update(dt, st, animate);
       else active.advanceOffscreen(dt);
       // Weapon-skin VFX ride the humanoid rig's held weapon. Hidden cosmetic
-      // rigs skip their uniform writes until they return to view.
-      if (runCharacterPresentation) v.visual.updateWeaponVfx(dt);
+      // rigs skip their uniform writes until they return to view; the visible
+      // ones shed with camera distance and the frame-budget governor's vfx
+      // lever (weapon_vfx_shed_core owns why that split is fairness-safe).
+      if (runCharacterPresentation) {
+        v.visual.updateWeaponVfx(dt, weaponVfxShedScale(d2, this.appliedBudgetLevels?.vfx ?? 1));
+      }
       // The sheathe swap is deferred to the gesture midpoint, so the rig (and any
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
       if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
