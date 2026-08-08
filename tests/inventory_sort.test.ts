@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
@@ -9,6 +11,7 @@ import {
   consolidateBagStacks,
   sortInventoryStacks,
 } from '../src/sim/inventory_sort';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 
@@ -274,6 +277,23 @@ describe('consolidateBagStacks', () => {
     expect(inv).toEqual([slot('copper_ore', 14), slot('copper_ore', -3)]);
   });
 
+  it('never lets a corrupt non-positive count ABSORB honest units either', () => {
+    // The target arm of the same guard: without it, 10 poured into a -3
+    // deficit leaves 7 and silently destroys three real items.
+    const inv = [slot('copper_ore', -3), slot('copper_ore', 10)];
+    consolidateBagStacks(inv, lookup, cap);
+    expect(inv).toEqual([slot('copper_ore', -3), slot('copper_ore', 10)]);
+  });
+
+  it('never merges an instanced target into a later plain donor (the other direction)', () => {
+    const inv = [slot('copper_ore', 5, { instance: { signer: 'Aldric' } }), slot('copper_ore', 5)];
+    consolidateBagStacks(inv, lookup, cap);
+    expect(inv).toEqual([
+      slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
+      slot('copper_ore', 5),
+    ]);
+  });
+
   it('conserves every unit across an arbitrary consolidation', () => {
     const inv = [
       slot('copper_ore', 15),
@@ -390,11 +410,37 @@ describe('sortInventoryStacks with the manual-arrangement layer (dense hints)', 
     const inv = [slot('pelt', 1), slot('blade'), slot('keystone'), slot('potion', 2)];
     sortInventoryStacks(inv, lookup, cap);
     // Capacity 2: the two best ranks own the grid; the rest append past it
-    // (layoutBagCells's tolerated-overflow path), nothing vanishes.
+    // (layoutBagCells's tolerated-overflow path) in ARRAY order, and nothing
+    // vanishes or duplicates (four DISTINCT stack objects, the full multiset).
     const cells = layoutBagCells(inv, 2);
     expect(cells.length).toBe(4);
-    expect(cells.filter(Boolean).length).toBe(4);
+    expect(new Set(cells).size).toBe(4);
+    expect([...cells.map((s) => s?.itemId)].sort()).toEqual(
+      ['pelt', 'blade', 'keystone', 'potion'].sort(),
+    );
     expect(cells.slice(0, 2).map((s) => s?.itemId)).toEqual(['blade', 'potion']);
+    // The overflow tail is array order (pelt before keystone), pinned so a
+    // future "sorted tail" change is a deliberate edit, never an accident.
+    expect(cells.slice(2).map((s) => s?.itemId)).toEqual(['pelt', 'keystone']);
+  });
+
+  it('a manual drag then a SECOND sort restores the canonical order', () => {
+    // The sort must overwrite stale manual hints, never honor them.
+    const inv = [slot('pelt', 3), slot('blade'), slot('keystone')];
+    sortInventoryStacks(inv, lookup, cap);
+    const peltIndex = inv.findIndex((s) => s.itemId === 'pelt');
+    expect(moveStackToCell(inv, peltIndex, 0, 16)).toBe(true);
+    sortInventoryStacks(inv, lookup, cap);
+    expect(cellIds(inv, 16).slice(0, 3)).toEqual(['blade', 'keystone', 'pelt']);
+  });
+
+  it('refuses an illegal drag over the dense post-sort hints, mutating nothing', () => {
+    const inv = [slot('blade'), slot('keystone')];
+    sortInventoryStacks(inv, lookup, cap);
+    const before = inv.map((s) => ({ ...s }));
+    expect(moveStackToCell(inv, 0, 16, 16)).toBe(false); // cell past the bag
+    expect(moveStackToCell(inv, 5, 0, 16)).toBe(false); // no such stack
+    expect(inv).toEqual(before);
   });
 });
 
@@ -417,14 +463,74 @@ describe('sortInventoryStacks against the REAL catalog', () => {
     expect(cells[fineAt + 1]).toBe('elderwood_log');
   });
 
-  it('totally orders the whole catalog: a permutation, idempotent', () => {
+  it('sorts the whole catalog: every adjacent cell pair satisfies the comparator', () => {
+    // Hints are 0..n-1 for ANY comparator (each stack gets one cell), so the
+    // decisive claim is SORTEDNESS: walk the cells in order and hold every
+    // adjacent pair to compareBagStacks <= 0.
     const everything = Object.keys(REAL_ITEMS).map((id) => slot(id, 1));
     sortInventoryStacks(everything, realLookup, cap);
-    const hints = everything.map((s) => s.slot).sort((a, b) => (a ?? 0) - (b ?? 0));
-    expect(hints).toEqual(everything.map((_, i) => i));
-    const once = everything.map((s) => ({ ...s }));
-    sortInventoryStacks(everything, realLookup, cap);
-    expect(everything).toEqual(once);
+    const cells = [...everything].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
+    for (let i = 0; i + 1 < cells.length; i++) {
+      expect(
+        compareBagStacks(cells[i], cells[i + 1], realLookup),
+        `cells ${i} (${cells[i].itemId}) and ${i + 1} (${cells[i + 1].itemId}) are out of order`,
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it('lands the identical grid from a shuffled copy of the same catalog', () => {
+    // The cross-host determinism claim: cell order must not depend on input
+    // order beyond deliberate ties. Shuffle with a seeded LCG (never
+    // Math.random) and compare the id sequence cell by cell. Comparator ties
+    // (same id, same count here) keep input order by design, so compare at
+    // the id level, which ties cannot reorder.
+    const ids = Object.keys(REAL_ITEMS);
+    const canonical = ids.map((id) => slot(id, 1));
+    const shuffled = ids.map((id) => slot(id, 1));
+    let lcg = 0x2f6e2b1;
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      lcg = (Math.imul(lcg, 1664525) + 1013904223) >>> 0;
+      const j = lcg % (i + 1);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    sortInventoryStacks(canonical, realLookup, cap);
+    sortInventoryStacks(shuffled, realLookup, cap);
+    const cellOrder = (inv: InvSlot[]) =>
+      [...inv].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0)).map((s) => s.itemId);
+    expect(cellOrder(shuffled)).toEqual(cellOrder(canonical));
+  });
+
+  it('keeps every one of the nine grade families contiguous, fine first', () => {
+    // Quality and kind are compared BEFORE family, so a future content edit
+    // that moves one grade's quality or kind silently splits its family;
+    // sweeping all nine rows is the tripwire.
+    for (const [baseId, row] of Object.entries(MATERIAL_GRADES)) {
+      const inv = [slot(baseId, 5), slot('goldleaf_herb', 2), slot(row.fineItemId, 3)];
+      sortInventoryStacks(inv, realLookup, cap);
+      const cells = cellIds(inv).filter((id): id is string => id !== null);
+      const fineAt = cells.indexOf(row.fineItemId);
+      expect(fineAt, `${row.fineItemId} missing from the sorted cells`).toBeGreaterThanOrEqual(0);
+      expect(cells[fineAt + 1], `${row.fineItemId} is not seated beside ${baseId}`).toBe(baseId);
+    }
+  });
+
+  it('orders the six qualities by the literal ladder (the bag_filter mirror)', () => {
+    // Pinned to the literal sequence, not re-derived from either rank map, so
+    // the sim ladder and the UI quality view cannot silently disagree.
+    const LADDER = ['legendary', 'epic', 'rare', 'uncommon', 'common', 'poor'];
+    const defs = Object.fromEntries(
+      LADDER.map((quality) => [
+        `q_${quality}`,
+        { id: `q_${quality}`, name: 'Same Name', kind: 'junk', quality },
+      ]),
+    ) as unknown as Record<string, ItemDef>;
+    const qLookup = (id: string): ItemDef | undefined => defs[id];
+    for (let i = 0; i + 1 < LADDER.length; i++) {
+      expect(
+        compareBagStacks(slot(`q_${LADDER[i]}`), slot(`q_${LADDER[i + 1]}`), qLookup),
+        `${LADDER[i]} must sort before ${LADDER[i + 1]}`,
+      ).toBeLessThan(0);
+    }
   });
 });
 
@@ -468,20 +574,44 @@ describe('Sim.sortInventory (the command against the real sim)', () => {
     invOf(sim, pid).length = 0; // drop the starter provisions
     sim.sortInventory(pid);
     expect(invOf(sim, pid)).toEqual([]);
+    // An unknown pid must refuse without touching any player's bag.
+    sim.addItem('worn_sword', 1, pid);
+    const before = invOf(sim, pid).map((s: InvSlot) => ({ ...s }));
     sim.sortInventory(987654); // no such player: resolve() refuses
+    expect(invOf(sim, pid)).toEqual(before);
   });
 
-  it('draws zero rng (the module header claim, pinned)', () => {
+  it('resolves the local player when called with no pid (the offline IWorld arm)', () => {
+    // IWorldInventory.sortInventory() takes no arguments, so the offline host
+    // always runs the pid-undefined resolution.
+    const sim = new Sim({ seed: 11, playerClass: 'warrior' }) as Sim & Record<string, any>;
+    const meta = sim.players.values().next().value;
+    if (!meta) throw new Error('no local player');
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: 'baked_bread', count: 2 });
+    sim.addItem('worn_sword', 1, meta.entityId);
+    sim.sortInventory();
+    expect(meta.inventory.find((s: InvSlot) => s.itemId === 'worn_sword')?.slot).toBe(0);
+    expect(meta.inventory.find((s: InvSlot) => s.itemId === 'baked_bread')?.slot).toBe(1);
+  });
+
+  it('draws zero rng (the module header claim, pinned, with a positive control)', () => {
     const { sim, pid } = makeSim();
     sim.addItem('worn_sword', 1, pid);
-    invOf(sim, pid).push({ itemId: 'baked_bread', count: 2 });
+    const inv = invOf(sim, pid);
+    inv.push({ itemId: 'baked_bread', count: 2 });
     let draws = 0;
     sim.rng.setObserver(() => {
       draws += 1;
     });
     sim.sortInventory(pid);
-    sim.rng.setObserver(null);
     expect(draws).toBe(0);
+    // The sort actually ran (hints stamped), so zero draws is not an early
+    // refusal; and the observer actually observes, so zero is not a dead rig.
+    expect(inv.find((s: InvSlot) => s.itemId === 'worn_sword')?.slot).toBe(0);
+    sim.rng.next();
+    expect(draws).toBe(1);
+    sim.rng.setObserver(null);
   });
 });
 
@@ -495,5 +625,31 @@ describe('ClientWorld.sortInventory (wire)', () => {
     world.cmd = (payload: unknown) => sent.push(payload);
     ClientWorld.prototype.sortInventory.call(world);
     expect(sent).toEqual([{ cmd: 'inv_sort' }]);
+  });
+});
+
+// Source pins over the two server arms nothing else holds: the heavy
+// self-snapshot resend (drop it and the tidied grid never reaches the online
+// client while the offline host still looks perfect) and the dispatch body.
+// Anchored to the contiguous declaration, sliced so a same-token mention in a
+// different clause cannot satisfy the pin.
+describe('server wiring for inv_sort (source pins)', () => {
+  const gameSource = readFileSync(
+    fileURLToPath(new URL('../server/game.ts', import.meta.url)),
+    'utf8',
+  );
+
+  it("keeps 'inv_sort' in HEAVY_SELF_CMDS", () => {
+    const start = gameSource.indexOf('const HEAVY_SELF_CMDS = new Set<string>([');
+    expect(start).toBeGreaterThanOrEqual(0);
+    const declaration = gameSource.slice(start, gameSource.indexOf(']);', start));
+    expect(declaration).toContain("'inv_sort'");
+  });
+
+  it('dispatches the inv_sort case to sim.sortInventory(pid)', () => {
+    const start = gameSource.indexOf("case 'inv_sort':");
+    expect(start).toBeGreaterThanOrEqual(0);
+    const body = gameSource.slice(start, gameSource.indexOf('break;', start));
+    expect(body).toContain('sim.sortInventory(pid)');
   });
 });

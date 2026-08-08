@@ -6,11 +6,19 @@
 // one-shot settle ripple that plays only once the painted grid CONTENT
 // changes (online the press repaints the still-unsorted mirror first; the
 // tidied grid lands with the heavy self snapshot).
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
+
+// Each test gets FRESH stack objects (the ripple test stamps slot hints onto
+// whatever it is handed) and a clean woc_bag_filter (BagsWindow reads it at
+// construction), so no case depends on a predecessor's writes.
+beforeEach(() => {
+  localStorage.clear();
+  vi.restoreAllMocks();
+});
 
 function harness(inventory: InvSlot[]): {
   root: HTMLElement;
@@ -83,7 +91,7 @@ function harness(inventory: InvSlot[]): {
   return { root, window, world, sortCalls };
 }
 
-const INV: InvSlot[] = [
+const inv = (): InvSlot[] => [
   { itemId: 'baked_bread', count: 2 },
   { itemId: 'worn_sword', count: 1 },
   { itemId: 'baked_bread', count: 3 },
@@ -97,36 +105,51 @@ function clickSort(root: HTMLElement): void {
 
 describe('bags sort button', () => {
   it('renders in the tools row with a focus key and an accessible name', () => {
-    const { root } = harness([...INV]);
+    const { root } = harness(inv());
     const btn = root.querySelector('button.bag-sort-btn') as HTMLElement | null;
     expect(btn).not.toBeNull();
     expect(btn?.dataset.focusKey).toBe('bag-sort-btn');
+    // Non-empty AND not the raw key: the regression this catches is a missing
+    // catalog entry rendering the key itself (a t()-vs-t() compare would not).
     expect(btn?.getAttribute('aria-label')).toBeTruthy();
+    expect(btn?.getAttribute('aria-label')).not.toBe('hudChrome.bags.sortButtonAria');
     expect(btn?.closest('.bag-tools')).not.toBeNull();
   });
 
   it('dispatches exactly one world.sortInventory per press', () => {
-    const { root, sortCalls } = harness([...INV]);
+    const { root, sortCalls } = harness(inv());
     clickSort(root);
     expect(sortCalls).toHaveLength(1);
   });
 
   it('resets an active category/sort/search view back to the pristine cells', () => {
-    const { root } = harness([...INV]);
-    // Arm a derived view: pick the quality sort from the dropdown.
+    const { root } = harness(inv());
+    // Arm all three dimensions: the press must reset EVERY one, not just the
+    // sort (a `{ ...this.filter, sort: 'recent' }` narrowing would leave the
+    // chip and the search text live over the tidied bag).
     const select = root.querySelector('select.bag-sort') as HTMLSelectElement;
     select.value = 'quality';
     select.dispatchEvent(new Event('change', { bubbles: true }));
-    expect((root.querySelector('select.bag-sort') as HTMLSelectElement).value).toBe('quality');
+    const chip = [...root.querySelectorAll('button.bag-chip')].find(
+      (c) => c.getAttribute('aria-pressed') === 'false',
+    ) as HTMLElement;
+    chip.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const search = root.querySelector('input.bag-search') as HTMLInputElement;
+    search.value = 'bread';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
     clickSort(root);
-    // Back to the manual view: the dropdown reads recent and the grid paints
-    // real cells again (data-bag-index only exists in the manual view).
+    // Back to the manual view: dropdown on recent, All chip active, search
+    // empty, and the grid paints real cells again (data-bag-index only exists
+    // in the manual view).
     expect((root.querySelector('select.bag-sort') as HTMLSelectElement).value).toBe('recent');
+    expect((root.querySelector('input.bag-search') as HTMLInputElement).value).toBe('');
+    const firstChip = root.querySelector('button.bag-chip') as HTMLElement;
+    expect(firstChip.getAttribute('aria-pressed')).toBe('true');
     expect(root.querySelector('button.bag-item[data-bag-index]')).not.toBeNull();
   });
 
   it('does not persist the filter reset: the saved preference survives the press', () => {
-    const { root } = harness([...INV]);
+    const { root } = harness(inv());
     const select = root.querySelector('select.bag-sort') as HTMLSelectElement;
     select.value = 'quality';
     select.dispatchEvent(new Event('change', { bubbles: true }));
@@ -137,7 +160,7 @@ describe('bags sort button', () => {
   });
 
   it('never fires the ripple from the press filter reset alone (online mirror unchanged)', () => {
-    const { root } = harness([...INV]);
+    const { root } = harness(inv());
     // Arm a derived view first: the press resets it, which switches the grid
     // SHAPE (list to real cells). That alone is not a sort effect.
     const select = root.querySelector('select.bag-sort') as HTMLSelectElement;
@@ -148,7 +171,7 @@ describe('bags sort button', () => {
   });
 
   it('fires the ripple when only cell hints move (a restamp with no merge)', () => {
-    const { root, window, world } = harness([...INV]);
+    const { root, window, world } = harness(inv());
     clickSort(root);
     expect(root.querySelector('.bag-grid-settle')).toBeNull();
     for (let i = 0; i < world.inventory.length; i++) world.inventory[i].slot = i;
@@ -157,7 +180,7 @@ describe('bags sort button', () => {
   });
 
   it('plays the settle ripple only once the painted content changes', () => {
-    const { root, window, world } = harness([...INV]);
+    const { root, window, world } = harness(inv());
     // The press itself repaints an UNCHANGED grid (the online mirror has not
     // heard back yet): no ripple.
     clickSort(root);
@@ -175,5 +198,38 @@ describe('bags sort button', () => {
     // A later ordinary repaint does not ripple again (one-shot).
     window.render();
     expect(root.querySelector('.bag-grid-settle')).toBeNull();
+  });
+
+  it('the timeout backstop disarms a no-op sort for good', () => {
+    const { root, window, world } = harness(inv());
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    clickSort(root);
+    now += 3500; // past SORT_SETTLE_MS with nothing changed (already tidy)
+    for (let i = 0; i < world.inventory.length; i++) world.inventory[i].slot = i;
+    window.render();
+    // Disarmed, not merely skipped: even a real change no longer ripples.
+    expect(root.querySelector('.bag-grid-settle')).toBeNull();
+    world.inventory[0].count = 4;
+    window.render();
+    expect(root.querySelector('.bag-grid-settle')).toBeNull();
+  });
+
+  it('caps the stagger index so a full bag settles inside half a second', () => {
+    const many: InvSlot[] = Array.from({ length: 26 }, () => ({
+      itemId: 'baked_bread',
+      count: 1,
+    }));
+    const { root, window, world } = harness(many);
+    (world as unknown as { bagCapacity: number }).bagCapacity = 28;
+    clickSort(root);
+    for (let i = 0; i < world.inventory.length; i++) world.inventory[i].slot = i;
+    window.render();
+    const grid = root.querySelector('.bag-grid-settle');
+    expect(grid).not.toBeNull();
+    const styleAt = (i: number) =>
+      (grid?.children[i] as HTMLElement).style.getPropertyValue('--settle-i');
+    expect(styleAt(19)).toBe('19');
+    expect(styleAt(25)).toBe('20'); // clamped at SORT_SETTLE_STAGGER_CAP
   });
 });

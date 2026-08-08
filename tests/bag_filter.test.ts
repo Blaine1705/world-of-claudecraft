@@ -45,6 +45,9 @@ const ITEMS: Record<string, ItemDef> = {
   // Its REAL fine grade (MATERIAL_GRADES links the pair), for the grade-family
   // grouping arm of the quality view.
   fine_iron_ore: { id: 'fine_iron_ore', name: 'Fine Iron Ore', kind: 'junk', quality: 'common' },
+  // A REAL material whose name sorts BETWEEN 'Fine Iron Ore' and 'Iron Ore',
+  // so the grade-family arm is decisive: a plain name order would interleave it.
+  goldleaf_herb: { id: 'goldleaf_herb', name: 'Goldleaf Herb', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
   reins: {
@@ -224,13 +227,26 @@ describe('applyBagFilter: sorting', () => {
   it('quality view seats a fine material grade beside its base grade, fine first', () => {
     // iron_ore has a real MATERIAL_GRADES row (fine_iron_ore); both grades are
     // quality common, so only the grade family, never quality, can group them.
+    // Goldleaf Herb alphabetizes between the two grade NAMES, so a plain name
+    // order would read fine_iron_ore, goldleaf_herb, iron_ore: the family key
+    // is what pulls the grades together past it.
     const inv: InvSlot[] = [
       { itemId: 'iron_ore', count: 9 },
       { itemId: 'bread', count: 1 },
+      { itemId: 'goldleaf_herb', count: 4 },
       { itemId: 'fine_iron_ore', count: 3 },
     ];
     const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
-    expect(ids(out)).toEqual(['bread', 'fine_iron_ore', 'iron_ore']);
+    expect(ids(out)).toEqual(['bread', 'goldleaf_herb', 'fine_iron_ore', 'iron_ore']);
+  });
+
+  it('name view breaks a same-name tie with the ladder (fuller stacks first)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'iron_ore', count: 7 },
+      { itemId: 'iron_ore', count: 20 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    expect(out.map((s) => s.count)).toEqual([20, 7]);
   });
 
   it('sorts by name A to Z', () => {

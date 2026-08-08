@@ -600,7 +600,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-      // 7 as of the bags Sort button: bags_window's `lastGridSignature` gates
+      // 7 as of the bags Sort button: bags_window's `lastSortSignature` gates
       // only whether the one-shot settle ANIMATION plays (which draws no
       // text); fillGrid rebuilds every cell unconditionally and the existing
       // bags fan-out arm repaints the window wholesale on a locale switch.

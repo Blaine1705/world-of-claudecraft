@@ -172,6 +172,11 @@ export function consolidateBagStacks(
 ): void {
   for (let i = 0; i < inventory.length; i++) {
     const target = inventory[i];
+    // A corrupt non-positive persisted count is INERT on both sides of a
+    // merge: as a target it would absorb honest units into its deficit
+    // (10 poured into a -3 leaves 7, three real items gone), and as a donor
+    // (guarded below) a negative take would shrink the survivor.
+    if (target.count <= 0) continue;
     if (!isMergeableInstancePayload(target.instance)) continue;
     const cap = stackCap(lookup(target.itemId));
     for (let j = i + 1; j < inventory.length && target.count < cap; j++) {
