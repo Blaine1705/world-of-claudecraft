@@ -75,7 +75,10 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     const p = resolvePrewarmPolicy({ ...BASE, finishFullManifestBeforeReveal: true });
     expect(p.finishFullManifestBeforeReveal).toBe(true);
 
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       "finishFullManifestBeforeReveal: GFX.tier === 'insane' && !GFX.constrainedMemory",
     );
@@ -115,8 +118,58 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     expect(orderedPrewarmIds(MANIFEST_IDS, p)).toEqual(MANIFEST_IDS);
     for (const id of MANIFEST_IDS) expect(prewarmEntryRuns(id, p)).toBe(true);
   });
+
+  it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const compileEntryAt = renderer.indexOf("id: 'programs.compile'");
+    const nextEntryAt = renderer.indexOf("id: 'sky.current-zone'", compileEntryAt);
+    const compileEntry = renderer.slice(compileEntryAt, nextEntryAt);
+
+    expect(compileEntryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(compileEntryAt);
+    expect(compileEntry).toContain(
+      'deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported',
+    );
+  });
 });
 
+it('prewarms adaptive quality shader variants behind the desktop loading cover', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
+  const nextEntryAt = renderer.indexOf("id: 'sky.current-zone'", entryAt);
+  const entry = renderer.slice(entryAt, nextEntryAt);
+
+  expect(entryAt).toBeGreaterThan(-1);
+  expect(nextEntryAt).toBeGreaterThan(entryAt);
+  expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
+  expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
+  expect(entry).toContain('renderPasses++');
+  expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+});
+it('settles linked desktop programs with hidden renders even after the soft deadline', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  for (const [id, nextId] of [
+    ['sky.current-zone', 'render.settle-passes'],
+    ['render.settle-passes', 'diagnostics.baseline'],
+  ] as const) {
+    const entryAt = renderer.indexOf(`id: '${id}'`);
+    const nextEntryAt = renderer.indexOf(`id: '${nextId}'`, entryAt);
+    const entry = renderer.slice(entryAt, nextEntryAt);
+    expect(entryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(entryAt);
+    expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+    expect(entry).toContain('finishBehindCover || performance.now() < deadline');
+  }
+});
 describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone path)', () => {
   const p = resolvePrewarmPolicy({
     ...BASE,
@@ -161,7 +214,10 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   });
 
   it('wires the two-view constrained cap into the renderer', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
     expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
   });
@@ -355,7 +411,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     );
     expect(ordered.indexOf('views.landmarks')).toBeLessThan(ordered.indexOf('views.nearby'));
 
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const landmarkEntryAt = renderer.indexOf("id: 'views.landmarks'");
     const portalEntryAt = renderer.indexOf("id: 'views.persistent-portals'");
     const nearbyEntryAt = renderer.indexOf("id: 'views.nearby'");
@@ -387,7 +446,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     // could reuse it instead of duplicating it. gateViewOnCompile itself still
     // owns the unsupported-browser short-circuit and the compilePending
     // lifecycle; sequencing and timeout diagnostics now live one hop over.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const gateStart = renderer.indexOf('private gateViewOnCompile(');
     const gateEnd = renderer.indexOf('\n  /** The visual the player currently sees', gateStart);
     const gate = renderer.slice(gateStart, gateEnd);
@@ -452,7 +514,10 @@ describe('constrained entry view creation ramp', () => {
   });
 
   it('is wired into the renderer before optional candidate creation', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const budgetMethodStart = renderer.indexOf('private runtimeViewCreateBudget(');
     const budgetMethodEnd = renderer.indexOf(
       '\n  private viewCandidatePriority(',
@@ -476,7 +541,10 @@ describe('constrained entry view creation ramp', () => {
   });
 
   it('uses the bounded texture path for constrained prewarm', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       `await this.prewarmInitialSceneTexturesBatched(
                 policy.textureBatchSize,
@@ -518,7 +586,10 @@ describe('constrained entry view creation ramp', () => {
 
 describe('runtime entity-view parity', () => {
   it('keeps the full shared visibility range and continuous world submission', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).not.toContain('ENTITY_VIEW_CREATE_RANGE_CONSTRAINED');
     expect(renderer).not.toContain('ENTITY_VIEW_DESTROY_RANGE_CONSTRAINED');
     expect(renderer).not.toContain('resolveRuntimeViewRangePolicy({');

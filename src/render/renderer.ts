@@ -39,7 +39,7 @@ import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
-import { groundHeight, waterLevel, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -368,6 +368,7 @@ import {
   RenderBudgetGovernor,
   type RenderBudgetSample,
   type RenderBudgetState,
+  renderBudgetShaderPrewarmLevels,
 } from './render_budget';
 import {
   beginRendererFrameTelemetry,
@@ -788,6 +789,8 @@ type RendererWorldPhase =
   | 'props'
   | 'foliage'
   | 'fish'
+  | 'ambientScenery'
+  | 'zoneFeatures'
   | 'vfx'
   | 'camera'
   | 'ambience'
@@ -1136,6 +1139,8 @@ function emptyWorldPhaseMs(): RendererWorldPhaseMs {
     props: 0,
     foliage: 0,
     fish: 0,
+    ambientScenery: 0,
+    zoneFeatures: 0,
     vfx: 0,
     camera: 0,
     ambience: 0,
@@ -4016,6 +4021,12 @@ export class Renderer {
     this.hitchLogEnabled = enabled;
   }
 
+  /** Clears retained renderer costs at the boundary of a user-requested diagnostics scan. */
+  resetDiagnosticSamples(): void {
+    for (const samples of Object.values(this.phaseSamples)) samples.clear();
+    this.hitchTracker.reset();
+  }
+
   hitchStats(): HitchSummary | null {
     return this.hitchLogEnabled ? this.hitchTracker.summary() : null;
   }
@@ -6081,6 +6092,11 @@ export class Renderer {
         category: 'world',
         priority: 80,
         required: true,
+        // Async-capable desktop must finish linking behind the loading cover even
+        // when the hidden world frame consumed the soft 12 s manifest budget.
+        // Synchronous compilers and constrained WebKit keep the deadline because
+        // they cannot safely wait behind the cover without a hard upper bound.
+        deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
         // If the loading deadline drops the monolithic compile, retain only
         // explicit archetype-sized roots. Three r165's compileAsync first runs
         // a synchronous traversal, so the live resume lane must never receive
@@ -6146,15 +6162,44 @@ export class Renderer {
           `mode=${compileMode};timedOut=${compileTimedOut};skinnedShadowGroups=${compiledSkinnedShadowGroups}`,
       },
       {
+        id: 'programs.budget-variants',
+        category: 'world',
+        priority: 85,
+        required: true,
+        deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
+        run: async () => {
+          if (!GFX.autoGovernor || !this.asyncCompileSupported) return;
+          const originalState = this.renderBudgetGovernor.state();
+          const originalAppliedLevels = this.appliedBudgetLevels
+            ? { ...this.appliedBudgetLevels }
+            : null;
+          const originalQualityChange = this.lastQualityChange;
+          try {
+            for (const levels of renderBudgetShaderPrewarmLevels(originalState)) {
+              this.applyRenderBudgetState({ ...originalState, levels });
+              await this.compilePrewarmColorPrograms(this.scene, false);
+              this.renderPrewarmPass(1 / 60);
+              renderPasses++;
+            }
+          } finally {
+            this.applyRenderBudgetState(originalState);
+            this.appliedBudgetLevels = originalAppliedLevels;
+            this.lastQualityChange = originalQualityChange;
+          }
+        },
+      },
+      {
         id: 'sky.current-zone',
+        deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
         category: 'sky',
         priority: 90,
         required: false,
         // No resumeUnits: this would present real frames in a synchronous loop.
         run: () => {
+          const finishBehindCover = !constrainedPrewarm && this.asyncCompileSupported;
           const points = [p.pos, activeZone.hub];
           for (const point of points) {
-            if (performance.now() >= deadline) break;
+            if (!(finishBehindCover || performance.now() < deadline)) break;
             this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
@@ -6163,13 +6208,15 @@ export class Renderer {
       },
       {
         id: 'render.settle-passes',
+        deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
         category: this.post ? 'post' : 'world',
         priority: 100,
         required: false,
         // No resumeUnits: this is a tight loop of real presented renders.
         run: () => {
+          const finishBehindCover = !constrainedPrewarm && this.asyncCompileSupported;
           const minPasses = this.lowGfx ? 8 : 10;
-          while (renderPasses < minPasses && performance.now() < deadline) {
+          while (renderPasses < minPasses && (finishBehindCover || performance.now() < deadline)) {
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -6178,6 +6225,7 @@ export class Renderer {
       },
       {
         id: 'diagnostics.baseline',
+        deadlineExempt: true,
         category: 'diagnostics',
         priority: 110,
         required: false,
@@ -10637,8 +10685,9 @@ export class Renderer {
       this.viewFar(),
       this.fogState === 'outdoor',
     );
-    this.updateZoneFeatureVisibility(fogFar);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
+    this.updateZoneFeatureVisibility(fogFar);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,
@@ -10706,6 +10755,7 @@ export class Renderer {
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);
     this.motes.update(p.pos.x, p.pos.z, dt);
     // The wilderness night layer rides beside the ambient motes: same
     // player-centred streaming contract, but gated on real dark and anchored to
@@ -10724,6 +10774,7 @@ export class Renderer {
     // horizon, so band blades never stand past unbuilt ground
     this.bladeGrassBand.update(p.pos.x, p.pos.z, fogFar, this.fogState === 'outdoor');
     this.cliffScree.update(p.pos.x, p.pos.z);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart);
     this.realmFlora?.update(this.time);
     this.emberFeatures?.update(this.time);
     this.frostSky?.update(this.time, this.camera.position.x, this.camera.position.z);
@@ -10750,7 +10801,7 @@ export class Renderer {
       this.groundSample,
       this.views,
     );
-    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
     this.updateUnderwater(dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);

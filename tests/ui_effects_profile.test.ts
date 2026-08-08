@@ -9,6 +9,7 @@ import {
   uiEffectsAllowFctCrit,
   uiEffectsProfilesEqual,
   uiEffectsTokens,
+  worldEntryGpuSettleCoverMs,
 } from '../src/game/ui_effects_profile';
 
 describe('loading curtain reduced-motion timing', () => {
@@ -18,6 +19,11 @@ describe('loading curtain reduced-motion timing', () => {
   });
 });
 
+it('keeps desktop governor settling covered but never extends constrained entry', () => {
+  expect(worldEntryGpuSettleCoverMs({ adaptiveBudget: true, constrainedMemory: false })).toBe(1800);
+  expect(worldEntryGpuSettleCoverMs({ adaptiveBudget: false, constrainedMemory: false })).toBe(0);
+  expect(worldEntryGpuSettleCoverMs({ adaptiveBudget: true, constrainedMemory: true })).toBe(0);
+});
 // The resolver is the ONLY place the HUD effect precedence lives. These tests pin
 // every documented rule so a regression (a dropped clamp, glass dropped under
 // reduced-motion, low no longer cutting cost) fails here instead of in the page.

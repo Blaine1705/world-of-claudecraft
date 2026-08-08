@@ -15,13 +15,14 @@ import type { Entity } from '../types';
 
 /** The rng an `offStreamRng` mob's PASSIVE idle draws come from: a private
  *  sub-stream seeded from the sim clock and the mob's id, exactly as the
- *  ambient stable horses do (mob/ambient.ts), so a new herd of idle content
- *  never drifts the shared world stream. Every other mob gets `ctx.rng` ITSELF
- *  back (the same object, not a copy), so no shipped mob's draw position moves.
+ *  ambient stable horses do (mob/ambient.ts). Distance-culled worlds use the
+ *  same private lane for all passive mob rolls, so skipping an invisible mob
+ *  cannot move a visible mob's shared-stream draw. Without either opt-in, the
+ *  mob gets `ctx.rng` itself and the historical draw position is unchanged.
  *  Deterministic and wall-clock free, so offline, server and headless agree.
  *  Pinned by tests/off_stream_rng.test.ts. */
 export function idleRng(ctx: SimContext, mob: Entity): Rng {
-  if (!mob.offStreamRng) return ctx.rng;
+  if (!mob.offStreamRng && ctx.cfg.idleMobTickRadius <= 0) return ctx.rng;
   const seed = (((ctx.tickCount * 0x9e3779b1) >>> 0) ^ ((mob.id * 0x85ebca6b) >>> 0)) >>> 0;
   return new Rng(seed);
 }

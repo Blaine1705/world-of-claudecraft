@@ -297,6 +297,94 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Dev-only in-memory collector for an unattended local diagnostics run. Reports never
+// touch disk and the endpoints do not exist in preview or production builds.
+function diagnosticsCapturePlugin() {
+  let latestReport = '';
+  const sameOrigin = (origin: string | undefined, host: string | undefined): boolean => {
+    if (!origin || !host) return true;
+    try {
+      return new URL(origin).host === host;
+    } catch {
+      return false;
+    }
+  };
+  return {
+    name: 'woc-diagnostics-capture',
+    apply: 'serve' as const,
+    configureServer(server: {
+      middlewares: {
+        use: (
+          fn: (
+            req: {
+              url?: string;
+              method?: string;
+              headers: Record<string, string | string[] | undefined>;
+              on: (event: string, callback: (chunk?: unknown) => void) => void;
+            },
+            res: {
+              statusCode: number;
+              setHeader: (name: string, value: string) => void;
+              end: (body?: string) => void;
+            },
+            next: () => void,
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use((req, res, next) => {
+        const pathOnly = (req.url ?? '').split('?')[0];
+        if (pathOnly === '/__diagnostics/latest') {
+          if (req.method !== 'GET') {
+            res.statusCode = 405;
+            res.end('GET only');
+            return;
+          }
+          res.setHeader('Cache-Control', 'no-store');
+          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+          res.statusCode = latestReport ? 200 : 404;
+          res.end(latestReport || 'No completed diagnostics capture yet.');
+          return;
+        }
+        if (pathOnly !== '/__diagnostics/capture') {
+          next();
+          return;
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        const origin = Array.isArray(req.headers.origin)
+          ? req.headers.origin[0]
+          : req.headers.origin;
+        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
+        if (!sameOrigin(origin, host)) {
+          res.statusCode = 403;
+          res.end('same-origin requests only');
+          return;
+        }
+        let body = '';
+        let rejected = false;
+        req.on('data', (chunk) => {
+          if (rejected) return;
+          body += String(chunk);
+          if (body.length > 2_000_000) {
+            rejected = true;
+            res.statusCode = 413;
+            res.end('report too large');
+          }
+        });
+        req.on('end', () => {
+          if (rejected) return;
+          latestReport = body;
+          res.statusCode = 204;
+          res.end();
+        });
+      });
+    },
+  };
+}
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
@@ -307,6 +395,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
+    diagnosticsCapturePlugin(),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {

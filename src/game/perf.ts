@@ -7,6 +7,7 @@ import {
   type SceneCensusReport,
 } from '../render/scene_census_core';
 import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
@@ -404,6 +405,7 @@ export class PerfMonitor {
   private devTraceFrames: DevPerfTraceFrame[] = [];
   private devTraceSpans: DevPerfTraceSpan[] = [];
   private devLongTasks: DevLongTaskRecord[] = [];
+  private diagnosticsPanel: PerfDiagnosticsPanel | null = null;
 
   constructor(
     private renderer: Renderer | null,
@@ -411,10 +413,22 @@ export class PerfMonitor {
   ) {
     const params = new URLSearchParams(location.search);
     this.traceEnabled = localDevPerfTraceEnabled();
+    const diagnosticsEnabled = params.has('diagnostics');
     this.enabled =
-      this.traceEnabled || params.has('perf') || localStorage.getItem('woc_perf') === '1';
+      this.traceEnabled ||
+      diagnosticsEnabled ||
+      params.has('perf') ||
+      localStorage.getItem('woc_perf') === '1';
     if (this.enabled) {
       this.mountOverlay();
+    }
+    if (diagnosticsEnabled) {
+      this.diagnosticsPanel = new PerfDiagnosticsPanel({
+        startMeasurement: () => this.reset(),
+        snapshot: () => this.report(),
+        runSceneCensus: () => this.runSceneCensus(),
+      });
+      this.diagnosticsPanel.setReady(Boolean(this.renderer));
     }
     this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
@@ -423,6 +437,7 @@ export class PerfMonitor {
   setRenderer(renderer: Renderer | null): void {
     this.renderer = renderer;
     renderer?.setHitchLogEnabled(this.enabled);
+    this.diagnosticsPanel?.setReady(Boolean(renderer));
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {
@@ -819,6 +834,7 @@ export class PerfMonitor {
     if (!this.enabled) return;
     this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
+    this.diagnosticsPanel?.update(this.lastSnapshot);
   }
 
   snapshot(now = performance.now()): PerfSnapshot {
@@ -974,6 +990,10 @@ export class PerfMonitor {
     this.devTraceFrames = [];
     this.devTraceSpans = [];
     this.devLongTasks = [];
+    if (this.diagnosticsPanel) {
+      this.renderer?.resetDiagnosticSamples();
+      this.diagnosticsPanel.onMonitorReset();
+    }
   }
 
   private mountOverlay(): void {
