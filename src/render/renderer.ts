@@ -56,7 +56,11 @@ import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
-import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
+import {
+  type BackgroundGpuQueueStats,
+  createBackgroundGpuQueue,
+  GPU_WORK_PRIORITY,
+} from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BattlegroundView, buildBattleground } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
@@ -3268,6 +3272,7 @@ export class Renderer {
     await this.backgroundGpuWork.run(
       () => this.ensureEnvironmentBiome(zone.biome),
       GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      `pmrem:${zone.biome}`,
     );
     await this.prewarmTextureInIdle(domeSource);
   }
@@ -3362,6 +3367,7 @@ export class Renderer {
                 await this.backgroundGpuWork.run(
                   () => this.compilePrewarmColorPrograms(obj, false),
                   GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                  `zone-prepare-compile:${obj.name || obj.type}`,
                 );
               }
             }
@@ -3455,10 +3461,12 @@ export class Renderer {
               await this.backgroundGpuWork.run(
                 () => this.compilePrewarmColorPrograms(childRoot, true),
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                `zone-prewarm-color:${childRoot.name || childRoot.type}`,
               );
               await this.backgroundGpuWork.run(
                 () => this.compileSkinnedShadowPrograms(childRoot),
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                `zone-prewarm-shadow:${childRoot.name || childRoot.type}`,
               );
             },
             prepareChildAssets: (child) => {
@@ -3474,7 +3482,11 @@ export class Renderer {
               this.renderPrewarmPass(1 / 60, { offscreen: true });
             },
             runUpload: (work) =>
-              this.backgroundGpuWork.run(work, GPU_WORK_PRIORITY.VISIBLE_PREWARM),
+              this.backgroundGpuWork.run(
+                work,
+                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                'zone-prewarm-upload',
+              ),
           });
           tCompile = performance.now();
         } else {
@@ -3969,6 +3981,7 @@ export class Renderer {
     renderDiagnostics: RenderDiagnosticsSnapshot;
     lastFrame?: RendererFrameStats;
     prewarm: RendererPrewarmStats | null;
+    gpuQueue: BackgroundGpuQueueStats;
   } {
     const info = this.webgl.info;
     const renderBudget = this.renderBudgetGovernor.state();
@@ -4028,6 +4041,7 @@ export class Renderer {
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: this.snapshotLastFrameStats(),
       prewarm: this.lastPrewarmStats,
+      gpuQueue: this.backgroundGpuWork.stats(),
     };
   }
 
@@ -5036,7 +5050,7 @@ export class Renderer {
   private queueSpiritPuppetBuild(build: () => void): void {
     this.spiritBuildLane = this.spiritBuildLane
       .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS))
-      .then(() => this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND))
+      .then(() => this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND, 'spirit-puppet'))
       .catch((err: unknown) => {
         console.warn('[spirits] deferred puppet build failed', err);
       });
@@ -5056,6 +5070,7 @@ export class Renderer {
         this.backgroundGpuWork.run(
           () => this.webgl.initTexture(chunkTexture),
           GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+          'texture-chunk-upload',
         ),
     })
       .then(() => {
@@ -6280,7 +6295,8 @@ export class Renderer {
               idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
                 maxTimeoutDeferrals: 2,
               }),
-            runUnit: (unit) => this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME),
+            runUnit: (unit) =>
+              this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id),
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               failedResumeUnits.push(`${entry.id}:${unit.id}`);
@@ -7468,7 +7484,7 @@ export class Renderer {
           this.compileSkinnedShadowPrograms(target),
         ),
       VIEW_COMPILE_GATE_MAX_MS,
-      { priority },
+      { priority, label: `live-gate:${target.name || target.type}` },
     );
   }
 
