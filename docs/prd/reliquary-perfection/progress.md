@@ -1439,3 +1439,213 @@ owns the push.
   no-prefix crest literals, per-pipeline floors on the item sweep, and
   an ITEM-kind grid/strip byte-identity arm through the new
   default-parameter path.
+
+## Phase 17 (2026-08-08): Per-relic obtain counts + wire/serialize perf
+
+- Step 0: pre-flight clean at 7980a41ce6, in sync with the remote; the
+  release tip e5c16ca398 was already contained (the Phase 16 QA
+  catch-up merge covered it), so no sync merge was needed this phase.
+  Containment re-verified before commit.
+- THREE MAINTAINER RULINGS obtained and executed this phase (all
+  2026-08-08):
+  1. clears-0 provenance (open since Phase 12): OMIT AT ZERO. A first
+     find whose crediting clear meter reads zero lands sparse (no
+     clears key); the restore sanitizer floors then drops sub-1 values
+     so old saves converge. The recorded-ruling tripwire test was
+     rewritten to pin the new behavior, with a contrast arm proving a
+     turned-over meter still stamps.
+  2. Obtain-count seam: WORLD-SOURCED ONLY. Loot, corpse harvest,
+     gather, fish, craft, salvage, quest rewards, conjures, instance
+     and delve and rift awards, and currency purchases count;
+     player-to-player transfers (trade, mail, market buy/cancel/
+     collect via the grantCopies funnel) and internal relocations
+     (enchant re-mint x2, unbind peel, commission-order return, mech
+     chroma unequip on both host arms, adminRestoreItem, the PBE boost
+     kit) never count. Discovery is UNCHANGED everywhere: only the
+     tally and the clears provenance stamp are movement-gated.
+  3. Buyback: MOVEMENT (supersedes the phase file's literal grant-path
+     list). The sim-diff review proved sell-then-buyback is
+     copper-neutral and infinitely repeatable, so the phase-file lock
+     would have made the tally freely inflatable by one player alone,
+     the exact reading the two-player pass-around ban exists to
+     prevent. Buyback discovery still fires and now carries movement
+     provenance via a direct module import of markItemDiscovered
+     (BUYBACK_MOVEMENT), keeping the SimContext seam opts-free per the
+     Phase 10 decision.
+- Decided within delegation, recorded: the heroicOf walk. noteRelicObtain
+  mirrors markItemDiscovered's walk (depth cap 3) and increments every
+  catalogued id it visits, closing the 63-of-135 gap where heroic
+  drops filled the base page but never moved its tally. No heroic id
+  is itself catalogued (pinned), so exactly one id scores per chain
+  today. A movement heroic grant still counts nothing (pinned).
+- Built (sim + wire): ReliquaryState.counts (sparse, catalogued relic
+  item ids, cap RELIQUARY_OBTAIN_COUNT_CAP 1e9), incremented per COPY
+  at the two grant hubs (eight catalogued specimen relics ARE
+  stackable, so per-call and per-copy differ; the split is pinned in
+  tests/reliquary_content.test.ts); movement?: boolean on both hub
+  opts bags, threaded at every relocation site with a one-line why
+  each; retro join seed never increments (asserted); the tally writes
+  an empty firstFind carrier entry so pre-Reliquary veterans accrue
+  entries on re-obtain (the majority production case: their ids are
+  already on the itemsDiscovered ledger, so the first-find hook can
+  never fire for them). pageId removed end to end (interface, write
+  site, serialize, restore, the view's hinted arm and both call
+  sites); serialize folds count onto the first-find entry ({clears?,
+  count?}), no new top-level key, no new wire delta key (68 holds).
+  Wire build memoized: reliquaryWireJson (renamed from
+  reliquaryWireBlob, which the phase file still names) behind two
+  WeakMaps keyed on state identity (rev + cache; no state-shape
+  leakage into saves or goldens, no cross-test reset needed), bumped
+  by all four public writers, served via maybeRaw in server/game.ts
+  (maybeSerialized is invisible to the ALL_DELTA_KEYS scraper, a
+  briefed-call correction). Ownership snapshot hoisted to one build
+  per fill chain with evaluation points preserved exactly (the
+  Explore pass corrected arch note 9: it was 2 to 3 rebuilds per
+  fill, not 3 to 4, but each copied bags plus bank via ownedMounts,
+  and the join seed multiplied the chain per seeded id).
+- Built (ui + docs): IWorld facet member reliquaryObtainCounts (data;
+  parity pins 310/81/229, facet map 33); ClientWorld mirror +
+  bareClient fixture default; tooltip line on owned cells via the
+  plural base hudChrome.plurals.reliquaryObtainedTimes ("Obtained
+  {count} time/times", English genuinely inflects) rendered in BOTH
+  owned branches (body and the item early-return), absent count =
+  no line (the transfer/unknown-provenance arm, pinned); aria carries
+  whole-sentence bases (reliquaryCellOwnedObtainedAria,
+  reliquaryCellOwnedClearsObtainedAria) with the clear number in a
+  separate {clears} slot so tPlural selects on the count that
+  inflects; five non-Latin fills in-change (M16), 15 Latin locales
+  pending (Phase 22 worklist); the refresh signature gained a twelfth
+  dimension (reliquaryObtainCountsDigest, size + sum fold) so an open
+  window repaints on a tally tick (pinned through the real
+  refreshIfChanged path). docs/design/reliquary.md: obtain-count
+  glossary row, the sanctioned counts-only block under deliberately
+  deferred (per-drop history stays deferred), the memoized wire-thrift
+  row, and the obtain-counts cost row in PRODUCTION-ABSOLUTE framing.
+- Measured (db reviewer method, re-verified independently two ways
+  that agree within 4 bytes): production-absolute cost of the whole
+  Reliquary key on a worst-case veteran row is about +1,772 stored
+  bytes (+17 percent) under pglz, rewritten every 30 s per online
+  session; raw size about 15 percent below the pre-fix branch shape
+  (cheaper detoast for the seq-scan readers). Intra-branch: counts
+  cost 371 stored bytes where dropping pageId and zero-clears stamps
+  saved 881 (why the fold beat a sibling map). pglz confirmed as the
+  production algorithm (no compose override).
+- Reviews: five, ALL PASS, ZERO blocking anywhere. (1) architecture
+  coverage on the implementation round (7 should-fix, all adjudicated:
+  two became maintainer rulings above, the rest applied); (2) fresh
+  architecture on the fix round (3 should-fix, applied in round 2;
+  draw stream proven byte-identical at every sampled tick); (3)
+  cross-platform-sync (2 should-fix, applied: the mutation-scope scan
+  guard in tests/architecture.test.ts, and the buyback impossibility
+  comment falsified by guild-bank withdrawals, fixed by the
+  BUYBACK_MOVEMENT provenance); (4) database-performance (the
+  production-absolute framing correction above, plus the save-cadence
+  pin extension); (5) migration-safety (legacy-blob round-trip
+  composition pin, orphan-count serialize trap pin, Array.isArray
+  entry guard, all applied). Both fix rounds were fresh-reviewed or
+  reviewer-derived; nothing self-certified.
+- 60 parity goldens regenerated ONCE (cause recorded in
+  tests/parity/CLAUDE.md: reliquary.counts is a new persisted
+  PlayerMeta field, the enchantCastBagSlot precedent); zero changed
+  lines touch rng.draws, rng.digest, or events, verified
+  independently by three parties (implementer, both architecture
+  passes). The fix rounds added no further golden churn (verified,
+  not assumed).
+- Recorded observations, no action: catalog churn now destroys
+  tallies along with provenance (restore drops uncatalogued ids; no
+  down-migration; inherent, joins the Phase 22 release-notes rider
+  class); tallies ride the 30 s autosave (a hard crash loses up to
+  30 s of ticks, correct for a cosmetic counter); guild-bank
+  withdrawal never fires discovery (pre-existing gap, predates this
+  phase, now named in the buyback comment); dropping pageId is a
+  one-way migration (a multi-page relic's recent-strip jump target
+  can change for pre-reorder finds; the fallback answers from the
+  catalog, byte-identical except after a page retirement); counts key
+  insertion order differs live vs restored (obtain order vs sorted;
+  same pre-existing property as firstFind; matters only if a future
+  parity scenario digests live meta across a save/restore); every
+  world-sourced obtain now re-ships the whole reliq blob to that one
+  client on the next heavy tick (cadence sized: 1/90 specimen rate,
+  boss rarity elsewhere; a few KB per player per tens of minutes);
+  commission crafting credits the crafter's mint and not the
+  requester's movement-flagged delivery (service semantics, kept);
+  craft outputs COUNT (world-sourced, materials consumed so the loop
+  is not free, unlike buyback; phase-file lock kept); the delve Marks
+  shop sells four catalogued relics and those purchases count
+  (currency earned in the world; named in the facet doc); the offline
+  /dev kit deliberately diverges from the movement-flagged PBE boost
+  (dev-gated, DevKitApplyCtx.addItem carries no opts; seed policy
+  recorded as server-boost-only).
+- Phase 16 QA follow-up EXECUTED (the mobile write anchor): re-measured
+  on the finished Phase 17 tree with a fresh vite on an unused port,
+  mobile viewport, swiftshader: hudHotDomWrites 695, skip rate 0.983,
+  byte-for-byte the Phase 16 QA measurement and inside the 696-698
+  release-tip band, so the phase adds zero writes and the growth is
+  release-owned. Anchor re-captured 640 to 706 in
+  tests/hud_perf_budget.baseline.md (worst healthy capture 698, same
+  8-write headroom discipline as the original 632-to-640 row) with the
+  inherited cause stated in the row per the re-pin policy;
+  tests/hud_perf_budget.test.ts green against it. The same-machine
+  branch-vs-tip pairing the frontend reviewer asked for EXISTS and is
+  the attribution's evidence: the Phase 16 QA ran both sides on this
+  machine the same day (branch 695-696 vs clean release tip 696-698,
+  byte-identical write sets, recorded in its ARM 3 record above), and
+  the Phase 17 re-measure (695) is on the finished phase tree, at or
+  below the tip band. The raise loosens no branch-attributable budget. The sibling
+  base-owned overage (desktop frameLong50 14-17 vs 12 under load) is
+  NOT this phase's delegation and stays surfaced upstream, unre-pinned.
+  The tour's prewarm startup-budget overrun (15.0 s vs 5 s) is the
+  known swiftshader-under-load artifact, not a phase signal.
+- Validation on the combined tree: tsc clean; the 13-suite joint run
+  (architecture, reliquary_state, reliquary_wire, world_api_parity,
+  snapshots, env_protocol, reliquary_view, reliquary_window,
+  reliquary_window_behavior, reliquary_content, localization_fixes,
+  hud_perf_budget, bare_client_defaults) 1178 passed, zero failures;
+  Agent A's adjacent sweeps (commission, enchanting, market, mail,
+  deeds, sim, parity and more) green. ci:changed: this phase's 33
+  changed files carry ZERO biome errors; the run's single error is the
+  recorded inherited release-delta scope noise
+  (src/render/characters/manifest.ts, byte-identical to the release
+  tip; CI's base-scoped biome is green; Phase 16 QA disposition
+  unchanged). gate_select (TURBO_FORCE=1) on the uncommitted tree
+  stopped at i18n freshness, the documented committed-tree
+  requirement (the regenerated bundles ARE the working-tree copies;
+  the diff it printed is exactly this phase's new keys vs HEAD);
+  re-run after the commits, result recorded below.
+- Completion reviews (passes six and seven) and the closing fix round:
+  qa-checklist verdict READY, zero blocking (its should-fix, the stale
+  three-vs-two maybeRaw scraper comment, applied; nits applied: the
+  duplicate snapshot-fixture meter assignment removed, the
+  predicate-swap premise pinned as a non-empty-page-list content test
+  rather than the vacuous predicate-vs-index self-comparison it warned
+  toward, the design doc's bare catalog literal dated to v0.36.0).
+  frontend-seam-reviewer PASS, zero blocking (applied: {count} means
+  the CLEAR number in two legacy keys and the OBTAIN count in the
+  three new bases, now guarded by catalog comments; the digest jsdoc
+  equal-cardinality overclaim reworded; the behavior-stub type
+  narrowed to drop the retired pageId; its write-anchor evidence ask
+  was already satisfied by the recorded same-machine pairing, clause
+  added above). test-coverage-auditor: one blocking on the NEW scan
+  guard itself (the write regex missed compound assignment, increment,
+  ??=, .length =, Object.assign, and prefix spellings; widened with
+  firing AND sparing self-test arms, the alias limitation named in a
+  comment) plus applied should-fixes and nits: string/NaN count
+  sanitizer fixtures (block grown to twelve with the floor moved),
+  the cap pinned to the 1e9 literal, the trade test grown an
+  INSTANCED-arm relic (grantOffer's second movement flag was
+  untested), the scan-floor comment made honest (raised to 500 with
+  the .some() arms credited), a same-seed counts arm on the
+  determinism pin, the PBE bagged-loop premise asserted, the sheet
+  probe quoted ('"count"' so accountId-class fields cannot false-red
+  it), and the combined aria base's singular leaf pinned through t()
+  on the leaf. All re-validated green after application.
+- Commit cadence deviation, recorded: the phase file prescribed
+  separate feat and perf commits, but the perf hunks (pageId removal,
+  memo, hoist) interleave with the feature in the same files
+  (reliquary.ts, game.ts, reliquary_view.ts), so a hunk-level split
+  risked broken intermediate commits; the perf work rides the feat
+  commit with its body naming it, and the docs and anchor re-capture
+  commit separately.
+- reliquaryWireBlob was renamed reliquaryWireJson in the diff; the
+  phase file's starter prompt still names the old symbol (historical
+  record, left as written).

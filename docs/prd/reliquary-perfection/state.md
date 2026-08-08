@@ -1,17 +1,15 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 16 + 16 QA COMPLETE (2026-08-08), pushed to
-origin/feature/reliquary (PR #2976) by the QA session. The tree sits on
-the second Phase 16 sync merge 75dca4ba7c (origin/release/v0.36.0 tip
-6ed4d7e12c; parity 309/80/229, delta keys 68 with ptime + reliq) plus
-the QA fix rounds (opaque-art carve-out re-key, forced-colors arm,
-bareClient defaults sweep). QA verdict PASS-WITH-FOLLOWUPS (mobile 695
-hudHotDomWrites vs the 640 anchor, attributed cross-release, owned by
-the Phase 17 perf phase; two inherited mobile E2E failure families
-recorded in progress.md). Next: Phase 17 (obtain counts + wire perf;
-the clears-0 provenance ruling is DUE before it ships obtain counts).
-Base is release/v0.36.0 (PR #2976 retargeted at the 2026-08-07
-rollover). Update this line as phases complete.
+Current phase: 17 COMPLETE, LOCAL (2026-08-08, not pushed; Phase 17 QA
+owns the push). Obtain counts + wire/serialize perf: three maintainer
+rulings executed (clears-0 omit-at-zero, world-sourced-only count
+seam, buyback-is-movement), parity pins now 310/81/229 (facet map 33,
+delta keys 68 unchanged), 60 goldens regenerated once for the new
+persisted reliquary.counts field. Five reviews, all PASS, zero
+blocking. Full record in progress.md "Phase 17". Next: Phase 17 QA
+(fresh session; gate + push). Base is release/v0.36.0 (tip e5c16ca398
+already contained at phase start; re-verify containment at QA).
+Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -118,7 +116,11 @@ rollover). Update this line as phases complete.
   never revoked, and the titles page becomes completable for everyone else. Rollback
   note for release ops: a pre-Reliquary binary autosaving a rolled-forward character
   drops the reliquary key and the masterwork:* visits permanently (itemsDiscovered
-  survives, so fill and rank recover; provenance and recent do not).
+  survives, so fill and rank recover; provenance and recent do not; since Phase 17,
+  obtain tallies are a third unrecoverable loss category, and the milder rollback
+  to a pre-Phase-17-but-Reliquary-aware binary also wipes them: that binary's
+  restore ignores the folded count field and its first autosave drops every tally
+  while membership and provenance survive).
 - Phase 10 QA (2026-08-05): fix round applied 1 blocking (Biome format diff in
   tests/reliquary_state.test.ts), the emission pin (tests/reliquary_window.test.ts now
   pins this.log + combatAnnouncer.push of retroText inside the reliquary handler body,
@@ -512,7 +514,49 @@ rollover). Update this line as phases complete.
   every-default claim enforced (28 accreted fields mirrored). perf:tour
   and the mobile E2E suite executed: two inherited failure families and
   the mobile 695-vs-640 write anchor recorded as Phase 17 follow-ups.
-- Phase 17: (pending)
+- Phase 17 (2026-08-08): Obtain counts + wire/serialize perf.
+  ReliquaryState.counts (sparse, catalogued relic ITEM ids only, cap
+  1e9), incremented per COPY at both grant hubs behind the new
+  movement?: boolean opt; movement sites: grantCopies both arms
+  (market buy/cancel/collect + mail), trade x2, enchant re-mint x2,
+  unbind peel, commission-order return, mech chroma unequip (BOTH host
+  arms), adminRestoreItem, pbe_boost x3, and buyback (ruling; via
+  direct deeds import BUYBACK_MOVEMENT, seam stays opts-free).
+  noteRelicObtain walks heroicOf like discovery (base id scores; no
+  heroic id is catalogued, pinned). Carrier entry: an obtain writes
+  firstFind[id] = {} when absent (pre-Reliquary veterans accrue
+  entries on re-obtain; counts keys are a strict subset of firstFind
+  keys, pinned both directions). Movement also gates the clears
+  provenance stamp at ANY meter value (extends the executed clears-0
+  ruling); unlock emit, toast, recent push unchanged on movement
+  first-finds (pinned). Wire: count folds onto the first-find entry
+  ({clears?, count?}); pageId dropped end to end (old blobs load
+  clean, one-release tolerance; the view answers from the catalog);
+  reliquaryWireBlob renamed reliquaryWireJson, memoized behind two
+  state-identity WeakMaps (rev bumped by all four public writers;
+  mutation-scope scan guard in tests/architecture.test.ts forbids
+  reliquary state writes outside src/sim/reliquary.ts), served via
+  maybeRaw (maybeSerialized is invisible to the ALL_DELTA_KEYS
+  scraper). Ownership snapshot hoisted to one build per fill chain
+  (evaluation points preserved; premise pinned). Facet:
+  reliquaryObtainCounts data member (310/81/229; ClientWorld mirror +
+  bareClient default). UI: hudChrome.plurals.reliquaryObtainedTimes +
+  reliquaryCellOwnedObtainedAria + reliquaryCellOwnedClearsObtainedAria
+  (whole-sentence aria bases, {clears} separate so tPlural selects on
+  the inflecting count; five non-Latin fills in-change, 15 Latin
+  pending -> Phase 22); twelfth refresh-signature dimension
+  (reliquaryObtainCountsDigest) so an open window repaints on a tally
+  tick. Measured (pglz, two agreeing methods): production-absolute
+  +1,772 stored bytes (+17 percent) worst-case veteran row at the 30 s
+  autosave cadence; intra-branch counts cost 371 vs 881 saved by
+  dropping pageId + zero-clears. Doctrine: counts are information,
+  never a score (nothing consumes them). Rollback: a pre-Phase-17
+  binary ignores the count field and its first autosave wipes every
+  tally permanently (third unrecoverable loss category beside
+  provenance and recent). Records and observed gotchas (guild-bank
+  discovery gap, catalog-churn tally loss, insertion-order note,
+  re-ship cadence, craft/Marks-shop counting calls, dev-kit vs PBE
+  divergence): progress.md "Phase 17".
 - Phase 18: (pending)
 - Phase 19: (pending)
 - Phase 20: (pending)
@@ -550,7 +594,13 @@ rollover). Update this line as phases complete.
   release tip verified green first in a throwaway worktree). The branch's
   seed 1 / default 2 hunt is GONE; the file now carries only the release
   lineage, so future merges have one side and the caveat is retired.
-- RULING OPEN (Phase 12 arch review): a catalogued relic acquired while its page
+- RULING EXECUTED by Phase 17, 2026-08-08 (the entry below is kept for
+  provenance): the maintainer ruled OMIT AT ZERO, and Phase 17 widened it to
+  movement grants at ANY meter value (a market buy with 12 clears must not
+  stamp clears: 12; same fabricated-provenance class). Both surfaces (tooltip
+  and aria) lose the line when clears is absent; the tripwire test was
+  rewritten to pin the new behavior with a turned-over-meter contrast arm.
+  Original entry: a catalogued relic acquired while its page
   clear meter reads 0 (trade, auction, mail) stamps clears: 0 and renders "first
   found on clear 0". Absent (provenance unknown, matching the retro doctrine) may be
   righter. Current behavior is pinned in tests/reliquary_state.test.ts with a
@@ -733,7 +783,10 @@ rollover). Update this line as phases complete.
   sentence would drop the rows off the pending worklist forever), and the release-tier
   gate hard-fails on pending so it cannot ship. The ru retro plural leaves (the same
   number-invariant colon-genitive sentence x4) are flagged for a native-speaker pass
-  at release fill.
+  at release fill. Phase 17 adds to the worklist: the three obtain-count plural
+  bases (hudChrome.plurals.reliquaryObtainedTimes, reliquaryCellOwnedObtainedAria,
+  reliquaryCellOwnedClearsObtainedAria) pending in the 15 Latin locales (the five
+  non-Latin fills landed in-change per M16).
 - RESOLVED (Phase 11): the wiki shelf-name glossary conflict. One term per locale
   locked in scripts/i18n_glossary.json (reliquaryShelves row); see the Phase 11
   surfaces entry for the deviation rationale on Professions.
