@@ -52,11 +52,11 @@ describe('glub family bespoke attack (issue #2889 round 2)', () => {
     const floatingConstBlock = manifestBlock('const FLOATING: ClipMap = {', '};');
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
-    // Exactly 5 remaining direct `clips: FLOATING,` usages: mob_dragonkin,
-    // mob_choir_thrall, mob_demon_flying, mob_glimmerwisp, mob_duskwisp.
-    // mob_nightkin and mob_ghost already migrated off FLOATING on this
-    // branch's base; mob_glub migrates off it above.
+    // Exactly 4 remaining direct `clips: FLOATING,` usages: mob_dragonkin,
+    // mob_choir_thrall, mob_glimmerwisp, mob_duskwisp.
+    // mob_nightkin, mob_ghost, and mob_demon_flying already migrated off
+    // FLOATING on this branch's base; mob_glub migrates off it above.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(5);
+    expect(remaining).toBe(4);
   });
 });
