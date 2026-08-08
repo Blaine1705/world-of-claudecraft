@@ -12,7 +12,7 @@
 
 import type { DuelState } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DT, dist2d } from '../types';
+import { DT, dist2d, type Entity } from '../types';
 
 const DUEL_COUNTDOWN = 3;
 const DUEL_FORFEIT_DISTANCE = 60;
@@ -160,6 +160,26 @@ export function updateDuels(ctx: SimContext): void {
   }
 }
 
+/**
+ * Strip every aura on `target` whose source resolves, through `pvpController`,
+ * to the player `controllerPid`: the opponent themselves and anything they
+ * control. Delegates the removal to `clearAurasFromSource` per distinct source
+ * so the fade events and the stat recalc stay that function's business.
+ */
+function clearAurasFromController(
+  ctx: SimContext,
+  target: Entity | undefined,
+  controllerPid: number,
+): void {
+  if (!target) return;
+  const sources = new Set<number>();
+  for (const a of target.auras) {
+    const src = ctx.entities.get(a.sourceId);
+    if (src && ctx.pvpController(src)?.id === controllerPid) sources.add(a.sourceId);
+  }
+  for (const sourceId of sources) ctx.clearAurasFromSource(target, sourceId);
+}
+
 // winnerPid null = draw/cancelled
 export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | null): void {
   // Idempotent: a same-tick reciprocal lethal hit re-enters here after the
@@ -179,8 +199,15 @@ export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | nu
       e.autoAttack = false;
     }
   }
-  if (ea) ctx.clearAurasFromSource(ea, duel.b);
-  if (eb) ctx.clearAurasFromSource(eb, duel.a);
+  // Clear what the OPPONENT did, using the same definition of "the opponent"
+  // the lethal clamp uses. The clamp resolves a damage source through
+  // pvpController, so anything the opponent controls (their pet) cannot kill a
+  // duelist for the whole bout; clearing only auras stamped with the opponent's
+  // own entity id left a pet's dot ticking on a body handed back at 1 hp with no
+  // clamp left, and the next tick killed for real. Two halves of one duel must
+  // not disagree about whose doing something was.
+  clearAurasFromController(ctx, ea, duel.b);
+  clearAurasFromController(ctx, eb, duel.a);
   if (winnerPid !== null && aMeta && bMeta) {
     const winner = winnerPid === duel.a ? aMeta : bMeta;
     const loser = winnerPid === duel.a ? bMeta : aMeta;
