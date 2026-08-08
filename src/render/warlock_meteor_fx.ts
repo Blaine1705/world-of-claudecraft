@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   felMeteorHash01 as hash01,
   planRainMeteorShower,
@@ -26,7 +26,10 @@ const MAX_COSMETIC_SHOWERS = 12;
 export const POWERFUL_FEL_METEOR_TEXTURE_URL = '/vfx/fel_meteor_impact.png';
 
 let powerfulFelMeteorTexture: THREE.Texture | null = null;
-registerPreload(
+// Deferred, never eager: a module-import registerPreload joins the launch
+// fetch burst and re-opens the WKWebView OOM lane the deferred gate exists
+// to prevent (tests/defer_launcher_preloads.test.ts pins the sanctioned set).
+registerDeferredPreload(() =>
   loadTexture(POWERFUL_FEL_METEOR_TEXTURE_URL, { srgb: true }).then((texture) => {
     powerfulFelMeteorTexture = texture;
     return texture;

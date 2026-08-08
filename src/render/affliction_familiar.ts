@@ -8,7 +8,7 @@ import {
   writeAfflictionFamiliarPose,
 } from './affliction_familiar_core';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 
 const MODEL_HEIGHT = 0.65;
 const MODEL_FORWARD_YAW = -Math.PI / 2;
@@ -17,7 +17,10 @@ const MODEL_URL = '/models/props/maledict_eye.glb';
 let loadedMaledictEye: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  // Deferred, never eager: a module-import registerPreload joins the launch
+  // fetch burst and re-opens the WKWebView OOM lane the deferred gate exists
+  // to prevent (tests/defer_launcher_preloads.test.ts pins the sanctioned set).
+  registerDeferredPreload(() =>
     loadGltf(MODEL_URL).then((gltf) => {
       loadedMaledictEye = gltf.scene;
     }),
