@@ -326,6 +326,9 @@
       "electron-winstaller",
       "fsevents",
       "@reown/appkit"
-    ]
+    ],
+    "patchedDependencies": {
+      "three@0.165.0": "patches/three@0.165.0.patch"
+    }
   }
 }
