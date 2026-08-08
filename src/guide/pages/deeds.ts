@@ -1,7 +1,8 @@
 // The Book of Deeds. A spoiler-safe overview of the achievements system: how deeds are
 // earned and shown, what the Book itself puts in front of you (categories, the recent
 // strip, rarity, deed links), what Renown is, the cosmetic titles and borders, the
-// per-zone Chronicles and their Chroniclers, and the Feats shelf, followed by the full
+// per-zone Chronicles and their Chroniclers, the Steam and Epic achievement mirror, and
+// the Feats shelf, followed by the full
 // public catalog by category. Hidden deeds are filtered out upstream by the generator, so nothing
 // secret can reach this page. Every deed's criteria live in the in-game Book of Deeds; the
 // wiki lists names, Renown, and rewards only, keeping instanced spoilers off the public
@@ -128,6 +129,11 @@ export const deeds: GuidePage = {
         <section class="guide-block">
           <h2>${esc(t('guide.deedsPage.rewardsHeading'))}</h2>
           <p>${esc(t('guide.deedsPage.rewardsBody'))}</p>
+        </section>
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.deedsPage.platformHeading'))}</h2>
+          <p>${esc(t('guide.deedsPage.platformBody'))}</p>
         </section>
 
         <section class="guide-block">

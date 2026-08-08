@@ -3657,7 +3657,13 @@ export const id_ID: EnTranslations = {
       "step0Title": "Get in",
       "step0Body": "Offline play asks for nothing: choose Offline on the start screen and press Play. To play with everyone else, make a free account (a username, a password, and an email address for recovery) or sign in to the one you have, then pick a world from the World List.",
       "worldsTitle": "Choosing a world",
-      "worldsBody": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. The World List shows how busy each world is, from Low to Full, so pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one."
+      "worldsBody": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. The World List shows how busy each world is, from Low to Full, so pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
+      "charactersTitle": "Your characters",
+      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
+      "namesTitle": "Naming your hero",
+      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
+      "connectionTitle": "If your connection drops",
+      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
     },
     "controls": {
       "intro": "Tombol bawaan untuk desktop. Setiap pengaturan tombol dapat diubah di opsi permainan, kecuali Esc, yang selalu membuka menu permainan, dan sebuah pengaturan tombol bisa berupa kombinasi pengubah seperti Shift+Z.",
@@ -3702,7 +3708,8 @@ export const id_ID: EnTranslations = {
       "attackMove": "Attack Move (only once you switch the option on)",
       "meters": "Damage meters (damage, healing, and threat)",
       "petMark": "Pet: Mark, select your own pet (the same as clicking its frame)",
-      "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard."
+      "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.",
+      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
     },
     "settingsPage": {
       "heading": "Pengaturan & Kinerja",
@@ -4188,7 +4195,15 @@ export const id_ID: EnTranslations = {
       "q15": "Do I need an account?",
       "a15": "Only to play online. The offline world asks for nothing: choose Offline on the start screen and press Play. An online account is free, takes a username, a password, and an email address for account recovery, and keeps your characters saved on the server. Once you have one you can turn on two-factor authentication from the options.",
       "q16": "What is a world?",
-      "a16": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. When you sign in, the World List shows how busy each world is, from Low to Full, so you can pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one."
+      "a16": "Online play happens on worlds, and each one is a full copy of the game with its own players, its own World Market, and its own standings. When you sign in, the World List shows how busy each world is, from Low to Full, so you can pick a quiet one for elbow room or a busy one for company. Your characters live on the world you made them on, and you can keep characters on more than one.",
+      "q17": "How many characters can I have, and can I delete one?",
+      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
+      "q18": "Can I change my character's name?",
+      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
+      "q19": "What happens if I get disconnected?",
+      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
+      "q20": "I found a bug. How do I report it?",
+      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
     },
     "classList": {
       "heading": "Sembilan kelas",
@@ -4779,7 +4794,9 @@ export const id_ID: EnTranslations = {
         "feat": "Mahajasa"
       },
       "bookHeading": "Inside the Book",
-      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear."
+      "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.",
+      "platformHeading": "Steam and Epic achievements",
+      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
     },
     "wishPage": {
       "heading": "Hal-hal yang andai kuketahui dulu",

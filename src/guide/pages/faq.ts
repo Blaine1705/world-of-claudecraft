@@ -20,13 +20,17 @@ const QA: { q: TranslationKey; a: TranslationKey; cap?: boolean; zones?: boolean
   { q: 'guide.faqPage.q4', a: 'guide.faqPage.a4' },
   { q: 'guide.faqPage.q15', a: 'guide.faqPage.a15' },
   { q: 'guide.faqPage.q16', a: 'guide.faqPage.a16' },
+  { q: 'guide.faqPage.q17', a: 'guide.faqPage.a17' },
+  { q: 'guide.faqPage.q18', a: 'guide.faqPage.a18' },
   { q: 'guide.faqPage.q5', a: 'guide.faqPage.a5' },
   { q: 'guide.faqPage.q6', a: 'guide.faqPage.a6', cap: true, zones: true },
   { q: 'guide.faqPage.q7', a: 'guide.faqPage.a7' },
+  { q: 'guide.faqPage.q19', a: 'guide.faqPage.a19' },
   { q: 'guide.faqPage.q8', a: 'guide.faqPage.a8' },
   { q: 'guide.faqPage.q9', a: 'guide.faqPage.a9' },
   { q: 'guide.faqPage.q10', a: 'guide.faqPage.a10', cap: true },
   { q: 'guide.faqPage.q11', a: 'guide.faqPage.a11' },
+  { q: 'guide.faqPage.q20', a: 'guide.faqPage.a20' },
 ];
 
 export const faq: GuidePage = {

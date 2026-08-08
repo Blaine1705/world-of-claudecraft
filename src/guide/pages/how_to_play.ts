@@ -27,6 +27,9 @@ const BASICS = [
   ['guide.howToPlay.groupingTitle', 'guide.howToPlay.groupingBody'],
   ['guide.howToPlay.onlineTitle', 'guide.howToPlay.onlineBody'],
   ['guide.howToPlay.worldsTitle', 'guide.howToPlay.worldsBody'],
+  ['guide.howToPlay.charactersTitle', 'guide.howToPlay.charactersBody'],
+  ['guide.howToPlay.namesTitle', 'guide.howToPlay.namesBody'],
+  ['guide.howToPlay.connectionTitle', 'guide.howToPlay.connectionBody'],
 ] as const;
 
 export const howToPlay: GuidePage = {

@@ -124,6 +124,7 @@ export const controls: GuidePage = {
         ${lead('guide.controls.intro')}
         ${groups}
         <p>${esc(t('guide.controls.swimNote'))}</p>
+        <p>${esc(t('guide.controls.clickMoveNote'))}</p>
         <p>${esc(t('guide.controls.attackMoveNote'))}</p>
         <p>${esc(t('guide.controls.onBarBinding'))}</p>
         <section class="guide-block">

@@ -1179,6 +1179,39 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
   });
 
+  // Second wave of absent rows, found by auditing the whole table against BIND_ACTIONS:
+  // swimming had no key at all, the battleground flag action was undocumented on a page
+  // that describes flag play, damage meters were missing, and the Pet group showed five
+  // of six binds. Same contract as above: a changed shipped default reds this test rather
+  // than silently drifting the public reference.
+  it('documents Swim Down, the arrow-key alternates, the flag action, meters, and Pet: Mark', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>LCtrl</kbd></td><td>Swim down while you are in the water (hold)');
+    expect(html).toContain('<kbd>Arrow Keys</kbd>');
+    expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
+    expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
+    expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+  });
+
+  it('keeps the second-wave binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('dive')).toEqual(['ControlLeft']);
+    expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
+    expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
+    expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    // The arrow keys are the SECOND default of the four movement actions, which is the
+    // whole claim the Arrow Keys row makes.
+    expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
+    expect(defaults.get('back')).toEqual(['KeyS', 'ArrowDown']);
+    expect(defaults.get('turnLeft')).toEqual(['KeyA', 'ArrowLeft']);
+    expect(defaults.get('turnRight')).toEqual(['KeyD', 'ArrowRight']);
+  });
+
   it('keeps those five binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
