@@ -412,7 +412,7 @@ const ENEMY7: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
-  hit: ['HitRecieve'],
+  hit: ['HitRecieve', 'HitRecieve_Heavy'],
   death: 'Death',
 };
 
@@ -1682,7 +1682,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
-    animUrls: [`${CREATURES}/kobold_ability_anims.glb`],
+    animUrls: [
+      `${CREATURES}/goblin_hit_variety_anims.glb`,
+      `${CREATURES}/kobold_ability_anims.glb`,
+    ],
     clips: KOBOLD_ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
@@ -1721,6 +1724,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_ogre: {
     url: `${CREATURES}/giant.glb`,
+    animUrls: [`${CREATURES}/giant_hit_variety_anims.glb`],
     height: 2.8,
     clips: ENEMY7,
     tint: 'entity',
