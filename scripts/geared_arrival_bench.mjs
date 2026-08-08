@@ -29,6 +29,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const PORT = Number(process.env.BENCH_PORT ?? 5198);
@@ -41,6 +42,10 @@ const DB_URL =
   process.env.DATABASE_URL ?? 'postgres://eastbrook:change-me@127.0.0.1:5433/eastbrook';
 const BOOT_TIMEOUT_MS = Number(process.env.BENCH_BOOT_TIMEOUT_MS ?? 240000);
 const WAVE_MS = Number(process.env.BENCH_WAVE_MS ?? 12000);
+// This bench mints accounts, grants skins straight into Postgres, and drives
+// /dev cheats: every target must be local, always.
+assertLoopbackUrl(SERVER, 'SERVER_URL');
+assertLoopbackDatabaseUrl(DB_URL);
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const OUT = process.env.BENCH_OUT ?? path.join('tmp', `geared-arrival-${LABEL}-${stamp}.json`);
 

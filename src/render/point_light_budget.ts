@@ -95,20 +95,22 @@ export function applyPointLightBudget(
   }
   // Sort whenever the live budget (which can sit below visibleCount under the
   // frame-budget governor or on constrained-memory tiers) actually truncates
-  // the ranked list, and whenever an ineligible light exists (it must not hold
-  // a counted slot, so eligible entries sort ahead of it). Comparing against
-  // visibleCount alone let array order, not distance, decide which lights
-  // shine whenever liveBudget < ranked.length <= visibleCount.
-  if (ranked.length > liveBudget || ineligible > 0) {
+  // the ranked list. Comparing against visibleCount alone let array order,
+  // not distance, decide which lights shine whenever
+  // liveBudget < ranked.length <= visibleCount. Ineligible entries sort to
+  // the tail so they never hold a counted slot; on the untruncated path they
+  // are skipped by the running counter instead, so a hidden ancestor never
+  // forces a per-frame sort of its own (the hot path stays allocation-free).
+  if (ranked.length > liveBudget) {
     ranked.sort((a, b) => Number(!a.eligible) - Number(!b.eligible) || a.d2 - b.d2);
   }
   let drawn = 0;
   for (let index = 0; index < ranked.length; index++) {
     const entry = ranked[index];
-    const counted = entry.eligible !== false && index < visibleCount;
+    const counted = entry.eligible !== false && drawn < visibleCount;
     if (counted) drawn++;
     entry.light.visible = counted;
-    const shine = counted && index < liveBudget && entry.d2 < rangeSq;
+    const shine = counted && drawn <= liveBudget && entry.d2 < rangeSq;
     if (entry.dynamic) {
       if (!shine) entry.light.intensity = 0;
     } else if (entry.base !== null) {

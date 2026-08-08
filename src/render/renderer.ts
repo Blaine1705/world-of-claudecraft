@@ -6111,10 +6111,12 @@ export class Renderer {
         // Weapon-skin rarity VFX: the rigs are worn by OTHER players, so their
         // programs otherwise link the first time a skinned player walks into
         // view, mid-gameplay, on top of the rig build itself (the reported
-        // connection freeze). One hidden synthetic rig covers every component
-        // family, and the shader sources carry no authored values, so it
-        // compiles the exact keys the live rigs ask for later. The sky dome is
-        // deliberately not warmed: the world path builds none.
+        // connection freeze). One hidden rig per REAL WEAPON_VFX catalog spec,
+        // built through the worn path ({ grounded: false }): a synthetic
+        // per-family rig was tried first and still left ~108 first-sight
+        // program links, because the component mix differs per spec and each
+        // mix links its own program set. The sky dome is deliberately not
+        // warmed: the world path builds none.
         id: 'vfx.weapon-skins',
         category: 'vfx',
         priority: 61,

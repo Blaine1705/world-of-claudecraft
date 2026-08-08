@@ -246,6 +246,22 @@ describe('applyPointLightBudget', () => {
     });
   });
 
+  it('wires the drawn-count pin: scene root in, pads on the drawn count out', () => {
+    // The whole-scene relink fix has two wiring halves that no unit case can
+    // see: the renderer must pass its scene so ancestry is checked against the
+    // real root, and the pads must fill against the DRAWN count, not the
+    // chosen count. Dropping either silently reinstates the arrival freeze.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const methodStart = source.indexOf('private budgetFireLights(');
+    const methodEnd = source.indexOf('// light shafts fade', methodStart);
+    const method = source.slice(methodStart, methodEnd);
+
+    expect(method).toContain('const drawnCount = applyPointLightBudget(');
+    expect(method).toContain('this.scene,');
+    expect(method).toContain('pointLightPadCount(drawnCount, visibleCount)');
+    expect(method).not.toContain('pointLightPadCount(ranked.length');
+  });
+
   it('wires contributor flicker after the renderer completes selection', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const methodStart = source.indexOf('private budgetFireLights(');

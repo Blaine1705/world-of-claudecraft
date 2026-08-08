@@ -151,6 +151,8 @@ describe('assertLoopbackDatabaseUrl', () => {
 const GUARDED_SCRIPTS = [
   'scripts/admin_guild_bank_shot.mjs',
   'scripts/admin_professions_shot.mjs',
+  'scripts/catalog_program_census.mjs',
+  'scripts/geared_arrival_bench.mjs',
   'scripts/load_players.mjs',
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
