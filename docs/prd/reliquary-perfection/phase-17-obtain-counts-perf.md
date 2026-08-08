@@ -22,7 +22,8 @@ STEP 1 - LOAD CONTEXT (Explore agent): state.md, progress.md;
 src/sim/reliquary.ts (state shape, serialize/restore, onItemDiscovered,
 characterReliquaryOwnership, reliquaryWireBlob), src/sim/deeds.ts markItemDiscovered
 (fires once per id: counts need a DIFFERENT hook point: find the addItem/
-addItemInstance grant sites in src/sim/sim.ts:8201/:8270 and items.ts buyback),
+addItemInstance grant sites in src/sim/sim.ts (grep the method names; their
+offsets rot with every release sync) and items.ts buyback),
 server/game.ts reliq encode + heavy-self cadence, src/net/online.ts reliq decode,
 src/ui/reliquary_window.ts cellTooltipHtml + refreshIfChanged/sigFromInput,
 docs/design/reliquary.md (the performance contract table + deliberately-deferred list),

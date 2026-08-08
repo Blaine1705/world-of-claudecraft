@@ -1,13 +1,17 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 16 COMPLETE (2026-08-08), LOCAL ONLY, not pushed (the
-Phase 16 QA session owns the push). The remote tip is 86d9dafe70 (the
-Phase 15 QA push d757d7423f plus its moving-base catch-up merge); local
-work sits on top of the Phase 16 sync merge ecdacc8769
-(origin/release/v0.36.0 tip 4fe38b799d). gate_select fully green at the
-Phase 15 QA close; any new red is Phase 16's. Next: Phase 16 QA (fresh
-session, ultracode). Base is release/v0.36.0 (PR #2976 retargeted at the
-2026-08-07 rollover). Update this line as phases complete.
+Current phase: 16 + 16 QA COMPLETE (2026-08-08), pushed to
+origin/feature/reliquary (PR #2976) by the QA session. The tree sits on
+the second Phase 16 sync merge 75dca4ba7c (origin/release/v0.36.0 tip
+6ed4d7e12c; parity 309/80/229, delta keys 68 with ptime + reliq) plus
+the QA fix rounds (opaque-art carve-out re-key, forced-colors arm,
+bareClient defaults sweep). QA verdict PASS-WITH-FOLLOWUPS (mobile 695
+hudHotDomWrites vs the 640 anchor, attributed cross-release, owned by
+the Phase 17 perf phase; two inherited mobile E2E failure families
+recorded in progress.md). Next: Phase 17 (obtain counts + wire perf;
+the clears-0 provenance ruling is DUE before it ships obtain counts).
+Base is release/v0.36.0 (PR #2976 retargeted at the 2026-08-07
+rollover). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -67,23 +71,25 @@ session, ultracode). Base is release/v0.36.0 (PR #2976 retargeted at the
 - Catalog: src/sim/content/reliquary.ts (pages, RELIQUARY_HORIZON_TITLES,
   RELIQUARY_ITEM_TO_PAGES). Runtime: src/sim/reliquary.ts (state, onItemDiscovered,
   noteReliquaryMark, CURATOR_RANK_DEFS, syncCuratorRankDeeds, pushRecent, serialize/
-  restore). Discovery hub: src/sim/deeds.ts markItemDiscovered (:531) +
-  seedItemDiscovery (:1089). Facet: src/world_api/reliquary.ts (7 members).
-- Wire: server/game.ts maybe('reliq', ...) ~:8467, HEAVY_SELF_EVENTS ~:749, retro
-  fan-out gate ~:8655; client mirror src/net/online.ts ~:3435-3442, completion reads
-  ~:4863-4875.
+  restore). Discovery hub: src/sim/deeds.ts (markItemDiscovered, seedItemDiscovery).
+  Facet: src/world_api/reliquary.ts (7 members).
+- Wire: server/game.ts (the maybe('reliq', ...) emit inside the heavy self gate,
+  HEAVY_SELF_EVENTS, the retro fan-out gate); client mirror src/net/online.ts (the
+  s.reliq self-decode block and the reliquaryPageCompletion reads). Line numbers rot
+  across release syncs: grep the symbol, never trust a recorded offset.
 - UI: src/ui/reliquary_view.ts (pure core, UI_PURE_CORES), src/ui/reliquary_window.ts
   (cold painter, COLD_PAINTER_ALLOWANCES, reflowAllow scrollTop x2),
-  src/ui/reliquary_sheet_view.ts, hud wiring src/ui/hud.ts (handleReliquaryUnlocks
-  ~:13205, progression block ~:15817, border badge row ~:15788).
+  src/ui/reliquary_cell_art.ts (per-kind art resolver + reliquaryCellArtOpaque, bare
+  core in all three lists), src/ui/reliquary_sheet_view.ts, hud wiring src/ui/hud.ts
+  (handleReliquaryUnlocks, the progression block, the border badge row).
 - Server sheet: server/character_sheet.ts (SheetReliquary, CURATOR_RANK_ENGLISH),
   server/profile_page.ts (:149-155, :214-215).
 - Deeds exemplars: src/ui/deeds_window.ts (openWithDeed), src/ui/hud/chat/
   deed_chat_line.ts (clickable chat), deed tracker painter + #deed-tracker, deed_i18n.ts
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
 - Guards: tests/architecture.test.ts (UI_PURE_CORES x3 lists), tests/
-  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (307/79/228 since the
-  Phase 14 v0.36.0 sync re-union, facet 33),
+  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (309/80/229 since the
+  Phase 16 QA second sync brought the release's playtimeSeconds, facet 33),
   tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
 
 ## Surfaces added by this packet (append per phase as they land)
@@ -490,6 +496,22 @@ session, ultracode). Base is release/v0.36.0 (PR #2976 retargeted at the
   reliquaryRelicPageId/PageIndex (2 call sites each, rule of three not
   met). Brief corrections recorded: 9 mounts not 12; no ghost marker
   class exists.
+- Phase 16 QA: COMPLETE (2026-08-08), full record in progress.md. Second
+  sync 75dca4ba7c (release tip 6ed4d7e12c; parity 309/80/229 with the
+  release's playtimeSeconds, delta keys 68, guide regen after the honor
+  title recut, char_window rig + bareClient drift fixes).
+  release-merge-audit CLEAN after fixes; cross-platform-sync PASS. The QA
+  find: category-fallback title crests flat-tiled under the silhouette
+  filter; the carve-out now keys on data-cell-art="opaque" stamped from
+  reliquaryCellArtOpaque (Armory urls + procedural crests via
+  deedCrestHasPaintedArt), with a forced-colors arm (filters drop, dashed
+  missing cue) probed at runtime, per-family opacity premise byte-pinned
+  (shared tests/helpers/webp_header.ts; chrome_icons' VP8L alpha bit
+  fixed), the item family exempt as dark-card by premise with a sweep
+  that reds on the first procedural item relic, and bareClient's
+  every-default claim enforced (28 accreted fields mirrored). perf:tour
+  and the mobile E2E suite executed: two inherited failure families and
+  the mobile 695-vs-640 write anchor recorded as Phase 17 follow-ups.
 - Phase 17: (pending)
 - Phase 18: (pending)
 - Phase 19: (pending)

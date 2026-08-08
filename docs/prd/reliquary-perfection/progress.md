@@ -1302,3 +1302,116 @@ owns the push.
   (sharp is deterministic; the title element does not raster), so the
   pinned pair is genuinely produced from the pinned source and no hash
   moved.
+
+## Phase 16 QA (2026-08-08): Verify launcher + cell art
+
+- Pre-flight: HEAD a4537e14e9, clean, 7 ahead of the remote tip 86d9dafe70,
+  exactly as the Phase 16 close recorded. Open rulings surfaced at start and
+  close, none decided this session: mounts-place + heroic difficulty
+  (together), quest class-gate (wyrmcult_grand_robe), native-shell
+  sourceStore, clears-0 provenance (due before Phase 17 ships obtain
+  counts), compact-tier minimap/clock collision, drift-drain banner raw wire
+  page id.
+- Second sync merge 75dca4ba7c (origin/release/v0.36.0 tip 6ed4d7e12c,
+  incoming 400 files: gate-perf test trims, bespoke mob anim clips, KTX2
+  atlases, character-sheet playtime, the IP-safe honor title recut).
+  Conflict resolution: parity pins to 309/80/229 (playtimeSeconds joins the
+  pure-release 302), delta keys to 68 (both sides added one: ptime and
+  reliq), plural bases merge the playtime trio beside the reliquary trio,
+  online.ts keeps the reliq self-decode block and adds the ptime mirror,
+  pending.ts + translation_keys regenerated via i18n:gen. Post-merge drift
+  fixes: 984c938c24 (release playtime test rig lacked the branch's
+  openReliquary dep; tsc caught it), 8467a8b6a1 (guide regen: the recut
+  renamed three honor titles to Linebreaker / Fieldreaver / Warcrowned and
+  the branch-generated GUIDE_RELIQUARY still carried the old names).
+- release-merge-audit (7-dimension workflow, 777k tokens): one blocking
+  (the guide regen above), bare_client playtimeSeconds mirror, the
+  release's dangling deeds.ts comment fragment (applied), doc anchor rot
+  (state.md parity row, wire/hud line offsets, phase-17 addItem offsets:
+  all de-rotted to symbol anchors). Cleared: sim/server/ui overlaps read
+  against both parents with nothing dropped, deed ids and crest derivation
+  unaffected by the recut (names only), parity/goldens/i18n bundles clean.
+  cross-platform-sync over the merge: PASS, zero should-fix; notes
+  recorded: RL env supplies no calendar (pre-existing arm), playtime
+  precision differs per host by design (snapshots pin renders them
+  identically), ReliquaryFirstFind / ReliquaryFirstFindView dual naming.
+- Visual QA on a warm dev server (fresh vite on 127.0.0.1:5203, pixels not
+  DOM, rect + elementFromPoint gates, overlays cleared per shot): launcher
+  crown verified in the desktop rail beside its siblings and in the mobile
+  More tray at 3x; contact sheet vs siblings at 128px and 24px on dark and
+  light plates (style-coherent, silhouette legible; the crown vs the Ranks
+  podium-crown at tray size ruled distinct enough). Every kind verified in
+  BOTH states: mounts 9/9 owned via /dev mounts (reins art, Illuminated
+  badge) and missing (dark silhouettes); skins 29/29 owned (staged through
+  accountCosmetics.weaponSkinIds; full-color cards) and missing (grayscale
+  carve-out, weapon shapes legible at 34px mobile cells); titles owned
+  (six painted crests staged through the deed surfaces) and missing;
+  marks 6/6 owned and missing; field notes 4/4 owned including the
+  authored specimen flask (reads as a flask at cell size beside its three
+  borrowed-profession neighbors); a Conquerors item page missing state
+  (dark-card item ghosts read correctly).
+- The QA round's real find: the missing-state carve-out was keyed on the
+  weapon_skin kind literal, and the seven category-fallback title crests
+  (deed_cat_* procedural composites, opaque by construction) rendered as
+  flat tinted tiles, confirmed on pixels. Fixed across three reviewed
+  rounds (7af2ca97f5, 4dfa89db66, 3ec72deab8): the window stamps
+  data-cell-art="opaque" from the resolver's own family answer
+  (reliquaryCellArtOpaque: Armory prefix for urls, painted-art MEMBERSHIP
+  via deedCrestHasPaintedArt for crests, so a bespoke crest whose art
+  trails also rides it), the CSS keys on the attribute, and forced-colors
+  drops the filters plus gains a dashed missing cue (box-shadow, the owned
+  ring, is stripped there), verified at runtime via a CDP emulated-media
+  probe (filters none, border dashed).
+- Premise pins the fix round added: the per-family opacity premise read
+  off the shipped WebP headers (professions + painted deed crests all
+  alpha; Armory all opaque; helper shared in tests/helpers/webp_header.ts,
+  which also fixed chrome_icons' VP8L alpha read that masked a height
+  bit); every catalogued item relic must resolve to a committed dark-card
+  pipeline (items webp or weapons jpg), so the first procedural item relic
+  reds instead of landing on the wrong filter. ACCEPTED GAP, recorded: the
+  item family is exempt from the opacity attribute because both of its
+  committed pipelines are dark-card (weapons jpgs measured mean luma
+  ~25/255) and 643 of 698 item webps carry no alpha, so an alpha rule
+  cannot express the real premise (bright vs dark backgrounds); an item-art
+  restyle to bright cards would need the predicate extended, and only the
+  premise sweep would notice. A review claim that 13 Conquerors weapons
+  composite procedurally was REFUTED with the file open: all 13 resolve
+  through ITEM_WEAPON_VARIANTS to /ui/weapons rendered thumbnails.
+- Reviewer rounds (all findings applied or recorded, none silently
+  dropped): frontend-seam on the phase (0 blocking / 4 should-fix / 9
+  nice-to-have), qa-checklist READY (1 should-fix: this record), fix-round
+  frontend-seam (0 blocking / 6 should-fix / 8 nice-to-have; the
+  procedural-crest and item-family generalizations above came from it),
+  test-coverage-auditor on the fix round (PASS with one blocking test gap:
+  the forced-colors pin was not decisive; closed content-bound), plus a
+  fresh coverage pass over the closing round. bareClient's "mirrors every
+  class-field default" claim is now ENFORCED
+  (tests/bare_client_defaults.test.ts); the sweep surfaced 28 accreted
+  fields beyond playtimeSeconds, all mirrored, 69 consuming suites green.
+- Deferred VERIFY items executed: npm run perf:tour desktop + mobile
+  (swiftshader, both viewports): skip rates 0.984 / 0.982 vs the 0.96
+  floor, desktop hudHotDomWrites 602 within the 640 anchor; mobile 695
+  EXCEEDS the 640 anchor. Phase 16 adds no per-frame surface (cold window,
+  hud_perf_budget green), so this reads as accumulated growth across
+  releases plus low-tier variance under software GL; FOLLOW-UP for the
+  Phase 17 perf phase: attribute and either shed writes or re-capture the
+  anchor on the baseline machine. FCT pool cap-bounded at the low tier.
+  scripts/mobile_*.mjs: tray overflow OK (22 buttons, all reachable, the
+  Reliquary row among them); hud overlap audit green on the surfaces this
+  packet touches, 4 violations in the chat keyboard-dock family and
+  cluster check 9 violations on mobile-autorun visibility, BOTH inherited:
+  the branch diff over the whole packet touches neither the keyboard
+  applier nor the autorun control (screenshots aside), recorded here
+  rather than silently re-pinned.
+- Evidence: docs/screenshots/reliquary-phase16/ gains the mobile skins and
+  titles missing states at 3x, the field-notes page, a forced-colors
+  record shot, and re-shot titles-desktop (seeded at 2x so it pairs with
+  its before again; the earlier Phase 16 claim that the titles page shows
+  both owned-crest tiers holds in the re-shot frame) and mounts-mobile
+  (full window; the prior capture clipped the grid at the fold).
+  Capture-scale note: the new mobile shots are 932x430 at 3x.
+- Validation at the tip: tsc clean; the reliquary/deeds/chrome suites, the
+  conflict-pin suites, and all 69 bareClient consumers green
+  (1173 tests); node scripts/gate_select.mjs run with TURBO_FORCE=1 (the
+  turbo i18n input-list fix has not merged to this branch; a warm shared
+  cache can replay stale bundles) - result recorded below after the run.
