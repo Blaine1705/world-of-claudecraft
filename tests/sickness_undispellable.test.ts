@@ -192,70 +192,11 @@ describe('the flag reaches the online client', () => {
   });
 });
 
-describe('warlock Voidfeast cannot devour a sickness', () => {
-  it.each(['resurrection', 'unstuck'] as const)(
-    'refuses the self-cast on %s sickness before billing',
-    (which) => {
-      const { sim, p, events } = rig('warlock', 'wlk_r8_voidfeast');
-      sicken(sim, p, which);
-      const manaBefore = p.resource;
-      const hpBefore = p.hp;
-      sim.targetEntity(p.id);
-      sim.castAbility('voidfeast');
-      sim.tick();
-      expect(
-        events.some((e) => e.type === 'error' && /nothing to devour/i.test(e.text ?? '')),
-      ).toBe(true);
-      expect(has(p, idOf(which))).toBe(true);
-      // The gate refuses before billing, so the 6% devour heal never pays out either.
-      expect(p.resource).toBe(manaBefore);
-      expect(p.cooldowns.has('voidfeast')).toBe(false);
-      expect(p.hp).toBe(hpBefore);
-    },
-  );
-
-  it('refuses an ally carrying only Resurrection Sickness', () => {
-    const sim = new Sim({
-      seed: 7,
-      playerClass: 'warlock',
-      autoEquip: true,
-      noPlayer: true,
-    }) as AnySim;
-    const lockId = sim.addPlayer('warlock', 'Lock') as number;
-    const allyId = sim.addPlayer('warrior', 'Ally') as number;
-    sim.setPlayerLevel(12, lockId);
-    sim.setPlayerLevel(12, allyId);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'wlk_r8_voidfeast' } }, lockId)).toBe(true);
-    const lock = sim.entities.get(lockId) as Entity;
-    const ally = sim.entities.get(allyId) as Entity;
-    ally.pos = { ...lock.pos, x: lock.pos.x + 2 };
-    ally.prevPos = { ...ally.pos };
-    sim.rebucket(ally);
-    lock.resource = lock.maxResource;
-    applyResurrectionSickness(sim.ctx, ally);
-    const manaBefore = lock.resource;
-    sim.targetEntity(allyId, lockId);
-    sim.castAbility('voidfeast', lockId);
-    for (let i = 0; i < 15; i++) sim.tick();
-    expect(has(ally, RESURRECTION_SICKNESS_ID)).toBe(true);
-    expect(lock.resource).toBe(manaBefore);
-    expect(lock.cooldowns.has('voidfeast')).toBe(false);
-  });
-
-  it('still devours an ordinary debuff sitting under a sickness', () => {
-    const { sim, p } = rig('warlock', 'wlk_r8_voidfeast');
-    // Order matters: the dispel executor scans from the END of the aura array and
-    // stops at its `count`, so the sickness must be the FIRST candidate it meets.
-    // With the wail pushed last the test would pass with no fix at all.
-    p.auras.push(witheringWail(p.id));
-    sicken(sim, p, 'resurrection');
-    sim.targetEntity(p.id);
-    sim.castAbility('voidfeast');
-    for (let i = 0; i < 15; i++) sim.tick();
-    expect(has(p, 'test_withering_wail')).toBe(false);
-    expect(has(p, RESURRECTION_SICKNESS_ID)).toBe(true);
-  });
-});
+// The warlock devour (Voidfeast) was deliberately retired by the three-spec
+// overhaul (PR #2742: the row-8 option became Abyssal Gag / spell_lock, and
+// the def survives hidden for persisted action bars only); no warlock arm
+// exists for this invariant. Mage Spellsteal and Cold Coffin, covered below,
+// are the surviving dispel surfaces.
 
 // The arena/fiesta clean slate wipes every aura outright (readyArenaFighter), which
 // is deliberate: nobody should fight a normalized bout at a quarter of their stats.

@@ -22,6 +22,11 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'voidfeast',
     name: 'Voidfeast',
     class: 'warlock',
+    // RETIRED by the three-spec overhaul (PR #2742): the row-8 option that
+    // granted it was consciously repurposed into Abyssal Gag (spell_lock) and
+    // no other grant exists. The def stays, hidden, so persisted action bars
+    // can identify and discard it (the same contract death_coil above uses).
+    hiddenFromPlayer: true,
     learnLevel: 8,
     cost: 35,
     castTime: 0,
