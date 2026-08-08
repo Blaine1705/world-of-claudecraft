@@ -1725,7 +1725,7 @@ export function tintedMaterial(
       });
     }
   }
-  if (tint !== null) {
+  if (tint !== null && mat.color) {
     // subtle pull toward the template color — hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
