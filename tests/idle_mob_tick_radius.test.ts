@@ -51,6 +51,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer, INTEREST_DROP_RADIUS } from '../server/game';
+import { ENTITY_VIEW_DESTROY_RANGE } from '../src/render/renderer';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { Sim } from '../src/sim/sim';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
@@ -82,6 +83,9 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     const server = new GameServer();
     expect(server.sim.cfg.idleMobTickRadius).toBe(INTEREST_DROP_RADIUS);
     expect(INTEREST_DROP_RADIUS).toBe(PLAYER_INTEREST_DROP_RADIUS);
+    expect(PLAYER_INTEREST_DROP_RADIUS).toBe(100);
+    expect(ENTITY_VIEW_DESTROY_RANGE).toBe(96);
+    expect(PLAYER_INTEREST_DROP_RADIUS).toBeGreaterThan(ENTITY_VIEW_DESTROY_RANGE);
   });
 
   it('uses the same invisible-idle-mob throttle in the offline browser game', () => {

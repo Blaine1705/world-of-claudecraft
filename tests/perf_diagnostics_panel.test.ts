@@ -87,12 +87,16 @@ describe('PerfDiagnosticsPanel', () => {
       resolve(process.cwd(), 'diagnostics/start-diagnostics.ps1'),
       'utf8',
     );
+    const readme = readFileSync(resolve(process.cwd(), 'diagnostics/README.md'), 'utf8');
 
     expect(vite).toContain("'/__diagnostics/capture'");
     expect(vite).toContain("'/__diagnostics/latest'");
     expect(main).toContain("startupParams.get('diagnosticsAuto') === '1'");
     expect(launcher).toContain('diagnosticsAuto=1');
     expect(launcher).toContain('diagnosticsCapture=1');
+    expect(launcher).toContain('[switch]$AllowSparseCheckoutMutation');
+    expect(launcher).toContain('if (-not $AllowSparseCheckoutMutation)');
+    expect(readme).toContain('-AllowSparseCheckoutMutation');
   });
 
   it('only enables unattended report capture on an explicit local URL', () => {

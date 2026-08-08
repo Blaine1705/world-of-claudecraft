@@ -4,6 +4,7 @@ param(
   [int]$Port = 5173,
   [switch]$SkipInstall,
   [switch]$SkipAssets,
+  [switch]$AllowSparseCheckoutMutation,
   [switch]$SmokeTest
 )
 
@@ -36,6 +37,9 @@ $assetsMissing = $requiredAssetFiles | Where-Object {
   -not (Test-Path -LiteralPath (Join-Path $repoRoot $_) -PathType Leaf)
 }
 if (-not $SkipAssets -and $assetsMissing) {
+  if (-not $AllowSparseCheckoutMutation) {
+    throw 'Required game assets are missing. The launcher will not change this checkout automatically. Rerun with -AllowSparseCheckoutMutation to permit git sparse-checkout add public, or use -SkipAssets only when you intentionally do not need the full game.'
+  }
   Write-Host 'Downloading the game media assets. This repository contains several gigabytes of models, textures, and audio.'
   Write-Host "Missing asset sentinels: $($assetsMissing -join ', ')"
   & git sparse-checkout add public

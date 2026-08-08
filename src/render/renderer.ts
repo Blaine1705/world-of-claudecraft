@@ -495,7 +495,8 @@ const FESTIVAL_GOLD_COLORS: readonly number[] = [0xffd14d, 0xfff2c0];
 // are several draw calls each and read as sub-pixel specks long before this.
 const ENTITY_DRAW_RANGE = 80;
 const ENTITY_VIEW_CREATE_RANGE_SQ = ENTITY_DRAW_RANGE * ENTITY_DRAW_RANGE;
-const ENTITY_VIEW_DESTROY_RANGE_SQ = 96 * 96;
+export const ENTITY_VIEW_DESTROY_RANGE = 96;
+const ENTITY_VIEW_DESTROY_RANGE_SQ = ENTITY_VIEW_DESTROY_RANGE * ENTITY_VIEW_DESTROY_RANGE;
 const VIEW_CREATE_BUDGET_LOW = 2;
 const VIEW_CREATE_BUDGET_HIGH = 8;
 const VIEW_CREATE_SLOW_FRAME_MS = 33;

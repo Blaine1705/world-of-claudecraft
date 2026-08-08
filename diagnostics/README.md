@@ -8,8 +8,17 @@ ClaudeCraft.
 
 Double-click `RUN_DIAGNOSTICS.cmd` in the repository root.
 
-The first run may take a while because the launcher downloads the repository's large
-media-asset tree and installs the pinned dependencies. Later runs reuse both.
+The first run may take a while because the launcher installs the pinned dependencies.
+Later runs reuse them. If a sparse checkout omits the large media-asset tree, the launcher
+stops without changing Git state. To explicitly allow it to add `public` to the sparse
+checkout and download those assets, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\diagnostics\start-diagnostics.ps1 -AllowSparseCheckoutMutation
+```
+
+That flag permits the single `git sparse-checkout add public` mutation. It is never implied
+by double-clicking the launcher.
 
 The launcher requires Node.js and npm, and runs the repository's pinned pnpm version
 without changing your global pnpm installation. It also checks concrete runtime files across the audio, Basis, environment, font, map, model,

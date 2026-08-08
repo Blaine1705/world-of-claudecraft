@@ -10,6 +10,10 @@ import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
+import {
+  diagnosticsCaptureAllowed,
+  diagnosticsReadAllowed,
+} from './scripts/lib/diagnostics_capture_guard.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 
@@ -301,14 +305,6 @@ function musicEditorSavePlugin() {
 // touch disk and the endpoints do not exist in preview or production builds.
 function diagnosticsCapturePlugin() {
   let latestReport = '';
-  const sameOrigin = (origin: string | undefined, host: string | undefined): boolean => {
-    if (!origin || !host) return true;
-    try {
-      return new URL(origin).host === host;
-    } catch {
-      return false;
-    }
-  };
   return {
     name: 'woc-diagnostics-capture',
     apply: 'serve' as const,
@@ -320,6 +316,7 @@ function diagnosticsCapturePlugin() {
               url?: string;
               method?: string;
               headers: Record<string, string | string[] | undefined>;
+              socket: { remoteAddress?: string };
               on: (event: string, callback: (chunk?: unknown) => void) => void;
             },
             res: {
@@ -338,6 +335,11 @@ function diagnosticsCapturePlugin() {
           if (req.method !== 'GET') {
             res.statusCode = 405;
             res.end('GET only');
+            return;
+          }
+          if (!diagnosticsReadAllowed(req.socket.remoteAddress)) {
+            res.statusCode = 403;
+            res.end('loopback requests only');
             return;
           }
           res.setHeader('Cache-Control', 'no-store');
@@ -359,9 +361,9 @@ function diagnosticsCapturePlugin() {
           ? req.headers.origin[0]
           : req.headers.origin;
         const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
-        if (!sameOrigin(origin, host)) {
+        if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
           res.statusCode = 403;
-          res.end('same-origin requests only');
+          res.end('loopback same-origin requests only');
           return;
         }
         let body = '';

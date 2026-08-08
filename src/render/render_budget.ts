@@ -167,9 +167,11 @@ const URGENT_GRASS_STEP = 0.14;
 const URGENT_LIGHTING_STEP = 0.12;
 const URGENT_VFX_STEP = 0.08;
 
-/** Exact non-resolution quality states an urgent governor path can expose.
- * Renderer prewarm compiles each state behind the loading cover so changing
- * density or light count cannot mint shader programs in a playable frame. */
+/** Non-resolution states visited by repeated urgent degradation.
+ * Renderer prewarm walks this urgent ladder behind the loading cover to link its
+ * point-light-count variants. This does not enumerate the normal-pressure ladder's
+ * smaller steps; grass, foliage and VFX levels accompany the lighting states because
+ * those runtime density and uniform knobs do not select shader programs themselves. */
 export function renderBudgetShaderPrewarmLevels(
   state: Pick<RenderBudgetState, 'levels' | 'caps'>,
 ): RenderBudgetLevels[] {

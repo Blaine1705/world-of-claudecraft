@@ -4,6 +4,7 @@
 import './styles/index.css';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
+import { afterActiveAnimationMs } from './game/active_animation_timer';
 import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
@@ -1033,22 +1034,6 @@ function nextPaint(): Promise<void> {
   });
 }
 
-function afterActiveAnimationMs(durationMs: number, callback: () => void): void {
-  const targetMs = Math.max(0, durationMs);
-  if (targetMs === 0) {
-    callback();
-    return;
-  }
-  let activeMs = 0;
-  let previousAt = performance.now();
-  const tick = (now: number): void => {
-    activeMs += Math.min(50, Math.max(0, now - previousAt));
-    previousAt = now;
-    if (activeMs >= targetMs) callback();
-    else requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
 // The loading screen blocks pointer input but a covered button keeps keyboard
 // focus, so Enter/Space could re-fire it mid-entry. One entry per page load;
 // every failure path recovers via fatalOverlay's reload.
