@@ -180,6 +180,40 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mountLessonActiveMirror = false;
   c.activeBossDeathZones = [];
   c.riftEventExpiresAtMs = null;
+  // The "mirrors every class-field default" claim above is now ENFORCED by
+  // tests/bare_client_defaults.test.ts (a source scrape of ClientWorld's
+  // initialized fields), which surfaced the drift below: these had all
+  // accreted on the class without the fixture noticing. Values mirror the
+  // class initializers exactly; guildBankInfo in particular is read through
+  // `!== null` gates, where undefined would behave differently.
+  c.guildBankInfo = null;
+  c.guildBankLogEntries = [];
+  c.guildBankLogState = 'idle';
+  c.guildBankLogAt = 0;
+  c.toolEffectSlots = [];
+  c.commissionOrders = [];
+  c.socialDirty = false;
+  c.wireSeen = new Set();
+  c.lastStopAutoAttackOnTargetSwitch = null;
+  c.reconnectAttempts = 0;
+  c.conflictRejections = 0;
+  c.timeoutRejections = 0;
+  c.sessionEnded = false;
+  c.counterfangWindowDeadlineMs = 0;
+  c.invChanged = false;
+  c.cosmeticsChanged = false;
+  c.actionBarRestore = undefined;
+  c.actionBarRestoreResolved = false;
+  c.actionBarSaveTimer = null;
+  c.actionBarSaveLastJson = null;
+  c.actionBarSavePending = null;
+  c.profanityDirty = false;
+  c.pendingTargetEcho = null;
+  c.nextCommandOutcomeId = 1;
+  c.pendingCommandOutcomes = new Map();
+  c.selfLockouts = {};
+  c.selfOwnedMounts = [];
+  c.selfRidingTrained = false;
 
   Object.assign(c, rest);
   return c;

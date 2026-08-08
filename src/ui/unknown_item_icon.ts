@@ -70,7 +70,8 @@ export function unknownItemIconHtml(itemId: string, quality: string = 'common'):
  *
  *  The quality rides a CLASS attribute: esc() stops quote breakout but not
  *  token injection (a space would append a second class), so the rung is
- *  allowlisted to the known ladder and anything else paints common. */
+ *  constrained to a lowercase-alpha charset and anything else paints common
+ *  (an unranked lowercase rung passes and takes default styling). */
 export function itemIconImgHtml(src: string, quality: string): string {
   const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
   return `<img class="item-icon q-${rung}" src="${esc(src)}" alt="" draggable="false">`;

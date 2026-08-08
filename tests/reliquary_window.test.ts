@@ -1090,8 +1090,14 @@ describe('styles and architecture registration', () => {
     );
     // Forced-colors arm: the silhouette filters drop (information rides the
     // cell border, opacity, and aria label), so a locked relic stays legible.
+    // Content-bound through the OPAQUE selector and the filter reset: a bare
+    // media-query existence check would stay green with an emptied block, and
+    // the second selector is load-bearing (the opaque rule is one specificity
+    // rung above the plain missing rule, so without an equal-specificity
+    // reset inside the media block the opaque cells would keep grayscale in
+    // forced-colors mode).
     expect(reliquaryCss).toMatch(
-      /@media \(forced-colors: active\) \{\s*\.reliquary-cell--missing \.item-icon,/,
+      /@media \(forced-colors: active\) \{[^@]*?\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: none;/,
     );
     // Phase 6 seal chrome (cosmetic ranks).
     expect(reliquaryCss).toContain('.reliquary-rank-seal');

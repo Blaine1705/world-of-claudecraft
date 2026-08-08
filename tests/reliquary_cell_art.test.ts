@@ -345,6 +345,13 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_prog_veteran' })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'item', itemId: 'reins_valorsteed' })).toBe(false);
+    // Prefix BOUNDARIES: a sibling directory or a deed id that merely starts
+    // with 'cat' must not ride the carve-out (the trailing slash and the
+    // trailing underscore are load-bearing).
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: '/ui/store/armory-promo/x.webp' })).toBe(
+      false,
+    );
+    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_category_thing' })).toBe(false);
   });
 
   it('agrees with the resolver on real catalog slots (both directions)', () => {
@@ -403,9 +410,12 @@ describe('shipped art files', () => {
     // webps ship without alpha, but the bright subject on a near-black card
     // still reads under brightness(0.18), verified on pixels in the Phase 16
     // QA). What it cannot work on is BRIGHT self-backgrounded art: the
-    // Armory cards (pinned opaque here, all of them) and the procedural
-    // deed_cat_* composites (opaque by construction in icons.ts BACKGROUNDS,
-    // no file to read). A professions or painted-crest file losing its matte,
+    // Armory cards (pinned opaque here, all of them; the sweep is
+    // CATALOG-bounded, a skin added to WEAPON_SKINS without a reliquary slot
+    // is unswept here and surfaces in reliquary_content instead) and the
+    // procedural deed_cat_* composites (opaque by construction in icons.ts
+    // BACKGROUNDS, no file to read; that half of the premise is prose-only
+    // here). A professions or painted-crest file losing its matte,
     // or an Armory card gaining one, must consciously re-pin here AND
     // revisit the predicate instead of silently landing on the wrong filter.
     const hasAlpha = (file: string): boolean => {
@@ -413,7 +423,11 @@ describe('shipped art files', () => {
       expect(buf.toString('ascii', 0, 4), file).toBe('RIFF');
       const tag = buf.toString('ascii', 12, 16);
       if (tag === 'VP8X') return (buf.readUInt8(20) & 0x10) !== 0;
-      if (tag === 'VP8L') return (buf.readUInt32LE(24) & 0x08) !== 0;
+      // VP8L: byte 20 is the 0x2f signature; alpha_is_used is bit 28 of the
+      // 32-bit word at offset 21 (after 14 width bits and 14 height bits).
+      // Verified against real VP8L-with-alpha files (public/ui/procs). No
+      // swept file is VP8L today, but a re-encode must not read as no-alpha.
+      if (tag === 'VP8L') return ((buf.readUInt32LE(21) >>> 28) & 1) !== 0;
       return false;
     };
     const staticCrestUrl = (crestId: string): string | null => {
@@ -614,7 +628,12 @@ describe('ReliquaryWindow cell markup', () => {
     // leave this arm green against a stale literal. An opaque Armory card or
     // category-fallback crest renders as a black tile whenever this breaks.
     const componentsCss = readFileSync(join(REPO_ROOT, 'src/styles/components.css'), 'utf8');
-    const selectorMatch = componentsCss.match(/^\s*(\.[^{}]*data-cell-art[^{}]*opaque[^{}]*)\{/m);
+    // Commas excluded so a deleted carve-out cannot silently retarget the
+    // extraction onto the forced-colors block's two-selector list (the arm
+    // would still red, but pointing at the wrong cause).
+    const selectorMatch = componentsCss.match(
+      /^\s*(\.[^{},]*data-cell-art[^{},]*opaque[^{},]*)\{/m,
+    );
     if (!selectorMatch) throw new Error('contract: the opaque-art carve-out rule exists');
     const liveSelector = selectorMatch[1].trim();
     expect(liveSelector).toContain('.reliquary-cell--missing');

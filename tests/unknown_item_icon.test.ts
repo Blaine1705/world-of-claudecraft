@@ -27,19 +27,24 @@ describe('itemIconImgHtml (the shared minter, named directly)', () => {
     );
   });
 
-  it('allowlists the rung out of the class attribute (no token injection)', () => {
+  it('keeps a hostile rung out of the class attribute (no token injection)', () => {
     const quoted = itemIconImgHtml('/x.webp', 'x" onerror="alert(1)');
     expect(quoted).not.toContain('onerror');
     expect(quoted).toContain('class="item-icon q-common"');
     const spaced = itemIconImgHtml('/x.webp', 'common evil');
     expect(spaced).toContain('class="item-icon q-common"');
     expect(spaced).not.toContain('evil');
+    // The guard is a CHARSET filter, not a ladder allowlist: an unranked but
+    // lowercase-alpha rung passes through (and simply takes default styling),
+    // which is the same tolerance the unknownItemIconHtml wire-quality arm
+    // documents above. Pinned so the boundary is named, not assumed.
+    expect(itemIconImgHtml('/x.webp', 'notarung')).toContain('class="item-icon q-notarung"');
   });
 
   it('escapes the src attribute (no quote breakout)', () => {
     const html = itemIconImgHtml('x" onerror="alert(1)', 'epic');
     expect(html).not.toContain('src="x" onerror');
-    expect(html).toContain('&quot;');
+    expect(html).toContain('src="x&quot;');
   });
 });
 
