@@ -25,7 +25,7 @@
 // the whole decision with plain arrays and no Sim.
 
 import { itemCopyPin } from './item_copy_ref';
-import type { EquipSlot, InvSlot, ItemInstancePayload } from './types';
+import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot, type ItemInstancePayload } from './types';
 
 /** One saved slot: which item, and which COPY of it. */
 export interface SavedGearPiece {
@@ -45,6 +45,30 @@ export type SavedGearSet = Partial<Record<EquipSlot, SavedGearPiece>>;
  * leaf: `equipment` is item ids by slot, `equipmentInstance` is the per-slot
  * payload of whichever piece carries one (sparse; a plain piece has no entry).
  */
+/**
+ * The WORN payload rendered in the BAG slot's shape, so both sides pin identically.
+ *
+ * This normalization is load-bearing, not tidiness. `equipmentPayloadFor` packs
+ * `craftedRecipeId` INTO the worn payload, while `returnEquippedItemToBags` unpacks
+ * it back out to the InvSlot's own field. `itemCopyPin` reads the two shapes
+ * differently, so pinning the worn form directly meant a crafted piece could never
+ * match itself once it was back in the bags: saved, unequipped, and then reported
+ * gone with the exact copy sitting right there.
+ */
+function wornAsBagSlot(itemId: string, payload: ItemInstancePayload | undefined): InvSlot {
+  if (!payload) return { itemId, count: 1 };
+  const { craftedRecipeId, ...rest } = payload as ItemInstancePayload & {
+    craftedRecipeId?: string;
+  };
+  const instance = Object.keys(rest).length > 0 ? (rest as ItemInstancePayload) : undefined;
+  return {
+    itemId,
+    count: 1,
+    ...(instance ? { instance } : {}),
+    ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+  };
+}
+
 export function buildGearSet(
   equipment: Partial<Record<EquipSlot, string>>,
   equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>> | undefined,
@@ -53,14 +77,10 @@ export function buildGearSet(
   for (const key of Object.keys(equipment) as EquipSlot[]) {
     const itemId = equipment[key];
     if (typeof itemId !== 'string' || itemId === '') continue;
-    const instance = equipmentInstance?.[key];
-    // Pin the piece through the same function the bag side uses, by synthesizing
-    // the slot shape it expects. Sharing the function is the point: a set saved
-    // from worn gear has to compare equal to the same copy sitting in a bag.
-    out[key] = {
-      itemId,
-      pin: instance ? itemCopyPin({ itemId, count: 1, instance }) : '',
-    };
+    // itemCopyPin is the SINGLE authority on both sides. No `instance ? ... : ''`
+    // short-circuit: it made a crafted-but-unenchanted copy pin as the empty
+    // string on one side and as a real fingerprint on the other.
+    out[key] = { itemId, pin: itemCopyPin(wornAsBagSlot(itemId, equipmentInstance?.[key])) };
   }
   return out;
 }
@@ -116,7 +136,17 @@ export interface GearSwapPlan {
  * something is missing.
  *
  * Each bag index is claimed at most once, so two ring slots saved from two copies
- * of one id cannot both resolve onto the same stack.
+ * of one id cannot both resolve onto the same stack. (The live apply path in
+ * progression/talents.ts re-plans per slot against the live bags, which gets the
+ * same property for free; the claim set is what makes a WHOLE-set plan coherent
+ * for a caller that wants to inspect one before acting.)
+ *
+ * KNOWN LIMITATION, pinned by a test rather than left to be discovered: this
+ * searches the BAGS only. A set whose pieces are currently worn in each other's
+ * slots (two rings exchanged between ring1 and ring2) reports them unavailable and
+ * never corrects itself, because neither is in a bag. Fixing it means unequipping
+ * within the set first, which is a larger change than this feature needs; the
+ * common case (a set sitting in bags) is unaffected.
  */
 export function planGearSwap(
   set: SavedGearSet,
@@ -129,9 +159,12 @@ export function planGearSwap(
   const unavailable: UnavailableEquip[] = [];
   const claimed = new Set<number>();
 
-  // Sorted so a plan is deterministic regardless of key insertion order: the sim
-  // must produce the same swap on every host for the same inputs.
-  const slots = (Object.keys(set) as EquipSlot[]).sort();
+  // Ordered by ALL_EQUIP_SLOTS rather than alphabetically. Both are deterministic
+  // (which is what the sim requires), but the canonical order matches the rest of
+  // the equipment surface and makes displacement interactions predictable: the
+  // hands resolve before the armor that cannot displace them.
+  const wanted = new Set(Object.keys(set) as EquipSlot[]);
+  const slots = ALL_EQUIP_SLOTS.filter((slot) => wanted.has(slot));
 
   for (const slot of slots) {
     const want = set[slot];
@@ -139,10 +172,7 @@ export function planGearSwap(
 
     const wornId = equipment[slot];
     if (wornId === want.itemId) {
-      const wornInstance = equipmentInstance?.[slot];
-      const wornPin = wornInstance
-        ? itemCopyPin({ itemId: wornId, count: 1, instance: wornInstance })
-        : '';
+      const wornPin = itemCopyPin(wornAsBagSlot(wornId, equipmentInstance?.[slot]));
       if (wornPin === want.pin) {
         alreadyWorn.push(slot);
         continue;
@@ -158,8 +188,10 @@ export function planGearSwap(
       // Counted BEFORE the claim check, so "held but taken" stays distinguishable
       // from "not held at all".
       sawId = true;
-      const pin = bagSlot.instance ? itemCopyPin(bagSlot) : '';
-      if (pin !== want.pin) continue;
+      // itemCopyPin unconditionally: the old `instance ? pin : ''` short-circuit
+      // gave a crafted-but-unenchanted copy the empty pin on this side while the
+      // saved side fingerprinted it properly, so a crafted piece could never match.
+      if (itemCopyPin(bagSlot) !== want.pin) continue;
       if (claimed.has(i)) {
         sawClaimedMatch = true;
         continue;
@@ -177,30 +209,4 @@ export function planGearSwap(
   }
 
   return { equips, alreadyWorn, unavailable };
-}
-
-/**
- * Free bag slots a swap needs beyond what it frees.
- *
- * Each equip takes one unit out of the bags and can put the displaced piece back,
- * so a one-for-one swap is slot-neutral. It is NOT free when the target slot is
- * empty: the incoming piece leaves the bags and nothing returns, which frees a
- * slot rather than costing one. So the only way a swap grows the bag count is a
- * stack that splits, which cannot happen here because worn kinds are one per slot.
- *
- * Returned as a number rather than a boolean so a caller can name the shortfall in
- * a refusal, and kept here beside the plan so the arithmetic has one home.
- */
-export function gearSwapBagDelta(
-  plan: GearSwapPlan,
-  equipment: Partial<Record<EquipSlot, string>>,
-): number {
-  let delta = 0;
-  for (const equip of plan.equips) {
-    // -1: the incoming piece leaves the bags.
-    delta -= 1;
-    // +1 only if a piece comes back off the body into the bags.
-    if (typeof equipment[equip.slot] === 'string') delta += 1;
-  }
-  return delta;
 }

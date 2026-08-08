@@ -1622,7 +1622,9 @@ export const fr_FR: EnTranslations = {
       "defaultBuildName": "Configuration {n}",
       "newBuildWithGear": "New Build (save gear too)",
       "gearRestored": "Restored {n} gear pieces from this build.",
-      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
+      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
+      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
+      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
     },
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."

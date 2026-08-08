@@ -4,6 +4,7 @@ import {
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
 } from './content/talents';
+import { ITEMS } from './data';
 import type { SavedGearSet } from './loadout_gear';
 import { isEquipSlot, type PlayerClass } from './types';
 
@@ -35,6 +36,11 @@ function repairGearSet(value: unknown): SavedGearSet | undefined {
     if (!piece) continue;
     const itemId = piece.itemId;
     if (typeof itemId !== 'string' || itemId === '') continue;
+    // The id must name a real item that actually fits this slot. Without this a
+    // corrupt or stale row survived load and turned every switch into per-slot
+    // refusal spam for a piece that could never resolve.
+    const def = ITEMS[itemId];
+    if (!def || def.slot !== key) continue;
     out[key] = { itemId, pin: typeof piece.pin === 'string' ? piece.pin : '' };
     kept++;
   }

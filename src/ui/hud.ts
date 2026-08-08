@@ -11735,9 +11735,29 @@ export class Hud {
               '#ffd100',
             );
           }
-          const missing = ev.notHeld + ev.copyGone + ev.takenByOtherSlot;
-          if (missing > 0) {
-            this.log(t('hudChrome.talents.gearMissing', { n: formatNumber(missing) }), '#ff8a5c');
+          // Three distinct reasons, three distinct lines. The event schema and the
+          // planner's doc exist to tell them apart, and "you no longer own it" is
+          // different news from "that enchanted copy is gone" or "you only have one
+          // of these". Collapsing them threw the distinction away at the last step.
+          if (ev.notHeld > 0) {
+            this.log(
+              t('hudChrome.talents.gearNotHeld', { n: formatNumber(ev.notHeld) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.copyGone > 0) {
+            this.log(
+              t('hudChrome.talents.gearCopyGone', { n: formatNumber(ev.copyGone) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.takenByOtherSlot > 0) {
+            this.log(
+              t('hudChrome.talents.gearTakenByOtherSlot', {
+                n: formatNumber(ev.takenByOtherSlot),
+              }),
+              '#ff8a5c',
+            );
           }
           break;
         }

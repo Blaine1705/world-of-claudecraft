@@ -141,3 +141,131 @@ describe('a loadout captures and restores the gear it was saved with', () => {
     expect(gearResults(sim.drainEvents())).toEqual([]);
   });
 });
+
+describe('multi-piece and crafted restores (review findings)', () => {
+  async function twoSlots(): Promise<{ chest: string; feet: string }> {
+    const { ITEMS } = await import('../src/sim/data');
+    const chest = Object.values(ITEMS).find((d) => d.slot === 'chest' && d.kind === 'armor');
+    const feet = Object.values(ITEMS).find((d) => d.slot === 'feet' && d.kind === 'armor');
+    if (!chest || !feet) throw new Error('need chest and feet fixtures');
+    return { chest: chest.id, feet: feet.id };
+  }
+
+  it('restores the SAVED copy for every slot, not just the first', async () => {
+    // The stale-index blocker. The plan resolves all indices up front, then each
+    // equip splices its slot out and shifts every higher index down one, so the
+    // second piece consumed whatever slid into its recorded index. The bags below
+    // hold a plain duplicate of the feet piece specifically so a shifted index
+    // lands on the WRONG copy rather than merely on nothing.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const { chest, feet } = await twoSlots();
+
+    meta.equipment.chest = chest;
+    meta.equipment.feet = feet;
+    meta.equipmentInstance = { chest: ENCHANT, feet: ENCHANT };
+    const saved = sim.saveLoadout('PvP', [], pid, undefined, true);
+
+    delete meta.equipment.chest;
+    delete meta.equipment.feet;
+    meta.equipmentInstance = {};
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: chest, count: 1, instance: ENCHANT });
+    meta.inventory.push({ itemId: feet, count: 1, instance: ENCHANT });
+    meta.inventory.push({ itemId: feet, count: 1 });
+    sim.drainEvents();
+
+    sim.switchLoadout(saved, pid);
+
+    expect(meta.equipment.chest).toBe(chest);
+    expect(meta.equipment.feet).toBe(feet);
+    expect(meta.equipmentInstance?.chest, 'the chest enchant came back').toBeDefined();
+    expect(meta.equipmentInstance?.feet, 'and so did the feet enchant').toBeDefined();
+    const plainLeft = meta.inventory.filter((s) => s.itemId === feet && !s.instance);
+    expect(plainLeft, 'the plain duplicate stayed in the bags').toHaveLength(1);
+  });
+
+  it('restores a CRAFTED piece, whose provenance is packed differently when worn', async () => {
+    // The crafted blocker. equipmentPayloadFor packs craftedRecipeId INTO the worn
+    // payload while returnEquippedItemToBags unpacks it back to the InvSlot field,
+    // so the two shapes pin differently and the saved copy read as gone.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const { chest } = await twoSlots();
+
+    meta.equipment.chest = chest;
+    meta.equipmentInstance = { chest: { craftedRecipeId: 'r_test' } as never };
+    const saved = sim.saveLoadout('Crafted', [], pid, undefined, true);
+
+    delete meta.equipment.chest;
+    meta.equipmentInstance = {};
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: chest, count: 1, craftedRecipeId: 'r_test' });
+    sim.drainEvents();
+
+    sim.switchLoadout(saved, pid);
+
+    expect(meta.equipment.chest, 'the crafted copy was found and worn').toBe(chest);
+    const results = gearResults(sim.drainEvents());
+    expect(results[0]?.copyGone, 'and not reported gone').toBe(0);
+  });
+
+  it('reports what actually happened, not what was planned', async () => {
+    // equipped: was plan.equips.length, computed before any equip ran, so a piece
+    // the equip path itself refused was still reported as restored.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const { chest } = await twoSlots();
+
+    meta.equipment.chest = chest;
+    const saved = sim.saveLoadout('Plain', [], pid, undefined, true);
+    delete meta.equipment.chest;
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: chest, count: 1 });
+    sim.drainEvents();
+
+    sim.switchLoadout(saved, pid);
+    const results = gearResults(sim.drainEvents());
+    expect(results[0]?.equipped, 'one real transition').toBe(1);
+    expect(meta.equipment.chest).toBe(chest);
+  });
+});
+
+describe('an overwrite does not silently discard a captured set', () => {
+  it('keeps the gear when a plain Save Build overwrites a gear-carrying loadout', async () => {
+    // Tweak one talent on your PvP build, hit Save, and the pinned set used to be
+    // gone with no warning, because the overwrite rebuilds the whole record.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    meta.equipment.chest = await chestItemId();
+    meta.equipmentInstance = { chest: ENCHANT };
+
+    const saved = sim.saveLoadout('PvP', [], pid, undefined, true);
+    expect(meta.loadouts[saved].gear, 'captured on the first save').toBeDefined();
+
+    // Same NAME, no capture requested: an overwrite of the same record.
+    sim.saveLoadout('PvP', [], pid);
+    expect(meta.loadouts[saved].gear, 'the set survives the overwrite').toBeDefined();
+  });
+
+  it('still creates a gear-free loadout when the name is new', async () => {
+    // Guards the guard: preservation must key on the EXISTING record, not blanket
+    // re-attach gear to every save.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    meta.equipment.chest = await chestItemId();
+    sim.saveLoadout('PvP', [], pid, undefined, true);
+    const plain = sim.saveLoadout('PvE', [], pid);
+    expect(Object.hasOwn(meta.loadouts[plain], 'gear')).toBe(false);
+  });
+});

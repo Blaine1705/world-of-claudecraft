@@ -53,12 +53,13 @@ import {
 } from '../content/talents';
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
 import { buildGearSet, planGearSwap, type SavedGearSet } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, isFormAuraKind } from '../types';
+import { ALL_EQUIP_SLOTS, type Entity, type EquipSlot, isFormAuraKind } from '../types';
 
 function cleanRemovedProcState(
   ctx: SimContext,
@@ -423,6 +424,15 @@ export function saveTalentLoadout(
   if (captureGear) {
     const captured = buildGearSet(r.meta.equipment, r.meta.equipmentInstance);
     if (Object.keys(captured).length > 0) lo.gear = captured;
+  } else {
+    // Preserve a gear set the loadout already had. An overwrite rebuilds the whole
+    // record, so a plain "Save Build" over an existing gear-carrying loadout used
+    // to delete its pinned set silently: tweak one talent on a PvP build, hit Save,
+    // and the gear was gone with no warning. Not asking to CHANGE the gear is not
+    // the same as asking to remove it.
+    const existingIndex = r.meta.loadouts.findIndex((l) => l.name === clean);
+    const existingGear = existingIndex >= 0 ? r.meta.loadouts[existingIndex].gear : undefined;
+    if (existingGear) lo.gear = existingGear;
   }
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
   if (existing >= 0) {
@@ -458,24 +468,63 @@ export function saveTalentLoadout(
  * callers rely on that, so a missing piece is reported and the rest still equip.
  */
 function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): void {
-  const plan = planGearSwap(set, meta.inventory, meta.equipment, meta.equipmentInstance);
-  for (const step of plan.equips) {
-    // Re-planned per step would be safer against mid-loop bag shifts, but equipping
-    // cannot reorder OTHER stacks: it removes one unit and appends the displaced
-    // piece, so an index earlier in the array stays valid. The planner also claims
-    // each index once, so two slots never target the same stack.
+  // RE-PLAN PER SLOT, against the live bags, immediately before each equip.
+  //
+  // Resolving every index up front and then equipping in sequence is wrong: each
+  // equip splices its consumed stack out of the inventory, shifting every higher
+  // index down one, and the loop does not run in index order. The second piece
+  // then consumed whatever slid into its recorded index, which reintroduces the
+  // exact wrong-copy defect this feature exists to prevent.
+  //
+  // Re-planning also replaces the planner's cross-slot claim set for free: once a
+  // stack is consumed it is simply not there for the next slot to find, so two ring
+  // slots sharing one held copy resolve correctly without bookkeeping.
+  let equipped = 0;
+  let alreadyWorn = 0;
+  const reasons = { notHeld: 0, copyGone: 0, takenByOtherSlot: 0 };
+
+  // Canonical equipment order, matching planGearSwap.
+  const wanted = new Set(Object.keys(set) as EquipSlot[]);
+  for (const slot of ALL_EQUIP_SLOTS.filter((s2) => wanted.has(s2))) {
+    const want = set[slot];
+    if (!want) continue;
+    const plan = planGearSwap(
+      { [slot]: want } as SavedGearSet,
+      meta.inventory,
+      meta.equipment,
+      meta.equipmentInstance,
+    );
+    if (plan.alreadyWorn.length > 0) {
+      alreadyWorn++;
+      continue;
+    }
+    const step = plan.equips[0];
+    if (!step) {
+      const reason = plan.unavailable[0]?.reason ?? 'notHeld';
+      reasons[reason]++;
+      continue;
+    }
+    // Count the real transition, not the intent. equipItem has refusal arms the
+    // planner does not model (level requirement, unique-equipped, a full bag on a
+    // displaced piece), so reporting the plan told players pieces were restored
+    // that were not.
+    const before = meta.equipment[slot];
+    const beforePin = itemCopyPin(before === undefined ? undefined : { itemId: before, count: 1 });
     equipItemImpl(ctx, step.itemId, meta.entityId, step.slot, step.bagIndex);
+    const after = meta.equipment[slot];
+    const afterPin = itemCopyPin(after === undefined ? undefined : { itemId: after, count: 1 });
+    if (after !== undefined && (before !== after || beforePin !== afterPin)) equipped++;
+    else reasons.copyGone++;
   }
-  // Text-free result, always emitted when a set was applied, so the client can
-  // report both what landed and what is missing without the sim owning any copy.
+
   ctx.emit({
     type: 'loadoutGearResult',
     pid: meta.entityId,
-    equipped: plan.equips.length,
-    alreadyWorn: plan.alreadyWorn.length,
-    notHeld: plan.unavailable.filter((u) => u.reason === 'notHeld').length,
-    copyGone: plan.unavailable.filter((u) => u.reason === 'copyGone').length,
-    takenByOtherSlot: plan.unavailable.filter((u) => u.reason === 'takenByOtherSlot').length,
+    equipped,
+    alreadyWorn,
+    notHeld: reasons.notHeld,
+    copyGone: reasons.copyGone,
+    takenByOtherSlot: reasons.takenByOtherSlot,
   });
 }
 
