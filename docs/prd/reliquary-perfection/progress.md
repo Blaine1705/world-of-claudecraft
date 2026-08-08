@@ -1649,3 +1649,23 @@ owns the push.
 - reliquaryWireBlob was renamed reliquaryWireJson in the diff; the
   phase file's starter prompt still names the old symbol (historical
   record, left as written).
+- End-of-phase sync: the base moved DURING the phase (as the brief
+  warned), so after the four phase commits a second merge landed the
+  new tip 81804a179e (merge 221ac9e81a: the wiki round-two accuracy
+  pass, PR 3160). The merge touched ZERO branch-owned files (no
+  release-merge-audit owed), tsc stayed clean, wiki:content
+  regenerated to a no-diff tree, and the release's NEW
+  guide_key_coverage guard is green against this phase's catalog keys
+  (101 guide tests). Containment re-verified.
+- Final gate on the COMMITTED tree (TURBO_FORCE=1): the artifact
+  regen, i18n freshness, and malware steps all PASS; the run stops at
+  the changed-files biome step, the same recorded inherited
+  stale-main scope noise as Phase 16 QA (this branch's own authored
+  files are biome-clean; CI's base-scoped biome is unaffected). Every
+  step masked behind that stop was run by hand green: npx tsc
+  --noEmit clean, npm run build exit 0 (all five entries, generated
+  artifacts fresh, no diff), and the FULL vitest suite at the gate's
+  own worker bound: 2388 files passed, 33261 tests passed, zero
+  failures (the anim_pipeline_hunter_ghost pair that was red at the
+  old tip is green here: PR 3111's fix is in the base). Phase 17 QA
+  should expect the same lone biome stop and nothing else.
