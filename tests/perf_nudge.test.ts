@@ -5,15 +5,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // perf-doctor analyzer runs REAL so the ids the toast receives come from the
 // same rules the beacon reports.
 vi.mock('../src/ui/perf_nudge_toast', () => ({ initPerfNudgeToast: vi.fn(() => true) }));
-vi.mock('../src/game/software_render_notice', () => ({ softwareNoticeShown: vi.fn(() => false) }));
+vi.mock('../src/game/software_render_notice', () => ({
+  softwareNoticeShown: vi.fn(() => false),
+  discreteNoticeShown: vi.fn(() => false),
+}));
 
 import type { PerfSnapshot } from '../src/game/perf';
 import { initPerfNudge } from '../src/game/perf_nudge';
-import { softwareNoticeShown } from '../src/game/software_render_notice';
+import { discreteNoticeShown, softwareNoticeShown } from '../src/game/software_render_notice';
 import { initPerfNudgeToast } from '../src/ui/perf_nudge_toast';
 
 const toast = vi.mocked(initPerfNudgeToast);
 const noticeShown = vi.mocked(softwareNoticeShown);
+const discreteShown = vi.mocked(discreteNoticeShown);
 
 const CHECK_MS = 30_000;
 
@@ -82,6 +86,7 @@ describe('initPerfNudge', () => {
     expect(toast).toHaveBeenCalledWith({
       suggestionIds: ['hardware-acceleration'],
       softwareNoticeAlreadyShown: false,
+      discreteNoticeAlreadyShown: false,
       desktopShell: false,
     });
 
@@ -140,8 +145,23 @@ describe('initPerfNudge', () => {
     expect(toast).toHaveBeenCalledWith({
       suggestionIds: ['hardware-acceleration'],
       softwareNoticeAlreadyShown: true,
+      discreteNoticeAlreadyShown: false,
       desktopShell: true,
     });
+  });
+
+  it('threads the shell inactive-GPU notice memo into the toast', () => {
+    // Read at CHECK time, not at init: the shell verdict can land after the
+    // nudge is armed, and the toast still has to learn about it.
+    discreteShown.mockReturnValue(true);
+    const report = vi.fn(() => snap({ glRenderer: 'Google SwiftShader' }));
+    initPerfNudge({ perf: { report }, desktopShell: true });
+
+    vi.advanceTimersByTime(CHECK_MS);
+    expect(toast).toHaveBeenCalledWith(
+      expect.objectContaining({ discreteNoticeAlreadyShown: true }),
+    );
+    discreteShown.mockReturnValue(false);
   });
 
   it('stops cleanly when the caller tears it down', () => {

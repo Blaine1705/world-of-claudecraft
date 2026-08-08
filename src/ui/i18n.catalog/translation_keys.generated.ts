@@ -4451,6 +4451,7 @@ export type TranslationKeyFlat =
   | 'gatherEvent.moonlitBloom'
   | 'gatherEvent.pristineVein'
   | 'gpuNotice.bodyDesktop'
+  | 'gpuNotice.bodyDiscreteInactive'
   | 'gpuNotice.bodyWeb'
   | 'gpuNotice.dismiss'
   | 'guide.abilityHook.arcane_intellect'

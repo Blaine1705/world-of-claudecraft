@@ -7499,6 +7499,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
+  'gpuNotice.bodyDiscreteInactive':
+    '游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
   'gpuNotice.dismiss': '关闭',

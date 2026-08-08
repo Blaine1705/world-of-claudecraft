@@ -7,6 +7,7 @@
 import { desktopBridge } from '../runtime';
 import { initDesktopUpdateToast } from '../ui/desktop_update_toast';
 import { initDesktopErrorRelay } from './desktop_error_relay';
+import { initDesktopGpuStatus } from './desktop_gpu_status';
 import { initDesktopShellStrings } from './desktop_shell_strings';
 
 export function initDesktopShellIntegration(): void {
@@ -16,4 +17,7 @@ export function initDesktopShellIntegration(): void {
   initDesktopErrorRelay(bridge);
   initDesktopShellStrings(bridge);
   initDesktopUpdateToast(bridge);
+  // Subscribes early on purpose: the shell's GPU verdict can arrive long before
+  // the renderer (and therefore the notice) exists, and this latches it.
+  initDesktopGpuStatus(bridge);
 }

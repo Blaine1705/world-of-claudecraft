@@ -66,6 +66,16 @@ export interface DesktopRendererErrorReport {
   col?: number;
 }
 
+// The shell's GPU verdict for this machine (electron pushes it once the GPU
+// info is known): whether Chromium fell back to a software rasterizer, and
+// whether a machine with a dedicated GPU is running the session on the
+// power-saving one. `adapter` is the shell's adapter description, for logs.
+export interface DesktopGpuStatus {
+  softwareRendering: boolean;
+  discreteInactive: boolean;
+  adapter: string;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -109,6 +119,10 @@ export interface DesktopBridge {
   // Signals that the Epic link POST settled so any cancelable adapter handle
   // can be released. Absent on older shells: feature-check before use.
   epicLinkSettled?(): Promise<unknown>;
+  // The shell's GPU verdict, pushed once it is known (it can land before or
+  // after the notice that consumes it). Absent on older shells that predate the
+  // verdict: feature-check before use, like the other post-trio methods.
+  onGpuStatus?(callback: (status: DesktopGpuStatus) => void): () => void;
 }
 
 export function desktopBridge(): DesktopBridge | null {

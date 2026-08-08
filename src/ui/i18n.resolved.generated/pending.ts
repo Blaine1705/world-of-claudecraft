@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -582,6 +583,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -1154,6 +1156,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -1726,6 +1729,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -2299,6 +2303,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -2871,6 +2876,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -3483,6 +3489,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "pt_BR": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -4065,6 +4072,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "cs_CZ": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -4637,6 +4645,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -5209,6 +5218,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -5781,6 +5791,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -6353,6 +6364,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -6925,6 +6937,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -7497,6 +7510,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -8069,6 +8083,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
+    "gpuNotice.bodyDiscreteInactive",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",

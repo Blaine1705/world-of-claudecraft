@@ -7812,6 +7812,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'gpuNotice.bodyDesktop':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
+  'gpuNotice.bodyDiscreteInactive':
+    '게임이 전용(게이밍) GPU를 사용하지 않고 절전형 GPU에서 실행되고 있어 성능이 떨어집니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
   'gpuNotice.bodyWeb':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
   'gpuNotice.dismiss': '닫기',
