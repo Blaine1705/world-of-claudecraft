@@ -1,6 +1,6 @@
-// Area B (issue #2889 round 2): mob_murloc's bespoke "slap/flop combo"
+// Area B (issue #2889 round 2): mob_bear's bespoke "ground-swipe maul"
 // attack. Authored by pose-sample-and-blend (scripts/anim/pose_blend.mjs,
-// scripts/build_murloc_anims.mjs), the same technique documented in
+// scripts/build_bear_anims.mjs), the same technique documented in
 // .claude/skills/blender-anim-pipeline/SKILL.md and proven by batch 1
 // (tests/anim_pipeline_batch1.test.ts).
 import { readFileSync } from 'node:fs';
@@ -33,26 +33,31 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
   return MANIFEST_SRC.slice(start, end);
 }
 
-describe('murloc family bespoke attack (issue #2889 round 2)', () => {
-  it('ships Murloc_Attack in a mesh-free donor GLB', () => {
-    const glbPath = 'public/models/creatures/murloc_ability_anims.glb';
-    expect(clipNamesOf(glbPath)).toEqual(['Murloc_Attack']);
+describe('bear family bespoke attack (issue #2889 round 2)', () => {
+  it('ships Bear_Attack in a mesh-free donor GLB', () => {
+    const glbPath = 'public/models/creatures/bear_ability_anims.glb';
+    expect(clipNamesOf(glbPath)).toEqual(['Bear_Attack']);
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
-  it('gives mob_murloc its own ClipMap instead of mutating the shared BIPED14 constant', () => {
-    const murlocBlock = manifestBlock('mob_murloc: {', 'mob_kobold: {');
-    expect(murlocBlock).toContain('murloc_ability_anims.glb');
-    expect(murlocBlock).toContain('clips: MURLOC_BIPED14');
-    expect(murlocBlock).not.toContain('clips: BIPED14,');
+  it('gives mob_bear its own ClipMap instead of mutating the shared BIPED14 constant', () => {
+    const bearBlock = manifestBlock('mob_bear: {', 'mob_yeti: {');
+    expect(bearBlock).toContain('bear_ability_anims.glb');
+    expect(bearBlock).toContain('clips: BEAR_BIPED14');
+    expect(bearBlock).not.toContain('clips: BIPED14,');
 
+    // BIPED14 itself (the constant definition, not a VisualDef using it)
+    // must still read the original shared attack.
     const bipedConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(bipedConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // Exactly 2 remaining direct `clips: BIPED14,` usages: mob_demon and
-    // mob_demonalt. mob_yeti, mob_troll, and mob_bear already migrated off
-    // BIPED14 (mob_bear on this branch's base); mob_murloc migrates off it
-    // above.
+    // Exactly 2 remaining direct `clips: BIPED14,` usages (6 originally:
+    // mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon, mob_demonalt,
+    // minus the one migrated to BEAR_BIPED14 above, the one already
+    // migrated to TROLL_BIPED14 by mob_troll's own bespoke attack, the one
+    // already migrated to YETI_BIPED14 by mob_yeti's own bespoke attack,
+    // and the one already migrated to MURLOC_BIPED14 by mob_murloc's own
+    // bespoke attack, #2889).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: BIPED14,/g)].length;
     expect(remaining).toBe(2);
   });
