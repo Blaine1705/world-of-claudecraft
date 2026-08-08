@@ -271,6 +271,15 @@ describe('painted HUD-chrome launcher icons', () => {
     expect(hasChromeIconArt('not-an-icon')).toBe(false);
   });
 
+  it('ships painted art for the Reliquary launcher (crown)', () => {
+    // Phase 16 acceptance pin: the Reliquary is a primary destination, so its
+    // launcher renders painted chrome art beside its siblings, never the bare
+    // glyph. Guard A already ties the set to the committed webp; this pins the
+    // membership itself so dropping the row is a red, not a silent downgrade.
+    expect(hasChromeIconArt('crown')).toBe(true);
+    expect(chromeIconUrl('crown')).toBe('/ui/chrome/crown.webp');
+  });
+
   it('hydrates an art id as a decorative <img> and everything else as inline <svg>', () => {
     const art = hydrateOne('character');
     expect(art.startsWith('<img')).toBe(true);
