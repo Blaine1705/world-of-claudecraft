@@ -70,27 +70,31 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      // mob_troll wires TROLL_BIPED14 and mob_yeti wires YETI_BIPED14 (both
-      // `{ ...BIPED14, attack: [...] }`, issue #2889): each inherits BIPED14's
+      // mob_troll, mob_yeti, mob_murloc, and mob_bear each wire their own
+      // `{ ...BIPED14, attack: [...] }` variant (TROLL_BIPED14, YETI_BIPED14,
+      // MURLOC_BIPED14, BEAR_BIPED14, issue #2889): each inherits BIPED14's
       // hit array unchanged, so they still qualify as BIPED14 consumers for
       // HitReact_Heavy.
-      const clipsOk =
-        key === 'mob_troll'
-          ? block.includes('clips: TROLL_BIPED14')
-          : key === 'mob_yeti'
-            ? block.includes('clips: YETI_BIPED14')
-            : block.includes('clips: BIPED14');
+      const BIPED14_VARIANTS: Record<string, string> = {
+        mob_troll: 'TROLL_BIPED14',
+        mob_yeti: 'YETI_BIPED14',
+        mob_murloc: 'MURLOC_BIPED14',
+        mob_bear: 'BEAR_BIPED14',
+      };
+      const clipsOk = block.includes(`clips: ${BIPED14_VARIANTS[key] ?? 'BIPED14'}`);
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // Scoped to these 4 BIPED14-family donor basenames rather than every
-    // `_hit_variety_anims.glb` in the manifest: other families (KayKit's
-    // kaykit()/skeletonClips(), ENEMY_BITE/CRAB_ENEMY_BITE, etc, issue #2889)
-    // independently wire their own hit-variety donors in the same batch and
-    // would otherwise inflate an unscoped count every time one of them lands.
-    const donorPattern =
-      /yetialt_hit_variety_anims\.glb|frog_hit_variety_anims\.glb|orc_hit_variety_anims\.glb|demonalt_hit_variety_anims\.glb/g;
-    const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
+    // Exactly 6 BIPED14-family consumers touched: a stray extra or missing
+    // wiring changes this count. Scoped to this family's own donor
+    // basenames rather than every `_hit_variety_anims.glb` in the manifest,
+    // since unrelated families (KayKit's kaykit()/skeletonClips(),
+    // ENEMY_BITE/CRAB_ENEMY_BITE, the enemy7 hit-variety batch, etc, issue
+    // #2889) land their own donors independently and would otherwise break
+    // this pin.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/(yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
+    ].length;
     expect(occurrences).toBe(6);
   });
 });
