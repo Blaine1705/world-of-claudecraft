@@ -140,11 +140,9 @@ describe('Warlock pet signature VFX', () => {
 
   it('claims both pet abilities before the generic renderer fallback', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(renderer).toContain("ev.ability === 'emberkin_felbolt'");
-    expect(renderer).toContain("ev.ability === 'gloomshade_abyssal_chain'");
+    // Routing is data-driven now: the spec registry claims both pet abilities
+    // through the one handleSpellfx gate (the two spec-shape tests above prove
+    // each ability resolves its dedicated FULL spec).
     expect(renderer).toContain('this.abilityVfx.handleSpellfx(ev)');
-    expect(renderer.indexOf("ev.ability === 'emberkin_felbolt'")).toBeLessThan(
-      renderer.indexOf('isNeedleOfFateProjectile(ev)'),
-    );
   });
 });

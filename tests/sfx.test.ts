@@ -107,6 +107,10 @@ beforeEach(() => {
   // Neutralize the ±jitter so alternation is the only pitch variable under test.
   vi.spyOn(Math, 'random').mockReturnValue(0.5);
   sfx.init();
+  // The MAX_VOICES budget is only released by onended callbacks the audio stub
+  // never fires, so voices leak across tests in this file; reset the counter so
+  // each test starts with the full budget.
+  (sfx as unknown as { active: number }).active = 0;
   // Footsteps are off by default (the footstepSfx setting); enable them so the
   // play-path behaviours below are exercised. The gate itself is tested separately.
   sfx.setFootstepsEnabled(true);

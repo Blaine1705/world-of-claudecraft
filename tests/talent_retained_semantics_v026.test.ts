@@ -156,7 +156,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     const rows = { 14: 'wlk_r14_amplify_curse' };
 
     expect(resolved('warlock', 'needle_of_fate', rows, 'affliction').cost).toBe(23);
-    expect(resolved('warlock', 'soul_harvest', rows, 'demonology').cost).toBe(44);
+    // 55 base, -25% from the talent, then demonology's innate -8% generator
+    // baseline (spec_baselines.ts) stacks multiplicatively: floor lands at 37.
+    expect(resolved('warlock', 'soul_harvest', rows, 'demonology').cost).toBe(37);
     expect(resolved('warlock', 'shadow_bolt', rows, 'destruction').cost).toBe(42);
   });
 

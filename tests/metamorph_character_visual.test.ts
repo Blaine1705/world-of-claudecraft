@@ -131,7 +131,10 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
     expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
-    expect(source).toContain('v.metamorphVisual?.setActive(formVisibility.metamorph)');
+    expect(source).toContain('v.metamorphVisual?.setActive(');
+    expect(source).toContain(
+      'formVisibility.metamorph && v.formCompilePending !== v.metamorphVisual.root',
+    );
     expect(source).toContain('characterFormShadowPlan(');
     expect(source).toContain(
       'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',

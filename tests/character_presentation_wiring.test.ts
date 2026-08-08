@@ -18,7 +18,9 @@ describe('character presentation sleep wiring', () => {
     expect(renderer).toContain(
       'const runCharacterPresentation = shouldRunCharacterPresentationWork(',
     );
-    expect(renderer).toContain('if (runCharacterPresentation) active.update(dt, st, animate);');
+    expect(renderer).toContain(
+      'if (runCharacterPresentation) active.update(dt, st, animate, this.reducedMotion());',
+    );
     expect(renderer).toContain('else active.advanceOffscreen(dt);');
     // The weapon-skin rig is still gated on presentation (a hidden rig writes no
     // uniforms), and a visible one now carries its shed multiplier: the pin

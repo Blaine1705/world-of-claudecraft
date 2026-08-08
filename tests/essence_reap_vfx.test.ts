@@ -131,9 +131,9 @@ describe('Essence Reap premium filler VFX', () => {
       {
         rank: 3,
         level: 20,
-        cost: 65,
+        cost: 55,
         effects: [
-          { type: 'directDamage', min: 54, max: 66 },
+          { type: 'directDamage', min: 44, max: 55 },
           { type: 'gainSoulFragments', amount: 1 },
         ],
       },

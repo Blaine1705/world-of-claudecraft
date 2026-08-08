@@ -172,7 +172,10 @@ describe('Veilbound March', () => {
 
     expect(first.auras.filter((active) => active.id === 'veilbound_mark')).toHaveLength(1);
     expect(second.auras.filter((active) => active.id === 'veilbound_mark')).toHaveLength(1);
-    expect(sim.player.paladinDevotion?.value).toBe(2);
+    // One march grants exactly one traversal Devotion (the ability text: "The
+    // first mark grants 1 Devotion"); veilbound_march has no cast-time Devotion
+    // row in DEVOTION_GAIN, so the total from zero is 1.
+    expect(sim.player.paladinDevotion?.value).toBe(1);
   });
 
   it('ticks Holy damage and triple threat for six seconds, and reduces only its damage to the marking Paladin', () => {

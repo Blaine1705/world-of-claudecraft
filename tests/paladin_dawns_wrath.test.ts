@@ -259,7 +259,7 @@ describe("Retribution Paladin Dawn's Wrath", () => {
       autoAura: 8,
       finalHp: 49880,
       finalAura: 8,
-      hammerHp: 49641,
+      hammerHp: 49640,
       procActive: false,
       hammerCooldown: 0,
       devotion: 2,

@@ -81,6 +81,8 @@ describe('Fireball travel visual', () => {
     expect(renderer).toContain("const fireballForm = requestedForm === 'fireball'");
     expect(renderer).toContain('v.fireballTravelVisual = syncFireballTravelVisual(');
     expect(renderer).toContain('v.fireballTravelVisual?.dispose()');
-    expect(renderer).toContain('v.visual.setActive(formVisibility.base)');
+    expect(renderer).toContain(
+      'v.visual.setActive(formVisibility.base && !v.visualCompilePending)',
+    );
   });
 });

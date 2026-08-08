@@ -232,12 +232,26 @@ describe('availableAuraProcDefs', () => {
     expect(missing).toEqual([]);
   });
 
-  it('routes Hellglass Ward to the canonical Felhunter painting', () => {
+  it('routes generated talent procs to their canonical ability icons', () => {
+    // The Hellglass Ward -> Felhunter special case retired with the warlock
+    // three-spec overhaul; the surviving contract is the generic one: each
+    // drawable talent proc surfaces exactly when its row is selected and
+    // carries a real ability id for its icon.
     expect(
-      availableAuraProcDefs('warlock', known(), talents({ 20: 'wlk_r20_grimoire_of_haste' })).map(
+      availableAuraProcDefs('warlock', known(), talents({ 17: 'wlk_r17_demonic_resilience' })).map(
         ({ id, iconAbilityId }) => ({ id, iconAbilityId }),
       ),
-    ).toEqual([{ id: 'wlk_grimoire_of_carnage', iconAbilityId: 'summon_felhunter' }]);
+    ).toEqual([{ id: 'wlk_curse_mastery', iconAbilityId: 'wlk_r17_demonic_resilience' }]);
+    expect(
+      availableAuraProcDefs(
+        'druid',
+        known(),
+        talents({ 8: 'dru_r8_improved_roots', 11: 'dru_r11_furor' }),
+      ).map(({ id, iconAbilityId }) => ({ id, iconAbilityId })),
+    ).toEqual([
+      { id: 'dru_ironhide_reflex', iconAbilityId: 'bear_form' },
+      { id: 'dru_gripping_ambush', iconAbilityId: 'entangling_roots' },
+    ]);
   });
 
   it('covers the actionable Fire, Frost, and Arcane Mage states', () => {

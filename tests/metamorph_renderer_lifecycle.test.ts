@@ -32,6 +32,8 @@ interface LifecycleHarness {
   viewLights: THREE.Light[];
   clickTargets: THREE.Object3D[];
   lightRankDirty: boolean;
+  weaponSkinApplies: { cancel(id: number): void };
+  nameplatePainter: { remove(id: number): void };
   removeView(id: number): void;
 }
 
@@ -66,6 +68,8 @@ describe('Metamorphosis renderer lifecycle', () => {
     renderer.viewLights = [];
     renderer.clickTargets = [clickTarget];
     renderer.lightRankDirty = false;
+    renderer.weaponSkinApplies = { cancel: vi.fn() };
+    renderer.nameplatePainter = { remove: vi.fn() };
 
     renderer.removeView(42);
 

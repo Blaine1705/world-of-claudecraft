@@ -204,18 +204,21 @@ describe('missing painted icon accepted-art manifest', () => {
     );
     const accepted = manifest();
     expect(accepted.schemaVersion).toBe(1);
+    // The paladin overhaul retired aura_surge/cleansing_verdict/divine_shield/
+    // holy_wrath (4 ability rows) and buildHeroicVariants added the
+    // heroic_duskwhisper resolver, so 209/194/90/15 became 206/190/86/16.
     expect(accepted.scope).toEqual({
-      targetRows: 209,
-      rasterPaintings: 194,
-      abilities: 90,
+      targetRows: 206,
+      rasterPaintings: 190,
+      abilities: 86,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 15,
+      heroicWeaponResolvers: 16,
       originalInventoryRows: 197,
       supplementalCurrentHeadRows: 12,
     });
-    expect(accepted.assets).toHaveLength(194);
-    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
+    expect(accepted.assets).toHaveLength(190);
+    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(86);
     expect(accepted.assets.filter((asset) => asset.kind === 'item')).toHaveLength(101);
     expect(accepted.assets.filter((asset) => asset.kind === 'deed')).toHaveLength(3);
 
@@ -229,7 +232,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(15);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(16);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
@@ -359,9 +362,9 @@ describe('missing painted icon accepted-art manifest', () => {
         ).toBe(true);
       }
     }
-    expect(shippingHashes.size).toBe(194);
-    expect(sourceHashes.size).toBe(194);
-    expect(masterHashes.size).toBe(194);
+    expect(shippingHashes.size).toBe(190);
+    expect(sourceHashes.size).toBe(190);
+    expect(masterHashes.size).toBe(190);
     expect(sorted(referenceRoles)).toEqual([...ALLOWED_REFERENCE_ROLES]);
   });
 });

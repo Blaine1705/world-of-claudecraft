@@ -63,6 +63,7 @@ import {
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_LAYOUT_VERSION,
   PET_SPECIAL_WIRE_VERSION,
+  STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
@@ -113,7 +114,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
-      timerWire: 2,
+      timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });
@@ -124,7 +125,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
-      timerWire: 2,
+      timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });

@@ -24,6 +24,9 @@ describe('Paladin combat VFX routing', () => {
       triggerAttack,
       pulseAt,
       vfx,
+      // The spec-registry gate runs before the paladin switch; none of these fx
+      // names are registry casts, so the real painter returns false too.
+      abilityVfx: { handleSpellfx: vi.fn(() => false) },
     } as unknown as Renderer;
     const handle = (event: Record<string, unknown>) =>
       Renderer.prototype.handleEvent.call(renderer, event as SimEvent);
