@@ -118,12 +118,12 @@ describe('dragonkin family bespoke attack (issue #2889)', () => {
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
     // Every other VisualDef still pointing at the shared constant is
-    // untouched: exactly 4 remaining direct `clips: FLOATING,` usages (9
+    // untouched: exactly 3 remaining direct `clips: FLOATING,` usages (9
     // originally, minus batch 1's elemental migration, minus the ghost,
-    // nightkin, and round-2 glub follow-up migrations, minus this batch's
-    // dragonkin migration).
+    // nightkin, round-2 glub, and flying demon follow-up migrations, minus
+    // this batch's dragonkin migration).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(4);
+    expect(remaining).toBe(3);
   });
 
   it('does not touch the mage or elemental object literals from batch 1', () => {

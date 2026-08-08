@@ -136,8 +136,10 @@ describe('ghost family bespoke attack (issue #2889 follow-up batch)', () => {
     // one more, and the round-2 glub migration (tests/anim_pipeline_glub.test.ts)
     // takes one more still, and the dragonkin family's own follow-up migration
     // to DRAGONKIN_FLOATING (tests/anim_pipeline_druid_dragonkin.test.ts) takes
-    // one more, leaving 4 remaining direct `clips: FLOATING,` usages.
+    // one more, and the flying demon's own migration to DEMON_FLYING_FLOATING
+    // (tests/anim_pipeline_shaman_demonflying.test.ts) takes one more still,
+    // leaving 3 remaining direct `clips: FLOATING,` usages.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(4);
+    expect(remaining).toBe(3);
   });
 });
