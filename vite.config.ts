@@ -339,6 +339,7 @@ export default defineConfig({
         '**/.codex/**',
         '**/.agents/**',
         '**/.worktrees/**',
+        '**/.wt/**',
         '**/.venv/**',
         '**/tmp/**',
       ],
