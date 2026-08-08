@@ -1020,3 +1020,128 @@ owns the push.
   nothing implemented against them: mounts-place + heroic difficulty
   (decide together), quest class-gate (wyrmcult_grand_robe), native-shell
   sourceStore, clears-0 provenance (due before Phase 17).
+
+## Phase 15 QA (2026-08-08): Verify deep links, chat, tracker, guide search
+
+- Verdict: PASS. Zero blocking findings across seven fresh review passes;
+  every should-fix and every applied nit landed across three fix rounds,
+  each round fresh-reviewed before the next; eight scratch mutations proved
+  the load-bearing pins decisive (each reddened exactly its target test with
+  a clean revert).
+- Sync (03622bb782): merged origin/release/v0.36.0 (tip 895b906d2e). The
+  release-merge-audit found both branch-owned overlap files
+  (scripts/pr_shot_targets.mjs, tests/architecture.test.ts) merged with both
+  sides intact and no legacy arms, endpoints, db-mock sites, or injection
+  seams in the delta. PR #3111 inside the sync FIXED the inherited
+  tests/anim_pipeline_hunter_ghost.test.ts pair: green in isolation and in
+  the full suite, which ran fully green for the first time in this branch's
+  history (2352 files, 32848 tests).
+- The masked browser red that fix exposed: gate_select stops at its first
+  failing step, so the browser step never ran while the full suite carried
+  the inherited red. With the pair fixed the browser step ran for the first
+  time and both reliquary axe tests threw: the rig's world stub predated the
+  pin store and lacked cfg.playerClass / player.name, which pinKey reads at
+  render. Fixed at b0dbee80f8; the suite is 29/29 and axe judges the
+  aria-disabled pin markup clean.
+- Audit fan-out, all zero blocking: frontend-seam-reviewer,
+  test-coverage-auditor, and qa-checklist as fresh agents, plus a 23-agent
+  workflow (jump-correctness, perf-alloc, guide-search, and completeness
+  arms; every finding adversarially verified with the file open, 19 of 19
+  upheld). Write-elision PROVEN by two scratch mutations (facet-bypass and
+  always-dirty painter both redden exactly the elision pin in
+  tests/reliquary_tracker_painter.test.ts). Parity arm: zero src/world_api/
+  or src/net/ files in the phase range, and ClientWorld carries the same
+  cfg.playerClass / player.name surface the pin key reads, so pins persist
+  identically offline and online. Guide arm: corpus freshness and the
+  hidden-deed filter green; the search deep-link anchors ride the same
+  hash-anchor mechanism six pre-existing search types use (guide/app.ts
+  scrolls the target on route), so no browser run was needed to settle it.
+- Fix round 1 (29ebc7d3ae): both Illumination chat emitters apply the relic
+  line's inert-link policy to a catalog-unknown page; the at-cap pin control
+  keeps its tab stop (aria-disabled, never native disabled) with the refusal
+  on a shared aria-describedby cap note and a polite-region announcement on
+  a refused activation; the tracker drive reuses one input object (the deed
+  tracker's allocation-free precedent); the ownership signature mixes with
+  Math.imul; the pin prune is single-pass; the painter clears dt-flash from
+  recycled pool slots; the guide-search tie-break collates in the active
+  locale. Test side: the tracker pair joined the window hygiene scans, the
+  banner text arguments and the gridIndex success-arm anchoring were pinned,
+  prune persist-plus-nudge asserts, drift-guard tests on both arms, a cold
+  all-empty-shape test, a private-mode persistPins test, the dual-relic
+  floor, dt-header target-guard pins, and the capture target's cross-file
+  spelling pins.
+- Fix round 2 (987749dff3), closing the fresh review of round 1 (frontend
+  seam: 0 blocking, 5 should-fix, 8 nits; coverage audit: 2 BLOCKING gaps
+  proven by mutant runs): the cap note goes EMPTY on a paint with no at-cap
+  control (an unconditional sentence read a false full state to browse-mode
+  AT; anyAtCap raised during the markup build, reset per render); the prune
+  back-fill arm and the per-build input.pinned re-read gained decisive tests
+  (both had been deletable with the suite green: the rigs mutated one shared
+  Set while production reassigns it); the imul rationale is pinned at the
+  8691-count float-collision pair; the recycled-slot test drives a
+  core-reachable shrink shape; the private-mode persist test spies the
+  localStorage INSTANCE (the prototype spy never fired in happy-dom, so its
+  first draft passed vacuously, caught by the fresh review); plus the CSS
+  dimming pin for both refusal spellings, whole-statement comment-stripped
+  closest() pins, the double-refusal reannounce assert, and banner
+  timestamp typing.
+- Fix round 3 (d757d7423f), settling the round-2 fresh review (0 blocking,
+  ship-it): the drift guard adopts Object.hasOwn(RELIQUARY_PAGES_BY_ID, id)
+  (the reliquary_i18n pageDef idiom, O(1) and prototype-safe); close()
+  clears the cap note for symmetry with the live region; comment-accuracy
+  fixes (pin-toggle result doc, positive-anchor rationale, tie-break strip
+  strength, a11y-rig cast warning); the painter shrink test derives its
+  bounds from RELIQUARY_TRACK_CAP.
+- Record corrections to the Phase 15 entry above (imprecision, not defects):
+  open(nav) DOES early-return when already open; the warm jump works because
+  render() consumes the armed one-shots last, and the cited jump test :342
+  pins the warm open(nav) arm while the warm openWithPage arm is pinned at
+  :158/:168/:206. "Shelf card" in the entry-point list means the shelf PAGE
+  ROW ([data-page]); the actual shelf cards are [data-nav] and never call
+  gotoPage. "openWithPage jumps at 2" counts the jumpId form only; hud.ts
+  has three openWithPage sites and all three are pinned.
+- Considered and declined, with rationale: a chip-mode row-loop skip and a
+  lastChip initializer (family divergence from the deed painter for no
+  user-visible gain); dropping the per-row ensurePinsLoaded (defensive
+  re-check behind an early return); suppressing the banner prose on a
+  drifted Illumination (text, not a jump; a drift drain is a dev/ops anomaly
+  worth seeing, and the raw-id echo is flagged below for a ruling); a
+  white-box pin of close()'s one-shot clearing (defense-in-depth for a
+  throw mid-render; both auditors split and the unreachable-path argument
+  won).
+- Follow-up candidates ADDED by this QA (recorded, not built): a batch
+  ownership facet read (one bag, N page reads) would remove the
+  per-pinned-page bags-plus-bank copies on the 500ms band, natural Phase 17
+  material next to the documented sig-gather copy; duplicate relic labels
+  render indistinguishable guide-search rows (dual-page names share label
+  and type; needs a renderer-level page hint); haystack-only search matches
+  surface at score 0 with no highlight mark (guide-wide scoring shape);
+  warm deep links play no audio.click while equivalent in-window clicks do
+  (design call); deed_chat_line's role=button accessible name carries no
+  action context (shared with the deeds chat lines; a fix-all-consumers
+  key); the refused pin click gives sighted users no feedback beyond the
+  dimmed control (SR users get the announce); pin-from-Overview (the nearly
+  strip shows the right candidates but cannot pin them); the alloc-probe
+  gap on slow-band cores (shared with deeds_view); the a11y browser rig's
+  as-never cast erases missing-member checking (a typed partial or shared
+  world-stub factory would catch the next pinKey-style read at tsc time);
+  the reliquary chat-link suite's audio import prints harmless ECONNREFUSED
+  noise when run alone (pre-existing).
+- Needs a maintainer ruling, surfaced by this QA: (1) the compact-tier
+  minimap coords/clock collision over the tracker chip is VISIBLE IN THE
+  COMMITTED after-tracker-mobile.png (owner: the compact top: max(96px,
+  ...) rule); the Phase 15 deferral should be an explicit call, not a
+  silent ride-along. (2) On catalog drift the banner and plain toast echo
+  the RAW wire page id via reliquaryPageName's fallback: injection-safe
+  (text nodes) but an untranslated server-supplied identifier in player
+  text, which brushes the i18n render-sink rule; pre-existing, now
+  documented at the guard sites.
+- Gate: node scripts/gate_select.mjs PASS, all 8 steps green, first at
+  987749dff3 and re-run at the final tip d757d7423f (the full-suite step
+  green including the formerly inherited pair, the browser step green for
+  the first time). tsc clean and biome errors zero on every touched file
+  throughout; ci:changed clean.
+- OPEN rulings surfaced again at QA start and close, no call received,
+  nothing implemented against them: mounts-place + heroic difficulty
+  (decide together), quest class-gate (wyrmcult_grand_robe), native-shell
+  sourceStore, clears-0 provenance (due before Phase 17).

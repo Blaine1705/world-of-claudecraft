@@ -1,9 +1,11 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 15 COMPLETE (2026-08-07), commits LOCAL awaiting the Phase 15
-QA session (phase-15-qa.md, fresh session, ultracode), which owns the push.
-Base is release/v0.36.0 (PR #2976 retargeted at the 2026-08-07 rollover).
-Update this line as phases complete.
+Current phase: 15 QA COMPLETE (2026-08-08), PASS, pushed to PR #2976 at
+d757d7423f (docs commit on top). The v0.36.0 sync inside the QA fixed the
+inherited hunter_ghost pair, so gate_select is fully green (all 8 steps,
+browser step included) for the first time on this branch. Next: Phase 16
+(phase-16-art.md, fresh session). Base is release/v0.36.0 (PR #2976
+retargeted at the 2026-08-07 rollover). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -395,6 +397,19 @@ Update this line as phases complete.
   item and mark first-finds. Follow-up option (not built): derive Horizons
   latest from firstFind. Observation: Horizons ownership rides the single
   reliquaryCatalogCompletion().owned signature dimension.
+- Phase 15 QA: COMPLETE (2026-08-08), PASS, full record in progress.md
+  ("Phase 15 QA"). Sync 03622bb782 brought the hunter_ghost test fix (PR
+  #3111) and the VFX perf batch (PR #3118); release-merge-audit clean. Three
+  fix rounds (29ebc7d3ae, 987749dff3, d757d7423f), each fresh-reviewed, zero
+  blocking anywhere; eight mutation checks proved the load-bearing pins.
+  Notable corrections: the at-cap pin control is now aria-disabled with an
+  aria-describedby cap note (tab stop kept, refusal announced), the
+  Illumination emitters carry the inert-link drift guard, and the browser
+  a11y rig gained the pin-store identity fields (its red had been masked by
+  the gate stopping at the inherited full-suite failure). Two new
+  maintainer-ruling items recorded in the QA section (compact-tier chip
+  collision now visible in the committed mobile shot; raw wire page id
+  echoed in drift-drain banner prose).
 - Phase 15: COMPLETE (2026-08-07), full record in progress.md. Sync
   ace14e32a4 was history-only (the release tip reverted the whole PR #3094
   snapshot-tick-costs chain; net zero-file diff, no audit owed). Deep links:
