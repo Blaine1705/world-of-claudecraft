@@ -1,14 +1,16 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 17 COMPLETE, LOCAL (2026-08-08, not pushed; Phase 17 QA
-owns the push). Obtain counts + wire/serialize perf: three maintainer
-rulings executed (clears-0 omit-at-zero, world-sourced-only count
-seam, buyback-is-movement), parity pins now 310/81/229 (facet map 33,
-delta keys 68 unchanged), 60 goldens regenerated once for the new
-persisted reliquary.counts field. Five reviews, all PASS, zero
-blocking. Full record in progress.md "Phase 17". Next: Phase 17 QA
-(fresh session; gate + push). Base is release/v0.36.0 (tip e5c16ca398
-already contained at phase start; re-verify containment at QA).
+Current phase: 17 QA COMPLETE, PASS, PUSHED (2026-08-08). All five
+acceptance rigs green on real runs (offline, online with wire-frame
+thrift proof, pre-packet blob on the live server path, memo probe,
+mobile landscape touch); seven fresh review passes zero blocking; the
+QA fix round landed provably decisive pins (two of them corrected by
+mutation testing). Gate: the FIRST fully green in-gate run of the
+packet, all 8 steps (the inherited biome stop is RETIRED: the release
+tip biome-formatted the noisy manifest), full suite 33350 in-gate,
+browser regressions step green. Full record in progress.md "Phase 17
+QA". Next: Phase 18 (rewards ladder; fresh session; sync
+origin/release/v0.36.0 at start as always).
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
@@ -557,6 +559,26 @@ Update this line as phases complete.
   discovery gap, catalog-churn tally loss, insertion-order note,
   re-ship cadence, craft/Marks-shop counting calls, dev-kit vs PBE
   divergence): progress.md "Phase 17".
+- Phase 17 QA: COMPLETE (2026-08-08), PASS, pushed; full record in
+  progress.md "Phase 17 QA". Real-run acceptance all green (the online
+  arm proves wire thrift end to end with a frame counter: zero reliq
+  frames across quiet windows, one per grant); pre-packet blob loads
+  clean on the live server path; write anchor re-verified on the
+  post-merge head (mobile 689 vs anchor 706). Fix round: decisive pins
+  for the stopping rule, the currency-vendor positive arm (exact
+  four-id set), the loot-arm dirty chain (wireRev-arm redundancy
+  discovered and recorded: onInventoryChangedForQuests bumps wireRev
+  per grant, so HEAVY_SELF_EVENTS loot is belt to its suspenders), the
+  mark-path illumination behavior, a literal wire-byte pin (restore
+  key order is SORTED), content premises arming every latent movement
+  flag, and a text-pinned noteRelicObtain caller-set guard over all of
+  src/ + server/ + headless/. Both grant hubs' opts bags are Readonly
+  now. The inherited changed-files biome stop is RETIRED (release-side
+  format); gate_select runs all 8 steps green in-gate including the
+  full suite and browser regressions. Screenshots:
+  docs/screenshots/reliquary-phase17. Surfaced, not acted on: the
+  guild-bank withdrawal discovery gap wants an explicit maintainer
+  decision (named in the buyback comment; self-heals at next login).
 - Phase 18: (pending)
 - Phase 19: (pending)
 - Phase 20: (pending)

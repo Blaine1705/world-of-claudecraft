@@ -1669,3 +1669,176 @@ owns the push.
   failures (the anim_pipeline_hunter_ghost pair that was red at the
   old tip is green here: PR 3111's fix is in the base). Phase 17 QA
   should expect the same lone biome stop and nothing else.
+
+## Phase 17 QA (2026-08-08): Verify obtain counts + wire/serialize perf
+
+- Step 0: pre-flight clean at eea4282716 (six local commits over the pushed
+  7980a41ce6, by design; QA owns the push). The base had moved again: merged
+  origin/release/v0.36.0 tip 4d52f151eb (merge 1759aaa174; PR 3161 client
+  perf: render prewarm, point-light budget, hitch forensics, crowd benches,
+  plus a release-side biome format of src/render/characters/manifest.ts).
+  The incoming delta touched ZERO branch-owned files (intersection empty, no
+  release-merge-audit owed), wiki:content regenerated to a no-diff tree, tsc
+  clean, containment re-verified before work and again before the push.
+- Real-run acceptance (the depth code review could not verify), five rigs,
+  ALL GREEN (rig transcripts in the session; scripts were session-scratch
+  under tmp/, not committed):
+  - OFFLINE (fresh vite on an unused port, low preset, swiftshader):
+    /dev give cryptbone_helm twice; facet reads 1 then 2; the Hollow Crypt
+    cell is owned; tooltip renders "Obtained 2 times"; the cell aria reads
+    the whole sentence "Cryptbone Helm, catalogued, obtained 2 times"; the
+    executed clears-0 ruling is visible live (zero-meter dev grant, no
+    clears line). 8/8 checks.
+  - ONLINE (server on :8787 with ALLOW_DEV_COMMANDS=1, fresh account,
+    ClientWorld not Sim): dev_give twice over the wire; facet 1 then 2;
+    tooltip and aria identical to offline. WIRE THRIFT proven end to end
+    with a page-level WebSocket frame counter: exactly one reliq-bearing
+    frame at login sync, ZERO reliq frames across a 12 s quiet window (238
+    other frames flowed) and a 10 s post-grant quiet window, and exactly one
+    reliq frame per grant. This also empirically confirms the loot-event
+    dirty chain the cross-platform reviewer traced. 10/10 checks.
+  - PRE-PACKET BLOB on the live server path: planted the legacy shape
+    (pageId present, clears: 0, no counts) into the dev DB character row,
+    logged in through the real restore: loads clean, counts empty, the
+    entry survives with clears dropped by the sanitizer, recent resolves
+    from the catalog with pageId ignored, the owned cell renders the
+    absent-count arm (no Obtained line, no clears line), zero page errors.
+    11/11 checks.
+  - MEMO on the real module (tsx over src/sim/reliquary.ts): 1000 quiet
+    reads return the same cache record with ZERO JSON.stringify work; a
+    public-writer mutation invalidates exactly once and the rebuilt blob
+    carries the new count. All green.
+  - MOBILE landscape (844x390, coarse pointer, real CDP touch tap): the
+    shared tooltip opens via touch, "Obtained 2 times" renders, #tooltip
+    max-width 280px is honored (actual width 142.5px), no horizontal
+    overflow, fully inside the viewport. The chat keyboard-dock (4) and
+    mobile-autorun (9) failure families stay inherited-and-recorded; not
+    re-run. 11/11 checks.
+- Screenshots committed under docs/screenshots/reliquary-phase17 (desktop
+  window + tooltip, mobile landscape window + tooltip, online tooltip
+  closeup), captured at the low preset with entry overlays dismissed.
+- Reviews: five fresh passes on the immutable phase range plus an Explore
+  diff map. ALL PASS / READY, ZERO blocking anywhere: architecture (rng
+  neutrality re-proven from the goldens: zero draws/events lines moved),
+  cross-platform-sync (fold/unfold symmetry, delta-key discipline, movement
+  classification re-derived independently), migration-safety (executed the
+  real restore under tsx, rollback simulated against the previous release's
+  code, hostile inputs beyond the fixtures), test-coverage-auditor (1380
+  targeted tests run, per-claim verdict table), qa-checklist (READY,
+  conditional on the write-anchor re-measure below and the quest-fallback
+  pin, both closed this session).
+- perf:tour mobile re-run on the CURRENT head (the qa-checklist condition:
+  the release merge is render-heavy and postdates the 028a480697 anchor
+  re-pin): hudHotDomWrites 689, inside the 706 anchor and BELOW the
+  recorded 695-698 same-machine band, so the anchor holds and the release
+  perf work if anything shed writes. The prewarm startup overrun (16.4 s vs
+  5 s) and frameLong50 14 match the recorded swiftshader-under-load
+  artifacts (15.0 s and 14-17 at close-out); not new signals.
+- QA fix round, TWO batches, both fresh-reviewed before commit (fresh
+  architecture agent: PASS, its 2 should-fix + 7 nits all applied; fresh
+  test-coverage agent: its one blocking was independently found and fixed
+  by this session's OWN mutation probe before the report landed, and its
+  5 should-fix + applicable nits all applied). The mutation story, recorded
+  because it changed the shipped comments: the first gate-ON wire pin was
+  vacuous TWICE over (the staggered-refresh slot at a frozen tickCount, and
+  the real mask: onInventoryChangedForQuests bumps meta.wireRev on EVERY
+  inventory mutation, so the wireRev arm of heavyDue re-ships a tally
+  change with `loot` gone from HEAVY_SELF_EVENTS; production never degrades
+  to the 2 s backstop, the original review premise was incomplete). The
+  shipped test steps off the stagger slot AND neutralizes the wireRev arm,
+  isolating the loot arm; removing `loot` from HEAVY_SELF_EVENTS now reds
+  it, proven by mutation both directions, and the comments name the
+  redundancy honestly. Fix-round contents:
+  - tests/reliquary_state.test.ts: bank round trip + bag move +
+    partial-stack split non-increment pin (the phase file's stopping rule,
+    previously unpinned; every leg carries a post-condition, the reorder
+    arm pinning the stack's CELL since the move writes InvSlot.slot, never
+    array order); trade INSTANCED-arm payload premise (signer survives the
+    handover); mech-chroma content premise arming the latent movement pins
+    (no chroma plate is catalogued); quest-fallback content pin (no
+    requiredItem is catalogued; the re-grant is movement-shaped without a
+    flag, the unbind-peel pattern); ownership-snapshot liveness as
+    reference identity AND as behavior (the all-mark professions_field_notes
+    page illuminates on its last noteReliquaryMark fill, the emit a
+    defensive copy would kill); wire-JSON equality plus a LITERAL byte pin
+    (which also pins the sorted restore key order); a 13th hostile fixture
+    (count: null, the on-disk spelling of NaN/Infinity corruption,
+    documentary per the auditor).
+  - tests/reliquary_wire.test.ts: the decisive gate-ON loot-arm pin
+    described above (stagger dodge + wireRev neutralization + the gate
+    premise assert); the gate-forced arm's comment corrected (it claimed
+    no event marks the session dirty, which misstated production).
+  - tests/reliquary_content.test.ts: no copper vendor and no disenchant
+    yield (both tables + the two weapon fallbacks) stocks a catalogued
+    relic, with floors that also pin the swept values as REAL item ids so
+    a table reshape cannot make the sweep silently vacuous.
+  - tests/delve_shop.test.ts: the currency-vendor POSITIVE arm (a Marks
+    purchase of deacon_reliquary_helm counts 1 then 2 through the real buy
+    path, with the granted count asserted both legs) plus the facet doc's
+    four-id claim as an EXACT set equality over all delve-shop stock.
+  - tests/architecture.test.ts: the mutation-scope guard walk now includes
+    headless/ (membership pinned on the real env_server.ts, floor comment
+    made exact), and a caller-set pin holds noteRelicObtain to exactly the
+    two hub arms with the call TEXT pinned (movement gate + per-copy count
+    arg), scanning ALL of src/ plus server/ plus headless/ so a caller in
+    ClientWorld or the UI is one import away from redding it; the aliased
+    import limitation and the owner-exclusion dependency are stated.
+  - Behavior-neutral source edits (the fresh architecture pass verified
+    neutrality line by line): the pageId tolerance note now says the
+    one-release clock never started in production (feature-branch and PBE
+    rows only); the malformed JSDoc line in noteRelicObtain fixed; the
+    SimContext.markItemDiscovered note records that the opts-carrying path
+    is the deeds module function, the seam member has no production caller
+    left, and the two deeds.test.ts arms are its only exercisers;
+    server/pbe_boost.ts names dev_give as the third dev-family arm;
+    sim.ts's mech-chroma unequip uses the shared MOVEMENT_GRANT const, and
+    both grant hubs (plus their SimContext mirrors) type their opts bags
+    Readonly so the shared const cannot be poisoned in-hub.
+  - Docs: the design doc's obtain-counts cost row now states its
+    distribution sensitivity (an independent QA model with every entry
+    stamped and multi-digit tallies lands nearer +2,460 stored bytes; size
+    write amplification against 2.5 KB, components reproduce to the byte);
+    src/sim/CLAUDE.md's mechanic recipe states the identity-keyed WeakMap
+    memo conditions under which a module-global cache is sanctioned.
+- Recorded, no action (with the reviewer rationale): the digest int32 fold
+  can wrap at the 1e9 cap (unreachable live, documented in source); the
+  30 s tally loss window on hard crash (correct for a cosmetic counter,
+  contrasted with the GM-restore durable save); the offline getter returns
+  the live counts record where ClientWorld swaps per snapshot (known
+  offline-IWorld asymmetry, safe because the window recomputes the digest
+  per poll); character_sheet pays a full restore to read marks (negligible,
+  and the sheet's '"count"' leak pin is in place); reliquaryWireCacheProbe
+  stays a documented test-only export; the obtainedLineHtml compute in the
+  discarded plain-body branch for ItemDef relics (cold path, dead work
+  only); the cap literal pin lives one it-block away from the clamp
+  fixtures (same file, reds on a retune either way).
+- SURFACED for the maintainer, not acted on: the guild-bank withdrawal
+  discovery gap (moveBetweenContainers never touches the ledger; predates
+  the packet, now named in the buyback comment; self-heals at next login
+  via seedItemDiscovery) deserves an explicit decision at some point.
+- Open rulings surfaced at start and close, nothing implemented against
+  them: mounts-place + heroic-difficulty line shape (decide together),
+  wyrm class-gated quest hint, sourceStore native copy, compact-tier
+  minimap/clock collision, drift-drain banner raw wire page id. None was
+  due this phase.
+- Gate on the committed tree (TURBO_FORCE=1): PASS, ALL 8 STEPS GREEN, exit 0,
+  the first fully green in-gate run of the packet. The recorded inherited
+  changed-files biome stop is RETIRED: the release tip biome-formatted
+  src/render/characters/manifest.ts (5716b0cd6f) and the sync merge made
+  the branch copy byte-identical, so ci:changed now passes (warnings only,
+  the non-gating pre-existing class). That unmasked the steps behind it for
+  their first in-gate execution this packet (the gate-select
+  first-fail-masks lesson, closing cleanly): the FULL vitest suite ran
+  inside the gate (the planner fell back to full on the release-delta
+  scope: 2392 files passed, 33350 tests passed, 2 expected-fail, 108
+  skipped, workers 8; up from 33261 at close-out with the release's and
+  this QA's new tests), the browser-regressions step ran green (16 files,
+  110 tests), i18n + wiki + SFX artifacts fresh on the committed tree,
+  malware scan clean, tsc + env/server/bot builds + the client bundle all
+  green.
+- Verdict: PASS. Every acceptance criterion verified on real runs, zero
+  blocking findings across seven fresh review passes, the fix round
+  mutation-proven, the gate fully green in-gate, pushed to
+  origin/feature/reliquary (PR 2976). Handoff: Phase 18 (rewards ladder)
+  starts from a pushed, fully green tree; sync origin/release/v0.36.0 at
+  Step 0 as always.
