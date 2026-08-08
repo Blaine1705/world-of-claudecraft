@@ -5622,8 +5622,11 @@ export class Sim {
     bar: (string | null)[],
     pidOrAlloc?: number | TalentAllocation,
     allocMaybe?: TalentAllocation,
+    captureGear = false,
   ): number {
-    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, allocMaybe);
+    // `captureGear` is opt-in and LAST, so every existing caller (IWorld, the RL
+    // host, the server dispatch, the tests) keeps its current arity and behavior.
+    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, allocMaybe, captureGear);
     // A successful save applies the staged allocation (the UI's Save flow always
     // passes it), so mark the talent deeds like the sibling wrappers; -1 is a
     // rejected save. saveTalentLoadout derives its pid the same way.

@@ -53,6 +53,8 @@ import {
 } from '../content/talents';
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { equipItem as equipItemImpl } from '../items';
+import { buildGearSet, planGearSwap, type SavedGearSet } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -399,6 +401,7 @@ export function saveTalentLoadout(
   bar: (string | null)[],
   pidOrAlloc?: number | TalentAllocation,
   allocMaybe?: TalentAllocation,
+  captureGear = false,
 ): number {
   const pid = typeof pidOrAlloc === 'number' ? pidOrAlloc : undefined;
   const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
@@ -415,6 +418,12 @@ export function saveTalentLoadout(
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];
   const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
+  // Opt-in: the `gear` KEY is absent unless the player asked for it, which keeps the
+  // persisted and wire shapes unchanged for every talent-only loadout.
+  if (captureGear) {
+    const captured = buildGearSet(r.meta.equipment, r.meta.equipmentInstance);
+    if (Object.keys(captured).length > 0) lo.gear = captured;
+  }
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
   if (existing >= 0) {
     r.meta.loadouts = r.meta.loadouts.map((saved, index) => (index === existing ? lo : saved));
@@ -434,6 +443,42 @@ export function saveTalentLoadout(
   return r.meta.activeLoadout;
 }
 
+/**
+ * Apply a saved gear set: plan against the CURRENT bags, then equip each resolved
+ * copy into its saved slot.
+ *
+ * Calls the equip impl directly rather than `ctx.equipItem`, deliberately. The seam
+ * signature is `(itemId, pid?)` and the `Sim` facade overloads its second parameter
+ * for IWorld callers, so a bag index passed positionally through either would land
+ * in the wrong argument. Going straight to the impl lets both the target equip slot
+ * and the bag index be named explicitly, which is the whole point: the index is what
+ * makes this equip the copy the player SAVED rather than the newest match.
+ *
+ * Never fails the switch. Talents have already committed by the time this runs, and
+ * callers rely on that, so a missing piece is reported and the rest still equip.
+ */
+function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): void {
+  const plan = planGearSwap(set, meta.inventory, meta.equipment, meta.equipmentInstance);
+  for (const step of plan.equips) {
+    // Re-planned per step would be safer against mid-loop bag shifts, but equipping
+    // cannot reorder OTHER stacks: it removes one unit and appends the displaced
+    // piece, so an index earlier in the array stays valid. The planner also claims
+    // each index once, so two slots never target the same stack.
+    equipItemImpl(ctx, step.itemId, meta.entityId, step.slot, step.bagIndex);
+  }
+  // Text-free result, always emitted when a set was applied, so the client can
+  // report both what landed and what is missing without the sim owning any copy.
+  ctx.emit({
+    type: 'loadoutGearResult',
+    pid: meta.entityId,
+    equipped: plan.equips.length,
+    alreadyWorn: plan.alreadyWorn.length,
+    notHeld: plan.unavailable.filter((u) => u.reason === 'notHeld').length,
+    copyGone: plan.unavailable.filter((u) => u.reason === 'copyGone').length,
+    takenByOtherSlot: plan.unavailable.filter((u) => u.reason === 'takenByOtherSlot').length,
+  });
+}
+
 // Apply a saved loadout's talents (out of combat). The action bar is restored
 // client-side from the loadout's stored slot map. Re-validated server-side.
 export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number): boolean {
@@ -447,6 +492,11 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
   }
   const revisionBeforeMutation = r.meta.wireRev;
   if (!commitTalentAllocation(ctx, r.meta, r.e, lo.alloc, null)) return false;
+  // Gear AFTER talents, and only if this loadout captured a set. Talents committing
+  // is the contract callers already rely on, so a gear problem must never be able to
+  // fail the talent swap: every unavailable piece is reported and the rest still
+  // equip, rather than the whole switch refusing.
+  if (lo.gear) applySavedGear(ctx, r.meta, lo.gear);
   r.meta.activeLoadout = index;
   markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({
