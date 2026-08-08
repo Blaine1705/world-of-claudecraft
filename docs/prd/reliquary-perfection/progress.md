@@ -931,3 +931,92 @@ owns the push.
 - OPEN rulings surfaced again at this QA, no call received, nothing
   implemented against them: mounts-place + heroic difficulty (decide
   together), quest class-gate, native-shell sourceStore.
+
+## Phase 15 (2026-08-07): Deep links, clickable chat, tracker, guide search
+
+- Commits (LOCAL, Phase 15 QA session owns the push): ace14e32a4 release sync
+  (history-only: the tip reverted the PR #3094 chain, zero-file net diff),
+  153a67d80e guide search, 0c8941f119 deep link + chat lines, f4c2a81cac
+  tracker, 8578d0861d review fix round, ee836e061a screenshots + capture
+  target, 972fd44922 fix-round-review round, then this docs commit.
+- Deep links: openWithPage(pageId) owns the jump state transition through the
+  shared gotoPage helper the in-window data-page delegation now also calls;
+  it clears the needle and ownership chip (the openWithDeed doctrine) and
+  one-shot-focuses the page header on warm AND cold opens. open(nav) closes
+  the recorded Phase 13 QA contract: it clears a persisted off-shelf pageId,
+  clears search/ownedFilter, and arms a focusNavId one-shot at the rail so
+  the rank-up link is perceivable for keyboard and screen-reader users even
+  when the window is already open. Unknown and prototype-key ids open the
+  window wherever it last was, unfocused, without a nav switch.
+- Chat: relic gain, both Illumination emitters, and rank-up lines are
+  node-built on the deed_chat_line family (gold kept, labels resolved from
+  the local catalog, one fresh link node per token). The retro summary and
+  the celebration banner stay plain, pinned. Relic-to-page resolution was
+  factored OUT of buildReliquaryView (reliquaryRelicPageIndex /
+  reliquaryRelicPageId) so the chat link and the recent strip share one
+  resolver; a relic the catalog lost renders a plain line.
+- Tracker: the deed-tracker recipe cloned end to end (chrome in both
+  entries, pure view core, write-elided painter, slow band, delegation,
+  collapse persistence, compact count chip opening the window, safe-area via
+  the stack wrapper). Pin toggles live on shelf rows (sibling button) and
+  the page-detail header, per-character localStorage on the deeds watchlist
+  shape, pruned on Illumination. Default selection = the Overview strip's
+  own nearly-complete rule via the extracted shared predicate + ranking.
+  The whole-catalog default scan memoizes on a five-surface ownership
+  signature delivered as a thunk read only on the nothing-pinned branch
+  (Sim.ownedMounts() copies bags plus bank per read, so a pinned player
+  pays zero ownership reads per slow build; laziness pinned by test).
+  Delta-flash is slot-independent (keyed by page id), first sighting and
+  returns never flash, the completing relic deliberately never flashes (the
+  Illumination celebration owns that moment; module header records it).
+- Guide search: GUIDE_RELIQUARY pages and relics indexed onto the page
+  anchor with the page name in the relic haystack; the acceptance names
+  (Gravewyrm Sanctum, Gravewyrm Mantle) resolve through the real rank();
+  hidden-deed prose swept absent from labels AND haystacks with
+  non-vacuity guards; a dual-page relic indexes once per page (26 such
+  relics), matching the in-game counting rule.
+- i18n: nine hudChrome.reliquary keys + two guide.search type labels, all
+  M16-wordy, real fills in the five non-Latin overlays in-change (terms
+  reuse each locale's established Reliquary vocabulary); Latin pends to the
+  Phase 22 worklist. i18n:gen re-run after each catalog edit; freshness
+  clean on the committed tree.
+- Reviews: frontend-seam, test-coverage, and qa-checklist over the phase
+  diff: ZERO blocking across all three (QA verdict READY). Every finding
+  applied: fix round 8578d0861d (15 findings, 17 mutation proofs), itself
+  freshly reviewed (0 blocking, 3 should-fix, 7 nice-to-have), those
+  applied in 972fd44922 (lazy signature, nav-arm needle clear, close()
+  one-shot resets, two comment corrections, four test hardenings, all
+  mutation-proven). Screenshots agent, QA reviewer, and one context agent
+  died on the 6pm session usage limit mid-run and were resumed from their
+  transcripts; deliverables completed after reset.
+- Gate: node scripts/gate_select.mjs (planner fell back to the FULL suite):
+  2347 files / 32794 tests passed; red ONLY the inherited
+  anim_pipeline_hunter_ghost pair (manifestBlock anchor "player_hunter: {"
+  gone at the release tip), confirmed deterministic by isolated re-run.
+  ci:changed exit 0. The gate was re-run after the last fix commit
+  (972fd44922): identical result, the inherited pair is the ONLY red.
+- Screenshots: docs/screenshots/reliquary-phase15 (desktop strip clipped +
+  in-place, mobile compact chip, pin control both states) plus a
+  reliquary-tracker entry in scripts/pr_shot_targets.mjs scoped to the two
+  tracker modules. No before shots: the strip is new and a base checkout in
+  the shared worktree was unsafe while other sessions edit it.
+- Follow-up candidates recorded, NOT built: the pre-existing compact-tier
+  collision (minimap coords y=100 / clock y=122 overlap the tracker stack
+  top at y=96; the always-on strip makes it visible to everyone; owner:
+  the compact top: max(96px, ...) rule); #right-tracker-stack has no
+  max-height/overflow story with five populated trackers on short
+  landscape phones (unverified visually); back-to-back fills inside the
+  flash hold show one pulse (class never toggles off; cosmetic); the
+  tally chip can read 5 while the mobile 88px clip shows about four rows
+  (shared with the deed tracker); reliquaryFocusFallbackKey has no pin:
+  arm (matches the deeds precedent; change both together if ever); wiki
+  search serves raw catalog English page/relic names in every locale
+  while the in-game window localizes them (pre-existing packet-level
+  divergence, search now agrees with the page it links to); a 2x clipped
+  screenshot needs a shoot() scale change in scripts/pr_screenshots.mjs.
+- Release-tier note: fifteen Latin locales pend on the eleven new keys;
+  joins the standing i18n-locale-fill chore before v0.36.0 ships.
+- OPEN rulings surfaced again at phase start and close, no call received,
+  nothing implemented against them: mounts-place + heroic difficulty
+  (decide together), quest class-gate (wyrmcult_grand_robe), native-shell
+  sourceStore, clears-0 provenance (due before Phase 17).

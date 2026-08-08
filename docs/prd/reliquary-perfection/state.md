@@ -1,9 +1,9 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 14 COMPLETE (2026-08-07), commits LOCAL awaiting the Phase 14
-QA session (phase-14-qa.md, fresh session, ultracode), which owns the push.
-Base is release/v0.36.0 since this phase (PR #2976 retargeted). Update this
-line as phases complete.
+Current phase: 15 COMPLETE (2026-08-07), commits LOCAL awaiting the Phase 15
+QA session (phase-15-qa.md, fresh session, ultracode), which owns the push.
+Base is release/v0.36.0 (PR #2976 retargeted at the 2026-08-07 rollover).
+Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -395,7 +395,57 @@ line as phases complete.
   item and mark first-finds. Follow-up option (not built): derive Horizons
   latest from firstFind. Observation: Horizons ownership rides the single
   reliquaryCatalogCompletion().owned signature dimension.
-- Phase 15: (pending)
+- Phase 15: COMPLETE (2026-08-07), full record in progress.md. Sync
+  ace14e32a4 was history-only (the release tip reverted the whole PR #3094
+  snapshot-tick-costs chain; net zero-file diff, no audit owed). Deep links:
+  ReliquaryWindow.openWithPage(pageId) over the shared private gotoPage (the
+  in-window data-page delegation uses the same helper, so a chat jump and a
+  row click cannot resolve a shelf differently); open(nav) now clears a
+  persisted off-shelf pageId plus search/ownedFilter (closing the Phase 13
+  QA contract) and arms a focusNavId one-shot (rail button, warm and cold,
+  guarded nearest-scroll); openWithPage clears search/ownedFilter and
+  one-shot-focuses the page header (focusPageId + spotlightPage); close()
+  resets both jump one-shots. Chat: all four reliquary emitters (relic
+  gain, BOTH Illumination arms, rank-up) are node-built on the
+  deed_chat_line family via logNodes; retro summary and the celebration
+  banner stay plain; relic-to-page resolution factored from the recent
+  strip as reliquaryRelicPageIndex/reliquaryRelicPageId (null resolves to a
+  plain line); handleReliquaryUnlocks pins extended, never weakened
+  (logNodes/deedLineNodes/deedChatLinkEl exact-count 4, openWithPage jump
+  count 2, retro conversion forbidden by negative pin). Tracker:
+  #reliquary-tracker in BOTH entries after #deed-tracker;
+  reliquary_tracker_view.ts (UI_PURE_CORES; RELIQUARY_TRACK_CAP 5 =
+  DEED_WATCH_CAP, RELIQUARY_FLASH_BUILDS 2; pinned insertion order wins,
+  default = top nearly-complete via isReliquaryNearlyComplete +
+  rankNearlyComplete extracted from reliquary_view so both surfaces share
+  one rule; whole-catalog default scan memoized on a five-surface ownership
+  signature passed as a THUNK read only on the nothing-pinned branch,
+  laziness pinned) + reliquary_tracker_painter.ts (HOT_PAINTERS innerHTML 1
+  / setAttribute 3 / removeAttribute 3; dt-* vocabulary, list id
+  reliquary-pin-list, lastChip ARIA swap, dt-flash toggle, reduced-motion
+  static). Pins persist per character (woc_reliquary_pins_<class>_<name>,
+  the deeds watchlist shape, pruned on Illumination, untrusted-storage arms
+  tested); collapse = reliquaryTrackerCollapsed (BOOL_SETTINGS); compact
+  chip opens the window; NO options toggle (deed precedent has none).
+  Registries: HUD_UPDATE_DRIVES (slow/chrome), FANOUT_ARMS +
+  NOT_A_LANGUAGE_GATE (lastChip), crafting_launcher fit-content,
+  UI_DOM_MODULES (reliquary_window localStorage). New keys:
+  hudChrome.reliquary.{trackerLabel, collapseHint, expandHint,
+  openWindowHint, pin, unpin, pinFull, pinAria, unpinAria} +
+  guide.search.{typeReliquaryPage, typeRelic}; five non-Latin fills
+  in-change, Latin pending (Phase 22 worklist). Guide search:
+  GUIDE_RELIQUARY pages + relics indexed to the page anchor (relic haystack
+  carries the page name; hidden-deed prose swept absent; a dual-page relic
+  indexes once per page, matching the catalog counting rule). Reviews:
+  frontend-seam + coverage + qa-checklist all ZERO blocking; every finding
+  applied across two reviewed fix rounds (8578d0861d reviewed fresh, its
+  findings applied in 972fd44922), 20+ mutation proofs. Screenshots:
+  docs/screenshots/reliquary-phase15 (4 after shots) + a scoped
+  reliquary-tracker pr_shot_targets registry entry. Gate: full-suite
+  fallback run red ONLY on the inherited anim_pipeline_hunter_ghost pair
+  (isolated re-run confirmed, release-tip-owned). Follow-ups recorded in
+  progress.md, notably the pre-existing compact-tier minimap-badge overlap
+  the always-on strip makes visible.
 - Phase 16: (pending)
 - Phase 17: (pending)
 - Phase 18: (pending)
