@@ -24,7 +24,7 @@ const {
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
-const { rangedFileResponse } = require('./media_range.cjs');
+const { rangeContentType, rangedFileResponse } = require('./media_range.cjs');
 const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
@@ -221,9 +221,13 @@ function registerAppProtocol() {
     }
     // Every served path (asset or the SPA index.html fallback) gets the CSP header;
     // net.fetch's own Response has immutable headers, so withCspHeader builds a fresh
-    // one that preserves the body, status, statusText, and Content-Type.
+    // one that preserves the body, status, statusText, and Content-Type. Media files
+    // also advertise Accept-Ranges here, so range support is visible to a client
+    // that probes the full response before sending its first ranged request.
     const response = await net.fetch(pathToFileURL(filePath).toString());
-    return withCspHeader(response, csp);
+    const full = withCspHeader(response, csp);
+    if (rangeContentType(filePath)) full.headers.set('Accept-Ranges', 'bytes');
+    return full;
   });
 }
 

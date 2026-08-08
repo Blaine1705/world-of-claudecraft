@@ -82,6 +82,15 @@ describe('isUnsatisfiableRange', () => {
   it('detects a well-formed range starting at or past EOF', () => {
     expect(isUnsatisfiableRange('bytes=1000-', 1000)).toBe(true);
     expect(isUnsatisfiableRange('bytes=1500-2000', 1000)).toBe(true);
+    // an open end is unbounded, so a start past 2^53 still resolves to a 416
+    expect(isUnsatisfiableRange('bytes=99999999999999999999999-', 1000)).toBe(true);
+  });
+
+  it('detects the zero-length suffix and any well-formed range on an empty file', () => {
+    expect(isUnsatisfiableRange('bytes=-0', 1000)).toBe(true);
+    expect(isUnsatisfiableRange('bytes=0-', 0)).toBe(true);
+    expect(isUnsatisfiableRange('bytes=1000-', 0)).toBe(true);
+    expect(isUnsatisfiableRange('bytes=-5', 0)).toBe(true);
   });
 
   it('stays false for satisfiable, malformed, or inverted ranges', () => {
@@ -90,7 +99,6 @@ describe('isUnsatisfiableRange', () => {
     expect(isUnsatisfiableRange('bytes=2000-1500', 1000)).toBe(false);
     expect(isUnsatisfiableRange('bytes=-100', 1000)).toBe(false);
     expect(isUnsatisfiableRange(null, 1000)).toBe(false);
-    expect(isUnsatisfiableRange('bytes=1000-', 0)).toBe(false);
   });
 });
 
@@ -131,6 +139,21 @@ describe('rangedFileResponse', () => {
     expect(res?.headers.get('Content-Range')).toBe('bytes 0-9/10');
   });
 
+  it('clamps a past-EOF end and keeps body, length, and range in agreement', async () => {
+    const res = await rangedFileResponse(filePath, 'bytes=5-99999');
+    expect(res?.status).toBe(206);
+    expect(await res?.text()).toBe('56789');
+    expect(res?.headers.get('Content-Length')).toBe('5');
+    expect(res?.headers.get('Content-Range')).toBe('bytes 5-9/10');
+  });
+
+  it('serves the suffix form as a 206 of the final N bytes', async () => {
+    const res = await rangedFileResponse(filePath, 'bytes=-3');
+    expect(res?.status).toBe(206);
+    expect(await res?.text()).toBe('789');
+    expect(res?.headers.get('Content-Range')).toBe('bytes 7-9/10');
+  });
+
   it('carries extra headers so the handler keeps its every-response CSP rule', async () => {
     const res = await rangedFileResponse(filePath, 'bytes=0-', {
       'Content-Security-Policy': "default-src 'self'",
@@ -150,6 +173,30 @@ describe('rangedFileResponse', () => {
     expect(res?.status).toBe(416);
     expect(res?.headers.get('Content-Range')).toBe('bytes */10');
     expect(res?.headers.get('Content-Security-Policy')).toBe("default-src 'self'");
+    // the 416 is bounds-only: no body, no stale media headers
+    expect(await res?.text()).toBe('');
+    expect(res?.headers.get('Content-Type')).toBeNull();
+    expect(res?.headers.get('Accept-Ranges')).toBeNull();
+  });
+
+  it('answers a start past 2^53 with 416, never the full-200 fallback', async () => {
+    const res = await rangedFileResponse(filePath, 'bytes=99999999999999999999999-');
+    expect(res?.status).toBe(416);
+    expect(res?.headers.get('Content-Range')).toBe('bytes */10');
+  });
+
+  it('answers a zero-byte media file with 416 instead of an empty 200', async () => {
+    const emptyPath = join(dir, 'empty.mp3');
+    writeFileSync(emptyPath, '');
+    const res = await rangedFileResponse(emptyPath, 'bytes=0-');
+    expect(res?.status).toBe(416);
+    expect(res?.headers.get('Content-Range')).toBe('bytes */0');
+  });
+
+  it('answers the zero-length suffix with 416 and the real bounds', async () => {
+    const res = await rangedFileResponse(filePath, 'bytes=-0');
+    expect(res?.status).toBe(416);
+    expect(res?.headers.get('Content-Range')).toBe('bytes */10');
   });
 
   it('returns null for a non-media extension so the full path keeps its MIME type', async () => {
@@ -168,24 +215,46 @@ describe('rangedFileResponse', () => {
 
 describe('app:// handler wiring (electron/main.cjs)', () => {
   const main = readFileSync(join(__dirname, '..', 'electron', 'main.cjs'), 'utf8');
+  const handlerStart = main.indexOf("protocol.handle('app'");
+  // the first close at the registration's own indent ends THE handler body
+  const handlerEnd = main.indexOf('\n  });', handlerStart);
+  const handler = main.slice(handlerStart, handlerEnd);
 
-  it('imports the range helper', () => {
-    expect(main).toContain("require('./media_range.cjs')");
+  it('imports the range helpers as live code, not a comment', () => {
+    expect(main).toMatch(
+      /^const \{ rangeContentType, rangedFileResponse \} = require\('\.\/media_range\.cjs'\);$/m,
+    );
   });
 
-  it('answers ranged requests before the full-response fallback inside the app handler', () => {
-    const handlerStart = main.indexOf("protocol.handle('app'");
-    const handlerEnd = main.indexOf('function lockDownPermissions');
+  it('slices exactly one registered app handler', () => {
     expect(handlerStart).toBeGreaterThan(-1);
     expect(handlerEnd).toBeGreaterThan(handlerStart);
-    // one registration only, so the slice below is THE handler body
     expect(main.split("protocol.handle('app'").length - 1).toBe(1);
-    const handler = main.slice(handlerStart, handlerEnd);
+  });
+
+  it('answers ranged requests after the path guards and before the full-response fallback', () => {
+    const guardCheck = handler.indexOf('fileInside(distDir, filePath)');
     const rangeRead = handler.indexOf("request.headers.get('range')");
     const rangedCall = handler.indexOf('rangedFileResponse(');
     const fullFallback = handler.indexOf('net.fetch(pathToFileURL(filePath)');
-    expect(rangeRead).toBeGreaterThan(-1);
+    expect(guardCheck).toBeGreaterThan(-1);
+    expect(rangeRead).toBeGreaterThan(guardCheck);
     expect(rangedCall).toBeGreaterThan(rangeRead);
     expect(fullFallback).toBeGreaterThan(rangedCall);
+  });
+
+  // Indentation-anchored shape pins: a commented-out line shifts its indent and
+  // kills the match, so a revert, a dropped return, a dropped CSP argument, or
+  // swapped arguments all fail here even though the unit suite stays green.
+  it('keeps the range branch live: awaited, CSP-carrying, and returned', () => {
+    expect(handler).toMatch(
+      /\n {4}const rangeValue = request\.headers\.get\('range'\);\n {4}if \(rangeValue\) \{\n {6}const ranged = await rangedFileResponse\(filePath, rangeValue, \{\n {8}'Content-Security-Policy': csp,\n {6}\}\);\n {6}if \(ranged\) return ranged;\n {4}\}\n/,
+    );
+  });
+
+  it('advertises Accept-Ranges for media on the full-response fallback', () => {
+    expect(handler).toMatch(
+      /\n {4}const full = withCspHeader\(response, csp\);\n {4}if \(rangeContentType\(filePath\)\) full\.headers\.set\('Accept-Ranges', 'bytes'\);\n {4}return full;/,
+    );
   });
 });

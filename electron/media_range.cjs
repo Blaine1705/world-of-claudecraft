@@ -68,17 +68,25 @@ function rangeResponseHeaders(range, size, contentType) {
   };
 }
 
-// A syntactically valid single range whose start sits at or past EOF. Distinct
-// from a malformed header (which the handler may ignore per RFC 9110): this
-// one earns a 416 with the real bounds, because falling back to a plain 200
-// would recreate the exact demuxer format error this module exists to fix,
-// silently, e.g. against a truncated or replaced asset.
+// A syntactically valid single range that no byte of the resource satisfies:
+// an absolute start at or past EOF (EOF included, so a file truncated to zero
+// bytes still counts), a zero-length suffix (bytes=-0), or any well-formed
+// range against an empty file. Distinct from a malformed header (which the
+// handler may ignore per RFC 9110): these earn a 416 with the real bounds,
+// because falling back to a plain 200 would recreate the exact demuxer format
+// error this module exists to fix, silently, e.g. against a truncated or
+// replaced asset.
 function isUnsatisfiableRange(rangeValue, size) {
-  if (typeof rangeValue !== 'string' || !Number.isInteger(size) || size <= 0) return false;
-  const match = /^bytes=(\d+)-(\d*)$/.exec(rangeValue.trim());
+  if (typeof rangeValue !== 'string' || !Number.isInteger(size) || size < 0) return false;
+  const value = rangeValue.trim();
+  const suffix = /^bytes=-(\d+)$/.exec(value);
+  if (suffix) return Number(suffix[1]) === 0 || size === 0;
+  const match = /^bytes=(\d+)-(\d*)$/.exec(value);
   if (!match) return false;
   const start = Number(match[1]);
-  const end = match[2] === '' ? Number.MAX_SAFE_INTEGER : Number(match[2]);
+  // An open end is unbounded: Infinity keeps end >= start true for any start,
+  // so a start past even Number.MAX_SAFE_INTEGER still resolves to the 416.
+  const end = match[2] === '' ? Infinity : Number(match[2]);
   return start >= size && end >= start;
 }
 
