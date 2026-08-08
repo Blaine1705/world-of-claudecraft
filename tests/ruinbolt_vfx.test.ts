@@ -87,6 +87,7 @@ function liveWindupHarness() {
     windups: new Map(),
     orbits: new Map(),
     glows: new Map(),
+    stunStars: new Map(),
     orbitBandCount: 0,
     applyGlow: null,
   });
