@@ -1796,7 +1796,7 @@ export function bgInfoFor(
     // A READ, never the rollover: `bgFirstWinBonusAvailable` reports a stored
     // date that is not today as re-armed without writing anything, because a
     // per-viewer wire builder must not mutate the daily window it reports on.
-    firstWinBonusReady: bgFirstWinBonusAvailable(ctx.utcDay, meta),
+    firstWinBonusReady: bgFirstWinBonusAvailable(ctx.resetDay, meta),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };
