@@ -49,10 +49,11 @@ describe('murloc family bespoke attack (issue #2889 round 2)', () => {
     const bipedConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(bipedConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // Exactly 3 remaining direct `clips: BIPED14,` usages: mob_bear,
-    // mob_demon, mob_demonalt. mob_yeti and mob_troll already migrated off
-    // BIPED14 on this branch's base; mob_murloc migrates off it above.
+    // Exactly 2 remaining direct `clips: BIPED14,` usages: mob_demon and
+    // mob_demonalt. mob_yeti, mob_troll, and mob_bear already migrated off
+    // BIPED14 (mob_bear on this branch's base); mob_murloc migrates off it
+    // above.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: BIPED14,/g)].length;
-    expect(remaining).toBe(3);
+    expect(remaining).toBe(2);
   });
 });

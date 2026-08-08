@@ -373,7 +373,7 @@ export const en_CA: EnTranslations = {
       "unavailable": "Unstuck is unavailable in your current state."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
+      "absorbed": "Absorbed ({amount})",
       "cheap": "Cheap!"
     },
     "emotes": {

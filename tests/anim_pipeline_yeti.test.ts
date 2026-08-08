@@ -49,11 +49,10 @@ describe('yeti family bespoke attack (issue #2889 round 2)', () => {
     const bipedConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(bipedConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // Exactly 3 remaining direct `clips: BIPED14,` usages: mob_bear,
-    // mob_demon, mob_demonalt. mob_troll already migrated off BIPED14 on
-    // this branch's base; mob_murloc migrates off it in a parallel round-2
-    // PR (issue #2889, tests/anim_pipeline_murloc.test.ts).
+    // Exactly 2 remaining direct `clips: BIPED14,` usages: mob_demon and
+    // mob_demonalt. mob_troll, mob_murloc, and mob_bear have each already
+    // migrated off BIPED14 to their own bespoke ClipMap (issue #2889 round 2).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: BIPED14,/g)].length;
-    expect(remaining).toBe(3);
+    expect(remaining).toBe(2);
   });
 });
