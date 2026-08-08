@@ -371,75 +371,132 @@ async function enterObserver(page) {
 }
 
 async function measureWave(page, waveIndex, waveSize) {
-  return page.evaluate(async (ms) => {
-    const g = window.__game;
-    const before = g.renderer.perfStats();
-    g.perf.reset();
-    const gaps = [];
-    let last = performance.now();
-    let raf = true;
-    const tick = () => {
-      const now = performance.now();
-      gaps.push(now - last);
-      last = now;
-      if (raf) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-    await new Promise((r) => setTimeout(r, ms));
-    raf = false;
-    const after = g.renderer.perfStats();
-    const s = g.perf.report();
-    const sorted = [...gaps].sort((a, b) => b - a);
-    let players = 0;
-    for (const e of g.world.entities.values()) if (e.kind === 'player') players++;
-    return {
-      worstGaps: sorted.slice(0, 6).map((v) => Math.round(v * 10) / 10),
-      stallsOver150: gaps.filter((v) => v >= 150).length,
-      stallsOver50: gaps.filter((v) => v >= 50).length,
-      programsDelta: after.programs - before.programs,
-      texturesDelta: after.textures - before.textures,
-      viewsAfter: after.views,
-      visiblePlayers: players,
-      hitchByCause: s.hitches?.byCause ?? null,
-      // Dev-trace attribution of the wave's worst frames (perfTrace=1 on
-      // localhost): spans, long tasks, and stall attributions name where a
-      // multi-second arrival frame actually went.
-      traceWorst: (s.devTrace?.frames ?? []).slice(0, 3).map((f) => ({
-        frameMs: f.frameMs,
-        scoreMs: f.scoreMs,
-        reasons: f.reasons,
-        mainMs: f.mainMs,
-        submit: f.renderer?.lastFrame?.phaseMs?.submit ?? null,
-        stall: f.stallAttribution
-          ? {
-              submitMs: f.stallAttribution.submitMs,
-              programDelta: f.stallAttribution.programDelta,
-              createdViewTypes: f.stallAttribution.createdViewTypes,
-              newMaterials: f.stallAttribution.diagnostics.newMaterials.slice(0, 6),
-              firstVisible: f.stallAttribution.diagnostics.firstVisibleObjects.slice(0, 6),
+  return page.evaluate(
+    async (ms, wantProgramDiff, wantLightAudit) => {
+      const g = window.__game;
+      // BENCH_PROGRAM_DIFF=1: snapshot the raw program cache keys around the
+      // wave so the offline analysis can name each NEW program and find which
+      // key segment diverged from its closest already-linked twin.
+      const programKeys = () =>
+        wantProgramDiff
+          ? (g.renderer.webgl.info.programs ?? []).map((p) => `${p.name}\t${p.cacheKey}`)
+          : null;
+      const keysBefore = programKeys();
+      const before = g.renderer.perfStats();
+      g.perf.reset();
+      const gaps = [];
+      // BENCH_LIGHT_AUDIT=1: per frame, count the point lights the render will
+      // actually count (visible with a visible ancestry, in the camera layers),
+      // and when the count CHANGES capture each light's ancestry so the leak has
+      // a name. The pinned budget promises this count never moves.
+      const lightAudit = [];
+      const auditLights = () => {
+        const seen = [];
+        g.renderer.scene.traverseVisible((o) => {
+          if (o.isPointLight && o.layers.test(g.renderer.camera.layers)) seen.push(o);
+        });
+        return seen;
+      };
+      const lightPath = (o) => {
+        const parts = [];
+        let cur = o;
+        while (cur && parts.length < 5) {
+          parts.push(cur.name || cur.type);
+          cur = cur.parent;
+        }
+        return parts.join('<');
+      };
+      let lastLightCount = -1;
+      let last = performance.now();
+      let raf = true;
+      const tick = () => {
+        const now = performance.now();
+        gaps.push(now - last);
+        last = now;
+        if (wantLightAudit) {
+          const lights = auditLights();
+          if (lights.length !== lastLightCount) {
+            lastLightCount = lights.length;
+            if (lightAudit.length < 40) {
+              lightAudit.push({
+                t: Math.round(now),
+                count: lights.length,
+                lights: lights.map(lightPath),
+              });
             }
-          : null,
-      })),
-      traceSpans: (s.devTrace?.spans ?? []).slice(0, 6).map((sp) => ({
-        name: sp.name,
-        ms: sp.durationMs,
-        detail: sp.detail ?? null,
-      })),
-      traceLongTasks: (s.devTrace?.longTasks ?? [])
-        .filter((t) => t.durationMs >= 500)
-        .slice(-4)
-        .map((t) => ({
-          ms: t.durationMs,
-          nearestSpan: t.nearestSpanName ?? null,
-          nearestSpanMs: t.nearestSpanMs ?? null,
+          }
+        }
+        if (raf) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      await new Promise((r) => setTimeout(r, ms));
+      raf = false;
+      const after = g.renderer.perfStats();
+      const s = g.perf.report();
+      const sorted = [...gaps].sort((a, b) => b - a);
+      let players = 0;
+      for (const e of g.world.entities.values()) if (e.kind === 'player') players++;
+      return {
+        worstGaps: sorted.slice(0, 6).map((v) => Math.round(v * 10) / 10),
+        stallsOver150: gaps.filter((v) => v >= 150).length,
+        stallsOver50: gaps.filter((v) => v >= 50).length,
+        programsDelta: after.programs - before.programs,
+        texturesDelta: after.textures - before.textures,
+        viewsAfter: after.views,
+        visiblePlayers: players,
+        hitchByCause: s.hitches?.byCause ?? null,
+        // Dev-trace attribution of the wave's worst frames (perfTrace=1 on
+        // localhost): spans, long tasks, and stall attributions name where a
+        // multi-second arrival frame actually went.
+        traceWorst: (s.devTrace?.frames ?? []).slice(0, 3).map((f) => ({
+          frameMs: f.frameMs,
+          scoreMs: f.scoreMs,
+          reasons: f.reasons,
+          mainMs: f.mainMs,
+          submit: f.renderer?.lastFrame?.phaseMs?.submit ?? null,
+          stall: f.stallAttribution
+            ? {
+                submitMs: f.stallAttribution.submitMs,
+                programDelta: f.stallAttribution.programDelta,
+                createdViewTypes: f.stallAttribution.createdViewTypes,
+                newMaterials: f.stallAttribution.diagnostics.newMaterials.slice(0, 6),
+                firstVisible: f.stallAttribution.diagnostics.firstVisibleObjects.slice(0, 6),
+              }
+            : null,
         })),
-      // BENCH_LINK_STACKS=1: drains the slow LINK_STATUS/uniform queries
-      // captured since the last wave, stacks included, plus the named slow
-      // draws from the renderBufferDirect wrapper.
-      slowLinks: (window.__slowLinks ?? []).splice(0, 60),
-      slowDraws: (window.__slowDraws ?? []).splice(0, 80),
-    };
-  }, WAVE_MS);
+        traceSpans: (s.devTrace?.spans ?? []).slice(0, 6).map((sp) => ({
+          name: sp.name,
+          ms: sp.durationMs,
+          detail: sp.detail ?? null,
+        })),
+        traceLongTasks: (s.devTrace?.longTasks ?? [])
+          .filter((t) => t.durationMs >= 500)
+          .slice(-4)
+          .map((t) => ({
+            ms: t.durationMs,
+            nearestSpan: t.nearestSpanName ?? null,
+            nearestSpanMs: t.nearestSpanMs ?? null,
+          })),
+        // BENCH_LINK_STACKS=1: drains the slow LINK_STATUS/uniform queries
+        // captured since the last wave, stacks included, plus the named slow
+        // draws from the renderBufferDirect wrapper.
+        slowLinks: (window.__slowLinks ?? []).splice(0, 60),
+        slowDraws: (window.__slowDraws ?? []).splice(0, 80),
+        // BENCH_PROGRAM_DIFF=1: every program linked during the wave, as raw
+        // name+cacheKey rows the offline analysis diffs against its closest
+        // pre-wave twin to name the key segment that diverged.
+        newProgramKeys: (() => {
+          if (!wantProgramDiff) return null;
+          const beforeSet = new Set(keysBefore);
+          return programKeys().filter((k) => !beforeSet.has(k));
+        })(),
+        lightAudit: wantLightAudit ? lightAudit : null,
+      };
+    },
+    WAVE_MS,
+    process.env.BENCH_PROGRAM_DIFF === '1',
+    process.env.BENCH_LIGHT_AUDIT === '1',
+  );
 }
 
 async function main() {
