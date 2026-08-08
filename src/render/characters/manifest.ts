@@ -1659,10 +1659,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
     // baked off this same rig's own poses. Loads alongside the hit-variety
     // donor GLB below; both are mesh-free so their clips just merge in.
-    animUrls: [
-      `${CREATURES}/yetialt_hit_variety_anims.glb`,
-      `${CREATURES}/yeti_ability_anims.glb`,
-    ],
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`, `${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
@@ -1679,7 +1676,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MURLOC_BIPED14,
     // Murloc_Attack clip donor (scripts/build_murloc_anims.mjs): mesh-free,
     // baked off this same rig's own poses. Loads alongside the hit-variety
-    // donor GLB; both are mesh-free so their clips just merge in.
+    // donor GLB below; both are mesh-free so their clips just merge in.
     animUrls: [
       `${CREATURES}/frog_hit_variety_anims.glb`,
       `${CREATURES}/murloc_ability_anims.glb`,
