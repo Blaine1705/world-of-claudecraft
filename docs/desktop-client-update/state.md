@@ -12,12 +12,26 @@ done (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focus
 + 7ed6a6fac4 version + docs 3e9a87b8e2), and phase 2 QA done (2026-08-08,
 PASS-WITH-FOLLOWUPS: 0 blocking, one confirmed should-fix cluster, fixed in
 97e5305a14: the publish-workflow version guard anchored on the derive expressions and
-pinned by tests/desktop_publish_guard.test.ts); next up is phase 3
-(phase-03-gpu-visibility.md). Phase 2 QA start merge 094f6facbc took release tip
-4d52f151eb (PR 3161 perf train; no electron/desktop paths; turbo.json renamed the
-typecheck task to check:types). The phase 2 review fixes (privacy-security-review
-W1/W2/W3 and three nits) are folded into the four feature commits, not separate; see
-progress.md notes.
+pinned by tests/desktop_publish_guard.test.ts). Phase 2 QA start merge 094f6facbc took
+release tip 4d52f151eb (PR 3161 perf train; no electron/desktop paths; turbo.json
+renamed the typecheck task to check:types). The phase 2 review fixes
+(privacy-security-review W1/W2/W3 and three nits) are folded into the four feature
+commits, not separate; see progress.md notes.
+
+Phase 3 done (2026-08-08, commits 89c5003ddb electron push + 57ca3a7bc3 renderer
+notice + 3fd5f7a4c2 review hardening; base merge was a no-op, release tip still
+4d52f151eb): the main-process GPU verdict reaches the player through the gpu notice.
+Channel 'desktop-gpu-status' (push-only, sent BEFORE the logGpuStatus dedup
+early-return so crash-recovery reloads still get it), pure reducer
+electron/gpu_status_events.cjs, preload onGpuStatus, optional
+DesktopBridge.onGpuStatus, latch module src/game/desktop_gpu_status.ts, dismissal is
+now a component signature (legacy '1' = software dismissal), new key
+gpuNotice.bodyDiscreteInactive with five M16 fills, perf_nudge integratedGpu arm
+suppressed via discreteNoticeShown(). Reviews: security PASS, seam
+PASS-WITH-FOLLOWUPS 0 blocking (one SHOULD-FIX deliberately rejected and pinned:
+both-armed keeps discreteNoticeShown() true, see progress.md phase 3 notes; QA
+should re-litigate). 9/9 mutation probes killed. Next up: phase 3 QA
+(phase-03-qa.md), fresh session, pull+merge first.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -135,10 +149,19 @@ progress.md notes.
 
 New files created: tests/electron_scheme_privileges.test.ts (phase 1),
 tests/electron_shell_startup.test.ts (phase 2),
-tests/desktop_publish_guard.test.ts (phase 2 QA)
-New bridge methods / IPC channels: (none yet)
-New settings keys: (none yet)
-New i18n keys: (none yet)
+tests/desktop_publish_guard.test.ts (phase 2 QA),
+electron/gpu_status_events.cjs + .d.cts, src/game/desktop_gpu_status.ts,
+tests/electron_gpu_status_events.test.ts, tests/electron_gpu_push.test.ts,
+tests/desktop_gpu_status.test.ts, tests/gpu_notice_toast.test.ts (phase 3)
+New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
+no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
+{ softwareRendering, discreteInactive, adapter<=64 } whitelisted in
+electron/gpu_status_events.cjs and re-validated by normalizeDesktopGpuStatus
+New settings keys: (none yet; the gpu notice dismissal localStorage value
+woc_gpu_notice_dismissed grew from '1' to a component signature in phase 3, legacy
+'1' still honored)
+New i18n keys: gpuNotice.bodyDiscreteInactive (en + zh_CN/zh_TW/ja_JP/ko_KR/ru_RU
+fills; 16 locales pending for the release fill pass) (phase 3)
 New tests: tests/electron_scheme_privileges.test.ts, the app:// scheme privileges pin
 (app-entry-anchored, block/line/trailing-comment-stripped, per-key explicit-true as
 whole-line values, exact key-set equality with a quoted-key-aware scanner as the

@@ -8,7 +8,7 @@
 | 1 QA | Verify phase 1 | done | 2026-08-08 | 2026-08-08 |
 | 2 | Shell startup and window polish | done | 2026-08-08 | 2026-08-08 |
 | 2 QA | Verify phase 2 | done | 2026-08-08 | 2026-08-08 |
-| 3 | Hybrid-GPU visibility | not started | | |
+| 3 | Hybrid-GPU visibility | done | 2026-08-08 | 2026-08-08 |
 | 3 QA | Verify phase 3 | not started | | |
 | 4 | Presentation lifecycle | not started | | |
 | 4 QA | Verify phase 4 | not started | | |
@@ -37,9 +37,9 @@ instance focuses/restores the window (deep-link path unchanged); [x] application
 nulled on Win/Linux before ready, macOS default menu kept; [x] DESKTOP_VERSION derived
 or pinned to package.json with a test (derived, plus the equality pin).
 
-Phase 3: [ ] desktop-gpu-status push channel (main verdict -> renderer); [ ] gpu notice
-triggers off the shell verdict, discrete-inactive body added (M16 fills); [ ] ipc pins
-updated; [ ] web/mobile unaffected (feature-checked).
+Phase 3: [x] desktop-gpu-status push channel (main verdict -> renderer); [x] gpu notice
+triggers off the shell verdict, discrete-inactive body added (M16 fills); [x] ipc pins
+updated; [x] web/mobile unaffected (feature-checked).
 
 Phase 4: [ ] hidden-window render skip (render+paint skipped, sim/net keep running)
 with a pure decision core and tests; [ ] display/DPI change push -> pixel-ratio
@@ -282,3 +282,76 @@ Phase 2 QA (2026-08-08, fix commit 97e5305a14):
   renamed typecheck) + env/server/bot builds and the client bundle proven green via
   turbo after the vitest abort. Post-fix affected set 33 files / 446 tests green with
   the exit code captured, not piped away.
+
+Phase 3 (2026-08-08, commits 89c5003ddb electron + 57ca3a7bc3 renderer + 3fd5f7a4c2
+review hardening):
+- Base merge was a no-op (release/v0.36.0 unchanged since the phase 2 QA merge of
+  4d52f151eb), so no suite re-run was owed to it.
+- Main pushes its GPU verdict on the new push-only channel 'desktop-gpu-status' from
+  the logGpuStatus flow, with the send placed BEFORE the log dedup early-return: a
+  crash-recovery reload usually reproduces an identical reading, and a send behind
+  the dedup would never reach the fresh page. Payload is built by the new pure
+  reducer electron/gpu_status_events.cjs (booleans coerced with === true, adapter
+  sliced to 64, whitelist-only; .d.cts sibling), softwareRendering is the OR of
+  aux.softwareRendering and isSoftwareRenderer(featureStatus). Correction to the
+  phase file: isSoftwareRenderer lives in electron/shell_guards.cjs, not
+  gpu_preference.cjs. gpu_preference.cjs behavior untouched (the opt-out lever is
+  phase 7).
+- Preload onGpuStatus mirrors the onUpdateEvent guards (no-op unsubscribe on a
+  non-function, payload shape check on all three fields, removeListener closure).
+  tests/electron_ipc_channels.test.ts gains the channel (sorts first) and the bridge
+  method; new tests/electron_gpu_status_events.test.ts covers the reducer and new
+  tests/electron_gpu_push.test.ts pins the .on (not .once) did-finish-load binding,
+  the send-before-dedup ORDER, the reducer require, the live-window guard, and the
+  push-only negatives (no invoke, no ipcMain.handle). House trap learned: the channel
+  literal must sit on the same line as webContents.send( for the ipc-channels regex.
+- Renderer: optional DesktopBridge.onGpuStatus (older shells feature-checked), new
+  src/game/desktop_gpu_status.ts (normalize + latch + forward; payloads missing
+  either boolean are DROPPED, not coerced), composed in initDesktopShellIntegration,
+  whose module-scope timing guarantees the subscription exists before did-finish-load
+  can fire (the push has no replay; a lazy subscriber would miss it, noted for
+  phase 7 if anything ever subscribes late). The toast supports both race orders:
+  verdict-before-init folds the module-scope shellVerdict at init, init-before-verdict
+  re-resolves and builds the DOM lazily. Dismissal is now a component signature under
+  the unchanged key woc_gpu_notice_dismissed ('' | 'discrete-inactive' | 'software' |
+  'discrete-inactive,software'); the shipped legacy '1' parses as a software
+  dismissal; a verdict shrinking to a subset stays hidden, a new component re-arms.
+- i18n: one new key gpuNotice.bodyDiscreteInactive (English + the five M16 non-Latin
+  fills zh_CN/zh_TW/ja_JP/ko_KR/ru_RU, placed with their gpuNotice siblings); no
+  existing key reworded, no placeholders; 16 locales pending for the release-time
+  fill pass. Generated artifacts regenerated via i18n:gen and committed.
+- perf_nudge: the integratedGpu arm is suppressed by the new discreteNoticeShown()
+  exposure, sampled (like softwareNoticeShown) inside the 30 s check, so a late shell
+  verdict is still seen; softwareNoticeShown() remains software-only (R16 preserved).
+- Reviews: privacy-security-review PASS (0 findings above info; its three actionable
+  notes fixed in 3fd5f7a4c2: renderer-side 64-char adapter cap, length-bounded
+  signature parse, and an honest do-not-log adapter comment in runtime.ts).
+  frontend-seam-reviewer PASS-WITH-FOLLOWUPS, 0 blocking: its languagechange pin gap
+  is closed by the new tests/gpu_notice_toast.test.ts (no binding on a never-shown
+  session, no resurrect on locale flip after dismissal, spy-counted); its
+  displayed-latch SHOULD-FIX was REJECTED deliberately and pinned as intended
+  behavior: when both components arm, the software body carries the identical remedy,
+  so the integrated-GPU nudge stays suppressed rather than surfacing copy that
+  claims the shell picked the gaming GPU (false on that machine); the both-armed
+  shape is exactly the post-crash WARP flip. Phase 3 QA should re-litigate this with
+  fresh eyes.
+- Mutation probes on the committed tree, 9/9 killed with rc=1 and named failing
+  tests: send relocated past the dedup; adapter cap removed (main side); legacy '1'
+  parse emptied; coverage every->some; shell-verdict forward dropped; discrete
+  exposure reading the wrong field; body precedence flipped; renderer-side cap
+  removed; parse bound removed. Tree proven clean after every restore.
+- Gate at 57ca3a7bc3 (BROWSER_PATH exported): i18n + wiki + sfx artifacts, i18n
+  freshness, malware, and biome changed-files green; vitest full-suite fallback
+  (lockfile) red ONLY on the 8 accepted asset-seal suites (11 tests, phase 11
+  re-mint deferral), 2372 files / 32674 tests otherwise green; post-vitest steps
+  proven via turbo (check:types build:env build:server build:bot 5/5, build:bundle
+  3/3). The hardening commit re-ran its six touched suites (66 tests) + tsc + biome.
+- Ledger (recorded, not fixed): the shell.css comment claiming the gpu notice and
+  perf nudge are mutually exclusive by construction is stale (a late shell verdict
+  can put both up; slots are separate fixed positions, but measure the discrete body
+  height at 440px width, longest copy, taller in ru_RU: phase 3 QA); the
+  perfNudge.integratedGpu copy still claims the desktop app picks the gaming GPU
+  automatically (reword requires the translated-in-the-same-change pass);
+  downgrade-to-older-client re-nags once (signature unknown to the old '1' check,
+  accepted, self-healing); initGpuNotice's boolean return is test-facing only;
+  screenshots deferred to PR time per the LOCAL-ONLY rule (capture on LOW preset).
