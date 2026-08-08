@@ -3885,7 +3885,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
   'entities.abilities.summon_imp.name': 'Panggil Emberkin',
   'entities.abilities.summon_infernal.description':
-    'Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Ruin setiap detik.',
+    'Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik.',
   'entities.abilities.summon_infernal.name': 'Panggil Raksasa Pyre',
   'entities.abilities.summon_succubus.description':
     'Memanggil Duskborn di bawah perintah Penyihir Iblis. Duskborn adalah iblis rapuh yang menyerang dengan cepat dan memukul keras dalam jarak dekat. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
@@ -12041,7 +12041,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresStealth': 'Membutuhkan siluman',
   'abilityUi.tooltip.requiresStealthSkulduggery':
     'Membutuhkan siluman (tidak diperlukan pada 3 Gloam atau selama Tabir Bayangan)',
-  'abilityUi.tooltip.ruinCost': '{cost} Ruin',
+  'abilityUi.tooltip.ruinCost': '{cost} Wrack',
   'entities.abilities.abyssal_rift.description':
     'Membuka celah di lokasi yang dipilih, menarik musuh dalam radius 8 m ke pusatnya, memberikan {damage} kerusakan Bayangan, dan membuat mereka terpana selama 2 detik. Bos menerima kerusakan tetapi menahan tarikan dan efek terpana.',
   'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
@@ -12297,7 +12297,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     '{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini',
   'hudChrome.auraEffect.desolation':
     '{charges} muatan: Baut Reruntuhanmu berikutnya dirapal {castPct}% lebih cepat atau Hujan Apimu berikutnya mendarat seketika',
-  'hudChrome.auraEffect.duskfireClaim': 'Kematian memberikan {value} Ruin',
+  'hudChrome.auraEffect.duskfireClaim': 'Kematian memberikan {value} Wrack',
   'hudChrome.auraEffect.elementalTrance':
     'Kerusakan yang diterima berkurang {pct}%. {mana}% dari semua kerusakan yang kamu berikan diubah menjadi mana',
   'hudChrome.auraEffect.energyRegen': 'Meningkatkan regenerasi Energi sebesar {pct}%',
@@ -12342,7 +12342,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.physicalReduction':
     'Mengurangi kerusakan Fisik yang diterima sebesar {pct}%',
   'hudChrome.auraEffect.pyreGuardian':
-    'Menghasilkan {ruin} Ruin setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk',
+    'Menghasilkan {ruin} Wrack setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk',
   'hudChrome.auraEffect.resourceCount': '{value} dari {max}',
   'hudChrome.auraEffect.resourceSap':
     'Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk',
@@ -12367,8 +12367,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Rapal ulang dalam radius {range} m untuk kembali ke sini dan mengonsumsi jangkar',
   'hudChrome.auraEffect.wintersChill':
     '{charges} muatan: mantra yang kompatibel memperlakukan target ini seolah membeku',
-  'hudChrome.procOverlay.ruinMeter': 'Ruin',
-  'hudChrome.procOverlay.ruinStatus': '{value} dari {max} Ruin',
+  'hudChrome.procOverlay.ruinMeter': 'Wrack',
+  'hudChrome.procOverlay.ruinStatus': '{value} dari {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Serpihan Jiwa',
   'hudChrome.warlock.doomEmptyStatus': '{value} dari {max} Kecaman.',
   'hudChrome.warlock.doomLabel': 'Kecaman',

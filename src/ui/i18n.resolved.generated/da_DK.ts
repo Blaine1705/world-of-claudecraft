@@ -334,8 +334,8 @@ export const da_DK: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Sjælesplinter",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} af {max} Ruin"
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} af {max} Wrack"
     },
     "spectate": {
       "banner": "Tilskuer til {name}"
@@ -2175,8 +2175,8 @@ export const da_DK: EnTranslations = {
       "icicles": "{value} af {max} Istapper; ved {max} kan Gletsjerspyd kastes",
       "desolation": "{charges} ladninger: dit næste Undergangslyn kastes {castPct}% hurtigere, eller din næste Ildregn lander øjeblikkeligt",
       "ruinousBrand": "{charges} kopier tilbage: direkte besværgelser kopierer {otherPct}% skade hertil, eller {selfPct}% når dette er deres mål",
-      "duskfireClaim": "Død giver {value} Ruin",
-      "pyreGuardian": "Genererer {ruin} Ruin hvert {ruinInterval}. sek og gør {damage} Ildskade inden for {radius} m hvert {damageInterval}. sek",
+      "duskfireClaim": "Død giver {value} Wrack",
+      "pyreGuardian": "Genererer {ruin} Wrack hvert {ruinInterval}. sek og gør {damage} Ildskade inden for {radius} m hvert {damageInterval}. sek",
       "perfectMoment": "Æterpile forbruger ikke Arkane Ladninger",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -7590,7 +7590,7 @@ export const da_DK: EnTranslations = {
     "tooltip": {
       "rank": "Rang {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Wrack",
       "range": "{range} m rækkevidde",
       "rangeWithMin": "{min}-{max} m rækkevidde",
       "instant": "Øjeblikkelig",
@@ -9228,7 +9228,7 @@ export const da_DK: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Tilkald Pyre Colossus",
-        "description": "Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Ruin hvert sekund."
+        "description": "Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund."
       },
       "summon_doomguard": {
         "name": "Tilkald Wraithborn",

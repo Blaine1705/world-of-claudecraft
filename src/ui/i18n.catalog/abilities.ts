@@ -29,7 +29,7 @@ const abilityStringsEn = {
     tooltip: {
       rank: 'Rank {rank}',
       cost: '{cost} {resource}',
-      ruinCost: '{cost} Ruin',
+      ruinCost: '{cost} Wrack',
       range: '{range} yd range',
       rangeWithMin: '{min}-{max} yd range',
       instant: 'Instant',
@@ -619,7 +619,7 @@ const classAbilityNamesEn = {
       [
         'rain_of_fire',
         'Rain of Fire',
-        'Spends 3 Ruin to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
+        'Spends 3 Wrack to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
       ],
       [
         'volley',
@@ -1571,7 +1571,7 @@ const classAbilityNamesEn = {
       [
         'shadowburn',
         'Duskfire',
-        'Spends 1 Ruin to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Ruin if the claimed target dies within 5 sec.',
+        'Spends 1 Wrack to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Wrack if the claimed target dies within 5 sec.',
       ],
       [
         'ruinous_brand',
@@ -1968,7 +1968,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
+        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -2038,7 +2038,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec.',
+        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
       ],
       [
         'summon_doomguard',
@@ -2230,7 +2230,7 @@ const classAbilityNamesEn = {
       [
         'chaos_bolt',
         'Ruinbolt',
-        'Spends 3 Ruin to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%.',
+        'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%.',
       ],
       [
         'dark_pact',

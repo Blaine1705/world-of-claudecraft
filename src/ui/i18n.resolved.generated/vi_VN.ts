@@ -334,8 +334,8 @@ export const vi_VN: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Mảnh Linh Hồn",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} trên {max} Ruin"
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} trên {max} Wrack"
     },
     "spectate": {
       "banner": "Đang xem {name}"
@@ -2175,8 +2175,8 @@ export const vi_VN: EnTranslations = {
       "icicles": "{value} trên {max} Băng Nhọn; ở {max}, có thể thi triển Chông Băng Hà",
       "desolation": "{charges} tầng: Tia Hủy Diệt tiếp theo của bạn thi triển nhanh hơn {castPct}%, hoặc Mưa Lửa tiếp theo của bạn đổ xuống ngay lập tức",
       "ruinousBrand": "Còn lại {charges} bản sao: phép trực tiếp sao chép {otherPct}% sát thương vào đây, hoặc {selfPct}% khi đây là mục tiêu của chúng",
-      "duskfireClaim": "Cái chết cấp {value} Ruin",
-      "pyreGuardian": "Tạo ra {ruin} Ruin mỗi {ruinInterval} giây và gây {damage} sát thương Lửa trong bán kính {radius} thước mỗi {damageInterval} giây",
+      "duskfireClaim": "Cái chết cấp {value} Wrack",
+      "pyreGuardian": "Tạo ra {ruin} Wrack mỗi {ruinInterval} giây và gây {damage} sát thương Lửa trong bán kính {radius} thước mỗi {damageInterval} giây",
       "perfectMoment": "Phi Tiêu Ê-te không tiêu hao Điện Tích Bí Thuật",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -7590,7 +7590,7 @@ export const vi_VN: EnTranslations = {
     "tooltip": {
       "rank": "Cấp {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Wrack",
       "range": "Tầm {range} thước",
       "rangeWithMin": "Tầm {min}-{max} thước",
       "instant": "Tức thời",
@@ -9228,7 +9228,7 @@ export const vi_VN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Triệu Hồi Pyre Colossus",
-        "description": "Gọi một Pyre Colossus rơi xuống khu vực mục tiêu, gây 58-72 sát thương Lửa khi tiếp đất. Nó chiến đấu trong 30 giây mà không thay thế quỷ của bạn, thiêu đốt kẻ địch gần đó mỗi 2 giây và tạo 1 Ruin mỗi giây."
+        "description": "Gọi một Pyre Colossus rơi xuống khu vực mục tiêu, gây 58-72 sát thương Lửa khi tiếp đất. Nó chiến đấu trong 30 giây mà không thay thế quỷ của bạn, thiêu đốt kẻ địch gần đó mỗi 2 giây và tạo 1 Wrack mỗi giây."
       },
       "summon_doomguard": {
         "name": "Triệu Hồi Wraithborn",

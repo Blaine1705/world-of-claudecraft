@@ -334,8 +334,8 @@ export const id_ID: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Serpihan Jiwa",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} dari {max} Ruin"
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} dari {max} Wrack"
     },
     "spectate": {
       "banner": "Menonton {name}"
@@ -2175,8 +2175,8 @@ export const id_ID: EnTranslations = {
       "icicles": "{value} dari {max} Es Runcing; pada {max}, Pancang Glasial dapat dirapal",
       "desolation": "{charges} muatan: Baut Reruntuhanmu berikutnya dirapal {castPct}% lebih cepat atau Hujan Apimu berikutnya mendarat seketika",
       "ruinousBrand": "{charges} salinan tersisa: mantra langsung menyalin {otherPct}% kerusakan ke sini, atau {selfPct}% saat ini menjadi targetnya",
-      "duskfireClaim": "Kematian memberikan {value} Ruin",
-      "pyreGuardian": "Menghasilkan {ruin} Ruin setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk",
+      "duskfireClaim": "Kematian memberikan {value} Wrack",
+      "pyreGuardian": "Menghasilkan {ruin} Wrack setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk",
       "perfectMoment": "Panah Aether tidak mengonsumsi Muatan Arkana",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -7590,7 +7590,7 @@ export const id_ID: EnTranslations = {
     "tooltip": {
       "rank": "Peringkat {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Wrack",
       "range": "Jangkauan {range} yard",
       "rangeWithMin": "Jangkauan {min}-{max} yard",
       "instant": "Seketika",
@@ -9228,7 +9228,7 @@ export const id_ID: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Panggil Raksasa Pyre",
-        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Ruin setiap detik."
+        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik."
       },
       "summon_doomguard": {
         "name": "Panggil Wraithborn",

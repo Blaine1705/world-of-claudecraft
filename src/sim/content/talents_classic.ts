@@ -362,7 +362,7 @@ const WARLOCK_SPECS: SpecDef[] = [
     'Ruination',
     'dps',
     'x',
-    'A siege caster who builds Ruin and spends it on overwhelming fire.',
+    'A siege caster who builds Wrack and spends it on overwhelming fire.',
     'conflagrate',
     'Desolation',
     'Conflagrate grants Desolation. It significantly shortens your next Ruinbolt cast or calls down the first wave of Rain of Fire immediately.',

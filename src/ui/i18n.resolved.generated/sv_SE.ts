@@ -334,8 +334,8 @@ export const sv_SE: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Själfragment",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} av {max} Ruin"
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} av {max} Wrack"
     },
     "spectate": {
       "banner": "Åskådar {name}"
@@ -2175,8 +2175,8 @@ export const sv_SE: EnTranslations = {
       "icicles": "{value} av {max} Istappar; vid {max} kan Glaciärtagg kastas",
       "desolation": "{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart",
       "ruinousBrand": "{charges} kopior återstår: direkta besvärjelser kopierar {otherPct}% skada hit, eller {selfPct}% när detta är deras mål",
-      "duskfireClaim": "Döden ger {value} Ruin",
-      "pyreGuardian": "Genererar {ruin} Ruin var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek",
+      "duskfireClaim": "Döden ger {value} Wrack",
+      "pyreGuardian": "Genererar {ruin} Wrack var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek",
       "perfectMoment": "Eterpilar förbrukar inte Arkanladdningar",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -7590,7 +7590,7 @@ export const sv_SE: EnTranslations = {
     "tooltip": {
       "rank": "Rang {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Wrack",
       "range": "{range} yards räckvidd",
       "rangeWithMin": "{min}-{max} yards räckvidd",
       "instant": "Omedelbar",
@@ -9228,7 +9228,7 @@ export const sv_SE: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Frammana Pyre Colossus",
-        "description": "Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Ruin varje sekund."
+        "description": "Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Wrack varje sekund."
       },
       "summon_doomguard": {
         "name": "Frammana Wraithborn",

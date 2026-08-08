@@ -1316,7 +1316,7 @@ export function castAbility(
     return;
   }
   if ((ability.ruinCost ?? 0) > ruinAmount(p)) {
-    ctx.error(p.id, 'Not enough Ruin!');
+    ctx.error(p.id, 'Not enough Wrack!');
     return;
   }
 
@@ -2320,7 +2320,7 @@ function applyAbility(
     return;
   }
   if ((ability.ruinCost ?? 0) > ruinAmount(p)) {
-    ctx.error(p.id, 'Not enough Ruin!');
+    ctx.error(p.id, 'Not enough Wrack!');
     return;
   }
   if (ability.soulFragmentCost !== undefined && soulFragmentCount(p) < ability.soulFragmentCost) {

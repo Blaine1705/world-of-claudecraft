@@ -3721,7 +3721,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
   'entities.abilities.summon_imp.name': 'Tilkald Emberkin',
   'entities.abilities.summon_infernal.description':
-    'Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Ruin hvert sekund.',
+    'Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund.',
   'entities.abilities.summon_infernal.name': 'Tilkald Pyre Colossus',
   'entities.abilities.summon_succubus.description':
     'Tilkalder en Duskborn under Heksemesterens kommando. Duskbornen er en skrøbelig dæmon, der slår hurtigt og rammer hårdt i nærkamp. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
@@ -11892,7 +11892,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresStealth': 'Kræver snigen',
   'abilityUi.tooltip.requiresStealthSkulduggery':
     'Kræver snigen (ikke nødvendigt ved 3 Tusmørke eller under Skyggesløret)',
-  'abilityUi.tooltip.ruinCost': '{cost} Ruin',
+  'abilityUi.tooltip.ruinCost': '{cost} Wrack',
   'entities.abilities.abyssal_rift.description':
     'Åbner en rift på det valgte sted, trækker fjender inden for 8 m ind mod dens centrum, giver {damage} Skyggeskade og bedøver dem i 2 sek. Bosser tager skade, men modstår trækket og bedøvelsen.',
   'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
@@ -12144,7 +12144,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     '{used} af {cap} sek. nedkølingsreduktion brugt i dette vindue',
   'hudChrome.auraEffect.desolation':
     '{charges} ladninger: dit næste Undergangslyn kastes {castPct}% hurtigere, eller din næste Ildregn lander øjeblikkeligt',
-  'hudChrome.auraEffect.duskfireClaim': 'Død giver {value} Ruin',
+  'hudChrome.auraEffect.duskfireClaim': 'Død giver {value} Wrack',
   'hudChrome.auraEffect.elementalTrance':
     'Skade modtaget reduceret med {pct}%. {mana}% af al skade, du gør, omdannes til mana',
   'hudChrome.auraEffect.energyRegen': 'Øger energiregenerering med {pct}%',
@@ -12187,7 +12187,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.petHaste': 'Øger kæledyrets handlingshastighed med {pct}%',
   'hudChrome.auraEffect.physicalReduction': 'Reducerer Fysisk skade modtaget med {pct}%',
   'hudChrome.auraEffect.pyreGuardian':
-    'Genererer {ruin} Ruin hvert {ruinInterval}. sek og gør {damage} Ildskade inden for {radius} m hvert {damageInterval}. sek',
+    'Genererer {ruin} Wrack hvert {ruinInterval}. sek og gør {damage} Ildskade inden for {radius} m hvert {damageInterval}. sek',
   'hudChrome.auraEffect.resourceCount': '{value} af {max}',
   'hudChrome.auraEffect.resourceSap':
     'Genopretter {value} af din nuværende ressource hvert {interval}. sek',
@@ -12209,8 +12209,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kast igen inden for {range} m for at vende tilbage hertil og forbruge ankeret',
   'hudChrome.auraEffect.wintersChill':
     '{charges} ladninger: kompatible besværgelser behandler dette mål som frosset',
-  'hudChrome.procOverlay.ruinMeter': 'Ruin',
-  'hudChrome.procOverlay.ruinStatus': '{value} af {max} Ruin',
+  'hudChrome.procOverlay.ruinMeter': 'Wrack',
+  'hudChrome.procOverlay.ruinStatus': '{value} af {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Sjælesplinter',
   'hudChrome.warlock.doomEmptyStatus': '{value} af {max} Fordømmelse.',
   'hudChrome.warlock.doomLabel': 'Fordømmelse',

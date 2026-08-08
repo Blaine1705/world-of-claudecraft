@@ -25,8 +25,8 @@ export const hudChromeStrings = {
   },
   procOverlay: {
     soulFragmentsMeter: 'Soul Fragments',
-    ruinMeter: 'Ruin',
-    ruinStatus: '{value} of {max} Ruin',
+    ruinMeter: 'Wrack',
+    ruinStatus: '{value} of {max} Wrack',
   },
   spectate: {
     banner: 'Spectating {name}',
@@ -2463,15 +2463,15 @@ export const hudChromeStrings = {
       '{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back',
     afflictionVicarious:
       'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation',
-    afflictionPossession: 'Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence',
+    afflictionPossession: 'Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence',
     afflictionJudgment:
       'Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation',
     afflictionLitany:
       'Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
     afflictionFateThreads:
-      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick',
+      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick',
     afflictionConsumeThreads:
-      'Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick',
+      'Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick',
     necromancyHarvestMark: 'Death can create 1 Soul Fragment',
     necromancyOssuaryMark:
       'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',
@@ -2492,9 +2492,9 @@ export const hudChromeStrings = {
       '{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately',
     ruinousBrand:
       '{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target',
-    duskfireClaim: 'Death grants {value} Ruin',
+    duskfireClaim: 'Death grants {value} Wrack',
     pyreGuardian:
-      'Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
+      'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
     perfectMoment: 'Aether Darts does not consume Arcane Charges',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',

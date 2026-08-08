@@ -153,7 +153,7 @@ const baseEnTable = {
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
   'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
-  'error.notEnoughRuin': 'Not enough Ruin!',
+  'error.notEnoughRuin': 'Not enough Wrack!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -946,7 +946,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
     'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
-    'error.tithefiendNeedsDirge': 'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1392,7 +1393,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
     'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
-    'error.tithefiendNeedsDirge': 'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
@@ -1837,8 +1839,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
-    'error.shellskinPreventsAttacks': 'Peau de carapace empêche d\'attaquer.',
-    'error.tithefiendNeedsDirge': 'Votre Démon de dîme a besoin d\'un ennemi affecté par Chant funèbre de pourriture.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2292,8 +2295,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
-    'error.shellskinPreventsAttacks': 'Peau de carapace empêche d\'attaquer.',
-    'error.tithefiendNeedsDirge': 'Votre Démon de dîme a besoin d\'un ennemi affecté par Chant funèbre de pourriture.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
@@ -2941,7 +2945,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Rovina insufficiente!',
     'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
     'error.shellskinPreventsAttacks': 'Pelle di Corazza impedisce di attaccare.',
-    'error.tithefiendNeedsDirge': 'Il tuo Demone della Decima richiede un nemico affetto da Canto Funebre della Putrefazione.',
+    'error.tithefiendNeedsDirge':
+      'Il tuo Demone della Decima richiede un nemico affetto da Canto Funebre della Putrefazione.',
     'error.guildBankNoGuild': 'Devi essere in una gilda per usare la banca della gilda.',
     'error.guildBankRank': 'Solo gli ufficiali della gilda possono usare la banca della gilda.',
     'error.guildBankFull': 'La banca della gilda è piena.',
@@ -3388,7 +3393,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Nicht genug Verderben!',
     'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
     'error.shellskinPreventsAttacks': 'Panzerhaut verhindert Angriffe.',
-    'error.tithefiendNeedsDirge': 'Euer Zehntteufel benötigt einen Gegner mit Klagelied des Verfalls.',
+    'error.tithefiendNeedsDirge':
+      'Euer Zehntteufel benötigt einen Gegner mit Klagelied des Verfalls.',
     'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
     'error.guildBankRank': 'Nur Gildenoffiziere dürfen die Gildenbank benutzen.',
     'error.guildBankFull': 'Die Gildenbank ist voll.',
@@ -5610,7 +5616,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Ruína insuficiente!',
     'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
     'error.shellskinPreventsAttacks': 'Pele de Casco impede ataques.',
-    'error.tithefiendNeedsDirge': 'Seu Demônio do Dízimo precisa de um inimigo afetado por Réquiem da Ruína.',
+    'error.tithefiendNeedsDirge':
+      'Seu Demônio do Dízimo precisa de um inimigo afetado por Réquiem da Ruína.',
     'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
     'error.guildBankRank': 'Somente oficiais da guilda podem usar o banco da guilda.',
     'error.guildBankFull': 'O banco da guilda está cheio.',
@@ -6054,7 +6061,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Недостаточно Погибели!',
     'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
     'error.shellskinPreventsAttacks': 'Панцирная кожа не позволяет атаковать.',
-    'error.tithefiendNeedsDirge': 'Вашему демону десятины нужен противник под действием Панихиды распада.',
+    'error.tithefiendNeedsDirge':
+      'Вашему демону десятины нужен противник под действием Панихиды распада.',
     'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
     'error.guildBankRank': 'Пользоваться банком гильдии могут только офицеры гильдии.',
     'error.guildBankFull': 'Банк гильдии полон.',
@@ -6676,7 +6684,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Niet genoeg Ruïne!',
     'error.burningPactRequired': 'Ontvlamming vereist Brandpact op het doelwit.',
     'error.shellskinPreventsAttacks': 'Schildhuid verhindert aanvallen.',
-    'error.tithefiendNeedsDirge': 'Je Tiendduivel heeft een vijand nodig die onder Klaaglied van Verval lijdt.',
+    'error.tithefiendNeedsDirge':
+      'Je Tiendduivel heeft een vijand nodig die onder Klaaglied van Verval lijdt.',
     'error.toolEffectSlotFromWindow': 'Open Beroepen om dit aan te brengen.',
     'error.mountTrainInProgress': 'Er is al een rijles bezig.',
     'error.mountTrainDismountFirst': 'Stijg eerst af.',
@@ -6966,7 +6975,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Ruin tidak cukup!',
     'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
     'error.shellskinPreventsAttacks': 'Kulit Cangkang mencegah serangan.',
-    'error.tithefiendNeedsDirge': 'Iblis Persepuluhan-mu membutuhkan musuh yang terkena Ratapan Pembusukan.',
+    'error.tithefiendNeedsDirge':
+      'Iblis Persepuluhan-mu membutuhkan musuh yang terkena Ratapan Pembusukan.',
     'error.toolEffectSlotFromWindow': 'Buka Profesi untuk memasangnya.',
     'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
     'error.mountTrainDismountFirst': 'Turun dulu.',
@@ -7110,7 +7120,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
     'error.burningPactRequired': 'Tutuşturma için hedefte Yanan Ahit olmalı.',
     'error.shellskinPreventsAttacks': 'Kabuk Deri saldırıları engelliyor.',
-    'error.tithefiendNeedsDirge': 'Öşür İfritin, Çürüme Ağıdı etkisindeki bir düşmana ihtiyaç duyar.',
+    'error.tithefiendNeedsDirge':
+      'Öşür İfritin, Çürüme Ağıdı etkisindeki bir düşmana ihtiyaç duyar.',
     'error.toolEffectSlotFromWindow': 'Bunu takmak için Meslekler penceresini aç.',
     'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
     'error.mountTrainDismountFirst': 'Önce in.',
@@ -7254,7 +7265,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
     'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
     'error.shellskinPreventsAttacks': 'Skalhud förhindrar attacker.',
-    'error.tithefiendNeedsDirge': 'Din tiondedemon behöver en fiende som påverkas av Förruttnelsens klagosång.',
+    'error.tithefiendNeedsDirge':
+      'Din tiondedemon behöver en fiende som påverkas av Förruttnelsens klagosång.',
     'error.toolEffectSlotFromWindow': 'Öppna Yrken för att sätta in den.',
     'error.mountTrainInProgress': 'En ridlektion pågår redan.',
     'error.mountTrainDismountFirst': 'Stig av först.',
@@ -7540,7 +7552,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notEnoughRuin': 'Ikke nok Ruin!',
     'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
     'error.shellskinPreventsAttacks': 'Skalhud forhindrer angreb.',
-    'error.tithefiendNeedsDirge': 'Din Tiendedæmon skal bruge en fjende, der er ramt af Forfaldets Klagesang.',
+    'error.tithefiendNeedsDirge':
+      'Din Tiendedæmon skal bruge en fjende, der er ramt af Forfaldets Klagesang.',
     'error.toolEffectSlotFromWindow': 'Åbn Erhverv for at sætte den i.',
     'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
     'error.mountTrainDismountFirst': 'Stig af først.',

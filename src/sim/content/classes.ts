@@ -2228,7 +2228,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Spends 3 Ruin to rain fire over the target area for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
+      'Spends 3 Wrack to rain fire over the target area for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
   },
   volley: {
     id: 'volley',
@@ -5542,7 +5542,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     // executeThreshold, not requiresTargetHpBelow: Duskfire is STRICTLY below 20%
     // (a target sitting exactly on the line is not claimable), which is what its
-    // description promises and what the Ruin-refund window is tuned around.
+    // description promises and what the Wrack-refund window is tuned around.
     // Warrior Execute keeps the looser at-or-below requiresTargetHpBelow gate.
     executeThreshold: 0.2,
     effects: [
@@ -5550,7 +5550,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 72, max: 84 },
     ],
     description:
-      'Spends 1 Ruin to execute an enemy below 20% health for $d Shadow damage. Refunds its Ruin if the claimed target dies within 5 sec.',
+      'Spends 1 Wrack to execute an enemy below 20% health for $d Shadow damage. Refunds its Wrack if the claimed target dies within 5 sec.',
   },
   ruinous_brand: {
     id: 'ruinous_brand',
@@ -5667,7 +5667,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'summonPyreColossus', duration: 30 },
     ],
     description:
-      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec.',
+      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
   },
   soul_harvest: {
     id: 'soul_harvest',
@@ -7455,7 +7455,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 118, max: 140 }],
     description:
-      'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
+      'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },
   moonkin_form: {
     id: 'moonkin_form',

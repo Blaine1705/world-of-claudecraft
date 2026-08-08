@@ -334,8 +334,8 @@ export const en: EnTranslations = {
     },
     "procOverlay": {
       "soulFragmentsMeter": "Soul Fragments",
-      "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} of {max} Wrack"
     },
     "spectate": {
       "banner": "Spectating {name}"
@@ -2154,11 +2154,11 @@ export const en: EnTranslations = {
       "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
       "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
       "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionPossession": "Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence",
       "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
       "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick",
       "necromancyHarvestMark": "Death can create 1 Soul Fragment",
       "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
       "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
@@ -2175,8 +2175,8 @@ export const en: EnTranslations = {
       "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
       "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
       "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "duskfireClaim": "Death grants {value} Wrack",
+      "pyreGuardian": "Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
       "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
@@ -7590,7 +7590,7 @@ export const en: EnTranslations = {
     "tooltip": {
       "rank": "Rank {rank}",
       "cost": "{cost} {resource}",
-      "ruinCost": "{cost} Ruin",
+      "ruinCost": "{cost} Wrack",
       "range": "{range} yd range",
       "rangeWithMin": "{min}-{max} yd range",
       "instant": "Instant",
@@ -8053,7 +8053,7 @@ export const en: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Rain of Fire",
-        "description": "Spends 3 Ruin to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately."
+        "description": "Spends 3 Wrack to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately."
       },
       "volley": {
         "name": "Volley",
@@ -8846,7 +8846,7 @@ export const en: EnTranslations = {
       },
       "shadowburn": {
         "name": "Duskfire",
-        "description": "Spends 1 Ruin to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Ruin if the claimed target dies within 5 sec."
+        "description": "Spends 1 Wrack to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Wrack if the claimed target dies within 5 sec."
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
@@ -9172,7 +9172,7 @@ export const en: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrate",
-        "description": "Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)"
+        "description": "Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)"
       },
       "moonkin_form": {
         "name": "Moonwing Form",
@@ -9228,7 +9228,7 @@ export const en: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Summon Pyre Colossus",
-        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec."
+        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec."
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",
@@ -9388,7 +9388,7 @@ export const en: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Spends 3 Ruin to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
+        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",

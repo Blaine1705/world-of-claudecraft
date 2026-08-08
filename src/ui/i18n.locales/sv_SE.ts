@@ -3715,7 +3715,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammanar en Emberkin under häxmästarens befäl. Emberkin slungar askpilar mot dina fiender från avstånd. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
   'entities.abilities.summon_imp.name': 'Frammana Emberkin',
   'entities.abilities.summon_infernal.description':
-    'Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Ruin varje sekund.',
+    'Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Wrack varje sekund.',
   'entities.abilities.summon_infernal.name': 'Frammana Pyre Colossus',
   'entities.abilities.summon_succubus.description':
     'Frammanar en Duskborn under häxmästarens befäl. Duskborn är en bräcklig demon som hugger snabbt och slår hårt i närstrid. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
@@ -11915,7 +11915,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresStealth': 'Kräver att du är dold',
   'abilityUi.tooltip.requiresStealthSkulduggery':
     'Kräver att du är dold (behövs inte vid 3 Skymningsförråd eller under Skuggslöjan)',
-  'abilityUi.tooltip.ruinCost': '{cost} Ruin',
+  'abilityUi.tooltip.ruinCost': '{cost} Wrack',
   'entities.abilities.abyssal_rift.description':
     'River upp en reva på den valda platsen, drar fiender inom 8 meter till dess mitt, vållar {damage} skuggskada och bedövar dem i 2 sek. Bossar tar skada men motstår dragningen och bedövningen.',
   'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
@@ -12166,7 +12166,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     '{used} av {cap} sek nedkylningsreduktion använd i detta fönster',
   'hudChrome.auraEffect.desolation':
     '{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart',
-  'hudChrome.auraEffect.duskfireClaim': 'Döden ger {value} Ruin',
+  'hudChrome.auraEffect.duskfireClaim': 'Döden ger {value} Wrack',
   'hudChrome.auraEffect.elementalTrance':
     'Mottagen skada minskad med {pct}%. {mana}% av all skada du vållar omvandlas till mana',
   'hudChrome.auraEffect.energyRegen': 'Ökar energiregenereringen med {pct}%',
@@ -12207,7 +12207,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.petHaste': 'Ökar ditt husdjurs handlingshastighet med {pct}%',
   'hudChrome.auraEffect.physicalReduction': 'Minskar mottagen fysisk skada med {pct}%',
   'hudChrome.auraEffect.pyreGuardian':
-    'Genererar {ruin} Ruin var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek',
+    'Genererar {ruin} Wrack var {ruinInterval}:e sek och vållar {damage} eldskada inom {radius} m var {damageInterval}:e sek',
   'hudChrome.auraEffect.resourceCount': '{value} av {max}',
   'hudChrome.auraEffect.resourceSap':
     'Återställer {value} av din nuvarande resurs var {interval}:e sek',
@@ -12230,8 +12230,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kasta igen inom {range} m för att återvända hit och förbruka ankaret',
   'hudChrome.auraEffect.wintersChill':
     '{charges} laddningar: kompatibla besvärjelser behandlar detta mål som fryst',
-  'hudChrome.procOverlay.ruinMeter': 'Ruin',
-  'hudChrome.procOverlay.ruinStatus': '{value} av {max} Ruin',
+  'hudChrome.procOverlay.ruinMeter': 'Wrack',
+  'hudChrome.procOverlay.ruinStatus': '{value} av {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Själfragment',
   'hudChrome.warlock.doomEmptyStatus': '{value} av {max} Fördömelse.',
   'hudChrome.warlock.doomLabel': 'Fördömelse',
