@@ -62,6 +62,14 @@ const THUNZHARR_REACH_SCALE = 5;
 // function of (templateId, scale), so cache it: bounded by the small number of
 // distinct template/scale pairs actually spawned. Safe because no caller
 // mutates the returned object, only reads its fields.
+//
+// scale is not always a small fixed set: rift.ts jitters it with
+// `rng.range(0.92, 1.12)` per spawn, so an unbounded map would grow by one
+// entry per rift mob for the life of the process. Cap the cache and evict the
+// oldest entry (Map iterates in insertion order) past the cap so a long
+// session of rift churn can't leak memory; a bounded miss just rebuilds the
+// same value, it never changes behavior.
+export const MAX_COMBAT_PROFILE_CACHE_ENTRIES = 2048;
 const combatProfileCache = new Map<string, MobCombatProfile>();
 
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
@@ -69,8 +77,17 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
   const cached = combatProfileCache.get(key);
   if (cached) return cached;
   const profile = buildCombatProfileForMob(templateId, scale);
+  if (combatProfileCache.size >= MAX_COMBAT_PROFILE_CACHE_ENTRIES) {
+    const oldestKey = combatProfileCache.keys().next().value;
+    if (oldestKey !== undefined) combatProfileCache.delete(oldestKey);
+  }
   combatProfileCache.set(key, profile);
   return profile;
+}
+
+/** Test-only: the live entry count, so a bound regression fails a test instead of a live process. */
+export function combatProfileCacheSizeForTest(): number {
+  return combatProfileCache.size;
 }
 
 function buildCombatProfileForMob(templateId: string, scale: number): MobCombatProfile {

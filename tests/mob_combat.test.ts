@@ -7,9 +7,11 @@ import {
   tryMobMeleeSwingInRange,
 } from '../src/sim/mob/combat_profile';
 import {
+  combatProfileCacheSizeForTest,
   combatProfileForMob,
   DEFAULT_MOB_COMBAT_PROFILE,
   effectiveMobMeleeRange,
+  MAX_COMBAT_PROFILE_CACHE_ENTRIES,
   NYTHRAXIS_ADD_COMBAT_PROFILE,
   NYTHRAXIS_BOSS_COMBAT_PROFILE,
   scaledDefaultMobMeleeRange,
@@ -157,5 +159,14 @@ describe('mob combat profiles', () => {
       meleeRange: scaledDefaultMobMeleeRange(2),
       desiredRange: scaledDefaultMobMeleeRange(2) * 0.8,
     });
+  });
+
+  it('bounds the combatProfileForMob cache: a mob with a continuously jittered scale (rift.ts scales spawns by rng.range(0.92, 1.12), so scale is not always a small fixed set) cannot grow it without limit', () => {
+    for (let i = 0; i < MAX_COMBAT_PROFILE_CACHE_ENTRIES + 500; i++) {
+      // Emulates rift.ts's per-spawn scale jitter: a distinct float on every call, the
+      // exact case an unbounded map-by-scale would leak on over a long session.
+      combatProfileForMob('bog_crawler', 1 + i / 1_000_000);
+    }
+    expect(combatProfileCacheSizeForTest()).toBeLessThanOrEqual(MAX_COMBAT_PROFILE_CACHE_ENTRIES);
   });
 });
