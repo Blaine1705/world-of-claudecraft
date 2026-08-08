@@ -3562,6 +3562,7 @@ export const tr_TR: EnTranslations = {
       "world": {
         "heading": "Dünyayı keşfet",
         "sub": "Tek bir kesintisiz toprak, üç bölge; sakin vadilerden donmuş zirvelere.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Seviye {min} - {max}",
         "cta": "Dünyayı gör",
         "valeName": "Doğudere Vadisi",
@@ -3614,7 +3615,8 @@ export const tr_TR: EnTranslations = {
         "q3": "Çevrim dışı oynayabilir miyim?",
         "a3": "Evet. Tarayıcında anında başlayan bir tek oyunculu mod, ayrıca paylaşılan çevrim içi dünya var.",
         "q4": "Azami seviyeye ulaşmak ne kadar sürer?",
-        "a4": "Sınır, üç bölge boyunca görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir."
+        "a4": "Sınır, üç bölge boyunca görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Dünyaya katıl",
@@ -4176,6 +4178,7 @@ export const tr_TR: EnTranslations = {
       "a5": "Dokuz; klasik tank, şifacı ve hasar rollerini kapsar, her biri bir kaynak sistemine (öfke, mana ya da enerji) ve kendi imza yeteneklerine sahiptir.",
       "q6": "Seviye sınırı nedir?",
       "a6": "Görevler, zindanlar ve keşiflerle dolu, birbirine bağlı üç bölgede ulaşılan seviye {cap}.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Karakterim kaydedilecek mi?",
       "a7": "Çevrimiçi karakterler sunucuda otomatik olarak kaydedilir. Çevrimdışı karakterler hızlı oturumlar ve testler için tarayıcınızda yaşar.",
       "q8": "Kendi kopyamı barındırabilir miyim?",

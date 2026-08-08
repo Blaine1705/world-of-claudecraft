@@ -3562,6 +3562,7 @@ export const cs_CZ: EnTranslations = {
       "world": {
         "heading": "Prozkoumej svět",
         "sub": "Jedna souvislá země, tři zóny, od tichých údolí po zmrzlé štíty.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Úrovně {min} až {max}",
         "cta": "Podívat se na svět",
         "valeName": "Eastbrookské údolí",
@@ -3614,7 +3615,8 @@ export const cs_CZ: EnTranslations = {
         "q3": "Můžu hrát offline?",
         "a3": "Ano. V prohlížeči je okamžitý režim pro jednoho hráče, vedle sdíleného online světa.",
         "q4": "Jak dlouho trvá dosáhnout maximální úrovně?",
-        "a4": "Maximum je úroveň {cap}, dosažená napříč třemi zónami úkolů, dungeonů a průzkumu."
+        "a4": "Maximum je úroveň {cap}, dosažená napříč třemi zónami úkolů, dungeonů a průzkumu.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Přidej se do světa",
@@ -4176,6 +4178,7 @@ export const cs_CZ: EnTranslations = {
       "a5": "Devět, pokrývajících klasické role tanka, léčitele a poškození, každá se systémem zdroje, vztekem, manou nebo energií, a vlastními typickými schopnostmi.",
       "q6": "Jaká je maximální úroveň?",
       "a6": "Úroveň {cap}, dosažená napříč třemi propojenými zónami úkolů, dungeonů a průzkumu.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Uloží se moje postava?",
       "a7": "Online postavy se automaticky ukládají na serveru. Offline postavy žijí v prohlížeči pro rychlé seance a testování.",
       "q8": "Můžu hostovat vlastní kopii?",

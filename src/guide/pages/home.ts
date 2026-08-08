@@ -83,7 +83,7 @@ function worldHtml(): string {
   return `
     <section class="guide-section" aria-labelledby="guide-world-h">
       <h2 class="guide-section-h" id="guide-world-h">${esc(t('guide.home.world.heading'))}</h2>
-      <p class="guide-section-sub">${esc(t('guide.home.world.sub', { zones: formatNumber(ZONE_COUNT) }))}</p>
+      <p class="guide-section-sub">${esc(t('guide.home.world.subCount', { zones: formatNumber(ZONE_COUNT) }))}</p>
       <div class="guide-zone-grid">${cards}</div>
       <p class="guide-section-more"><a href="${esc(hrefFor('world'))}">${esc(t('guide.home.world.cta'))}</a></p>
     </section>`;
@@ -120,7 +120,7 @@ function faqHtml(): string {
     ['guide.home.faq.q3', t('guide.home.faq.a3')],
     [
       'guide.home.faq.q4',
-      t('guide.home.faq.a4', { cap: formatNumber(LEVEL_CAP), zones: formatNumber(ZONE_COUNT) }),
+      t('guide.home.faq.a4Count', { cap: formatNumber(LEVEL_CAP), zones: formatNumber(ZONE_COUNT) }),
     ],
   ] as const;
   const items = qa

@@ -23,7 +23,7 @@ const QA: { q: TranslationKey; a: TranslationKey; cap?: boolean; zones?: boolean
   { q: 'guide.faqPage.q17', a: 'guide.faqPage.a17' },
   { q: 'guide.faqPage.q18', a: 'guide.faqPage.a18' },
   { q: 'guide.faqPage.q5', a: 'guide.faqPage.a5' },
-  { q: 'guide.faqPage.q6', a: 'guide.faqPage.a6', cap: true, zones: true },
+  { q: 'guide.faqPage.q6', a: 'guide.faqPage.a6Count', cap: true, zones: true },
   { q: 'guide.faqPage.q7', a: 'guide.faqPage.a7' },
   { q: 'guide.faqPage.q19', a: 'guide.faqPage.a19' },
   { q: 'guide.faqPage.q8', a: 'guide.faqPage.a8' },

@@ -3562,6 +3562,7 @@ export const ko_KR: EnTranslations = {
       "world": {
         "heading": "세계를 탐험하세요",
         "sub": "고요한 골짜기부터 얼어붙은 봉우리까지, 하나로 이어진 대지와 3개의 지역.",
+        "subCount": "{zones}개 지역이 하나로 이어진 대지. 고요한 골짜기와 물에 잠긴 늪지부터 잿빛 황야, 얼어붙은 고지, 산울타리 미로 정원까지 펼쳐집니다.",
         "levels": "{min} - {max} 레벨",
         "cta": "세계 둘러보기",
         "valeName": "동부개울 골짜기",
@@ -3614,7 +3615,8 @@ export const ko_KR: EnTranslations = {
         "q3": "오프라인으로 플레이할 수 있나요?",
         "a3": "네. 브라우저에서 바로 즐기는 1인 플레이 모드와 함께 모두가 모이는 온라인 월드도 있습니다.",
         "q4": "최고 레벨까지 얼마나 걸리나요?",
-        "a4": "최고 레벨은 {cap}레벨이며, 퀘스트와 던전, 탐험으로 가득한 3개 지역을 거쳐 도달합니다."
+        "a4": "최고 레벨은 {cap}레벨이며, 퀘스트와 던전, 탐험으로 가득한 3개 지역을 거쳐 도달합니다.",
+        "a4Count": "최고 레벨은 {cap}레벨이며, 퀘스트와 던전, 탐험으로 가득한 지역들을 거쳐 도달합니다. 지역은 모두 {zones}개이며, 그중 가장 먼 곳들은 이미 최고 레벨에 오른 캐릭터를 위해 만들어졌습니다."
       },
       "community": {
         "heading": "월드에 참여하세요",
@@ -3658,12 +3660,12 @@ export const ko_KR: EnTranslations = {
       "step0Body": "오프라인 플레이는 아무것도 요구하지 않습니다. 시작 화면에서 오프라인을 고르고 플레이를 누르면 됩니다. 다른 모든 사람과 함께 플레이하려면 무료 계정을 만들거나(사용자 이름과 비밀번호, 복구용 이메일 주소가 필요합니다) 이미 가지고 있는 계정으로 로그인한 다음, 월드 목록에서 월드를 하나 고르세요.",
       "worldsTitle": "월드 고르기",
       "worldsBody": "온라인 플레이는 월드에서 이루어지며, 월드 하나하나가 저마다의 플레이어와 저마다의 세계 시장, 저마다의 순위를 지닌 게임 전체의 사본입니다. 월드 목록은 각 월드가 얼마나 붐비는지를 여유부터 만원까지 보여 주니, 넉넉한 자리를 원하면 한산한 곳을, 사람들과 어울리고 싶으면 붐비는 곳을 고르세요. 캐릭터는 만들어 둔 월드에 머물며, 여러 월드에 캐릭터를 나눠 둘 수도 있습니다.",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "charactersTitle": "여러분의 캐릭터",
+      "charactersBody": "한 계정은 월드마다 최대 열 명의 캐릭터를 둘 수 있으니, 무엇 하나 포기하지 않고도 여러 직업을 시험해 볼 자리가 넉넉합니다. 삭제는 신중하게 이루어집니다. 캐릭터가 월드 밖에 있어야 하고, 게임이 이름을 직접 입력하라고 요구한 뒤에야 사라집니다. 삭제한 캐릭터는 영영 돌아오지 않으며, 세계 시장 등록 물품과 레이븐포스트 우편도 함께 사라집니다.",
+      "namesTitle": "영웅의 이름 짓기",
+      "namesBody": "이름은 2자에서 16자까지이며 글자로 시작하고, 공백과 붙임표, 아포스트로피를 담을 수 있습니다. 같은 월드의 두 캐릭터가 하나의 이름을 함께 쓸 수는 없고, 대소문자를 달리한다고 이름이 비는 것도 아닙니다. Ashwind가 쓰이고 있다면 ashwind도 쓰이고 있는 것입니다. 여러분이 적어 넣은 철자는 그대로 지켜집니다. 이름은 캐릭터와 끝까지 함께하니, 오래 마음에 들 이름을 고르세요.",
+      "connectionTitle": "접속이 끊겼을 때",
+      "connectionBody": "신호가 끊기거나 노트북을 덮거나 페이지를 새로 고쳐도 로그아웃되지 않습니다. 게임이 알아서 재접속하는 동안 캐릭터는 약 5분간 월드에 남아 있고, 같은 세션의 같은 자리로 돌아오게 됩니다. 그 말은 접속을 끊는 것이 싸움을 벗어나는 방법이 아니라는 뜻이기도 합니다. 캐릭터는 여전히 그 자리에 서 있으니까요. 게임 메뉴에서 로그아웃하면 기다리지 않고 즉시 떠나며, 같은 계정의 다른 캐릭터로 접속해도 마찬가지입니다."
     },
     "controls": {
       "intro": "PC 기본 단축키입니다. Esc를 제외한 모든 키 설정은 게임 옵션에서 바꿀 수 있으며, Esc는 언제나 게임 메뉴를 엽니다. 또한 Shift+Z 같은 조합 키로도 설정할 수 있습니다.",
@@ -3709,7 +3711,7 @@ export const ko_KR: EnTranslations = {
       "meters": "피해량 미터 (피해, 치유, 위협)",
       "petMark": "펫: 지정, 자신의 펫을 선택합니다 (펫 정보창을 클릭하는 것과 같습니다)",
       "onBarBinding": "단축바에서 곧바로 설정할 수도 있습니다. 키 설정 창에서 행동 단축바 키 편집을 고른 다음, 화면의 단축바에서 칸을 클릭하고 원하는 키를 누르세요. 다 끝냈으면 완료를 클릭하면 됩니다. 이 방법은 실제 키보드가 필요하므로 데스크톱에서만 쓸 수 있습니다.",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "clickMoveNote": "클릭하여 이동은 직접 켜기 전까지 꺼져 있습니다. 게임 메뉴에서 키 설정 창을 열고 클릭하여 이동을 켠 다음, 그 아래의 클릭 이동 버튼 줄에서 어느 마우스 버튼이 걸음을 맡을지 고르세요(기본값은 왼쪽 클릭이며 오른쪽 클릭도 쓸 수 있습니다). 켜 두면 땅 위의 한 지점을 클릭할 때 그곳으로 걸어가며, 바닥에 남는 표식이 어디로 향하는지 알려 줍니다. 생물이나 다른 플레이어를 클릭하면 그쪽으로 걸어가 사거리 안에서 멈추고, 그 클릭은 대상 지정이나 상호작용이라는 본래 역할도 그대로 해냅니다. 클릭한 것에 이미 닿을 만큼 가까이 있다면 제자리에 선 채로 상호작용만 하게 됩니다. 이동 키를 아무거나 누르면 조작이 곧바로 돌아오며 가던 길이 끝나고, 마우스 버튼을 누른 채 주위를 둘러보아도 마찬가지입니다. 점프는 길을 끊지 않으므로 뛰어오르는 동안에도 계속 나아가며, 게임 메뉴를 여는 것은 가던 길을 잠시 멈출 뿐이어서 메뉴를 닫으면 다시 이어집니다."
     },
     "settingsPage": {
       "heading": "설정 및 성능",
@@ -4176,6 +4178,7 @@ export const ko_KR: EnTranslations = {
       "a5": "9개로, 클래식한 탱커, 힐러, 딜러 역할을 아우르며, 각자 자원 체계(분노, 마나, 기력)와 고유한 대표 능력을 지니고 있습니다.",
       "q6": "최고 레벨은 몇인가요?",
       "a6": "{cap}레벨이며, 퀘스트와 던전, 탐험으로 이어진 3개 지역을 거쳐 도달합니다.",
+      "a6Count": "{cap}레벨이며, 퀘스트와 던전, 탐험으로 이어진 지역들을 거쳐 도달합니다. 지역은 모두 {zones}개로, 시작 골짜기부터 이미 최고 레벨에 오른 캐릭터를 위해 만들어진 지역까지 이어집니다.",
       "q7": "제 캐릭터가 저장되나요?",
       "a7": "온라인 캐릭터는 서버에 자동으로 저장됩니다. 오프라인 캐릭터는 짧은 플레이와 시험용으로 브라우저에 보관됩니다.",
       "q8": "제 서버를 직접 운영할 수 있나요?",
@@ -4196,14 +4199,14 @@ export const ko_KR: EnTranslations = {
       "a15": "온라인으로 플레이할 때만 필요합니다. 오프라인 세계는 아무것도 요구하지 않습니다. 시작 화면에서 오프라인을 고르고 플레이를 누르면 됩니다. 온라인 계정은 무료이며 사용자 이름과 비밀번호, 계정 복구용 이메일 주소만 있으면 만들 수 있고, 캐릭터를 서버에 저장해 둡니다. 계정을 만든 뒤에는 옵션에서 2단계 인증을 켤 수 있습니다.",
       "q16": "월드란 무엇인가요?",
       "a16": "온라인 플레이는 월드 위에서 이루어지며, 월드 하나하나가 저마다의 플레이어와 저마다의 세계 시장, 저마다의 순위를 지닌 게임 전체의 사본입니다. 로그인하면 월드 목록이 각 월드가 얼마나 붐비는지 낮음부터 포화까지 보여 주므로, 한적한 곳을 골라 여유를 누리거나 붐비는 곳을 골라 사람들과 어울릴 수 있습니다. 캐릭터는 자신이 만들어진 월드에서 살아가며, 두 개 이상의 월드에 캐릭터를 둘 수도 있습니다.",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q17": "캐릭터는 몇 명까지 만들 수 있고, 삭제할 수도 있나요?",
+      "a17": "한 계정에서 월드마다 최대 열 명까지 둘 수 있으며, 두 개 이상의 월드에 캐릭터를 둘 수도 있습니다. 지우려면 캐릭터 목록에서 삭제하세요. 그 캐릭터는 월드에 나가 있지 않아야 하고, 확인을 위해 이름을 직접 입력해야 하므로 손이 미끄러졌다고 영웅을 잃는 일은 없습니다. 삭제는 되돌릴 수 없습니다. 그 캐릭터의 소지품도 함께 사라지고, 세계 시장에 올려 둔 등록 물품은 시장에서 내려가며, 레이븐포스트 우편함도 비워집니다.",
+      "q18": "캐릭터 이름을 바꿀 수 있나요?",
+      "a18": "직접 바꿀 수는 없으니 마음에 드는 이름을 고르세요. 이름은 2자에서 16자까지의 글자로 이루어지며 글자로 시작해야 하고, 공백과 붙임표, 아포스트로피를 쓸 수 있습니다. 그리고 대소문자를 어떻게 쓰든 한 월드 안에서 이름은 저마다 하나뿐입니다. 행동 규칙에 어긋나는 이름은 거절됩니다. 이름을 바꾸라는 요구를 받는 경우는 운영자가 이름 변경을 요구할 때 한 번뿐입니다. 계정을 닫으면 그 이름들이 다른 플레이어에게 풀릴 수 있지만, 한동안 접속하지 않았다는 이유만으로 풀리는 일은 결코 없습니다. 활동이 없는 계정도 자기 이름을 그대로 지킵니다.",
+      "q19": "접속이 끊기면 어떻게 되나요?",
+      "a19": "여러분의 캐릭터는 약 5분 동안 월드에 남아 있고 게임이 알아서 재접속을 시도하므로, 신호가 끊기거나 노트북을 덮거나 페이지를 새로 고쳐도 대개는 있던 자리로, 같은 세션으로 돌아옵니다. 캐릭터가 정말로 그 자리에 서 있는 것이기 때문에, 접속을 끊는 것은 싸움에서 달아나는 방법이 되지 못합니다. 게임 메뉴에서 로그아웃을 고르면 그 시간을 기다리지 않고 즉시 세계를 떠납니다.",
+      "q20": "버그를 찾았습니다. 어떻게 신고하나요?",
+      "a20": "온라인 게임 안에서 Esc로 메뉴를 열고 버그 신고를 고르세요. 무슨 일이 있었는지 적어 보내면 됩니다. 월드와 캐릭터, 서 있던 좌표는 버전과 기기 정보와 함께 자동으로 따라가며, 스크린샷 포함을 체크하면 보고 있던 화면을 그림으로 첨부할 수 있습니다. 여러 건을 잇달아 보내면 다음 신고까지 잠시 기다려 달라는 안내가 나올 수 있습니다."
     },
     "classList": {
       "heading": "9개의 직업",
@@ -4795,8 +4798,8 @@ export const ko_KR: EnTranslations = {
       },
       "bookHeading": "업적의 서 들여다보기",
       "bookBody": "업적의 서는 모든 업적을 넘겨 볼 수 있는 범주로 나누어 정리하고, 검색창과 함께 전체, 이미 얻은 것, 아직 얻지 못한 것, 거의 다 된 것을 골라 보는 필터를 제공합니다. 위쪽의 최근 줄에는 가장 최근에 해금한 것들이 담겨 있어, 하나를 클릭하면 곧바로 그 카드로 넘어갑니다. 누군가 채팅에 올린 업적 이름을 클릭해도 마찬가지입니다. 그 옆의 거의 다 왔어요는 완료에 가장 가까운 몇 가지를 짚어 줍니다. 온라인 월드에서는 업적마다 희귀도, 곧 그것을 얻어 낸 모험가의 비율까지 함께 붙으므로 어느 것이 흔하고 어느 것이 진짜 고비인지 한눈에 알 수 있습니다. 오프라인 세계에는 셀 인구가 없으므로 아무것도 표시되지 않습니다. 목록 끝에는 칭호 선반이 자리하며, 그곳에서 걸칠 칭호를 고릅니다.",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "platformHeading": "Steam과 Epic 도전 과제",
+      "platformBody": "데스크톱 앱에서 Steam이나 Epic Games 계정을 연동하면, 여러분이 얻은 업적이 그 계정의 도전 과제로 함께 기록됩니다. 언제나 게임 세계가 기준입니다. 업적은 이곳에서 얻어 캐릭터에 새겨지고, 도전 과제는 그 뒤를 따라옵니다. 모든 업적에 짝이 되는 도전 과제가 있는 것은 아니며, 바로 도착하지 않더라도 다음에 접속할 때 따라잡습니다. 연동은 어디까지나 연동일 뿐, 로그인 수단이 되지는 않습니다."
     },
     "wishPage": {
       "heading": "미리 알았으면 좋았을 것들",

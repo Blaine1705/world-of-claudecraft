@@ -3562,6 +3562,7 @@ export const it_IT: EnTranslations = {
       "world": {
         "heading": "Esplora il mondo",
         "sub": "Una terra continua, tre zone, dalle valli tranquille alle vette ghiacciate.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Livelli da {min} a {max}",
         "cta": "Scopri il mondo",
         "valeName": "Valle di Eastbrook",
@@ -3614,7 +3615,8 @@ export const it_IT: EnTranslations = {
         "q3": "Posso giocare offline?",
         "a3": "Sì. C'è una modalità immediata per giocatore singolo nel tuo browser, oltre al mondo online condiviso.",
         "q4": "Quanto ci vuole per raggiungere il livello massimo?",
-        "a4": "Il limite è il livello {cap}, raggiunto attraverso tre zone di missioni, dungeon ed esplorazione."
+        "a4": "Il limite è il livello {cap}, raggiunto attraverso tre zone di missioni, dungeon ed esplorazione.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Unisciti al mondo",
@@ -4176,6 +4178,7 @@ export const it_IT: EnTranslations = {
       "a5": "Nove, che coprono i ruoli classici di tank, guaritore e danno, ognuna con un sistema di risorse (ira, mana o energia) e le proprie abilità distintive.",
       "q6": "Qual è il livello massimo?",
       "a6": "Livello {cap}, raggiunto attraverso tre zone collegate di missioni, dungeon ed esplorazione.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Il mio personaggio verrà salvato?",
       "a7": "I personaggi online vengono salvati automaticamente sul server. I personaggi offline vivono nel tuo browser per sessioni rapide e test.",
       "q8": "Posso ospitare una mia copia?",

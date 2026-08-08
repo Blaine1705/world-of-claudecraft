@@ -3562,6 +3562,7 @@ export const es: EnTranslations = {
       "world": {
         "heading": "Explora el mundo",
         "sub": "Una sola tierra continua, tres zonas, desde valles tranquilos hasta picos helados.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Niveles {min} a {max}",
         "cta": "Conoce el mundo",
         "valeName": "Valle de Eastbrook",
@@ -3614,7 +3615,8 @@ export const es: EnTranslations = {
         "q3": "¿Puedo jugar sin conexión?",
         "a3": "Sí. Hay un modo de un jugador instantáneo en tu navegador, además del mundo en línea compartido.",
         "q4": "¿Cuánto se tarda en llegar al nivel máximo?",
-        "a4": "El máximo es el nivel {cap}, alcanzado a través de tres zonas de misiones, mazmorras y exploración."
+        "a4": "El máximo es el nivel {cap}, alcanzado a través de tres zonas de misiones, mazmorras y exploración.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Únete al mundo",
@@ -4176,6 +4178,7 @@ export const es: EnTranslations = {
       "a5": "Nueve, que cubren los roles clásicos de tanque, sanador y daño, cada una con su propio sistema de recursos (ira, maná o energía) y sus habilidades distintivas.",
       "q6": "¿Cuál es el nivel máximo?",
       "a6": "Nivel {cap}, alcanzado a través de tres zonas conectadas de misiones, mazmorras y exploración.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "¿Se guardará mi personaje?",
       "a7": "Los personajes en línea se guardan en el servidor automáticamente. Los personajes sin conexión viven en tu navegador para sesiones rápidas y pruebas.",
       "q8": "¿Puedo alojar mi propia copia?",

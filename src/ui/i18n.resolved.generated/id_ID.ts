@@ -3562,6 +3562,7 @@ export const id_ID: EnTranslations = {
       "world": {
         "heading": "Jelajahi dunia",
         "sub": "Satu daratan menyambung, tiga zona, dari lembah yang tenang hingga puncak beku.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Level {min} hingga {max}",
         "cta": "Lihat dunianya",
         "valeName": "Lembah Eastbrook",
@@ -3614,7 +3615,8 @@ export const id_ID: EnTranslations = {
         "q3": "Bisakah saya bermain luring?",
         "a3": "Ya. Ada mode pemain tunggal instan di browser-mu, ditambah dunia daring bersama.",
         "q4": "Berapa lama untuk mencapai level maksimal?",
-        "a4": "Batasnya adalah level {cap}, dicapai melintasi tiga zona penuh misi, dungeon, dan penjelajahan."
+        "a4": "Batasnya adalah level {cap}, dicapai melintasi tiga zona penuh misi, dungeon, dan penjelajahan.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Bergabunglah dengan dunia",
@@ -4176,6 +4178,7 @@ export const id_ID: EnTranslations = {
       "a5": "Sembilan, mencakup peran klasik tank, penyembuh, dan penyerang, masing-masing dengan sistem sumber daya (amukan, mana, atau energi) dan kemampuan khasnya sendiri.",
       "q6": "Berapa batas levelnya?",
       "a6": "Level {cap}, dicapai melintasi tiga zona terhubung berisi misi, ruang bawah tanah, dan penjelajahan.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Apakah karakter saya akan tersimpan?",
       "a7": "Karakter daring disimpan di server secara otomatis. Karakter luring tersimpan di perambanmu untuk sesi cepat dan pengujian.",
       "q8": "Bisakah saya menjalankan salinan saya sendiri?",

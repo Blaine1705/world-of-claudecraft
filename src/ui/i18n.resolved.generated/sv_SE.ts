@@ -3562,6 +3562,7 @@ export const sv_SE: EnTranslations = {
       "world": {
         "heading": "Utforska världen",
         "sub": "Ett sammanhängande land, tre zoner, från stilla dalar till frusna toppar.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Nivå {min} till {max}",
         "cta": "Se världen",
         "valeName": "Östbäcksdalen",
@@ -3614,7 +3615,8 @@ export const sv_SE: EnTranslations = {
         "q3": "Kan jag spela offline?",
         "a3": "Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.",
         "q4": "Hur lång tid tar det att nå maxnivå?",
-        "a4": "Taket är nivå {cap}, nått genom tre zoner av uppdrag, fängelsehål och utforskning."
+        "a4": "Taket är nivå {cap}, nått genom tre zoner av uppdrag, fängelsehål och utforskning.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Gå med i världen",
@@ -4176,6 +4178,7 @@ export const sv_SE: EnTranslations = {
       "a5": "Nio, som täcker de klassiska rollerna tank, läkare och skadegörare, var och en med ett resurssystem (raseri, mana eller energi) och sina egna signaturförmågor.",
       "q6": "Vad är nivåtaket?",
       "a6": "Nivå {cap}, nådd genom tre sammanlänkade zoner av uppdrag, fängelsehålor och utforskning.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Kommer min karaktär att sparas?",
       "a7": "Onlinekaraktärer sparas på servern automatiskt. Offlinekaraktärer lever i din webbläsare för snabba sessioner och testning.",
       "q8": "Kan jag driva min egen kopia?",

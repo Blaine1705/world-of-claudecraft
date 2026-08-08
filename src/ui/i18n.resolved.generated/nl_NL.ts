@@ -3562,6 +3562,7 @@ export const nl_NL: EnTranslations = {
       "world": {
         "heading": "Verken de wereld",
         "sub": "Eén aaneengesloten land, drie gebieden, van stille valleien tot bevroren toppen.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Niveau {min} tot {max}",
         "cta": "Bekijk de wereld",
         "valeName": "Oostbeekdal",
@@ -3614,7 +3615,8 @@ export const nl_NL: EnTranslations = {
         "q3": "Kan ik offline spelen?",
         "a3": "Ja. Er is een directe singleplayermodus in je browser, plus de gedeelde online wereld.",
         "q4": "Hoe lang duurt het om het maximale niveau te bereiken?",
-        "a4": "De grens is niveau {cap}, bereikt over drie gebieden vol quests, kerkers en verkenning."
+        "a4": "De grens is niveau {cap}, bereikt over drie gebieden vol quests, kerkers en verkenning.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Sluit je aan bij de wereld",
@@ -4176,6 +4178,7 @@ export const nl_NL: EnTranslations = {
       "a5": "Negen, die de klassieke rollen van tank, genezer en damage dekken, elk met een bronsysteem (woede, mana of energie) en hun eigen kenmerkende vaardigheden.",
       "q6": "Wat is de niveaulimiet?",
       "a6": "Niveau {cap}, bereikt over drie verbonden gebieden vol quests, kerkers en verkenning.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Wordt mijn personage opgeslagen?",
       "a7": "Online personages worden automatisch op de server opgeslagen. Offline personages leven in je browser voor snelle sessies en tests.",
       "q8": "Kan ik mijn eigen kopie hosten?",

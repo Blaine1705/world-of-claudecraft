@@ -3562,6 +3562,7 @@ export const vi_VN: EnTranslations = {
       "world": {
         "heading": "Khám phá thế giới",
         "sub": "Một dải đất liền mạch, ba vùng, từ những thung lũng yên bình đến những đỉnh núi băng giá.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Cấp {min} đến {max}",
         "cta": "Ngắm thế giới",
         "valeName": "Thung Lũng Đông Khê",
@@ -3614,7 +3615,8 @@ export const vi_VN: EnTranslations = {
         "q3": "Tôi có thể chơi ngoại tuyến không?",
         "a3": "Có. Có chế độ chơi đơn tức thì ngay trong trình duyệt của bạn, cộng thêm thế giới trực tuyến chung.",
         "q4": "Mất bao lâu để đạt cấp tối đa?",
-        "a4": "Cấp tối đa là cấp {cap}, đạt được qua ba vùng đất với nhiệm vụ, hầm ngục và khám phá."
+        "a4": "Cấp tối đa là cấp {cap}, đạt được qua ba vùng đất với nhiệm vụ, hầm ngục và khám phá.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Gia nhập thế giới",
@@ -4176,6 +4178,7 @@ export const vi_VN: EnTranslations = {
       "a5": "Chín lớp, bao trùm các vai tank, hồi máu và sát thương cổ điển, mỗi lớp có một hệ tài nguyên (Cuồng Nộ, mana, hoặc Năng Lượng) và những kỹ năng đặc trưng riêng.",
       "q6": "Giới hạn cấp độ là bao nhiêu?",
       "a6": "Cấp {cap}, đạt được xuyên qua ba khu vực liền kề đầy nhiệm vụ, hầm ngục và khám phá.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Nhân vật của tôi có được lưu lại không?",
       "a7": "Nhân vật trực tuyến được lưu trên máy chủ một cách tự động. Nhân vật ngoại tuyến sống trong trình duyệt của bạn cho những phiên chơi nhanh và thử nghiệm.",
       "q8": "Tôi có thể tự lưu trữ bản sao của riêng mình không?",

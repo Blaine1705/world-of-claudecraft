@@ -3562,6 +3562,7 @@ export const ja_JP: EnTranslations = {
       "world": {
         "heading": "ワールドを冒険しよう",
         "sub": "ひと続きの大地、3つのゾーン。静かな谷から凍てつく頂まで。",
+        "subCount": "ひと続きの大地に広がる{zones}のゾーン。静かな谷や沈んだ湿地から、燃え殻の荒野、凍てつく高地、生垣迷路の庭園まで。",
         "levels": "レベル{min}から{max}",
         "cta": "ワールドを見る",
         "valeName": "イーストブルックの谷",
@@ -3614,7 +3615,8 @@ export const ja_JP: EnTranslations = {
         "q3": "オフラインで遊べますか?",
         "a3": "はい。ブラウザですぐに遊べるシングルプレイモードに加え、共有のオンラインワールドもあります。",
         "q4": "最大レベルまでどのくらいかかりますか?",
-        "a4": "レベル上限は{cap}で、3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。"
+        "a4": "レベル上限は{cap}で、3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。",
+        "a4Count": "レベル上限は{cap}で、クエスト、ダンジョン、探索を重ねながらゾーンを渡り歩いて到達します。ゾーンは全部で{zones}あり、その最果ては、すでに上限に達したキャラクターのために作られています。"
       },
       "community": {
         "heading": "ワールドに参加しよう",
@@ -3658,12 +3660,12 @@ export const ja_JP: EnTranslations = {
       "step0Body": "オフラインで遊ぶなら、何も必要ありません。スタート画面で「オフライン」を選び、「プレイ」を押すだけです。ほかのみんなと一緒に遊ぶなら、無料のアカウントを作るか（ユーザー名、パスワード、そして復旧用のメールアドレスが要ります）、すでにお持ちのアカウントでサインインし、ワールドリストからワールドを一つ選びましょう。",
       "worldsTitle": "ワールドを選ぶ",
       "worldsBody": "オンラインの遊びはワールドの上で進みます。どのワールドもゲームまるごと一つ分の写しで、そこに住むプレイヤーも、世界市場も、順位もそれぞれ独立しています。ワールドリストには各ワールドの混み具合が「低」から「満員」まで表示されるので、ゆったり遊びたいなら空いているワールドを、賑わいを求めるなら混んでいるワールドを選びましょう。キャラクターは作成したワールドに住み、複数のワールドにキャラクターを持つこともできます。",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "charactersTitle": "あなたのキャラクター",
+      "charactersBody": "1つのアカウントで、それぞれのワールドに最大10体までキャラクターを置けます。ですから、何かを手放すことなく、いくつものクラスを試す余地があります。削除は意識して行うものです。そのキャラクターはワールドの外にいる必要があり、消す前に名前を入力するよう求められます。削除したキャラクターは二度と戻らず、ワールドマーケットの出品もレイヴンポストの手紙も一緒になくなります。",
+      "namesTitle": "英雄に名前を付ける",
+      "namesBody": "名前は2文字から16文字で、最初は文字で始まり、スペース、ハイフン、アポストロフィを含められます。同じワールドの2体が同じ名前を持つことはできず、大文字と小文字を変えても名前は空きになりません。Ashwindが使われていれば、ashwindも使われています。あなたが入力したつづりは、そのままの形で保たれます。名前はキャラクターにずっと寄り添うものですから、後から見ても気に入っていられるものを選びましょう。",
+      "connectionTitle": "接続が切れたら",
+      "connectionBody": "回線が切れても、ふたを閉じても、ページを再読み込みしても、ログアウトにはなりません。ゲームが自分で再接続する間、あなたのキャラクターは5分ほどワールドに保たれ、同じセッションの同じ場所へ戻ってこられます。つまり、抜けることは戦いから離れる手段にはなりません。キャラクターはその場に立ったままです。ゲームメニューからログアウトすれば待たずにすぐ退出しますし、同じアカウントの別のキャラクターでサインインした場合も同じです。"
     },
     "controls": {
       "intro": "PC用のデフォルトキーです。すべてのキー割り当てはゲームのオプションで変更できます。ただしEscだけは例外で、常にゲームメニューを開きます。また、Shift+Zのような修飾キーの組み合わせを割り当てることもできます。",
@@ -3709,7 +3711,7 @@ export const ja_JP: EnTranslations = {
       "meters": "計測メーター（ダメージ、回復、脅威）",
       "petMark": "ペット：マーク。自分のペットを選択します（フレームをクリックするのと同じです）",
       "onBarBinding": "アクションバーから直接割り当てることもできます。キー設定パネルで「アクションバーのキーを編集」を選び、実際のバーのスロットをクリックして、割り当てたいキーを押すだけです。終わったら「完了」をクリックします。物理キーボードが必要なため、これはデスクトップ専用です。",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "clickMoveNote": "クリック移動は、自分で有効にするまではオフのままです。ゲームメニューからキー設定パネルを開き、「クリック移動」をオンにして、そのすぐ下にある「クリック移動ボタン」の行で、どのマウスボタンで歩くかを選びましょう（初期設定は「左クリック」、「右クリック」も選べます）。オンにすると、地面のどこかをクリックすればそこへ歩いていき、目指している場所には地面にマーカーが表示されます。クリーチャーや他のプレイヤーをクリックすると、その相手のもとまで歩いていって射程に入ったところで止まり、そのクリックはターゲットや対話といったいつもの役目もきちんと果たします。クリックしたものにもう手が届く距離にいるなら、そのまま動かずに対話するだけです。移動キーを押せばすぐに操作が手元へ戻って移動は終わり、マウスボタンを押したまま見回した場合も同じです。ジャンプでは終わらないので、跳んでいる間も移動は続きます。ゲームメニューを開いても移動は一時停止するだけで、メニューを閉じれば続きから再開します。"
     },
     "settingsPage": {
       "heading": "設定とパフォーマンス",
@@ -4176,6 +4178,7 @@ export const ja_JP: EnTranslations = {
       "a5": "九つで、クラシックなタンク、ヒーラー、ダメージのロールを網羅し、それぞれがリソースシステム（レイジ、マナ、またはエナジー）と独自の代表的なアビリティを持ちます。",
       "q6": "レベル上限はいくつですか?",
       "a6": "レベル{cap}で、つながった3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。",
+      "a6Count": "レベル{cap}で、クエスト、ダンジョン、探索を重ねながらゾーンを渡り歩いて到達します。ゾーンは全部で{zones}あり、旅立ちの渓谷から、すでにレベル上限に達したキャラクターのために作られた地方まで続いています。",
       "q7": "キャラクターは保存されますか?",
       "a7": "オンラインのキャラクターはサーバーに自動で保存されます。オフラインのキャラクターは、手軽なプレイやテスト用にブラウザ内に保存されます。",
       "q8": "自分でサーバーを立てられますか?",
@@ -4196,14 +4199,14 @@ export const ja_JP: EnTranslations = {
       "a15": "オンラインで遊ぶ場合だけ必要です。オフラインのワールドは何も求めません。開始画面で「オフライン」を選び、「プレイ」を押すだけです。オンラインアカウントは無料で、ユーザー名、パスワード、アカウント復旧用のメールアドレスがあれば作れ、キャラクターはサーバーに保存されます。作成後は、オプションから二要素認証を有効にできます。",
       "q16": "ワールドとは何ですか。",
       "a16": "オンラインプレイはワールドごとに行われ、その一つひとつが、独自のプレイヤー、独自のワールドマーケット、独自のランキングを持つゲームまるごとの写しです。サインインすると、ワールド一覧が各ワールドの混み具合を低から満員まで表示するので、ゆったり遊べる静かなところでも、賑やかなところでも選べます。キャラクターは作成したワールドに住み、複数のワールドにキャラクターを持つこともできます。",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q17": "キャラクターは何体まで持てますか。削除もできますか。",
+      "a17": "1つのアカウントにつき、1つのワールドに最大10体までキャラクターを持てます。複数のワールドにキャラクターを持つこともできます。消したいときは、キャラクター一覧から削除します。そのキャラクターがワールドにいないことが条件で、確認のために名前を入力する必要があるので、指がすべっただけで英雄を失うことはありません。削除は取り消せません。そのキャラクターの持ち物も一緒になくなり、ワールドマーケットの出品は市場から取り下げられ、レイヴンポストのメールボックスも空になります。",
+      "q18": "キャラクターの名前は変えられますか。",
+      "a18": "自分では変えられませんので、気に入った名前を選んでください。名前は2文字から16文字で、最初は文字で始まり、スペース、ハイフン、アポストロフィを使えます。同じワールドの中では、大文字と小文字の違いにかかわらず、それぞれの名前はただ一つです。行動規範に反する名前は受け付けられません。改名を求められるのは、モデレーターがそれを要求したときだけです。アカウントを閉じると、その名前が他のプレイヤーへ開放されることがありますが、しばらく遊んでいないだけでそうなることはありません。使われていないアカウントも、その名前を保ち続けます。",
+      "q19": "接続が切れたらどうなりますか。",
+      "a19": "あなたのキャラクターは5分ほどワールドに残り、ゲームは自分で再接続を試みます。ですから、回線が切れても、ノートPCを閉じても、ページを再読み込みしても、たいていは同じセッションの、元いた場所にそのまま戻れます。キャラクターが本当にその場に立ち続けている以上、切断は戦いから逃げる手段にはなりません。ゲームメニューから「ログアウト」を選んだ場合は、その時間を待たずにすぐ退出します。",
+      "q20": "バグを見つけました。どうやって報告しますか。",
+      "a20": "オンラインのゲーム内でEscを押してメニューを開き、「バグを報告」を選びます。何が起きたかを書いて送信してください。ワールド、キャラクター、立っていた座標は自動で一緒に送られ、バージョンや端末の情報も添えられます。「スクリーンショットを添付」にチェックを入れれば、そのとき見ていた画面の画像も付けられます。続けて何通も送ると、次を送るまで少し待つよう求められることがあります。"
     },
     "classList": {
       "heading": "9つのクラス",
@@ -4795,8 +4798,8 @@ export const ja_JP: EnTranslations = {
       },
       "bookHeading": "功績の書の中身",
       "bookBody": "功績の書は、すべての功績を切り替え可能なカテゴリに分けて並べます。検索欄と、全件、獲得済み、未獲得、あと少しで達成できるもの、という絞り込みがあります。上部の「最近」の帯には最新の解除が並び、クリックするとそのカードへ直接飛べます。チャットに投稿された功績名をクリックしたときも同じです。その隣の「あと少し」は、達成が近いいくつかを教えてくれます。レルムでは各功績にレアリティ、つまりそれを獲得した冒険者の割合も表示されるので、ありふれたものと本物の難関がひと目で分かります。オフラインのワールドには数えるべき人口がないので、そこでは表示されません。レールの末尾には称号の棚があり、身につける称号をそこで選びます。",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "platformHeading": "SteamとEpicの実績",
+      "platformBody": "デスクトップ版アプリからSteamまたはEpic Gamesのアカウントを連携すると、獲得した功績が、そのアカウントの実績として外側にも映し出されます。あくまでゲーム世界が本体です。功績はここで獲得され、あなたのキャラクターに記録され、実績はそのあとについてきます。すべての功績に対応する実績があるわけではありませんし、すぐに届かなかった場合も、次にログインしたときに追いつきます。連携はどこまでも連携であって、サインインの手段になることは決してありません。"
     },
     "wishPage": {
       "heading": "知っておきたかったこと",

@@ -3561,7 +3561,8 @@ export const en_CA: EnTranslations = {
       },
       "world": {
         "heading": "Explore the world",
-        "sub": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
+        "sub": "One continuous land, three zones, from quiet valleys to frozen peaks.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Levels {min} to {max}",
         "cta": "See the world",
         "valeName": "Eastbrook Vale",
@@ -3614,7 +3615,8 @@ export const en_CA: EnTranslations = {
         "q3": "Can I play offline?",
         "a3": "Yes. There is an instant single-player mode in your browser, plus the shared online world.",
         "q4": "How long to reach max level?",
-        "a4": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
+        "a4": "The cap is level {cap}, reached across three zones of quests, dungeons, and exploration.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Join the world",
@@ -4175,7 +4177,8 @@ export const en_CA: EnTranslations = {
       "q5": "How many classes are there?",
       "a5": "Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.",
       "q6": "What is the level cap?",
-      "a6": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
+      "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Will my character be saved?",
       "a7": "Online characters are saved on the server automatically. Offline characters live in your browser for quick sessions and testing.",
       "q8": "Can I host my own copy?",

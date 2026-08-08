@@ -3562,6 +3562,7 @@ export const da_DK: EnTranslations = {
       "world": {
         "heading": "Udforsk verden",
         "sub": "Ét sammenhængende land, tre zoner, fra stille dale til frosne tinder.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Niveau {min} til {max}",
         "cta": "Se verden",
         "valeName": "Østbæk Dal",
@@ -3614,7 +3615,8 @@ export const da_DK: EnTranslations = {
         "q3": "Kan jeg spille offline?",
         "a3": "Ja. Der er en øjeblikkelig enkeltspillertilstand i din browser, plus den delte online-verden.",
         "q4": "Hvor lang tid tager det at nå maksniveau?",
-        "a4": "Grænsen er niveau {cap}, nået på tværs af tre zoner med quests, fangehuller og udforskning."
+        "a4": "Grænsen er niveau {cap}, nået på tværs af tre zoner med quests, fangehuller og udforskning.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Slut dig til verdenen",
@@ -4176,6 +4178,7 @@ export const da_DK: EnTranslations = {
       "a5": "Ni, der dækker de klassiske roller tank, healer og skadevolder, hver med et ressourcesystem (raseri, mana eller energi) og sine egne signaturevner.",
       "q6": "Hvad er niveaugrænsen?",
       "a6": "Niveau {cap}, nået på tværs af tre forbundne zoner med opgaver, fangehuller og udforskning.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Bliver min figur gemt?",
       "a7": "Online-figurer gemmes automatisk på serveren. Offline-figurer lever i din browser til hurtige sessioner og afprøvning.",
       "q8": "Kan jeg være vært for min egen kopi?",

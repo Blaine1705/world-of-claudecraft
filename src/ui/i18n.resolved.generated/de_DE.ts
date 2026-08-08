@@ -3562,6 +3562,7 @@ export const de_DE: EnTranslations = {
       "world": {
         "heading": "Erkunde die Welt",
         "sub": "Ein zusammenhängendes Land, drei Gebiete, von stillen Tälern bis zu eisigen Gipfeln.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Stufe {min} bis {max}",
         "cta": "Die Welt entdecken",
         "valeName": "Eastbrook-Tal",
@@ -3614,7 +3615,8 @@ export const de_DE: EnTranslations = {
         "q3": "Kann ich offline spielen?",
         "a3": "Ja. Es gibt einen sofort verfügbaren Einzelspieler-Modus in deinem Browser, dazu die gemeinsame Online-Welt.",
         "q4": "Wie lange bis zur Höchststufe?",
-        "a4": "Die Höchststufe ist {cap}, erreicht über drei Gebiete voller Quests, Dungeons und Erkundung."
+        "a4": "Die Höchststufe ist {cap}, erreicht über drei Gebiete voller Quests, Dungeons und Erkundung.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Tritt der Welt bei",
@@ -4176,6 +4178,7 @@ export const de_DE: EnTranslations = {
       "a5": "Neun, die die klassischen Rollen Tank, Heiler und Schaden abdecken, jede mit einem Ressourcensystem (Wut, Mana oder Energie) und ihren eigenen charakteristischen Fähigkeiten.",
       "q6": "Was ist die Höchststufe?",
       "a6": "Stufe {cap}, erreicht über drei verbundene Gebiete voller Quests, Dungeons und Erkundung.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Wird mein Charakter gespeichert?",
       "a7": "Online-Charaktere werden automatisch auf dem Server gespeichert. Offline-Charaktere leben für schnelle Spielsitzungen und zum Testen in deinem Browser.",
       "q8": "Kann ich meine eigene Kopie hosten?",

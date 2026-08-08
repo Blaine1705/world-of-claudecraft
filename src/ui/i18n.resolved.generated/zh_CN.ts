@@ -3562,6 +3562,7 @@ export const zh_CN: EnTranslations = {
       "world": {
         "heading": "探索世界",
         "sub": "一片连绵不绝的大陆,三大区域,从静谧的山谷到冰封的峰巅。",
+        "subCount": "一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。",
         "levels": "{min} 至 {max} 级",
         "cta": "一览世界",
         "valeName": "东溪谷地",
@@ -3614,7 +3615,8 @@ export const zh_CN: EnTranslations = {
         "q3": "可以离线游玩吗?",
         "a3": "可以。浏览器中有即开即玩的单人模式，此外还有共享的在线世界。",
         "q4": "升到满级要多久?",
-        "a4": "等级上限为 {cap} 级,需横跨三大区域,通过任务、地下城与探索逐步达成。"
+        "a4": "等级上限为 {cap} 级,需横跨三大区域,通过任务、地下城与探索逐步达成。",
+        "a4Count": "等级上限为 {cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，其中最遥远的几处专为满级角色打造。"
       },
       "community": {
         "heading": "加入这个世界",
@@ -3658,12 +3660,12 @@ export const zh_CN: EnTranslations = {
       "step0Body": "离线游玩什么都不需要：在开始界面选择“离线”，再按“开始游戏”。想和大家一起玩，就注册一个免费账号（一个用户名、一个密码，以及一个用于找回账号的邮箱），或登录你已有的账号，然后从服务器列表里挑一个服务器。",
       "worldsTitle": "选择服务器",
       "worldsBody": "在线游玩发生在各个服务器上，每个服务器都是一份完整的游戏副本，有自己的玩家、自己的世界市场，也有自己的排名。服务器列表会显示每个服务器有多繁忙，从“低”到“已满”，所以你可以挑一个清静的落得宽敞，也可以挑一个热闹的不缺同伴。你的角色属于你创建它的那个服务器，而你可以在不止一个服务器上保留角色。",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "charactersTitle": "你的角色",
+      "charactersBody": "一个账号在每个服务器上最多可以保留十个角色，所以你尽可以多试几个职业，不必舍弃什么。删除则是一件需要下决心的事：角色必须不在世界中，游戏还会让你输入它的名字才肯放行。被删除的角色一去不返，它在世界市场上的挂单和渡鸦邮驿里的信件也会随它一并消失。",
+      "namesTitle": "为你的英雄起名",
+      "namesBody": "名字长 2 到 16 个字母，以字母开头，可以包含空格、连字符和撇号。同一个服务器上不会有两个角色重名，而大小写并不能让一个名字空出来：如果 Ashwind 已被占用，ashwind 同样被占用。你自己的写法会被原样保留。挑一个你会一直喜欢的名字吧，因为它会一直伴着这个角色。",
+      "connectionTitle": "如果你掉线了",
+      "connectionBody": "信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。"
     },
     "controls": {
       "intro": "电脑端的默认按键。除了始终用于打开游戏菜单的 Esc 之外，每一项绑定都可以在游戏选项中更改，而且一项绑定可以是像 Shift+Z 这样的修饰键组合。",
@@ -3709,7 +3711,7 @@ export const zh_CN: EnTranslations = {
       "meters": "伤害统计（伤害、治疗与威胁）",
       "petMark": "宠物：标记，选中你自己的宠物（等同于点击它的头像框）",
       "onBarBinding": "你也可以直接在动作条上绑定按键：在“按键绑定”面板中选择“编辑动作条按键”，然后点击动作条上的某个格子，再按下你想要的键。设置完毕后点击“完成”。这一项仅限桌面端，因为它需要一块实体键盘。",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "clickMoveNote": "点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。"
     },
     "settingsPage": {
       "heading": "设置和性能",
@@ -4176,6 +4178,7 @@ export const zh_CN: EnTranslations = {
       "a5": "九个，涵盖经典的坦克、治疗与输出定位，每个职业都拥有一套资源系统（怒气、法力或能量）以及各自的招牌技能。",
       "q6": "等级上限是多少?",
       "a6": "{cap} 级,需横跨三片相连的区域,通过任务、地下城与探索达成。",
+      "a6Count": "{cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，从最初的山谷，一直到专为满级角色打造的地带。",
       "q7": "我的角色会被保存吗?",
       "a7": "在线角色会自动保存在服务器上。离线角色存放在你的浏览器中,适合快速游玩和测试。",
       "q8": "我可以自己搭建一份服务器吗?",
@@ -4196,14 +4199,14 @@ export const zh_CN: EnTranslations = {
       "a15": "只有在线游玩才需要。离线世界什么都不问：在开始界面选择“离线”，按下“开始游戏”即可。在线账号是免费的，需要一个用户名、一个密码，以及一个用来找回账号的邮箱，你的角色会保存在服务器上。有了账号之后，你还可以在选项中开启双重验证。",
       "q16": "什么是世界？",
       "a16": "在线游玩发生在一个个世界上，而每个世界都是这个游戏的一份完整副本，有自己的玩家、自己的世界市场、自己的排名。登录时，世界列表会显示每个世界有多热闹，从“清闲”到“满员”，你可以挑一个安静的图个宽敞，或挑一个热闹的图个人气。你的角色住在创建它的那个世界上，而你也可以在不止一个世界里各留角色。",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q17": "我可以拥有多少个角色？可以删除角色吗？",
+      "a17": "同一个账号在每个服务器上最多可以有十个角色，而你也可以在不止一个服务器上拥有角色。想删掉某个角色，就在角色列表里删除它：该角色必须不在世界中，而且你要输入它的名字来确认，所以手一滑绝不会让你失去一位英雄。删除是永久的。那个角色的随身家当会随它而去，它在世界市场上的挂单会被撤下，渡鸦邮驿的信箱也会被清空。",
+      "q18": "我可以更改角色的名字吗？",
+      "a18": "你自己改不了，所以起名时挑一个中意的。名字为 2 到 16 个字母，以字母开头，允许空格、连字符和撇号；无论大小写怎么写，每个名字在它所在的服务器上都是唯一的。违反行为准则的名字会被拒绝。唯一一次会被要求改名，是管理员要求你改。注销账号可能会把它的名字释放给其他玩家，而单纯一阵子不玩绝不会：闲置的账号照样保留它的名字。",
+      "q19": "如果我掉线了会怎么样？",
+      "a19": "你的角色会在世界中停留大约五分钟，游戏也会自行尝试重连，所以信号中断、合上笔记本或刷新页面，通常都能让你回到原处、回到同一场对局里。也正因为你的角色确实还站在那儿，掉线并不是逃离战斗的办法。从游戏菜单里选择“退出登录”，则会立即离开，不必等完那段时间。",
+      "q20": "我发现了一个错误，该怎么报告？",
+      "a20": "在在线游戏中，用 Esc 打开菜单，选择“报告错误”。描述发生了什么，然后发送：你所在的服务器、你的角色，以及你当时站在哪里，都会自动一同附上，还有你的版本与设备信息；你也可以勾选“包含截图”，附上你当时看到的画面。如果你接连发送好几份，可能会被要求稍等片刻再发下一份。"
     },
     "classList": {
       "heading": "九大职业",
@@ -4795,8 +4798,8 @@ export const zh_CN: EnTranslations = {
       },
       "bookHeading": "走进功绩之书",
       "bookBody": "功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔架，你在那里挑选自己佩戴的那一个。",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "platformHeading": "Steam 与 Epic 成就",
+      "platformBody": "如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。"
     },
     "wishPage": {
       "heading": "我希望早点知道的事",

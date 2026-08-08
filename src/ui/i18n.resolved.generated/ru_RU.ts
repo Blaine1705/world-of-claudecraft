@@ -3562,6 +3562,7 @@ export const ru_RU: EnTranslations = {
       "world": {
         "heading": "Исследуйте мир",
         "sub": "Единая земля и три зоны, от тихих долин до ледяных вершин.",
+        "subCount": "Единая земля из {zones} зон: от тихих долин и затопленных топей до пепельных пустошей, ледяных вершин и садов-лабиринтов.",
         "levels": "Уровни с {min} по {max}",
         "cta": "Посмотреть мир",
         "valeName": "Долина Истбрук",
@@ -3614,7 +3615,8 @@ export const ru_RU: EnTranslations = {
         "q3": "Можно ли играть офлайн?",
         "a3": "Да. В браузере есть мгновенный одиночный режим, а также общий онлайн-мир.",
         "q4": "Сколько нужно времени, чтобы достичь максимального уровня?",
-        "a4": "Предел - {cap} уровень, который достигается через три зоны с заданиями, подземельями и исследованиями."
+        "a4": "Предел - {cap} уровень, который достигается через три зоны с заданиями, подземельями и исследованиями.",
+        "a4Count": "Предел — {cap} уровень, который достигается через зоны с заданиями, подземельями и исследованиями. Всего зон — {zones}, и самые дальние из них созданы для персонажей, уже достигших предела."
       },
       "community": {
         "heading": "Присоединяйтесь к миру",
@@ -3658,12 +3660,12 @@ export const ru_RU: EnTranslations = {
       "step0Body": "Офлайн-игра не просит ничего: выберите «Офлайн» на стартовом экране и нажмите «Играть». Чтобы играть вместе со всеми, заведите бесплатную учётную запись (имя пользователя, пароль и адрес почты для восстановления) или войдите в уже существующую, а затем выберите мир в «Списке миров».",
       "worldsTitle": "Выбор мира",
       "worldsBody": "Онлайн-игра идёт на мирах, и каждый из них — полная копия игры со своими игроками, своим Мировым рынком и своими рейтингами. «Список миров» показывает, насколько занят каждый мир, от низкой заполненности до полной, так что выбирайте тихий мир, если хотите простора, или людный, если хотите компании. Ваши персонажи живут в том мире, где вы их создали, и держать персонажей можно сразу в нескольких.",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "charactersTitle": "Ваши персонажи",
+      "charactersBody": "Одна учётная запись держит до десяти персонажей на каждом мире, так что места хватит, чтобы попробовать несколько классов, ничем не жертвуя. Удаление сделано нарочно неспешным: персонаж должен быть не в мире, и игра просит ввести его имя, прежде чем он уйдёт. Удалённый персонаж уходит навсегда, а вместе с ним его объявления на Мировом рынке и письма Вороновой почты.",
+      "namesTitle": "Имя вашего героя",
+      "namesBody": "Имя, это от 2 до 16 букв, оно начинается с буквы и может содержать пробелы, дефисы и апострофы. Два персонажа на одном мире не могут носить одно имя, и заглавные буквы имени не освобождают: если занято Ashwind, занято и ashwind. Ваше собственное написание сохраняется в точности так, как вы его ввели. Выбирайте имя, которому будете рады, ведь оно остаётся с персонажем навсегда.",
+      "connectionTitle": "Если оборвалась связь",
+      "connectionBody": "Оборванная связь, закрытая крышка ноутбука или перезагрузка страницы не выводят вас из игры. Ваш персонаж остаётся в мире около пяти минут, пока игра сама переподключается, и вы возвращаетесь на то же место в той же сессии. Это же значит, что разрыв связи, не способ выйти из боя: ваш персонаж по-прежнему стоит там. Выход через игровое меню уводит вас сразу, не дожидаясь, и точно так же поступает вход за другого персонажа той же учётной записи."
     },
     "controls": {
       "intro": "Клавиши по умолчанию для компьютера. Любую привязку можно изменить в настройках игры, кроме Esc, которая всегда открывает игровое меню, а привязка может быть сочетанием с модификатором, например Shift+Z.",
@@ -3709,7 +3711,7 @@ export const ru_RU: EnTranslations = {
       "meters": "Счётчики урона (урон, исцеление и угроза)",
       "petMark": "Питомец: «Метка», выбрать собственного питомца (то же, что щёлкнуть по его рамке)",
       "onBarBinding": "Привязать клавишу можно и прямо с панели: выберите «Настроить клавиши панели действий» в окне привязок, затем щёлкните ячейку на живой панели и нажмите нужную клавишу. Закончив, нажмите «Готово». Этот способ работает только на настольных версиях, ведь ему нужна настоящая клавиатура.",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "clickMoveNote": "«Движение по щелчку» выключено, пока вы сами его не включите: откройте панель «Назначение клавиш» в игровом меню, включите «Движение по щелчку», а затем в строке «Кнопка клика для движения» под ней выберите, какая кнопка мыши ведёт вас пешком (по умолчанию левая, можно правую). Когда настройка включена, щелчок по земле отправляет вас идти туда, а метка на земле показывает, куда вы направляетесь. Щелчок по существу или другому игроку подводит вас к нему и останавливает на нужном расстоянии, при этом сам щелчок по-прежнему делает свою обычную работу: выбирает цель или взаимодействует; а если вы уже стоите достаточно близко, вы просто взаимодействуете и остаётесь на месте. Любая клавиша передвижения тут же возвращает управление вам и прерывает путь, как и удержание кнопки мыши для обзора. Прыжок его не прерывает, так что в прыжке вы продолжаете идти, а игровое меню лишь ставит путь на паузу, и он продолжается, когда вы закроете меню."
     },
     "settingsPage": {
       "heading": "Настройки и производительность",
@@ -4176,6 +4178,7 @@ export const ru_RU: EnTranslations = {
       "a5": "Девять, охватывающих классические роли танка, лекаря и наносящего урон, у каждого своя ресурсная система (Ярость, Мана или Энергия) и собственные фирменные способности.",
       "q6": "Какой максимальный уровень?",
       "a6": "{cap} уровень, который достигается через три связанные зоны с заданиями, подземельями и исследованиями.",
+      "a6Count": "{cap} уровень, который достигается через зоны с заданиями, подземельями и исследованиями. Всего зон — {zones}: от начальной долины до земель, созданных для тех, кто уже достиг предела.",
       "q7": "Сохранится ли мой персонаж?",
       "a7": "Онлайн-персонажи сохраняются на сервере автоматически. Офлайн-персонажи хранятся в вашем браузере для быстрых сессий и тестирования.",
       "q8": "Могу ли я запустить собственную копию?",
@@ -4196,14 +4199,14 @@ export const ru_RU: EnTranslations = {
       "a15": "Только чтобы играть онлайн. Оффлайновый мир не просит ничего: выберите «Оффлайн» на стартовом экране и нажмите «Играть». Сетевая учётная запись бесплатна, требует имени, пароля и адреса почты для восстановления доступа и хранит ваших персонажей на сервере. Заведя её, вы можете включить двухфакторную аутентификацию в настройках.",
       "q16": "Что такое мир?",
       "a16": "Сетевая игра идёт на мирах, и каждый из них, это полная копия игры со своими игроками, своим Мировым рынком и своими рейтингами. При входе список миров показывает, насколько каждый занят, от низкой загрузки до полной, так что можно выбрать тихий ради простора или людный ради компании. Ваши персонажи живут на том мире, где вы их создали, и держать персонажей можно не на одном.",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q17": "Сколько у меня может быть персонажей и можно ли удалить персонажа?",
+      "a17": "До десяти персонажей на каждом мире в одной учётной записи, и персонажи могут быть сразу на нескольких мирах. Чтобы убрать одного, удалите его из списка персонажей: персонаж не должен находиться в мире, и вам придётся ввести его имя для подтверждения, поэтому дрогнувший палец не может стоить вам героя. Удаление необратимо. Вместе с персонажем уходит и всё его имущество, его объявления снимаются с Мирового рынка, а его почтовый ящик Вороновой почты очищается.",
+      "q18": "Могу ли я сменить имя персонажа?",
+      "a18": "Сами, нет, так что выбирайте имя по душе. Имя, это от 2 до 16 букв, оно начинается с буквы и допускает пробелы, дефисы и апострофы, и каждое уникально на своём мире, как бы вы ни расставили заглавные буквы. Имена, нарушающие правила поведения, отклоняются. Единственный случай, когда вас попросят переименоваться, это требование модератора. Закрытие учётной записи может освободить её имена для других игроков, а простой перерыв в игре, никогда: неактивная учётная запись сохраняет свои имена.",
+      "q19": "Что будет, если меня отключит?",
+      "a19": "Ваш персонаж остаётся в мире около пяти минут, и игра сама пытается переподключиться, так что оборванная связь, закрытый ноутбук или перезагрузка страницы обычно возвращают вас туда же, где вы были, и в ту же сессию. И раз ваш персонаж и правда всё ещё стоит там, разрыв связи, не способ сбежать из боя. «Выход» в игровом меню уводит вас сразу, не дожидаясь конца этого окна.",
+      "q20": "Я нашёл ошибку. Как о ней сообщить?",
+      "a20": "Прямо в сетевой игре откройте меню клавишей Esc и выберите «Сообщить об ошибке». Опишите, что случилось, и отправьте: ваш мир, ваш персонаж и место, где вы стояли, отправятся вместе с отчётом сами, вместе с версией игры и сведениями об устройстве, а флажок «Приложить скриншот» добавит снимок того, что было у вас на экране. Если отправить несколько отчётов подряд, вас могут попросить немного подождать перед следующим."
     },
     "classList": {
       "heading": "Девять классов",
@@ -4795,8 +4798,8 @@ export const ru_RU: EnTranslations = {
       },
       "bookHeading": "Внутри Книги",
       "bookBody": "Книга раскладывает все деяния по категориям, между которыми можно переключаться, и добавляет строку поиска и фильтры: всё подряд, заработанное, ещё не заработанное и то, что почти завершено. Вверху идёт полоса «Недавние» с вашими последними открытиями, и щелчок по одному из них ведёт прямо к его карточке, как и щелчок по названию деяния, которое кто-то отправил в чат. Рядом раздел «Почти готово» указывает на ту горстку, до которой вам осталось меньше всего. В королевстве у каждого деяния есть ещё и редкость, доля искателей приключений, что его заработали, так что вы с одного взгляда видите, какие из них обычны, а какие — настоящее восхождение; в оффлайновом мире считать некого, поэтому там редкость не показывается. В конце рейла стоит полка званий, где вы выбираете то, что будете носить.",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "platformHeading": "Достижения Steam и Epic",
+      "platformBody": "Если вы привяжете учётную запись Steam или Epic Games в настольном приложении, заработанные вами деяния отражаются наружу как достижения в этой учётной записи. Главным остаётся игровой мир: деяние вы зарабатываете здесь, оно записывается вашему персонажу, а достижение приходит следом. Парное достижение есть не у каждого деяния, а если оно не пришло сразу, то догонит вас при следующем входе в игру. Привязка, это всегда только привязка и никогда не способ войти в игру."
     },
     "wishPage": {
       "heading": "Что бы я хотел знать заранее",
@@ -5431,7 +5434,7 @@ export const ru_RU: EnTranslations = {
       "prestigeBody": "Опыт продолжает копиться даже после предела. Он питает косметический виртуальный уровень, так что полоса опыта всё растёт, и долгосрочный ранг почёта, который можно получить в листе персонажа, добравшись до него. Преодоление крупных рубежей накопленного за всё время опыта также приносит деяния в вашу Книгу деяний, с косметическими званиями и рамками именной таблички, что отображаются в листе персонажа. Всё это чисто по желанию и никогда не даёт силы, лишь отметка о пройденной вами дороге.",
       "noRush": "Спешить некуда. Этот мир создан, чтобы получать от него удовольствие в своём темпе, так что странствуйте, берите задания, что приглянулись, и дайте своему герою расти по дороге.",
       "ridingTitle": "Учимся ездить верхом",
-      "ridingBody": "Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward."
+      "ridingBody": "Верховая езда — одна из наград, что ждут в конце подъёма. На {level} уровне старшая конюшая обучит вас этому навыку за изрядную сумму золотом, а урок на учебном круге принесёт вам первые поводья. Скакун не даёт никакой силы вовсе; он просто делает мир меньше, а после долгого пути на север это уже своего рода награда."
     },
     "placeholder": {
       "note": "Этот раздел руководства уже в пути."

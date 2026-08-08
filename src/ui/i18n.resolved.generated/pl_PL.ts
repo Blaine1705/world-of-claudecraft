@@ -3562,6 +3562,7 @@ export const pl_PL: EnTranslations = {
       "world": {
         "heading": "Odkrywaj świat",
         "sub": "Jedna ciągła kraina, trzy strefy, od cichych dolin po zamarznięte szczyty.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Poziomy od {min} do {max}",
         "cta": "Zobacz świat",
         "valeName": "Dolina Wschodniego Strumienia",
@@ -3614,7 +3615,8 @@ export const pl_PL: EnTranslations = {
         "q3": "Czy mogę grać offline?",
         "a3": "Tak. Jest natychmiastowy tryb dla jednego gracza w przeglądarce, a także wspólny świat online.",
         "q4": "Ile zajmuje osiągnięcie maksymalnego poziomu?",
-        "a4": "Limit to poziom {cap}, osiągany w trzech strefach pełnych zadań, lochów i eksploracji."
+        "a4": "Limit to poziom {cap}, osiągany w trzech strefach pełnych zadań, lochów i eksploracji.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Dołącz do świata",
@@ -4176,6 +4178,7 @@ export const pl_PL: EnTranslations = {
       "a5": "Dziewięć, obejmujących klasyczne role obrońcy, uzdrowiciela i zadającego obrażenia, każda z własnym systemem zasobów (Wściekłość, Mana lub Energia) i charakterystycznymi umiejętnościami.",
       "q6": "Jaki jest limit poziomu?",
       "a6": "Poziom {cap}, osiągany w trzech połączonych krainach pełnych zadań, lochów i eksploracji.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Czy moja postać zostanie zapisana?",
       "a7": "Postacie online są zapisywane na serwerze automatycznie. Postacie offline żyją w twojej przeglądarce na szybkie sesje i testy.",
       "q8": "Czy mogę hostować własną kopię?",

@@ -3562,6 +3562,7 @@ export const fr_FR: EnTranslations = {
       "world": {
         "heading": "Explorez le monde",
         "sub": "Une seule terre continue, trois zones, des vallées paisibles aux pics gelés.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Niveaux {min} à {max}",
         "cta": "Découvrir le monde",
         "valeName": "Val d'Eastbrook",
@@ -3614,7 +3615,8 @@ export const fr_FR: EnTranslations = {
         "q3": "Puis-je jouer hors ligne ?",
         "a3": "Oui. Il existe un mode solo instantané dans votre navigateur, en plus du monde en ligne partagé.",
         "q4": "Combien de temps pour atteindre le niveau maximum ?",
-        "a4": "Le plafond est le niveau {cap}, atteint à travers trois zones de quêtes, de donjons et d'exploration."
+        "a4": "Le plafond est le niveau {cap}, atteint à travers trois zones de quêtes, de donjons et d'exploration.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Rejoignez le monde",
@@ -4176,6 +4178,7 @@ export const fr_FR: EnTranslations = {
       "a5": "Neuf, couvrant les rôles classiques de tank, de soigneur et de dégâts, chacune avec son système de ressource (rage, mana ou énergie) et ses capacités emblématiques.",
       "q6": "Quel est le niveau maximum ?",
       "a6": "Niveau {cap}, atteint à travers trois zones connectées de quêtes, de donjons et d'exploration.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Mon personnage sera-t-il sauvegardé ?",
       "a7": "Les personnages en ligne sont sauvegardés automatiquement sur le serveur. Les personnages hors ligne vivent dans votre navigateur, pour des sessions rapides et des tests.",
       "q8": "Puis-je héberger ma propre copie ?",

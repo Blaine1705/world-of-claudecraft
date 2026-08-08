@@ -3562,6 +3562,7 @@ export const pt_BR: EnTranslations = {
       "world": {
         "heading": "Explore o mundo",
         "sub": "Uma terra contínua, três zonas, de vales tranquilos a picos congelados.",
+        "subCount": "One continuous land of {zones} zones, from quiet valleys and drowned fens to cinder wastes, frozen heights, and hedge-maze gardens.",
         "levels": "Níveis {min} a {max}",
         "cta": "Veja o mundo",
         "valeName": "Vale de Eastbrook",
@@ -3614,7 +3615,8 @@ export const pt_BR: EnTranslations = {
         "q3": "Posso jogar offline?",
         "a3": "Sim. Há um modo instantâneo para um jogador no seu navegador, além do mundo online compartilhado.",
         "q4": "Quanto tempo leva para chegar ao nível máximo?",
-        "a4": "O limite é o nível {cap}, alcançado ao longo de três zonas de missões, masmorras e exploração."
+        "a4": "O limite é o nível {cap}, alcançado ao longo de três zonas de missões, masmorras e exploração.",
+        "a4Count": "The cap is level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, and the farthest of them are built for characters already at the cap."
       },
       "community": {
         "heading": "Junte-se ao mundo",
@@ -4176,6 +4178,7 @@ export const pt_BR: EnTranslations = {
       "a5": "Nove, cobrindo os clássicos papéis de tanque, curandeiro e dano, cada uma com um sistema de recurso (fúria, mana ou energia) e suas próprias habilidades características.",
       "q6": "Qual é o nível máximo?",
       "a6": "Nível {cap}, alcançado ao longo de três zonas conectadas de missões, masmorras e exploração.",
+      "a6Count": "Level {cap}, reached across zones of quests, dungeons, and exploration. There are {zones} zones in all, from the starting valley to regions built for characters already at the cap.",
       "q7": "Meu personagem será salvo?",
       "a7": "Os personagens online são salvos automaticamente no servidor. Os personagens offline vivem no seu navegador para sessões rápidas e testes.",
       "q8": "Posso hospedar minha própria cópia?",

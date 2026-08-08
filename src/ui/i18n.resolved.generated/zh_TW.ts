@@ -3562,6 +3562,7 @@ export const zh_TW: EnTranslations = {
       "world": {
         "heading": "探索世界",
         "sub": "一片相連的大陸，三座區域，從寧靜的山谷到冰封的高峰。",
+        "subCount": "一片相連的大陸，共 {zones} 座區域，從寧靜的山谷與沉沒的沼澤，到餘燼荒漠、冰封高地與樹籬迷宮花園。",
         "levels": "等級 {min} 至 {max}",
         "cta": "瀏覽世界",
         "valeName": "東溪谷地",
@@ -3614,7 +3615,8 @@ export const zh_TW: EnTranslations = {
         "q3": "我可以離線遊玩嗎？",
         "a3": "可以。瀏覽器中提供即時的單人模式，另外還有共享的線上世界。",
         "q4": "達到最高等級需要多久？",
-        "a4": "等級上限為 {cap} 級，需橫跨三座區域，透過任務、地城與探索達成。"
+        "a4": "等級上限為 {cap} 級，需橫跨三座區域，透過任務、地城與探索達成。",
+        "a4Count": "等級上限為 {cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，其中最遙遠的幾座，正是專為已達上限的角色所打造的。"
       },
       "community": {
         "heading": "加入這片世界",
@@ -3658,12 +3660,12 @@ export const zh_TW: EnTranslations = {
       "step0Body": "離線遊玩什麼都不用準備：在開始畫面選擇「離線」，按下「遊玩」即可。想和大家一起玩，就免費建立一個帳號（一個使用者名稱、一組密碼，以及一個用來找回帳號的電子郵件地址），或登入你既有的帳號，再從世界列表中挑一個世界。",
       "worldsTitle": "挑選一個世界",
       "worldsBody": "線上遊玩發生在各個世界上，而每個世界都是這款遊戲的完整副本，有自己的玩家、自己的世界市場，也有自己的排名。世界列表會顯示每個世界有多熱鬧，從「低」到「滿」，所以想要寬敞就挑安靜的，想要有人作伴就挑忙碌的。你的角色住在你當初建立他們的那個世界上，而你可以同時在不只一個世界上保有角色。",
-      "charactersTitle": "Your characters",
-      "charactersBody": "One account can keep up to ten characters on each world, so there is room to try several classes without giving anything up. Deleting one is deliberate: the character has to be out of the world, and the game asks you to type its name before it will go. A deleted character is gone for good, and its World Market listings and Ravenpost mail go with it.",
-      "namesTitle": "Naming your hero",
-      "namesBody": "A name is 2 to 16 letters long, starts with a letter, and can hold spaces, hyphens, and apostrophes. No two characters on the same world can share one, and capitalisation does not make a name free: if Ashwind is taken, ashwind is taken too. Your own spelling is kept exactly as you typed it. Pick a name you will be happy with, because it stays with the character.",
-      "connectionTitle": "If your connection drops",
-      "connectionBody": "A lost signal, a closed lid, or a page reload does not log you out. Your character is held in the world for about five minutes while the game reconnects on its own, and you come back to the same spot in the same session. That also means dropping out is not a way to leave a fight: your character is still standing there. Logging out from the game menu leaves at once instead of waiting, and so does signing in on another character on the same account."
+      "charactersTitle": "你的角色",
+      "charactersBody": "一個帳號在每個世界上最多可以保有十個角色，所以你有足夠的空間試玩好幾種職業，不必為此放棄任何東西。刪除角色則是一個慎重的動作：該角色必須不在世界中，而遊戲會要求你輸入它的名字，才肯讓它離去。被刪除的角色永遠回不來了，它在世界市場上的刊登與渡鴉郵驛的信件也會一併消失。",
+      "namesTitle": "為你的英雄命名",
+      "namesBody": "名字長度為 2 至 16 個字母，以字母開頭，並且可以包含空格、連字號與撇號。同一個世界上的兩個角色不能共用同一個名字，而大小寫不會讓一個名字重獲自由：如果 Ashwind 已被使用，ashwind 也一樣被使用了。你自己的拼寫方式會被完整保留，一如你輸入時的模樣。請挑一個你會滿意的名字，因為它將一直伴著這個角色。",
+      "connectionTitle": "如果你的連線中斷",
+      "connectionBody": "訊號中斷、闔上筆電，或是重新整理頁面，都不會讓你登出。你的角色會被保留在世界中約五分鐘，遊戲則自行重新連線，而你會回到同一個工作階段的同一個位置。這也表示斷線並不是一種脫離戰鬥的辦法：你的角色仍然站在那裡。從遊戲選單登出則會立刻離開，而不是等待，用同一個帳號登入另一個角色時也是如此。"
     },
     "controls": {
       "intro": "電腦版的預設按鍵。除了永遠用來開啟遊戲選單的 Esc 之外，每項配置皆可在遊戲選項中變更，而一項配置也可以是像 Shift+Z 這樣的組合鍵。",
@@ -3709,7 +3711,7 @@ export const zh_TW: EnTranslations = {
       "meters": "戰鬥統計（傷害、治療與仇恨）",
       "petMark": "寵物：標記，選取你自己的寵物（與點擊牠的頭像框相同）",
       "onBarBinding": "你也可以直接在動作列上設定按鍵：在「按鍵設定」面板中選擇「編輯動作列按鍵」，接著點擊動作列上的一個格子，再按下你想要的按鍵。完成後點擊「完成」。這一項僅限電腦版，因為它需要實體鍵盤。",
-      "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
+      "clickMoveNote": "點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。"
     },
     "settingsPage": {
       "heading": "設定與效能",
@@ -4176,6 +4178,7 @@ export const zh_TW: EnTranslations = {
       "a5": "九種，涵蓋經典的坦克、治療與輸出角色定位，每一種都有自己的資源系統（怒氣、法力或能量）以及專屬的招牌技能。",
       "q6": "等級上限是多少？",
       "a6": "{cap} 級，需橫跨三座相連的區域，透過任務、地城與探索達成。",
+      "a6Count": "{cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，從最初的起始山谷，一路延伸到專為已達上限的角色所打造的地帶。",
       "q7": "我的角色會被保存嗎？",
       "a7": "線上角色會自動保存在伺服器上。離線角色則存放在你的瀏覽器中，適合快速遊玩與測試。",
       "q8": "我可以自己架設一份副本嗎？",
@@ -4196,14 +4199,14 @@ export const zh_TW: EnTranslations = {
       "a15": "只有線上遊玩才需要。離線世界什麼都不要求：在起始畫面選擇「離線」，然後按下「遊玩」。線上帳號是免費的，需要一個使用者名稱、一組密碼，以及一個用於帳號救援的電子郵件地址，並會把你的角色保存在伺服器上。有了帳號之後，你可以在選項中開啟兩步驟驗證。",
       "q16": "什麼是世界？",
       "a16": "線上遊玩發生在各個世界上，而每個世界都是一份完整的遊戲副本，有自己的玩家、自己的世界市場與自己的排名。登入時，世界列表會顯示每個世界有多熱鬧，從「低」到「已滿」，讓你挑一個清靜的世界享受空間，或挑一個熱鬧的世界找伴。你的角色住在你創建它的那個世界上，而你可以在不只一個世界上保有角色。",
-      "q17": "How many characters can I have, and can I delete one?",
-      "a17": "Up to ten characters per world on one account, and you can have characters on more than one world. To remove one, delete it from the character list: the character must not be in the world, and you have to type its name to confirm, which is why a slip of the finger cannot cost you a hero. Deleting is permanent. That character's belongings go with it, its World Market listings are pulled from the market, and its Ravenpost mailbox is cleared.",
-      "q18": "Can I change my character's name?",
-      "a18": "Not by yourself, so choose one you like. Names are 2 to 16 letters, start with a letter, and allow spaces, hyphens, and apostrophes, and each one is unique on its world no matter how it is capitalised. Names that break the rules of conduct are refused. The one time you are asked to rename is when a moderator requires it. Closing your account can release its names for other players, and merely not playing for a while never does: an inactive account keeps its names.",
-      "q19": "What happens if I get disconnected?",
-      "a19": "Your character stays in the world for about five minutes and the game tries to reconnect on its own, so a dropped signal, a shut laptop, or a reload usually puts you right back where you were, in the same session. Because your character really is still standing there, disconnecting is not a way to escape a fight. Choosing Logout from the game menu leaves immediately rather than waiting out that window.",
-      "q20": "I found a bug. How do I report it?",
-      "a20": "From inside the online game, open the menu with Esc and choose Report a Bug. Describe what happened and send it: your world, your character, and where you were standing ride along automatically, together with your version and device details, and you can tick Include Screenshot to attach a picture of what you were looking at. If you send several in a row you may be asked to wait a moment before the next one."
+      "q17": "我可以有幾個角色？可以刪除嗎？",
+      "a17": "一個帳號在每個世界上最多可有十個角色，而你也可以在不只一個世界上擁有角色。想移除某個角色，請在角色列表中刪除它：該角色必須不在世界中，而且你得輸入它的名字來確認，正因如此，一次手滑絕不會讓你失去一位英雄。刪除是永久的。那個角色的身家會隨它而去，它在世界市場上的刊登會被撤下，它的渡鴉郵驛信箱也會被清空。",
+      "q18": "我可以更改角色的名字嗎？",
+      "a18": "你自己改不了，所以請挑一個你喜歡的。名字為 2 至 16 個字母，必須以字母開頭，並允許空格、連字號與撇號，而且無論大小寫如何，每個名字在它所屬的世界上都是獨一無二的。違反行為準則的名字會被拒絕。唯一會要求你改名的情況，是管理員要求你這麼做。關閉帳號可能會把它的名字釋出給其他玩家，而單純一陣子沒上線則絕不會：閒置的帳號仍然保有它的名字。",
+      "q19": "如果我斷線了會怎麼樣？",
+      "a19": "你的角色會在世界中停留約五分鐘，遊戲也會自行嘗試重新連線，因此訊號中斷、闔上筆電，或是重新整理頁面，通常都能讓你回到原處，回到同一個工作階段。也正因為你的角色真的還站在那裡，斷線並不是一種脫離戰鬥的辦法。若從遊戲選單選擇「登出」，則會立刻離開，而不會等那段時間過完。",
+      "q20": "我找到一個錯誤，該如何回報？",
+      "a20": "在線上遊戲中，以 Esc 開啟選單並選擇「回報錯誤」。描述發生了什麼事再送出即可：你所在的世界、你的角色，以及你當時站的位置都會自動一併附上，還有你的版本與裝置資訊，而你也可以勾選「包含截圖」，附上一張你當時所見畫面的圖片。如果你連續送出好幾份，系統可能會請你稍候片刻再送下一份。"
     },
     "classList": {
       "heading": "九大職業",
@@ -4795,8 +4798,8 @@ export const zh_TW: EnTranslations = {
       },
       "bookHeading": "功績之書裡面有什麼",
       "bookBody": "功績之書會把每個功績分門別類，讓你在類別之間翻閱，並附有搜尋框，以及全部、已獲得、未獲得與即將完成這幾種篩選。靠近頂端的「最近」一列收著你最新解鎖的功績，點擊其中一個就會直接跳到它的卡片；點擊別人貼在聊天中的功績名稱也一樣。在它旁邊，「即將完成」會指出你最接近達成的那幾個。在王國之中，每個功績還帶著它的稀有度，也就是已達成它的冒險者比例，讓你一眼看出哪些稀鬆平常、哪些是真正的攀登；離線世界沒有可供統計的人口，因此不顯示稀有度。側欄的盡頭是頭銜欄，你可以在那裡挑選要佩戴的頭銜。",
-      "platformHeading": "Steam and Epic achievements",
-      "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
+      "platformHeading": "Steam 與 Epic 成就",
+      "platformBody": "如果你在電腦版應用程式中連結了 Steam 或 Epic Games 帳號，你所贏得的功績便會向外同步，成為該帳號上的成就。遊戲世界始終是權威所在：你在這裡贏得功績，它記在你的角色身上，成就隨後才跟上。並非每個功績都有對應的成就，而某個成就若沒有立刻送達，也會在你下次登入時補上。連結永遠只是連結，絕不是一種登入方式。"
     },
     "wishPage": {
       "heading": "我希望早點知道的事",
