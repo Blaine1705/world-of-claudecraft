@@ -1002,23 +1002,80 @@ describe('static normalization round-trips', () => {
     60000,
   );
 
-  it.skipIf(!existsSync(BARREL_GLB))(
-    'downsizes prop textures to the requested game budget',
-    async () => {
-      mkdirSync(TMP, { recursive: true });
-      const outPath = join(TMP, 'normalized_prop.glb');
+  it('downsizes prop textures to the requested game budget', async () => {
+    // A SYNTHETIC webp-textured fixture, not a shipped GLB: the fleet-wide
+    // KTX2 conversion made every shipped model unreadable to the sharp
+    // resize inside normalizeProp (which only ever runs over fresh
+    // generation outputs, always png/webp), so a shipped fixture silently
+    // stopped exercising the downsize. The oversized NORMAL slot is the
+    // regression this guards: encoders that skip normal maps leave it huge.
+    mkdirSync(TMP, { recursive: true });
+    const inPath = join(TMP, 'oversized_prop.glb');
+    const outPath = join(TMP, 'normalized_prop.glb');
 
-      await glb.normalizeProp(BARREL_GLB, outPath, { height: 0.9, maxTex: 512 });
-      const report = await glb.inspectGlb(outPath);
-
-      expect(report.textures.length).toBeGreaterThan(0);
-      for (const texture of report.textures) {
-        expect(texture.width, texture.name).toBeLessThanOrEqual(512);
-        expect(texture.height, texture.name).toBeLessThanOrEqual(512);
+    const { Document, NodeIO } = await import('@gltf-transform/core');
+    const sharp = (await import('sharp')).default;
+    // A gradient, not a flat color: prune() bakes solid-color textures into
+    // material factors and would leave the report with zero textures.
+    const raw = Buffer.alloc(1024 * 1024 * 4);
+    for (let y = 0; y < 1024; y++) {
+      for (let x = 0; x < 1024; x++) {
+        const o = (y * 1024 + x) * 4;
+        raw[o] = x % 256;
+        raw[o + 1] = y % 256;
+        raw[o + 2] = 255;
+        raw[o + 3] = 255;
       }
-    },
-    60000,
-  );
+    }
+    const px = await sharp(raw, { raw: { width: 1024, height: 1024, channels: 4 } })
+      .webp()
+      .toBuffer();
+    // Distinct bytes for the normal slot: dedup() would merge two textures
+    // sharing one image and the report would lose the T_Normal row.
+    const pxNormal = await sharp(raw, { raw: { width: 1024, height: 1024, channels: 4 } })
+      .flip()
+      .webp()
+      .toBuffer();
+    const doc = new Document();
+    const buffer = doc.createBuffer();
+    const baseTex = doc.createTexture('T_Base').setImage(px).setMimeType('image/webp');
+    const normTex = doc.createTexture('T_Normal').setImage(pxNormal).setMimeType('image/webp');
+    const mat = doc.createMaterial('m').setBaseColorTexture(baseTex).setNormalTexture(normTex);
+    const position = doc
+      .createAccessor()
+      .setType('VEC3')
+      .setArray(new Float32Array([0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0]))
+      .setBuffer(buffer);
+    const uv = doc
+      .createAccessor()
+      .setType('VEC2')
+      .setArray(new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]))
+      .setBuffer(buffer);
+    const indices = doc
+      .createAccessor()
+      .setType('SCALAR')
+      .setArray(new Uint16Array([0, 1, 2, 0, 2, 3]))
+      .setBuffer(buffer);
+    const prim = doc
+      .createPrimitive()
+      .setAttribute('POSITION', position)
+      .setAttribute('TEXCOORD_0', uv)
+      .setIndices(indices)
+      .setMaterial(mat);
+    const node = doc.createNode('n').setMesh(doc.createMesh('quad').addPrimitive(prim));
+    doc.createScene('s').addChild(node);
+    await new NodeIO().write(inPath, doc);
+
+    await glb.normalizeProp(inPath, outPath, { height: 0.9, maxTex: 512 });
+    const report = await glb.inspectGlb(outPath);
+
+    expect(report.textures.length).toBeGreaterThan(0);
+    expect(report.textures.map((texture) => texture.name)).toContain('T_Normal');
+    for (const texture of report.textures) {
+      expect(texture.width, texture.name).toBeLessThanOrEqual(512);
+      expect(texture.height, texture.name).toBeLessThanOrEqual(512);
+    }
+  }, 60000);
 });
 
 // ---------------------------------------------------------------------------

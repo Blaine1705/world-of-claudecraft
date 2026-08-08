@@ -15,6 +15,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 let pagePromise = null;
 
 export function moduleImportUrl(path) {
+  // An absolute Windows path must form a proper drive URL even when this tool
+  // runs on POSIX: pathToFileURL there treats "C:\\repo\\..." as relative and
+  // resolves it against cwd with percent-encoded backslashes.
+  if (/^[A-Za-z]:[\\/]/.test(path)) {
+    return new URL(`file:///${path.replaceAll('\\', '/')}`).href;
+  }
   return pathToFileURL(path).href;
 }
 
