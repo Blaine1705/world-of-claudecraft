@@ -56,11 +56,11 @@ describe('warlock demon pet family bespoke attack (issue #2889 round 2)', () => 
     const bipedConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(bipedConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // Exactly 3 remaining direct `clips: BIPED14,` usages (5 today:
-    // mob_bear, mob_yeti, mob_murloc, mob_demon, mob_demonalt, since mob_troll
-    // already moved to its own TROLL_BIPED14 clip map, minus the TWO migrated
-    // to DEMON_BIPED14 above).
+    // Exactly 1 remaining direct `clips: BIPED14,` usage: mob_bear.
+    // mob_troll, mob_yeti, and mob_murloc already moved to their own
+    // TROLL_BIPED14 / YETI_BIPED14 / MURLOC_BIPED14 clip maps, and
+    // mob_demon / mob_demonalt are the TWO migrated to DEMON_BIPED14 above.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: BIPED14,/g)].length;
-    expect(remaining).toBe(3);
+    expect(remaining).toBe(1);
   });
 });
