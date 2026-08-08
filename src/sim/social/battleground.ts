@@ -586,16 +586,27 @@ function backfillBgMatches(ctx: SimContext): void {
       capsToWin: BG_CAPS_TO_WIN,
     });
     if (team === null) continue;
-    const index = pickBgBackfillGroup(
-      ctx.bgQueue.map((g) => ({ size: g.pids.length, waited: g.waited })),
-    );
-    if (index < 0) return; // no solo waiting: no later match can do better either
-    const pid = ctx.bgQueue[index].pids[0];
-    // The same liveness the matchmaker's queue hygiene demands. A candidate who
-    // fails it is left in place rather than dropped here, so matchmakeBg stays
+    // Liveness is folded into SELECTION, not applied after it. Picking the
+    // oldest solo first and only then testing them meant a single temporarily
+    // ineligible candidate blocked every backfill behind them: the loop moved
+    // on to the next MATCH, so a live 4v5 stayed unfilled while eligible solos
+    // waited. A failing candidate is still left queued, so matchmakeBg remains
     // the ONE site that unqueues and tells the player why.
-    const e = ctx.entities.get(pid);
-    if (!e || e.dead || ctx.bgMatches.has(pid) || e.pos.x > DUNGEON_X_THRESHOLD) continue;
+    //
+    // The rule mirrors matchmakeBg's hygiene, which is now three causes: gone
+    // offline, already seated, or committed to an arena match. Dying and
+    // standing in a dungeon deliberately no longer disqualify anyone (the seat
+    // revives and detaches them), so a corpse in the queue is a valid backfill.
+    const eligible: { index: number; size: number; waited: number }[] = [];
+    ctx.bgQueue.forEach((g, i) => {
+      const cand = g.pids[0];
+      if (!ctx.entities.get(cand) || ctx.bgMatches.has(cand) || ctx.arenaMatches.has(cand)) return;
+      eligible.push({ index: i, size: g.pids.length, waited: g.waited });
+    });
+    const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
+    if (pickedAt < 0) return; // no eligible solo waiting: no later match can do better
+    const index = eligible[pickedAt].index;
+    const pid = ctx.bgQueue[index].pids[0];
     ctx.bgQueue.splice(index, 1);
     seatBackfill(ctx, match, team, pid);
   }

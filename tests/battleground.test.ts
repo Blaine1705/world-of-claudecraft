@@ -3075,6 +3075,44 @@ describe('the outcome log stays observability-only', () => {
 });
 
 describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
+  it('does not let one ineligible oldest solo starve the backfill behind them', () => {
+    // Review catch: liveness used to be tested AFTER picking the oldest solo, so
+    // an ineligible candidate made the loop skip to the next MATCH. A live 4v5
+    // then stayed unfilled while perfectly good solos waited behind the stale
+    // one. Selection now filters first.
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+
+    // Queue both BEFORE any seat opens, so neither is backfilled early and the
+    // older one genuinely carries the longer wait.
+    const stale = sim.addPlayer('warrior', 'Stale');
+    tp(sim, stale, 0, -40);
+    sim.entities.get(stale)!.level = BG_MIN_LEVEL;
+    sim.bgQueueJoin(stale);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    const fresh = sim.addPlayer('rogue', 'Fresh');
+    tp(sim, fresh, 2, -40);
+    sim.entities.get(fresh)!.level = BG_MIN_LEVEL;
+    sim.bgQueueJoin(fresh);
+    const staleGroup = sim.ctx.bgQueue.find((g) => g.pids.includes(stale))!;
+    const freshGroup = sim.ctx.bgQueue.find((g) => g.pids.includes(fresh))!;
+    expect(staleGroup.waited, 'the stale one really is the older candidate').toBeGreaterThan(
+      freshGroup.waited,
+    );
+
+    // Make the OLDER one ineligible the way a real one is: already seated.
+    sim.ctx.bgMatches.set(stale, match);
+    // ...and only NOW open the seat.
+    bgResolveDesertion(sim.ctx, match.teams[0][4]);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    sim.tick();
+
+    expect(match.teams[0], 'the younger eligible solo filled the seat').toContain(fresh);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+  });
+
   // The leaver already pays (bgResolveDesertion charges rating and an L). This
   // is the other half: the four who stayed get their fifth back rather than
   // playing out a rated 4v5, which at BG_TEAM_SIZE 5 is most of a match.
