@@ -516,6 +516,16 @@ product exist. Coding and merge stay dark-safe without those credentials.
   can read dumps, set a retention window, and disclose the upload in the privacy
   policy. The log redaction strips bearer tokens and obvious credential patterns
   before writing.
+- V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
+  pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
+  persists compiled bytecode for the bundled scripts under the per-user profile
+  (`Code Cache/`, sibling of the log paths above) to cut cold-start compile time.
+  Known integrity tradeoff: the `onlyLoadAppFromAsar` and
+  `enableEmbeddedAsarIntegrityValidation` fuses do not cover this cache, so it is a
+  user-writable input to the JS engine outside the asar integrity envelope. Accepted
+  because poisoning it requires same-user code execution and the payload executes
+  inside the OS-sandboxed renderer (sandbox and context isolation stay on), not the
+  main process; the cache holds application bytecode only, never player data.
 
 ## Post-release verification checklist (each OS, each channel)
 
