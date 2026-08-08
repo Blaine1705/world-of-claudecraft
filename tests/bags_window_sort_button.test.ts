@@ -227,8 +227,9 @@ describe('bags sort button', () => {
     window.render();
     const grid = root.querySelector('.bag-grid-settle');
     expect(grid).not.toBeNull();
+    if (!grid) throw new Error('settle grid missing');
     const styleAt = (i: number) =>
-      (grid?.children[i] as HTMLElement).style.getPropertyValue('--settle-i');
+      (grid.children[i] as HTMLElement).style.getPropertyValue('--settle-i');
     expect(styleAt(19)).toBe('19');
     expect(styleAt(25)).toBe('20'); // clamped at SORT_SETTLE_STAGGER_CAP
   });
