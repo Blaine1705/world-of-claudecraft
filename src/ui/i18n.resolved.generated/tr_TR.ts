@@ -1319,6 +1319,7 @@ export const tr_TR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.",
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Geliştirici Rozetlerini Göster",
       "showOwnNameplate": "Kendi İsim Etiketimi Göster",
       "showPlayerNameplates": "Oyuncu İsim Etiketlerini Göster",

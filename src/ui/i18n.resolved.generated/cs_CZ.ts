@@ -1319,6 +1319,7 @@ export const cs_CZ: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Drží kurzor myši uvnitř okna při tažení pro otáčení kamery, takže nemůže dojet k okraji obrazovky ani na jiný monitor. Vypni, pokud chceš volný kurzor.",
       "showWalletOnCharacterScreen": "Zobrazit peněženku na obrazovce postavy",
       "showWalletOnPlayerCard": "Zobrazit peněženku na kartě hráče",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Zobrazit vývojářské odznaky",
       "showOwnNameplate": "Zobrazit mou jmenovku",
       "showPlayerNameplates": "Zobrazit jmenovky hráčů",

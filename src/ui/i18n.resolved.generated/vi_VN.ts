@@ -1319,6 +1319,7 @@ export const vi_VN: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Giữ con trỏ chuột bên trong cửa sổ khi bạn kéo để xoay camera, để nó không thể chạm tới mép màn hình hoặc di chuyển sang màn hình khác. Hãy tắt nếu bạn thích con trỏ tự do.",
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
       "showOwnNameplate": "Hiện Bảng Tên Của Tôi",
       "showPlayerNameplates": "Hiện Bảng Tên Người Chơi",

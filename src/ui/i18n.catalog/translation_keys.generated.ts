@@ -7974,6 +7974,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showOwnNameplate'
   | 'hudChrome.options.showPetFrame'
   | 'hudChrome.options.showPlayerNameplates'
+  | 'hudChrome.options.showPlaytime'
   | 'hudChrome.options.showSecondaryActionBar'
   | 'hudChrome.options.showTargetOfTarget'
   | 'hudChrome.options.showThirdActionBar'

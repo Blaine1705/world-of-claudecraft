@@ -1319,6 +1319,7 @@ export const sv_SE: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",

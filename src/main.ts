@@ -2425,6 +2425,14 @@ async function startGame(
       settings.set('showWalletOnPlayerCard', !!value);
       return;
     }
+    if (key === 'showPlaytime') {
+      settings.set('showPlaytime', !!value);
+      // The character sheet is a cold window (no repeating driver), so repaint
+      // it now; this is also the repaint the sheet's own privacy eye relies on
+      // (its toggle routes through this arm).
+      hud.renderCharIfOpen();
+      return;
+    }
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
       return;

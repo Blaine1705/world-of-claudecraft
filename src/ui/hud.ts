@@ -4801,11 +4801,13 @@ export class Hud {
     togglePlaytimeVisible: () => {
       // Per-device display preference (settings.showPlaytime), the
       // showWalletOnPlayerCard doctrine: the total keeps accruing, this only
-      // conceals THIS client's sheet value. Repaint mints the flipped row.
-      const settings = this.optionsHooks?.settings;
-      if (!settings) return;
-      settings.set('showPlaytime', !settings.get('showPlaytime'));
-      this.renderCharIfOpen();
+      // conceals THIS client's sheet value. The flip routes through the
+      // options seam so the eye and the Options row share ONE write path;
+      // the main.ts arm owns the settings write and synchronously repaints
+      // the open sheet (which the click handler's focus re-seat relies on).
+      const hooks = this.optionsHooks;
+      if (!hooks) return;
+      hooks.onSettingChange('showPlaytime', !hooks.settings.get('showPlaytime'));
     },
   });
   // Inspect ("Profile") window painter (inspect_view.ts pure core + inspect_window.ts
@@ -15570,7 +15572,10 @@ export class Hud {
     this.dailyRewardsWindow.onCosmeticsChanged();
   }
 
-  private renderCharIfOpen(): void {
+  // Public for the main.ts options arm (showPlaytime): the sheet is a cold
+  // window, so an Options-panel flip repaints it through this, the same call
+  // every internal repaint site uses.
+  renderCharIfOpen(): void {
     this.charWindow.renderIfOpen();
   }
 

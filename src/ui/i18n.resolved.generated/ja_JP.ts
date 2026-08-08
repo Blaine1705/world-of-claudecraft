@@ -1319,6 +1319,7 @@ export const ja_JP: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
+      "showPlaytime": "キャラクター画面にプレイ時間を表示",
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",

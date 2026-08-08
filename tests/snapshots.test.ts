@@ -35,6 +35,7 @@ import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/dat
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -758,12 +759,20 @@ describe('delta snapshots', () => {
     (client as unknown as SnapshotApplier).applySnapshot(snap3);
     expect(client.playtimeSeconds).toBe(3780);
 
-    // Cross-host display agreement, pinned: the offline getter serves
-    // unfloored seconds while the online mirror is minute-quantized, and the
-    // sheet's minute-flooring parts split must render both identically.
-    expect(playtimeParts(client.playtimeSeconds)).toEqual(
-      playtimeParts(server.sim.playtimeSeconds),
-    );
+    // Cross-host display agreement, pinned ABSOLUTELY on both sides (3725s
+    // baseline + 61s session = 1h 3m): the offline formula serves unfloored
+    // seconds while the online mirror is minute-quantized, and the sheet's
+    // minute-flooring parts split must render both identically. The offline
+    // arm anchors on the session's own meta (not Sim.primary, which is only
+    // coincidentally the same character in this harness), and the literal
+    // expectation keeps the pin decisive inside this file even if
+    // playtimeParts itself regresses.
+    expect(playtimeParts(client.playtimeSeconds)).toEqual({ days: 0, hours: 1, minutes: 3 });
+    expect(playtimeParts(livePlaytimeSeconds(meta, server.sim.time))).toEqual({
+      days: 0,
+      hours: 1,
+      minutes: 3,
+    });
   });
 
   it('round-trips the Hunter reactive window as remaining seconds', () => {

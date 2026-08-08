@@ -1319,6 +1319,7 @@ export const nl_NL: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",

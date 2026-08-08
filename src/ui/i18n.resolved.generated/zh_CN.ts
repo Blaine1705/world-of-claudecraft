@@ -1319,6 +1319,7 @@ export const zh_CN: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。",
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
+      "showPlaytime": "在角色界面显示游戏时长",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",

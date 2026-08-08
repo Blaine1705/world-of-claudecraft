@@ -1319,6 +1319,7 @@ export const pt_BR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Mantém o cursor do mouse dentro da janela enquanto você arrasta para girar a câmera, para que ele não alcance a borda da tela nem passe para outro monitor. Desative se preferir um cursor livre.",
       "showWalletOnCharacterScreen": "Mostrar carteira na tela de personagens",
       "showWalletOnPlayerCard": "Mostrar carteira no cartão de jogador",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Exibir Insígnias de Desenvolvedor",
       "showOwnNameplate": "Mostrar Minha Placa de Nome",
       "showPlayerNameplates": "Mostrar Placas de Nome dos Jogadores",

@@ -1319,6 +1319,7 @@ export const de_DE: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Hält den Mauszeiger im Fenster, während Ihr zum Drehen der Kamera zieht, damit er nicht den Bildschirmrand erreicht oder auf einen anderen Monitor wandert. Schaltet dies aus, wenn Ihr einen freien Cursor bevorzugt.",
       "showWalletOnCharacterScreen": "Wallet auf dem Charakterbildschirm anzeigen",
       "showWalletOnPlayerCard": "Wallet auf der Spielerkarte anzeigen",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Entwicklerabzeichen anzeigen",
       "showOwnNameplate": "Eigene Namensplakette anzeigen",
       "showPlayerNameplates": "Spieler-Namensplaketten anzeigen",

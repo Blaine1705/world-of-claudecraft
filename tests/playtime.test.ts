@@ -73,6 +73,23 @@ describe('Sim.playtimeSeconds (IWorldProgressionXp)', () => {
     expect(sim.playtimeSeconds).toBeCloseTo(1, 5);
   });
 
+  it('clamps a corrupt negative finite saved baseline to zero at load', () => {
+    // The clamp's second arm: Number.isFinite passes a finite negative, so
+    // the retained Math.max(0, ...) must catch it or a corrupt -50 save feeds
+    // a negative lifetime onto the ptime wire and the sheet.
+    const donor = makeSim();
+    const donorPid = donor.addPlayer('warrior', 'Aleph');
+    const state = donor.serializeCharacter(donorPid);
+    expect(state).not.toBeNull();
+    const sim = makeSim();
+    sim.addPlayer('warrior', 'Aleph', {
+      state: { ...(state as object), totalPlayedSeconds: -50 } as never,
+    });
+    expect(sim.playtimeSeconds).toBe(0);
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(sim.playtimeSeconds).toBeCloseTo(1, 5);
+  });
+
   it('loads the saved baseline and keeps accruing on top (the relog path)', () => {
     const sim = makeSim();
     const a = sim.addPlayer('warrior', 'Aleph');
@@ -86,5 +103,38 @@ describe('Sim.playtimeSeconds (IWorldProgressionXp)', () => {
     expect(sim2.playtimeSeconds).toBeCloseTo(65, 5);
     for (let i = 0; i < 20 * 10; i++) sim2.tick();
     expect(sim2.playtimeSeconds).toBeCloseTo(75, 5);
+  });
+
+  it('re-derives the session epoch when relogging into a WARM sim', () => {
+    // The live server's sim clock is far past zero when a character logs in,
+    // so this is the shape that actually exercises the epoch re-derivation:
+    // a joinedAt persisted with the save (or left at 0) reads 365 here, and a
+    // baseline clobbered by the warm clock reads 300 or 305. Only a baseline
+    // taken from the save plus a joinedAt minted AT join reads 65 then 75.
+    const donor = makeSim();
+    const a = donor.addPlayer('warrior', 'Aleph');
+    for (let i = 0; i < 20 * 65; i++) donor.tick();
+    const state = donor.serializeCharacter(a);
+    expect(state?.totalPlayedSeconds).toBeCloseTo(65, 5);
+
+    const sim2 = makeSim();
+    for (let i = 0; i < 20 * 300; i++) sim2.tick();
+    sim2.addPlayer('warrior', 'Aleph', { state: state ?? undefined });
+    expect(sim2.playtimeSeconds).toBeCloseTo(65, 5);
+    for (let i = 0; i < 20 * 10; i++) sim2.tick();
+    expect(sim2.playtimeSeconds).toBeCloseTo(75, 5);
+  });
+
+  it('folds idempotently across repeated saves in one session (no double-count)', () => {
+    // The classic regression this pins against: a later change that "commits"
+    // the fold by writing meta.totalPlayedSeconds back at save without also
+    // resetting meta.joinedAt would double-count every subsequent second
+    // (the second save here would read 90, not 60).
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    for (let i = 0; i < 20 * 30; i++) sim.tick();
+    expect(sim.serializeCharacter(a)?.totalPlayedSeconds).toBeCloseTo(30, 5);
+    for (let i = 0; i < 20 * 30; i++) sim.tick();
+    expect(sim.serializeCharacter(a)?.totalPlayedSeconds).toBeCloseTo(60, 5);
   });
 });

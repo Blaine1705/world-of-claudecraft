@@ -1204,6 +1204,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.',
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
+  'hudChrome.options.showPlaytime': 'Показывать время в игре на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
   'hudChrome.options.showOwnNameplate': 'Показывать свою табличку с именем',

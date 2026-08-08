@@ -1319,6 +1319,7 @@ export const en: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",

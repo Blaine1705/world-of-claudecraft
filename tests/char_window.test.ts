@@ -15,6 +15,7 @@ import {
 } from '../src/ui/char_window';
 import { hasTranslation } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
+import { svgIcon } from '../src/ui/ui_icons';
 
 // The character window painter is a DOM module. Most guards below inspect its
 // source, while the profession-art arm opts into jsdom and drives the real
@@ -502,8 +503,17 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       playtimeSeconds: opts.seconds,
       professionsState: { skills: [] },
     };
-    const togglePlaytimeVisible = vi.fn();
+    // Mirror the production toggle (settings flip + synchronous sheet
+    // repaint via the main.ts options arm) so the focus re-seat assertion
+    // exercises the REBUILT eye, not the pre-repaint capture the rebuild
+    // orphans.
+    let visible = opts.visible;
+    const togglePlaytimeVisible = vi.fn(() => {
+      visible = !visible;
+      win.render();
+    });
     const restoreFocus = vi.fn();
+    const attachTooltip = vi.fn();
     const win = new CharWindow({
       root: () => root,
       world: () => world as never,
@@ -529,25 +539,34 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       showError: vi.fn(),
       helmHidden: () => false,
       toggleHelm: vi.fn(),
-      playtimeVisible: () => opts.visible,
+      playtimeVisible: () => visible,
       togglePlaytimeVisible,
       itemIcon: () => '',
       moneyHtml: () => '',
       itemTooltip: () => '',
-      attachTooltip: vi.fn(),
+      attachTooltip,
     });
     win.render();
-    return { root, togglePlaytimeVisible, restoreFocus };
+    return { root, togglePlaytimeVisible, restoreFocus, attachTooltip };
   }
 
   it('renders the revealed value with the concealing eye affordance', () => {
     const { root } = renderSheet({ visible: true, seconds: 5 * HOUR + 42 * MINUTE });
+    expect(root.querySelector('.char-playtime-label')?.textContent).toBe('Time Played');
     const value = root.querySelector('.char-playtime-value');
     expect(value?.textContent).toBe('5 hours, 42 minutes');
     expect(value?.classList.contains('char-playtime-value-hidden')).toBe(false);
     const eye = root.querySelector('[data-act="toggle-playtime"]');
     expect(eye?.getAttribute('aria-pressed')).toBe('false');
     expect(eye?.getAttribute('aria-label')).toBe('Hide time played');
+    // Glyph polarity, pinned through the slash path's unique data (the DOM
+    // re-serializes the SVG, so byte-equality with svgIcon() cannot hold):
+    // eye-off is the eye PLUS the diagonal slash, so revealed must carry the
+    // shared outline and NOT the slash.
+    expect(svgIcon('eye-off')).toContain('M106 42');
+    expect(svgIcon('eye')).not.toContain('M106 42');
+    expect(eye?.innerHTML).toContain('M256 112');
+    expect(eye?.innerHTML).not.toContain('M106 42');
   });
 
   it('conceals the VALUE, not the row, while hidden (and flips the eye state)', () => {
@@ -560,19 +579,46 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
     const eye = root.querySelector('[data-act="toggle-playtime"]');
     expect(eye?.getAttribute('aria-pressed')).toBe('true');
     expect(eye?.getAttribute('aria-label')).toBe('Show time played');
+    // Glyph polarity: concealed shows the struck eye (the slash path).
+    expect(eye?.innerHTML).toContain('M106 42');
   });
 
-  it('routes the eye click through the HUD-owned toggle and re-seats focus', () => {
+  it('routes the eye click through the HUD-owned toggle and re-seats focus on the rebuilt eye', () => {
     const { root, togglePlaytimeVisible, restoreFocus } = renderSheet({
       visible: true,
       seconds: HOUR,
     });
     const eye = root.querySelector<HTMLButtonElement>('[data-act="toggle-playtime"]');
+    expect(eye).not.toBeNull();
     eye?.click();
     expect(togglePlaytimeVisible).toHaveBeenCalledTimes(1);
-    // The toggle repaints the sheet HUD-side (innerHTML rebuild), so the
-    // painter hands focus to the rebuilt eye via the focus-return dep.
+    // The toggle repaints the sheet (innerHTML rebuild), so the painter must
+    // hand focus to the eye MINTED BY THE REPAINT: the stale pre-repaint
+    // capture is orphaned by the rebuild and would drop a keyboard user on
+    // <body>. Killing regressions: restoreFocus(oldEye), restoreFocus(null),
+    // and a re-seat ordered before the repaint.
+    const rebuilt = root.querySelector<HTMLButtonElement>('[data-act="toggle-playtime"]');
+    expect(rebuilt).not.toBeNull();
+    expect(rebuilt).not.toBe(eye);
     expect(restoreFocus).toHaveBeenCalledTimes(1);
+    expect(restoreFocus).toHaveBeenCalledWith(rebuilt);
+    // And the repaint really flipped the row: the rebuilt eye is the
+    // concealed arm now.
+    expect(rebuilt?.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('serves the swapping eye tooltip from the LIVE visibility state', () => {
+    const { root, attachTooltip } = renderSheet({ visible: true, seconds: HOUR });
+    const eyeCall = attachTooltip.mock.calls.find(
+      ([el]) => (el as HTMLElement).getAttribute?.('data-act') === 'toggle-playtime',
+    );
+    expect(eyeCall).toBeDefined();
+    const tooltipText = eyeCall?.[1] as () => string;
+    expect(tooltipText()).toBe('Hide time played');
+    // The callback reads the dep live, so after a toggle the SAME registered
+    // closure serves the other arm.
+    root.querySelector<HTMLButtonElement>('[data-act="toggle-playtime"]')?.click();
+    expect(tooltipText()).toBe('Show time played');
   });
 });
 
