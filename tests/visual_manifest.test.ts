@@ -10,7 +10,6 @@ import {
   manifestUrlsForGraphics,
   SKINS,
   VISUALS,
-  type VisualDef,
   visibleAttachmentsForGraphics,
   visualKeyFor,
 } from '../src/render/characters/manifest';

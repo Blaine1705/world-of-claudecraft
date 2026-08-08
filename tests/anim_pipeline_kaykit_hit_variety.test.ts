@@ -87,20 +87,23 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
   });
 
   it('wires a matching animUrls entry onto every kaykit()/skeletonClips() consumer', () => {
-    // 36 VisualDef entries route through kaykit()/skeletonClips(); each gets
+    // 42 VisualDef entries route through kaykit()/skeletonClips(); each gets
     // exactly one `${...}_hit_variety_anims.glb` reference (a few source
     // files, e.g. mage.glb, back multiple entries, so this counts textual
-    // occurrences across the whole manifest, not distinct donor files).
+    // occurrences across the whole manifest, not distinct donor files). Count
+    // grew from 36 to 42 after rebasing onto release/v0.36.0, which landed
+    // its own kaykit()/skeletonClips() consumers (yeti/orc/troll and others)
+    // in parallel.
     const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
-    expect(occurrences).toBe(36);
+    expect(occurrences).toBe(42);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).
-    const hunterBlock = manifestBlock('player_hunter: {', 'player_rogue: {');
+    const hunterBlock = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
     expect(hunterBlock).toContain('bow_anims.glb');
     expect(hunterBlock).toContain('ranger_hit_variety_anims.glb');
 
-    const mageBlock = manifestBlock('player_mage: {', 'player_warlock: {');
+    const mageBlock = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
     expect(mageBlock).toContain('mage_ability_anims.glb');
     expect(mageBlock).toContain('mage_hit_variety_anims.glb');
 
