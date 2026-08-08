@@ -4080,13 +4080,9 @@ export const it_IT: EnTranslations = {
       "thorns": "Protegge un alleato, così gli attaccanti in mischia si feriscono colpendolo."
     },
     "petHook": {
-      "emberkin": "Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.",
+      "emberkin": "A ranged demon whose signature Felbolt chips at enemies from a safe distance.",
       "gloomshade": "Un demone robusto che provoca e assorbe i colpi, così puoi lanciare in tranquillità.",
-      "duskborn": "Un demone veloce in mischia che colpisce forte ma cede sotto pressione.",
-      "spellhound": "Uno scaramucciatore d'ombra che dà la caccia agli incantatori nemici.",
-      "warfiend": "Un picchiatore resistente in mischia, il tuttofare una volta che riesci a evocarlo.",
-      "pyre_colossus": "Un colosso massiccio dalla mischia devastante, evocato per pura potenza.",
-      "wraithborn": "Un evocatore d'élite che fa piovere ombra pesante dalla distanza."
+      "pyre_colossus": "Un colosso massiccio dalla mischia devastante, evocato per pura potenza."
     },
     "bestiary": {
       "heading": "Bestiario",
@@ -12601,9 +12597,6 @@ export const it_IT: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix il Re dei Cunicoli"
       },
@@ -12625,17 +12618,8 @@ export const it_IT: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec il Legaspettri"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Selthe Madre del Coro"

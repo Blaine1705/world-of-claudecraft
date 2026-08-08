@@ -2794,7 +2794,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blessing_of_might.description':
     '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
-  'entities.abilities.divine_protection.description': '神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。',
+  'entities.abilities.divine_protection.description':
+    '神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
   'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
@@ -2815,7 +2816,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
   'entities.abilities.retribution_aura.name': '报偿光环',
-  'entities.abilities.retribution_aura.description': '以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。',
+  'entities.abilities.retribution_aura.description':
+    '以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',
@@ -2849,7 +2851,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description': '在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。',
+  'entities.abilities.rapid_fire.description':
+    '在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。',
   'entities.abilities.smite.name': '惩击',
   'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
@@ -2880,7 +2883,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.chain_heal.name': '治疗链',
-  'entities.abilities.chain_heal.description': '治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）',
+  'entities.abilities.chain_heal.description':
+    '治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）',
   'entities.abilities.earth_shock.name': '大地震击',
   'entities.abilities.earth_shock.description':
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
@@ -3059,7 +3063,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
-  'entities.abilities.holy_shield.description': '获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。',
+  'entities.abilities.holy_shield.description':
+    '获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
@@ -3476,12 +3481,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': '瓦尔卡斯骨卫',
   'entities.mobs.emberkin.name': '烬裔',
   'entities.mobs.gloomshade.name': '幽影',
-  'entities.mobs.duskborn.name': '暮裔',
   'entities.mobs.grix_the_tunnelking.name': '隧道之王格里克斯',
-  'entities.mobs.spellhound.name': '噬法猎犬',
-  'entities.mobs.warfiend.name': '战魔',
   'entities.mobs.pyre_colossus.name': '焚炎巨像',
-  'entities.mobs.wraithborn.name': '亡魂裔',
   'entities.mobs.choirmother_selthe.name': '唱诗母塞尔瑟',
   'entities.mobs.drowned_templeguard.name': '溺亡神殿卫',
   'entities.mobs.drowned_votary.name': '溺亡信徒',
@@ -6294,12 +6295,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': '竞技场与 PvP',
   'guide.nav.talents': '天赋',
   'guide.nav.wishIKnew': '我希望早点知道的事',
-  'guide.petHook.wraithborn': '一只精英施法者，从远处倾泻沉重的暗影伤害。',
-  'guide.petHook.warfiend': '一名耐打的近战猛士，能召唤它之后就是全能的选择。',
-  'guide.petHook.spellhound': '一名暗影游击手，专门纠缠敌方施法者。',
   'guide.petHook.emberkin': '一只远程火焰箭恶魔，从安全距离外消磨敌人。',
   'guide.petHook.pyre_colossus': '一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。',
-  'guide.petHook.duskborn': '一只快速的近战恶魔，输出凶猛，但承压能力很差。',
   'guide.petHook.gloomshade': '一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。',
   'guide.related': '相关内容',
   'guide.search.label': '搜索',

@@ -4082,11 +4082,7 @@ export const cs_CZ: EnTranslations = {
     "petHook": {
       "emberkin": "Démon s ohnivou střelou na dálku, který ukrajuje nepřátele z bezpečné vzdálenosti.",
       "gloomshade": "Odolný démon, který tauntuje a pohlcuje zásahy, abys mohl v klidu sesílat.",
-      "duskborn": "Rychlý démon na blízko, který tvrdě zasahuje, ale pod tlakem se láme.",
-      "spellhound": "Stínový potyčkář, který štve nepřátelské sesilatele.",
-      "warfiend": "Odolný rváč na blízko, všestranná volba, jakmile ho dokážeš vyvolat.",
-      "pyre_colossus": "Mohutný kolos s drtivým bojem na blízko, vyvolaný pro hrubou sílu.",
-      "wraithborn": "Elitní sesilatel, který z dálky sesílá těžký stín."
+      "pyre_colossus": "Mohutný kolos s drtivým bojem na blízko, vyvolaný pro hrubou sílu."
     },
     "bestiary": {
       "heading": "Bestiář",
@@ -12601,9 +12597,6 @@ export const cs_CZ: EnTranslations = {
       "gloomshade": {
         "name": "Šerostín"
       },
-      "duskborn": {
-        "name": "Zrozený ze soumraku"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Tunelový král"
       },
@@ -12625,17 +12618,8 @@ export const cs_CZ: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec, poutač přízraků"
       },
-      "spellhound": {
-        "name": "Kouzelný ohař"
-      },
-      "warfiend": {
-        "name": "Válečný běs"
-      },
       "pyre_colossus": {
         "name": "Kolos pohřební hranice"
-      },
-      "wraithborn": {
-        "name": "Zrozený z přízraku"
       },
       "choirmother_selthe": {
         "name": "Matka sboru Selthe"

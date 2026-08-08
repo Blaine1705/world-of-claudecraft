@@ -4082,11 +4082,7 @@ export const ja_JP: EnTranslations = {
     "petHook": {
       "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
       "gloomshade": "挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。",
-      "duskborn": "素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。",
-      "spellhound": "敵のキャスターに食らいつくシャドウのスカーミッシャーです。",
-      "warfiend": "頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。",
-      "pyre_colossus": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。",
-      "wraithborn": "遠くから重いシャドウを降らせるエリートのキャスターです。"
+      "pyre_colossus": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。"
     },
     "bestiary": {
       "heading": "モンスター図鑑",
@@ -12601,9 +12597,6 @@ export const ja_JP: EnTranslations = {
       "gloomshade": {
         "name": "グルームシェイド"
       },
-      "duskborn": {
-        "name": "ダスクボーン"
-      },
       "grix_the_tunnelking": {
         "name": "トンネルキングのグリックス"
       },
@@ -12625,17 +12618,8 @@ export const ja_JP: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "魂縛りマルドレク"
       },
-      "spellhound": {
-        "name": "スペルハウンド"
-      },
-      "warfiend": {
-        "name": "ウォーフィーンド"
-      },
       "pyre_colossus": {
         "name": "パイアコロッサス"
-      },
-      "wraithborn": {
-        "name": "レイスボーン"
       },
       "choirmother_selthe": {
         "name": "聖歌母セルセ"

@@ -4082,11 +4082,7 @@ export const en: EnTranslations = {
     "petHook": {
       "emberkin": "A ranged demon whose signature Felbolt chips at enemies from a safe distance.",
       "gloomshade": "A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.",
-      "duskborn": "A fast melee demon that hits hard but folds under pressure.",
-      "spellhound": "A shadow skirmisher that hounds enemy casters.",
-      "warfiend": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "pyre_colossus": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "wraithborn": "An elite caster that rains heavy shadow from afar."
+      "pyre_colossus": "A hulking juggernaut with crushing melee, summoned for raw power."
     },
     "bestiary": {
       "heading": "Bestiary",
@@ -12601,9 +12597,6 @@ export const en: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix the Tunnelking"
       },
@@ -12625,17 +12618,8 @@ export const en: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Wraithbinder Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Choirmother Selthe"

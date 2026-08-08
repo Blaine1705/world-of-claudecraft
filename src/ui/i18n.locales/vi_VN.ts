@@ -4339,14 +4339,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Sát Thủ Tử Thần Voss',
   'entities.mobs.deepfen_murloc.name': 'Quái Đớp Deepfen',
   'entities.mobs.deeprock_kobold.name': 'Kẻ Đào Hầm Deeprock',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.drowned_dead.name': 'Tử Thi Chết Chìm',
   'entities.mobs.drowned_templeguard.name': 'Vệ Đền Chết Chìm',
   'entities.mobs.drowned_thrall.name': 'Nô Lệ Chết Chìm',
   'entities.mobs.drowned_votary.name': 'Tín Đồ Chết Chìm',
   'entities.mobs.fallen_captain_aldren.name': 'Đội Trưởng Sa Ngã Aldren',
-  'entities.mobs.warfiend.name': 'Warfiend',
-  'entities.mobs.spellhound.name': 'Spellhound',
   'entities.mobs.fen_troll.name': 'Troll Đầm Bùn',
   'entities.mobs.forest_wolf.name': 'Sói Rừng',
   'entities.mobs.glimmermere_wader.name': 'Kẻ Lội Hồ Lấp Lánh',
@@ -4404,7 +4401,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Sơ Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth Kẻ Chết Chìm',
   'entities.mobs.stormcrag_elemental.name': 'Nguyên Tố Bão Nham',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.thornpeak_ogre.name': 'Quỷ Khổng Lồ Đỉnh Gai',
   'entities.mobs.tidebound_acolyte.name': 'Tu Đồ Buộc Triều',
   'entities.mobs.tunnel_rat.name': 'Thợ Đào Deeprock',
@@ -6758,16 +6754,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Trang bạn đang tìm không tồn tại hoặc có thể đã được chuyển đi.',
   'guide.notFound.home': 'Trở lại trang tổng quan',
   'guide.notFound.title': 'Chúng tôi không tìm thấy trang đó',
-  'guide.petHook.wraithborn': 'Một pháp sư tinh nhuệ trút bóng tối nặng nề từ xa.',
-  'guide.petHook.warfiend':
-    'Một chiến binh cận chiến bền bỉ, lựa chọn toàn diện một khi bạn có thể triệu hồi nó.',
-  'guide.petHook.spellhound': 'Một kẻ tập kích bóng tối chuyên săn lùng các pháp sư của kẻ địch.',
   'guide.petHook.emberkin':
     'Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.',
   'guide.petHook.pyre_colossus':
     'Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy.',
-  'guide.petHook.duskborn':
-    'Một con quỷ cận chiến nhanh nhẹn, đánh rất mạnh nhưng dễ gục khi bị áp lực.',
   'guide.petHook.gloomshade':
     'Một con quỷ vững chãi biết khiêu khích và hứng đòn để bạn có thể niệm phép yên ổn.',
   'guide.placeholder.note': 'Phần này của cẩm nang đang được hoàn thiện.',

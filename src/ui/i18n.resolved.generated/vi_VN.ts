@@ -4082,11 +4082,7 @@ export const vi_VN: EnTranslations = {
     "petHook": {
       "emberkin": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
       "gloomshade": "Một con quỷ vững chãi biết khiêu khích và hứng đòn để bạn có thể niệm phép yên ổn.",
-      "duskborn": "Một con quỷ cận chiến nhanh nhẹn, đánh rất mạnh nhưng dễ gục khi bị áp lực.",
-      "spellhound": "Một kẻ tập kích bóng tối chuyên săn lùng các pháp sư của kẻ địch.",
-      "warfiend": "Một chiến binh cận chiến bền bỉ, lựa chọn toàn diện một khi bạn có thể triệu hồi nó.",
-      "pyre_colossus": "Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy.",
-      "wraithborn": "Một pháp sư tinh nhuệ trút bóng tối nặng nề từ xa."
+      "pyre_colossus": "Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy."
     },
     "bestiary": {
       "heading": "Thú Lục",
@@ -12601,9 +12597,6 @@ export const vi_VN: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Vua Đường Hầm"
       },
@@ -12625,17 +12618,8 @@ export const vi_VN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Kẻ Buộc Oan Hồn Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Mẫu Ca Selthe"

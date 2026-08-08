@@ -4080,13 +4080,9 @@ export const fr_FR: EnTranslations = {
       "thorns": "Protège un allié pour que les attaquants en mêlée se blessent en le frappant."
     },
     "petHook": {
-      "emberkin": "Un démon à traits de feu à distance qui entame les ennemis depuis une distance sûre.",
-      "gloomshade": "Un démon robuste qui provoque et encaisse les coups pour que vous puissiez incanter tranquillement.",
-      "duskborn": "Un démon de mêlée rapide qui frappe fort mais s'effondre sous la pression.",
-      "spellhound": "Un escarmoucheur d'ombre qui harcèle les lanceurs de sorts ennemis.",
-      "warfiend": "Un cogneur de mêlée résistant, le polyvalent une fois que vous pouvez l'invoquer.",
-      "pyre_colossus": "Un colosse écrasant à la mêlée dévastatrice, invoqué pour la puissance brute.",
-      "wraithborn": "Un lanceur de sorts d'élite qui déverse une ombre dévastatrice de loin."
+      "emberkin": "A ranged demon whose signature Felbolt chips at enemies from a safe distance.",
+      "gloomshade": "A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.",
+      "pyre_colossus": "Un colosse écrasant à la mêlée dévastatrice, invoqué pour la puissance brute."
     },
     "bestiary": {
       "heading": "Bestiaire",
@@ -12601,9 +12597,6 @@ export const fr_FR: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix le Roi des tunnels"
       },
@@ -12625,17 +12618,8 @@ export const fr_FR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec le Lie-spectres"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Selthe, mère de chœur"

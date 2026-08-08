@@ -4082,11 +4082,7 @@ export const pt_BR: EnTranslations = {
     "petHook": {
       "emberkin": "Um demônio de setas de fogo à distância que desgasta os inimigos de um ponto seguro.",
       "gloomshade": "Um demônio robusto que provoca e absorve golpes para você conjurar em paz.",
-      "duskborn": "Um demônio corpo a corpo rápido que acerta forte, mas cede sob pressão.",
-      "spellhound": "Um combatente sombrio que persegue conjuradores inimigos.",
-      "warfiend": "Um brigão corpo a corpo resistente, o faz-tudo assim que você consegue invocá-lo.",
-      "pyre_colossus": "Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta.",
-      "wraithborn": "Um conjurador de elite que despeja sombra pesada à distância."
+      "pyre_colossus": "Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta."
     },
     "bestiary": {
       "heading": "Bestiário",
@@ -12601,9 +12597,6 @@ export const pt_BR: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix o Rei dos Túneis"
       },
@@ -12625,17 +12618,8 @@ export const pt_BR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec o Atador-de-espectros"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Mãe-do-Coro Selthe"

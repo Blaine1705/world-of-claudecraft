@@ -4082,11 +4082,7 @@ export const tr_TR: EnTranslations = {
     "petHook": {
       "emberkin": "Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.",
       "gloomshade": "Kışkırtıp darbeleri üzerine çeken sağlam bir iblis, böylece rahatça büyü yapabilirsin.",
-      "duskborn": "Sert vuran ama baskı altında çabuk dağılan hızlı bir yakın dövüş iblisi.",
-      "spellhound": "Düşman büyücülerin peşine düşen bir gölge akıncısı.",
-      "warfiend": "Dayanıklı bir yakın dövüş kabadayısı; onu çağırabildiğin andan itibaren her işe yarayan bir yoldaş.",
-      "pyre_colossus": "Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır.",
-      "wraithborn": "Uzaktan ağır gölge yağdıran seçkin bir büyücü."
+      "pyre_colossus": "Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır."
     },
     "bestiary": {
       "heading": "Yaratıklar Kitabı",
@@ -12601,9 +12597,6 @@ export const tr_TR: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Tünelkral Grix"
       },
@@ -12625,17 +12618,8 @@ export const tr_TR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Hayaletbağlayan Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Koroana Selthe"

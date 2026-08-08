@@ -4082,11 +4082,7 @@ export const nl_NL: EnTranslations = {
     "petHook": {
       "emberkin": "Een demon op afstand die met vuurbouten vijanden bestookt vanaf een veilige afstand.",
       "gloomshade": "Een stevige demon die provoceert en klappen opvangt zodat jij rustig kunt casten.",
-      "duskborn": "Een snelle melee-demon die hard toeslaat maar bezwijkt onder druk.",
-      "spellhound": "Een schaduwschermutselaar die vijandelijke casters opjaagt.",
-      "warfiend": "Een taaie melee-vechter, het allroundtype zodra je hem kunt oproepen.",
-      "pyre_colossus": "Een kolossale moloch met verpletterende melee, opgeroepen voor pure kracht.",
-      "wraithborn": "Een elite-tovenaar die van veraf zware schaduw doet neerregenen."
+      "pyre_colossus": "Een kolossale moloch met verpletterende melee, opgeroepen voor pure kracht."
     },
     "bestiary": {
       "heading": "Bestiarium",
@@ -12601,9 +12597,6 @@ export const nl_NL: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix de Tunnelkoning"
       },
@@ -12625,17 +12618,8 @@ export const nl_NL: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Schimbinder Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre-Kolos"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Koormoeder Selthe"

@@ -4433,14 +4433,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Pembayang Maut Voss',
   'entities.mobs.deepfen_murloc.name': 'Penggigit Deepfen',
   'entities.mobs.deeprock_kobold.name': 'Penggali Terowongan Deeprock',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.drowned_dead.name': 'Mayat Tenggelam',
   'entities.mobs.drowned_templeguard.name': 'Penjaga Kuil Tenggelam',
   'entities.mobs.drowned_thrall.name': 'Budak Tenggelam',
   'entities.mobs.drowned_votary.name': 'Pemuja Tenggelam',
   'entities.mobs.fallen_captain_aldren.name': 'Kapten Aldren yang Gugur',
-  'entities.mobs.warfiend.name': 'Warfiend',
-  'entities.mobs.spellhound.name': 'Spellhound',
   'entities.mobs.fen_troll.name': 'Troll Mirefen',
   'entities.mobs.forest_wolf.name': 'Serigala Hutan',
   'entities.mobs.glimmermere_wader.name': 'Pengarung Glimmermere',
@@ -4498,7 +4495,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Suster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth sang Tenggelam',
   'entities.mobs.stormcrag_elemental.name': 'Elemental Stormcrag',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.thornpeak_ogre.name': 'Ogre Thornpeak',
   'entities.mobs.tidebound_acolyte.name': 'Akolit Terikat Pasang',
   'entities.mobs.tunnel_rat.name': 'Penggali Deeprock',
@@ -6854,15 +6850,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Halaman yang kamu cari tidak ada atau mungkin telah dipindahkan.',
   'guide.notFound.home': 'Kembali ke ikhtisar',
   'guide.notFound.title': 'Kami tidak dapat menemukan halaman itu',
-  'guide.petHook.wraithborn': 'Perapal elite yang menghujankan bayangan berat dari kejauhan.',
-  'guide.petHook.warfiend':
-    'Petarung jarak dekat yang tangguh, serba bisa begitu kamu mampu memanggilnya.',
-  'guide.petHook.spellhound': 'Penyerang bayangan yang memburu pemantra musuh.',
   'guide.petHook.emberkin': 'Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.',
   'guide.petHook.pyre_colossus':
     'Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni.',
-  'guide.petHook.duskborn':
-    'Iblis jarak dekat yang gesit, memukul keras tetapi mudah tumbang di bawah tekanan.',
   'guide.petHook.gloomshade':
     'Iblis kokoh yang memprovokasi dan menahan serangan agar kamu bisa memantra dengan tenang.',
   'guide.placeholder.note': 'Bagian panduan ini sedang dalam pengerjaan.',

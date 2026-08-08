@@ -4082,11 +4082,7 @@ export const sv_SE: EnTranslations = {
     "petHook": {
       "emberkin": "En eldpilskastande demon på avstånd som naggar fiender från säkert håll.",
       "gloomshade": "En robust demon som hånar och absorberar slag så att du kan besvärja i lugn och ro.",
-      "duskborn": "En snabb närstridsdemon som slår hårt men viker sig under press.",
-      "spellhound": "En skuggstrejfare som jagar fiendens besvärjare.",
-      "warfiend": "En tålig närstridskämpe, allroundern när du väl kan frammana den.",
-      "pyre_colossus": "En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka.",
-      "wraithborn": "En elitbesvärjare som regnar tunga skuggor på avstånd."
+      "pyre_colossus": "En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka."
     },
     "bestiary": {
       "heading": "Bestiarium",
@@ -12601,9 +12597,6 @@ export const sv_SE: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Tunnelkungen"
       },
@@ -12625,17 +12618,8 @@ export const sv_SE: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Vålnadsbindare Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Körmoder Selthe"

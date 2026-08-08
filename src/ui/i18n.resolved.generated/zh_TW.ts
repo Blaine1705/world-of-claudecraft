@@ -4082,11 +4082,7 @@ export const zh_TW: EnTranslations = {
     "petHook": {
       "emberkin": "一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。",
       "gloomshade": "一隻堅實的惡魔，會嘲諷並吸收攻擊，讓你能安心施法。",
-      "duskborn": "一隻快速的近戰惡魔，攻擊兇猛但承受壓力時容易倒下。",
-      "spellhound": "一隻暗影游擊手，專門糾纏敵方施法者。",
-      "warfiend": "一隻耐打的近戰猛將，是你能召喚後的全能型寵物。",
-      "pyre_colossus": "一隻龐大的巨獸，擁有摧枯拉朽的近戰，為純粹的力量而召喚。",
-      "wraithborn": "一隻精英施法者，從遠處降下沉重的暗影傷害。"
+      "pyre_colossus": "一隻龐大的巨獸，擁有摧枯拉朽的近戰，為純粹的力量而召喚。"
     },
     "bestiary": {
       "heading": "生物圖鑑",
@@ -12601,9 +12597,6 @@ export const zh_TW: EnTranslations = {
       "gloomshade": {
         "name": "幽蔭"
       },
-      "duskborn": {
-        "name": "暮裔"
-      },
       "grix_the_tunnelking": {
         "name": "隧道之王葛瑞克斯"
       },
@@ -12625,17 +12618,8 @@ export const zh_TW: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "縛魂者瑪爾德雷克"
       },
-      "spellhound": {
-        "name": "咒獵犬"
-      },
-      "warfiend": {
-        "name": "戰魔"
-      },
       "pyre_colossus": {
         "name": "烈焰巨像"
-      },
-      "wraithborn": {
-        "name": "怨魂裔"
       },
       "choirmother_selthe": {
         "name": "唱詩之母瑟爾瑟"

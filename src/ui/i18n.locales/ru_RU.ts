@@ -3645,12 +3645,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': 'Костяной страж Варкаса',
   'entities.mobs.emberkin.name': 'Уголёк',
   'entities.mobs.gloomshade.name': 'Мрачная тень',
-  'entities.mobs.duskborn.name': 'Сумеречнорождённая',
   'entities.mobs.grix_the_tunnelking.name': 'Грикс, Король туннелей',
-  'entities.mobs.spellhound.name': 'Гончая чар',
-  'entities.mobs.warfiend.name': 'Боевой бес',
   'entities.mobs.pyre_colossus.name': 'Погребальный колосс',
-  'entities.mobs.wraithborn.name': 'Духорождённый',
   'entities.mobs.choirmother_selthe.name': 'Матерь хора Селте',
   'entities.mobs.drowned_templeguard.name': 'Утонувший храмовый страж',
   'entities.mobs.drowned_votary.name': 'Утонувший служитель',
@@ -6681,15 +6677,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Арена и PvP',
   'guide.nav.talents': 'Таланты',
   'guide.nav.wishIKnew': 'Что бы я хотел знать заранее',
-  'guide.petHook.wraithborn': 'Элитный заклинатель, который издалека обрушивает тяжелую тьму.',
-  'guide.petHook.warfiend':
-    'Крепкий боец ближнего боя, универсал, как только вы сможете его призвать.',
-  'guide.petHook.spellhound': 'Налетчик тьмы, который преследует вражеских заклинателей.',
   'guide.petHook.emberkin':
     'Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.',
   'guide.petHook.pyre_colossus':
     'Громадный исполин с сокрушительным ближним боем, призываемый ради чистой силы.',
-  'guide.petHook.duskborn': 'Быстрый демон ближнего боя, который бьет сильно, но не держит удар.',
   'guide.petHook.gloomshade':
     'Стойкий демон, который провоцирует и поглощает удары, чтобы вы могли спокойно колдовать.',
   'guide.related': 'Связанное',

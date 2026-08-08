@@ -5631,12 +5631,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': 'Guardahuesos de Varkas',
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Gloomshade',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix el Rey Túnel',
-  'entities.mobs.spellhound.name': 'Spellhound',
-  'entities.mobs.warfiend.name': 'Warfiend',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Selthe, madre del coro',
   'entities.mobs.drowned_templeguard.name': 'Guardián ahogado del templo',
   'entities.mobs.drowned_votary.name': 'Devoto ahogado',
@@ -7495,16 +7491,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena y JcJ',
   'guide.nav.talents': 'Talentos',
   'guide.nav.wishIKnew': 'Lo que me habría gustado saber',
-  'guide.petHook.wraithborn': 'Un lanzador de élite que descarga sombra pesada desde la distancia.',
-  'guide.petHook.warfiend':
-    'Un combatiente cuerpo a cuerpo resistente, el todoterreno una vez que puedes invocarlo.',
-  'guide.petHook.spellhound': 'Un hostigador de las sombras que acosa a los lanzadores enemigos.',
   'guide.petHook.emberkin':
     'Un demonio de descargas de fuego a distancia que merma a los enemigos desde un lugar seguro.',
   'guide.petHook.pyre_colossus':
     'Un coloso descomunal con un cuerpo a cuerpo demoledor, invocado por puro poder.',
-  'guide.petHook.duskborn':
-    'Un demonio cuerpo a cuerpo veloz que golpea fuerte pero cede bajo presión.',
   'guide.petHook.gloomshade':
     'Un demonio robusto que provoca y absorbe golpes para que puedas lanzar en paz.',
   'guide.related': 'Relacionado',

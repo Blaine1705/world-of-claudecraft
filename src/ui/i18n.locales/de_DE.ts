@@ -5587,12 +5587,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': "Varkas' Knochenwache",
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Gloomshade',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix der Tunnelkönig',
-  'entities.mobs.spellhound.name': 'Spellhound',
-  'entities.mobs.warfiend.name': 'Warfiend',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Chormutter Selthe',
   'entities.mobs.drowned_templeguard.name': 'Ertränkte Tempelwache',
   'entities.mobs.drowned_votary.name': 'Ertränkter Andächtiger',
@@ -7357,17 +7353,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena und PvP',
   'guide.nav.talents': 'Talente',
   'guide.nav.wishIKnew': 'Was ich gern früher gewusst hätte',
-  'guide.petHook.wraithborn':
-    'Ein Elite-Zauberwirker, der aus der Ferne schweren Schatten regnen lässt.',
-  'guide.petHook.warfiend':
-    'Ein robuster Nahkampfschläger, der Allrounder, sobald du ihn beschwören kannst.',
-  'guide.petHook.spellhound': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
   'guide.petHook.emberkin':
     'Ein Feuerblitz-Dämon für die Distanz, der Gegner aus sicherer Entfernung abträgt.',
   'guide.petHook.pyre_colossus':
     'Ein massiger Koloss mit zermalmendem Nahkampf, beschworen für rohe Kraft.',
-  'guide.petHook.duskborn':
-    'Ein schneller Nahkampfdämon, der hart zuschlägt, aber unter Druck einknickt.',
   'guide.petHook.gloomshade':
     'Ein robuster Dämon, der verspottet und Treffer absorbiert, sodass du in Ruhe zaubern kannst.',
   'guide.related': 'Verwandtes',

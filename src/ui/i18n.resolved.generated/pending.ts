@@ -30,6 +30,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "guide.petHook.emberkin",
+    "guide.petHook.gloomshade",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
     "hudChrome.bags.sortButtonAria",
@@ -40,6 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "guide.petHook.emberkin",
+    "guide.petHook.gloomshade",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
     "hudChrome.bags.sortButtonAria",
@@ -51,6 +55,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.petHook.emberkin",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
     "hudChrome.bags.sortButtonAria",

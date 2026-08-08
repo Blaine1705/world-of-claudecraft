@@ -4082,11 +4082,7 @@ export const pl_PL: EnTranslations = {
     "petHook": {
       "emberkin": "Demon ciskający ognistymi pociskami z bezpiecznej odległości, podgryzający wrogów na dystans.",
       "gloomshade": "Wytrzymały demon, który prowokuje i przyjmuje ciosy na siebie, byś mógł spokojnie rzucać zaklęcia.",
-      "duskborn": "Szybki demon walczący wręcz, który zadaje potężne ciosy, lecz łatwo pada pod naporem.",
-      "spellhound": "Cienisty harcownik, który tropi wrogich rzucających zaklęcia.",
-      "warfiend": "Wytrzymały zabijaka walczący wręcz, uniwersalny towarzysz, gdy już zdołasz go przyzwać.",
-      "pyre_colossus": "Potężny kolos miażdżący wrogów w zwarciu, przyzywany dla czystej siły.",
-      "wraithborn": "Elitarny rzucający zaklęcia, który z oddali sprowadza ciężki ostrzał cienia."
+      "pyre_colossus": "Potężny kolos miażdżący wrogów w zwarciu, przyzywany dla czystej siły."
     },
     "bestiary": {
       "heading": "Bestiariusz",
@@ -12601,9 +12597,6 @@ export const pl_PL: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix Tunelowy Król"
       },
@@ -12625,17 +12618,8 @@ export const pl_PL: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Widmowiąż Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Chórmatka Selthe"

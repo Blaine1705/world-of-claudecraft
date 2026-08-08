@@ -4082,11 +4082,7 @@ export const id_ID: EnTranslations = {
     "petHook": {
       "emberkin": "Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.",
       "gloomshade": "Iblis kokoh yang memprovokasi dan menahan serangan agar kamu bisa memantra dengan tenang.",
-      "duskborn": "Iblis jarak dekat yang gesit, memukul keras tetapi mudah tumbang di bawah tekanan.",
-      "spellhound": "Penyerang bayangan yang memburu pemantra musuh.",
-      "warfiend": "Petarung jarak dekat yang tangguh, serba bisa begitu kamu mampu memanggilnya.",
-      "pyre_colossus": "Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni.",
-      "wraithborn": "Perapal elite yang menghujankan bayangan berat dari kejauhan."
+      "pyre_colossus": "Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni."
     },
     "bestiary": {
       "heading": "Bestiari",
@@ -12601,9 +12597,6 @@ export const id_ID: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix sang Raja Terowongan"
       },
@@ -12625,17 +12618,8 @@ export const id_ID: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Pengikat Arwah Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Raksasa Pyre"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Ibu Paduan Suara Selthe"

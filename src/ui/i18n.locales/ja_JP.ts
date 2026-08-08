@@ -3623,12 +3623,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': 'ヴァーカスの骨衛兵',
   'entities.mobs.emberkin.name': 'エンバーキン',
   'entities.mobs.gloomshade.name': 'グルームシェイド',
-  'entities.mobs.duskborn.name': 'ダスクボーン',
   'entities.mobs.grix_the_tunnelking.name': 'トンネルキングのグリックス',
-  'entities.mobs.spellhound.name': 'スペルハウンド',
-  'entities.mobs.warfiend.name': 'ウォーフィーンド',
   'entities.mobs.pyre_colossus.name': 'パイアコロッサス',
-  'entities.mobs.wraithborn.name': 'レイスボーン',
   'entities.mobs.choirmother_selthe.name': '聖歌母セルセ',
   'entities.mobs.drowned_templeguard.name': '溺れし神殿守',
   'entities.mobs.drowned_votary.name': '溺れし信徒',
@@ -6585,14 +6581,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'アリーナとPvP',
   'guide.nav.talents': 'タレント',
   'guide.nav.wishIKnew': '知っておきたかったこと',
-  'guide.petHook.wraithborn': '遠くから重いシャドウを降らせるエリートのキャスターです。',
-  'guide.petHook.warfiend':
-    '頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。',
-  'guide.petHook.spellhound': '敵のキャスターに食らいつくシャドウのスカーミッシャーです。',
   'guide.petHook.emberkin': '安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。',
   'guide.petHook.pyre_colossus':
     '強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。',
-  'guide.petHook.duskborn': '素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。',
   'guide.petHook.gloomshade':
     '挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。',
   'guide.related': '関連項目',

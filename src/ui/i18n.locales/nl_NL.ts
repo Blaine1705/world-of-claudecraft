@@ -4523,14 +4523,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Doodsbesluiper Voss',
   'entities.mobs.deepfen_murloc.name': 'Diepveen-Bijter',
   'entities.mobs.deeprock_kobold.name': 'Dieprots-Tunnelaar',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.drowned_dead.name': 'Verdronken Doden',
   'entities.mobs.drowned_templeguard.name': 'Verdronken Tempelwacht',
   'entities.mobs.drowned_thrall.name': 'Verdronken Lijfeigene',
   'entities.mobs.drowned_votary.name': 'Verdronken Aanbidder',
   'entities.mobs.fallen_captain_aldren.name': 'Gevallen Kapitein Aldren',
-  'entities.mobs.warfiend.name': 'Warfiend',
-  'entities.mobs.spellhound.name': 'Spellhound',
   'entities.mobs.fen_troll.name': 'Slijkveentrol',
   'entities.mobs.forest_wolf.name': 'Boswolf',
   'entities.mobs.glimmermere_wader.name': 'Glimmermere-Waadvogel',
@@ -4588,7 +4585,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Zuster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth de Verdronkene',
   'entities.mobs.stormcrag_elemental.name': 'Stormrots-Elementaal',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.thornpeak_ogre.name': 'Doorntop-Oger',
   'entities.mobs.tidebound_acolyte.name': 'Getijgebonden Acoliet',
   'entities.mobs.tunnel_rat.name': 'Dieprots-Graver',
@@ -6180,14 +6176,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'De pagina die je zocht bestaat niet of is mogelijk verplaatst.',
   'guide.notFound.home': 'Terug naar het overzicht',
   'guide.notFound.title': 'We konden die pagina niet vinden',
-  'guide.petHook.wraithborn': 'Een elite-tovenaar die van veraf zware schaduw doet neerregenen.',
-  'guide.petHook.warfiend': 'Een taaie melee-vechter, het allroundtype zodra je hem kunt oproepen.',
-  'guide.petHook.spellhound': 'Een schaduwschermutselaar die vijandelijke casters opjaagt.',
   'guide.petHook.emberkin':
     'Een demon op afstand die met vuurbouten vijanden bestookt vanaf een veilige afstand.',
   'guide.petHook.pyre_colossus':
     'Een kolossale moloch met verpletterende melee, opgeroepen voor pure kracht.',
-  'guide.petHook.duskborn': 'Een snelle melee-demon die hard toeslaat maar bezwijkt onder druk.',
   'guide.petHook.gloomshade':
     'Een stevige demon die provoceert en klappen opvangt zodat jij rustig kunt casten.',
   'guide.placeholder.note': 'Dit deel van de gids is onderweg.',
@@ -12291,7 +12283,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionViolence':
     '{charges} vergeldingen resteren; een vijandelijke aanval kent {doom} Verdoemenis toe en brengt {damage} Schaduwschade terug toe',
   'hudChrome.auraEffect.aoeEcho':
-    '{charges} echo\'s resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden',
+    "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
   'hudChrome.auraEffect.arcaneCharge':
     '{stacks} Arcaneladingen: Arcanekracht brengt {damagePct}% meer schade toe, wordt {castPct}% sneller gespreukt, en kost {costMult}x mana',
   'hudChrome.auraEffect.bleedVuln': 'Verhoogt de opgelopen bloedingsschade met {pct}%',

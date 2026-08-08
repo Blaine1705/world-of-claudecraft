@@ -4392,14 +4392,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Ölümavcısı Voss',
   'entities.mobs.deepfen_murloc.name': 'Deepfen Isirgani',
   'entities.mobs.deeprock_kobold.name': 'Deeprock Tunelcisi',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.drowned_dead.name': 'Boğulmuş Ölü',
   'entities.mobs.drowned_templeguard.name': 'Boğulmuş Tapınak Muhafızı',
   'entities.mobs.drowned_thrall.name': 'Boğulmuş Köle',
   'entities.mobs.drowned_votary.name': 'Boğulmuş Mürit',
   'entities.mobs.fallen_captain_aldren.name': 'Düşmüş Kaptan Aldren',
-  'entities.mobs.warfiend.name': 'Warfiend',
-  'entities.mobs.spellhound.name': 'Spellhound',
   'entities.mobs.fen_troll.name': 'Mirefen Trolü',
   'entities.mobs.forest_wolf.name': 'Orman Kurdu',
   'entities.mobs.glimmermere_wader.name': 'Glimmermere Yürüyücüsü',
@@ -4457,7 +4454,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Rahibe Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Boğulmuş Sloomtooth',
   'entities.mobs.stormcrag_elemental.name': 'Fırtınakaya Elementali',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.thornpeak_ogre.name': 'Dikenzirve Ogresi',
   'entities.mobs.tidebound_acolyte.name': 'Gelgitbağlı Çömez',
   'entities.mobs.tunnel_rat.name': 'Deeprock Kazıcısı',
@@ -6778,16 +6774,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Aradığın sayfa yok ya da taşınmış olabilir.',
   'guide.notFound.home': 'Genel bakışa dön',
   'guide.notFound.title': 'O sayfayı bulamadık',
-  'guide.petHook.wraithborn': 'Uzaktan ağır gölge yağdıran seçkin bir büyücü.',
-  'guide.petHook.warfiend':
-    'Dayanıklı bir yakın dövüş kabadayısı; onu çağırabildiğin andan itibaren her işe yarayan bir yoldaş.',
-  'guide.petHook.spellhound': 'Düşman büyücülerin peşine düşen bir gölge akıncısı.',
   'guide.petHook.emberkin':
     'Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.',
   'guide.petHook.pyre_colossus':
     'Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır.',
-  'guide.petHook.duskborn':
-    'Sert vuran ama baskı altında çabuk dağılan hızlı bir yakın dövüş iblisi.',
   'guide.petHook.gloomshade':
     'Kışkırtıp darbeleri üzerine çeken sağlam bir iblis, böylece rahatça büyü yapabilirsin.',
   'guide.placeholder.note': 'Rehberin bu bölümü yolda, yakında geliyor.',

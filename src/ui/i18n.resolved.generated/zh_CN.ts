@@ -4082,11 +4082,7 @@ export const zh_CN: EnTranslations = {
     "petHook": {
       "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
       "gloomshade": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
-      "duskborn": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
-      "spellhound": "一名暗影游击手，专门纠缠敌方施法者。",
-      "warfiend": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
-      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
-      "wraithborn": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
+      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。"
     },
     "bestiary": {
       "heading": "怪物图鉴",
@@ -12601,9 +12597,6 @@ export const zh_CN: EnTranslations = {
       "gloomshade": {
         "name": "幽影"
       },
-      "duskborn": {
-        "name": "暮裔"
-      },
       "grix_the_tunnelking": {
         "name": "隧道之王格里克斯"
       },
@@ -12625,17 +12618,8 @@ export const zh_CN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "缚魂者玛尔德雷克"
       },
-      "spellhound": {
-        "name": "噬法猎犬"
-      },
-      "warfiend": {
-        "name": "战魔"
-      },
       "pyre_colossus": {
         "name": "焚炎巨像"
-      },
-      "wraithborn": {
-        "name": "亡魂裔"
       },
       "choirmother_selthe": {
         "name": "唱诗母塞尔瑟"

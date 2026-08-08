@@ -6033,12 +6033,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': 'Garde-os de Varkas',
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Gloomshade',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix le Roi des tunnels',
-  'entities.mobs.spellhound.name': 'Spellhound',
-  'entities.mobs.warfiend.name': 'Warfiend',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Selthe, mère de chœur',
   'entities.mobs.drowned_templeguard.name': 'Garde du temple noyé',
   'entities.mobs.drowned_votary.name': 'Dévot noyé',
@@ -8020,19 +8016,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arène et JcJ',
   'guide.nav.talents': 'Talents',
   'guide.nav.wishIKnew': "Ce que j'aurais aimé savoir",
-  'guide.petHook.wraithborn':
-    "Un lanceur de sorts d'élite qui déverse une ombre dévastatrice de loin.",
-  'guide.petHook.warfiend':
-    "Un cogneur de mêlée résistant, le polyvalent une fois que vous pouvez l'invoquer.",
-  'guide.petHook.spellhound': "Un escarmoucheur d'ombre qui harcèle les lanceurs de sorts ennemis.",
-  'guide.petHook.emberkin':
-    'Un démon à traits de feu à distance qui entame les ennemis depuis une distance sûre.',
   'guide.petHook.pyre_colossus':
     'Un colosse écrasant à la mêlée dévastatrice, invoqué pour la puissance brute.',
-  'guide.petHook.duskborn':
-    "Un démon de mêlée rapide qui frappe fort mais s'effondre sous la pression.",
-  'guide.petHook.gloomshade':
-    'Un démon robuste qui provoque et encaisse les coups pour que vous puissiez incanter tranquillement.',
   'guide.related': 'À voir aussi',
   'guide.search.label': 'Rechercher',
   'guide.search.noResults': 'Aucun résultat',

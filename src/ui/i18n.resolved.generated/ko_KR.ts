@@ -4082,11 +4082,7 @@ export const ko_KR: EnTranslations = {
     "petHook": {
       "emberkin": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
       "gloomshade": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
-      "duskborn": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
-      "spellhound": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
-      "warfiend": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
-      "pyre_colossus": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
-      "wraithborn": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
+      "pyre_colossus": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다."
     },
     "bestiary": {
       "heading": "몬스터 도감",
@@ -12601,9 +12597,6 @@ export const ko_KR: EnTranslations = {
       "gloomshade": {
         "name": "어스름망령"
       },
-      "duskborn": {
-        "name": "황혼태생"
-      },
       "grix_the_tunnelking": {
         "name": "땅굴왕 그릭스"
       },
@@ -12625,17 +12618,8 @@ export const ko_KR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "영혼결속자 말드렉"
       },
-      "spellhound": {
-        "name": "주문사냥개"
-      },
-      "warfiend": {
-        "name": "전쟁마귀"
-      },
       "pyre_colossus": {
         "name": "화염거상"
-      },
-      "wraithborn": {
-        "name": "망령태생"
       },
       "choirmother_selthe": {
         "name": "성가대모 셀세"

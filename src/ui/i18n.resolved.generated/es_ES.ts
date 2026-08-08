@@ -4082,11 +4082,7 @@ export const es_ES: EnTranslations = {
     "petHook": {
       "emberkin": "Un demonio de descargas de fuego a distancia que merma a los enemigos desde un lugar seguro.",
       "gloomshade": "Un demonio robusto que provoca y absorbe golpes para que puedas lanzar en paz.",
-      "duskborn": "Un demonio cuerpo a cuerpo veloz que golpea fuerte pero cede bajo presión.",
-      "spellhound": "Un hostigador de las sombras que acosa a los lanzadores enemigos.",
-      "warfiend": "Un combatiente cuerpo a cuerpo resistente, el todoterreno una vez que puedes invocarlo.",
-      "pyre_colossus": "Un coloso descomunal con un cuerpo a cuerpo demoledor, invocado por puro poder.",
-      "wraithborn": "Un lanzador de élite que descarga sombra pesada desde la distancia."
+      "pyre_colossus": "Un coloso descomunal con un cuerpo a cuerpo demoledor, invocado por puro poder."
     },
     "bestiary": {
       "heading": "Bestiario",
@@ -12601,9 +12597,6 @@ export const es_ES: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix el Rey Túnel"
       },
@@ -12625,17 +12618,8 @@ export const es_ES: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec el Ataespectros"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Selthe, madre del coro"

@@ -5569,12 +5569,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': "Guardia d'ossa di Varkas",
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Gloomshade',
-  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix il Re dei Cunicoli',
-  'entities.mobs.spellhound.name': 'Spellhound',
-  'entities.mobs.warfiend.name': 'Warfiend',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
-  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Selthe Madre del Coro',
   'entities.mobs.drowned_templeguard.name': 'Guardiano del Tempio Annegato',
   'entities.mobs.drowned_votary.name': 'Devoto Annegato',
@@ -7431,17 +7427,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena e PvP',
   'guide.nav.talents': 'Talenti',
   'guide.nav.wishIKnew': 'Cose che avrei voluto sapere',
-  'guide.petHook.wraithborn': "Un evocatore d'élite che fa piovere ombra pesante dalla distanza.",
-  'guide.petHook.warfiend':
-    'Un picchiatore resistente in mischia, il tuttofare una volta che riesci a evocarlo.',
-  'guide.petHook.spellhound':
-    "Uno scaramucciatore d'ombra che dà la caccia agli incantatori nemici.",
-  'guide.petHook.emberkin':
-    'Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.',
   'guide.petHook.pyre_colossus':
     'Un colosso massiccio dalla mischia devastante, evocato per pura potenza.',
-  'guide.petHook.duskborn':
-    'Un demone veloce in mischia che colpisce forte ma cede sotto pressione.',
   'guide.petHook.gloomshade':
     'Un demone robusto che provoca e assorbe i colpi, così puoi lanciare in tranquillità.',
   'guide.related': 'Correlati',
