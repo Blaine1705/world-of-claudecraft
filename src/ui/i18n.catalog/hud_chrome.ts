@@ -95,7 +95,7 @@ export const hudChromeStrings = {
   },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
-    absorbed: 'Absorbed {amount}',
+    absorbed: 'Absorbed ({amount})',
     cheap: 'Cheap!',
   },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
