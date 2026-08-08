@@ -357,7 +357,7 @@ const BIPED14: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Punch', 'Weapon'],
-  hit: ['HitReact'],
+  hit: ['HitReact', 'HitReact_Heavy'],
   death: 'Death',
 };
 
@@ -1622,6 +1622,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // brown-tinted yeti rig, same recipe as the druid Bear form.
   mob_bear: {
     url: `${CREATURES}/yetialt.glb`,
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`],
     height: 2.2,
     clips: BIPED14,
     tint: 0x5a4030,
@@ -1630,6 +1631,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the same rig worn honestly: an ice-white yeti for the Frostveil
   mob_yeti: {
     url: `${CREATURES}/yetialt.glb`,
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`],
     height: 2.5,
     clips: YETI_BIPED14,
     // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
@@ -1647,6 +1649,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_murloc: {
     url: `${CREATURES}/frog.glb`,
+    animUrls: [`${CREATURES}/frog_hit_variety_anims.glb`],
     height: 1.7,
     clips: BIPED14,
     tint: 'entity',
@@ -1685,8 +1688,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // faint wash only — 0.35 flooded every material with the template green
     clips: TROLL_BIPED14,
     // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
+    // baked off this same rig's own poses. The second donor GLB
+    // (scripts/build_biped14_hit_variety_anims.mjs) donates the second
+    // BIPED14 hit-reaction clip, HitReact_Heavy.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`, `${CREATURES}/orc_hit_variety_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
@@ -1874,6 +1879,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 1.8,
     clips: BIPED14,
     tint: 'entity',
@@ -1989,6 +1995,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 2.1,
     clips: BIPED14,
     tint: 'entity',
