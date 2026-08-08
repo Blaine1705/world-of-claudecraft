@@ -70,7 +70,12 @@ describe('ENEMY_BITE hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, key).toContain('clips: ENEMY_BITE');
       expect(block, `${key} animUrls`).toContain(file);
     }
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Exactly 2 ENEMY_BITE consumers wire a hit-variety donor GLB: a stray
+    // extra or missing wiring on either family changes this count. (Other
+    // BIPED14 families independently wire their own `_hit_variety_anims.glb`
+    // donors in the same batch, issue #2889, so this only counts ENEMY_BITE
+    // consumers, not every `_hit_variety_anims.glb` occurrence repo-wide.)
+    const occurrences = [...MANIFEST_SRC.matchAll(/clips: ENEMY_BITE,/g)].length;
     expect(occurrences).toBe(2);
   });
 });
