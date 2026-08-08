@@ -781,7 +781,7 @@ function swims(def: VisualDef): VisualDef {
   };
 }
 
-const SKINS_DIR = 'textures/skins';
+export const SKINS_DIR = 'textures/skins';
 
 // ---------------------------------------------------------------------------
 // Combat Mech — a class-agnostic cosmetic body. Unlike the per-class skins
