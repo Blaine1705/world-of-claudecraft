@@ -67,7 +67,12 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Scoped to this family's own donor basenames: an unscoped
+    // `_hit_variety_anims.glb` count also picks up unrelated families
+    // (e.g. BIPED14's yetialt/frog/orc/demonalt donors) whenever they land
+    // their own hit-variety clips, which happens constantly in this repo.
+    const occurrences = [...MANIFEST_SRC.matchAll(/(?:goblin|giant)_hit_variety_anims\.glb/g)]
+      .length;
     expect(occurrences).toBe(2);
   });
 });
