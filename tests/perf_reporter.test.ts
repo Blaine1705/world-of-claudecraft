@@ -201,6 +201,7 @@ function snapshot(): PerfSnapshot {
     seconds: 80,
     frames: 4800,
     fps: 60,
+    hitchForensics: [],
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
