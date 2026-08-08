@@ -165,6 +165,13 @@ export function updateDuels(ctx: SimContext): void {
  * to the player `controllerPid`: the opponent themselves and anything they
  * control. Delegates the removal to `clearAurasFromSource` per distinct source
  * so the fade events and the stat recalc stay that function's business.
+ *
+ * KNOWN RESIDUAL: an `Aura` carries only `sourceId`, so a dot from a pet that
+ * has already DESPAWNED cannot be attributed to its owner at all, by this or
+ * any other reader. The fallback below keeps that case exactly as bad as it was
+ * before this function existed rather than worse; closing it properly would
+ * mean recording the controller on the aura at apply time, which is a wider
+ * change than this fix.
  */
 function clearAurasFromController(
   ctx: SimContext,
@@ -175,7 +182,14 @@ function clearAurasFromController(
   const sources = new Set<number>();
   for (const a of target.auras) {
     const src = ctx.entities.get(a.sourceId);
-    if (src && ctx.pvpController(src)?.id === controllerPid) sources.add(a.sourceId);
+    // Resolving through pvpController is what widens this past the opponent's
+    // own id to anything they control. When the source ENTITY is gone (a pet
+    // that died or was dismissed between the last tick and the end) there is
+    // nothing left to resolve, so fall back to the raw id comparison this
+    // replaced: never clear less than the old code did.
+    if (src ? ctx.pvpController(src)?.id === controllerPid : a.sourceId === controllerPid) {
+      sources.add(a.sourceId);
+    }
   }
   for (const sourceId of sources) ctx.clearAurasFromSource(target, sourceId);
 }

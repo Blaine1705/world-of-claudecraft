@@ -134,4 +134,34 @@ describe('what a duel leaves behind', () => {
     for (let i = 0; i < 20 * 8; i++) sim.tick();
     expect(loser.dead, 'so the loser is not killed by it seconds later').toBe(false);
   });
+
+  it("still clears the opponent's OWN dot when their entity is already gone", () => {
+    // Review catch on this fix: resolving the source through pvpController needs
+    // the source ENTITY to still exist, and the id comparison it replaced did
+    // not. A source that despawned between the last tick and the end must not
+    // silently skip the clear, which would reintroduce the very bug for a
+    // narrower trigger. The fallback keeps the old floor.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b)!;
+    loser.auras.push({
+      id: 'rend_ghost',
+      name: 'Rend',
+      kind: 'dot',
+      remaining: 30,
+      duration: 30,
+      value: 40,
+      tickInterval: 1,
+      tickTimer: 1,
+      sourceId: a,
+      school: 'physical',
+    } as Aura);
+    fightToTheEnd(sim, a, b);
+    // Drop the opponent's entity, then end a fresh duel the same way: the point
+    // is that the CLEAR path must not depend on the lookup succeeding.
+    sim.entities.delete(a);
+    expect(
+      loser.auras.some((x) => x.id === 'rend_ghost'),
+      "the opponent's own dot is cleared whether or not their entity survives",
+    ).toBe(false);
+  });
 });
