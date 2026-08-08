@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Reliquary crown launcher icon source</title>
   <!-- Reliquary crown, chrome launcher style: pale gold + warm bronze + cream,
-       thick dark outline, top-left light. -->
+       thick dark outline, top-left light. The title serves the a11y lint on
+       this SOURCE file only; the shipped asset is the keyed WebP. -->
   <defs>
     <clipPath id="bodyClip">
       <path d="M24 82
