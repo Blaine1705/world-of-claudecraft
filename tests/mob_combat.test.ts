@@ -16,6 +16,7 @@ import {
 } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import { MELEE_RANGE } from '../src/sim/types';
+import { assertAllocationStable } from './util/alloc_probe';
 
 describe('mob combat profiles', () => {
   it('gives ordinary mobs a pursuing scale-based melee profile (hit-and-run)', () => {
@@ -120,5 +121,41 @@ describe('mob combat profiles', () => {
       tryMobMeleeSwingInRange(sim.ctx, pursuing, player);
     }
     expect(player.hp).toBeLessThan(100000);
+  });
+
+  it('memoizes combatProfileForMob: repeated calls for the same templateId/scale return the identical cached object, allocating nothing new', () => {
+    assertAllocationStable(
+      () => combatProfileForMob('forest_wolf', 1.5),
+      64,
+      'combatProfileForMob',
+    );
+    // Same object identity holds for a hardcoded-profile mob too (it always did,
+    // but the memoized path must not regress that): a distinct cache entry per key.
+    const a = combatProfileForMob('nythraxis_scourge_of_thornpeak', 3.1);
+    const b = combatProfileForMob('nythraxis_scourge_of_thornpeak', 3.1);
+    expect(a).toBe(b);
+  });
+
+  it('keys the combatProfileForMob cache by templateId AND scale, never collapsing distinct mobs to one shared object', () => {
+    const wolfSmall = combatProfileForMob('forest_wolf', 1);
+    const wolfBig = combatProfileForMob('forest_wolf', 2);
+    const boss = combatProfileForMob('nythraxis_scourge_of_thornpeak', 3.1);
+
+    expect(wolfSmall).not.toBe(wolfBig);
+    expect(wolfSmall.meleeRange).not.toBe(wolfBig.meleeRange);
+    expect(wolfSmall).not.toBe(boss);
+
+    // Values stay correct under the cache exactly as the unmemoized function
+    // computed them (the regression pin for behavior-unchanged).
+    expect(wolfSmall).toEqual({
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(1),
+      desiredRange: scaledDefaultMobMeleeRange(1) * 0.8,
+    });
+    expect(wolfBig).toEqual({
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2),
+      desiredRange: scaledDefaultMobMeleeRange(2) * 0.8,
+    });
   });
 });

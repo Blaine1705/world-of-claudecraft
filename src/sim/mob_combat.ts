@@ -55,7 +55,25 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
 // reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
 
+// Mob AI reads the profile several times per engaged mob per tick (the threat
+// scan in updateMobTarget, the lookup that opens updateMobCombatProfile, and
+// each melee-range probe in the pursuit/caster loops), and every non-hardcoded
+// branch below built a fresh object literal on every read. A profile is a pure
+// function of (templateId, scale), so cache it: bounded by the small number of
+// distinct template/scale pairs actually spawned. Safe because no caller
+// mutates the returned object, only reads its fields.
+const combatProfileCache = new Map<string, MobCombatProfile>();
+
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
+  const key = `${templateId}:${scale}`;
+  const cached = combatProfileCache.get(key);
+  if (cached) return cached;
+  const profile = buildCombatProfileForMob(templateId, scale);
+  combatProfileCache.set(key, profile);
+  return profile;
+}
+
+function buildCombatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
   if (templateId === 'wildheart_ravager')
