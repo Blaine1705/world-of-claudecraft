@@ -17,12 +17,13 @@
 // necessary: the painter is handed the same object every build, so a captured
 // reference is never a snapshot.
 //
-// The stub world is SIM-SHAPED only (the offline shapes: a Map of earned deeds,
-// an ownedMounts() call, live Sets), and that is enough for this file, because
-// nothing here is a shape contract: the method reads five sizes plus a
-// completion callback and hands the pure core plain numbers, so the online
-// ClientWorld half is covered where it belongs (the IWorld parity pin) and the
-// core's own suite covers what it does with those numbers.
+// The stub world is SIM-SHAPED (the offline shapes: a Map of earned deeds, an
+// ownedMounts() call, live Sets), which the online mirror matches member for
+// member (the IWorld parity pin); the one online-only state this rig also
+// drives is the COLD mirror (the last describe below): before the first
+// snapshot lands, ClientWorld answers with every surface empty and every
+// completion() null, and the method must produce the hidden strip, not a
+// throw.
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
@@ -106,7 +107,8 @@ function makeRig(): TrackerRig {
     reliquaryPageCompletion: (pageId) => {
       const p = progress[pageId];
       if (!p) return null;
-      return { owned: p.owned, total: p.total, complete: p.total > 0 && p.owned >= p.total };
+      // complete mirrors production exactly (sim pageCompletion: owned === total).
+      return { owned: p.owned, total: p.total, complete: p.total > 0 && p.owned === p.total };
     },
     deedStats: { itemsDiscovered: new Set<string>() },
     reliquaryMarks: new Set<string>(),
@@ -299,5 +301,26 @@ describe('Hud.updateReliquaryTracker: the lazy ownership signature', () => {
     expect(rig.counts.ownedMounts).toBe(1);
     rig.hud.updateReliquaryTracker();
     expect(rig.counts.ownedMounts).toBe(2);
+  });
+});
+
+describe('Hud.updateReliquaryTracker: the cold ClientWorld mirror', () => {
+  it('paints the hidden strip from the pre-first-snapshot online shape, pinned or not', () => {
+    // Before the first snapshot lands, ClientWorld answers with every surface
+    // EMPTY (src/net/online.ts mints deedsEarned/deedStats/reliquaryMarks
+    // empty, accountCosmetics with weaponSkinIds: [], and ownedMounts() over
+    // the stored field) and reliquaryPageCompletion knows no page. The method
+    // reads .size off two Sets and a Map and .length off two arrays across
+    // five facets, so the all-empty mirror is the shape most likely to
+    // surface an undefined read; it must produce the hidden strip instead.
+    const rig = makeRig();
+    for (const key of Object.keys(rig.progress)) delete rig.progress[key];
+    rig.hud.updateReliquaryTracker();
+    expect(rig.painted[0]?.visible).toBe(false);
+    // A stored pin whose page the mirror cannot answer for yet stays a hidden
+    // line, not a crash: the reconnect race every online session can hit.
+    rig.hud.reliquaryWindow.pinned.add(PINNED_PAGE);
+    rig.hud.updateReliquaryTracker();
+    expect(rig.painted[1]?.visible).toBe(false);
   });
 });

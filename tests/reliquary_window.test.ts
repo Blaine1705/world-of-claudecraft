@@ -22,6 +22,10 @@ const stripComments = (src: string): string =>
 const painter = read('../src/ui/reliquary_window.ts');
 const view = read('../src/ui/reliquary_view.ts');
 const labels = read('../src/ui/reliquary_labels.ts');
+// The Phase 15 tracker pair rides the same hygiene scans (the deeds family
+// precedent: tests/deeds_window.test.ts scans deed_tracker_painter.ts by name).
+const trackerView = read('../src/ui/reliquary_tracker_view.ts');
+const trackerPainter = read('../src/ui/reliquary_tracker_painter.ts');
 const hud = read('../src/ui/hud.ts');
 const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
@@ -49,20 +53,24 @@ function sectionCss(name: string): string {
 describe('painter hygiene', () => {
   it('keeps hex/px literals out of the painter TS (tokens and classes only)', () => {
     // Allow the #reliquary-window comment/id reference; ban free-standing hex colors.
-    expect(painter).not.toMatch(/#[0-9a-fA-F]{3,8}(?![\w-])/);
-    expect(painter).not.toMatch(/'\d+px'/);
+    for (const src of [painter, trackerPainter, trackerView]) {
+      expect(src).not.toMatch(/#[0-9a-fA-F]{3,8}(?![\w-])/);
+      expect(src).not.toMatch(/'\d+px'/);
+    }
   });
 
   it('contains no em/en dashes', () => {
-    for (const src of [painter, view, labels]) {
+    for (const src of [painter, view, labels, trackerPainter, trackerView]) {
       expect(src).not.toMatch(/\u2014|\u2013/);
     }
   });
 
   it('reads neither the FPS governor nor the graphics tier (fairness)', () => {
     // Source lines, page blurbs, clear counts, and owned/missing state are all
-    // information a player acts on, so no preset may thin any of them.
-    for (const src of [painter, view, labels]) {
+    // information a player acts on, so no preset may thin any of them. The
+    // always-on tracker strip is held to the same oracle: everything it shows
+    // is player-chosen collection progress.
+    for (const src of [painter, view, labels, trackerPainter, trackerView]) {
       expect(src).not.toMatch(/governor/);
       expect(src).not.toMatch(/ui_effects_profile|fxTier|data-fx-level/);
     }
@@ -285,7 +293,10 @@ describe('painter hygiene', () => {
       /dataset\.page[\s\S]*?this\.gridIndex = 0;/,
       /\[data-back\][\s\S]*?this\.gridIndex = 0;/,
       /if \(nav !== undefined\) \{[\s\S]*?this\.gridIndex = 0;/,
-      /openWithPage\(pageId: string\)[\s\S]*?this\.gridIndex = 0;/,
+      // Anchored INSIDE the gotoPage-success braces: the deep link resets the
+      // cursor only on the arm that moved, so a reset hoisted above the guard
+      // (running for an id that failed to resolve) must fail this pin.
+      /openWithPage\(pageId: string\): void \{\s*if \(this\.gotoPage\(pageId\)\) \{\s*this\.gridIndex = 0;/,
     ]) {
       expect(code, String(arm)).toMatch(arm);
     }
@@ -423,7 +434,12 @@ describe('painter hygiene', () => {
     expect(code).not.toMatch(/data-reliquary-live[^\n]*aria-live/);
     expect(code).toContain("el.ownerDocument.createElement('span')");
     expect(code).toContain('const live = this.ensureLiveRegion(el)');
-    expect(code).toContain('el.append(live)');
+    // The at-cap pin note rides the same re-append (class-held, root-document
+    // minted): every refused pin control's aria-describedby must resolve on
+    // every paint, so minting it inside the innerHTML string would orphan the
+    // reference the AT already followed.
+    expect(code).toContain('el.append(live, this.ensureCapNote(el))');
+    expect(code).not.toMatch(/reliquary-pin-cap-note[^\n]*innerHTML/);
     expect(code).not.toMatch(/\bdocument\s*[.[]/);
     // Two keystrokes narrowing to the SAME count must still re-read, which an
     // unchanged textContent will not do.

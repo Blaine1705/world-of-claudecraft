@@ -144,6 +144,28 @@ describe('ReliquaryTrackerPainter: rows', () => {
     painter.update(view({ owned: 5, flash: false }));
     expect(line.classList.contains('dt-flash')).toBe(false);
   });
+
+  it('clears the flash from a slot whose row left the strip mid-hold', () => {
+    // Through the REAL eliding facet: a hide path that skipped the clear would
+    // leave the class on the pooled node AND 'on' in the multi-slot cache, so
+    // the next page recycled into this slot could never flash again (the
+    // toggle would elide against the stale entry).
+    const root = document.createElement('div');
+    const { writers } = countingWriters();
+    const painter = new ReliquaryTrackerPainter({ root: () => root, writers });
+    const line = root.querySelector('.dt-line') as HTMLElement;
+    painter.update(view({ flash: true }));
+    expect(line.classList.contains('dt-flash')).toBe(true);
+    const empty = makeReliquaryTrackerView();
+    empty.visible = true;
+    painter.update(empty);
+    expect(line.classList.contains('dt-flash')).toBe(false);
+    // A different page recycled into the slot flashes for real.
+    const next = view({ flash: true });
+    next.lines[0].pageId = 'conquerors_hollow_crypt';
+    painter.update(next);
+    expect(line.classList.contains('dt-flash')).toBe(true);
+  });
 });
 
 describe('ReliquaryTrackerPainter: chip-mode header contract', () => {

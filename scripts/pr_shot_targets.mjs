@@ -282,7 +282,15 @@ async function pinReliquaryTrackerPages(page) {
     let count = 0;
     for (const id of ids) {
       const btn = document.querySelector(`#reliquary-window [data-pin="${id}"]`);
-      if (!btn || btn.disabled || btn.getAttribute('aria-pressed') === 'true') continue;
+      // The at-cap refusal renders aria-disabled (still clickable, refused in
+      // the handler), so honor both forms or a full tracker flips a stale pin.
+      if (
+        !btn ||
+        btn.disabled ||
+        btn.getAttribute('aria-disabled') === 'true' ||
+        btn.getAttribute('aria-pressed') === 'true'
+      )
+        continue;
       btn.click();
       count++;
     }

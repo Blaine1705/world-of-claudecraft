@@ -296,6 +296,47 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('holds the reliquary-tracker capture to the window contracts it borrows', () => {
+    // The tracker capture stages pins through the window's OWN controls, so it
+    // rests on cross-file spellings the script cannot import. Both reads are
+    // COMMENT-STRIPPED so prose mentioning the tokens can never satisfy them.
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
+    );
+    const windowSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8'),
+    );
+    // The between-variant cleanup sweeps the same storage prefix the window
+    // persists under. A prefix drift would leave a prior variant's pins in
+    // place, and the pin control is a TOGGLE, so a stale pin would be flipped
+    // OFF and the capture would corrupt silently.
+    expect(windowSrc).toContain("RELIQUARY_PIN_KEY_PREFIX = 'woc_reliquary_pins'");
+    expect(script).toContain("indexOf('woc_reliquary_pins')");
+    // The staging drives the window's markup: the pin toggle (skipped when
+    // refused in EITHER form, or pressed), and the shelf rows' data-page.
+    expect(windowSrc).toContain('data-pin="${esc(pageId)}"');
+    expect(windowSrc).toContain('aria-pressed="${pinned}"');
+    expect(windowSrc).toContain('aria-disabled="true"');
+    expect(script).toContain("getAttribute('aria-disabled') === 'true'");
+    expect(script).toContain("getAttribute('aria-pressed') === 'true'");
+    expect(windowSrc).toContain('class="reliquary-page-row" data-page=');
+    expect(script).toContain('.reliquary-page-row');
+    // And the routing: both halves of the tracker pair reach the target.
+    for (const path of [
+      'src/ui/reliquary_tracker_painter.ts',
+      'src/ui/reliquary_tracker_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('reliquary-tracker');
+    }
+  });
+
   it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
     const plan = classifyDiff(['src/sim/content/deeds.ts']);
     expect(plan.isVisual).toBe(true);

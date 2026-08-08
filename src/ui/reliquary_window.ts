@@ -154,6 +154,8 @@ export class ReliquaryWindow {
    * reason). Surviving the rebuild is what makes the announcement work at all.
    */
   private liveEl: HTMLElement | null = null;
+  /** The shared at-cap pin description target (see ensureCapNote). */
+  private capNoteEl: HTMLElement | null = null;
   /** Last LOGICAL (pre-marker) announcement, so a world-driven repaint with an
    *  unchanged count never re-marks the region (see announceResults). */
   private lastAnnounced = '';
@@ -518,9 +520,11 @@ export class ReliquaryWindow {
       `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model, flash)}</div></div>`;
 
     // The innerHTML write above orphaned the region; put the SAME node back so
-    // the AT keeps the registration it already has, then write into it.
+    // the AT keeps the registration it already has, then write into it. The
+    // at-cap pin note rides along: every refused pin control names it via
+    // aria-describedby, so it must resolve on every paint.
     const live = this.ensureLiveRegion(el);
-    el.append(live);
+    el.append(live, this.ensureCapNote(el));
     this.wire(el, model);
     const scroll = el.querySelector('.reliquary-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
@@ -576,6 +580,23 @@ export class ReliquaryWindow {
     node.setAttribute('aria-live', 'polite');
     node.setAttribute('aria-atomic', 'true');
     this.liveEl = node;
+    return node;
+  }
+
+  /** The shared at-cap description target: one visually-hidden note every
+   *  refused pin control names via aria-describedby, minted once like the live
+   *  region and re-appended after each innerHTML rebuild so the references
+   *  always resolve. The text is rewritten per render (cold path) so a
+   *  language switch relabels it. */
+  private ensureCapNote(el: HTMLElement): HTMLElement {
+    let node = this.capNoteEl;
+    if (!node) {
+      node = el.ownerDocument.createElement('span');
+      node.className = 'visually-hidden';
+      node.id = 'reliquary-pin-cap-note';
+      this.capNoteEl = node;
+    }
+    node.textContent = t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) });
     return node;
   }
 
@@ -1115,8 +1136,9 @@ export class ReliquaryWindow {
    * The pin control for one page: a SIBLING of the page row (never nested; the
    * row is itself a button), and absent entirely on an illuminated page, which
    * is exactly what retires it from the HUD tracker (the deeds unwatch-button
-   * contract). At the cap an unpinned page renders disabled with the cap note,
-   * so the refusal is visible rather than a dead click.
+   * contract). At the cap an unpinned page renders aria-disabled (still a tab
+   * stop) with the cap note on aria-describedby, so the refusal is reachable
+   * and perceivable rather than a dead click.
    */
   private pinButtonHtml(pageId: string, complete: boolean): string {
     if (complete) return '';
@@ -1125,17 +1147,19 @@ export class ReliquaryWindow {
     const atCap = !pinned && this.pinnedSet.size >= RELIQUARY_TRACK_CAP;
     const name = reliquaryPageName(pageId);
     const label = t(pinned ? 'hudChrome.reliquary.unpin' : 'hudChrome.reliquary.pin');
-    // At the cap the refusal IS the accessible name: a disabled control that
-    // still claims it will pin the page describes something it cannot do. The
-    // reason never rides a native title attribute (this window's rule: the HUD
-    // cannot style, position, or dismiss one, and touch never sees it).
-    const aria = atCap
-      ? t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) })
-      : t(pinned ? 'hudChrome.reliquary.unpinAria' : 'hudChrome.reliquary.pinAria', { name });
+    // The accessible name stays the ACTION (so it always contains the visible
+    // "Pin" label); at the cap the refusal rides aria-describedby to the shared
+    // cap note, and aria-disabled (never native disabled) keeps the control a
+    // tab stop so a keyboard player still reaches the reason. The reason never
+    // rides a native title attribute (this window's rule: the HUD cannot style,
+    // position, or dismiss one, and touch never sees it).
+    const aria = t(pinned ? 'hudChrome.reliquary.unpinAria' : 'hudChrome.reliquary.pinAria', {
+      name,
+    });
     return (
       `<button type="button" class="reliquary-pin${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
       `data-focus-key="${esc(`pin:${pageId}`)}" aria-pressed="${pinned}" aria-label="${esc(aria)}"` +
-      `${atCap ? ' disabled' : ''}>${esc(label)}</button>`
+      `${atCap ? ' aria-disabled="true" aria-describedby="reliquary-pin-cap-note"' : ''}>${esc(label)}</button>`
     );
   }
 
@@ -1482,9 +1506,19 @@ export class ReliquaryWindow {
         if (!pageId) return;
         this.ensurePinsLoaded();
         const result = toggleReliquaryPin(this.pinnedSet, pageId);
-        // Refused at the cap: the button already renders disabled with the cap
-        // note, so there is nothing to repaint and nothing to persist.
-        if (!result.changed) return;
+        if (!result.changed) {
+          // Refused at the cap. The control stays focusable (aria-disabled,
+          // not native disabled), so an activation answers through the polite
+          // region instead of silence; the same reason rides the button's
+          // aria-describedby for focus-time discovery. Nothing to repaint and
+          // nothing to persist.
+          if (this.liveEl) {
+            this.liveEl.textContent = this.liveReannounce.mark(
+              t('hudChrome.reliquary.pinFull', { cap: this.fmt(RELIQUARY_TRACK_CAP) }),
+            );
+          }
+          return;
+        }
         this.pinnedSet = new Set(result.pinned);
         this.persistPins();
         // The tracker repaints now rather than up to a slow band later, so the

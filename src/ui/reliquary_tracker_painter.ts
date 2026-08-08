@@ -107,6 +107,9 @@ export class ReliquaryTrackerPainter {
       const els = this.lines[i];
       if (i >= view.count) {
         w.setDisplay(els.line, 'none');
+        // Clear the flash with the row: a lit class left on a recycled pool
+        // slot would elide the next real flash of whichever page lands here.
+        w.toggleClass(els.line, 'dt-flash', false);
         continue;
       }
       const line = view.lines[i];

@@ -139,7 +139,12 @@ export function rank(index: SearchEntry[], query: string): SearchEntry[] {
   if (!q) return [];
   const tokens = q.split(/\s+/).filter(Boolean);
   const hits = index.map((e) => ({ e, score: scoreEntry(e, tokens) })).filter((h) => h.score >= 0);
-  hits.sort((a, b) => b.score - a.score || a.e.label.localeCompare(b.e.label));
+  // The tie-break collates in the active locale, same as fold() above: an
+  // untagged localeCompare follows the host runtime's default locale, so the
+  // same query could order equal-score rows differently per machine.
+  hits.sort(
+    (a, b) => b.score - a.score || a.e.label.localeCompare(b.e.label, languageTag(getLanguage())),
+  );
   return hits.slice(0, MAX_RESULTS).map((h) => h.e);
 }
 

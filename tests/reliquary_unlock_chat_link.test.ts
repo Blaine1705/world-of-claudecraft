@@ -172,6 +172,9 @@ describe('the relic unlock line', () => {
     expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledWith(RELIC_PAGE);
     link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
     expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledTimes(2);
+    // The keyboard arm lands on the SAME page: a count alone would pass if the
+    // second activation jumped somewhere else.
+    expect(hud.reliquaryWindow.openWithPage).toHaveBeenNthCalledWith(2, RELIC_PAGE);
   });
 
   it('honours the recorded first-find page over the authored-order fallback', () => {
@@ -237,6 +240,47 @@ describe('the Illumination line (both emitters)', () => {
     expect(link.textContent).toBe(`[${pageLabel}]`);
     link.click();
     expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledWith(ILLUMINATED_PAGE);
+    // The banner argument is REAL prose: three sibling t() calls in the same
+    // method interpolate the node-splice sentinel (DEED_NAME_TOKEN), so a
+    // pasted token here would ship a banner reading the raw sentinel in every
+    // locale with nothing else red.
+    expect(hud.combatAnnouncer.push).toHaveBeenCalledWith(
+      t('hudChrome.reliquary.illuminateBanner', { name: pageLabel }),
+      expect.anything(),
+    );
+  });
+
+  it('leaves the BANNER-branch line plain when the illuminated page left the catalog', () => {
+    // The relic line's inert-link policy, applied to the Illumination arms: a
+    // drifted (or forged) wire id must not render a link that opens nothing.
+    const hud = makeHud();
+    hud.handleReliquaryUnlocks([
+      { itemId: RELIC_ID, illuminatedPageId: 'page_the_catalog_forgot' },
+    ]);
+    // The relic line still links; the Illumination line does not.
+    expect(links(hud)).toHaveLength(1);
+    expect(hud.log).toHaveBeenCalledWith(
+      t('hudChrome.reliquary.illuminateToast', {
+        name: reliquaryPageName('page_the_catalog_forgot'),
+      }),
+      GOLD,
+    );
+  });
+
+  it('leaves the DURABLE line plain when the illuminated page left the catalog', () => {
+    // Same policy on the other emitter (rank-up owns the banner slot here).
+    const hud = makeHud();
+    hud.handleReliquaryUnlocks([
+      { itemId: RELIC_ID, illuminatedPageId: 'page_the_catalog_forgot', curatorRank: RANK },
+    ]);
+    // The relic and rank-up lines still link; the Illumination line does not.
+    expect(links(hud)).toHaveLength(2);
+    expect(hud.log).toHaveBeenCalledWith(
+      t('hudChrome.reliquary.illuminateToast', {
+        name: reliquaryPageName('page_the_catalog_forgot'),
+      }),
+      GOLD,
+    );
   });
 
   it('is clickable on the DURABLE branch (rank-up owns the banner slot)', () => {
@@ -286,6 +330,12 @@ describe('the Curator rank-up line', () => {
     const navArg: unknown = hud.reliquaryWindow.open.mock.calls[0]?.[0];
     expect(typeof navArg).toBe('string');
     expect(isReliquaryNavId(navArg as string)).toBe(true);
+    // The banner argument is REAL prose, never the node-splice sentinel (see
+    // the Illumination banner pin for the trap this closes).
+    expect(hud.combatAnnouncer.push).toHaveBeenCalledWith(
+      t('hudChrome.reliquary.rankUpBanner', { rank: formatNumber(RANK), name: label }),
+      expect.anything(),
+    );
   });
 });
 

@@ -8263,10 +8263,14 @@
     cursor: var(--cursor-point);
     white-space: nowrap;
   }
-  .reliquary-pin:hover:not(:disabled) {
+  .reliquary-pin:hover:not(:disabled):not([aria-disabled="true"]) {
     filter: brightness(1.12);
   }
-  .reliquary-pin:disabled {
+  /* The at-cap refusal is aria-disabled (never native disabled) so the control
+     stays a tab stop and its aria-describedby reason stays reachable; both
+     forms take the same dimmed paint. */
+  .reliquary-pin:disabled,
+  .reliquary-pin[aria-disabled="true"] {
     opacity: 0.5;
     cursor: default;
   }

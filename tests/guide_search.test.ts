@@ -105,6 +105,11 @@ describe('guide search index contents', () => {
     // Every slot, not every distinct name: a relic shown on two pages is indexed
     // once per page so each hit deep-links to the catalog the reader lands on.
     expect(relicHits.length).toBe(relicTotal);
+    // Dual-page relics must EXIST for "once per page" to mean anything: were a
+    // content change to collapse every dual listing, the slot parity above
+    // would silently degrade to a distinct-name count.
+    const distinctNames = new Set(GUIDE_RELIQUARY.flatMap((p) => p.relics.map((r) => r.name))).size;
+    expect(relicTotal).toBeGreaterThan(distinctNames);
     const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
     // EVERY page and every slot, not a first-five sample: the count parities above
     // only say how MANY entries exist, so a page whose relics all carry a neighbour's

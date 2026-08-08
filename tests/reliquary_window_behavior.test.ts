@@ -281,7 +281,8 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
           });
           const owned = state.pageOwned.get(pageId) ?? real.owned;
           const total = state.pageTotal.get(pageId) ?? real.total;
-          return { owned, total, complete: total > 0 && owned >= total };
+          // complete mirrors production exactly (sim pageCompletion: owned === total).
+          return { owned, total, complete: total > 0 && owned === total };
         },
       }) as never,
     closeOthers: () => {
@@ -2574,7 +2575,7 @@ describe('pinning a page to the HUD tracker', () => {
     expect(rig.counts.pinChanged).toBe(before + 2);
   });
 
-  it('refuses an add at the cap visibly: the control is disabled and says why', () => {
+  it('refuses an add at the cap visibly: aria-disabled, still a tab stop, and says why', () => {
     const rig = makeWindow(baseState(), { nav: 'conquerors' });
     const shelfPages = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
     expect(
@@ -2586,22 +2587,40 @@ describe('pinning a page to the HUD tracker', () => {
     }
     expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP);
     const extra = shelfPages[RELIQUARY_TRACK_CAP];
-    const disabled = pinButton(rig.el, extra.id) as HTMLButtonElement;
-    expect(disabled.disabled).toBe(true);
-    // The refusal rides the accessible name, never a native title attribute
-    // (this window's rule), so it is the same string in every locale.
-    expect(disabled.getAttribute('aria-label')).toBe(
+    const refused = pinButton(rig.el, extra.id) as HTMLButtonElement;
+    // aria-disabled, never native disabled: the control keeps its tab stop, so
+    // a keyboard player still reaches the refusal instead of tabbing past a
+    // control that silently vanished from the order.
+    expect(refused.disabled).toBe(false);
+    expect(refused.getAttribute('aria-disabled')).toBe('true');
+    // The accessible NAME stays the action (label-in-name: it contains the
+    // visible "Pin" label); the refusal rides aria-describedby to the shared
+    // cap note, never a native title attribute (this window's rule), so it is
+    // the same string in every locale.
+    expect(refused.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.pinAria', { name: reliquaryPageName(extra.id) }),
+    );
+    expect(refused.getAttribute('aria-describedby')).toBe('reliquary-pin-cap-note');
+    expect(rig.el.querySelector('#reliquary-pin-cap-note')?.textContent).toBe(
       t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) }),
     );
-    expect(disabled.hasAttribute('title')).toBe(false);
+    expect(refused.hasAttribute('title')).toBe(false);
     const nudges = rig.counts.pinChanged;
-    disabled.click();
+    refused.click();
     expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP);
     expect(rig.counts.pinChanged).toBe(nudges);
+    // A reachable control that answers a click with nothing reads as broken,
+    // so the refused activation announces through the polite region (the
+    // reannounce marker may pad the text; the payload must be present).
+    expect(liveRegion(rig.el)?.textContent).toContain(
+      t('hudChrome.reliquary.pinFull', { cap: fmt(RELIQUARY_TRACK_CAP) }),
+    );
     // An UNPIN at the cap still works, which is what makes the cap navigable.
     pinButton(rig.el, shelfPages[0].id).click();
     expect(rig.w.pinned.size).toBe(RELIQUARY_TRACK_CAP - 1);
-    expect((pinButton(rig.el, extra.id) as HTMLButtonElement).disabled).toBe(false);
+    const freed = pinButton(rig.el, extra.id) as HTMLButtonElement;
+    expect(freed.hasAttribute('aria-disabled')).toBe(false);
+    expect(freed.hasAttribute('aria-describedby')).toBe(false);
   });
 
   it('persists the pins per character across window instances', () => {
@@ -2651,12 +2670,37 @@ describe('pinning a page to the HUD tracker', () => {
           break;
       }
     }
+    const nudges = rig.counts.pinChanged;
     rig.w.render();
     expect([...rig.w.pinned]).toEqual([]);
     expect(rig.el.querySelector(`.reliquary-pin[data-pin="${PAGE_ID}"]`)).toBeNull();
     // The row itself is still there (illuminated, badged), so this is the pin
     // control retiring, not the page vanishing.
     expect(rig.el.querySelector(`[data-page="${PAGE_ID}"]`)).not.toBeNull();
+    // The prune's other two effects, each independently droppable with the
+    // suite otherwise green: the shrunk set is PERSISTED (the doc comment's
+    // "in memory or in storage" guarantee), and the HUD tracker is nudged so
+    // the strip does not lag the retirement by a whole slow band.
+    expect(localStorage.getItem(PIN_KEY)).toBe('[]');
+    expect(rig.counts.pinChanged).toBe(nudges + 1);
+  });
+
+  it('keeps the pins working in-session when persisting throws (private mode)', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const original = Storage.prototype.setItem;
+    const denied = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('denied', 'QuotaExceededError');
+    });
+    try {
+      pinButton(rig.el, PAGE_ID).click();
+      // The toggle still lands in memory and the strip still gets nudged; only
+      // the cross-session copy is lost, which is all private mode can offer.
+      expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+      expect(rig.counts.pinChanged).toBeGreaterThan(0);
+    } finally {
+      denied.mockRestore();
+      expect(Storage.prototype.setItem).toBe(original);
+    }
   });
 
   it('keeps focus on the pin control across the repaint its own click triggers', () => {

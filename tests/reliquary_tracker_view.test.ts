@@ -39,7 +39,10 @@ function completionFrom(progress: Progress): (pageId: string) => ReliquaryPageCo
   return (pageId) => {
     const p = progress[pageId];
     if (p === undefined) return null;
-    return { owned: p.owned, total: p.total, complete: p.total > 0 && p.owned >= p.total };
+    // complete mirrors production exactly (sim pageCompletion: owned === total,
+    // owned counted over the page's own relic list), so the rig teaches the
+    // real rule to the next reader.
+    return { owned: p.owned, total: p.total, complete: p.total > 0 && p.owned === p.total };
   };
 }
 
@@ -616,9 +619,15 @@ describe('tracker chrome', () => {
     expect(arm).toContain("if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;");
     expect(arm).toContain('e.preventDefault();');
     expect(arm).toContain('e.stopPropagation();');
+    // Keys landing anywhere else in the strip (a row, the bar) must not toggle
+    // the collapse: only the header is the control.
+    expect(arm).toContain(".closest('.dt-header')");
     // The same compact-touch branch as the click delegation: the count chip
-    // opens the window, the desktop header toggles the collapse.
-    expect(arm).toContain('this.openReliquary();');
+    // opens the window, the desktop header toggles the collapse. Ordered, so
+    // nothing says openReliquary merely appears somewhere in the arm.
+    expect(arm).toMatch(
+      /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openReliquary\(\);/,
+    );
     expect(arm).toContain('this.toggleReliquaryTrackerCollapsed();');
   });
 
@@ -630,6 +639,8 @@ describe('tracker chrome', () => {
     expect(arm).toMatch(
       /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openReliquary\(\);/,
     );
+    // Clicks landing anywhere else in the strip must not toggle the collapse.
+    expect(arm).toContain(".closest('.dt-header')");
   });
 
   it('persists the tracker collapse as its own settings row', () => {

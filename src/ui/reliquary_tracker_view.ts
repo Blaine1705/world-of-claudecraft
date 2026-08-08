@@ -159,13 +159,15 @@ export function reliquaryTrackerOwnershipSig(parts: {
   mounts: number;
   weaponSkins: number;
 }): number {
-  return (
-    ((((parts.itemsDiscovered * 1009 + parts.marks) * 1009 + parts.deedsEarned) * 1009 +
-      parts.mounts) *
-      1009 +
-      parts.weaponSkins) |
-    0
-  );
+  // Math.imul per step keeps every intermediate in int32: one trailing |0 over
+  // float products would start rounding low bits away once an intermediate
+  // passes 2^53 (about 8,700 discovered items), silently disarming the memo.
+  let sig = parts.itemsDiscovered | 0;
+  sig = (Math.imul(sig, 1009) + parts.marks) | 0;
+  sig = (Math.imul(sig, 1009) + parts.deedsEarned) | 0;
+  sig = (Math.imul(sig, 1009) + parts.mounts) | 0;
+  sig = (Math.imul(sig, 1009) + parts.weaponSkins) | 0;
+  return sig;
 }
 
 /**
@@ -276,20 +278,28 @@ export function pruneReliquaryPins(
   pinned: ReadonlySet<string>,
   completion: (pageId: string) => ReliquaryPageCompletion | null,
 ): ReliquaryPinPruneResult {
-  let dropped = false;
+  // Single pass, one completion() read per page: each read folds a full
+  // ownership bag offline, so the drop path must not re-ask. The survivor set
+  // is minted lazily on the first drop, which keeps the common no-drop path
+  // allocation-free and returning the same instance.
+  let next: Set<string> | null = null;
   for (const pageId of pinned) {
     const c = completion(pageId);
-    if (c === null || c.total <= 0 || c.complete) {
-      dropped = true;
-      break;
+    if (c !== null && c.total > 0 && !c.complete) {
+      if (next !== null) next.add(pageId);
+      continue;
+    }
+    if (next === null) {
+      next = new Set<string>();
+      // Back-fill the survivors already walked (all kept: next was null until
+      // this first drop). Iteration only, no completion() re-reads.
+      for (const seen of pinned) {
+        if (seen === pageId) break;
+        next.add(seen);
+      }
     }
   }
-  if (!dropped) return { pinned, changed: false };
-  const next = new Set<string>();
-  for (const pageId of pinned) {
-    const c = completion(pageId);
-    if (c !== null && c.total > 0 && !c.complete) next.add(pageId);
-  }
+  if (next === null) return { pinned, changed: false };
   return { pinned: next, changed: true };
 }
 

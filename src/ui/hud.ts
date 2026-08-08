@@ -613,6 +613,7 @@ import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
   makeReliquaryTrackerView,
+  type ReliquaryTrackerInput,
   reliquaryTrackerOwnershipSig,
 } from './reliquary_tracker_view';
 import {
@@ -4685,6 +4686,12 @@ export class Hud {
   // one reused container, showing the pinned pages (or, before any pin, the
   // pages closest to Illumination).
   private readonly reliquaryTrackerView = makeReliquaryTrackerView();
+  // Lazily minted ONCE by updateReliquaryTracker and reused every build: the
+  // drive runs on the 500ms band for the life of the HUD, so the input object
+  // and its two closures are not re-allocated per build (the deed tracker's
+  // allocation-free drive precedent). The closures read this.sim live at call
+  // time; pinned and collapsed are the per-build fields.
+  private reliquaryTrackerInput: ReliquaryTrackerInput | null = null;
   private readonly reliquaryTrackerPainter = new ReliquaryTrackerPainter({
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
@@ -13442,14 +13449,22 @@ export class Hud {
       // Captured for the link closure: a property narrowing does not survive
       // into a callback, and the jump target is exactly the illuminated page.
       const jumpId = plan.illuminatedPageId;
-      this.logNodes(
-        deedLineNodes(
-          document,
-          t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
-          () => deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
-        ),
-        '#ffd100',
-      );
+      if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
+        // A page the catalog no longer holds (client/server catalog drift) has
+        // nowhere to jump, so the line stays plain: the relic line's
+        // inert-link policy above, applied to both Illumination emitters.
+        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+      } else {
+        this.logNodes(
+          deedLineNodes(
+            document,
+            t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+            () =>
+              deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+          ),
+          '#ffd100',
+        );
+      }
     }
     if (plan.banner) {
       const banner = plan.banner;
@@ -13480,15 +13495,21 @@ export class Hud {
         // branch that fires when Illumination OWNS the banner slot, and a
         // single-site conversion would leave it plain.
         const jumpId = banner.pageId;
-        this.logNodes(
-          deedLineNodes(
-            document,
-            t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
-            () =>
-              deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
-          ),
-          '#ffd100',
-        );
+        if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
+          // Same drift guard as the durable arm: a catalog-unknown page gets
+          // the plain line, never a link that opens nothing.
+          this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+        } else {
+          this.logNodes(
+            deedLineNodes(
+              document,
+              t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+              () =>
+                deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+            ),
+            '#ffd100',
+          );
+        }
       } else {
         const relic = banner.relic;
         const name = reliquaryRelicDisplayName(relic.kind, relic.id);
@@ -15661,7 +15682,7 @@ export class Hud {
   private updateReliquaryTracker(): void {
     const collapsed =
       (this.optionsHooks?.settings.get('reliquaryTrackerCollapsed') ?? false) === true;
-    const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, {
+    this.reliquaryTrackerInput ??= {
       pinned: this.reliquaryWindow.pinned,
       pageIds: RELIQUARY_PAGE_ORDER,
       completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
@@ -15689,7 +15710,13 @@ export class Hud {
           weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
         }),
       collapsed,
-    });
+    };
+    const input = this.reliquaryTrackerInput;
+    // Per-build fields: the pin set is re-read live off the window store and
+    // the collapse off settings; everything else on the reused input is stable.
+    input.pinned = this.reliquaryWindow.pinned;
+    input.collapsed = collapsed;
+    const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, input);
     // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
     // is a count chip that opens The Reliquary (see the #reliquary-tracker
     // click/keydown delegation, which reroutes to openReliquary here). Tell the
