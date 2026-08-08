@@ -227,6 +227,11 @@ describe('Guide entry wiring', () => {
     }
   });
 
+  // Registration only proves a module exists. tests/guide_route_render.test.ts renders
+  // every route and checks it produces a readable page (one h1, no unresolved key, no
+  // stray placeholder); it lives in its own file because the bestiary and models pages
+  // paint procedural icons through a canvas and so need a DOM environment.
+
   it('lists every route and class-detail page in the sitemap', () => {
     const origin = 'https://worldofclaudecraft.com';
     for (const r of GUIDE_ROUTES) {

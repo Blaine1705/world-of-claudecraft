@@ -11,7 +11,7 @@
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
-import { LEVEL_CAP } from '../data';
+import { RIFT_MIN_LEVEL } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, p, pageHeader, related, section, tag, tagRow } from './ui';
@@ -35,7 +35,7 @@ export const rifts: GuidePage = {
         ${section(
           'guide.riftsPage.groupHeading',
           `${p('guide.riftsPage.groupBody')}${callout(
-            `<p>${esc(t('guide.riftsPage.levelNote', { n: formatNumber(LEVEL_CAP) }))}</p>`,
+            `<p>${esc(t('guide.riftsPage.levelNote', { n: formatNumber(RIFT_MIN_LEVEL) }))}</p>`,
             { variant: 'note' },
           )}`,
         )}

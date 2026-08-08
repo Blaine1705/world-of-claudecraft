@@ -1,17 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { LEVEL_CAP, ZONE_TEASERS } from '../src/guide/data';
+import { LEVEL_CAP, RIFT_MIN_LEVEL, ZONE_TEASERS } from '../src/guide/data';
 import { ZONES } from '../src/sim/data';
+import { RIFT_MIN_LEVEL as SIM_RIFT_MIN_LEVEL } from '../src/sim/rift/portals';
 import { MAX_LEVEL } from '../src/sim/types';
 
-// LEVEL_CAP and ZONE_TEASERS in src/guide/data.ts are hand-duplicated literals,
-// not derived from the sim (see the comment atop that file): LEVEL_CAP mirrors
-// MAX_LEVEL and each ZONE_TEASERS entry mirrors a ZoneDef.levelRange, matched by
-// biome id ('vale'/'marsh'/'peaks'). Five guide surfaces (home, progression, faq,
-// combat, and the SEO JSON-LD in head.ts) render the hand copy directly, so a sim
-// level or zone band change would silently strand the guide showing a stale cap
-// or band until a human noticed, the same way CLASS_CHIPS drifted before
-// class_colors.test.ts pinned it. This suite is that same guard for LEVEL_CAP and
-// ZONE_TEASERS: any future drift between the two copies fails CI immediately.
+// LEVEL_CAP and RIFT_MIN_LEVEL in src/guide/data.ts are hand-duplicated literals, not
+// derived from the sim (the guide never imports the live world): LEVEL_CAP mirrors
+// MAX_LEVEL and RIFT_MIN_LEVEL mirrors the rift portal gate. Guide surfaces render the
+// hand copy directly (home, progression, faq, combat, rifts, and the SEO JSON-LD in
+// head.ts), so a sim level change would silently strand the guide showing a stale number
+// until a human noticed, the same way CLASS_CHIPS drifted before class_colors.test.ts
+// pinned it. This suite is that guard: any drift between the two copies fails CI.
 
 // ZONE_TEASERS used to be a hand-written subset that listed eight of the fourteen
 // zones and had to be pinned to the sim through a hand-maintained slug -> ZoneDef.id
@@ -23,6 +22,15 @@ import { MAX_LEVEL } from '../src/sim/types';
 describe('guide level cap and zone band freshness', () => {
   it('LEVEL_CAP matches the sim MAX_LEVEL', () => {
     expect(LEVEL_CAP).toBe(MAX_LEVEL);
+  });
+
+  it('RIFT_MIN_LEVEL matches the sim rift portal gate, and the cap the rifts page claims', () => {
+    expect(RIFT_MIN_LEVEL).toBe(SIM_RIFT_MIN_LEVEL);
+    // guide.riftsPage.levelNote reads "You have to be at the level cap, level {n}". That
+    // sentence is only true while the two constants agree, so the copy's own premise is
+    // pinned here: raise MAX_LEVEL without moving the rift gate and this reds, which is
+    // the signal to reword the note rather than ship a page that lies.
+    expect(RIFT_MIN_LEVEL).toBe(MAX_LEVEL);
   });
 
   it('gives every sim zone exactly one teaser, under a distinct slug', () => {

@@ -729,7 +729,7 @@ export const guideStrings = {
       'Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.',
     winTalentsTitle: 'Talents (N)',
     winTalentsBody:
-      'Your talent trees, the points you have to spend, and what each row does at every rank.',
+      'Where you choose your specialization, and your six talent rows with the three options each one offers and what every option does. Rows you have not reached yet are shown beside the ones you can pick now.',
     winProfessionsTitle: 'Professions (Shift+P)',
     winProfessionsBody:
       'What you have learned, how skilled you are at each, and how far each one can still go.',
@@ -859,8 +859,7 @@ export const guideStrings = {
     gear: 'Everything you have equipped, slot by slot, so the empty slots stand out.',
     bags: 'What you are carrying, best quality first, with your money at the end.',
     abilities: 'The abilities you have learned.',
-    talents:
-      'Your specialization, and how your talent points are split between the class tree and the spec tree.',
+    talents: 'Your specialization, and how many of your six talent rows you have chosen so far.',
     quests: 'Your active quest log, with the progress on each objective.',
     completed: 'The quests you have already turned in, in the order you finished them.',
     session: 'What you have done since you logged in: kills, deaths, damage and experience.',
@@ -2248,7 +2247,7 @@ export const guideStrings = {
 
     shareTitle: 'Publishing and forking',
     shareBody:
-      'Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.\n',
+      'Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.',
 
     uploadTitle: 'Bringing your own models',
     uploadBody:

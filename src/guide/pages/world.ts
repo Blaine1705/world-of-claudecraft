@@ -7,27 +7,17 @@
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { GUIDE_ZONES, type GuideZoneInfo } from '../content.generated';
+import { zoneKeyStem } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { loreFigure, loreQuote, pageHeader, paras, related } from './ui';
 
 // Curated per-zone copy (blurb, hub greeting, speaker, place notes) and the in-page
-// anchor are keyed by a KEY STEM, resolved per ZONE ID and never by zone order.
-//
-// The stem defaults to the zone's biome, which is how the first thirteen zones were
-// authored and how their catalog keys and locale fills are named. A biome is NOT unique
-// though: a zone that shares another zone's biome (it borrows its sky, palette, and song)
-// still needs its own prose and its own anchor, so it gets an explicit override here.
-// Today only the Farshore needs one: it is an island with its own town and its own
-// trouble, but it renders in the vale biome. Without the override it would inherit
-// Eastbrook Vale's copy and collide with its DOM id.
-//
-// One rule when adding a zone: every stem must be unique across GUIDE_ZONES. Give any
-// zone whose biome is already spoken for a stem of its own here.
-const ZONE_KEY_STEM: Record<string, string> = {
-  farshore_isle: 'farshore',
-};
-const keyStem = (z: GuideZoneInfo): string => ZONE_KEY_STEM[z.id] ?? z.biome;
+// anchor are keyed by the SHARED key stem in ../data (zoneKeyStem), resolved per ZONE ID
+// and never by zone order. The home teaser grid keys its copy off the same stem, so the
+// two surfaces cannot disagree about which zone owns which prose; the reason a stem is
+// not simply the biome, and the rule for adding one, live with the map there.
+const keyStem = zoneKeyStem;
 // The stable in-page anchor for a zone card (the map links to it).
 const zoneAnchor = (z: GuideZoneInfo): string => `zone-${keyStem(z)}`;
 

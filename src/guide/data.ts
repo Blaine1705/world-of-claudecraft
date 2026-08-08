@@ -4,9 +4,18 @@
 // itself and only the curated blurbs are hand-written. Names reuse existing i18n keys.
 
 import type { TranslationKey } from '../ui/i18n';
-import { GUIDE_ZONES } from './content.generated';
+import { GUIDE_ZONES, type GuideZoneInfo } from './content.generated';
 
 export const LEVEL_CAP = 20;
+
+/**
+ * The level a character must reach before a rift portal will let it through
+ * (RIFT_MIN_LEVEL in src/sim/rift/portals.ts). It equals the cap today, and the rifts
+ * page says so in prose; tests/guide_level_cap_drift.test.ts pins BOTH the mirror and
+ * that equality, so a future cap raise that leaves rifts behind reds CI instead of
+ * quietly turning the page into a lie.
+ */
+export const RIFT_MIN_LEVEL = 20;
 
 export interface ClassChip {
   id: string;
@@ -35,23 +44,40 @@ export interface ZoneTeaser {
   max: number;
 }
 
-// Curated copy is keyed by a short slug, which is also the CSS accent hook the home
-// zone cards use. The slug is the zone's biome, except The Farshore, which shares the
-// Vale's biome and so would otherwise borrow Eastbrook's name and blurb.
-const TEASER_SLUGS: Record<string, string> = { farshore_isle: 'farshore' };
+// THE one zone key stem, shared by every guide surface that keys curated per-zone copy
+// (the home teaser grid, the world page's blurbs, greetings, place notes and card
+// anchors). The stem is the zone's biome, which is how the first thirteen zones were
+// authored and how their catalog keys and locale fills are named.
+//
+// A biome is NOT unique, though: a zone that shares another zone's biome (it borrows its
+// sky, palette, and song) still needs its own prose and its own anchor, so it takes an
+// explicit override here. Today only The Farshore needs one: an island with its own town
+// and its own trouble that renders in the vale biome, it would otherwise inherit
+// Eastbrook Vale's copy and collide with its DOM id, which is exactly the bug that
+// shipped on the world page.
+//
+// One rule when adding a zone: every stem must be unique across GUIDE_ZONES. Give any
+// zone whose biome is already spoken for a stem of its own here, and nowhere else.
+const ZONE_KEY_STEM: Record<string, string> = { farshore_isle: 'farshore' };
+
+/** The stem that names a zone's curated catalog keys and its world-page anchor. */
+export function zoneKeyStem(zone: GuideZoneInfo): string {
+  return ZONE_KEY_STEM[zone.id] ?? zone.biome;
+}
 
 // Every teaser row is derived from the generated zone list, so the landing page can
 // never fall behind the world again: a new zone shows up on its own and only needs its
-// guide.home.world.<slug>Name and <slug>Blurb pair written. Sorted by level band, so
-// the grid reads outward from the starting valley.
+// guide.home.world.<stem>Name and <stem>Blurb pair written. Sorted by level band (the
+// sort is stable, so zones sharing a band keep their generated order), so the grid reads
+// outward from the starting valley.
 export const ZONE_TEASERS: ZoneTeaser[] = [...GUIDE_ZONES]
   .sort((a, b) => a.min - b.min || a.max - b.max)
   .map((zone) => {
-    const slug = TEASER_SLUGS[zone.id] ?? zone.biome;
+    const stem = zoneKeyStem(zone);
     return {
-      id: slug,
-      nameKey: `guide.home.world.${slug}Name` as TranslationKey,
-      blurbKey: `guide.home.world.${slug}Blurb` as TranslationKey,
+      id: stem,
+      nameKey: `guide.home.world.${stem}Name` as TranslationKey,
+      blurbKey: `guide.home.world.${stem}Blurb` as TranslationKey,
       min: zone.min,
       max: zone.max,
     };

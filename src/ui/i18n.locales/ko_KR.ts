@@ -11643,7 +11643,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.speed': '평범한 달리기와 비교해 얼마나 빠르게 움직이고 있는지, 그리고 무언가에 속박되어 있는지 알려 줍니다.',
   'guide.commandsPage.stats': '한 줄짜리 캐릭터 요약입니다. 레벨과 직업, 생명력, 자신의 자원, 전투력, 치명타율, 방어도가 나옵니다.',
   'guide.commandsPage.stickyBody': '슬래시 없이 쓴 문장이 어디로 나갈지는 지금 선택한 채팅 탭이 정합니다. 전체 탭을 선택해 두면 다음에 쓴 문장이 전체 채널로 나가니, 입력하기 전에 탭을 한 번 흘긋 보세요. 슬래시 명령은 언제나 탭보다 우선하므로 /w Bob hi는 어떤 탭이 열려 있든 Bob에게 귓속말로 가고, 귓속말 탭에서는 그냥 쓴 문장이 마지막으로 귓속말을 보낸 사람에게 답장으로 갑니다.',
-  'guide.commandsPage.talents': '자신의 전문화와, 특성 점수가 직업 트리와 전문화 트리에 어떻게 나뉘어 있는지 보여 줍니다.',
+  'guide.commandsPage.talents': '자신의 전문화와, 여섯 개의 특성 줄 가운데 몇 줄을 골랐는지 보여 줍니다.',
   'guide.commandsPage.target': '지금 겨냥한 대상의 이름과 레벨, 정체, 생명력을 보여 줍니다.',
   'guide.commandsPage.targetBuffs': '대상에게 걸린 효과를, 강화인지 약화인지 표시해 보여 줍니다.',
   'guide.commandsPage.threat': '당신과 싸우고 있는 적들이 지금 누구에게 붙어 있는지 알려 줍니다.',
@@ -11857,7 +11857,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.winSocialTitle': '친구와 길드 (O)',
   'guide.interfacePage.winSpellbookBody': '내 직업이 지닌 모든 능력이, 이미 배운 것과 앞으로 배울 것까지 순서대로 놓입니다. 능력을 행동 단축바로 끌어다 놓는 곳이 바로 여기입니다.',
   'guide.interfacePage.winSpellbookTitle': '주문서 (P)',
-  'guide.interfacePage.winTalentsBody': '특성 나무와 쓸 수 있는 특성 점수, 그리고 각 줄이 단계마다 무엇을 해 주는지가 담깁니다.',
+  'guide.interfacePage.winTalentsBody':
+    '전문화를 고르는 곳이자, 여섯 개의 특성 줄과 각 줄이 내놓는 세 가지 선택지, 그리고 저마다 무엇을 해 주는지가 담깁니다. 아직 이르지 못한 줄도 지금 고를 수 있는 줄과 나란히 보입니다.',
   'guide.interfacePage.winTalentsTitle': '특성 (N)',
   'guide.interfacePage.worldWindowsBody': '어떤 창은 키를 누를 일이 없습니다. 알맞은 사람에게 말을 걸거나 알맞은 것을 클릭하면 저절로 열립니다.\n\n상인은 판매 창을 엽니다. 사들일 수 있는 재고와, 마지막으로 판 물건이 담긴 되사기 탭이 함께 있어 실수로 판 물건을 되찾을 수 있습니다. 직업 교관은 지금 배울 수 있는 것과 앞으로 남은 것의 목록을 엽니다.\n\n은행원은 여러분의 금고를 엽니다. 칸을 더 사서 늘릴 수 있는 보관함입니다. 길드가 은행을 열어 두었다면 두 번째 탭에 그것이 보입니다. 꺼낼 권한이 없는 사람도 길드원이라면 누구나 안을 들여다볼 수 있어 길드가 무엇을 쥐고 있는지 물어볼 필요가 없고, 누가 넣고 꺼내고 길드의 동전을 옮길 수 있는지는 등급이 정하며, 모든 움직임은 기록에 남습니다.\n\n레이븐포스트 우편함은 편지를 엽니다. 한 탭에는 도착한 것이, 다른 탭에는 보내기 양식이 첨부물까지 담아 놓여 있습니다. 상인 곁의 세계 시장은 저만의 창을 가집니다. 한 탭에서 둘러보고 사고, 다른 탭에서 내 물건을 등록하며, 세 번째 탭에서 팔린 값을 거둡니다. 다른 플레이어와 얼굴을 맞대고 거래하면 양쪽에 한 자리씩 있는 거래 창이 열립니다.',
   'guide.interfacePage.worldWindowsTitle': '세계가 열어 주는 창',
