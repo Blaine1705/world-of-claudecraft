@@ -55,14 +55,14 @@ describe('druid caster-side ability-specific spellcasts (issue #2889)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_druid: swims({', 'player_mech: {');
+    const block = manifestBlock('player_druid: swims({', 'player_mech: swims({');
     expect(block).toContain('druid_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of DRUID_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real druid ability, and every referenced clip is shipped', () => {
-    const druidBlock = manifestBlock('player_druid: swims({', 'player_mech: {');
+    const druidBlock = manifestBlock('player_druid: swims({', 'player_mech: swims({');
     const abilityStart = druidBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = druidBlock.indexOf('\n      },', abilityStart);
@@ -118,9 +118,10 @@ describe('dragonkin family bespoke attack (issue #2889)', () => {
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
     // Every other VisualDef still pointing at the shared constant is
-    // untouched: exactly 5 remaining direct `clips: FLOATING,` usages (9
-    // originally, minus batch 1's elemental migration, minus the ghost and
-    // nightkin follow-up migrations, minus this batch's dragonkin migration).
+    // untouched: exactly 4 remaining direct `clips: FLOATING,` usages (9
+    // originally, minus batch 1's elemental migration, minus the ghost,
+    // nightkin, and round-2 glub follow-up migrations, minus this batch's
+    // dragonkin migration).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
     expect(remaining).toBe(4);
   });
