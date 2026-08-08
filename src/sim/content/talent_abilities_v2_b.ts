@@ -140,6 +140,12 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'death_coil',
     name: 'Morrowlash',
     class: 'warlock',
+    // RETIRED by the three-spec overhaul (PR #2742): the row-17 option that
+    // granted it was consciously repurposed into Grand Malediction (the
+    // signature-cooldown talent) and no other grant exists. The def stays,
+    // hidden, so persisted action bars can identify and discard it (the same
+    // contract PALADIN_LEGACY_ABILITY_IDS uses).
+    hiddenFromPlayer: true,
     learnLevel: 10,
     cost: 70,
     castTime: 0,

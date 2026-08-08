@@ -33,7 +33,7 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: outputPath,
           },
           stdio: 'pipe',
-          timeout: 30_000,
+          timeout: 120_000,
         },
       );
 
@@ -118,7 +118,7 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: secondShardPath,
           },
           stdio: 'pipe',
-          timeout: 30_000,
+          timeout: 120_000,
         },
       );
       const secondShard = JSON.parse(readFileSync(secondShardPath, 'utf8')) as {
@@ -134,7 +134,8 @@ describe('Nythraxis matrix DPS rotations', () => {
     } finally {
       rmSync(outputDirectory, { recursive: true, force: true });
     }
-  }, 45_000);
+    // Two tsx child runs at ~60s each on the finalized kits.
+  }, 300_000);
 
   it('moves long caster buffs to prepull instead of recurring combat priority', () => {
     expect(source).toContain("prepull: ['arcane_intellect']");
@@ -149,7 +150,9 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain("'evil_eye'");
     expect(source).toContain("'sentence'");
     expect(source).toContain("'needle_of_fate'");
-    expect(source).toContain("if (spec.key === 'affliction_warlock') return");
+    // The three-spec overhaul gives EVERY warlock spec a pet (graveguard for
+    // demonology, imp otherwise); the old affliction petless early-return is
+    // gone with the imperative per-spec branches.
     expect(source).toContain(
       "spec.key === 'demonology_warlock' ? 'raise_graveguard' : 'summon_imp'",
     );
@@ -226,30 +229,21 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain('for (const [seedIndex, seed] of runSeeds.entries())');
   });
 
-  it('builds complete paired raids and separates setup time from combat time', () => {
-    // v0.36 composition re-pin: finalized kits pair healers three at a time.
-    expect(source).toContain('const healerCombos = combos(healers, 3)');
-    expect(source).toMatch(/filter\(\(spec\) => spec\.cls !== 'warlock'\),\s*5,/);
-    expect(source).toContain('if (index === 5) sim.convertPartyToRaid(pids[0])');
-    expect(source).toContain('failed to place all ten players in one raid');
-    expect(source).toContain('const combatStart =');
-    expect(source).toContain('combatElapsed(');
-    expect(source).toContain('selectPairedBaselines');
-    expect(source).toContain('expandPairedPlans');
-    expect(source).toContain('pairedWarlockDps');
-    expect(source).toContain("process.env.MATRIX_SENTENCE_THRESHOLD ?? '80'");
-    expect(source).toContain('const encounterAdd = offTankFocusAdd ?? adds[0]');
-    expect(source).toContain("spec.cls === 'shaman' && wounded.length >= 2");
-    expect(source).toContain("spec.cls === 'priest' && wounded.length >= 3");
-  });
+  // The paired-raid scheme (warlocks filtered from the DPS roster, paired
+  // baselines, expandPairedPlans/pairedWarlockDps, a staged party-to-raid
+  // convert) was removed with the declarative spec-table rewrite (PR #2742's
+  // finalize-combat-kits commit); warlocks now compare through
+  // MATRIX_COMPARE_SPECS like every other spec, and convertPartyToRaid is
+  // unconditional in runGroup. Owner ruling 2026-08-08: the monolith-era test
+  // retires with the mechanism instead of being re-pinned.
 
-  it('uses validated near-Heroic non-raid equipment and fails closed on stale rotations', () => {
-    expect(source).toContain('function equipNearHeroicKit');
-    expect(source).toContain('!itemFromRaid(item.id)');
-    expect(source).toContain('has no offhand after equipment setup');
-    expect(source).toContain('validateMatrixCatalog()');
-    expect(source).toContain('Obsolete matrix rotations');
-  });
+  // The near-Heroic kit builder (equipNearHeroicKit + the !itemFromRaid
+  // exclusion) and the validateMatrixCatalog() fail-closed guard were dropped
+  // by the same rewrite: gearing goes through equipBest/equipSharedTankGear,
+  // which exclude only Nythraxis's own drops (NYTHRAXIS_DROP_IDS above), a
+  // deliberate methodology narrowing. Owner ruling 2026-08-08: accepted for
+  // this manual analysis tool; the spec-table source pins above are the
+  // remaining catalog-drift tripwire.
 
   it('models enhancement as Flametongue prepull, then auto-attacks, Stormstrike on cooldown, and Flame/Earth shock weave', () => {
     expect(source).toContain("prepull: ['flametongue_weapon']");

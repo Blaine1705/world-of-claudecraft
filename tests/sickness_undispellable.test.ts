@@ -344,36 +344,10 @@ describe('an arena bout is a parenthesis, not a way to shed a sickness', () => {
   });
 });
 
-describe('paladin Cleansing Verdict cannot purge a sickness', () => {
-  it.each(['resurrection', 'unstuck'] as const)(
-    'leaves %s sickness on the target and takes the debuff beneath it',
-    (which) => {
-      const { sim, p } = rig('paladin', 'pal_r8_cleansing_verdict');
-      // Wail FIRST, sickness second: Cleansing Verdict carries no requiresDispellable
-      // gate and dispels count 1 scanning from the end, so this ordering is what makes
-      // the case decisive. It must skip the sickness and take the wail underneath.
-      p.auras.push(witheringWail(p.id));
-      sicken(sim, p, which);
-      sim.targetEntity(p.id);
-      sim.castAbility('cleansing_verdict');
-      for (let i = 0; i < 15; i++) sim.tick();
-      expect(has(p, 'test_withering_wail')).toBe(false);
-      expect(has(p, idOf(which))).toBe(true);
-    },
-  );
-
-  it.each(['resurrection', 'unstuck'] as const)(
-    'finds nothing to purge when %s sickness is the only debuff',
-    (which) => {
-      const { sim, p } = rig('paladin', 'pal_r8_cleansing_verdict');
-      sicken(sim, p, which);
-      sim.targetEntity(p.id);
-      sim.castAbility('cleansing_verdict');
-      for (let i = 0; i < 15; i++) sim.tick();
-      expect(has(p, idOf(which))).toBe(true);
-    },
-  );
-});
+// The paladin purge (Cleansing Verdict) was deliberately removed by the
+// paladin overhaul (PR #2428: row 8 became the survival theme, and the ability
+// def was dropped in the same PR's cleanup commit); the class has no dispel
+// today, so no paladin arm exists for this invariant.
 
 describe('mage Cold Coffin (cleanseSelf) cannot strip a sickness', () => {
   it.each(['resurrection', 'unstuck'] as const)('leaves %s sickness on the caster', (which) => {

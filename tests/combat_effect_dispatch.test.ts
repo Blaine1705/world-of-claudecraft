@@ -147,7 +147,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     for (const tick of ticks) expect(tick.abilityId ?? null).toBeNull();
   });
 
-  it('fearImpact is gated to Harrow: Morrowlash shares fearDr but emits none', () => {
+  it('fearImpact is gated to the Harrow ability id, not to landing an incapacitate', () => {
     // Harrow (ability id 'fear'): the landed fear sounds once at the target.
     const harrow = makeSim('warlock', 20);
     const harrowTarget = spawnTarget(harrow.sim, harrow.p);
@@ -165,31 +165,25 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(fearImpacts).toHaveLength(1);
     expect(fearImpacts[0]).toMatchObject({ targetId: harrowTarget.id, ability: 'fear' });
 
-    // Morrowlash (death_coil) also carries fearDr (the graded fear break), but
-    // it has no fear recording and its own directDamage impact already sounds
-    // the hit, so the fearImpact emit must stay gated to Harrow's id.
-    // death_coil is a row-17 choice-row grant, so select it first.
-    const coil = makeSim('warlock', 20);
-    expect(coil.sim.applyTalents({ spec: null, rows: { 17: 'wlk_r17_death_coil' } })).toBe(true);
-    const coilTarget = spawnTarget(coil.sim, coil.p);
-    coil.sim.events.length = 0;
-    runEffects(
-      coil.sim.ctx,
-      coil.p,
-      coil.meta,
-      coilTarget,
-      resolve(coil.sim, 'death_coil', coil.p.id),
-    );
-    expect(coilTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
-    expect(coil.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
+    // A plain incapacitate (Gouge) lands its aura but must emit no
+    // fearImpact: the emit stays gated to Harrow's ability id. (Morrowlash,
+    // the historical fearDr-without-fear-audio counterexample, retired with
+    // the warlock three-spec overhaul; its def survives hidden for persisted
+    // action bars only.)
+    const toss = makeSim('rogue', 20);
+    const tossTarget = spawnTarget(toss.sim, toss.p);
+    toss.sim.events.length = 0;
+    runEffects(toss.sim.ctx, toss.p, toss.meta, tossTarget, resolve(toss.sim, 'gouge', toss.p.id));
+    expect(tossTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
+    expect(toss.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
       false,
     );
 
     // The AoE fear shouts emit fearImpact from the separate aoeFear case
     // (once per creature actually feared), which the Harrow id gate above
-    // must not touch. psychic_scream is a row-8 choice-row grant.
+    // must not touch. psychic_scream (Terror Canticle) is priest base kit
+    // since the overhaul; the old row-8 grant became a cooldown talent.
     const shout = makeSim('priest', 20);
-    expect(shout.sim.applyTalents({ spec: null, rows: { 8: 'pri_r8_psychic_scream' } })).toBe(true);
     const shoutTarget = spawnTarget(shout.sim, shout.p);
     shout.sim.events.length = 0;
     runEffects(
