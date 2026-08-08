@@ -1631,12 +1631,12 @@ export const VISUALS: Record<string, VisualDef> = {
   // the same rig worn honestly: an ice-white yeti for the Frostveil
   mob_yeti: {
     url: `${CREATURES}/yetialt.glb`,
-    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`],
     height: 2.5,
     clips: YETI_BIPED14,
     // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/yeti_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`, `${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
