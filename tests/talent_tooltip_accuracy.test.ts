@@ -808,7 +808,10 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
 
     const rendered = entry.render();
-    expect(rendered).toContain('Thunder Ward retaliation');
+    // The v0.36 release fill authored a real Spanish description for this row,
+    // superseding the English fallback this test originally pinned: the
+    // Spanish must still name the ward retaliation and the defensive value.
+    expect(rendered).toContain('Égida de Truenos');
     expect(rendered).toContain('10%');
     setLanguage('en');
   });
