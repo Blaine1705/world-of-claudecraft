@@ -93,6 +93,96 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     expect(INTEREST_DROP_RADIUS).toBeGreaterThan(MAX_AGGRO_RADIUS);
   });
 
+  it('skips the spatial lookup when no players are connected', () => {
+    const sim = new Sim({
+      seed: 20061,
+      playerClass: 'warrior',
+      noPlayer: true,
+      idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+    });
+    const idleMob = [...sim.entities.values()].find(sharedCullEligibleIdleMob);
+    if (!idleMob) throw new Error('expected a cull-eligible idle mob');
+
+    const gridQuery = vi.spyOn(sim.playerGrid, 'hasInRadius');
+    const culling = sim as unknown as { shouldSkipIdleMobTick(entity: Entity): boolean };
+
+    expect(culling.shouldSkipIdleMobTick(idleMob)).toBe(true);
+    expect(gridQuery).not.toHaveBeenCalled();
+  });
+
+  it('uses the player spatial grid instead of scanning a 60-player roster per idle mob', () => {
+    const sim = new Sim({
+      seed: 20061,
+      playerClass: 'warrior',
+      noPlayer: true,
+      idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+    });
+    for (let i = 0; i < 60; i++) sim.addPlayer('warrior', `Load${i}`);
+
+    const firstPlayerId = sim.players.keys().next().value;
+    if (firstPlayerId === undefined) throw new Error('expected a load-test player id');
+    const firstPlayer = sim.entities.get(firstPlayerId);
+    if (!firstPlayer) throw new Error('expected a load-test player');
+    const firstPosition = { ...firstPlayer.pos };
+    const farMob = [...sim.entities.values()].find((entity) => {
+      if (!sharedCullEligibleIdleMob(entity)) return false;
+      const dx = entity.pos.x - firstPlayer.pos.x;
+      const dz = entity.pos.z - firstPlayer.pos.z;
+      return dx * dx + dz * dz > PLAYER_INTEREST_DROP_RADIUS ** 2;
+    });
+    if (!farMob) throw new Error('expected an idle mob outside the player cluster');
+
+    const gridQuery = vi.spyOn(sim.playerGrid, 'hasInRadius');
+    const valuesScan = vi.spyOn(sim.players, 'values');
+    const keysScan = vi.spyOn(sim.players, 'keys');
+    const entriesScan = vi.spyOn(sim.players, 'entries');
+    const iteratorScan = vi.spyOn(sim.players, Symbol.iterator);
+    const forEachScan = vi.spyOn(sim.players, 'forEach');
+    const rosterIterations = [valuesScan, keysScan, entriesScan, iteratorScan, forEachScan];
+    const culling = sim as unknown as { shouldSkipIdleMobTick(entity: Entity): boolean };
+
+    expect(culling.shouldSkipIdleMobTick(farMob)).toBe(true);
+    expect(gridQuery).toHaveBeenCalledTimes(1);
+    expect(gridQuery).toHaveBeenLastCalledWith(
+      farMob.pos.x,
+      farMob.pos.z,
+      PLAYER_INTEREST_DROP_RADIUS,
+    );
+    for (const rosterIteration of rosterIterations) {
+      expect(rosterIteration).not.toHaveBeenCalled();
+    }
+
+    firstPlayer.pos = { ...farMob.pos };
+    firstPlayer.prevPos = { ...farMob.pos };
+    sim.grid.update(firstPlayer);
+    sim.playerGrid.update(firstPlayer);
+    expect(culling.shouldSkipIdleMobTick(farMob)).toBe(false);
+    expect(gridQuery).toHaveBeenCalledTimes(2);
+    expect(gridQuery).toHaveBeenLastCalledWith(
+      farMob.pos.x,
+      farMob.pos.z,
+      PLAYER_INTEREST_DROP_RADIUS,
+    );
+    for (const rosterIteration of rosterIterations) {
+      expect(rosterIteration).not.toHaveBeenCalled();
+    }
+
+    firstPlayer.pos = { ...firstPosition };
+    firstPlayer.prevPos = { ...firstPosition };
+    sim.grid.update(firstPlayer);
+    sim.playerGrid.update(firstPlayer);
+    for (const meta of sim.players.values()) meta.moveInput.forward = true;
+    gridQuery.mockClear();
+    const beforeTick = { ...firstPlayer.pos };
+    sim.tick();
+
+    expect(gridQuery).toHaveBeenCalled();
+    expect(
+      gridQuery.mock.calls.every(([, , radius]) => radius === PLAYER_INTEREST_DROP_RADIUS),
+    ).toBe(true);
+    expect(firstPlayer.pos).not.toEqual(beforeTick);
+  });
+
   it('isolates nearby passive RNG behavior from a culled distant mob', () => {
     const culled = new Sim({
       seed: 20061,
