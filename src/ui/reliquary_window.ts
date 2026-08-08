@@ -397,8 +397,11 @@ export class ReliquaryWindow {
     this.focusPageId = null;
     this.focusNavId = null;
     // The region must not carry a stale announcement (or a pending reannounce
-    // toggle) into the next visit; the NODE persists, its state does not.
+    // toggle) into the next visit; the NODE persists, its state does not. The
+    // cap note gets the same treatment for symmetry (open() re-renders before
+    // the root shows, so this is hygiene, not a reachable-state fix).
     if (this.liveEl) this.liveEl.textContent = '';
+    if (this.capNoteEl) this.capNoteEl.textContent = '';
     this.lastAnnounced = '';
     this.liveReannounce.reset();
     this.deps.hideTooltip();

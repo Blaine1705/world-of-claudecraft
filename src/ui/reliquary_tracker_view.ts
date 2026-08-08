@@ -241,10 +241,10 @@ export function buildReliquaryTrackerViewInto(
 
 export interface ReliquaryPinToggleResult {
   pinned: ReadonlySet<string>;
-  /** True when the add was refused at the cap. The window keeps the refused
-   *  control reachable (aria-disabled, the shared aria-describedby cap note)
-   *  and answers an activation through its polite region; never a silent
-   *  no-op. */
+  /** True when the add was refused at the cap. Informational: the window
+   *  branches on `changed` and re-derives its own at-cap rendering, so this
+   *  flag has test consumers only; it states the refusal reason the host
+   *  surfaces however it chooses. */
   full: boolean;
   changed: boolean;
 }

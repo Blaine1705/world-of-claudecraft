@@ -54,11 +54,13 @@ describe('guide search tie-break collation', () => {
     // The ranking tests above use ASCII labels no supported locale reorders,
     // so the tag cannot be pinned behaviorally here; the source pin mirrors
     // how fold() tags the SAME way, and the hoist keeps a per-keystroke sort
-    // from re-deriving the tag per comparison. Comment-stripped so prose
-    // cannot satisfy it.
+    // from re-deriving the tag per comparison. Comment-stripped (block AND
+    // trailing forms) so prose cannot satisfy it.
     const src = readFileSync(join(__dirname, '../src/guide/search.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
       .split('\n')
       .filter((line) => !/^\s*\/\//.test(line))
+      .map((line) => line.replace(/\s\/\/.*$/, ''))
       .join('\n');
     expect(src).toContain('const tag = languageTag(getLanguage());');
     expect(src).toContain('a.e.label.localeCompare(b.e.label, tag)');

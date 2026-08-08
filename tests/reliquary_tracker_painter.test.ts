@@ -12,6 +12,7 @@ import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host
 import { ReliquaryTrackerPainter } from '../src/ui/reliquary_tracker_painter';
 import {
   makeReliquaryTrackerView,
+  RELIQUARY_TRACK_CAP,
   type ReliquaryTrackerView,
 } from '../src/ui/reliquary_tracker_view';
 
@@ -152,11 +153,12 @@ describe('ReliquaryTrackerPainter: rows', () => {
     // toggle would elide against the stale entry). The shrink is a core-
     // reachable shape (five tracked lines dropping to two, visible stays
     // true), so a clear scoped to slot 0 or gated on emptiness fails here.
-    const fiveLit = (flashSlot: number): ReliquaryTrackerView => {
+    const last = RELIQUARY_TRACK_CAP - 1;
+    const fullLit = (flashSlot: number): ReliquaryTrackerView => {
       const v = makeReliquaryTrackerView();
       v.visible = true;
-      v.count = 5;
-      for (let i = 0; i < 5; i++) {
+      v.count = RELIQUARY_TRACK_CAP;
+      for (let i = 0; i < RELIQUARY_TRACK_CAP; i++) {
         v.lines[i].pageId = `page_${i}`;
         v.lines[i].owned = 3;
         v.lines[i].total = 10;
@@ -168,20 +170,20 @@ describe('ReliquaryTrackerPainter: rows', () => {
     const { writers } = countingWriters();
     const painter = new ReliquaryTrackerPainter({ root: () => root, writers });
     const lines = [...root.querySelectorAll<HTMLElement>('.dt-line')];
-    painter.update(fiveLit(4));
-    expect(lines[4].classList.contains('dt-flash')).toBe(true);
-    const shrunk = fiveLit(-1);
+    painter.update(fullLit(last));
+    expect(lines[last].classList.contains('dt-flash')).toBe(true);
+    const shrunk = fullLit(-1);
     shrunk.count = 2;
     painter.update(shrunk);
     // The hidden slot lost the class with the row (the pin the fix earns).
-    expect(lines[4].classList.contains('dt-flash')).toBe(false);
-    expect(lines[4].style.display).toBe('none');
+    expect(lines[last].classList.contains('dt-flash')).toBe(false);
+    expect(lines[last].style.display).toBe('none');
     // A different page recycled into the slot pulses for real: the cache was
     // cleared, so this toggle writes instead of eliding.
-    const recycled = fiveLit(4);
-    recycled.lines[4].pageId = 'page_recycled';
+    const recycled = fullLit(last);
+    recycled.lines[last].pageId = 'page_recycled';
     painter.update(recycled);
-    expect(lines[4].classList.contains('dt-flash')).toBe(true);
+    expect(lines[last].classList.contains('dt-flash')).toBe(true);
   });
 });
 

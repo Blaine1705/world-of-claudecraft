@@ -75,7 +75,8 @@ describe('painter hygiene', () => {
       expect(src).not.toMatch(/ui_effects_profile|fxTier|data-fx-level/);
     }
     // Positive anchors so the negative scans above are self-auditing: a moved
-    // or renamed tracker file would otherwise scan an empty read forever.
+    // file throws at read() already, but a file gutted in place (or reduced
+    // to a re-export) would keep passing every not-toMatch above.
     expect(trackerPainter).toContain('export class ReliquaryTrackerPainter');
     expect(trackerView).toContain('RELIQUARY_TRACK_CAP');
   });

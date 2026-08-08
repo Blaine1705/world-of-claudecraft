@@ -47,7 +47,11 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
-import { RELIQUARY_PAGE_ORDER, RELIQUARY_PAGES } from '../sim/content/reliquary';
+import {
+  RELIQUARY_PAGE_ORDER,
+  RELIQUARY_PAGES,
+  RELIQUARY_PAGES_BY_ID,
+} from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -13449,10 +13453,10 @@ export class Hud {
       // Captured for the link closure: a property narrowing does not survive
       // into a callback, and the jump target is exactly the illuminated page.
       const jumpId = plan.illuminatedPageId;
-      // Membership via the array scan, not RELIQUARY_PAGES_BY_ID: the record
-      // has a normal prototype, so a forged id like "constructor" would pass
-      // an `in`/truthiness check. 28 entries on a rare event path.
-      if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
+      // Membership via Object.hasOwn (the reliquary_i18n pageDef idiom): the
+      // record has a normal prototype, so an `in`/truthiness check would let
+      // a forged id like "constructor" through.
+      if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, jumpId)) {
         // A page the catalog no longer holds (client/server catalog drift)
         // would jump to a window that opens un-navigated, so the line stays
         // plain instead of carrying a dead link: the relic line's inert-link
@@ -13499,7 +13503,7 @@ export class Hud {
         // branch that fires when Illumination OWNS the banner slot, and a
         // single-site conversion would leave it plain.
         const jumpId = banner.pageId;
-        if (!RELIQUARY_PAGES.some((p) => p.id === jumpId)) {
+        if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, jumpId)) {
           // Same drift guard as the durable arm: a catalog-unknown page gets
           // the plain line, never a link that would open un-navigated. The
           // banner prose above keeps the (fallback) name on purpose: it is

@@ -1107,6 +1107,10 @@ describe('axe: professions window tool-effect controls', () => {
 
 describe('axe: reliquary window search, filters, and relic grid', () => {
   function reliquaryWorld() {
+    // CAUTION: the stub is handed over through an `as never` cast below, so
+    // tsc cannot flag a missing member here; a new world read in the window
+    // (like the Phase 15 pinKey identity pair) surfaces as a RUNTIME throw in
+    // this suite only. Keep this stub in step with what the window reads.
     return {
       // The Phase 15 pin store keys per character (pinKey reads BOTH), so the
       // stub carries the identity members every real world has.
