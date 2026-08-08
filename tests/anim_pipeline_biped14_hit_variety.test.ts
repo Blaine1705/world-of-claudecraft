@@ -83,14 +83,14 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // This assertion counts every `_hit_variety_anims.glb` reference across the
-    // WHOLE manifest, not just the 6 BIPED14 consumers above (the 6 consumers
-    // are individually pinned by the loop's `toContain` checks): it was 6 when
-    // this test was authored (the only hit-variety wiring in the manifest at
-    // the time), grew to 42 once the KayKit hit-variety batch
-    // (tests/anim_pipeline_kaykit_hit_variety.test.ts) landed its own 36
-    // consumers alongside these.
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
-    expect(occurrences).toBe(42);
+    // Scoped to these 4 BIPED14-family donor basenames rather than every
+    // `_hit_variety_anims.glb` in the manifest: other families (KayKit's
+    // kaykit()/skeletonClips(), ENEMY_BITE/CRAB_ENEMY_BITE, etc, issue #2889)
+    // independently wire their own hit-variety donors in the same batch and
+    // would otherwise inflate an unscoped count every time one of them lands.
+    const donorPattern =
+      /yetialt_hit_variety_anims\.glb|frog_hit_variety_anims\.glb|orc_hit_variety_anims\.glb|demonalt_hit_variety_anims\.glb/g;
+    const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
+    expect(occurrences).toBe(6);
   });
 });

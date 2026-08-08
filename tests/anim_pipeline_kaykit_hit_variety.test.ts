@@ -87,15 +87,17 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
   });
 
   it('wires a matching animUrls entry onto every kaykit()/skeletonClips() consumer', () => {
-    // 42 VisualDef entries route through kaykit()/skeletonClips(); each gets
-    // exactly one `${...}_hit_variety_anims.glb` reference (a few source
-    // files, e.g. mage.glb, back multiple entries, so this counts textual
-    // occurrences across the whole manifest, not distinct donor files). Count
-    // grew from 36 to 42 after rebasing onto release/v0.36.0, which landed
-    // its own kaykit()/skeletonClips() consumers (yeti/orc/troll and others)
-    // in parallel.
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
-    expect(occurrences).toBe(42);
+    // Count textual occurrences of exactly these 15 KayKit donor basenames
+    // (a few, e.g. mage.glb, back multiple VisualDef entries, so this is not
+    // the same as DONOR_GLBS.length). Scoped to the KayKit family's own donor
+    // filenames rather than every `_hit_variety_anims.glb` in the manifest:
+    // other families (BIPED14/YETI_BIPED14/TROLL_BIPED14, ENEMY_BITE/
+    // CRAB_ENEMY_BITE, etc, issue #2889) independently wire their own
+    // hit-variety donors in the same batch and would otherwise inflate an
+    // unscoped count every time one of them lands.
+    const donorPattern = new RegExp(DONOR_GLBS.map((p) => p.split('/').pop()).join('|'), 'g');
+    const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
+    expect(occurrences).toBe(36);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).
