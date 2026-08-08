@@ -280,7 +280,7 @@ persistence (`serializeCharacter`/`addPlayer`), the shared entry points above, a
   keeps working.
 
 ## Adding a mechanic here
-1. Add state to `Entity` (`types.ts`) and/or `PlayerMeta`; init it in `entity.ts` `baseEntity` / `createPlayer`. State stays on `Sim`/`Entity`, not in a module global.
+1. Add state to `Entity` (`types.ts`) and/or `PlayerMeta`; init it in `entity.ts` `baseEntity` / `createPlayer`. State stays on `Sim`/`Entity`, not in a module global. The ONE sanctioned module-global shape is a derived-output memo behind an identity-keyed `WeakMap` (the `reliquary.ts` wire memo): its output must be byte-identical to the uncached expression, it must never feed sim state or the save shape, every writer of its inputs must bump its revision, and a guard test must pin reuse by identity. Anything less is hidden sim state; do not add one casually.
 2. Decide where the BEHAVIOR lives:
    - Extending an existing system -> its module (e.g. a new ability effect -> `combat/effect_dispatch.ts`).
    - A NEW self-contained system -> a NEW sibling module that talks only to `SimContext`. Add the callbacks it needs to `sim_context.ts` (append-only) and bind them in `buildSimContext()`; keep a thin `Sim` delegate if a foreign caller resolves the method on the facade.
