@@ -474,6 +474,7 @@ import { YumiTeamMarkers } from './yumi_team_markers';
 import {
   type FeatureFootprint,
   hasUnseededInstanceMatrix,
+  isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
 } from './zone_feature_visibility_core';
 import {
@@ -3659,7 +3660,14 @@ export class Renderer {
   // Every attached feature group with its world XZ footprint, for the
   // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
   // these groups are static and matrix-frozen, so the bounds never move.
-  private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
+  private zoneFeatureGroups: {
+    group: THREE.Group;
+    footprint: FeatureFootprint | null;
+    /** Whether this group currently casts into the sun shadow map. */
+    shadowCasting: boolean;
+    /** Meshes that carried castShadow at the first far flip, for restore. */
+    shadowCasters: THREE.Mesh[] | null;
+  }[] = [];
 
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
@@ -3717,6 +3725,8 @@ export class Renderer {
         this.zoneFeatureGroups.push({
           group: cullGroup,
           footprint: measureFeatureFootprint(cullGroup),
+          shadowCasting: true,
+          shadowCasters: null,
         });
       }
     };
@@ -3740,6 +3750,23 @@ export class Renderer {
     const camZ = this.camera.position.z;
     for (const entry of this.zoneFeatureGroups) {
       entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
+      // Shadow casting stops far before the fogless detail horizon: the merged
+      // feature meshes disable frustum culling, so the shadow pass would
+      // otherwise redraw whole neighbour towns that cannot land one texel in
+      // the 105 yd shadow volume. Per-mesh writes only on a state flip.
+      const casting = isZoneFeatureShadowCasting(entry.footprint, camX, camZ, entry.shadowCasting);
+      if (casting !== entry.shadowCasting) {
+        entry.shadowCasting = casting;
+        if (!casting && !entry.shadowCasters) {
+          const casters: THREE.Mesh[] = [];
+          entry.group.traverse((obj) => {
+            const mesh = obj as THREE.Mesh;
+            if (mesh.isMesh && mesh.castShadow) casters.push(mesh);
+          });
+          entry.shadowCasters = casters;
+        }
+        for (const mesh of entry.shadowCasters ?? []) mesh.castShadow = casting;
+      }
     }
   }
 
