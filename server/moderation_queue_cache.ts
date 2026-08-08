@@ -55,10 +55,14 @@ let queryFn: () => Promise<ModerationQueueRow[]> = () => moderationQueue(emptyOn
 let nowFn: (() => number) | undefined;
 
 // The module-level singleton, built LAZILY on first read so a test seam
-// installed before first use takes effect.
-let cache: CachedRead<ModerationQueueRow[]> | null = null;
+// installed before first use takes effect. Typed readonly: Object.freeze on
+// an array narrows it to readonly T[] (unlike a plain object, an array loses
+// its mutator methods once frozen), and the cached array is shared by
+// reference with every reader in the TTL window, so readonly is also the
+// correct contract, not just what the freeze forces.
+let cache: CachedRead<readonly ModerationQueueRow[]> | null = null;
 
-function baseCache(): CachedRead<ModerationQueueRow[]> {
+function baseCache(): CachedRead<readonly ModerationQueueRow[]> {
   cache ??= createCachedRead(async () => Object.freeze(await queryFn()), {
     ttlMs: MODERATION_QUEUE_TTL_MS,
     now: nowFn,
