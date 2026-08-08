@@ -5292,14 +5292,16 @@ export class GameServer {
    *  save: an officer-plus member first (the rank that already moves this book
    *  every day), else any member. Null when nobody from the guild is online.
    *
-   *  Membership comes from a FRESH database read, not the session stamp. The
-   *  stamp can lag a kick or a leave, and carrying is NOT a free favour: if the
-   *  escrow save is refused, the carrier's session is QUARANTINED and
-   *  DISCONNECTED (the rollback arm), so a stale stamp would put a player who
-   *  is no longer even a member of the guild on a rollback-and-kick path for an
-   *  operator's act. One indexed read per operator purge is the right price for
-   *  that. A read failure answers null (fail closed: no carrier, no purge)
-   *  rather than falling back to the stamp.
+   *  Membership comes from a FRESH database read (socialDb.guildMembersFresh,
+   *  which deliberately bypasses the roster cache in server/guild_roster_cache.ts),
+   *  not the session stamp and not a TTL-cached roster answer. The stamp can lag
+   *  a kick or a leave, and carrying is NOT a free favour: if the escrow save is
+   *  refused, the carrier's session is QUARANTINED and DISCONNECTED (the
+   *  rollback arm), so a stale read would put a player who is no longer even a
+   *  member of the guild on a rollback-and-kick path for an operator's act. One
+   *  indexed read per operator purge is the right price for that. A read
+   *  failure answers null (fail closed: no carrier, no purge) rather than
+   *  falling back to the stamp.
    *
    *  Which BOOK gets flushed does not depend on this choice: the flush is
    *  driven by the session's own `dirtyGuildBanks` mark, which runGuildBankOp
@@ -5308,7 +5310,7 @@ export class GameServer {
   private async guildBankSaveCarrier(guildId: number): Promise<ClientSession | null> {
     let rankByCharacterId: Map<number, GuildRank>;
     try {
-      const members = await this.socialDb.guildMembers(guildId);
+      const members = await this.socialDb.guildMembersFresh(guildId);
       rankByCharacterId = new Map(members.map((m) => [m.id, m.rank]));
     } catch (err) {
       console.error(`guild bank carrier lookup failed for guild ${guildId}:`, err);
