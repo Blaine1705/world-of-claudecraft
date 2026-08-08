@@ -70,22 +70,29 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      // mob_troll, mob_yeti, and mob_murloc each wire their own
+      // mob_troll, mob_yeti, mob_murloc, and mob_bear each wire their own
       // `{ ...BIPED14, attack: [...] }` variant (TROLL_BIPED14, YETI_BIPED14,
-      // MURLOC_BIPED14, issue #2889): each inherits BIPED14's hit array
-      // unchanged, so they still qualify as BIPED14 consumers for
+      // MURLOC_BIPED14, BEAR_BIPED14, issue #2889): each inherits BIPED14's
+      // hit array unchanged, so they still qualify as BIPED14 consumers for
       // HitReact_Heavy.
       const BIPED14_VARIANTS: Record<string, string> = {
         mob_troll: 'TROLL_BIPED14',
         mob_yeti: 'YETI_BIPED14',
         mob_murloc: 'MURLOC_BIPED14',
+        mob_bear: 'BEAR_BIPED14',
       };
       const clipsOk = block.includes(`clips: ${BIPED14_VARIANTS[key] ?? 'BIPED14'}`);
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // Exactly 6 consumers touched: a stray extra or missing wiring changes this count.
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Exactly 6 BIPED14-family consumers touched: a stray extra or missing
+    // wiring changes this count. Scoped to this family's own donor
+    // basenames rather than every `_hit_variety_anims.glb` in the manifest,
+    // since unrelated families (e.g. the enemy7 hit-variety batch) land
+    // their own donors independently and would otherwise break this pin.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/(yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
+    ].length;
     expect(occurrences).toBe(6);
   });
 });
