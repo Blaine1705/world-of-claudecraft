@@ -18,7 +18,13 @@ import {
   unstuckSicknessDuration,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
-import { type BgMatch, bgAllPids, startBgMatch } from '../src/sim/social/battleground';
+import {
+  type BgMatch,
+  bgAllPids,
+  bgCarryingFlag,
+  CARRIED_FLAG_AURA_ID,
+  startBgMatch,
+} from '../src/sim/social/battleground';
 import {
   applyResurrectionSickness,
   moveToGraveyardForUnstuck,
@@ -152,6 +158,21 @@ function placeInsideBattlegroundWall(sim: Sim, match: BgMatch, pid: number): voi
   const origin = battlegroundOrigin(match.slot);
   const player = required(sim.entities.get(pid), 'battleground player');
   player.pos = sim.groundPos(origin.x + wall.x, origin.z + wall.z);
+  player.prevPos = { ...player.pos };
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  sim.grid.update(player);
+  sim.playerGrid.update(player);
+}
+
+function placeBattlegroundPlayer(sim: Sim, pid: number, x: number, z: number): void {
+  const player = required(sim.entities.get(pid), 'battleground player');
+  player.pos = sim.groundPos(x, z);
   player.prevPos = { ...player.pos };
   player.vx = 0;
   player.vy = 0;
@@ -451,6 +472,38 @@ describe('unstuck graveyard move while alive', () => {
     expect(player.dead).toBe(false);
     expect(player.ghost).toBe(false);
     expect(player.corpsePos).toBeNull();
+  });
+
+  it('drops a carried Thornhollow flag before moving the living carrier to the graveyard', () => {
+    const { sim, match } = startBattleground();
+    match.state = 'active';
+    match.timer = 0;
+    const carrier = match.teams[0][0];
+    const player = required(sim.entities.get(carrier), 'battleground carrier');
+    const enemyFlag = match.flags[1];
+    placeBattlegroundPlayer(sim, carrier, enemyFlag.home.x, enemyFlag.home.z);
+    sim.bgFlagAction(carrier);
+    sim.tick();
+    expect(bgCarryingFlag(sim.ctx, carrier)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === CARRIED_FLAG_AURA_ID)).toBe(true);
+    const dropAt = { ...player.pos };
+
+    expect(sim.unstuck(carrier)).toBe(true);
+    sim.drainEvents();
+    const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
+
+    expect(completed?.reason).toBe('moved_to_graveyard');
+    expect(bgCarryingFlag(sim.ctx, carrier)).toBe(false);
+    expect(player.auras.some((aura) => aura.id === CARRIED_FLAG_AURA_ID)).toBe(false);
+    expect(enemyFlag.state).toBe('dropped');
+    expect(enemyFlag.carrier).toBeNull();
+    expect(enemyFlag.pos.x).toBeCloseTo(dropAt.x, 6);
+    expect(enemyFlag.pos.z).toBeCloseTo(dropAt.z, 6);
+    expect(enemyFlag.pos.x).not.toBeCloseTo(player.pos.x, 6);
+    expect(enemyFlag.pos.z).not.toBeCloseTo(player.pos.z, 6);
+    expect(sim.bgMatchFor(carrier)).toBe(match);
   });
 
   it('charges Unstuck Sickness rather than The Keeper’s Toll, and clears momentum', () => {

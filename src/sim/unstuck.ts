@@ -29,6 +29,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { bgCarryingFlag, CARRIED_FLAG_AURA_ID } from './social/battleground';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
@@ -361,6 +362,7 @@ function completeUnstuck(
   // Both outcomes land on the same graveyard and charge the same Unstuck Sickness; they
   // differ only in whether a revive is needed on arrival. A living player is never killed.
   const wasDead = p.dead || p.ghost;
+  if (!wasDead && bgCarryingFlag(ctx, p.id)) ctx.bgCancelFlagAura(p, CARRIED_FLAG_AURA_ID);
   if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
   else moveToGraveyardForUnstuck(ctx, p.id);
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
