@@ -1,9 +1,10 @@
-// Wildheart Basin round 2 (issue #2889): the Vineclaw Stalker's own bespoke attack.
-// mob_wildheart_stalker shared the literal TRIPO_BIPED_FULL_RIG ClipMap object, by
+// Wildheart Basin round 2 (issue #2889): the Bloodmane Ravager's own bespoke attack.
+// mob_wildheart_ravager shared the literal TRIPO_BIPED_FULL_RIG ClipMap object, by
 // reference, with the other 4 Wildheart Basin mobs; this clip is authored by
-// pose-sample-and-blend (scripts/anim/pose_blend.mjs, scripts/build_wildheart_stalker_anims.mjs)
-// off the rig's own Attack donor. Follows the shipped-GLB-plus-manifest-source contract
-// test pattern (tests/anim_pipeline_batch1.test.ts's elemental family describe block).
+// pose-sample-and-blend (scripts/anim/pose_blend.mjs, scripts/build_wildheart_ravager_anims.mjs)
+// off the rig's own Attack and Hit donors. Follows the shipped-GLB-plus-manifest-source
+// contract test pattern (tests/anim_pipeline_batch1.test.ts's elemental family describe
+// block).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -34,18 +35,18 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
   return MANIFEST_SRC.slice(start, end);
 }
 
-describe('Vineclaw Stalker bespoke attack (issue #2889 round 2)', () => {
-  it('ships Wildheart_Stalker_Attack in a mesh-free donor GLB', () => {
-    const glbPath = 'public/models/creatures/wildheart_stalker_ability_anims.glb';
-    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_Stalker_Attack']);
+describe('Bloodmane Ravager bespoke attack (issue #2889 round 2)', () => {
+  it('ships Wildheart_Ravager_Attack in a mesh-free donor GLB', () => {
+    const glbPath = 'public/models/creatures/wildheart_ravager_ability_anims.glb';
+    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_Ravager_Attack']);
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
-  it('gives mob_wildheart_stalker its own ClipMap instead of mutating the shared TRIPO_BIPED_FULL_RIG constant', () => {
-    const stalkerBlock = manifestBlock('mob_wildheart_stalker: {', 'mob_wildheart_ravager: {');
-    expect(stalkerBlock).toContain('wildheart_stalker_ability_anims.glb');
-    expect(stalkerBlock).toContain('clips: WILDHEART_STALKER');
-    expect(stalkerBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
+  it('gives mob_wildheart_ravager its own ClipMap instead of mutating the shared TRIPO_BIPED_FULL_RIG constant', () => {
+    const ravagerBlock = manifestBlock('mob_wildheart_ravager: {', 'mob_wildheart_hexcaller: {');
+    expect(ravagerBlock).toContain('wildheart_ravager_ability_anims.glb');
+    expect(ravagerBlock).toContain('clips: WILDHEART_RAVAGER');
+    expect(ravagerBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
 
     // TRIPO_BIPED_FULL_RIG itself (the constant definition, not a VisualDef using it) must
     // still read the original shared Attack clip: the other 4 Wildheart mobs sharing it by
@@ -55,9 +56,9 @@ describe('Vineclaw Stalker bespoke attack (issue #2889 round 2)', () => {
 
     // Every other VisualDef still pointing at the shared constant is untouched: exactly 2
     // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usages (5 originally, minus the one
-    // migrated to WILDHEART_STALKER above, minus mob_wildheart_hexcaller's and
-    // mob_wildheart_ravager's parallel migrations to WILDHEART_HEXCALLER and
-    // WILDHEART_RAVAGER, issue #2889 round 2).
+    // migrated to WILDHEART_RAVAGER above, minus mob_wildheart_stalker's and
+    // mob_wildheart_hexcaller's parallel migrations to WILDHEART_STALKER and
+    // WILDHEART_HEXCALLER, issue #2889 round 2).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
     expect(remaining).toBe(2);
   });
