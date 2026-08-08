@@ -461,7 +461,7 @@ describe('class ability webp icons', () => {
 
   it('D) the 90 generated additions decode as unique, opaque, exact 128px reviewed art', async () => {
     const pins = missingWaveAbilityPins();
-    expect(pins).toHaveLength(90);
+    expect(pins).toHaveLength(100);
     const hashes = new Set<string>();
     const mapped = new Set<string>();
     for (const className of [
@@ -522,6 +522,6 @@ describe('class ability webp icons', () => {
       }
       expect(opaque, `${pin.id} must keep its full-square opaque background`).toBe(true);
     }
-    expect(hashes.size).toBe(90);
+    expect(hashes.size).toBe(100);
   });
 });

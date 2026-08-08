@@ -1070,7 +1070,7 @@ describe('static normalization round-trips', () => {
     const report = await glb.inspectGlb(outPath);
 
     expect(report.textures.length).toBeGreaterThan(0);
-    expect(report.textures.map((texture) => texture.name)).toContain('T_Normal');
+    expect(report.textures.map((texture: { name: string }) => texture.name)).toContain('T_Normal');
     for (const texture of report.textures) {
       expect(texture.width, texture.name).toBeLessThanOrEqual(512);
       expect(texture.height, texture.name).toBeLessThanOrEqual(512);
