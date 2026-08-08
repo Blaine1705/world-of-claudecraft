@@ -24,6 +24,7 @@ const {
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
+const { rangedFileResponse } = require('./media_range.cjs');
 const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
@@ -205,6 +206,18 @@ function registerAppProtocol() {
         : path.join(distDir, 'index.html');
     if (!fs.existsSync(filePath) || !fileInside(distDir, filePath)) {
       return notFound();
+    }
+    // Chromium's media stack requests <audio>/<video> sources with a Range header
+    // and rejects a plain 200 re-wrap as a format error, which left every streamed
+    // music cue silent in the shipped shell. Serve those as proper 206 slices (or
+    // a 416 for a past-EOF range) via electron/media_range.cjs; a null (non-media
+    // file, malformed range, unreadable file) falls through to the full response.
+    const rangeValue = request.headers.get('range');
+    if (rangeValue) {
+      const ranged = await rangedFileResponse(filePath, rangeValue, {
+        'Content-Security-Policy': csp,
+      });
+      if (ranged) return ranged;
     }
     // Every served path (asset or the SPA index.html fallback) gets the CSP header;
     // net.fetch's own Response has immutable headers, so withCspHeader builds a fresh
