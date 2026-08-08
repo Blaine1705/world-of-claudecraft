@@ -7,12 +7,12 @@ import {
   type SceneCensusReport,
 } from '../render/scene_census_core';
 import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
-import { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import {
   createHitchForensics,
   type HitchForensicsRecord,
   type HitchForensicsState,
 } from './hitch_forensics';
+import { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
