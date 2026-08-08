@@ -1,12 +1,13 @@
 // Renders the layered-SVG crown source (crown.svg, authored in-repo to the
 // chrome icon art direction) onto the flat magenta key the chrome converter
-// expects, then leaves public/ui/chrome/crown.png for `npm run assets:chrome`
-// to key, trim, center, and encode as the shipping 128px WebP.
+// expects, then runs `npm run assets:chrome` itself so the intermediate
+// crown.png never survives in public/ (which deploys verbatim): the converter
+// keys, trims, centers, encodes the shipping 128px WebP, and unlinks the PNG.
 //
-// Run by hand from the repo root, then the converter:
+// Run by hand from the repo root:
 //   node scripts/assets/chrome_crown/render_source.mjs
-//   npm run assets:chrome
 
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -26,4 +27,8 @@ await sharp({
   .composite([{ input: crown }])
   .png()
   .toFile(out);
-console.log(`wrote ${path.relative(repoRoot, out)}; now run: npm run assets:chrome`);
+console.log(`wrote ${path.relative(repoRoot, out)}; converting...`);
+execFileSync('node', [path.join(repoRoot, 'scripts', 'convert_chrome_icons_webp.mjs')], {
+  cwd: repoRoot,
+  stdio: 'inherit',
+});

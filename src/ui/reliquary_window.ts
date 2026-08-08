@@ -37,7 +37,11 @@ import { iconDataUrl } from './icons';
 import { knownItemDef, ownEntry } from './known_item';
 import { ReannounceMarker } from './live_region_reannounce';
 import type { PainterHostPresentation } from './painter_host';
-import { type ReliquaryArtSlot, reliquaryCellArt } from './reliquary_cell_art';
+import {
+  type ReliquaryArtSlot,
+  reliquaryCellArt,
+  reliquaryCellArtOpaque,
+} from './reliquary_cell_art';
 import { reliquaryPageDesc, reliquaryPageName } from './reliquary_i18n';
 import {
   reliquaryRelicDisplayName,
@@ -107,11 +111,6 @@ const NO_FLASH: ReadonlySet<string> = new Set();
  *  `<prefix>_<class>_<name>`, so two characters on one browser keep their own
  *  chase on the HUD tracker. */
 const RELIQUARY_PIN_KEY_PREFIX = 'woc_reliquary_pins';
-
-// The art and quality ladders take the resolver's own slot shape
-// (ReliquaryArtSlot): a grid cell and a recent find are the same slot, so both
-// resolve through one implementation, and importing the core's type keeps the
-// window and the resolver from ever drifting apart structurally.
 
 const FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
   all: 'hudChrome.reliquary.filterAll',
@@ -1294,6 +1293,14 @@ export class ReliquaryWindow {
     const stateClass = cell.owned ? 'owned' : 'missing';
     const quality = this.cellQuality(cell);
     const icon = this.cellIconHtml(cell, quality);
+    // The missing-state carve-out keys on the ART's opacity, not on a kind
+    // literal: Armory cards and category-fallback crests both paint their own
+    // background, and the resolver is the one place that knows which family a
+    // cell landed on (reliquaryCellArtOpaque). Descriptor resolution is a few
+    // map reads, so re-asking here stays free next to the compositing the
+    // icon path already memoizes.
+    const art = reliquaryCellArt(cell);
+    const opaqueArt = art !== null && reliquaryCellArtOpaque(art);
     // Resolved ONCE per cell per rebuild: the aria label and the count stamp
     // both read it, and the search path rebuilds the grid per keystroke.
     // Owned cells never show hunting directions, so they skip the resolution.
@@ -1309,6 +1316,7 @@ export class ReliquaryWindow {
       // the settled cell.
       `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
+      `${opaqueArt ? 'data-cell-art="opaque" ' : ''}` +
       // data-cell-source marks cells with at least one RESOLVABLE source line,
       // and carries how many actually resolve, so tooling (the PR shot picker)
       // can find the richest multi-source cell without matching English aria

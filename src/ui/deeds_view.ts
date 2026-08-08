@@ -101,10 +101,16 @@ export function deedJumpCategory(
   return deedDisplayCategory(def.category);
 }
 
+/** Prefix of the display-category FALLBACK crests (procedural recipes
+ *  composited over an opaque radial in icons.ts, unlike the alpha-matted
+ *  painted `deed_<id>` art). Exported so consumers reasoning about opacity
+ *  (the reliquary's missing-state carve-out) share the one spelling. */
+export const DEED_CATEGORY_CREST_PREFIX = 'deed_cat_';
+
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
     ? `deed_${id}`
-    : `deed_cat_${deedDisplayCategory(category)}`;
+    : `${DEED_CATEGORY_CREST_PREFIX}${deedDisplayCategory(category)}`;
 }
 
 export interface DeedProgress {

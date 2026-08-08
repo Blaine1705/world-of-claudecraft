@@ -13,7 +13,35 @@ vi.mock('../src/ui/icons', () => ({
   },
 }));
 
-const { knownItemIconHtml, unknownItemIconHtml } = await import('../src/ui/unknown_item_icon');
+const { itemIconImgHtml, knownItemIconHtml, unknownItemIconHtml } = await import(
+  '../src/ui/unknown_item_icon'
+);
+
+describe('itemIconImgHtml (the shared minter, named directly)', () => {
+  // The reliquary window feeds this resolver-gated URLs, so these arms guard
+  // the minter itself rather than any caller: a refactor that gives
+  // unknownItemIconHtml its own inline body must not leave this unpinned.
+  it('mints the exact .item-icon shape', () => {
+    expect(itemIconImgHtml('/ui/professions/masterwork_seal.webp', 'epic')).toBe(
+      '<img class="item-icon q-epic" src="/ui/professions/masterwork_seal.webp" alt="" draggable="false">',
+    );
+  });
+
+  it('allowlists the rung out of the class attribute (no token injection)', () => {
+    const quoted = itemIconImgHtml('/x.webp', 'x" onerror="alert(1)');
+    expect(quoted).not.toContain('onerror');
+    expect(quoted).toContain('class="item-icon q-common"');
+    const spaced = itemIconImgHtml('/x.webp', 'common evil');
+    expect(spaced).toContain('class="item-icon q-common"');
+    expect(spaced).not.toContain('evil');
+  });
+
+  it('escapes the src attribute (no quote breakout)', () => {
+    const html = itemIconImgHtml('x" onerror="alert(1)', 'epic');
+    expect(html).not.toContain('src="x" onerror');
+    expect(html).toContain('&quot;');
+  });
+});
 
 describe('unknownItemIconHtml', () => {
   it('renders the item-icon img at common quality by default', () => {

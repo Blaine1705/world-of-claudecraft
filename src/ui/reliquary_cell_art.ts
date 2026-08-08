@@ -34,11 +34,11 @@ import { FIELD_NOTE_PROFESSIONS } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
 import { mountItemId } from '../sim/mounts';
-import { deedCrestId } from './deeds_view';
+import { DEED_CATEGORY_CREST_PREFIX, deedCrestId } from './deeds_view';
 import { knownItemDef, ownEntry } from './known_item';
 import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import type { ReliquaryRelicNameKind } from './reliquary_view';
-import { armorySkinArt } from './woc_store_view';
+import { ARMORY_SKIN_ART_DIR, armorySkinArt } from './woc_store_view';
 
 /**
  * Where a relic cell's art comes from. Three arms because the three pipelines
@@ -156,6 +156,26 @@ export function reliquaryCellArt(slot: ReliquaryArtSlot): ReliquaryCellArt | nul
   }
   if (slot.kind === 'mark') return markArt(slot.id);
   return null;
+}
+
+/**
+ * True when this art paints its own BRIGHT background, so the missing-state
+ * silhouette filter (brightness-darken) would render a solid dark tile
+ * instead of a shape. Two catalog-reachable families qualify: the Armory
+ * store thumbnails (painted cards, no alpha) and the display-category
+ * FALLBACK crests (icons.ts recipes composited over an opaque radial). The
+ * other families stay legible under the darken without a carve-out: the
+ * professions sheet, painted `deed_<id>` crests, and the specimen glyph
+ * carry a real alpha matte, and item art (mostly alpha-less) is icon-style,
+ * a bright subject on a near-black card that still reads when darkened.
+ * tests/reliquary_cell_art.test.ts pins the per-family premise off the
+ * shipped WebP headers, so a family flipping reds there instead of silently
+ * landing on the wrong filter.
+ */
+export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
+  if (art.kind === 'url') return art.url.startsWith(`${ARMORY_SKIN_ART_DIR}/`);
+  if (art.kind === 'crest') return art.crestId.startsWith(DEED_CATEGORY_CREST_PREFIX);
+  return false;
 }
 
 /** Profession-sheet art for one lifetime mark. The masterwork family keys off

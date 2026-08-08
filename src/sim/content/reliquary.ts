@@ -447,11 +447,11 @@ export const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = Object.f
  *  take the same corpse_harvest activity hint. Stays private, unlike its
  *  exported sibling above: specimen relics are `kind: 'item'` and resolve
  *  their art through ITEMS, so the cell-art resolver never reads this map. */
-const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = {
+const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = Object.freeze({
   fine_thorium_ore: 'mining',
   fine_elderwood_log: 'logging',
   fine_sunpetal_herb: 'herbalism',
-};
+});
 
 /** Ids carrying a profession hint where the map has one, and the `fallback`
  *  hint (the activity that really awards them) everywhere it deliberately does

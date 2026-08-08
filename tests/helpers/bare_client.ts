@@ -72,6 +72,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.lifetimeXp = 0;
   c.prestigeRank = 0;
   c.restedXp = 0;
+  c.playtimeSeconds = 0;
   c.unlockedMilestones = [];
   c.talents = emptyAllocation();
   c.talentSpec = null;

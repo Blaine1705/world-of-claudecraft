@@ -144,6 +144,11 @@ export function defaultIconPrewarmPlan(
   const priorityCount = entries.length;
   for (const id of Object.keys(ITEMS)) push({ kind: 'item', id });
   for (const id of Object.keys(ABILITIES)) push({ kind: 'ability', id });
+  // 'crest' is deliberately absent: the deed and reliquary title shelves
+  // composite at most a handful of distinct deed_cat_* recipes on first
+  // paint, urlCache makes every later rebuild free, and the Book of Deeds
+  // has always paid that first-paint cost. Revisit if the per-shelf distinct
+  // crest set ever grows past a handful.
   return { entries, priorityCount };
 }
 

@@ -46,6 +46,7 @@ import {
   RELIQUARY_SPECIMEN_GLYPH_URL,
   type ReliquaryArtSlot,
   reliquaryCellArt,
+  reliquaryCellArtOpaque,
 } from '../src/ui/reliquary_cell_art';
 import { ReliquaryWindow, type ReliquaryWindowDeps } from '../src/ui/reliquary_window';
 import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
@@ -304,6 +305,12 @@ describe('unknown ids fall through to the caller fallback', () => {
       { kind: 'mark', id: 'not_a_real_mark' },
       { kind: 'mark', id: 'masterwork:notacraft' },
       { kind: 'mark', id: 'gather_event:nosuchflavor' },
+      // Path-traversal shapes: the Set/allowlist membership gates are what
+      // keep a wire-supplied id from minting a filesystem-shaped URL; these
+      // arms document that intent, not just the typo case above.
+      { kind: 'mark', id: 'masterwork:../../x' },
+      { kind: 'weapon_skin', id: '../../../etc/passwd' },
+      { kind: 'title', id: '../prog_veteran' },
     ];
     for (const slot of junk) {
       expect(reliquaryCellArt(slot), `${slot.kind}:${slot.id}`).toBeNull();
@@ -321,6 +328,39 @@ describe('unknown ids fall through to the caller fallback', () => {
       expect(reliquaryCellArt({ kind: 'mark', id }), id).toBeNull();
       expect(reliquaryCellArt({ kind: 'mount', id }), id).toBeNull();
     }
+  });
+
+  it('flags exactly the two self-backgrounded families as opaque (literal arms)', () => {
+    // The carve-out premise at the DESCRIPTOR level: Armory cards and the
+    // display-category fallback crests paint their own background; every
+    // other family carries an alpha matte (byte-pinned by the shipped-art
+    // sweep below). Literals, not a second resolver call, per the file rule.
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: '/ui/store/armory/brasscap_axe.webp' })).toBe(
+      true,
+    );
+    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_cat_pvp' })).toBe(true);
+    expect(
+      reliquaryCellArtOpaque({ kind: 'url', url: '/ui/professions/masterwork_seal.webp' }),
+    ).toBe(false);
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
+    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_prog_veteran' })).toBe(false);
+    expect(reliquaryCellArtOpaque({ kind: 'item', itemId: 'reins_valorsteed' })).toBe(false);
+  });
+
+  it('agrees with the resolver on real catalog slots (both directions)', () => {
+    const skin = reliquaryCellArt({ kind: 'weapon_skin', id: 'brasscap_axe' });
+    expect(skin !== null && reliquaryCellArtOpaque(skin)).toBe(true);
+    // DERIVED like the crest-pending arm: whichever title still paints the
+    // category fallback today must flag opaque; a painted one must not.
+    const pendingTitle = RELIQUARY_HORIZON_TITLES.find((id) => deedImageUrl(`deed_${id}`) === null);
+    expect(pendingTitle, 'premise: a category-crest title still exists').toBeDefined();
+    const fallback = reliquaryCellArt({ kind: 'title', id: pendingTitle as string });
+    expect(fallback !== null && reliquaryCellArtOpaque(fallback)).toBe(true);
+    const painted = reliquaryCellArt({ kind: 'title', id: 'prog_veteran' });
+    expect(painted).toEqual({ kind: 'crest', crestId: 'deed_prog_veteran' });
+    expect(painted !== null && reliquaryCellArtOpaque(painted)).toBe(false);
+    const mount = reliquaryCellArt({ kind: 'mount', id: 'valorsteed' });
+    expect(mount !== null && reliquaryCellArtOpaque(mount)).toBe(false);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {
@@ -354,6 +394,49 @@ describe('shipped art files', () => {
     // a resolver that stopped emitting URLs could not pass by emitting none.
     expect([...families].sort()).toEqual(['/ui/professions', '/ui/store/armory']);
     expect(missing, `art URLs with no committed file:\n${missing.join('\n')}`).toEqual([]);
+  });
+
+  it('pins the opacity premise per family off the shipped WebP headers', () => {
+    // The premise under reliquaryCellArtOpaque: the silhouette filter needs
+    // either a real alpha matte (professions sheet, painted deed crests) or
+    // dark-backgrounded icon-style art (the item family: 643 of its 698
+    // webps ship without alpha, but the bright subject on a near-black card
+    // still reads under brightness(0.18), verified on pixels in the Phase 16
+    // QA). What it cannot work on is BRIGHT self-backgrounded art: the
+    // Armory cards (pinned opaque here, all of them) and the procedural
+    // deed_cat_* composites (opaque by construction in icons.ts BACKGROUNDS,
+    // no file to read). A professions or painted-crest file losing its matte,
+    // or an Armory card gaining one, must consciously re-pin here AND
+    // revisit the predicate instead of silently landing on the wrong filter.
+    const hasAlpha = (file: string): boolean => {
+      const buf = readFileSync(file);
+      expect(buf.toString('ascii', 0, 4), file).toBe('RIFF');
+      const tag = buf.toString('ascii', 12, 16);
+      if (tag === 'VP8X') return (buf.readUInt8(20) & 0x10) !== 0;
+      if (tag === 'VP8L') return (buf.readUInt32LE(24) & 0x08) !== 0;
+      return false;
+    };
+    const staticCrestUrl = (crestId: string): string | null => {
+      const url = deedImageUrl(crestId);
+      return url !== null && url.startsWith('/') && url.endsWith('.webp') ? url : null;
+    };
+    const families = new Set<string>();
+    for (const slot of CATALOG_SLOTS) {
+      const art = reliquaryCellArt(slot);
+      if (art === null || art.kind === 'item') continue;
+      const url =
+        art.kind === 'url' && art.url.startsWith('/') && art.url.endsWith('.webp')
+          ? art.url
+          : art.kind === 'crest'
+            ? staticCrestUrl(art.crestId)
+            : null;
+      if (url === null) continue;
+      families.add(url.slice(0, url.lastIndexOf('/')));
+      const expectAlpha = !url.startsWith('/ui/store/armory/');
+      expect(hasAlpha(join(REPO_ROOT, 'public', url.slice(1))), url).toBe(expectAlpha);
+    }
+    // Anti-vacuity: all three file-backed non-item families really swept.
+    expect([...families].sort()).toEqual(['/ui/deeds', '/ui/professions', '/ui/store/armory']);
   });
 
   it('backs the item and crest families with committed files too', () => {
@@ -524,17 +607,15 @@ describe('ReliquaryWindow cell markup', () => {
     expect(rig.el.querySelectorAll('.reliquary-cell .reliquary-cell-art img').length).toBe(cells);
   });
 
-  it('paints a weapon-skin cell in the exact shape the missing-state carve-out targets', () => {
+  it('paints opaque-art cells in the exact shape the missing-state carve-out targets', () => {
     // Joins the CSS declaration pin (reliquary_window.test.ts) to real cell
     // output BY CONSTRUCTION: the selector is read out of the live stylesheet,
     // so renaming it in CSS while updating only the declaration pin cannot
-    // leave this arm green against a stale literal. The opaque Armory card
-    // renders as a black tile whenever this match breaks.
+    // leave this arm green against a stale literal. An opaque Armory card or
+    // category-fallback crest renders as a black tile whenever this breaks.
     const componentsCss = readFileSync(join(REPO_ROOT, 'src/styles/components.css'), 'utf8');
-    const selectorMatch = componentsCss.match(
-      /^\s*(\.[^{}]*data-cell-kind[^{}]*weapon_skin[^{}]*)\{/m,
-    );
-    if (!selectorMatch) throw new Error('contract: the skin missing-state carve-out rule exists');
+    const selectorMatch = componentsCss.match(/^\s*(\.[^{}]*data-cell-art[^{}]*opaque[^{}]*)\{/m);
+    if (!selectorMatch) throw new Error('contract: the opaque-art carve-out rule exists');
     const liveSelector = selectorMatch[1].trim();
     expect(liveSelector).toContain('.reliquary-cell--missing');
     const rig = makeRig();
@@ -545,6 +626,16 @@ describe('ReliquaryWindow cell markup', () => {
     // guildmark uncommon); deleting that arm paints q-common and reds here.
     expect(img.getAttribute('class')).toBe('item-icon q-uncommon');
     expect(img.matches(liveSelector)).toBe(true);
+    // The one attribute reaches BOTH opaque families: a category-fallback
+    // title crest matches the same live selector, a painted crest and a mount
+    // reins cell stay on the silhouette treatment.
+    openPage(rig, 'horizons', 'horizons_titles');
+    const pendingTitle = RELIQUARY_HORIZON_TITLES.find((id) => deedImageUrl(`deed_${id}`) === null);
+    expect(pendingTitle, 'premise: a category-crest title still exists').toBeDefined();
+    expect(cellArt(rig, pendingTitle as string).matches(liveSelector)).toBe(true);
+    expect(cellArt(rig, 'prog_veteran').matches(liveSelector)).toBe(false);
+    openPage(rig, 'horizons', 'horizons_mounts');
+    expect(cellArt(rig, 'valorsteed').matches(liveSelector)).toBe(false);
   });
 
   it('shares the resolver with the Overview recent strip', () => {

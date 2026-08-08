@@ -1077,14 +1077,21 @@ describe('styles and architecture registration', () => {
     expect(reliquaryCss).toContain('.reliquary-grid');
     expect(reliquaryCss).toContain('.reliquary-cell--missing');
     expect(reliquaryCss).toContain('.reliquary-cell--owned');
-    // Phase 16: missing weapon-skin cells silhouette their OPAQUE Armory card
-    // with grayscale plus a gentler darken (the item treatment reads as a
-    // black tile on card art). Declaration-level pin so an emptied block reds.
-    expect(reliquaryCss).toContain(
-      '.reliquary-cell--missing[data-cell-kind="weapon_skin"] .item-icon',
-    );
+    // Phase 16 (+QA round): missing cells with OPAQUE art (Armory cards,
+    // category-fallback crests) silhouette with grayscale plus a gentler
+    // darken (the item treatment reads as a black tile on self-backgrounded
+    // art). Keyed on the resolver-stamped data-cell-art attribute, never a
+    // kind literal. Declaration-level pin so an emptied block reds; the
+    // markup join lives in reliquary_cell_art.test.ts and reads THIS selector
+    // out of the live stylesheet.
+    expect(reliquaryCss).toContain('.reliquary-cell--missing[data-cell-art="opaque"] .item-icon');
     expect(reliquaryCss).toMatch(
-      /\.reliquary-cell--missing\[data-cell-kind="weapon_skin"\] \.item-icon \{\s*filter: grayscale\(1\)/,
+      /\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: grayscale\(1\)/,
+    );
+    // Forced-colors arm: the silhouette filters drop (information rides the
+    // cell border, opacity, and aria label), so a locked relic stays legible.
+    expect(reliquaryCss).toMatch(
+      /@media \(forced-colors: active\) \{\s*\.reliquary-cell--missing \.item-icon,/,
     );
     // Phase 6 seal chrome (cosmetic ranks).
     expect(reliquaryCss).toContain('.reliquary-rank-seal');

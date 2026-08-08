@@ -578,8 +578,12 @@ same file), and each module's header carries its own contract.
   through its reins ItemDef, a skin through the Armory thumbnail, a title through
   `deedCrestId`, a mark through the profession sheet) instead of the procedural unknown-item
   ghost. Null means "this bundle cannot place the id" and the window keeps its stale-client
-  fallback; any art the window paints from a descriptor still lands in the shared
-  `itemIconImgHtml` shape, because `.item-icon` is what the cell CSS sizes and silhouettes.
+  fallback; any art the window paints from a descriptor lands in the one
+  `<img class="item-icon q-*">` shape (the URL and crest arms via `itemIconImgHtml`, the item
+  arm via the shared `itemIcon` painter), because `.item-icon` is what the cell CSS sizes and
+  silhouettes. Cells whose art paints its own background (Armory cards, category-fallback
+  crests) get `data-cell-art="opaque"` stamped from `reliquaryCellArtOpaque`, which is what
+  the missing-state grayscale carve-out keys on instead of a kind literal.
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.
