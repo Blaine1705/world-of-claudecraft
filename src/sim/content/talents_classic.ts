@@ -332,11 +332,15 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A curse-weaver who turns enemy and allied actions into Condemnation.',
     'evil_eye',
     'Sentence',
-    'Increases Needle of Fate and Sentence damage by 10%.',
+    'Increases Needle of Fate, Sentence, and Litany of Guilt damage by 10%.',
     {
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.1 },
         { ability: 'sentence', dmgPct: 0.1 },
+        // The viability pass authored Litany's 5/9/14 expecting the mastery on
+        // top (tests/warlock_viability_fixes.test.ts pins 6/10/15 resolved);
+        // the wiring was missed when the ability landed.
+        { ability: 'litany_of_guilt', dmgPct: 0.1 },
       ],
     },
   ),

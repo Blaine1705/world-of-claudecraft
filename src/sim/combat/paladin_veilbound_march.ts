@@ -124,7 +124,10 @@ export function updateVeilboundMarchMovement(ctx: SimContext, caster: Entity): v
       sourceId: caster.id,
       school: 'holy',
     });
-    ctx.enterCombat(caster, target);
+    // Marking is a ghost-walk touch, not an attack: it must NOT flip an idle
+    // mob into chase (owner ruling 2026-08-08). Combat entry comes from the
+    // mark's own damage ticks through the normal damage path, so a marked mob
+    // that never takes a tick stays where it stands.
     if ((active.value3 ?? 0) === 0) {
       active.value3 = 1;
       grantAbilityDevotion(caster, 1);

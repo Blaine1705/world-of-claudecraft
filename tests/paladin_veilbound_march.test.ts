@@ -35,7 +35,10 @@ function targetAt(sim: TestSim, x: number, z: number): Entity {
   mob.hp = mob.maxHp;
   mob.hostile = true;
   mob.aiState = 'idle';
-  mob.auras.push(aura('test_pin', 'root', mob.id, 60));
+  // Unbreakable: the Veil Mark's own damage ticks would break an ordinary
+  // root (classic break-on-damage) and let the aggroed mob close the gap,
+  // which is exactly the drift the distance assertions must not see.
+  mob.auras.push({ ...aura('test_pin', 'root', mob.id, 60), unbreakableControl: true });
   sim.addEntity(mob);
   return mob;
 }
@@ -57,6 +60,14 @@ function walkInto(sim: TestSim, targets: Entity[]): void {
   sim.moveInput.forward = true;
   for (let tick = 0; tick < 4; tick++) sim.tick();
   sim.moveInput.forward = false;
+  // Movement intent decays over a grace window instead of stopping on the tick
+  // input clears (the black-holed-drop resume), so settle until the player
+  // actually stands still before callers measure or reposition against them.
+  for (let tick = 0; tick < 40; tick++) {
+    const { x, z } = sim.player.pos;
+    sim.tick();
+    if (sim.player.pos.x === x && sim.player.pos.z === z) break;
+  }
   for (const target of targets) {
     expect(target.auras).toContainEqual(
       expect.objectContaining({ id: 'veilbound_mark', sourceId: sim.playerId, kind: 'dot' }),
@@ -233,7 +244,9 @@ describe('Veilbound March', () => {
     expect(finalHits).toEqual([
       expect.objectContaining({ targetId: inside.id, amount: 36, school: 'holy' }),
     ]);
-    expect(sim.player.paladinDevotion?.value).toBe(2);
+    // "No extra Devotion": the march's single traversal grant is the only
+    // Devotion in the window (no cast-time or final-wave row in DEVOTION_GAIN).
+    expect(sim.player.paladinDevotion?.value).toBe(1);
     expect(sim.player.auras.some((active) => active.id === 'veilbound_march')).toBe(false);
     expect(moveSpeedMult(sim.player)).toBe(1);
     expect(sim.player.stats.armor).toBe(Math.round(baseArmor));
