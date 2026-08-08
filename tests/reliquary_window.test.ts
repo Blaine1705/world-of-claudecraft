@@ -1097,12 +1097,21 @@ describe('styles and architecture registration', () => {
     // specificity rung above the plain missing rule, so without an
     // equal-specificity reset inside the media block the opaque cells would
     // keep grayscale in forced-colors mode).
+    // One regex binds BOTH selectors to the declaration (dropping either
+    // selector, or the declaration, reds; the plain-missing arm is the
+    // larger population: every non-opaque cell). The block is then sliced
+    // to its own closing brace so hoisting the rules OUT of the media query
+    // (leaving it empty) cannot keep these green.
     expect(reliquaryCss).toMatch(
-      /@media \(forced-colors: active\) \{[^@]*?\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: none;/,
+      /@media \(forced-colors: active\) \{\s*\.reliquary-cell--missing \.item-icon,\s*\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: none;/,
     );
-    expect(reliquaryCss).toMatch(
-      /@media \(forced-colors: active\) \{[^@]*?\.reliquary-cell--missing \{\s*border-style: dashed;/,
-    );
+    const fcStart = reliquaryCss.indexOf('@media (forced-colors: active) {');
+    expect(fcStart).toBeGreaterThanOrEqual(0);
+    const fcEnd = reliquaryCss.indexOf('\n  }', fcStart);
+    expect(fcEnd).toBeGreaterThan(fcStart);
+    const fcBlock = reliquaryCss.slice(fcStart, fcEnd + 4);
+    expect(fcBlock).toContain('filter: none;');
+    expect(fcBlock).toMatch(/\.reliquary-cell--missing \{\s*border-style: dashed;/);
     // Phase 6 seal chrome (cosmetic ranks).
     expect(reliquaryCss).toContain('.reliquary-rank-seal');
     expect(reliquaryCss).toContain('data-seal="apprentice"');

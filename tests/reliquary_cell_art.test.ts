@@ -356,8 +356,20 @@ describe('unknown ids fall through to the caller fallback', () => {
     // The crest arm keys on PAINTED-ART MEMBERSHIP, not the deed_cat_ prefix:
     // any crest the compositor must paint procedurally (a category fallback,
     // a bespoke crest whose commissioned art has not landed, an unknown id)
-    // is an opaque tile by construction.
+    // is an opaque tile by construction. The bespoke-pending shape is pinned
+    // synthetically because its live population is empty today (all 21
+    // DEED_BESPOKE_CRESTS ids ship committed art): a deed_<id> crest absent
+    // from DEED_IMAGE_IDS must ride the carve-out, which is exactly the case
+    // the retired prefix test answered wrongly.
     expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_category_thing' })).toBe(true);
+    expect(
+      reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_some_future_bespoke_pending' }),
+    ).toBe(true);
+    // A crest id with no deed_ prefix at all (class/talent crests) is
+    // unreachable from the catalog (reliquaryCellArt only mints crest ids
+    // via deedCrestId) but pinned so the answer is named: procedural, so
+    // opaque if it ever arrived.
+    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'class_warrior' })).toBe(true);
   });
 
   it('agrees with the resolver on real catalog slots (both directions)', () => {
@@ -403,16 +415,23 @@ describe('unknown ids fall through to the caller fallback', () => {
     // the FIRST such relic reds here and must extend the predicate rather
     // than land silently on the wrong filter.
     const procedural: string[] = [];
-    let items = 0;
+    let itemsWebp = 0;
+    let weaponsJpg = 0;
     for (const slot of CATALOG_SLOTS) {
       const art = reliquaryCellArt(slot);
       if (art === null || art.kind !== 'item') continue;
-      items += 1;
-      if (itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null) {
-        procedural.push(art.itemId);
-      }
+      if (itemImageUrl(art.itemId) !== null) itemsWebp += 1;
+      else if (weaponIconUrl(art.itemId) !== null) weaponsJpg += 1;
+      else procedural.push(art.itemId);
     }
-    expect(items, 'anti-vacuity: the item shelves really contributed').toBeGreaterThan(100);
+    // Per-pipeline floors, so the "both committed pipelines" claim cannot go
+    // vacuous if one family empties out of the catalog.
+    expect(itemsWebp, 'anti-vacuity: the items-webp pipeline really contributed').toBeGreaterThan(
+      50,
+    );
+    expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
+      10,
+    );
     expect(
       procedural,
       `catalogued item relics with only procedural art (extend reliquaryCellArtOpaque):\n${procedural.join('\n')}`,
@@ -569,7 +588,11 @@ function makeRig(seed: { recent?: string[]; marks?: string[] } = {}): ArtRig {
 }
 
 /** Open the window and navigate to one page, the way a player clicks in. */
-function openPage(rig: ArtRig, nav: 'horizons' | 'professions', pageId: string): void {
+function openPage(
+  rig: ArtRig,
+  nav: 'conquerors' | 'horizons' | 'professions',
+  pageId: string,
+): void {
   rig.window.open(nav);
   const row = rig.el.querySelector<HTMLElement>(`[data-page="${pageId}"]`);
   if (!row) throw new Error(`contract: the ${nav} shelf lists ${pageId}`);
@@ -721,5 +744,20 @@ describe('ReliquaryWindow cell markup', () => {
     // The same slot on its shelf paints byte-identical art (one resolver).
     openPage(rig, 'professions', 'professions_masterwork');
     expect(cellArt(rig, 'masterwork:first').outerHTML).toBe(chip.outerHTML);
+  });
+
+  it('shares the resolver with the strip for an ITEM find too', () => {
+    // The strip's other reachable kind: an item chip routes through
+    // deps.itemIcon exactly like the grid's item arm (and unlike the mark
+    // arm's itemIconImgHtml), so the join is worth pinning per kind. The
+    // grid passes its pre-resolved descriptor into cellIconHtml while the
+    // strip omits the argument; byte-identity here is what proves the
+    // default-parameter path cannot desync the two.
+    const rig = makeRig({ recent: ['cryptbone_helm'] });
+    rig.window.open('overview');
+    const chip = rig.el.querySelector<HTMLImageElement>('.reliquary-recent-icon img');
+    if (!chip) throw new Error('contract: a recent item find paints its art in the chip');
+    openPage(rig, 'conquerors', 'conquerors_hollow_crypt');
+    expect(cellArt(rig, 'cryptbone_helm').outerHTML).toBe(chip.outerHTML);
   });
 });
