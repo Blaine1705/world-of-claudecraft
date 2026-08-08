@@ -44,7 +44,11 @@ import { formatMoney } from './format_money';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
-import { consumeNewestInventoryUnit, consumeSelectedInventorySlot } from './item_copy_ref';
+import {
+  consumeNewestInventoryUnit,
+  consumeSelectedInventorySlot,
+  selectedInventorySlot,
+} from './item_copy_ref';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { mountOwned, summonMountItem } from './mounts';
@@ -421,6 +425,18 @@ export function equipItem(
   if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
     return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
+  // Validate the selection BEFORE anything mutates. The displaced-hand branch below
+  // deletes the other hand's equipment entry, and the consume that could refuse sits
+  // further down, so refusing late destroyed the displaced piece outright: neither
+  // worn nor in bags, with its stats still applied because recalc never ran. Resolve
+  // without consuming here, and refuse before the first write.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
   if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
     ctx.error(meta.entityId, 'That does not go in that slot.');
     return;
@@ -511,7 +527,13 @@ export function equipItem(
   let consumed: InventoryUnit;
   if (slotIndex !== undefined) {
     const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
-    if (!taken) return;
+    // Unreachable in practice: the early gate above refuses an invalid selection
+    // before any mutation. Kept as a belt, and audible so it can never become a
+    // silent no-op if the gate is ever moved.
+    if (!taken) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
     consumed = taken;
   } else {
     consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
@@ -664,6 +686,17 @@ export function useItem(
   };
   if (!def) return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  // Validate the selection BEFORE any effect. Every use arm applied its heal, aura,
+  // cooldown or sit and only then consumed, so a refused selection granted the
+  // effect for free, repeatably. The aggregate countItem check above cannot catch
+  // it: the player really does hold the item, they just named a slot that is not it.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
@@ -845,9 +878,12 @@ export function useItem(
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
-    equipItem(ctx, itemId, meta.entityId);
+    // Forward the selection: click-to-equip routes through 'use', so this is the
+    // most common equip gesture in the game. Dropping it here left that gesture
+    // guessing while the aimed paperdoll path was precise.
+    equipItem(ctx, itemId, meta.entityId, undefined, slotIndex);
   } else if (def.kind === 'bag') {
-    equipBagCmd(ctx, itemId, undefined, meta.entityId);
+    equipBagCmd(ctx, itemId, undefined, meta.entityId, slotIndex);
   } else if (def.kind === 'mount') {
     // Reins work like any other usable item: clicking them (bags or an action-bar
     // slot) summons THAT mount. summonMountItem owns every gate, riding skill
@@ -1143,8 +1179,11 @@ export function sellItem(
   // the laundering hole the clamp exists to close.
   let consumedUnits: InventoryUnit[];
   if (sellableCount === 1 && slotIndex !== undefined) {
+    // Match the id BEFORE reading boundTo. Reading the raw slot first meant naming
+    // a slot that holds a different, bound item reported "bound" rather than
+    // "don't have that item", which is a misleading refusal.
     const named = meta.inventory[slotIndex];
-    if (named?.instance?.boundTo !== undefined) {
+    if (named?.itemId === itemId && named.instance?.boundTo !== undefined) {
       ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
       return;
     }

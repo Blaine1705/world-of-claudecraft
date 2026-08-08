@@ -215,21 +215,16 @@ export function evaluateSalvageAdmission(
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
-  // Refuse a selection that does not name a held copy, BEFORE the cast starts,
-  // so a stale frame is denied rather than silently falling back to a guess.
-  // Checked on a scratch copy: an admission denial must have no side effect.
-  const admissionMeta = ctx.players.get(pid);
-  if (admissionMeta && slotIndex !== undefined) {
-    const scratch = admissionMeta.inventory.map((slot) => ({ ...slot }));
-    if (consumeSelectedInventorySlot(scratch, itemId, slotIndex) === null) {
-      return { ok: false, itemId, reason: 'not_held' };
-    }
-  }
   const meta = ctx.players.get(pid);
   if (!meta) return null;
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const scratch = meta.inventory.map((s) => ({ ...s }));
-  const victim = consumeOneScratch(scratch, itemId);
+  // Predict the SELECTED victim, not the legacy one. A rift copy pays essence and a
+  // plain copy pays material, so modelling the wrong victim let a cast start that
+  // could only refuse at completion (the two payouts fit differently).
+  const selected = consumeSelectedInventorySlot(scratch, itemId, slotIndex);
+  if (selected === null) return { ok: false, itemId, reason: 'not_held' };
+  const victim = selected === undefined ? consumeOneScratch(scratch, itemId) : selected.instance;
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
   if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
@@ -260,9 +255,10 @@ function beginSalvageCast(
   p.castTargetId = null;
   p.channeling = false;
   p.enchantCastItemId = itemId;
-  // -1 means "no selection", matching the enchanting session convention, so an
-  // id-only salvage keeps its legacy behavior on completion.
-  p.enchantCastBagSlot = slotIndex === undefined ? -1 : slotIndex;
+  // Stored 1-based (slotIndex + 1, 0 = not pin-selected), mirroring the enchant
+  // family verbatim: the resting value must be 0 so the parity sampler's
+  // default-omission drops it. A -1 rest value re-hashes every golden.
+  p.enchantCastBagSlot = slotIndex === undefined ? 0 : slotIndex + 1;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
@@ -314,7 +310,7 @@ export function completeSalvageCast(ctx: SimContext, p: Entity, meta: PlayerMeta
   p.enchantCastTargetPin = '';
   // Empty session: silent no-op (completeRechargeCast precedent).
   if (itemId === '') return;
-  const slotIndex = sessionBagSlot < 0 ? undefined : sessionBagSlot;
+  const slotIndex = sessionBagSlot <= 0 ? undefined : sessionBagSlot - 1;
   // Pin re-check, mirroring the enchant family: the bag can move during the
   // cast (a loot, a sort, a stack merge), and an index alone would then point at
   // whatever slid into that slot. Refusing is the only safe answer, because the

@@ -80,6 +80,14 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     why: 'acquires a copy from vendor stock rather than acting on one the player holds',
   },
   {
+    cmd: 'mail_send',
+    why: 'names the copy by PAYLOAD rather than bag index: it ships full InvSlots and post_office resolves each against the sender bags with removeMatchingInstance, the market_list_instance shape',
+  },
+  {
+    cmd: 'trade_offer',
+    why: 'ships full InvSlots so the payload is on the wire, but the consume still uses the phase 12 sellerSignedCharmDeprioritize heuristic rather than matching that payload. Exempted as a KNOWN remaining gap rather than left invisible: converting the trade offer is follow-up work, and this entry is what keeps it from being forgotten',
+  },
+  {
     cmd: 'sell_all_junk',
     why: 'operates over the whole junk set by definition, so no single copy is named',
   },
@@ -126,6 +134,15 @@ describe('every item command can name the copy it acts on', () => {
     expect(arm, `${cmd} must parse msg.${field} in its OWN dispatch arm`).toContain(
       `Number.isInteger(msg.${field})`,
     );
+    // Parsing is half of it. An arm that reads the field and then calls the sim
+    // without it drops the selection at the authority boundary, which is
+    // indistinguishable from never having sent it. Require the parsed local to
+    // reach a sim call in the same arm.
+    const local = field === 'bagSlot' ? 'bag' : 'slot';
+    const simCall = arm.slice(arm.indexOf('sim.'));
+    expect(simCall, `${cmd} must FORWARD the parsed ${local} to the sim call`).toMatch(
+      new RegExp(`\\b${local}\\b`),
+    );
   });
 
   it('exempts only commands with a written reason, and no command is in both lists', () => {
@@ -146,7 +163,10 @@ describe('every item command can name the copy it acts on', () => {
     // command. Anything that sends an `item` field is acting on an item and must
     // appear in exactly one of the two tables above.
     const sending = new Set<string>();
-    const re = /cmd: '([a-z_]+)'[^}]*\bitem\b/g;
+    // `items?` on purpose: the first version matched only a literal `item` field,
+    // so trade_offer and mail_send (both of which ship items, as an `items` array)
+    // escaped classification entirely.
+    const re = /cmd: '([a-z_]+)'[^}]*\bitems?\b/g;
     for (const m of ONLINE.matchAll(re)) sending.add(m[1]);
 
     // Not vacuous: the sweep really does find the family.

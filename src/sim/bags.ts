@@ -421,8 +421,12 @@ export function equipBag(
   // A named slot consumes exactly that copy; an id-only call keeps the legacy
   // newest-first walk (ctx.removeItem) untouched.
   if (slotIndex !== undefined) {
-    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) return;
-    ctx.onInventoryChangedForQuests?.(meta);
+    // No onInventoryChangedForQuests here: the shared call below already fires for
+    // both arms, and running it twice re-evaluated collect objectives on one equip.
+    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
   } else {
     ctx.removeItem(itemId, 1, meta.entityId);
   }

@@ -36,12 +36,16 @@ import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './ty
  *  order. Moved verbatim from professions/enchanting.ts. */
 function sortedJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(sortedJson).join(',')}]`;
-  if (value && typeof value === 'object') {
+  if (value !== null && typeof value === 'object') {
     const record = value as Record<string, unknown>;
-    const keys = Object.keys(record).sort();
+    // An explicit undefined fingerprints like an ABSENT key (JSON.stringify
+    // drops both), so clearing a field by assignment can never flip the pin.
+    const keys = Object.keys(record)
+      .filter((k) => record[k] !== undefined)
+      .sort();
     return `{${keys.map((k) => `${JSON.stringify(k)}:${sortedJson(record[k])}`).join(',')}}`;
   }
-  return JSON.stringify(value ?? null);
+  return JSON.stringify(value) ?? 'null';
 }
 
 /** Identity of the COPY sitting in a bag slot, for re-checking a selection that

@@ -55,6 +55,34 @@ describe('itemCopyPin', () => {
     );
   });
 
+  it('fingerprints an explicit undefined like an ABSENT key', () => {
+    // The property the move originally carried and this PR first dropped: JSON
+    // drops both forms, so clearing a field by assignment must not flip the pin.
+    // It matters more once pins persist in JSONB, where a round trip erases
+    // undefined-valued keys (the loadout gear sets in the stacked PR).
+    const cleared: InvSlot = {
+      itemId: 'girdle',
+      count: 1,
+      instance: { enchantId: 'power', boundTo: undefined } as never,
+    };
+    const absent: InvSlot = {
+      itemId: 'girdle',
+      count: 1,
+      instance: { enchantId: 'power' } as never,
+    };
+    expect(itemCopyPin(cleared)).toBe(itemCopyPin(absent));
+  });
+
+  it('survives a JSON round trip, which is what persistence does to a payload', () => {
+    const slot: InvSlot = {
+      itemId: 'girdle',
+      count: 1,
+      instance: { enchantId: 'power', rolled: { stats: { str: 3 } } } as never,
+    };
+    const roundTripped = JSON.parse(JSON.stringify(slot)) as InvSlot;
+    expect(itemCopyPin(roundTripped)).toBe(itemCopyPin(slot));
+  });
+
   it('pins nothing for no slot', () => {
     expect(itemCopyPin(undefined)).toBe('');
   });
