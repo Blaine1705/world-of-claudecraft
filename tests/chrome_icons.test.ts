@@ -120,6 +120,7 @@ const SECONDARY_CONTROLS: UiIconName[] = [
   'next',
   'prev',
   'skull',
+  'sort',
   'swap',
   'target',
   'trash',
