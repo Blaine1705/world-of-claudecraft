@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
 
@@ -194,11 +195,9 @@ interface ArcSlot {
   pts: THREE.Vector3[];
 }
 
-export type RibbonAnchor = (
-  id: number,
-  heightFrac: number,
-  out?: THREE.Vector3,
-) => THREE.Vector3 | null;
+// The shared VFX anchor resolver (src/render/vfx_anchor.ts). `out` lets a
+// per-frame path resolve into its own scratch instead of allocating.
+export type RibbonAnchor = VfxAnchorResolver;
 
 // Plain world point (structurally satisfied by THREE.Vector3).
 export interface RibbonPoint {
@@ -231,9 +230,13 @@ export class AbilityVfxRibbons {
   // by add()/genBolt, so style garnish gets its own scratch pair)
   private s1 = new THREE.Vector3();
   private s2 = new THREE.Vector3();
-  private anchorFrom = new THREE.Vector3();
-  private anchorTo = new THREE.Vector3();
   private camPos = new THREE.Vector3();
+  // Per-frame anchor scratch (see ../vfx_anchor.ts): update() resolves a trail's
+  // source or target every frame and genBolt() resolves both ends of a live
+  // bolt. a1/a2 are separate because genBolt holds both readings at once; each
+  // is consumed before the next resolve into it.
+  private a1 = new THREE.Vector3();
+  private a2 = new THREE.Vector3();
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
   private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
   private shadowHeadScratch: THREE.Vector3[] = allocPts(3); // directional fang, reused per trail
@@ -509,7 +512,7 @@ export class AbilityVfxRibbons {
     onArrive: ((x: number, y: number, z: number) => void) | null,
     onTerminate: ((x: number, y: number, z: number) => void) | null,
   ): void {
-    const from = this.anchor(sourceId, 0.62, this.anchorFrom);
+    const from = this.anchor(sourceId, 0.62, this.a1);
     if (!from) return;
     const slot = this.trails.find((t) => !t.active) ?? this.trails[0];
     if (slot.active) this.terminateTrail(slot);
@@ -551,7 +554,7 @@ export class AbilityVfxRibbons {
     slot.seed = Math.random() * Math.PI * 2;
     // life scales with the real flight time (a 7 yd/s orb crossing 30 yd
     // must not evaporate at the legacy 3 s cap)
-    const to = slot.fixedTarget ? slot.fixedTo : this.anchor(targetId, 0.5, this.anchorTo);
+    const to = slot.fixedTarget ? slot.fixedTo : this.anchor(targetId, 0.5, this.a2);
     if (to) {
       this.s1.copy(to).add(slot.aim).sub(from);
       const dist = this.s1.length();
@@ -731,7 +734,7 @@ export class AbilityVfxRibbons {
         // staggered volley follower: ride the caster's hand until launch
         t.delay -= dt;
         t.ttl -= dt;
-        const from = this.anchor(t.sourceId, 0.62, this.anchorFrom);
+        const from = this.anchor(t.sourceId, 0.62, this.a1);
         if (from) {
           t.head.copy(from);
           t.origin.copy(from);
@@ -743,7 +746,7 @@ export class AbilityVfxRibbons {
         continue;
       }
       t.ttl -= dt;
-      const target = t.fixedTarget ? t.fixedTo : this.anchor(t.targetId, 0.5, this.anchorTo);
+      const target = t.fixedTarget ? t.fixedTo : this.anchor(t.targetId, 0.5, this.a1);
       if (!target || t.ttl <= 0) {
         this.terminateTrail(t);
         continue;
@@ -1164,8 +1167,8 @@ export class AbilityVfxRibbons {
 
   // Midpoint displacement into the slot's preallocated points (no branches).
   private genBolt(b: BoltSlot): void {
-    const from = b.fixed ? b.fromP : this.anchor(b.sourceId, 0.62, this.anchorFrom);
-    const to = b.fixed ? b.toP : this.anchor(b.targetId, 0.5, this.anchorTo);
+    const from = b.fixed ? b.fromP : this.anchor(b.sourceId, 0.62, this.a1);
+    const to = b.fixed ? b.toP : this.anchor(b.targetId, 0.5, this.a2);
     if (!from || !to) {
       b.count = 0;
       return;
@@ -1265,10 +1268,31 @@ export class AbilityVfxRibbons {
       return;
     }
     this.wasEmpty = false;
-    (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aCol as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.uv as THREE.BufferAttribute).needsUpdate = true;
-    if (this.geo.index) this.geo.index.needsUpdate = true;
+    // Upload only the prefix this frame actually wrote (the pooled cloud's
+    // idiom, ../vfx.ts packRenderCloud). The buffers are sized for the worst
+    // case (MAX_VERTS is thousands of vertices, ~180 KB across the three
+    // attributes plus the index), while a typical frame draws a handful of
+    // strips: without a range every live ribbon frame re-uploaded the whole
+    // set. Everything past the prefix is stale by design and unreachable,
+    // because setDrawRange below stops at this.i. clearUpdateRanges first, so
+    // a range queued on a frame the mesh was never submitted cannot pile up.
+    const posAttr = this.geo.attributes.position as THREE.BufferAttribute;
+    const colAttr = this.geo.attributes.aCol as THREE.BufferAttribute;
+    const uvAttr = this.geo.attributes.uv as THREE.BufferAttribute;
+    posAttr.clearUpdateRanges();
+    posAttr.addUpdateRange(0, this.v * 3);
+    posAttr.needsUpdate = true;
+    colAttr.clearUpdateRanges();
+    colAttr.addUpdateRange(0, this.v * 3);
+    colAttr.needsUpdate = true;
+    uvAttr.clearUpdateRanges();
+    uvAttr.addUpdateRange(0, this.v * 2);
+    uvAttr.needsUpdate = true;
+    if (this.geo.index) {
+      this.geo.index.clearUpdateRanges();
+      this.geo.index.addUpdateRange(0, this.i);
+      this.geo.index.needsUpdate = true;
+    }
     this.geo.setDrawRange(0, this.i);
   }
 }

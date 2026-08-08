@@ -357,6 +357,12 @@ export const zh_TW: EnTranslations = {
       "healerConfirmAccept": "復活",
       "healerConfirmCancel": "取消"
     },
+    "wiki": {
+      "confirmTitle": "開啟維基？",
+      "confirmBody": "將在瀏覽器中開啟 World of ClaudeCraft 維基，遊戲會繼續執行。",
+      "confirmOpen": "開啟維基",
+      "confirmCancel": "取消"
+    },
     "unstuck": {
       "menuButton": "脫困",
       "help": "脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。",
@@ -3378,6 +3384,9 @@ export const zh_TW: EnTranslations = {
       "toZone": "地區地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "需要等級 {level}"
     }
   },
   "gatherEvent": {

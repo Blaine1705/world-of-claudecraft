@@ -357,6 +357,12 @@ export const ru_RU: EnTranslations = {
       "healerConfirmAccept": "Воскресить",
       "healerConfirmCancel": "Отмена"
     },
+    "wiki": {
+      "confirmTitle": "Открыть вики?",
+      "confirmBody": "Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.",
+      "confirmOpen": "Открыть вики",
+      "confirmCancel": "Отмена"
+    },
     "unstuck": {
       "menuButton": "Выбраться",
       "help": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.",
@@ -3378,6 +3384,9 @@ export const ru_RU: EnTranslations = {
       "toZone": "Карта региона",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Требуется уровень {level}"
     }
   },
   "gatherEvent": {

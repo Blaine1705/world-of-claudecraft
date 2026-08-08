@@ -357,6 +357,12 @@ export const es_ES: EnTranslations = {
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Desatascar",
       "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
@@ -3378,6 +3384,9 @@ export const es_ES: EnTranslations = {
       "toZone": "Mapa de la zona",
       "toggleAria": "Alternar entre el mapa del mundo y el mapa de la zona",
       "levels": "Niveles {min} a {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

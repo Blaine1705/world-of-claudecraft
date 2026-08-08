@@ -357,6 +357,12 @@ export const tr_TR: EnTranslations = {
       "healerConfirmAccept": "Beni Canlandır",
       "healerConfirmCancel": "İptal etmek"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Kurtulma",
       "help": "Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.",
@@ -3378,6 +3384,9 @@ export const tr_TR: EnTranslations = {
       "toZone": "Bölge haritası",
       "toggleAria": "Dünya haritası ile bölge haritası arasında geçiş yap",
       "levels": "Seviye {min} ile {max} arası"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

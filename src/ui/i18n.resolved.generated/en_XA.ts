@@ -357,6 +357,12 @@ export const en_XA: EnTranslations = {
       "healerConfirmAccept": "[Ŕéʋíʋé Ɱé]",
       "healerConfirmCancel": "[Çáñçéļ]"
     },
+    "wiki": {
+      "confirmTitle": "[Óþéñ ţĥé Ŵíķí?]",
+      "confirmBody": "[Ţĥíš óþéñš ţĥé Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ŵíķí íñ ýóúŕ ƀŕóŵšéŕ. Ţĥé ĝáɱé ķééþš ŕúññíñĝ.]",
+      "confirmOpen": "[Óþéñ Ŵíķí]",
+      "confirmCancel": "[Çáñçéļ]"
+    },
     "unstuck": {
       "menuButton": "[Úñšţúçķ]",
       "help": "[Ŕéçóʋéŕý: /úñšţúçķ šţáŕţš á šţáţíóñáŕý çóúñţðóŵñ ţó ɱóʋé ýóú ţó á ñéáŕƀý ŕéáçĥáƀļé šáƒé šþóţ.]",
@@ -3378,6 +3384,9 @@ export const en_XA: EnTranslations = {
       "toZone": "[Žóñé ɱáþ]",
       "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ áñð ţĥé žóñé ɱáþ]",
       "levels": "[Ļéʋéļš {min} ţó {max}]"
+    },
+    "arenaGate": {
+      "minLevelNote": "[Ŕéɋúíŕéš ļéʋéļ {level}]"
     }
   },
   "gatherEvent": {

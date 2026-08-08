@@ -77,7 +77,7 @@ function liveWindupHarness() {
     ribbons: { update: vi.fn(), drawHeads: vi.fn() },
     rings: noopUpdate,
     flipbooks: noopUpdate,
-    decals: noopUpdate,
+    decals: { update: vi.fn(), setCameraPosition: vi.fn() },
     pillars: noopUpdate,
     shells: noopUpdate,
     groundAuras: noopUpdate,

@@ -201,6 +201,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。',
   'hudChrome.abilityError.shieldRequired': '盾を装備する必要があります。',
+  'hudChrome.arenaGate.minLevelNote': 'レベル {level} が必要です',
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
@@ -9648,6 +9649,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '静止してからスタック解除を使用してください。',
   'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
   'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': 'Wikiを開きますか？',
+  'hudChrome.wiki.confirmBody':
+    'World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。',
+  'hudChrome.wiki.confirmOpen': 'Wikiを開く',
+  'hudChrome.wiki.confirmCancel': 'キャンセル',
   'guide.abilityHook.revenge':
     '前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。',
   'guide.abilityHook.hamstring': '敵の移動を妨げ、逃走を阻止する。',

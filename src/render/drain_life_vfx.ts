@@ -3,6 +3,7 @@ import {
   AFFLICTION_FAMILIAR_LOCAL_X,
   AFFLICTION_FAMILIAR_LOCAL_Z,
 } from './affliction_familiar_core';
+import type { VfxOffsetAnchorResolver } from './vfx_anchor';
 
 const CHANNEL_POOL_SIZE = 12;
 const DRAIN_CORE = 0xc7ffd1;
@@ -29,13 +30,10 @@ export type DrainLifeParticleSink = (
   gravity: number,
 ) => void;
 
-export type DrainLifeAnchor = (
-  id: number,
-  heightFrac: number,
-  localX?: number,
-  localZ?: number,
-  out?: THREE.Vector3,
-) => THREE.Vector3 | null;
+// The offset-capable anchor resolver (src/render/vfx_anchor.ts owns the
+// contract): the demonic drain and evil-eye channels anchor their source end
+// on the hovering affliction familiar via its caster-local offset.
+export type DrainLifeAnchor = VfxOffsetAnchorResolver;
 
 type DrainChannelKind = 'drain' | 'demonicDrain' | 'evilEyeGaze';
 

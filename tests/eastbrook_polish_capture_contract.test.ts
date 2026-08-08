@@ -78,8 +78,11 @@ interface AttributionTargetFixture {
 // the rendererIntegration leaf (the release's PR #2983 re-land, this branch's
 // creator review pass), so the merged tree mints a value matching neither
 // parent. Captures adopted verbatim; no measured value moved on either side.
+// Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
+// follows the anchor seam, the weapon-skin fade and the census tag. No capture
+// was retaken; every measured value is adopted verbatim.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'febe18a8cd580cec46d7d145278561e48f13409c22c57346008bbe175a8fe7e0';
+  '565b1c0f04c9ed002341f066190c2f5cea0522e05e333b5015b2e472784faf9a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

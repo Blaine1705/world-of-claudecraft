@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "es_ES": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "fr_FR": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "fr_CA": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "de_DE": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "nl_NL": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "pl_PL": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "id_ID": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "tr_TR": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "sv_SE": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "vi_VN": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ],
+  "da_DK": [
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
+  ]
 };

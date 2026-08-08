@@ -357,6 +357,12 @@ export const vi_VN: EnTranslations = {
       "healerConfirmAccept": "Hồi sinh tôi",
       "healerConfirmCancel": "Hủy bỏ"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Thoát Kẹt",
       "help": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.",
@@ -3378,6 +3384,9 @@ export const vi_VN: EnTranslations = {
       "toZone": "Bản Đồ Vùng",
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
       "levels": "Cấp {min} đến {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

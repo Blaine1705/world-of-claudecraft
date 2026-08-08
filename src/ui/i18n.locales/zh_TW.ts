@@ -202,6 +202,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。',
   'hudChrome.abilityError.shieldRequired': '你必須裝備盾牌。',
+  'hudChrome.arenaGate.minLevelNote': '需要等級 {level}',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '關閉 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',
@@ -9206,6 +9207,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '請先停下再使用脫困。',
   'hudChrome.unstuck.busy': '請先完成目前動作再使用脫困。',
   'hudChrome.unstuck.unavailable': '目前狀態下無法使用脫困。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '開啟維基？',
+  'hudChrome.wiki.confirmBody': '將在瀏覽器中開啟 World of ClaudeCraft 維基，遊戲會繼續執行。',
+  'hudChrome.wiki.confirmOpen': '開啟維基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'guide.abilityHook.revenge': '橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。',
   'guide.abilityHook.hamstring': '妨礙敵人的移動，使其無法逃脫。',
   'game.talents.choicesTab': '抉擇',

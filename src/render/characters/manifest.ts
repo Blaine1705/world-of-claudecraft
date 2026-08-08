@@ -302,6 +302,22 @@ const WOLF_BAKED: ClipMap = {
   jump: 'Fall',
 };
 
+// Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
+// 2): greyjaw.glb is a much richer, dedicated 48-node rig (not shared with
+// mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
+// (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
+// blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
+// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
+// form_cat) still plays. WOLF_BAKED itself is untouched: both still read it,
+// and changing the shared base would change player druid/shaman form combat
+// feel, out of scope here. greyjaw already ships and wires BOTH
+// Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
+// hit-variety work is needed here: this override is attack-only.
+const GREYJAW_WOLF: ClipMap = {
+  ...WOLF_BAKED,
+  attack: ['Greyjaw_Attack'],
+};
+
 // Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
 // authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
 // rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
@@ -347,6 +363,17 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// The yeti family's own attack (scripts/build_yeti_anims.mjs, issue #2889
+// round 2): BIPED14's Punch/Weapon attack is shared by reference across 6
+// unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon,
+// mob_demonalt). This "icy roar-and-swipe" clip is baked off yetialt.glb's
+// own donor poses (Weapon's overhead swing blended through the currently
+// unused No clip's head-shake), so only mob_yeti gets it.
+const YETI_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Yeti_Attack'],
+};
+
 // mob_troll's own attack (scripts/build_troll_anims.mjs, issue #2889):
 // BIPED14's Punch/Weapon is shared by reference across 6 unrelated families
 // (a yeti, a frog-murloc, a demon and its alt among them). This clip is baked
@@ -369,6 +396,16 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   death: 'Death',
   cast: 'Cast',
   jump: 'Jump',
+};
+
+// The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
+// #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
+// Wildheart Basin mobs. This clip is baked off wildheart_stalker.glb's own donor poses
+// (a compressed re-timing of its own Attack clip into a spear-throw lunge), so only
+// mob_wildheart_stalker gets it; the other 4 Wildheart mobs are untouched.
+const WILDHEART_STALKER: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_Stalker_Attack'],
 };
 
 // 2023 enemy rig (goblin/giant)
@@ -412,6 +449,21 @@ const FLOATING: ClipMap = {
 const ELEMENTAL_FLOATING: ClipMap = {
   ...FLOATING,
   attack: ['Elemental_Attack'],
+};
+
+// The ghost family's own attack (scripts/build_ghost_anims.mjs, issue #2889):
+// FLOATING's Headbutt/Punch is shared by reference across 8 remaining
+// families after the elemental's migration above (a dragon, the flying demon
+// imp, the Nightbloom nightkin, the mushroom-folk glub among them). This clip
+// is baked off ghost.glb's own donor poses (the same shared rig
+// golelingevolved.glb uses, so the same forward-lunge Punch plus its two
+// unused gesture clips No/Yes), so only mob_ghost gets it; the wisps
+// (mob_glimmerwisp/mob_duskwisp) are unrigged bespoke meshes on a DIFFERENT
+// GLB where FLOATING's clip names simply no-op, and the other FLOATING
+// families stay untouched.
+const GHOST_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Ghost_Attack'],
 };
 
 // The nightkin family's own attack (scripts/build_nightkin_anims.mjs, issue
@@ -929,11 +981,49 @@ export const VISUALS: Record<string, VisualDef> = {
   player_hunter: swims({
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Ranged_Shoot']),
+    clips: {
+      ...kaykit(['2H_Ranged_Shoot']),
+      // Ability-specific attacks (scripts/build_hunter_ability_anims.mjs,
+      // issue #2889): the hunter had zero attackByAbility overrides across
+      // its kit, so every ability played the same crossbow-shoulder shot.
+      // The three melee abilities (range 0) get a bespoke swing each; the
+      // ranged shots split into a quick snap (every instant no-cast-time
+      // shot) versus the slow full draw Long Draw's own 3.0s cast time
+      // names; Volley gets its own rapid-pulse barrage. The three aspect
+      // toggles plus Fevered Draw are self-buffs with no swing to author, so
+      // they point straight at ranger.glb's own already-baked
+      // 'Spellcast_Raise' clip, the same no-bake pattern player_warrior's
+      // sanguine_aura already uses. Not every ability in the kit is listed:
+      // this batch's representative slice (tame_beast/dismiss_pet/revive_pet
+      // are pet-command channels with no combat swing to author, matching
+      // batch 1's own utility/summon exclusions for the mage).
+      attackByAbility: {
+        raptor_strike: 'Hunter_Melee_Gut',
+        mongoose_bite: 'Hunter_Melee_Counter',
+        wing_clip: 'Hunter_Melee_Clip',
+        serpent_sting: 'Hunter_Shot_Snap',
+        arcane_shot: 'Hunter_Shot_Snap',
+        concussive_shot: 'Hunter_Shot_Snap',
+        counter_shot: 'Hunter_Shot_Snap',
+        aimed_shot: 'Hunter_Shot_LongDraw',
+        volley: 'Hunter_Shot_Volley',
+        aspect_of_the_hawk: 'Spellcast_Raise',
+        aspect_of_the_monkey: 'Spellcast_Raise',
+        aspect_of_the_cheetah: 'Spellcast_Raise',
+        rapid_fire: 'Spellcast_Raise',
+      },
+    },
     // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
     // with a bow displayed the shot plays a draw instead of the crossbow
-    // shoulder-aim (visual.ts weaponSkinAttackClips).
-    animUrls: [`${PLAYERS}/bow_anims.glb`, `${PLAYERS}/bow_hold_anim.glb`],
+    // shoulder-aim (visual.ts weaponSkinAttackClips). The cast-time hold pose
+    // (bow_hold_anim.glb) and the ability-specific attack clips
+    // (scripts/build_hunter_ability_anims.mjs) ride the same mesh-free donor
+    // GLB mechanism, appended alongside: all three GLBs' clips load together.
+    animUrls: [
+      `${PLAYERS}/bow_anims.glb`,
+      `${PLAYERS}/bow_hold_anim.glb`,
+      `${PLAYERS}/hunter_ability_anims.glb`,
+    ],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -1427,7 +1517,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // rare ~2.75 in-world vs the 1.6 pack wolf).
     url: `${CREATURES}/greyjaw.glb`,
     height: 2.2,
-    clips: WOLF_BAKED,
+    clips: GREYJAW_WOLF,
+    // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
+    // baked off this same rig's own poses (a howl-then-pounce, distinct from
+    // the plain Attack every other WOLF_BAKED user still plays).
+    animUrls: [`${CREATURES}/greyjaw_ability_anims.glb`],
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
@@ -1560,7 +1654,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_yeti: {
     url: `${CREATURES}/yetialt.glb`,
     height: 2.5,
-    clips: BIPED14,
+    clips: YETI_BIPED14,
+    // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
@@ -1629,7 +1726,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/wildheart_stalker.glb`,
     height: 2.5,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_STALKER,
+    // Wildheart_Stalker_Attack clip donor (scripts/build_wildheart_stalker_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/wildheart_stalker_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
@@ -1920,7 +2020,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/ghost.glb`,
     height: 1.6,
     hover: 0.4,
-    clips: FLOATING,
+    clips: GHOST_FLOATING,
+    // Ghost_Attack clip donor (scripts/build_ghost_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/ghost_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },

@@ -438,6 +438,8 @@ const RENDER_PURE_CORES = [
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
   'src/render/detail_horizon_core.ts',
+  'src/render/drape_lod_core.ts',
+  'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
@@ -1610,6 +1612,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_briefing.ts',
   'src/ui/vale_cup_charge.ts',
   'src/ui/vale_cup_hud.ts',
+  'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));

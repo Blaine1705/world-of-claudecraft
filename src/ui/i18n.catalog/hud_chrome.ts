@@ -56,6 +56,16 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
+  // button label reuses nav.wiki; these are the confirm dialog's strings
+  // (confirm-first so a mid-fight tap never opens the browser by accident).
+  wiki: {
+    confirmTitle: 'Open the Wiki?',
+    confirmBody:
+      'This opens the World of ClaudeCraft wiki in your browser. The game keeps running.',
+    confirmOpen: 'Open Wiki',
+    confirmCancel: 'Cancel',
+  },
   // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
   // authoritative sim; new semantics use new keys so stale safe-spot translations
   // cannot be shown while locale fills catch up.
@@ -4334,5 +4344,11 @@ export const hudChromeStrings = {
     toggleAria: 'Switch between the world map and the zone map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
+  },
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
+  // when the local character is below the floor.
+  arenaGate: {
+    minLevelNote: 'Requires level {level}',
   },
 };

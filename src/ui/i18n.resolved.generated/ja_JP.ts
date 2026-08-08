@@ -357,6 +357,12 @@ export const ja_JP: EnTranslations = {
       "healerConfirmAccept": "復活する",
       "healerConfirmCancel": "キャンセル"
     },
+    "wiki": {
+      "confirmTitle": "Wikiを開きますか？",
+      "confirmBody": "World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。",
+      "confirmOpen": "Wikiを開く",
+      "confirmCancel": "キャンセル"
+    },
     "unstuck": {
       "menuButton": "スタック解除",
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
@@ -3378,6 +3384,9 @@ export const ja_JP: EnTranslations = {
       "toZone": "ゾーンマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "レベル {level} が必要です"
     }
   },
   "gatherEvent": {

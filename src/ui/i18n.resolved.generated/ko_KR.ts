@@ -357,6 +357,12 @@ export const ko_KR: EnTranslations = {
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
+    "wiki": {
+      "confirmTitle": "위키를 열까요?",
+      "confirmBody": "World of ClaudeCraft 위키를 브라우저에서 엽니다. 게임은 계속 실행됩니다.",
+      "confirmOpen": "위키 열기",
+      "confirmCancel": "취소"
+    },
     "unstuck": {
       "menuButton": "갇힘 탈출",
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
@@ -3378,6 +3384,9 @@ export const ko_KR: EnTranslations = {
       "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
+    },
+    "arenaGate": {
+      "minLevelNote": "레벨 {level} 필요"
     }
   },
   "gatherEvent": {
