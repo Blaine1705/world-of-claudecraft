@@ -454,16 +454,6 @@ const WILDHEART_HEXCALLER: ClipMap = {
   cast: 'Wildheart_Hexcaller_Attack',
 };
 
-// The Bloodmane Ravager's own attack (scripts/build_wildheart_ravager_anims.mjs, issue
-// #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
-// Wildheart Basin mobs. This clip is baked off wildheart_ravager.glb's own donor poses
-// (a heavier two-beat re-timing of its own Attack and Hit clips), so only
-// mob_wildheart_ravager gets it; the other 4 Wildheart mobs are untouched.
-const WILDHEART_RAVAGER: ClipMap = {
-  ...TRIPO_BIPED_FULL_RIG,
-  attack: ['Wildheart_Ravager_Attack'],
-};
-
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1873,15 +1863,10 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_wildheart_ravager: {
     url: `${CREATURES}/wildheart_ravager.glb`,
-    // Wildheart_Ravager_Attack clip donor (scripts/build_wildheart_ravager_anims.mjs):
-    // mesh-free, baked off this same rig's own poses.
-    animUrls: [
-      `${CREATURES}/wildheart_ravager_hit_variety_anims.glb`,
-      `${CREATURES}/wildheart_ravager_ability_anims.glb`,
-    ],
+    animUrls: [`${CREATURES}/wildheart_ravager_hit_variety_anims.glb`],
     height: 2.7,
     yaw: -Math.PI / 2,
-    clips: WILDHEART_RAVAGER,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.04,
   },
