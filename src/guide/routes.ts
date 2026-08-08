@@ -204,7 +204,9 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     id: 'reliquary',
     sub: 'reliquary',
     navKey: 'guide.nav.reliquary',
-    group: 'compendium',
+    // Filed with deeds/dungeons/delves/rifts: the release's sidebar regroup
+    // retired the old catch-all 'compendium' this page was authored into.
+    group: 'endgame',
     descKey: 'guide.reliquaryPage.intro',
   },
   {

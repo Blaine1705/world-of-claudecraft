@@ -844,7 +844,9 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     const route = GUIDE_ROUTES.find((r) => r.id === 'reliquary');
     expect(route?.sub).toBe('reliquary');
     expect(route?.navKey).toBe('guide.nav.reliquary');
-    expect(route?.group).toBe('compendium');
+    // 'endgame' since the release's sidebar regroup retired the catch-all
+    // compendium group: the page files beside deeds/dungeons/delves/rifts.
+    expect(route?.group).toBe('endgame');
     expect(pageFor('reliquary')).toBe(reliquaryPage);
   });
 
