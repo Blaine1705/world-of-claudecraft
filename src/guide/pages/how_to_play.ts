@@ -7,7 +7,10 @@ import { hrefFor } from '../routes';
 import { lead, related } from './ui';
 import type { GuidePage } from './types';
 
+// step0 was added after step1 to step6 were written, so it leads the list rather than
+// renumbering keys that locales have already filled.
 const STEPS = [
+  ['guide.howToPlay.step0Title', 'guide.howToPlay.step0Body'],
   ['guide.howToPlay.step1Title', 'guide.howToPlay.step1Body'],
   ['guide.howToPlay.step2Title', 'guide.howToPlay.step2Body'],
   ['guide.howToPlay.step3Title', 'guide.howToPlay.step3Body'],
@@ -23,6 +26,7 @@ const BASICS = [
   ['guide.howToPlay.deathTitle', 'guide.howToPlay.deathBody'],
   ['guide.howToPlay.groupingTitle', 'guide.howToPlay.groupingBody'],
   ['guide.howToPlay.onlineTitle', 'guide.howToPlay.onlineBody'],
+  ['guide.howToPlay.worldsTitle', 'guide.howToPlay.worldsBody'],
 ] as const;
 
 export const howToPlay: GuidePage = {
@@ -53,6 +57,7 @@ export const howToPlay: GuidePage = {
         <p class="guide-section-more"><a href="${esc(hrefFor('reference/controls'))}">${esc(t('guide.howToPlay.controlsLink'))}</a></p>
         ${related([
           { href: hrefFor('classes'), key: 'guide.nav.classes' },
+          { href: hrefFor('faq'), key: 'guide.nav.faq' },
           { href: hrefFor('wish-i-knew'), key: 'guide.nav.wishIKnew' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
         ])}

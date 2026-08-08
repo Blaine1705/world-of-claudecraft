@@ -12,6 +12,11 @@ import { lead, related } from './ui';
 // The three zones, in level-band order, named from the existing world teaser keys.
 const ZONES = ZONE_TEASERS;
 
+// Mirrors MOUNT_TRAIN_MIN_LEVEL in src/sim/mounts_training.ts. Held locally rather than
+// imported so the guide bundle never pulls the sim's content graph in for one number;
+// it is a plain player-facing requirement the trainer states in game.
+const RIDING_MIN_LEVEL = 20;
+
 export const progression: GuidePage = {
   titleKey: 'guide.nav.progression',
   render() {
@@ -50,11 +55,17 @@ export const progression: GuidePage = {
           <p>${esc(t('guide.progression.prestigeBody'))}</p>
         </section>
 
+        <section class="guide-block">
+          <h2>${esc(t('guide.progression.ridingTitle'))}</h2>
+          <p>${esc(t('guide.progression.ridingBody', { level: formatNumber(RIDING_MIN_LEVEL) }))}</p>
+        </section>
+
         <p class="guide-callout">${esc(t('guide.progression.noRush'))}</p>
         ${related([
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
           { href: hrefFor('reference/combat'), key: 'guide.nav.combat' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
+          { href: hrefFor('mounts'), key: 'guide.nav.mounts' },
           { href: hrefFor('deeds'), key: 'guide.nav.deeds' },
         ])}
       </article>`;

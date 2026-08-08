@@ -126,8 +126,13 @@ export function economyDetailHtml(): string {
         ${paras('guide.profPages.econ.marketBody')}
       </section>
       ${workOrdersSection()}
+      <section class="guide-block" id="prof-order-board">
+        <h2>${esc(t('guide.profPages.econ.orderBoardHeading'))}</h2>
+        ${paras('guide.profPages.econ.orderBoardBody')}
+      </section>
       <section class="guide-block" id="prof-commissions">
         <h2>${esc(t('guide.profPages.econ.commissionsHeading'))}</h2>
+        ${paras('guide.profPages.econ.commissionsBoardNote')}
         ${paras('guide.profPages.econ.commissionsBody')}
       </section>
       <section class="guide-block" id="prof-provenance">

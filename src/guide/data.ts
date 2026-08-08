@@ -1,9 +1,10 @@
-// Presentational data for the Guide, mirrored from src/sim/content/. Class brand colors
-// match CLASSES[id].color and zone bands match the ZoneDefs; a scripts/wiki generator
-// derives the full per-class and per-zone dataset from the sim in a later phase, so
-// only the small bits the landing needs live here. Names reuse existing i18n keys.
+// Presentational data for the Guide. Class brand colors match CLASSES[id].color and are
+// mirrored from src/sim/content/; the zone teasers are derived from the generated zone
+// list (content.generated.ts) so their names, level bands, and count come from the game
+// itself and only the curated blurbs are hand-written. Names reuse existing i18n keys.
 
 import type { TranslationKey } from '../ui/i18n';
+import { GUIDE_ZONES } from './content.generated';
 
 export const LEVEL_CAP = 20;
 
@@ -34,61 +35,27 @@ export interface ZoneTeaser {
   max: number;
 }
 
-export const ZONE_TEASERS: ZoneTeaser[] = [
-  {
-    id: 'vale',
-    nameKey: 'guide.home.world.valeName',
-    blurbKey: 'guide.home.world.valeBlurb',
-    min: 1,
-    max: 7,
-  },
-  {
-    id: 'marsh',
-    nameKey: 'guide.home.world.marshName',
-    blurbKey: 'guide.home.world.marshBlurb',
-    min: 6,
-    max: 13,
-  },
-  {
-    id: 'peaks',
-    nameKey: 'guide.home.world.peaksName',
-    blurbKey: 'guide.home.world.peaksBlurb',
-    min: 13,
-    max: 20,
-  },
-  {
-    id: 'dusk',
-    nameKey: 'guide.home.world.duskName',
-    blurbKey: 'guide.home.world.duskBlurb',
-    min: 15,
-    max: 20,
-  },
-  {
-    id: 'ember',
-    nameKey: 'guide.home.world.emberName',
-    blurbKey: 'guide.home.world.emberBlurb',
-    min: 16,
-    max: 20,
-  },
-  {
-    id: 'frost',
-    nameKey: 'guide.home.world.frostName',
-    blurbKey: 'guide.home.world.frostBlurb',
-    min: 17,
-    max: 20,
-  },
-  {
-    id: 'amber',
-    nameKey: 'guide.home.world.amberName',
-    blurbKey: 'guide.home.world.amberBlurb',
-    min: 18,
-    max: 20,
-  },
-  {
-    id: 'fen',
-    nameKey: 'guide.home.world.fenName',
-    blurbKey: 'guide.home.world.fenBlurb',
-    min: 19,
-    max: 20,
-  },
-];
+// Curated copy is keyed by a short slug, which is also the CSS accent hook the home
+// zone cards use. The slug is the zone's biome, except The Farshore, which shares the
+// Vale's biome and so would otherwise borrow Eastbrook's name and blurb.
+const TEASER_SLUGS: Record<string, string> = { farshore_isle: 'farshore' };
+
+// Every teaser row is derived from the generated zone list, so the landing page can
+// never fall behind the world again: a new zone shows up on its own and only needs its
+// guide.home.world.<slug>Name and <slug>Blurb pair written. Sorted by level band, so
+// the grid reads outward from the starting valley.
+export const ZONE_TEASERS: ZoneTeaser[] = [...GUIDE_ZONES]
+  .sort((a, b) => a.min - b.min || a.max - b.max)
+  .map((zone) => {
+    const slug = TEASER_SLUGS[zone.id] ?? zone.biome;
+    return {
+      id: slug,
+      nameKey: `guide.home.world.${slug}Name` as TranslationKey,
+      blurbKey: `guide.home.world.${slug}Blurb` as TranslationKey,
+      min: zone.min,
+      max: zone.max,
+    };
+  });
+
+/** How many zones the world holds, for copy that states the count. */
+export const ZONE_COUNT = ZONE_TEASERS.length;

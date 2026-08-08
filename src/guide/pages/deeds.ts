@@ -1,7 +1,8 @@
 // The Book of Deeds. A spoiler-safe overview of the achievements system: how deeds are
-// earned and shown, what Renown is, the cosmetic titles and borders, the per-zone
-// Chronicles and their Chroniclers, and the Feats shelf, followed by the full public
-// catalog by category. Hidden deeds are filtered out upstream by the generator, so nothing
+// earned and shown, what the Book itself puts in front of you (categories, the recent
+// strip, rarity, deed links), what Renown is, the cosmetic titles and borders, the
+// per-zone Chronicles and their Chroniclers, and the Feats shelf, followed by the full
+// public catalog by category. Hidden deeds are filtered out upstream by the generator, so nothing
 // secret can reach this page. Every deed's criteria live in the in-game Book of Deeds; the
 // wiki lists names, Renown, and rewards only, keeping instanced spoilers off the public
 // site (the same bar the dungeons page and the bestiary hold).
@@ -115,6 +116,11 @@ export const deeds: GuidePage = {
         </section>
 
         <section class="guide-block">
+          <h2>${esc(t('guide.deedsPage.bookHeading'))}</h2>
+          <p>${esc(t('guide.deedsPage.bookBody'))}</p>
+        </section>
+
+        <section class="guide-block">
           <h2>${esc(t('guide.deedsPage.renownHeading'))}</h2>
           <p>${esc(t('guide.deedsPage.renownBody'))}</p>
         </section>
@@ -145,6 +151,7 @@ export const deeds: GuidePage = {
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
+          { href: hrefFor('quests'), key: 'guide.nav.quests' },
         ])}
       </article>`;
   },
