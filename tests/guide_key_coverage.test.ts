@@ -97,8 +97,11 @@ const RETIRED_KEYS: string[] = [
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
 
   // -- Content the game no longer has, so the wiki must not define it.
-  'guide.glossary.augmentDef', // augments are not a player-facing system
+  // The glossary defined Augment as a draft pick in a two-on-two Fiesta match.
+  // Fiesta is retired and is not among the tabs the PvP window offers, so the term
+  // described content no player can reach.
   'guide.glossary.augmentTerm',
+  'guide.glossary.augmentDef',
   'guide.bestiary.flavor.mirejaw_frenzy', // summon-only encounter add, filtered from the bestiary
   'guide.footer.communityWiki', // the standalone MediaWiki redirect this SPA replaced
 
