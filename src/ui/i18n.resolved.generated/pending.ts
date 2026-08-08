@@ -9,25 +9,105 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "es_ES": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "fr_FR": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "fr_CA": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "de_DE": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "zh_CN": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "zh_TW": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "ko_KR": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "ja_JP": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "pt_BR": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "ru_RU": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "cs_CZ": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "nl_NL": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "pl_PL": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "id_ID": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "tr_TR": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "sv_SE": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "vi_VN": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ],
+  "da_DK": [
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows"
+  ]
 };
