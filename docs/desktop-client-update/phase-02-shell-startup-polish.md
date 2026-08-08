@@ -1,0 +1,88 @@
+# Phase 2: shell startup and window polish
+
+### Starter Prompt
+```
+This is Phase 2 of the Desktop Client Update: shell startup and window polish.
+
+Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: not needed.
+
+PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
+/home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,
+never push; first action pull+merge origin/release/v0.36.0 (re-run electron/desktop
+suites on a non-trivial merge); git status clean or stop and ask.
+
+Goal: clean startup presentation, a second launch that focuses the running game, a
+lighter Win/Linux menu path, and a download-links version that cannot go stale.
+
+STEP 0 - memory scan (topics: desktop-client-update program, worktree cwd drift).
+
+STEP 1 - LOAD CONTEXT: Explore agent (budget ~30 calls, report-first) summarizes:
+state.md, progress.md, this file; electron/main.cjs createMainWindow +
+second-instance handler + menu call + whenReady flow; src/game/desktop_download.ts and
+tests/desktop_download.test.ts + tests/desktop_download_dom.test.ts; how the build
+exposes the app version to client code (search for package.json version usage /
+__APP_VERSION__ / import.meta.env in vite config and src). Return: exact current
+window-creation options, the second-instance handler body, where a build-time version
+constant could come from.
+
+STEP 2 - EXECUTE. Deliverables (one agent for electron/, one for the version fix, in
+parallel):
+Electron agent:
+- show:false on the BrowserWindow plus win.once('ready-to-show', show) AND a safety
+  fallback (show after ~4s if ready-to-show never fired; log when the fallback path
+  runs). Keep the dark backgroundColor.
+- second-instance: keep the existing deep-link argv scan, and ALWAYS
+  restore-if-minimized + focus the existing window even when no deep link is present.
+- Menu: on win32/linux call Menu.setApplicationMenu(null) BEFORE app.whenReady() and
+  drop the per-window setMenu(null); on darwin change NOTHING (the default menu is
+  deliberate: copy/paste/quit shortcuts live there).
+- Pins: extend the main.cjs text-scan tests for all three (ready-to-show present,
+  fallback present, second-instance focus/restore present, platform-guarded
+  setApplicationMenu). Pure decision logic (e.g. shouldShowFallback timing, focus
+  decision) goes in a pure module if it grows beyond a guard clause.
+Version agent:
+- Make the desktop download version build-derived instead of the hand-bumped
+  DESKTOP_VERSION constant: source it from package.json version at build time (follow
+  however the repo already exposes build-time constants; if nothing exists, a vite
+  define is acceptable and small). The no-JS fallback hrefs in index.html must stay
+  consistent (find how they are generated; if hand-written, add a build check).
+- Pin: a test asserting the download module's version equals package.json version, so
+  a release bump can never strand the links again.
+
+INVARIANTS IN PLAY: macOS menu untouched; deep-link login/wallet flows unchanged (their
+tests must stay green); no em dashes/emojis; module-first for any non-trivial logic.
+
+Out of scope: window bounds persistence and display modes (phase 7/8); GPU work
+(phase 3); tray, zoom, notifications.
+
+STEP 3 - VALIDATION + REVIEW:
+- `npx vitest run tests/electron_*.test.ts tests/desktop_*.test.ts`, `npx tsc --noEmit`,
+  `npm run ci:changed`.
+- Manual smoke if the environment allows: `npm run electron:pack`, launch, verify no
+  pre-paint flash, launch a second instance and verify focus; record results either way.
+- Review dispatch per the implementation-plan.md matrix: electron/ surface -> spawn
+  privacy-security-review (COVERAGE prompt, ~30-call budget). The version fix touches
+  src/game/ -> frontend-seam-reviewer ONLY if HUD/UI surface changed beyond a constant.
+- `node scripts/gate_select.mjs`.
+
+STEP 4 - COMMITS:
+- feat(desktop): show the window on ready-to-show with a safety fallback
+- fix(desktop): focus the running instance on second launch
+- perf(desktop): null the application menu on win32 and linux before ready
+- fix(game): derive the desktop download version from the package version
+
+STEP 5 - ACCEPTANCE:
+- [ ] No visible pre-paint flash; fallback show is logged when exercised.
+- [ ] Second launch with no deep link focuses/restores; deep-link behavior unchanged.
+- [ ] macOS menu path untouched by the diff.
+- [ ] Download version is build-derived, test-pinned to package.json, currently 0.36.0.
+- [ ] Suites + gate_select green; smoke results recorded.
+
+STEP 6 - DOCS + MEMORY: progress.md, state.md inventory (new pins, version mechanism).
+
+STEP 7 - FINAL RESPONSE: status, files, validation, reviewer verdicts, handoff line.
+
+STOPPING RULES: stop and ask if ready-to-show interacts badly with the crash-recovery
+reload path (crash_guard reloads the webContents; the window must not re-hide); stop if
+the index.html no-JS hrefs turn out to be generated by a step this phase should not own.
+```
