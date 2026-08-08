@@ -202,6 +202,15 @@ describe('mobile action ring: source-slot state per page', () => {
 });
 
 describe('mobile action ring: proc state remains perceptible', () => {
+  function ruleBody(css: string, selector: string): string {
+    const start = css.indexOf(`${selector} {`);
+    expect(start, selector).toBeGreaterThanOrEqual(0);
+    const open = css.indexOf('{', start);
+    const close = css.indexOf('}', open);
+    expect(close, selector).toBeGreaterThan(open);
+    return css.slice(open + 1, close);
+  }
+
   it('renders the shared proc class on touch as well as desktop', () => {
     expect(HUD_CSS).toMatch(/\.action-btn\.proc\s*\{[^}]*abtn-proc-pulse/s);
     expect(MOBILE_HUD_CSS).toMatch(
@@ -219,6 +228,12 @@ describe('mobile action ring: proc state remains perceptible', () => {
   });
 
   it('stops the touch proc pulse under reduced motion', () => {
+    const steadyRule = ruleBody(
+      MOBILE_HUD_CSS,
+      'body.mobile-touch #mobile-action-ring button.proc',
+    );
+    expect(steadyRule).toContain('border-color: #ffd97a;');
+    expect(steadyRule).toMatch(/box-shadow:\s*[\s\S]*#ffcf40e6/);
     expect(MOBILE_HUD_CSS).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc\s*\{[^}]*animation:\s*none/,
     );

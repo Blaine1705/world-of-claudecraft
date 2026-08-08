@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Vessillo in Mano',
+    desc: 'Cattura una bandiera ai Campi di Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Valletta Resiste',
+    desc: 'Vinci una battaglia ai Campi di Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardiano della Valletta',
+    desc: 'Vinci 25 battaglie ai Campi di Thornhollow.',
+    title: 'Portabandiera',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cento Vessilli',
+    desc: 'Cattura 100 bandiere ai Campi di Thornhollow nel corso della tua carriera.',
+  },
+  dgn_rift: {
+    name: 'Camminasquarci',
+    desc: 'Completa uno Squarcio sconfiggendo il suo boss di piano.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Sovrano degli Squarci',
+    desc: 'Completa uno Squarcio di rango S, il livello più difficile che un portale di Squarcio può generare.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Spezzalinee',
+    desc: 'Guadagna 10.000 Onore nel corso della tua vita. Spenderlo non ti farà mai perdere il grado.',
+    title: 'Spezzalinee',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Devastacampi',
+    desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
+    title: 'Devastacampi',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Coronato dalla guerra',
+    desc: 'Guadagna 150.000 Onore nel corso della tua vita. Raro in qualsiasi reame, ed è giusto che sia così.',
+    title: 'Coronato dalla guerra',
+  },
   chr_drakemaw_broodlord: {
     name: 'Spezzacovata',
     desc: 'Uccidi un Signore della covata di Drakemaw tra le sue uova, superando il grido, il fendente e il fuoco.',

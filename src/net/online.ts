@@ -1338,6 +1338,7 @@ function blankEntity(id: number): Entity {
     sitting: false,
     afk: false,
     weaponStowed: false,
+    helmHidden: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1457,6 +1458,10 @@ export class ClientWorld implements IWorld {
   prestigeRank = 0;
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
+  // Lifetime played seconds, mirrored from snapshot self (`ptime`, quantized
+  // to whole minutes server-side so the delta gate ships it about once a
+  // minute).
+  playtimeSeconds = 0;
   unlockedMilestones: string[] = [];
   // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
   // snapshot self (display + staging). ---
@@ -2905,6 +2910,7 @@ export class ClientWorld implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
+      e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
@@ -3434,6 +3440,7 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
@@ -3447,10 +3454,11 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
-      // Commission order board (issue #1298): server-diffed per tick like
-      // prof/cprof above, so this is how BOTH sides of an accept/deliver
-      // converge (not the commissionOrderResult event, which is deny-toast
-      // only).
+      // Commission order board (issue #1298): server-gated on the board
+      // revision at the corder wire cadence (a passive party converges within
+      // one cadence window; the viewer's own commands re-arm for the next
+      // snapshot), and this is how BOTH sides of an accept/deliver converge
+      // (not the commissionOrderResult event, which is deny-toast only).
       if (s.corder !== undefined) this.commissionOrders = s.corder ?? [];
       // Enchanting-action outcome mirrors (Professions 2.0): the
       // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
@@ -3878,6 +3886,9 @@ export class ClientWorld implements IWorld {
   moveInventoryItem(from: number, to: number): void {
     this.cmd({ cmd: 'inv_move', from, to });
   }
+  sortInventory(): void {
+    this.cmd({ cmd: 'inv_sort' });
+  }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
   equipItemToSlot(itemId: string, slot: EquipSlot): void {
@@ -4230,6 +4241,14 @@ export class ClientWorld implements IWorld {
     const p = this.entities.get(this.playerId);
     if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
     this.cmd({ cmd: 'stow_weapon' });
+  }
+  setHelmHidden(hidden: boolean): void {
+    // Optimistic local nudge (the toggleWeaponStow idiom) so the recompose and
+    // portrait re-snapshot land instantly; the next snapshot's `hh` bit
+    // reconciles. No dead-gate: a wardrobe preference, not an action.
+    const p = this.entities.get(this.playerId);
+    if (p) p.helmHidden = hidden;
+    this.cmd({ cmd: 'set_helm', hidden });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);

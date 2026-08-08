@@ -28,7 +28,8 @@ function fmtEffects(effects: AbilityDef['effects']): string {
       const any = e as Record<string, unknown>;
       if ('min' in any && 'max' in any) return `${e.type} ${any.min}-${any.max}`;
       if ('total' in any) return `${e.type} ${any.total}/${any.duration}`;
-      if ('amount' in any) return `${e.type} ${any.amount}`;
+      if ('amount' in any) return `${e.type} ${any.amount}/${any.duration}`;
+      if ('duration' in any) return `${e.type} ${any.duration}`;
       return e.type;
     })
     .join(' + ');
@@ -55,16 +56,16 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 110, effects: 'heal 218-258' }, // NEW cap rank
   ],
   temporal_echo: [
-    { level: 8, cost: 40, effects: 'heal 24-30 + temporalEcho' },
-    { level: 12, cost: 60, effects: 'heal 40-50 + temporalEcho' },
-    { level: 18, cost: 85, effects: 'heal 58-70 + temporalEcho' },
-    { level: 20, cost: 90, effects: 'heal 84-102 + temporalEcho' }, // NEW cap rank
+    { level: 8, cost: 40, effects: 'heal 24-30 + temporalEcho 15' },
+    { level: 12, cost: 60, effects: 'heal 40-50 + temporalEcho 15' },
+    { level: 18, cost: 85, effects: 'heal 58-70 + temporalEcho 15' },
+    { level: 20, cost: 90, effects: 'heal 84-102 + temporalEcho 15' }, // NEW cap rank
   ],
   temporal_barrier: [
-    { level: 5, cost: 50, effects: 'absorb 55' },
-    { level: 12, cost: 75, effects: 'absorb 100' },
-    { level: 18, cost: 105, effects: 'absorb 160' },
-    { level: 20, cost: 120, effects: 'absorb 232' }, // NEW cap rank
+    { level: 5, cost: 50, effects: 'absorb 55/10' },
+    { level: 12, cost: 75, effects: 'absorb 100/10' },
+    { level: 18, cost: 105, effects: 'absorb 160/10' },
+    { level: 20, cost: 120, effects: 'absorb 232/10' }, // NEW cap rank
   ],
   // ---- priest
   lesser_heal: [
@@ -86,10 +87,10 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 75, effects: 'hot 205/15' }, // revalued cap (was 140)
   ],
   power_word_shield: [
-    { level: 6, cost: 45, effects: 'absorb 48' },
-    { level: 12, cost: 70, effects: 'absorb 90' },
-    { level: 18, cost: 100, effects: 'absorb 145' },
-    { level: 20, cost: 130, effects: 'absorb 210' }, // NEW cap rank
+    { level: 6, cost: 45, effects: 'absorb 48/30' },
+    { level: 12, cost: 70, effects: 'absorb 90/30' },
+    { level: 18, cost: 100, effects: 'absorb 145/30' },
+    { level: 20, cost: 130, effects: 'absorb 210/30' }, // NEW cap rank
   ],
   prayer_of_healing: [
     { level: 10, cost: 130, effects: 'aoeHeal 100-122' },

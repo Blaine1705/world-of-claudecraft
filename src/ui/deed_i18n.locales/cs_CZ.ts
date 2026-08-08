@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Vlajka v ruce',
+    desc: 'Zajmi vlajku v Thornhollowských polích.',
+  },
+  pvp_bg_first_win: {
+    name: 'Kotlina drží',
+    desc: 'Vyhraj bitvu o Thornhollowská pole.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Strážce kotliny',
+    desc: 'Vyhraj 25 bitev o Thornhollowská pole.',
+    title: 'Praporečník',
+  },
+  pvp_bg_captures_100: {
+    name: 'Sto vlajek',
+    desc: 'Zajmi za celou svou kariéru 100 vlajek v Thornhollowských polích.',
+  },
+  dgn_rift: {
+    name: 'Poutník trhlinou',
+    desc: 'Vyčisti Trhlinu porážkou bosse jejího patra.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Vládce trhlin',
+    desc: 'Vyčisti Trhlinu stupně S, nejtěžší úroveň, na jakou se může objevit trhlinový portál.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Prolamovač šiků',
+    desc: 'Získej za celý svůj život 10 000 cti. Její utrácení tě o hodnost nikdy nepřipraví.',
+    title: 'Prolamovač šiků',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Plenitel polí',
+    desc: 'Získej za celý svůj život 40 000 cti, celou sezónu skutečné války za sebou.',
+    title: 'Plenitel polí',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Korunovaný válkou',
+    desc: 'Získej za celý svůj život 150 000 cti. Na kterémkoli realmu vzácnost, a taková i má být.',
+    title: 'Korunovaný válkou',
+  },
   chr_drakemaw_broodlord: {
     name: 'Lamač líhně',
     desc: 'Zab Pána líhně Dračí tlamy uprostřed jeho vajec, skrz řev, sek i oheň.',

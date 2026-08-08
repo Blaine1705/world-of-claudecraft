@@ -72,8 +72,17 @@ interface AttributionTargetFixture {
 // vfx.weapon-skins prewarm entry move src/render/renderer.ts forward again,
 // on top of the bow-aim renderer edit the release landed after the revert.
 // No Eastbrook input, geometry value, or capture moved.
+// Re-minted again for the second release/v0.35.0 merge (the swimming strokes PR
+// and the v0.35.0 batch both move the renderer leaf on the release side).
+// Re-minted for the merge of release/v0.35.0 into this branch: both sides moved
+// the rendererIntegration leaf (the release's PR #2983 re-land, this branch's
+// creator review pass), so the merged tree mints a value matching neither
+// parent. Captures adopted verbatim; no measured value moved on either side.
+// Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
+// follows the anchor seam, the weapon-skin fade and the census tag. No capture
+// was retaken; every measured value is adopted verbatim.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '74725f312d51e75c0dc19989cd1b1df6bb73ceea4a1474dd61079dd9971b2b70';
+  'de0f1454a0d7b6599d8a7f536042c577659fb6726d1131125503bf8dc0a27fd7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

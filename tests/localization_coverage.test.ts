@@ -1276,7 +1276,9 @@ describe('i18n Localization Key Coverage', () => {
   // Deed names and reward titles that legitimately equal English in a locale,
   // recorded as deliberate cross-language cognates (Veteran, Champion, Paragon,
   // and Gladiator are those languages' own words; Marginalia is Latin; nl keeps
-  // the poker term Full House). This list IS the recording mechanism: a deed
+  // the poker term Full House; Sergeant is the real de/nl/sv rank word, spelled
+  // identically, and the rest of that honor ladder IS translated). This list IS
+  // the recording mechanism: a deed
   // name or title that matches English WITHOUT a row here is an accidental
   // leak at the release gate. Dialect locales list their rendered result
   // (es_ES and fr_CA resolve through their base tables plus overrides).
@@ -1287,6 +1289,8 @@ describe('i18n Localization Key Coverage', () => {
     fr_CA: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
     it_IT: ['soc_market_magnate.title'],
     de_DE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'prog_champion.name',
@@ -1298,6 +1302,8 @@ describe('i18n Localization Key Coverage', () => {
     ],
     pt_BR: ['prog_paragon.name', 'prog_paragon.title'],
     nl_NL: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'dlv_lore_journal.name',
       'pvp_arena_1v1_1900.name',
       'pvp_arena_1v1_1900.title',
@@ -1311,6 +1317,8 @@ describe('i18n Localization Key Coverage', () => {
       'pvp_arena_1v1_1900.title',
     ],
     sv_SE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'pvp_arena_1v1_1900.name',

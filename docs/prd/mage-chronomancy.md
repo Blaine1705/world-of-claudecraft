@@ -786,7 +786,7 @@ convierte al 40% por ser dano Arcano real del mago; es marginal y coherente.
 La maestria de Fase 1 (Chronoweave, `global.healPct`) se aplica dentro de `applyHeal` (curas
 directas y absorciones propias), pero NO se aplica a la curacion de conversion de Eco temporal:
 la conversion usa `Math.round(danoEfectivo * tasa)` limpio. Es una decision consciente para
-mantener el numero de conversion legible y testeable (100 de Arcano single -> 35 exacto) y porque
+mantener el numero de conversion legible y testeable (100 de Arcano single -> 40 exacto) y porque
 la maestria de Fase 1 se definio como refuerzo de la curacion DIRECTA. Cuando se cierre la maestria
 definitiva de Cronomancia (seccion 13.8, potenciar Eco), se decidira si la conversion escala.
 

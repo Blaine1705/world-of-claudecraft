@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Elde Sancak',
+    desc: "Dikenvadi Ovası'nda bir sancak ele geçir.",
+  },
+  pvp_bg_first_win: {
+    name: 'Vadi Tutunuyor',
+    desc: 'Bir Dikenvadi Ovası savaşını kazan.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Vadinin Muhafızı',
+    desc: '25 Dikenvadi Ovası savaşı kazan.',
+    title: 'Sancaktar',
+  },
+  pvp_bg_captures_100: {
+    name: 'Yüz Sancak',
+    desc: "Kariyerin boyunca Dikenvadi Ovası'nda 100 sancak ele geçir.",
+  },
+  dgn_rift: {
+    name: 'Yarık Gezgini',
+    desc: 'Kat şefini yenerek bir Yarığı temizle.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Yarık Hükümdarı',
+    desc: 'Bir Yarık portalının oluşturabileceği en zor kademe olan S dereceli bir Yarığı temizle.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Saf Kıran',
+    desc: 'Ömrün boyunca 10.000 onur kazan. Onu harcamak rütbeni asla kaybettirmez.',
+    title: 'Saf Kıran',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Meydan Yağmacısı',
+    desc: 'Ömrün boyunca 40.000 onur kazan, arkanda gerçek bir savaş mevsimi bırak.',
+    title: 'Meydan Yağmacısı',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Savaş Taçlısı',
+    desc: 'Ömrün boyunca 150.000 onur kazan. Herhangi bir diyarda nadirdir, ve öyle de olmalı.',
+    title: 'Savaş Taçlısı',
+  },
   chr_drakemaw_broodlord: {
     name: 'Kuluçka Kırıcı',
     desc: "Bir Ejder Ağzı Yuva Lordu'nu, narasına, yarma darbesine ve ateşine rağmen, yumurtalarının ortasında öldür.",

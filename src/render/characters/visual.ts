@@ -9,7 +9,14 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
-import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
+import {
+  createWeaponVfx,
+  DEFAULT_TUNING,
+  WEAPON_VFX,
+  type WeaponVfxHandle,
+  type WeaponVfxTuning,
+} from '../weapon_vfx';
+import { scaleWeaponVfxTuning } from '../weapon_vfx_shed_core';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimActionWeight,
@@ -26,6 +33,7 @@ import {
 } from './anim_state';
 import {
   applyMaterials,
+  applyModularSliderMorphs,
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
@@ -36,8 +44,10 @@ import {
   skinTexture,
   tintedFarMaterials,
 } from './assets';
+import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ModularAppearance, ModularLook } from './modular';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -356,8 +366,36 @@ export class CharacterVisual {
   private skinIndex: number;
   private weaponItemId: string | null;
   private offhandItemId: string | null;
+  /** Composition inputs for a `modular` def (null for a fixed class rig).
+   *  Changing a look means changing GEOMETRY, so callers rebuild the visual
+   *  rather than mutating it; this is kept so they can tell whether they must. */
+  private look: ModularLook | null = null;
+
+  /** The composition this visual was built from (null for a fixed class rig). */
+  get modularLook(): ModularLook | null {
+    return this.look;
+  }
+
+  /** Move the face/body sliders on the LIVE body: morph influences are
+   *  per-instance over shared geometry, so a slider drag repaints without the
+   *  dispose-and-recompose a geometry change needs (which is why the sliders
+   *  are deliberately outside `modularBuildSignature`). No-op on a fixed rig. */
+  applyModularSliders(app: ModularAppearance): void {
+    if (!this.look) return;
+    this.look = { ...this.look, app };
+    applyModularSliderMorphs(this.model, app);
+  }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  // The skin's authored tuning row (the rig's 1.0 look) plus the shed
+  // multiplier last applied over it, and one scratch the scaled row is written
+  // into so a shed step allocates nothing.
+  private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
+  private weaponVfxShed = 1;
+  private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
+  /** Long-hair secondary motion (modular styles with sway morphs; empty and
+   *  free on every other rig). */
+  private hairSway = new HairSwayDriver();
   // Skin payloads whose orientation blends to a root-relative pin (see
   // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
   // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
@@ -493,6 +531,7 @@ export class CharacterVisual {
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
+    look: ModularLook | null = null,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -517,7 +556,14 @@ export class CharacterVisual {
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
-    this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    // THE MECH IS A REPLACEMENT BODY, NOT A LAYER. Only a `modular` def can
+    // compose a character, so a look handed to a fixed rig is dropped here
+    // rather than carried: the mech cosmetic must never end up with a second
+    // body inside it (Troy, 2026-08-07). assembleModel already ignores `look`
+    // for a non-modular def, this makes the visual agree, so nothing
+    // downstream can read a look the geometry never used.
+    this.look = prep.def.modular ? look : null;
+    this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
     configureTightBoneTextures(this.model);
     applyMaterials(
       this.model,
@@ -545,6 +591,7 @@ export class CharacterVisual {
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
+    this.hairSway.build(this.model);
     this.modelWrap.add(this.model);
     this.poseWrap.add(this.modelWrap);
     this.root.add(this.poseWrap);
@@ -804,6 +851,10 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
+      // Morph influences, not bone writes, so mixer order is irrelevant, but
+      // it rides the animated branch: a throttled far rig has no business
+      // integrating a hair spring.
+      this.hairSway.update(dt, s);
     }
   }
 
@@ -1069,16 +1120,34 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
-    const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    // Resolved against THIS rig's bound clips: a rig without the substitute
+    // (every body but the hunter) keeps its own authored attack instead of
+    // swinging with no animation at all.
+    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
+    // A displayed bow skin substitutes Bow_Draw_Shot for the hunter's RANGED
+    // attacks, including the ranged per-ability overrides: the crossbow-
+    // shoulder ability poses (Hunter_Shot_Snap etc.) are authored for the
+    // class's authored crossbow and would look backwards with a bow visibly
+    // drawn. It must NOT substitute for a non-ranged override: the three
+    // melee abilities (raptor_strike, mongoose_bite, wing_clip) play a
+    // bespoke Hunter_Melee_* swing regardless of a displayed bow, since a bow
+    // skin never changes how a melee hit is thrown, and the self-buff aspect
+    // toggles / Fevered Draw (rapid_fire) play the class's own baked
+    // Spellcast_Raise raise/buff ceremony through this same playAttack path
+    // (the ability-VFX painter triggers non-contact authored gestures here
+    // too), never a draw-shot. Both are identified by their clip-name
+    // convention rather than a hardcoded ability list, so any future
+    // non-ranged override keeps its authored clip automatically
+    // (tests/weapon_skins.test.ts).
+    const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    const overrideIsNonRanged =
+      rawOverride?.startsWith('Hunter_Melee_') || rawOverride === 'Spellcast_Raise';
+    const override = !skinAttack || overrideIsNonRanged ? rawOverride : undefined;
     if (override && this.action(override)) {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
       this.currentOneShotIsAttack = true;
       return;
     }
-    // Resolved against THIS rig's bound clips: a rig without the substitute
-    // (every body but the hunter) keeps its own authored attack instead of
-    // swinging with no animation at all.
-    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
     const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
@@ -1651,10 +1720,14 @@ export class CharacterVisual {
     const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
     const spec = skin ? (WEAPON_VFX[skin.model] ?? null) : null;
     if (!skin || !spec) return;
+    // The authored row is the rig's 1.0 look; the shed lever below re-derives
+    // from it, so it must be kept rather than only pushed once.
+    this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
+    this.weaponVfxShed = 1;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, { grounded: false });
       handle.setBackdropVisible(false);
-      handle.setTuning(weaponVfxTuningFor(skin.model, spec.tier));
+      handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
       // Tag the rig's own scene nodes: applyMaterials must never tint its
       // ShaderMaterials and the shadow pass has no business with sprite shells.
@@ -1677,10 +1750,43 @@ export class CharacterVisual {
 
   /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
    *  without an active skin; the renderer calls it once per entity per frame.
-   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
-  updateWeaponVfx(dt: number): void {
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon).
+   *
+   *  `shed` is the rig-strength multiplier from `weaponVfxShedScale` (viewer
+   *  distance plus the frame-budget governor's vfx lever); 1 is the authored
+   *  look. It only ever DIMS; what removes a rig is the far-LOD swap below.
+   *
+   *  The rig's point light deliberately keeps its `visible` flag at every
+   *  scale: three counts visible point lights into every lit material's program
+   *  cache key, so clearing one mid-flight is the open-world recompile freeze.
+   *  Dimming drives its intensity down instead, which is the look without the
+   *  hazard. */
+  updateWeaponVfx(dt: number, shed = 1): void {
     this.applySkinOrientation(dt);
+    if (this.weaponVfx.length === 0) return;
+    // A rig that the far-LOD swap has taken off screen still cost a full tick
+    // of uniform writes, emissive pulse and light flicker every frame, for
+    // something no pixel can show: `setFar` hides `modelWrap`, and a held
+    // weapon (with its rig) hangs off a bone INSIDE it.
+    //
+    // Gated on farMesh as well as `far`, and that is the load-bearing half:
+    // `setFar` leaves `modelWrap` VISIBLE when there is no baked mesh to stand
+    // in for it, while `isFar` reads true either way. Skipping on `far` alone
+    // would freeze a rig that is still drawing, leaving its motes hanging in
+    // the air and its light stuck at whatever the last flicker wrote.
+    if (this.far && this.farMesh) return;
+    this.applyWeaponVfxShed(shed);
     for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  // Write-elided: setTuning walks every part and rewrites its materials, so the
+  // quantized scale is compared first and an unchanged frame costs nothing.
+  private applyWeaponVfxShed(shed: number): void {
+    const next = Number.isFinite(shed) ? Math.min(1, Math.max(0, shed)) : 1;
+    if (next === this.weaponVfxShed) return;
+    this.weaponVfxShed = next;
+    scaleWeaponVfxTuning(this.weaponVfxAuthored, next, this.weaponVfxTuningScratch);
+    for (const handle of this.weaponVfx) handle.setTuning(this.weaponVfxTuningScratch);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their

@@ -105,6 +105,7 @@ export const IWORLD_MEMBERS = [
   { name: 'prestigeRank', kind: 'data' },
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
+  { name: 'playtimeSeconds', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
@@ -147,6 +148,7 @@ export const IWORLD_MEMBERS = [
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
+  { name: 'sortInventory', kind: 'method' },
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
@@ -164,6 +166,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
+  { name: 'setHelmHidden', kind: 'method' },
   { name: 'unstuck', kind: 'method' },
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
@@ -551,9 +554,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // branch's commission order board (issue #1298) adds commissionOrders
     // (data) plus openCommissionOrder/cancelCommissionOrder/
     // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
-    expect(IWORLD_MEMBERS.length).toBe(299);
-    expect(DATA_MEMBERS.length).toBe(76);
-    expect(METHOD_MEMBERS.length).toBe(223);
+    // This branch's paperdoll helmet-visibility eye adds setHelmHidden
+    // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
+    // sortInventory (IWorldInventory, a method), leaving 301. The character
+    // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
+    // data), leaving 302.
+    expect(IWORLD_MEMBERS.length).toBe(302);
+    expect(DATA_MEMBERS.length).toBe(77);
+    expect(METHOD_MEMBERS.length).toBe(225);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -773,6 +781,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -810,6 +819,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
@@ -821,6 +831,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stationPlacements',
@@ -923,6 +934,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInfo',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1130,6 +1142,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
@@ -1140,6 +1153,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'slotToolEffect',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
@@ -1306,6 +1320,7 @@ const FACET_INVENTORY = [
   'equipItem',
   'equipItemToSlot',
   'moveInventoryItem',
+  'sortInventory',
   'unequipItem',
   'useItem',
   'discardItem',
@@ -1330,6 +1345,7 @@ const FACET_COSMETICS = [
   'unequipMechChroma',
   'changeWeaponSkin',
   'toggleWeaponStow',
+  'setHelmHidden',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
 type _ExhaustCosmetics = AssertNever<
   Exclude<keyof IWorldCosmetics, (typeof FACET_COSMETICS)[number]>
@@ -1352,6 +1368,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
   'leaderboard',
@@ -1749,8 +1766,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(299);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(299);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(302);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(302);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -10,8 +10,7 @@
 //   - conservative offensive rotation: 70-90s to OOM,
 //   - conservative + occasional Temporal Mend/Barrier: ~55-65s,
 //   - emergency (hold 4 charges): 15-25s,
-//   - conservative Chronomancy at 50-70% of Piro and Cryo DPS over the same window
-//     (measured 66.1% of Piro, 56.7% of Cryo on the v0.35.0 world).
+//   - conservative healing rotation at 50-65% of Piro and Cryo DPS over the same window.
 import { describe, expect, it } from 'vitest';
 import { aetherSurgeStacks } from '../src/sim/combat/chronomancy';
 import { hasFreeCostFor } from '../src/sim/combat/empower_next';
@@ -279,19 +278,13 @@ describe('Chronomancy Phase 3 balance targets', () => {
         `piro=${(totals.piro / 3).toFixed(2)} (${((chronoDps / (totals.piro / 3)) * 100).toFixed(1)}%) ` +
         `cryo=${(totals.cryo / 3).toFixed(2)} (${((chronoDps / (totals.cryo / 3)) * 100).toFixed(1)}%)\n`,
     );
-    // Measured on the v0.35.0 world with the restored rank packets: chrono
-    // 26.48 DPS against piro 40.07 (66.1%) and cryo 46.73 (56.7%). The band is
-    // DERIVED from those readings with real headroom on both sides rather than
-    // shimmed to fit: an earlier revision of this test sat 0.15 DPS over a 65%
-    // ceiling and carried an absolute tolerance constant to pass, which pins
-    // nothing. 70% is the ceiling the piro arm actually supports (3.9 points of
-    // room), 50% the floor the cryo arm supports (6.7 points). Both still fail
-    // if Chronomancy drifts toward pure-DPS parity, which is the contract.
-    // NOTE for the class owner: 66.1% of Piro is above the 65% the PRD asked
-    // for, a consequence of the level-20 rank packets landing, not of sampling.
+    // This is the complete conservative HEALER loop: Echo upkeep and periodic
+    // Mend/Barrier casts share the same 40-second combat window as the pure-DPS
+    // baselines. Keep the result inside the PRD's 50-65% contribution band;
+    // do not widen the product contract to fit a sampled reading.
     for (const pureDps of [totals.piro / 3, totals.cryo / 3]) {
       expect(chronoDps).toBeGreaterThanOrEqual(pureDps * 0.5);
-      expect(chronoDps).toBeLessThanOrEqual(pureDps * 0.7);
+      expect(chronoDps).toBeLessThanOrEqual(pureDps * 0.65);
     }
   });
 

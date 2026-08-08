@@ -65,6 +65,7 @@ export type UiIconName =
   | 'jump'
   | 'autorun'
   | 'swap'
+  | 'sort'
   | 'nameplates'
   | 'vibrate'
   | 'lock'
@@ -79,7 +80,10 @@ export type UiIconName =
   | 'makers-mark'
   | 'enchant-rune'
   | 'bond-link'
-  | 'download';
+  | 'download'
+  | 'eye'
+  | 'eye-off'
+  | 'wiki';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -176,10 +180,19 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
   // page-cycle badge), matching the jump/autorun glyph weight
   swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
+  // hand-authored sort: three shrinking bars plus a down arrow (the bag
+  // clean-up button; matches the swap/meters geometric weight)
+  sort: '<path d="M64 104h288v48H64zM64 232h208v48H64zM64 360h128v48H64zM402 104h48v224h-48z"/><path d="M362 328h128l-64 88z"/>',
   // hand-authored download: arrow into a base line (the desktop update card),
   // matching the jump glyph weight
   download:
     '<path d="M236 72h40v196h84L256 372 156 268h80z"/><rect x="116" y="408" width="280" height="40" rx="14"/>',
+  // hand-authored eye (the paperdoll helmet-visibility toggle): almond outline
+  // cut open around a solid pupil (evenodd ring, like the vibrate case)
+  eye: '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/>',
+  // the eye behind a diagonal slash bar (helm hidden state)
+  'eye-off':
+    '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/><path d="M106 42 470 406l-40 40L66 82z" stroke="rgba(40,26,20,0.85)" stroke-width="26"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
@@ -210,6 +223,11 @@ const ICONS: Record<UiIconName, string> = {
   // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
   professions:
     '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // hand-authored question mark (the Wiki launcher): a stroked hook over a dot,
+  // the universal "look it up" affordance, drawn bold so it reads at
+  // micro-button size and stays tellable apart from the emote speech bubble
+  // (a filled balloon) and the deeds book (a solid tome)
+  wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.
