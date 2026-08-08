@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -278,6 +279,26 @@ describe('painted HUD-chrome launcher icons', () => {
     // membership itself so dropping the row is a red, not a silent downgrade.
     expect(hasChromeIconArt('crown')).toBe(true);
     expect(chromeIconUrl('crown')).toBe('/ui/chrome/crown.webp');
+  });
+
+  it('keeps the crown webp in lockstep with its committed SVG source', () => {
+    // The crown is the one chrome icon with an in-repo source
+    // (scripts/assets/chrome_crown/, its siblings were generated externally),
+    // so drift between the two is detectable and worth pinning: an SVG edit
+    // that was never re-rendered, or a re-render never re-encoded, reds here.
+    // To update BOTH legitimately: edit crown.svg, run
+    // `node scripts/assets/chrome_crown/render_source.mjs` then
+    // `npm run assets:chrome`, and re-pin both hashes in one commit.
+    const sha = (rel: string) =>
+      createHash('sha256')
+        .update(readFileSync(path.join(repoRoot, rel)))
+        .digest('hex');
+    expect(sha('scripts/assets/chrome_crown/crown.svg')).toBe(
+      '768004a53601a7a4c2ba90faa1f851fa0e74e66bd28df3f1fe5cb9bd7d969a45',
+    );
+    expect(sha('public/ui/chrome/crown.webp')).toBe(
+      '139900a0f4ff72186d9d3ea0584ba418c499f4ef9e17d5e858b920ecacc7cf8c',
+    );
   });
 
   it('hydrates an art id as a decorative <img> and everything else as inline <svg>', () => {

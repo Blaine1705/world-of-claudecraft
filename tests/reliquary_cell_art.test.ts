@@ -479,6 +479,36 @@ describe('ReliquaryWindow cell markup', () => {
     );
   });
 
+  it('paints a painted-crest title cell through the crest branch, no canvas', () => {
+    // The one window branch no other arm executes (QA gate should-fix): a
+    // mutant reverting the crest arm to the ghost across the 36-cell titles
+    // shelf must red here. prog_veteran ships painted crest art, so
+    // iconDataUrl short-circuits to the static URL and happy-dom needs no
+    // canvas; the category-crest tier composites and stays covered at the
+    // descriptor level.
+    const rig = makeRig();
+    openPage(rig, 'horizons', 'horizons_titles');
+    const img = cellArt(rig, 'prog_veteran');
+    expect(img.getAttribute('class')).toBe('item-icon q-epic');
+    expect(img.getAttribute('src')).toBe('/ui/deeds/prog_veteran.webp');
+  });
+
+  it('paints a weapon-skin cell in the exact shape the missing-state carve-out targets', () => {
+    // Joins the CSS declaration pin (reliquary_window.test.ts) to real cell
+    // output: the carve-out selector must MATCH the painted markup, or the
+    // opaque Armory card renders as the black tile the rule exists to fix.
+    const rig = makeRig();
+    openPage(rig, 'horizons', 'horizons_weapon_skins');
+    const img = cellArt(rig, 'brasscap_axe');
+    expect(img.getAttribute('src')).toBe('/ui/store/armory/brasscap_axe.webp');
+    const cell = rig.el.querySelector<HTMLElement>('.reliquary-cell[data-cell-id="brasscap_axe"]');
+    if (!cell) throw new Error('contract: the skins page paints the brasscap_axe cell');
+    expect(cell.matches('.reliquary-cell--missing[data-cell-kind="weapon_skin"]')).toBe(true);
+    expect(img.matches('.reliquary-cell--missing[data-cell-kind="weapon_skin"] .item-icon')).toBe(
+      true,
+    );
+  });
+
   it('shares the resolver with the Overview recent strip', () => {
     // The chip and the cell are one implementation (cellIconHtml), so a mark
     // that just landed shows the same profession art in the strip as on its

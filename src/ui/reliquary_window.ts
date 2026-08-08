@@ -24,7 +24,7 @@
 // module injects.
 
 import { audio } from '../game/audio';
-import { MOUNTS } from '../sim/content/mounts';
+import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
@@ -34,7 +34,7 @@ import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, getLanguage, languageTag, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl } from './icons';
-import { knownItemDef } from './known_item';
+import { knownItemDef, ownEntry } from './known_item';
 import { ReannounceMarker } from './live_region_reannounce';
 import type { PainterHostPresentation } from './painter_host';
 import { type ReliquaryArtSlot, reliquaryCellArt } from './reliquary_cell_art';
@@ -1395,8 +1395,11 @@ export class ReliquaryWindow {
   }
 
   private cellQuality(cell: ReliquaryArtSlot): string {
+    // Each table read goes through its own canonical resolver (knownItemDef /
+    // mountDef / ownEntry), matching cellIconHtml's own-property discipline:
+    // cell ids arrive off the wire on the recent ring.
     if (cell.kind === 'item' || cell.kind === 'unknown') {
-      const def = ITEMS[cell.id];
+      const def = knownItemDef(ITEMS, cell.id);
       if (def?.quality) return def.quality;
     }
     // Profession marks: masterworks read as epic; rare field notes as rare.
@@ -1405,11 +1408,11 @@ export class ReliquaryWindow {
       if (cell.id.startsWith('gather_event:')) return 'rare';
     }
     if (cell.kind === 'mount') {
-      const def = MOUNTS[cell.id as keyof typeof MOUNTS];
+      const def = mountDef(cell.id);
       if (def?.rarity) return def.rarity;
     }
     if (cell.kind === 'weapon_skin') {
-      const def = WEAPON_SKINS[cell.id];
+      const def = ownEntry(WEAPON_SKINS, cell.id);
       if (def?.rarity) return def.rarity;
     }
     if (cell.kind === 'title') return 'epic';

@@ -4693,7 +4693,8 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
   }
   // Deed crests with committed painted art short-circuit to the static WebP. A URL-only path is
   // sufficient: deed crests are only ever drawn into <img> tags (the Book of Deeds cards and
-  // recent strip, and the Reliquary title shelf) through this function, never through the synchronous iconCanvas path
+  // recent strip, and the Reliquary title shelf) through this function, never through the
+  // synchronous iconCanvas path
   // (that is class-crest portraits only, unit_portrait_painter.ts), so no canvas is needed. Every
   // other crest id (class/talent crests, the deed_cat_* bases, bespoke procedural recipes) returns
   // null here and falls through to the composited canvas below.

@@ -1220,10 +1220,12 @@ owns the push.
   CLAUDE.md bullet header names the module, and the sim comment drops its
   ui path.
 - Recorded calls (not built, deliberate): (a) the 29 armory thumbnails
-  are 512px painted into 48-56px cells (~380 KB cold for the one shelf,
-  warm after any Armory visit); a 128px derivative set stays an option if
-  the weight ever matters, recorded rather than duplicating 29 assets
-  now. (b) The new test file's window rig drives one Sim-shaped stub
+  are 512px painted into 48-56px cells; the cost that matters is DECODE
+  memory (about 30 MB of decoded RGBA for the one shelf; transfer is
+  325 KB), and it duplicates the identical peak the Armory store window
+  already pays with the same 29 files rather than creating a new one; a
+  128px derivative set stays an option if the weight ever matters,
+  recorded rather than duplicating 29 assets now. (b) The new test file's window rig drives one Sim-shaped stub
   only; the facet types pin reliquaryRecent/reliquaryMarks to identical
   shapes in both hosts and the dual-host source pin lives in
   tests/reliquary_window.test.ts, so a second stub shape would assert
@@ -1257,3 +1259,25 @@ owns the push.
   instead. The per-kind resolver extraction rule was checked and NOT
   triggered for reliquaryRelicPageId/PageIndex (2 production call sites
   each, not 3).
+- QA gate (qa-checklist, fresh agent): READY, zero blocking, 2 should-fix
+  + 4 nice-to-have, every finding applied in the reviewed fix round: the
+  two execution-coverage arms (the window's crest branch driven through a
+  painted title on horizons_titles, and a weapon-skin cell asserted to
+  MATCH the missing-state carve-out selector, joining the CSS pin to real
+  markup), cellQuality upgraded to each table's canonical resolver
+  (knownItemDef / mountDef / ownEntry, matching cellIconHtml), the
+  icons.ts comment re-wrapped, a crown.svg-to-crown.webp sha256 lockstep
+  pin in chrome_icons (with the re-render recipe in the comment; the SVG
+  also gained a title element for biome's error-tier noSvgWithoutTitle,
+  which surfaced when the source file became tracked), and the armory
+  weight note reframed to decode memory. The QA's VERIFY items: the full
+  gate ran green after the fix (below); mobile evidence is the committed
+  3x screenshots; perf:tour and the deeper mobile E2E belong to the
+  Phase 16 QA session.
+- Gate: node scripts/gate_select.mjs PASS, all 8 steps green (full-suite
+  fallback mode: 2364 files / 33031 tests passed, 2 expected fails, the
+  browser step 16 files / 110 tests, typecheck and all five builds
+  clean). One red on the first run: biome's noSvgWithoutTitle on the
+  newly committed crown.svg (untracked files are invisible to
+  ci:changed, so the pre-commit manual run could not see it); fixed with
+  the title element and the gate re-ran fully green.
