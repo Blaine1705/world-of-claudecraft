@@ -29,41 +29,75 @@ function scan(method: string) {
   return readMethodCallSites('src/ui/hud.ts', HUD_SRC, 'Hud', method);
 }
 
+/** Source text of one `Hud` method, for the presence half of each check. */
+function methodSource(method: string): string {
+  const from = HUD_SRC.slice(HUD_SRC.indexOf(`private ${method}`));
+  return from.slice(0, from.indexOf('\n  }\n') + 4);
+}
+
+// The two unrefundable-currency shops, each with the EXACT command its confirm
+// callback is required to own. Naming the command per shop is load-bearing, not
+// tidiness: the first version of this file asserted `buyItem` for BOTH rows, and
+// the Marks command is `buyHeroicVendorItem`, which does not contain that
+// substring. So the sibling row could never have failed, however the heroic
+// purchase was refactored, while claiming to cover it (OSSBrain review, #3137).
+// Parameterizing removes the whole class of mistake: each row now says the one
+// call it forbids, and the vacuity assertion below proves that call is really in
+// the method it names.
+const CONFIRMED_PURCHASES = [
+  { method: 'requestWarfarePurchase', command: 'buyItem', label: 'Warfare (honor)' },
+  {
+    method: 'requestHeroicVendorPurchase',
+    command: 'buyHeroicVendorItem',
+    label: 'Heroic Marks',
+  },
+] as const;
+
 describe('Warfare purchases are gated behind the confirm dialog', () => {
-  it('routes the buy through confirmDialog and never calls buyItem directly', () => {
-    const { sites } = scan('requestWarfarePurchase');
-    const calls = sites.map((s) => s.call);
+  it.each(CONFIRMED_PURCHASES)(
+    'routes the $label buy through confirmDialog, never calling $command directly',
+    ({ method, command }) => {
+      const calls = scan(method).sites.map((s) => s.call);
 
-    // The dialog IS evaluated by the method.
-    expect(calls, 'requestWarfarePurchase must open the confirm dialog').toContain(
-      'this.confirmDialog',
-    );
+      // The dialog IS evaluated by the method.
+      expect(calls, `${method} must open the confirm dialog`).toContain('this.confirmDialog');
 
-    // The purchase is NOT. It lives in the accept callback, which the walk
-    // deliberately does not count as a direct evaluation. If someone hoists it out of
-    // the callback, it appears here and this fails.
-    expect(
-      calls.filter((c) => c.includes('buyItem')),
-      'buyItem must fire only from the confirm callback, never directly',
-    ).toEqual([]);
-  });
+      // The purchase is NOT. It lives in the accept callback, which the walk
+      // deliberately does not count as a direct evaluation, so hoisting it out of
+      // the callback makes it appear here and fails this.
+      expect(
+        calls.filter((c) => c.includes(command)),
+        `${command} must fire only from the confirm callback, never directly`,
+      ).toEqual([]);
+    },
+  );
 
-  it('still contains the buy call somewhere, so the gate cannot pass by deletion', () => {
-    // Guards the guard: an empty method would satisfy the assertion above. The buy has
-    // to exist in the source, just not as a direct evaluation.
-    const body = HUD_SRC.slice(HUD_SRC.indexOf('private requestWarfarePurchase'));
-    const method = body.slice(0, body.indexOf('\n  }\n') + 4);
-    expect(method).toContain('buyItem');
-    expect(method).toContain('confirmDialog');
-  });
+  it.each(CONFIRMED_PURCHASES)(
+    'names a $command that really exists in $method, so the row cannot be vacuous',
+    ({ method, command }) => {
+      // Guards the guard, in both directions. An empty method, a renamed command,
+      // or a typo in the table would each satisfy the assertion above by matching
+      // nothing at all. This is exactly what the original single-command version
+      // lacked for the heroic row.
+      const source = methodSource(method);
+      expect(source, `${method} must still perform ${command} somewhere`).toContain(command);
+      expect(source, `${method} must still open a confirm dialog`).toContain('confirmDialog');
+    },
+  );
 
-  it('holds the same shape for the Heroic Marks shop, the other unrefundable currency', () => {
-    // Marks purchases record no buyback either, and the Warfare dialog borrows this
-    // one's title and buttons. Pinning both stops a future refactor from unpicking the
-    // sibling while this file watches only one of them.
-    const calls = scan('requestHeroicVendorPurchase').sites.map((s) => s.call);
-    expect(calls).toContain('this.confirmDialog');
-    expect(calls.filter((c) => c.includes('buyItem'))).toEqual([]);
+  it('forbids a DISTINCT command per shop, so one row cannot stand in for the other', () => {
+    // The heroic bug in miniature: two rows sharing one command string means the
+    // narrower shop is unguarded. Pinning distinctness keeps a future editor from
+    // collapsing them back together.
+    const commands = CONFIRMED_PURCHASES.map((row) => row.command);
+    expect(new Set(commands).size, 'each shop must forbid its own command').toBe(commands.length);
+    // And neither may be a substring of the other, which is the precise trap
+    // here: a `buyItem` filter silently matches nothing in `buyHeroicVendorItem`.
+    for (const a of commands) {
+      for (const b of commands) {
+        if (a !== b) expect(a.includes(b), `${a} must not subsume ${b}`).toBe(false);
+      }
+    }
   });
 
   it('leaves no honor-priced stock reachable through the UNCONFIRMED ordinary window', () => {
