@@ -33,11 +33,13 @@ import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, getLanguage, languageTag, type TranslationKey, t, tPlural } from './i18n';
+import { iconDataUrl } from './icons';
+import { knownItemDef } from './known_item';
 import { ReannounceMarker } from './live_region_reannounce';
 import type { PainterHostPresentation } from './painter_host';
+import { type ReliquaryArtSlot, reliquaryCellArt } from './reliquary_cell_art';
 import { reliquaryPageDesc, reliquaryPageName } from './reliquary_i18n';
 import {
-  type ReliquaryRelicNameKind,
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
   reliquarySourceAriaText,
@@ -74,7 +76,12 @@ import {
 } from './reliquary_view';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
-import { knownItemIconHtml, unknownItemIconHtml } from './unknown_item_icon';
+import {
+  BLANK_PIXEL,
+  itemIconImgHtml,
+  knownItemIconHtml,
+  unknownItemIconHtml,
+} from './unknown_item_icon';
 
 // Re-export pure rank chrome helpers so existing imports keep resolving.
 export { CURATOR_RANK_NAME_KEYS, curatorRankNameKey };
@@ -101,12 +108,10 @@ const NO_FLASH: ReadonlySet<string> = new Set();
  *  chase on the HUD tracker. */
 const RELIQUARY_PIN_KEY_PREFIX = 'woc_reliquary_pins';
 
-/**
- * What the art and quality ladders need from a relic: a grid cell and a recent
- * find are the same slot shape, so both resolve through one implementation
- * (the recent ring's wire-shaped 'unknown' kind rides along).
- */
-type ReliquaryRelicSlot = { kind: ReliquaryRelicNameKind; id: string };
+// The art and quality ladders take the resolver's own slot shape
+// (ReliquaryArtSlot): a grid cell and a recent find are the same slot, so both
+// resolve through one implementation, and importing the core's type keeps the
+// window and the resolver from ever drifting apart structurally.
 
 const FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
   all: 'hudChrome.reliquary.filterAll',
@@ -1344,23 +1349,52 @@ export class ReliquaryWindow {
   }
 
   /**
-   * Art for one relic slot, on the grid and on a recent chip alike. Item relics
-   * get the real procedural icon; every other kind gets the quality ghost until
-   * dedicated art lands with those shelves. One implementation, so a relic
-   * cannot render as art in one place and as a silhouette in the other.
+   * Art for one relic slot, on the grid and on a recent chip alike. Every
+   * catalogued kind resolves real art: reliquary_cell_art.ts walks each kind to
+   * its committed source (reins item, Armory thumbnail, deed crest, profession
+   * sheet, the authored specimen glyph) and this method only turns that answer
+   * into markup. An id this bundle cannot place still falls to the quality
+   * ghost, which is now a stale-client case rather than a whole shelf.
+   *
+   * One implementation for the grid and the strip, so a relic cannot render as
+   * art in one place and as a silhouette in the other.
    */
-  private cellIconHtml(cell: ReliquaryRelicSlot, quality: string): string {
+  private cellIconHtml(cell: ReliquaryArtSlot, quality: string): string {
+    const art = reliquaryCellArt(cell);
+    if (art !== null) {
+      if (art.kind === 'item') {
+        // Straight through the shared itemIcon painter, so a relic cell and the
+        // same stack in the bag are byte-identical (and a mount cell inherits
+        // the reins def's own quality, never a second opinion about it). The
+        // own-property read matches the resolver's R34 discipline even though
+        // the id is already resolver-validated.
+        const def = knownItemDef(ITEMS, art.itemId);
+        if (def) return this.deps.itemIcon(def);
+      } else if (art.kind === 'url') {
+        return itemIconImgHtml(art.url, quality);
+      } else {
+        return itemIconImgHtml(this.crestIconSrc(art.crestId), quality);
+      }
+    }
     if (cell.kind === 'item' || cell.kind === 'unknown') {
-      const def = ITEMS[cell.id];
-      if (def) return this.deps.itemIcon(def);
       return unknownItemIconHtml(cell.id, quality);
     }
-    // Non-item slots (marks / mounts / skins / titles): quality ghost until
-    // dedicated art lands with those shelves. Still readable as a silhouette.
     return knownItemIconHtml({ id: cell.id, quality });
   }
 
-  private cellQuality(cell: ReliquaryRelicSlot): string {
+  /** A deed crest's src, carrying the item ladder's never-a-throw swallow: a
+   *  crest with no painted art composites its category recipe on a canvas, and
+   *  a host without one must still paint a cell rather than take the window
+   *  down (the unknown_item_icon.ts contract). */
+  private crestIconSrc(crestId: string): string {
+    try {
+      return iconDataUrl('crest', crestId);
+    } catch {
+      return BLANK_PIXEL;
+    }
+  }
+
+  private cellQuality(cell: ReliquaryArtSlot): string {
     if (cell.kind === 'item' || cell.kind === 'unknown') {
       const def = ITEMS[cell.id];
       if (def?.quality) return def.quality;

@@ -8549,6 +8549,13 @@
     filter: brightness(0.18) contrast(1.1);
     opacity: 0.9;
   }
+  /* Weapon-skin art is the Armory store thumbnail, an OPAQUE card with its own
+     painted background, so the item silhouette treatment above reads as a
+     near-black tile instead of a shape. Grayscale plus a gentler darken keeps
+     the weapon silhouette visible while still reading locked. */
+  .reliquary-cell--missing[data-cell-kind="weapon_skin"] .item-icon {
+    filter: grayscale(1) brightness(0.45) contrast(1.05);
+  }
   .reliquary-empty {
     padding: 16px 8px;
     font-size: 13px;

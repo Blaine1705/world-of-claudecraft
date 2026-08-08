@@ -1077,6 +1077,15 @@ describe('styles and architecture registration', () => {
     expect(reliquaryCss).toContain('.reliquary-grid');
     expect(reliquaryCss).toContain('.reliquary-cell--missing');
     expect(reliquaryCss).toContain('.reliquary-cell--owned');
+    // Phase 16: missing weapon-skin cells silhouette their OPAQUE Armory card
+    // with grayscale plus a gentler darken (the item treatment reads as a
+    // black tile on card art). Declaration-level pin so an emptied block reds.
+    expect(reliquaryCss).toContain(
+      '.reliquary-cell--missing[data-cell-kind="weapon_skin"] .item-icon',
+    );
+    expect(reliquaryCss).toMatch(
+      /\.reliquary-cell--missing\[data-cell-kind="weapon_skin"\] \.item-icon \{\s*filter: grayscale\(1\)/,
+    );
     // Phase 6 seal chrome (cosmetic ranks).
     expect(reliquaryCss).toContain('.reliquary-rank-seal');
     expect(reliquaryCss).toContain('data-seal="apprentice"');

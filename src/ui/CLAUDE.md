@@ -559,7 +559,7 @@ same file), and each module's header carries its own contract.
   `deed_i18n.locales/` fetched lazily via `DEED_LOCALE_LOADERS`);
   `deeds_leaderboard_view.ts` is the Renown-board tab's pure core.
 - **reliquary_view.ts** / **reliquary_window.ts** (+ **reliquary_i18n.ts**,
-  **reliquary_i18n.locales/**, **reliquary_sheet_view.ts**,
+  **reliquary_i18n.locales/**, **reliquary_sheet_view.ts**, **reliquary_cell_art.ts**,
   **reliquary_tracker_view.ts** / **reliquary_tracker_painter.ts**): The Reliquary collection
   window, the Book of Deeds family exactly. The DOM-free core builds the shelf/page/grid
   models and the drain-batched unlock plan; the painter is a cold, event-driven window off
@@ -572,6 +572,14 @@ same file), and each module's header carries its own contract.
   the nearly-complete default, and the fill-delta flash over one reused container, and
   memoizes the whole-catalog default scan on an ownership signature because
   `reliquaryPageCompletion` mints a fresh ownership bag per call in BOTH hosts.
+  **reliquary_cell_art.ts** is the per-kind art resolver both the grid and the recent strip
+  read through: it maps a relic slot to a DESCRIPTOR (an item id, a public URL, or a deed
+  crest id) and never mints markup, so every kind reaches art that already ships (a mount
+  through its reins ItemDef, a skin through the Armory thumbnail, a title through
+  `deedCrestId`, a mark through the profession sheet) instead of the procedural unknown-item
+  ghost. Null means "this bundle cannot place the id" and the window keeps its stale-client
+  fallback; any art the window paints from a descriptor still lands in the shared
+  `itemIconImgHtml` shape, because `.item-icon` is what the cell CSS sizes and silhouettes.
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.

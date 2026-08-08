@@ -431,16 +431,22 @@ export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
  *  (gatherRareEventFlavor plus NODE_HARVEST_TABLE, src/sim/professions/).
  *  gather_event:perfect_specimen is absent on purpose: it fires on corpse
  *  harvest, which belongs to no gathering profession and takes the
- *  corpse_harvest ACTIVITY hint instead. */
-const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = {
+ *  corpse_harvest ACTIVITY hint instead.
+ *
+ *  Exported because the client's cell-art resolver paints each field note
+ *  with its gathering profession's art and must read that pairing from here
+ *  rather than re-listing it. */
+export const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = Object.freeze({
   'gather_event:pristine_vein': 'mining',
   'gather_event:ancient_heartwood': 'logging',
   'gather_event:moonlit_bloom': 'herbalism',
-};
+});
 
 /** Specimen jackpot to its gathering profession. The five corpse-harvest
  *  pristine specimens are absent for the same reason as perfect_specimen, and
- *  take the same corpse_harvest activity hint. */
+ *  take the same corpse_harvest activity hint. Stays private, unlike its
+ *  exported sibling above: specimen relics are `kind: 'item'` and resolve
+ *  their art through ITEMS, so the cell-art resolver never reads this map. */
 const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = {
   fine_thorium_ore: 'mining',
   fine_elderwood_log: 'logging',
