@@ -4,7 +4,7 @@
 ```
 This is Phase 1 of the Desktop Client Update: Electron runtime plumbing.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: not needed (small phase).
+Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none in this phase (standard agent fan-out only).
 
 PROJECT RULES (non-negotiable, from docs/desktop-client-update/state.md):
 - Work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update (branch

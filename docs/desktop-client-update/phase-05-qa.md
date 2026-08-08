@@ -5,8 +5,9 @@
 This is Phase 5 QA of the Desktop Client Update: verify the recovery-ladder fix and the
 LOW monotonicity retune.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: allowed if you want an
-adversarial-verify pass over the numeric retune.
+Model: Fable 5, xhigh effort. Harness: Claude Code. ultracode. Orchestrate this audit as a deterministic Workflow: parallel audit
+agents per focus area, findings adversarially verified by independent skeptics
+before they count.
 
 PROJECT RULES: work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update
 (git -C always); LOCAL-ONLY, never push; first pull+merge origin/release/v0.36.0;

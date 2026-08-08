@@ -5,8 +5,7 @@
 This is Phase 5 of the Desktop Client Update: governor recovery ladder and LOW-tier
 monotonicity.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: not needed, but this is
-the subtlest phase; prefer depth over speed.
+Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none in this phase (standard agent fan-out only).
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,

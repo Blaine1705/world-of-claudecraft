@@ -5,8 +5,10 @@
 This is Phase 6 QA of the Desktop Client Update: verify the three train. This is the
 highest-risk phase in the packet; budget accordingly.
 
-Model: Opus 4.8, xhigh effort, 1m context variant if needed. Harness: Claude Code.
-ULTRACODE: recommended; run finding-verification adversarially.
+Model: Fable 5, xhigh effort, 1m context variant if needed. Harness: Claude Code.
+ultracode. Orchestrate this audit as a deterministic Workflow: parallel audit
+agents per focus area, findings adversarially verified by independent skeptics
+before they count.
 
 PROJECT RULES: work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update
 (git -C always); LOCAL-ONLY, never push; first pull+merge origin/release/v0.36.0 (if

@@ -4,9 +4,10 @@
 ```
 This is Phase 6 of the Desktop Client Update: the three.js 0.185 train.
 
-Model: Opus 4.8, xhigh effort, 1m context variant if the renderer file load demands it.
-Harness: Claude Code. ULTRACODE: allowed; the migration walk is broad and benefits from
-a pipeline (audit item -> patch -> verify) with adversarial verification.
+Model: Fable 5, xhigh effort, 1m context variant if the renderer file load demands it.
+Harness: Claude Code. Workflow orchestration: standard agent fan-out; the migration walk may be pipelined
+with adversarial verification if this session is opted into Workflow orchestration
+at runtime.
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,

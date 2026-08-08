@@ -5,8 +5,9 @@
 This is Phase 11 of the Desktop Client Update: final integration QA. This closes the
 packet.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: recommended for the
-whole-packet audit sweep.
+Model: Fable 5, xhigh effort. Harness: Claude Code. ultracode. Orchestrate this audit as a deterministic Workflow: parallel audit
+agents per focus area, findings adversarially verified by independent skeptics
+before they count.
 
 PROJECT RULES: work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update
 (git -C always); LOCAL-ONLY, never push (the user lifts this AFTER this phase);

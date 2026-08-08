@@ -1,6 +1,6 @@
 # Desktop Client Update: implementation plan
 
-TOC packet. Each phase is a fresh Claude Code session running Opus 4.8 at xhigh effort;
+TOC packet. Each phase is a fresh Claude Code session running Fable 5 at xhigh effort;
 the starter prompt for phase N lives in phase-NN-<slug>.md and its QA in
 phase-NN-qa.md. This file carries the canonical workflow and the one Review Dispatch
 Matrix; phase files reference them and never inline copies.

@@ -5,7 +5,10 @@
 This is Phase 9 QA of the Desktop Client Update: verify OS notifications and the
 what's-new link.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code.
+Model: Fable 5, xhigh effort. Harness: Claude Code.
+ultracode. Orchestrate this audit as a deterministic Workflow: parallel audit
+agents per focus area, findings adversarially verified by independent skeptics
+before they count.
 
 PROJECT RULES: work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update
 (git -C always); LOCAL-ONLY, never push; first pull+merge origin/release/v0.36.0;

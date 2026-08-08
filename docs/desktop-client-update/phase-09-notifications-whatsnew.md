@@ -4,7 +4,7 @@
 ```
 This is Phase 9 of the Desktop Client Update: OS notifications and the what's-new link.
 
-Model: Opus 4.8, xhigh effort. Harness: Claude Code. ULTRACODE: not needed.
+Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none in this phase (standard agent fan-out only).
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,
