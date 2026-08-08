@@ -159,6 +159,25 @@ describe('the castle stone slabs use the program-preserving clone', () => {
   });
 });
 
+describe('the town ghost and independent-building clones preserve programs', () => {
+  it('routes the three kit clone sites through material_clone_hooks', () => {
+    // A bare clone at any of these sites drops the zone-haze hook, splits the
+    // program cache key, and links a program per kit material the first time
+    // a crowd arrival whips the camera across town (the measured
+    // first-contact burst: village/khex/fenbridge materials linking inside
+    // one frame).
+    const sites = [
+      ['props.ts', 'const ghostSrc = cloneMaterialWithHooks(src)'],
+      ['fenbridge_town.ts', 'independent ? cloneMaterialWithHooks(shared) : shared'],
+      ['eastbrook_town.ts', 'independent ? cloneMaterialWithHooks(shared) : shared'],
+    ];
+    for (const [file, needle] of sites) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source, `${file} lost its hook-preserving clone`).toContain(needle);
+    }
+  });
+});
+
 describe('the ability-VFX body glow uses the program-preserving clone', () => {
   it('clones the rig material through material_clone_hooks', () => {
     const visual = readFileSync(
