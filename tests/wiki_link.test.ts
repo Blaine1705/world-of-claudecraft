@@ -3,6 +3,7 @@
 // so what this suite pins is that nothing opens before OK, that a dismissal
 // opens nothing, and that the URL follows the deploy being played.
 
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CANONICAL_WIKI_URL, promptWikiVisit, resolveWikiUrl } from '../src/ui/wiki_link';
 
@@ -72,5 +73,26 @@ describe('promptWikiVisit', () => {
     promptWikiVisit({ confirm, openUrl });
     (confirm.mock.calls[0][4] as () => void)();
     expect(openUrl).toHaveBeenCalledWith(CANONICAL_WIKI_URL);
+  });
+});
+
+// The launcher's HUD wiring is optional-chained ($('#mm-wiki')?.addEventListener),
+// so a dropped id in either entry document would silently disarm the button with
+// every suite green. Pin the ids in BOTH entries plus the Hud binding so removal
+// fails here instead of shipping a dead control.
+describe('wiki launcher wiring pins', () => {
+  const entries = ['index.html', 'play.html'] as const;
+
+  it('both entry documents carry the desktop micro button and the mobile More-tray twin', () => {
+    for (const file of entries) {
+      const html = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+      expect(html, `${file} lost #mm-wiki`).toContain('id="mm-wiki"');
+      expect(html, `${file} lost #mobile-wiki`).toContain('id="mobile-wiki"');
+    }
+  });
+
+  it('Hud binds the micro button to the confirm-first opener', () => {
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain("$('#mm-wiki')?.addEventListener('click', () => this.openWiki());");
   });
 });
