@@ -7,14 +7,10 @@
 // percentages, no drop rates, no per-boss mount tables, no race time budget.
 
 import { formatNumber } from '../../ui/i18n';
+import { RIDING_MIN_LEVEL } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, p, pageHeader, paras, related, section } from './ui';
-
-// Mirrors MOUNT_TRAIN_MIN_LEVEL in src/sim/mounts_training.ts. Copied rather than
-// imported: that module pulls src/sim/data (the whole content graph) into the guide
-// bundle for one integer. It is a plain player-facing gate, told to you in game.
-const RIDING_MIN_LEVEL = 20;
 
 export const mounts: GuidePage = {
   titleKey: 'guide.nav.mounts',

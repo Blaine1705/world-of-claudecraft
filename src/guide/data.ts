@@ -17,6 +17,15 @@ export const LEVEL_CAP = 20;
  */
 export const RIFT_MIN_LEVEL = 20;
 
+/**
+ * The level the stablemaster will teach Riding at (MOUNT_TRAIN_MIN_LEVEL in
+ * src/sim/mounts_training.ts). Mirrored rather than imported, like the two above:
+ * importing that module would pull the sim's whole content graph into the guide bundle
+ * for one integer. Two pages state this gate (mounts and progression), so it lives here
+ * once and is pinned in tests/guide_level_cap_drift.test.ts.
+ */
+export const RIDING_MIN_LEVEL = 20;
+
 export interface ClassChip {
   id: string;
   nameKey: TranslationKey;

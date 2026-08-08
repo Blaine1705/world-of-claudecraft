@@ -1,21 +1,17 @@
-// Leveling and Progression. How experience is earned, the journey across the three
+// Leveling and Progression. How experience is earned, the journey across the world's
 // zones, rested XP, and what waits at the cap. Spoiler-safe and number-free by design:
 // systems and direction only, no XP amounts, percentages, or timings.
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
-import { LEVEL_CAP, ZONE_TEASERS } from '../data';
+import { LEVEL_CAP, RIDING_MIN_LEVEL, ZONE_COUNT, ZONE_TEASERS } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { lead, related } from './ui';
 
-// The three zones, in level-band order, named from the existing world teaser keys.
+// Every zone, in level-band order, named from the shared world teaser rows (which are
+// themselves derived from the sim), so this list cannot fall behind the world.
 const ZONES = ZONE_TEASERS;
-
-// Mirrors MOUNT_TRAIN_MIN_LEVEL in src/sim/mounts_training.ts. Held locally rather than
-// imported so the guide bundle never pulls the sim's content graph in for one number;
-// it is a plain player-facing requirement the trainer states in game.
-const RIDING_MIN_LEVEL = 20;
 
 export const progression: GuidePage = {
   titleKey: 'guide.nav.progression',
@@ -40,7 +36,7 @@ export const progression: GuidePage = {
 
         <section class="guide-block">
           <h2>${esc(t('guide.progression.journeyTitle'))}</h2>
-          <p>${esc(t('guide.progression.journeyBody'))}</p>
+          <p>${esc(t('guide.progression.journeyBodyCount', { zones: formatNumber(ZONE_COUNT) }))}</p>
           <ol class="guide-basics">${zones}</ol>
         </section>
 
@@ -52,6 +48,7 @@ export const progression: GuidePage = {
         <section class="guide-block">
           <h2>${esc(t('guide.progression.capTitle', { cap: formatNumber(LEVEL_CAP) }))}</h2>
           <p>${esc(t('guide.progression.capJourneyBody', { cap: formatNumber(LEVEL_CAP) }))}</p>
+          <p>${esc(t('guide.progression.capEndgameBody'))}</p>
           <p>${esc(t('guide.progression.prestigeBody'))}</p>
         </section>
 
@@ -66,6 +63,8 @@ export const progression: GuidePage = {
           { href: hrefFor('reference/combat'), key: 'guide.nav.combat' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
           { href: hrefFor('mounts'), key: 'guide.nav.mounts' },
+          { href: hrefFor('delves'), key: 'guide.nav.delves' },
+          { href: hrefFor('rifts'), key: 'guide.nav.rifts' },
           { href: hrefFor('deeds'), key: 'guide.nav.deeds' },
         ])}
       </article>`;

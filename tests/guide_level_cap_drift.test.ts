@@ -1,16 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { LEVEL_CAP, RIFT_MIN_LEVEL, ZONE_TEASERS } from '../src/guide/data';
+import { LEVEL_CAP, RIDING_MIN_LEVEL, RIFT_MIN_LEVEL, ZONE_TEASERS } from '../src/guide/data';
 import { ZONES } from '../src/sim/data';
+import { MOUNT_TRAIN_MIN_LEVEL } from '../src/sim/mounts_training';
 import { RIFT_MIN_LEVEL as SIM_RIFT_MIN_LEVEL } from '../src/sim/rift/portals';
 import { MAX_LEVEL } from '../src/sim/types';
 
-// LEVEL_CAP and RIFT_MIN_LEVEL in src/guide/data.ts are hand-duplicated literals, not
-// derived from the sim (the guide never imports the live world): LEVEL_CAP mirrors
-// MAX_LEVEL and RIFT_MIN_LEVEL mirrors the rift portal gate. Guide surfaces render the
-// hand copy directly (home, progression, faq, combat, rifts, and the SEO JSON-LD in
-// head.ts), so a sim level change would silently strand the guide showing a stale number
-// until a human noticed, the same way CLASS_CHIPS drifted before class_colors.test.ts
-// pinned it. This suite is that guard: any drift between the two copies fails CI.
+// The level literals in src/guide/data.ts are hand-duplicated, not derived from the sim
+// (the guide never imports the live world): LEVEL_CAP mirrors MAX_LEVEL, RIFT_MIN_LEVEL
+// mirrors the rift portal gate, and RIDING_MIN_LEVEL mirrors the mount trainer's gate.
+// Guide surfaces render the hand copy directly (home, progression, faq, combat, rifts,
+// mounts, and the SEO JSON-LD in head.ts), so a sim level change would silently strand
+// the guide showing a stale number until a human noticed, the same way CLASS_CHIPS
+// drifted before class_colors.test.ts pinned it. This suite is that guard: any drift
+// between the two copies fails CI.
 
 // ZONE_TEASERS used to be a hand-written subset that listed eight of the fourteen
 // zones and had to be pinned to the sim through a hand-maintained slug -> ZoneDef.id
@@ -31,6 +33,10 @@ describe('guide level cap and zone band freshness', () => {
     // pinned here: raise MAX_LEVEL without moving the rift gate and this reds, which is
     // the signal to reword the note rather than ship a page that lies.
     expect(RIFT_MIN_LEVEL).toBe(MAX_LEVEL);
+  });
+
+  it('RIDING_MIN_LEVEL matches the sim mount training gate', () => {
+    expect(RIDING_MIN_LEVEL).toBe(MOUNT_TRAIN_MIN_LEVEL);
   });
 
   it('gives every sim zone exactly one teaser, under a distinct slug', () => {

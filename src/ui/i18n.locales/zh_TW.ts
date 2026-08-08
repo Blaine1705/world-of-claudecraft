@@ -6576,6 +6576,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.nav.stats': '角色與屬性',
   'guide.progression.bandLabel': '等級 {min} 至 {max}',
   'guide.progression.capBody': '每一級都會讓你更強韌並帶來新技能，一路直到 {cap} 級的上限。',
+  'guide.progression.capEndgameBody':
+    '裂隙是唯一真正等到滿級才開放的內容。它們按自己的節奏在各處國度中撕裂開來，分為 C 到 S 的等階，而全服的每一支隊伍都在爭當率先封印它的那一隊。秘探的告示板同樣一直都在，等你的裝備跟上之後，它更高的難度也值得再走一趟。',
   'guide.progression.capJourneyBody':
     '{cap} 級是上限，是升級的終點，卻不是成長的盡頭。從那裡開始，你會以普通與英雄難度挑戰地城與團隊副本、在世界首領崛起時與他一戰、追逐更好的裝備，並在競技場中試煉自己。',
   'guide.progression.capTitle': '抵達 {cap} 級',
@@ -6583,6 +6585,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每一場戰鬥、每一個任務、每一步北行，都會讓你的英雄更為強大。以下說明升級如何運作，以及當你登上巔峰之後，是什麼讓你持續成長。',
   'guide.progression.journeyBody':
     '這個世界是一片相連的大地，三座區域由南而北排列，每一座都高上一個等級。你從翠綠的山谷起步，奮力穿越沼澤，最終在寒冷的高峰落腳。跟著任務的軌跡走，這片土地便會帶你從一座區域前往下一座。',
+  'guide.progression.journeyBodyCount':
+    '這個世界是一片相連的大地，共有 {zones} 座區域。其中三座是你升級時所走的路，由南而北排列：你從翠綠的山谷起步，奮力穿越沼澤，最終在寒冷的高峰落腳。跟著任務的軌跡走，這片土地便會帶你從一座區域前往下一座。山谷海岸之外還有一座小島，適合低等級時前往；其餘的國度都自那同一條路旁展開，是為已經走完這段攀登的角色而建。',
   'guide.progression.journeyTitle': '北行之路',
   'guide.progression.noRush':
     '不必急。這個世界就在那裡，讓你以自己的步調盡情享受，所以儘管漫遊、接下吸引你目光的任務，讓你的英雄一路成長吧。',

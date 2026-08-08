@@ -6577,6 +6577,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.bandLabel': '{min} 至 {max} 级',
   'guide.progression.capBody':
     '每升一级都会让你更加坚韧，并带来新的技能，一路直至 {cap} 级的等级上限。',
+  'guide.progression.capEndgameBody':
+    '裂隙是唯一真正等到满级才开放的内容。它们按自己的节奏在各处国度中撕裂开来，分为 C 到 S 的等阶，而全服的每一支队伍都在争当率先封印它的那一队。探秘的告示板同样一直都在，等你的装备跟上之后，它更高的难度也值得再走一趟。',
   'guide.progression.capJourneyBody':
     '{cap} 级是上限，是升级的终点，却非成长的尽头。从那时起，你可以打普通与英雄难度的地下城和团队副本，在世界首领崛起时与他一战，追逐更好的装备，并在竞技场中检验自己。',
   'guide.progression.capTitle': '抵达 {cap} 级',
@@ -6584,6 +6586,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。',
   'guide.progression.journeyBody':
     '整个世界是一片连绵不绝的大陆，三大区域由南向北铺展，每一处的等级都更高一层。你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。',
+  'guide.progression.journeyBodyCount':
+    '整个世界是一片连绵不绝的大陆，共有 {zones} 个区域。其中三个是你升级时走的那条路，由南向北铺展：你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。山谷海岸之外还有一座小岛，供低等级时前往；其余的国度都自那同一条路旁展开，是为已经走完这段攀登的角色准备的。',
   'guide.progression.journeyTitle': '北行之旅',
   'guide.progression.noRush':
     '不必着急。这个世界供你按自己的节奏尽情享受，所以尽管漫步，接下吸引你的任务，让你的英雄在旅途中渐渐成长。',

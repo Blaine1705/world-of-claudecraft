@@ -3264,10 +3264,18 @@ export const guideStrings = {
       'You earn experience by completing quests, by defeating enemies, by clearing delves, and by working a profession: harvesting and crafting pay character experience on top of the trade skill they teach, for as long as the work is still teaching you something. Quests give the most by far, so following the quest trail is the fastest way to climb, while kills, delve runs, and the gathering you do along the way fill in the rest.',
     capBody:
       'Each level makes you tougher and brings new abilities, all the way to the cap of level {cap}.',
-    // The leveling journey across the three zones, south to north.
+    // The leveling journey. journeyBody is RETIRED: it described a three-zone strip, and
+    // the list of zones under it is derived from the world, so it read as a contradiction
+    // once the world had fourteen. The reworded copy is a NEW key because it carries a
+    // {zones} token, and adding a token to a shipped key breaks interpolation parity in
+    // every locale that already translated it (the subCount / a4Count precedent). The old
+    // value stays so the locale overlays that carry it keep resolving; it simply stops
+    // rendering.
     journeyTitle: 'The journey north',
     journeyBody:
       'The world is one continuous land, three zones laid south to north, each a step higher in level. You start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next.',
+    journeyBodyCount:
+      'The world is one continuous land of {zones} zones. Three of them are the road you level on, laid south to north: you start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next. An island sits off the valley coast for the early levels, and the rest of the realms open off that same road, built for characters who have already made the climb.',
     bandLabel: 'Levels {min} to {max}',
     // Rested XP, described without numbers.
     restedTitle: 'Rested experience',
@@ -3277,6 +3285,12 @@ export const guideStrings = {
     capTitle: 'Reaching level {cap}',
     capJourneyBody:
       'Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid on normal and heroic, face the world boss when he rises, chase better gear, and test yourself in the arena.',
+    // Named separately rather than folded into capJourneyBody, which is already shipped
+    // and translated: the cap-only content that older paragraph predates. Rifts are the
+    // one thing gated on the cap itself (RIFT_MIN_LEVEL); delves open far earlier, so
+    // they are named here as something that keeps going rather than something that opens.
+    capEndgameBody:
+      'Rifts are the one thing that waits for the cap itself. They tear open out in the realms on their own schedule, ranked from C to S, and every group in the world races to be the one that closes each of them. The delve boards keep going too, and their harder tier is worth another look once your gear has caught up.',
     prestigeBody:
       'Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can claim from your character sheet once you are there. Passing big lifetime-experience milestones also earns deeds in your Book of Deeds, with cosmetic titles and nameplate borders that show on your character sheet. All of it is purely optional and never grants power, just a mark of the road you have walked.',
     // Gentle reassurance.
