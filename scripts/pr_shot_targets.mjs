@@ -1238,6 +1238,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'inventory-sort',
+    label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
+    when: ['sim/inventory_sort', 'ui/bags_window'],
+    // A deliberately messy bag (scattered partial stacks of the same material,
+    // fine grades split from their base, gear and trash interleaved), then the
+    // REAL Sort button press. On a base checkout the button does not exist and
+    // the click is skipped, so the same recipe shoots the honest BEFORE state.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.values?.().next?.()?.value;
+        const scramble = [
+          { itemId: 'copper_ore', count: 12 },
+          { itemId: 'baked_bread', count: 3 },
+          { itemId: 'copper_ore', count: 7 },
+          { itemId: 'fine_copper_ore', count: 4 },
+          { itemId: 'silverleaf_herb', count: 9 },
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'fine_silverleaf_herb', count: 2 },
+          { itemId: 'silverleaf_herb', count: 6 },
+        ];
+        if (meta) for (const s of scramble) meta.inventory.push({ ...s });
+        for (const id of ['eastbrook_arming_sword', 'cryptbone_helm', 'minor_healing_potion']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      await page.evaluate(() => {
+        document.querySelector('button.bag-sort-btn')?.click();
+      });
+      // Past the settle ripple (160ms + capped stagger) so the shot is stable.
+      await wait(900);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],

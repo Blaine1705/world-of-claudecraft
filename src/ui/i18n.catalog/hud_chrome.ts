@@ -2209,6 +2209,12 @@ export const hudChromeStrings = {
     sortRecent: 'Recent',
     sortQuality: 'Quality',
     sortName: 'Name',
+    // The one-shot clean-up button beside the view controls: combines partial
+    // stacks and rearranges the real cells server-side (IWorldInventory
+    // sortInventory), unlike the view-only dropdown above it.
+    sortButton: 'Sort',
+    sortButtonAria: 'Sort your bags',
+    sortButtonHint: 'Combine stacks and group items by type',
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',

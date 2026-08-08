@@ -65,6 +65,7 @@ export type UiIconName =
   | 'jump'
   | 'autorun'
   | 'swap'
+  | 'sort'
   | 'nameplates'
   | 'vibrate'
   | 'lock'
@@ -179,6 +180,9 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
   // page-cycle badge), matching the jump/autorun glyph weight
   swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
+  // hand-authored sort: three shrinking bars plus a down arrow (the bag
+  // clean-up button; matches the swap/meters geometric weight)
+  sort: '<path d="M64 104h288v48H64zM64 232h208v48H64zM64 360h128v48H64zM402 104h48v224h-48z"/><path d="M362 328h128l-64 88z"/>',
   // hand-authored download: arrow into a base line (the desktop update card),
   // matching the jump glyph weight
   download:

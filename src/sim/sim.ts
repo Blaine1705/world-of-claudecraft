@@ -8553,6 +8553,10 @@ export class Sim {
     items.moveInventoryItem(this.ctx, from, to, pid);
   }
 
+  sortInventory(pid?: number): void {
+    items.sortInventory(this.ctx, pid);
+  }
+
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
   // rather than letting the resolver pick. items.equipItem re-validates the slot
   // against the item, so this is a request, never a bypass.

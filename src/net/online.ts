@@ -3886,6 +3886,9 @@ export class ClientWorld implements IWorld {
   moveInventoryItem(from: number, to: number): void {
     this.cmd({ cmd: 'inv_move', from, to });
   }
+  sortInventory(): void {
+    this.cmd({ cmd: 'inv_sort' });
+  }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
   equipItemToSlot(itemId: string, slot: EquipSlot): void {

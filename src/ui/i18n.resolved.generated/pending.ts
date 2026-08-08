@@ -11,6 +11,9 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -37,6 +40,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -63,6 +69,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -89,6 +98,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -116,6 +128,9 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -142,6 +157,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -172,6 +190,9 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -199,6 +220,9 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -225,6 +249,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -251,6 +278,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -277,6 +307,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -303,6 +336,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -329,6 +365,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -355,6 +394,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
@@ -381,6 +423,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
     "hudChrome.charSheet.hidePlaytimeAria",
     "hudChrome.charSheet.playtimeHidden",
     "hudChrome.charSheet.playtimeLabel",
