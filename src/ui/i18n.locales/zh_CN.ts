@@ -10080,6 +10080,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.reliquaryRetroSummary.few': '你的圣物库已更新：补录 {count} 件圣物。',
   'hudChrome.plurals.reliquaryRetroSummary.many': '你的圣物库已更新：补录 {count} 件圣物。',
   'hudChrome.plurals.reliquaryRetroSummary.other': '你的圣物库已更新：补录 {count} 件圣物。',
+  // 中文没有可数名词的复数变化，四个分支使用同一句话。
+  'hudChrome.plurals.reliquaryObtainedTimes.one': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.few': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.many': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.other': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.one': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.few': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.many': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.other': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.few':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.many':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.other':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
   'hudChrome.reliquary.curatorRankName1': '见习策展人',
   'hudChrome.reliquary.curatorRankName2': '战利品保管者',
   'hudChrome.reliquary.curatorRankName3': '大师策展人',

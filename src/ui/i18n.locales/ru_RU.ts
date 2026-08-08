@@ -10738,6 +10738,28 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
   'hudChrome.plurals.reliquaryRetroSummary.other':
     'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
+  // "раз" склоняется по счёту, поэтому три формы здесь действительно разные:
+  // 1 раз, 2 раза, 5 раз. Дробное значение (other) идёт с формой "раза".
+  'hudChrome.plurals.reliquaryObtainedTimes.one': 'Получено {count} раз',
+  'hudChrome.plurals.reliquaryObtainedTimes.few': 'Получено {count} раза',
+  'hudChrome.plurals.reliquaryObtainedTimes.many': 'Получено {count} раз',
+  'hudChrome.plurals.reliquaryObtainedTimes.other': 'Получено {count} раза',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.one':
+    '{name}, каталогизировано, получено {count} раз',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.few':
+    '{name}, каталогизировано, получено {count} раза',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.many':
+    '{name}, каталогизировано, получено {count} раз',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.other':
+    '{name}, каталогизировано, получено {count} раза',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one':
+    '{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раз',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.few':
+    '{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раза',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.many':
+    '{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раз',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.other':
+    '{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раза',
   'hudChrome.reliquary.curatorRankName1': 'Ученик хранителя',
   'hudChrome.reliquary.curatorRankName2': 'Хранитель трофеев',
   'hudChrome.reliquary.curatorRankName3': 'Мастер-хранитель',

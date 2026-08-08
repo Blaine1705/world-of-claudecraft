@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 965,
-      "state": "4fa0698b",
+      "state": "c0ebba77",
       "events": "9ab0f9a1",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 965,
-      "state": "8ad708d0",
+      "state": "37bbef9c",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 965,
-      "state": "52ea90fe",
+      "state": "4bd5a2ea",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "85ab6279",
+      "state": "96e0bb15",
       "events": "15c901ba",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 965,
-      "state": "da656f76",
+      "state": "0d93c0c2",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 965,
-      "state": "3d5c3f5f",
+      "state": "c9705b4b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 965,
-      "state": "dca37f3f",
+      "state": "04af86ab",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "0a8b4cf2",
+      "state": "cbb0985e",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 965,
-      "state": "4841d17f",
+      "state": "f2795eeb",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -176,6 +176,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -237,6 +238,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {

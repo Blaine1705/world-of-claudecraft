@@ -10570,6 +10570,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
   'hudChrome.plurals.reliquaryRetroSummary.other':
     '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
+  // 日本語には可算名詞の複数形がないため、4つの分岐はすべて同一の文になります。
+  'hudChrome.plurals.reliquaryObtainedTimes.one': '入手回数：{count} 回',
+  'hudChrome.plurals.reliquaryObtainedTimes.few': '入手回数：{count} 回',
+  'hudChrome.plurals.reliquaryObtainedTimes.many': '入手回数：{count} 回',
+  'hudChrome.plurals.reliquaryObtainedTimes.other': '入手回数：{count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.one': '{name}、収蔵済み、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.few': '{name}、収蔵済み、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.many': '{name}、収蔵済み、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.other': '{name}、収蔵済み、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one':
+    '{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.few':
+    '{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.many':
+    '{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.other':
+    '{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回',
   'hudChrome.reliquary.curatorRankName1': '見習いキュレーター',
   'hudChrome.reliquary.curatorRankName2': '戦利品の守り手',
   'hudChrome.reliquary.curatorRankName3': 'マスターキュレーター',

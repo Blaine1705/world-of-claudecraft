@@ -743,6 +743,95 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     }
     expect(new Set(ruForms).size, `ru one/few/many were ${JSON.stringify(ruForms)}`).toBe(3);
   });
+
+  it('authors the Phase 17 obtain-count plurals and fills all five non-Latin locales', () => {
+    // Three CLDR-plural bases, four leaves each: the tooltip line plus the two
+    // owned aria arms it has to agree with. English genuinely inflects here
+    // ("1 time" / "2 times"), unlike the count-neutral reliquaryToGo pair.
+    const BASES = [
+      'reliquaryObtainedTimes',
+      'reliquaryCellOwnedObtainedAria',
+      'reliquaryCellOwnedClearsObtainedAria',
+    ];
+    const PLURAL_LEAVES = ['one', 'few', 'many', 'other'];
+    const chromeCode = stripComments(chrome);
+    // English: the singular leaf really is singular, and the other three are
+    // not. Pinning only key PRESENCE would pass on four identical leaves,
+    // which is the exact regression a hand-copied plural block ships.
+    expect(chromeCode).toMatch(/one: 'Obtained \{count\} time',/);
+    for (const leaf of PLURAL_LEAVES.slice(1)) {
+      expect(chromeCode, leaf).toMatch(new RegExp(`${leaf}: 'Obtained \\{count\\} times',`));
+    }
+    // The clear number rides its OWN slot in the combined aria arm: tPlural
+    // owns {count} and selects on it, so reusing {count} for the clear would
+    // silently inflect the sentence off the wrong number.
+    expect(chromeCode).toContain('first found on clear {clears}, obtained {count} time');
+    const fillValue = (table: string, key: string): string | undefined =>
+      table.match(new RegExp(`'${key.replace(/\./g, '\\.')}':\\s*\\n?\\s*'([^']*)'`))?.[1];
+    for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']) {
+      const table = stripComments(read(`../src/ui/i18n.locales/${locale}.ts`));
+      for (const base of BASES) {
+        for (const leaf of PLURAL_LEAVES) {
+          const key = `hudChrome.plurals.${base}.${leaf}`;
+          const value = fillValue(table, key);
+          expect(typeof value, `${locale} ${key} missing`).toBe('string');
+          expect(value?.trim(), `${locale} ${key} empty`).not.toBe('');
+          // Every leaf keeps the placeholders its English carries, or the
+          // number the sentence is about vanishes from that locale.
+          expect(value, `${locale} ${key} lost {count}`).toContain('{count}');
+          if (base !== 'reliquaryObtainedTimes') {
+            expect(value, `${locale} ${key} lost {name}`).toContain('{name}');
+          }
+          if (base === 'reliquaryCellOwnedClearsObtainedAria') {
+            expect(value, `${locale} ${key} lost {clears}`).toContain('{clears}');
+          }
+        }
+      }
+    }
+    // Russian inflects "раз" by count (1 раз / 2 раза / 5 раз), so its three
+    // forms must stay apart on every base. Each capture is asserted to be a
+    // real string first: three undefineds also have a Set size of 1, and would
+    // otherwise fail (or pass) for the wrong reason.
+    const ru = read('../src/ui/i18n.locales/ru_RU.ts');
+    for (const base of BASES) {
+      const forms = PLURAL_LEAVES.slice(0, 3).map((leaf) =>
+        fillValue(ru, `hudChrome.plurals.${base}.${leaf}`),
+      );
+      for (const [i, form] of forms.entries()) {
+        expect(typeof form, `ru ${base}.${PLURAL_LEAVES[i]} did not parse`).toBe('string');
+        expect(form?.trim(), `ru ${base}.${PLURAL_LEAVES[i]} empty`).not.toBe('');
+      }
+      // one and few must differ (раз vs раза); many rejoins one, which is
+      // correct Russian, so the pin is "at least two distinct forms".
+      expect(new Set(forms).size, `ru ${base} was ${JSON.stringify(forms)}`).toBeGreaterThanOrEqual(
+        2,
+      );
+      expect(forms[0], `ru ${base}: one and few must not collapse`).not.toBe(forms[1]);
+    }
+  });
+
+  it('renders the obtain tally through ONE helper both owned tooltip branches call', () => {
+    // The agreement contract, pinned at the source: the plain body and the
+    // full-item-tooltip early return both append the line, and the label
+    // carries it too. A branch that quietly dropped it would ship a tooltip
+    // that loses a fact depending on whether the ItemDef resolved.
+    const code = stripComments(painter);
+    expect(code).toContain('private obtainedLineHtml(cell: ReliquaryGridCellModel): string');
+    expect(code.match(/this\.obtainedLineHtml\(cell\)/g)?.length, 'both owned branches').toBe(2);
+    expect(code).toMatch(/body \+= this\.obtainedLineHtml\(cell\);/);
+    expect(code).toMatch(/html \+= this\.obtainedLineHtml\(cell\);/);
+    // CLDR selection on the RAW count, with the DISPLAY value interpolated:
+    // selecting on a formatted string collapses every locale onto .other.
+    expect(code).toContain(
+      "tPlural('hudChrome.plurals.reliquaryObtainedTimes', count, { count: this.fmt(count) })",
+    );
+    expect(code).toContain("tPlural('hudChrome.plurals.reliquaryCellOwnedObtainedAria', count, {");
+    expect(code).toContain(
+      "tPlural('hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria', count, {",
+    );
+    // Absent means "cannot say" (traded, mailed, bought): no line, no zero.
+    expect(code).toMatch(/if \(count === undefined\) return '';/);
+  });
 });
 
 describe('hud orchestration', () => {
@@ -978,8 +1067,11 @@ describe('entry HTML and i18n chrome', () => {
     // that filled; the rank line opens Overview, the one surface that shows the
     // seal (open('overview') now clears a persisted off-shelf page).
     expect(handler).toContain('const pageIndex = reliquaryRelicPageIndex(RELIQUARY_PAGES);');
-    expect(handler).toContain('const firstFind = this.sim.reliquaryFirstFind;');
-    expect(handler).toContain('const pageId = reliquaryRelicPageId(pageIndex, firstFind, log.id);');
+    // Phase 17: the resolver reads the catalog index alone (the stored
+    // first-find pageId hint is gone), so the handler no longer threads
+    // this.sim.reliquaryFirstFind through it.
+    expect(handler).not.toContain('this.sim.reliquaryFirstFind');
+    expect(handler).toContain('const pageId = reliquaryRelicPageId(pageIndex, log.id);');
     expect(handler).toContain(
       'deedChatLinkEl(document, name, () => this.reliquaryWindow.openWithPage(pageId))',
     );

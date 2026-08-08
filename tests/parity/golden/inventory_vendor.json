@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "4efa8ac6",
+      "state": "7916fd78",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -92,6 +92,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -170,7 +171,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b4bc9e35",
+      "state": "66b7e04f",
       "events": "a005f741",
       "rng": {
         "draws": 0,
@@ -237,6 +238,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -315,7 +317,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "67baa46f",
+      "state": "46e93ffb",
       "events": "f03ad83d",
       "rng": {
         "draws": 0,
@@ -389,10 +391,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -474,7 +477,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "19eeb31a",
+      "state": "4b520a6a",
       "events": "67742213",
       "rng": {
         "draws": 0,
@@ -548,10 +551,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -633,7 +637,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "1503cfb6",
+      "state": "c0247906",
       "events": "5ae2a56a",
       "rng": {
         "draws": 0,
@@ -710,10 +714,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -795,7 +800,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "bf152b26",
+      "state": "99b47b56",
       "events": "6024a757",
       "rng": {
         "draws": 0,
@@ -872,10 +877,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -970,7 +976,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "8a251f3d",
+      "state": "076068ad",
       "events": "bf90a36a",
       "rng": {
         "draws": 0,
@@ -1043,10 +1049,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -1141,7 +1148,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9210a92a",
+      "state": "932cbbda",
       "events": "cb1a432d",
       "rng": {
         "draws": 0,
@@ -1215,10 +1222,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -1323,7 +1331,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a2c023f1",
+      "state": "7cd245f1",
       "events": "ff257c49",
       "rng": {
         "draws": 0,
@@ -1401,10 +1409,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -1509,7 +1518,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "4c351d28",
+      "state": "89b4c2fc",
       "events": "cd1eb7e0",
       "rng": {
         "draws": 0,
@@ -1592,10 +1601,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -1700,7 +1710,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "90a28a3d",
+      "state": "0db969e1",
       "events": "c9308034",
       "rng": {
         "draws": 0,
@@ -1783,10 +1793,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -1897,7 +1908,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "edff86a0",
+      "state": "705fbd2c",
       "events": "0dc07402",
       "rng": {
         "draws": 0,
@@ -1981,10 +1992,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -2099,7 +2111,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "913e136f",
+      "state": "a96d2d9f",
       "events": "54f870b1",
       "rng": {
         "draws": 0,
@@ -2183,10 +2195,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"
@@ -2297,7 +2310,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "913e136f",
+      "state": "a96d2d9f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2381,10 +2394,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "cryptbone_helm": 1
+            },
             "firstFind": {
-              "cryptbone_helm": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "cryptbone_helm": {}
             },
             "recent": [
               "cryptbone_helm"

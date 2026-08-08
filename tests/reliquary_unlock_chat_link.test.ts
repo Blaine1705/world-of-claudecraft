@@ -49,7 +49,7 @@ const rankName = (rank: number): string =>
   t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 
 interface ReliquaryLinkHarness {
-  sim: { reliquaryFirstFind: Record<string, { clears?: number; pageId?: string }> };
+  sim: { reliquaryFirstFind: Record<string, { clears?: number }> };
   chatLogEl: HTMLElement;
   chatTimestamps: boolean;
   chatClock: string;
@@ -177,22 +177,25 @@ describe('the relic unlock line', () => {
     expect(hud.reliquaryWindow.openWithPage).toHaveBeenNthCalledWith(2, RELIC_PAGE);
   });
 
-  it('honours the recorded first-find page over the authored-order fallback', () => {
-    // Where the player actually found it wins, the recent strip's rule: the
-    // same relic sits on two pages, so this cannot pass by coincidence.
-    const hud = makeHud();
-    hud.sim.reliquaryFirstFind = { [RELIC_ID]: { pageId: HINT_PAGE, clears: 2 } };
-    hud.handleReliquaryUnlocks([{ itemId: RELIC_ID }]);
-    (links(hud)[0] as HTMLElement).click();
-    expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledWith(HINT_PAGE);
-  });
+  it('jumps by CATALOG order, never by stored first-find meta', () => {
+    // Phase 17 retired the stored pageId hint the resolver used to prefer, so
+    // the answer is the first authored page and nothing else. RELIC_ID sits on
+    // HINT_PAGE too (asserted as a content premise above), which is what makes
+    // this decisive: a resolver still reading per-relic find history would have
+    // to answer HINT_PAGE for at least one of the two states below.
+    const withMeta = makeHud();
+    withMeta.sim.reliquaryFirstFind = { [RELIC_ID]: { clears: 2 } };
+    withMeta.handleReliquaryUnlocks([{ itemId: RELIC_ID }]);
+    (links(withMeta)[0] as HTMLElement).click();
+    expect(withMeta.reliquaryWindow.openWithPage).toHaveBeenCalledWith(RELIC_PAGE);
+    expect(withMeta.reliquaryWindow.openWithPage).not.toHaveBeenCalledWith(HINT_PAGE);
 
-  it('falls back to the catalog when the recorded page is gone from it', () => {
-    const hud = makeHud();
-    hud.sim.reliquaryFirstFind = { [RELIC_ID]: { pageId: 'retired_page', clears: 2 } };
-    hud.handleReliquaryUnlocks([{ itemId: RELIC_ID }]);
-    (links(hud)[0] as HTMLElement).click();
-    expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledWith(RELIC_PAGE);
+    // The retro / veteran state (no entry at all) lands on the same page: the
+    // jump target cannot depend on whether provenance was ever recorded.
+    const withoutMeta = makeHud();
+    withoutMeta.handleReliquaryUnlocks([{ itemId: RELIC_ID }]);
+    (links(withoutMeta)[0] as HTMLElement).click();
+    expect(withoutMeta.reliquaryWindow.openWithPage).toHaveBeenCalledWith(RELIC_PAGE);
   });
 
   it('leaves the line PLAIN for a relic the catalog no longer places', () => {

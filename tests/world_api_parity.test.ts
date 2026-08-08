@@ -424,6 +424,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryFirstFind', kind: 'data' },
   { name: 'reliquaryMarks', kind: 'data' },
   { name: 'reliquaryRecent', kind: 'data' },
+  { name: 'reliquaryObtainCounts', kind: 'data' },
   { name: 'reliquaryPageCompletion', kind: 'method' },
   { name: 'reliquaryCatalogCompletion', kind: 'method' },
   { name: 'reliquaryCuratorRank', kind: 'method' },
@@ -569,10 +570,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // clean-up button adds sortInventory (IWorldInventory, a method), for
     // 301 on pure release, and the character sheet's Time Played line adds
     // playtimeSeconds (IWorldProgressionXp, data), for 302 on pure release.
-    // The Reliquary facet adds seven members (3 data + 4 methods),
-    // leaving 309.
-    expect(IWORLD_MEMBERS.length).toBe(309);
-    expect(DATA_MEMBERS.length).toBe(80);
+    // The Reliquary facet adds eight members (4 data + 4 methods),
+    // leaving 310. The fourth data member is reliquaryObtainCounts, the
+    // Phase 17 per-relic obtain tally.
+    expect(IWORLD_MEMBERS.length).toBe(310);
+    expect(DATA_MEMBERS.length).toBe(81);
     expect(METHOD_MEMBERS.length).toBe(229);
   });
   it('has no duplicate member names', () => {
@@ -812,6 +814,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryCuratorRank',
       'reliquaryFirstFind',
       'reliquaryMarks',
+      'reliquaryObtainCounts',
       'reliquaryPageClearCount',
       'reliquaryPageCompletion',
       'reliquaryRecent',
@@ -962,6 +965,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'reliquaryFirstFind',
       'reliquaryMarks',
+      'reliquaryObtainCounts',
       'reliquaryRecent',
       'renown',
       'restedXp',
@@ -1722,6 +1726,7 @@ const FACET_RELIQUARY = [
   'reliquaryFirstFind',
   'reliquaryMarks',
   'reliquaryRecent',
+  'reliquaryObtainCounts',
   'reliquaryPageCompletion',
   'reliquaryCatalogCompletion',
   'reliquaryCuratorRank',
@@ -1808,8 +1813,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(309);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(309);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(310);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(310);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -36,6 +36,7 @@ import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -3397,10 +3398,12 @@ describe('online mount command and race-event transport', () => {
 
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
-// source, so any unregistered delta key reddens this gate. All but two ride
+// source, so any unregistered delta key reddens this gate. All but three ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
-// shared across viewers), not plain `maybe(...)`. The count is the union of the
+// shared across viewers), and `reliq` is `maybeRaw(...)` too but for a different
+// memo: a PER-CHARACTER blob serialized once per state revision
+// (reliquaryWireJson), never shared across viewers. The count is the union of the
 // release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
 const ALL_DELTA_KEYS = [
   'achg',
@@ -3724,10 +3727,21 @@ function dirtyEveryDeltaField(): {
   meta.deedStats.dungeonClears.hollow_crypt = 2;
   meta.renown = 15;
   meta.activeTitle = 'prog_veteran';
-  // Reliquary sparse blob (`reliq`): one catalogued first-find + capped recent
-  // so the codec pin is non-vacuous (empty {} would pass first-snapshot only).
-  meta.reliquary.firstFind.cryptbone_helm = { clears: 2, pageId: 'conquerors_hollow_crypt' };
-  meta.reliquary.recent = ['cryptbone_helm'];
+  // Reliquary sparse blob (`reliq`): one catalogued first-find with BOTH of the
+  // entry's fields (clears provenance and the Phase 17 obtain tally, which
+  // rides folded onto the entry rather than as a fourth top-level key) plus a
+  // capped recent, so the codec pin is non-vacuous (empty {} would pass
+  // first-snapshot only).
+  //
+  // Through the real WRITE SEAMS, never by hand-mutating the state: the wire
+  // blob is memoized per state revision, and only these functions bump it. A
+  // hand-mutated fixture is a lie that happens to work, because it sits before
+  // this session's first memo build; move it after one and the fixture would
+  // silently stop reaching the wire. tests/reliquary_wire.test.ts made the same
+  // move for the same reason. (The clear meter feeding the stamp is the
+  // dungeonClears assignment in the deed-stats block above.)
+  noteRelicItemFind(meta, 'cryptbone_helm');
+  noteRelicObtain(meta, 'cryptbone_helm', 3);
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -4159,10 +4173,11 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
     // reliq fans out to reliquaryFirstFind / Marks / Recent (asserted directly like
     // tal; no TERSE_TO_IWORLD rename). Sparse blob only; not a second discovery set.
-    expect(client.reliquaryFirstFind.cryptbone_helm).toEqual({
-      clears: 2,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    // Phase 17 wire shape change: pageId dropped from the entry, the obtain
+    // tally folded onto it. The mirror splits `count` back out into
+    // reliquaryObtainCounts, so the entry itself carries clears alone.
+    expect(client.reliquaryFirstFind.cryptbone_helm).toEqual({ clears: 2 });
+    expect(client.reliquaryObtainCounts).toEqual({ cryptbone_helm: 3 });
     expect(client.reliquaryRecent).toEqual(['cryptbone_helm']);
     // tal -> talents / talentSpec / loadouts / activeLoadout
     expect(client.talents).toEqual({ spec: 'arms', rows: {} });

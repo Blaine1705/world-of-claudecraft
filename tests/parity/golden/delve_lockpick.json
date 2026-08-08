@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e1a51d49",
+      "state": "1906bf73",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -146,7 +147,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 974,
-      "state": "49dfb792",
+      "state": "ebe361ec",
       "events": "95577a16",
       "rng": {
         "draws": 4,
@@ -157,7 +158,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 974,
-      "state": "8b02498e",
+      "state": "5ecce698",
       "events": "cc147418",
       "rng": {
         "draws": 4,
@@ -168,7 +169,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 974,
-      "state": "d6514e39",
+      "state": "2333fd23",
       "events": "dd462e11",
       "rng": {
         "draws": 5,
@@ -179,7 +180,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 976,
-      "state": "110438bc",
+      "state": "bec520ae",
       "events": "a79d9d28",
       "rng": {
         "draws": 8,
@@ -281,6 +282,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 55,
@@ -495,7 +497,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "d7972093",
+      "state": "0bab1d8d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -506,7 +508,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "d7972093",
+      "state": "0bab1d8d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -608,6 +610,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 55,

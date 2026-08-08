@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "187d7a8e",
+      "state": "f63b6859",
       "events": "3b970d94",
       "rng": {
         "draws": 2,
@@ -92,6 +92,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 5,
@@ -164,10 +165,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"

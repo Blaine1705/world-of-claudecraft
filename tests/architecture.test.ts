@@ -751,6 +751,148 @@ function posixRel(rel: string): string {
   return rel.split('\\').join('/');
 }
 
+// ---------------------------------------------------------------------------
+// Reliquary state mutation scope: every write to the sparse blob's surfaces
+// lives in ONE module, because the wire memo depends on it.
+// ---------------------------------------------------------------------------
+//
+// src/sim/reliquary.ts memoizes the serialized `reliq` self blob per state
+// revision, and every writer inside it bumps that revision. A write from
+// anywhere else would not bump, and the failure mode is SILENT: the server
+// compares the memo's string against session.lastSent, so a stale build ships
+// NOTHING and the client keeps the old blob forever with no error on any
+// surface. Nothing reds, nothing logs, the player just stops seeing finds.
+//
+// So the invariant is scope, not spelling: the four mutable surfaces
+// (firstFind, marks, recent, counts) are written only by the module that owns
+// the revision counter. REPLACING the whole `meta.reliquary` object is
+// deliberately allowed (sim.ts does it on character load) and is safe for the
+// opposite reason: a fresh object has a fresh identity, so the identity-keyed
+// cache simply has no entry for it.
+const RELIQUARY_STATE_OWNER = join(simRoot, 'reliquary.ts');
+const RELIQUARY_SURFACES = 'firstFind|marks|recent|counts';
+// Every assignment operator spelling: plain `=`, the compound forms
+// (`+=`, `??=`, `||=`, `&&=`, `**=`, shifts, bitwise), guarded so `==`,
+// `===`, `>=`, `<=`, and `!=` comparisons never fire (the operator class
+// excludes `<`, `>`, and `!`, and the trailing `[^=]` excludes `==`).
+const ASSIGN_OP = `(?:\\*\\*|<<|>>>|>>|\\?\\?|\\|\\||&&|[+\\-*/%&|^])?=[^=]`;
+/** Assignment or in-place mutation of a Reliquary state surface. */
+const RELIQUARY_WRITE_RE = new RegExp(
+  `\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\s*` +
+    `(?:(?:\\.length\\s*)?${ASSIGN_OP}` +
+    `|\\[[^\\]]*\\]\\s*${ASSIGN_OP}` +
+    `|(?:\\[[^\\]]*\\]|\\.length)?\\s*(?:\\+\\+|--)` +
+    `|\\.(?:add|delete|clear|set|push|pop|shift|unshift|splice|sort|reverse|fill|copyWithin)\\s*\\()`,
+);
+/** `delete x.reliquary.firstFind[id]`, which the shape above cannot see. */
+const RELIQUARY_DELETE_RE = new RegExp(
+  `\\bdelete\\s+[^;]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+/** Prefix increment and Object.assign, which put the surface AFTER the verb. */
+const RELIQUARY_PREFIX_RE = new RegExp(
+  `(?:\\+\\+|--)\\s*[\\w.$]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+const RELIQUARY_OBJASSIGN_RE = new RegExp(
+  `Object\\.assign\\(\\s*[^,)]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+// ACCEPTED LIMITATION: a line regex cannot see identity-level aliasing, so a
+// write through a stored alias (`const st = meta.reliquary; st.counts[id] = 1`)
+// or through a held surface reference (`ownership.marks.add(id)`) escapes this
+// scan. The owning module itself uses exactly those shapes internally, which is
+// legal (its writers bump the wire revision); outside it, none exist today
+// (verified by hand at Phase 17). This guard is a tripwire for the common
+// spellings, not a proof: treat a new alias-shaped write as a review item.
+function reliquaryStateWrite(line: string): boolean {
+  return (
+    RELIQUARY_WRITE_RE.test(line) ||
+    RELIQUARY_DELETE_RE.test(line) ||
+    RELIQUARY_PREFIX_RE.test(line) ||
+    RELIQUARY_OBJASSIGN_RE.test(line)
+  );
+}
+
+describe('Reliquary sparse-state writes stay inside their owning module', () => {
+  const scanned = [...walk(simRoot), ...walk(join(repoRoot, 'server'))].filter(
+    (f) => f !== RELIQUARY_STATE_OWNER,
+  );
+
+  it('finds both trees to scan', () => {
+    // Floor ABOVE the flat top-level file count of either root ALONE (about
+    // 139 for src/sim and 167 for server at authoring, recursive total about
+    // 650), so a walk that silently stopped recursing, or lost one of the two
+    // roots, cannot pass. The two .some() membership arms below pin the
+    // recursion reaching a nested directory in each root.
+    expect(scanned.length).toBeGreaterThan(500);
+    expect(scanned.some((f) => f.includes(join('src', 'sim', 'professions')))).toBe(true);
+    expect(scanned.some((f) => f.includes(join('server', 'http')))).toBe(true);
+    // The owner itself is excluded, and it really exists (an excluded path that
+    // is simply a typo would make this whole guard vacuous).
+    expect(existsSync(RELIQUARY_STATE_OWNER)).toBe(true);
+    expect(scanned).not.toContain(RELIQUARY_STATE_OWNER);
+  });
+
+  it('no module outside src/sim/reliquary.ts writes firstFind / marks / recent / counts', () => {
+    const violations = scanLines(scanned, RELIQUARY_WRITE_RE)
+      .concat(scanLines(scanned, RELIQUARY_DELETE_RE))
+      .concat(scanLines(scanned, RELIQUARY_PREFIX_RE))
+      .concat(scanLines(scanned, RELIQUARY_OBJASSIGN_RE));
+    expect(
+      violations,
+      'a Reliquary state write outside its owning module skips the wire-memo revision bump,\n' +
+        'which ships a STALE blob silently (see src/sim/reliquary.ts reliquaryWireJson):\n' +
+        `${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('the ban FIRES on every write spelling, and spares reads and whole-object replacement', () => {
+    // A guard with no self-test is a guard nobody has seen fail.
+    for (const line of [
+      'meta.reliquary.marks.add(markId);',
+      'meta.reliquary.marks.delete(markId);',
+      'meta.reliquary.marks.clear();',
+      'meta.reliquary.recent.push(id);',
+      'meta.reliquary.recent.shift();',
+      'meta.reliquary.recent.splice(i, 1);',
+      'meta.reliquary.recent.sort();',
+      'state.reliquary.firstFind[itemId] = {};',
+      'r.meta.reliquary.counts[id] = 3;',
+      'meta.reliquary.counts = {};',
+      'this.primary.reliquary.recent = [];',
+      'delete meta.reliquary.firstFind[itemId];',
+      // Compound assignment, increment, and after-the-verb spellings: the
+      // shapes a tally write from another module would most plausibly use.
+      'meta.reliquary.counts[id] += 1;',
+      'meta.reliquary.counts[itemId]++;',
+      '++meta.reliquary.counts[id];',
+      'meta.reliquary.firstFind[id] ??= {};',
+      'meta.reliquary.recent.length = 0;',
+      'Object.assign(meta.reliquary.counts, saved);',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(true);
+    }
+    // ...and does NOT fire on reads, which are everywhere and legitimate, nor
+    // on replacing the whole state object (safe: fresh identity, fresh cache).
+    for (const line of [
+      'return this.primary.reliquary.firstFind;',
+      'return this.primary.reliquary.counts;',
+      'if (meta.reliquary.marks.has(markId)) return false;',
+      'const n = meta.reliquary.counts[id] ?? 0;',
+      'expect(meta.reliquary.recent).toEqual([]);',
+      'meta.reliquary = restoreReliquaryState(s.reliquary);',
+      'marks: this.primary.reliquary.marks,',
+      'if (meta.reliquary.firstFind[itemId] === undefined) return;',
+      // Comparison and arithmetic READS that the widened operator arm must
+      // keep sparing: >= and <= and != end in the same '=' a lazy regex trips on.
+      'if (meta.reliquary.counts[id] >= 1) return;',
+      'while (meta.reliquary.recent.length > cap) {',
+      'const more = meta.reliquary.counts[id] + 1;',
+      'if (meta.reliquary.counts[id] != null) draw();',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(false);
+    }
+  });
+});
+
 describe('src/world_api IWorld seam purity invariants', () => {
   it('finds the IWorld seam (world_api.ts + every facet file)', () => {
     expect(worldApiFiles).toContain(worldApiEntry);

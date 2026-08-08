@@ -1729,6 +1729,24 @@ export const fr_FR: EnTranslations = {
         "many": "{count} to go",
         "other": "{count} to go"
       },
+      "reliquaryObtainedTimes": {
+        "one": "Obtained {count} time",
+        "few": "Obtained {count} times",
+        "many": "Obtained {count} times",
+        "other": "Obtained {count} times"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, catalogued, obtained {count} time",
+        "few": "{name}, catalogued, obtained {count} times",
+        "many": "{name}, catalogued, obtained {count} times",
+        "other": "{name}, catalogued, obtained {count} times"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, catalogued, first found on clear {clears}, obtained {count} time",
+        "few": "{name}, catalogued, first found on clear {clears}, obtained {count} times",
+        "many": "{name}, catalogued, first found on clear {clears}, obtained {count} times",
+        "other": "{name}, catalogued, first found on clear {clears}, obtained {count} times"
+      },
       "deedsRetroSummary": {
         "one": "Your chronicle catches up: {count} deed recorded.",
         "few": "Votre chronique rattrape son retard: {count} hauts faits consignés.",

@@ -1729,6 +1729,24 @@ export const ja_JP: EnTranslations = {
         "many": "あと {count} 件",
         "other": "あと {count} 件"
       },
+      "reliquaryObtainedTimes": {
+        "one": "入手回数：{count} 回",
+        "few": "入手回数：{count} 回",
+        "many": "入手回数：{count} 回",
+        "other": "入手回数：{count} 回"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}、収蔵済み、入手回数 {count} 回",
+        "few": "{name}、収蔵済み、入手回数 {count} 回",
+        "many": "{name}、収蔵済み、入手回数 {count} 回",
+        "other": "{name}、収蔵済み、入手回数 {count} 回"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "few": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "many": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回",
+        "other": "{name}、収蔵済み、初回入手はクリア {clears} 回目、入手回数 {count} 回"
+      },
       "deedsRetroSummary": {
         "one": "年代記が追いつきました: {count} 件の功績を記録。",
         "few": "年代記が追いつきました: {count} 件の功績を記録。",

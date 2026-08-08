@@ -12,10 +12,10 @@
 
 /** Sparse first-obtain metadata for one catalogued relic item id. */
 export interface ReliquaryFirstFindView {
-  /** Clear count of the page source at first obtain (when applicable). */
+  /** Clear count of the page source at first obtain. Absent when the page has
+   *  no clear meter, when the meter had not turned over yet, and on a retro
+   *  fill: all three mean the same thing, that no clear can be named. */
   clears?: number;
-  /** Page id that credited the find (diagnostic; multi-page fill stays global). */
-  pageId?: string;
 }
 
 /** Page progress over relic ownership. */
@@ -47,6 +47,20 @@ export interface IWorldReliquary {
    * when none.
    */
   reliquaryRecent: readonly string[];
+  /**
+   * Per-relic obtain tally for catalogued relic ITEM ids, sparse: an absent id
+   * has never been counted. Counts WORLD-SOURCED acquisitions only, so the
+   * number reads as "the world handed you this many"; a trade, mail, market
+   * purchase, vendor buyback, or re-mint never bumps one. A heroic-difficulty
+   * drop credits the BASE relic, the same slot its discovery fills, so the
+   * count agrees with the page. A CURRENCY vendor does count, and is meant to:
+   * the delve Marks shop sells four catalogued relics (deacon_reliquary_helm,
+   * varric_shadow_cowl, sister_nhalia_choir_plate, drowned_choir_fang), Marks
+   * are earned in the world, and buying a second copy really is a second thing
+   * the world handed you. Information, never a score: it feeds no completion,
+   * rank, drop rate, or reward. Empty object when none.
+   */
+  reliquaryObtainCounts: Readonly<Record<string, number>>;
   /**
    * Page progress X/Y for a catalog page id, or null when the id is not a
    * live page. Owned counts come from itemsDiscovered, marks, ownedMounts,

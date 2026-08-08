@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
 import { DEEDS } from '../src/sim/content/deeds';
 import { delveShopGateUnlocked } from '../src/sim/content/delves/shop';
 import { recipeById } from '../src/sim/content/recipes';
@@ -13,9 +14,18 @@ import {
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
-import { DELVES } from '../src/sim/data';
+import { mechChromaItemId } from '../src/sim/content/skins';
+import { DELVES, ITEMS } from '../src/sim/data';
 import { checkDeedTrigger, grantDeed, markItemDiscovered } from '../src/sim/deeds';
 import { grantDelveClearTo } from '../src/sim/delves/runs';
+import { grantCopies } from '../src/sim/item_instance_transfer';
+import { ownedMounts } from '../src/sim/mounts';
+import { isCommissionEligible } from '../src/sim/professions/commission';
+import {
+  acceptCommissionOrder,
+  deliverCommissionOrder,
+  openCommissionOrder,
+} from '../src/sim/professions/commission_order';
 import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
@@ -30,20 +40,25 @@ import {
   freshReliquaryState,
   isReliquaryStateEmpty,
   noteRelicItemFind,
+  noteRelicObtain,
   noteReliquaryMark,
   onItemDiscovered,
   pageCompletion,
   RELIQUARY_ITEM_TO_PAGES,
+  RELIQUARY_OBTAIN_COUNT_CAP,
   RELIQUARY_PAGES_BY_ID,
   RELIQUARY_RECENT_CAP,
   reliquaryOwnershipOpts,
+  reliquaryWireCacheProbe,
+  reliquaryWireJson,
   restoreReliquaryState,
+  type SavedReliquaryState,
   serializeReliquaryState,
   syncCuratorRankDeeds,
   syncReliquaryMarksFromVisited,
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
-import { runCraft } from './helpers/enchant_family_cast';
+import { runApplyEnchant, runCraft } from './helpers/enchant_family_cast';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -59,6 +74,10 @@ function primary(sim: Sim) {
 
 /** Catalogued Hollow Crypt unique (Phase 2 expanded conquerors_hollow_crypt). */
 const CATALOGUE_RELIC = 'cryptbone_helm';
+/** A catalogued relic that STACKS (a Professions-shelf specimen), so the
+ *  per-copy half of the counting contract is reachable through plain addItem.
+ *  File-scoped: the obtain-counts AND determinism describes both drive it. */
+const STACKABLE_RELIC = 'pristine_hide';
 /** Real item that is NOT a catalogued Reliquary relic. */
 const NON_RELIC = 'glimmerfin_koi';
 
@@ -96,28 +115,27 @@ describe('Reliquary first discover of a catalogued relic', () => {
 
     markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
     expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 3,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    // toEqual on the WHOLE entry: Phase 17 dropped the pageId diagnostic, so a
+    // stray extra key reds here rather than riding along unnoticed.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 3 });
     expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
 
     // Second discover: no re-stamp, no double recent entry.
     meta.deedStats.dungeonClears.hollow_crypt = 99;
     markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 3,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 3 });
     expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
   });
 
-  it('stamps clears 0 when the crediting page clear meter reads zero', () => {
-    // Recorded behavior, ruling open (Phase 12 arch review): absent might be
-    // righter for source-less acquisitions (trade / auction house), where the
-    // zero says nothing about provenance; see the packet state.md OPEN items.
-    // Today the live find stamps clears: 0, which the window renders as
-    // "first found on clear 0". Driven through the real discover path.
+  it('omits clears entirely when the crediting page clear meter reads zero', () => {
+    // The executed ruling (maintainer, 2026-08-08): omit at zero. A zero says
+    // nothing about provenance, and the surfaces it reached said something
+    // false, that the relic was "first found on clear 0". The two shapes it
+    // covers are a provenance-unknown acquisition (bought, traded, mailed) and
+    // a drop taken mid first run, before that run's clear was credited. Both
+    // now land sparse, which is the same shape the retro seed writes for
+    // ownership that predates the system: owned, provenance unknown.
+    // Driven through the real discover path.
     const sim = makeSim();
     const { meta } = primary(sim);
     expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.clearSource).toEqual({
@@ -128,12 +146,16 @@ describe('Reliquary first discover of a catalogued relic', () => {
     expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
 
     markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
-    // toEqual, not a key probe: a sparse entry (no clears key) fails here, so
-    // this reds the day the ruling lands and the behavior changes.
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 0,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    // toEqual({}), not a key probe: the entry itself must still land (the fill
+    // is real membership meta), and a resurrected clears: 0 or a revived
+    // pageId both red here.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    // One clear later, the same page stamps for real: the omission is about
+    // the meter reading zero, not about this page having no meter at all.
+    const other = 'cryptbone_greaves';
+    meta.deedStats.dungeonClears.hollow_crypt = 1;
+    markItemDiscovered(sim.ctx, meta, other);
+    expect(meta.reliquary.firstFind[other]).toEqual({ clears: 1 });
   });
 
   it('onItemDiscovered alone does not dual-write itemsDiscovered', () => {
@@ -224,21 +246,27 @@ describe('Reliquary serialize / restore round-trip', () => {
     meta.deedStats.dungeonClears.hollow_crypt = 2;
     markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
 
+    // Two more obtains of the same relic, so the folded tally has a value that
+    // is neither absent nor 1 and a dropped fold cannot pass by coincidence.
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(2);
+
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.reliquary).toBeDefined();
-    expect(state.reliquary!.firstFind?.[CATALOGUE_RELIC]).toEqual({
-      clears: 2,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    // The tally rides folded ONTO the entry (count), never as a fourth
+    // top-level key; pageId is gone.
+    expect(state.reliquary!.firstFind?.[CATALOGUE_RELIC]).toEqual({ clears: 2, count: 2 });
     expect(state.reliquary!.recent).toEqual([CATALOGUE_RELIC]);
 
-    // Hand-edited unknown ids must not grow membership on restore.
+    // Hand-edited unknown ids must not grow membership on restore, and a count
+    // riding one of them vanishes with the entry it rode in on.
     const dirty: CharacterState = {
       ...state,
       reliquary: {
         firstFind: {
           ...(state.reliquary!.firstFind ?? {}),
-          not_a_real_relic: { clears: 9, pageId: 'nope' },
+          not_a_real_relic: { clears: 9, count: 7 },
         },
         marks: ['not_an_authored_mark'],
         recent: [CATALOGUE_RELIC, 'not_a_real_relic'],
@@ -247,54 +275,70 @@ describe('Reliquary serialize / restore round-trip', () => {
     const sim2 = makeSim();
     const pid = sim2.addPlayer('warrior', 'Reload', { state: dirty });
     const m2 = sim2.players.get(pid)!;
-    expect(m2.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 2,
-      pageId: 'conquerors_hollow_crypt',
-    });
+    expect(m2.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 2 });
+    expect(m2.reliquary.counts[CATALOGUE_RELIC]).toBe(2);
     expect(m2.reliquary.firstFind.not_a_real_relic).toBeUndefined();
+    // The subset invariant, adversarially: counts keys can only ever name an
+    // entry that survived, so the uncatalogued row's count is gone too.
+    expect(Object.hasOwn(m2.reliquary.counts, 'not_a_real_relic')).toBe(false);
+    expect(Object.keys(m2.reliquary.counts).every((id) => id in m2.reliquary.firstFind)).toBe(true);
     expect(m2.reliquary.marks.size).toBe(0);
     expect(m2.reliquary.recent).toEqual([CATALOGUE_RELIC]);
   });
 
-  it('restore sanitizes clears and pageId per FIELD on catalogued entries', () => {
+  it('restore sanitizes clears and count per FIELD on catalogued entries', () => {
     // Every id here is catalogued, so the field guards are actually reached
     // (an uncatalogued id is dropped before either filter runs). Snug floor:
-    // the slice must fill all eight fixtures.
+    // the slice must fill all twelve fixtures. Phase 17 retired the pageId
+    // fixtures with the field and added the tally's own guards in their place.
     const ids = [
       ...new Set(
         RELIQUARY_PAGES.flatMap((p) =>
           p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
         ),
       ),
-    ].slice(0, 8);
-    expect(ids.length).toBe(8);
+    ].slice(0, 12);
+    expect(ids.length).toBe(12);
     const [
       negative,
       infinite,
       notANumber,
       fractional,
-      bogusPage,
-      foreignPage,
+      zeroClears,
+      staleShape,
       stringClears,
+      zeroCount,
+      hugeCount,
+      stringCount,
+      nanCount,
       nonObject,
     ] = ids;
-    const validPageId = RELIQUARY_ITEM_TO_PAGES.get(negative)![0];
-    // A real page that never lists foreignPage: acceptance must be
-    // RELIQUARY_PAGES_BY_ID membership only, not an item-to-page relation.
-    const unrelatedPageId = 'horizons_titles';
-    expect(RELIQUARY_PAGES_BY_ID[unrelatedPageId]).toBeDefined();
-    expect(RELIQUARY_ITEM_TO_PAGES.get(foreignPage)).not.toContain(unrelatedPageId);
 
     const restored = restoreReliquaryState({
       firstFind: {
-        [negative]: { clears: -3, pageId: validPageId },
+        [negative]: { clears: -3, count: 4 },
         [infinite]: { clears: Number.POSITIVE_INFINITY },
         [notANumber]: { clears: Number.NaN },
-        [fractional]: { clears: 2.7 },
-        [bogusPage]: { pageId: 'nope' },
-        [foreignPage]: { pageId: unrelatedPageId },
+        [fractional]: { clears: 2.7, count: 3.9 },
+        // The executed omit-at-zero ruling, on the LOAD side: a legacy blob
+        // written before it still carries clears: 0, and 0.x floors into the
+        // same case. Both drop the field and keep the entry.
+        [zeroClears]: { clears: 0.6 },
+        // A pre-Phase-17 blob: the retired pageId is simply not read, and the
+        // entry loads clean rather than being rejected for carrying it.
+        [staleShape]: { clears: 3, pageId: 'conquerors_hollow_crypt' } as never,
         // A string clears fails the typeof gate outright (never coerced).
         [stringClears]: { clears: '5' } as never,
+        // A tally of zero is the absent key, never a stored 0.
+        [zeroCount]: { count: 0 },
+        // Above the cap clamps rather than dropping: the obtain happened.
+        [hugeCount]: { count: RELIQUARY_OBTAIN_COUNT_CAP * 10 },
+        // A string count fails the typeof gate outright (never coerced: '5'
+        // must not floor to 5 and persist), and a NaN count fails the finite
+        // gate; each covers a sanitizeObtainCount arm the numeric fixtures
+        // above cannot reach.
+        [stringCount]: { count: '5' } as never,
+        [nanCount]: { count: Number.NaN },
         // A non-object entry is dropped WHOLE (the entry guard), unlike every
         // per-field case above, which keeps the entry and drops the field.
         [nonObject]: 'junk' as never,
@@ -308,21 +352,36 @@ describe('Reliquary serialize / restore round-trip', () => {
     );
     expect(Object.hasOwn(restored.firstFind, nonObject)).toBe(false);
     // Negative clears are dropped outright (absent key, never clamped to 0),
-    // while the valid pageId on the same entry still lands.
+    // while the valid count on the same entry still lands.
     expect(Object.hasOwn(restored.firstFind[negative], 'clears')).toBe(false);
-    expect(restored.firstFind[negative].pageId).toBe(validPageId);
+    expect(restored.counts[negative]).toBe(4);
     // Non-finite clears (Infinity, NaN) are dropped the same way.
     expect(Object.hasOwn(restored.firstFind[infinite], 'clears')).toBe(false);
     expect(Object.hasOwn(restored.firstFind[notANumber], 'clears')).toBe(false);
-    // Fractional clears floor (2.7 lands as 2), matching the live stamp path.
+    // Both numbers floor (2.7 -> 2, 3.9 -> 3), matching the live write paths.
     expect(restored.firstFind[fractional]).toEqual({ clears: 2 });
-    // A pageId outside RELIQUARY_PAGES_BY_ID is dropped; the entry survives.
-    expect(Object.hasOwn(restored.firstFind[bogusPage], 'pageId')).toBe(false);
-    // Membership is the WHOLE rule: a real page that never lists the item is
-    // kept (diagnostic field; restore does not re-derive the relation).
-    expect(restored.firstFind[foreignPage].pageId).toBe(unrelatedPageId);
+    expect(restored.counts[fractional]).toBe(3);
+    // clears 0 (and 0.x) drop the FIELD; the entry itself still lands.
+    expect(restored.firstFind[zeroClears]).toEqual({});
+    expect(Object.hasOwn(restored.firstFind, zeroClears)).toBe(true);
+    // The stale pageId is neither read nor kept, and its entry is otherwise
+    // untouched: a veteran's save loads with its provenance intact.
+    expect(restored.firstFind[staleShape]).toEqual({ clears: 3 });
     // The string clears ('5') failed the typeof gate; the field is dropped.
     expect(Object.hasOwn(restored.firstFind[stringClears], 'clears')).toBe(false);
+    // count 0 is the absent key, not a stored zero.
+    expect(Object.hasOwn(restored.counts, zeroCount)).toBe(false);
+    expect(restored.firstFind[zeroCount]).toEqual({});
+    // An over-cap tally clamps to the cap.
+    expect(restored.counts[hugeCount]).toBe(RELIQUARY_OBTAIN_COUNT_CAP);
+    // String and NaN counts drop the FIELD (typeof and finite gates); the
+    // entries themselves still land.
+    expect(Object.hasOwn(restored.counts, stringCount)).toBe(false);
+    expect(restored.firstFind[stringCount]).toEqual({});
+    expect(Object.hasOwn(restored.counts, nanCount)).toBe(false);
+    expect(restored.firstFind[nanCount]).toEqual({});
+    // counts never outlives firstFind: every key names a surviving entry.
+    expect(Object.keys(restored.counts).every((id) => id in restored.firstFind)).toBe(true);
   });
 });
 
@@ -1280,17 +1339,773 @@ describe('Reliquary pure completion + curator rank', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Phase 17: per-relic obtain counts. World-sourced acquisitions only, and
+// information rather than a score: no page, rank, deed, or drop rate reads it.
+// ---------------------------------------------------------------------------
+
+describe('Reliquary obtain counts', () => {
+  /** A catalogued WEAPON relic, so the enchant re-mint arm can be driven. */
+  const WEAPON_RELIC = 'mistcallers_fang';
+
+  it('counts a world-sourced grant per COPY, and only for catalogued relics', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    // A second acquisition of a relic already owned still counts: the tally is
+    // about obtains, not about membership (which stopped moving at the first).
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(2);
+    expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]); // no second find moment
+
+    // Per COPY, not per call: a stacked grant of three is three acquisitions.
+    expect(stackSizeOf(ITEMS[STACKABLE_RELIC])).toBeGreaterThan(1);
+    sim.addItem(STACKABLE_RELIC, 3, sim.playerId);
+    expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(3);
+
+    // A real item that is not catalogued never enters the map at all.
+    sim.addItem(NON_RELIC, 2, sim.playerId);
+    expect(Object.hasOwn(meta.reliquary.counts, NON_RELIC)).toBe(false);
+    expect(Object.keys(meta.reliquary.counts).sort()).toEqual(
+      [CATALOGUE_RELIC, STACKABLE_RELIC].sort(),
+    );
+  });
+
+  it('counts every copy of one instanced grant', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItemInstance(STACKABLE_RELIC, { signer: 'Gatherer' }, sim.playerId, 3);
+    expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(3);
+  });
+
+  it('a MOVEMENT grant discovers but never counts, on both hub arms', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId, { movement: true });
+    // Discovery is deliberately unaffected: seeing a relic for the first time
+    // across a trade window still fills the page and still toasts.
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    expect(meta.reliquary.counts).toEqual({});
+
+    sim.addItemInstance(STACKABLE_RELIC, { signer: 'Someone' }, sim.playerId, 2, {
+      movement: true,
+    });
+    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(true);
+    expect(meta.reliquary.counts).toEqual({});
+  });
+
+  it('the exchange pipes (market buy / cancel / collect, mail claim) never count', () => {
+    // grantCopies is the ONE grant all four share, so covering it covers them.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantCopies(sim.ctx, sim.playerId, CATALOGUE_RELIC, 1);
+    grantCopies(sim.ctx, sim.playerId, STACKABLE_RELIC, 2, { signer: 'Seller' });
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(true);
+    expect(meta.reliquary.counts).toEqual({});
+  });
+
+  it('a completed trade never counts for the receiver', () => {
+    const sim = makeSim();
+    const giver = primary(sim);
+    const takerPid = sim.addPlayer('warrior', 'Taker');
+    const taker = sim.players.get(takerPid)!;
+    // Stand the two next to each other: the trade guards are range-checked.
+    const takerEntity = sim.entities.get(takerPid)!;
+    takerEntity.pos.x = giver.e.pos.x;
+    takerEntity.pos.z = giver.e.pos.z;
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(giver.meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    // The INSTANCED arm of the same handover: grantOffer routes a unit that
+    // carries an instance payload through ctx.addItemInstance, a SEPARATE call
+    // site with its own movement flag, so a plain-only offer would leave that
+    // flag untested (a traded signed specimen takes exactly this arm).
+    sim.addItemInstance(STACKABLE_RELIC, { signer: 'Giver' }, sim.playerId, 1);
+    expect(giver.meta.reliquary.counts[STACKABLE_RELIC]).toBe(1);
+
+    sim.tradeRequest(takerPid, sim.playerId);
+    sim.tradeAccept(takerPid);
+    sim.tradeSetOffer(
+      [
+        { itemId: CATALOGUE_RELIC, count: 1 },
+        { itemId: STACKABLE_RELIC, count: 1 },
+      ],
+      0,
+      sim.playerId,
+    );
+    sim.tradeConfirm(sim.playerId);
+    sim.tradeConfirm(takerPid);
+
+    // BOTH handovers really happened (otherwise the count claim is vacuous).
+    expect(taker.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    expect(taker.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
+    expect(taker.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    // ...and the receiving side gained membership without gaining a tally on
+    // EITHER arm (plain and instanced).
+    expect(taker.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    expect(taker.reliquary.firstFind[STACKABLE_RELIC]).toBeDefined();
+    expect(taker.reliquary.counts).toEqual({});
+    // The giver's own tally is untouched by giving it away: the number counts
+    // what the world handed you, and nothing takes that back.
+    expect(giver.meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    expect(giver.meta.reliquary.counts[STACKABLE_RELIC]).toBe(1);
+  });
+
+  it('an apply-enchant re-mint of a relic never counts', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItem(WEAPON_RELIC, 1, sim.playerId);
+    sim.addItem('arcane_dust', 20, sim.playerId);
+    expect(meta.reliquary.counts[WEAPON_RELIC]).toBe(1);
+
+    runApplyEnchant(sim, WEAPON_RELIC, 'enchant_weapon_might');
+    expect(sim.lastEnchantResult?.ok).toBe(true);
+    expect(meta.reliquary.counts[WEAPON_RELIC]).toBe(1);
+
+    // The REPLACE arm mints through the same hub on a separate path.
+    runApplyEnchant(sim, WEAPON_RELIC, 'enchant_weapon_intellect', undefined, true);
+    expect(sim.lastEnchantResult?.ok).toBe(true);
+    expect(meta.reliquary.counts[WEAPON_RELIC]).toBe(1);
+  });
+
+  it('a vendor buyback NEVER counts, but still discovers', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    // Stand at Trader Wilkes so the sell / buyback proximity gates pass (the
+    // tests/items.test.ts idiom: dist2d over pos.x / pos.z is the whole gate).
+    const wilkes = [...sim.entities.values()].find((x) => x.templateId === 'trader_wilkes');
+    expect(wilkes, 'trader_wilkes must exist in the seeded world').toBeDefined();
+    e.pos.x = wilkes!.pos.x + 2;
+    e.pos.z = wilkes!.pos.z;
+    (sim as unknown as { rebucket(entity: typeof e): void }).rebucket(e);
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    meta.copper = 100000;
+    const copperBeforeSale = meta.copper;
+
+    sim.sellItem(CATALOGUE_RELIC, 1, sim.playerId);
+    expect(meta.vendorBuyback.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    // Unchanged by the sale: selling is not an obtain in either direction.
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+
+    sim.buyBackItem(CATALOGUE_RELIC, undefined, undefined, sim.playerId);
+    expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    // Buyback is MOVEMENT (maintainer, 2026-08-08): sell credits sellValue and
+    // buyback charges the same sellValue back, so the cycle is copper neutral
+    // and repeatable without limit. Counting it would let one player inflate a
+    // tally for free, the single-player form of the two-player loop the whole
+    // movement rule exists to refuse.
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    // Copper-neutral, asserted rather than assumed: this is the premise the
+    // ruling rests on, so it must red here if vendor pricing ever changes.
+    expect(meta.copper).toBe(copperBeforeSale);
+    // Discovery is untouched on every movement path, buyback included.
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+
+    // Ten more cycles do not move it either: the refusal is per acquisition,
+    // not a one-shot that a repeat could slip past.
+    for (let i = 0; i < 10; i++) {
+      sim.sellItem(CATALOGUE_RELIC, 1, sim.playerId);
+      sim.buyBackItem(CATALOGUE_RELIC, undefined, undefined, sim.playerId);
+    }
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    expect(meta.copper).toBe(copperBeforeSale);
+  });
+
+  it('a heroic variant counts its BASE, the slot its discovery fills', () => {
+    // The catalog deliberately lists base ids only (pinned in
+    // tests/reliquary_content.test.ts), and markItemDiscovered's heroic walk is
+    // what fills the base slot from a heroic drop. The tally runs the SAME walk
+    // (maintainer delegation, 2026-08-08) so the number agrees with the slot
+    // the fill landed in; keying on the granted id alone left 63 of the 135
+    // catalogued relics with an owned page and a tally frozen at zero.
+    const heroicId = 'heroic_tideguard_greaves';
+    const baseId = ITEMS[heroicId]?.heroicOf;
+    expect(baseId).toBe('tideguard_greaves');
+    // No heroic id is itself catalogued, so the chain has exactly one scoring
+    // id here; the walk still increments EVERY catalogued id it visits, which
+    // is what a catalogued variant would need.
+    expect(isCataloguedRelicItem(heroicId)).toBe(false);
+    expect(isCataloguedRelicItem(baseId!)).toBe(true);
+
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItem(heroicId, 1, sim.playerId);
+
+    expect(meta.deedStats.itemsDiscovered.has(baseId!)).toBe(true);
+    expect(meta.reliquary.firstFind[baseId!]).toBeDefined();
+    expect(meta.reliquary.counts).toEqual({ [baseId!]: 1 });
+    // The uncatalogued variant never enters the map under its own id.
+    expect(Object.hasOwn(meta.reliquary.counts, heroicId)).toBe(false);
+
+    // A second heroic drop keeps crediting the base, so a heroic farmer's
+    // number climbs exactly like a normal-difficulty farmer's.
+    sim.addItem(heroicId, 1, sim.playerId);
+    expect(meta.reliquary.counts[baseId!]).toBe(2);
+
+    // And a MOVEMENT heroic grant still counts nothing, so the new walk did
+    // not smuggle the tally past the movement gate.
+    const traded = makeSim();
+    const tradedMeta = primary(traded).meta;
+    traded.addItem(heroicId, 1, traded.playerId, { movement: true });
+    expect(tradedMeta.deedStats.itemsDiscovered.has(baseId!)).toBe(true);
+    expect(tradedMeta.reliquary.counts).toEqual({});
+  });
+
+  it('a relic discovered before the Reliquary shipped starts its tally on re-obtain', () => {
+    // The common veteran shape, and the one case where a count has no entry to
+    // ride: markItemDiscovered fires the first-find hook only on an id's FIRST
+    // ever discovery, so a pre-rollout relic can never grow a firstFind entry
+    // through the seed. The obtain writes the empty carrier itself, or the
+    // tally would be dropped by every save.
+    const held: CharacterState = {
+      ...makeSim().serializeCharacter(makeSim().playerId)!,
+      inventory: [{ itemId: CATALOGUE_RELIC, count: 1 }],
+      deedStats: { itemsDiscovered: [CATALOGUE_RELIC] },
+      reliquary: undefined,
+    };
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Veteran', { state: held });
+    const meta = sim.players.get(pid)!;
+    // Premise: the join really left the blob empty.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
+    expect(isReliquaryStateEmpty(meta.reliquary)).toBe(true);
+
+    sim.addItem(CATALOGUE_RELIC, 1, pid);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    // The carrier landed, sparse: owned, provenance unknown.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    expect(isReliquaryStateEmpty(meta.reliquary)).toBe(false);
+
+    // And it survives the round trip, which is the whole point of the carrier.
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.reliquary?.firstFind?.[CATALOGUE_RELIC]).toEqual({ count: 1 });
+    const reloaded = makeSim();
+    const rid = reloaded.addPlayer('warrior', 'Reload', { state: saved });
+    expect(reloaded.meta(rid)!.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+  });
+
+  it('a MOVEMENT first find stamps NO clears, at any meter value', () => {
+    // The executed provenance ruling (maintainer, 2026-08-08), extending the
+    // omit-at-zero one: the stamp answers "which clear did you find this on",
+    // so a relic that arrived from somewhere else has no answer even when the
+    // meter is high. A player sitting on twelve Hollow Crypt clears who BUYS
+    // the drop did not find it on clear twelve.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.dungeonClears.hollow_crypt = 12;
+    // Premise: the meter really is turned over, so a sparse entry below cannot
+    // be the omit-at-zero rule passing by coincidence.
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(12);
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId, { movement: true });
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+
+    // CONTRAST, same meter, same relic id, world-sourced: the stamp lands.
+    // Without this arm the assertion above would also pass if clears had
+    // simply stopped working.
+    const world = makeSim();
+    const worldMeta = primary(world).meta;
+    worldMeta.deedStats.dungeonClears.hollow_crypt = 12;
+    world.addItem(CATALOGUE_RELIC, 1, world.playerId);
+    expect(worldMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 12 });
+  });
+
+  it('a MOVEMENT first find still toasts and still pushes recent', () => {
+    // Scope guard for the ruling above: only PROVENANCE is unknown. The
+    // catalogue fill itself is real, so the unlock event, its page ids, and
+    // the recent ring are all unchanged. Narrowing those too would silently
+    // delete a player's "you filled a slot" moment on every market purchase.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.drainEvents();
+
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId, { movement: true });
+
+    const unlocks = sim
+      .drainEvents()
+      .filter((e) => e.type === 'reliquaryUnlock' && e.itemId === CATALOGUE_RELIC);
+    expect(unlocks.length).toBe(1);
+    expect(unlocks[0].type === 'reliquaryUnlock' && unlocks[0].retro).toBeUndefined();
+    expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+  });
+
+  it('the trade and market pipes land their first finds sparse', () => {
+    // The ruling through the REAL relocation seams rather than the raw opt, so
+    // a site that stopped passing the flag reds here even though the hub-level
+    // test above would stay green.
+    const traded = makeSim();
+    const tradedMeta = primary(traded).meta;
+    tradedMeta.deedStats.dungeonClears.hollow_crypt = 7;
+    grantCopies(traded.ctx, traded.playerId, CATALOGUE_RELIC, 1);
+    expect(tradedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+
+    const instanced = makeSim();
+    const instancedMeta = primary(instanced).meta;
+    instancedMeta.deedStats.dungeonClears.hollow_crypt = 7;
+    grantCopies(instanced.ctx, instanced.playerId, CATALOGUE_RELIC, 1, { signer: 'Seller' });
+    expect(instancedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+  });
+
+  it('clamps at the cap and ignores a non-positive copy count', () => {
+    // The cap bounds a PERSISTED field and production clamps with the same
+    // imported constant, so without this literal a cap retune moves both
+    // sides of every clamp assertion together and nothing reds.
+    expect(RELIQUARY_OBTAIN_COUNT_CAP).toBe(1e9);
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    noteRelicObtain(meta, CATALOGUE_RELIC, RELIQUARY_OBTAIN_COUNT_CAP);
+    noteRelicObtain(meta, CATALOGUE_RELIC, 5);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(RELIQUARY_OBTAIN_COUNT_CAP);
+    noteRelicObtain(meta, STACKABLE_RELIC, 0);
+    noteRelicObtain(meta, STACKABLE_RELIC, -3);
+    noteRelicObtain(meta, STACKABLE_RELIC, Number.NaN);
+    expect(Object.hasOwn(meta.reliquary.counts, STACKABLE_RELIC)).toBe(false);
+    // Fractional copies floor (2.5 grants two whole units, matching the hub's
+    // integer stack semantics), and the floor happens before the increment.
+    noteRelicObtain(meta, STACKABLE_RELIC, 2.5);
+    expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(2);
+  });
+
+  it('is information only: the tally scores no completion, rank, or deed', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const rankBefore = catalogRankOwned(characterReliquaryOwnership(meta));
+    const deedsBefore = meta.deedsEarned.size;
+    // Two hundred obtains of ONE relic: a tally that fed rank or completion
+    // anywhere would have to move something here.
+    for (let i = 0; i < 200; i++) noteRelicObtain(meta, CATALOGUE_RELIC);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(200);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(rankBefore);
+    expect(curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)))).toBe(0);
+    expect(meta.deedsEarned.size).toBe(deedsBefore);
+    expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(0);
+    // And it is never a top-level saved key: the blob still has three.
+    const serialized = serializeReliquaryState(meta.reliquary)!;
+    expect(Object.keys(serialized).sort()).toEqual(['firstFind']);
+    expect(serialized).not.toHaveProperty('counts');
+  });
+});
+
+describe('Reliquary legacy blob migration and the counts/firstFind invariant', () => {
+  it('a pre-Phase-17 blob is STRIPPED by one round trip, and restore is a fixed point', () => {
+    // The one-release tolerance, pinned by composition rather than by reading
+    // the restore code: a save written before Phase 17 carries the retired
+    // pageId and a clears: 0 the omit-at-zero ruling now refuses, and both
+    // must be gone from what the next autosave writes, without the entries
+    // themselves being dropped (they are real membership meta).
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, 3);
+    const [zeroClears, realClears, counted] = ids;
+    const legacy = {
+      firstFind: {
+        [zeroClears]: { clears: 0, pageId: 'conquerors_hollow_crypt' },
+        [realClears]: { clears: 4, pageId: 'conquerors_hollow_crypt' },
+        [counted]: { clears: 2, pageId: 'conquerors_hollow_crypt', count: 5 },
+      },
+      marks: [...RELIQUARY_MARK_IDS].slice(0, 1),
+      recent: [zeroClears],
+    } as never as SavedReliquaryState;
+
+    const restored = restoreReliquaryState(legacy);
+    const rewritten = serializeReliquaryState(restored)!;
+    expect(rewritten).toBeDefined();
+
+    // Stripped: no pageId anywhere, and the zero clears is gone while its
+    // entry survives. Whole-object toEqual, so a surviving stale key reds.
+    expect(rewritten.firstFind).toEqual({
+      [zeroClears]: {},
+      [realClears]: { clears: 4 },
+      [counted]: { clears: 2, count: 5 },
+    });
+    expect(JSON.stringify(rewritten)).not.toContain('pageId');
+
+    // FIXED POINT: restoring what we just wrote lands on the same state as
+    // restoring the legacy blob did, so the migration converges in one pass
+    // and a later load can never drift further.
+    const second = restoreReliquaryState(rewritten);
+    expect(second.firstFind).toEqual(restored.firstFind);
+    expect(second.counts).toEqual(restored.counts);
+    expect([...second.marks]).toEqual([...restored.marks]);
+    expect(second.recent).toEqual(restored.recent);
+    // ...and serializing again is byte-stable, the property the wire memo and
+    // the delta gate both lean on.
+    expect(JSON.stringify(serializeReliquaryState(second))).toBe(JSON.stringify(rewritten));
+  });
+
+  it('an ARRAY entry is dropped whole, not loaded as an empty carrier', () => {
+    // typeof [] === 'object', so an array row used to pass the entry guard and
+    // land as {}, inventing membership for a relic whose row was junk.
+    const id = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ][0];
+    const restored = restoreReliquaryState({
+      firstFind: { [id]: [] as never } as never,
+    });
+    expect(Object.hasOwn(restored.firstFind, id)).toBe(false);
+    expect(restored.counts).toEqual({});
+    // A populated array is refused the same way (no numeric-key salvage).
+    const withEntries = restoreReliquaryState({
+      firstFind: { [id]: [{ clears: 3 }] as never } as never,
+    });
+    expect(Object.hasOwn(withEntries.firstFind, id)).toBe(false);
+  });
+
+  it('counts keys stay a SUBSET of firstFind across a mixed obtain/find sequence', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, 6);
+    // Interleaved deliberately: obtains before finds, finds before obtains,
+    // repeats, a movement grant, and a retro fill, so no single ordering can
+    // be the only one the invariant survives.
+    noteRelicObtain(meta, ids[0]);
+    noteRelicItemFind(meta, ids[1]);
+    noteRelicObtain(meta, ids[1], 2);
+    sim.addItem(ids[2], 1, sim.playerId);
+    sim.addItem(ids[3], 1, sim.playerId, { movement: true });
+    noteRelicItemFind(meta, ids[4], { retro: true });
+    noteRelicObtain(meta, ids[4]);
+    noteRelicObtain(meta, ids[0], 3);
+    markItemDiscovered(sim.ctx, meta, ids[5]);
+
+    expect(Object.keys(meta.reliquary.counts).length).toBeGreaterThanOrEqual(4);
+    for (const key of Object.keys(meta.reliquary.counts)) {
+      expect(key in meta.reliquary.firstFind, `${key} counted with no carrier entry`).toBe(true);
+    }
+    // And the invariant survives the round trip it exists to protect.
+    const saved = sim.serializeCharacter(sim.playerId)!;
+    const reloaded = restoreReliquaryState(saved.reliquary);
+    for (const key of Object.keys(reloaded.counts)) {
+      expect(key in reloaded.firstFind).toBe(true);
+    }
+    expect(reloaded.counts).toEqual(meta.reliquary.counts);
+  });
+
+  it('a count with NO carrier entry is silently LOST by serialize (the trap this documents)', () => {
+    // Hand-built state, reachable only by a future writer that increments
+    // counts without writing the carrier firstFind entry noteRelicObtain
+    // writes. The blob folds each tally ONTO its entry, so a tally with no
+    // entry has nowhere to ride and vanishes at the next autosave, with
+    // nothing red anywhere. Pinned so the loss is a documented consequence
+    // rather than a surprise, and so the carrier write is understood as
+    // load-bearing rather than as defensive noise.
+    const id = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ][0];
+    const orphaned = freshReliquaryState();
+    orphaned.counts[id] = 9;
+    orphaned.marks.add([...RELIQUARY_MARK_IDS][0]);
+
+    const saved = serializeReliquaryState(orphaned)!;
+    expect(saved).toBeDefined();
+    // The mark carried the blob past omit-empty, so this is a real save that
+    // simply has no home for the tally.
+    expect(saved.firstFind).toBeUndefined();
+    expect(JSON.stringify(saved)).not.toContain('9');
+    expect(restoreReliquaryState(saved).counts).toEqual({});
+    // Contrast: the same tally written through noteRelicObtain DOES survive,
+    // because that function writes the carrier.
+    const proper = freshReliquaryState();
+    const meta = { reliquary: proper } as unknown as Parameters<typeof noteRelicObtain>[0];
+    noteRelicObtain(meta, id, 9);
+    expect(restoreReliquaryState(serializeReliquaryState(proper)!).counts[id]).toBe(9);
+  });
+});
+
+describe('Reliquary movement flag at the remaining relocation sites', () => {
+  it('unequipping a mech chroma re-grants without counting (offline arm)', () => {
+    // Equipping a chroma CONSUMES its item; unequipping mints it back. Pure
+    // relocation of a copy the account already owns. Latent for the tally
+    // today (no chroma item id is catalogued) and pinned anyway, because the
+    // flag's absence is invisible until content makes one catalogued.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const chromaId = sim.accountCosmetics.mechChromaIds[0] ?? 'amber_crimson';
+    sim.accountCosmetics = { ...sim.accountCosmetics, mechChromaIds: [chromaId] };
+    const before = { ...meta.reliquary.counts };
+
+    expect(sim.unequipMechChroma(chromaId, sim.playerId)).toBe(true);
+    // The re-grant really happened (otherwise the count claim is vacuous).
+    const itemId = mechChromaItemId(chromaId);
+    expect(itemId).toBeTruthy();
+    expect(meta.inventory.some((s) => s.itemId === itemId)).toBe(true);
+    // Discovery fires as on every movement path; the tally does not move.
+    expect(meta.deedStats.itemsDiscovered.has(itemId!)).toBe(true);
+    expect(meta.reliquary.counts).toEqual(before);
+  });
+
+  it('the commission-order delivery hands over without counting, and the CRAFT counts', () => {
+    // Two catalogued relics are craftable (boundstone_helm here), which makes
+    // this flow reachable with a real relic rather than a stand-in: the
+    // crafter's mint is world-sourced and COUNTS, while the delivery to the
+    // requester is a handover and must not.
+    const sim = makeSim();
+    const crafter = primary(sim);
+    const requesterPid = sim.addPlayer('warrior', 'Requester');
+    const requester = sim.players.get(requesterPid)!;
+    const requesterEntity = sim.entities.get(requesterPid)!;
+    requesterEntity.pos.x = crafter.e.pos.x;
+    requesterEntity.pos.z = crafter.e.pos.z;
+
+    const RELIC = 'boundstone_helm';
+    const RECIPE = 'recipe_ironbound_warplate_helm';
+    expect(isCataloguedRelicItem(RELIC)).toBe(true);
+    crafter.meta.knownRecipes.add(RECIPE);
+    // The recipe carries a combo requirement (armorcrafting + weaponcrafting),
+    // so the crafter needs the attuned pair AND skill in both, exactly as a
+    // real crafter would; comboEligibility refuses on identity before it ever
+    // looks at the skills.
+    crafter.meta.archetype.activeArchetype = 'armorcrafting';
+    crafter.meta.archetype.pairedMajor = 'weaponcrafting';
+    crafter.meta.craftSkills.armorcrafting = 300;
+    crafter.meta.craftSkills.weaponcrafting = 300;
+    sim.addItem('arcanite_bar', 2, sim.playerId);
+    sim.addItem('thorium_ore', 10, sim.playerId);
+    sim.addItem('wolf_fang', 8, sim.playerId);
+    sim.addItem('smithing_flux', 4, sim.playerId);
+
+    // The board keys on the RECIPE, and an 'open' order any crafter may take.
+    const order = openCommissionOrder(sim.ctx, RECIPE, 'open', undefined, requesterPid);
+    expect(order.ok, order.reason).toBe(true);
+    const orderId = order.orderId;
+    expect(orderId).toBeDefined();
+    expect(acceptCommissionOrder(sim.ctx, orderId!, sim.playerId).ok).toBe(true);
+
+    runCraft(sim, RECIPE, true, sim.playerId);
+    expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
+    // The crafter's own mint COUNTS: world-sourced, and unlike the buyback
+    // loop it is not free, because the reagents were consumed.
+    expect(crafter.meta.reliquary.counts[RELIC]).toBe(1);
+    expect(requester.reliquary.counts).toEqual({});
+
+    const delivered = deliverCommissionOrder(sim.ctx, orderId!, sim.playerId);
+    expect(delivered.ok, delivered.reason).toBe(true);
+    // The requester really received it, and gained membership without a tally.
+    expect(requester.inventory.some((s) => s.itemId === RELIC)).toBe(true);
+    expect(requester.deedStats.itemsDiscovered.has(RELIC)).toBe(true);
+    expect(requester.reliquary.firstFind[RELIC]).toBeDefined();
+    expect(requester.reliquary.counts).toEqual({});
+    // ...and no provenance was fabricated for the handover either.
+    expect(requester.reliquary.firstFind[RELIC]).toEqual({});
+    // The crafter's tally is unchanged by giving it away.
+    expect(crafter.meta.reliquary.counts[RELIC]).toBe(1);
+  });
+
+  it('the unbind stack-split peel can never reach a catalogued relic (content)', () => {
+    // commission.ts only peels when a bound slot holds MORE than one copy, and
+    // unbind is offered only for commission-eligible kinds. Those kinds never
+    // stack past one, so the peel arm is unreachable for every catalogued
+    // relic: its movement flag is correct but defensive. This pins the content
+    // fact rather than scraping the source, so the day a stackable relic
+    // becomes commission-eligible, this reds and the flag gets a real test.
+    const offenders: string[] = [];
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        if (relic.kind !== 'item') continue;
+        const def = ITEMS[relic.itemId];
+        if (isCommissionEligible(def) && stackSizeOf(def) > 1) offenders.push(relic.itemId);
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: commission-eligible relics DO exist, so the premise is
+    // about stacking rather than about the eligible set being empty.
+    const eligible = RELIQUARY_PAGES.flatMap((p) =>
+      p.relics.filter((r) => r.kind === 'item' && isCommissionEligible(ITEMS[r.itemId])),
+    );
+    expect(eligible.length).toBeGreaterThan(100);
+  });
+
+  it('a guild-bank-shaped first find through buyback lands sparse and uncounted', () => {
+    // The hole the buyback comment used to deny: guild bank withdrawals move
+    // items with moveBetweenContainers and never touch the discovery ledger,
+    // so an UNDISCOVERED relic can reach a player's bags. Selling and buying
+    // it back then fires its first-ever discovery through the vendor path. The
+    // fixture models that arrival directly (bags mutated with no ledger write),
+    // because the state, not the route, is what the vendor path sees.
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    const wilkes = [...sim.entities.values()].find((x) => x.templateId === 'trader_wilkes');
+    e.pos.x = wilkes!.pos.x + 2;
+    e.pos.z = wilkes!.pos.z;
+    (sim as unknown as { rebucket(entity: typeof e): void }).rebucket(e);
+    meta.copper = 100000;
+    meta.deedStats.dungeonClears.hollow_crypt = 9;
+
+    // Arrives with NO discovery credit, the guild-bank shape.
+    meta.inventory.push({ itemId: CATALOGUE_RELIC, count: 1 });
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+
+    sim.sellItem(CATALOGUE_RELIC, 1, sim.playerId);
+    sim.buyBackItem(CATALOGUE_RELIC, undefined, undefined, sim.playerId);
+
+    // The first-ever discovery really happened HERE, on the vendor path.
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    // ...and it invented neither provenance nor a tally, despite a meter
+    // reading 9 that the old opts-free seam call would have stamped.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    expect(meta.reliquary.counts).toEqual({});
+  });
+});
+
+describe('Reliquary fill-chain ownership hoist premise', () => {
+  // The hoist in src/sim/reliquary.ts (onItemDiscovered / noteReliquaryMark /
+  // maybeSyncCuratorRankDeeds each build characterReliquaryOwnership ONCE and
+  // thread it) rests on a stated premise, quoted from the comment there:
+  // three of the snapshot's four surfaces are LIVE references, so a write
+  // inside the chain is visible through it, and the fourth, ownedMounts, is a
+  // COPY that "cannot change inside a fill chain at all, since nothing here
+  // moves a reins item". Only that fourth surface can go stale, and only if
+  // some step of the chain grants or removes an item. Today nothing does:
+  // noteRelicItemFind writes firstFind and recent, emitReliquaryUnlock reads
+  // and queues an event, and grantDeed touches deedsEarned / renown /
+  // milestones. This pins the premise itself, so a future deed reward that
+  // hands out an item reds HERE, next to the rationale, instead of silently
+  // under-reporting Curator rank.
+  it('a rank-granting fill chain moves no item in bags, bank, or equipment', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Hold reins so ownedMounts is non-empty and a staleness bug would have
+    // something to lose (an empty copy could not disagree with a live read).
+    sim.addItem('reins_valorsteed', 1, sim.playerId);
+    meta.bank.inventory.push({ itemId: 'reins_swiftpaw', count: 1 });
+
+    const snapshot = () => ({
+      inventory: JSON.stringify(meta.inventory),
+      bank: JSON.stringify(meta.bank.inventory),
+      equipment: JSON.stringify(meta.equipment),
+      mounts: [...ownedMounts(meta)].sort().join(','),
+    });
+    const rank = () => curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)));
+
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, CURATOR_RANK_DEFS[2].threshold);
+    // Every fill is a chain; each is checked in isolation so the assertion
+    // names the exact call that moved something, and the rank-crossing ones
+    // (the chains that actually reach emit + syncCuratorRankDeeds off the
+    // hoisted snapshot) are counted so this cannot pass vacuously.
+    let rankUps = 0;
+    for (const id of ids) {
+      const before = snapshot();
+      const rankBefore = rank();
+      markItemDiscovered(sim.ctx, meta, id);
+      if (rank() > rankBefore) rankUps++;
+      // Equality on CONTENTS, not lengths: a swap preserving counts would
+      // still falsify the premise.
+      expect(snapshot(), `fill of ${id} moved an item`).toEqual(before);
+    }
+    // The chains under test really did grant rank deeds, which is the step
+    // that reuses the snapshot furthest from where it was built.
+    expect(rankUps).toBeGreaterThanOrEqual(2);
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_rank_3')).toBe(true);
+  });
+});
+
+describe('Reliquary wire memo revision bumps', () => {
+  // The memo's failure mode is SILENT: the server compares the string
+  // reliquaryWireJson returns against session.lastSent, so a writer that forgets
+  // to bump the revision ships nothing at all and the client keeps a stale blob
+  // forever, with no error anywhere. This drives each of the four public writers
+  // in turn and asserts the built JSON actually moved, which is the observable
+  // the server depends on (rather than the private revision counter).
+  it('every public writer moves the built blob', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const state = meta.reliquary;
+    meta.deedStats.dungeonClears.hollow_crypt = 3;
+
+    const build = () => reliquaryWireJson(state);
+    // A build with nothing written yet, so each step below has a prior string
+    // to differ from and the cache record exists to be reused.
+    expect(build()).toBe('{}');
+    expect(reliquaryWireCacheProbe(state)).toBeDefined();
+
+    // 1. noteRelicItemFind (the first-find write seam).
+    const afterEmpty = build();
+    expect(noteRelicItemFind(meta, CATALOGUE_RELIC)).toBe(true);
+    const afterFind = build();
+    expect(afterFind).not.toBe(afterEmpty);
+    expect(JSON.parse(afterFind).firstFind[CATALOGUE_RELIC]).toEqual({ clears: 3 });
+
+    // 2. noteRelicObtain (the tally).
+    noteRelicObtain(meta, CATALOGUE_RELIC);
+    const afterObtain = build();
+    expect(afterObtain).not.toBe(afterFind);
+    expect(JSON.parse(afterObtain).firstFind[CATALOGUE_RELIC]).toEqual({ clears: 3, count: 1 });
+
+    // 3. noteReliquaryMark (a mark plus its recent push).
+    const markId = [...RELIQUARY_MARK_IDS][0];
+    expect(noteReliquaryMark(sim.ctx, meta, markId)).toBe(true);
+    const afterMark = build();
+    expect(afterMark).not.toBe(afterObtain);
+    expect(JSON.parse(afterMark).marks).toEqual([markId]);
+
+    // 4. syncReliquaryMarksFromVisited (the silent join-time refill).
+    const second = [...RELIQUARY_MARK_IDS][1];
+    expect(second).toBeDefined();
+    meta.deedStats.visited.add(second);
+    expect(syncReliquaryMarksFromVisited(meta)).toBe(1);
+    const afterSync = build();
+    expect(afterSync).not.toBe(afterMark);
+    expect(JSON.parse(afterSync).marks).toContain(second);
+
+    // A build with nothing written in between reuses the cached record, so the
+    // assertions above are about the WRITES moving it, not about every call
+    // rebuilding regardless.
+    const record = reliquaryWireCacheProbe(state);
+    expect(build()).toBe(afterSync);
+    expect(reliquaryWireCacheProbe(state)).toBe(record);
+  });
+});
+
 describe('Reliquary determinism', () => {
-  it('identical seeds and discover order produce identical firstFind and recent', () => {
-    function run(): { first: string; recent: string[] } {
+  it('identical seeds and discover order produce identical firstFind, recent, and counts', () => {
+    function run(): { first: string; recent: string[]; counts: string } {
       const sim = makeSim(99);
       const { meta } = primary(sim);
       meta.deedStats.dungeonClears.hollow_crypt = 4;
       markItemDiscovered(sim.ctx, meta, NON_RELIC);
       markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
+      // The tally is new Phase 17 sim state written on the grant path: it
+      // rides the same-seed pin like the surfaces it is folded beside.
+      sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+      sim.addItem(STACKABLE_RELIC, 2, sim.playerId);
       return {
         first: JSON.stringify(meta.reliquary.firstFind),
         recent: [...meta.reliquary.recent],
+        counts: JSON.stringify(meta.reliquary.counts),
       };
     }
     const a = run();
@@ -1298,7 +2113,8 @@ describe('Reliquary determinism', () => {
     expect(a).toEqual(b);
     // No wall-clock or Math.random in the path: two runs stay bit-equal.
     expect(a.first).toContain(CATALOGUE_RELIC);
-    expect(a.recent).toEqual([CATALOGUE_RELIC]);
+    expect(a.recent).toEqual([CATALOGUE_RELIC, STACKABLE_RELIC]);
+    expect(JSON.parse(a.counts)[STACKABLE_RELIC]).toBe(2);
   });
 });
 
@@ -1429,15 +2245,22 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     sim.drainEvents();
     expect(meta.reliquary.recent).toEqual([]);
 
-    // A catalogued relic the seed did not cover, on a page that actually has a
-    // clear source, so the stamped-clears half of the contract is observable.
+    // A catalogued relic the seed did not cover, on a page whose clear meter is
+    // a normal-difficulty dungeon, so this test can TURN THAT METER OVER and
+    // the stamped-clears half of the contract is observable. Since the Phase 17
+    // ruling omits clears at zero, a page left at zero would prove nothing
+    // here: a stamp only exists once a clear does.
     const liveRelic = catalogItemIds.find((id) => {
       if (SEEDED.includes(id)) return false;
       const pageId = RELIQUARY_ITEM_TO_PAGES.get(id)?.[0];
       const source = pageId ? RELIQUARY_PAGES_BY_ID[pageId]?.clearSource : undefined;
-      return source !== undefined && source.kind !== 'none';
+      return source !== undefined && source.kind === 'dungeon' && source.difficulty !== 'heroic';
     });
-    expect(liveRelic, 'a clear-sourced catalogued relic outside the seed').toBeDefined();
+    expect(liveRelic, 'a dungeon-sourced catalogued relic outside the seed').toBeDefined();
+    const source = RELIQUARY_PAGES_BY_ID[RELIQUARY_ITEM_TO_PAGES.get(liveRelic!)![0]].clearSource;
+    expect(source?.kind).toBe('dungeon');
+    if (source?.kind !== 'dungeon') throw new Error('expected a dungeon clear source');
+    meta.deedStats.dungeonClears[source.dungeonId] = 5;
 
     sim.addItem(liveRelic!, 1, pid);
     const unlocks = sim
@@ -1446,7 +2269,16 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     expect(unlocks.length).toBe(1);
     expect(unlocks[0].type === 'reliquaryUnlock' && unlocks[0].retro).toBeUndefined();
     expect(meta.reliquary.recent).toEqual([liveRelic]);
-    expect(Object.hasOwn(meta.reliquary.firstFind[liveRelic!], 'clears')).toBe(true);
+    expect(meta.reliquary.firstFind[liveRelic!]).toEqual({ clears: 5 });
+    // The same live grant is a world-sourced obtain, so the tally starts at 1
+    // while every seeded (retro) relic stays uncounted: logging in holding a
+    // relic is not an acquisition.
+    expect(meta.reliquary.counts[liveRelic!]).toBe(1);
+    for (const seeded of SEEDED) {
+      expect(Object.hasOwn(meta.reliquary.counts, seeded), `${seeded} must stay uncounted`).toBe(
+        false,
+      );
+    }
   });
 
   it('a join that only holds mount reins keeps its rank-up retro-flagged', () => {
@@ -1510,7 +2342,9 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     expect(ids.length).toBe(threshold);
     for (const id of ids) {
       expect(meta.deedStats.itemsDiscovered.has(id), `${id} must start undiscovered`).toBe(false);
-      meta.reliquary.firstFind[id] = { pageId: RELIQUARY_ITEM_TO_PAGES.get(id)?.[0] };
+      // A sparse entry is the whole desync: the blob knows the relic, the
+      // ledger does not. Phase 17 left the entry with no fields at all.
+      meta.reliquary.firstFind[id] = {};
     }
     expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
     sim.drainEvents();

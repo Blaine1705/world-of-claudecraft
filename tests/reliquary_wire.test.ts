@@ -13,14 +13,24 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  // The chroma unequip path revokes through the db before its promise chain;
+  // stubbed so the movement pin below exercises the real server method.
+  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   insertBankLedgerRow: vi.fn(async () => {}),
   // join() refreshes account flair; stub so tests do not stderr on missing export.
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
 import { GameServer } from '../server/game';
+import { applyBoostKitToPlayer } from '../server/pbe_boost';
+import { mechChromaItemId } from '../src/sim/content/skins';
 import { markItemDiscovered } from '../src/sim/deeds';
-import { RELIQUARY_PAGES_BY_ID } from '../src/sim/reliquary';
+import {
+  isCataloguedRelicItem,
+  noteReliquaryMark,
+  RELIQUARY_PAGES_BY_ID,
+  reliquaryWireCacheProbe,
+} from '../src/sim/reliquary';
 import type { Sim } from '../src/sim/sim';
 import { bareClient } from './helpers/bare_client';
 
@@ -74,6 +84,10 @@ function scriptedReliquaryState(sim: Sim, pid: number): void {
   markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
   // A second catalogued unique so recent is multi-entry and completion is partial.
   markItemDiscovered(sim.ctx, meta, 'cryptbone_greaves');
+  // One real hub grant so the folded obtain tally rides the wire for exactly
+  // ONE of the two entries: the other stays sparse, which is what proves the
+  // fold is per entry rather than a blanket field.
+  sim.addItem(CATALOGUE_RELIC, 1, pid);
 }
 
 describe('Reliquary wire thrift', () => {
@@ -86,8 +100,10 @@ describe('Reliquary wire thrift', () => {
     // Seed an authored mark so the non-empty marks[] arm is on the wire (Phase 3
     // contract: firstFind / marks / recent; omit-empty when none).
     const meta = sim.players.get(session.pid)!;
-    meta.reliquary.marks.add(SEEDED_MARK_ID);
-    meta.reliquary.recent.push(SEEDED_MARK_ID);
+    // Through the real write seam, not a hand-mutation: noteReliquaryMark is
+    // what pushes recent AND bumps the wire memo's revision, so seeding this
+    // way keeps the test honest about how a mark actually reaches the blob.
+    noteReliquaryMark(sim.ctx, meta, SEEDED_MARK_ID);
 
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
@@ -99,14 +115,10 @@ describe('Reliquary wire thrift', () => {
     // Sparse shape: firstFind + marks + recent. Never a second discovery array.
     expect(reliq).not.toHaveProperty('itemsDiscovered');
     expect(Object.keys(reliq).sort()).toEqual(['firstFind', 'marks', 'recent']);
-    expect(reliq.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 4,
-      pageId: PAGE_ID,
-    });
-    expect(reliq.firstFind.cryptbone_greaves).toEqual({
-      clears: 4,
-      pageId: PAGE_ID,
-    });
+    // Phase 17 wire shape: pageId is gone from the entry and the obtain tally
+    // rides folded onto it as `count`, never as a fourth top-level key.
+    expect(reliq.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 4, count: 1 });
+    expect(reliq.firstFind.cryptbone_greaves).toEqual({ clears: 4 });
     expect(reliq.marks).toEqual([SEEDED_MARK_ID]);
     expect(reliq.recent).toEqual([CATALOGUE_RELIC, 'cryptbone_greaves', SEEDED_MARK_ID]);
 
@@ -147,10 +159,60 @@ describe('Reliquary wire thrift', () => {
     (server as any).broadcastSnapshots();
     const after = lastSnap(fw.sent);
     expect(after.self).toHaveProperty('reliq');
-    expect(after.self.reliq.firstFind[CATALOGUE_RELIC]).toEqual({
-      clears: 1,
-      pageId: PAGE_ID,
-    });
+    expect(after.self.reliq.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 1 });
+
+    // A later OBTAIN of the same relic moves nothing but the tally: it is not
+    // a find, so no event marks the session dirty, but the memo's revision
+    // still has to move or the re-ship would carry a stale blob. Forcing the
+    // heavy gate open is what isolates the memo from the dirty flag here.
+    (server as any).heavySelfGate = false;
+    sim.addItem(CATALOGUE_RELIC, 1, session.pid);
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const counted = lastSnap(fw.sent);
+    expect(counted.self).toHaveProperty('reliq');
+    expect(counted.self.reliq.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 1, count: 1 });
+  });
+
+  it('builds the reliq blob once per CHANGE, not once per heavy tick', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 8, 'RelicH');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+    // Force every tick heavy so the two ticks below are genuinely both due;
+    // otherwise the staggered refresh, not the memo, would be doing the work.
+    (server as any).heavySelfGate = false;
+
+    meta.deedStats.dungeonClears.hollow_crypt = 2;
+    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
+    routeEvents(server, sim.drainEvents());
+    (server as any).broadcastSnapshots();
+    const first = reliquaryWireCacheProbe(meta.reliquary);
+    expect(first, 'the heavy tick must have built and cached a blob').toBeDefined();
+
+    // A second heavy tick with nothing changed reuses the SAME record. Object
+    // identity, not equal bytes: equal bytes would pass with no memo at all.
+    (server as any).broadcastSnapshots();
+    expect(reliquaryWireCacheProbe(meta.reliquary)).toBe(first);
+
+    // A write rebuilds: a new record at a higher revision, carrying the change.
+    sim.addItem(CATALOGUE_RELIC, 1, session.pid);
+    (server as any).broadcastSnapshots();
+    const rebuilt = reliquaryWireCacheProbe(meta.reliquary);
+    expect(rebuilt).not.toBe(first);
+    expect(rebuilt!.rev).toBeGreaterThan(first!.rev);
+    expect(JSON.parse(rebuilt!.json).firstFind[CATALOGUE_RELIC]).toEqual({ clears: 2, count: 1 });
+
+    // The memo is keyed on state IDENTITY, so a second character's blob can
+    // never be served from the first one's cache.
+    const otherFw = fakeWs();
+    const other = joinAt(server, otherFw, 9, 'RelicI');
+    const otherMeta = sim.players.get(other.pid)!;
+    expect(reliquaryWireCacheProbe(otherMeta.reliquary)).toBeUndefined();
+    (server as any).broadcastSnapshots();
+    expect(reliquaryWireCacheProbe(otherMeta.reliquary)).not.toBe(rebuilt);
+    expect(reliquaryWireCacheProbe(otherMeta.reliquary)!.json).toBe('{}');
   });
 
   it('reliquaryUnlock is id-only with pageIds and no English', () => {
@@ -248,6 +310,88 @@ describe('Reliquary wire thrift', () => {
   });
 });
 
+describe('Reliquary movement flag on the server-only grant paths', () => {
+  it('a GM item restore re-mints without counting, and still discovers', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 20, 'RelicRestore');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+    meta.deedStats.dungeonClears.hollow_crypt = 5;
+
+    // The real admin entry point, resolved by characterId exactly as the
+    // support handler resolves it.
+    const outcome = server.adminRestoreItem(session.characterId, CATALOGUE_RELIC, 2);
+    expect(outcome).toBe('ok');
+
+    // The grant really landed (otherwise every claim below is vacuous).
+    expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    // Discovery fires, as on every movement path...
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    // ...while the tally stays empty and no clear count is invented, despite a
+    // meter reading 5. A support ticket must not move a player-visible number.
+    expect(meta.reliquary.counts).toEqual({});
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+  });
+
+  it('a PBE boost kit seeds gear without counting any of it', () => {
+    // Behavioral rather than a source scan: applyBoostKitToPlayer is a pure
+    // Sim function (the DB work lives in its callers), so the policy can be
+    // driven for real. A boost kit is a SYSTEM SEED, mirroring the join-time
+    // retro fill, which deliberately never counts either.
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 22, 'RelicBoost');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+    meta.pbeBoostKit = 0;
+
+    expect(applyBoostKitToPlayer(sim, session.pid)).toBe(true);
+
+    // Premise: the kit really does hand over catalogued relics, or "no counts"
+    // would be true for the boring reason.
+    const seededRelics = [...meta.deedStats.itemsDiscovered].filter((id) =>
+      isCataloguedRelicItem(id),
+    );
+    expect(seededRelics.length).toBeGreaterThan(0);
+    // The alt-role BAGGED loop is a distinct grant site inside the kit: prove
+    // it handed over a catalogued relic of its own, so dropping only ITS
+    // movement flag cannot stay green on the equipped items' content alone.
+    expect(meta.inventory.some((s) => isCataloguedRelicItem(s.itemId))).toBe(true);
+    // Discovery fills the catalog, as on every movement path...
+    for (const id of seededRelics) expect(meta.reliquary.firstFind[id]).toBeDefined();
+    // ...and not one of them counts as something the world handed the player.
+    expect(meta.reliquary.counts).toEqual({});
+  });
+
+  it('unequipping a mech chroma re-grants without counting (server arm)', () => {
+    // The twin of the offline Sim.unequipMechChroma pin in
+    // tests/reliquary_state.test.ts. Both arms must carry the flag or the two
+    // hosts answer the tally differently for one action; this is the half a
+    // sim-only test cannot see.
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 21, 'RelicChroma');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+
+    const chromaId = 'amber_crimson';
+    const itemId = mechChromaItemId(chromaId);
+    expect(itemId).toBeTruthy();
+    session.accountCosmetics = { ...session.accountCosmetics, mechChromaIds: [chromaId] };
+    const before = { ...meta.reliquary.counts };
+
+    (
+      server as unknown as { unequipAccountMechChroma(s: unknown, c: string): void }
+    ).unequipAccountMechChroma(session, chromaId);
+
+    expect(meta.inventory.some((s) => s.itemId === itemId)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(itemId!)).toBe(true);
+    expect(meta.reliquary.counts).toEqual(before);
+  });
+});
+
 describe('Reliquary online / offline parity for scripted state', () => {
   it('ClientWorld mirrors reliq and answers completion identically to Sim', () => {
     const server = new GameServer();
@@ -269,6 +413,10 @@ describe('Reliquary online / offline parity for scripted state', () => {
     );
     expect([...client.reliquaryMarks]).toEqual([...sim.reliquaryMarks]);
     expect(client.reliquaryRecent).toEqual([...sim.reliquaryRecent]);
+    // The obtain tally travels folded onto a firstFind entry and the mirror
+    // splits it back out, so the two hosts answer the facet identically.
+    expect(client.reliquaryObtainCounts).toEqual(sim.reliquaryObtainCounts);
+    expect(client.reliquaryObtainCounts).toEqual({ [CATALOGUE_RELIC]: 1 });
 
     // Ownership for completion still rides deedStats discovery, mirrored via dstats.
     expect(client.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
@@ -343,6 +491,19 @@ describe('Reliquary online / offline parity for scripted state', () => {
     (server as any).broadcastSnapshots();
     expect(saveSpy).not.toHaveBeenCalled();
     expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+
+    // The Phase 17 mutation point: a REPEAT obtain writes state (the tally)
+    // without being a find at all, so it emits no reliquaryUnlock and nothing
+    // marks the session dirty. It must not force a save either: the tally
+    // rides the 30s autosave like the rest of the sparse blob, and a per-drop
+    // save here would be a write amplification the whole design avoids.
+    sim.addItem(CATALOGUE_RELIC, 1, session.pid);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    const repeatEvents = sim.drainEvents();
+    routeEvents(server, repeatEvents);
+    (server as unknown as { detectActivity(e: unknown[]): void }).detectActivity(repeatEvents);
+    (server as any).broadcastSnapshots();
+    expect(saveSpy).not.toHaveBeenCalled();
 
     // Contrast: a synthetic deedUnlocked must schedule saveCharacter so the
     // harness cannot vacuous-pass if the spy target drifts.

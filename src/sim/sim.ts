@@ -475,6 +475,7 @@ import {
   clearCountForSource,
   curatorRankFromOwned,
   freshReliquaryState,
+  noteRelicObtain,
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
   type ReliquaryState,
@@ -783,6 +784,12 @@ export { FALL_SAFE_DISTANCE } from './player_motion';
 // browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
 // server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
 const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
+
+/** The one opts object a movement grant hands the discovery ledger, shared so
+ *  the hot grant path never allocates per call (deeds.ts RETRO_SEED is the
+ *  same idiom for the join-time seed). Discovery itself is unaffected by the
+ *  flag; it only reaches the Reliquary's first-find provenance stamp. */
+const MOVEMENT_GRANT = { movement: true } as const;
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -4447,7 +4454,9 @@ export class Sim {
         this.setPlayerSkin(meta.entityId, 0, 'class');
       }
     }
-    this.addItem(itemId, 1, r.meta.entityId);
+    // movement: unequipping a mech chroma re-grants the very item equipping it
+    // consumed, so this relocates a copy the account already owns.
+    this.addItem(itemId, 1, r.meta.entityId, { movement: true });
     return true;
   }
 
@@ -4663,6 +4672,9 @@ export class Sim {
   }
   get reliquaryRecent(): readonly string[] {
     return this.primary.reliquary.recent;
+  }
+  get reliquaryObtainCounts(): Readonly<Record<string, number>> {
+    return this.primary.reliquary.counts;
   }
   /** Full Reliquary ownership surfaces (items, marks, mounts, skins, titles). */
   private reliquaryOwnershipSurfaces() {
@@ -8390,11 +8402,32 @@ export class Sim {
   // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
   // disenchant UI wiring): pass the same opts from those too, or the new
   // grants will double-ding and double-log the way the original ones did.
+  // opts.movement: this grant RELOCATES or re-mints copies the player already
+  // holds, or hands over copies another player held (trade, mail, market, an
+  // enchant re-mint, an unbind stack split, a returned commission order,
+  // vendor buyback, an admin restore, a PBE boost kit). It is not a
+  // world-sourced acquisition, so it must never bump a Reliquary obtain count,
+  // or two players could pass one relic back and forth and both watch the
+  // number climb. Discovery is UNAFFECTED: seeing a relic for the first time
+  // across a trade window still discovers it. The flag also suppresses the
+  // Reliquary's first-find CLEAR-COUNT stamp, which would otherwise claim a
+  // run the player never made (src/sim/reliquary.ts noteRelicItemFind).
+  //
+  // Where the near cases land, stated once so a new grant site does not have
+  // to guess. CRAFTING COUNTS: a craft output is world-sourced, and unlike the
+  // buyback loop it is not free, because the materials are consumed. A
+  // CURRENCY vendor counts too (delve Marks are earned in the world). What
+  // does NOT count is a copy changing hands or being re-minted from itself.
   addItem(
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: {
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8403,7 +8436,22 @@ export class Sim {
     addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId);
+    // `movement` rides along but never gates discovery: it only tells the
+    // Reliquary's first-find stamp not to claim a clear the player never ran.
+    deedsMod.markItemDiscovered(
+      this.ctx,
+      meta,
+      itemId,
+      undefined,
+      opts?.movement ? MOVEMENT_GRANT : undefined,
+    );
+    // Reliquary obtain tally, one per COPY granted (not per call like the
+    // discovery ledger above, where an id is simply new or not). Most
+    // catalogued relics are gear and cannot stack, so the two readings usually
+    // coincide; the eight stackable profession specimens on the Professions
+    // shelf are why this passes `count` rather than 1. Pinned in
+    // tests/reliquary_content.test.ts.
+    if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -8436,12 +8484,18 @@ export class Sim {
   // per grant, matching addItem's per-call semantics.
   // opts.silent / opts.callerLogs: see addItem's matching params above, same
   // contract.
+  // opts.movement: see addItem's matching param above, same contract.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: {
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8471,8 +8525,19 @@ export class Sim {
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
-    // the static def quality for the quality-first marks.
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
+    // the static def quality for the quality-first marks. `movement` rides
+    // along exactly as in addItem above (provenance only, never membership).
+    deedsMod.markItemDiscovered(
+      this.ctx,
+      meta,
+      itemId,
+      instance.rolled?.quality,
+      opts?.movement ? MOVEMENT_GRANT : undefined,
+    );
+    // Reliquary obtain tally, one per COPY granted: unlike discovery (which is
+    // per call by definition, an id is either new or it is not) a windfall of
+    // three copies really is three acquisitions.
+    if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.

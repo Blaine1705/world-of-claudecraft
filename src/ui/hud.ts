@@ -13440,19 +13440,17 @@ export class Hud {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const plan = buildReliquaryUnlockPlan(events, reducedMotion);
     // One catalog index for the whole drain, feeding the SAME resolution the
-    // Reliquary's own recent strip uses (reliquaryRelicPageId: the recorded
-    // first-find page while the catalog still holds it, else the first authored
-    // page listing the slot). A chip and its own announcement therefore cannot
-    // point at different pages.
+    // Reliquary's own recent strip uses (reliquaryRelicPageId: the first
+    // authored page listing the slot). A chip and its own announcement
+    // therefore cannot point at different pages.
     const pageIndex = reliquaryRelicPageIndex(RELIQUARY_PAGES);
-    const firstFind = this.sim.reliquaryFirstFind;
     for (const log of plan.logs) {
       // One shared resolver for chat, banner, and every window surface: the two
       // ladders here each carried their own humanized fallback, and only one of
       // them stripped a colon namespace, so `mount:swift_gryphon` printed
       // differently in the log than on the banner for the same unlock.
       const name = reliquaryRelicDisplayName(log.kind, log.id);
-      const pageId = reliquaryRelicPageId(pageIndex, firstFind, log.id);
+      const pageId = reliquaryRelicPageId(pageIndex, log.id);
       if (pageId === null) {
         // A relic the catalog no longer places has nowhere to jump, so the line
         // stays plain rather than offering a link that opens nothing (the

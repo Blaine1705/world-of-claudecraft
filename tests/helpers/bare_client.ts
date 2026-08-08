@@ -109,6 +109,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.reliquaryFirstFind = {};
   c.reliquaryMarks = new Set();
   c.reliquaryRecent = [];
+  c.reliquaryObtainCounts = {};
   c.renown = 0;
   c.activeTitle = null;
   c.delveRun = null;

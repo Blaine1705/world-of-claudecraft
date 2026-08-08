@@ -1729,6 +1729,24 @@ export const ru_RU: EnTranslations = {
         "many": "осталось {count} реликвий",
         "other": "осталось {count} реликвии"
       },
+      "reliquaryObtainedTimes": {
+        "one": "Получено {count} раз",
+        "few": "Получено {count} раза",
+        "many": "Получено {count} раз",
+        "other": "Получено {count} раза"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, каталогизировано, получено {count} раз",
+        "few": "{name}, каталогизировано, получено {count} раза",
+        "many": "{name}, каталогизировано, получено {count} раз",
+        "other": "{name}, каталогизировано, получено {count} раза"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раз",
+        "few": "{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раза",
+        "many": "{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раз",
+        "other": "{name}, каталогизировано, впервые найдено на прохождении {clears}, получено {count} раза"
+      },
       "deedsRetroSummary": {
         "one": "Летопись наверстала упущенное: записано деяний: {count}.",
         "few": "Летопись наверстала упущенное: записано деяний: {count}.",

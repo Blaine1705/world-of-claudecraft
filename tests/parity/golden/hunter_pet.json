@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "2ead8d33",
+      "state": "b7f38455",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -141,7 +142,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 967,
-      "state": "efe895eb",
+      "state": "a07df541",
       "events": "1c89aa76",
       "rng": {
         "draws": 10,
@@ -152,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "5ba90562",
+      "state": "f72ee250",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -163,7 +164,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 967,
-      "state": "07ffc8a4",
+      "state": "e9b4d672",
       "events": "8f675a78",
       "rng": {
         "draws": 174,
@@ -174,7 +175,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 967,
-      "state": "9efd666d",
+      "state": "10cffbb3",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -185,7 +186,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "6371ea28",
+      "state": "6f3913c6",
       "events": "a45ab22a",
       "rng": {
         "draws": 533,
@@ -196,7 +197,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "0dee9a55",
+      "state": "a01b341b",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -207,7 +208,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "0dee9a55",
+      "state": "a01b341b",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -290,6 +291,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 20,

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "18b73a5e",
+      "state": "3f684184",
       "events": "a7f88743",
       "rng": {
         "draws": 1,
@@ -96,6 +96,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -160,6 +161,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -220,6 +222,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -468,7 +471,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "638b33e5",
+      "state": "1d31cc72",
       "events": "c3300a4d",
       "rng": {
         "draws": 3,
@@ -545,10 +548,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"
@@ -623,6 +627,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 5,
@@ -690,6 +695,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 5,
@@ -945,7 +951,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "335129ee",
+      "state": "3615f1d8",
       "events": "afbb260e",
       "rng": {
         "draws": 3,
@@ -1022,10 +1028,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"
@@ -1109,10 +1116,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"
@@ -1183,6 +1191,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 5,
@@ -1422,7 +1431,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 967,
-      "state": "b5d5b181",
+      "state": "2166a30b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1499,10 +1508,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"
@@ -1586,10 +1596,11 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
             "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
+              "greyjaw_hide_boots": {}
             },
             "recent": [
               "greyjaw_hide_boots"
@@ -1660,6 +1671,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 5,

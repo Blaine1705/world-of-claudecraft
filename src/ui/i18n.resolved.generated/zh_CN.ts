@@ -1729,6 +1729,24 @@ export const zh_CN: EnTranslations = {
         "many": "还差 {count} 件",
         "other": "还差 {count} 件"
       },
+      "reliquaryObtainedTimes": {
+        "one": "已获得 {count} 次",
+        "few": "已获得 {count} 次",
+        "many": "已获得 {count} 次",
+        "other": "已获得 {count} 次"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}，已收录，已获得 {count} 次",
+        "few": "{name}，已收录，已获得 {count} 次",
+        "many": "{name}，已收录，已获得 {count} 次",
+        "other": "{name}，已收录，已获得 {count} 次"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "few": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "many": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次",
+        "other": "{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次"
+      },
       "deedsRetroSummary": {
         "one": "你的编年史已更新：补录 {count} 项功绩。",
         "few": "你的编年史已更新：补录 {count} 项功绩。",

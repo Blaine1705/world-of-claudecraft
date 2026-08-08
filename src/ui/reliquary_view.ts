@@ -238,9 +238,15 @@ export function reliquarySourceLinePlan(
 }
 
 /** Sparse first-find meta (mirrors IWorld.reliquaryFirstFind). */
-export type ReliquaryFirstFindLookup = Readonly<
-  Record<string, { clears?: number; pageId?: string } | undefined>
->;
+export type ReliquaryFirstFindLookup = Readonly<Record<string, { clears?: number } | undefined>>;
+
+/**
+ * Sparse per-relic obtain tally (mirrors IWorld.reliquaryObtainCounts). An
+ * ABSENT id means no counted obtain, which is not the same as no obtain: a
+ * relic that arrived by trade, mail, or market never has one, and neither does
+ * a veteran who has not re-obtained since counting began.
+ */
+export type ReliquaryObtainCountLookup = Readonly<Record<string, number | undefined>>;
 
 export interface ReliquaryViewInput {
   /** Catalog pages (live RELIQUARY_PAGES or a synthetic table in tests). */
@@ -266,6 +272,12 @@ export interface ReliquaryViewInput {
    * Used only for owned-cell tooltips (clear#); never invents ownership.
    */
   firstFind?: ReliquaryFirstFindLookup;
+  /**
+   * Sparse obtain tally for catalogued item relics. Owned-cell tooltips only;
+   * it never decides ownership, completion, rank, or order. Information about
+   * a relic you already have, never a score.
+   */
+  obtainCounts?: ReliquaryObtainCountLookup;
   /** Mount ownership (live ownedMounts / reins seam). */
   ownedMounts?: { has(id: string): boolean };
   /** Account weapon-skin unlocks (empty when account cosmetics absent). */
@@ -378,6 +390,14 @@ export interface ReliquaryGridCellModel {
    * firstFind meta. Undefined for retro ownership, non-item relics, or missing.
    */
   firstFindClears?: number;
+  /**
+   * How many times this owned item relic has been obtained from the world.
+   * Undefined for a missing cell, a non-item relic, and for an owned relic the
+   * world reports no counted obtain for (traded, mailed, bought on the market,
+   * or held since before counting): those are the same "cannot say" the
+   * tooltip answers by rendering no line at all.
+   */
+  obtainedCount?: number;
   /**
    * Every door this relic comes through, ids only and in authored order
    * (reliquarySourceLinePlan). Undefined when the catalog authors no hint for
@@ -500,6 +520,7 @@ export function buildReliquaryPageCells(
     weaponSkins?: { has(id: string): boolean };
     deedsEarned?: { has(id: string): boolean };
     firstFind?: ReliquaryFirstFindLookup;
+    obtainCounts?: ReliquaryObtainCountLookup;
   },
 ): ReliquaryGridCellModel[] {
   const cells: ReliquaryGridCellModel[] = [];
@@ -522,6 +543,16 @@ export function buildReliquaryPageCells(
     if (owned && relic.kind === 'item') {
       const clears = opts.firstFind?.[id]?.clears;
       if (clears !== undefined) cell.firstFindClears = clears;
+      // Item relics only, on the same rule as the clear stamp above: the world
+      // tallies catalogued item ids and nothing else, so a mark, mount, skin,
+      // or title cell must never surface a number even from a spoofed record.
+      // The floor is a real gate, not a formality: the record arrives off the
+      // wire, and a zero, a negative, or a non-number must render no line
+      // rather than "Obtained 0 times".
+      const count = opts.obtainCounts?.[id];
+      if (typeof count === 'number' && Number.isFinite(count) && count >= 1) {
+        cell.obtainedCount = count;
+      }
     }
     cells.push(cell);
   }
@@ -570,10 +601,9 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
       kind = 'item';
     }
     // Where the chip jumps to, through the shared resolver the unlock chat
-    // line also calls (reliquaryRelicPageId): first-find page, else the first
-    // authored page holding the slot, else null.
-    const pageId =
-      relicPageIndex === null ? null : reliquaryRelicPageId(relicPageIndex, input.firstFind, id);
+    // line also calls (reliquaryRelicPageId): the first authored page holding
+    // the slot, else null.
+    const pageId = relicPageIndex === null ? null : reliquaryRelicPageId(relicPageIndex, id);
     // Shelf cards summarize a shelf, not the needle, so their latest-find line
     // is captured from the WHOLE ring before the search filter below: typing
     // must not blank a card's last find.
@@ -679,6 +709,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
         const cells = buildReliquaryPageCells(page, {
           ...opts,
           firstFind: input.firstFind,
+          obtainCounts: input.obtainCounts,
         });
         const visible = cells.filter(
           (cell) =>
@@ -787,24 +818,23 @@ export function reliquaryRelicPageIndex(
 }
 
 /**
- * Where a relic's jump lands: the recorded first-find page when the catalog
- * still holds it (that is where the player actually found the relic),
- * otherwise the first authored page that lists the slot. Null means the
- * catalog no longer places the relic at all, and the caller renders an inert
- * surface (the recent strip's unclickable chip, a plain chat line) instead of
- * promising a page that is not there.
+ * Where a relic's jump lands: the first authored page that lists the slot.
+ * Null means the catalog no longer places the relic at all, and the caller
+ * renders an inert surface (the recent strip's unclickable chip, a plain chat
+ * line) instead of promising a page that is not there.
  *
  * The ONE answer to "where does this relic live": the Overview recent chip and
  * the unlock chat line share it, so a chip and its own announcement can never
- * point at different pages.
+ * point at different pages. It used to prefer a `pageId` the first-find stamp
+ * recorded, but that stamp only ever held the same first authored page this
+ * index resolves, so the hint could differ from the catalog in exactly one
+ * case: a page retired since the find, where the fallback was already the
+ * answer. Phase 17 retired the stored field with it.
  */
 export function reliquaryRelicPageId(
   index: ReliquaryRelicPageIndex,
-  firstFind: ReliquaryFirstFindLookup | undefined,
   relicId: string,
 ): string | null {
-  const hinted = firstFind?.[relicId]?.pageId;
-  if (hinted !== undefined && index.pageIds.has(hinted)) return hinted;
   return index.pageOf.get(relicId) ?? null;
 }
 
@@ -1029,6 +1059,12 @@ export interface ReliquaryRefreshSigParts {
    * fill (discovered size + firstFind key count + active page owned).
    */
   ownershipDigest?: number;
+  /**
+   * Obtain-tally digest so a REPEAT obtain repaints an open window. It is the
+   * only dimension that moves on one: a duplicate fills no silhouette, mints no
+   * first-find key, and changes no total.
+   */
+  countsDigest?: number;
   /** Live search needle, so a keystroke repaints the narrowed list. */
   search?: string;
   /** Live grid ownership filter, so a chip click repaints the grid. */
@@ -1047,6 +1083,7 @@ export function reliquaryRefreshSig(parts: ReliquaryRefreshSigParts): string {
     parts.pageId,
     parts.clearsDigest ?? 0,
     parts.ownershipDigest ?? 0,
+    parts.countsDigest ?? 0,
     parts.search ?? '',
     parts.ownedFilter ?? 'all',
   ]);
@@ -1070,6 +1107,38 @@ export function reliquaryOwnershipDigest(parts: {
       parts.pageOwned) |
     0
   );
+}
+
+/**
+ * Compact digest of the sparse obtain tally, the dimension that carries a
+ * REPEAT obtain into an open window's signature.
+ *
+ * Size AND sum, because either alone has a live blind spot: a first obtain
+ * mints a key (size moves, sum moves), a duplicate only bumps a value (sum
+ * moves alone), and size catches a whole-record swap only when the key
+ * COUNT changes with it (an equal-cardinality swap with an equal sum would
+ * elide; unreachable live, because per-key counts only increment and a
+ * record swap moves owned/recentSig/marksSize in the same signature). Both
+ * folds are order-independent on purpose: an online mirror rebuilds the
+ * record wholesale, and a re-ordered rebuild of the SAME tally must still
+ * elide rather than repaint.
+ *
+ * Counted in place (for..in plus hasOwn, the firstFindCount precedent) so a
+ * slow-band poll that elides allocates nothing; the hasOwn guard keeps the
+ * fold own-keys-only, and the numeric guard keeps a prototype-shaped key from
+ * poisoning the sum with NaN, which would then compare unequal forever and
+ * repaint the window on every poll.
+ */
+export function reliquaryObtainCountsDigest(counts: ReliquaryObtainCountLookup): number {
+  let size = 0;
+  let sum = 0;
+  for (const id in counts) {
+    if (!Object.hasOwn(counts, id)) continue;
+    size += 1;
+    const n = counts[id];
+    if (typeof n === 'number' && Number.isFinite(n)) sum = (sum + n) | 0;
+  }
+  return (size * 1009 + sum) | 0;
 }
 
 /** Stable digest of the recent ring (order matters; the ring arrives from the

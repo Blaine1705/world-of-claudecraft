@@ -746,11 +746,19 @@ export interface SimContextCallbacks {
   // opts.silent / opts.callerLogs: see Sim.addItem's matching params, same
   // contract (suppress the client's default loot audio cue, and its default
   // "You receive:" text line when the caller owns the line for this grant).
+  // opts.movement: also Sim.addItem's, same contract (this grant relocates or
+  // re-mints copies somebody already held, so it never bumps a Reliquary
+  // obtain count; discovery still fires).
   addItem(
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: {
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    },
   ): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
   // bags before gear so pooled bag capacity exists before the pieces land. Plain
@@ -768,7 +776,12 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: {
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    },
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.

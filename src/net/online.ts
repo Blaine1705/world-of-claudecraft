@@ -1582,6 +1582,7 @@ export class ClientWorld implements IWorld {
   reliquaryFirstFind: Record<string, ReliquaryFirstFindView> = {};
   reliquaryMarks: Set<string> = new Set();
   reliquaryRecent: string[] = [];
+  reliquaryObtainCounts: Record<string, number> = {};
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -3469,6 +3470,10 @@ export class ClientWorld implements IWorld {
         this.reliquaryFirstFind = restored.firstFind;
         this.reliquaryMarks = restored.marks;
         this.reliquaryRecent = restored.recent;
+        // The obtain tally rides folded into the firstFind entries on the wire;
+        // restore splits it back out, so the mirror reads it the same way the
+        // offline Sim reads the live state.
+        this.reliquaryObtainCounts = restored.counts;
       }
       if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];

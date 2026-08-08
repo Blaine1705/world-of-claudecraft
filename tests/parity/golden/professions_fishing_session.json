@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "60db104b",
+      "state": "b7e2dc0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -153,7 +154,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "147b53db",
+      "state": "18c4351d",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
@@ -215,6 +216,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -298,7 +300,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "209ec4c0",
+      "state": "8795deca",
       "events": "affa4108",
       "rng": {
         "draws": 1,
@@ -360,6 +362,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -443,7 +446,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 964,
-      "state": "952cf80e",
+      "state": "10b71ce0",
       "events": "cffa3816",
       "rng": {
         "draws": 2,
@@ -519,6 +522,7 @@
           ],
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "talents": {
@@ -598,7 +602,7 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 964,
-      "state": "4ff9f2c7",
+      "state": "ba73f8e9",
       "events": "943b953c",
       "rng": {
         "draws": 3,
@@ -680,6 +684,7 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
+            "counts": {},
             "firstFind": {}
           },
           "renown": 10,

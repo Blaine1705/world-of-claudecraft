@@ -541,13 +541,21 @@ export function bumpDeedStat(
  *  `opts.retro` is set ONLY by the join-time seed pass (seedItemDiscovery):
  *  it makes the Reliquary fill silent and flags the events it emits, so a
  *  veteran's first login after a rollout never reads as a live find. Every
- *  live acquisition site omits it. */
+ *  live acquisition site omits it.
+ *
+ *  `opts.movement` is the inventory hub's matching flag for a grant that
+ *  relocated a copy somebody already held (trade, mail, market, a re-mint).
+ *  DISCOVERY IS UNAFFECTED by it, deliberately: seeing a relic for the first
+ *  time across a trade window still discovers it and still fills its catalog
+ *  slot. It rides here only so the Reliquary's first-find stamp can tell "you
+ *  found this on clear N" from "this arrived from somewhere", which is a claim
+ *  about provenance rather than about ownership. */
 export function markItemDiscovered(
   ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   rolledQuality?: string,
-  opts?: Readonly<{ retro?: boolean }>,
+  opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
 ): void {
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds

@@ -10555,6 +10555,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.reliquaryRetroSummary.few': '성물고가 따라잡았습니다: 성물 {count}개 수록.',
   'hudChrome.plurals.reliquaryRetroSummary.many': '성물고가 따라잡았습니다: 성물 {count}개 수록.',
   'hudChrome.plurals.reliquaryRetroSummary.other': '성물고가 따라잡았습니다: 성물 {count}개 수록.',
+  // 한국어는 수에 따라 형태가 바뀌지 않으므로 네 갈래 모두 같은 문장입니다.
+  'hudChrome.plurals.reliquaryObtainedTimes.one': '획득 {count}회',
+  'hudChrome.plurals.reliquaryObtainedTimes.few': '획득 {count}회',
+  'hudChrome.plurals.reliquaryObtainedTimes.many': '획득 {count}회',
+  'hudChrome.plurals.reliquaryObtainedTimes.other': '획득 {count}회',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.one': '{name}, 수록됨, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.few': '{name}, 수록됨, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.many': '{name}, 수록됨, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.other': '{name}, 수록됨, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one':
+    '{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.few':
+    '{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.many':
+    '{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.other':
+    '{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득',
   'hudChrome.reliquary.curatorRankName1': '견습 큐레이터',
   'hudChrome.reliquary.curatorRankName2': '전리품 수호자',
   'hudChrome.reliquary.curatorRankName3': '마스터 큐레이터',

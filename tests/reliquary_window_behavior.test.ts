@@ -158,7 +158,9 @@ interface WorldState {
   itemsDiscovered: Set<string>;
   marks: Set<string>;
   recent: string[];
-  firstFind: Record<string, { clears?: number; pageId?: string }>;
+  firstFind: Record<string, { clears?: number }>;
+  /** reliquaryObtainCounts: sparse, catalogued item ids only, >= 1. */
+  obtainCounts: Record<string, number>;
   mounts: string[];
   weaponSkinIds: string[];
   deedsEarned: Map<string, string>;
@@ -189,6 +191,7 @@ function baseState(): WorldState {
     marks: new Set(),
     recent: [],
     firstFind: {},
+    obtainCounts: {},
     mounts: [],
     weaponSkinIds: [],
     deedsEarned: new Map(),
@@ -246,6 +249,10 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         reliquaryMarks: state.marks,
         reliquaryRecent: state.recent,
         reliquaryFirstFind: state.firstFind,
+        // Handed over as the LIVE record, exactly as both real worlds expose it,
+        // so a mutation in a test is visible to the next poll without rebuilding
+        // the stub (and so the painter is observed reading it, not copying it).
+        reliquaryObtainCounts: state.obtainCounts,
         ownedMounts: () => {
           state.reads.ownedMounts++;
           return state.mounts;
@@ -682,6 +689,17 @@ describe('ReliquaryWindow: refreshIfChanged elision and per-dimension repaint', 
     expectDimension(rig, 'first-find meta', () => {
       state.firstFind[relicIds(PAGE_ID)[1] ?? ''] = { clears: 3 };
     });
+    // A FIRST counted obtain (new key) and then a REPEAT one (value bump). The
+    // repeat is the load-bearing half: it fills no silhouette, mints no
+    // first-find key, and moves no total, so the counts digest is the only
+    // dimension that can carry it into an open window.
+    expectDimension(rig, 'first counted obtain', () => {
+      state.obtainCounts[relicIds(PAGE_ID)[2] ?? ''] = 1;
+    });
+    expectDimension(rig, 'repeat obtain', () => {
+      const id = relicIds(PAGE_ID)[2] ?? '';
+      state.obtainCounts[id] = (state.obtainCounts[id] ?? 0) + 1;
+    });
   });
 
   it('latches the new painter state so an interaction is not followed by a second paint', () => {
@@ -1015,6 +1033,146 @@ describe('ReliquaryWindow: cell tooltips and aria labels', () => {
         count: fmt(7),
       }),
     );
+  });
+
+  it('adds the obtain tally to an owned relic the world has counted', () => {
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.itemsDiscovered.add(id);
+    state.obtainCounts[id] = 3;
+    const rig = openPage(state);
+    const node = must(rig.el, `[data-cell-id="${id}"]`);
+    const line = tPlural('hudChrome.plurals.reliquaryObtainedTimes', 3, { count: fmt(3) });
+    const html = tooltipFor(rig, node)?.() ?? '';
+    // The full item tooltip branch: the stub body first, then the tally line.
+    expect(html).toContain(`<div data-item-tooltip="${id}"></div>`);
+    expect(html).toContain(`<div class="tt-line">${esc(line)}</div>`);
+    // Keyboard parity (the agreement contract): whatever the tooltip gained,
+    // the label gained, through the count-bearing owned aria arm.
+    expect(node.getAttribute('aria-label')).toBe(
+      tPlural('hudChrome.plurals.reliquaryCellOwnedObtainedAria', 3, {
+        name: reliquaryRelicDisplayName('item', id),
+        count: fmt(3),
+      }),
+    );
+  });
+
+  it('reads the SINGULAR leaf at exactly one obtain', () => {
+    // Pinned against the `.one` leaf itself, not against tPlural: a painter that
+    // resolved the base's `.other` directly would render "Obtained 1 times" and
+    // red here, while a tPlural-vs-tPlural comparison would be a tautology.
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.itemsDiscovered.add(id);
+    state.obtainCounts[id] = 1;
+    const rig = openPage(state);
+    const node = must(rig.el, `[data-cell-id="${id}"]`);
+    const singular = t('hudChrome.plurals.reliquaryObtainedTimes.one', { count: fmt(1) });
+    expect(tooltipFor(rig, node)?.()).toContain(`<div class="tt-line">${esc(singular)}</div>`);
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.plurals.reliquaryCellOwnedObtainedAria.one', {
+        name: reliquaryRelicDisplayName('item', id),
+        count: fmt(1),
+      }),
+    );
+  });
+
+  it('renders NO tally line for an owned relic the world reports no count for', () => {
+    // The transfer arm of the doctrine: a relic that arrived by trade, mail, or
+    // market has no counted obtain, and the tooltip must say nothing at all
+    // rather than "Obtained 0 times". Exact equality against the item-tooltip
+    // stub is the decisive shape: any extra line at all fails it.
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.itemsDiscovered.add(id);
+    const rig = openPage(state);
+    const node = must(rig.el, `[data-cell-id="${id}"]`);
+    expect(tooltipFor(rig, node)?.()).toBe(`<div data-item-tooltip="${id}"></div>`);
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.cellOwnedAria', { name: reliquaryRelicDisplayName('item', id) }),
+    );
+  });
+
+  it('carries the clear number AND the tally when an owned relic has both', () => {
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[2] ?? '';
+    state.itemsDiscovered.add(id);
+    state.firstFind[id] = { clears: 7 };
+    state.obtainCounts[id] = 4;
+    const rig = openPage(state);
+    const node = must(rig.el, `[data-cell-id="${id}"]`);
+    const html = tooltipFor(rig, node)?.() ?? '';
+    expect(html).toContain(esc(t('hudChrome.reliquary.firstFindClears', { count: fmt(7) })));
+    expect(html).toContain(
+      esc(tPlural('hudChrome.plurals.reliquaryObtainedTimes', 4, { count: fmt(4) })),
+    );
+    // ONE label, both facts: the clear number rides its own {clears} slot so
+    // the CLDR selection stays on the obtain count.
+    expect(node.getAttribute('aria-label')).toBe(
+      tPlural('hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria', 4, {
+        name: reliquaryRelicDisplayName('item', id),
+        clears: fmt(7),
+        count: fmt(4),
+      }),
+    );
+  });
+
+  it('selects the singular leaf on the combined clears-and-tally base at exactly one', () => {
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[2] ?? '';
+    state.itemsDiscovered.add(id);
+    state.firstFind[id] = { clears: 7 };
+    state.obtainCounts[id] = 1;
+    const rig = openPage(state);
+    const node = must(rig.el, `[data-cell-id="${id}"]`);
+    // Pinned through t() on the LEAF, not tPlural against tPlural: the
+    // combined base's plural-selection arm would otherwise be a tautology,
+    // and a painter collapsed onto .other would stay green (the sibling
+    // single-fact bases already pin their singulars the same way).
+    expect(node.getAttribute('aria-label')).toBe(
+      t('hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one', {
+        name: reliquaryRelicDisplayName('item', id),
+        clears: fmt(7),
+        count: fmt(1),
+      }),
+    );
+  });
+
+  it('appends the tally to the plain body when an owned item has no live ItemDef', () => {
+    // The second owned tooltip branch. It is reachable only when the client
+    // cannot resolve the relic's ItemDef (a stale bundle against a newer
+    // catalog), which is exactly why it must carry the line too: the branch
+    // that drops it would ship a tooltip that silently loses a fact. Simulated
+    // by removing the def for the duration of the test and restoring it, so the
+    // live catalog is unchanged for every other case in this file.
+    const state = baseState();
+    const id = relicIds(PAGE_ID)[1] ?? '';
+    state.itemsDiscovered.add(id);
+    state.obtainCounts[id] = 2;
+    const def = ITEMS[id];
+    expect(def, 'content premise: the relic normally HAS a live ItemDef').toBeDefined();
+    delete ITEMS[id];
+    try {
+      const rig = openPage(state);
+      const node = must(rig.el, `[data-cell-id="${id}"]`);
+      const html = tooltipFor(rig, node)?.() ?? '';
+      // Premise: this really is the body branch, not the item-tooltip one.
+      expect(html).not.toContain('data-item-tooltip');
+      expect(html).toContain(esc(t('hudChrome.reliquary.ownedTooltipStatus')));
+      expect(html).toContain(
+        `<div class="tt-line">${esc(
+          tPlural('hudChrome.plurals.reliquaryObtainedTimes', 2, { count: fmt(2) }),
+        )}</div>`,
+      );
+      expect(node.getAttribute('aria-label')).toBe(
+        tPlural('hudChrome.plurals.reliquaryCellOwnedObtainedAria', 2, {
+          name: reliquaryRelicDisplayName('item', id),
+          count: fmt(2),
+        }),
+      );
+    } finally {
+      if (def) ITEMS[id] = def;
+    }
   });
 
   it('gives every recent-strip chip its full localized name through the shared tooltip', () => {

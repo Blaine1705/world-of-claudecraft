@@ -1729,6 +1729,24 @@ export const ko_KR: EnTranslations = {
         "many": "{count}개 남음",
         "other": "{count}개 남음"
       },
+      "reliquaryObtainedTimes": {
+        "one": "획득 {count}회",
+        "few": "획득 {count}회",
+        "many": "획득 {count}회",
+        "other": "획득 {count}회"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, 수록됨, {count}회 획득",
+        "few": "{name}, 수록됨, {count}회 획득",
+        "many": "{name}, 수록됨, {count}회 획득",
+        "other": "{name}, 수록됨, {count}회 획득"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득",
+        "few": "{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득",
+        "many": "{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득",
+        "other": "{name}, 수록됨, 첫 획득은 클리어 {clears}회차, {count}회 획득"
+      },
       "deedsRetroSummary": {
         "one": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
         "few": "연대기가 따라잡았습니다: 업적 {count}개 기록.",

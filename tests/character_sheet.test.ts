@@ -238,7 +238,7 @@ describe('characterSheet: reliquary completion pair + rank', () => {
         itemsDiscovered: ['cryptbone_helm'],
       } as CharacterState['deedStats'],
       reliquary: {
-        firstFind: { cryptbone_helm: { clears: 3, pageId: 'conquerors_hollow_crypt' } },
+        firstFind: { cryptbone_helm: { clears: 3, count: 2 } },
         marks: ['masterwork:first'],
         recent: ['cryptbone_helm', 'masterwork:first'],
       },
@@ -253,6 +253,11 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(json).not.toContain('firstFind');
     expect(json).not.toContain('masterwork:first');
     expect(json).not.toContain('clears');
+    // The Phase 17 obtain tally is personal meta too: it rides folded into a
+    // firstFind entry, so a sheet that ever dumped the blob would leak it.
+    // Quoted so a future benign field like accountId (which contains the bare
+    // substring) cannot turn this into a false failure.
+    expect(json).not.toContain('"count"');
   });
 
   it('scores marks through sheetReliquaryFromState', () => {

@@ -43,6 +43,7 @@ import {
   reliquaryFillPct,
   reliquaryFocusFallbackKey,
   reliquaryMarkFindKey,
+  reliquaryObtainCountsDigest,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
@@ -374,38 +375,28 @@ describe('buildReliquaryView recent', () => {
 // ---------------------------------------------------------------------------
 
 describe('recent find pageId (where a chip jumps)', () => {
-  it('prefers the recorded first-find page when the catalog still holds it', () => {
-    // crypt_helm sits on crypt_n in authored order, so a hint pointing at a
-    // DIFFERENT live page is the only way to prove the hint wins the scan.
-    const hinted: ReliquaryPageDef = {
+  it('answers from the CATALOG alone, never from stored first-find meta', () => {
+    // Phase 17 retired the stored pageId hint the resolver used to prefer.
+    // crypt_helm sits on crypt_n in authored order but ALSO on a later page,
+    // so a resolver still reading a stored hint (or any per-relic memory of
+    // where the find happened) would have to answer differently here.
+    const later: ReliquaryPageDef = {
       id: 'hint_home',
       shelf: 'conquerors',
       name: 'Hint Home',
       relics: [{ kind: 'item', itemId: 'crypt_helm' }],
     };
-    const model = buildReliquaryView(
+    const withLaterPage = buildReliquaryView(
       input({
-        pages: [...TEST_PAGES, hinted],
+        pages: [...TEST_PAGES, later],
         recent: ['crypt_helm'],
-        firstFind: { crypt_helm: { pageId: 'hint_home' } },
+        firstFind: { crypt_helm: { clears: 4 } },
       }),
     );
-    // Premise: the scan alone would answer crypt_n, so this is not self-proving.
+    expect(withLaterPage.recent[0]?.pageId).toBe('crypt_n');
+    // And the answer does not move when the first-find entry is absent
+    // entirely (the veteran / retro shape), so the two states agree.
     expect(buildReliquaryView(input({ recent: ['crypt_helm'] })).recent[0]?.pageId).toBe('crypt_n');
-    expect(model.recent[0]?.pageId).toBe('hint_home');
-  });
-
-  it('falls back to the catalog scan when the hinted page is gone from the catalog', () => {
-    // Content drift: a first-find row recorded against a page that no longer
-    // exists must not strand the chip on a page nothing can open.
-    const model = buildReliquaryView(
-      input({
-        recent: ['crypt_helm'],
-        firstFind: { crypt_helm: { pageId: 'retired_page', clears: 4 } },
-      }),
-    );
-    expect(TEST_PAGES.some((p) => p.id === 'retired_page')).toBe(false);
-    expect(model.recent[0]?.pageId).toBe('crypt_n');
   });
 
   it('answers with the FIRST page in authored order for a relic on two pages', () => {
@@ -875,7 +866,7 @@ describe('page grid cells', () => {
     const page = TEST_PAGES[0];
     const cells = buildReliquaryPageCells(page, {
       itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
-      firstFind: { crypt_helm: { clears: 4, pageId: 'crypt_n' } },
+      firstFind: { crypt_helm: { clears: 4 } },
     });
     expect(
       cells.map((c) => ({ id: c.id, owned: c.owned, firstFindClears: c.firstFindClears })),
@@ -907,6 +898,81 @@ describe('page grid cells', () => {
     expect(blade?.firstFindClears).toBeUndefined();
   });
 
+  it('stamps the obtain tally on owned item cells and nowhere else', () => {
+    const page = TEST_PAGES[0];
+    const cells = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
+      obtainCounts: {
+        crypt_helm: 3,
+        // Owned but uncounted (traded / mailed / market): the ABSENT arm, which
+        // is the transfer case the doctrine deliberately leaves unattributable.
+        // crypt_ring is intentionally not a key here.
+        // Counted but not owned: a tally must never imply ownership.
+        crypt_blade: 9,
+      },
+    });
+    expect(
+      cells.map((c) => ({ id: c.id, owned: c.owned, obtainedCount: c.obtainedCount })),
+    ).toEqual([
+      { id: 'crypt_helm', owned: true, obtainedCount: 3 },
+      { id: 'crypt_blade', owned: false, obtainedCount: undefined },
+      { id: 'crypt_ring', owned: true, obtainedCount: undefined },
+    ]);
+  });
+
+  it('never surfaces a tally on a non-item relic, even from a spoofed record', () => {
+    // The world tallies catalogued ITEM ids only, so a mark cell whose id
+    // happens to appear in the record must stay silent: the same rule the
+    // firstFind stamp above follows.
+    const page = TEST_PAGES.find((p) => p.id === 'prof_stub')!;
+    const cells = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet(),
+      marks: ownedSet('mw_a'),
+      obtainCounts: { mw_a: 4 },
+    });
+    expect(cells[0]).toMatchObject({ id: 'mw_a', kind: 'mark', owned: true });
+    expect(cells[0]?.obtainedCount).toBeUndefined();
+  });
+
+  it('rejects every below-floor and non-numeric tally the wire could carry', () => {
+    // The record is mirrored from the server, so the >= 1 floor is a real gate:
+    // each of these must render NO line rather than "Obtained 0 times" or NaN.
+    const page = TEST_PAGES[0];
+    const countFor = (value: unknown): number | undefined =>
+      buildReliquaryPageCells(page, {
+        itemsDiscovered: ownedSet('crypt_helm'),
+        obtainCounts: { crypt_helm: value } as Record<string, number>,
+      })[0]?.obtainedCount;
+    expect(countFor(0)).toBeUndefined();
+    expect(countFor(-2)).toBeUndefined();
+    expect(countFor(Number.NaN)).toBeUndefined();
+    expect(countFor(Number.POSITIVE_INFINITY)).toBeUndefined();
+    expect(countFor('7')).toBeUndefined();
+    // The floor itself is inclusive: exactly one obtain still gets a line.
+    expect(countFor(1)).toBe(1);
+  });
+
+  it('threads obtainCounts into pageDetail cells through buildReliquaryView', () => {
+    // Guards the pass-through at buildReliquaryView (obtainCounts:
+    // input.obtainCounts); buildReliquaryPageCells alone would stay green if
+    // that wire were dropped, and the window would silently stop showing it.
+    const open = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
+        obtainCounts: { crypt_helm: 5, crypt_blade: 9 },
+      }),
+    );
+    const byId = new Map((open.pageDetail?.cells ?? []).map((c) => [c.id, c]));
+    expect(byId.get('crypt_helm')?.obtainedCount).toBe(5);
+    // Counted without discovery: neither ownership nor a tally is invented.
+    expect(byId.get('crypt_blade')?.owned).toBe(false);
+    expect(byId.get('crypt_blade')?.obtainedCount).toBeUndefined();
+    // Owned with no counted obtain: the absent arm survives the thread.
+    expect(byId.get('crypt_ring')?.obtainedCount).toBeUndefined();
+  });
+
   it('pageDetail is null without a page selection and fills on selection', () => {
     expect(buildReliquaryView(input({ nav: 'conquerors' })).pageDetail).toBeNull();
     const open = buildReliquaryView(
@@ -930,7 +996,7 @@ describe('page grid cells', () => {
         pageId: 'crypt_n',
         itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
         firstFind: {
-          crypt_helm: { clears: 4, pageId: 'crypt_n' },
+          crypt_helm: { clears: 4 },
           // Spoof without discovery must not invent ownership or clear meta.
           crypt_blade: { clears: 99 },
         },
@@ -1259,6 +1325,64 @@ describe('reliquaryRefreshSig', () => {
     // join green in both suites, which silently stops a keystroke repainting.
     expect(reliquaryRefreshSig({ ...base, search: 'a' })).not.toBe(baseSig);
     expect(reliquaryRefreshSig({ ...base, ownedFilter: 'owned' })).not.toBe(baseSig);
+    // The Phase 17 dimension. A repeat obtain moves NOTHING else in this list,
+    // so dropping `parts.countsDigest ?? 0` from the join would leave an open
+    // window painting a stale tally with every other pin still green.
+    expect(reliquaryRefreshSig({ ...base, countsDigest: 1 })).not.toBe(baseSig);
+  });
+
+  it('a repeat obtain moves the signature, and an unchanged tally holds it', () => {
+    // The whole reason the dimension exists, asserted end to end over the real
+    // digest: the SAME tally must produce a byte-equal signature (or every
+    // slow-band poll would repaint), and a duplicate obtain of a relic already
+    // on the wall must move it even though no set, key, or total changed.
+    const base = {
+      owned: 2,
+      total: 9,
+      curatorRank: 1,
+      recentSig: 'a',
+      marksSize: 0,
+      nav: 'overview' as const,
+      pageId: null as string | null,
+    };
+    const counts: Record<string, number> = { crypt_helm: 1 };
+    const sigFor = (): string =>
+      reliquaryRefreshSig({ ...base, countsDigest: reliquaryObtainCountsDigest(counts) });
+    const settled = sigFor();
+    expect(sigFor()).toBe(settled);
+    counts.crypt_helm = 2;
+    const bumped = sigFor();
+    expect(bumped).not.toBe(settled);
+    // A first obtain of a DIFFERENT relic moves it again (new key, not a bump).
+    counts.crypt_blade = 1;
+    expect(sigFor()).not.toBe(bumped);
+  });
+
+  it('reliquaryObtainCountsDigest folds size and sum, own keys only, order-free', () => {
+    expect(reliquaryObtainCountsDigest({})).toBe(0);
+    // A minted key and a bumped value both move it: sum alone would miss a
+    // restore that swapped keys at equal total, size alone would miss a bump.
+    expect(reliquaryObtainCountsDigest({ a: 1 })).not.toBe(reliquaryObtainCountsDigest({}));
+    expect(reliquaryObtainCountsDigest({ a: 2 })).not.toBe(reliquaryObtainCountsDigest({ a: 1 }));
+    expect(reliquaryObtainCountsDigest({ a: 1, b: 1 })).not.toBe(
+      reliquaryObtainCountsDigest({ a: 2 }),
+    );
+    // Order-free: an online mirror rebuilds the record wholesale, and a
+    // re-ordered rebuild of the same tally must elide rather than repaint.
+    expect(reliquaryObtainCountsDigest({ a: 1, b: 2 })).toBe(
+      reliquaryObtainCountsDigest({ b: 2, a: 1 }),
+    );
+    // Own keys only: an inherited numeric property is not a tally.
+    const inherited = Object.create({ ghost: 40 }) as Record<string, number>;
+    inherited.a = 1;
+    expect(reliquaryObtainCountsDigest(inherited)).toBe(reliquaryObtainCountsDigest({ a: 1 }));
+    // A non-finite value must not poison the sum into NaN, which would compare
+    // unequal to itself forever and repaint the window on every single poll.
+    const poisoned = reliquaryObtainCountsDigest({ a: Number.NaN });
+    expect(Number.isFinite(poisoned)).toBe(true);
+    expect(poisoned).toBe(reliquaryObtainCountsDigest({ a: Number.NaN }));
+    // It still counts as a key, so the record is not mistaken for empty.
+    expect(poisoned).not.toBe(reliquaryObtainCountsDigest({}));
   });
 
   it('reliquaryOwnershipDigest moves on discovered size, firstFind, or pageOwned', () => {

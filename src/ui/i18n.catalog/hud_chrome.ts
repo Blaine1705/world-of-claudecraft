@@ -1867,6 +1867,32 @@ export const hudChromeStrings = {
       many: '{count} to go',
       other: '{count} to go',
     },
+    // How many times an owned relic has been taken from the world, on its own
+    // tooltip line and folded into the cell's aria label. English really does
+    // inflect here ("1 time" / "2 times"), unlike the count-neutral pair above.
+    // The two aria bases spell the WHOLE sentence rather than stitching the
+    // tooltip line onto a label fragment: clause order and the punctuation
+    // between clauses are the translator's to choose. Their clear number rides
+    // a separate {clears} slot because tPlural owns {count} and selects on it,
+    // and the number whose noun inflects is the obtain count, not the clear.
+    reliquaryObtainedTimes: {
+      one: 'Obtained {count} time',
+      few: 'Obtained {count} times',
+      many: 'Obtained {count} times',
+      other: 'Obtained {count} times',
+    },
+    reliquaryCellOwnedObtainedAria: {
+      one: '{name}, catalogued, obtained {count} time',
+      few: '{name}, catalogued, obtained {count} times',
+      many: '{name}, catalogued, obtained {count} times',
+      other: '{name}, catalogued, obtained {count} times',
+    },
+    reliquaryCellOwnedClearsObtainedAria: {
+      one: '{name}, catalogued, first found on clear {clears}, obtained {count} time',
+      few: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      many: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      other: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+    },
     deedsRetroSummary: {
       one: 'Your chronicle catches up: {count} deed recorded.',
       few: 'Your chronicle catches up: {count} deeds recorded.',
@@ -4228,6 +4254,12 @@ export const hudChromeStrings = {
     cellMissingAria: '{name}, not yet found',
     ownedTooltipStatus: 'Catalogued in The Reliquary',
     missingTooltipStatus: 'Not yet found',
+    // {count} here is the CLEAR number, not the obtain tally: the plural
+    // obtain bases (hudChrome.plurals.reliquaryObtainedTimes and friends)
+    // reuse the {count} name for the OBTAIN count because tPlural selects on
+    // it, and their clear number rides {clears} instead. Renaming this key's
+    // slot would invalidate every shipped overlay fill, so the two meanings
+    // coexist and this note is the guard.
     firstFindClears: 'First found on clear {count}',
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
@@ -4281,6 +4313,9 @@ export const hudChromeStrings = {
     // reader user gets everything a hover tooltip shows; owned cells fold in the
     // first-find clear number on the same rule.
     cellMissingSourceAria: '{name}, not yet found, {source}',
+    // {count} is the CLEAR number here too (see the firstFindClears note);
+    // the obtain-count aria lives on the plurals bases with {clears}/{count}
+    // split the other way round.
     cellOwnedClearsAria: '{name}, catalogued, first found on clear {count}',
     searchPlaceholder: 'Search relics',
     searchAria: 'Search The Reliquary by name',

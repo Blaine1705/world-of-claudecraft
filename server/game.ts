@@ -67,7 +67,7 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
-import { reliquaryWireBlob } from '../src/sim/reliquary';
+import { reliquaryWireJson } from '../src/sim/reliquary';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -3440,7 +3440,11 @@ export class GameServer {
         this.sim.setPlayerSkin(live.pid, 0, 'class');
       }
     }
-    this.sim.addItem(itemId, 1, session.pid);
+    // movement: the sim-side twin of Sim.unequipMechChroma. Unequipping a mech
+    // chroma re-grants the item equipping it consumed, so this relocates a copy
+    // the account already owns. Both arms carry the flag or the offline Sim and
+    // this server would answer the obtain tally differently for one action.
+    this.sim.addItem(itemId, 1, session.pid, { movement: true });
     void revokeAccountMechChroma(session.accountId, chromaId)
       .then((cosmetics) => this.replaceLiveAccountCosmetics(session.accountId, cosmetics))
       .catch((err) => console.error('failed to remove account mech chroma:', err));
@@ -5791,7 +5795,11 @@ export class GameServer {
     const clamped = Number.isInteger(count)
       ? Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, count))
       : 1;
-    this.sim.addItem(itemId, clamped, session.pid);
+    // movement: a support restore re-mints a copy the player already obtained
+    // once (and already had counted), so crediting it again would inflate a
+    // player-visible number from a support ticket. The safer default for a
+    // verb named restore.
+    this.sim.addItem(itemId, clamped, session.pid, { movement: true });
     // Close the audit-durability window: the audit row is already committed,
     // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a
     // crash inside that window would leave a row for a grant that vanished).
@@ -8857,11 +8865,20 @@ export class GameServer {
         visited: [...meta.deedStats.visited],
         dungeonClears: meta.deedStats.dungeonClears,
       });
-      // Reliquary sparse blob only: firstFind / marks / recent (omit-empty).
-      // Item ownership stays on dstats.itemsDiscovered; never a second full
-      // discovery array. Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS
-      // member so a fill re-diffs on the next snapshot without saveCharacter.
-      maybe('reliq', reliquaryWireBlob(meta.reliquary));
+      // Reliquary sparse blob only: firstFind (with its folded obtain tally) /
+      // marks / recent, omit-empty. Item ownership stays on
+      // dstats.itemsDiscovered; never a second full discovery array.
+      // Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS member so a fill
+      // re-diffs on the next snapshot without saveCharacter.
+      // maybeRaw, not maybe: this is the same shape the realm readouts use, a
+      // value serialized ONCE by a memo instead of per session per tick.
+      // reliquaryWireJson caches on the state's own revision, so a staggered
+      // refresh for a player whose Reliquary has not moved (the overwhelming
+      // case) reuses the string rather than walking and re-stringifying the
+      // whole blob just to hand the delta gate bytes it already has. The output
+      // is byte-identical to the JSON.stringify path it replaces, so lastSent
+      // comparisons are unchanged across the swap.
+      maybeRaw('reliq', reliquaryWireJson(meta.reliquary));
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,

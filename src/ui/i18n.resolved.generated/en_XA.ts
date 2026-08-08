@@ -1729,6 +1729,24 @@ export const en_XA: EnTranslations = {
         "many": "[{count} ţó ĝó]",
         "other": "[{count} ţó ĝó]"
       },
+      "reliquaryObtainedTimes": {
+        "one": "[Óƀţáíñéð {count} ţíɱé]",
+        "few": "[Óƀţáíñéð {count} ţíɱéš]",
+        "many": "[Óƀţáíñéð {count} ţíɱéš]",
+        "other": "[Óƀţáíñéð {count} ţíɱéš]"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "[{name}, çáţáļóĝúéð, óƀţáíñéð {count} ţíɱé]",
+        "few": "[{name}, çáţáļóĝúéð, óƀţáíñéð {count} ţíɱéš]",
+        "many": "[{name}, çáţáļóĝúéð, óƀţáíñéð {count} ţíɱéš]",
+        "other": "[{name}, çáţáļóĝúéð, óƀţáíñéð {count} ţíɱéš]"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {clears}, óƀţáíñéð {count} ţíɱé]",
+        "few": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {clears}, óƀţáíñéð {count} ţíɱéš]",
+        "many": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {clears}, óƀţáíñéð {count} ţíɱéš]",
+        "other": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {clears}, óƀţáíñéð {count} ţíɱéš]"
+      },
       "deedsRetroSummary": {
         "one": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééð ŕéçóŕðéð.]",
         "few": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]",

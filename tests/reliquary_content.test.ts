@@ -5,6 +5,7 @@
 // live loot / deed tables so a content change reds until the curator decides.
 // Update the literal floors and totals deliberately when product adds content.
 import { describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
 import { CLASSES } from '../src/sim/content/classes';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
@@ -391,12 +392,66 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     }
   });
 
+  it('maps every catalogued item id to a NON-EMPTY page list', () => {
+    // The premise behind Phase 17's predicate unification: noteRelicItemFind
+    // swapped its "pages array non-empty" gate for isCataloguedRelicItem
+    // (which is membership in this index), a behavior-preserving swap ONLY
+    // while no key maps to an empty list. The index builder creates a key
+    // together with its first page, so this can red only if the builder is
+    // rewritten; if it ever does, a catalogued relic on no page would mint a
+    // first find whose chat line renders inert. (A direct
+    // isCataloguedRelicItem-vs-index agreement pin would be vacuous: the
+    // predicate IS the index membership test.)
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBeGreaterThan(100);
+    for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
+      expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
+    }
+  });
+
   it('does not catalog mount reins on Conqueror pages (Horizons owns mounts)', () => {
     for (const page of CONQUEROR_PAGES) {
       for (const id of itemRelicIds(page)) {
         expect(isMountReinsId(id)).toBe(false);
       }
     }
+  });
+
+  it('splits into non-stackable gear plus exactly the stackable specimen relics', () => {
+    // The obtain tally (Phase 17) increments per COPY, so which relics can
+    // arrive as a stack of more than one is load-bearing rather than trivia:
+    // for everything in the gear bucket a grant is always one copy and the
+    // per-copy and per-call readings coincide, while the specimen bucket is
+    // the reason src/sim/sim.ts addItem passes its `count` through instead of
+    // a literal 1. stackSizeOf is the one authority both sides read.
+    const stackable: string[] = [];
+    const gear: string[] = [];
+    for (const page of RELIQUARY_PAGES) {
+      for (const id of itemRelicIds(page)) {
+        (stackSizeOf(ITEMS[id]) > 1 ? stackable : gear).push(id);
+      }
+    }
+    // Exact list, not a count: a new stackable relic has to be looked at
+    // (per-copy counting is right for it, but so is the window's phrasing).
+    expect([...new Set(stackable)].sort()).toEqual([
+      'fine_elderwood_log',
+      'fine_sunpetal_herb',
+      'fine_thorium_ore',
+      'prime_cut',
+      'pristine_claw',
+      'pristine_hide',
+      'pristine_silk',
+      'pristine_venom_gland',
+    ]);
+    // Every stackable one is a Professions-shelf specimen, never Conqueror
+    // gear: that is what makes the bucket a knowable list rather than a drift.
+    for (const id of stackable) {
+      expect(
+        (RELIQUARY_PROFESSION_SPECIMEN_ITEMS as readonly string[]).includes(id),
+        `${id} is not a specimen`,
+      ).toBe(true);
+    }
+    // Vacuity floor: the gear bucket is the overwhelming majority.
+    expect(gear.length).toBeGreaterThan(100);
   });
 
   it('isCataloguedRelicItem matches the item index and rejects junk', () => {

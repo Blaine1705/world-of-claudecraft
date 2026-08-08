@@ -74,6 +74,7 @@ import {
   reliquaryFillPct,
   reliquaryFlashKey,
   reliquaryFocusFallbackKey,
+  reliquaryObtainCountsDigest,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
@@ -759,6 +760,11 @@ export class ReliquaryWindow {
       relicSearchText: (kind, id) => reliquaryRelicSearchText(kind, id, tag),
       clearCount: (pageId) => world.reliquaryPageClearCount(pageId),
       firstFind: world.reliquaryFirstFind,
+      // Live reference, never a copy: this half of the input is built on every
+      // slow-band poll and most of them elide, so the record is read only when
+      // a rebuild actually walks the cells (and by the digest below, which
+      // folds it in place).
+      obtainCounts: world.reliquaryObtainCounts,
       deedsEarned: world.deedsEarned,
     };
   }
@@ -800,6 +806,11 @@ export class ReliquaryWindow {
       pageId: input.pageId,
       clearsDigest,
       ownershipDigest,
+      // A repeat obtain of a relic already on the wall moves nothing else in
+      // this signature: no set grows, no first-find key is minted, no total
+      // changes. Without this dimension an open window would keep painting the
+      // previous tally until something unrelated happened to repaint it.
+      countsDigest: reliquaryObtainCountsDigest(world.reliquaryObtainCounts),
       search: input.search,
       ownedFilter: input.ownedFilter,
     });
@@ -1335,13 +1346,34 @@ export class ReliquaryWindow {
   /**
    * Keyboard parity with hover: the label carries everything the tooltip shows
    * a mouse (EVERY source line for a missing relic, the first-find clear number
-   * for an owned one), so nothing actionable is hover-only. A label cannot carry
+   * and the obtain tally for an owned one), so nothing actionable is hover-only.
+   * A label cannot carry
    * the tooltip's separate lines, so they fold into the one {source} slot
    * through the localized join (reliquarySourceAriaText), never punctuation
    * spelled here.
    */
   private cellAria(cell: ReliquaryGridCellModel, name: string, sourceLines: string[]): string {
     if (cell.owned) {
+      // Four owned shapes, one whole authored sentence each rather than a
+      // stitched-together label: the clause order and the punctuation between
+      // clauses differ per locale, and nothing here may spell either. The two
+      // count-bearing arms are CLDR-plural on the obtain count (the number
+      // whose noun inflects); the clear number rides as a separate {clears}
+      // slot, because tPlural owns {count} and would otherwise select on the
+      // wrong number.
+      const count = cell.obtainedCount;
+      if (count !== undefined) {
+        return cell.firstFindClears !== undefined
+          ? tPlural('hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria', count, {
+              name,
+              clears: this.fmt(cell.firstFindClears),
+              count: this.fmt(count),
+            })
+          : tPlural('hudChrome.plurals.reliquaryCellOwnedObtainedAria', count, {
+              name,
+              count: this.fmt(count),
+            });
+      }
       return cell.firstFindClears !== undefined
         ? t('hudChrome.reliquary.cellOwnedClearsAria', {
             name,
@@ -1443,6 +1475,27 @@ export class ReliquaryWindow {
     return reliquaryRelicDisplayName(cell.kind, cell.id);
   }
 
+  /**
+   * The obtain tally line, the ONE implementation both owned tooltip branches
+   * append: the full-item-tooltip branch and the plain body. A cell the world
+   * reports no counted obtain for renders nothing at all rather than a zero,
+   * because the absence means "cannot say", not "never obtained": a relic that
+   * arrived by trade, mail, or market purchase is deliberately uncounted, and
+   * so is one a veteran has held since before the tally existed.
+   *
+   * CLDR-plural selected on the RAW count so "Obtained 1 time" reads right and
+   * a locale with real plural forms gets the leaf it needs. The DISPLAY number
+   * is interpolated through formatNumber: selecting on that formatted string
+   * would collapse every locale onto .other.
+   */
+  private obtainedLineHtml(cell: ReliquaryGridCellModel): string {
+    const count = cell.obtainedCount;
+    if (count === undefined) return '';
+    return `<div class="tt-line">${esc(
+      tPlural('hudChrome.plurals.reliquaryObtainedTimes', count, { count: this.fmt(count) }),
+    )}</div>`;
+  }
+
   private cellTooltipHtml(cell: ReliquaryGridCellModel): string {
     const name = this.cellDisplayName(cell);
     const status = cell.owned
@@ -1460,7 +1513,9 @@ export class ReliquaryWindow {
     // Agreement contract with cellHtml/cellAria: both sides derive from the
     // same reliquarySourceLines(cell.sourcePlans) on the same cell object, so
     // the aria fold and this loop cannot disagree on content or count. Any
-    // cap, filter, or dedup added here must land on the aria side too.
+    // cap, filter, or dedup added here must land on the aria side too, and the
+    // same rule binds every OWNED line below (clear#, obtain tally): whatever
+    // this tooltip gains, cellAria gains in the same change.
     if (!cell.owned) {
       for (const source of reliquarySourceLines(cell.sourcePlans)) {
         body += `<div class="tt-line">${esc(source)}</div>`;
@@ -1476,9 +1531,11 @@ export class ReliquaryWindow {
         }),
       )}</div>`;
     }
+    body += this.obtainedLineHtml(cell);
     // Owned item relics also get the full item tooltip body (stats are catalog
     // truth, not invented power) so the museum reads like other item surfaces.
-    // Append first-find clear# when present (live obtain only; never invented).
+    // Append first-find clear# when present (live obtain only; never invented),
+    // then the obtain tally on the same rule.
     if (cell.owned && cell.kind === 'item') {
       const def = ITEMS[cell.id];
       if (def) {
@@ -1490,6 +1547,7 @@ export class ReliquaryWindow {
             }),
           )}</div>`;
         }
+        html += this.obtainedLineHtml(cell);
         return html;
       }
     }
