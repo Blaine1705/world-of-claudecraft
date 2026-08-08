@@ -7438,8 +7438,20 @@ export class Renderer {
 
   private compileGate(target: THREE.Object3D): Promise<unknown> {
     const priority = this.compilePriorityFor(target);
+    // Compile the same variant pair the boot prewarm proved out, never a bare
+    // compileAsync at the ambient render target: three keys a program on the
+    // bound target's output colour space (WebGLPrograms getParameters), so on
+    // composer tiers an unbound compile links the canvas srgb variant while
+    // the scene pass draws the linear one, and the view's first visible frame
+    // still linked the real program synchronously (the measured 300-500ms
+    // border-crossing stall). The colour pass binds the tier-correct target;
+    // the skinned depth pass covers the renderer-owned shadow material that
+    // the colour walk cannot enumerate.
     return this.liveCompileGates.run(
-      () => this.webgl.compileAsync(target, this.camera, this.scene),
+      () =>
+        this.compilePrewarmColorPrograms(target, false).then(() =>
+          this.compileSkinnedShadowPrograms(target),
+        ),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority },
     );

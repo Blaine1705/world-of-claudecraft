@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type EntityView, Renderer } from '../src/render/renderer';
@@ -6,6 +7,7 @@ interface CompileGateHarness {
   gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null;
   gateSwapOnCompile(target: THREE.Object3D): void;
   gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
+  compileGate(target: THREE.Object3D): Promise<unknown>;
 }
 
 function harness(): CompileGateHarness & Record<string, unknown> {
@@ -123,6 +125,45 @@ describe('Renderer live shader compile rejection recovery', () => {
 
     expect(target.visible).toBe(false);
     expect(report).not.toHaveBeenCalled();
+  });
+
+  it('links the tier-correct colour variant then the skinned shadow variant in one gate slot', async () => {
+    const renderer = harness();
+    const order: string[] = [];
+    renderer.sim = { player: { targetId: null } };
+    renderer.liveCompileGates = { run: (fn: () => Promise<unknown>) => fn() };
+    renderer.compilePrewarmColorPrograms = vi.fn(
+      (_root: THREE.Object3D, includeOffscreenVariant: boolean) => {
+        order.push(`color:${includeOffscreenVariant}`);
+        return Promise.resolve();
+      },
+    );
+    renderer.compileSkinnedShadowPrograms = vi.fn(() => {
+      order.push('shadow');
+      return Promise.resolve();
+    });
+    const target = new THREE.Group();
+
+    await renderer.compileGate(target);
+
+    expect(order).toEqual(['color:false', 'shadow']);
+    expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(target, false);
+    expect(renderer.compileSkinnedShadowPrograms).toHaveBeenCalledWith(target);
+  });
+
+  it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const gateStart = source.indexOf('private compileGate(');
+    const gateEnd = source.indexOf('private recoverRejectedCompileGate(', gateStart);
+    expect(gateStart).toBeGreaterThan(-1);
+    expect(gateEnd).toBeGreaterThan(gateStart);
+    const gateMethod = source.slice(gateStart, gateEnd);
+    // Three keys a program on the bound target's output colour space, so a bare
+    // compileAsync here links the canvas variant while composer tiers draw the
+    // linear one: route through the same variant pair the boot prewarm uses.
+    expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
+    expect(gateMethod).toContain('this.compileSkinnedShadowPrograms(target)');
+    expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 
   it('ignores a rejection after renderer shutdown starts', async () => {
