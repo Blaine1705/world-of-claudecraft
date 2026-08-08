@@ -51,10 +51,11 @@ describe('mobile window layout CSS', () => {
       /body\.mobile-touch #daily-rewards-window:not\(\.store-active\) \.dr-body \{([^}]*)\}/,
     );
     expect(rewardsBody).not.toBeNull();
-    expect(rewardsBody?.[1]).toContain('column-count: 1;');
+    expect(rewardsBody?.[1]).toContain('columns: initial;');
     expect(rewardsBody?.[1]).toContain('overflow-x: hidden;');
     expect(rewardsBody?.[1]).toContain('overflow-y: auto;');
     expect(rewardsBody?.[1]).toContain('overscroll-behavior: contain;');
+    expect(rewardsBody?.[1]).not.toContain('column-count:');
     expect(rewardsBody?.[1]).not.toContain('column-count: 2;');
 
     const spinOverlayZ = Number(
@@ -76,6 +77,22 @@ describe('mobile window layout CSS', () => {
       'utf8',
     ).replace(/\r\n/g, '\n');
     expect(components).toMatch(/\.dr-spin-overlay \{[^}]*z-index: 60;/);
+
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-stage \{[^}]*width: min\(360px, calc\(var\(--app-vw, 100vw\) - 24px\), calc\(var\(--app-vh, 100dvh\) - 24px\)\);/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-wheel-big \{[^}]*width: 300px;[^}]*max-width: 84%;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-wheel-big span \{[^}]*translateY\(-106px\)/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-result \{[^}]*width: 120px;[^}]*height: 120px;[^}]*font-size: 18px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-pointer \{[^}]*border-left-width: 13px;[^}]*border-right-width: 13px;[^}]*border-top-width: 24px;/,
+    );
   });
 
   it('hides the mobile bottom action bar only while a truly fullscreen window (bags/char) is open', () => {

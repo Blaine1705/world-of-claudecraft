@@ -2680,8 +2680,7 @@
     width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
   }
   body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    column-count: 1;
-    column-gap: normal;
+    columns: initial;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
