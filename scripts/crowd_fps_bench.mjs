@@ -52,9 +52,10 @@ function record(line) {
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER = process.env.SERVER_URL ?? 'http://localhost:8787';
-// The bench mints accounts and drives /dev cheats (teleport, level): the
-// server it talks to must be local, always.
+// The bench mints accounts and drives /dev cheats (teleport, level), both
+// directly and through the page it opens: every target must be local, always.
 assertLoopbackUrl(SERVER, 'SERVER_URL');
+assertLoopbackUrl(GAME_URL, 'GAME_URL');
 const WS_BASE = SERVER.replace(/^http/, 'ws');
 const BATCHES = (process.env.CROWD_BATCHES ?? '10,20,35,50').split(',').map(Number);
 const W = Number(process.env.CROWD_W ?? 1920);
