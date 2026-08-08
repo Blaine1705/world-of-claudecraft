@@ -1545,7 +1545,13 @@ export const vi_VN: EnTranslations = {
     },
     "charSheet": {
       "offense": "Tấn Công",
-      "defense": "Phòng Thủ"
+      "defense": "Phòng Thủ",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
@@ -1666,6 +1672,24 @@ export const vi_VN: EnTranslations = {
         "few": "còn lại {count} giây",
         "many": "còn lại {count} giây",
         "other": "còn lại {count} giây"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Ai: {count} người chơi đang trực tuyến trên {realm}.",

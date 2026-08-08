@@ -11,6 +11,7 @@ import {
   CharWindow,
   craftNameText,
   hobbyCraftText,
+  playtimeText,
 } from '../src/ui/char_window';
 import { hasTranslation } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -138,6 +139,8 @@ describe('char_window: profession art placements', () => {
       showError: vi.fn(),
       helmHidden: () => false,
       toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
       itemTooltip: () => '',
@@ -241,6 +244,8 @@ describe('char_window: profession art placements', () => {
       showError: vi.fn(),
       helmHidden: () => false,
       toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
       itemTooltip: () => '',
@@ -435,6 +440,136 @@ describe('hobbyCraftText (#1294): id-to-key view model', () => {
       expect(text).toBe(craftNameText(craft.id));
       expect(text).not.toBe('None');
     }
+  });
+});
+
+describe('char_window: lifetime Time Played line (issue: character-sheet playtime)', () => {
+  const MINUTE = 60;
+  const HOUR = 3600;
+  const DAY = 86_400;
+
+  // RuneScape-style composition: the two coarsest non-zero units, the zero
+  // minor unit dropped, floored (an accumulator never overstates), sub-minute
+  // floor line. English catalog values resolve through the real i18n runtime,
+  // so these also pin the plural leaves and the join template.
+  it('formats the two coarsest units and drops a zero minor unit', () => {
+    expect(playtimeText(0)).toBe('Less than a minute');
+    expect(playtimeText(59)).toBe('Less than a minute');
+    expect(playtimeText(MINUTE)).toBe('1 minute');
+    expect(playtimeText(2 * MINUTE + 59)).toBe('2 minutes');
+    expect(playtimeText(HOUR)).toBe('1 hour');
+    expect(playtimeText(HOUR + MINUTE)).toBe('1 hour, 1 minute');
+    expect(playtimeText(5 * HOUR + 42 * MINUTE + 59)).toBe('5 hours, 42 minutes');
+    expect(playtimeText(DAY)).toBe('1 day');
+    expect(playtimeText(DAY + 59)).toBe('1 day');
+    expect(playtimeText(DAY + HOUR)).toBe('1 day, 1 hour');
+    // Minutes never ride a days-scale total: two coarsest units only.
+    expect(playtimeText(12 * DAY + 5 * HOUR + 31 * MINUTE)).toBe('12 days, 5 hours');
+    // Days-scale total with zero whole hours drops the minor unit even though
+    // minutes remain (hours is the only legal minor unit at days scale).
+    expect(playtimeText(2 * DAY + 31 * MINUTE)).toBe('2 days');
+  });
+
+  it('degrades a negative or non-finite total to the sub-minute floor', () => {
+    expect(playtimeText(-5)).toBe('Less than a minute');
+    expect(playtimeText(Number.NaN)).toBe('Less than a minute');
+  });
+
+  function renderSheet(opts: { visible: boolean; seconds: number }) {
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      playtimeSeconds: opts.seconds,
+      professionsState: { skills: [] },
+    };
+    const togglePlaytimeVisible = vi.fn();
+    const restoreFocus = vi.fn();
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus,
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => opts.visible,
+      togglePlaytimeVisible,
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+    win.render();
+    return { root, togglePlaytimeVisible, restoreFocus };
+  }
+
+  it('renders the revealed value with the concealing eye affordance', () => {
+    const { root } = renderSheet({ visible: true, seconds: 5 * HOUR + 42 * MINUTE });
+    const value = root.querySelector('.char-playtime-value');
+    expect(value?.textContent).toBe('5 hours, 42 minutes');
+    expect(value?.classList.contains('char-playtime-value-hidden')).toBe(false);
+    const eye = root.querySelector('[data-act="toggle-playtime"]');
+    expect(eye?.getAttribute('aria-pressed')).toBe('false');
+    expect(eye?.getAttribute('aria-label')).toBe('Hide time played');
+  });
+
+  it('conceals the VALUE, not the row, while hidden (and flips the eye state)', () => {
+    const { root } = renderSheet({ visible: false, seconds: 12 * DAY });
+    const value = root.querySelector('.char-playtime-value');
+    expect(value?.textContent).toBe('Hidden');
+    expect(value?.classList.contains('char-playtime-value-hidden')).toBe(true);
+    // Decisive: the real total may leak nowhere in the sheet markup.
+    expect(root.innerHTML).not.toContain('12 days');
+    const eye = root.querySelector('[data-act="toggle-playtime"]');
+    expect(eye?.getAttribute('aria-pressed')).toBe('true');
+    expect(eye?.getAttribute('aria-label')).toBe('Show time played');
+  });
+
+  it('routes the eye click through the HUD-owned toggle and re-seats focus', () => {
+    const { root, togglePlaytimeVisible, restoreFocus } = renderSheet({
+      visible: true,
+      seconds: HOUR,
+    });
+    const eye = root.querySelector<HTMLButtonElement>('[data-act="toggle-playtime"]');
+    eye?.click();
+    expect(togglePlaytimeVisible).toHaveBeenCalledTimes(1);
+    // The toggle repaints the sheet HUD-side (innerHTML rebuild), so the
+    // painter hands focus to the rebuilt eye via the focus-return dep.
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
   });
 });
 

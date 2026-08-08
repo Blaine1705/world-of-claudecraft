@@ -1545,7 +1545,13 @@ export const sv_SE: EnTranslations = {
     },
     "charSheet": {
       "offense": "Anfall",
-      "defense": "Försvar"
+      "defense": "Försvar",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
@@ -1666,6 +1672,24 @@ export const sv_SE: EnTranslations = {
         "few": "{count} sekunder kvar",
         "many": "{count} sekunder kvar",
         "other": "{count} sekunder kvar"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Vilka: {count} spelare online på {realm}.",

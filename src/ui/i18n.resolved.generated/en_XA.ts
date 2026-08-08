@@ -1545,7 +1545,13 @@ export const en_XA: EnTranslations = {
     },
     "charSheet": {
       "offense": "[Óƒƒéñšé]",
-      "defense": "[Ðéƒéñšé]"
+      "defense": "[Ðéƒéñšé]",
+      "playtimeLabel": "[Ţíɱé Þļáýéð]",
+      "playtimeParts": "[{major}, {minor}]",
+      "playtimeUnderMinute": "[Ļéšš ţĥáñ á ɱíñúţé]",
+      "playtimeHidden": "[Ĥíððéñ]",
+      "showPlaytimeAria": "[Šĥóŵ ţíɱé þļáýéð]",
+      "hidePlaytimeAria": "[Ĥíðé ţíɱé þļáýéð]"
     },
     "statInfo": {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
@@ -1666,6 +1672,24 @@ export const en_XA: EnTranslations = {
         "few": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "many": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "other": "[{count} šéçóñðš ŕéɱáíñíñĝ]"
+      },
+      "playtimeDays": {
+        "one": "[{count} ðáý]",
+        "few": "[{count} ðáýš]",
+        "many": "[{count} ðáýš]",
+        "other": "[{count} ðáýš]"
+      },
+      "playtimeHours": {
+        "one": "[{count} ĥóúŕ]",
+        "few": "[{count} ĥóúŕš]",
+        "many": "[{count} ĥóúŕš]",
+        "other": "[{count} ĥóúŕš]"
+      },
+      "playtimeMinutes": {
+        "one": "[{count} ɱíñúţé]",
+        "few": "[{count} ɱíñúţéš]",
+        "many": "[{count} ɱíñúţéš]",
+        "other": "[{count} ɱíñúţéš]"
       },
       "playersOnline": {
         "one": "[Ŵĥó: {count} þļáýéŕ óñļíñé óñ {realm}.]",

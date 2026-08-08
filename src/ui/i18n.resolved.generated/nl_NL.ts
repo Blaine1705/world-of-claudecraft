@@ -1545,7 +1545,13 @@ export const nl_NL: EnTranslations = {
     },
     "charSheet": {
       "offense": "Aanval",
-      "defense": "Verdediging"
+      "defense": "Verdediging",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
@@ -1666,6 +1672,24 @@ export const nl_NL: EnTranslations = {
         "few": "{count} seconden resterend",
         "many": "{count} seconden resterend",
         "other": "{count} seconden resterend"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Wie: {count} speler online op {realm}.",

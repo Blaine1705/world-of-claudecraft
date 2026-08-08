@@ -1545,7 +1545,13 @@ export const ja_JP: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻撃",
-      "defense": "防御"
+      "defense": "防御",
+      "playtimeLabel": "プレイ時間",
+      "playtimeParts": "{major}{minor}",
+      "playtimeUnderMinute": "1分未満",
+      "playtimeHidden": "非表示",
+      "showPlaytimeAria": "プレイ時間を表示",
+      "hidePlaytimeAria": "プレイ時間を非表示"
     },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
@@ -1666,6 +1672,24 @@ export const ja_JP: EnTranslations = {
         "few": "残り {count} 秒",
         "many": "残り {count} 秒",
         "other": "残り {count} 秒"
+      },
+      "playtimeDays": {
+        "one": "{count} 日",
+        "few": "{count} 日",
+        "many": "{count} 日",
+        "other": "{count} 日"
+      },
+      "playtimeHours": {
+        "one": "{count} 時間",
+        "few": "{count} 時間",
+        "many": "{count} 時間",
+        "other": "{count} 時間"
+      },
+      "playtimeMinutes": {
+        "one": "{count} 分",
+        "few": "{count} 分",
+        "many": "{count} 分",
+        "other": "{count} 分"
       },
       "playersOnline": {
         "one": "Who：{realm}に{count}人のプレイヤーがオンラインです。",

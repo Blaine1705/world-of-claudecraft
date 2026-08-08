@@ -1545,7 +1545,13 @@ export const zh_CN: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻击",
-      "defense": "防御"
+      "defense": "防御",
+      "playtimeLabel": "游戏时长",
+      "playtimeParts": "{major}{minor}",
+      "playtimeUnderMinute": "不到一分钟",
+      "playtimeHidden": "已隐藏",
+      "showPlaytimeAria": "显示游戏时长",
+      "hidePlaytimeAria": "隐藏游戏时长"
     },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
@@ -1666,6 +1672,24 @@ export const zh_CN: EnTranslations = {
         "few": "剩余 {count} 秒",
         "many": "剩余 {count} 秒",
         "other": "剩余 {count} 秒"
+      },
+      "playtimeDays": {
+        "one": "{count} 天",
+        "few": "{count} 天",
+        "many": "{count} 天",
+        "other": "{count} 天"
+      },
+      "playtimeHours": {
+        "one": "{count} 小时",
+        "few": "{count} 小时",
+        "many": "{count} 小时",
+        "other": "{count} 小时"
+      },
+      "playtimeMinutes": {
+        "one": "{count} 分钟",
+        "few": "{count} 分钟",
+        "many": "{count} 分钟",
+        "other": "{count} 分钟"
       },
       "playersOnline": {
         "one": "查询：{realm}上有{count}名玩家在线。",

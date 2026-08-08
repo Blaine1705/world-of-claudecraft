@@ -4795,6 +4795,15 @@ export class Hud {
       this.drawPlayerFramePortrait();
       this.renderCharIfOpen();
     },
+    playtimeVisible: () => this.optionsHooks?.settings.get('showPlaytime') ?? true,
+    togglePlaytimeVisible: () => {
+      // Per-device display preference (settings.showPlaytime), the
+      // showWalletOnPlayerCard doctrine: the total keeps accruing, this only
+      // conceals THIS client's sheet value. Repaint mints the flipped row.
+      const settings = this.optionsHooks?.settings;
+      if (settings) settings.set('showPlaytime', !settings.get('showPlaytime'));
+      this.renderCharIfOpen();
+    },
   });
   // Inspect ("Profile") window painter (inspect_view.ts pure core + inspect_window.ts
   // painter). It paints #inspect-window for both the rich in-range card (live

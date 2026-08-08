@@ -105,6 +105,7 @@ export const IWORLD_MEMBERS = [
   { name: 'prestigeRank', kind: 'data' },
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
+  { name: 'playtimeSeconds', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
@@ -553,9 +554,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (data) plus openCommissionOrder/cancelCommissionOrder/
     // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
     // This branch's paperdoll helmet-visibility eye adds setHelmHidden
-    // (IWorldCosmetics, a method), leaving 300.
-    expect(IWORLD_MEMBERS.length).toBe(300);
-    expect(DATA_MEMBERS.length).toBe(76);
+    // (IWorldCosmetics, a method), leaving 300. The character sheet's Time
+    // Played line adds playtimeSeconds (IWorldProgressionXp, data), leaving
+    // 301.
+    expect(IWORLD_MEMBERS.length).toBe(301);
+    expect(DATA_MEMBERS.length).toBe(77);
     expect(METHOD_MEMBERS.length).toBe(224);
   });
   it('has no duplicate member names', () => {
@@ -776,6 +779,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -927,6 +931,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInfo',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1358,6 +1363,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
   'leaderboard',
@@ -1755,8 +1761,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(300);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(300);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(301);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(301);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

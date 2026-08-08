@@ -1545,7 +1545,13 @@ export const fr_CA: EnTranslations = {
     },
     "charSheet": {
       "offense": "Attaque",
-      "defense": "Défense"
+      "defense": "Défense",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "Grâce à vos {value} en {stat} :",
@@ -1666,6 +1672,24 @@ export const fr_CA: EnTranslations = {
         "few": "{count} secondes restantes",
         "many": "{count} secondes restantes",
         "other": "{count} secondes restantes"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Qui : {count} joueur en ligne sur {realm}.",

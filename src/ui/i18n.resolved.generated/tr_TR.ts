@@ -1545,7 +1545,13 @@ export const tr_TR: EnTranslations = {
     },
     "charSheet": {
       "offense": "Saldırı",
-      "defense": "Savunma"
+      "defense": "Savunma",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "{value} {stat} değerinden:",
@@ -1666,6 +1672,24 @@ export const tr_TR: EnTranslations = {
         "few": "{count} saniye kaldı",
         "many": "{count} saniye kaldı",
         "other": "{count} saniye kaldı"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Kimler: {realm} sunucusunda {count} oyuncu çevrimiçi.",

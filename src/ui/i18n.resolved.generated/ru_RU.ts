@@ -1545,7 +1545,13 @@ export const ru_RU: EnTranslations = {
     },
     "charSheet": {
       "offense": "Атака",
-      "defense": "Защита"
+      "defense": "Защита",
+      "playtimeLabel": "Время в игре",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Меньше минуты",
+      "playtimeHidden": "Скрыто",
+      "showPlaytimeAria": "Показать время в игре",
+      "hidePlaytimeAria": "Скрыть время в игре"
     },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
@@ -1666,6 +1672,24 @@ export const ru_RU: EnTranslations = {
         "few": "Осталось {count} сек.",
         "many": "Осталось {count} сек.",
         "other": "Осталось {count} сек."
+      },
+      "playtimeDays": {
+        "one": "{count} день",
+        "few": "{count} дня",
+        "many": "{count} дней",
+        "other": "{count} дня"
+      },
+      "playtimeHours": {
+        "one": "{count} час",
+        "few": "{count} часа",
+        "many": "{count} часов",
+        "other": "{count} часа"
+      },
+      "playtimeMinutes": {
+        "one": "{count} минута",
+        "few": "{count} минуты",
+        "many": "{count} минут",
+        "other": "{count} минуты"
       },
       "playersOnline": {
         "one": "Список игроков: на {realm} в сети {count} игрок.",
