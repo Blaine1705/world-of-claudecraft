@@ -412,7 +412,7 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
-  hit: ['Hit'],
+  hit: ['Hit', 'Hit_Stagger'],
   death: 'Death',
   cast: 'Cast',
   jump: 'Jump',
@@ -1786,17 +1786,21 @@ export const VISUALS: Record<string, VisualDef> = {
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
   mob_wildheart_stalker: {
     url: `${CREATURES}/wildheart_stalker.glb`,
+    // Wildheart_Stalker_Attack clip donor (scripts/build_wildheart_stalker_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [
+      `${CREATURES}/wildheart_stalker_hit_variety_anims.glb`,
+      `${CREATURES}/wildheart_stalker_ability_anims.glb`,
+    ],
     height: 2.5,
     yaw: -Math.PI / 2,
     clips: WILDHEART_STALKER,
-    // Wildheart_Stalker_Attack clip donor (scripts/build_wildheart_stalker_anims.mjs):
-    // mesh-free, baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/wildheart_stalker_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
   mob_wildheart_ravager: {
     url: `${CREATURES}/wildheart_ravager.glb`,
+    animUrls: [`${CREATURES}/wildheart_ravager_hit_variety_anims.glb`],
     height: 2.7,
     yaw: -Math.PI / 2,
     clips: TRIPO_BIPED_FULL_RIG,
@@ -1805,17 +1809,21 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_wildheart_hexcaller: {
     url: `${CREATURES}/wildheart_hexcaller.glb`,
+    // Wildheart_Hexcaller_Attack clip donor (scripts/build_wildheart_hexcaller_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [
+      `${CREATURES}/wildheart_hexcaller_hit_variety_anims.glb`,
+      `${CREATURES}/wildheart_hexcaller_ability_anims.glb`,
+    ],
     height: 2.5,
     yaw: -Math.PI / 2,
     clips: WILDHEART_HEXCALLER,
-    // Wildheart_Hexcaller_Attack clip donor (scripts/build_wildheart_hexcaller_anims.mjs):
-    // mesh-free, baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/wildheart_hexcaller_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
   mob_wildheart_beastmaster: {
     url: `${CREATURES}/wildheart_beastmaster.glb`,
+    animUrls: [`${CREATURES}/wildheart_beastmaster_hit_variety_anims.glb`],
     height: 3,
     yaw: -Math.PI / 2,
     clips: TRIPO_BIPED_FULL_RIG,
@@ -1824,6 +1832,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_wildheart_high_priest: {
     url: `${CREATURES}/wildheart_high_priest.glb`,
+    animUrls: [`${CREATURES}/wildheart_high_priest_hit_variety_anims.glb`],
     height: 3.2,
     yaw: -Math.PI / 2,
     clips: TRIPO_BIPED_FULL_RIG,
