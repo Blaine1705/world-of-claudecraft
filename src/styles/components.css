@@ -6833,12 +6833,16 @@
   }
   .bag-tools {
     display: flex;
+    /* Wrap rather than clip: in the half-width mobile pairings (char/vendor/
+       bank/market) the row is too narrow for search + sort + Sort button, and
+       overflow:hidden on the sheet would silently eat the last control. */
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
   .bag-search {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width: 96px;
     font-family: var(--ui-font);
     font-size: 16px;
     padding: 4px 7px;
@@ -6897,8 +6901,8 @@
      small per-cell stagger (--settle-i, capped painter-side). Opacity plus a
      3px drop only (DESIGN.md motion rules); reduced motion turns it off. */
   .bag-grid-settle > * {
-    animation: bag-sort-settle 160ms ease-out backwards;
-    animation-delay: calc(var(--settle-i, 0) * 14ms);
+    animation: bag-sort-settle calc(160ms * var(--motion-scale, 1)) ease-out backwards;
+    animation-delay: calc(var(--settle-i, 0) * 14ms * var(--motion-scale, 1));
   }
   @keyframes bag-sort-settle {
     from {

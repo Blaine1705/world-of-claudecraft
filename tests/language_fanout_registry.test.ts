@@ -388,9 +388,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'bags_window.ts',
-    memos: ['lastGridSignature'],
+    memos: ['lastSortSignature'],
     reason:
-      'lastGridSignature gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, keyed on the painted content changing because online the tidied grid arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; at worst a locale switch inside the 3-second settle window plays the ripple once, which draws no text.',
+      'lastSortSignature gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, keyed on the INVENTORY signature changing because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
   },
   {
     file: 'deed_tracker_painter.ts',

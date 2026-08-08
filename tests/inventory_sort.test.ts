@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
+// Aliased: this file declares a small synthetic table for the ladder arms; the
+// real merged catalog drives the whole-catalog and grade-family arms.
+import { ITEMS as REAL_ITEMS } from '../src/sim/data';
 import { layoutBagCells } from '../src/sim/inventory_order';
 import {
   compareBagStacks,
@@ -264,6 +267,13 @@ describe('consolidateBagStacks', () => {
     expect(inv.map((s) => s.count)).toEqual([20, 40]);
   });
 
+  it('never lets a corrupt non-positive count donate (units are conserved)', () => {
+    const inv = [slot('copper_ore', 10), slot('copper_ore', -3), slot('copper_ore', 4)];
+    consolidateBagStacks(inv, lookup, cap);
+    // The corrupt entry neither donates nor vanishes; the honest stacks merge.
+    expect(inv).toEqual([slot('copper_ore', 14), slot('copper_ore', -3)]);
+  });
+
   it('conserves every unit across an arbitrary consolidation', () => {
     const inv = [
       slot('copper_ore', 15),
@@ -357,6 +367,36 @@ describe('sortInventoryStacks', () => {
   });
 });
 
+describe('sortInventoryStacks against the REAL catalog', () => {
+  const realLookup = (id: string): ItemDef | undefined => REAL_ITEMS[id];
+
+  it('groups the real elderwood grade family, fine first, across an intervening name', () => {
+    // Real display names need not share a prefix (the grade word aside), so a
+    // plain name sort could interleave another material between the grades;
+    // the family key must keep them adjacent regardless, premium grade first.
+    const inv = [
+      slot('elderwood_log', 20),
+      slot('goldleaf_herb', 5),
+      slot('fine_elderwood_log', 3),
+    ];
+    sortInventoryStacks(inv, realLookup, cap);
+    const cells = cellIds(inv).filter((id): id is string => id !== null);
+    const fineAt = cells.indexOf('fine_elderwood_log');
+    expect(fineAt).toBeGreaterThanOrEqual(0);
+    expect(cells[fineAt + 1]).toBe('elderwood_log');
+  });
+
+  it('totally orders the whole catalog: a permutation, idempotent', () => {
+    const everything = Object.keys(REAL_ITEMS).map((id) => slot(id, 1));
+    sortInventoryStacks(everything, realLookup, cap);
+    const hints = everything.map((s) => s.slot).sort((a, b) => (a ?? 0) - (b ?? 0));
+    expect(hints).toEqual(everything.map((_, i) => i));
+    const once = everything.map((s) => ({ ...s }));
+    sortInventoryStacks(everything, realLookup, cap);
+    expect(everything).toEqual(once);
+  });
+});
+
 describe('Sim.sortInventory (the command against the real sim)', () => {
   const makeSim = (): { sim: Sim & Record<string, any>; pid: number } => {
     const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true }) as Sim &
@@ -398,6 +438,19 @@ describe('Sim.sortInventory (the command against the real sim)', () => {
     sim.sortInventory(pid);
     expect(invOf(sim, pid)).toEqual([]);
     sim.sortInventory(987654); // no such player: resolve() refuses
+  });
+
+  it('draws zero rng (the module header claim, pinned)', () => {
+    const { sim, pid } = makeSim();
+    sim.addItem('worn_sword', 1, pid);
+    invOf(sim, pid).push({ itemId: 'baked_bread', count: 2 });
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    sim.sortInventory(pid);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
   });
 });
 

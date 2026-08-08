@@ -125,6 +125,37 @@ describe('bags sort button', () => {
     expect(root.querySelector('button.bag-item[data-bag-index]')).not.toBeNull();
   });
 
+  it('does not persist the filter reset: the saved preference survives the press', () => {
+    const { root } = harness([...INV]);
+    const select = root.querySelector('select.bag-sort') as HTMLSelectElement;
+    select.value = 'quality';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const saved = localStorage.getItem('woc_bag_filter');
+    expect(saved).toContain('quality');
+    clickSort(root);
+    expect(localStorage.getItem('woc_bag_filter')).toBe(saved);
+  });
+
+  it('never fires the ripple from the press filter reset alone (online mirror unchanged)', () => {
+    const { root } = harness([...INV]);
+    // Arm a derived view first: the press resets it, which switches the grid
+    // SHAPE (list to real cells). That alone is not a sort effect.
+    const select = root.querySelector('select.bag-sort') as HTMLSelectElement;
+    select.value = 'quality';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    clickSort(root);
+    expect(root.querySelector('.bag-grid-settle')).toBeNull();
+  });
+
+  it('fires the ripple when only cell hints move (a restamp with no merge)', () => {
+    const { root, window, world } = harness([...INV]);
+    clickSort(root);
+    expect(root.querySelector('.bag-grid-settle')).toBeNull();
+    for (let i = 0; i < world.inventory.length; i++) world.inventory[i].slot = i;
+    window.render();
+    expect(root.querySelector('.bag-grid-settle')).not.toBeNull();
+  });
+
   it('plays the settle ripple only once the painted content changes', () => {
     const { root, window, world } = harness([...INV]);
     // The press itself repaints an UNCHANGED grid (the online mirror has not

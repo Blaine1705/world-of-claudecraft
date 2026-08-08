@@ -46,11 +46,11 @@ import {
   type BagDestroyAction,
   type BagMode,
   bagDestroyAction,
-  bagGridSignature,
   bagItemAction,
   bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
+  bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
   bagTooltipHintKey,
@@ -294,14 +294,16 @@ export class BagsWindow {
   private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
 
   // One-shot sort settle animation. Armed by the sort button; the NEXT grid
-  // paint whose content actually differs plays the CSS settle ripple and
-  // disarms. Content-keyed rather than paint-keyed because online the press
-  // repaints the still-unsorted mirror first and the tidied grid only lands
-  // with the heavy self snapshot; a timestamp backstop (SORT_SETTLE_MS) keeps
-  // a no-op sort (already tidy) from arming forever. `lastGridSignature`
-  // tracks what the last paint showed, whatever caused it.
+  // paint whose INVENTORY signature (bagSortSignature: id, count, cell hint)
+  // actually differs plays the CSS settle ripple and disarms. Keyed on the
+  // inventory rather than the painted grid because the press both resets an
+  // active filter (a shape switch that is not a sort effect) and, online,
+  // repaints the still-unsorted mirror first: the tidied inventory only lands
+  // with the heavy self snapshot. A timestamp backstop (SORT_SETTLE_MS) keeps
+  // a no-op sort (already tidy) from arming forever. `lastSortSignature`
+  // tracks what the last paint saw, whatever caused it.
   private sortSettleArmedAt = 0;
-  private lastGridSignature = '';
+  private lastSortSignature = '';
 
   constructor(private readonly deps: BagsWindowDeps) {}
 
@@ -685,8 +687,10 @@ export class BagsWindow {
       audio.cardShuffle();
       this.armSortSettle();
       this.deps.world().sortInventory();
+      // In-memory only, deliberately NOT persisted: the press shows the
+      // tidied cells NOW, but the player's saved category/sort/search
+      // preference (woc_bag_filter) survives into the next session.
       this.filter = { ...DEFAULT_BAG_FILTER };
-      this.persistFilter();
       this.render();
     });
     tools.appendChild(sortBtn);
@@ -697,15 +701,16 @@ export class BagsWindow {
 
   // Whether an armed sort settle should play on THIS paint: only while the
   // arming is fresh (the backstop clears a no-op sort) and only once the
-  // painted content actually changed (online, the tidied grid arrives with
-  // the heavy self snapshot, not the press's own repaint).
+  // inventory itself actually changed (online, the tidied inventory arrives
+  // with the heavy self snapshot, not the press's own repaint; the press's
+  // filter reset alone must never fire it).
   private consumeSortSettle(signature: string): boolean {
     if (this.sortSettleArmedAt === 0) return false;
     if (performance.now() - this.sortSettleArmedAt >= SORT_SETTLE_MS) {
       this.sortSettleArmedAt = 0;
       return false;
     }
-    if (signature === this.lastGridSignature) return false;
+    if (signature === this.lastSortSignature) return false;
     this.sortSettleArmedAt = 0;
     return true;
   }
@@ -738,9 +743,9 @@ export class BagsWindow {
     // Settle bookkeeping rides every paint: the class never persists across a
     // repaint (each replay would re-run the animation on the fresh nodes).
     grid.classList.remove('bag-grid-settle');
-    const signature = bagGridSignature(model);
+    const signature = bagSortSignature(world.inventory);
     const settle = this.consumeSortSettle(signature);
-    this.lastGridSignature = signature;
+    this.lastSortSignature = signature;
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;

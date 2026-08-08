@@ -31,7 +31,7 @@
 
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { baseMaterialFor } from './professions/material_grades';
-import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef } from './types';
+import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef, type ItemKind } from './types';
 
 /** Item-table access, injected so tests drive synthetic defs and the leaf
  *  never imports data.ts (the command body passes the merged ITEMS table). */
@@ -51,7 +51,9 @@ export interface SortableStack {
 // kind (every material lives there; gray vendor trash is hoisted out below),
 // then quest items where they are easy to find, and poor-quality trash dead
 // last so the sell-all-junk sweep reads straight off the bag's tail.
-const KIND_RANK: Record<string, number> = {
+// Record<ItemKind, number> deliberately: a new kind fails to compile until it
+// is given a rank here, instead of silently sorting after gray trash.
+const KIND_RANK: Record<ItemKind, number> = {
   weapon: 0,
   armor: 1,
   held_offhand: 2,
@@ -66,7 +68,14 @@ const KIND_RANK: Record<string, number> = {
   quest: 11,
 };
 const TRASH_RANK = 12; // any poor-quality item, regardless of kind
-const UNKNOWN_RANK = 13; // a def the lookup cannot resolve (defensive; the sim's table is complete)
+// The two defensive tails are DISTINCT ranks on purpose (comparator
+// transitivity): a missing-def stack compares by raw id while a known def
+// compares by the name/quality chain, and if the two populations could tie on
+// category the mixed bucket would order inconsistently (an intransitive
+// comparator makes Array.prototype.sort implementation-defined, a cross-host
+// hazard). Distinct ranks mean the buckets never meet in a tie.
+const UNRANKED_KIND_RANK = 13; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
+const MISSING_DEF_RANK = 14; // a def the lookup cannot resolve (defensive; the sim's table is complete)
 
 // Lower rank sorts first, so the grid reads legendary down to poor. Mirrors
 // the UI's bag_filter.ts ranks (extended with the same unknown fallback).
@@ -84,9 +93,9 @@ function qualityRankOf(def: ItemDef): number {
 }
 
 function categoryRankOf(def: ItemDef | undefined): number {
-  if (!def) return UNKNOWN_RANK;
+  if (!def) return MISSING_DEF_RANK;
   if ((def.quality ?? 'common') === 'poor') return TRASH_RANK;
-  return KIND_RANK[def.kind] ?? UNKNOWN_RANK;
+  return KIND_RANK[def.kind] ?? UNRANKED_KIND_RANK;
 }
 
 // Paperdoll position for gear kinds, so armor groups helmet-to-feet the way
@@ -170,6 +179,9 @@ export function consolidateBagStacks(
       if (
         donor.itemId !== target.itemId ||
         donor.craftedRecipeId !== target.craftedRecipeId ||
+        // A corrupt non-positive persisted count must never DONATE (a negative
+        // take would shrink the survivor while vanishing the donor at zero).
+        donor.count <= 0 ||
         !canStackInstancePayloads(target.instance, donor.instance)
       )
         continue;
@@ -189,7 +201,10 @@ export function consolidateBagStacks(
  *  never rearranged (see the header for why); layoutBagCells turns the new
  *  hints into the grid, and new loot (which carries no hint) flows into the
  *  first cell past the sorted block. Idempotent: a second call merges
- *  nothing and stamps identical hints. */
+ *  nothing and stamps identical hints. A legacy over-capacity save keeps its
+ *  tolerated overflow: the first `capacity` sorted ranks fill the grid and
+ *  layoutBagCells appends the rest past it (total and lossless, the tail is
+ *  simply not a grid position). */
 export function sortInventoryStacks(
   inventory: InvSlot[],
   lookup: ItemDefLookup,

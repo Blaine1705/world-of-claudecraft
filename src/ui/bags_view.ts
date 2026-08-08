@@ -513,18 +513,15 @@ export function buildBagGrid(
   return { state: 'items', cells, visible, emptyCells, overflow };
 }
 
-/** Stable content key for a painted bag grid: what the player would SEE, one
- *  token per square (item id x count, '.' for a hole), plus the state and the
- *  trailing free squares. The sort settle ripple keys on this changing (the
- *  press itself repaints the still-unsorted mirror online; the tidied grid
- *  lands with the heavy self snapshot), so it must cover both grid shapes:
- *  real cells in the pristine view, the visible list in a derived view. */
-export function bagGridSignature(model: BagGridModel): string {
-  const squares =
-    model.cells.length > 0
-      ? model.cells.map((s) => (s ? `${s.itemId}x${s.count}` : '.'))
-      : model.visible.map((s) => `${s.itemId}x${s.count}`);
-  return `${model.state}|${squares.join(',')}|${model.emptyCells}`;
+/** Stable key over exactly what the sort command changes: each stack's id,
+ *  count (consolidation merges), and parked cell hint (the restamp), in array
+ *  order. The sort settle ripple keys on this changing rather than on the
+ *  painted grid, because the press also resets an active filter and the
+ *  derived-list-to-real-cells SHAPE switch would read as a content change on
+ *  the press's own repaint (online, that paint still shows the unsorted
+ *  mirror; the tidied inventory lands with the heavy self snapshot). */
+export function bagSortSignature(inventory: readonly InvSlot[]): string {
+  return inventory.map((s) => `${s.itemId}x${s.count}@${s.slot ?? '-'}`).join(',');
 }
 
 /** One socket of the bag bar: the equipped bag (with its slot count) or an

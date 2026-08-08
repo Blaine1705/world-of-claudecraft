@@ -46,37 +46,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.sortButtonAria",
     "hudChrome.bags.sortButtonHint"
   ],
-  "zh_CN": [
-    "hudChrome.bags.sortButton",
-    "hudChrome.bags.sortButtonAria",
-    "hudChrome.bags.sortButtonHint"
-  ],
-  "zh_TW": [
-    "hudChrome.bags.sortButton",
-    "hudChrome.bags.sortButtonAria",
-    "hudChrome.bags.sortButtonHint"
-  ],
-  "ko_KR": [
-    "hudChrome.bags.sortButton",
-    "hudChrome.bags.sortButtonAria",
-    "hudChrome.bags.sortButtonHint"
-  ],
-  "ja_JP": [
-    "hudChrome.bags.sortButton",
-    "hudChrome.bags.sortButtonAria",
-    "hudChrome.bags.sortButtonHint"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
     "hudChrome.bags.sortButtonAria",
     "hudChrome.bags.sortButtonHint"
   ],
-  "ru_RU": [
-    "hudChrome.bags.sortButton",
-    "hudChrome.bags.sortButtonAria",
-    "hudChrome.bags.sortButtonHint"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
