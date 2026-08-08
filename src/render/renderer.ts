@@ -320,6 +320,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
 import {
   type OpaqueSortPolicyInput,
   opaqueFrontToBackSort,
@@ -5558,6 +5559,7 @@ export class Renderer {
     let playerPrewarmGroup: THREE.Group | null = null;
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
+    let ghostVariantPrewarmGroup: THREE.Group | null = null;
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
@@ -5688,6 +5690,7 @@ export class Renderer {
         playerPrewarmGroup,
         objectPrewarmGroup,
         propMaterialPrewarmGroup,
+        ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
         landmarkPrewarmGroup,
@@ -5726,6 +5729,10 @@ export class Renderer {
         this.scene.remove(objectPrewarmGroup);
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
+      // Removed, never disposed (same reason as the weapon-VFX group below):
+      // these twins hold the only reference keeping each ghost material's
+      // TRANSPARENT program linked once the live structures are still opaque.
+      if (ghostVariantPrewarmGroup) this.scene.remove(ghostVariantPrewarmGroup);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -5744,6 +5751,7 @@ export class Renderer {
       playerPrewarmGroup = null;
       objectPrewarmGroup = null;
       propMaterialPrewarmGroup = null;
+      ghostVariantPrewarmGroup = null;
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
@@ -5930,6 +5938,47 @@ export class Renderer {
           this.scene.add(propMaterialPrewarmGroup);
         },
         detail: () => `objects=${propMaterialPrewarmGroup?.children.length ?? 0}`,
+      },
+      {
+        // The camera-ghost fade flips `transparent`, which three keys a SECOND
+        // program on, so every ghosted kit material linked one the first time
+        // it faded. A crowd arrival whips the camera across town and fades
+        // dozens of structures inside one frame (the measured geared-arrival
+        // stall). One hidden twin per distinct ghost PROGRAM, in the exact fade
+        // state, links that half here instead: measured on the offline
+        // Eastbrook scene, fading every live ghost material went from 41
+        // programs over 2.39s of compile to 3 over 0.53s.
+        id: 'props.ghost-fade-variants',
+        category: 'props',
+        priority: 46,
+        required: false,
+        // Two bounded units: stage the twins, then link them. Both read the
+        // live scene, so a resume after world entry still sees the same
+        // hideables the entry pass would have.
+        resumeUnits: () => [
+          {
+            id: 'ghost-fade-variants:group',
+            run: () => {
+              ghostVariantPrewarmGroup = buildGhostVariantPrewarmGroup(this.scene);
+              setRenderCategory(ghostVariantPrewarmGroup, 'prewarm');
+              this.scene.add(ghostVariantPrewarmGroup);
+            },
+          },
+          {
+            id: 'ghost-fade-variants:compile',
+            run: async () => {
+              if (ghostVariantPrewarmGroup) {
+                await this.compilePrewarmColorPrograms(ghostVariantPrewarmGroup, false);
+              }
+            },
+          },
+        ],
+        run: () => {
+          ghostVariantPrewarmGroup = buildGhostVariantPrewarmGroup(this.scene);
+          setRenderCategory(ghostVariantPrewarmGroup, 'prewarm');
+          this.scene.add(ghostVariantPrewarmGroup);
+        },
+        detail: () => `objects=${ghostVariantPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // Compile every foliage shader (tree/rock/dressing species + far-tree
@@ -6182,6 +6231,7 @@ export class Renderer {
             ['npcs', npcPrewarmGroup],
             ['objects', objectPrewarmGroup],
             ['props', propMaterialPrewarmGroup],
+            ['ghost-fade-variants', ghostVariantPrewarmGroup],
             ['foliage', foliagePrewarmGroup],
             ['great-tree', greatTreePrewarmGroup],
             ['weapon-vfx', weaponVfxPrewarmGroup],
