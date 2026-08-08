@@ -531,6 +531,10 @@ const IDLE_PREWARM_TIMEOUT_MS = 250;
 // cancelled, so the target remains hidden and the serial gate remains occupied
 // until the driver settles instead of overlapping first-draw or later links.
 const VIEW_COMPILE_GATE_MAX_MS = 1500;
+// Textures per zone-prewarm upload unit: small enough that one grant's
+// decode+upload stays well under a frame, large enough not to double the
+// idle-slot count for texture-light children.
+const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
@@ -3472,20 +3476,40 @@ export class Renderer {
             prepareChildAssets: (child) => {
               this.prewarmObjectTextures(child as THREE.Object3D);
             },
-            warmChild: (groupLike, child) => {
+            // Decomposed upload: a whole-child bounded render was a measured
+            // 100-345ms main-thread unit (texture decode+upload dominating).
+            // Pre-upload the child's textures in small batches through their
+            // own arbiter units, then the bounded render only pays geometry
+            // upload plus the raster warm.
+            warmChildUnits: (groupLike, child) => {
               const group = groupLike as THREE.Group;
               const childRoot = child as THREE.Object3D;
-              this.renderBoundedPrewarmRoot(group, childRoot);
+              const units: { label: string; run: () => void }[] = [];
+              const textures = [...this.collectObjectTextures(childRoot, false)];
+              for (let i = 0; i < textures.length; i += PREWARM_TEXTURE_UNIT_BATCH) {
+                const batch = textures.slice(i, i + PREWARM_TEXTURE_UNIT_BATCH);
+                units.push({
+                  label: 'zone-prewarm-tex',
+                  run: () => {
+                    for (const texture of batch) this.webgl.initTexture(texture);
+                  },
+                });
+              }
+              units.push({
+                label: `zone-prewarm-render:${childRoot.name || childRoot.type}`,
+                run: () => this.renderBoundedPrewarmRoot(group, childRoot),
+              });
+              return units;
             },
             renderWarmPass: () => {
               tCompile = performance.now();
               this.renderPrewarmPass(1 / 60, { offscreen: true });
             },
-            runUpload: (work) =>
+            runUpload: (work, label) =>
               this.backgroundGpuWork.run(
                 work,
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                'zone-prewarm-upload',
+                label ?? 'zone-prewarm-upload',
               ),
           });
           tCompile = performance.now();
