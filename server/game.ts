@@ -60,6 +60,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
@@ -8785,6 +8786,11 @@ export class GameServer {
     // this session dirty, and the title echo must not wait on the heavy gate).
     maybe('renown', meta.renown);
     maybe('atitle', meta.activeTitle);
+    // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
+    // whole minutes so the serialized form changes about once a minute and the
+    // delta gate drops it from every other tick; the sheet displays minutes at
+    // most, so no read loses precision.
+    maybe('ptime', Math.floor(livePlaytimeSeconds(meta, this.sim.time) / 60) * 60);
     selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
