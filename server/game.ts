@@ -1550,7 +1550,7 @@ function bgWideInterestApplies(
   // pet trails the enemy, so widening it would leak the same position by proxy.
   const subjectId = e.kind === 'player' ? e.id : e.ownerId;
   if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
-  return viewerBgTeam !== null && viewerBgTeam.includes(subjectId);
+  return viewerBgTeam?.includes(subjectId) ?? false;
 }
 
 // full rate close up and for anything the viewer is fighting; mid range
