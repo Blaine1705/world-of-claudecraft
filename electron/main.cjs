@@ -4,6 +4,7 @@ const {
   crashReporter,
   dialog,
   ipcMain,
+  Menu,
   net,
   protocol,
   session,
@@ -171,6 +172,17 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
+// The game draws its own chrome, so the default in-window menu bar on Windows
+// and Linux is dead weight; nulling it at the APPLICATION level (not per window)
+// means no window is ever created with a menu bar, so the first paint cannot
+// flash one. This must run before app 'ready', hence module scope rather than
+// inside whenReady. darwin is excluded on purpose: on macOS the menu lives in
+// the system menu bar and owns the standard copy/paste/hide/quit accelerators,
+// which a Mac app must keep.
+if (process.platform === 'win32' || process.platform === 'linux') {
+  Menu.setApplicationMenu(null);
+}
+
 function fileInside(root, target) {
   const rel = path.relative(root, target);
   return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
@@ -289,10 +301,10 @@ function createMainWindow() {
     },
   });
 
-  mainWindow.setMenu(null);
-
-  // setMenu(null) drops the default menu (and its DevTools accelerator), and the packaged
-  // build never auto-opens DevTools, so bind a debug affordance directly to
+  // The application menu is nulled for win32/linux at module scope, before app ready (see the
+  // Menu.setApplicationMenu call there), so on those platforms there is no menu and therefore
+  // no default DevTools accelerator; macOS keeps its default menu deliberately. The packaged
+  // build never auto-opens DevTools either, so bind a debug affordance directly to
   // the renderer's key events: F12, Cmd+Option+I (macOS), or Ctrl+Shift+I (Windows/Linux)
   // toggles the inspector. This is how CSP violations, GPU state, and runtime errors get
   // inspected in a shipped app. DevTools is a local-only affordance requiring physical
