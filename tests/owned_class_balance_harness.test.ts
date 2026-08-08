@@ -163,7 +163,8 @@ describe('owned-class level 20 balance harness', () => {
     // rogue-layer drift (measured 1.18 on the combined tree). Re-author both
     // sides of this pair when the owned-class stack integrates.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(1.2);
-  }, 60_000);
+    // The grown owned-class matrix runs ~180s under shard load.
+  }, 240_000);
 
   it('keeps the Druid damage arms sane on the fixed low-SP probe', () => {
     // IMPORTANT: this fixed PBE loadout is a level-20 caster PROXY (spell power
