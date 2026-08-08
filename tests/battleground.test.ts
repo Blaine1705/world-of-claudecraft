@@ -5,7 +5,8 @@ import { isDispellableAura } from '../src/sim/aura_classify';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
-import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
+import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
 import {
   awardBattlegroundHonor,
@@ -49,6 +50,7 @@ import {
   drainBgOutcomes,
   recordBgOutcome,
 } from '../src/sim/social/battleground_outcomes';
+import { addThreat } from '../src/sim/threat';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -356,19 +358,25 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     for (const m of party) expect(match.teams[teamOfLeader]).toContain(m);
   });
 
-  it('refuses to queue from inside an instance, while dead, or twice', () => {
+  it('queues while dead and from inside an instance, and still refuses a double queue', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     sim.entities.get(a)!.level = BG_MIN_LEVEL;
     const dungeonInstance = instanceOrigin(0, 0);
     tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
+    expect(sim.bgInfoFor(a)!.queued, 'a dungeon pull must not cost the spot').toBe(true);
+    sim.bgQueueLeave(a);
 
     tp(sim, a, 0, -40);
     kill(sim, a);
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
+    expect(sim.bgInfoFor(a)!.queued, 'a corpse run must not cost the spot').toBe(true);
+    // The matchmaker tick is where the old eviction happened, so the wait has to
+    // survive one: pressing Queue and being dropped a tick later is the bug.
+    sim.tick();
+    expect(sim.bgInfoFor(a)!.queued, 'the matchmaker tick must not evict a corpse').toBe(true);
+    sim.bgQueueLeave(a);
 
     const b = sim.addPlayer('mage', 'B');
     tp(sim, b, 0, -40);
@@ -379,6 +387,115 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     expect(sim.bgInfoFor(b)!.queueSize).toBe(1);
     sim.bgQueueLeave(b);
     expect(sim.bgInfoFor(b)!.queued).toBe(false);
+  });
+});
+
+// Ten queued champions on ONE tick short of seating, so a caller can do
+// something to one of them (kill them, walk them into a dungeon) and then let
+// the pop land on that state.
+function tenQueuedUnseated(): { sim: Sim; pids: number[] } {
+  const sim = makeWorld();
+  const pids: number[] = [];
+  const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+  for (let i = 0; i < 10; i++) {
+    const pid = sim.addPlayer(classes[i % 5], `Q${i}`);
+    tp(sim, pid, (i % 5) * 2 - 4, -40);
+    sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+    pids.push(pid);
+    sim.bgQueueJoin(pid);
+  }
+  return { sim, pids };
+}
+
+describe('Thornhollow Fields: the queue survives the wait', () => {
+  it('seats a fighter who died waiting, alive and whole rather than as a corpse', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const corpse = pids[3];
+    kill(sim, corpse);
+    const dead = sim.entities.get(corpse)!;
+    expect(dead.dead, 'the arrangement itself must hold').toBe(true);
+
+    sim.tick(); // the pop
+    const match = sim.bgMatchFor(corpse);
+    expect(match, 'dying while waiting must not cost the seat').toBeTruthy();
+    expect(bgAllPids(match!)).toContain(corpse);
+    // Seated alive: every arm of the spirit state, since ghost implies dead
+    // everywhere else and a stale corpsePos would strand a rez prompt on the field.
+    expect(dead.dead).toBe(false);
+    expect(dead.ghost).toBe(false);
+    expect(dead.corpsePos).toBeNull();
+    expect(dead.hp).toBe(dead.maxHp);
+    expect(isBgPos(dead.pos.x)).toBe(true);
+
+    // ...and they go home ALIVE, not back to the corpse they left behind. The
+    // match is a parenthesis: pools are handed back as carried in, and a corpse
+    // carried in nothing, so the floor of 1 hp is what they leave with. That is
+    // the deliberate cost of the free trip past a corpse run, and the reason we
+    // do not restore the death: a stale corpsePos outlives the body it named.
+    endBgMatch(sim.ctx, match!, 0, 'caps');
+    expect(dead.dead).toBe(false);
+    expect(dead.ghost).toBe(false);
+    expect(dead.hp).toBe(1);
+    expect(isBgPos(dead.pos.x)).toBe(false);
+  });
+
+  it('holds the spot through a dungeon pull, then detaches the fighter at the door', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const diver = pids[6];
+    enterDungeon(sim.ctx, 'gravewyrm_sanctum', diver);
+    const e = sim.entities.get(diver)!;
+    expect(e.pos.x, 'the arrangement itself must hold').toBeGreaterThan(DUNGEON_X_THRESHOLD);
+
+    // Put the diver on a live hate table so the scrub has something to undo.
+    const inst = sim.ctx.instances.find((i) => i.partyKey !== null)!;
+    const mob = inst.mobIds.map((id) => sim.entities.get(id)).find((m) => m && !m.dead)!;
+    addThreat(mob, diver, 500);
+    expect(mob.threat.get(diver)).toBe(500);
+
+    sim.tick(); // the pop
+    const match = sim.bgMatchFor(diver);
+    expect(match, 'a dungeon pull must not cost the seat').toBeTruthy();
+    expect(isBgPos(e.pos.x)).toBe(true);
+
+    // Leaving through the battleground must cost exactly what leaving through
+    // the door costs: the instance no longer holds any aggro on them.
+    expect(mob.threat.has(diver), 'the pop must scrub instance threat').toBe(false);
+
+    // ...and the return point is the door OUTSIDE, never the interior
+    // coordinates, whose claim may be gone by the time the match ends.
+    const ret = match!.returns.get(diver)!;
+    expect(ret.x).toBeLessThanOrEqual(DUNGEON_X_THRESHOLD);
+    endBgMatch(sim.ctx, match!, 0, 'caps');
+    expect(e.pos.x, 'the fighter must not be sent back inside').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    expect(e.dead).toBe(false);
+  });
+
+  it('still drops a waiting player who commits to an arena match, and says so', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const defector = pids[2];
+    const opponent = sim.addPlayer('warrior', 'ArenaFoe');
+    tp(sim, opponent, 0, -40);
+    sim.entities.get(opponent)!.level = BG_MIN_LEVEL;
+    sim.arenaQueueJoin(defector);
+    sim.arenaQueueJoin(opponent);
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 60 && !sim.ctx.arenaMatches.has(defector); i++) {
+      events.push(...sim.tick());
+    }
+    expect(sim.ctx.arenaMatches.has(defector), 'the arrangement itself must hold').toBe(true);
+
+    // The instance-position check used to do this job as a side effect (the
+    // arena band sits past DUNGEON_X_THRESHOLD); it is now explicit, so pin it.
+    expect(sim.bgInfoFor(defector)!.queued).toBe(false);
+    expect(sim.bgMatchFor(defector)).toBeNull();
+    expect(logPidsFor(events, 'You leave the Thornhollow Fields queue.')).toContain(defector);
+    // Only the defector: the other nine keep waiting.
+    for (const pid of pids.filter((p) => p !== defector)) {
+      expect(sim.bgInfoFor(pid)!.queued).toBe(true);
+    }
   });
 });
 
@@ -1899,7 +2016,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
   });
 
-  it('a queued player who walks into an instance is evicted with the leave notice', () => {
+  it('a queued player who walks into an instance keeps the spot, silently', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     tp(sim, a, 0, -40);
@@ -1910,8 +2027,10 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     const dungeonInstance = instanceOrigin(0, 0);
     tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     const evs = sim.tick();
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
-    expect(evs.some((e) => e.type === 'bgUnqueued' && e.pid === a)).toBe(true);
+    expect(sim.bgInfoFor(a)!.queued).toBe(true);
+    // Nothing happened, so nothing is announced: the un-queue notice is now
+    // reserved for the one cause that is still a real eviction (an arena match).
+    expect(evs.some((e) => e.type === 'bgUnqueued' && e.pid === a)).toBe(false);
   });
 
   it('a live participant cannot enter a delve mid-match', () => {
