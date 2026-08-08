@@ -83,9 +83,11 @@ jobs:
       # equal to package.json by tests/desktop_download.test.ts), so there is
       # no second constant to drift. Fail fast on a mismatched tag before the
       # long builds. Tag pushes do not run the vitest pin, so the greps below
-      # keep the derive mechanism itself honest at publish time: they assert
-      # the module still reads the define and the build still bakes it, not
-      # any version value.
+      # keep the derive mechanism itself honest at publish time: each anchors
+      # on the load-bearing expression (the assignment reading the define, and
+      # the define entry itself), never any version value, so a mention in a
+      # comment or a type-only declare cannot satisfy it. The exact patterns
+      # are extracted and executed both ways by tests/desktop_publish_guard.test.ts.
       - name: Verify version lockstep
         run: |
           VERSION="$(node -p "require('./package.json').version")"
@@ -94,11 +96,11 @@ jobs:
             echo "Tag ${GITHUB_REF_NAME} does not match package.json version v${VERSION}." >&2
             exit 1
           fi
-          if ! grep -q "__APP_VERSION__" src/game/desktop_download.ts; then
+          if ! grep -qF "DESKTOP_VERSION = typeof __APP_VERSION__" src/game/desktop_download.ts; then
             echo "src/game/desktop_download.ts no longer derives its version from the __APP_VERSION__ define; the download page would go stale. See docs/desktop-release.md." >&2
             exit 1
           fi
-          if ! grep -q "__APP_VERSION__" vite.config.ts; then
+          if ! grep -qF "__APP_VERSION__: JSON.stringify(appVersion)" vite.config.ts; then
             echo "vite.config.ts no longer defines __APP_VERSION__; the download-page version would not be baked at build time. See docs/desktop-release.md." >&2
             exit 1
           fi
