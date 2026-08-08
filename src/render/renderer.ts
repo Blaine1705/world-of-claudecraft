@@ -11166,7 +11166,18 @@ export class Renderer {
     // governor (effectivePointLights) only changes how many SHINE, not the count.
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
+    // Ancestry-aware: a chosen light under a group the world hid (zone
+    // streaming, far-LOD wraps, compile gates) is not drawn, so it must not
+    // hold a counted slot; the returned drawn count drives the pads below.
+    const drawnCount = applyPointLightBudget(
+      ranked,
+      px,
+      pz,
+      visibleCount,
+      liveBudget,
+      LIGHT_BUDGET_RANGE_SQ,
+      this.scene,
+    );
     if (flicker) {
       flickerContributingFireLights(
         ranked,
@@ -11178,8 +11189,9 @@ export class Renderer {
     }
     // Fill unused slots of the visible count with pad lights so the total
     // visible point-light count stays pinned at visibleCount even when fewer
-    // real lights than the budget exist (boot, sparse custom maps, interiors).
-    const padCount = pointLightPadCount(ranked.length, visibleCount);
+    // real lights than the budget exist (boot, sparse custom maps, interiors)
+    // or when chosen lights sit under hidden ancestors (drawnCount < chosen).
+    const padCount = pointLightPadCount(drawnCount, visibleCount);
     for (let i = 0; i < this.lightPads.length; i++) this.lightPads[i].visible = i < padCount;
   }
 

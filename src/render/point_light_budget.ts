@@ -10,6 +10,8 @@ export interface RankedPointLight {
   dynamic: boolean;
   /** Stable index in the renderer's fire-light registry, absent for view lights. */
   fireIndex?: number;
+  /** Working flag: drawn-eligibility computed by applyPointLightBudget. */
+  eligible?: boolean;
 }
 
 export interface ReconciledViewPointLights {
@@ -51,7 +53,28 @@ export function reconcileViewPointLights(
   return { lights: next, changed: true };
 }
 
-/** Apply a fixed-count nearest-light budget without reallocating rank entries. */
+/**
+ * Three's render counts a point light into numPointLights iff the light AND
+ * its whole ancestor chain are visible. The budget owns light.visible, but the
+ * world owns the ancestors (zone streaming, far-LOD wraps, compile gates), so
+ * a chosen light under a hidden group would keep its counted slot while the
+ * render dropped it, and the drawn count (part of every lit material's program
+ * cache key) would drift. A light is drawn-eligible only if walking its
+ * parents reaches `sceneRoot` through visible nodes.
+ */
+function isDrawnEligible(light: THREE.PointLight, sceneRoot: THREE.Object3D): boolean {
+  let node = light.parent;
+  while (node !== null) {
+    if (node === sceneRoot) return node.visible;
+    if (node.visible === false) return false;
+    node = node.parent;
+  }
+  return false;
+}
+
+/** Apply a fixed-count nearest-light budget without reallocating rank entries.
+ *  Returns the number of counted, drawn-eligible lights so the caller can pad
+ *  the render-visible total up to `visibleCount`. */
 export function applyPointLightBudget(
   ranked: RankedPointLight[],
   px: number,
@@ -59,22 +82,31 @@ export function applyPointLightBudget(
   visibleCount: number,
   liveBudget: number,
   rangeSq: number,
-): void {
+  sceneRoot?: THREE.Object3D,
+): number {
+  let ineligible = 0;
   for (const entry of ranked) {
     if (entry.dynamic) entry.light.getWorldPosition(entry.worldPos);
     const dx = entry.worldPos.x - px;
     const dz = entry.worldPos.z - pz;
     entry.d2 = dx * dx + dz * dz;
+    entry.eligible = sceneRoot === undefined || isDrawnEligible(entry.light, sceneRoot);
+    if (!entry.eligible) ineligible++;
   }
   // Sort whenever the live budget (which can sit below visibleCount under the
   // frame-budget governor or on constrained-memory tiers) actually truncates
-  // the ranked list: comparing against visibleCount alone let array order,
-  // not distance, decide which lights shine whenever liveBudget < ranked.length
-  // <= visibleCount.
-  if (ranked.length > liveBudget) ranked.sort((a, b) => a.d2 - b.d2);
+  // the ranked list, and whenever an ineligible light exists (it must not hold
+  // a counted slot, so eligible entries sort ahead of it). Comparing against
+  // visibleCount alone let array order, not distance, decide which lights
+  // shine whenever liveBudget < ranked.length <= visibleCount.
+  if (ranked.length > liveBudget || ineligible > 0) {
+    ranked.sort((a, b) => Number(!a.eligible) - Number(!b.eligible) || a.d2 - b.d2);
+  }
+  let drawn = 0;
   for (let index = 0; index < ranked.length; index++) {
     const entry = ranked[index];
-    const counted = index < visibleCount;
+    const counted = entry.eligible !== false && index < visibleCount;
+    if (counted) drawn++;
     entry.light.visible = counted;
     const shine = counted && index < liveBudget && entry.d2 < rangeSq;
     if (entry.dynamic) {
@@ -85,6 +117,7 @@ export function applyPointLightBudget(
       entry.light.intensity = 0;
     }
   }
+  return drawn;
 }
 
 /** Flicker only fire lights that the completed budget says can contribute. */
@@ -99,7 +132,7 @@ export function flickerContributingFireLights(
   for (let index = 0; index < contributingCount; index++) {
     const entry = ranked[index];
     const fireIndex = entry.fireIndex;
-    if (fireIndex === undefined || entry.d2 >= rangeSq) continue;
+    if (fireIndex === undefined || entry.d2 >= rangeSq || entry.eligible === false) continue;
     const base = (entry.light.userData.baseIntensity as number | undefined) ?? 11;
     entry.light.intensity = base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
   }
