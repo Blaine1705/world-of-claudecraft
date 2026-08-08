@@ -15,22 +15,17 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import {
-  battlegroundOrigin,
-  bgOriginAt,
   INSTANCE_X_BASE,
   isArenaPos,
-  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
   zoneAt,
 } from './data';
 import { delveModuleZOffset } from './delves/runs';
-import { PLAYER_BODY_RADIUS } from './pathfind';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { bgCarryingFlag, CARRIED_FLAG_AURA_ID } from './social/battleground';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
@@ -53,7 +48,6 @@ export { UNSTUCK_COOLDOWN_ID } from './unstuck_cooldown';
 const POSITION_EPS = 1e-4;
 const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
-const STUCK_COLLISION_EPS = 1e-3;
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -124,23 +118,6 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
-  const bgMatch = ctx.bgMatches.get(pid);
-  if (bgMatch && isBgPos(pos.x)) {
-    const slot = bgOriginAt(pos.z).slot;
-    if (slot !== bgMatch.slot) return null;
-    return located(
-      {
-        kind: 'battleground',
-        id: 'thornhollow_fields',
-        instanceId: String(bgMatch.id),
-        slot: bgMatch.slot,
-      },
-      pos,
-      battlegroundOrigin(bgMatch.slot),
-    );
-  }
-  if (isBgPos(pos.x)) return null;
-
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
@@ -193,19 +170,12 @@ function forcedMovement(p: Entity): boolean {
 }
 
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
-  if (ctx.bgMatches.has(pid)) return false;
   return (
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
     isValeCupPlayer(ctx, pid) ||
     isArenaPos(p.pos.x)
   );
-}
-
-function liveBattlegroundStuckInWallGeometry(ctx: SimContext, p: Entity): boolean {
-  if (p.dead || p.ghost || !ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
-  const resolved = ctx.resolveMovePoint(p.pos.x, p.pos.z, PLAYER_BODY_RADIUS, p);
-  return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > STUCK_COLLISION_EPS;
 }
 
 /**
@@ -239,13 +209,6 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
-  if (
-    !p.dead &&
-    !p.ghost &&
-    ctx.bgMatches.has(p.id) &&
-    !liveBattlegroundStuckInWallGeometry(ctx, p)
-  )
-    return 'competitive';
   if (hasMoveInput(meta)) return 'moving';
   return null;
 }
@@ -377,7 +340,6 @@ function completeUnstuck(
   // Both outcomes land on the same graveyard and charge the same Unstuck Sickness; they
   // differ only in whether a revive is needed on arrival. A living player is never killed.
   const wasDead = p.dead || p.ghost;
-  if (!wasDead && bgCarryingFlag(ctx, p.id)) ctx.bgCancelFlagAura(p, CARRIED_FLAG_AURA_ID);
   if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
   else moveToGraveyardForUnstuck(ctx, p.id);
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
