@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CHROME_ART_IDS, chromeIconUrl, hasChromeIconArt } from '../src/ui/chrome_icon_art';
 import { hasUiIcon, hydrateIcons, svgIcon, type UiIconName } from '../src/ui/ui_icons';
+import { webpHasAlpha, webpSize } from './helpers/webp_header';
 
 // Gate for the painted HUD-chrome launcher art (sibling of tests/deed_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/chrome/<name>.webp is the source of truth
@@ -53,43 +54,9 @@ function isValidWebp(file: string): boolean {
   }
 }
 
-function webpHeader(file: string): { tag: string; buf: Buffer } {
-  const fd = openSync(file, 'r');
-  try {
-    const buf = Buffer.alloc(32);
-    readSync(fd, buf, 0, 32, 0);
-    return { tag: buf.toString('ascii', 12, 16), buf };
-  } finally {
-    closeSync(fd);
-  }
-}
-
-// Dimensions, read directly from each WebP encoding mode.
-function webpSize(file: string): { width: number; height: number } {
-  const { tag, buf } = webpHeader(file);
-  if (tag === 'VP8 ')
-    return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
-  if (tag === 'VP8L') {
-    const bits = buf.readUInt32LE(21);
-    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
-  }
-  if (tag === 'VP8X')
-    return {
-      width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
-      height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
-    };
-  throw new Error(`unknown webp chunk "${tag}" in ${file}`);
-}
-
-// Alpha presence: an extended (VP8X) file declares it in bit 4 of its feature byte, and a
-// lossless (VP8L) file in bit 4 of the byte after its size bits. A plain lossy VP8 chunk has
-// no alpha channel at all, so it fails here by construction.
-function webpHasAlpha(file: string): boolean {
-  const { tag, buf } = webpHeader(file);
-  if (tag === 'VP8X') return (buf.readUInt8(20) & 0x10) !== 0;
-  if (tag === 'VP8L') return (buf.readUInt32LE(24) & 0x08) !== 0;
-  return false;
-}
+// webpHeader / webpSize / webpHasAlpha moved to tests/helpers/webp_header.ts
+// (shared with reliquary_cell_art's opacity-premise sweep; the move also
+// fixed this file's VP8L alpha read, which masked a height bit).
 
 const committedIds = (): string[] =>
   existsSync(chromeDir)

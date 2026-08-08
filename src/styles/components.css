@@ -8629,24 +8629,35 @@
     filter: brightness(0.18) contrast(1.1);
     opacity: 0.9;
   }
-  /* Opaque-art carve-out: Armory store thumbnails AND display-category
-     fallback crests paint their own background, so the item silhouette
-     treatment above reads as a near-black tile instead of a shape. Grayscale
-     plus a gentler darken keeps the art's silhouette visible while still
-     reading locked. The window stamps data-cell-art="opaque" from the
-     resolver's own family answer (reliquaryCellArtOpaque), so this rule never
-     grows a second kind literal when a new opaque family appears. */
+  /* Opaque-art carve-out: Armory store thumbnails AND procedural crests
+     (category fallbacks, bespoke crests whose art trails) paint their own
+     bright background, so the item silhouette treatment above reads as a
+     near-black tile instead of a shape. Grayscale plus a gentler darken
+     keeps the art's silhouette visible while still reading locked. The
+     window stamps data-cell-art="opaque" from the resolver's own family
+     answer (reliquaryCellArtOpaque), so this rule never grows a second kind
+     literal when a new opaque family appears. */
   .reliquary-cell--missing[data-cell-art="opaque"] .item-icon {
     filter: grayscale(1) brightness(0.45) contrast(1.05);
   }
-  /* Forced-colors mode does not remap img content but the filters above still
-     apply, turning a locked relic into an unreadable dark blob. Owned versus
-     missing already rides the cell border, the cell opacity, and the aria
-     label, so let the art itself read. */
+  /* Forced-colors mode does not remap img content but the filters above
+     still apply, turning a locked relic into an unreadable dark blob, so
+     both filter rules drop (the second selector is load-bearing: the
+     carve-out is one specificity rung above the plain missing rule, and a
+     media query adds none). Forced colors also strips the owned cell's
+     box-shadow ring, which normally separates the two states alongside the
+     darkened art, so the missing state gains a dashed border as a
+     color-independent cue; the aria label carries the state for readers
+     either way. Same @layer as the rules it overrides; a later layer could
+     outrank this, which is why the declaration pin in
+     tests/reliquary_window.test.ts is content-bound. */
   @media (forced-colors: active) {
     .reliquary-cell--missing .item-icon,
     .reliquary-cell--missing[data-cell-art="opaque"] .item-icon {
       filter: none;
+    }
+    .reliquary-cell--missing {
+      border-style: dashed;
     }
   }
   .reliquary-empty {

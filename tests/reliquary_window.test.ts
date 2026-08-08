@@ -1088,16 +1088,20 @@ describe('styles and architecture registration', () => {
     expect(reliquaryCss).toMatch(
       /\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: grayscale\(1\)/,
     );
-    // Forced-colors arm: the silhouette filters drop (information rides the
-    // cell border, opacity, and aria label), so a locked relic stays legible.
-    // Content-bound through the OPAQUE selector and the filter reset: a bare
-    // media-query existence check would stay green with an emptied block, and
-    // the second selector is load-bearing (the opaque rule is one specificity
-    // rung above the plain missing rule, so without an equal-specificity
-    // reset inside the media block the opaque cells would keep grayscale in
-    // forced-colors mode).
+    // Forced-colors arm: the silhouette filters drop and the missing state
+    // gains a dashed border (box-shadow is stripped in forced colors, so the
+    // owned ring cannot carry the distinction there). Content-bound through
+    // the OPAQUE selector, the filter reset, and the dashed cue: a bare
+    // media-query existence check would stay green with an emptied block,
+    // and the second selector is load-bearing (the opaque rule is one
+    // specificity rung above the plain missing rule, so without an
+    // equal-specificity reset inside the media block the opaque cells would
+    // keep grayscale in forced-colors mode).
     expect(reliquaryCss).toMatch(
       /@media \(forced-colors: active\) \{[^@]*?\.reliquary-cell--missing\[data-cell-art="opaque"\] \.item-icon \{\s*filter: none;/,
+    );
+    expect(reliquaryCss).toMatch(
+      /@media \(forced-colors: active\) \{[^@]*?\.reliquary-cell--missing \{\s*border-style: dashed;/,
     );
     // Phase 6 seal chrome (cosmetic ranks).
     expect(reliquaryCss).toContain('.reliquary-rank-seal');

@@ -39,7 +39,9 @@ import {
   iconDataUrl,
   isUnknownIconRecipe,
   itemIconRecipe,
+  itemImageUrl,
   needsIconDataUrlWarm,
+  weaponIconUrl,
 } from '../src/ui/icons';
 import {
   RELIQUARY_SPECIMEN_GLYPH_ID,
@@ -50,6 +52,7 @@ import {
 } from '../src/ui/reliquary_cell_art';
 import { ReliquaryWindow, type ReliquaryWindowDeps } from '../src/ui/reliquary_window';
 import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
+import { webpHasAlpha } from './helpers/webp_header';
 
 const REPO_ROOT = join(__dirname, '..');
 
@@ -345,13 +348,16 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_prog_veteran' })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'item', itemId: 'reins_valorsteed' })).toBe(false);
-    // Prefix BOUNDARIES: a sibling directory or a deed id that merely starts
-    // with 'cat' must not ride the carve-out (the trailing slash and the
-    // trailing underscore are load-bearing).
+    // Prefix BOUNDARY on the url arm: a sibling directory must not ride the
+    // carve-out (the trailing slash is load-bearing).
     expect(reliquaryCellArtOpaque({ kind: 'url', url: '/ui/store/armory-promo/x.webp' })).toBe(
       false,
     );
-    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_category_thing' })).toBe(false);
+    // The crest arm keys on PAINTED-ART MEMBERSHIP, not the deed_cat_ prefix:
+    // any crest the compositor must paint procedurally (a category fallback,
+    // a bespoke crest whose commissioned art has not landed, an unknown id)
+    // is an opaque tile by construction.
+    expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_category_thing' })).toBe(true);
   });
 
   it('agrees with the resolver on real catalog slots (both directions)', () => {
@@ -368,6 +374,49 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(painted !== null && reliquaryCellArtOpaque(painted)).toBe(false);
     const mount = reliquaryCellArt({ kind: 'mount', id: 'valorsteed' });
     expect(mount !== null && reliquaryCellArtOpaque(mount)).toBe(false);
+  });
+
+  it('agrees with deedImageUrl on EVERY catalogued crest (both premise halves)', () => {
+    // The crest arm's whole contract in one derived sweep: opaque exactly
+    // when no committed painted file backs the crest, which covers the
+    // category fallbacks AND a future bespoke crest whose art trails its
+    // deed (deedCrestId answers deed_<id> for those, so a prefix test would
+    // wrongly leave them on the silhouette filter).
+    let crests = 0;
+    for (const slot of CATALOG_SLOTS) {
+      const art = reliquaryCellArt(slot);
+      if (art === null || art.kind !== 'crest') continue;
+      crests += 1;
+      expect(reliquaryCellArtOpaque(art), art.crestId).toBe(deedImageUrl(art.crestId) === null);
+    }
+    expect(crests, 'anti-vacuity: the titles shelf really contributed crests').toBeGreaterThan(30);
+  });
+
+  it('every catalogued item relic resolves to a COMMITTED dark-card pipeline', () => {
+    // The item arm of reliquaryCellArtOpaque answers false uncondition-
+    // ally, resting on this premise: every item the catalog can show ships
+    // either a /ui/items webp (non-weapons, alpha-less but dark-card) or a
+    // /ui/weapons rendered-model jpg (weapons via ITEM_WEAPON_VARIANTS,
+    // measured dark: mean luma ~25/255), both of which stay legible under
+    // the silhouette darken. A catalogued item that falls through to the
+    // procedural compositor instead would paint an opaque radial tile, so
+    // the FIRST such relic reds here and must extend the predicate rather
+    // than land silently on the wrong filter.
+    const procedural: string[] = [];
+    let items = 0;
+    for (const slot of CATALOG_SLOTS) {
+      const art = reliquaryCellArt(slot);
+      if (art === null || art.kind !== 'item') continue;
+      items += 1;
+      if (itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null) {
+        procedural.push(art.itemId);
+      }
+    }
+    expect(items, 'anti-vacuity: the item shelves really contributed').toBeGreaterThan(100);
+    expect(
+      procedural,
+      `catalogued item relics with only procedural art (extend reliquaryCellArtOpaque):\n${procedural.join('\n')}`,
+    ).toEqual([]);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {
@@ -419,16 +468,8 @@ describe('shipped art files', () => {
     // or an Armory card gaining one, must consciously re-pin here AND
     // revisit the predicate instead of silently landing on the wrong filter.
     const hasAlpha = (file: string): boolean => {
-      const buf = readFileSync(file);
-      expect(buf.toString('ascii', 0, 4), file).toBe('RIFF');
-      const tag = buf.toString('ascii', 12, 16);
-      if (tag === 'VP8X') return (buf.readUInt8(20) & 0x10) !== 0;
-      // VP8L: byte 20 is the 0x2f signature; alpha_is_used is bit 28 of the
-      // 32-bit word at offset 21 (after 14 width bits and 14 height bits).
-      // Verified against real VP8L-with-alpha files (public/ui/procs). No
-      // swept file is VP8L today, but a re-encode must not read as no-alpha.
-      if (tag === 'VP8L') return ((buf.readUInt32LE(21) >>> 28) & 1) !== 0;
-      return false;
+      expect(readFileSync(file).toString('ascii', 0, 4), file).toBe('RIFF');
+      return webpHasAlpha(file);
     };
     const staticCrestUrl = (crestId: string): string | null => {
       const url = deedImageUrl(crestId);
@@ -647,14 +688,22 @@ describe('ReliquaryWindow cell markup', () => {
     expect(img.matches(liveSelector)).toBe(true);
     // The one attribute reaches BOTH opaque families: a category-fallback
     // title crest matches the same live selector, a painted crest and a mount
-    // reins cell stay on the silhouette treatment.
+    // reins cell stay on the silhouette treatment. The negative arms assert
+    // the missing STATE and the attribute's absence separately, so a rig
+    // that ever seeds ownership cannot make them pass vacuously.
     openPage(rig, 'horizons', 'horizons_titles');
     const pendingTitle = RELIQUARY_HORIZON_TITLES.find((id) => deedImageUrl(`deed_${id}`) === null);
     expect(pendingTitle, 'premise: a category-crest title still exists').toBeDefined();
     expect(cellArt(rig, pendingTitle as string).matches(liveSelector)).toBe(true);
-    expect(cellArt(rig, 'prog_veteran').matches(liveSelector)).toBe(false);
+    const paintedImg = cellArt(rig, 'prog_veteran');
+    expect(paintedImg.closest('.reliquary-cell--missing')).not.toBeNull();
+    expect(paintedImg.closest('.reliquary-cell')?.hasAttribute('data-cell-art')).toBe(false);
+    expect(paintedImg.matches(liveSelector)).toBe(false);
     openPage(rig, 'horizons', 'horizons_mounts');
-    expect(cellArt(rig, 'valorsteed').matches(liveSelector)).toBe(false);
+    const mountImg = cellArt(rig, 'valorsteed');
+    expect(mountImg.closest('.reliquary-cell--missing')).not.toBeNull();
+    expect(mountImg.closest('.reliquary-cell')?.hasAttribute('data-cell-art')).toBe(false);
+    expect(mountImg.matches(liveSelector)).toBe(false);
   });
 
   it('shares the resolver with the Overview recent strip', () => {

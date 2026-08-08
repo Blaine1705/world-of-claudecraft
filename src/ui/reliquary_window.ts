@@ -1292,15 +1292,14 @@ export class ReliquaryWindow {
     const name = this.cellDisplayName(cell);
     const stateClass = cell.owned ? 'owned' : 'missing';
     const quality = this.cellQuality(cell);
-    const icon = this.cellIconHtml(cell, quality);
     // The missing-state carve-out keys on the ART's opacity, not on a kind
-    // literal: Armory cards and category-fallback crests both paint their own
+    // literal: Armory cards and procedural crests both paint their own
     // background, and the resolver is the one place that knows which family a
-    // cell landed on (reliquaryCellArtOpaque). Descriptor resolution is a few
-    // map reads, so re-asking here stays free next to the compositing the
-    // icon path already memoizes.
+    // cell landed on (reliquaryCellArtOpaque). Resolved once here and handed
+    // to cellIconHtml, so the descriptor is never computed twice per cell.
     const art = reliquaryCellArt(cell);
     const opaqueArt = art !== null && reliquaryCellArtOpaque(art);
+    const icon = this.cellIconHtml(cell, quality, art);
     // Resolved ONCE per cell per rebuild: the aria label and the count stamp
     // both read it, and the search path rebuilds the grid per keystroke.
     // Owned cells never show hunting directions, so they skip the resolution.
@@ -1366,9 +1365,15 @@ export class ReliquaryWindow {
    *
    * One implementation for the grid and the strip, so a relic cannot render as
    * art in one place and as a silhouette in the other.
+   *
+   * The grid passes the descriptor it already resolved for the opacity stamp;
+   * the recent strip omits it and resolves here.
    */
-  private cellIconHtml(cell: ReliquaryArtSlot, quality: string): string {
-    const art = reliquaryCellArt(cell);
+  private cellIconHtml(
+    cell: ReliquaryArtSlot,
+    quality: string,
+    art: ReturnType<typeof reliquaryCellArt> = reliquaryCellArt(cell),
+  ): string {
     if (art !== null) {
       if (art.kind === 'item') {
         // Straight through the shared itemIcon painter, so a relic cell and the

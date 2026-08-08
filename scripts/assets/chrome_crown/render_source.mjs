@@ -1,8 +1,11 @@
 // Renders the layered-SVG crown source (crown.svg, authored in-repo to the
 // chrome icon art direction) onto the flat magenta key the chrome converter
-// expects, then runs `npm run assets:chrome` itself so the intermediate
-// crown.png never survives in public/ (which deploys verbatim): the converter
-// keys, trims, centers, encodes the shipping 128px WebP, and unlinks the PNG.
+// expects, then invokes the converter script (the same one `npm run
+// assets:chrome` wraps) so the intermediate crown.png does not linger in
+// public/ (which deploys verbatim): the converter keys, trims, centers,
+// encodes the shipping 128px WebP, and unlinks the PNG. If the converter
+// fails, the stray PNG is caught by the WebP-only arm of
+// tests/chrome_icons.test.ts rather than shipping.
 //
 // Run by hand from the repo root:
 //   node scripts/assets/chrome_crown/render_source.mjs

@@ -101,16 +101,38 @@ export function deedJumpCategory(
   return deedDisplayCategory(def.category);
 }
 
+/** The crest-id prefix every deed crest carries (`deed_<deedId>` painted,
+ *  `deed_cat_<category>` fallback). One spelling for deedCrestId and the
+ *  painted-art membership below. */
+const DEED_CREST_ID_PREFIX = 'deed_';
+
 /** Prefix of the display-category FALLBACK crests (procedural recipes
  *  composited over an opaque radial in icons.ts, unlike the alpha-matted
- *  painted `deed_<id>` art). Exported so consumers reasoning about opacity
- *  (the reliquary's missing-state carve-out) share the one spelling. */
+ *  painted `deed_<id>` art). */
 export const DEED_CATEGORY_CREST_PREFIX = 'deed_cat_';
 
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
-    ? `deed_${id}`
+    ? `${DEED_CREST_ID_PREFIX}${id}`
     : `${DEED_CATEGORY_CREST_PREFIX}${deedDisplayCategory(category)}`;
+}
+
+/**
+ * True when this crest id resolves to committed painted art (an alpha-matted
+ * WebP under public/ui/deeds), false for every crest the icon system must
+ * COMPOSITE procedurally: the deed_cat_* category fallbacks AND a bespoke
+ * crest whose commissioned art has not landed yet (deedCrestId still answers
+ * `deed_<id>` for those, so a prefix test cannot tell the two apart). The
+ * procedural compositor fills its whole tile with an opaque radial, which is
+ * what the reliquary's missing-state carve-out keys on (reliquaryCellArtOpaque).
+ * Mirrors icons.ts deedImageUrl's membership without importing the canvas
+ * module into a pure core.
+ */
+export function deedCrestHasPaintedArt(crestId: string): boolean {
+  return (
+    crestId.startsWith(DEED_CREST_ID_PREFIX) &&
+    DEED_IMAGE_IDS.has(crestId.slice(DEED_CREST_ID_PREFIX.length))
+  );
 }
 
 export interface DeedProgress {
