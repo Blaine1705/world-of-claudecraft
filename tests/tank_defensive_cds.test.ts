@@ -8,9 +8,15 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function make(cls: string) {
-  const sim = new Sim({ seed: 5, playerClass: cls as any, autoEquip: true });
+  const sim = new Sim({
+    seed: 5,
+    playerClass: cls as any,
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const pid = sim.playerId;
   const p = sim.entities.get(pid) as Entity & Record<string, unknown>;
@@ -62,7 +68,7 @@ function advanceArena(sim: Sim, pid: number): ArenaMatch {
 }
 
 function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const classes: PlayerClass[] =
     format === '1v1'
       ? ['paladin', 'warrior']
@@ -70,6 +76,7 @@ function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
         ? ['paladin', 'mage', 'rogue', 'priest']
         : ['paladin', 'mage', 'rogue', 'priest', 'hunter', 'druid'];
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `P${i}`));
+  for (const pid of pids) sim.setPlayerLevel(20, pid);
   for (const pid of pids) sim.arenaQueueJoin(pid, format);
   sim.tick();
   const match = advanceArena(sim, pids[0]);
@@ -310,7 +317,7 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
       let sourcePid: number;
       let match: ArenaMatch | null = null;
       if (mode === 'duel') {
-        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
         victimPid = sim.addPlayer('paladin', 'Paladin');
         sourcePid = sim.addPlayer('warrior', 'Warrior');
         const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };

@@ -1927,7 +1927,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
 
   it('the honor DR window round-trips through CharacterState and clears on UTC rollover', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -1940,7 +1940,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     // the full price again (the reset arm in pvp/honor.ts dailyWindow)
     const honorAfterDayOne = sim.meta(winner)!.honor;
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
-    sim.utcDay = '2026-07-27';
+    sim.resetDay = '2026-07-27';
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
     const rematch = sim.bgMatchFor(winner)!;
@@ -2346,9 +2346,9 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(1.5);
   });
 
-  it('pays exactly once per UTC day, under its own honor reason', () => {
+  it('pays exactly once per reset day, under its own honor reason', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2370,7 +2370,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a SECOND win the same day pays the base award only', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2397,7 +2397,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('the UTC rollover re-arms it, and the claim survives a save/load round trip', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2408,12 +2408,12 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     const state = sim.serializeCharacter(winner)!;
     expect(state.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
     const sim2 = makeWorld();
-    sim2.utcDay = '2026-07-26';
+    sim2.resetDay = '2026-07-26';
     const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
     expect(sim2.meta(reloaded)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
     expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady, 'still spent after a relog').toBe(false);
     // ...and the NEXT day re-arms it without any award having run.
-    sim2.utcDay = '2026-07-27';
+    sim2.resetDay = '2026-07-27';
     expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady).toBe(true);
 
     // A clean character writes NOTHING (byte-stable saves): absent until claimed.
@@ -2422,7 +2422,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     expect(sim3.serializeCharacter(clean)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
 
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
-    sim.utcDay = '2026-07-27';
+    sim.resetDay = '2026-07-27';
     expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'a new day re-arms the chip').toBe(true);
     const before = sim.meta(winner)!.honor;
     startBgMatch(sim.ctx, [...match.teams[0]], [...match.teams[1]]);
@@ -2437,9 +2437,37 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     );
   });
 
+  it('re-arms on the RESET window, and never on the UTC calendar date alone', () => {
+    // The reported bug: the banner read "First win of the day" at 6 PM Pacific to
+    // a player who had already won that afternoon, because midnight UTC had
+    // passed at 5 PM and rolled the window mid-evening. The two clocks are now
+    // separate fields, so moving the calendar date must do nothing at all.
+    const { sim, pids } = tenInQueue();
+    sim.resetDay = '2026-08-07';
+    sim.utcDay = '2026-08-07';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    playedOutWin(sim, match, winner);
+    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'claimed by the win').toBe(false);
+
+    // 6 PM Pacific: the UTC calendar has ticked over to the 8th, the realm's own
+    // reset (3 AM Eastern) has not.
+    sim.utcDay = '2026-08-08';
+    expect(
+      sim.bgInfoFor(winner)!.firstWinBonusReady,
+      'a UTC rollover must not re-arm the day',
+    ).toBe(false);
+    expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+
+    // The realm's reset is what re-arms it.
+    sim.resetDay = '2026-08-08';
+    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'the realm reset re-arms it').toBe(true);
+  });
+
   it('an UNRATED dev match never claims it', () => {
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pids: number[] = [];
     for (let i = 0; i < 4; i++) {
       const p = sim.addPlayer('warrior', `D${i}`);
@@ -2463,7 +2491,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a FORFEIT win never claims it (forfeits pay no honor at all)', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2477,7 +2505,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a DRAW never claims it', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const pid = match.teams[0][0];
@@ -2490,7 +2518,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('the bgEnd event carries the bonus so the finish surface can name it', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2508,12 +2536,12 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     // stored date reads as re-armed, and the stored date is left for the next
     // real award to roll over.
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
     playedOutWin(sim, match, winner);
-    sim.utcDay = '2026-07-27';
+    sim.resetDay = '2026-07-27';
     expect(sim.bgInfoFor(winner)!.firstWinBonusReady).toBe(true);
     expect(sim.meta(winner)!.honorArenaDaily!.date, 'the read wrote nothing').toBe('2026-07-26');
     expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
@@ -2834,7 +2862,7 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // The bgEnd event needs the BONUS on its own (the finish surface names it),
     // and the caller needs the total to stay honest about what was credited.
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pid = sim.addPlayer('warrior', 'Champ');
     const meta = sim.meta(pid)!;
 
@@ -2860,7 +2888,7 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // grantHonor credits zero once a purse is at the honor ceiling; spending the
     // day's one bonus for zero honor is the wrong way to lose that race.
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pid = sim.addPlayer('warrior', 'Capped');
     const meta = sim.meta(pid)!;
     meta.honor = Number.MAX_SAFE_INTEGER;
