@@ -388,9 +388,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'bags_window.ts',
-    memos: ['lastSortSignature'],
+    memos: ['lastSortBaseline'],
     reason:
-      'lastSortSignature gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, keyed on the INVENTORY signature changing because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
+      'lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
   },
   {
     file: 'deed_tracker_painter.ts',
@@ -600,10 +600,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-      // 7 as of the bags Sort button: bags_window's `lastSortSignature` gates
-      // only whether the one-shot settle ANIMATION plays (which draws no
-      // text); fillGrid rebuilds every cell unconditionally and the existing
-      // bags fan-out arm repaints the window wholesale on a locale switch.
+      // 7 as of the bags Sort button: bags_window's `lastSortBaseline`
+      // gates only whether the one-shot settle ANIMATION plays (which draws
+      // no text); fillGrid rebuilds every cell unconditionally and the
+      // existing bags fan-out arm repaints the window wholesale on a locale
+      // switch.
     ).toBe(7);
   });
 

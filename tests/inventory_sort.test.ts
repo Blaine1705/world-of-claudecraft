@@ -91,6 +91,7 @@ const ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'poor',
   },
+  flat_ale: { id: 'flat_ale', name: 'Flat Ale', kind: 'drink', quality: 'poor' },
 } as unknown as Record<string, ItemDef>;
 
 const lookup = (id: string): ItemDef | undefined => ITEMS[id];
@@ -150,11 +151,13 @@ describe('compareBagStacks: the clean-up ladder', () => {
   });
 
   it('hoists poor quality of ANY kind into the trash band after quest items', () => {
-    expect(sortedIds([slot('broken_sword'), slot('keystone'), slot('blade')])).toEqual([
-      'blade',
-      'keystone',
-      'broken_sword',
-    ]);
+    // Multiple kinds (weapon, drink; junk rides the neighboring cases): the
+    // hoist reads quality BEFORE kind, so every one lands in the tail band.
+    // Within the band, mainhand is paperdoll rank 0 like the slotless ale, so
+    // the family NAME decides: Broken Sword before Flat Ale.
+    expect(
+      sortedIds([slot('flat_ale'), slot('broken_sword'), slot('keystone'), slot('blade')]),
+    ).toEqual(['blade', 'keystone', 'broken_sword', 'flat_ale']);
   });
 
   it('orders armor by paperdoll slot, helmet before chest before feet before rings', () => {
@@ -283,6 +286,15 @@ describe('consolidateBagStacks', () => {
     const inv = [slot('copper_ore', -3), slot('copper_ore', 10)];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([slot('copper_ore', -3), slot('copper_ore', 10)]);
+  });
+
+  it('treats a non-integer count as corrupt on both sides (never donates, never absorbs)', () => {
+    // JSON can persist a fractional count even though no sim path mints one;
+    // the guard is Number.isInteger, so a 2.5 is inert exactly like a -3 and
+    // the honest stacks around it still merge.
+    const inv = [slot('copper_ore', 2.5), slot('copper_ore', 10), slot('copper_ore', 4)];
+    consolidateBagStacks(inv, lookup, cap);
+    expect(inv).toEqual([slot('copper_ore', 2.5), slot('copper_ore', 14)]);
   });
 
   it('never merges an instanced target into a later plain donor (the other direction)', () => {

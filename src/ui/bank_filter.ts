@@ -9,12 +9,10 @@
 // injected resolver (the bank searches the displayed name, unlike bags which
 // matches the raw English item.name today; that divergence is intentional).
 //
-// Bare-named, so it escapes the architecture.test.ts *_view / *_core on-disk
-// sweep and needs no UI_PURE_CORES registration (verified against the sweep's
-// /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness cross-check,
-// which only lists REGISTERED bare cores). bag_filter.ts, once in the same
-// boat, IS registered now: phase 19 gave it a runtime sim import
-// (material_taxonomy), so its purity is scanned.
+// Registered in UI_PURE_CORES + BARE_NAMED (tests/architecture.test.ts): the
+// clean-up-ladder tiebreak gave this module its first runtime sim import
+// (compareBagStacks, below), so its purity is scanned, exactly the road
+// bag_filter.ts took when phase 19 gave it material_taxonomy.
 
 import { compareBagStacks } from '../sim/inventory_sort';
 import {

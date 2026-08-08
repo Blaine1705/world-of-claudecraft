@@ -30,6 +30,7 @@
 // in the same cells on every host.
 
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
+import type { Quality } from './loot_master';
 import { baseMaterialFor } from './professions/material_grades';
 import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef, type ItemKind } from './types';
 
@@ -78,8 +79,11 @@ const UNRANKED_KIND_RANK = 13; // a known def whose kind escaped KIND_RANK (unre
 const MISSING_DEF_RANK = 14; // a def the lookup cannot resolve (defensive; the sim's table is complete)
 
 // Lower rank sorts first, so the grid reads legendary down to poor. Mirrors
-// the UI's bag_filter.ts ranks (extended with the same unknown fallback).
-const QUALITY_RANK: Record<string, number> = {
+// the UI's bag_filter.ts ranks. Record<Quality, number> for the same reason
+// KIND_RANK is total above: a new quality tier fails to compile until it is
+// ranked here, instead of silently landing mid-ladder. (This is the DISPLAY
+// ladder, descending; loot_master.ts owns the ascending threshold ladder.)
+const QUALITY_RANK: Record<Quality, number> = {
   legendary: 0,
   epic: 1,
   rare: 2,
@@ -89,7 +93,7 @@ const QUALITY_RANK: Record<string, number> = {
 };
 
 function qualityRankOf(def: ItemDef): number {
-  return QUALITY_RANK[def.quality ?? 'common'] ?? QUALITY_RANK.common;
+  return QUALITY_RANK[def.quality ?? 'common'];
 }
 
 function categoryRankOf(def: ItemDef | undefined): number {
@@ -122,7 +126,11 @@ function familyKeyOf(itemId: string, def: ItemDef, lookup: ItemDefLookup): [stri
 
 // Deterministic code-unit string order. Deliberately NOT localeCompare: the
 // comparator runs inside the sim on both hosts, and localeCompare's answer
-// depends on the host's collation tables. Item names are English ASCII.
+// depends on the host's collation tables. Item names are English ASCII, and
+// the grid order keys on the ENGLISH content name for every locale on
+// purpose: a per-locale order would break cross-host determinism (the server
+// has no locale), so do not "fix" this into localeCompare or a localized
+// name lookup.
 function compareStrings(a: string, b: string): number {
   if (a < b) return -1;
   if (a > b) return 1;
@@ -172,11 +180,12 @@ export function consolidateBagStacks(
 ): void {
   for (let i = 0; i < inventory.length; i++) {
     const target = inventory[i];
-    // A corrupt non-positive persisted count is INERT on both sides of a
-    // merge: as a target it would absorb honest units into its deficit
-    // (10 poured into a -3 leaves 7, three real items gone), and as a donor
-    // (guarded below) a negative take would shrink the survivor.
-    if (target.count <= 0) continue;
+    // A corrupt persisted count (non-positive, fractional, or non-finite) is
+    // INERT on both sides of a merge: as a target it would absorb honest
+    // units into its deficit (10 poured into a -3 leaves 7, three real items
+    // gone) or poison the survivor (NaN propagates through +=), and as a
+    // donor (guarded below) a bad take would shrink or poison the survivor.
+    if (!Number.isInteger(target.count) || target.count <= 0) continue;
     if (!isMergeableInstancePayload(target.instance)) continue;
     const cap = stackCap(lookup(target.itemId));
     for (let j = i + 1; j < inventory.length && target.count < cap; j++) {
@@ -184,8 +193,10 @@ export function consolidateBagStacks(
       if (
         donor.itemId !== target.itemId ||
         donor.craftedRecipeId !== target.craftedRecipeId ||
-        // A corrupt non-positive persisted count must never DONATE (a negative
-        // take would shrink the survivor while vanishing the donor at zero).
+        // A corrupt count (non-positive, fractional, or non-finite) must never
+        // DONATE (a negative take would shrink the survivor while vanishing
+        // the donor at zero; NaN would poison it).
+        !Number.isInteger(donor.count) ||
         donor.count <= 0 ||
         !canStackInstancePayloads(target.instance, donor.instance)
       )
@@ -208,8 +219,8 @@ export function consolidateBagStacks(
  *  first cell past the sorted block. Idempotent: a second call merges
  *  nothing and stamps identical hints. A legacy over-capacity save keeps its
  *  tolerated overflow: the first `capacity` sorted ranks fill the grid and
- *  layoutBagCells appends the rest past it (total and lossless, the tail is
- *  simply not a grid position). */
+ *  layoutBagCells appends the rest past it in ARRAY order (total and
+ *  lossless; the tail is not a grid position and is not itself sorted). */
 export function sortInventoryStacks(
   inventory: InvSlot[],
   lookup: ItemDefLookup,

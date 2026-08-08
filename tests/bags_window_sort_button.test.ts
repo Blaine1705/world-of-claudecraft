@@ -6,6 +6,8 @@
 // one-shot settle ripple that plays only once the painted grid CONTENT
 // changes (online the press repaints the still-unsorted mirror first; the
 // tidied grid lands with the heavy self snapshot).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -13,11 +15,14 @@ import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
 // Each test gets FRESH stack objects (the ripple test stamps slot hints onto
-// whatever it is handed) and a clean woc_bag_filter (BagsWindow reads it at
-// construction), so no case depends on a predecessor's writes.
+// whatever it is handed), a clean woc_bag_filter (BagsWindow reads it at
+// construction), and an empty document.body (harness roots would otherwise
+// accumulate and turn any future document-scoped query into cross-test
+// contamination), so no case depends on a predecessor's writes.
 beforeEach(() => {
   localStorage.clear();
   vi.restoreAllMocks();
+  document.body.innerHTML = '';
 });
 
 function harness(inventory: InvSlot[]): {
@@ -25,8 +30,10 @@ function harness(inventory: InvSlot[]): {
   window: BagsWindow;
   world: { inventory: InvSlot[] };
   sortCalls: number[];
+  tooltips: Map<Element, () => string>;
 } {
   const sortCalls: number[] = [];
+  const tooltips = new Map<Element, () => string>();
   const world = {
     inventory,
     bags: [null, null, null, null],
@@ -43,7 +50,9 @@ function harness(inventory: InvSlot[]): {
     itemIcon: () => '<span class="item-icon"></span>',
     moneyHtml: () => '',
     itemTooltip: () => '',
-    attachTooltip: noop,
+    attachTooltip: (el: HTMLElement, html: () => string) => {
+      tooltips.set(el, html);
+    },
     root: () => root,
     world: () => world,
     wocBalanceHtml: () => '',
@@ -88,7 +97,7 @@ function harness(inventory: InvSlot[]): {
   };
   const window = new BagsWindow(deps);
   window.render();
-  return { root, window, world, sortCalls };
+  return { root, window, world, sortCalls, tooltips };
 }
 
 const inv = (): InvSlot[] => [
@@ -171,6 +180,10 @@ describe('bags sort button', () => {
   });
 
   it('fires the ripple when only cell hints move (a restamp with no merge)', () => {
+    // Pinned clock: the armed arm must not depend on how long the test runner
+    // takes between the click and the render (gate contention can exceed the
+    // 3s backstop on the real wall clock).
+    vi.spyOn(performance, 'now').mockImplementation(() => 1000);
     const { root, window, world } = harness(inv());
     clickSort(root);
     expect(root.querySelector('.bag-grid-settle')).toBeNull();
@@ -180,6 +193,7 @@ describe('bags sort button', () => {
   });
 
   it('plays the settle ripple only once the painted content changes', () => {
+    vi.spyOn(performance, 'now').mockImplementation(() => 1000);
     const { root, window, world } = harness(inv());
     // The press itself repaints an UNCHANGED grid (the online mirror has not
     // heard back yet): no ripple.
@@ -215,7 +229,31 @@ describe('bags sort button', () => {
     expect(root.querySelector('.bag-grid-settle')).toBeNull();
   });
 
+  it('never fires the ripple without a press: ordinary loot repaints stay still', () => {
+    // A small pinned clock is what makes this decisive: with the armed-at-0
+    // guard deleted, `now - 0` must read as INSIDE the settle window (a warm
+    // process's large performance.now would mask the mutant by expiring it).
+    vi.spyOn(performance, 'now').mockImplementation(() => 1000);
+    const { root, window, world } = harness(inv());
+    world.inventory.push({ itemId: 'baked_bread', count: 1 });
+    window.render();
+    expect(root.querySelector('.bag-grid-settle')).toBeNull();
+  });
+
+  it('renders the tooltip hint through t(), never the raw key', () => {
+    const { root, tooltips } = harness(inv());
+    const btn = root.querySelector('button.bag-sort-btn');
+    expect(btn).not.toBeNull();
+    const html = tooltips.get(btn as Element);
+    expect(html).toBeDefined();
+    const body = html ? html() : '';
+    expect(body).toContain('tt-sub');
+    expect(body).not.toContain('hudChrome.bags.sortButtonHint');
+    expect(body.replace(/<[^>]*>/g, '').trim()).not.toBe('');
+  });
+
   it('caps the stagger index so a full bag settles inside half a second', () => {
+    vi.spyOn(performance, 'now').mockImplementation(() => 1000);
     const many: InvSlot[] = Array.from({ length: 26 }, () => ({
       itemId: 'baked_bread',
       count: 1,
@@ -232,5 +270,35 @@ describe('bags sort button', () => {
       (grid.children[i] as HTMLElement).style.getPropertyValue('--settle-i');
     expect(styleAt(19)).toBe('19');
     expect(styleAt(25)).toBe('20'); // clamped at SORT_SETTLE_STAGGER_CAP
+  });
+});
+
+// Source pins over the CSS half of the settle contract (the TS side above can
+// only see the --settle-i indices). Each regex is a CONTIGUOUS block match,
+// never a lazy span that could satisfy itself across a neighboring rule (the
+// reduced-motion media block holds exactly the one settle rule, so the pin
+// closes the block it opened).
+describe('settle ripple CSS contract (components.css)', () => {
+  // join(__dirname, ...) rather than an import.meta URL: the DOM environment
+  // rewrites import.meta.url to an http scheme (the instance-marker suite's
+  // documented workaround).
+  const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+
+  it('pins the 160ms duration and the 14ms per-cell stagger, both motion-scaled', () => {
+    // The half-second claim in the stagger-cap test above is 160 + 20 * 14 =
+    // 440ms; these literals are its CSS half, so a delay bump cannot silently
+    // outgrow the budget while every test stays green.
+    expect(css).toMatch(
+      /\.bag-grid-settle\s*>\s*\*\s*\{\s*animation:\s*bag-sort-settle\s+calc\(160ms\s*\*\s*var\(--motion-scale,\s*1\)\)\s+ease-out\s+backwards;\s*animation-delay:\s*calc\(var\(--settle-i,\s*0\)\s*\*\s*14ms\s*\*\s*var\(--motion-scale,\s*1\)\);\s*\}/,
+    );
+  });
+
+  it('pins BOTH reduced-motion off switches (media query and body class)', () => {
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.bag-grid-settle\s*>\s*\*\s*\{\s*animation:\s*none;\s*\}\s*\}/,
+    );
+    expect(css).toMatch(
+      /body\.reduce-motion\s+\.bag-grid-settle\s*>\s*\*\s*\{\s*animation:\s*none;\s*\}/,
+    );
   });
 });

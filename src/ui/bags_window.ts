@@ -295,20 +295,25 @@ export class BagsWindow {
 
   // One-shot sort settle animation. Armed by the sort button; the NEXT grid
   // paint whose INVENTORY signature (bagSortSignature: id, count, cell hint)
-  // actually differs plays the CSS settle ripple and disarms. Keyed on the
-  // inventory rather than the painted grid because the press both resets an
-  // active filter (a shape switch that is not a sort effect) and, online,
-  // repaints the still-unsorted mirror first: the tidied inventory only lands
-  // with the heavy self snapshot. A timestamp backstop (SORT_SETTLE_MS) keeps
-  // a no-op sort (already tidy) from arming forever. `lastSortSignature`
-  // tracks what the last paint saw, whatever caused it.
+  // differs from the PRESS-TIME baseline plays the CSS settle ripple and
+  // disarms. Keyed on the inventory rather than the painted grid because the
+  // press both resets an active filter (a shape switch that is not a sort
+  // effect) and, online, repaints the still-unsorted mirror first: the tidied
+  // inventory only lands with the heavy self snapshot. Comparing against the
+  // baseline (not the previous paint) keeps intermediate paints, or a close
+  // and reopen inside the window, from shifting what "changed" means. A
+  // timestamp backstop (SORT_SETTLE_MS) keeps a no-op sort (already tidy)
+  // from arming forever.
   private sortSettleArmedAt = 0;
-  private lastSortSignature = '';
+  private lastSortBaseline = '';
 
   constructor(private readonly deps: BagsWindowDeps) {}
 
   private armSortSettle(): void {
     this.sortSettleArmedAt = performance.now();
+    // Captured BEFORE the sort command runs (offline the sim mutates
+    // synchronously on the same call stack as the click handler).
+    this.lastSortBaseline = bagSortSignature(this.deps.world().inventory);
   }
 
   /**
@@ -701,16 +706,16 @@ export class BagsWindow {
 
   // Whether an armed sort settle should play on THIS paint: only while the
   // arming is fresh (the backstop clears a no-op sort) and only once the
-  // inventory itself actually changed (online, the tidied inventory arrives
-  // with the heavy self snapshot, not the press's own repaint; the press's
-  // filter reset alone must never fire it).
+  // inventory actually differs from its press-time state (online, the tidied
+  // inventory arrives with the heavy self snapshot, not the press's own
+  // repaint; the press's filter reset alone must never fire it).
   private consumeSortSettle(signature: string): boolean {
     if (this.sortSettleArmedAt === 0) return false;
     if (performance.now() - this.sortSettleArmedAt >= SORT_SETTLE_MS) {
       this.sortSettleArmedAt = 0;
       return false;
     }
-    if (signature === this.lastSortSignature) return false;
+    if (signature === this.lastSortBaseline) return false;
     this.sortSettleArmedAt = 0;
     return true;
   }
@@ -743,9 +748,7 @@ export class BagsWindow {
     // Settle bookkeeping rides every paint: the class never persists across a
     // repaint (each replay would re-run the animation on the fresh nodes).
     grid.classList.remove('bag-grid-settle');
-    const signature = bagSortSignature(world.inventory);
-    const settle = this.consumeSortSettle(signature);
-    this.lastSortSignature = signature;
+    const settle = this.consumeSortSettle(bagSortSignature(world.inventory));
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
