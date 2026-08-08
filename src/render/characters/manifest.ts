@@ -1992,12 +1992,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // the Hollow's wandering bosses: two more rigs no other zone uses
   mob_crab: {
     url: `${CREATURES}/crabenemy.glb`,
-    animUrls: [`${CREATURES}/crabenemy_hit_variety_anims.glb`],
     height: 1.7,
     clips: CRAB_ENEMY_BITE,
     // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/crab_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [
+      `${CREATURES}/crabenemy_hit_variety_anims.glb`,
+      `${CREATURES}/crab_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.35,
   },
