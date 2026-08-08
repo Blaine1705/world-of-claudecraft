@@ -550,7 +550,11 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
         (m.kind === 'player' && owner.inCombat));
     const aggressive =
       pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
-    if (!engagingUs && !ownerOffense && !aggressive) return;
+    // A close stealthed hostile player is itself an assist signal: petCanSeeTarget
+    // already applied the tight stealth boundary, so this does not widen detection.
+    const closeStealthedHostilePlayer =
+      m.kind === 'player' && m.auras.some((a) => a.kind === 'stealth');
+    if (!engagingUs && !ownerOffense && !aggressive && !closeStealthedHostilePlayer) return;
     const d = dist2d(pet.pos, m.pos);
     if (d < bestD) {
       best = m;

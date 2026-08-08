@@ -643,6 +643,30 @@ describe('pet stealth detection sits in the mob band, not triple it', () => {
     return { sim, owner, enemy, pet, enemyPid: b };
   }
 
+  function stealthedDuelOpponentWithoutOwnerOffense(): {
+    sim: Sim;
+    owner: Entity;
+    enemy: Entity;
+    pet: Entity;
+    enemyPid: number;
+  } {
+    const { sim, a, b } = startedDuelHunter();
+    const owner = expectDefined(sim.entities.get(a));
+    const enemy = expectDefined(sim.entities.get(b));
+    const pet = adopt(sim, a);
+    sim.setPlayerLevel(20, a);
+    sim.setPlayerLevel(20, b);
+    pet.petMode = 'defensive';
+    enemy.auras.push(stealthAura());
+    isolate(sim, [a, b, pet.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    owner.targetId = null;
+    owner.autoAttack = false;
+    owner.inCombat = false;
+    return { sim, owner, enemy, pet, enemyPid: b };
+  }
+
   it('spans the change: the fixture distance lies strictly between the two radii', () => {
     // The band bounds below are DERIVED from the same two constants the production code
     // reads, so on their own they would move with any edit to either. Pin both to their
@@ -667,6 +691,30 @@ describe('pet stealth detection sits in the mob band, not triple it', () => {
     place(enemy, newRadius - 0.5, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+  });
+
+  it('a defensive pet detects a close stealthed hostile player in an active duel', () => {
+    const { sim, enemy, pet, owner, enemyPid } = stealthedDuelOpponentWithoutOwnerOffense();
+    place(enemy, 2.3, 0);
+    syncGrid(sim);
+
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+
+    updatePet(sim.ctx, pet);
+    expect(pet.aggroTargetId).toBe(enemyPid);
+    expect(pet.inCombat).toBe(true);
+  });
+
+  it('a defensive pet still ignores a far stealthed hostile player in an active duel', () => {
+    const { sim, enemy, pet, owner } = stealthedDuelOpponentWithoutOwnerOffense();
+    place(enemy, 5.7, 0);
+    syncGrid(sim);
+
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+
+    updatePet(sim.ctx, pet);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
   });
 
   it('unstealthed, the same player at that distance is acquired normally', () => {
