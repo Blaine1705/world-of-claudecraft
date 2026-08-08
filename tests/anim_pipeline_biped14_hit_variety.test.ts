@@ -85,7 +85,12 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, `${key} animUrls`).toContain(file);
     }
     // Exactly 6 consumers touched: a stray extra or missing wiring changes this count.
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Scoped to this family's own donor basenames so an unrelated family
+    // landing its own *_hit_variety_anims.glb donor elsewhere does not
+    // break this count.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/(yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
+    ].length;
     expect(occurrences).toBe(6);
   });
 });

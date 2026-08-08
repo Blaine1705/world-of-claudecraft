@@ -67,7 +67,11 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Scoped to this family's own donor basenames: other Wildheart/etc.
+    // families ship their own unrelated *_hit_variety_anims.glb donors from
+    // other issues, and an unscoped count would break on every unrelated
+    // landing.
+    const occurrences = [...MANIFEST_SRC.matchAll(/(goblin|giant)_hit_variety_anims\.glb/g)].length;
     expect(occurrences).toBe(2);
   });
 });

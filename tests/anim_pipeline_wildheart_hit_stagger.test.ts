@@ -62,11 +62,11 @@ describe('TRIPO_BIPED_FULL_RIG hit-reaction stagger (issue #2889 round 2)', () =
   });
 
   it('wires a matching animUrls entry onto every TRIPO_BIPED_FULL_RIG consumer', () => {
-    // mob_wildheart_stalker was split onto its own WILDHEART_STALKER const
-    // (scripts/build_wildheart_stalker_anims.mjs, issue #2889 round 2) for its
-    // own Wildheart_Stalker_Attack clip; WILDHEART_STALKER spreads
-    // TRIPO_BIPED_FULL_RIG (including the shared Hit_Stagger hit array), so it
-    // still counts as a consumer, just under its own clips constant.
+    // mob_wildheart_stalker and mob_wildheart_hexcaller were each split onto
+    // their own clips const (WILDHEART_STALKER / WILDHEART_HEXCALLER) for
+    // their own attack clip; both spread TRIPO_BIPED_FULL_RIG (including the
+    // shared Hit_Stagger hit array), so they still count as consumers, just
+    // under their own clips constant.
     const consumers: [string, string, string][] = [
       [
         'mob_wildheart_stalker',
@@ -81,7 +81,7 @@ describe('TRIPO_BIPED_FULL_RIG hit-reaction stagger (issue #2889 round 2)', () =
       [
         'mob_wildheart_hexcaller',
         'wildheart_hexcaller_hit_variety_anims.glb',
-        'clips: TRIPO_BIPED_FULL_RIG',
+        'clips: WILDHEART_HEXCALLER',
       ],
       [
         'mob_wildheart_beastmaster',

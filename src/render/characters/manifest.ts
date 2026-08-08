@@ -1796,13 +1796,15 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_wildheart_hexcaller: {
     url: `${CREATURES}/wildheart_hexcaller.glb`,
-    animUrls: [`${CREATURES}/wildheart_hexcaller_hit_variety_anims.glb`],
+    // Wildheart_Hexcaller_Attack clip donor (scripts/build_wildheart_hexcaller_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [
+      `${CREATURES}/wildheart_hexcaller_hit_variety_anims.glb`,
+      `${CREATURES}/wildheart_hexcaller_ability_anims.glb`,
+    ],
     height: 2.5,
     yaw: -Math.PI / 2,
     clips: WILDHEART_HEXCALLER,
-    // Wildheart_Hexcaller_Attack clip donor (scripts/build_wildheart_hexcaller_anims.mjs):
-    // mesh-free, baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/wildheart_hexcaller_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
