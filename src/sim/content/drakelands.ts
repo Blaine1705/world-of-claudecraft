@@ -697,7 +697,9 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     weapon: { min: 21, max: 34, speed: 1.8, dagger: true },
-    stats: { agi: 13, sta: 6 },
+    // ilvl-26 mainhand budget (18): the stamina point over budget came off the
+    // DPS-neutral stat, keeping the agility identity.
+    stats: { agi: 13, sta: 5 },
     sellValue: 9000,
     requiredClass: ['rogue', 'hunter'],
     requiredLevel: 20,

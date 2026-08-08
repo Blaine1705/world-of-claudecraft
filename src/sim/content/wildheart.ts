@@ -14,7 +14,9 @@ export const WILDHEART_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     weapon: { min: 20, max: 31, speed: 1.7, dagger: true },
-    stats: { agi: 12, sta: 7 },
+    // ilvl-26 mainhand budget (18): the stamina point over budget came off the
+    // DPS-neutral stat, keeping the agility identity.
+    stats: { agi: 12, sta: 6 },
     sellValue: 9000,
     requiredClass: ['rogue', 'hunter'],
     requiredLevel: 20,

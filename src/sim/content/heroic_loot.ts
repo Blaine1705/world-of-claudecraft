@@ -41,8 +41,8 @@ export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 // archetype; healer-facing pieces never take Hit (heals are not resisted by level).
 // The ilvl 33/37 raid variants scale these up + add a secondary rating (see
 // heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
-const ARMOR_RATING = 40; // 40 rating = 4.0%
-const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
+export const ARMOR_RATING = 40; // 40 rating = 4.0%
+export const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
 const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
 const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
 

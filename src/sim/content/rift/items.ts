@@ -77,7 +77,13 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     weapon: { min: 19, max: 31, speed: 1.6, dagger: true },
-    stats: { agi: 12, sta: 7 },
+    // ilvl-31 mainhand budget (22), on the same ~12:7 agi:sta identity the
+    // dungeon daggers carry.
+    stats: { agi: 14, sta: 8 },
+    // The clear-time allowance (one rating per ilvl-31 piece, see the constants
+    // above): an agility dagger takes crit per the agi-to-crit pattern the
+    // rating ladder pins, at the same 40-rating floor the armor pieces mirror.
+    critRating: RIFT_ARMOR_RATING,
     sellValue: 9000,
     requiredClass: ['rogue', 'hunter'],
     requiredLevel: 20,
