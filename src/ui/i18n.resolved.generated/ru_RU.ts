@@ -1619,7 +1619,10 @@ export const ru_RU: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Билд {n}"
+      "defaultBuildName": "Билд {n}",
+      "newBuildWithGear": "Новая сборка (сохранить и снаряжение)",
+      "gearRestored": "Восстановлено предметов снаряжения: {n}.",
+      "gearMissing": "Не найдено сохранённых предметов снаряжения: {n}."
     },
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."

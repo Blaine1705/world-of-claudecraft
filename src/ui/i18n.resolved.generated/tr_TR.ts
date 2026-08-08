@@ -1619,7 +1619,10 @@ export const tr_TR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Yapı {n}"
+      "defaultBuildName": "Yapı {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
     },
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."

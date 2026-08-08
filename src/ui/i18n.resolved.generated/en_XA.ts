@@ -1619,7 +1619,10 @@ export const en_XA: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "[Ɓúíļð {n}]"
+      "defaultBuildName": "[Ɓúíļð {n}]",
+      "newBuildWithGear": "[Ñéŵ Ɓúíļð (šáʋé ĝéáŕ ţóó)]",
+      "gearRestored": "[Ŕéšţóŕéð {n} ĝéáŕ þíéçéš ƒŕóɱ ţĥíš ƀúíļð.]",
+      "gearMissing": "[{n} šáʋéð ĝéáŕ þíéçéš áŕé ɱíššíñĝ áñð ŵéŕé ñóţ éɋúíþþéð.]"
     },
     "tips": {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"

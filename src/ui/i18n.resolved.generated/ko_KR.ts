@@ -1619,7 +1619,10 @@ export const ko_KR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "빌드 {n}"
+      "defaultBuildName": "빌드 {n}",
+      "newBuildWithGear": "새 빌드 (장비도 저장)",
+      "gearRestored": "이 빌드에서 장비 {n}개를 복원했습니다.",
+      "gearMissing": "저장된 장비 {n}개를 찾을 수 없어 착용하지 못했습니다."
     },
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."

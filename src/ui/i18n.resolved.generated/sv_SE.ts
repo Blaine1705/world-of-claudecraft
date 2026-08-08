@@ -1619,7 +1619,10 @@ export const sv_SE: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Bygge {n}"
+      "defaultBuildName": "Bygge {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
     },
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."

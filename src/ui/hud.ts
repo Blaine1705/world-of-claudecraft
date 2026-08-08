@@ -4383,7 +4383,8 @@ export class Hud {
     applyTalents: (allocation) => this.sim.applyTalents(allocation),
     respec: () => this.sim.respec(),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
-    saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
+    saveLoadout: (name, bar, alloc, captureGear) =>
+      this.sim.saveLoadout(name, bar, alloc, captureGear),
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
     applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
@@ -11721,6 +11722,23 @@ export class Hud {
               );
             audio.disenchant();
           } else this.showError(t(toast.key));
+          break;
+        }
+        case 'loadoutGearResult': {
+          // A loadout with a captured gear set was applied. The sim sends COUNTS
+          // only, so all the copy lives here. Two separate lines rather than one
+          // combined sentence: what came back and what is missing are different
+          // pieces of news, and the missing line is the one a player has to act on.
+          if (ev.equipped > 0) {
+            this.log(
+              t('hudChrome.talents.gearRestored', { n: formatNumber(ev.equipped) }),
+              '#ffd100',
+            );
+          }
+          const missing = ev.notHeld + ev.copyGone + ev.takenByOtherSlot;
+          if (missing > 0) {
+            this.log(t('hudChrome.talents.gearMissing', { n: formatNumber(missing) }), '#ff8a5c');
+          }
           break;
         }
         case 'salvageResult': {

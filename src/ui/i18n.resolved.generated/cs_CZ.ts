@@ -1619,7 +1619,10 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Sestava {n}"
+      "defaultBuildName": "Sestava {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
     },
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."

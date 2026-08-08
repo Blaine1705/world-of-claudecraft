@@ -1231,6 +1231,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.browserSupport.getDesktopApp': 'Получить настольное приложение',
   'hudChrome.landing.browserSupport.continueInBrowser': 'Продолжить в браузере',
   'hudChrome.landing.browserSupport.dismissAria': 'Закрыть уведомление о неподдерживаемом браузере',
+  'hudChrome.talents.newBuildWithGear': 'Новая сборка (сохранить и снаряжение)',
+  'hudChrome.talents.gearRestored': 'Восстановлено предметов снаряжения: {n}.',
+  'hudChrome.talents.gearMissing': 'Не найдено сохранённых предметов снаряжения: {n}.',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',

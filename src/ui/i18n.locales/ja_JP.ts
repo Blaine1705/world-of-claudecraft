@@ -1222,6 +1222,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.browserSupport.getDesktopApp': 'デスクトップアプリを入手',
   'hudChrome.landing.browserSupport.continueInBrowser': 'ブラウザで続ける',
   'hudChrome.landing.browserSupport.dismissAria': 'サポート対象外ブラウザの通知を閉じる',
+  'hudChrome.talents.newBuildWithGear': '新規ビルド（装備も保存）',
+  'hudChrome.talents.gearRestored': 'このビルドから装備{n}点を復元しました。',
+  'hudChrome.talents.gearMissing': '保存された装備{n}点が見つからず、装備できませんでした。',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',

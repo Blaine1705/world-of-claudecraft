@@ -1619,7 +1619,10 @@ export const ja_JP: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "ビルド {n}"
+      "defaultBuildName": "ビルド {n}",
+      "newBuildWithGear": "新規ビルド（装備も保存）",
+      "gearRestored": "このビルドから装備{n}点を復元しました。",
+      "gearMissing": "保存された装備{n}点が見つからず、装備できませんでした。"
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"

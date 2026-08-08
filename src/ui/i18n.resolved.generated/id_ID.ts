@@ -1619,7 +1619,10 @@ export const id_ID: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Rakitan {n}"
+      "defaultBuildName": "Rakitan {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
     },
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."

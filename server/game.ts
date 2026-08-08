@@ -7457,13 +7457,28 @@ export class GameServer {
       }
       case 'saveLoadout': {
         const hasAlloc = Object.hasOwn(msg, 'alloc');
+        // Strict === true, never a truthy coerce: an absent or malformed field must
+        // read as "do not capture", so a crafted frame cannot opt a player in.
+        const captureGear = msg.captureGear === true;
         if (hasAlloc) {
           const alloc = parseTalentAllocation(msg.alloc);
           if (typeof msg.name === 'string' && alloc) {
-            sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+            sim.saveLoadout(
+              msg.name,
+              Array.isArray(msg.bar) ? msg.bar : [],
+              pid,
+              alloc,
+              captureGear,
+            );
           }
         } else if (typeof msg.name === 'string') {
-          sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid);
+          sim.saveLoadout(
+            msg.name,
+            Array.isArray(msg.bar) ? msg.bar : [],
+            pid,
+            undefined,
+            captureGear,
+          );
         }
         break;
       }

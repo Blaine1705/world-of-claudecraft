@@ -1719,6 +1719,12 @@ export const hudChromeStrings = {
   // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The gear-capturing save entry, beside the plain one in the loadout menu.
+    newBuildWithGear: 'New Build (save gear too)',
+    // Applying a loadout that captured gear. Counts come from the text-free
+    // loadoutGearResult event, so the sim carries none of this copy.
+    gearRestored: 'Restored {n} gear pieces from this build.',
+    gearMissing: '{n} saved gear pieces are missing and were not equipped.',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.

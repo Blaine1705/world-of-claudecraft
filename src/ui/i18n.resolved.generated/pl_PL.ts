@@ -1619,7 +1619,10 @@ export const pl_PL: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Zestaw {n}"
+      "defaultBuildName": "Zestaw {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearMissing": "{n} saved gear pieces are missing and were not equipped."
     },
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
