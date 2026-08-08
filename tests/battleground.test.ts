@@ -438,7 +438,8 @@ describe('Thornhollow Fields: the queue survives the wait', () => {
     const dead = sim.entities.get(corpse)!;
     expect(dead.dead, 'the arrangement itself must hold').toBe(true);
 
-    sim.tick(); // the pop
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(corpse);
     expect(match, 'dying while waiting must not cost the seat').toBeTruthy();
     expect(bgAllPids(match!)).toContain(corpse);
@@ -475,7 +476,8 @@ describe('Thornhollow Fields: the queue survives the wait', () => {
     addThreat(mob, diver, 500);
     expect(mob.threat.get(diver)).toBe(500);
 
-    sim.tick(); // the pop
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(diver);
     expect(match, 'a dungeon pull must not cost the seat').toBeTruthy();
     expect(isBgPos(e.pos.x)).toBe(true);
