@@ -4051,8 +4051,15 @@ export class ClientWorld implements IWorld {
       this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
     }
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
+  salvageItem(itemId: string, target?: { slotIndex: number }): void {
+    // `slot` is a BAG INDEX here, matching disenchantItem (and NOT apply_enchant,
+    // whose `slot` names an equip slot). Omitted with no selection, so the
+    // message stays byte-identical to the pre-feature form.
+    if (target === undefined) {
+      this.cmd({ cmd: 'salvage_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'salvage_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // Maker's Bond unbind service (Professions 2.0): command only,
   // never predicted. The server re-validates eligibility/bound-ness/station

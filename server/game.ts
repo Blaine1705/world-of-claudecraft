@@ -6584,7 +6584,13 @@ export class GameServer {
         }
         break;
       case 'salvage_item':
-        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          // Same bag-index parsing as disenchant_item: an unrecognized slot reads
+          // as undefined (the legacy id-only path), never as index 0, and the sim
+          // re-validates it against ITS inventory.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.salvageItem(msg.item, pid, slot);
+        }
         break;
       case 'unbind_item':
         // Maker's Bond unbind service (Professions 2.0): the sim

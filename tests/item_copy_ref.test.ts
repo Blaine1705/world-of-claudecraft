@@ -15,6 +15,7 @@ import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   itemCopyPin,
+  itemCopyStillPinned,
 } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
 
@@ -133,6 +134,43 @@ describe('consumeNewestInventoryUnit: the legacy fallback, unchanged', () => {
       craftedRecipeId: undefined,
     });
     expect(inv).toHaveLength(1);
+  });
+});
+
+describe('itemCopyStillPinned: surviving a bag that shifts mid-cast', () => {
+  it('holds while the pinned copy stays put', () => {
+    const inv = [enchanted('girdle', 'power'), plain('boots')];
+    expect(itemCopyStillPinned(inv, 0, itemCopyPin(inv[0]))).toBe(true);
+  });
+
+  it('fails when a different copy slides into the pinned index', () => {
+    // The mid-cast hazard, and the reason a bare index is not enough: the player
+    // aimed at their enchanted girdle, then a loot re-ordered the bag. Hitting
+    // whatever now occupies index 0 is worse than the old guess, because the
+    // player believes they chose.
+    const inv = [enchanted('girdle', 'power'), plain('boots')];
+    const pin = itemCopyPin(inv[0]);
+    inv[0] = plain('girdle');
+    expect(itemCopyStillPinned(inv, 0, pin)).toBe(false);
+  });
+
+  it('fails when the bag shrank past the pinned index', () => {
+    const inv = [enchanted('girdle', 'power')];
+    const pin = itemCopyPin(inv[0]);
+    inv.pop();
+    expect(itemCopyStillPinned(inv, 0, pin)).toBe(false);
+  });
+
+  it('passes for an id-only action, which pinned nothing', () => {
+    expect(itemCopyStillPinned([plain('girdle')], undefined, '')).toBe(true);
+  });
+
+  it('survives a partial consume of the pinned stack, which changes only count', () => {
+    // A pin that moved on count would false-refuse after any partial consume.
+    const inv = [enchanted('scroll', 'power', 3)];
+    const pin = itemCopyPin(inv[0]);
+    inv[0].count -= 1;
+    expect(itemCopyStillPinned(inv, 0, pin)).toBe(true);
   });
 });
 

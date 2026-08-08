@@ -187,7 +187,8 @@ export class BagItemActionMenu {
         if (action === 'disenchant') {
           if (slotIndex === undefined) world.disenchantItem(itemId);
           else world.disenchantItem(itemId, { slotIndex });
-        } else world.salvageItem(itemId);
+        } else if (slotIndex === undefined) world.salvageItem(itemId);
+        else world.salvageItem(itemId, { slotIndex });
         this.deps.afterAction();
       },
     );

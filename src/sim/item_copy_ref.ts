@@ -147,8 +147,28 @@ export function consumeItemCopy(
   return { kind: 'fellBack', unit: consumeNewestInventoryUnit(inventory, itemId) };
 }
 
-// No pin RE-CHECK helper here yet, deliberately. Enchanting owns the only
-// mid-action re-check in the tree and does it inline against its own cast
-// session; none of the surfaces this PR converts has a cast time. Extracting a
-// second copy of that logic with no caller would be abstraction for a
-// hypothetical, so it lands with the first surface that needs it.
+/**
+ * Re-check a selection pinned at the START of a multi-tick action against the
+ * slot living at that index NOW. False means the bag shifted underneath (a move,
+ * a merge, a loot, a sort) and the action must refuse rather than hit whatever
+ * moved in.
+ *
+ * A bag index is stable only within one tick, so any action with a cast time
+ * needs this: without it, selecting a copy and then looting during the cast
+ * redirects the hit, which is strictly worse than the old guess because the
+ * player believes they aimed. Enchanting performs the same re-check inline
+ * against its own session; salvage is the second caller, which is what earns
+ * this its place here.
+ *
+ * `undefined` slotIndex passes: an id-only action pinned nothing, so there is
+ * nothing to invalidate and it keeps its legacy behavior.
+ */
+export function itemCopyStillPinned(
+  inventory: InvSlot[],
+  slotIndex: number | undefined,
+  pin: string,
+): boolean {
+  if (slotIndex === undefined) return true;
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return false;
+  return itemCopyPin(inventory[slotIndex]) === pin;
+}
