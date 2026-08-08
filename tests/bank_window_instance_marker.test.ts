@@ -169,7 +169,10 @@ describe('bank grid fine-grade mark', () => {
   // on/off decision itself is pinned in bag_fine_mark_view.test.ts; these
   // cases pin the bank painter's composition of it.
   it('a banked fine material wears the rim class and the fine corner seal', () => {
-    const root = windowFor([slot('fine_copper_ore', undefined, 3), slot('copper_ore', undefined, 3)]);
+    const root = windowFor([
+      slot('fine_copper_ore', undefined, 3),
+      slot('copper_ore', undefined, 3),
+    ]);
     const cells = root.querySelectorAll('button.bank-item');
     expect(cells.length).toBe(2);
     expect(cells[0].classList.contains('bag-fine')).toBe(true);

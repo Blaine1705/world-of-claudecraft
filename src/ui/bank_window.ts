@@ -19,6 +19,7 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -30,6 +31,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { filterBankSlots } from './bank_filter';
 import { showQuantityPrompt } from './bank_quantity_prompt';
@@ -45,8 +47,6 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
-import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
-import { bagFineMark } from './bag_fine_mark_view';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
