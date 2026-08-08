@@ -527,7 +527,13 @@ export function equipItem(
   let consumed: InventoryUnit;
   if (slotIndex !== undefined) {
     const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
-    if (!taken) return;
+    // Unreachable in practice: the early gate above refuses an invalid selection
+    // before any mutation. Kept as a belt, and audible so it can never become a
+    // silent no-op if the gate is ever moved.
+    if (!taken) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
     consumed = taken;
   } else {
     consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
@@ -1173,8 +1179,11 @@ export function sellItem(
   // the laundering hole the clamp exists to close.
   let consumedUnits: InventoryUnit[];
   if (sellableCount === 1 && slotIndex !== undefined) {
+    // Match the id BEFORE reading boundTo. Reading the raw slot first meant naming
+    // a slot that holds a different, bound item reported "bound" rather than
+    // "don't have that item", which is a misleading refusal.
     const named = meta.inventory[slotIndex];
-    if (named?.instance?.boundTo !== undefined) {
+    if (named?.itemId === itemId && named.instance?.boundTo !== undefined) {
       ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
       return;
     }

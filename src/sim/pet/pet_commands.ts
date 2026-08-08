@@ -670,7 +670,12 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number, slotIndex
   // A named slot consumes exactly that copy; an id-only call keeps the legacy
   // newest-first walk (ctx.removeItem) untouched.
   if (slotIndex !== undefined) {
-    if (consumeSelectedInventorySlot(r.meta.inventory, itemId, slotIndex) === null) return;
+    if (consumeSelectedInventorySlot(r.meta.inventory, itemId, slotIndex) === null) {
+      // Say why. Every other surface in this family emits the same line; a silent
+      // refusal reads to the player as the button being broken.
+      ctx.error(r.e.id, "You don't have that item.");
+      return;
+    }
     ctx.onInventoryChangedForQuests?.(r.meta);
   } else {
     ctx.removeItem(itemId, 1, r.e.id);
