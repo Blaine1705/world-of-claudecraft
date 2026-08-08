@@ -1,11 +1,13 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 15 QA COMPLETE (2026-08-08), PASS, pushed to PR #2976 at
-d757d7423f (docs commit on top). The v0.36.0 sync inside the QA fixed the
-inherited hunter_ghost pair, so gate_select is fully green (all 8 steps,
-browser step included) for the first time on this branch. Next: Phase 16
-(phase-16-art.md, fresh session). Base is release/v0.36.0 (PR #2976
-retargeted at the 2026-08-07 rollover). Update this line as phases complete.
+Current phase: 16 COMPLETE (2026-08-08), LOCAL ONLY, not pushed (the
+Phase 16 QA session owns the push). The remote tip is 86d9dafe70 (the
+Phase 15 QA push d757d7423f plus its moving-base catch-up merge); local
+work sits on top of the Phase 16 sync merge ecdacc8769
+(origin/release/v0.36.0 tip 4fe38b799d). gate_select fully green at the
+Phase 15 QA close; any new red is Phase 16's. Next: Phase 16 QA (fresh
+session, ultracode). Base is release/v0.36.0 (PR #2976 retargeted at the
+2026-08-07 rollover). Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -461,7 +463,33 @@ retargeted at the 2026-08-07 rollover). Update this line as phases complete.
   (isolated re-run confirmed, release-tip-owned). Follow-ups recorded in
   progress.md, notably the pre-existing compact-tier minimap-badge overlap
   the always-on strip makes visible.
-- Phase 16: (pending)
+- Phase 16: COMPLETE (2026-08-08), full record in progress.md. Sync
+  ecdacc8769 (parity 308/79/229 with the release's sortInventory; command
+  schema 192/205; NOT_A_LANGUAGE_GATE floor 8; audit CLEAN). Launcher:
+  public/ui/chrome/crown.webp joins CHROME_ART_IDS + mapping.json
+  (in-repo layered-SVG source under scripts/assets/chrome_crown/, the one
+  sanctioned 2D exception there; membership pin in chrome_icons; both
+  entries already carried data-icon="crown", zero HTML edits). Cells: new
+  pure resolver src/ui/reliquary_cell_art.ts (triple-registered
+  bare-named core; descriptor union item|url|crest, null = old fallback)
+  routes mounts to reins ItemDefs via mountItemId, skins to
+  armorySkinArt store thumbnails (membership-gated), titles to
+  deedCrestId (total: painted or category crest), marks to the masterwork
+  seal / prof_<craft> / gather_<profession> via the now-exported frozen
+  FIELD_NOTE_PROFESSIONS, and gather_event:perfect_specimen to the
+  authored specimen-flask SVG data URL (RELIQUARY_SPECIMEN_GLYPH_ID
+  marker, apostrophe-free for esc()). The window consumes descriptors
+  through the shared itemIconImgHtml shape (extracted in
+  unknown_item_icon.ts); missing weapon-skin cells carry a grayscale
+  carve-out (opaque card art) pinned declaration-level. The acceptance
+  sweep forbids the ghost for ALL 245 catalog relics
+  (tests/reliquary_cell_art.test.ts, 25 tests, 3 mutation proofs).
+  Reviews: architecture PASS, frontend-seam PASS, every finding applied
+  or recorded (512px thumbnail weight and the single-stub rig note are
+  the two recorded calls). NO resolver extraction for
+  reliquaryRelicPageId/PageIndex (2 call sites each, rule of three not
+  met). Brief corrections recorded: 9 mounts not 12; no ghost marker
+  class exists.
 - Phase 17: (pending)
 - Phase 18: (pending)
 - Phase 19: (pending)

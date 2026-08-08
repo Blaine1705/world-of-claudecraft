@@ -1145,3 +1145,115 @@ owns the push.
   nothing implemented against them: mounts-place + heroic difficulty
   (decide together), quest class-gate (wyrmcult_grand_robe), native-shell
   sourceStore, clears-0 provenance (due before Phase 17).
+
+## Phase 16 (2026-08-08): Art: painted launcher icon + owned cell art
+
+- Sync (ecdacc8769): merged origin/release/v0.36.0 (tip 4fe38b799d, 31
+  commits: the bag sort PR 3128, the v0.35.1 back-merge, the nanoid pin,
+  the tickPerf i18n fill). Conflicts resolved: parity pins 308/79/229
+  (sortInventory joins pure release at 301, the reliquary facet stays +7),
+  command schema 192/205 (inv_sort send + dispatch), the
+  NOT_A_LANGUAGE_GATE floor to 8 (both sides added a row: the reliquary
+  tracker lastChip and the bags lastSortBaseline), pending.ts regenerated
+  via i18n:build. The release-merge-audit (fresh agent) returned CLEAN:
+  both-sides files merged with both intents intact, no legacy arms, the
+  new inv_sort/set_helm commands corpus-covered, no injection-seam or
+  db-mock drift, and the chrome pipeline byte-untouched. Two premise
+  notes: tests/chrome_icons.test.ts gained 'sort' in SECONDARY_CONTROLS
+  and ui_icons.ts gained the 'sort' glyph. i18n:scan refreshed the
+  LOCAL-ONLY status registry (gitignored) after the sync's new keys.
+- Launcher art (dc49aa721b): both entries already carried
+  data-icon="crown", so the whole change is public/ui/chrome/crown.webp
+  plus the CHROME_ART_IDS row, the mapping.json row, and a membership pin
+  in tests/chrome_icons.test.ts (guards A-E all pass; SECONDARY_CONTROLS
+  untouched). No image-generation key is available in this environment
+  (the Gemini key has zero image quota), so the icon is authored in-repo:
+  a layered SVG to the directory's shared art direction (sibling-palette
+  sampled: gold #e8c858 family, bronze, cream, near-black outline,
+  top-left light), rendered onto the magenta key by
+  scripts/assets/chrome_crown/render_source.mjs and encoded by the normal
+  assets:chrome converter. Judged against the committed siblings at 128px
+  and 24px on contact sheets before shipping (DESIGN.md: procedural only
+  at the painted bar). mapping.json's directory-level source line now
+  says "except where an entry names its own source" and the crown row
+  carries its own provenance; CREDITS.md row amended the same way;
+  scripts/assets/CLAUDE.md names chrome_crown/ as the one sanctioned 2D
+  exception in the GLB pipeline directory.
+- Cell art (2412654f3b): new pure resolver src/ui/reliquary_cell_art.ts
+  (UI_PURE_CORES + BARE_NAMED + EXPECTED_BARE_NAMED), descriptor union
+  {item|url|crest} with null = keep the old fallback. Mounts route
+  mountItemId to the reins ItemDef and out through deps.itemIcon (cell ==
+  bag, 9/9 painted 3D head renders); skins route armorySkinArt behind a
+  WEAPON_SKINS membership gate (29/29 store thumbnails); titles route
+  deedCrestId (total: painted crest or display-category crest; the 7
+  crest-pending title deeds render their category crest, never the
+  ghost); marks route the masterwork seal, prof_<craft> art, or
+  gather_<profession> art via the newly exported (and now frozen)
+  FIELD_NOTE_PROFESSIONS; gather_event:perfect_specimen (corpse harvest,
+  no committed art BY DESIGN) gets the authored specimen-flask SVG data
+  URL (percent-encoded, apostrophe-free so it survives esc(), marker id
+  woc-specimen-glyph). The window is a thin consumer emitting the shared
+  itemIconImgHtml shape (extracted from unknownItemIconHtml) so the
+  .item-icon CSS keeps sizing and silhouetting all art; crestIconSrc
+  carries the never-a-throw swallow. Missing weapon-skin cells get a
+  grayscale(1) brightness(0.45) carve-out (their card art is OPAQUE, the
+  item treatment reads as a black tile); declaration-level pin in
+  tests/reliquary_window.test.ts.
+- Tests: tests/reliquary_cell_art.test.ts (25). The acceptance sweep
+  drives all 245 catalog relics through the resolver and forbids null
+  (anti-vacuity floor + all-five-kinds arm), per-kind literal pins with
+  content premises asserted first, negative and prototype-key arms per
+  table-backed kind, a file-existence sweep over every emitted URL
+  family, five window-level arms on the real ReliquaryWindow (happy-dom),
+  the recent-chip shared-path arm (mark chip == grid cell byte-identical),
+  and the mount-rarity vs reins-quality agreement pin. Three scratch
+  mutants proved the pins redden (mount arm nulled: 5 red; titles forced
+  per-deed: 3 red; specimen arm deleted: 3 red).
+- Reviews, all fresh agents: architecture-reviewer PASS (0/0/2: both
+  nice-to-haves applied: FIELD_NOTE_PROFESSIONS frozen,
+  SPECIMEN_PROFESSIONS stays-private comment); frontend-seam-reviewer
+  PASS (0 blocking, 5 should-fix, 6 nice-to-have, ALL applied except two
+  recorded calls below): the icons.ts crest-exclusivity comment now names
+  the Reliquary, the stale local slot type replaced by the resolver's
+  exported ReliquaryArtSlot, the window's bare ITEMS index now
+  knownItemDef, the SVG literal carries the no-apostrophe rule, the ui
+  CLAUDE.md bullet header names the module, and the sim comment drops its
+  ui path.
+- Recorded calls (not built, deliberate): (a) the 29 armory thumbnails
+  are 512px painted into 48-56px cells (~380 KB cold for the one shelf,
+  warm after any Armory visit); a 128px derivative set stays an option if
+  the weight ever matters, recorded rather than duplicating 29 assets
+  now. (b) The new test file's window rig drives one Sim-shaped stub
+  only; the facet types pin reliquaryRecent/reliquaryMarks to identical
+  shapes in both hosts and the dual-host source pin lives in
+  tests/reliquary_window.test.ts, so a second stub shape would assert
+  nothing new.
+- Validation: tsc clean throughout; the affected suites
+  (reliquary_cell_art, reliquary_window, reliquary_window_behavior,
+  architecture, chrome_icons, reliquary_content, i18n_status_registry,
+  styles quartet, weapon_skins) 358 green post-fix-round; ci:changed
+  exit 0; agent-side sweeps: 19 reliquary suites + adjacent guards + seam
+  guards all green (1175 tests across the three groups).
+- Screenshots: docs/screenshots/reliquary-phase16/ before/after pairs
+  (desktop mounts, titles, skins, gallery; mobile mounts; the launcher
+  rail and the mobile More tray from the change-aware picker). Ownership
+  seeded through the real dev-command path (/dev mounts; 170 /dev give
+  discoveries firing col_discovery_150 and, at 24 relics, the rank-2
+  bridge deed, so the titles page shows BOTH owned-crest tiers). The
+  capture rig tops up the chat token bucket between gives (burst 8,
+  refill 2/s throttles a scripted give loop; TS privacy is compile-time
+  only).
+- OPEN rulings surfaced at phase start, no call received, nothing
+  implemented against them: mounts-place + heroic difficulty (decide
+  together; would change the mounts page source LINES, not this phase's
+  cell art), quest class-gate (wyrmcult_grand_robe), native-shell
+  sourceStore, clears-0 provenance (due before Phase 17), compact-tier
+  minimap/clock collision over the tracker chip, drift-drain banner raw
+  page id.
+- Phase-brief corrections for the record: Horizons mounts are 9 (not
+  12), non-item Horizons slots are 74 (post-warfare growth), and there
+  is NO unknown-ghost marker class (the ghost is which SRC resolves plus
+  state CSS), so the acceptance pin asserts art descriptors and URLs
+  instead. The per-kind resolver extraction rule was checked and NOT
+  triggered for reliquaryRelicPageId/PageIndex (2 production call sites
+  each, not 3).
