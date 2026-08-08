@@ -6,7 +6,8 @@ may drift; re-verify by symbol name before relying on one.
 
 ## Current phase
 
-Phase 1 not started. See progress.md for the live table.
+Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc); next up is phase 1 QA
+(phase-01-qa.md). See progress.md for the live table and the phase 1 notes.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -122,12 +123,18 @@ Phase 1 not started. See progress.md for the live table.
 
 ## Inventory (append as phases land)
 
-New files created: (none yet)
+New files created: tests/electron_scheme_privileges.test.ts (phase 1)
 New bridge methods / IPC channels: (none yet)
 New settings keys: (none yet)
 New i18n keys: (none yet)
-New tests: (none yet)
-Dependency moves: (none yet)
+New tests: tests/electron_scheme_privileges.test.ts, the app:// scheme privileges pin
+(app-entry-anchored, comment-stripped, per-key explicit-true plus exact key-set
+equality as the deny-list; single-registration count pin). Mutation-verified on all
+four dimensions (phase 1).
+Dependency moves: electron 43.1.1 to 43.3.0 and the electron-builder family
+(electron-builder, app-builder-lib, dmg-builder, electron-builder-squirrel-windows)
+26.15.6 to 26.15.7, via pnpm add -D, devDependencies only; vendor bundles
+(electron-log/main, electron-updater) byte-identical across the bump (phase 1).
 Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path recorded here)
 
 ## Known gotchas for this packet
@@ -144,3 +151,31 @@ Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path record
 - The i18n semantic-regressions suite (full gate only) pins reviewed locale prose:
   rewording an existing English value that has stale Latin locale fills reds it;
   re-point pins or add fresh non-Latin fills in the same change.
+- gate_select's biome leg (`npm run ci:changed`) diffs against biome.json
+  `vcs.defaultBranch` (origin/main), so on this release-based branch it sweeps the
+  whole release-vs-main delta (300+ files) and reds on pre-existing offenders
+  (vite.config.ts noUndeclaredEnvVars, src/render/characters/manifest.ts format),
+  aborting the gate before vitest and the builds. Struck in phase 1. Verify the true
+  delta with `npx @biomejs/biome ci --changed --since=origin/release/v0.36.0
+  --no-errors-on-unmatched`; for a fully green gate run, pin biome.json
+  defaultBranch to origin/release/v0.36.0 in the working tree for the run and revert
+  it after (NEVER commit the pin). Do not fix the offenders: they are deferred
+  whole-repo debt, not this branch's regression.
+- electron/vendor/ is gitignored generated output, so "vendor bundles unchanged"
+  can never be read off `git status`: hash `electron/vendor/*.cjs` before and after
+  and compare (phase 1 recipe).
+- pnpm-lock.yaml is a HASHED INPUT of all 7 asset source fingerprints: ANY lockfile
+  change (phase 1 electron bump, phase 6 three train, a base merge that moved deps)
+  reds 8 asset suites (5 eastbrook files, fenbridge, render_glb_replacement,
+  terrorspark) on seal mismatches. Fix is never to weaken the pins: the
+  size-preserving re-mint runbook (scripts/assets/remint_lockfile_fingerprints.mjs,
+  5-step order in commit 218de2db08). USER DECISION 2026-08-08: defer to ONE
+  re-mint at phase 11 over the final lockfile; until then these 8 suites are the
+  accepted per-phase full-gate exception (everything else must stay green, and the
+  lockfile-triggered vitest full-suite fallback means every per-phase gate WILL run
+  them).
+- tests/profile_mode.test.mjs (in the normal vitest suite) and the browser
+  regressions leg need a browser binary this machine lacks by default: export
+  BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
+  runs; without it profile_mode fails at import (this is the known environmental
+  full-gate failure).
