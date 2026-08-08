@@ -7,7 +7,7 @@
 | 1 | Electron runtime plumbing | done | 2026-08-08 | 2026-08-08 |
 | 1 QA | Verify phase 1 | done | 2026-08-08 | 2026-08-08 |
 | 2 | Shell startup and window polish | done | 2026-08-08 | 2026-08-08 |
-| 2 QA | Verify phase 2 | not started | | |
+| 2 QA | Verify phase 2 | done | 2026-08-08 | 2026-08-08 |
 | 3 | Hybrid-GPU visibility | not started | | |
 | 3 QA | Verify phase 3 | not started | | |
 | 4 | Presentation lifecycle | not started | | |
@@ -213,3 +213,72 @@ Phase 2 (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focu
   ONLY on the 8 accepted asset-seal suites (11 tests, every failure a fingerprint
   mismatch, phase 11 re-mint deferral); typecheck + env/server/bot builds and the
   client bundle proven green via turbo after the vitest abort.
+
+Phase 2 QA (2026-08-08, fix commit 97e5305a14):
+- QA-start base merge 094f6facbc took origin/release/v0.36.0 tip 4d52f151eb (PR 3161
+  client-perf train: 53 files, all render/game/tests plus turbo.json; no electron,
+  package.json, or lockfile paths). Electron+desktop+version suites re-run green
+  post-merge (30 files, 418 tests) and tsc clean before the audit began; every phase 2
+  audit file byte-identical between 3e9a87b8e2 and the merged HEAD.
+- Deterministic Workflow audit: five parallel audit agents (correctness,
+  test-coverage-auditor pin quality, dead-code, fresh privacy-security-review,
+  qa-checklist per the dispatch matrix), every BLOCKING or SHOULD-FIX finding then
+  verified by two independent skeptics (code-behavior lens and premise-evidence lens),
+  then one exclusive 13-mutation probe on the committed tree. 16 agents, zero losses,
+  zero empty reports.
+- Verdict: 0 BLOCKING. The four SHOULD-FIX filings collapsed to ONE confirmed defect
+  cluster: the desktop-publish.yml derive-mechanism greps (the W3 review fix) were
+  satisfiable by the __APP_VERSION__ token surviving in the module's explanatory
+  comment or type-only declare after a hardcode revert, and the lockstep block had no
+  test coverage at all (both skeptics independently reproduced the vacuous grep). A
+  fifth filing (the vitest residual: hardcoding the CURRENT version passes the equality
+  pin today) was refuted by both skeptics as the registered division of labor, sound
+  only while the workflow backstop holds, which the fix below restores.
+- Fix (97e5305a14): both workflow greps anchored on the load-bearing expressions
+  ("DESKTOP_VERSION = typeof __APP_VERSION__" in the module, "__APP_VERSION__:
+  JSON.stringify(appVersion)" in vite.config.ts, grep -qF), and the new
+  tests/desktop_publish_guard.test.ts extracts the exact patterns from the workflow
+  and executes them through real grep in both directions: they must match the live
+  tree and must reject a mechanism-dead revert fixture that keeps the bare token in a
+  comment and a declare. The live-tree arm also makes a module hardcode red on every
+  vitest run, not only at the next version bump.
+- Mutation probe on the committed tree: 12/13 KILLED with rc!=0 plus named failing
+  tests; M12 (hardcode to the current version value) SURVIVED-BY-DESIGN pre-fix
+  exactly as predicted and was re-probed KILLED after 97e5305a14 (the guard test's
+  live-tree arm names the failure). Tree byte-clean after every restore and at the
+  end, verified independently of the probe agent.
+- Correctness re-verification: all five charter premises confirmed against real code.
+  Crash recovery reloads the same webContents and can never strand a hidden window
+  (every crash_guard arm traced, including dialog-quit and app.exit paths); parked
+  login/wallet codes are recovered by the trustedSender-gated pull on all three
+  deep-link arrival paths; activate recreation arms its own captured win, timer,
+  once-listener, and crash guard, and a stale timer no-ops via the captured
+  isDestroyed check; the menu allowlist is exact with macOS truly unchanged; the
+  version chain is build-time only and the no-JS hrefs are consistent on every
+  platform link.
+- NICE-TO-HAVE ledger (recorded, not fixed): deliver helpers send without an
+  isDestroyed guard (pre-existing pattern, almost certainly unreachable); the crash
+  dialog can parent to a still-hidden window for up to 4 s; second-instance reveal
+  fires before any deep-link validation and the login code is shape-unvalidated
+  unlike the wallet path (pre-existing reveal semantics, W1-intended); pin-hardening
+  nits in electron_shell_startup.test.ts (unscoped captured-win pin, arm-blind
+  activate pin, one constant-true darwin assertion, unpinned fallback polarity,
+  hand-rolled slice anchors) and its comment-strip regex fragility;
+  ELECTRON-DESKTOP-AUDIT.md still presents setMenu(null) as current hardening (that
+  doc already carries known-stale claims); bare __APP_VERSION__ reads in src/main.ts
+  and src/game/perf_reporter.ts (release-owned surface, outside this packet). The
+  frontend-seam-reviewer skip was judged correct on substance (constant derivation,
+  no HUD surface) and is recorded here as the reasoned skip the matrix row demands.
+- NEW PHASE 11 ITEMS from this QA: (1) one win32 (or wine/CI) launch-log check that
+  the module-scope pre-ready Menu.setApplicationMenu(null) path boots clean (only
+  linux is smoke-proven today); (2) design the registered I4 dist grep so a
+  dist-based version assertion subsumes both the '0.0.0'-fallback check and
+  download-page staleness.
+- Gate at final HEAD (BROWSER_PATH exported; biome defaultBranch pinned to the
+  release branch for the run and reverted, never committed): i18n + wiki + sfx
+  artifacts, i18n freshness, malware, and biome changed-files all green; the vitest
+  full-suite fallback (43 changed paths) red ONLY on the 8 accepted asset-seal suites
+  (11 tests, phase 11 re-mint deferral); check:types (the base merge's turbo.json
+  renamed typecheck) + env/server/bot builds and the client bundle proven green via
+  turbo after the vitest abort. Post-fix affected set 33 files / 446 tests green with
+  the exit code captured, not piped away.

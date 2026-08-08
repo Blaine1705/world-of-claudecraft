@@ -7,12 +7,17 @@ may drift; re-verify by symbol name before relying on one.
 ## Current phase
 
 Phase 1 done (2026-08-08, commits fff0a2898e + 18da4ef8cc + docs a8544d6b57), phase 1
-QA done (2026-08-08, PASS-WITH-FOLLOWUPS, fixes 042ba0a766 + docs db885d81bb), and
-phase 2 done (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focus
-+ 7ed6a6fac4 version + the docs commit); next up is phase 2 QA (phase-02-qa.md).
-Phase 2 start merge of origin/release/v0.36.0 was a no-op (tip already
-merged at 81804a179e). The phase 2 review fixes (privacy-security-review W1/W2/W3 and
-three nits) are folded into the four commits, not separate; see progress.md notes.
+QA done (2026-08-08, PASS-WITH-FOLLOWUPS, fixes 042ba0a766 + docs db885d81bb), phase 2
+done (2026-08-08, commits 2eb2c45356 menu + 82b040f5a5 show + b6d6a1900e focus
++ 7ed6a6fac4 version + docs 3e9a87b8e2), and phase 2 QA done (2026-08-08,
+PASS-WITH-FOLLOWUPS: 0 blocking, one confirmed should-fix cluster, fixed in
+97e5305a14: the publish-workflow version guard anchored on the derive expressions and
+pinned by tests/desktop_publish_guard.test.ts); next up is phase 3
+(phase-03-gpu-visibility.md). Phase 2 QA start merge 094f6facbc took release tip
+4d52f151eb (PR 3161 perf train; no electron/desktop paths; turbo.json renamed the
+typecheck task to check:types). The phase 2 review fixes (privacy-security-review
+W1/W2/W3 and three nits) are folded into the four feature commits, not separate; see
+progress.md notes.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -129,7 +134,8 @@ three nits) are folded into the four commits, not separate; see progress.md note
 ## Inventory (append as phases land)
 
 New files created: tests/electron_scheme_privileges.test.ts (phase 1),
-tests/electron_shell_startup.test.ts (phase 2)
+tests/electron_shell_startup.test.ts (phase 2),
+tests/desktop_publish_guard.test.ts (phase 2 QA)
 New bridge methods / IPC channels: (none yet)
 New settings keys: (none yet)
 New i18n keys: (none yet)
@@ -150,18 +156,27 @@ second-instance focus POSITIONED before the deep-link scan, focusMainWindow defi
 once with an exact call-site count of five (login, wallet, second-instance, activate,
 plus the definition), the win32/linux-allowlist Menu.setApplicationMenu(null) guard
 before app.whenReady() with darwin never named, and zero setMenu(null) occurrences).
-Mutation-probed by the implementer 12/12 killed pre-commit; phase 2 QA should re-verify
-on the committed tree. VERSION MECHANISM (phase 2): src/game/desktop_download.ts
-derives DESKTOP_VERSION from the __APP_VERSION__ vite define (typeof-guarded, '0.0.0'
-fallback for the define-less standalone browser config; the define IS applied under
-normal vitest, probe-verified). scripts/release_version.mjs no longer owns the module
-(html hrefs + game-version + README badges remain its surfaces);
-.github/workflows/desktop-publish.yml's verify job greps for the derive mechanism
-instead of a version literal; tests/desktop_download.test.ts pins module version ==
-package.json read fresh from disk and != '0.0.0'; tests/desktop_download_dom.test.ts
-cross-checks every real index.html/play.html platform href against the module and pins
-play.html's deliberate no-Linux exemption. Deferred (review nit I4): a build-output
-check that dist never ships the '0.0.0' fallback; fold into phase 11.
+Mutation-probed by the implementer 12/12 killed pre-commit; phase 2 QA re-verified on
+the committed tree: 12/13 killed with named failing tests, and the one survivor
+(hardcode to the CURRENT version value, survived-by-design at the time) has been
+killed since 97e5305a14 by the guard test below. VERSION MECHANISM (phase 2):
+src/game/desktop_download.ts derives DESKTOP_VERSION from the __APP_VERSION__ vite
+define (typeof-guarded, '0.0.0' fallback for the define-less standalone browser
+config; the define IS applied under normal vitest, probe-verified).
+scripts/release_version.mjs no longer owns the module (html hrefs + game-version +
+README badges remain its surfaces); .github/workflows/desktop-publish.yml's verify
+job greps for the derive mechanism instead of a version literal, anchored since
+97e5305a14 on the load-bearing expressions (phase 2 QA proved the original
+bare-token greps were satisfiable by the token in a comment or the type-only
+declare); tests/desktop_publish_guard.test.ts extracts the workflow's exact patterns
+and executes them through grep both ways (must match the live tree, must reject a
+mechanism-dead revert fixture), so neither a module hardcode nor a weakened guard
+can pass vitest; tests/desktop_download.test.ts pins module version == package.json
+read fresh from disk and != '0.0.0'; tests/desktop_download_dom.test.ts cross-checks
+every real index.html/play.html platform href against the module and pins play.html's
+deliberate no-Linux exemption. Deferred (review nit I4): a build-output check that
+dist never ships the '0.0.0' fallback; fold into phase 11 (phase 2 QA note: a
+dist-based version assertion can subsume both I4 and download-page staleness).
 Dependency moves: electron 43.1.1 to 43.3.0 and the electron-builder family
 (electron-builder, app-builder-lib, dmg-builder, electron-builder-squirrel-windows)
 26.15.6 to 26.15.7, via pnpm add -D, devDependencies only; vendor bundles
@@ -176,6 +191,9 @@ Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path record
 
 - pnpm only: regenerate the lockfile via pnpm add/update, never hand-edit; frozen
   installs print a cosmetic "Packages: -136" line, ignore it.
+- The 2026-08-08 release merge (4d52f151eb) renamed the turbo typecheck task to
+  check:types: the post-vitest-abort proof is now `npx turbo run check:types
+  build:env build:server build:bot`, then `npx turbo run build:bundle`.
 - The Bash tool runs zsh here: wrap bash-isms in `bash -c`; quote everything.
 - Fresh worktrees need their own `pnpm install` (done for this one on 2026-08-08).
 - Commit the feature work BEFORE planting any mutation-test probes; git checkout
