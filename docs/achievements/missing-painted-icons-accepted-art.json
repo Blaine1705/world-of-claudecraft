@@ -8,12 +8,12 @@
     "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
   },
   "scope": {
-    "targetRows": 209,
-    "rasterPaintings": 194,
-    "abilities": 90,
+    "targetRows": 206,
+    "rasterPaintings": 190,
+    "abilities": 86,
     "items": 101,
     "deeds": 3,
-    "heroicWeaponResolvers": 15,
+    "heroicWeaponResolvers": 16,
     "originalInventoryRows": 197,
     "supplementalCurrentHeadRows": 12
   },
@@ -48,7 +48,6 @@
     "abilities": [
       "arcane_power",
       "aspect_of_the_wild",
-      "aura_surge",
       "avenging_wrath",
       "berserk",
       "bestial_wrath",
@@ -57,7 +56,6 @@
       "chain_heal",
       "chain_lightning",
       "chaos_bolt",
-      "cleansing_verdict",
       "cleaving_blows",
       "cloak_of_shadows",
       "cold_blood",
@@ -72,7 +70,6 @@
       "desperate_prayer",
       "deterrence",
       "diabolical_twinstrike",
-      "divine_shield",
       "earthbind",
       "earthquake",
       "elemental_mastery",
@@ -88,7 +85,6 @@
       "holy_shield",
       "holy_shock",
       "holy_taunt",
-      "holy_wrath",
       "howl_of_terror",
       "hurricane",
       "inner_focus",
@@ -240,7 +236,11 @@
       "wreckfield_flotsam_crate",
       "wyrmwatch_warning_banner"
     ],
-    "deeds": ["dgn_wildheart_basin", "dgn_wildheart_basin_heroic", "pvp_card_duel_first_win"],
+    "deeds": [
+      "dgn_wildheart_basin",
+      "dgn_wildheart_basin_heroic",
+      "pvp_card_duel_first_win"
+    ],
     "heroicWeaponResolvers": [
       {
         "id": "heroic_bonewrought_greatsword",
@@ -273,6 +273,17 @@
         "heldModelPath": "public/models/weapons/adv_sword_2handed_color.glb",
         "canonicalDisplayName": "Direfang Greatblade",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Direfang Greatblade; inherits base visual variant adv_sword_2handed_color.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_duskwhisper",
+        "baseId": "duskwhisper",
+        "variant": "purple_dagger",
+        "bagIconUrl": "/ui/weapons/purple_dagger.jpg",
+        "portraitPath": "public/ui/weapons/purple_dagger.jpg",
+        "heldModelPath": "public/models/weapons/purple_dagger.glb",
+        "canonicalDisplayName": "Duskwhisper",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Duskwhisper (Fanglord Beastmaster heroic boss drop); inherits base visual variant purple_dagger.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -534,67 +545,6 @@
     },
     {
       "kind": "ability",
-      "id": "aura_surge",
-      "runtimeUrl": "/ui/skills/paladin/aura_surge.webp",
-      "acceptedSha256": "3da241e75ea46900563b2f72b6715ff8c41aaf4550fa0b22a77efaa2280d7e58",
-      "acceptedBytes": 4470,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/aura_surge.png",
-        "bytes": 2116260,
-        "sha256": "622452af1e34e14186751e1daf6d6b2dd3a63cfc35ddd0df34f5b81bb43ae225",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/aura_surge.png",
-        "bytes": 388137,
-        "sha256": "3cd32d7ce47abc051c2422fc1e13485956a5beeadfb94d048b585eb2f565481c",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Dawnward Ricochet",
-      "canonicalGameplayMeaningOrAcquisition": "Dawnward Ricochet hits the primary target for 100 to 120 Holy damage, bounces to 2 enemies at 75% per hop, and silences the primary for 2 sec; 20 sec cooldown.",
-      "intendedVisualSubject": "A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dawnward Ricochet (aura_surge)\nCanonical mechanic: Dawnward Ricochet hits the primary target for 100 to 120 Holy damage, bounces to 2 enemies at 75% per hop, and silences the primary for 2 sec; 20 sec cooldown.\nSubject: A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "composition reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/divine_protection.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
       "id": "avenging_wrath",
       "runtimeUrl": "/ui/skills/paladin/avenging_wrath.webp",
       "acceptedSha256": "95da7400aa47172fadd548f92bb82c297710be95755329dce3eda9942d1c511c",
@@ -628,7 +578,7 @@
         "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wrathwing (avenging_wrath)\nCanonical mechanic: Wrathwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.\nSubject: Golden wings flanking a sword and spell orb, both ignited by one halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -1083,67 +1033,6 @@
     },
     {
       "kind": "ability",
-      "id": "cleansing_verdict",
-      "runtimeUrl": "/ui/skills/paladin/cleansing_verdict.webp",
-      "acceptedSha256": "42b5aa21c4aedef8876475aaf1efb960ed91590e1ede7475fba0caedfe715534",
-      "acceptedBytes": 2796,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/cleansing_verdict.png",
-        "bytes": 1899300,
-        "sha256": "b56d4401a197ef218bf0e2566b185cecc0895df6b2ee20f97d9b6388ed8e2621",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/cleansing_verdict.png",
-        "bytes": 324205,
-        "sha256": "ecc5e29a0dc6a0e17b6f944aa90ac2748fc6ac0ed6fd354f14f3b81afb6b2c56",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Cleansing Verdict",
-      "canonicalGameplayMeaningOrAcquisition": "Cleansing Verdict removes one harmful magic effect from a friendly and heals them for 40 to 50; 30 yd, 8 sec cooldown.",
-      "intendedVisualSubject": "A radiant hand lifting a dark rune from an ally's heart and burning it away.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Cleansing Verdict (cleansing_verdict)\nCanonical mechanic: Cleansing Verdict removes one harmful magic effect from a friendly and heals them for 40 to 50; 30 yd, 8 sec cooldown.\nSubject: A radiant hand lifting a dark rune from an ally's heart and burning it away.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/holy_light.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
       "id": "cleaving_blows",
       "runtimeUrl": "/ui/skills/warrior/cleaving_blows.webp",
       "acceptedSha256": "81d858296577b4f9bd1ca89741fe93e9c36dba71ee42e623fbed52d1732c4a05",
@@ -1543,7 +1432,7 @@
         "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Crusader Strike (crusader_strike)\nCanonical mechanic: Crusader Strike deals weapon damage plus 24 Holy damage; 4 sec cooldown.\nSubject: A cross-marked sword carving a bright diagonal holy arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -1995,67 +1884,6 @@
         "alpha": "opaque"
       },
       "class": "warrior"
-    },
-    {
-      "kind": "ability",
-      "id": "divine_shield",
-      "runtimeUrl": "/ui/skills/paladin/divine_shield.webp",
-      "acceptedSha256": "51e12e57c01a47db3857486dd07089f3457ed0656fad6547610d0f672c33902b",
-      "acceptedBytes": 5628,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/divine_shield.png",
-        "bytes": 2472279,
-        "sha256": "9ed6b699602a2fd92262adf664130599f43d3298d81c04afed0a87dd652384e1",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/divine_shield.png",
-        "bytes": 453544,
-        "sha256": "11b70c450220c9d085a932913327fe4d4201eccf08039d13220a1c23fd81e406",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Lightward",
-      "canonicalGameplayMeaningOrAcquisition": "Lightward absorbs 900 damage for 8 sec; 300 sec cooldown. Current mechanics are a large absorb, not immunity.",
-      "intendedVisualSubject": "A sealed luminous dome around a kneeling paladin, layered like thick glass.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lightward (divine_shield)\nCanonical mechanic: Lightward absorbs 900 damage for 8 sec; 300 sec cooldown. Current mechanics are a large absorb, not immunity.\nSubject: A sealed luminous dome around a kneeling paladin, layered like thick glass.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/divine_protection.webp",
-            "role": "subject reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/holy_light.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
     },
     {
       "kind": "ability",
@@ -2586,7 +2414,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2830,7 +2658,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2891,7 +2719,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -2952,69 +2780,8 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          }
-        ]
-      },
-      "processing": [
-        "Copied the accepted image-generation master into the worktree.",
-        "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
-        "Composed and encoded to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
-      ],
-      "expected": {
-        "width": 128,
-        "height": 128,
-        "maxBytes": 15360,
-        "alpha": "opaque"
-      },
-      "class": "paladin"
-    },
-    {
-      "kind": "ability",
-      "id": "holy_wrath",
-      "runtimeUrl": "/ui/skills/paladin/holy_wrath.webp",
-      "acceptedSha256": "81257cfa84b6682f5e221de77d78c56bdf04e4fc41daf19a807e33873e181a5f",
-      "acceptedBytes": 4628,
-      "master": {
-        "path": "tmp/imagegen/missing-painted-icons/masters/abilities/paladin/holy_wrath.png",
-        "bytes": 2160093,
-        "sha256": "bfcf26a8cae6ca3b642263201a223cdf7b22bf99b61d2c73a2ac2f0186e7d4a5",
-        "width": 1254,
-        "height": 1254,
-        "format": "png",
-        "colourspace": "srgb"
-      },
-      "source": {
-        "path": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_wrath.png",
-        "bytes": 410999,
-        "sha256": "81b03ae17f4488adc3b09785724719b4545d21beb6272bddad717e97b3a2107d",
-        "width": 512,
-        "height": 512,
-        "format": "png",
-        "colourspace": "srgb",
-        "alpha": "opaque"
-      },
-      "canonicalDisplayName": "Saint's Ire",
-      "canonicalGameplayMeaningOrAcquisition": "Saint's Ire deals 54 to 68 Holy damage to enemies within 10 yd; 20 sec cooldown.",
-      "intendedVisualSubject": "A paladin at the center of a white-gold sunburst striking a ring of enemies.",
-      "generation": {
-        "source": "OpenAI built-in image generation",
-        "owner": "World of ClaudeCraft",
-        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Saint's Ire (holy_wrath)\nCanonical mechanic: Saint's Ire deals 54 to 68 Holy damage to enemies within 10 yd; 20 sec cooldown.\nSubject: A paladin at the center of a white-gold sunburst striking a ring of enemies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
-        "references": [
-          {
-            "path": "public/ui/skills/paladin/judgement.webp",
-            "role": "style reference",
-            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-            "license": "CraftPix premium royalty-free commercial license, non-transferable"
-          },
-          {
-            "path": "public/ui/skills/paladin/hammer_of_justice.webp",
-            "role": "composition reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           }
@@ -4111,7 +3878,7 @@
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
           },
           {
-            "path": "public/ui/skills/paladin/judgement.webp",
+            "path": "public/ui/skills/paladin/final_edict.webp",
             "role": "style reference",
             "provenance": "CraftPix Premium art licensed to Levy Street for this project",
             "license": "CraftPix premium royalty-free commercial license, non-transferable"
@@ -5986,10 +5753,18 @@
         "alpha": "transparent-subject",
         "geometry": {
           "alphaThreshold": 8,
-          "bounds": [59, 56, 453, 455],
+          "bounds": [
+            59,
+            56,
+            453,
+            455
+          ],
           "visiblePixels": 111216,
           "coverage": 0.424255,
-          "centerOffset": [0.5, 0]
+          "centerOffset": [
+            0.5,
+            0
+          ]
         }
       },
       "canonicalDisplayName": "The Basin Bites Back",
@@ -6044,7 +5819,12 @@
           "maxCenterOffset": 2,
           "coverageMin": 0.35,
           "coverageMax": 0.6,
-          "alphaBounds": [14, 14, 113, 113],
+          "alphaBounds": [
+            14,
+            14,
+            113,
+            113
+          ],
           "visiblePixels": 7087
         }
       },
@@ -6076,10 +5856,18 @@
         "alpha": "transparent-subject",
         "geometry": {
           "alphaThreshold": 8,
-          "bounds": [60, 56, 452, 455],
+          "bounds": [
+            60,
+            56,
+            452,
+            455
+          ],
           "visiblePixels": 109651,
           "coverage": 0.418285,
-          "centerOffset": [0.5, 0]
+          "centerOffset": [
+            0.5,
+            0
+          ]
         }
       },
       "canonicalDisplayName": "Heroic: The Wildheart Basin",
@@ -6134,7 +5922,12 @@
           "maxCenterOffset": 2,
           "coverageMin": 0.35,
           "coverageMax": 0.6,
-          "alphaBounds": [15, 14, 113, 113],
+          "alphaBounds": [
+            15,
+            14,
+            113,
+            113
+          ],
           "visiblePixels": 6983
         }
       },
@@ -6166,10 +5959,18 @@
         "alpha": "transparent-subject",
         "geometry": {
           "alphaThreshold": 8,
-          "bounds": [56, 57, 455, 454],
+          "bounds": [
+            56,
+            57,
+            455,
+            454
+          ],
           "visiblePixels": 109175,
           "coverage": 0.41647,
-          "centerOffset": [0, 0]
+          "centerOffset": [
+            0,
+            0
+          ]
         }
       },
       "canonicalDisplayName": "House Rules",
@@ -6224,7 +6025,12 @@
           "maxCenterOffset": 2,
           "coverageMin": 0.35,
           "coverageMax": 0.6,
-          "alphaBounds": [14, 14, 113, 113],
+          "alphaBounds": [
+            14,
+            14,
+            113,
+            113
+          ],
           "visiblePixels": 6948
         }
       },
