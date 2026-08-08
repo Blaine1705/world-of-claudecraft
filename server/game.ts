@@ -704,6 +704,7 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
+  'inv_sort', // consolidates stacks + restamps cell hints: the self snapshot must resend it
   'unequip_item',
   // salvage_item is deliberately ABSENT since the Craft Cast System: the
   // command only starts a cast (nothing mutates on receipt), and the
@@ -6310,6 +6311,11 @@ export class GameServer {
         if (typeof msg.from === 'number' && typeof msg.to === 'number') {
           sim.moveInventoryItem(msg.from, msg.to, pid);
         }
+        break;
+      case 'inv_sort':
+        // The one-shot bag clean-up. No payload: the sim re-derives the whole
+        // arrangement from the live inventory, so there is nothing to trust.
+        sim.sortInventory(pid);
         break;
       case 'unequip_item':
         if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
