@@ -59,6 +59,7 @@ const DPR = Number(process.env.CROWD_DPR ?? 1);
 const SETTLE_MS = Number(process.env.CROWD_SETTLE_MS ?? 3500);
 const CLUSTER_R = Number(process.env.CROWD_R ?? 9);
 const MIN_FPS = parseCeilingEnv('CROWD_MIN_FPS', process.env.CROWD_MIN_FPS);
+const BOOT_TIMEOUT_MS = Number(process.env.CROWD_BOOT_TIMEOUT_MS ?? 25000);
 const JSON_OUT = process.env.CROWD_JSON_OUT ?? 'tmp/crowd-fps-latest.json';
 const checkedOutHeadSha = gitOutput(['rev-parse', 'HEAD']);
 const evidenceHeadSha = process.env.CROWD_HEAD_SHA?.trim() || checkedOutHeadSha;
@@ -215,7 +216,7 @@ async function enterWorld(page) {
           document.querySelector('#login-user') &&
           document.querySelector('#btn-login'),
       ),
-    { timeout: 25000, polling: 200 },
+    { timeout: BOOT_TIMEOUT_MS, polling: 200 },
   );
   await page.evaluate(
     (u, p) => {
@@ -274,7 +275,9 @@ async function enterWorld(page) {
     (row?.querySelector('.enter-world-btn') ?? document.querySelector('.enter-world-btn'))?.click();
   }, camName);
   await page.waitForFunction(() => window.__game?.world?.player && window.__game?.perf?.report, {
-    timeout: 25000,
+    // A cold vite plus a profile-less browser can spend well over 25s on the
+    // Ultra asset preload; the world join itself is server-confirmed earlier.
+    timeout: BOOT_TIMEOUT_MS,
     polling: 300,
   });
   await sleep(1500);
@@ -410,6 +413,11 @@ async function main() {
       crowdSample.actualJoined = bots.length;
       results.push(crowdSample);
       record(`  ${row(results.at(-1))}`);
+      if (process.env.CROWD_CENSUS === '1' && target === BATCHES.at(-1)) {
+        // One-shot per-system draw breakdown at the largest crowd: names where
+        // the calls/triangles actually go (characters vs world systems).
+        crowdSample.census = await page.evaluate(() => window.__game.perf.runSceneCensus());
+      }
       try {
         await page.screenshot({ path: `tmp/crowd-${target}.png` });
       } catch {
