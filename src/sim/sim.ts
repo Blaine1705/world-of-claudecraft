@@ -321,6 +321,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -7766,7 +7767,22 @@ export class Sim {
     }
     e.pos.x = bestX;
     e.pos.z = bestZ;
-    const g = groundHeight(bestX, bestZ, this.cfg.seed);
+    // The floor a body rests on, which for a PLAYER includes the standable prop
+    // top underfoot, not just the terrain. Feared players are moved through here
+    // and return early from the player step, so `stepPlayerMotion` and its whole
+    // vertical pass never run for the duration: snapping to raw terrain dropped
+    // anyone feared off a rampart deck several yards INSIDE the rampart, where
+    // swept collision then refused every direction once the fear ended (from
+    // inside a volume every direction is a surface). Same expression the vertical
+    // pass and climb.ts already land against.
+    //
+    // Scoped to players deliberately: mobs and pets keep the terrain snap they
+    // have always had, so their movement, and the parity draw order with it, is
+    // untouched.
+    const g =
+      e.kind === 'player'
+        ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
+        : groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
       canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
