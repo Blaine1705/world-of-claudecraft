@@ -15,8 +15,11 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import {
+  battlegroundOrigin,
+  bgOriginAt,
   INSTANCE_X_BASE,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
@@ -118,6 +121,23 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
+  const bgMatch = ctx.bgMatches.get(pid);
+  if (bgMatch && isBgPos(pos.x)) {
+    const slot = bgOriginAt(pos.z).slot;
+    if (slot !== bgMatch.slot) return null;
+    return located(
+      {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(bgMatch.id),
+        slot: bgMatch.slot,
+      },
+      pos,
+      battlegroundOrigin(bgMatch.slot),
+    );
+  }
+  if (isBgPos(pos.x)) return null;
+
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
@@ -170,6 +190,7 @@ function forcedMovement(p: Entity): boolean {
 }
 
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
+  if (ctx.bgMatches.has(pid)) return false;
   return (
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
