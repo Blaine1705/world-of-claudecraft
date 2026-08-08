@@ -62,23 +62,49 @@ describe('TRIPO_BIPED_FULL_RIG hit-reaction stagger (issue #2889 round 2)', () =
   });
 
   it('wires a matching animUrls entry onto every TRIPO_BIPED_FULL_RIG consumer', () => {
-    const consumers: [string, string][] = [
-      ['mob_wildheart_stalker', 'wildheart_stalker_hit_variety_anims.glb'],
-      ['mob_wildheart_ravager', 'wildheart_ravager_hit_variety_anims.glb'],
-      ['mob_wildheart_hexcaller', 'wildheart_hexcaller_hit_variety_anims.glb'],
-      ['mob_wildheart_beastmaster', 'wildheart_beastmaster_hit_variety_anims.glb'],
-      ['mob_wildheart_high_priest', 'wildheart_high_priest_hit_variety_anims.glb'],
+    // mob_wildheart_stalker was split onto its own WILDHEART_STALKER const
+    // (scripts/build_wildheart_stalker_anims.mjs, issue #2889 round 2) for its
+    // own Wildheart_Stalker_Attack clip; WILDHEART_STALKER spreads
+    // TRIPO_BIPED_FULL_RIG (including the shared Hit_Stagger hit array), so it
+    // still counts as a consumer, just under its own clips constant.
+    const consumers: [string, string, string][] = [
+      [
+        'mob_wildheart_stalker',
+        'wildheart_stalker_hit_variety_anims.glb',
+        'clips: WILDHEART_STALKER',
+      ],
+      [
+        'mob_wildheart_ravager',
+        'wildheart_ravager_hit_variety_anims.glb',
+        'clips: TRIPO_BIPED_FULL_RIG',
+      ],
+      [
+        'mob_wildheart_hexcaller',
+        'wildheart_hexcaller_hit_variety_anims.glb',
+        'clips: TRIPO_BIPED_FULL_RIG',
+      ],
+      [
+        'mob_wildheart_beastmaster',
+        'wildheart_beastmaster_hit_variety_anims.glb',
+        'clips: TRIPO_BIPED_FULL_RIG',
+      ],
+      [
+        'mob_wildheart_high_priest',
+        'wildheart_high_priest_hit_variety_anims.glb',
+        'clips: TRIPO_BIPED_FULL_RIG',
+      ],
     ];
-    for (const [key, file] of consumers) {
+    for (const [key, file, clipsRef] of consumers) {
       const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      expect(block, key).toContain('clips: TRIPO_BIPED_FULL_RIG');
+      expect(block, key).toContain(clipsRef);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // Exactly 5 consumers touched.
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Exactly 5 Wildheart consumers touched (other rig families, e.g. yeti/frog/orc/demon,
+    // ship their own unrelated *_hit_variety_anims.glb donors from other issues).
+    const occurrences = [...MANIFEST_SRC.matchAll(/wildheart_\w+_hit_variety_anims\.glb/g)].length;
     expect(occurrences).toBe(5);
   });
 });
