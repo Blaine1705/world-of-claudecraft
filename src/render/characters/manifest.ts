@@ -300,6 +300,22 @@ const WOLF_BAKED: ClipMap = {
   jump: 'Fall',
 };
 
+// Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
+// 2): greyjaw.glb is a much richer, dedicated 48-node rig (not shared with
+// mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
+// (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
+// blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
+// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
+// form_cat) still plays. WOLF_BAKED itself is untouched: both still read it,
+// and changing the shared base would change player druid/shaman form combat
+// feel, out of scope here. greyjaw already ships and wires BOTH
+// Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
+// hit-variety work is needed here: this override is attack-only.
+const GREYJAW_WOLF: ClipMap = {
+  ...WOLF_BAKED,
+  attack: ['Greyjaw_Attack'],
+};
+
 // Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
 // authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
 // rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
@@ -341,7 +357,7 @@ const BIPED14: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Punch', 'Weapon'],
-  hit: ['HitReact'],
+  hit: ['HitReact', 'HitReact_Heavy'],
   death: 'Death',
 };
 
@@ -367,6 +383,17 @@ const TROLL_BIPED14: ClipMap = {
   attack: ['Troll_Smash'],
 };
 
+// The murloc family's own attack (scripts/build_murloc_anims.mjs, issue
+// #2889 round 2): BIPED14's Punch/Weapon attack is shared by reference
+// across 6 unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll,
+// mob_demon, mob_demonalt). This "slap/flop combo" clip is baked off
+// frog.glb's own donor poses (Punch's forward slap blended through the
+// currently unused Wave clip's arm flail), so only mob_murloc gets it.
+const MURLOC_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Murloc_Attack'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -380,13 +407,35 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   jump: 'Jump',
 };
 
+// The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
+// #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
+// Wildheart Basin mobs. This clip is baked off wildheart_stalker.glb's own donor poses
+// (a compressed re-timing of its own Attack clip into a spear-throw lunge), so only
+// mob_wildheart_stalker gets it; the other 4 Wildheart mobs are untouched.
+const WILDHEART_STALKER: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_Stalker_Attack'],
+};
+
+// The Sunbone Hexcaller's own attack/cast (scripts/build_wildheart_hexcaller_anims.mjs,
+// issue #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack and Cast are shared by reference
+// across all 5 Wildheart Basin mobs. This clip is baked off wildheart_hexcaller.glb's own
+// donor poses (a cast-dominated re-timing of its own Cast and Attack clips), so only
+// mob_wildheart_hexcaller gets it; the other 4 Wildheart mobs are untouched. Wired into
+// both attack and cast so the Hexcaller's ordinary auto-attack reads as spellwork too.
+const WILDHEART_HEXCALLER: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_Hexcaller_Attack'],
+  cast: 'Wildheart_Hexcaller_Attack',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
-  hit: ['HitRecieve'],
+  hit: ['HitRecieve', 'HitRecieve_Heavy'],
   death: 'Death',
 };
 
@@ -449,6 +498,18 @@ const NIGHTKIN_FLOATING: ClipMap = {
   attack: ['Nightkin_Attack'],
 };
 
+// The glub family's own attack (scripts/build_glub_anims.mjs, issue #2889
+// round 2): FLOATING's Headbutt/Punch is shared by reference across 8
+// unrelated families (mob_dragonkin, mob_choir_thrall, mob_demon_flying,
+// mob_nightkin, mob_ghost, mob_glimmerwisp, mob_duskwisp, mob_glub among
+// them). This "spore burst" clip is baked off glubevolved.glb's own donor
+// poses (Punch's forward lunge blended through its two unused gesture
+// clips, No and Yes), so only mob_glub gets it.
+const GLUB_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Glub_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -457,6 +518,31 @@ const ENEMY_BITE: ClipMap = {
   attack: ['Bite_Front'],
   hit: ['HitRecieve'],
   death: 'Death',
+};
+
+// The crab's own attack (scripts/build_crab_anims.mjs, issue #2889 round 2):
+// crabenemy.glb ships several unused bonus donor clips (Bite_InPlace, Dance,
+// No, Yes, Jump) alongside the shared Bite_Front every ENEMY_BITE family
+// plays; this blends Dance's side-to-side wiggle into Bite_InPlace's
+// in-place snap for a pincer-click flourish before the bite lands, distinct
+// from the plain forward-lunging Bite_Front every other ENEMY_BITE family
+// (mob_treant) still plays.
+const CRAB_ENEMY_BITE: ClipMap = {
+  ...ENEMY_BITE,
+  attack: ['Crab_Attack'],
+};
+
+// The treant's own attack (scripts/build_treant_anims.mjs, issue #2889
+// round 2): a tree "biting" reads wrong, so this reinterprets the shared
+// ENEMY_BITE attack as a slam/root-grab off yeti.glb's own donor poses (a
+// rooted Idle hold into Bite_Front's downward lean, repurposed as a
+// branch-slam, settled by Dance's sway), instead of the plain Bite_Front
+// every other ENEMY_BITE family (mob_crab) still plays. A low-node-count
+// rig (2-3 animated nodes throughout), so the motion reads simple and
+// blocky by nature.
+const TREANT_ENEMY_BITE: ClipMap = {
+  ...ENEMY_BITE,
+  attack: ['Treant_Attack'],
 };
 
 // Procedurally authored Water Elemental. Node transforms ripple its layered
@@ -1468,7 +1554,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // rare ~2.75 in-world vs the 1.6 pack wolf).
     url: `${CREATURES}/greyjaw.glb`,
     height: 2.2,
-    clips: WOLF_BAKED,
+    clips: GREYJAW_WOLF,
+    // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
+    // baked off this same rig's own poses (a howl-then-pounce, distinct from
+    // the plain Attack every other WOLF_BAKED user still plays).
+    animUrls: [`${CREATURES}/greyjaw_ability_anims.glb`],
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
@@ -1592,6 +1682,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // brown-tinted yeti rig, same recipe as the druid Bear form.
   mob_bear: {
     url: `${CREATURES}/yetialt.glb`,
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`],
     height: 2.2,
     clips: BIPED14,
     tint: 0x5a4030,
@@ -1603,8 +1694,9 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.5,
     clips: YETI_BIPED14,
     // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/yeti_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/yetialt_hit_variety_anims.glb`, `${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
@@ -1618,14 +1710,21 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_murloc: {
     url: `${CREATURES}/frog.glb`,
     height: 1.7,
-    clips: BIPED14,
+    clips: MURLOC_BIPED14,
+    // Murloc_Attack clip donor (scripts/build_murloc_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/frog_hit_variety_anims.glb`, `${CREATURES}/murloc_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.45,
   },
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
-    animUrls: [`${CREATURES}/kobold_ability_anims.glb`],
+    animUrls: [
+      `${CREATURES}/goblin_hit_variety_anims.glb`,
+      `${CREATURES}/kobold_ability_anims.glb`,
+    ],
     clips: KOBOLD_ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
@@ -1655,13 +1754,16 @@ export const VISUALS: Record<string, VisualDef> = {
     // faint wash only — 0.35 flooded every material with the template green
     clips: TROLL_BIPED14,
     // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
+    // baked off this same rig's own poses. The second donor GLB
+    // (scripts/build_biped14_hit_variety_anims.mjs) donates the second
+    // BIPED14 hit-reaction clip, HitReact_Heavy.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`, `${CREATURES}/orc_hit_variety_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
   mob_ogre: {
     url: `${CREATURES}/giant.glb`,
+    animUrls: [`${CREATURES}/giant_hit_variety_anims.glb`],
     height: 2.8,
     clips: ENEMY7,
     tint: 'entity',
@@ -1673,7 +1775,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/wildheart_stalker.glb`,
     height: 2.5,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_STALKER,
+    // Wildheart_Stalker_Attack clip donor (scripts/build_wildheart_stalker_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/wildheart_stalker_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
@@ -1689,7 +1794,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/wildheart_hexcaller.glb`,
     height: 2.5,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_HEXCALLER,
+    // Wildheart_Hexcaller_Attack clip donor (scripts/build_wildheart_hexcaller_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/wildheart_hexcaller_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.04,
   },
@@ -1841,6 +1949,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 1.8,
     clips: BIPED14,
     tint: 'entity',
@@ -1919,7 +2028,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/glubevolved.glb`,
     height: 1.4,
     hover: 0.15,
-    clips: FLOATING,
+    clips: GLUB_FLOATING,
+    // Glub_Attack clip donor (scripts/build_glub_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/glub_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.45,
   },
@@ -1927,7 +2039,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_crab: {
     url: `${CREATURES}/crabenemy.glb`,
     height: 1.7,
-    clips: ENEMY_BITE,
+    clips: CRAB_ENEMY_BITE,
+    // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/crab_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -1950,12 +2065,16 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_treant: {
     url: `${CREATURES}/yeti.glb`,
     height: 2.6,
-    clips: ENEMY_BITE,
+    clips: TREANT_ENEMY_BITE,
+    // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
+    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 2.1,
     clips: BIPED14,
     tint: 'entity',
