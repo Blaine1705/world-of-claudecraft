@@ -400,7 +400,7 @@ export function equipBag(
   }
   let target = socket;
   if (target === undefined) {
-    const empty = meta.bags.findIndex((b) => b === null);
+    const empty = meta.bags.indexOf(null);
     target = empty >= 0 ? empty : -1;
   }
   if (target === -1) {
