@@ -5768,13 +5768,7 @@ export class Renderer {
         priority: 32,
         required: false,
         run: async () => {
-          this.dungeons ??= new DungeonInteriors(
-            this.scene,
-            this.lowGfx,
-            this.flames,
-            this.fireLights,
-          );
-          interiorPrewarmGroup = await this.dungeons.buildPrewarmGroup();
+          interiorPrewarmGroup = await this.ensureDungeons().buildPrewarmGroup();
           this.scene.add(interiorPrewarmGroup);
         },
         detail: () => `objects=${interiorPrewarmGroup?.children.length ?? 0}`,
@@ -7818,16 +7812,32 @@ export class Renderer {
     this.dungeons?.retireHideables(doomed);
   }
 
+  // The one construction point for DungeonInteriors: every build path (first
+  // dungeon approach, delve modules, rift floors, the boot prewarm) gets the
+  // live compile gate injected, so a streamed interior attaches hidden until
+  // its programs link instead of stalling its first visible frame.
+  private ensureDungeons(): DungeonInteriors {
+    this.dungeons ??= new DungeonInteriors(
+      this.scene,
+      this.lowGfx,
+      this.flames,
+      this.fireLights,
+      this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined,
+    );
+    return this.dungeons;
+  }
+
   private buildInterior(
     interior: string,
     ox: number,
     oz: number,
     opts?: Parameters<DungeonInteriors['buildInterior']>[3],
   ): void {
-    this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
-    void this.dungeons.buildInterior(interior, ox, oz, opts).catch((err) => {
-      console.error('Failed to build dungeon interior:', err);
-    });
+    void this.ensureDungeons()
+      .buildInterior(interior, ox, oz, opts)
+      .catch((err) => {
+        console.error('Failed to build dungeon interior:', err);
+      });
   }
 
   // Outdoor fog presets per biome (high tier eases between them as the player
@@ -8043,8 +8053,7 @@ export class Renderer {
   ): void {
     if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) return;
     this.pendingInteriors.add(key);
-    this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
-    void buildDelveModule(this.dungeons, moduleId, ox, oz)
+    void buildDelveModule(this.ensureDungeons(), moduleId, ox, oz)
       .then(() => {
         this.builtInteriors.add(key);
         this.pendingInteriors.delete(key);
@@ -8249,13 +8258,7 @@ export class Renderer {
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
             const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-            this.dungeons ??= new DungeonInteriors(
-              this.scene,
-              this.lowGfx,
-              this.flames,
-              this.fireLights,
-            );
-            void this.dungeons
+            void this.ensureDungeons()
               .buildInterior(floor.style.kit, o.x, o.z, {
                 layout: floor.layout,
                 style: floor.style,

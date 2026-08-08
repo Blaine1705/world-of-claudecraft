@@ -85,7 +85,7 @@ interface AttributionTargetFixture {
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '29ff5b58d2c8200e117edf85abd2bc35fa0dea29996020b7cbdec55efa2e3791';
+  'd571590b54b1cb85da55a00b5e985026b023b0abb36a8a3f42e8e26c12ae1aa1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

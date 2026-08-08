@@ -166,6 +166,30 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 
+  it('routes every dungeon interior build through the gate-injected constructor', () => {
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    // One construction point: ensureDungeons injects the live compile gate, so
+    // a streamed interior (dungeon approach, delve module, rift floor) never
+    // links its programs synchronously on its first visible frame.
+    expect(rendererSource.split('new DungeonInteriors(').length - 1).toBe(1);
+    const ensureStart = rendererSource.indexOf('private ensureDungeons(');
+    expect(ensureStart).toBeGreaterThan(-1);
+    const ensureBody = rendererSource.slice(ensureStart, rendererSource.indexOf('}', ensureStart));
+    expect(ensureBody).toContain(
+      'this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined',
+    );
+    const dungeonSource = readFileSync(
+      new URL('../src/render/dungeon.ts', import.meta.url),
+      'utf8',
+    );
+    expect(dungeonSource).toContain(
+      'await attachSceneGroupGated(this.scene, group, this.compileGate)',
+    );
+  });
+
   it('ignores a rejection after renderer shutdown starts', async () => {
     const renderer = harness();
     let reject!: (error: unknown) => void;
