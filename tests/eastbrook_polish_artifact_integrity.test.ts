@@ -668,10 +668,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so all three literals mint to values matching
+// neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '86ba8d993c4f63d902c03dc51c080eddd790f1bfedc3ae96c7d1103e0ee58157';
+  '42fb616f1b34945b8f4ae820c10ff83467f611c250d8e8ff25323725c2d85f83';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd3b7a896ac6dedf8812b18365aed919d27c4fb582400dc1d780f2b5f7f20becc';
+  '1556193fece78aed25b5eba88f38250764e6e20944945d675f9f606591058566';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1566,10 +1571,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // landing on top of the VFX per-frame cost work already on this release
     // branch, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
+    // compileAsync patch branch: the first-order composite follows both
+    // parents' inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c22441cf2f237a9609fc67eee6faac4babdbee38d0fc1002dbe2402c8d54440d');
+    ).toBe('5ea0097a5bc0603ba061d59c07a31b4a23dafdbd843016cac0e349342f5d5049');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
