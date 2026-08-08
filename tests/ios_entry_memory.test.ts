@@ -76,7 +76,7 @@ describe('tight-memory residency diet', () => {
 describe('deferred skin atlases on the packaged iOS shell', () => {
   it('gates the boot atlas sweep on the hint-stable native profile', () => {
     expect(assetsSource).toContain(
-      'const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);',
+      'const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);',
     );
     // The character-preview gate must not re-await atlases the boot deferred.
     expect(assetsSource).toContain('const missingSkins = eagerSkinAtlases');
@@ -267,7 +267,7 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
   it('extracts props and foliage as they land on the packaged shell', () => {
     const propsSource = read('../src/render/props.ts');
     const foliageSource = read('../src/render/foliage.ts');
-    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key);');
-    expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
+    expect(propsSource).toContain('if (GFX.iosMemoryProfile) propAsset(key);');
+    expect(foliageSource).toContain('if (GFX.iosMemoryProfile) extractParts(url);');
   });
 });

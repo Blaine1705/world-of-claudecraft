@@ -1193,7 +1193,7 @@ async function startGame(
       ...baseEntryDiagnostics(),
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
-      nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      iosMemoryProfile: GFX.iosMemoryProfile,
       tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
@@ -1384,7 +1384,7 @@ async function startGame(
     // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
     console.info(
       `[entry-guard] scene built: tier=${GFX.tier} constrainedMemory=${GFX.constrainedMemory} ` +
-        `nativeIosMemoryProfile=${GFX.nativeIosMemoryProfile} ` +
+        `iosMemoryProfile=${GFX.iosMemoryProfile} ` +
         `pooledVisualCap=${GFX.maxPooledCharacterVisuals} ` +
         `dynamicShadows=${GFX.dynamicShadows} shadowMap=${GFX.shadowMap} ` +
         `msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
@@ -4641,7 +4641,7 @@ async function startGame(
   } else {
     if (introPolicy.reason === 'constrained-ios-webkit') {
       console.info(
-        `[entry-guard] spawn cinematic suppressed: constrained native iOS WebKit ` +
+        `[entry-guard] spawn cinematic suppressed: constrained iOS WebKit ` +
           `preset=${settings.get('graphicsPreset')} tier=${GFX.tier}`,
       );
     }
@@ -4705,10 +4705,10 @@ async function startGame(
     console.warn('Renderer prewarm failed', err);
   }
   // The entry allocation spike is over: start streaming the mob bodies the
-  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
-  // whose GLB is still arriving renders a beat late through the fail-soft
-  // view-create path, instead of its decode competing with the scene build for
-  // the WebContent memory ceiling.
+  // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
+  // the packaged app; empty everywhere else). A mob whose GLB is still arriving
+  // renders a beat late through the fail-soft view-create path, instead of its
+  // decode competing with the scene build for the WebContent memory ceiling.
   const streamedCount = startStreamedCharacterPreloads();
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
@@ -6693,7 +6693,7 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
   // entry instead of holding all of them at the launcher, so the preview of a
   // character wearing one needs ITS skin fetched on demand (the mech lazy-load
   // pattern). Memoized and a no-op when resident or on eager platforms; a

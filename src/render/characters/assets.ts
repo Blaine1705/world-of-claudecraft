@@ -505,17 +505,20 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Packaged iOS carves the mob bodies out of the boot gate and STREAMS them after
-// first frame instead. They are the heaviest character content (creature +
-// skeleton-family GLBs with embedded 1024-class atlases; 47 files, and by far
-// the largest share of the decoded character residency) and nothing on the
-// launcher, the character-select preview, or the player's own spawn needs them:
-// mob views are created fail-soft (createCharacterVisual returns null and
-// view_create_retry retries, the #2079 seam; mounts already stream exactly this
-// way), so a mob whose GLB is still arriving pops in a beat later instead of
-// crashing anything. Measured on an iPhone 17 Pro, decoding the full set inside
-// the entry gate put WebContent at 1.54 GB before the renderer ever existed;
-// streaming defers that mass to after the entry spike has cleared. Weapons and
+// Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged
+// native app: see GFX.iosMemoryProfile in gfx.ts) carves the mob bodies out of
+// the boot gate and STREAMS them after first frame instead. They are the
+// heaviest character content (creature + skeleton-family GLBs with embedded
+// 1024-class atlases; 47 files, and by far the largest share of the decoded
+// character residency) and nothing on the launcher, the character-select
+// preview, or the player's own spawn needs them: mob views are created
+// fail-soft (createCharacterVisual returns null and view_create_retry retries,
+// the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
+// is still arriving pops in a beat later instead of crashing anything.
+// Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
+// WebContent at 1.54 GB before the renderer ever existed; streaming defers that
+// mass to after the entry spike has cleared, and that WebContent ceiling is
+// identical whether the process hosts Safari or the packaged app. Weapons and
 // NPC bodies stay in the gate: the char-select preview builds CharacterVisual
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
@@ -530,7 +533,7 @@ const streamableUrls = allPreloadUrls.filter(
   (url) =>
     STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
 );
-let streamedUrls = GFX.nativeIosMemoryProfile ? streamableUrls : [];
+let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
 let streamedUrlSet = new Set(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
@@ -590,8 +593,9 @@ let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
  * this call started). main.ts calls it once the entry is past its allocation
- * spike (prewarm complete). Empty everywhere but the packaged iOS shell, where
- * the boot gate above deliberately excluded these urls. A failed fetch re-arms
+ * spike (prewarm complete). Empty everywhere but iOS WebKit hosts (Safari,
+ * other iOS browsers, and the packaged app), where the boot gate above
+ * deliberately excluded these urls. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -632,7 +636,7 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) defers
 // the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
 // decode to well over 100 MB of RGBA inside the same WebContent process whose
 // jetsam ceiling the entry spike already presses against (the iPhone 13 report),
@@ -643,20 +647,20 @@ for (const [key, list] of Object.entries(SKINS)) {
 // profile hints derive from static boot signals (never the tier), so this
 // import-time read cannot drift from the live profile the way an import-time
 // TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
+const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = target.nativeIosMemoryProfile ? streamableUrls : [];
+  const nextStreamedUrls = target.iosMemoryProfile ? streamableUrls : [];
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
   const skinTasks =
-    target.nativeIosMemoryProfile || target.tightMemory
+    target.iosMemoryProfile || target.tightMemory
       ? []
       : [...bootSkinUrls].map((url) =>
           skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),

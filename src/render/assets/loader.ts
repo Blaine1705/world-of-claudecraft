@@ -126,10 +126,14 @@ function polishGltfTextures(gltf: GLTF): void {
 // preload set a WebContent kill lands and which asset preceded it (the iPhone 17
 // Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
 // with no JS error, so sequencing evidence has to come from the console, not
-// from error handlers). Gated like the residency table: dev browsers plus the
-// native iOS profile under diagnosis. The production WEB population must not
-// pay ~700 console lines per entry; the native Release shell suppresses the JS
-// console anyway, and a Debug shell attached for diagnosis sees every line.
+// from error handlers). Gated like the residency table: dev browsers plus every
+// iOS WebKit host under diagnosis (Safari and other iOS browsers included, not
+// just the native shell: the WebContent kills this exists to trace hit them
+// identically, and having zero console evidence from the plain-browser population
+// is exactly what let a Safari-only regression of this kind go undiagnosed). The
+// native Release shell suppresses the JS console anyway, so this costs it
+// nothing; on iOS Safari the ~700 console lines per entry are the trade for
+// finally having sequencing evidence when a player reports a crash there.
 function loadDiagEnabled(): boolean {
   // Vitest sets DEV too, and every jsdom texture fetch FAILs, so a suite that
   // touches the loader emits hundreds of these lines; that console volume is
@@ -137,7 +141,7 @@ function loadDiagEnabled(): boolean {
   // flake on the release gate). Tests never read this diagnostic: keep it out
   // of the test env entirely.
   if (import.meta.env.TEST) return false;
-  return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
+  return import.meta.env.DEV || GFX.iosMemoryProfile;
 }
 let loadDiagSeq = 0;
 function diagStart(kind: string, resolved: string): number {

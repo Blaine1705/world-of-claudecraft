@@ -484,9 +484,10 @@ for (const key of ALL_PROP_KEYS) {
     // superset; live profile preparation may load only the requested target.
     if (!deferredPropKeysForBoot().has(key)) return Promise.resolve();
     return preparePropSource(key).then(() => {
-      // Preserve the packaged-iOS boot path: extract each source as it lands
-      // and release its parsed scene before the renderer build.
-      if (GFX.nativeIosMemoryProfile) propAsset(key);
+      // Preserve the iOS WebKit boot path (Safari, other iOS browsers, and the
+      // packaged app alike): extract each source as it lands and release its
+      // parsed scene before the renderer build.
+      if (GFX.iosMemoryProfile) propAsset(key);
     });
   });
 }
@@ -2696,7 +2697,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     // shadow via the bake exactly as they did per-material before; the
     // lowProps ghost path (whole-group hide) cannot diverge because every
     // lowProps profile also disables dynamicShadows (gfx.ts:
-    // constrainedMemory is true whenever nativeIosMemoryProfile is).
+    // constrainedMemory is true whenever iosMemoryProfile is).
     for (const h of cellBuild.hideables) {
       for (const b of h.bakeMeshes) b.mesh.castShadow = false;
     }

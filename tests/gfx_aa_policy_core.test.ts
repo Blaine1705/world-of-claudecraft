@@ -39,7 +39,7 @@ describe('graphics anti-aliasing policy', () => {
     expect(
       gfxAaPolicy('insane', {
         constrainedMemory: true,
-        nativeIosMemoryProfile: true,
+        iosMemoryProfile: true,
       }),
     ).toEqual({
       pixelRatioCap: 1.25,
