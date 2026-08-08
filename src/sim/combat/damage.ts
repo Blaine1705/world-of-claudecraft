@@ -31,6 +31,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -1262,6 +1263,10 @@ export function handleDeath(
     // fired and petPickTarget's `!owner.dead` gate left it idle and unkillable.
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
+    // Recorded FIRST, while the pet is still standing, so the owner's own
+    // resurrection can hand back exactly the pet this death is about to take
+    // (pet/pet_owner_revive.ts). Pure state, no rng.
+    snapshotPetOnOwnerDeath(ctx, e.id);
     const pet = ctx.petOf(e.id);
     if (pet) handleDeath(ctx, pet, killer, killerAbility);
     return;
