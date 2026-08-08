@@ -88,6 +88,16 @@ describe('wiki launcher wiring pins', () => {
       const html = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
       expect(html, `${file} lost #mm-wiki`).toContain('id="mm-wiki"');
       expect(html, `${file} lost #mobile-wiki`).toContain('id="mobile-wiki"');
+      // The micro button has no text content, so a dropped data-icon hook
+      // would render it completely invisible with every suite green (the
+      // #mm-discord pin in client_shell.test.ts guards the same hazard).
+      // The mobile twin degrades to its .mobile-label text, but pin it too.
+      expect(html, `${file} lost #mm-wiki's icon hook`).toMatch(
+        /id="mm-wiki"[^>]*data-icon="wiki"/,
+      );
+      expect(html, `${file} lost #mobile-wiki's icon hook`).toMatch(
+        /id="mobile-wiki"[^>]*data-icon="wiki"/,
+      );
     }
   });
 
