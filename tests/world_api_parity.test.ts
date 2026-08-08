@@ -106,6 +106,7 @@ export const IWORLD_MEMBERS = [
   { name: 'prestigeRank', kind: 'data' },
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
+  { name: 'playtimeSeconds', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
@@ -564,12 +565,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 298
     // (plus deedsRecent already in the base for 299 on pure release). The
     // v0.36.0 base's paperdoll helmet-visibility eye adds setHelmHidden
-    // (IWorldCosmetics, a method), for 300 on pure release, and its bag
+    // (IWorldCosmetics, a method), for 300 on pure release, its bag
     // clean-up button adds sortInventory (IWorldInventory, a method), for
-    // 301 on pure release. The Reliquary facet adds seven members
-    // (3 data + 4 methods), leaving 308.
-    expect(IWORLD_MEMBERS.length).toBe(308);
-    expect(DATA_MEMBERS.length).toBe(79);
+    // 301 on pure release, and the character sheet's Time Played line adds
+    // playtimeSeconds (IWorldProgressionXp, data), for 302 on pure release.
+    // The Reliquary facet adds seven members (3 data + 4 methods),
+    // leaving 309.
+    expect(IWORLD_MEMBERS.length).toBe(309);
+    expect(DATA_MEMBERS.length).toBe(80);
     expect(METHOD_MEMBERS.length).toBe(229);
   });
   it('has no duplicate member names', () => {
@@ -790,6 +793,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -949,6 +953,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInfo',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1389,6 +1394,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
   'leaderboard',
@@ -1802,8 +1808,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(308);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(308);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(309);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(309);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

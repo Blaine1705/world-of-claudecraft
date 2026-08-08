@@ -35,6 +35,7 @@ import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/dat
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -42,6 +43,7 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { playtimeParts } from '../src/ui/playtime_view';
 import {
   bareClient,
   broadcast,
@@ -724,6 +726,53 @@ describe('delta snapshots', () => {
     expect(snap.self.trade).toBeNull();
     expect(Array.isArray(snap.self.inv)).toBe(true);
     expect(Array.isArray(snap.ents)).toBe(true);
+  });
+
+  it('round-trips lifetime played time minute-quantized on ptime', () => {
+    // The encoder floors to whole minutes (still in seconds on the wire) so
+    // the serialized form only changes about once a minute and the delta gate
+    // drops the key from every other tick; the decoder mirrors it verbatim.
+    const meta = server.sim.players.get(session.pid)!;
+    meta.totalPlayedSeconds = 3725; // 1h 2m 5s baseline, sim.time still ~0
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ptime).toBe(3720);
+
+    const client = bareClient(session.pid);
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // Unchanged within the same minute: the next snapshot omits the key, and
+    // the delta-guarded decode keeps the prior mirror instead of wiping it.
+    broadcast(server);
+    const snap2 = lastSnap(fc.sent);
+    expect(snap2.self).not.toHaveProperty('ptime');
+    (client as unknown as SnapshotApplier).applySnapshot(snap2);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // The elapsed-session arm: once the sim clock crosses the next whole
+    // minute the quantized value re-ships and tracks the live total.
+    (server.sim as { time: number }).time += 61;
+    broadcast(server);
+    const snap3 = lastSnap(fc.sent);
+    expect(snap3.self.ptime).toBe(3780);
+    (client as unknown as SnapshotApplier).applySnapshot(snap3);
+    expect(client.playtimeSeconds).toBe(3780);
+
+    // Cross-host display agreement, pinned ABSOLUTELY on both sides (3725s
+    // baseline + 61s session = 1h 3m): the offline formula serves unfloored
+    // seconds while the online mirror is minute-quantized, and the sheet's
+    // minute-flooring parts split must render both identically. The offline
+    // arm anchors on the session's own meta (not Sim.primary, which is only
+    // coincidentally the same character in this harness), and the literal
+    // expectation keeps the pin decisive inside this file even if
+    // playtimeParts itself regresses.
+    expect(playtimeParts(client.playtimeSeconds)).toEqual({ days: 0, hours: 1, minutes: 3 });
+    expect(playtimeParts(livePlaytimeSeconds(meta, server.sim.time))).toEqual({
+      days: 0,
+      hours: 1,
+      minutes: 3,
+    });
   });
 
   it('round-trips the Hunter reactive window as remaining seconds', () => {
@@ -3407,6 +3456,7 @@ const ALL_DELTA_KEYS = [
   'ncd',
   'party',
   'prof',
+  'ptime',
   'qdone',
   'qlog',
   'reliq',
@@ -3484,6 +3534,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   party: 'partyInfo',
   prk: 'prestigeRank',
   prof: 'professionsState',
+  ptime: 'playtimeSeconds',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
@@ -4302,11 +4353,12 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 67 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 68 unique keys in sorted order', () => {
     // +1 guildBank (Guild Bank Phase 2), +1 battleground bg, +1 commission
-    // order board corder (issue #1298), +1 reliq (Reliquary Phase 3 sparse blob).
-    expect(ALL_DELTA_KEYS).toHaveLength(67);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(67);
+    // order board corder (issue #1298), +1 the character sheet's lifetime
+    // played-time key ptime, +1 reliq (Reliquary Phase 3 sparse blob).
+    expect(ALL_DELTA_KEYS).toHaveLength(68);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(68);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4332,8 +4384,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // plus the packet's slotted-tool-effects key tslot for 63, the
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, the commission order board key corder (issue #1298) for 66,
-    // and reliq (Reliquary Phase 3 sparse blob) for 67.
-    expect(scraped.size).toBe(67);
+    // the character sheet's lifetime played-time key ptime for 67, and
+    // reliq (Reliquary Phase 3 sparse blob) for 68.
+    expect(scraped.size).toBe(68);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

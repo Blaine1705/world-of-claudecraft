@@ -52,19 +52,19 @@ export const table: DeedLocaleTable = {
     desc: '성물고에서 큐레이터 등급 5를 달성하십시오 (고유 성물 100종 수록).',
   },
   pvp_honor_sergeant: {
-    name: '병장',
+    name: '전열파쇄자',
     desc: '평생 명예 10,000을 획득하십시오. 명예를 소비해도 계급은 사라지지 않습니다.',
-    title: '병장',
+    title: '전열파쇄자',
   },
   pvp_honor_knight_lieutenant: {
-    name: '기사-소위',
+    name: '전장약탈자',
     desc: '평생 명예 40,000을 획득하십시오. 진짜 전쟁을 한 계절 치른 셈입니다.',
-    title: '기사-소위',
+    title: '전장약탈자',
   },
   pvp_honor_field_marshal: {
-    name: '원수',
+    name: '전쟁왕관',
     desc: '평생 명예 150,000을 획득하십시오. 어느 서버에서든 드물며, 마땅히 그래야 합니다.',
-    title: '원수',
+    title: '전쟁왕관',
   },
   chr_drakemaw_broodlord: {
     name: '둥지 파괴자',
