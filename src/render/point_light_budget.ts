@@ -84,14 +84,12 @@ export function applyPointLightBudget(
   rangeSq: number,
   sceneRoot?: THREE.Object3D,
 ): number {
-  let ineligible = 0;
   for (const entry of ranked) {
     if (entry.dynamic) entry.light.getWorldPosition(entry.worldPos);
     const dx = entry.worldPos.x - px;
     const dz = entry.worldPos.z - pz;
     entry.d2 = dx * dx + dz * dz;
     entry.eligible = sceneRoot === undefined || isDrawnEligible(entry.light, sceneRoot);
-    if (!entry.eligible) ineligible++;
   }
   // Sort whenever the live budget (which can sit below visibleCount under the
   // frame-budget governor or on constrained-memory tiers) actually truncates

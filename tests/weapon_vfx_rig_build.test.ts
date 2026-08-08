@@ -288,6 +288,7 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     let hosts = 0;
     let lights = 0;
     let visibleLights = 0;
+    let shells = 0;
     group.traverse((object) => {
       if (object.name) names.add(object.name);
       if (object.name?.startsWith('prewarm-skin-host:')) hosts++;
@@ -295,6 +296,7 @@ describe('buildWeaponVfxPrewarmGroup', () => {
         lights++;
         if (object.visible) visibleLights++;
       }
+      if (object.userData.__vfx) shells++;
     });
 
     expect(hosts).toBe(specCount);
@@ -303,9 +305,14 @@ describe('buildWeaponVfxPrewarmGroup', () => {
         `prewarm-skin-host:${key}`,
       );
     }
-    for (const name of ['vfx_coreSprite', 'vfx_motes', 'vfx_twinkles', 'vfx_aurora']) {
+    for (const name of ['vfx_coreSprite', 'vfx_motes', 'vfx_drift', 'vfx_twinkles', 'vfx_aurora']) {
       expect(names, `${name} missing from the prewarm rigs`).toContain(name);
     }
+    // The fresnel rim shell parents itself to the host mesh instead of the rig
+    // group, so it is counted by its tag rather than a name.
+    expect(shells).toBeGreaterThan(0);
+    // The ground pool rides sceneExtras, which every rig group carries.
+    expect(names).toContain('weapon_vfx_extras');
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key the boot compile warms.
     expect(lights).toBe(specCount);

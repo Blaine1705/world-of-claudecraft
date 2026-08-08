@@ -34,6 +34,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
+import { assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
@@ -51,6 +52,9 @@ function record(line) {
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER = process.env.SERVER_URL ?? 'http://localhost:8787';
+// The bench mints accounts and drives /dev cheats (teleport, level): the
+// server it talks to must be local, always.
+assertLoopbackUrl(SERVER, 'SERVER_URL');
 const WS_BASE = SERVER.replace(/^http/, 'ws');
 const BATCHES = (process.env.CROWD_BATCHES ?? '10,20,35,50').split(',').map(Number);
 const W = Number(process.env.CROWD_W ?? 1920);

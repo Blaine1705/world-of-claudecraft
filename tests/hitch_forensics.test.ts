@@ -19,6 +19,21 @@ describe('createHitchForensics', () => {
     expect(f.records()).toEqual([]);
   });
 
+  it('pins the default threshold at exactly 150ms', () => {
+    // The forensics contract everywhere (bench stall counts, prod reports)
+    // speaks in "stalls over 150": a drifted default silently reclassifies
+    // every capture, so the boundary is pinned to the value itself.
+    const under = createHitchForensics();
+    under.sample(0, 20, state());
+    under.sample(5000, 149.9, state({ programs: 500 }));
+    expect(under.records()).toEqual([]);
+
+    const at = createHitchForensics();
+    at.sample(0, 20, state());
+    at.sample(5000, 150, state({ programs: 500 }));
+    expect(at.records()).toHaveLength(1);
+  });
+
   it('stores only the fields that changed across a hitch interval', () => {
     const f = createHitchForensics();
     f.sample(0, 20, state());

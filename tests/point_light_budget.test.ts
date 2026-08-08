@@ -254,6 +254,10 @@ describe('applyPointLightBudget', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const methodStart = source.indexOf('private budgetFireLights(');
     const methodEnd = source.indexOf('// light shafts fade', methodStart);
+    // A renamed end marker must fail here, never silently widen the slice to
+    // the rest of the file (which would let the pins match anywhere).
+    expect(methodStart).toBeGreaterThan(-1);
+    expect(methodEnd).toBeGreaterThan(methodStart);
     const method = source.slice(methodStart, methodEnd);
 
     expect(method).toContain('const drawnCount = applyPointLightBudget(');

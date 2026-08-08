@@ -6,8 +6,8 @@
 // arrive by teleport, each bot leveled and equipped with a varied weapon AND
 // a Season 1 Armory weapon skin (the hero tiers carry heavy VFX rigs), so
 // every arrival brings first-seen models and materials exactly like real
-// players do. Skins are granted straight into accounts.cosmetics in the dev
-// database before the bot joins (the session loads ownership at join; the
+// players do. Skins are granted straight into account_weapon_cosmetics in the
+// dev database before the bot joins (the session loads ownership at join; the
 // dev flow deliberately skips the economy service).
 //
 // The script owns its client: it starts vite with --strictPort from the

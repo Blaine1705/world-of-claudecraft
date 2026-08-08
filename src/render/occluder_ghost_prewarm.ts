@@ -194,9 +194,10 @@ function buildTwin(target: OccluderGhostTarget): THREE.Mesh {
 }
 
 /**
- * A hidden group of one twin mesh per ghost material found under `root`, in the
- * exact fade state, so the boot compile links the transparent variants the
- * first live fade would otherwise link inside a gameplay frame.
+ * A hidden group of one twin mesh per DISTINCT ghost program found under
+ * `root` (materials sharing a program cache key share one twin), in the exact
+ * fade state, so the boot compile links the transparent variants the first
+ * live fade would otherwise link inside a gameplay frame.
  */
 export function buildGhostVariantPrewarmGroup(root: THREE.Object3D): THREE.Group {
   const group = new THREE.Group();
