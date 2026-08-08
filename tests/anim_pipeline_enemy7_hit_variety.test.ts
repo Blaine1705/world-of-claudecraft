@@ -67,7 +67,13 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    const occurrences = [...MANIFEST_SRC.matchAll(/_hit_variety_anims\.glb/g)].length;
+    // Scoped to these 2 ENEMY7-family donor basenames rather than every
+    // `_hit_variety_anims.glb` in the manifest: other families (KayKit's
+    // kaykit()/skeletonClips(), BIPED14/YETI_BIPED14/TROLL_BIPED14, etc,
+    // issue #2889) independently wire their own hit-variety donors and would
+    // otherwise inflate an unscoped count every time one of them lands.
+    const donorPattern = /goblin_hit_variety_anims\.glb|giant_hit_variety_anims\.glb/g;
+    const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
     expect(occurrences).toBe(2);
   });
 });
