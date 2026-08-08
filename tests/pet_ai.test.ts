@@ -534,6 +534,25 @@ describe('petPickTarget: a defensive pet assists against a hostile PLAYER', () =
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
   });
 
+  it('keeps assisting through the whole inCombat LINGER, which is the disclosed cost', () => {
+    // Review catch, pinned rather than left to the PR body: `inCombat` is a
+    // LINGERING flag, not an instantaneous one, so a defensive pet keeps
+    // initiating on the owner's target for the linger window after the fight is
+    // actually over. That is bounded and gated by isHostileTo, and it is the
+    // accepted cost of reading a flag the tick order publishes one tick late,
+    // but it is behavior a future reader should have to change this test to
+    // change, rather than discover.
+    const { sim, owner, pet, enemyPid } = spellCasterFixture();
+    owner.inCombat = true;
+    owner.combatTimer = 0; // freshly engaged; the flag decays over PET_COMBAT_LINGER
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+
+    // The moment the flag actually clears, the assist stops. The flag, not the
+    // timer, is the gate: this is the boundary the fix reads.
+    owner.inCombat = false;
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
   it('leaves an untargeted hostile player alone even while the owner is in combat', () => {
     const { sim, owner, pet } = spellCasterFixture();
     owner.inCombat = true;
