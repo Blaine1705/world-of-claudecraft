@@ -513,6 +513,20 @@ export function buildBagGrid(
   return { state: 'items', cells, visible, emptyCells, overflow };
 }
 
+/** Stable content key for a painted bag grid: what the player would SEE, one
+ *  token per square (item id x count, '.' for a hole), plus the state and the
+ *  trailing free squares. The sort settle ripple keys on this changing (the
+ *  press itself repaints the still-unsorted mirror online; the tidied grid
+ *  lands with the heavy self snapshot), so it must cover both grid shapes:
+ *  real cells in the pristine view, the visible list in a derived view. */
+export function bagGridSignature(model: BagGridModel): string {
+  const squares =
+    model.cells.length > 0
+      ? model.cells.map((s) => (s ? `${s.itemId}x${s.count}` : '.'))
+      : model.visible.map((s) => `${s.itemId}x${s.count}`);
+  return `${model.state}|${squares.join(',')}|${model.emptyCells}`;
+}
+
 /** One socket of the bag bar: the equipped bag (with its slot count) or an
  *  empty socket awaiting a bag item. */
 export interface BagSocketModel {

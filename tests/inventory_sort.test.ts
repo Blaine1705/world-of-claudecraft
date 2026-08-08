@@ -152,9 +152,12 @@ describe('compareBagStacks: the clean-up ladder', () => {
   });
 
   it('orders armor by paperdoll slot, helmet before chest before feet before rings', () => {
-    expect(
-      sortedIds([slot('band'), slot('chest'), slot('helm'), slot('epic_boots')]),
-    ).toEqual(['helm', 'chest', 'epic_boots', 'band']);
+    expect(sortedIds([slot('band'), slot('chest'), slot('helm'), slot('epic_boots')])).toEqual([
+      'helm',
+      'chest',
+      'epic_boots',
+      'band',
+    ]);
   });
 
   it('orders better quality first within a category and slot', () => {
@@ -252,10 +255,7 @@ describe('consolidateBagStacks', () => {
       slot('copper_ore', 5, { craftedRecipeId: 'r1' }),
     ];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([
-      slot('copper_ore', 10, { craftedRecipeId: 'r1' }),
-      slot('copper_ore', 5),
-    ]);
+    expect(inv).toEqual([slot('copper_ore', 10, { craftedRecipeId: 'r1' }), slot('copper_ore', 5)]);
   });
 
   it('lets a legacy overstacked entry donate without ever being split', () => {

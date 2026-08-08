@@ -10,54 +10,119 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "es_ES": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "fr_FR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "fr_CA": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "de_DE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
+  ],
+  "zh_TW": [
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
+  ],
+  "ko_KR": [
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
+  ],
+  "ja_JP": [
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
+  ],
   "pt_BR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
+  ],
   "cs_CZ": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "nl_NL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "pl_PL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "id_ID": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "tr_TR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "sv_SE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "vi_VN": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ],
   "da_DK": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint"
   ]
 };

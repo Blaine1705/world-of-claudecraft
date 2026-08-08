@@ -125,7 +125,11 @@ function compareStrings(a: string, b: string): number {
  *  grades grouped under their base material), fine grade before base, item
  *  id, fuller stacks first. Ties (same id, same count, e.g. two distinct
  *  instanced copies) return 0 and keep their relative array order. */
-export function compareBagStacks(a: SortableStack, b: SortableStack, lookup: ItemDefLookup): number {
+export function compareBagStacks(
+  a: SortableStack,
+  b: SortableStack,
+  lookup: ItemDefLookup,
+): number {
   const defA = lookup(a.itemId);
   const defB = lookup(b.itemId);
   const category = categoryRankOf(defA) - categoryRankOf(defB);

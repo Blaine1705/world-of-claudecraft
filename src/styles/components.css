@@ -6862,6 +6862,62 @@
     color: inherit;
     cursor: var(--cursor-point);
   }
+  /* The one-shot clean-up button beside the view dropdown (the
+     .bank-deposit-all action-button shape: same row, same gold treatment). */
+  .bag-sort-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .bag-sort-btn:hover {
+    filter: brightness(1.12);
+  }
+  .bag-sort-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .bag-sort-btn .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  body.mobile-touch .bag-sort-btn {
+    min-height: 40px;
+  }
+  /* One-shot settle ripple after a clean-up: each square eases in with a
+     small per-cell stagger (--settle-i, capped painter-side). Opacity plus a
+     3px drop only (DESIGN.md motion rules); reduced motion turns it off. */
+  .bag-grid-settle > * {
+    animation: bag-sort-settle 160ms ease-out backwards;
+    animation-delay: calc(var(--settle-i, 0) * 14ms);
+  }
+  @keyframes bag-sort-settle {
+    from {
+      opacity: 0.35;
+      transform: translateY(-3px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-grid-settle > * {
+      animation: none;
+    }
+  }
+  body.reduce-motion .bag-grid-settle > * {
+    animation: none;
+  }
   .money {
     margin-top: 8px;
     font-size: 12px;
