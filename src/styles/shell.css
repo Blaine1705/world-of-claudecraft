@@ -3364,6 +3364,12 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-delete-btn {
       justify-self: end;
     }
+    /* One-shot redesign: a quiet gold accent so the limited, spend-once offer
+       reads as special without out-shouting Enter World above it. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .reroll-char-btn {
+      color: var(--gold-dim);
+      border-color: var(--gold-dim);
+    }
     /* The class summary's base type is sized for the small pre-game card
        (10px to 12px); on the full-screen stage it reads too small. Scale the
        whole details sheet up one step in every cs-wow panel. */
@@ -4679,6 +4685,24 @@
     font-size: 13px;
     mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+  }
+
+  /* One-shot appearance redesign: the customizer docked in the news panel's
+     slot. The customizer body scrolls inside the fixed panel height; the
+     Save / Keep actions stay pinned below it. */
+  .cs-reroll-panel #charselect-reroll-host {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .cs-reroll-actions {
+    flex: none;
+    display: flex;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+  }
+  .cs-reroll-actions .btn {
+    flex: 1 1 0;
   }
 
   .class-details-content {

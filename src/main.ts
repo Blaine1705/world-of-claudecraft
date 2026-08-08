@@ -243,6 +243,7 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
+  portraitsReady,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
@@ -294,6 +295,7 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
+  type Entity,
   MELEE_RANGE,
   PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,
@@ -1364,19 +1366,22 @@ async function startGame(
     setLoadingPercent(37, t('loading.enteringWorld'));
     await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
     setLoadingPercent(40, t('loading.enteringWorld'));
-    // Compose the LOCAL player's body from their authored appearance: every
-    // class routes through the modular part library, each via its own
-    // `player_<class>_modular` def. Every other entity keeps its fixed class
-    // rig: the look is presentation state and is not on the wire, so remote
-    // players cannot be composed yet. In-world the kit's helm follows the
-    // entity's OWN `helmHidden` wire bit (the paperdoll eye toggle) rather
-    // than the creation turntable's preview state, so peers compose with the
-    // owner's choice the day looks ride the wire.
-    setModularLookProvider((e) =>
-      e.kind === 'player' && e.id === world.playerId
-        ? inWorldLookFor(e.templateId as PlayerClass, e.helmHidden)
-        : null,
-    );
+    // Compose EVERY player's body from their authored appearance: the look
+    // now rides the identity wire (`app`, set at join from the character's
+    // own DB column), so peers compose exactly what the owner designed,
+    // local player included, from the same server truth. An entity with no
+    // authored look (a pre-creator character) keeps the fixed class rig, and
+    // a Combat Mech wearer keeps the mech (createCharacterVisual gates it).
+    // The kit's helm follows each entity's OWN `helmHidden` wire bit (the
+    // paperdoll eye toggle), so peers see the owner's choice. Per-entity
+    // wire JSON is normalized at compose time (visual build, not per frame):
+    // hostile or stale payloads clamp to a valid body.
+    setModularLookProvider((e) => inWorldLookFor(e, e.id === world.playerId));
+    // No helmet re-assert here on purpose. The preference is per CHARACTER
+    // now: set from the creator's toggle at creation, changed by the paperdoll
+    // eye afterwards, and serialized into that character's own saved state.
+    // The device-global localStorage key this used to read forced ONE
+    // character's choice onto every character on the machine.
     renderer = new Renderer(world, canvas, nameplates);
     rendererReady = true;
     renderer.setAudioSink(sfx);
@@ -4912,6 +4917,19 @@ async function startOffline(
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
+  // Offline has no account and no character row, so the local draft IS this
+  // character's authored look and the creator's toggle IS its helm choice.
+  // Stamped onto the entity because that is where every consumer reads a look
+  // from now (the wire fills this field online); without it an offline session
+  // composes nothing and falls back to the fixed class rig.
+  const offlinePlayer = sim.entities.get(sim.playerId);
+  if (offlinePlayer) {
+    // The entity field is deliberately opaque (the sim must not depend on the
+    // render layer's ModularAppearance), so the interface needs the cast an
+    // online wire payload does not.
+    offlinePlayer.modularAppearance = modularAppearance as unknown as Record<string, unknown>;
+    offlinePlayer.helmHidden = !creationHelm;
+  }
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
   // weapon model on the mech (swap them in the bag to see each one). DEV builds
@@ -5189,13 +5207,20 @@ function modularLookForClass(cls: PlayerClass): ModularLook | null {
   return { app: modularAppearance, worn: creationLoadout(cls) };
 }
 
-/** The IN-WORLD look: the class's full kit, with the head piece left off when
- *  the wearer's `helmHidden` wire bit says so (the paperdoll eye toggle).
- *  Distinct from creationLoadout on purpose: the creation turntable's
- *  helm preview is a view for picking a face, not a wardrobe choice. */
-function inWorldLookFor(cls: PlayerClass, helmHidden: boolean): ModularLook | null {
-  const full = fullSet(readStoredArmorSet(cls));
-  return { app: modularAppearance, worn: helmHidden ? { ...full, head: null } : full };
+/** The IN-WORLD look for a player entity: THEIR authored appearance (the
+ *  `app` identity wire field, i.e. the character's own DB column, never the
+ *  device-global creation draft, which used to restyle every character on
+ *  the account), worn over the class's full kit, with the head piece left
+ *  off when the entity's `helmHidden` wire bit says so (the paperdoll eye
+ *  toggle). Null for entities with no authored look: they keep the fixed
+ *  class rig. Only the local player honours the per-class armor-set
+ *  localStorage override (a dev knob); peers wear their class kit. */
+function inWorldLookFor(e: Entity, isSelf: boolean): ModularLook | null {
+  if (e.kind !== 'player' || !e.modularAppearance) return null;
+  const cls = e.templateId as PlayerClass;
+  const app = normalizeAppearance(e.modularAppearance as Partial<ModularAppearance>);
+  const full = fullSet(isSelf ? readStoredArmorSet(cls) : classArmorSet(cls));
+  return { app, worn: e.helmHidden ? { ...full, head: null } : full };
 }
 
 /** Whether the creation turntable shows the set's helm. A view of the
@@ -5229,6 +5254,38 @@ function previewClassBody(cls: PlayerClass): void {
  *  keep previewing the first class's kit and weapons after a switch. */
 const appearancePanelClass = new Map<string, PlayerClass>();
 
+/** What this panel's customizer RESOLVED to when it was built.
+ *
+ *  The customizer owns its DOM and bakes every label through t() at mount, with
+ *  no re-localize pass of its own (its rows carry no data-i18n for the
+ *  translatePage sweep to find). The create panel mounts during boot, BEFORE the
+ *  lazy locale chunk resolves, so its labels come out English and STAY English
+ *  for every non-English player.
+ *
+ *  The probe is resolved TEXT, not the language id, because the language id is
+ *  already the player's choice at boot: what arrives late is the table behind
+ *  it. Comparing text catches both that and a deliberate language switch, and
+ *  stays equal for English players so they never pay a rebuild. */
+const appearancePanelProbe = new Map<string, string>();
+
+/** The signature a mounted customizer is compared against: language plus two
+ *  resolved labels, so an unchanged language with a newly-loaded table still
+ *  reads as stale. */
+function appearanceLocaleProbe(): string {
+  return `${getLanguage()}|${t('auth.appearance')}|${t('auth.earrings')}`;
+}
+
+/** Rebuild any mounted appearance customizer whose labels are now stale. Called
+ *  when the boot locale chunk lands; the language-switch path reaches the same
+ *  check through refreshLocalizedDynamicShell -> renderClassDetails. */
+function relocalizeAppearancePanels(): void {
+  for (const [panelId, cls] of [...appearancePanelClass]) {
+    if (appearancePanelProbe.get(panelId) !== appearanceLocaleProbe()) {
+      syncAppearanceUi(panelId, cls);
+    }
+  }
+}
+
 /** Mount (or tear down) the appearance customizer under a class-details panel. */
 function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
   const hostSel = APPEARANCE_HOSTS[panelId];
@@ -5244,13 +5301,20 @@ function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
     return;
   }
   host.hidden = false;
-  if (existing) {
+  if (existing && appearancePanelProbe.get(panelId) === appearanceLocaleProbe()) {
     // The panel survives class switches; poke it so live-coloured chips (the
     // outfit swatches read the class kit) repaint for the new class.
     existing.set({});
     return;
   }
+  if (existing) {
+    // The locale resolved differently than when this panel was built (see
+    // appearancePanelProbe): its labels are baked, so relabelling means a rebuild.
+    existing.destroy();
+    appearanceUis.delete(panelId);
+  }
   const panelClass = () => appearancePanelClass.get(panelId) ?? cls;
+  appearancePanelProbe.set(panelId, appearanceLocaleProbe());
   appearanceUis.set(
     panelId,
     mountAppearanceCustomizer(host, {
@@ -5350,9 +5414,12 @@ function updatePreviewContainer(panelId: string): void {
 
   if (panelId === '#charselect-panel') {
     // The selected roster row drives the showcase: its full real appearance
-    // (class or Combat Mech body + chroma + equipped mainhand), matching the world.
-    if (charselectSelected) {
-      characterPreview.setAppearance(charselectAppearance(charselectSelected));
+    // (class or Combat Mech body + chroma + equipped mainhand), matching the
+    // world. An open redesign editor wins: its draft IS the stage's subject.
+    if (rerollTarget && rerollDraft) {
+      driveRerollPreview();
+    } else if (charselectSelected) {
+      showCharselectCharacter(charselectSelected);
     } else {
       const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
       const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
@@ -6377,6 +6444,9 @@ async function refreshCharacters(): Promise<void> {
   // Drop any stale selection from a previous realm; the default first-row
   // selection below re-arms the shared Enter World button and the preview name.
   charselectSelected = null;
+  // A redesign in progress is a draft against the OLD roster; discard it
+  // (nothing was saved) rather than let it edit a row that may be gone.
+  closeRerollEditor(false);
   syncCharselectEnterButton();
   setCharselectPreviewName('');
   try {
@@ -6429,7 +6499,32 @@ async function refreshCharacters(): Promise<void> {
       const inWorldHint = c.online
         ? `<span class="char-inworld-hint">${escapeHtml(t('character.inWorldHint'))}</span>`
         : '';
-      row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
+      // One-shot redesign token (server-decided: pre-creator character, token
+      // unspent). Rendered on every action arm; gone for good once spent.
+      const rerollBtn = c.appearanceRerollAvailable
+        ? `<button type="button" class="btn reroll-char-btn" title="${escapeHtml(t('character.redesignHint'))}" aria-label="${escapeHtml(t('character.redesignTitle', { name: c.name }))}">${escapeHtml(t('character.redesign'))}</button>`
+        : '';
+      // The chip draws the character's REAL body: their authored modular look
+      // (or the mech cosmetic), matching the 3D stage and the world.
+      const chipHtml = () =>
+        portraitChipHtml({
+          cls: c.class,
+          skin: c.skin ?? 0,
+          name: c.name,
+          variant: 'sm',
+          look: charselectLook(c),
+          catalog: c.skinCatalog ?? 'class',
+        });
+      // A composed chip cannot hydrate from data attributes, so a row built
+      // before the portrait renderer is ready re-renders its own chip once the
+      // assets land (the crest placeholder shows until then).
+      if (charselectLook(c) && !portraitsReady()) {
+        onPortraitsReady(() => {
+          const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
+          if (chip?.isConnected) chip.outerHTML = chipHtml();
+        });
+      }
+      row.innerHTML = `${chipHtml()}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
           <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
@@ -6437,10 +6532,10 @@ async function refreshCharacters(): Promise<void> {
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${deleteCharButtonHtml(c.online)}</span>`
+            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${deleteCharButtonHtml(false)}</span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -6483,8 +6578,9 @@ async function refreshCharacters(): Promise<void> {
         row.setAttribute('aria-selected', 'true');
         // The class-details sheet is gone from this screen (the news panel sits
         // there now), so drive the 3D preview directly: two characters of the
-        // same class can still differ in gear, skin, or cosmetic body.
-        characterPreview?.setAppearance(charselectAppearance(c));
+        // same class can still differ in gear, skin, cosmetic body, or their
+        // authored modular look.
+        showCharselectCharacter(c);
         charselectSelected = c;
         syncCharselectEnterButton();
         setCharselectPreviewName(c.name);
@@ -6496,6 +6592,13 @@ async function refreshCharacters(): Promise<void> {
           e.preventDefault();
           selectRow();
         }
+      });
+      row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Select the row first so the stage, name, and Enter World button all
+        // agree on which character is being redesigned.
+        selectRow();
+        openRerollEditor(c);
       });
       // Double-click a row to jump straight into the world (classic-select
       // muscle memory). It routes through the shared desktop Enter World button
@@ -6727,6 +6830,141 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
 // can verify they never drift from the sim's class/ability definitions.
 
 const activeClassDetailsTimeouts: Record<string, number | null> = {};
+
+/** A roster character's composed pieces, or null when they render the legacy
+ *  rig: no authored look on the row (a pre-creator character), or the Combat
+ *  Mech replacement body (which is never composed over). The worn kit mirrors
+ *  the in-world rule: the class's full set, head off when the character's
+ *  saved helm preference says so. */
+function charselectLook(c: CharacterSummary): ModularLook | null {
+  if (!c.appearance || c.skinCatalog === 'mech') return null;
+  const app = normalizeAppearance(c.appearance as Partial<ModularAppearance>);
+  const full = fullSet(classArmorSet(c.class));
+  return { app, worn: c.helmHidden ? { ...full, head: null } : full };
+}
+
+/** Drive the char-select stage with a roster character's REAL body: their own
+ *  authored modular look when they have one (previously every roster row
+ *  showed the legacy class rig regardless of the design it was created
+ *  with), the mech cosmetic or legacy rig otherwise. */
+function showCharselectCharacter(c: CharacterSummary): void {
+  if (!characterPreview) return;
+  const look = charselectLook(c);
+  if (!look) {
+    characterPreview.setAppearance(charselectAppearance(c));
+    return;
+  }
+  // Same on-demand weapon-skin warmup the legacy path performs (see
+  // charselectAppearance): the composed turntable holds the skinned weapon too.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
+  characterPreview.setModular(
+    look.app,
+    look.worn,
+    c.class,
+    c.mainhandItemId ?? null,
+    c.offhandItemId ?? null,
+  );
+  characterPreview.setWeaponSkin(c.weaponSkinId ?? null);
+}
+
+// ---------------------------------------------------------------------------
+// One-shot appearance redesign (the char-select "Redesign" button).
+//
+// Characters authored before the modular creator shipped carry a single
+// server-tracked redesign token (CharacterSummary.appearanceRerollAvailable).
+// The editor reuses the creation customizer, docked where the news panel
+// sits, and drives the shared 3D stage with a DRAFT look; nothing is written
+// anywhere until Save posts it and the server burns the token atomically.
+// Cancel (or navigating away) discards the draft and the character keeps the
+// design it had.
+// ---------------------------------------------------------------------------
+let rerollTarget: CharacterSummary | null = null;
+let rerollDraft: ModularAppearance | null = null;
+let rerollUi: AppearanceCustomizer | null = null;
+/** Helm preview toggle while redesigning: a view, not part of the draft
+ *  (creationHelm's rule). Off by default so the face being edited is visible. */
+let rerollHelm = false;
+
+function rerollLoadout(c: CharacterSummary): ArmorLoadout {
+  const full = fullSet(classArmorSet(c.class));
+  return rerollHelm ? full : { ...full, head: null };
+}
+
+function driveRerollPreview(): void {
+  if (!rerollTarget || !rerollDraft || !characterPreview) return;
+  characterPreview.setModular(
+    rerollDraft,
+    rerollLoadout(rerollTarget),
+    rerollTarget.class,
+    rerollTarget.mainhandItemId ?? null,
+    rerollTarget.offhandItemId ?? null,
+  );
+  characterPreview.setWeaponSkin(rerollTarget.weaponSkinId ?? null);
+}
+
+function openRerollEditor(c: CharacterSummary): void {
+  const panel = document.getElementById('charselect-reroll');
+  const host = document.getElementById('charselect-reroll-host');
+  if (!panel || !host) return;
+  closeRerollEditor(false);
+  rerollTarget = c;
+  rerollHelm = false;
+  // Seed from the character's stored look; a pre-creator character has none
+  // and starts from the default body.
+  rerollDraft = normalizeAppearance((c.appearance as Partial<ModularAppearance>) ?? null);
+  const title = document.getElementById('charselect-reroll-title');
+  if (title) title.textContent = t('character.redesignTitle', { name: c.name });
+  const errEl = document.getElementById('charselect-reroll-error');
+  if (errEl) errEl.textContent = '';
+  document.getElementById('charselect-news')?.setAttribute('hidden', '');
+  panel.removeAttribute('hidden');
+  rerollUi = mountAppearanceCustomizer(host, {
+    value: rerollDraft,
+    onChange: (next) => {
+      rerollDraft = next;
+      driveRerollPreview();
+    },
+    helm: rerollHelm,
+    onHelm: (on) => {
+      rerollHelm = on;
+      driveRerollPreview();
+    },
+    armorSet: () => classArmorSet(c.class),
+  });
+  setCharselectPreviewName(c.name);
+  driveRerollPreview();
+}
+
+function closeRerollEditor(restoreSelection: boolean): void {
+  rerollUi?.destroy();
+  rerollUi = null;
+  rerollTarget = null;
+  rerollDraft = null;
+  document.getElementById('charselect-reroll')?.setAttribute('hidden', '');
+  document.getElementById('charselect-news')?.removeAttribute('hidden');
+  if (restoreSelection && charselectSelected) showCharselectCharacter(charselectSelected);
+}
+
+async function saveRerollAppearance(): Promise<void> {
+  const c = rerollTarget;
+  const draft = rerollDraft;
+  if (!c || !draft) return;
+  const saveBtn = document.getElementById('btn-reroll-save') as HTMLButtonElement | null;
+  const errEl = document.getElementById('charselect-reroll-error');
+  if (saveBtn) saveBtn.disabled = true;
+  if (errEl) errEl.textContent = '';
+  try {
+    await api.rerollAppearance(c.id, draft);
+    closeRerollEditor(false);
+    // Re-pull the roster: the row redraws with the new look, and the spent
+    // token (server truth) removes the Redesign button.
+    await refreshCharacters();
+  } catch (err) {
+    if (errEl) errEl.textContent = userFacingApiError(err);
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+  }
+}
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
@@ -7163,6 +7401,11 @@ function translatePage(): void {
 
 function refreshLocalizedDynamicShell(): void {
   updateWalletButton();
+  // Relabel the appearance customizers BEFORE the per-panel arms below: each
+  // arm returns early for the panel that happens to be on screen, so a language
+  // switch made from char-select would otherwise leave the create panel's baked
+  // labels in the old language until a class chip was clicked.
+  relocalizeAppearancePanels();
   const activePanel = document.body.dataset.startPanel;
   if (activePanel === 'realm-panel') {
     showRealmList();
@@ -9174,6 +9417,9 @@ function wireStartScreens(): void {
     // homepage permanently hidden - a worse failure than the English flash this gate prevents.
     try {
       translatePage();
+      // The create panel mounted its appearance customizer during boot, before
+      // this chunk resolved, so its baked labels are still English.
+      relocalizeAppearancePanels();
     } finally {
       if (gated && startScreen) startScreen.style.visibility = '';
     }
@@ -9900,6 +10146,14 @@ function wireStartScreens(): void {
   // New Character opens the dedicated create screen; create's Back returns here.
   $('#btn-new-character').addEventListener('click', () => show('#charcreate-panel'));
   $('#btn-charcreate-back').addEventListener('click', () => show('#charselect-panel'));
+  // One-shot appearance redesign: Save spends the token (server-authoritative),
+  // Cancel discards the draft and restores the selected character's stage.
+  document
+    .getElementById('btn-reroll-save')
+    ?.addEventListener('click', () => void saveRerollAppearance());
+  document
+    .getElementById('btn-reroll-cancel')
+    ?.addEventListener('click', () => closeRerollEditor(true));
   // Close the realm dropdown on outside click or Escape.
   document.addEventListener('click', (e) => {
     if (!realmDropdownOpen) return;
@@ -10114,6 +10368,15 @@ function wireStartScreens(): void {
         name,
         clsEl.dataset.class as PlayerClass,
         selectedSkin('#online-skin-row', onlineSkin),
+        // The look designed on this panel becomes THIS character's stored
+        // appearance (its own DB column). The localStorage draft stays what
+        // it is, the creator's working copy for the NEXT creation, and can
+        // never restyle characters that already exist.
+        modularAppearance,
+        // The turntable's helmet toggle is a real wardrobe choice at creation
+        // time: it becomes the character's standing helm preference, so the
+        // face just authored is the one that walks into the world.
+        !creationHelm,
       );
       newCharNameInput.value = '';
       charselectError.textContent = '';
@@ -10903,7 +11166,7 @@ function wireStartScreens(): void {
         // character before assets finished, show its real appearance; otherwise
         // fall back to the selected class chip (create/offline panels).
         if (charselectSelected) {
-          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+          showCharselectCharacter(charselectSelected);
         } else {
           const selSelector =
             activePanelId === '#offline-select'

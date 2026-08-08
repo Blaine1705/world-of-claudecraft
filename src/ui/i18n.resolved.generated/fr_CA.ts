@@ -6364,7 +6364,7 @@ export const fr_CA: EnTranslations = {
     "browSoft": "Doux",
     "browThick": "Épais",
     "browAngled": "Inclinés",
-    "earrings": "Boucles d'oreilles",
+    "earrings": "Piercings",
     "jewelMaterial": "Matériau des bijoux",
     "jewelDefault": "Tel que forgé",
     "jewelGold": "Or",
@@ -7474,7 +7474,12 @@ export const fr_CA: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Nom",
     "sortRecent": "Joués récemment",
-    "sortPlaytime": "Temps de jeu"
+    "sortPlaytime": "Temps de jeu",
+    "redesign": "Remodeler",
+    "redesignHint": "Ce personnage est antérieur au nouveau créateur de personnage. Vous disposez d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.",
+    "redesignTitle": "Remodeler {name}",
+    "redesignSave": "Enregistrer la nouvelle apparence",
+    "redesignCancel": "Conserver l’apparence actuelle"
   },
   "deleteCharacter": {
     "title": "Supprimer le personnage",

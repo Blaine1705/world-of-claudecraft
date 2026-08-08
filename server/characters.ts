@@ -47,11 +47,16 @@ import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+// The shared, host-agnostic bounds check for an untrusted look (the
+// action_bar.ts pattern). The renderer owns what the values MEAN; the server
+// only guarantees the stored document is small and well shaped.
+import { sanitizeAppearance } from '../src/world_api/appearance';
 import { normalizeCharName, offensiveName } from './auth';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
   type CharacterRow,
+  consumeAppearanceReroll,
   createCharacterCapped,
   deleteCharacter,
   getCharacter,
@@ -74,6 +79,7 @@ import {
   CHARACTER_CREATE_POLICY,
   CHARACTER_DELETE_POLICY,
   CHARACTER_RENAME_POLICY,
+  CHARACTER_REROLL_POLICY,
   CHARACTER_TAKEOVER_POLICY,
   rateLimit,
 } from './http/middleware/rate_limit';
@@ -121,6 +127,14 @@ const DELETE_CONFIRM = {
   error: 'type the character name to confirm deletion',
   code: 'character.delete_confirm',
 } as const;
+const INVALID_APPEARANCE = {
+  error: 'invalid appearance',
+  code: 'character.invalid_appearance',
+} as const;
+const REROLL_NOT_AVAILABLE = {
+  error: 'appearance reroll is not available for this character',
+  code: 'character.reroll_unavailable',
+} as const;
 
 /** The ctx.state key the owned, authorized character row is stashed under. */
 const CHARACTER_RESOURCE = 'character';
@@ -140,6 +154,11 @@ const VALID_CLASSES: readonly string[] = [
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;
+/** Characters authored before the modular creator shipped (created_at earlier
+ *  than this) carry ONE appearance reroll so their player can redesign them in
+ *  the new creator. UTC midnight on the ship date; compared server-side only,
+ *  so every client agrees on who is eligible. */
+export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-09T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
@@ -207,6 +226,7 @@ const REAL_CHARACTERS_DB = {
   listCharacters,
   getCharacter,
   createCharacterCapped,
+  consumeAppearanceReroll,
   reclaimDeactivatedName,
   renameCharacter,
   saveCharacterState,
@@ -240,6 +260,55 @@ function ownedCharacter(ctx: Ctx): CharacterRow {
 /** Server canonical form for the delete confirmation (mirrors the legacy inline helper). */
 function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';
+}
+
+/** Sanitize an untrusted appearance payload for storage.
+ *  `undefined`/`null` = "no authored look" (a legacy-rig character); a plain
+ *  object is bounded by the shared wire validator (known keys only, plain
+ *  values, short strings, small slider maps); anything else is the caller's
+ *  400. What the values MEAN is the renderer's business: every consumer runs
+ *  normalizeAppearance before composing, so a stored style id that no longer
+ *  exists clamps to a valid body rather than breaking one. */
+function parseAppearanceBody(raw: unknown): Record<string, unknown> | null | 'invalid' {
+  if (raw === undefined || raw === null) return null;
+  return sanitizeAppearance(raw) ?? 'invalid';
+}
+
+/** The cosmetic half of a create payload, sanitized ONCE for both dispatch
+ *  arms (this module's RouteDef handler and the retained legacy ladder arm in
+ *  server/main.ts), so a dispatch rollback cannot quietly create characters
+ *  without their authored look or with the wrong helmet. `'invalid'` is the
+ *  caller's 400. */
+export function parseCreationCosmetics(
+  body: Record<string, unknown>,
+): { appearance: Record<string, unknown> | null; helmHidden: boolean } | 'invalid' {
+  const appearance = parseAppearanceBody(body.appearance);
+  if (appearance === 'invalid') return 'invalid';
+  // The creator's helmet toggle is this character's STANDING wardrobe
+  // preference, not just a turntable view: a player who authored a face
+  // should meet it in the world rather than a bucket. So hidden unless the
+  // client explicitly asks for a shown helm, which is also the right default
+  // for a legacy/API client that sends nothing.
+  return { appearance, helmHidden: body.helmHidden !== false };
+}
+
+/** Stamp the creation-time helm choice onto a fresh character state. The look
+ *  rides its own column, but helm visibility is SIM state, so it belongs in
+ *  the blob. Zero-default omission (the sim's own serialization convention):
+ *  only a hidden helm is written, so a shown one leaves the blob unchanged. */
+export function withCreationHelm(state: CharacterState, helmHidden: boolean): CharacterState {
+  if (helmHidden) state.helmHidden = true;
+  return state;
+}
+
+/** Whether this character still holds its one-shot redesign token: authored
+ *  before the modular creator shipped, token unspent. The date check lives
+ *  server-side so the list payload is the single authority the roster button
+ *  keys on. */
+function appearanceRerollAvailable(c: CharacterRow): boolean {
+  if (c.appearance_reroll_used) return false;
+  const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
+  return Number.isFinite(created) && created < APPEARANCE_REROLL_CUTOFF.getTime();
 }
 
 /** Shape a realm rank lookup into the character-sheet's rank field (pure; mirrors main.ts). */
@@ -285,6 +354,17 @@ export function buildCharacterList(
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       ),
+      // The authored modular look (null = pre-creator character, legacy rig).
+      // Already normalized at write; echoed so char-select composes THIS
+      // character's body instead of the device-global draft.
+      appearance: c.appearance ?? null,
+      // Mirror of state.helmHidden so the roster preview wears (or bares) the
+      // kit helm exactly as the world last saw this character.
+      helmHidden: c.state?.helmHidden === true,
+      createdAt: c.created_at ? new Date(c.created_at).toISOString() : null,
+      // Server-decided (cutoff + unspent token): the roster's one-shot
+      // redesign button renders exactly when this is true.
+      appearanceRerollAvailable: appearanceRerollAvailable(c),
     })),
   };
 }
@@ -501,13 +581,25 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     0,
     Math.min(MAX_SKIN, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
   );
+  // The authored look and the helm choice ride the create body and are fixed
+  // to THIS character: the look lands in its own column, so no later creation
+  // can restyle an existing character. Both optional (a legacy/api client
+  // without the creator still creates fine); a malformed appearance is a 400.
+  const cosmetics = parseCreationCosmetics(body);
+  if (cosmetics === 'invalid') {
+    json(ctx.res, 400, INVALID_APPEARANCE);
+    return;
+  }
   const create = () =>
     charactersDb.createCharacterCapped(
       accountId,
       name,
       cls,
       CHARACTER_LIMIT,
-      rt.initialCharacterState(cls, name, skin),
+      // Rebuilt per attempt: the reclaim path calls create() twice, exactly
+      // as the inline rt.initialCharacterState call it replaces did.
+      withCreationHelm(rt.initialCharacterState(cls, name, skin), cosmetics.helmHidden),
+      cosmetics.appearance,
     );
   const respondCreated = (c: CharacterRow): void => {
     gameMetricsCounters().characterCreated();
@@ -718,6 +810,38 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
 
+/** POST /api/characters/:id/appearance-reroll: spend the character's one-shot
+ *  redesign token on a new authored look. Eligibility (ownership + pre-cutoff
+ *  creation + unspent token) is decided ATOMICALLY inside the single UPDATE
+ *  (consumeAppearanceReroll), so two concurrent submits cannot both land; the
+ *  handler only shapes the payload and maps the outcome. Allowed while the
+ *  character is online: the new look simply applies from the next world entry
+ *  (appearance rides the join, not the live session). */
+async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
+  const character = ownedCharacter(ctx);
+  const body = (ctx.body ?? {}) as Record<string, unknown>;
+  const appearance = parseAppearanceBody(body.appearance);
+  // Unlike create, the reroll's whole point is a new look: absent counts as
+  // malformed rather than "clear the appearance".
+  if (appearance === 'invalid' || appearance === null) {
+    json(ctx.res, 400, INVALID_APPEARANCE);
+    return;
+  }
+  const ok = await charactersDb.consumeAppearanceReroll(
+    ctxAccountId(ctx),
+    character.id,
+    appearance,
+    APPEARANCE_REROLL_CUTOFF,
+  );
+  if (!ok) {
+    json(ctx.res, 400, REROLL_NOT_AVAILABLE);
+    return;
+  }
+  // Echo the normalized look so the client can update its roster row without
+  // a second list fetch.
+  json(ctx.res, 200, { ok: true, appearance });
+}
+
 // ---------------------------------------------------------------------------
 // The route table. registry.ts spreads this into apiRoutes. The account-owned :id
 // routes carry meta.requireOwned { kind:'character', ownerScope:'account' } so the
@@ -807,6 +931,22 @@ export const routes: RouteDef[] = [
       requireOwnedCharacter(NOT_FOUND),
     ],
     handler: takeoverHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
+    method: 'POST',
+    path: '/api/characters/:id/appearance-reroll',
+    surface: 'api',
+    // Registry-only (the new-route rule): no legacy ladder twin. withBody BEFORE
+    // requireOwnedCharacter, the rename/delete order, so a malformed body answers
+    // uniformly for any :id.
+    middleware: [
+      activeGuard,
+      rateLimit(CHARACTER_REROLL_POLICY),
+      withBody(),
+      requireOwnedCharacter(CHARACTER_NOT_FOUND),
+    ],
+    handler: appearanceRerollHandler,
     meta: OWNED_CHARACTER_META,
   },
   {

@@ -6364,7 +6364,7 @@ export const cs_CZ: EnTranslations = {
     "browSoft": "Jemné",
     "browThick": "Husté",
     "browAngled": "Šikmé",
-    "earrings": "Náušnice",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiál šperků",
     "jewelDefault": "Původní",
     "jewelGold": "Zlato",
@@ -7474,7 +7474,12 @@ export const cs_CZ: EnTranslations = {
     "sortLevel": "Úroveň",
     "sortName": "Jméno",
     "sortRecent": "Nedávno hrané",
-    "sortPlaytime": "Čas hraní"
+    "sortPlaytime": "Čas hraní",
+    "redesign": "Přetvořit",
+    "redesignHint": "Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.",
+    "redesignTitle": "Přetvořit postavu {name}",
+    "redesignSave": "Uložit nový vzhled",
+    "redesignCancel": "Ponechat současný vzhled"
   },
   "deleteCharacter": {
     "title": "Smazat postavu",

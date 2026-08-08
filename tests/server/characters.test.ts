@@ -20,6 +20,7 @@ import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -379,6 +380,10 @@ describe('character list handlers', () => {
           mainhandItemId: 'worn_sword',
           offhandItemId: 'eastbrook_buckler',
           weaponSkinId: 'ice_fang_sword',
+          appearance: null,
+          helmHidden: false,
+          createdAt: null,
+          appearanceRerollAvailable: false,
         },
         {
           id: 2,
@@ -394,6 +399,10 @@ describe('character list handlers', () => {
           mainhandItemId: null,
           offhandItemId: null,
           weaponSkinId: null,
+          appearance: null,
+          helmHidden: false,
+          createdAt: null,
+          appearanceRerollAvailable: false,
         },
       ],
     };
@@ -880,6 +889,132 @@ describe('create handler', () => {
 // ---------------------------------------------------------------------------
 // Rename handler.
 // ---------------------------------------------------------------------------
+
+describe('create handler appearance', () => {
+  it('bounds a posted appearance and stores it beside the new row', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const posted = { gender: 'female', hair: 'fantasybraid', skinLight: 0.8, evil: 'payload' };
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', appearance: posted },
+    });
+    expect(res.status).toBe(200);
+    const stored = createCharacterCapped.mock.calls[0][5] as Record<string, unknown>;
+    // Known keys survive verbatim; unknown ones never reach the row (it is
+    // re-broadcast to other players). Value MEANING is the renderer's job:
+    // see tests/appearance_wire_bounds.test.ts.
+    expect(stored).toEqual({ gender: 'female', hair: 'fantasybraid', skinLight: 0.8 });
+  });
+
+  it('hides the helm by default so the authored face is what enters the world', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    const state = createCharacterCapped.mock.calls[0][4] as { helmHidden?: boolean };
+    expect(state.helmHidden).toBe(true);
+  });
+
+  it('keeps the helm shown when the creator previewed it on (helmHidden false)', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', helmHidden: false },
+    });
+    expect(res.status).toBe(200);
+    // Zero-default omission: a shown helm writes NOTHING into the blob.
+    const state = createCharacterCapped.mock.calls[0][4] as { helmHidden?: boolean };
+    expect(state.helmHidden).toBeUndefined();
+  });
+
+  it('stores null when no appearance is posted (a legacy-rig character)', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(createCharacterCapped.mock.calls[0][5]).toBeNull();
+  });
+
+  it('400s a present-but-malformed appearance without creating', async () => {
+    const createCharacterCapped = vi.fn(async (..._args: unknown[]) => charRow({ id: 12 }));
+    setCharactersDbForTests({ createCharacterCapped });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior', appearance: 'not-an-object' },
+    });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'invalid appearance', code: 'character.invalid_appearance' });
+    expect(createCharacterCapped).not.toHaveBeenCalled();
+  });
+});
+
+describe('appearance reroll handler', () => {
+  it('200s the bounded look and spends the token through the atomic update', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    const character = charRow({ id: 5 });
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { appearance: { gender: 'female', hair: 'highbun', evil: 'payload' } },
+    });
+    const bounded = { gender: 'female', hair: 'highbun' };
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ok: true, appearance: bounded });
+    const [accountId, characterId, stored, cutoff] = consumeAppearanceReroll.mock.calls[0] as [
+      number,
+      number,
+      Record<string, unknown>,
+      Date,
+    ];
+    expect(accountId).toBe(7);
+    expect(characterId).toBe(5);
+    expect(stored).toEqual(bounded);
+    expect(cutoff).toBe(APPEARANCE_REROLL_CUTOFF);
+  });
+
+  it('400s reroll-unavailable when the atomic update matches no row', async () => {
+    // One WHERE arm failed: not owned, created after the cutoff, or the token
+    // is already spent. The handler cannot tell which, and must not care.
+    setCharactersDbForTests({ consumeAppearanceReroll: async () => false });
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 5 })),
+      body: { appearance: { gender: 'female' } },
+    });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      error: 'appearance reroll is not available for this character',
+      code: 'character.reroll_unavailable',
+    });
+  });
+
+  it('400s a missing or malformed appearance without touching the token', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    for (const body of [{}, { appearance: 'not-an-object' }, { appearance: [1, 2] }]) {
+      const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+        account: { accountId: 7, scope: 'full' },
+        state: stateWith(charRow({ id: 5 })),
+        body,
+      });
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({
+        error: 'invalid appearance',
+        code: 'character.invalid_appearance',
+      });
+    }
+    expect(consumeAppearanceReroll).not.toHaveBeenCalled();
+  });
+});
 
 describe('rename handler', () => {
   it('200s a rename and rekeys the market seller (saveMarket when a rekey lands)', async () => {
@@ -1636,8 +1771,8 @@ describe('character-mutation limiters (newLimiterCharacterMutations 429)', () =>
 // ---------------------------------------------------------------------------
 
 describe('routes table', () => {
-  it('registers the nine character routes on the api surface', () => {
-    expect(routes).toHaveLength(9);
+  it('registers the ten character routes on the api surface', () => {
+    expect(routes).toHaveLength(10);
     for (const r of routes) {
       expect(r.surface).toBe('api');
       expect(typeof r.handler).toBe('function');
@@ -1651,6 +1786,7 @@ describe('routes table', () => {
       'GET /api/characters/:id/deeds-recent',
       'POST /api/characters/:id/rename',
       'POST /api/characters/:id/takeover',
+      'POST /api/characters/:id/appearance-reroll',
       'DELETE /api/characters/:id',
     ];
     for (const key of ownedPaths) {

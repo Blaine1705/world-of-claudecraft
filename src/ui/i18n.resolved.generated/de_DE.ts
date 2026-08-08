@@ -6364,7 +6364,7 @@ export const de_DE: EnTranslations = {
     "browSoft": "Weich",
     "browThick": "Dicht",
     "browAngled": "Schräg",
-    "earrings": "Ohrringe",
+    "earrings": "Piercings",
     "jewelMaterial": "Schmuckmaterial",
     "jewelDefault": "Wie geschmiedet",
     "jewelGold": "Gold",
@@ -7474,7 +7474,12 @@ export const de_DE: EnTranslations = {
     "sortLevel": "Stufe",
     "sortName": "Name",
     "sortRecent": "Zuletzt gespielt",
-    "sortPlaytime": "Spielzeit"
+    "sortPlaytime": "Spielzeit",
+    "redesign": "Umgestalten",
+    "redesignHint": "Diese Figur stammt aus der Zeit vor dem neuen Charaktereditor. Ihr habt eine kostenlose Umgestaltung; sie wird beim Speichern verbraucht.",
+    "redesignTitle": "{name} umgestalten",
+    "redesignSave": "Neues Aussehen speichern",
+    "redesignCancel": "Aktuelles Aussehen behalten"
   },
   "deleteCharacter": {
     "title": "Charakter löschen",

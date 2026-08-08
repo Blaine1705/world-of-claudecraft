@@ -6364,7 +6364,7 @@ export const nl_NL: EnTranslations = {
     "browSoft": "Zacht",
     "browThick": "Dik",
     "browAngled": "Schuin",
-    "earrings": "Oorbellen",
+    "earrings": "Piercings",
     "jewelMaterial": "Juwelenmateriaal",
     "jewelDefault": "Zoals Gesmeed",
     "jewelGold": "Goud",
@@ -7474,7 +7474,12 @@ export const nl_NL: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Naam",
     "sortRecent": "Onlangs gespeeld",
-    "sortPlaytime": "Speeltijd"
+    "sortPlaytime": "Speeltijd",
+    "redesign": "Herontwerpen",
+    "redesignHint": "Dit personage stamt van vóór de nieuwe personagemaker. Je hebt één gratis herontwerp; het wordt gebruikt zodra je opslaat.",
+    "redesignTitle": "{name} herontwerpen",
+    "redesignSave": "Nieuw uiterlijk opslaan",
+    "redesignCancel": "Huidig uiterlijk behouden"
   },
   "deleteCharacter": {
     "title": "Personage verwijderen",

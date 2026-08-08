@@ -6364,7 +6364,7 @@ export const id_ID: EnTranslations = {
     "browSoft": "Lembut",
     "browThick": "Tebal",
     "browAngled": "Miring",
-    "earrings": "Anting",
+    "earrings": "Tindik",
     "jewelMaterial": "Bahan Perhiasan",
     "jewelDefault": "Bawaan Tempa",
     "jewelGold": "Emas",
@@ -7474,7 +7474,12 @@ export const id_ID: EnTranslations = {
     "sortLevel": "Level",
     "sortName": "Nama",
     "sortRecent": "Baru Dimainkan",
-    "sortPlaytime": "Waktu Bermain"
+    "sortPlaytime": "Waktu Bermain",
+    "redesign": "Desain Ulang",
+    "redesignHint": "Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.",
+    "redesignTitle": "Desain Ulang {name}",
+    "redesignSave": "Simpan Tampilan Baru",
+    "redesignCancel": "Pertahankan Tampilan Saat Ini"
   },
   "deleteCharacter": {
     "title": "Hapus Karakter",

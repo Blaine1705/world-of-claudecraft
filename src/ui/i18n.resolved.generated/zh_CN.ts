@@ -6364,7 +6364,7 @@ export const zh_CN: EnTranslations = {
     "browSoft": "柔和",
     "browThick": "浓密",
     "browAngled": "上扬",
-    "earrings": "耳环",
+    "earrings": "穿孔饰品",
     "jewelMaterial": "首饰材质",
     "jewelDefault": "原样",
     "jewelGold": "黄金",
@@ -7474,7 +7474,12 @@ export const zh_CN: EnTranslations = {
     "sortLevel": "等级",
     "sortName": "名称",
     "sortRecent": "最近游玩",
-    "sortPlaytime": "游戏时长"
+    "sortPlaytime": "游戏时长",
+    "redesign": "重新设计",
+    "redesignHint": "该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。",
+    "redesignTitle": "重新设计{name}",
+    "redesignSave": "保存新外观",
+    "redesignCancel": "保留当前外观"
   },
   "deleteCharacter": {
     "title": "删除角色",

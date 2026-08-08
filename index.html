@@ -1164,6 +1164,18 @@
                 <div class="news-loading" data-i18n="news.loading">Loading the latest updates...</div>
               </div>
             </div>
+            <!-- One-shot appearance redesign for pre-creator characters. Docks
+                 where the news panel sits (same class) and replaces it while
+                 open; the 3D stage previews the new look live. -->
+            <div id="charselect-reroll" class="cs-news-panel cs-reroll-panel" hidden>
+              <div class="cs-news-title" id="charselect-reroll-title"></div>
+              <div id="charselect-reroll-host"></div>
+              <div class="cs-reroll-actions">
+                <button type="button" class="btn btn-primary" id="btn-reroll-save" data-i18n="character.redesignSave">Save New Look</button>
+                <button type="button" class="btn btn-secondary" id="btn-reroll-cancel" data-i18n="character.redesignCancel">Keep Current Look</button>
+              </div>
+              <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
+            </div>
           </div>
         </div>
 

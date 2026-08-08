@@ -6364,7 +6364,7 @@ export const da_DK: EnTranslations = {
     "browSoft": "Bløde",
     "browThick": "Tykke",
     "browAngled": "Vinklede",
-    "earrings": "Øreringe",
+    "earrings": "Piercinger",
     "jewelMaterial": "Smykkemateriale",
     "jewelDefault": "Som Smedet",
     "jewelGold": "Guld",
@@ -7474,7 +7474,12 @@ export const da_DK: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Navn",
     "sortRecent": "Senest spillet",
-    "sortPlaytime": "Spilletid"
+    "sortPlaytime": "Spilletid",
+    "redesign": "Omdesign",
+    "redesignHint": "Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.",
+    "redesignTitle": "Omdesign {name}",
+    "redesignSave": "Gem nyt udseende",
+    "redesignCancel": "Behold nuværende udseende"
   },
   "deleteCharacter": {
     "title": "Slet Karakter",

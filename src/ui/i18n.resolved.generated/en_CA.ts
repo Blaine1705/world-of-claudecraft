@@ -6364,7 +6364,7 @@ export const en_CA: EnTranslations = {
     "browSoft": "Soft",
     "browThick": "Thick",
     "browAngled": "Angled",
-    "earrings": "Earrings",
+    "earrings": "Piercings",
     "jewelMaterial": "Jewellery Material",
     "jewelDefault": "As Forged",
     "jewelGold": "Gold",
@@ -7474,7 +7474,12 @@ export const en_CA: EnTranslations = {
     "sortLevel": "Level",
     "sortName": "Name",
     "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortPlaytime": "Playtime",
+    "redesign": "Redesign",
+    "redesignHint": "This character predates the new character creator. You get one free redesign; it is used when you save.",
+    "redesignTitle": "Redesign {name}",
+    "redesignSave": "Save New Look",
+    "redesignCancel": "Keep Current Look"
   },
   "deleteCharacter": {
     "title": "Delete Character",

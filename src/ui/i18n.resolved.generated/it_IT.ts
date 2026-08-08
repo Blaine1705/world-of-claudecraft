@@ -6364,7 +6364,7 @@ export const it_IT: EnTranslations = {
     "browSoft": "Morbide",
     "browThick": "Folte",
     "browAngled": "Inclinate",
-    "earrings": "Orecchini",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiale Gioielli",
     "jewelDefault": "Come Forgiato",
     "jewelGold": "Oro",
@@ -7474,7 +7474,12 @@ export const it_IT: EnTranslations = {
     "sortLevel": "Livello",
     "sortName": "Nome",
     "sortRecent": "Giocati di recente",
-    "sortPlaytime": "Tempo di gioco"
+    "sortPlaytime": "Tempo di gioco",
+    "redesign": "Ridisegna",
+    "redesignHint": "Questo personaggio è precedente al nuovo creatore di personaggi. Hai un ridisegno gratuito; viene usato al salvataggio.",
+    "redesignTitle": "Ridisegna {name}",
+    "redesignSave": "Salva nuovo aspetto",
+    "redesignCancel": "Mantieni aspetto attuale"
   },
   "deleteCharacter": {
     "title": "Elimina personaggio",

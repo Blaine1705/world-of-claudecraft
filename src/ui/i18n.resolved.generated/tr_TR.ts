@@ -6364,7 +6364,7 @@ export const tr_TR: EnTranslations = {
     "browSoft": "Yumuşak",
     "browThick": "Kalın",
     "browAngled": "Açılı",
-    "earrings": "Küpeler",
+    "earrings": "Piercingler",
     "jewelMaterial": "Takı Malzemesi",
     "jewelDefault": "Dövüldüğü Gibi",
     "jewelGold": "Altın",
@@ -7474,7 +7474,12 @@ export const tr_TR: EnTranslations = {
     "sortLevel": "Seviye",
     "sortName": "Ad",
     "sortRecent": "Son Oynanan",
-    "sortPlaytime": "Oynama Süresi"
+    "sortPlaytime": "Oynama Süresi",
+    "redesign": "Yeniden Tasarla",
+    "redesignHint": "Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.",
+    "redesignTitle": "{name} karakterini yeniden tasarla",
+    "redesignSave": "Yeni Görünümü Kaydet",
+    "redesignCancel": "Mevcut Görünümü Koru"
   },
   "deleteCharacter": {
     "title": "Karakteri Sil",

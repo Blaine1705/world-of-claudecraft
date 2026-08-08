@@ -6364,7 +6364,7 @@ export const en_XA: EnTranslations = {
     "browSoft": "[Šóƒţ]",
     "browThick": "[Ţĥíçķ]",
     "browAngled": "[Áñĝļéð]",
-    "earrings": "[Éáŕŕíñĝš]",
+    "earrings": "[Þíéŕçíñĝš]",
     "jewelMaterial": "[Ĵéŵéļļéŕý Ɱáţéŕíáļ]",
     "jewelDefault": "[Áš Ƒóŕĝéð]",
     "jewelGold": "[Ĝóļð]",
@@ -7474,7 +7474,12 @@ export const en_XA: EnTranslations = {
     "sortLevel": "[Ļéʋéļ]",
     "sortName": "[Ñáɱé]",
     "sortRecent": "[Ŕéçéñţļý Þļáýéð]",
-    "sortPlaytime": "[Þļáýţíɱé]"
+    "sortPlaytime": "[Þļáýţíɱé]",
+    "redesign": "[Ŕéðéšíĝñ]",
+    "redesignHint": "[Ţĥíš çĥáŕáçţéŕ þŕéðáţéš ţĥé ñéŵ çĥáŕáçţéŕ çŕéáţóŕ. Ýóú ĝéţ óñé ƒŕéé ŕéðéšíĝñ; íţ íš úšéð ŵĥéñ ýóú šáʋé.]",
+    "redesignTitle": "[Ŕéðéšíĝñ {name}]",
+    "redesignSave": "[Šáʋé Ñéŵ Ļóóķ]",
+    "redesignCancel": "[Ķééþ Çúŕŕéñţ Ļóóķ]"
   },
   "deleteCharacter": {
     "title": "[Ðéļéţé Çĥáŕáçţéŕ]",

@@ -6364,7 +6364,7 @@ export const pl_PL: EnTranslations = {
     "browSoft": "Delikatne",
     "browThick": "Gęste",
     "browAngled": "Skośne",
-    "earrings": "Kolczyki",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiał biżuterii",
     "jewelDefault": "Jak wykute",
     "jewelGold": "Złoto",
@@ -7474,7 +7474,12 @@ export const pl_PL: EnTranslations = {
     "sortLevel": "Poziom",
     "sortName": "Imię",
     "sortRecent": "Ostatnio grane",
-    "sortPlaytime": "Czas gry"
+    "sortPlaytime": "Czas gry",
+    "redesign": "Przeprojektuj",
+    "redesignHint": "Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
+    "redesignTitle": "Przeprojektuj postać {name}",
+    "redesignSave": "Zapisz nowy wygląd",
+    "redesignCancel": "Zachowaj obecny wygląd"
   },
   "deleteCharacter": {
     "title": "Usuń postać",

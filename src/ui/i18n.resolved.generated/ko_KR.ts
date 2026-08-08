@@ -6364,7 +6364,7 @@ export const ko_KR: EnTranslations = {
     "browSoft": "부드럽게",
     "browThick": "짙게",
     "browAngled": "치켜올림",
-    "earrings": "귀걸이",
+    "earrings": "피어싱",
     "jewelMaterial": "장신구 재질",
     "jewelDefault": "원본 그대로",
     "jewelGold": "황금",
@@ -7474,7 +7474,12 @@ export const ko_KR: EnTranslations = {
     "sortLevel": "레벨",
     "sortName": "이름",
     "sortRecent": "최근 플레이",
-    "sortPlaytime": "플레이 시간"
+    "sortPlaytime": "플레이 시간",
+    "redesign": "재디자인",
+    "redesignHint": "이 캐릭터는 새 캐릭터 편집기 이전에 생성되었습니다. 무료 재디자인 기회가 1회 있으며, 저장할 때 사용됩니다.",
+    "redesignTitle": "{name} 재디자인",
+    "redesignSave": "새 외형 저장",
+    "redesignCancel": "현재 외형 유지"
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",

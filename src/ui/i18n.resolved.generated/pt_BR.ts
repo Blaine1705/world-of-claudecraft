@@ -6364,7 +6364,7 @@ export const pt_BR: EnTranslations = {
     "browSoft": "Suaves",
     "browThick": "Grossas",
     "browAngled": "Inclinadas",
-    "earrings": "Brincos",
+    "earrings": "Piercings",
     "jewelMaterial": "Material da Joia",
     "jewelDefault": "Como Forjado",
     "jewelGold": "Ouro",
@@ -7474,7 +7474,12 @@ export const pt_BR: EnTranslations = {
     "sortLevel": "Nível",
     "sortName": "Nome",
     "sortRecent": "Jogados recentemente",
-    "sortPlaytime": "Tempo de jogo"
+    "sortPlaytime": "Tempo de jogo",
+    "redesign": "Redesenhar",
+    "redesignHint": "Este personagem é anterior ao novo criador de personagens. Você tem um redesenho gratuito; ele é usado ao salvar.",
+    "redesignTitle": "Redesenhar {name}",
+    "redesignSave": "Salvar novo visual",
+    "redesignCancel": "Manter visual atual"
   },
   "deleteCharacter": {
     "title": "Excluir personagem",

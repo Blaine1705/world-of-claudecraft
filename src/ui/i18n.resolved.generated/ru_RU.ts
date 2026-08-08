@@ -6364,7 +6364,7 @@ export const ru_RU: EnTranslations = {
     "browSoft": "Мягкие",
     "browThick": "Густые",
     "browAngled": "Наклонные",
-    "earrings": "Серьги",
+    "earrings": "Пирсинг",
     "jewelMaterial": "Материал украшений",
     "jewelDefault": "Как выковано",
     "jewelGold": "Золото",
@@ -7474,7 +7474,12 @@ export const ru_RU: EnTranslations = {
     "sortLevel": "Уровень",
     "sortName": "Имя",
     "sortRecent": "Недавно сыгранные",
-    "sortPlaytime": "Время в игре"
+    "sortPlaytime": "Время в игре",
+    "redesign": "Переделать",
+    "redesignHint": "Этот персонаж создан до появления нового редактора внешности. У вас есть одна бесплатная переделка; она расходуется при сохранении.",
+    "redesignTitle": "Переделать: {name}",
+    "redesignSave": "Сохранить новый облик",
+    "redesignCancel": "Оставить текущий облик"
   },
   "deleteCharacter": {
     "title": "Удалить персонажа",

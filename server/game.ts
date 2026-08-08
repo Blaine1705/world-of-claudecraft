@@ -1303,6 +1303,12 @@ function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
+    // The authored modular look (~0.6 KB, normalized at write). Identity-only
+    // on purpose: it is immutable for the life of the session (set at join,
+    // no command mutates it), so it ships once per entity per viewer and
+    // never rides the per-tick dynamic fields — peers compose the body from
+    // it with no recurring wire cost.
+    if (e.modularAppearance) out.app = e.modularAppearance;
     const eq = e.equippedItems;
     for (const _ in eq) {
       out.eq = eq;
@@ -3541,6 +3547,10 @@ export class GameServer {
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
         hotbarLayout?: ActionBarLayout | null;
+        // The character's authored modular look (characters.appearance),
+        // normalized at write. Stamped onto the world entity so it rides the
+        // identity wire (`app`) to every client in view.
+        appearance?: Record<string, unknown> | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -3578,6 +3588,7 @@ export class GameServer {
       state: state ?? undefined,
       characterId,
       bankBonus: meta.bankBonus,
+      appearance: meta.appearance ?? null,
     });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
