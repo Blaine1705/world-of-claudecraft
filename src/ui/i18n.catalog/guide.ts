@@ -626,7 +626,7 @@ export const guideStrings = {
     // tables, not on party membership).
     threatTitle: 'Who the enemy hits',
     threatBody:
-      "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a defensive stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
+      "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
     // Environmental hazards. Both are number-free by design: breath drain and the
     // drown pulse live in src/sim/breath.ts, the open-sea clock in src/sim/fatigue.ts.
     hazardsTitle: 'The water can kill you',
@@ -1234,7 +1234,7 @@ export const guideStrings = {
       'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.',
     formLine: {
       form_bear:
-        'The tanking shape: a thick hide, rage instead of mana, and extra threat so enemies keep swinging at you.',
+        'The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.',
       form_cat:
         'The melee damage shape: energy and combo points, like a rogue, and much less threat.',
       form_travel:
@@ -1878,7 +1878,7 @@ export const guideStrings = {
       'Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.',
     floorsHeading: 'Down through the floors',
     floorsBody:
-      'A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. Some rifts open a hand-built set piece instead, a place called the Infernal Citadel, which runs to its own fixed length rather than a generated descent.',
+      'A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.',
     boundHeading: 'Once you draw blood',
     boundBody:
       "The first kill your group takes inside a rift settles the run. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one. Before that first kill nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
