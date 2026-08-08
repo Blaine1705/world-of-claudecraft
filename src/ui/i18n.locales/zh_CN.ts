@@ -9186,10 +9186,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
-  'hudChrome.wiki.confirmTitle': '打开维基？',
-  'hudChrome.wiki.confirmBody': '将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。',
-  'hudChrome.wiki.confirmOpen': '打开维基',
-  'hudChrome.wiki.confirmCancel': '取消',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
@@ -9221,6 +9217,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '请先停下再使用脱困。',
   'hudChrome.unstuck.busy': '请先完成当前动作再使用脱困。',
   'hudChrome.unstuck.unavailable': '当前状态下无法使用脱困。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '打开维基？',
+  'hudChrome.wiki.confirmBody': '将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。',
+  'hudChrome.wiki.confirmOpen': '打开维基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'guide.abilityHook.revenge': '横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。',
   'guide.abilityHook.hamstring': '妨碍敌人的移动，使其无法逃脱。',
   'game.talents.choicesTab': '抉择',

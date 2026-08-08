@@ -9623,11 +9623,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
-  'hudChrome.wiki.confirmTitle': 'Wikiを開きますか？',
-  'hudChrome.wiki.confirmBody':
-    'World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。',
-  'hudChrome.wiki.confirmOpen': 'Wikiを開く',
-  'hudChrome.wiki.confirmCancel': 'キャンセル',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
@@ -9663,6 +9658,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '静止してからスタック解除を使用してください。',
   'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
   'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': 'Wikiを開きますか？',
+  'hudChrome.wiki.confirmBody':
+    'World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。',
+  'hudChrome.wiki.confirmOpen': 'Wikiを開く',
+  'hudChrome.wiki.confirmCancel': 'キャンセル',
   'guide.abilityHook.revenge':
     '前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。',
   'guide.abilityHook.hamstring': '敵の移動を妨げ、逃走を阻止する。',

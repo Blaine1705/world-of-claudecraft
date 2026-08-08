@@ -6,8 +6,11 @@
 // it is not cancelable once taken).
 //
 // Registered in tests/architecture.test.ts UI_DOM_MODULES: it owns the
-// window.open hop (which Electron's setWindowOpenHandler converts to a
-// system-browser open). The URL decision itself is the pure resolveWikiUrl.
+// window.open hop. Every shell hands that hop to the system browser, so the
+// game really does keep running: Electron via setWindowOpenHandler, Capacitor
+// iOS via createWebViewWith (UIApplication.open, no in-app webview), and
+// Capacitor Android via Bridge.launchIntent (ACTION_VIEW for any host outside
+// the app origin). The URL decision itself is the pure resolveWikiUrl.
 
 import { NATIVE_APP } from '../client_origin';
 import { t } from './i18n';
