@@ -373,7 +373,7 @@ export const en_XA: EnTranslations = {
       "unavailable": "[Úñšţúçķ íš úñáʋáíļáƀļé íñ ýóúŕ çúŕŕéñţ šţáţé.]"
     },
     "fct": {
-      "absorbed": "[Áƀšóŕƀéð {amount}]",
+      "absorbed": "[Áƀšóŕƀéð ({amount})]",
       "cheap": "[Çĥéáþ!]"
     },
     "emotes": {
