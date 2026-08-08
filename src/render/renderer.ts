@@ -4028,6 +4028,8 @@ export class Renderer {
     glRenderer: string;
     contextLost: number;
     contextRestored: number;
+    /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
+    nightAmount: number;
     phaseMs: RendererPhaseStats;
     renderDiagnostics: RenderDiagnosticsSnapshot;
     lastFrame?: RendererFrameStats;
@@ -4088,6 +4090,7 @@ export class Renderer {
       glRenderer: this.glRenderer,
       contextLost: this.contextLostCount,
       contextRestored: this.contextRestoredCount,
+      nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: this.snapshotLastFrameStats(),

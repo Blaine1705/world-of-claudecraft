@@ -224,6 +224,7 @@ function snapshot(): PerfSnapshot {
       tier: 'high',
       qualityBuckets: qualityBuckets(),
       gpuQueue: { units: 0, totalSyncMs: 0, worstSyncMs: 0, slowest: [] },
+      nightAmount: 0,
       autoGovernor: true,
       budget: {
         targetFps: 60,

@@ -665,6 +665,11 @@ export class PerfMonitor {
       state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
       state.effectiveRenderScale = r.effectiveRenderScale;
       state.budgetMode = r.renderBudget.mode;
+      // Day/night dimension: a hitch cluster that only appears with
+      // nightAmount high (streetlamps lit, more active point lights) reads
+      // differently from the same cluster at noon.
+      state.nightAmount = r.nightAmount;
+      state.activePointLights = r.qualityBuckets.features.activePointLights;
       const frame = r.lastFrame;
       if (frame) {
         state.biome = frame.biome;
