@@ -1,0 +1,229 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+const raw = readFileSync(join(__dirname, '..', 'electron', 'main.cjs'), 'utf8');
+
+// Strip block comments and line comments before matching, so a commented-out
+// line never satisfies a positive pin. The line-comment pattern refuses a `//`
+// preceded by a colon, because main.cjs carries real scheme literals
+// (`app://`, `${deepLinkProtocol}://`) that a naive strip would eat along with
+// the rest of their line.
+const code = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
+
+const count = (haystack: string, needle: string) => haystack.split(needle).length - 1;
+
+// Slice from an opening anchor to the first line that closes at the given
+// indent, so every pin below scans a bounded region (one handler, one function)
+// rather than the whole file, where an unrelated match could satisfy it.
+function block(from: string, close: string, label: string): string {
+  const start = code.indexOf(from);
+  expect(start, `${label}: anchor "${from}" not found in main.cjs`).toBeGreaterThan(-1);
+  const end = code.indexOf(close, start);
+  expect(end, `${label}: unterminated block after "${from}"`).toBeGreaterThan(start);
+  return code.slice(start, end);
+}
+
+// electron/main.cjs is the Electron entry and cannot run under vitest, so the
+// shell startup wiring is pinned as text (same rationale as the app:// scheme,
+// updater, and gpu pins). All three behaviors here fail SILENTLY when lost: a
+// dropped show:false shows an unpainted frame, a dropped fallback timer leaves
+// a wedged renderer windowless, a dropped second-instance focus makes a second
+// launch look like nothing happened, and a dropped platform guard on the menu
+// would strip macOS of its copy/paste/quit accelerators. None of that reds a
+// runtime test.
+describe('shell startup polish pins (electron/main.cjs)', () => {
+  it('creates the one window hidden, keeping the dark backgroundColor', () => {
+    expect(count(code, 'new BrowserWindow('), 'expected exactly one BrowserWindow').toBe(1);
+    const options = block('new BrowserWindow({', '\n  });', 'BrowserWindow options');
+    // Whole-line matches: `show: falseish` or a trailing-expression form must
+    // not satisfy either pin.
+    expect(/^\s*show: false,$/m.test(options), 'window must be created with show: false').toBe(
+      true,
+    );
+    expect(
+      /^\s*backgroundColor: '#05070a',$/m.test(options),
+      'the dark backgroundColor must survive the hidden-window change',
+    ).toBe(true);
+  });
+
+  it('shows the window on ready-to-show and clears the fallback there', () => {
+    expect(count(code, "once('ready-to-show'"), 'expected one ready-to-show registration').toBe(1);
+    const handler = block("mainWindow.once('ready-to-show'", '\n  });', 'ready-to-show handler');
+    expect(handler, 'ready-to-show must disarm the fallback timer').toContain(
+      'clearReadyToShowFallback();',
+    );
+    expect(handler, 'ready-to-show must show the window').toContain('showMainWindow();');
+  });
+
+  it('shows once: only a live, still-hidden window, via a captured instance', () => {
+    // The helpers act on the captured `win`, never the module-level mainWindow:
+    // createMainWindow can run again (macOS activate), and a stale timer must
+    // not act on a successor window.
+    expect(/^\s*const win = mainWindow;$/m.test(code), 'the window must be captured').toBe(true);
+    const helper = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
+    expect(helper, 'show helper must skip a destroyed window').toContain('win.isDestroyed()');
+    expect(helper, 'show helper must skip an already visible window').toContain('win.isVisible()');
+    expect(helper, 'show helper must actually show the window').toContain('win.show();');
+    expect(helper, 'show helper must not read the reassignable module binding').not.toContain(
+      'mainWindow.',
+    );
+  });
+
+  it('arms a 4000 ms fallback that shows the window and warns', () => {
+    expect(
+      /^const READY_TO_SHOW_FALLBACK_MS = 4000;$/m.test(code),
+      'the fallback timeout must be a top-level named 4000 ms constant',
+    ).toBe(true);
+    const timerStart = code.indexOf('let readyToShowFallback = setTimeout(');
+    expect(timerStart, 'fallback timer not armed with setTimeout').toBeGreaterThan(-1);
+    // Ends the slice on the delay argument itself, so a literal delay in place
+    // of the constant fails the pin instead of passing it.
+    const timerEnd = code.indexOf('}, READY_TO_SHOW_FALLBACK_MS);', timerStart);
+    expect(
+      timerEnd,
+      'the fallback timer must be armed with READY_TO_SHOW_FALLBACK_MS',
+    ).toBeGreaterThan(timerStart);
+    const timerBody = code.slice(timerStart, timerEnd);
+    expect(timerBody, 'the fallback must show the window through the show-once helper').toContain(
+      'showMainWindow()',
+    );
+    expect(timerBody, 'the fallback must record that it fired').toContain('log.warn(');
+  });
+
+  it('never lets a fallback timer outlive its window', () => {
+    const clear = block('const clearReadyToShowFallback = () => {', '\n  };', 'clear helper');
+    expect(clear, 'the clear helper must call clearTimeout').toContain(
+      'clearTimeout(readyToShowFallback);',
+    );
+    const closed = block("mainWindow.on('closed'", '\n  });', 'closed handler');
+    expect(closed, "the 'closed' handler must clear the fallback timer").toContain(
+      'clearReadyToShowFallback();',
+    );
+    expect(closed, "the 'closed' handler must still drop the window reference").toContain(
+      'mainWindow = null;',
+    );
+  });
+
+  it('focuses the running window on second-instance before any deep-link work', () => {
+    const handler = block("app.on('second-instance'", '\n  });', 'second-instance handler');
+    const focusAt = handler.indexOf('focusMainWindow();');
+    const findAt = handler.indexOf('argv.find(');
+    expect(focusAt, 'second-instance must focus the window').toBeGreaterThan(-1);
+    expect(findAt, 'second-instance must still scan argv for a deep link').toBeGreaterThan(-1);
+    // Position, not presence: focusing must happen for every second launch, not
+    // only on the deep-link path.
+    expect(
+      focusAt,
+      'focus must run before the deep-link scan, so it runs unconditionally',
+    ).toBeLessThan(findAt);
+    expect(handler, 'the deep-link scheme test must survive').toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: pins main.cjs source text verbatim
+      'arg.startsWith(`${deepLinkProtocol}://`)',
+    );
+    expect(handler, 'a found deep link must still be handled').toContain(
+      'if (url) handleDeepLink(url);',
+    );
+  });
+
+  it('defines focusMainWindow once and routes every focus site through it', () => {
+    expect(count(code, 'function focusMainWindow('), 'expected one focusMainWindow').toBe(1);
+    const def = block('function focusMainWindow(', '\n}', 'focusMainWindow');
+    expect(def, 'focus must reveal a still-hidden window (pre-paint deep links)').toContain(
+      'mainWindow.show()',
+    );
+    expect(def, 'focus must restore a minimized window first').toContain(
+      'mainWindow.isMinimized()',
+    );
+    expect(def, 'focus must restore a minimized window first').toContain('mainWindow.restore()');
+    expect(def, 'focus must focus the window').toContain('mainWindow.focus()');
+    // Exactly the definition plus the four call sites (login, wallet,
+    // second-instance, activate): a fifth caller is an unreviewed focus path
+    // and must show up here.
+    expect(
+      count(code, 'focusMainWindow('),
+      'focusMainWindow call-site count drifted from the reviewed set',
+    ).toBe(5);
+  });
+
+  it('reveals the existing window on activate instead of no-opping', () => {
+    const handler = block("app.on('activate'", '\n  });', 'activate handler');
+    expect(handler, 'activate must still create a window when none exists').toContain(
+      'createMainWindow()',
+    );
+    expect(handler, 'activate with a live (possibly hidden) window must reveal it').toContain(
+      'focusMainWindow()',
+    );
+  });
+
+  it('routes the login and wallet handoff deliveries through the shared helper', () => {
+    const login = block('function deliverLoginCode(', '\n}', 'deliverLoginCode');
+    expect(login, 'login delivery must use the shared focus helper').toContain(
+      'focusMainWindow();',
+    );
+    expect(login, 'login delivery must not re-inline focus').not.toContain('mainWindow.focus()');
+    expect(login, 'login delivery must not re-inline restore').not.toContain(
+      'mainWindow.restore()',
+    );
+
+    const wallet = block('function deliverWalletHandoffCode(', '\n}', 'deliverWalletHandoffCode');
+    expect(wallet, 'wallet delivery must use the shared focus helper').toContain(
+      'focusMainWindow();',
+    );
+    expect(wallet, 'wallet delivery must not re-inline restore').not.toContain(
+      'mainWindow.restore()',
+    );
+    // The darwin app-level focus must stay ahead of the no-window early return:
+    // it is what raises the app when the handoff arrives with no window yet.
+    const steal = wallet.indexOf("if (process.platform === 'darwin') app.focus({ steal: true });");
+    const guard = wallet.indexOf('if (!mainWindow) return;');
+    expect(steal, 'the darwin app.focus line must survive').toBeGreaterThan(-1);
+    expect(guard, 'the no-window early return must survive').toBeGreaterThan(-1);
+    expect(steal, 'darwin app.focus must stay before the no-window early return').toBeLessThan(
+      guard,
+    );
+  });
+
+  it('nulls the application menu on win32 and linux only, before app ready', () => {
+    const requireBlock = block('const {', "} = require('electron');", 'electron require');
+    expect(/^\s*Menu,$/m.test(requireBlock), 'Menu must be required from electron').toBe(true);
+
+    expect(
+      count(code, 'Menu.setApplicationMenu(null)'),
+      'expected exactly one setApplicationMenu(null)',
+    ).toBe(1);
+    // The guard is pinned as one contiguous form, so the call cannot drift out
+    // of it and an inverted `!== darwin` allowlist cannot satisfy the pin.
+    const guard =
+      /^if \(process\.platform === 'win32' \|\| process\.platform === 'linux'\) \{\n {2}Menu\.setApplicationMenu\(null\);\n\}$/m;
+    const match = guard.exec(code);
+    expect(
+      match,
+      'setApplicationMenu(null) must sit in a top-level win32/linux allowlist',
+    ).not.toBeNull();
+    expect(
+      match?.[0] ?? '',
+      'darwin must be excluded by omission, never named in the guard',
+    ).not.toContain('darwin');
+
+    const menuAt = code.indexOf('Menu.setApplicationMenu(null)');
+    const ready = code.indexOf('app.whenReady()');
+    const schemes = code.indexOf('protocol.registerSchemesAsPrivileged(');
+    expect(ready, 'app.whenReady() not found in main.cjs').toBeGreaterThan(-1);
+    // Electron applies the menu at window creation, so nulling it after ready
+    // would pass a position-blind scan while a menu bar still flashed.
+    expect(menuAt, 'the menu must be nulled before app ready').toBeLessThan(ready);
+    expect(schemes, 'registerSchemesAsPrivileged not found in main.cjs').toBeGreaterThan(-1);
+    expect(
+      menuAt,
+      'the menu guard must sit after the scheme registration, which pins its own position',
+    ).toBeGreaterThan(schemes);
+  });
+
+  it('no longer carries a per-window setMenu(null)', () => {
+    expect(
+      count(code, 'setMenu(null)'),
+      'the per-window menu strip is replaced by the app-level guard',
+    ).toBe(0);
+  });
+});

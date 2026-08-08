@@ -461,12 +461,24 @@ function openDesktopWalletHandoff(code) {
   return shell.openExternal(buildWalletHandoffBrowserUrl(apiOrigin, code));
 }
 
+// Bring the running window back to the player. A deep link or a second launch
+// can arrive during the pre-paint hidden phase (the window is created with
+// show:false), where restore()/focus() alone would leave the app looking dead,
+// so a still-hidden window is shown as-is: a dark unpainted frame beats
+// nothing happening. restore() before focus(), because focus() on a minimized
+// window does nothing on Windows and Linux.
+function focusMainWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (!mainWindow.isVisible()) mainWindow.show();
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.focus();
+}
+
 function deliverLoginCode(code) {
   pendingLoginCode = code;
   if (!mainWindow) return;
   mainWindow.webContents.send('desktop-login-code', code);
-  if (mainWindow.isMinimized()) mainWindow.restore();
-  mainWindow.focus();
+  focusMainWindow();
 }
 
 function deliverWalletHandoffCode(code) {
@@ -474,8 +486,7 @@ function deliverWalletHandoffCode(code) {
   if (process.platform === 'darwin') app.focus({ steal: true });
   if (!mainWindow) return;
   mainWindow.webContents.send('desktop-wallet-handoff-code', code);
-  if (mainWindow.isMinimized()) mainWindow.restore();
-  mainWindow.focus();
+  focusMainWindow();
 }
 
 function handleDeepLink(url) {
@@ -643,6 +654,10 @@ if (!singleInstance) {
   app.quit();
 } else {
   app.on('second-instance', (_event, argv) => {
+    // Launching the game again is a request to see it, deep link or not: the
+    // second process quits, so without this the click would look like nothing
+    // happened when the first window sits minimized or behind another app.
+    focusMainWindow();
     const url = argv.find((arg) => arg.startsWith(`${deepLinkProtocol}://`));
     if (url) handleDeepLink(url);
   });
@@ -775,7 +790,10 @@ app.whenReady().then(() => {
   if (initialDeepLink) handleDeepLink(initialDeepLink);
 
   app.on('activate', () => {
+    // A dock click during the pre-paint hidden phase must reveal the live
+    // window, not no-op because a (hidden) window already exists.
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+    else focusMainWindow();
   });
 });
 
