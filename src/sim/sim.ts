@@ -4456,7 +4456,7 @@ export class Sim {
     }
     // movement: unequipping a mech chroma re-grants the very item equipping it
     // consumed, so this relocates a copy the account already owns.
-    this.addItem(itemId, 1, r.meta.entityId, { movement: true });
+    this.addItem(itemId, 1, r.meta.entityId, MOVEMENT_GRANT);
     return true;
   }
 
@@ -8422,12 +8422,12 @@ export class Sim {
     itemId: string,
     count: number,
     pid?: number,
-    opts?: {
+    opts?: Readonly<{
       silent?: boolean;
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
-    },
+    }>,
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8490,12 +8490,12 @@ export class Sim {
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: {
+    opts?: Readonly<{
       silent?: boolean;
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
-    },
+    }>,
   ): void {
     const r = this.resolve(pid);
     if (!r) return;

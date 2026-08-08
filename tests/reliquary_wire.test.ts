@@ -161,10 +161,12 @@ describe('Reliquary wire thrift', () => {
     expect(after.self).toHaveProperty('reliq');
     expect(after.self.reliq.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 1 });
 
-    // A later OBTAIN of the same relic moves nothing but the tally: it is not
-    // a find, so no event marks the session dirty, but the memo's revision
-    // still has to move or the re-ship would carry a stale blob. Forcing the
-    // heavy gate open is what isolates the memo from the dirty flag here.
+    // A later OBTAIN of the same relic moves nothing but the tally. In
+    // production it still dirties the session (addItem emits a `loot` event,
+    // a HEAVY_SELF_EVENTS member; the gate-ON arm below pins that chain);
+    // HERE the gate is forced open so this assertion isolates the MEMO'S
+    // revision from the dirty flag: even with every tick heavy, a stale build
+    // would ship the old bytes.
     (server as any).heavySelfGate = false;
     sim.addItem(CATALOGUE_RELIC, 1, session.pid);
     fw.sent.length = 0;
@@ -172,6 +174,60 @@ describe('Reliquary wire thrift', () => {
     const counted = lastSnap(fw.sent);
     expect(counted.self).toHaveProperty('reliq');
     expect(counted.self.reliq.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 1, count: 1 });
+  });
+
+  it('a repeat obtain re-ships promptly through the loot event with the gate ON', () => {
+    // The PRODUCTION path for a tally-only change reaching an online client:
+    // addItem always emits `loot`, `loot` is in HEAVY_SELF_EVENTS, routing
+    // sets selfHeavyDirty, and the next snapshot re-diffs reliq. Nothing else
+    // pinned that chain (removing `loot` from HEAVY_SELF_EVENTS would fall
+    // back to the ~2s staggered refresh with every other test green), so this
+    // drives it with the gate ON, end to end, and asserts the count advances.
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 8, 'RelicJ');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+    // The premise in the name: SELF_SNAPSHOT_FULL=1 would silently void it.
+    expect((server as any).heavySelfGate).toBe(true);
+
+    sim.addItem(CATALOGUE_RELIC, 1, session.pid);
+    routeEvents(server, sim.drainEvents());
+    (server as any).broadcastSnapshots();
+    const first = lastSnap(fw.sent);
+    expect(first.self.reliq.firstFind[CATALOGUE_RELIC].count).toBe(1);
+
+    // Isolate the LOOT arm of heavyDue before the decisive broadcast. A
+    // repeat obtain reaches the client promptly through TWO redundant arms
+    // (proven by mutation while writing this): the `loot` event marks
+    // selfHeavyDirty, AND onInventoryChangedForQuests bumps meta.wireRev on
+    // every inventory mutation, which the wireRev arm re-diffs. Removing
+    // `loot` from HEAVY_SELF_EVENTS therefore does NOT degrade the tally to
+    // the staggered backstop today; the failure needs both arms gone. This
+    // test holds the loot arm alone: step off the modulo slot, then
+    // neutralize the wireRev arm after routing, so ONLY the dirty flag can
+    // carry the re-ship and dropping `loot` from the set goes red here.
+    while ((sim.tickCount + session.pid) % 40 === 0) sim.tick();
+    expect((sim.tickCount + session.pid) % 40).not.toBe(0);
+    routeEvents(server, sim.drainEvents()); // clear tick residue deliberately
+
+    // The repeat obtain: no find, no unlock event, only `loot` carries it.
+    fw.sent.length = 0;
+    const wireRevBefore = meta.wireRev;
+    sim.addItem(CATALOGUE_RELIC, 1, session.pid);
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'loot')).toBe(true);
+    expect(events.some((e) => e.type === 'reliquaryUnlock')).toBe(false);
+    routeEvents(server, events);
+    expect(session.selfHeavyDirty, 'the loot event must mark the session dirty').toBe(true);
+    // The redundant arm's premise, then its neutralization (see above).
+    expect(meta.wireRev).toBeGreaterThan(wireRevBefore);
+    session.lastWireRev = meta.wireRev;
+    (server as any).broadcastSnapshots();
+    const after = lastSnap(fw.sent);
+    expect(after.self).toHaveProperty('reliq');
+    expect(after.self.reliq.firstFind[CATALOGUE_RELIC].count).toBe(2);
+    expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(2);
   });
 
   it('builds the reliq blob once per CHANGE, not once per heavy tick', () => {

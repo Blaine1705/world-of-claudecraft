@@ -171,7 +171,10 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
       // possibly a `clears: 0`. Neither is read: the entry loads clean, and
       // where a relic lives comes from the catalog index, which is where the
       // fallback arm always computed the identical answer. One release of
-      // tolerance, then no save written since carries the field at all.
+      // tolerance, then no save written since carries the field at all. That
+      // clock never started in production: the Reliquary has not shipped, so
+      // only feature-branch and PBE rows ever wrote `pageId`, and this
+      // tolerance exists for THEM, not for any released save.
       state.firstFind[itemId] = slim;
       // The tally is split back out of its carrier entry, so counts keys can
       // only ever be a SUBSET of the entries that survived the filters above:
@@ -441,7 +444,6 @@ export function noteRelicItemFind(
  * which relocate or re-mint copies somebody already held. Counting those would
  * let two players hand one relic back and forth and watch both tallies climb,
  * which is exactly the reading the number must not support.
-
  *
  * Deliberately quiet: no event, no recent push, no saveCharacter, no rank
  * sync. The tally rides the sparse blob's 30s autosave like the rest.

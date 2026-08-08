@@ -63,7 +63,10 @@ const CHARACTER_LIMIT = 10;
  *  The offline /dev kit (src/sim/dev_kit.ts) deliberately DIFFERS and still
  *  counts: it is ALLOW_DEV_COMMANDS-gated so it cannot reach a real player,
  *  and its DevKitApplyCtx.addItem carries no opts to thread a flag through.
- *  The seed policy recorded here is server-boost-only, on purpose. */
+ *  The server `dev_give` command (server/game.ts) is the same family: also
+ *  ALLOW_DEV_COMMANDS-gated, also counts, so the two dev arms agree with
+ *  each other. The seed policy recorded here is server-boost-only, on
+ *  purpose. */
 const MOVEMENT = { movement: true } as const;
 const BOOST_MAX_SKIN = 7;
 // Same fixed world seed the normal creation path uses (initialCharacterState

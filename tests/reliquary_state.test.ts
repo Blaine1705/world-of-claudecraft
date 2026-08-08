@@ -14,8 +14,8 @@ import {
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
-import { mechChromaItemId } from '../src/sim/content/skins';
-import { DELVES, ITEMS } from '../src/sim/data';
+import { MECH_CHROMAS, mechChromaItemId } from '../src/sim/content/skins';
+import { DELVES, ITEMS, QUESTS } from '../src/sim/data';
 import { checkDeedTrigger, grantDeed, markItemDiscovered } from '../src/sim/deeds';
 import { grantDelveClearTo } from '../src/sim/delves/runs';
 import { grantCopies } from '../src/sim/item_instance_transfer';
@@ -289,7 +289,7 @@ describe('Reliquary serialize / restore round-trip', () => {
   it('restore sanitizes clears and count per FIELD on catalogued entries', () => {
     // Every id here is catalogued, so the field guards are actually reached
     // (an uncatalogued id is dropped before either filter runs). Snug floor:
-    // the slice must fill all twelve fixtures. Phase 17 retired the pageId
+    // the slice must fill all thirteen fixtures. Phase 17 retired the pageId
     // fixtures with the field and added the tally's own guards in their place.
     const ids = [
       ...new Set(
@@ -297,8 +297,8 @@ describe('Reliquary serialize / restore round-trip', () => {
           p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
         ),
       ),
-    ].slice(0, 12);
-    expect(ids.length).toBe(12);
+    ].slice(0, 13);
+    expect(ids.length).toBe(13);
     const [
       negative,
       infinite,
@@ -311,6 +311,7 @@ describe('Reliquary serialize / restore round-trip', () => {
       hugeCount,
       stringCount,
       nanCount,
+      nullCount,
       nonObject,
     ] = ids;
 
@@ -339,6 +340,10 @@ describe('Reliquary serialize / restore round-trip', () => {
         // above cannot reach.
         [stringCount]: { count: '5' } as never,
         [nanCount]: { count: Number.NaN },
+        // The on-disk spelling of numeric corruption: JSON.stringify writes
+        // NaN and Infinity as null (and jsonb rejects the bare literals), so
+        // null is the form a corrupted tally actually takes in Postgres.
+        [nullCount]: { count: null } as never,
         // A non-object entry is dropped WHOLE (the entry guard), unlike every
         // per-field case above, which keeps the entry and drops the field.
         [nonObject]: 'junk' as never,
@@ -380,6 +385,9 @@ describe('Reliquary serialize / restore round-trip', () => {
     expect(restored.firstFind[stringCount]).toEqual({});
     expect(Object.hasOwn(restored.counts, nanCount)).toBe(false);
     expect(restored.firstFind[nanCount]).toEqual({});
+    // ...and the null spelling those corruptions take ON DISK drops the same way.
+    expect(Object.hasOwn(restored.counts, nullCount)).toBe(false);
+    expect(restored.firstFind[nullCount]).toEqual({});
     // counts never outlives firstFind: every key names a surviving entry.
     expect(Object.keys(restored.counts).every((id) => id in restored.firstFind)).toBe(true);
   });
@@ -1380,6 +1388,55 @@ describe('Reliquary obtain counts', () => {
     expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(3);
   });
 
+  it('bank round trips, bag moves, and partial-stack splits never move the tally', () => {
+    // The phase's stopping rule names these expressly: container moves ride
+    // moveBetweenContainers / moveInventoryItem and bypass the grant hubs, so
+    // nothing on these routes can reach noteRelicObtain. That is the property
+    // a future refactor breaks silently (funnel a bank withdraw through
+    // addItem and a player-visible number inflates on every bank visit), and
+    // nothing else in the tree pinned it.
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    const banker = [...sim.entities.values()].find(
+      (x) => x.kind === 'npc' && x.templateId === 'bursar_fernando',
+    );
+    expect(banker, 'the banker the deposit gate needs must exist').toBeDefined();
+    e.pos = { ...banker!.pos };
+    e.prevPos = { ...e.pos };
+    sim.rebucket(e);
+
+    sim.addItem(STACKABLE_RELIC, 2, sim.playerId);
+    expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(2);
+    const bagSlot = () => meta.inventory.findIndex((s) => s.itemId === STACKABLE_RELIC);
+    const bankSlot = () => meta.bank.inventory.findIndex((s) => s.itemId === STACKABLE_RELIC);
+    const bagCount = () =>
+      meta.inventory.filter((s) => s.itemId === STACKABLE_RELIC).reduce((n, s) => n + s.count, 0);
+
+    // A partial deposit SPLITS the stack across the two containers...
+    sim.bankDeposit(bagSlot(), 1);
+    expect(bagCount()).toBe(1);
+    expect(meta.bank.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
+    // ...the remainder follows as a whole-slot deposit...
+    sim.bankDeposit(bagSlot());
+    expect(bagCount()).toBe(0);
+    // ...and both copies come back across a partial and a whole withdrawal.
+    sim.bankWithdraw(bankSlot(), 1);
+    sim.bankWithdraw(bankSlot());
+    expect(bagCount()).toBe(2);
+    expect(bankSlot()).toBe(-1);
+
+    // A bag reorder is a container move too, through its own seam. The
+    // post-condition keeps this arm live: a silently refused move would make
+    // the tally assertion below vacuously true for this leg. The move writes
+    // the stack's CELL (InvSlot.slot), never the array order, so that is the
+    // observable to pin.
+    sim.moveInventoryItem(bagSlot(), 0);
+    expect(meta.inventory.find((s) => s.itemId === STACKABLE_RELIC)?.slot).toBe(0);
+
+    // Four bank legs and a reorder later, the tally has not moved.
+    expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(2);
+  });
+
   it('a MOVEMENT grant discovers but never counts, on both hub arms', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
@@ -1444,6 +1501,13 @@ describe('Reliquary obtain counts', () => {
     // BOTH handovers really happened (otherwise the count claim is vacuous).
     expect(taker.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
     expect(taker.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
+    // Premise for the INSTANCED arm: the received unit still carries its
+    // payload, so the handover really took grantOffer's addItemInstance branch
+    // (a unit that lost its payload would fall into the plain branch and leave
+    // that call site's movement flag untested).
+    expect(taker.inventory.find((s) => s.itemId === STACKABLE_RELIC)?.instance?.signer).toBe(
+      'Giver',
+    );
     expect(taker.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
     // ...and the receiving side gained membership without gaining a tally on
     // EITHER arm (plain and instanced).
@@ -1858,6 +1922,18 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
     // Discovery fires as on every movement path; the tally does not move.
     expect(meta.deedStats.itemsDiscovered.has(itemId!)).toBe(true);
     expect(meta.reliquary.counts).toEqual(before);
+
+    // Content premise that ARMS the pin above (and its server-arm sibling in
+    // tests/reliquary_wire.test.ts): no chroma plate id is catalogued today,
+    // so those movement flags are latent and the counts assertions would hold
+    // with or without them. The day a plate lands in the catalog, this reds
+    // and the flags gain a live test (the unbind-peel pattern).
+    const cataloguedChromaPlates = MECH_CHROMAS.map((c) => mechChromaItemId(c.id))
+      .filter((id): id is string => id !== null)
+      .filter((id) => isCataloguedRelicItem(id));
+    expect(cataloguedChromaPlates).toEqual([]);
+    // Vacuity floor: the chroma table itself is populated.
+    expect(MECH_CHROMAS.length).toBeGreaterThan(0);
   });
 
   it('the commission-order delivery hands over without counting, and the CRAFT counts', () => {
@@ -1915,6 +1991,26 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
     expect(requester.reliquary.firstFind[RELIC]).toEqual({});
     // The crafter's tally is unchanged by giving it away.
     expect(crafter.meta.reliquary.counts[RELIC]).toBe(1);
+  });
+
+  it('the quest fallback re-grant can never reach a catalogued relic (content)', () => {
+    // acceptQuest and the turn-in recovery both re-grant missing
+    // quest.requiredItems through a bare ctx.addItem: a re-mint of a copy the
+    // player already obtained, movement semantics without the flag. Safe today
+    // because every declared requiredItem is a quest-kind item and none is
+    // catalogued; this pins that premise (the unbind-peel pattern) so the day
+    // a catalogued relic becomes a requiredItem, the site gains a real
+    // classification decision instead of silently counting the re-mint.
+    const offenders: string[] = [];
+    for (const [questId, quest] of Object.entries(QUESTS)) {
+      for (const itemId of quest.requiredItems ?? []) {
+        if (isCataloguedRelicItem(itemId)) offenders.push(`${questId}:${itemId}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: requiredItems declarations DO exist to be swept.
+    const declaring = Object.values(QUESTS).filter((q) => (q.requiredItems?.length ?? 0) > 0);
+    expect(declaring.length).toBeGreaterThan(0);
   });
 
   it('the unbind stack-split peel can never reach a catalogued relic (content)', () => {
@@ -2033,6 +2129,50 @@ describe('Reliquary fill-chain ownership hoist premise', () => {
   });
 });
 
+describe('Reliquary ownership snapshot liveness', () => {
+  it('the snapshot surfaces the fill chain depends on are LIVE references', () => {
+    // noteReliquaryMark builds its ownership snapshot BEFORE marks.add and
+    // hands the SAME object to emitReliquaryUnlock and syncCuratorRankDeeds,
+    // which need the post-add view. That is correct only while
+    // characterReliquaryOwnership returns live references for these three
+    // surfaces: a future defensive copy (an entirely safe-looking change)
+    // would kill page-completion illumination and rank deeds on the MARK path
+    // silently, with the whole suite green, because every illumination test
+    // drives the ITEM path where the ledger write precedes the snapshot.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const ownership = characterReliquaryOwnership(meta);
+    expect(ownership.marks).toBe(meta.reliquary.marks);
+    expect(ownership.itemsDiscovered).toBe(meta.deedStats.itemsDiscovered);
+    expect(ownership.deedsEarned).toBe(meta.deedsEarned);
+  });
+
+  it('a MARK that completes its page illuminates it (the liveness in behavior)', () => {
+    // The behavioral arm of the identity pin above: professions_field_notes
+    // is all-mark, so its LAST fill goes through noteReliquaryMark, whose
+    // hoisted pre-add snapshot must still see the add (the live marks Set)
+    // for pageCompletion to read complete. A defensive copy in
+    // characterReliquaryOwnership kills exactly this emit.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const page = RELIQUARY_PAGES_BY_ID.professions_field_notes;
+    const markIds = page.relics.filter((r) => r.kind === 'mark').map((r) => r.markId);
+    expect(markIds.length, 'the all-mark page premise').toBe(page.relics.length);
+    expect(markIds.length).toBeGreaterThan(1);
+    for (const markId of markIds.slice(0, -1)) {
+      expect(noteReliquaryMark(sim.ctx, meta, markId)).toBe(true);
+    }
+    sim.drainEvents();
+    const last = markIds[markIds.length - 1];
+    expect(noteReliquaryMark(sim.ctx, meta, last)).toBe(true);
+    const unlock = sim.drainEvents().find((e) => e.type === 'reliquaryUnlock' && e.markId === last);
+    expect(unlock).toBeDefined();
+    expect(unlock && unlock.type === 'reliquaryUnlock' && unlock.illuminatedPageId).toBe(
+      'professions_field_notes',
+    );
+  });
+});
+
 describe('Reliquary wire memo revision bumps', () => {
   // The memo's failure mode is SILENT: the server compares the string
   // reliquaryWireJson returns against session.lastSent, so a writer that forgets
@@ -2087,6 +2227,40 @@ describe('Reliquary wire memo revision bumps', () => {
     const record = reliquaryWireCacheProbe(state);
     expect(build()).toBe(afterSync);
     expect(reliquaryWireCacheProbe(state)).toBe(record);
+  });
+
+  it('the memoized wire JSON is byte-identical to the direct serialize expression', () => {
+    // The maybe-to-maybeRaw swap in server/game.ts rests on this equality: a
+    // byte mismatch would fail every session's lastSent comparison once at
+    // deploy and spuriously re-ship the blob to every connected client. The
+    // equality arm pins that the memo wraps serializeReliquaryState with the
+    // `?? {}` default (it shares the serializer, so it cannot see a drift
+    // INSIDE it); the literal arm below is what pins the actual bytes.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.dungeonClears.hollow_crypt = 2;
+    sim.addItem(CATALOGUE_RELIC, 1, sim.playerId);
+    sim.addItem(STACKABLE_RELIC, 3, sim.playerId);
+    expect(noteReliquaryMark(sim.ctx, meta, [...RELIQUARY_MARK_IDS][0])).toBe(true);
+    expect(reliquaryWireJson(meta.reliquary)).toBe(
+      JSON.stringify(serializeReliquaryState(meta.reliquary) ?? {}),
+    );
+
+    // The LITERAL byte pin: key order, the fold shape, and the sparse-field
+    // omissions, spelled out so a serializer field-order or shape drift reds
+    // here even though both expressions above share the implementation. Note
+    // the firstFind key order: RESTORE iterates the saved keys SORTED (the
+    // recorded live-vs-restored insertion-order property), so greaves lands
+    // before helm even though the fixture lists helm first.
+    const state = restoreReliquaryState({
+      firstFind: { cryptbone_helm: { clears: 2, count: 3 }, cryptbone_greaves: {} },
+      marks: ['gather_event:pristine_vein'],
+      recent: ['cryptbone_helm'],
+    });
+    expect(reliquaryWireJson(state)).toBe(
+      '{"firstFind":{"cryptbone_greaves":{},"cryptbone_helm":{"clears":2,"count":3}},' +
+        '"marks":["gather_event:pristine_vein"],"recent":["cryptbone_helm"]}',
+    );
   });
 });
 

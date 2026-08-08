@@ -59,6 +59,10 @@ import {
   zoneContaining,
 } from '../src/sim/data';
 import type { LootTier } from '../src/sim/lockpick';
+import {
+  ARMOR_SECONDARY_BY_TYPE,
+  DISENCHANT_MATERIAL_BY_QUALITY,
+} from '../src/sim/professions/disenchant_reagents';
 import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { masterworkBonusStats } from '../src/sim/professions/masterwork';
@@ -382,6 +386,45 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it('no copper vendor and no disenchant yield stocks a catalogued relic', () => {
+    // Two unflagged world-source grant paths whose SAFETY is a content fact,
+    // not a code property. buyItem (src/sim/items.ts) counts every purchase,
+    // sanctioned for CURRENCY vendors (delve Marks, heroic marks) where the
+    // coin is earned in the world; a catalogued relic on a plain copper
+    // vendorItems list would open a gold-repeatable tally climb. Disenchant
+    // yields (materials plus typed secondaries) also count, a self-loop only
+    // if a yield id were ever catalogued. Both sets are empty of relics today;
+    // this reds the day a content edit changes either, forcing the
+    // classification decision instead of silently inheriting "counts".
+    const vendorOffenders: string[] = [];
+    for (const [npcId, npc] of Object.entries(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) {
+        if (isCataloguedRelicItem(itemId)) vendorOffenders.push(`${npcId}:${itemId}`);
+      }
+    }
+    expect(vendorOffenders).toEqual([]);
+    const yieldOffenders = [
+      ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
+      ...Object.values(ARMOR_SECONDARY_BY_TYPE),
+      // typedSecondaryFor's two weapon fallbacks, the only yields not in a table.
+      'resonant_timber',
+      'resonant_steel',
+    ].filter((id) => isCataloguedRelicItem(id));
+    expect(yieldOffenders).toEqual([]);
+    // Vacuity floors: both swept sets are populated, and every swept yield
+    // value is a REAL item id (a table reshape to objects would otherwise
+    // make isCataloguedRelicItem silently false for every entry).
+    expect(Object.values(NPCS).some((n) => (n.vendorItems?.length ?? 0) > 0)).toBe(true);
+    const sweptYields = [
+      ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
+      ...Object.values(ARMOR_SECONDARY_BY_TYPE),
+      'resonant_timber',
+      'resonant_steel',
+    ];
+    expect(sweptYields.length).toBeGreaterThan(2);
+    expect(sweptYields.every((v) => typeof v === 'string' && ITEMS[v] !== undefined)).toBe(true);
   });
 
   it('does not catalog heroic_ variants (base ids already fill via discovery)', () => {

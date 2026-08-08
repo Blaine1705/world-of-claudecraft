@@ -812,19 +812,28 @@ function reliquaryStateWrite(line: string): boolean {
 }
 
 describe('Reliquary sparse-state writes stay inside their owning module', () => {
-  const scanned = [...walk(simRoot), ...walk(join(repoRoot, 'server'))].filter(
-    (f) => f !== RELIQUARY_STATE_OWNER,
-  );
+  // headless/ joins the walk: the RL env server holds a live Sim and could
+  // grow a surface write as easily as server/ (it has none today).
+  const scanned = [
+    ...walk(simRoot),
+    ...walk(join(repoRoot, 'server')),
+    ...walk(join(repoRoot, 'headless')),
+  ].filter((f) => f !== RELIQUARY_STATE_OWNER);
 
-  it('finds both trees to scan', () => {
-    // Floor ABOVE the flat top-level file count of either root ALONE (about
-    // 139 for src/sim and 167 for server at authoring, recursive total about
-    // 650), so a walk that silently stopped recursing, or lost one of the two
-    // roots, cannot pass. The two .some() membership arms below pin the
-    // recursion reaching a nested directory in each root.
+  it('finds all three trees to scan', () => {
+    // Floor ABOVE the flat top-level file count of either large root ALONE
+    // (about 139 for src/sim and 167 for server at authoring, recursive total
+    // about 650), so a walk that silently stopped recursing, or lost one of
+    // the two LARGE roots, cannot pass (headless is two files; only its
+    // membership arm below catches losing it). The .some() arms pin the
+    // recursion reaching a nested directory in each large root and the
+    // headless root being present at all.
     expect(scanned.length).toBeGreaterThan(500);
     expect(scanned.some((f) => f.includes(join('src', 'sim', 'professions')))).toBe(true);
     expect(scanned.some((f) => f.includes(join('server', 'http')))).toBe(true);
+    // Anchored on a real file, not a bare path fragment: a checkout whose own
+    // absolute path contains a `headless` component must not satisfy this.
+    expect(scanned.some((f) => f.endsWith(join('headless', 'env_server.ts')))).toBe(true);
     // The owner itself is excluded, and it really exists (an excluded path that
     // is simply a typo would make this whole guard vacuous).
     expect(existsSync(RELIQUARY_STATE_OWNER)).toBe(true);
@@ -842,6 +851,40 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
         'which ships a STALE blob silently (see src/sim/reliquary.ts reliquaryWireJson):\n' +
         `${violations.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('noteRelicObtain is called from exactly the two grant hubs (caller-set pin)', () => {
+    // The tally writer takes `meta` directly (no SimContext hop), so a NEW
+    // caller adopts whatever movement policy it likes with no seam forcing
+    // the question, and the line-regex ban above cannot see it (the write
+    // happens inside the owning module on the caller's behalf). Pin the
+    // caller set AND the call text: both call sites must be the hub line
+    // with its movement gate intact, so a dropped `!opts?.movement` prefix,
+    // a changed copies argument, or a replacement arm elsewhere in sim.ts
+    // all red here, not just a third file. A new caller is not banned, it is
+    // a REVIEW ITEM: extend this pin only after classifying the new site
+    // against the movement rule. Scope: all of src/ (ClientWorld and the UI
+    // import from the owning module already, so a caller there is one import
+    // away) plus server/ and headless/; the owner file is excluded, which is
+    // also what keeps its own `export function noteRelicObtain(` definition
+    // line from matching. Accepted limitation: an aliased import
+    // (`import { noteRelicObtain as x }`) escapes the regex; treat one as a
+    // review item, the same standing as the write-ban's alias blind spot.
+    const callerScanned = [
+      ...walk(join(repoRoot, 'src')),
+      ...walk(join(repoRoot, 'server')),
+      ...walk(join(repoRoot, 'headless')),
+    ].filter((f) => f !== RELIQUARY_STATE_OWNER);
+    const callers = scanLines(callerScanned, /\bnoteRelicObtain\s*\(/);
+    const files = [...new Set(callers.map((v) => v.split(':')[0]))].sort();
+    expect(files, `unexpected noteRelicObtain callers:\n${callers.join('\n')}`).toEqual([
+      relative(repoRoot, join(simRoot, 'sim.ts')),
+    ]);
+    const texts = callers.map((v) => v.slice(v.indexOf('  ') + 2));
+    expect(texts, 'both hub arms carry the movement gate and per-copy count').toEqual([
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+    ]);
   });
 
   it('the ban FIRES on every write spelling, and spares reads and whole-object replacement', () => {
