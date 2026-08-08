@@ -277,7 +277,9 @@ import {
   createSuspiciousRegistrationReport,
   prunePlayerReportsBatch,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from './moderation_db';
+import { bustModerationQueueCache } from './moderation_queue_cache';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
@@ -827,6 +829,11 @@ function bustBoardCaches(): void {
   bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
+// The admin moderation queue's cached base read (server/moderation_queue_cache.ts):
+// busted the same immediate way as the boards above, so a ban/mute/ignored
+// report never lingers in the queue for up to a TTL cycle after the write that
+// resolved it.
+setOnModerationQueueChanged(bustModerationQueueCache);
 
 // Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
 // above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
