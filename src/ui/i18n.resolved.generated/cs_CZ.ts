@@ -4791,6 +4791,8 @@ export const cs_CZ: EnTranslations = {
       "chanWhisperBody": "Soukromá zpráva jednomu hráči podle jména, ať je kdekoli. Použij pro tichou domluvu.",
       "chanParty": "Party.",
       "chanPartyBody": "Mluv se všemi ve skupině bez ohledu na to, jak jsou rozptýlení.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Obecný.",
       "chanGeneralBody": "Vždy zapnutý kanál pro celý svět, který dosáhne ke všem online, dobrý na otázku nebo běžné povídání. Na rozdíl od World a Looking for Group se do něj nemusíš přihlašovat.",
       "chanWorld": "World.",

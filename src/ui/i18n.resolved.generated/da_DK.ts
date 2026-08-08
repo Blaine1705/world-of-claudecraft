@@ -4791,6 +4791,8 @@ export const da_DK: EnTranslations = {
       "chanWhisperBody": "En privat besked til én spiller ved navn, uanset hvor de er. Brug den til et stille ord.",
       "chanParty": "Følgesvende.",
       "chanPartyBody": "Tal med alle i din gruppe, uanset hvor spredt I er.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Almen.",
       "chanGeneralBody": "En altid-tændt rigsdækkende kanal, der når alle online, god til at stille et spørgsmål eller småsnakke. I modsætning til World og Looking for Group behøver du aldrig at melde dig til.",
       "chanWorld": "Verden.",

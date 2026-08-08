@@ -4791,6 +4791,8 @@ export const tr_TR: EnTranslations = {
       "chanWhisperBody": "Nerede olursa olsun, isimle tek bir oyuncuya özel bir mesaj. Sessiz bir çift söz için kullan.",
       "chanParty": "Grup.",
       "chanPartyBody": "Ne kadar dağılmış olursanız olun, grubundaki herkesle konuş.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Genel.",
       "chanGeneralBody": "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
       "chanWorld": "Dünya.",

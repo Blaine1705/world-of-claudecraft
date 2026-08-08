@@ -5494,6 +5494,8 @@ export type TranslationKeyFlat =
   | 'guide.skipToContent'
   | 'guide.social.calendarBody'
   | 'guide.social.calendarHeading'
+  | 'guide.social.chanBattleground'
+  | 'guide.social.chanBattlegroundBody'
   | 'guide.social.chanGeneral'
   | 'guide.social.chanGeneralBody'
   | 'guide.social.chanGuild'

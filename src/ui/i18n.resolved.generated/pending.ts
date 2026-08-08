@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -41,6 +43,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -72,6 +76,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -103,6 +109,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -135,6 +143,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -166,6 +176,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -196,11 +208,25 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody"
+  ],
+  "zh_TW": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody"
+  ],
+  "ko_KR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody"
+  ],
+  "ja_JP": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody"
+  ],
   "pt_BR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -231,8 +257,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmOpen",
     "hudChrome.wiki.confirmTitle"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody"
+  ],
   "cs_CZ": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -264,6 +295,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -295,6 +328,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -326,6 +361,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -357,6 +394,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -388,6 +427,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -419,6 +460,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",
@@ -450,6 +493,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
     "hud.chat.templates.battleground",
     "hud.core.chatChannels.names.battleground",
     "hudChrome.arenaGate.minLevelNote",

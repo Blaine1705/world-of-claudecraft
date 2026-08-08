@@ -4791,6 +4791,8 @@ export const ja_JP: EnTranslations = {
       "chanWhisperBody": "名前を指定して一人のプレイヤーへ、どこにいても送れるプライベートなメッセージ。内緒話に使いましょう。",
       "chanParty": "パーティ。",
       "chanPartyBody": "どれだけ離れていても、グループの全員に話しかけられます。",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "一般。",
       "chanGeneralBody": "オンラインの全員に届く、常時オンのレルム全体のチャンネル。質問したり雑談したりするのに向いています。WorldやLooking for Groupとは違い、参加を選ぶ必要は一切ありません。",
       "chanWorld": "ワールド。",

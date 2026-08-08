@@ -4791,6 +4791,8 @@ export const it_IT: EnTranslations = {
       "chanWhisperBody": "Un messaggio privato a un giocatore per nome, ovunque si trovi. Usalo per uno scambio riservato.",
       "chanParty": "Gruppo.",
       "chanPartyBody": "Parla con tutti nel tuo gruppo, per quanto siate sparpagliati.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Generale.",
       "chanGeneralBody": "Un canale di tutto il reame sempre attivo che raggiunge tutti gli online, buono per fare una domanda o chiacchierare in generale. A differenza dei canali Mondo e Cerca gruppo, non devi mai iscriverti.",
       "chanWorld": "Mondo.",

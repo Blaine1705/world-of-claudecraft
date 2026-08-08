@@ -9519,6 +9519,15 @@ export class GameServer {
               // match lifecycle, and flag plays refresh `bg` next snapshot.
               if (BG_WIRE_RESET_EVENTS.has(ev.type))
                 session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+              // A sticky /bg must not outlive the match it belongs to. The
+              // party precedent this channel copies is not equivalent: a party
+              // disband is occasional, a battleground ending is CERTAIN, so
+              // leaving the stickiness set would route the next plain line of
+              // every fighter after every match into "You are not in a
+              // battleground." Drop back to say, and only from bg.
+              if (ev.type === 'bgEnd' && session.rememberedChat.channel === 'battleground') {
+                session.rememberedChat = { channel: 'say' };
+              }
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (
