@@ -87,8 +87,9 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
     // Exactly 6 BIPED14 hit-variety donors are wired: a stray extra or missing
     // BIPED14 family wiring changes this count, while other rig families can
     // still add their own hit-variety donor GLBs independently.
-    const occurrences = [...MANIFEST_SRC.matchAll(/(?:yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g)]
-      .length;
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/(?:yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
+    ].length;
     expect(occurrences).toBe(6);
   });
 });

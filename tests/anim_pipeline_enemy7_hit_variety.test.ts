@@ -69,7 +69,8 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     }
     // Exactly 2 ENEMY7 hit-variety donors are wired. Other rig families can add
     // their own hit-variety donor GLBs without changing this ENEMY7 contract.
-    const occurrences = [...MANIFEST_SRC.matchAll(/(?:goblin|giant)_hit_variety_anims\.glb/g)].length;
+    const occurrences = [...MANIFEST_SRC.matchAll(/(?:goblin|giant)_hit_variety_anims\.glb/g)]
+      .length;
     expect(occurrences).toBe(2);
   });
 });
