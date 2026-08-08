@@ -212,19 +212,22 @@ describe('guild bank painter mark contract (source pins)', () => {
     const painter = readFileSync('src/ui/guild_bank_window.ts', 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
-    expect(painter).toContain('instanceGlyphMarkHtml(glyphKind)');
+    expect(painter).toContain('cornerMarkHtml(cornerMark)');
     expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
     expect(painter).toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS\[glyphKind\]/);
     // The guild pane never uses the UNKNOWN_ key family (see the aria case
     // above); a switch to it must be a deliberate edit, not drift.
     expect(painter).not.toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS');
-    // The fine mark composes through the same pure cores and shared mint the
-    // bags and personal-bank painters use (quest arm pinned null: quest items
-    // cannot enter the guild bank).
+    // The fine mark composes through the same pure cores and the one
+    // exhaustive cornerMarkHtml dispatch the bags and personal-bank painters
+    // use (quest arm pinned null: quest items cannot enter the guild bank).
+    // Both arms of the known/unknown branch emit the rim through
+    // bagRimClasses, so the seal and rim can never split across the branch.
     expect(painter).toContain('bagFineMark(slot.itemId)');
     expect(painter).toContain('bagCornerMark(glyphKind, null, fineMark)');
-    expect(painter).toContain('${bagRimClasses(null, fineMark)}');
-    expect(painter).toContain('fineSealMarkHtml()');
+    expect(painter.split('${bagRimClasses(null, fineMark)}').length).toBe(3);
+    expect(painter).not.toContain('instanceGlyphMarkHtml');
+    expect(painter).not.toContain('fineSealMarkHtml');
     // No private seal URL or class fork that could drift from bags.
     expect(painter).not.toContain('MASTERWORK_SEAL_IMAGE_URL');
     expect(painter).not.toContain('bi-masterwork-seal');

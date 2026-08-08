@@ -11,11 +11,13 @@
 // The mark FAMILY is all-surfaces by rule: a new mark (grade, purpose, or
 // per-copy) is minted here and painted by bags, bank, AND guild bank in the
 // same change, never inlined into one window (the fine seal shipped bag-only
-// once and the bank gap was a reported defect). The one exception is the
-// quest-purpose seal, which stays bag-only because quest items cannot enter
-// either bank; its markup lives in the bags painter beside its questReady
-// state. Each helper mints ONE mark from a resolved kind.
+// once and the bank gap was a reported defect). The one REACHABILITY
+// exception is the quest-purpose seal: quest items cannot enter either bank,
+// so only bags can ever mint it, but its markup still lives here so
+// cornerMarkHtml is the one exhaustive dispatch. Each helper mints ONE mark
+// from a resolved kind.
 
+import type { BagCornerMark } from './bag_corner_mark_view';
 import type { BagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { TranslationKey } from './i18n';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
@@ -70,4 +72,19 @@ export function instanceGlyphMarkHtml(kind: BagInstanceGlyphKind): string {
     return '<span class="bi-instance" aria-hidden="true"></span>';
   }
   return `<span class="bi-glyph bi-glyph-${kind}" aria-hidden="true">${svgIcon(GLYPH_ICONS[kind])}</span>`;
+}
+
+/** Corner-mark HTML for the RESOLVED corner kind (bag_corner_mark_view.ts
+ *  bagCornerMark): the one exhaustive dispatch, so a painter never re-derives
+ *  the corner from the raw glyph kind (a future corner kind would otherwise
+ *  silently paint a per-copy glyph where the core said otherwise). The quest
+ *  seal takes the caller's questReady state; the banks pass a null quest arm
+ *  into bagCornerMark, so that arm only ever mints for bags. */
+export function cornerMarkHtml(mark: BagCornerMark, opts?: { questReady?: boolean }): string {
+  if (mark === null) return '';
+  if (mark === 'fine') return fineSealMarkHtml();
+  if (mark === 'quest') {
+    return `<span class="bi-quest-seal${opts?.questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`;
+  }
+  return instanceGlyphMarkHtml(mark);
 }

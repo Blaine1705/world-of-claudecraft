@@ -578,15 +578,23 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(components).toMatch(
       /prefers-reduced-motion:\s*reduce[\s\S]*?\.bi-quest-seal-ready[\s\S]*?animation:\s*none/,
     );
-    // Painter paints classes only; no raw quest hex in bags_window.
+    // Painter paints classes only; no raw quest hex in bags_window. The quest
+    // seal markup itself now lives in the shared cornerMarkHtml dispatch
+    // (item_instance_glyph_mark.ts), so the class pins land there; the
+    // painter keeps the decision calls and threads questReady through.
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).not.toContain('#ffd12d');
     expect(painter).not.toContain('#ffd100');
-    expect(painter).toContain('bag-quest');
-    expect(painter).toContain('bi-quest-seal');
     expect(painter).toContain('bagQuestMarkKind');
-    expect(painter).toContain('bag-quest-ready');
-    expect(painter).toContain('bi-quest-seal-ready');
+    expect(painter).toContain('cornerMarkHtml(cornerMark, { questReady })');
+    const markHelper = readFileSync(
+      join(__dirname, '../src/ui/item_instance_glyph_mark.ts'),
+      'utf8',
+    );
+    expect(markHelper).not.toContain('#ffd12d');
+    expect(markHelper).not.toContain('#ffd100');
+    expect(markHelper).toContain('class="bi-quest-seal');
+    expect(markHelper).toContain('bi-quest-seal-ready');
   });
 
   it('fine bag treatment is always-on, tokenized, and never an --fx gate', () => {
@@ -635,11 +643,12 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(components).not.toContain('.bag-item:hover .bi-fine-seal');
     expect(components).not.toContain('.bank-item:hover .bi-fine-seal');
     // The painter paints classes only and mints the seal through the shared
-    // item_instance_glyph_mark helper (no inline seal markup or raw fine teal
+    // cornerMarkHtml dispatch (no inline seal markup or raw fine teal
     // anywhere; the token literal must live in tokens.css alone).
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).toContain('bagFineMark');
-    expect(painter).toContain('fineSealMarkHtml()');
+    expect(painter).toContain('cornerMarkHtml(cornerMark, { questReady })');
+    expect(painter).not.toContain('fineSealMarkHtml');
     expect(painter).not.toContain('#6ec8d4');
     const markHelper = readFileSync(
       join(__dirname, '../src/ui/item_instance_glyph_mark.ts'),

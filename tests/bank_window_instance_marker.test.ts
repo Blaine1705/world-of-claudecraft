@@ -261,7 +261,7 @@ describe('bank-item instance mark stylesheet contract', () => {
     const painter = readFileSync(join(__dirname, '../src/ui/bank_window.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
-    expect(painter).toContain('instanceGlyphMarkHtml(glyphKind)');
+    expect(painter).toContain('cornerMarkHtml(cornerMark)');
     expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
     // The KNOWN key family must be used on its own: the lookbehind skips the
     // UNKNOWN_ sibling, whose name contains this one as a substring (a bare
@@ -271,11 +271,14 @@ describe('bank-item instance mark stylesheet contract', () => {
     // The fine mark composes through the same pure cores and shared mint bags
     // use: id-based decision, corner priority from bag_corner_mark_view, rim
     // class from bagRimClasses (quest arm pinned null: quest items cannot
-    // enter the bank), seal markup from the shared helper.
+    // enter the bank), markup from the one exhaustive cornerMarkHtml dispatch
+    // pinned above (no fineSealMarkHtml or glyph call here: a painter that
+    // re-derived the corner from the raw glyph kind is the drift this closes).
     expect(painter).toContain('bagFineMark(slot.itemId)');
     expect(painter).toContain('bagCornerMark(glyphKind, null, fineMark)');
     expect(painter).toContain('${bagRimClasses(null, fineMark)}');
-    expect(painter).toContain('fineSealMarkHtml()');
+    expect(painter).not.toContain('instanceGlyphMarkHtml');
+    expect(painter).not.toContain('fineSealMarkHtml');
     // No private seal URL or class fork that could drift from bags.
     expect(painter).not.toContain('MASTERWORK_SEAL_IMAGE_URL');
     expect(painter).not.toContain('bi-masterwork-seal');

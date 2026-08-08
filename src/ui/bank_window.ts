@@ -60,9 +60,8 @@ import {
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
-  fineSealMarkHtml,
+  cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
-  instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -735,8 +734,7 @@ export class BankWindow {
       // Quest items cannot enter the bank, so the quest arm is always null.
       const glyphKind = bagInstanceGlyphKind(slot.instance);
       const cornerMark = bagCornerMark(glyphKind, null, fineMark);
-      const instanceMark =
-        cornerMark === 'fine' ? fineSealMarkHtml() : instanceGlyphMarkHtml(glyphKind);
+      const instanceMark = cornerMarkHtml(cornerMark);
       // Stale-client guard (R34): an id this bundle predates still holds a
       // real, counted bank slot, so it renders (fallback icon, raw id as the
       // label) instead of vanishing. The withdraw click stays live because the

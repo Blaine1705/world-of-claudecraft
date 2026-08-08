@@ -7022,7 +7022,11 @@
      grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
      .bag-fine together with .bag-quest, so source order against .bag-quest
      is not load-bearing; nor is order against the cell focus rings, which
-     are outline-based. Always-on, no --fx-* gate (fairness). */
+     are outline-based. This box-shadow REPLACES the quality-glow rule at the
+     same specificity, which is inert while every fine id is common quality
+     (the commons resets kill that glow anyway); a future non-common fine
+     grade must revisit this composition or lose its quality glow. Always-on,
+     no --fx-* gate (fairness). */
   .bag-item.bag-fine,
   .bank-item.bag-fine {
     border-color: var(--color-bag-fine-rim) !important;

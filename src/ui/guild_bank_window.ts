@@ -55,11 +55,7 @@ import {
 } from './guild_bank_view';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import {
-  fineSealMarkHtml,
-  INSTANCE_GLYPH_ARIA_KEYS,
-  instanceGlyphMarkHtml,
-} from './item_instance_glyph_mark';
+import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
@@ -477,8 +473,7 @@ export class GuildBankTab {
     const glyphKind = bagInstanceGlyphKind(slot.instance);
     const fineMark = bagFineMark(slot.itemId);
     const cornerMark = bagCornerMark(glyphKind, null, fineMark);
-    const instanceMark =
-      cornerMark === 'fine' ? fineSealMarkHtml() : instanceGlyphMarkHtml(glyphKind);
+    const instanceMark = cornerMarkHtml(cornerMark);
     if (slot.known && item) {
       cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}${dormantClass}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
@@ -505,8 +500,13 @@ export class GuildBankTab {
     } else {
       // Unknown id (a removed def): a recoverable dormant-shaped cell. The sim
       // ALLOWS withdrawing it (the recovery path), so it stays actionable; the
-      // raw id is the only name that exists for it.
-      cell.className = `bank-item gbank-unknown${dormantClass}`;
+      // raw id is the only name that exists for it. The rim call mirrors the
+      // known arm so the two halves of the fine mark can never split across
+      // the branch: fineMark is false for any id outside the local grade
+      // table, so this is a no-op today, but if the grade table ever carried
+      // an id this branch sees, the seal minted above and the rim would still
+      // arrive together.
+      cell.className = `bank-item gbank-unknown${bagRimClasses(null, fineMark)}${dormantClass}`;
       cell.innerHTML = `<span class="gbank-unknown-label">${esc(
         t('hudChrome.bank.guildUnknownItem'),
       )}</span>${instanceMark}<span class="bank-count">${
