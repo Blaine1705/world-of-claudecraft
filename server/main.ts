@@ -91,6 +91,7 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   buildCharacterList,
@@ -813,6 +814,12 @@ function bustBoardCaches(): void {
   bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board, but the same delisting-must-be-immediate reasoning: the
+  // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
+  // A ban/unban changes every OTHER eligible character's ahead/total counts
+  // too, so the whole cache is dropped rather than just the moderated
+  // account's own key.
+  bustAllLifetimeXpRankCache();
   // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
   // and IP-ban writes fire this same hook, and they feed the
   // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
