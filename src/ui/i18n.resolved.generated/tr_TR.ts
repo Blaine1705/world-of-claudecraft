@@ -7098,6 +7098,7 @@ export const tr_TR: EnTranslations = {
       "deathRecapAbility": "Öldün. {ability} tarafından öldürüldün.",
       "deathRecapFalling": "Öldün. Düşerek can verdin.",
       "deathRecapDrowned": "Öldün. Boğuldun.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Kendini dinlenmiş ve yeniden sapasağlam hissediyorsun.",
       "ignoringChat": "{name} oyuncusunun sohbeti görmezden geliniyor.",
       "noLongerIgnoring": "{name} artık görmezden gelinmiyor.",

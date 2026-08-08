@@ -7098,6 +7098,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapAbility": "Je bent gestorven. Gedood door {ability}.",
       "deathRecapFalling": "Je bent gestorven. Je bent te pletter gevallen.",
       "deathRecapDrowned": "Je bent gestorven. Je bent verdronken.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",

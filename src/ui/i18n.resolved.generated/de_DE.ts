@@ -7098,6 +7098,7 @@ export const de_DE: EnTranslations = {
       "deathRecapAbility": "Ihr seid gestorben. Erschlagen durch {ability}.",
       "deathRecapFalling": "Ihr seid gestorben. Ihr seid in den Tod gestürzt.",
       "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",

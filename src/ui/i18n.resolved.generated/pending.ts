@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "es_ES": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "fr_FR": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "fr_CA": [
+    "hud.system.deathRecapCauterized"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "de_DE": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "zh_CN": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "zh_TW": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "ko_KR": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "ja_JP": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "pt_BR": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "ru_RU": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "cs_CZ": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "nl_NL": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "pl_PL": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "id_ID": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "tr_TR": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "sv_SE": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "vi_VN": [
+    "hud.system.deathRecapCauterized"
+  ],
+  "da_DK": [
+    "hud.system.deathRecapCauterized"
+  ]
 };
