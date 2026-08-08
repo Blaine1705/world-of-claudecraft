@@ -1484,9 +1484,7 @@ export class BagsWindow {
         this.deps.showError(t('hud.pet.petEatsFoodOnly'));
         return;
       case 'petFeed':
-        this.deps.world().feedPet(s.itemId, {
-          slotIndex: bagStackIndex(this.deps.world().inventory, s),
-        });
+        this.deps.world().feedPet(s.itemId, this.copyRefFor(s));
         this.deps.setPendingPetFeed(false);
         this.deps.resetPetBarSig();
         this.render();
@@ -1495,9 +1493,7 @@ export class BagsWindow {
         this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
         break;
       case 'equipBag':
-        this.deps.world().equipBag(s.itemId, undefined, {
-          slotIndex: bagStackIndex(this.deps.world().inventory, s),
-        });
+        this.deps.world().equipBag(s.itemId, undefined, this.copyRefFor(s));
         this.deps.hideTooltip();
         this.render();
         break;
@@ -1506,9 +1502,7 @@ export class BagsWindow {
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
         if (!item || !this.deps.useGatherTool(item)) {
-          this.deps.world().useItem(s.itemId, {
-            slotIndex: bagStackIndex(this.deps.world().inventory, s),
-          });
+          this.deps.world().useItem(s.itemId, this.copyRefFor(s));
         }
         this.render();
         this.deps.renderCharIfOpen();
@@ -1657,6 +1651,18 @@ export class BagsWindow {
     this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
   }
 
+  /** The copy selection for a clicked stack, or undefined when the stack is no
+   *  longer in the live inventory.
+   *
+   *  bagStackIndex is indexOf, so a stale click yields -1. Sending -1 would be
+   *  REFUSED by the sim (the leaf rejects any out-of-range index by design), which
+   *  turns a stale click into a silent no-op. Falling back to no-selection keeps
+   *  the pre-feature behavior for exactly the case where we cannot name the copy. */
+  private copyRefFor(slot: InvSlot): { slotIndex: number } | undefined {
+    const index = bagStackIndex(this.deps.world().inventory, slot);
+    return index >= 0 ? { slotIndex: index } : undefined;
+  }
+
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
     if (ev.ctrlKey || ev.metaKey) {
@@ -1668,9 +1674,7 @@ export class BagsWindow {
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else {
-      this.deps.world().sellItem(slot.itemId, undefined, {
-        slotIndex: bagStackIndex(this.deps.world().inventory, slot),
-      });
+      this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
   }
 

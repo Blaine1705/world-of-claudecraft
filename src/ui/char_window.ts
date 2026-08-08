@@ -551,7 +551,15 @@ export class CharWindow {
       e.preventDefault();
       this.deps.dragState.end();
       this.markDropTargets(null);
-      this.dropOnEquipSlot(drag.itemId, slot);
+      // The desktop drop carries the drag's bag index the same way the touch path
+      // does; without it the most ordinary equip gesture fell back to the guess.
+      // `drag.index` is already null for a sorted or filtered grid, which names no
+      // position, so that case correctly sends no selection.
+      this.dropOnEquipSlot(
+        drag.itemId,
+        slot,
+        drag.index !== null && drag.index >= 0 ? { slotIndex: drag.index } : undefined,
+      );
     });
   }
 
