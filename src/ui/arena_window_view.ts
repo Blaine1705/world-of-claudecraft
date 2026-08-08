@@ -140,7 +140,13 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   // (pvp_tabs_view.ts) owns tab pinning and locking, fed by the same snapshot.
   const bracket = a.match?.format ?? queuedFmt ?? selectedBracket;
   const canSwitchBracket = !a.queued && !inMatch;
-  const standing = a.standings[bracket];
+  // Defaulted HERE rather than at each reader: `standings` is mirrored straight
+  // off the server snapshot, so a client talking to a server that predates the
+  // draws field would otherwise render NaN in the rating-summary line. Every
+  // other draws consumer in this file already defaults; this is the one that
+  // reaches painters through `view.standing`, so one site covers them all.
+  const rawStanding = a.standings[bracket];
+  const standing = { ...rawStanding, draws: rawStanding.draws ?? 0 };
   const ladderRows = a.ladders[bracket];
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === myPid;
