@@ -70,16 +70,17 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      // mob_troll wires TROLL_BIPED14 and mob_yeti wires YETI_BIPED14 (both
-      // `{ ...BIPED14, attack: [...] }`, issue #2889): each inherits BIPED14's
-      // hit array unchanged, so they still qualify as BIPED14 consumers for
+      // mob_troll, mob_yeti, and mob_murloc each wire their own
+      // `{ ...BIPED14, attack: [...] }` variant (TROLL_BIPED14, YETI_BIPED14,
+      // MURLOC_BIPED14, issue #2889): each inherits BIPED14's hit array
+      // unchanged, so they still qualify as BIPED14 consumers for
       // HitReact_Heavy.
-      const clipsOk =
-        key === 'mob_troll'
-          ? block.includes('clips: TROLL_BIPED14')
-          : key === 'mob_yeti'
-            ? block.includes('clips: YETI_BIPED14')
-            : block.includes('clips: BIPED14');
+      const BIPED14_VARIANTS: Record<string, string> = {
+        mob_troll: 'TROLL_BIPED14',
+        mob_yeti: 'YETI_BIPED14',
+        mob_murloc: 'MURLOC_BIPED14',
+      };
+      const clipsOk = block.includes(`clips: ${BIPED14_VARIANTS[key] ?? 'BIPED14'}`);
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }

@@ -383,6 +383,17 @@ const TROLL_BIPED14: ClipMap = {
   attack: ['Troll_Smash'],
 };
 
+// The murloc family's own attack (scripts/build_murloc_anims.mjs, issue
+// #2889 round 2): BIPED14's Punch/Weapon attack is shared by reference
+// across 6 unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll,
+// mob_demon, mob_demonalt). This "slap/flop combo" clip is baked off
+// frog.glb's own donor poses (Punch's forward slap blended through the
+// currently unused Wave clip's arm flail), so only mob_murloc gets it.
+const MURLOC_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Murloc_Attack'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -1698,9 +1709,12 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_murloc: {
     url: `${CREATURES}/frog.glb`,
-    animUrls: [`${CREATURES}/frog_hit_variety_anims.glb`],
     height: 1.7,
-    clips: BIPED14,
+    clips: MURLOC_BIPED14,
+    // Murloc_Attack clip donor (scripts/build_murloc_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/frog_hit_variety_anims.glb`, `${CREATURES}/murloc_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.45,
   },

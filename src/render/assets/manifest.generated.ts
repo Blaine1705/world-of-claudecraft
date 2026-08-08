@@ -333,6 +333,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
   "models/creatures/kobold_ability_anims.glb": "/media/models/creatures/kobold_ability_anims.f2d51c66b479.glb",
   "models/creatures/leaping_fish.glb": "/media/models/creatures/leaping_fish.3df008156018.glb",
+  "models/creatures/murloc_ability_anims.glb": "/media/models/creatures/murloc_ability_anims.71d64c63e2ca.glb",
   "models/creatures/mushroom_pixie.glb": "/media/models/creatures/mushroom_pixie.8186e2c99bf3.glb",
   "models/creatures/nightkin_ability_anims.glb": "/media/models/creatures/nightkin_ability_anims.da356d2e31e5.glb",
   "models/creatures/orc.glb": "/media/models/creatures/orc.6c59f0f4a163.glb",
