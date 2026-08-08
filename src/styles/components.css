@@ -1754,7 +1754,9 @@
     font-variant-numeric: tabular-nums;
   }
   .char-playtime-value-hidden {
-    color: #7c7256;
+    /* Information-bearing text (the concealed state's only signal), so the
+       readable muted token, not the fainter .cp-none gray. */
+    color: var(--color-text-muted);
     font-style: italic;
   }
   /* The value's privacy eye: the helm eye's circle chrome, seated inline at
@@ -1802,6 +1804,12 @@
     border-color: rgba(255, 218, 160, 0.8);
     color: #fff;
     box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  /* Steady keyboard ring, distinct from hover (the HUD-chrome WCAG contract):
+     never transitioned (the transition list above excludes outline). */
+  .char-playtime-eye:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
     .char-playtime-eye {

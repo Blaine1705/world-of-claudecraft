@@ -4801,7 +4801,8 @@ export class Hud {
       // showWalletOnPlayerCard doctrine: the total keeps accruing, this only
       // conceals THIS client's sheet value. Repaint mints the flipped row.
       const settings = this.optionsHooks?.settings;
-      if (settings) settings.set('showPlaytime', !settings.get('showPlaytime'));
+      if (!settings) return;
+      settings.set('showPlaytime', !settings.get('showPlaytime'));
       this.renderCharIfOpen();
     },
   });

@@ -56,6 +56,23 @@ describe('Sim.playtimeSeconds (IWorldProgressionXp)', () => {
     expect(state?.totalPlayedSeconds).toBeCloseTo(sim.playtimeSeconds, 10);
   });
 
+  it('degrades a corrupt non-finite saved baseline to zero at load', () => {
+    // Math.max passes NaN through, so the load clamp guards with
+    // Number.isFinite (the bgRating idiom); without it a corrupt save would
+    // poison every future fold and ship null on the ptime wire.
+    const donor = makeSim();
+    const donorPid = donor.addPlayer('warrior', 'Aleph');
+    const state = donor.serializeCharacter(donorPid);
+    expect(state).not.toBeNull();
+    const sim = makeSim();
+    sim.addPlayer('warrior', 'Aleph', {
+      state: { ...(state as object), totalPlayedSeconds: Number.NaN } as never,
+    });
+    expect(sim.playtimeSeconds).toBe(0);
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(sim.playtimeSeconds).toBeCloseTo(1, 5);
+  });
+
   it('loads the saved baseline and keeps accruing on top (the relog path)', () => {
     const sim = makeSim();
     const a = sim.addPlayer('warrior', 'Aleph');

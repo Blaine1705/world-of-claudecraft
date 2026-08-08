@@ -42,6 +42,7 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { playtimeParts } from '../src/ui/playtime_view';
 import {
   bareClient,
   broadcast,
@@ -747,6 +748,22 @@ describe('delta snapshots', () => {
     expect(snap2.self).not.toHaveProperty('ptime');
     (client as unknown as SnapshotApplier).applySnapshot(snap2);
     expect(client.playtimeSeconds).toBe(3720);
+
+    // The elapsed-session arm: once the sim clock crosses the next whole
+    // minute the quantized value re-ships and tracks the live total.
+    (server.sim as { time: number }).time += 61;
+    broadcast(server);
+    const snap3 = lastSnap(fc.sent);
+    expect(snap3.self.ptime).toBe(3780);
+    (client as unknown as SnapshotApplier).applySnapshot(snap3);
+    expect(client.playtimeSeconds).toBe(3780);
+
+    // Cross-host display agreement, pinned: the offline getter serves
+    // unfloored seconds while the online mirror is minute-quantized, and the
+    // sheet's minute-flooring parts split must render both identically.
+    expect(playtimeParts(client.playtimeSeconds)).toEqual(
+      playtimeParts(server.sim.playtimeSeconds),
+    );
   });
 
   it('round-trips the Hunter reactive window as remaining seconds', () => {

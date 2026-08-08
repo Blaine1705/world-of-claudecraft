@@ -459,6 +459,9 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
     expect(playtimeText(2 * MINUTE + 59)).toBe('2 minutes');
     expect(playtimeText(HOUR)).toBe('1 hour');
     expect(playtimeText(HOUR + MINUTE)).toBe('1 hour, 1 minute');
+    // A minute-quantized ONLINE mirror value (always a multiple of 60, see
+    // the ptime wire key) renders identically to its unfloored offline twin.
+    expect(playtimeText(HOUR + 2 * MINUTE)).toBe('1 hour, 2 minutes');
     expect(playtimeText(5 * HOUR + 42 * MINUTE + 59)).toBe('5 hours, 42 minutes');
     expect(playtimeText(DAY)).toBe('1 day');
     expect(playtimeText(DAY + 59)).toBe('1 day');

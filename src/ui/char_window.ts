@@ -340,6 +340,10 @@ export class CharWindow {
   // sheet in the shared inset-card treatment. The eye conceals the VALUE per
   // device (screenshot / stream privacy) without stopping the accrual; state
   // and the settings write are HUD-owned through deps, the helm eye doctrine.
+  // The value is a per-render snapshot ON PURPOSE: a cold window may not arm
+  // its own repeating driver (tests/hud_perf_budget.test.ts), so an open sheet
+  // refreshes on the next repaint (reopen, equip change, locale switch), never
+  // on a clock. Do not "fix" staleness with a setInterval here.
   private playtimeHtml(world: IWorld): string {
     const visible = this.deps.playtimeVisible();
     const value = visible
