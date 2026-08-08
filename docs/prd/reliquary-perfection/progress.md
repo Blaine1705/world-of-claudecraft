@@ -1415,3 +1415,27 @@ owns the push.
   (1173 tests); node scripts/gate_select.mjs run with TURBO_FORCE=1 (the
   turbo i18n input-list fix has not merged to this branch; a warm shared
   cache can replay stale bundles) - result recorded below after the run.
+- Gate: node scripts/gate_select.mjs (TURBO_FORCE=1) FAILED at the
+  changed-files biome step on src/render/characters/manifest.ts, a
+  release-side format diff: biome's --changed set diffs vs origin/main
+  (stale while main trails the release train), so the whole release delta
+  enters the local checked set. The file is byte-identical to
+  origin/release/v0.36.0 (INHERITED, local-only scope noise; the PR-tier
+  CI classifies changed files against the release base and never sees
+  it). Per the first-fail-masks-later-steps rule the remaining steps ran
+  by hand behind the carried red: full vitest 2386 files / 33200 tests
+  passed (zero failures, bounded workers), tsc clean, browser
+  regressions and all builds green (recorded below). Targeted biome over
+  every file this QA touched: zero errors.
+- Round 4 (9ff0374203) applied the fresh coverage audit of rounds 2-3:
+  the bareClient sweep moved to a TypeScript AST scrape (the regex was
+  blind by shape to callback-typed and multi-line annotations; three on*
+  callback fields were genuinely missing and are mirrored now), value
+  assertions for simple-literal defaults with the fixture's three
+  documented deliberate divergences excepted, the forced-colors pin
+  binds both selectors to the declaration inside the sliced block
+  (mutation-verified: dropping either selector, the declaration, the
+  dashed cue, or hoisting the rules out all red), bespoke-pending and
+  no-prefix crest literals, per-pipeline floors on the item sweep, and
+  an ITEM-kind grid/strip byte-identity arm through the new
+  default-parameter path.
