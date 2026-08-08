@@ -3048,3 +3048,68 @@ describe('the outcome log stays observability-only', () => {
     ]);
   });
 });
+
+describe('Thornhollow Fields: talents are the fighter own to change', () => {
+  // A queue pop can catch a player in a farming build, and the match is rated,
+  // so being seated in the wrong spec costs rating with no counterplay. Gear
+  // was already swappable in here (equipItem carries no match gate at all), so
+  // the talent block was the one half of a build a fighter could not fix.
+  // Combat is still the line: the refusal moves from "during a battleground"
+  // to the same in-combat rule that governs the open world.
+  const seatedFighter = (): { sim: Sim; match: BgMatch; pid: number } => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    return { sim, match, pid: pids[0] };
+  };
+
+  it('lets a fighter respec inside a live match while out of combat', () => {
+    const { sim, match, pid } = seatedFighter();
+    expect(match.state).toBe('active');
+    expect(sim.ctx.bgMatches.has(pid)).toBe(true);
+    const fighter = sim.entities.get(pid)!;
+    fighter.inCombat = false;
+
+    expect(sim.setSpec('fury', pid)).toBe(true);
+    expect(sim.ctx.players.get(pid)!.talents.spec).toBe('fury');
+    expect(sim.selectTalentRow(5, 'war_row_double_charge', pid)).toBe(true);
+    expect(sim.ctx.players.get(pid)!.talents.rows[5]).toBe('war_row_double_charge');
+    expect(sim.respec(pid)).toBe(true);
+    expect(sim.ctx.players.get(pid)!.talents.rows[5]).toBeUndefined();
+  });
+
+  it('still refuses a respec in combat, and says so without naming the battleground', () => {
+    const { sim, pid } = seatedFighter();
+    const fighter = sim.entities.get(pid)!;
+    fighter.inCombat = true;
+
+    const before = sim.ctx.players.get(pid)!.talents.spec;
+    expect(sim.setSpec('fury', pid)).toBe(false);
+    expect(sim.respec(pid)).toBe(false);
+    expect(sim.ctx.players.get(pid)!.talents.spec).toBe(before);
+    // The refusal a fighter now sees is the plain combat rule. The old
+    // battleground-specific line is gone from the emit surface entirely, which
+    // is why its matcher entry is deleted in the same change.
+    const texts = errorTexts(sim.tick());
+    expect(texts).toContain('You cannot change talents in combat.');
+    expect(texts).not.toContain('You cannot change talents during a battleground.');
+  });
+
+  it('leaves the arena lock alone', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'ArenaA');
+    sim.entities.get(a)!.level = 20;
+    sim.entities.get(a)!.inCombat = false;
+    // Out of combat and out of any match, the same calls go through: that is
+    // what makes the refusals below attributable to the arena entry alone.
+    expect(sim.setSpec('fury', a)).toBe(true);
+    expect(sim.respec(a)).toBe(true);
+
+    // talentLockReason only asks arenaMatches.has(), so the membership is the
+    // whole fixture; a full ArenaMatch would drag updateArena into the assert.
+    sim.ctx.arenaMatches.set(a, {} as never);
+    expect(sim.setSpec('arms', a)).toBe(false);
+    expect(sim.respec(a)).toBe(false);
+    expect(sim.ctx.players.get(a)!.talents.spec).toBe('fury');
+  });
+});
