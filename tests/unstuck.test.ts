@@ -431,6 +431,28 @@ describe('unstuck graveyard move while alive', () => {
     expect(player.ghost).toBe(false);
   });
 
+  it('blocks a valid idle battleground fighter from using Unstuck as fast travel', () => {
+    const { sim, match } = startBattleground();
+    match.state = 'active';
+    match.timer = 0;
+    const pid = match.teams[0][0];
+    const player = required(sim.entities.get(pid), 'battleground fighter');
+    const origin = { ...player.pos };
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual({
+      type: 'unstuck',
+      phase: 'blocked',
+      reason: 'competitive',
+      pid,
+    });
+
+    expect(required(sim.meta(pid), 'battleground metadata').pendingUnstuck).toBeNull();
+    expect(player.pos).toEqual(origin);
+    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID) ?? 0).toBe(0);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
   it('moves a battleground fighter out of wall geometry to their team graveyard without leaving the match', () => {
     const { sim, match } = startBattleground();
     match.state = 'active';
@@ -474,7 +496,7 @@ describe('unstuck graveyard move while alive', () => {
     expect(player.corpsePos).toBeNull();
   });
 
-  it('drops a carried Thornhollow flag before moving the living carrier to the graveyard', () => {
+  it('drops a carried Thornhollow flag before moving a trapped living carrier to the graveyard', () => {
     const { sim, match } = startBattleground();
     match.state = 'active';
     match.timer = 0;
@@ -486,6 +508,7 @@ describe('unstuck graveyard move while alive', () => {
     sim.tick();
     expect(bgCarryingFlag(sim.ctx, carrier)).toBe(true);
     expect(player.auras.some((aura) => aura.id === CARRIED_FLAG_AURA_ID)).toBe(true);
+    placeInsideBattlegroundWall(sim, match, carrier);
     const dropAt = { ...player.pos };
 
     expect(sim.unstuck(carrier)).toBe(true);

@@ -26,6 +26,7 @@ import {
   zoneAt,
 } from './data';
 import { delveModuleZOffset } from './delves/runs';
+import { PLAYER_BODY_RADIUS } from './pathfind';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -52,6 +53,7 @@ export { UNSTUCK_COOLDOWN_ID } from './unstuck_cooldown';
 const POSITION_EPS = 1e-4;
 const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
+const STUCK_COLLISION_EPS = 1e-3;
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -200,6 +202,12 @@ function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
   );
 }
 
+function liveBattlegroundStuckInWallGeometry(ctx: SimContext, p: Entity): boolean {
+  if (p.dead || p.ghost || !ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
+  const resolved = ctx.resolveMovePoint(p.pos.x, p.pos.z, PLAYER_BODY_RADIUS, p);
+  return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > STUCK_COLLISION_EPS;
+}
+
 /**
  * A dead, unreleased body is frozen: the tick runs no movement for it, so its
  * velocity, `onGround`, and `jumping` keep whatever value they held at the instant
@@ -231,6 +239,13 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
+  if (
+    !p.dead &&
+    !p.ghost &&
+    ctx.bgMatches.has(p.id) &&
+    !liveBattlegroundStuckInWallGeometry(ctx, p)
+  )
+    return 'competitive';
   if (hasMoveInput(meta)) return 'moving';
   return null;
 }
