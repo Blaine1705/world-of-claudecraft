@@ -56,6 +56,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const subscribed = matches(preload, /ipcRenderer\.on\('([^']+)'/g);
     const pushed = matches(mainSide, /webContents\.send\('([^']+)'/g);
     expect([...subscribed].sort()).toEqual([
+      'desktop-gpu-status',
       'desktop-login-code',
       'desktop-update-event',
       'desktop-wallet-handoff-code',
@@ -128,6 +129,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'reportRendererError',
       'onUpdateEvent',
       'installUpdate',
+      'onGpuStatus',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',

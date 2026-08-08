@@ -47,6 +47,7 @@ const {
   relaunchForLinuxPrime,
   summarizeGpuDevices,
 } = require('./gpu_preference.cjs');
+const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const {
   buildWalletHandoffBrowserUrl,
   parseWalletHandoffDeepLink,
@@ -678,14 +679,17 @@ if (!singleInstance) {
 // effect). This MUST run after the GPU process has reported (call it on the window's
 // did-finish-load, not at whenReady, where getGPUFeatureStatus can still return a
 // pre-initialization 'disabled_off'). Runs again after every reload (crash recovery); an
-// unchanged renderer reading is deduped to keep the log quiet. Dev-channel diagnostics only
-// (the log file), never user-facing.
+// unchanged renderer reading is deduped to keep the log quiet. The log lines themselves are
+// dev-channel diagnostics; the whitelisted verdict pushed on 'desktop-gpu-status' is the one
+// user-facing product of this flow (the renderer localizes it, see src/game/).
 let lastGpuRendererLog = '';
 function logGpuStatus() {
+  let softwareVerdict = false;
   try {
     const status = app.getGPUFeatureStatus();
     log.info('[gpu] feature status', status);
-    if (isSoftwareRenderer(status)) {
+    softwareVerdict = isSoftwareRenderer(status);
+    if (softwareVerdict) {
       log.warn('[gpu] WebGL is NOT hardware-accelerated:', {
         webgl: status?.webgl,
         webgl2: status?.webgl2,
@@ -701,6 +705,19 @@ function logGpuStatus() {
         log.warn('[gpu] GPU process reports softwareRendering: the game is on a CPU rasterizer');
       }
       const { devices, discreteInactive } = summarizeGpuDevices(info?.gpuDevice);
+      // Push the verdict BEFORE the log dedup below: the dedup exists only to keep the log
+      // quiet, and after a crash-recovery reload the reading is usually identical, so a send
+      // placed after it would never reach the freshly loaded page. This resolves async, so
+      // re-check the window rather than trusting the caller's.
+      const gpuStatus = gpuStatusPayload({
+        softwareRendering: aux.softwareRendering,
+        glRenderer: aux.glRenderer,
+        discreteInactive,
+        softwareVerdict,
+      });
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('desktop-gpu-status', gpuStatus);
+      }
       const line = {
         glRenderer: aux.glRenderer,
         glVendor: aux.glVendor,

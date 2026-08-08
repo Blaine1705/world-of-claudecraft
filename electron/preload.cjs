@@ -148,4 +148,23 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     return () => ipcRenderer.removeListener('desktop-update-event', listener);
   },
   installUpdate: () => ipcRenderer.invoke('desktop-update-install'),
+  // The shell's GPU verdict, pushed once the GPU process has reported (and again
+  // after a crash-recovery reload). Payloads are the whitelisted shape built in
+  // electron/gpu_status_events.cjs; the renderer localizes the notice itself.
+  onGpuStatus: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.softwareRendering === 'boolean' &&
+        typeof payload.discreteInactive === 'boolean' &&
+        typeof payload.adapter === 'string'
+      ) {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-gpu-status', listener);
+    return () => ipcRenderer.removeListener('desktop-gpu-status', listener);
+  },
 });
