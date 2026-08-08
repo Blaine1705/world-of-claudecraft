@@ -1993,6 +1993,13 @@ export class Sim {
   // "no calendar known" (headless/replay), the daily window then never rolls over,
   // keeping same-seed runs reproducible. Tests may set it to pin a date.
   utcDay = '';
+  // The daily-reset WINDOW key ('YYYY-MM-DD' of the reset that opened it), set by
+  // the host each tick alongside utcDay. Every daily rollover reads THIS, not the
+  // calendar date: the server derives it from the realm's own 3 AM reset boundary
+  // (server/raid_reset.ts `resetDayKey`), the offline client from the player's
+  // local one, so a daily never rolls over mid-evening the way midnight UTC did.
+  // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
+  resetDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -4943,6 +4950,9 @@ export class Sim {
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      get resetDay() {
+        return sim.resetDay;
       },
       get utcDay() {
         return sim.utcDay;
