@@ -355,8 +355,26 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
   }
   const members = party ? [...party.members] : [id];
   for (const m of members) {
-    if (ctx.bgMatches.has(m) || ctx.arenaMatches.has(m) || bgGroupContaining(ctx, m)) {
+    // A live OFFER counts as unavailable, the same as a seat or a queue slot.
+    // Without it a solo could take a queue pop, accept a party invite before
+    // answering it, and be queued again by the leader: the character would sit
+    // in a pending offer AND a fresh group at once, and declining or lapsing
+    // the first would leave the new group standing, bypassing the requeue
+    // lockout that decline is supposed to cost them.
+    if (
+      ctx.bgMatches.has(m) ||
+      ctx.arenaMatches.has(m) ||
+      bgGroupContaining(ctx, m) ||
+      bgProposalFor(ctx, m)
+    ) {
       ctx.error(id, 'A party member is already queued or in a match.');
+      return;
+    }
+    // The lockout is the same bypass one step later: it is charged to the
+    // PLAYER, so a leader's press must not carry a locked-out member back into
+    // the queue the press they ignored just cost them.
+    if (bgRequeueLockedUntil(ctx, m) > 0) {
+      ctx.error(id, 'A party member must wait before queueing for Thornhollow Fields again.');
       return;
     }
     const member = ctx.entities.get(m);

@@ -8609,6 +8609,7 @@ type BgExtraKey =
   | 'errQueueDead'
   | 'errQueueInMatch'
   | 'errMemberQueued'
+  | 'errMemberRequeueLocked'
   | 'errNoFlag'
   | 'errPartyTooLarge'
   | 'errPartyLeaderOnly'
@@ -8631,6 +8632,7 @@ type BgExtraKey =
   | 'errRequeueLocked';
 
 const BG_EXTRA_EN: Record<BgExtraKey, string> = {
+  errMemberRequeueLocked: 'A party member must wait before queueing for Thornhollow Fields again.',
   offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
   offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
   groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
@@ -8665,6 +8667,7 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
 export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
   en: BG_EXTRA_EN,
   zh_CN: {
+    errMemberRequeueLocked: '有队伍成员需要等待后才能再次排队进入荆谷原野。',
     offerReady: '荆谷原野已准备就绪。接受邀请即可加入战斗。',
     offerKeptPlace: '战斗未能成行。你保留了荆谷原野队列中的位置。',
     groupLeaveQueue: '你的队伍离开了荆谷原野队列。',
@@ -8696,6 +8699,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: '战场中无法骑乘坐骑。',
   },
   zh_TW: {
+    errMemberRequeueLocked: '有隊伍成員需要等待後才能再次排隊進入荊谷原野。',
     offerReady: '荊谷原野已準備就緒。接受邀請即可加入戰鬥。',
     offerKeptPlace: '戰鬥未能成行。你保留了荊谷原野佇列中的位置。',
     groupLeaveQueue: '你的隊伍離開了荊谷原野佇列。',
@@ -8727,6 +8731,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: '戰場中無法騎乘坐騎。',
   },
   ja_JP: {
+    errMemberRequeueLocked:
+      'パーティーメンバーがソーンホロウ平原に再び参加できるようになるまで待つ必要があります。',
     offerReady: 'ソーンホロウ平原の準備が整いました。参加するには承諾してください。',
     offerKeptPlace: '戦闘は成立しませんでした。ソーンホロウ平原のキューでの順番は保持されます。',
     groupLeaveQueue: 'あなたのパーティーはソーンホロウ平原のキューから離脱しました。',
@@ -8762,6 +8768,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: 'ウォードルーンを手に入れた!',
   },
   ko_KR: {
+    errMemberRequeueLocked: '파티원이 쏜할로우 평원 대기열에 다시 참가하려면 기다려야 합니다.',
     offerReady: '쏜할로우 평원이 준비되었습니다. 수락하여 전투에 참여하세요.',
     offerKeptPlace: '전투가 성사되지 않았습니다. 쏜할로우 평원 대기열의 순번은 유지됩니다.',
     groupLeaveQueue: '당신의 파티가 쏜할로우 평원 대기열에서 나왔습니다.',
@@ -8797,6 +8804,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: '수호 룬을 차지했습니다!',
   },
   ru_RU: {
+    errMemberRequeueLocked:
+      'Участнику группы нужно подождать, прежде чем снова встать в очередь Терновой Лощины.',
     offerReady: 'Терновая Лощина готова. Примите приглашение, чтобы вступить в бой.',
     offerKeptPlace: 'Бой не состоялся. Ваше место в очереди Терновой Лощины сохранено.',
     groupLeaveQueue: 'Ваша группа покинула очередь Терновой Лощины.',
@@ -8832,6 +8841,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeWardRune: 'Вы подобрали руну защиты!',
   },
   en_CA: {
+    errMemberRequeueLocked:
+      'A party member must wait before queueing for Thornhollow Fields again.',
     offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
     offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
     groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
@@ -8866,6 +8877,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: "You can't ride in a battleground.",
   },
   es: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
     offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
     offerKeptPlace:
       'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
@@ -8906,6 +8919,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   es_ES: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
     offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
     offerKeptPlace:
       'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
@@ -8946,6 +8961,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   fr_FR: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
     offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
     offerKeptPlace:
       'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
@@ -8985,6 +9002,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   fr_CA: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
     offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
     offerKeptPlace:
       'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
@@ -9024,6 +9043,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   it_IT: {
+    errMemberRequeueLocked:
+      'Un membro del gruppo deve attendere prima di rientrare in coda per i Campi di Thornhollow.',
     offerReady: 'I Campi di Thornhollow sono pronti. Accetta per unirti alla battaglia.',
     offerKeptPlace:
       'La battaglia non si è formata. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
@@ -9063,6 +9084,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Non puoi cavalcare in un campo di battaglia.',
   },
   de_DE: {
+    errMemberRequeueLocked:
+      'Ein Gruppenmitglied muss warten, bevor es sich erneut für die Thornhollow-Felder anmelden kann.',
     offerReady: 'Die Thornhollow-Felder sind bereit. Nimm an, um dich der Schlacht anzuschließen.',
     offerKeptPlace:
       'Die Schlacht kam nicht zustande. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
@@ -9104,6 +9127,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Auf einem Schlachtfeld kannst du nicht reiten.',
   },
   pt_BR: {
+    errMemberRequeueLocked:
+      'Um membro do grupo precisa esperar antes de entrar na fila dos Campos de Thornhollow de novo.',
     offerReady: 'Os Campos de Thornhollow estão prontos. Aceite para entrar na batalha.',
     offerKeptPlace:
       'A batalha não se formou. Você mantém seu lugar na fila dos Campos de Thornhollow.',
@@ -9144,6 +9169,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Você não pode montar em um campo de batalha.',
   },
   cs_CZ: {
+    errMemberRequeueLocked:
+      'Člen skupiny musí počkat, než se znovu zařadí do fronty na Thornhollowská pole.',
     offerReady: 'Thornhollowská pole jsou připravena. Přijmi pozvání a zapoj se do bitvy.',
     offerKeptPlace:
       'Bitva se nenaplnila. Své místo ve frontě na Thornhollowská pole si ponecháváš.',
@@ -9181,6 +9208,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Na bojišti nemůžeš používat jezdecké zvíře.',
   },
   nl_NL: {
+    errMemberRequeueLocked:
+      'Een groepslid moet wachten voordat het zich opnieuw kan aanmelden voor de Doornholte-Velden.',
     offerReady: 'De Doornholte-Velden zijn gereed. Accepteer om aan de strijd deel te nemen.',
     offerKeptPlace:
       'De strijd kwam niet rond. Je behoudt je plaats in de wachtrij van de Doornholte-Velden.',
@@ -9220,6 +9249,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Je kunt niet rijden op een slagveld.',
   },
   pl_PL: {
+    errMemberRequeueLocked:
+      'Członek drużyny musi odczekać, zanim ponownie dołączy do kolejki na Pola Ciernistej Kotliny.',
     offerReady: 'Pola Ciernistej Kotliny są gotowe. Zaakceptuj, aby dołączyć do bitwy.',
     offerKeptPlace:
       'Bitwa nie doszła do skutku. Zachowujesz swoje miejsce w kolejce na Pola Ciernistej Kotliny.',
@@ -9259,6 +9290,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Na polu bitwy nie możesz dosiadać wierzchowca.',
   },
   id_ID: {
+    errMemberRequeueLocked:
+      'Anggota kelompok harus menunggu sebelum mengantre Padang Thornhollow lagi.',
     offerReady: 'Padang Thornhollow sudah siap. Terima untuk bergabung ke pertempuran.',
     offerKeptPlace:
       'Pertempuran tidak terisi penuh. Posisimu di antrean Padang Thornhollow tetap terjaga.',
@@ -9298,6 +9331,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Kamu tidak bisa menunggang tunggangan di medan perang.',
   },
   tr_TR: {
+    errMemberRequeueLocked:
+      'Bir grup üyesinin Dikenvadi Ovaları sırasına yeniden girmek için beklemesi gerekiyor.',
     offerReady: 'Dikenvadi Ovaları hazır. Savaşa katılmak için kabul et.',
     offerKeptPlace: 'Savaş dolmadı. Dikenvadi Ovaları sırasındaki yerini koruyorsun.',
     groupLeaveQueue: 'Grubun Dikenvadi Ovaları sırasından ayrıldı.',
@@ -9333,6 +9368,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Savaş alanında binek kullanamazsın.',
   },
   sv_SE: {
+    errMemberRequeueLocked: 'En gruppmedlem måste vänta innan ni köar till Törnhålefälten igen.',
     offerReady: 'Törnhålefälten är redo. Acceptera för att gå med i striden.',
     offerKeptPlace: 'Striden blev inte fulltalig. Du behåller din plats i kön till Törnhålefälten.',
     groupLeaveQueue: 'Din grupp lämnar kön till Törnhålefälten.',
@@ -9366,6 +9402,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Du kan inte rida på ett slagfält.',
   },
   vi_VN: {
+    errMemberRequeueLocked:
+      'Một thành viên trong nhóm phải đợi trước khi vào lại hàng chờ Cánh Đồng Thung Gai.',
     offerReady: 'Cánh Đồng Thung Gai đã sẵn sàng. Chấp nhận để tham gia trận chiến.',
     offerKeptPlace: 'Trận đấu không đủ người. Bạn vẫn giữ chỗ trong hàng chờ Cánh Đồng Thung Gai.',
     groupLeaveQueue: 'Nhóm của bạn rời hàng chờ Cánh Đồng Thung Gai.',
@@ -9400,6 +9438,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMountInBg: 'Bạn không thể cưỡi thú cưỡi ở chiến trường.',
   },
   da_DK: {
+    errMemberRequeueLocked:
+      'Et gruppemedlem skal vente, før I kan stille jer i kø til Tornehule Sletter igen.',
     offerReady: 'Tornehule Sletter er klar. Accepter for at deltage i kampen.',
     offerKeptPlace: 'Kampen blev ikke fyldt. Du beholder din plads i køen til Tornehule Sletter.',
     groupLeaveQueue: 'Din gruppe forlader køen til Tornehule Sletter.',
@@ -10660,6 +10700,10 @@ const RULES: Rule[] = [
     build: (m) => tBg('partyJoinQueue', { count: m[1] }),
   },
   { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
+  {
+    re: /^A party member must wait before queueing for Thornhollow Fields again\.$/,
+    build: () => tBg('errMemberRequeueLocked'),
+  },
   // The queue-pop offer (social/battleground_proposal.ts). The requeue lockout
   // is the only one carrying a value, so it is the only one that captures.
   {

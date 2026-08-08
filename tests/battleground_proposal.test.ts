@@ -226,6 +226,51 @@ describe('Thornhollow Fields: a failed offer, and who pays for it', () => {
   });
 });
 
+describe('Thornhollow Fields: a live offer makes a fighter unavailable', () => {
+  it('refuses a party queue when any MEMBER is holding a pending offer', () => {
+    // Review catch: the member loop checked seats, arena matches and queue
+    // groups but not a live offer. A solo could take a pop, accept a party
+    // invite before answering, and be queued again by the leader, so the same
+    // character sat in a pending offer AND a fresh group; declining the first
+    // then left the new group standing and skipped the lockout entirely.
+    const { sim, pids } = tenOffered();
+    const held = pids[5];
+    expect(bgProposalFor(sim.ctx, held), 'the member really is holding an offer').toBeTruthy();
+
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -44);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    sim.partyInvite(held, leader);
+    sim.partyAccept(held);
+
+    sim.bgQueueJoin(leader);
+
+    expect(sim.bgInfoFor(leader)!.queued, 'the leader press is refused').toBe(false);
+    expect(bgProposalFor(sim.ctx, held), 'and the offer is untouched').toBeTruthy();
+  });
+
+  it('refuses a party queue when a MEMBER is still under the requeue lockout', () => {
+    // The same bypass one step later: the lockout is charged to the player, so
+    // a leader's press must not carry them back into the queue the offer they
+    // ignored just cost them.
+    const { sim, pids } = tenOffered();
+    const decliner = pids[3];
+    bgRespond(sim.ctx, false, decliner);
+    expect(sim.bgInfoFor(decliner)!.requeueIn, 'the lockout is live').toBeGreaterThan(0);
+
+    const leader = sim.addPlayer('mage', 'Leader2');
+    tp(sim, leader, 2, -44);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    sim.partyInvite(decliner, leader);
+    sim.partyAccept(decliner);
+
+    sim.bgQueueJoin(leader);
+
+    expect(sim.bgInfoFor(leader)!.queued).toBe(false);
+    expect(sim.bgInfoFor(decliner)!.queued).toBe(false);
+  });
+});
+
 describe('Thornhollow Fields: the offer holds its slot', () => {
   it('reserves the field while pending and seats onto that same slot', () => {
     const { sim, pids } = tenOffered();
