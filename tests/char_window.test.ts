@@ -536,6 +536,7 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       openPlayerCard: vi.fn(),
       openPrestige: vi.fn(),
       openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
