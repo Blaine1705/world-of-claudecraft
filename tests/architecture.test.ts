@@ -434,6 +434,7 @@ const RENDER_PURE_CORES = [
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
+  'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
   'src/render/drape_lod_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
