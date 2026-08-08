@@ -89,15 +89,13 @@ describe('foliage preload set covers placement at every graphics tier (regressio
     expect(all.has('models/foliage/pine_2.glb')).toBe(true);
   });
 
-  it('preloads the full cross-tier catalog regardless of the import-time tier guess', () => {
-    // The deferred registration loop must not filter ALL_FOLIAGE_MODEL_URLS by any
-    // tier guess: every url it iterates is a url placement can eventually ask for, at
-    // SOME live tier, so every one of them must actually be prepared, unconditionally.
+  it('ALL_FOLIAGE_MODEL_URLS is constructed as the exact HIGH union LOW superset (a data-shape invariant, not a runtime one: see tests/foliage_preload_boot.test.ts for proof the deferred loop actually FETCHES every one of these regardless of the import-time tier guess)', () => {
     const all = allFoliageModelUrls();
     const high = highTierFoliageModelUrls();
     const low = lowTierFoliageModelUrls();
     for (const url of high) expect(all.has(url)).toBe(true);
     for (const url of low) expect(all.has(url)).toBe(true);
+    expect(all.size).toBe(high.size);
   });
 
   it('the deferred preload loop never skips a url by tier (no frozen-guess gate remains)', () => {

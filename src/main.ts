@@ -4620,7 +4620,6 @@ async function startGame(
     seen: introSeen,
     playerLevel: world.player.level,
     reducedMotion: settings.get('reduceMotion') || osReducedMotion,
-    native: isNativeRuntime(),
     platform: mobilePlatform(),
     engine: startupBrowserEnv.engine,
     constrainedMemory: GFX.constrainedMemory,
@@ -10855,7 +10854,12 @@ function wireStartScreens(): void {
       const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
       if (container && canvas) {
         characterPreview = new CharacterPreview(container, canvas, {
-          constrainedMemory: NATIVE_APP,
+          // GFX.constrainedMemory covers every iOS WebKit host (Safari and other iOS
+          // browsers, not just the packaged app) plus the general touch/coarse-pointer
+          // detector, not just NATIVE_APP: the launcher's char-select preview sits in the
+          // same entry-allocation window the boot preload defers/streams for
+          // (assets/preload.ts: "a 12 GB iPhone 17 Pro was killed 1.6s into the LAUNCHER").
+          constrainedMemory: GFX.constrainedMemory,
         });
         // If a token auto-login already rendered the roster and selected a
         // character before assets finished, show its real appearance; otherwise

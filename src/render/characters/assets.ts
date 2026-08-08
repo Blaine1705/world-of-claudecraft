@@ -691,8 +691,8 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    // Deferred atlases (native iOS) are not boot assets: gating the preview on
-    // them would re-create the exact entry-footprint spike the deferral removes.
+    // Deferred atlases (every iOS WebKit host) are not boot assets: gating the
+    // preview on them would re-create the exact entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
       ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];
@@ -1556,7 +1556,7 @@ export function setHeldOffhand(
 export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   const url = weaponSkinModelUrl(skinId);
   if (!url) return null;
-  // Streamed skin not arrived yet (packaged iOS: the Armory prewarm starts
+  // Streamed skin not arrived yet (every iOS WebKit host: the Armory prewarm starts
   // microseconds after the stream pass): degrade to null, which the preview
   // rig treats as unavailable, and kick the fetch. Throwing here lost the
   // whole 29-skin warmup and could escape an ArmoryInspect click handler.

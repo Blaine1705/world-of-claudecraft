@@ -275,6 +275,12 @@ function prepareFoliageSource(url: string): Promise<void> {
 
 /** Prepare the foliage source set selected by an explicit target profile. */
 export function prepareFoliageProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  // Unlike the deferred BOOT lane below (unconditional on purpose: see the P0 comment
+  // there), filtering by `target` here is safe: this only runs from a live graphics
+  // rebuild (src/render/assets/graphics_profile.ts), which the coordinator always
+  // AWAITS before activating `target` and letting placement run against it - there is
+  // no "placement outruns this guess" window the way there is at boot.
+  //
   // Existing extracted URLs belong to the active renderer. Reload their
   // released source scenes before the coordinator clears derived caches, so
   // its old-profile rollback arm can still rebuild after a target failure.
@@ -308,8 +314,19 @@ for (const url of ALL_FOLIAGE_MODEL_URLS) {
     prepareFoliageSource(url).then(() => {
       // Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) still
       // extracts each source as it lands so parsed scenes do not accumulate before the
-      // renderer build.
-      if (GFX.iosMemoryProfile) extractParts(url);
+      // renderer build - but only for a url the CURRENT tier guess actually places.
+      // extractParts bakes to float geometry and a converted material, which can
+      // OUTWEIGH the compressed source it replaces, so eagerly extracting every
+      // HIGH-only variant on a device that guessed lean would trade the crash this
+      // preload set exists to prevent for a permanent (session-long) memory cost on
+      // exactly the devices this profile protects. A url the guess excludes stays an
+      // un-extracted, un-released parsed source: cheaper than baking it for nothing,
+      // and still safe if the guess turns out wrong, because buildTrees() calls
+      // extractParts(url) itself (idempotent, cached) the moment placement actually
+      // needs it, same as it always has for every non-iOS profile.
+      if (GFX.iosMemoryProfile && Object.values(foliageModelUrlsFor(GFX)).flat().includes(url)) {
+        extractParts(url);
+      }
     }),
   );
 }
