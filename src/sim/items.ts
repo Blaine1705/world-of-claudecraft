@@ -44,6 +44,7 @@ import { formatMoney } from './format_money';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
+import { consumeNewestInventoryUnit } from './item_copy_ref';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { mountOwned, summonMountItem } from './mounts';
@@ -87,20 +88,6 @@ type EquippedInventoryUnit = InventoryUnit;
 // vendor sell/buyback already had, so they reuse this shape and the walk
 // below instead of duplicating it.
 export type VendorRemovedUnit = InventoryUnit;
-
-function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
-  for (let i = meta.inventory.length - 1; i >= 0; i--) {
-    const slot = meta.inventory[i];
-    if (slot.itemId !== itemId) continue;
-    const instance =
-      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
-    const craftedRecipeId = slot.craftedRecipeId;
-    slot.count -= 1;
-    if (slot.count <= 0) meta.inventory.splice(i, 1);
-    return { instance, craftedRecipeId };
-  }
-  return { instance: undefined, craftedRecipeId: undefined };
-}
 
 function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
   if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
@@ -484,7 +471,7 @@ export function equipItem(
   // the highest-index match: loot another plain copy afterward and the plain
   // one gets equipped instead. Deterministic, acceptable for v1, but a future
   // picker UI should not assume the enchanted copy is always favored.
-  const consumed = consumeEquippedInventoryUnit(meta, itemId);
+  const consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
   ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
