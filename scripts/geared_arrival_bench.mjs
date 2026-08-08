@@ -28,6 +28,7 @@ import pg from 'pg';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { dismissEntryOverlays } from './enter_offline_game.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const PORT = Number(process.env.BENCH_PORT ?? 5198);
@@ -322,6 +323,45 @@ async function enterObserver(page) {
   if (/swiftshader|llvmpipe|software/i.test(gl)) {
     throw new Error(`software GL renderer ("${gl}")`);
   }
+  // Same post-entry cleanup as the shared offline helper: intro cinematic,
+  // tutorial, and the camera-mode prompt would otherwise sit over the run.
+  await dismissEntryOverlays(page);
+  if (process.env.BENCH_LINK_STACKS === '1') {
+    // Name the exact object and material of every slow draw: the three-side
+    // stacks stop at renderObjects, this says WHAT was being drawn.
+    await page.evaluate(() => {
+      const webgl = window.__game.renderer.webgl;
+      const orig = webgl.renderBufferDirect.bind(webgl);
+      window.__slowDraws = [];
+      webgl.renderBufferDirect = (camera, scene, geometry, material, object, group) => {
+        const t0 = performance.now();
+        const out = orig(camera, scene, geometry, material, object, group);
+        const ms = performance.now() - t0;
+        if (ms >= 30 && window.__slowDraws.length < 80) {
+          const path = [];
+          let cur = object;
+          while (cur && path.length < 6) {
+            path.push(cur.name || cur.type);
+            cur = cur.parent;
+          }
+          window.__slowDraws.push({
+            ms: Math.round(ms * 10) / 10,
+            material: material.name || material.type,
+            object: path.join('<'),
+            entityId: object?.userData?.entityId ?? null,
+          });
+        }
+        return out;
+      };
+    });
+  }
+  // The Season 1 Armory store panel self-opens on a fresh account; close it.
+  await page.evaluate(() => {
+    for (const btn of document.querySelectorAll('button, .close, [aria-label="Close"]')) {
+      const label = (btn.getAttribute('aria-label') ?? btn.textContent ?? '').trim();
+      if (label === 'Close' || label === 'x' || label === 'X') btn.click();
+    }
+  });
   await page.evaluate(
     (x, z) => window.__game.world.chat(`/dev tp ${x} ${z}`),
     OBSERVER.x,
@@ -393,6 +433,11 @@ async function measureWave(page, waveIndex, waveSize) {
           nearestSpan: t.nearestSpanName ?? null,
           nearestSpanMs: t.nearestSpanMs ?? null,
         })),
+      // BENCH_LINK_STACKS=1: drains the slow LINK_STATUS/uniform queries
+      // captured since the last wave, stacks included, plus the named slow
+      // draws from the renderBufferDirect wrapper.
+      slowLinks: (window.__slowLinks ?? []).splice(0, 60),
+      slowDraws: (window.__slowDraws ?? []).splice(0, 80),
     };
   }, WAVE_MS);
 }
@@ -430,8 +475,62 @@ async function main() {
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 900, deviceScaleFactor: 1 });
+    if (process.env.BENCH_LINK_STACKS === '1') {
+      // Culprit finder: time every LINK_STATUS/uniform query (the calls that
+      // block on an unfinished program link) and keep the JS stack of the
+      // slow ones. Dev-served code is unminified, so the stack names the
+      // exact draw path that forced a synchronous link.
+      await page.evaluateOnNewDocument(() => {
+        window.__slowLinks = [];
+        for (const proto of [
+          window.WebGL2RenderingContext?.prototype,
+          window.WebGLRenderingContext?.prototype,
+        ]) {
+          if (!proto) continue;
+          for (const method of ['getProgramParameter', 'getUniformLocation']) {
+            const orig = proto[method];
+            proto[method] = function (...args) {
+              const t0 = performance.now();
+              const out = orig.apply(this, args);
+              const ms = performance.now() - t0;
+              if (ms >= 30 && window.__slowLinks.length < 60) {
+                window.__slowLinks.push({
+                  method,
+                  ms: Math.round(ms * 10) / 10,
+                  stack: (new Error().stack ?? '').split('\n').slice(2, 9).join('\n'),
+                });
+              }
+              return out;
+            };
+          }
+        }
+      });
+    }
     console.log('entering observer...');
     await enterObserver(page);
+    if (process.env.BENCH_SETTLE_PROGRAMS === '1') {
+      // Wait for the boot prewarm plus its resume lane to finish linking
+      // (program count plateau): measures the steady-state arrival cost
+      // instead of racing the first minute's background compile debt.
+      const deadline = Date.now() + 180000;
+      let last = -1;
+      let stableSince = Date.now();
+      for (;;) {
+        const programs = await page.evaluate(() => window.__game.renderer.perfStats().programs);
+        if (programs !== last) {
+          last = programs;
+          stableSince = Date.now();
+          console.log(`  prewarm settling: programs=${programs}`);
+        }
+        if (Date.now() - stableSince > 12000) break;
+        if (Date.now() > deadline) {
+          console.log('  prewarm settle timeout, continuing');
+          break;
+        }
+        await sleep(2000);
+      }
+      console.log(`  settled at programs=${last}`);
+    }
 
     const waves = [];
     let cursor = 0;
