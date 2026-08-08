@@ -521,6 +521,19 @@ const CRAB_ENEMY_BITE: ClipMap = {
   attack: ['Crab_Attack'],
 };
 
+// The treant's own attack (scripts/build_treant_anims.mjs, issue #2889
+// round 2): a tree "biting" reads wrong, so this reinterprets the shared
+// ENEMY_BITE attack as a slam/root-grab off yeti.glb's own donor poses (a
+// rooted Idle hold into Bite_Front's downward lean, repurposed as a
+// branch-slam, settled by Dance's sway), instead of the plain Bite_Front
+// every other ENEMY_BITE family (mob_crab) still plays. A low-node-count
+// rig (2-3 animated nodes throughout), so the motion reads simple and
+// blocky by nature.
+const TREANT_ENEMY_BITE: ClipMap = {
+  ...ENEMY_BITE,
+  attack: ['Treant_Attack'],
+};
+
 // Procedurally authored Water Elemental. Node transforms ripple its layered
 // translucent body and drive the hands through the Waterbolt casting motion.
 const WATER_ELEMENTAL: ClipMap = {
@@ -2038,7 +2051,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_treant: {
     url: `${CREATURES}/yeti.glb`,
     height: 2.6,
-    clips: ENEMY_BITE,
+    clips: TREANT_ENEMY_BITE,
+    // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
