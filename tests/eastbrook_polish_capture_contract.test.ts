@@ -89,8 +89,10 @@ interface AttributionTargetFixture {
 // and townRuntime leaves while this branch's lockfile patch moved the GLB and
 // source-fingerprint leaves, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted after pinning the three specifier exact (PR 3165 review): only
+// the pnpm-lock.yaml specifier row moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1556193fece78aed25b5eba88f38250764e6e20944945d675f9f606591058566';
+  '9dd239c2645c8e996d1af0a3bc20d1103e4ff338b226c8fd9b8f405c175b575a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
