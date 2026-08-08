@@ -387,6 +387,27 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
 });
 
 describe('Thornhollow Fields: team parties for the match', () => {
+  it('evicts a deserter who was the party BASE, not just an auto-added member', () => {
+    // Review catch: formBgTeamParty returns everyone the formation ADDED, and
+    // the base unit kept its own party object, so it never appears in
+    // autoPartyPids. A base deserter was therefore left in the match party,
+    // reading its chat and holding a frame for a fight they had walked out of.
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    const team = match.teams[0];
+    // The base is whoever the formation did NOT record as auto-added.
+    const base = team.find((p) => !match.autoPartyPids[0].includes(p));
+    expect(base, 'a sim-formed team really does have a base outside the auto list').toBeTruthy();
+
+    bgResolveDesertion(sim.ctx, base!);
+
+    const stayer = team.find((p) => p !== base)!;
+    const party = sim.partyOf(stayer);
+    expect(party, 'the rest of the team keeps its party').toBeTruthy();
+    expect(party!.members, 'the deserting base is out of it').not.toContain(base);
+    expect(sim.partyOf(base!), 'and holds no match party of their own').toBeNull();
+  });
+
   it('welds each all-solo team into one party at start and disbands both at the end', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;

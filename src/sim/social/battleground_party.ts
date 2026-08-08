@@ -122,8 +122,21 @@ export function unwindBgAutoPartyFor(
   pid: number,
 ): void {
   for (const team of [0, 1] as const) {
-    if (!auto[team].includes(pid)) continue;
-    ctx.removeFromParty(pid, LEAVE_VERB);
-    auto[team] = auto[team].filter((p) => p !== pid);
+    if (auto[team].includes(pid)) {
+      ctx.removeFromParty(pid, LEAVE_VERB);
+      auto[team] = auto[team].filter((p) => p !== pid);
+      continue;
+    }
+    // The BASE unit is deliberately absent from `auto`: formBgTeamParty returns
+    // everyone the formation ADDED, and the base kept its own party object. So a
+    // deserter who happened to be the base was left sitting in the match party,
+    // still reading its chat and holding a party frame for a fight they walked
+    // out of. Evict them too, identified by sharing the party with an
+    // auto-added member: that is what marks it a party THIS system built rather
+    // than a whole premade's own group, which deserting must never break up.
+    const party = ctx.partyOf(pid);
+    if (party && auto[team].some((m) => party.members.includes(m))) {
+      ctx.removeFromParty(pid, LEAVE_VERB);
+    }
   }
 }
