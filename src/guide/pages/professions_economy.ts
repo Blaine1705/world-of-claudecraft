@@ -110,7 +110,6 @@ function workOrdersSection(): string {
 }
 
 export function economyDetailHtml(): string {
-  const e = GUIDE_PROF_ECONOMY;
   return `
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>

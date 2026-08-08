@@ -562,8 +562,7 @@ export const guideStrings = {
     ifStopAutoAttack:
       'Whether switching targets stops your swing. Off by default, so your attack carries over to the new target.',
     ifShowAttackButton: 'Puts an explicit Attack button on your action bar.',
-    ifWalkByAutoloot:
-      'Scoops the loot from your own kills as you walk past them. Off by default.',
+    ifWalkByAutoloot: 'Scoops the loot from your own kills as you walk past them. Off by default.',
     ifGroundReticle: 'Shows the ground circle while you are aiming a placed spell.',
     ifMouseoverCast:
       'Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.',
@@ -648,129 +647,129 @@ export const guideStrings = {
   // Interface & HUD reference: what each part of the screen is and which window each
   // key opens. The Controls page stays the key table; this is the map of the screen.
   interfacePage: {
-  // Interface & HUD reference: a map of the screen. Not a second key table (the
-  // Controls page owns that) and not an options tour (the Settings page owns
-  // that). Multi-paragraph bodies separate paragraphs with '\n\n' and render
-  // through the shared paras() helper. Facts mirror index.html's #ui markup,
-  // src/styles/hud.css anchors, src/game/keybinds.ts defaults, and the owning
-  // modules under src/ui/ and src/ui/hud/.
-  intro:
-    'A map of the screen: what every frame, bar, and button on your interface does, and which window each key opens.',
-  scopeTitle: 'Keys, and where to change them',
-  scopeBody:
-    'Every key named on this page is the default, and every one of them can be rebound. The full key table lives on the Controls page, and the options that change how the interface looks and behaves live on the Settings page. Esc closes whatever window is on top, and opens the game menu when nothing is open.',
+    // Interface & HUD reference: a map of the screen. Not a second key table (the
+    // Controls page owns that) and not an options tour (the Settings page owns
+    // that). Multi-paragraph bodies separate paragraphs with '\n\n' and render
+    // through the shared paras() helper. Facts mirror index.html's #ui markup,
+    // src/styles/hud.css anchors, src/game/keybinds.ts defaults, and the owning
+    // modules under src/ui/ and src/ui/hud/.
+    intro:
+      'A map of the screen: what every frame, bar, and button on your interface does, and which window each key opens.',
+    scopeTitle: 'Keys, and where to change them',
+    scopeBody:
+      'Every key named on this page is the default, and every one of them can be rebound. The full key table lives on the Controls page, and the options that change how the interface looks and behaves live on the Settings page. Esc closes whatever window is on top, and opens the game menu when nothing is open.',
 
-  glanceTitle: 'The screen at a glance',
-  glanceBody:
-    'The interface lives around the edges of the screen and leaves the middle clear for the world. Your own frame, your action bars, and your experience bar sit along the bottom. Your target and your party sit in the top left. The minimap and the zone name sit in the top right, with your trackers running down the right side below them. The chat box sits in the bottom left corner, and a rail of small square buttons sits in the bottom right.\n\nEverything else is a window you open and close. Most windows have a key of their own, most also have a button in that rail in the bottom right, and every one of them closes with its own key again or with Esc.',
+    glanceTitle: 'The screen at a glance',
+    glanceBody:
+      'The interface lives around the edges of the screen and leaves the middle clear for the world. Your own frame, your action bars, and your experience bar sit along the bottom. Your target and your party sit in the top left. The minimap and the zone name sit in the top right, with your trackers running down the right side below them. The chat box sits in the bottom left corner, and a rail of small square buttons sits in the bottom right.\n\nEverything else is a window you open and close. Most windows have a key of their own, most also have a button in that rail in the bottom right, and every one of them closes with its own key again or with Esc.',
 
-  framesTitle: 'Unit frames',
-  framesBody:
-    'A unit frame is a portrait with bars beside it: a health bar always, a resource bar when the unit has one, and a name and a level chip. A damage shield paints as a lighter segment laid over the top of the health bar, so you can watch the shield spend itself before the health starts to move.',
-  frameSelfTitle: 'Your own frame',
-  frameSelfBody:
-    'Bottom center, next to your action bars. Portrait, level, health, and your resource, with a mark while you are in combat, a resting mark while you are resting, and a row of combo points for the classes that build them. Clicking the frame targets yourself.',
-  frameTargetTitle: 'Your target',
-  frameTargetBody:
-    'Top left, appearing the moment you select something and gone again when you drop it. The same portrait and bars, plus an Elite tag on the tougher enemies, a cast bar showing what your target is casting, and a strip of the effects that are on it.',
-  frameTotTitle: "Your target's target",
-  frameTotBody:
-    'A small frame beside your target frame showing who your target is currently on. It is the quickest way to tell whether a monster is fighting your tank or coming for you. It stays hidden until you switch it on in the options.',
-  framePartyTitle: 'Your party',
-  framePartyBody:
-    'Party members stack under your target frame on the left, one row each. A row dims when that member walks out of range, shows the effects worth reacting to, and can show their pet beside them. How much health text a row carries is up to you: none, a percentage, the numbers, or both.',
-  framePetTitle: 'Your pet',
-  framePetBody:
-    'Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.',
-  framesMoveBody:
-    'Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.',
+    framesTitle: 'Unit frames',
+    framesBody:
+      'A unit frame is a portrait with bars beside it: a health bar always, a resource bar when the unit has one, and a name and a level chip. A damage shield paints as a lighter segment laid over the top of the health bar, so you can watch the shield spend itself before the health starts to move.',
+    frameSelfTitle: 'Your own frame',
+    frameSelfBody:
+      'Bottom center, next to your action bars. Portrait, level, health, and your resource, with a mark while you are in combat, a resting mark while you are resting, and a row of combo points for the classes that build them. Clicking the frame targets yourself.',
+    frameTargetTitle: 'Your target',
+    frameTargetBody:
+      'Top left, appearing the moment you select something and gone again when you drop it. The same portrait and bars, plus an Elite tag on the tougher enemies, a cast bar showing what your target is casting, and a strip of the effects that are on it.',
+    frameTotTitle: "Your target's target",
+    frameTotBody:
+      'A small frame beside your target frame showing who your target is currently on. It is the quickest way to tell whether a monster is fighting your tank or coming for you. It stays hidden until you switch it on in the options.',
+    framePartyTitle: 'Your party',
+    framePartyBody:
+      'Party members stack under your target frame on the left, one row each. A row dims when that member walks out of range, shows the effects worth reacting to, and can show their pet beside them. How much health text a row carries is up to you: none, a percentage, the numbers, or both.',
+    framePetTitle: 'Your pet',
+    framePetBody:
+      'Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.',
+    framesMoveBody:
+      'Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.',
 
-  barsTitle: 'Bars, timers, and combat text',
-  barsBody:
-    "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
+    barsTitle: 'Bars, timers, and combat text',
+    barsBody:
+      "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
 
-  aurasTitle: 'Buffs and debuffs',
-  aurasBody:
-    "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs cancels it.\n\nAn option moves your buff row onto your own unit frame, which leaves the whole corner to your debuffs.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
+    aurasTitle: 'Buffs and debuffs',
+    aurasBody:
+      "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs cancels it.\n\nAn option moves your buff row onto your own unit frame, which leaves the whole corner to your debuffs.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
 
-  actionBarsTitle: 'Your action bars',
-  actionBarsBody:
-    'Three rows of eleven ability slots sit above your experience bar, with a dedicated attack button at the head of the first row. Only the first row is there to begin with: the second and third are switched on in the options when you want the room, and the third needs the second. The number row across the top of your keyboard fires the first bar, and the extra bars default to the numpad.\n\nAbilities come from your spellbook (P): drag one out of the book onto a slot, or use the toggle on its row to put it on the first free one. Items work the same way, so a stack of potions or a bandage can live on a slot and be used with a key.\n\nOnce a bar is arranged the way you like it, you can lock it. Locking refuses drags, drops, and clears while leaving the abilities themselves as usable as ever, so a fumbled click in a fight cannot rearrange your buttons.\n\nTwo smaller bars join the row when they apply: the pet bar, with Attack, Stop, Taunt, Defensive, and Aggressive on Ctrl plus 1 through 5, and a stance bar for the classes that change stance or form.',
+    actionBarsTitle: 'Your action bars',
+    actionBarsBody:
+      'Three rows of eleven ability slots sit above your experience bar, with a dedicated attack button at the head of the first row. Only the first row is there to begin with: the second and third are switched on in the options when you want the room, and the third needs the second. The number row across the top of your keyboard fires the first bar, and the extra bars default to the numpad.\n\nAbilities come from your spellbook (P): drag one out of the book onto a slot, or use the toggle on its row to put it on the first free one. Items work the same way, so a stack of potions or a bandage can live on a slot and be used with a key.\n\nOnce a bar is arranged the way you like it, you can lock it. Locking refuses drags, drops, and clears while leaving the abilities themselves as usable as ever, so a fumbled click in a fight cannot rearrange your buttons.\n\nTwo smaller bars join the row when they apply: the pet bar, with Attack, Stop, Taunt, Defensive, and Aggressive on Ctrl plus 1 through 5, and a stance bar for the classes that change stance or form.',
 
-  minimapTitle: 'The minimap',
-  minimapBody:
-    'Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.',
+    minimapTitle: 'The minimap',
+    minimapBody:
+      'Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.',
 
-  mapTitle: 'The world map and your trackers',
-  mapBody:
-    'M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.',
+    mapTitle: 'The world map and your trackers',
+    mapBody:
+      'M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.',
 
-  chatTitle: 'The chat box',
-  chatBody:
-    'Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.',
+    chatTitle: 'The chat box',
+    chatBody:
+      'Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.',
 
-  keyWindowsTitle: 'Windows you open with a key',
-  keyWindowsBody:
-    'Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.',
-  winCharTitle: 'Character sheet (C)',
-  winCharBody:
-    'Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.',
-  winBagsTitle: 'Bags (B)',
-  winBagsBody:
-    'Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.',
-  winSpellbookTitle: 'Spellbook (P)',
-  winSpellbookBody:
-    'Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.',
-  winTalentsTitle: 'Talents (N)',
-  winTalentsBody:
-    'Your talent trees, the points you have to spend, and what each row does at every rank.',
-  winProfessionsTitle: 'Professions (Shift+P)',
-  winProfessionsBody:
-    'What you have learned, how skilled you are at each, and how far each one can still go.',
-  winCraftingTitle: 'Crafting (T)',
-  winCraftingBody:
-    'Your recipes, what each one needs, and what you can make right now with what you are carrying.',
-  winQuestLogTitle: 'Quest log (L)',
-  winQuestLogBody:
-    'Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.',
-  winDeedsTitle: 'Book of Deeds (Shift+Z)',
-  winDeedsBody:
-    'The record of what you have done, the titles and Renown it has paid you, and what is still open.',
-  winSocialTitle: 'Friends and Guild (O)',
-  winSocialBody:
-    'Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.',
-  winFinderTitle: 'Dungeon Finder (Shift+I)',
-  winFinderBody:
-    'The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.',
-  winMetersTitle: 'Damage meters (Shift+H)',
-  winMetersBody:
-    'Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.',
-  winMoreTitle: 'And a few more',
-  winMoreBody:
-    'The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way.',
+    keyWindowsTitle: 'Windows you open with a key',
+    keyWindowsBody:
+      'Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.',
+    winCharTitle: 'Character sheet (C)',
+    winCharBody:
+      'Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.',
+    winBagsTitle: 'Bags (B)',
+    winBagsBody:
+      'Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.',
+    winSpellbookTitle: 'Spellbook (P)',
+    winSpellbookBody:
+      'Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.',
+    winTalentsTitle: 'Talents (N)',
+    winTalentsBody:
+      'Your talent trees, the points you have to spend, and what each row does at every rank.',
+    winProfessionsTitle: 'Professions (Shift+P)',
+    winProfessionsBody:
+      'What you have learned, how skilled you are at each, and how far each one can still go.',
+    winCraftingTitle: 'Crafting (T)',
+    winCraftingBody:
+      'Your recipes, what each one needs, and what you can make right now with what you are carrying.',
+    winQuestLogTitle: 'Quest log (L)',
+    winQuestLogBody:
+      'Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.',
+    winDeedsTitle: 'Book of Deeds (Shift+Z)',
+    winDeedsBody:
+      'The record of what you have done, the titles and Renown it has paid you, and what is still open.',
+    winSocialTitle: 'Friends and Guild (O)',
+    winSocialBody:
+      'Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.',
+    winFinderTitle: 'Dungeon Finder (Shift+I)',
+    winFinderBody:
+      'The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.',
+    winMetersTitle: 'Damage meters (Shift+H)',
+    winMetersBody:
+      'Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.',
+    winMoreTitle: 'And a few more',
+    winMoreBody:
+      'The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way.',
 
-  worldWindowsTitle: 'Windows the world opens for you',
-  worldWindowsBody:
-    "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
+    worldWindowsTitle: 'Windows the world opens for you',
+    worldWindowsBody:
+      "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
 
-  lootTitle: 'Loot and rolls',
-  lootBody:
-    "Interact with a body you have earned and the loot window opens, listing what dropped. Click a line to take it.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts. When they can, a Harvest section appears at the foot of the loot window with a box to tick for each component you want.",
+    lootTitle: 'Loot and rolls',
+    lootBody:
+      "Interact with a body you have earned and the loot window opens, listing what dropped. Click a line to take it.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts. When they can, a Harvest section appears at the foot of the loot window with a box to tick for each component you want.",
 
-  playerCardTitle: 'Your player card',
-  playerCardBody:
-    'A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.',
+    playerCardTitle: 'Your player card',
+    playerCardBody:
+      'A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.',
 
-  wikiTitle: 'The Wiki button',
-  wikiBody:
-    'This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.',
+    wikiTitle: 'The Wiki button',
+    wikiBody:
+      'This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.',
 
-  mobileTitle: 'On a phone or a tablet',
-  mobileBody:
-    'Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with five action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. Around them sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping, plus a pull-out row of your consumables that fills itself from what you are carrying.\n\nAlong the bottom edge are Chat, Social, Quests, Settings, and More. More opens a tray holding the rest of your windows, including your character, the Dungeon Finder, PvP, the Vale Cup, emotes, and the wiki. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.',
-  railTitle: 'The button rail',
-  railBody:
-    'Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThey cover your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, crafting, PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply.',
+    mobileTitle: 'On a phone or a tablet',
+    mobileBody:
+      'Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with five action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. Around them sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping, plus a pull-out row of your consumables that fills itself from what you are carrying.\n\nAlong the bottom edge are Chat, Social, Quests, Settings, and More. More opens a tray holding the rest of your windows, including your character, the Dungeon Finder, PvP, the Vale Cup, emotes, and the wiki. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.',
+    railTitle: 'The button rail',
+    railBody:
+      'Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThey cover your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, crafting, PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply.',
   },
 
   // Slash Commands reference: the chat command surface, grouped by purpose.
@@ -782,12 +781,12 @@ export const guideStrings = {
     // surface is deliberately absent.
     intro: 'Every command you can type into chat, grouped by what it is for, with its short forms.',
     slashBody:
-  'Anything you type in the chat box that starts with a slash is a command rather than something you say out loud. Press Enter and it either acts (you follow someone, you invite them, you roll) or it prints a private line only you can see.',
+      'Anything you type in the chat box that starts with a slash is a command rather than something you say out loud. Press Enter and it either acts (you follow someone, you invite them, you roll) or it prints a private line only you can see.',
     aliasBody:
-  'Most commands have short forms, and every form listed in a row does exactly the same thing: /w, /t and /tell are one command. Words in angle brackets are required, words in square brackets are optional, and the capitalization of the command itself never matters.',
+      'Most commands have short forms, and every form listed in a row does exactly the same thing: /w, /t and /tell are one command. Words in angle brackets are required, words in square brackets are optional, and the capitalization of the command itself never matters.',
     helpTipTitle: 'The game knows the list too',
     helpTipBody:
-  'Type /help in game, or /commands, or just /?, and the whole command list prints into your chat. Mistype a command and the game tells you it did not recognize it, and points you back at /help.',
+      'Type /help in game, or /commands, or just /?, and the whole command list prints into your chat. Mistype a command and the game tells you it did not recognize it, and points you back at /help.',
     cmdHeader: 'Command',
     doesHeader: 'What it does',
 
@@ -796,7 +795,7 @@ export const guideStrings = {
     say: 'Speak to the players standing near you. A plain line with no slash goes to whichever chat tab you have selected, and Say is the one you start on.',
     yell: 'Shout, so players much further away than say range hear you.',
     whisper:
-  'Send a private message to one player who is online. Their name matches whatever capitalization you type, as long as only one player could be meant.',
+      'Send a private message to one player who is online. Their name matches whatever capitalization you type, as long as only one player could be meant.',
     reply: 'Answer whoever whispered you last, without typing their name again.',
     me: 'Freeform action text in the third person, so "/me ponders the fountain" reads as your name followed by the action. Everyone near you sees it.',
     partyChat: 'Talk to everyone in your party or raid.',
@@ -804,13 +803,13 @@ export const guideStrings = {
     // Channels
     groupChannels: 'Channels',
     channelsIntro:
-  'General reaches the whole realm and you are in it from the moment you log in. World and LFG are opt in: join one first, then you can read and talk in it.',
+      'General reaches the whole realm and you are in it from the moment you log in. World and LFG are opt in: join one first, then you can read and talk in it.',
     general: 'The realm-wide General channel.',
     gAlias:
-  'A short form with two meanings, so it is worth knowing: offline it sends to General, but online it is your guild channel. Type /general or /1 when you definitely mean General.',
+      'A short form with two meanings, so it is worth knowing: offline it sends to General, but online it is your guild channel. Type /general or /1 when you definitely mean General.',
     guild: 'Talk to your guild. Online play only, and you need to be in a guild.',
     officer:
-  'The officer channel of your guild, open to officers and the Guild Master. Online play only.',
+      'The officer channel of your guild, open to officers and the Guild Master. Online play only.',
     join: 'Join or leave an optional channel. The two you can join are world and lfg, and typing /join on its own lists them. Opening a chat tab for one of them joins it for you.',
     world: 'Talk in the World channel, once you have joined it.',
     lfg: 'Talk in the LFG channel, where people look for groups. Join it first.',
@@ -819,13 +818,13 @@ export const guideStrings = {
     groupParty: 'Party and group',
     invite: 'Invite an online player to your party by name, however far away they are standing.',
     partyRoster:
-  'With no message after it, this prints your party roster instead: every member with their level, class and health, and the leader marked.',
+      'With no message after it, this prints your party roster instead: every member with their level, class and health, and the leader marked.',
     ready:
-  'The party or raid leader starts a ready check, and everyone else gets a prompt to answer yes or no.',
+      'The party or raid leader starts a ready check, and everyone else gets a prompt to answer yes or no.',
     assist:
-  'Target whatever the named player is targeting. With no name it assists the player you have targeted. It reaches your party and raid anywhere in the world, and anyone else close enough for you to see.',
+      'Target whatever the named player is targeting. With no name it assists the player you have targeted. It reaches your party and raid anywhere in the world, and anyone else close enough for you to see.',
     follow:
-  'Trail another player automatically. With no name it follows your current target. Moving, casting, fighting, picking a new target, or the other player pulling away all end it, and you cannot start it in combat.',
+      'Trail another player automatically. With no name it follows your current target. Moving, casting, fighting, picking a new target, or the other player pulling away all end it, and you cannot start it in combat.',
     unfollow: 'Stop following.',
     roll: 'Roll a random number, from 1 to 100 unless you name a limit or a range. Your party sees the result, or everyone nearby when you are not in one. The roll is made by the server, so nobody can fake one.',
 
@@ -834,33 +833,34 @@ export const guideStrings = {
     who: 'List the players online. Add text to narrow it to names or zones containing that text.',
     inspect: "Look up an online player's level, class and health.",
     ignore:
-  "Hide a player's public chat and their overhead chat bubbles from you. Their whispers, rolls, invites and mail still arrive. The list form prints who you are ignoring.",
+      "Hide a player's public chat and their overhead chat bubbles from you. Their whispers, rolls, invites and mail still arrive. The list form prints who you are ignoring.",
     block:
-  'The stronger version: it also stops their whispers, invites and mail, and hides the two of you from each other in /who. The list form prints who you have blocked.',
+      'The stronger version: it also stops their whispers, invites and mail, and hides the two of you from each other in /who. The list form prints who you have blocked.',
     peopleNote:
-  'The /who roster and your ignore and block lists are kept by the server, so those work in online play only.',
+      'The /who roster and your ignore and block lists are kept by the server, so those work in online play only.',
 
     // Your character
     groupSelf: 'Your character',
     selfIntro:
-  'These print a private line into your chat that nobody else sees. Nothing is broadcast, so they are safe to use in the middle of a fight.',
+      'These print a private line into your chat that nobody else sees. Nothing is broadcast, so they are safe to use in the middle of a fight.',
     played: 'How long this character has been in the world during this session.',
     playtime: 'How long this character has been played in total, across every session.',
     xp: 'Your level and how far through it you are.',
     gold: 'What is in your purse.',
     stats:
-  'A one-line character summary: level, class, health, your resource, attack power, crit chance and armor.',
+      'A one-line character summary: level, class, health, your resource, attack power, crit chance and armor.',
     gear: 'Everything you have equipped, slot by slot, so the empty slots stand out.',
     bags: 'What you are carrying, best quality first, with your money at the end.',
     abilities: 'The abilities you have learned.',
     talents:
-  'Your specialization, and how your talent points are split between the class tree and the spec tree.',
+      'Your specialization, and how your talent points are split between the class tree and the spec tree.',
     quests: 'Your active quest log, with the progress on each objective.',
     completed: 'The quests you have already turned in, in the order you finished them.',
     session: 'What you have done since you logged in: kills, deaths, damage and experience.',
-    arena: 'Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.',
+    arena:
+      'Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.',
     listings:
-  'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
+      'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
     buyback: 'What you sold to a vendor recently and could still buy back.',
 
     // How you are right now
@@ -869,17 +869,18 @@ export const guideStrings = {
     cooldowns: 'Which of your abilities are cooling down, soonest ready first.',
     pet: "Your pet's name, level, family and health.",
     petTaunt: "Your pet's taunt cooldown, and whether it is set to cast it on its own.",
-    speed: 'How fast you are moving compared to a normal run, and whether something has you rooted.',
+    speed:
+      'How fast you are moving compared to a normal run, and whether something has you rooted.',
     form: 'The shapeshift form or combat stance you are in.',
     manaRegen:
-  'For mana users: whether your out-of-combat mana regeneration has started ticking again.',
+      'For mana users: whether your out-of-combat mana regeneration has started ticking again.',
     savedMana:
-  'For a mana user who is shapeshifted: the mana parked while you are shifted, which comes back when you shift out.',
+      'For a mana user who is shapeshifted: the mana parked while you are shifted, which comes back when you shift out.',
     combo: 'How many combo points you are holding.',
     consumable: 'The food and drink working on you right now, and how long each has left.',
     potion: 'The shared combat potion cooldown, which is separate from your ability cooldowns.',
     falling:
-  'Whether you are airborne, how far above the ground you are, and whether the landing is going to hurt.',
+      'Whether you are airborne, how far above the ground you are, and whether the landing is going to hurt.',
 
     // In a fight
     groupCombat: 'In a fight',
@@ -893,7 +894,7 @@ export const guideStrings = {
     consider: "How dangerous your target's level makes it, compared to yours.",
     queued: 'The ability armed to go off on your next melee swing.',
     overpower:
-  'For warriors: whether the Overpower window that an enemy dodge opens is still available.',
+      'For warriors: whether the Overpower window that an enemy dodge opens is still available.',
 
     // World and travel
     groupWorld: 'World and travel',
@@ -903,15 +904,15 @@ export const guideStrings = {
     pois: 'The landmarks of your current zone, nearest first, with the distance to each.',
     graveyard: 'Where your spirit would return to if you fell here.',
     dungeons:
-  'Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.',
+      'Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.',
     dungeonMode: 'Switch your dungeons between the normal and heroic difficulty.',
     dungeonReset:
-  'Abandon your own empty instances, which is what you do after changing difficulty.',
+      'Abandon your own empty instances, which is what you do after changing difficulty.',
 
     // Recovery and presence
     groupRecovery: 'Recovery and presence',
     unstuck:
-  'The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.',
+      'The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.',
     afk: 'Mark yourself Away From Keyboard, with an optional message that anyone who whispers you gets as an automatic reply. Repeat it with no message to clear it; any other chat clears it too.',
     dnd: 'Do Not Disturb: like away, except whispers sent to you are held back instead of delivered.',
     sit: 'Sit down where you are, and stand back up. You stand automatically the moment you move, cast, or take a hit.',
@@ -920,22 +921,22 @@ export const guideStrings = {
     // Emotes (the full list lives on the Social page)
     emotesHeading: 'Emotes',
     emotesBody:
-  'The social emotes are commands too: /wave, /bow, /cheer, /dance, /laugh and the rest, each shown to everyone in say range. Add a name to aim one at somebody, as in "/wave Aleph", and /me covers anything the list does not.',
+      'The social emotes are commands too: /wave, /bow, /cheer, /dance, /laugh and the rest, each shown to everyone in say range. Add a name to aim one at somebody, as in "/wave Aleph", and /me covers anything the list does not.',
     emotesMore: 'More about emotes and playing together',
 
     // The "!" community commands (server-relayed, online only)
     bangHeading: 'Community commands',
     bangBody:
-  'A few commands start with an exclamation mark instead of a slash. They announce something to the realm and post it to the community Discord at the same time, so people who are not logged in see it too. They are part of online play.',
+      'A few commands start with an exclamation mark instead of a slash. They announce something to the realm and post it to the community Discord at the same time, so people who are not logged in see it too. They are part of online play.',
     bangList:
-  'The set is !lfg for looking for a group, !wts and !wtb for selling and buying, !recruit for guild recruitment, !event for a raid or a meetup, and !help when you are stuck. Type the command, then your message.',
+      'The set is !lfg for looking for a group, !wts and !wtb for selling and buying, !recruit for guild recruitment, !event for a raid or a meetup, and !help when you are stuck. Type the command, then your message.',
 
     // What happens when a command does not land
     unknownHeading: 'If a command does not work',
     unknownBody:
-  'A command the game does not recognize comes back as an unknown-command notice, and nothing is said out loud, so a typo never lands in the channel you were talking in. Commands sent too quickly in a row are throttled: slow down for a moment and they go through again. Some need something to act on, so /follow with nobody targeted, or /reply when nobody has whispered you, will tell you so.',
+      'A command the game does not recognize comes back as an unknown-command notice, and nothing is said out loud, so a typo never lands in the channel you were talking in. Commands sent too quickly in a row are throttled: slow down for a moment and they go through again. Some need something to act on, so /follow with nobody targeted, or /reply when nobody has whispered you, will tell you so.',
     stickyBody:
-  'Which chat tab you have selected decides where a plain line with no slash goes. Select the World tab and your next untagged line goes to World, so glance at the tab before you type. A slash command always wins over the tab, so /w Bob hi whispers Bob whichever tab is up, and on the whisper tab a plain line answers whoever whispered you last.',
+      'Which chat tab you have selected decides where a plain line with no slash goes. Select the World tab and your next untagged line goes to World, so glance at the tab before you type. A slash command always wins over the tab, so /w Bob hi whispers Bob whichever tab is up, and on the whisper tab a plain line answers whoever whispered you last.',
   },
 
   glossary: {
@@ -1231,7 +1232,8 @@ export const guideStrings = {
     },
     // The summon spell's own kit line. Water Jet is the PET's pet-bar command, not this
     // spell, so it renders as a paragraph under the row instead of as this line.
-    mageEleSummon: 'A Frost spell that calls the elemental to your side and sets it on your target.',
+    mageEleSummon:
+      'A Frost spell that calls the elemental to your side and sets it on your target.',
     // Form names owned by this page (the sim's own names: src/sim/content/classes.ts
     // bear_form, cat_form, travel_form). Kept here rather than read from the model
     // gallery's labels so a reword over there cannot silently rename the forms.
@@ -1456,50 +1458,50 @@ export const guideStrings = {
   // Mounts & Riding: the riding lesson, summoning a mount, the speed tiers, and the
   // show-jumping race at the stables.
   mountsPage: {
-  // Mounts and riding. Curated prose, no generated roster: the content generator emits no
-  // mount data, and a hand-typed list would drift and would have to name the two catalog
-  // mounts with no player-facing acquisition path (src/sim/content/mounts.ts). Spoiler-safe:
-  // no move-speed percentages, no drop rates, no per-boss mount table, no race time budget.
-  // The plain gates a player is told in game (level 20, 80 gold, 10 gold) are published.
-  heading: 'Mounts and riding',
-  intro:
-    'A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.',
-  whatHeading: 'What a mount is',
-  whatBody:
-    'A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.',
-  learnHeading: 'Learning to ride',
-  // Two paragraphs (paras()): the 80g skill purchase first, then the quest, which is only
-  // pickable after it (zone3.ts q_riding_lessons requiresRidingTrained). {level} is
-  // formatNumber(MOUNT_TRAIN_MIN_LEVEL) from the page module.
-  learnBody:
-    "Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.",
-  whereHeading: 'Where to find her',
-  whereBody:
-    'The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.',
-  firstHeading: 'Your first mount',
-  firstBody:
-    'The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.',
-  rideHeading: 'Getting on and getting off',
-  // Two paragraphs. The keybind sentence is scoped to desktop on purpose: the shared toggle
-  // only ever dismounts (or calls the lesson steed), while the mobile More-tray button also
-  // summons through the reins item.
-  rideBody:
-    "There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways.",
-  breaksHeading: 'What puts you back on your feet',
-  breaksBody:
-    'Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, and salvaging all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.',
-  speedHeading: 'Speed and tiers',
-  speedBody:
-    'Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.',
-  collectHeading: 'Where the rarer mounts come from',
-  collectBody:
-    "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
-  raceHeading: 'The stables race',
-  raceBody:
-    "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
-  goodsHeading: 'Reins are ordinary goods',
-  goodsBody:
-    'A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your hands while you are riding, the mount goes with them and you are set down where you stand.',
+    // Mounts and riding. Curated prose, no generated roster: the content generator emits no
+    // mount data, and a hand-typed list would drift and would have to name the two catalog
+    // mounts with no player-facing acquisition path (src/sim/content/mounts.ts). Spoiler-safe:
+    // no move-speed percentages, no drop rates, no per-boss mount table, no race time budget.
+    // The plain gates a player is told in game (level 20, 80 gold, 10 gold) are published.
+    heading: 'Mounts and riding',
+    intro:
+      'A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.',
+    whatHeading: 'What a mount is',
+    whatBody:
+      'A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.',
+    learnHeading: 'Learning to ride',
+    // Two paragraphs (paras()): the 80g skill purchase first, then the quest, which is only
+    // pickable after it (zone3.ts q_riding_lessons requiresRidingTrained). {level} is
+    // formatNumber(MOUNT_TRAIN_MIN_LEVEL) from the page module.
+    learnBody:
+      'Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.',
+    whereHeading: 'Where to find her',
+    whereBody:
+      'The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.',
+    firstHeading: 'Your first mount',
+    firstBody:
+      'The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.',
+    rideHeading: 'Getting on and getting off',
+    // Two paragraphs. The keybind sentence is scoped to desktop on purpose: the shared toggle
+    // only ever dismounts (or calls the lesson steed), while the mobile More-tray button also
+    // summons through the reins item.
+    rideBody:
+      'There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways.',
+    breaksHeading: 'What puts you back on your feet',
+    breaksBody:
+      'Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, and salvaging all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.',
+    speedHeading: 'Speed and tiers',
+    speedBody:
+      'Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.',
+    collectHeading: 'Where the rarer mounts come from',
+    collectBody:
+      "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
+    raceHeading: 'The stables race',
+    raceBody:
+      "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
+    goodsHeading: 'Reins are ordinary goods',
+    goodsBody:
+      'A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your hands while you are riding, the mount goes with them and you are set down where you stand.',
   },
 
   worldPage: {
@@ -1749,7 +1751,8 @@ export const guideStrings = {
     heading: 'Dungeons and Raids',
     intro:
       'When the open world is not enough, gather a party and step into an instance: a private copy of a dungeon made just for your group.',
-    party: 'Dungeons are built for a party of five. The endgame raid is for ten. If you do not have four friends on hand, the Dungeon Finder will build a group for the runs it queues.',
+    party:
+      'Dungeons are built for a party of five. The endgame raid is for ten. If you do not have four friends on hand, the Dungeon Finder will build a group for the runs it queues.',
     soloLead:
       'Every dungeon opens with a soloable lead-in quest, so you always know why you are going in.',
     levelExact: 'Level {n}',
@@ -1836,48 +1839,48 @@ export const guideStrings = {
   // Rifts: portals that open out in the zones, the C/B/A/S ranks, the first-clear
   // race, and what a run leaves you with.
   riftsPage: {
-  // Rifts: the procedural instanced descents that open on their own out in the zones.
-  // Spoiler-safe: the rank letters, the level gate, the shape of a run, and the race
-  // rule are all broadcast to the whole realm in chat, so they are public. NO rank
-  // multipliers, mob levels, drop rates, coin amounts, or boss scripts. The "Rift
-  // Forge" is deliberately unnamed: the upgrade/enchant/socket seam has no client
-  // caller, so no player can reach it.
-  heading: 'Rifts',
-  intro:
-    'A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.',
-  whatHeading: 'What a rift is',
-  whatBody:
-    'Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.',
-  openHeading: 'Where rifts open, and how often',
-  openBody:
-    'Rifts tear open out in the wider zones of the realm rather than in the early valley, and the whole realm hears about it: a line in your chat names the rank and the zone the moment one appears. Each eligible zone comes up for a rift about once an hour, and a zone that already has one standing waits its turn rather than opening a second. A rift nobody closes collapses on its own after a couple of hours, and the realm hears that too. A zone whose rift was sealed stays quiet until its next turn comes around, so an announcement is worth walking toward while it is fresh.',
-  ranksHeading: 'The four ranks',
-  ranksBody:
-    'Every rift is ranked C, B, A, or S, and the rank rides in the announcement, so you know what you are walking toward before you leave town. C is the gentlest, B and A climb from there, and S is the hardest thing a rift can be. Rank is the only dial. It decides how mean the floors are, and nothing else does, so a C rift is not a smaller rift, it is the same shape of run with a lighter hand.',
-  // {rank} is the rank letter (C, B, A, S), spliced verbatim: the letters are the
-  // proper nouns the realm announcement prints, so they are never translated.
-  rankFmt: 'Rank {rank}',
-  groupHeading: 'Who goes in',
-  groupBody:
-    'Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.',
-  // {n} is the level cap, formatted through formatNumber.
-  levelNote:
-    'Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.',
-  floorsHeading: 'Down through the floors',
-  floorsBody:
-    'A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. Some rifts open a hand-built set piece instead, a place called the Infernal Citadel, which runs to its own fixed length rather than a generated descent.',
-  boundHeading: 'Once you draw blood',
-  boundBody:
-    "The first kill your group takes inside a rift settles the run. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one. Before that first kill nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
-  raceHeading: 'The race for the first clear',
-  raceBody:
-    'Every group in the realm can attack the same rift at once, each in its own copy, and only the first to bring down the thing at the bottom seals it. When a group wins, the realm hears their names and their time, and the way in closes behind them. Losing the race does not end your run: your copy stays open, the thing at the bottom still falls to you, and you still walk out under your own power. What it costs you is everything that clearing it would have paid. The boss leaves nothing behind for the group that came second, so what you carry home is what dropped off the mobs on the way down, and nothing more. The Book of Deeds still counts the clear, because you did put the thing down. It is the only race in the game you can lose without ever laying eyes on the people who beat you.',
-  rewardsHeading: 'What you carry out',
-  rewardsBody:
-    "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence and rift gems in your bags besides. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
-  trackerHeading: 'The tracker on your screen',
-  trackerBody:
-    'While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing to new parties. Once you are through, your group plays the rift out at its own pace, however long that takes.',
+    // Rifts: the procedural instanced descents that open on their own out in the zones.
+    // Spoiler-safe: the rank letters, the level gate, the shape of a run, and the race
+    // rule are all broadcast to the whole realm in chat, so they are public. NO rank
+    // multipliers, mob levels, drop rates, coin amounts, or boss scripts. The "Rift
+    // Forge" is deliberately unnamed: the upgrade/enchant/socket seam has no client
+    // caller, so no player can reach it.
+    heading: 'Rifts',
+    intro:
+      'A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.',
+    whatHeading: 'What a rift is',
+    whatBody:
+      'Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.',
+    openHeading: 'Where rifts open, and how often',
+    openBody:
+      'Rifts tear open out in the wider zones of the realm rather than in the early valley, and the whole realm hears about it: a line in your chat names the rank and the zone the moment one appears. Each eligible zone comes up for a rift about once an hour, and a zone that already has one standing waits its turn rather than opening a second. A rift nobody closes collapses on its own after a couple of hours, and the realm hears that too. A zone whose rift was sealed stays quiet until its next turn comes around, so an announcement is worth walking toward while it is fresh.',
+    ranksHeading: 'The four ranks',
+    ranksBody:
+      'Every rift is ranked C, B, A, or S, and the rank rides in the announcement, so you know what you are walking toward before you leave town. C is the gentlest, B and A climb from there, and S is the hardest thing a rift can be. Rank is the only dial. It decides how mean the floors are, and nothing else does, so a C rift is not a smaller rift, it is the same shape of run with a lighter hand.',
+    // {rank} is the rank letter (C, B, A, S), spliced verbatim: the letters are the
+    // proper nouns the realm announcement prints, so they are never translated.
+    rankFmt: 'Rank {rank}',
+    groupHeading: 'Who goes in',
+    groupBody:
+      'Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.',
+    // {n} is the level cap, formatted through formatNumber.
+    levelNote:
+      'Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.',
+    floorsHeading: 'Down through the floors',
+    floorsBody:
+      'A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. Some rifts open a hand-built set piece instead, a place called the Infernal Citadel, which runs to its own fixed length rather than a generated descent.',
+    boundHeading: 'Once you draw blood',
+    boundBody:
+      "The first kill your group takes inside a rift settles the run. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one. Before that first kill nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
+    raceHeading: 'The race for the first clear',
+    raceBody:
+      'Every group in the realm can attack the same rift at once, each in its own copy, and only the first to bring down the thing at the bottom seals it. When a group wins, the realm hears their names and their time, and the way in closes behind them. Losing the race does not end your run: your copy stays open, the thing at the bottom still falls to you, and you still walk out under your own power. What it costs you is everything that clearing it would have paid. The boss leaves nothing behind for the group that came second, so what you carry home is what dropped off the mobs on the way down, and nothing more. The Book of Deeds still counts the clear, because you did put the thing down. It is the only race in the game you can lose without ever laying eyes on the people who beat you.',
+    rewardsHeading: 'What you carry out',
+    rewardsBody:
+      "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence and rift gems in your bags besides. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
+    trackerHeading: 'The tracker on your screen',
+    trackerBody:
+      'While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing to new parties. Once you are through, your group plays the rift out at its own pace, however long that takes.',
   },
 
   delvesPage: {
@@ -2190,60 +2193,60 @@ export const guideStrings = {
   // 3D model gallery page (/guide/models): browse every class, creature, and demon.
   // World Editor: the separate /editor tool, what it builds, and where maps live.
   editorPage: {
-  intro:
-    'A map editor of your own, in the browser. Shape the land, plant props and camps, then drop into the result and walk around it.',
-  whereTitle: 'Where to find it',
-  whereBody:
-    'The editor is a page of its own at /editor, apart from the game. It opens on a fresh, untitled map built from the world you already know, so you always start with real ground under your feet. A short guided tour runs the first time you visit, and Help in the top bar can run it again.',
+    intro:
+      'A map editor of your own, in the browser. Shape the land, plant props and camps, then drop into the result and walk around it.',
+    whereTitle: 'Where to find it',
+    whereBody:
+      'The editor is a page of its own at /editor, apart from the game. It opens on a fresh, untitled map built from the world you already know, so you always start with real ground under your feet. A short guided tour runs the first time you visit, and Help in the top bar can run it again.',
 
-  buildTitle: 'What you can build',
-  buildBody:
-    'Tools live on the rail down the left, each with a single-letter shortcut shown on its button. Pick one and work straight on the map in front of you. Ctrl+Z undoes and Ctrl+Y redoes, so nothing you try is permanent.',
-  toolLandTitle: 'Shape the land',
-  toolLandBody:
-    'Raise, lower, smooth, and flatten the ground under a brush whose size and strength you set as you go.',
-  toolSurfaceTitle: 'Paint and flood',
-  toolSurfaceBody:
-    'Paint biome ground cover over a zone default, and set the water level of a lake the map declares.',
-  toolPlaceTitle: 'Place props',
-  toolPlaceBody:
-    'Drop pieces from the built-in asset catalog onto the ground, then move, rotate, scale, and duplicate them. A placement can be given collision so a player walks around it instead of through it, and the erase tool lifts a placement back off the map when you change your mind.',
-  toolCampTitle: 'Camps and a spawn point',
-  toolCampBody:
-    'Lay out mob camps that come alive in playtest, and set the spot where a playtest drops the player in.',
-  toolBlockerTitle: 'Invisible walls',
-  toolBlockerBody:
-    'Drag blocker walls that stop movement without showing anything, for an edge you want quietly closed off.',
-  toolRegionTitle: 'Copy a whole area',
-  toolRegionBody:
-    'Box-select terrain and placed assets with the region tool, then paste that selection somewhere else on the map.',
+    buildTitle: 'What you can build',
+    buildBody:
+      'Tools live on the rail down the left, each with a single-letter shortcut shown on its button. Pick one and work straight on the map in front of you. Ctrl+Z undoes and Ctrl+Y redoes, so nothing you try is permanent.',
+    toolLandTitle: 'Shape the land',
+    toolLandBody:
+      'Raise, lower, smooth, and flatten the ground under a brush whose size and strength you set as you go.',
+    toolSurfaceTitle: 'Paint and flood',
+    toolSurfaceBody:
+      'Paint biome ground cover over a zone default, and set the water level of a lake the map declares.',
+    toolPlaceTitle: 'Place props',
+    toolPlaceBody:
+      'Drop pieces from the built-in asset catalog onto the ground, then move, rotate, scale, and duplicate them. A placement can be given collision so a player walks around it instead of through it, and the erase tool lifts a placement back off the map when you change your mind.',
+    toolCampTitle: 'Camps and a spawn point',
+    toolCampBody:
+      'Lay out mob camps that come alive in playtest, and set the spot where a playtest drops the player in.',
+    toolBlockerTitle: 'Invisible walls',
+    toolBlockerBody:
+      'Drag blocker walls that stop movement without showing anything, for an edge you want quietly closed off.',
+    toolRegionTitle: 'Copy a whole area',
+    toolRegionBody:
+      'Box-select terrain and placed assets with the region tool, then paste that selection somewhere else on the map.',
 
-  viewsTitle: 'Two views of the same map',
-  viewsBody:
-    'The 3D viewport draws your map with the real game renderer, so what you see is what you get: drag to orbit, scroll to zoom. The 2D overhead map is the plan view, better for moving zone markers such as hubs, graveyards, and points of interest, and for framing a large area before you sculpt it. The toggle sits in the top bar.',
+    viewsTitle: 'Two views of the same map',
+    viewsBody:
+      'The 3D viewport draws your map with the real game renderer, so what you see is what you get: drag to orbit, scroll to zoom. The 2D overhead map is the plan view, better for moving zone markers such as hubs, graveyards, and points of interest, and for framing a large area before you sculpt it. The toggle sits in the top bar.',
 
-  playtestTitle: 'Play your map',
-  playtestBody:
-    'Playtest hands the map to the game and drops you into it as a warrior. Everything you made is underfoot: camps spawn, blocker walls hold, and placements with collision push you around them. When you have seen enough, come back to the editor and keep working.',
-  sandboxTitle: 'A sandbox, not the live world',
-  sandboxBody:
-    'Custom maps never change the game everyone else is playing. A playtest runs offline in your own browser and never talks to the server, so nothing that happens in it reaches your characters or the shared world.',
+    playtestTitle: 'Play your map',
+    playtestBody:
+      'Playtest hands the map to the game and drops you into it as a warrior. Everything you made is underfoot: camps spawn, blocker walls hold, and placements with collision push you around them. When you have seen enough, come back to the editor and keep working.',
+    sandboxTitle: 'A sandbox, not the live world',
+    sandboxBody:
+      'Custom maps never change the game everyone else is playing. A playtest runs offline in your own browser and never talks to the server, so nothing that happens in it reaches your characters or the shared world.',
 
-  saveTitle: 'Saving your work',
-  saveBody:
-    'Ctrl+S saves, and the Save button carries a dot while there are unsaved edits. Without an account the editor still works: maps are kept in your own browser, an autosave can be switched on, and Export writes a map out as a plain JSON file that Import reads straight back.\n\nSigned in with your game account, a save also goes to the server, so your maps follow you to another machine. The Open window has one tab for the drafts in this browser and another for the maps saved to your account. If the editor shows an offline badge, sign in to the game in another tab, then reload the editor.',
+    saveTitle: 'Saving your work',
+    saveBody:
+      'Ctrl+S saves, and the Save button carries a dot while there are unsaved edits. Without an account the editor still works: maps are kept in your own browser, an autosave can be switched on, and Export writes a map out as a plain JSON file that Import reads straight back.\n\nSigned in with your game account, a save also goes to the server, so your maps follow you to another machine. The Open window has one tab for the drafts in this browser and another for the maps saved to your account. If the editor shows an offline badge, sign in to the game in another tab, then reload the editor.',
 
-  shareTitle: 'Publishing and forking',
-  shareBody:
-    'Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.\n',
+    shareTitle: 'Publishing and forking',
+    shareBody:
+      'Maps saved to your account start private. From the Open window you can publish one, which lists it for anyone to browse, and unpublish it again at any time. The Public tab in that same window browses everything other players have published: Open loads one so you can look around how it was made, and Fork drops a private copy into your own list to change however you like. A copy is a new map: editing it never touches the original.\n\nThere is a limit on how many maps one account may keep, so tidy up the experiments you are done with.\n',
 
-  uploadTitle: 'Bringing your own models',
-  uploadBody:
-    'Signed in, the Upload button takes a GLB model of your own and adds it to the asset browser beside the built-in catalog, ready to place like any other prop. Uploads are stored on your account, count against a size and storage limit, and can be deleted from the asset browser when you no longer want them.',
+    uploadTitle: 'Bringing your own models',
+    uploadBody:
+      'Signed in, the Upload button takes a GLB model of your own and adds it to the asset browser beside the built-in catalog, ready to place like any other prop. Uploads are stored on your account, count against a size and storage limit, and can be deleted from the asset browser when you no longer want them.',
 
-  helpTitle: 'Learning the tools',
-  helpBody:
-    'Help in the top bar opens a reference covering every tool, the keyboard shortcuts, and the mouse moves, and it can restart the guided tour at any time. The rest is poking at things: undo is always a keystroke away, and Export gives you a copy of a map you can always come back to.',
+    helpTitle: 'Learning the tools',
+    helpBody:
+      'Help in the top bar opens a reference covering every tool, the keyboard shortcuts, and the mouse moves, and it can restart the guided tour at any time. The rest is poking at things: undo is always a keystroke away, and Export gives you a copy of a map you can always come back to.',
   },
 
   models: {

@@ -4,7 +4,7 @@
 // answers sit together.
 
 import { esc } from '../../ui/esc';
-import { formatNumber, t, type TranslationKey } from '../../ui/i18n';
+import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { LEVEL_CAP, ZONE_COUNT } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
@@ -36,15 +36,13 @@ const QA: { q: TranslationKey; a: TranslationKey; cap?: boolean; zones?: boolean
 export const faq: GuidePage = {
   titleKey: 'guide.nav.faq',
   render() {
-    const items = QA
-      .map(({ q, a, cap, zones }) => {
-        const answer = t(a, {
-          ...(cap ? { cap: formatNumber(LEVEL_CAP) } : {}),
-          ...(zones ? { zones: formatNumber(ZONE_COUNT) } : {}),
-        });
-        return `<details class="guide-faq-item"><summary>${esc(t(q))}</summary><p>${esc(answer)}</p></details>`;
-      })
-      .join('');
+    const items = QA.map(({ q, a, cap, zones }) => {
+      const answer = t(a, {
+        ...(cap ? { cap: formatNumber(LEVEL_CAP) } : {}),
+        ...(zones ? { zones: formatNumber(ZONE_COUNT) } : {}),
+      });
+      return `<details class="guide-faq-item"><summary>${esc(t(q))}</summary><p>${esc(answer)}</p></details>`;
+    }).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.nav.faq'))}</h1>

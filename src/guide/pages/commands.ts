@@ -77,7 +77,10 @@ const GROUPS: Group[] = [
         cmds: ['/ignore <name>', '/unignore <name>', '/ignorelist'],
         desc: 'guide.commandsPage.ignore',
       },
-      { cmds: ['/block <name>', '/unblock <name>', '/blocklist'], desc: 'guide.commandsPage.block' },
+      {
+        cmds: ['/block <name>', '/unblock <name>', '/blocklist'],
+        desc: 'guide.commandsPage.block',
+      },
     ],
     note: 'guide.commandsPage.peopleNote',
   },

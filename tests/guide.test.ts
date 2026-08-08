@@ -179,7 +179,8 @@ describe('Guide routes', () => {
       'compete',
       'reference',
     ]);
-    for (const g of groups) expect(g.routes.length, `group "${g.group}" is empty`).toBeGreaterThan(0);
+    for (const g of groups)
+      expect(g.routes.length, `group "${g.group}" is empty`).toBeGreaterThan(0);
     expect(hrefFor('')).toBe(GUIDE_BASE);
     expect(hrefFor('classes')).toBe('/wiki/classes');
   });
