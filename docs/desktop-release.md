@@ -246,9 +246,11 @@ Linux publish and vice versa.
 
 Triggers:
 
-- Pushing a release tag `v<version>` (the tagged commit must be on `main`, the tag
-  must match `package.json` `version`, and `DESKTOP_VERSION` must match too; the
-  workflow hard-fails on any mismatch so a half-bumped release cannot publish).
+- Pushing a release tag `v<version>` (the tagged commit must be on `main` and the
+  tag must match `package.json` `version`; the workflow hard-fails on a mismatch
+  so a half-bumped release cannot publish). The download page's version derives
+  from `package.json` at build time, so there is no second constant to keep in
+  step with the tag.
 - Manual `workflow_dispatch` (Actions tab, "Desktop publish", pick a branch).
   By default this is a DRY RUN: it builds, signs, verifies, and checksums
   exactly like a release, then attaches the artifacts to the workflow run
@@ -308,10 +310,13 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
 
 ## Publishing a website update
 
-1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
-   and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
-   page links point at the new build (the static hrefs in `index.html` and
-   `play.html` are the no-JS fallback; keep them on the same version). The page
+1. Bump `version` in `package.json` (the feed is version-ordered; see rollback).
+   `DESKTOP_VERSION` in `src/game/desktop_download.ts` derives from it at build
+   time through the `__APP_VERSION__` define, so the download page links follow
+   the bump on their own; `scripts/release_version.mjs prepare` rewrites the
+   static hrefs in `index.html` and `play.html` (the no-JS fallback) to the same
+   version, and `tests/desktop_download_dom.test.ts` pins them against the
+   module. Artifact names key off `package.json` `version` too. The page
    offers macOS (dmg), Windows (the x64 NSIS installer; `build.nsis.
    buildUniversalInstaller: false` makes electron-builder emit one installer per
    arch instead of a single dual-arch exe, and the download page links x64,
