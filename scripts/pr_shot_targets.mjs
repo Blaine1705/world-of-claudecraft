@@ -196,6 +196,10 @@ export const TARGETS = [
       { key: 'carry-scoreboard', scene: 'carry' },
       { key: 'scoreboard-mobile', scene: 'carry', mobile: true },
       { key: 'match-board', scene: 'board' },
+      // The kill feed carries PLAYER NAMES, which run to 24 characters, so the
+      // shot deliberately uses long ones: the shearing this scene exists to
+      // witness only shows up once a name is wider than the banner.
+      { key: 'kill-feed', scene: 'killfeed' },
       { key: 'field-map', scene: 'map' },
       // last on purpose: it kills the player, which would pollute later scenes
       { key: 'graveyard', scene: 'graveyard' },
@@ -307,6 +311,34 @@ export const TARGETS = [
           window.__game.input.camPitch = 0.4;
         });
         await wait(800);
+      }
+      if (scene === 'killfeed') {
+        // Push straight at the feed rather than staging real deaths: the banner
+        // is the subject, and real kills give no control over the NAME LENGTHS
+        // that decide whether it shears.
+        await page.evaluate(() => {
+          const feed = window.__game.hud.bgKillFeed;
+          const now = performance.now() / 1000;
+          feed.push(
+            { killerName: 'MYTxMeykolZ', victimName: 'PEEKOMAXIMUS', killerTeam: 1, victimTeam: 0 },
+            now,
+          );
+          feed.push(
+            { killerName: 'Nine', victimName: 'NUNCHUCKS', killerTeam: 0, victimTeam: 1 },
+            now,
+          );
+          feed.push(
+            {
+              killerName: 'Bramblethornwick',
+              victimName: 'Stormhammerfel',
+              killerTeam: 1,
+              victimTeam: 0,
+            },
+            now,
+          );
+        });
+        await wait(400);
+        return { clip: '#bg-killfeed' };
       }
       if (scene === 'board') {
         // pin the hover-expanded match board open and shoot just the strip
