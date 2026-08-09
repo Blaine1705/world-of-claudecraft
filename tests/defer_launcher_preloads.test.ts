@@ -118,6 +118,18 @@ describe('startGame wiring', () => {
     expect(awaitAt).toBeGreaterThan(beginAt);
     expect(rendererAt).toBeGreaterThan(awaitAt);
   });
+
+  // The locale/deed chunk fetch and the deferred world-asset preloads are
+  // independent boot-time network/decode phases (one remote, one bundled
+  // local). Opening the deferred lane before awaiting the locale fetch lets
+  // both run concurrently instead of paying their durations back to back;
+  // opening it after would silently reintroduce the serialization.
+  it('opens the deferred preload lane BEFORE awaiting the locale fetch', () => {
+    const beginAt = mainSource.indexOf('beginDeferredPreloads()');
+    const localeAwaitAt = mainSource.indexOf('await Promise.all([ensureLocaleLoaded(');
+    expect(beginAt).toBeGreaterThan(-1);
+    expect(localeAwaitAt).toBeGreaterThan(beginAt);
+  });
 });
 
 describe('editor viewport wiring', () => {
