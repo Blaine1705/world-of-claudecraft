@@ -156,6 +156,7 @@ const GUARDED_SCRIPTS = [
   'scripts/load_players.mjs',
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
+  'scripts/profile_recent_finds_shot.mjs',
 ] as const;
 
 // Scripts that drive /dev cheats over the wire but never open Postgres: they

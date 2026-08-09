@@ -37,6 +37,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import pg from 'pg';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 
 const PORT = Number(process.env.PORT ?? 8797);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -45,6 +46,12 @@ const NAME = process.env.SHOT_NAME ?? 'profile-strip';
 const CHAR = process.env.PROFILE_CHAR ?? 'Relicwarden';
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) throw new Error('DATABASE_URL is required');
+// This rig registers accounts and rewrites a character's state blob: both
+// targets must be local. The URL arm covers the server this script spawns
+// (a hostile PORT/env cannot point it elsewhere), the DATABASE arm the pg
+// connection the seeding UPDATE runs on.
+assertLoopbackUrl(BASE, 'BASE (from PORT)');
+assertLoopbackDatabaseUrl(DATABASE_URL);
 mkdirSync(OUT, { recursive: true });
 
 const log = (...a) => console.log('[profile-shot]', ...a);
