@@ -2811,6 +2811,13 @@ export class ClientWorld implements IWorld {
         e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
         e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
         e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
+        // Curator standing (cosmetic, server-computed): rank plus the
+        // character-scoped completion pair. Same split as ht/hb above: the rank
+        // defaults to 0 (unranked) and the pair stays undefined, so an identity
+        // record that omits them RESETS a previously ranked mirror.
+        e.curatorRank = typeof w.crk === 'number' ? w.crk : 0; // Curator rank 1-5
+        e.relicsOwned = typeof w.cro === 'number' ? w.cro : undefined; // relics owned
+        e.relicsTotal = typeof w.crt === 'number' ? w.crt : undefined; // relic total
         // Account flair (cosmetic, operator-set): the AI-operated mark and, for a
         // flagged streamer, their platform links. NEVER trust the wire: the links are
         // re-sanitized here (they end up in a window.open), and stay sparse/undefined

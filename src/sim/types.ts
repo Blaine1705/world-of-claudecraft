@@ -4124,6 +4124,15 @@ export interface Entity extends ClientMirroredEntityFields {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Curator standing flair (cosmetic, server-set from the character's LIVE
+  // Reliquary ownership; the sim never reads any of it): the Curator rank
+  // (0/undefined = unranked, 1-5 = Apprentice…Eternal Curator) and the
+  // character-scoped completion pair behind it, for the inspect card's
+  // Reliquary line and the rank-5 sigil. All three ride together and are
+  // absent for an unranked character, exactly like the dev fields above.
+  curatorRank?: number;
+  relicsOwned?: number;
+  relicsTotal?: number;
   // Account flair (cosmetic, operator-set from the admin dashboard; the sim
   // never reads either): the AI-operated mark that prefixes the name with [AI],
   // and an official streamer's platform links for the player menu. `streamerLinks`

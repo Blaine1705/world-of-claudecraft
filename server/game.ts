@@ -68,7 +68,12 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
-import { reliquaryWireJson } from '../src/sim/reliquary';
+import {
+  catalogCharacterCompletion,
+  characterReliquaryOwnership,
+  curatorRankFromOwned,
+  reliquaryWireJson,
+} from '../src/sim/reliquary';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -1362,6 +1367,21 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
   if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
+  // Curator standing (cosmetic): rank plus the character-scoped completion pair
+  // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
+  // Sparse like the flair above: refreshCuratorStanding only stamps them when
+  // the character owns at least one relic, so an unranked player ships nothing
+  // and a full record with the keys absent resets the mirror.
+  if (e.curatorRank) out.crk = e.curatorRank; // Curator rank 1-5
+  if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
+  // relicsTotal is the one player-INDEPENDENT number of the three: it is the
+  // character-scoped catalog size, so a client could derive it from its own
+  // content tables and never ask. It rides the wire anyway because a
+  // MIXED-VERSION client must not print a total that disagrees with the
+  // server's catalog: the denominator on the card is whatever the server counted
+  // when it stamped the pair, so an older or newer client shows the server's
+  // completion rather than a locally-derived one that quietly differs.
+  if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
   if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
   // Official streamer's platform links (player menu). Already gated by
   // wireStreamerLinks at the point they were set on the entity, so an account whose
@@ -3205,7 +3225,62 @@ export class GameServer {
     }
   }
 
+  // Update one player's Curator standing (rank + the character-scoped completion
+  // pair) for the inspect card's Reliquary line and the rank-5 sigil. Cosmetic
+  // identity only: the sim never reads these back, and no client command can set
+  // them, so the numbers are server-computed or they do not exist.
+  //
+  // Unlike the three flair refreshers beside it this is pure CPU off the LIVE sim
+  // meta (one catalog walk, no DB row, no RPC), so it is synchronous and needs no
+  // "did the player leave mid-fetch" guard.
+  //
+  // What inspect and /c/ actually share: ONE formula (catalogCharacterCompletion)
+  // scored over EQUIVALENT ownership surfaces (items + marks + bags-AND-bank
+  // reins + earned deeds). Same inputs, same pair and same rank, with no second
+  // derivation to drift. That is NOT a promise the two agree at every instant.
+  // This reads LIVE meta; the public sheet reads the PERSISTED state blob, so /c/
+  // lags live meta until the next character save writes it. Join-time reconciles
+  // are the sharpest case: unionLegacyMilestones folds legacy milestone deeds
+  // into meta.deedsEarned at load, so a catalogued title relic behind one of them
+  // scores HERE the moment the character joins and only reaches the blob, and so
+  // /c/, at the save after that.
+  //
+  // Unranked reads as ABSENT, not zero: an owned count of 0 clears all three
+  // fields so a fresh character's identity record carries no standing at all.
+  private refreshCuratorStanding(session: ClientSession): void {
+    const e = this.sim.entities.get(session.pid);
+    const meta = this.sim.meta(session.pid);
+    if (!e || !meta) return;
+    const { owned, total } = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    // Assigned unconditionally: wireCacheFor diffs the identity JSON, so an
+    // unchanged stamp re-broadcasts nothing and a changed one re-broadcasts
+    // itself, exactly like the flair refreshers above.
+    e.curatorRank = owned > 0 ? curatorRankFromOwned(owned) : undefined;
+    e.relicsOwned = owned > 0 ? owned : undefined;
+    e.relicsTotal = owned > 0 ? total : undefined;
+  }
+
+  // The periodic identity-flair cycle, in two halves that are deliberately NOT
+  // under the same guard.
+  //
+  // The synchronous curator sweep runs FIRST and UNGUARDED. The overlap guard
+  // below belongs to the three AWAITED refreshers (wallet RPC, Discord, GitHub):
+  // one of those cycles can outrun the interval and must not pile up. The curator
+  // sweep is pure CPU off live sim meta with no IO of its own, so it can never be
+  // the thing that piles up, and leaving it under the guard meant one degraded
+  // RPC cycle froze every online player's Curator standing for as long as that
+  // cycle hung. The per-session try/catch is the same best-effort contract the
+  // .catch arms give the awaited three: one throwing session must not kill the
+  // sweep for the sessions behind it. Join stamps the standing separately, so
+  // this half only has to catch what changed mid-session.
   private async refreshAllHolderTiers(): Promise<void> {
+    for (const session of this.clients.values()) {
+      try {
+        this.refreshCuratorStanding(session);
+      } catch (err) {
+        console.error('curator standing refresh failed:', err);
+      }
+    }
     if (this.holderTierRefreshing) return; // a slow cycle (RPC) must not pile up
     this.holderTierRefreshing = true;
     try {
@@ -3837,6 +3912,15 @@ export class GameServer {
     void this.refreshAccountFlair(session).catch((err) =>
       console.error('account flair refresh failed:', err),
     );
+    // Stamp the Curator standing off the just-loaded meta so an inspect landing
+    // before the first 60s cycle already reads the true rank. Synchronous (pure
+    // CPU), so the try/catch is what keeps the same "a flair stamp must never
+    // affect joining the world" contract the awaited reads get from .catch.
+    try {
+      this.refreshCuratorStanding(session);
+    } catch (err) {
+      console.error('curator standing refresh failed:', err);
+    }
     return session;
   }
 
