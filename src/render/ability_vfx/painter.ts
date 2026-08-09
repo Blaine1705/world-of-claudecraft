@@ -361,6 +361,13 @@ const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
   venom: 'smoke',
 };
 
+// The pet signature abilities whose creature rigs author an attackByAbility
+// clip (manifest: mob_emberkin, mob_gloomshade). Only these carry the ability
+// id through the mob throw fallback. Pinned against the sim pet roster and
+// the manifest by tests/pet_signature_attack_ids.test.ts, so a new pet rig
+// authoring a signature clip cannot silently miss this list.
+export const PET_SIGNATURE_ATTACK_IDS = new Set(['emberkin_felbolt', 'gloomshade_abyssal_chain']);
+
 export class AbilityVfx {
   private quality = 1;
   private budget = new AbilityVfxBudget();
@@ -798,7 +805,7 @@ export class AbilityVfx {
         color: planCast(spec, this.quality, tier).color,
       };
       this.beamChannels.set(ev.sourceId, ch);
-      this.mobThrowFallback(ev.sourceId, abilityId);
+      this.mobThrowFallback(ev.sourceId, ev.ability);
     }
     ch.lastAt = nowSec;
     ch.targetId = ev.targetId;
@@ -1455,12 +1462,22 @@ export class AbilityVfx {
   // hurling an instant bolt/ray with NO cast state has nothing else animating
   // the throw, so play its attack one-shot at launch. Claiming an event must
   // not lose that read.
+  // In THIS fallback a plain mob's throw stays ID-LESS: the base #2961
+  // invariant pins that the ability-carrying triggerAttack read on the throw
+  // paths is the player gesture tell. The ONE exception here is the pet
+  // signature set above, whose creature rigs author an attackByAbility clip
+  // the id routes to. (The 'windup' arm is a different, deliberate channel:
+  // it forwards the id for every caster because boss mechanic clips ride
+  // attackByAbility off windup cues, e.g. the broodlord's Cleave/Stun.)
   private mobThrowFallback(sourceId: number, abilityId?: string): void {
     const d = this.deps;
     if (!d.isMob?.(sourceId)) return;
     if (d.castingAbilityOf?.(sourceId)) return;
     if (d.isMidOneShot?.(sourceId)) return;
-    d.triggerAttack(sourceId, abilityId);
+    d.triggerAttack(
+      sourceId,
+      abilityId !== undefined && PET_SIGNATURE_ATTACK_IDS.has(abilityId) ? abilityId : undefined,
+    );
   }
 
   // Player projectile/lightning/nova release had no rig read at all: only
