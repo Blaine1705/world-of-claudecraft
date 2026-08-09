@@ -1521,7 +1521,26 @@ function tickRiftHazards(
       riftRankForBaseLevel(inst.baseLevel) === 'S'
         ? p.hp + p.maxHp
         : Math.max(1, Math.round(p.maxHp * 0.06 * (tier === 'deep' ? 2 : 1)));
-    ctx.dealDamage(null, p, dmg, false, 'fire', 'Molten Rift', 'hit', true);
+    // Stable 'rift_hazard_molten' abilityId (last positional arg) is what
+    // combat_sfx.ts's RIFT_HAZARD_ABILITY_IDS keys the impact-suppression set
+    // off of, not the 'Molten Rift' display label above, so a display-only
+    // rename can never silently reintroduce the doubled impact cue (review
+    // finding on PR #2687).
+    ctx.dealDamage(
+      null,
+      p,
+      dmg,
+      false,
+      'fire',
+      'Molten Rift',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      false,
+      'rift_hazard_molten',
+    );
     riftFx(ctx, p.pos.x, p.pos.z, 'fire', 'burst', 'rift_lava_tick'); // flames lick up as the lava sears you (1 Hz)
   }
 }
@@ -1573,6 +1592,9 @@ function tickRiftRollers(
       p.pos = ctx.groundPos(dest.x, dest.z);
       p.prevPos = { ...p.pos };
       ctx.rebucket(p);
+      // Same stable-id contract as the Molten Rift hazard above: the
+      // 'rift_hazard_boulder' abilityId, not the 'Rolling Boulder' label, is
+      // what combat_sfx.ts keys the impact-suppression set off of.
       ctx.dealDamage(
         null,
         p,
@@ -1582,6 +1604,11 @@ function tickRiftRollers(
         'Rolling Boulder',
         'hit',
         true,
+        undefined,
+        true,
+        false,
+        false,
+        'rift_hazard_boulder',
       );
       riftFx(ctx, p.pos.x, p.pos.z, 'physical', 'nova', 'rift_boulder_impact'); // a heavy dusty wallop as it bowls you
     }
