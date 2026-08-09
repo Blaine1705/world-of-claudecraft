@@ -4,17 +4,24 @@
 //
 // The dependency-sync check is unchanged from the inline version in gate.mjs;
 // only the log prefix is parameterized. The audio-tooling check additionally
-// runs its two version probes concurrently and skips them outright when
-// `sfx:check` is about to be a turbo cache hit this run (see
-// isTurboCacheHit in gate_task_cache.mjs), since a broken toolchain cannot
-// fail a step that never runs. tests/dependency_sync_gate_preflight.test.ts
-// and tests/sfx_gate_preflight.test.ts spawn gate.mjs and assert on its exact
+// runs its two version probes concurrently instead of serially.
+// tests/dependency_sync_gate_preflight.test.ts and
+// tests/sfx_gate_preflight.test.ts spawn gate.mjs and assert on its exact
 // stderr for both. Both preflights exist to turn a confusing mid-gate failure
 // into a clear early one, which the selective gate needs at least as much: it
 // is the path people will run most often.
+//
+// This check is NOT skipped on a turbo cache hit for `sfx:check`: the
+// bundled ffmpeg/ffprobe binaries are also invoked from `build:bundle`
+// (npm run sfx:manifest -> writeSfxGainCeilings -> computeSfxGainCeilings,
+// scripts/sfx/sfx_gain_ceiling.mjs), which has disjoint turbo inputs from
+// `sfx:check`. A source-only change with untouched audio is exactly the
+// ordinary case where `sfx:check` is a cache HIT while `build:bundle` is a
+// MISS, so gating the probe on `sfx:check` alone would let a broken
+// ffmpeg-static install surface deep inside the client build instead of
+// here.
 import { spawn, spawnSync } from 'node:child_process';
 import { FFMPEG_PATH, FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
-import { isTurboCacheHit } from './gate_task_cache.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -72,18 +79,12 @@ function probeToolByExecution(toolPath, shell) {
  * download their binary via an install script, so a scripts-skipped install
  * leaves a missing file behind the import and the PATH fallback may be absent too.
  *
- * Runs the two probes concurrently, and skips them entirely when the gate's
- * `sfx:check` step (the only step that actually invokes ffmpeg/ffprobe) is
- * about to be a turbo cache hit this run: a broken toolchain cannot fail a
- * step that never runs, so the fail-fast this preflight exists for only
- * matters when the toolchain is actually about to be used.
+ * Runs the two probes concurrently rather than serially.
  *
  * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined> }} opts
- * @returns {Promise<string | null>} error text, or null when skipped or both tools run
+ * @returns {Promise<string | null>} error text, or null when both tools run
  */
-export async function checkAudioTooling({ label, shell, env = process.env }) {
-  if (isTurboCacheHit('sfx:check', { shell, env })) return null;
-
+export async function checkAudioTooling({ label, shell }) {
   const tools = [
     ['ffmpeg', FFMPEG_PATH],
     ['ffprobe', FFPROBE_PATH],

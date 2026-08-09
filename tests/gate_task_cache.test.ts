@@ -1,13 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
 import {
   GATE_CACHE_TASK_INVENTORY,
   GATE_CACHEABLE_TASKS,
   GATE_NON_CACHEABLE_TASKS,
-  isTurboCacheHit,
   isTurboGateStep,
   turboRunArgs,
 } from '../scripts/lib/gate_task_cache.mjs';
@@ -205,80 +202,5 @@ describe('gate.mjs wiring pins', () => {
     expect(pkg.scripts.build).toContain('i18n:gen');
     expect(pkg.scripts.build).toContain('wiki:content');
     expect(pkg.scripts['build:bundle']).not.toContain('i18n:gen');
-  });
-});
-
-describe('isTurboCacheHit', () => {
-  function withFixtureDir(run: (dir: string) => void) {
-    const dir = mkdtempSync(join(tmpdir(), 'woc-turbocache-'));
-    try {
-      run(dir);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  }
-
-  /** A fake `npx` on PATH that logs its argv and prints canned dry-run JSON. */
-  function withFakeNpx(dryRunStdout: string, run: (dir: string) => void) {
-    withFixtureDir((dir) => {
-      writeFileSync(
-        join(dir, 'npx'),
-        `#!/bin/sh\necho "$@" > "${join(dir, 'argv.log')}"\necho '${dryRunStdout}'\nexit 0\n`,
-        { mode: 0o755 },
-      );
-      run(dir);
-    });
-  }
-
-  it('reports a HIT and calls turbo --no-install, scoped to the one task', () => {
-    withFakeNpx('{"tasks":[{"task":"sfx:check","cache":{"status":"HIT"}}]}', (dir) => {
-      const hit = isTurboCacheHit('sfx:check', { shell: false, env: { PATH: dir } });
-      expect(hit).toBe(true);
-      const argv = readFileSync(join(dir, 'argv.log'), 'utf8').trim();
-      expect(argv).toBe('--no-install turbo run sfx:check --dry=json');
-    });
-  });
-
-  it('reports no hit on a turbo MISS', () => {
-    withFakeNpx('{"tasks":[{"task":"sfx:check","cache":{"status":"MISS"}}]}', (dir) => {
-      expect(isTurboCacheHit('sfx:check', { shell: false, env: { PATH: dir } })).toBe(false);
-    });
-  });
-
-  it('fails closed (not a hit) when the dry-run output is not parseable JSON', () => {
-    withFakeNpx('not json at all', (dir) => {
-      expect(isTurboCacheHit('sfx:check', { shell: false, env: { PATH: dir } })).toBe(false);
-    });
-  });
-
-  it('fails closed when turbo dry-run exits nonzero', () => {
-    withFixtureDir((dir) => {
-      writeFileSync(join(dir, 'npx'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
-      expect(isTurboCacheHit('sfx:check', { shell: false, env: { PATH: dir } })).toBe(false);
-    });
-  });
-
-  it('fails closed when npx cannot be spawned at all (empty PATH)', () => {
-    expect(isTurboCacheHit('sfx:check', { shell: false, env: { PATH: '' } })).toBe(false);
-  });
-
-  it('fails closed, fast, and without a network fallback in a directory that is not a turbo workspace', () => {
-    // --no-install keeps this off the network: a fixture with no local turbo
-    // and no packageManager field fails immediately rather than fetching one.
-    // isTurboCacheHit spawns relative to process.cwd() (matching every other
-    // spawnSync call in gate_preflight.mjs), so this drives that directly.
-    withFixtureDir((dir) => {
-      writeFileSync(
-        join(dir, 'package.json'),
-        JSON.stringify({ name: 'fixture', version: '1.0.0' }),
-      );
-      const cwd = process.cwd();
-      process.chdir(dir);
-      try {
-        expect(isTurboCacheHit('sfx:check', { shell: false, env: process.env })).toBe(false);
-      } finally {
-        process.chdir(cwd);
-      }
-    });
   });
 });
