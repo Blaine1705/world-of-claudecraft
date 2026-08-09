@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { BG_GRAVEYARDS, battlegroundColliders } from '../src/sim/battleground_layout';
 import {
-  battlegroundOrigin,
   BUILTIN_WORLD,
+  battlegroundOrigin,
   DELVES,
   INSTANCE_X_BASE,
   isBgPos,
   setActiveWorldContent,
 } from '../src/sim/data';
-import { BG_GRAVEYARDS, battlegroundColliders } from '../src/sim/battleground_layout';
 import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { swimSurfaceY } from '../src/sim/player_motion';
@@ -19,6 +19,7 @@ import {
   unstuckSicknessDuration,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
+import { type BgMatch, startBgMatch } from '../src/sim/social/battleground';
 import {
   applyResurrectionSickness,
   bgGraveyardSpot,
@@ -26,7 +27,6 @@ import {
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
 } from '../src/sim/spirit';
-import { startBgMatch, type BgMatch } from '../src/sim/social/battleground';
 import { type BlockerDef, MAX_LEVEL, type SimEvent, type WorldContent } from '../src/sim/types';
 import {
   UNSTUCK_COOLDOWN_ID,
