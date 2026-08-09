@@ -3315,6 +3315,7 @@ export const zh_TW: EnTranslations = {
       "unlockToast": "聖物已收錄：{name}",
       "illuminateBanner": "頁面已點亮：{name}",
       "illuminateToast": "{name} 上的每一件聖物均已填滿。",
+      "illuminationBroadcastLine": "{name} 點亮了聖物庫頁面：{page}",
       "markFind": {
         "masterwork_first": "首件傑作",
         "masterwork_weaponcrafting": "武器鍛造傑作",

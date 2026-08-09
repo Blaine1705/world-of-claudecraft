@@ -14,7 +14,7 @@
 // then they render the authored English through the fallback above.
 
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
-import { getLanguage, type SupportedLanguage } from './i18n';
+import { getLanguage, type SupportedLanguage, t } from './i18n';
 import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
 import { makeLazyLocaleChannel } from './lazy_locale_channel';
 
@@ -153,6 +153,32 @@ export function reliquaryPageDesc(pageId: string): string {
   const def = pageDef(pageId);
   if (!def) return '';
   return maybePseudoString(localeEntry(pageId)?.desc ?? def.desc ?? '');
+}
+
+/** The guild-chat news template for another player's first-ever page
+ *  Illumination (Phase 18) with the page slot filled by a caller-owned
+ *  string: the HUD passes its splice sentinel (DEED_NAME_TOKEN) so the page
+ *  name lands as a clickable jump node;
+ *  reliquaryIlluminationBroadcastLine below passes the resolved name for a
+ *  plain-text line. One template render, so the two forms cannot drift (the
+ *  deed_i18n deedBroadcastRendered pattern). */
+export function reliquaryIlluminationBroadcastRendered(
+  characterName: string,
+  pageSlot: string,
+): string {
+  return t('hudChrome.reliquary.illuminationBroadcastLine', {
+    name: characterName,
+    page: pageSlot,
+  });
+}
+
+/** The guild-chat news line for another player's first-ever page
+ *  Illumination, composed client-side from the id-based wire event (the
+ *  server never sends page English). Pure and Node-testable so the one HUD
+ *  switch arm stays a thin log call; a catalog-unknown page id (mixed-version
+ *  drift) degrades to the raw id through reliquaryPageName's fallback. */
+export function reliquaryIlluminationBroadcastLine(characterName: string, pageId: string): string {
+  return reliquaryIlluminationBroadcastRendered(characterName, reliquaryPageName(pageId));
 }
 
 export interface ReliquaryTranslationManifestEntry {

@@ -8862,6 +8862,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.gridKeyboardHint'
   | 'hudChrome.reliquary.illuminateBanner'
   | 'hudChrome.reliquary.illuminateToast'
+  | 'hudChrome.reliquary.illuminationBroadcastLine'
   | 'hudChrome.reliquary.markFind.gather_event_ancient_heartwood'
   | 'hudChrome.reliquary.markFind.gather_event_moonlit_bloom'
   | 'hudChrome.reliquary.markFind.gather_event_perfect_specimen'

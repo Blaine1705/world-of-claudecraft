@@ -10537,6 +10537,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '성물 수록: {name}',
   'hudChrome.reliquary.illuminateBanner': '페이지 조명됨: {name}',
   'hudChrome.reliquary.illuminateToast': '{name}의 모든 성물이 채워졌습니다.',
+  'hudChrome.reliquary.illuminationBroadcastLine': '{name} 님이 성물고 페이지를 조명했습니다: {page}',
   'hudChrome.reliquary.recentJumpAria': '{name} 페이지 열기',
   'hudChrome.reliquary.recentEmpty':
     '아직 발견한 성물이 없습니다. 지금부터 수록하는 성물이 여기에 표시됩니다.',

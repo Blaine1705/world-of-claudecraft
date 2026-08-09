@@ -10065,6 +10065,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '聖物已收錄：{name}',
   'hudChrome.reliquary.illuminateBanner': '頁面已點亮：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} 上的每一件聖物均已填滿。',
+  'hudChrome.reliquary.illuminationBroadcastLine': '{name} 點亮了聖物庫頁面：{page}',
   'hudChrome.reliquary.recentJumpAria': '開啟{name}所在的頁面',
   'hudChrome.reliquary.recentEmpty': '尚無發現。此後收錄的聖物都會出現在這裡。',
   'hudChrome.reliquary.nearlyEmpty': '即將完成的頁面會匯集於此。',

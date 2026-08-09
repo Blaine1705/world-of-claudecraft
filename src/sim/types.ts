@@ -4444,10 +4444,12 @@ export type SimEvent = { pid?: number } & (
       curatorRank?: number;
       /**
        * Set on the on-join seed pass: the client batches these into one
-       * summary line instead of a toast per relic. Server-side this event is
-       * always self-scoped (a HEAVY_SELF_EVENTS member with no fan-out arm),
-       * so on reliquaryUnlock the flag is presentation only; the same flag on
-       * deedUnlocked is what gates that event's server fan-out.
+       * summary line instead of a toast per relic. The event itself stays
+       * self-scoped (a HEAVY_SELF_EVENTS member), but since Phase 18 the flag
+       * also gates the server's illumination fan-out exactly like
+       * deedUnlocked's: detectActivity broadcasts a first-ever
+       * illuminatedPageId to the earner's guildmates and followers only when
+       * retro is not true (a veteran's on-join seed pass must never marquee).
        */
       retro?: boolean;
     }
@@ -4587,6 +4589,12 @@ export type SimEvent = { pid?: number } & (
   // switch stays exhaustively typed. Carries ids and the earner's name only,
   // never deed text: the client composes the line from deed_i18n.
   | { type: 'deedBroadcast'; characterName: string; deedId: string }
+  // A guildmate's or followed friend's FIRST-EVER Reliquary page Illumination
+  // (Phase 18). Emitted only by the server's SocialService, declared here
+  // like deedBroadcast so the one client event switch stays exhaustively
+  // typed. Carries the earner's name and the page id only, never page text:
+  // the client composes the line from reliquary_i18n plus its own chrome key.
+  | { type: 'reliquaryIlluminationBroadcast'; characterName: string; pageId: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

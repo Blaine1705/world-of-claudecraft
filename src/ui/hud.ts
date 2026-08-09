@@ -610,7 +610,11 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { reliquaryPageName } from './reliquary_i18n';
+import {
+  reliquaryIlluminationBroadcastLine,
+  reliquaryIlluminationBroadcastRendered,
+  reliquaryPageName,
+} from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
@@ -12058,6 +12062,45 @@ export class Hud {
             ),
             '#40d264',
           );
+          break;
+        }
+        case 'reliquaryIlluminationBroadcast': {
+          // A guildmate's or followed friend's first-ever page Illumination
+          // (Phase 18), the deedBroadcast arm's Reliquary sibling. Id-based
+          // on the wire (server sends the page id, never English); the line
+          // composes in reliquary_i18n (Node-pinned there), guild-chat green,
+          // with the page name spliced in as a clickable jump to that page in
+          // the viewer's own Reliquary. A catalog-unknown page id
+          // (mixed-version drift; membership via Object.hasOwn, the
+          // reliquary_i18n pageDef idiom) keeps the plain line rather than a
+          // dead link: the Illumination toast's inert-link policy.
+          const pageId = ev.pageId;
+          if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)) {
+            // Text NODES, never the token-parsing log path: this branch is
+            // the one place a remote-origin string (name + raw page id)
+            // reaches chat, and it must stay structurally inert rather than
+            // incidentally safe via the name charset.
+            this.logNodes(
+              [
+                document.createTextNode(
+                  reliquaryIlluminationBroadcastLine(ev.characterName, pageId),
+                ),
+              ],
+              '#40d264',
+            );
+          } else {
+            this.logNodes(
+              deedLineNodes(
+                document,
+                reliquaryIlluminationBroadcastRendered(ev.characterName, DEED_NAME_TOKEN),
+                () =>
+                  deedChatLinkEl(document, reliquaryPageName(pageId), () =>
+                    this.reliquaryWindow.openWithPage(pageId),
+                  ),
+              ),
+              '#40d264',
+            );
+          }
           break;
         }
         case 'error':

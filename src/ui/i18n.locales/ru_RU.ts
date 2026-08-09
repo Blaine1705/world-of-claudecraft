@@ -10716,6 +10716,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': 'Реликвия каталогизирована: {name}',
   'hudChrome.reliquary.illuminateBanner': 'Страница озарена: {name}',
   'hudChrome.reliquary.illuminateToast': 'Все реликвии на странице {name} заполнены.',
+  'hudChrome.reliquary.illuminationBroadcastLine': '{name} озаряет страницу Реликвария: {page}',
   'hudChrome.reliquary.recentJumpAria': 'Открыть страницу с реликвией {name}',
   'hudChrome.reliquary.recentEmpty':
     'Находок пока нет. Реликвии, которые вы каталогизируете, будут появляться здесь.',

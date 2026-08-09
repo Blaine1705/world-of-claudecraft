@@ -14,6 +14,7 @@ import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
@@ -9066,11 +9067,31 @@ export class GameServer {
           if (ids) ids.push(ev.deedId);
           else deedUnlocks.set(s, [ev.deedId]);
           // Marquee unlocks fan out to guildmates and followers, and
-          // feed-worthy unlocks (titles, the first koi) to the Discord
-          // activity feed; retro unlocks NEVER fan out anywhere (a veteran's
-          // first login after rollout must not spam their guild or the feed).
+          // feed-worthy unlocks (titles, borders, the first koi) to the
+          // Discord activity feed; retro unlocks NEVER fan out anywhere (a
+          // veteran's first login after rollout must not spam their guild or
+          // the feed).
           if (ev.retro !== true) this.fanOutDeedUnlock(s, ev.deedId, now);
         }
+      }
+      // Reliquary first-ever page Illumination (Phase 18). The sim gates
+      // illuminatedPageId on the sticky per-character illuminatedPages set,
+      // so its presence means FIRST-EVER illumination for this character: a
+      // repeat completion after catalog growth emits no illuminatedPageId,
+      // and the on-join retro seed pass carries retro: true and must never
+      // marquee (the deedUnlocked retro rule). Marquee only: no Discord feed
+      // arm (only border deeds reach the feed, and the flagship illumination
+      // deeds reach it through their titles), no character_deeds write, and
+      // no forced save (membership authority stays the sparse self blob; the
+      // wire pins in tests/reliquary_wire.test.ts hold this arm to that).
+      if (
+        ev.type === 'reliquaryUnlock' &&
+        ev.pid !== undefined &&
+        ev.illuminatedPageId !== undefined &&
+        ev.retro !== true
+      ) {
+        const s = this.clients.get(ev.pid);
+        if (s) this.fanOutIllumination(s, ev.illuminatedPageId);
       }
       // Economy telemetry: one granted node harvest, counted under the ZONE
       // of the node that yielded it (R3) and the node's own tool TIER (R31, so
@@ -9806,7 +9827,8 @@ export class GameServer {
 
   // Fan a non-retro deed unlock out to its two audiences, the earner's online
   // guildmates and followers (marquee deeds) and the Discord activity feed
-  // (title deeds + the first koi, via discordFeedDeed's fail-closed gate),
+  // (title + border deeds and the first koi, via discordFeedDeed's
+  // fail-closed gate),
   // unless the account opted out (accounts.deed_broadcasts, ONE read serving
   // both audiences; a Discord post is a wider audience than the guild marquee,
   // so the opt-out covers it a fortiori). Fire-and-forget off the loop (the
@@ -9851,6 +9873,29 @@ export class GameServer {
         }
       })
       .catch((err) => console.error('deed broadcast failed:', err));
+  }
+
+  // Fan a non-retro FIRST-EVER Reliquary page Illumination out to the
+  // earner's online guildmates and followers, the fanOutDeedUnlock marquee
+  // audience; there is no Discord feed arm for illuminations. Fail-closed on
+  // the page id (the isPubliclyListableDeedId reasoning): production runs a
+  // mixed-version fleet, so a NEWER page's id can reach an older process, and
+  // broadcasting it would hand viewers an id their catalog cannot place. The
+  // accounts.deed_broadcasts flag is the ONE social-broadcast consent
+  // surface, so the opt-out covers this broadcast exactly as it covers deed
+  // marquees. Fire-and-forget off the loop (the fanOutDeedUnlock pattern):
+  // session identity is captured BEFORE the await so a leave between tick and
+  // resolution changes nothing, a failure logs without touching gameplay, and
+  // the earner's own banner is client-side from the sim event.
+  private fanOutIllumination(session: ClientSession, pageId: string): void {
+    if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)) return;
+    const { accountId, characterId, name } = session;
+    void getDeedBroadcasts(accountId)
+      .then((enabled) => {
+        if (!enabled) return;
+        return this.social.broadcastIllumination({ characterId, name }, pageId);
+      })
+      .catch((err) => console.error('illumination broadcast failed:', err));
   }
 
   private sendDailyRewardPointsGained(session: ClientSession, points: number): void {

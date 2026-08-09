@@ -8,6 +8,11 @@
 // Offline the Sim exposes live PlayerMeta.reliquary; online the ClientWorld
 // mirrors the heavy-gated `reliq` self blob. The `reliquaryUnlock` event is
 // presentation-only (toast / live UX) and must never invent membership.
+// The sticky illuminatedPages record (Phase 18) is DELIBERATELY not a facet
+// member: it is sim/server-authoritative anti-repeat state with no render/ui
+// consumer (banner and marquee are event-driven); ClientWorld drops it on
+// decode. Adding a consumer means adding the member here, in BOTH worlds,
+// and in the parity pin, in one change.
 // ---------------------------------------------------------------------------
 
 /** Sparse first-obtain metadata for one catalogued relic item id. */

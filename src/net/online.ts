@@ -3474,6 +3474,10 @@ export class ClientWorld implements IWorld {
         // restore splits it back out, so the mirror reads it the same way the
         // offline Sim reads the live state.
         this.reliquaryObtainCounts = restored.counts;
+        // restored.illuminatedPages is DELIBERATELY not mirrored: the sticky
+        // illumination record is sim/server-authoritative with no IWorld
+        // consumer (the client banner and the guild marquee both key off
+        // events). It rides the blob only because wire shape is save shape.
       }
       if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];

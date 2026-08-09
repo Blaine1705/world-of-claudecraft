@@ -3315,6 +3315,7 @@ export const tr_TR: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
+      "illuminationBroadcastLine": "{name} has illuminated a Reliquary page: {page}",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",

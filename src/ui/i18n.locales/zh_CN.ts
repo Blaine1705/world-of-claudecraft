@@ -10063,6 +10063,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '圣物已收录：{name}',
   'hudChrome.reliquary.illuminateBanner': '页面已点亮：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} 上的每一件圣物均已填满。',
+  'hudChrome.reliquary.illuminationBroadcastLine': '{name} 点亮了圣物库页面：{page}',
   'hudChrome.reliquary.recentJumpAria': '打开{name}所在的页面',
   'hudChrome.reliquary.recentEmpty': '尚无发现。此后收录的圣物都会出现在这里。',
   'hudChrome.reliquary.nearlyEmpty': '即将完成的页面会汇集于此。',

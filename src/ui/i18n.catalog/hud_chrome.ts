@@ -4264,6 +4264,11 @@ export const hudChromeStrings = {
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
+    // Phase 18: another player's FIRST-EVER page Illumination, the
+    // hudChrome.deeds.broadcastLine sibling (guild-chat green, page name
+    // spliced in as a clickable jump; the wire event carries the page id
+    // only and the client resolves {page} through reliquary_i18n).
+    illuminationBroadcastLine: '{name} has illuminated a Reliquary page: {page}',
     // Phase 7: profession mark find labels (player-visible chrome). Catalog page
     // names are NOT keys here: they resolve from the page id through
     // src/ui/reliquary_i18n.ts, the deed_i18n entity-style channel.

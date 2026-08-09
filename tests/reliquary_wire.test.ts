@@ -500,6 +500,9 @@ describe('Reliquary online / offline parity for scripted state', () => {
   });
 
   it('does not invent membership from a presentation-only reliquaryUnlock event', () => {
+    // Phase 18 note: the server now carries an illumination fan-out arm for
+    // this event, but on the CLIENT it stays presentation-only: membership
+    // authority is the sparse self blob, never an event.
     const client = bareClient(99);
     expect(client.reliquaryFirstFind[CATALOGUE_RELIC]).toBeUndefined();
     expect(client.reliquaryRecent).toEqual([]);
@@ -542,11 +545,32 @@ describe('Reliquary online / offline parity for scripted state', () => {
     const events = sim.drainEvents();
     expect(events.some((e) => e.type === 'reliquaryUnlock')).toBe(true);
     routeEvents(server, events);
-    // detectActivity must not force a deed-style save on reliquaryUnlock.
+    // detectActivity must not force a deed-style save on reliquaryUnlock
+    // (since Phase 18 the event HAS a fan-out arm, the illumination marquee;
+    // the arm broadcasts and nothing else: no save, no membership write).
     (server as unknown as { detectActivity(e: unknown[]): void }).detectActivity(events);
     (server as any).broadcastSnapshots();
     expect(saveSpy).not.toHaveBeenCalled();
     expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+
+    // The Phase 18 arm at full fire: a first-ever illumination broadcasts the
+    // marquee, and STILL forces no save (marquee only, no record write). The
+    // spy resolves so no real social delivery runs.
+    const illumSpy = vi
+      .spyOn((server as any).social, 'broadcastIllumination')
+      .mockResolvedValue(undefined);
+    (server as unknown as { detectActivity(e: unknown[]): void }).detectActivity([
+      {
+        type: 'reliquaryUnlock',
+        pid: session.pid,
+        itemId: CATALOGUE_RELIC,
+        pageIds: [PAGE_ID],
+        illuminatedPageId: PAGE_ID,
+      },
+    ]);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(illumSpy).toHaveBeenCalledTimes(1);
+    expect(saveSpy).not.toHaveBeenCalled();
 
     // The Phase 17 mutation point: a REPEAT obtain writes state (the tally)
     // without being a find at all, so it emits no reliquaryUnlock and nothing
