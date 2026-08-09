@@ -93,6 +93,7 @@ import {
   isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
+  PLAYER_INTEREST_DROP_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type SportRole,
@@ -317,7 +318,7 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 const INTEREST_RADIUS = 90;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
-export const INTEREST_DROP_RADIUS = 100;
+export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
