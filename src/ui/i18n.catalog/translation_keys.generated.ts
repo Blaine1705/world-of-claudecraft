@@ -6792,6 +6792,7 @@ export type TranslationKeyFlat =
   | 'hud.system.arenaVictoryBanner'
   | 'hud.system.arenaVictoryLog'
   | 'hud.system.deathRecapAbility'
+  | 'hud.system.deathRecapCauterized'
   | 'hud.system.deathRecapDrowned'
   | 'hud.system.deathRecapFalling'
   | 'hud.system.deathRecapKiller'

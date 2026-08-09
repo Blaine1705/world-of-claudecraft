@@ -2121,6 +2121,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '사망했습니다. {ability}(으)로 사망했습니다.',
   'hud.system.deathRecapFalling': '사망했습니다. 추락사했습니다.',
   'hud.system.deathRecapDrowned': '사망했습니다. 익사했습니다.',
+  'hud.system.deathRecapCauterized': '사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
   'hud.system.noLongerIgnoring': '{name}을 더 이상 차단하지 않습니다.',

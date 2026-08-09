@@ -7880,6 +7880,7 @@ export const id_ID: EnTranslations = {
       "deathRecapAbility": "Kamu telah tewas. Tewas oleh {ability}.",
       "deathRecapFalling": "Kamu telah tewas. Kamu jatuh hingga tewas.",
       "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",

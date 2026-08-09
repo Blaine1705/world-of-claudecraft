@@ -7880,6 +7880,7 @@ export const vi_VN: EnTranslations = {
       "deathRecapAbility": "Bạn đã chết. Bị hạ gục bởi {ability}.",
       "deathRecapFalling": "Bạn đã chết. Bạn đã ngã tử vong.",
       "deathRecapDrowned": "Bạn đã chết. Bạn đã chết đuối.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",

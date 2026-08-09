@@ -7880,6 +7880,7 @@ export const ru_RU: EnTranslations = {
       "deathRecapAbility": "Вы погибли. Причина: {ability}.",
       "deathRecapFalling": "Вы погибли. Вы разбились насмерть.",
       "deathRecapDrowned": "Вы погибли. Вы утонули.",
+      "deathRecapCauterized": "Вы погибли. Ожог Прижигания одолел вас.",
       "respawn": "Вы снова чувствуете себя отдохнувшим и целым.",
       "ignoringChat": "Чат от {name} игнорируется.",
       "noLongerIgnoring": "{name} больше не игнорируется.",

@@ -328,6 +328,10 @@ const hudStringsEn = {
       // death_recap_feedback.ts).
       deathRecapFalling: 'You have died. You fell to your death.',
       deathRecapDrowned: 'You have died. You drowned.',
+      // Cauterize's self-inflicted burn (aura id 'cauterizing', display name
+      // 'Cauterized') is another unattributed cause: it must not read as
+      // "Slain by Cauterized", which sounds like an enemy landed the kill.
+      deathRecapCauterized: "You have died. Cauterize's burn overwhelmed you.",
       respawn: 'You feel rested and whole again.',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',

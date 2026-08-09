@@ -2159,6 +2159,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': 'Вы погибли. Причина: {ability}.',
   'hud.system.deathRecapFalling': 'Вы погибли. Вы разбились насмерть.',
   'hud.system.deathRecapDrowned': 'Вы погибли. Вы утонули.',
+  'hud.system.deathRecapCauterized': 'Вы погибли. Ожог Прижигания одолел вас.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
