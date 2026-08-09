@@ -3333,6 +3333,33 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(stayerMeta.bgLosses).toBe(1);
   });
 
+  it('records no DRAW for the backfilled fighter either, only for the rest', () => {
+    // The interaction the W-L-D record creates with the unrated seat. A draw is
+    // now a counter in its own right, so the ladder gate has to cover it too:
+    // counting one here would put a backfilled fighter back on the record by the
+    // side door, which is the whole thing the unrated seat promises it will not
+    // do. Neither change could see this case on its own.
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    bgRespond(sim.ctx, true, spare);
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const stayer = match.teams[0].find((p) => p !== spare)!;
+    endBgMatch(sim.ctx, match, null, 'caps'); // a DRAW: no winner
+
+    const spareMeta = sim.ctx.players.get(spare)!;
+    const stayerMeta = sim.ctx.players.get(stayer)!;
+    expect(spareMeta.bgDraws).toBe(0);
+    expect(spareMeta.bgWins).toBe(0);
+    expect(spareMeta.bgLosses).toBe(0);
+    // Decisive only against a teammate who really did record one: same match,
+    // same result, same tick.
+    expect(stayerMeta.bgDraws).toBe(1);
+  });
+
   it('ASKS before seating, and an away player never consumes the seat', () => {
     // The reason the seat is an offer rather than a teleport. An away-but-
     // connected player is exactly who the queue-pop prompt exists to catch, and
