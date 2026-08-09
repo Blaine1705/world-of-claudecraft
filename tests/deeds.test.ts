@@ -392,6 +392,27 @@ describe('grant path', () => {
     expect(meta.renown).toBe(before + 5);
   });
 
+  it('refuses a prototype-keyed id a bare index would resolve, so renown never goes NaN', () => {
+    // DEEDS is a plain object, so grantDeed(meta, '__proto__') without the hasOwn
+    // guard resolves def = Object.prototype (truthy, past `!def`), then runs
+    // `renown += undefined` (NaN, and it seeds the SQL sort index) and adds a
+    // non-string legacy value to unlockedMilestones. The guard fails closed.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, 'soc_meet_bursar'); // a real 5-renown grant first
+    const before = meta.renown;
+    const earnedBefore = meta.deedsEarned.size;
+    const milestonesBefore = meta.unlockedMilestones.size;
+    for (const key of ['__proto__', 'constructor', 'toString', 'valueOf']) {
+      expect(sim.ctx.grantDeed(meta, key), key).toBe(false);
+    }
+    expect(Number.isNaN(meta.renown)).toBe(false);
+    expect(meta.renown).toBe(before);
+    expect(meta.deedsEarned.size).toBe(earnedBefore);
+    expect(meta.deedsEarned.has('__proto__')).toBe(false);
+    expect(meta.unlockedMilestones.size).toBe(milestonesBefore);
+  });
+
   it('the meta fixpoint resolves chained deeds within a single pass', () => {
     const sim = makeSim();
     const { meta, e } = primary(sim);
@@ -1895,6 +1916,23 @@ describe('active border selection (setActiveBorder)', () => {
     // the stored value is the DEED ID, never the reward slug
     expect(meta.activeBorder).not.toBe('prestige_laurels');
     expect((DEEDS[BORDER_DEED].reward as { slug: string }).slug).toBe('prestige_laurels');
+  });
+
+  it('the activeBorder facet getter reads the border field, not the title', () => {
+    // A getter wired to primary.activeTitle would return the title id here and
+    // pass every meta.activeBorder / e.border assertion in this file (those read
+    // the field directly). Distinct ids make the wrong-field wiring visible:
+    // this is the read behind the self portrait ring (hud playerFrame.borderSlug)
+    // and the picker's worn state.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantDeed(sim.ctx, meta, 'prog_veteran'); // title reward
+    grantDeed(sim.ctx, meta, BORDER_DEED); // border reward
+    sim.setActiveTitle('prog_veteran');
+    sim.setActiveBorder(BORDER_DEED);
+    expect(sim.activeBorder).toBe(BORDER_DEED);
+    expect(sim.activeTitle).toBe('prog_veteran');
+    expect(sim.activeBorder).not.toBe(sim.activeTitle);
   });
 
   it('silently rejects an unearned deed, an earned rewardless deed, an earned TITLE deed, and an unknown id', () => {

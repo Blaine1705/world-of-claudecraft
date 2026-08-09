@@ -606,6 +606,13 @@ export function grantDeed(
   deedId: string,
   opts?: Readonly<{ retro?: boolean }>,
 ): boolean {
+  // DEEDS is a plain object, so a bare index resolves a prototype key
+  // ('__proto__', 'constructor') to a truthy Object.prototype member that
+  // sails past `!def`. Unlike the cosmetic setters, this path has no later
+  // reward-kind gate to catch it: an unguarded hit would run `renown +=
+  // undefined` (NaN, and it feeds the SQL sort index) and add a non-string
+  // legacy value to unlockedMilestones. Guard at the source.
+  if (!Object.hasOwn(DEEDS, deedId)) return false;
   const def = DEEDS[deedId];
   if (!def) return false;
   if (meta.deedsEarned.has(deedId)) return false;
@@ -662,8 +669,12 @@ export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | nul
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
     if (!meta.deedsEarned.has(deedId)) return;
-    // DEEDS is a plain object, so a bare index resolves prototype keys
-    // ('__proto__', 'constructor') for a hostile or drifted id.
+    // DEEDS is a plain object. The reward-kind check below already refuses a
+    // bare prototype key on its own (Object.prototype has no `reward`), so this
+    // hasOwn guard's real job is to stay correct if Object.prototype is ever
+    // polluted elsewhere, which would otherwise make a prototype-key id resolve
+    // a truthy reward. grantDeed needs the same guard for a stronger reason: it
+    // has no later kind check to catch the prototype hit.
     if (!Object.hasOwn(DEEDS, deedId)) return;
     if (DEEDS[deedId]?.reward?.kind !== 'title') return;
   }
@@ -1165,7 +1176,12 @@ export function unionLegacyMilestones(meta: PlayerMeta): void {
  *  every load (the saved number exists only for a later SQL sort index). */
 export function recomputeRenown(meta: PlayerMeta): void {
   let renown = 0;
-  for (const id of meta.deedsEarned.keys()) renown += DEEDS[id]?.renown ?? 0;
+  // deedsEarned keys come verbatim from the save, so a hostile blob can carry
+  // a prototype key; hasOwn keeps the bare index from resolving Object.prototype
+  // (the `?? 0` already coerces the miss to 0, so this only makes the intent
+  // explicit and matches the grantDeed guard above).
+  for (const id of meta.deedsEarned.keys())
+    if (Object.hasOwn(DEEDS, id)) renown += DEEDS[id]?.renown ?? 0;
   meta.renown = renown;
 }
 
