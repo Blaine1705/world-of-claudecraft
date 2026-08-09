@@ -1425,6 +1425,10 @@ describe('the hidden-frame paint cut', () => {
       'this.chatAnnouncer.flush',
       'this.questDialog.updateVoice',
       'this.lootRolls.update',
+      // Music keeps playing on hidden frames, so its state machine must keep
+      // transitioning there too (phase 4 QA F1: a minimized player heard the
+      // stale track until restore while this sat below the cut).
+      'this.instanceMusic.update',
     ]);
   });
 
@@ -1436,6 +1440,14 @@ describe('the hidden-frame paint cut', () => {
       'this.mountRaceControls.update',
       'this.lockpickController.repaintIfChanged',
       'this.tutorial.update',
+      // The timed proposal popups stay below the cut DELIBERATELY (phase 4 QA
+      // F3 adjudication): their show() and cue ride the ungated event drain,
+      // proposal expiry is server-authoritative, and the first painted frame
+      // after restore rebuilds them from the live snapshot, so nothing a
+      // hidden window does with their DOM matters. Hoisting them would put
+      // DOM writes above the cut.
+      'this.dungeonFinderProposalPopup.render',
+      'this.bgProposalPopup.render',
     ]) {
       const site = scan.sites.find((entry) => entry.call === call);
       expect(site, `${call} is no longer driven by update()`).toBeDefined();
