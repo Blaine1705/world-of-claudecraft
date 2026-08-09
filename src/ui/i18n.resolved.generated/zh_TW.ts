@@ -3311,6 +3311,8 @@ export const zh_TW: EnTranslations = {
     },
     "bgOffer": {
       "title": "荊谷原野已準備就緒",
+      "backfillTitle": "荊谷原野需要一名戰士",
+      "backfillBody": "這場戰鬥已經開始。你將加入人數不足的一方，本場對戰不會改變你的評分。",
       "accepted": "已確認 {accepted}/{size}",
       "remaining": "剩餘 {seconds} 秒確認",
       "accept": "接受",

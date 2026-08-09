@@ -8945,6 +8945,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalRole': '你的職責：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 已確認',
   'hudChrome.bgOffer.title': '荊谷原野已準備就緒',
+  'hudChrome.bgOffer.backfillTitle': '荊谷原野需要一名戰士',
+  'hudChrome.bgOffer.backfillBody': '這場戰鬥已經開始。你將加入人數不足的一方，本場對戰不會改變你的評分。',
   'hudChrome.bgOffer.accepted': '已確認 {accepted}/{size}',
   'hudChrome.bgOffer.remaining': '剩餘 {seconds} 秒確認',
   'hudChrome.bgOffer.accept': '接受',

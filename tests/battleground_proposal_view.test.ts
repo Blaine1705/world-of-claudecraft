@@ -20,6 +20,7 @@ const info = (proposal: BgProposalInfo | null): BgInfo => ({
 
 const offer = (over: Partial<BgProposalInfo> = {}): BgProposalInfo => ({
   id: 7,
+  kind: 'match',
   size: 10,
   accepted: 3,
   myResponse: 'pending',
@@ -87,6 +88,9 @@ describe('buildBgProposalPopupView', () => {
     expect(Object.keys(view).sort()).toEqual([
       'accepted',
       'full',
+      // The offer KIND is a category, never an identity: it says whether this
+      // is a fresh match or a live one, and names nobody.
+      'kind',
       'myResponse',
       'remaining',
       'sig',

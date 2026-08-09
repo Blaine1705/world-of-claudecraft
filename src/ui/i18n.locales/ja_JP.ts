@@ -9363,6 +9363,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalRole': 'あなたのロール：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 人が承認',
   'hudChrome.bgOffer.title': 'ソーンホロウ平原の準備が整いました',
+  'hudChrome.bgOffer.backfillTitle': 'ソーンホロウ平原が戦士を求めています',
+  'hudChrome.bgOffer.backfillBody': 'この戦いはすでに進行中です。人数の足りない側に加わります。この試合はレーティングに影響しません。',
   'hudChrome.bgOffer.accepted': '{size} 人中 {accepted} 人が承認',
   'hudChrome.bgOffer.remaining': '残り {seconds} 秒',
   'hudChrome.bgOffer.accept': '承認',

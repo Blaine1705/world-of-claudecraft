@@ -86,7 +86,16 @@ export interface BgLadderEntry {
 /** A live queue-pop offer as the local player sees it. Anonymous by design. */
 export interface BgProposalInfo {
   id: number;
-  size: number; // fighters the offer needs (always both teams in full)
+  /**
+   * What this offer actually is. A backfill is one seat in a match ALREADY
+   * under way: unrated for the joiner, and inheriting a scoreline they had no
+   * part in. The prompt is the only surface that can say so before the answer
+   * is given (the chat line scrolls away mid-fight), and the whole point of
+   * asking is informed consent, so the discriminator rides here rather than
+   * being inferred from `size`.
+   */
+  kind: 'match' | 'backfill';
+  size: number; // fighters the offer needs (both teams in full, or 1 for a backfill)
   accepted: number; // fighters who have accepted so far
   myResponse: 'pending' | 'accepted';
   remaining: number; // whole seconds left to answer

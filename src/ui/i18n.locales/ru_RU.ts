@@ -9506,6 +9506,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalRole': 'Ваша роль: {role}',
   'hudChrome.finder.accepted': 'Подтвердили: {accepted} из {size}',
   'hudChrome.bgOffer.title': 'Терновая Лощина готова',
+  'hudChrome.bgOffer.backfillTitle': 'Терновой Лощине нужен боец',
+  'hudChrome.bgOffer.backfillBody': 'Этот бой уже идёт. Вы присоединитесь к стороне, которой не хватает бойца, и этот бой не изменит ваш рейтинг.',
   'hudChrome.bgOffer.accepted': 'Готовы: {accepted} из {size}',
   'hudChrome.bgOffer.remaining': 'На ответ: {seconds} с',
   'hudChrome.bgOffer.accept': 'Принять',
