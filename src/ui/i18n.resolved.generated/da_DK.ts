@@ -7880,6 +7880,7 @@ export const da_DK: EnTranslations = {
       "deathRecapAbility": "Du er død. Dræbt af {ability}.",
       "deathRecapFalling": "Du er død. Du faldt i døden.",
       "deathRecapDrowned": "Du er død. Du druknede.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Du føler dig udhvilet og hel igen.",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",

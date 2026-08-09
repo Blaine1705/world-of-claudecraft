@@ -2137,6 +2137,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '死亡しました。{ability}によって死亡しました。',
   'hud.system.deathRecapFalling': '死亡しました。転落死しました。',
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
+  'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',

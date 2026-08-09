@@ -7880,6 +7880,7 @@ export const cs_CZ: EnTranslations = {
       "deathRecapAbility": "Tvá postava zemřela. Příčina: {ability}.",
       "deathRecapFalling": "Tvá postava zemřela. Spadla k smrti.",
       "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
