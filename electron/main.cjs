@@ -284,6 +284,24 @@ const MOVE_DISPLAY_DEBOUNCE_MS = 250;
 // triggers fire for reasons that leave the reading identical).
 let lastDisplayPush = null;
 
+// How often the shell re-derives and re-pushes presentation state while the
+// last derived reading was HIDDEN. The five window events plus did-finish-load
+// cover every mainstream un-hide, but restore events have WM-specific misfire
+// history (the same reason the state is derived, not latched), and the focus
+// self-heal needs the player to interact first. This backstop bounds a fully
+// swallowed un-hide event to one interval instead of "until the first click",
+// and costs nothing while the window is visible: the interval only exists
+// while the derived reading is hidden, and each tick re-derives, so the tick
+// after an un-hide pushes visible and disarms itself.
+const HIDDEN_REDERIVE_INTERVAL_MS = 15000;
+let hiddenRederiveTimer = null;
+
+const clearHiddenRederiveTimer = () => {
+  if (hiddenRederiveTimer === null) return;
+  clearInterval(hiddenRederiveTimer);
+  hiddenRederiveTimer = null;
+};
+
 // The single send site for 'desktop-presentation-changed'. The renderer cannot
 // work hidden-ness out for itself: the game window sets backgroundThrottling:false,
 // which keeps the Page Visibility API reporting 'visible' the whole time the
@@ -298,6 +316,9 @@ let lastDisplayPush = null;
 function sendPresentationState() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   const hidden = mainWindow.isMinimized() || !mainWindow.isVisible();
+  if (hidden && hiddenRederiveTimer === null) {
+    hiddenRederiveTimer = setInterval(sendPresentationState, HIDDEN_REDERIVE_INTERVAL_MS);
+  } else if (!hidden) clearHiddenRederiveTimer();
   const presentationState = presentationStatePayload(hidden);
   mainWindow.webContents.send('desktop-presentation-changed', presentationState);
 }
@@ -539,6 +560,7 @@ function createMainWindow() {
   mainWindow.on('closed', () => {
     clearReadyToShowFallback();
     clearMoveDisplayTimer();
+    clearHiddenRederiveTimer();
     mainWindow = null;
   });
 }

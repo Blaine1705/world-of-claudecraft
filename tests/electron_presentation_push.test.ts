@@ -44,12 +44,37 @@ describe('the window presentation push to the renderer', () => {
       'function sendPresentationState() { ' +
         'if (!mainWindow || mainWindow.isDestroyed()) return; ' +
         'const hidden = mainWindow.isMinimized() || !mainWindow.isVisible(); ' +
+        'if (hidden && hiddenRederiveTimer === null) { ' +
+        'hiddenRederiveTimer = setInterval(sendPresentationState, HIDDEN_REDERIVE_INTERVAL_MS); ' +
+        '} else if (!hidden) clearHiddenRederiveTimer(); ' +
         'const presentationState = presentationStatePayload(hidden); ' +
         "mainWindow.webContents.send('desktop-presentation-changed', presentationState); }",
     );
     // No module-level latch anywhere: the whole point is that there is no second
-    // copy of this state to go stale.
+    // copy of this state to go stale. (The re-derive timer HANDLE is not a
+    // state copy: every tick re-reads the live window.)
     expect(main).not.toContain('presentationHidden');
+  });
+
+  it('arms a re-derive backstop while hidden, and tears it down on visible and on closed', () => {
+    // A WM can make a window visible without emitting restore/show/focus
+    // (phase 4 QA F2); the focus self-heal then needs a click. The backstop
+    // bounds that stale-hidden window to one interval. It must be keyed on the
+    // DERIVED value inside the one send helper (so the tick after an un-hide
+    // disarms itself) and be cleared with the window, like the move debounce.
+    const body = flat(sendHelperBody());
+    expect(body).toContain('if (hidden && hiddenRederiveTimer === null)');
+    expect(body).toContain('setInterval(sendPresentationState, HIDDEN_REDERIVE_INTERVAL_MS)');
+    expect(body).toContain('else if (!hidden) clearHiddenRederiveTimer();');
+    expect(main).toContain('const HIDDEN_REDERIVE_INTERVAL_MS = 15000;');
+    // Exactly one arm site: the backstop cannot be re-armed from an event
+    // handler where a missed clear would leak intervals.
+    expect([...main.matchAll(/setInterval\(sendPresentationState/g)].length).toBe(1);
+    // Torn down with its window, alongside the sibling timers.
+    const closed = flat(main);
+    expect(closed).toContain(
+      "mainWindow.on('closed', () => { clearReadyToShowFallback(); clearMoveDisplayTimer(); clearHiddenRederiveTimer(); mainWindow = null; });",
+    );
   });
 
   it('has exactly one send site, built through the reducer, never an inline literal', () => {
