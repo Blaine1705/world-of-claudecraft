@@ -233,9 +233,8 @@ jobs:
         # stale Chromium build. npx playwright install then throws it away
         # (playwright's own browser GC deletes any revision the resolved
         # version does not claim), so all the fallback buys is a wasted
-        # restore and extract on every version bump. Companion to #3178,
-        # which removes the same fallback from ci.yml's browser-gate job;
-        # land this one first, #3178 second.
+        # restore and extract on every version bump. Matches ci.yml's
+        # browser-gate job, which dropped the same fallback in #3178.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
