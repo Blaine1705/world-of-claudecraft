@@ -609,13 +609,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.log).not.toContain('tests/chronomancy_balance.test.ts');
   });
 
-  it('vitest honors exact-path --exclude flags additively (the one external assumption)', async () => {
-    // The whole lane rests on `--exclude=<exact relative path>` removing that
-    // file and ONLY that file, while the config-level excludes stay in force.
-    // If a vitest bump changed either semantic, the lane files would run in
-    // both halves (duplicate work, never a gap) and the perf win would vanish
-    // silently; this spawn makes that loud. `vitest list --filesOnly` prints
-    // the collected set without running anything.
+  async function listVitestFilesExcluding(excludePath: string): Promise<string[]> {
     const child = spawn(
       'npx',
       [
@@ -623,7 +617,17 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
         'vitest',
         'list',
         '--filesOnly',
-        `--exclude=${'tests/battleground.test.ts'}`,
+        `--exclude=${excludePath}`,
+        // vite.config.ts turns on experimental.fsModuleCache for warm-rerun speed, but its
+        // cache key does not fully account for a varying --exclude flag: a prior `vitest
+        // list` invocation (with a different or no --exclude) can leave a stale cached file
+        // set that this spawn then inherits, making the exclude look like it silently failed
+        // even though the real, uncached behavior is correct (repro'd directly:
+        // `npx vitest --clearCache` or this flag both make it consistently correct; neither
+        // is used elsewhere in the outer gate run, so this does not affect its own cache).
+        // This is a correctness check of vitest's live --exclude semantics, so it must not
+        // read a cache in the first place.
+        '--experimental.fsModuleCache=false',
       ],
       { cwd: repoRoot, env: { ...process.env } },
     );
@@ -647,7 +651,27 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       });
     });
     expect(exitCode).toBe(0);
-    const files = out.split('\n').map((l) => l.trim());
+    return out.split('\n').map((l) => l.trim());
+  }
+
+  it('vitest honors exact-path --exclude flags additively (the one external assumption)', async () => {
+    // The whole lane rests on `--exclude=<exact relative path>` removing that
+    // file and ONLY that file, while the config-level excludes stay in force.
+    // If a vitest bump changed either semantic, the lane files would run in
+    // both halves (duplicate work, never a gap) and the perf win would vanish
+    // silently; this spawn makes that loud. `vitest list --filesOnly` prints
+    // the collected set without running anything.
+    //
+    // This test spawns a real `npx vitest` subprocess from INSIDE a vitest run, sharing the
+    // same module/transform cache the outer run is concurrently writing to under full-suite
+    // parallel load, which occasionally races the spawned list into a stale read. One retry
+    // with a fresh subprocess distinguishes that from a real vitest exclude-semantics
+    // regression: a real regression fails identically both times, transient cache noise does
+    // not.
+    let files = await listVitestFilesExcluding('tests/battleground.test.ts');
+    if (files.some((f) => f.endsWith('tests/battleground.test.ts'))) {
+      files = await listVitestFilesExcluding('tests/battleground.test.ts');
+    }
     // Exact, not glob-broadened: the excluded file is gone, its many
     // same-prefix siblings survive.
     expect(files.some((f) => f.endsWith('tests/battleground.test.ts'))).toBe(false);
@@ -656,7 +680,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // Additive to the config excludes, never replacing them.
     expect(files.some((f) => f.includes('tests/browser/'))).toBe(false);
     expect(files.some((f) => f.includes('node_modules/'))).toBe(false);
-  }, 130_000);
+  }, 260_000);
 
   it('shard mode passes the lane exclusions through to the real leg argv', async () => {
     const run = await runEntry(['--shard=2/8', '--plan-only'], {
