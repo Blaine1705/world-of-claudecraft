@@ -384,6 +384,7 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
@@ -1093,7 +1094,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
     ...new Set(
       [...uiCores, ...renderCores]
         .filter((f) => !viewOrCoreRe.test(f))
-        .map((f) => relative(repoRoot, f)),
+        .map((f) => relative(repoRoot, f).replaceAll('\\', '/')),
     ),
   ].sort();
 }
@@ -1191,7 +1192,9 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
     const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
-    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
+    const bareNamedRel = [
+      ...new Set(BARE_NAMED.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
+    ].sort();
     expect(
       derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
@@ -1222,7 +1225,7 @@ describe('curated bare-named pure cores (cross-check)', () => {
 
     const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
     const mutatedBareNamedRel = [
-      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
     ].sort();
     // The OLD derived check: still green after the synchronized delete (the gap).
     expect(derivedBare).toEqual(mutatedBareNamedRel);
