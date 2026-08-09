@@ -84,6 +84,10 @@ export function resolvePerfNudge(input: {
     // Mirror of the software suppression: when the boot notice already told the
     // player the dedicated GPU is idle, this arm would repeat it AND contradict
     // it (its copy says the desktop app picks the gaming GPU automatically).
+    // Unreachable in production wiring today and kept as defense-in-depth: the
+    // analyzer emits 'integrated-gpu' only outside the desktop shell (the
+    // !desktopShell gate in perf_doctor, pinned in tests/perf_doctor.test.ts)
+    // while a discrete-inactive verdict only ever comes from the shell bridge.
     if (input.discreteNoticeAlreadyShown === true) return hidden;
     return { shown: true, bodyKey: 'perfNudge.integratedGpu' };
   }

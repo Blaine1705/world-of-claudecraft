@@ -70,10 +70,13 @@ describe('the displayed latch under a persisted dismissal', () => {
 
 describe('the displayed latch on a both-component verdict', () => {
   it('counts both components as accounted for while the software body wins the copy', async () => {
-    // Deliberate semantics (reviewed and kept): the software copy carries the
-    // identical remedy, so the perf nudge's integrated-GPU arm must stay
-    // suppressed rather than surface copy claiming the shell picked the gaming
-    // GPU. The WARP-flip shape reports both components at once.
+    // Deliberate semantics, re-litigated and KEPT in phase 3 QA: the software
+    // copy carries the identical remedy, so both components latch even though
+    // the software body wins the copy (an armed-at-render latch). Honesty
+    // note from that re-litigation: the discrete suppression this feeds is
+    // unreachable in production wiring today (perf_doctor's !desktopShell gate
+    // on 'integrated-gpu'); the latch is defense-in-depth, not load-bearing.
+    // The WARP-flip shape reports both components at once.
     const toast = await bootToast();
     expect(
       toast.initGpuNotice({ softwareRendering: true, discreteInactive: true, desktopShell: true }),

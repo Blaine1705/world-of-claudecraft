@@ -66,15 +66,25 @@ let applyShellVerdict: ((verdict: GpuNoticeVerdict) => void) | null = null;
 // and never cleared by a dismissal: the perf-nudge sibling suppresses its
 // redundant arms on "the boot notice already said this" (packet 0 ruling R16),
 // which stays true after the player closes the notice. When both components
-// are armed, the software body wins the copy yet BOTH count as accounted for,
-// on purpose: the software copy carries the identical remedy (update drivers,
-// Windows High performance), so the integrated-GPU nudge would be redundant
-// there, and its copy claims the desktop shell picked the gaming GPU, which is
-// exactly false on such a machine (the post-crash WARP-flip shape reports both
-// components at once). Reset by initGpuNotice (a new boot).
+// are armed, the software body wins the copy yet BOTH count as accounted for
+// (an armed-at-render latch, not a which-body-was-read latch), on purpose: the
+// software copy carries the identical remedy (update drivers, Windows High
+// performance), and surfacing the integrated-GPU nudge instead would assert
+// the shell picked the gaming GPU, exactly false on such a machine (the
+// post-crash WARP-flip shape reports both components at once). Re-litigated
+// and KEPT in phase 3 QA, with one honesty correction: the discrete arm of
+// the suppression this feeds is unreachable in production wiring today
+// (perf_doctor gates 'integrated-gpu' on !desktopShell, and a discrete
+// verdict only exists inside the shell), so these semantics are
+// defense-in-depth for the day that analyzer gate changes, not a load-bearing
+// guard now. Reset by initGpuNotice (a new boot).
 let displayed: GpuNoticeVerdict = NO_VERDICT;
 
-/** Which verdict components this session actually showed the player. */
+/**
+ * The components the rendered body accounted for this session. On a
+ * both-component verdict the software copy wins yet both latch true: this is
+ * "what the notice covered", not "which body text the player read".
+ */
 export function gpuNoticeDisplayed(): GpuNoticeVerdict {
   return { ...displayed };
 }
