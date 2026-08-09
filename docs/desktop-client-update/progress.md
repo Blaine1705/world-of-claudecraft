@@ -465,7 +465,7 @@ hardening, e1dd4a7798 honesty pass; tree clean, LOCAL-ONLY intact):
   alongside the GPU-force opt-out and the analyzer premise revisit).
 
 Phase 4 (2026-08-08, commits 87b193e31b hidden skip, 7ac4d3dbf6 shell pushes,
-26d89a3426 review hardening):
+26d89a3426 review hardening, 051aa455b0 allocation-free gating):
 - Base merge was a no-op (release tip 1478f9d2ba unchanged since the phase 3 QA
   merge), so no suite re-run was owed to it.
 - DESIGN FACT that reshaped the phase: the Electron BrowserWindow docs state
@@ -576,10 +576,29 @@ Phase 4 (2026-08-08, commits 87b193e31b hidden skip, 7ac4d3dbf6 shell pushes,
   environment-sensitive (a fast GPU would keep the frame rate up); the
   sharpening candidate for QA is a renderer-side presented-frames counter,
   since every existing counter sits upstream of the sync argument.
-- Gate at 26d89a3426 (BROWSER_PATH exported; biome defaultBranch pinned to the
-  release branch for the run and reverted, never committed; first run FAILED
-  on a biome format diff in the new probe script, fixed and amended): see the
-  gate paragraph appended below after the run.
+- Gate at 051aa455b0 (BROWSER_PATH exported; biome defaultBranch pinned to the
+  release branch for the run and reverted, never committed). The gate took four
+  runs to converge, each failure real and fixed: run 1 red on a biome format
+  diff in the new probe script; run 2 red on THREE suites beyond the accepted
+  seal set, all caught by the full-suite fallback and all legitimate: the frame
+  allocation guard (tests/client_frame_allocations.test.ts) rejected the
+  per-frame gate-input literal (fixed by a hoisted reused input object plus
+  frozen shared decision singletons in presentation_gate.ts and a reused
+  presentFrame host refreshed per sync, post can be rebuilt mid-session), and
+  the draw_stats_core and vfx source pins had drifted from the extraction
+  (re-anchored: the adaptive-resolution step is present-gated behind
+  beginFrame; the main-path prepareDraw-then-render order lives in
+  frame_present, behaviorally pinned by its own suite, with the camera-pose
+  invariant pinned at the presentFrame call site); run 3 red on the vfx pin's
+  own formatting. Run 4 terminal: i18n + wiki + sfx artifacts, freshness,
+  malware, and biome legs green; vitest full-suite fallback red ONLY on the 8
+  accepted asset-seal suites (11 tests, phase 11 re-mint deferral), 2383
+  files / 32746 tests otherwise green; post-vitest steps proven via turbo
+  (check:types build:env build:server build:bot 5/5, build:bundle 3/3).
+  Lesson recorded: the gate's full-suite fallback is the only thing that runs
+  the frame-allocation and renderer source-pin suites, so a frame-loop change
+  should run tests/client_frame_allocations.test.ts, tests/vfx.test.ts, and
+  tests/draw_stats_core.test.ts in its targeted set up front.
 - Ledger (recorded, not fixed): main.ts frame-loop threading is pinned by
   method-shape plus the E2E rig only (the coordinator has no unit seam);
   the updateAdaptiveResolution hold has no vitest pin (phase 5 owns it);

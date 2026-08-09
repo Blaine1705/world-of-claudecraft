@@ -48,8 +48,8 @@ did-finish-load reloads only); shell.css comment rewritten with the numbers and
 the supersede-first rule for any future mid-session push.
 
 Phase 4 done (2026-08-08, commits 87b193e31b hidden render skip, 7ac4d3dbf6
-shell pushes, 26d89a3426 review hardening; base merge was a no-op, release tip
-still 1478f9d2ba): a hidden/minimized desktop window stops GL submission, HUD
+shell pushes, 26d89a3426 review hardening, 051aa455b0 allocation-free gating;
+base merge was a no-op, release tip still 1478f9d2ba): a hidden/minimized desktop window stops GL submission, HUD
 paint, and perf frame sampling while the sim tick and network drain keep
 running (pure core src/game/presentation_gate.ts, DI draw module
 src/render/frame_present.ts, present threaded as renderer.sync's 7th arg,
