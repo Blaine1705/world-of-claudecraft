@@ -79,6 +79,24 @@ describe('arena leaderboard', () => {
     ]);
   });
 
+  it('reads the 2v2 draws from the 2v2 field, and counts it there too', () => {
+    // The 2v2 arm is a separate expression from the 1v1 one, so a copy-paste of
+    // arena1v1Draws into it would ship green against the default-format tests
+    // above while silently zeroing every draw on the 2v2 ladder.
+    return (async () => {
+      dbMock.query.mockResolvedValueOnce({ rows: [] });
+      await topArenaRatings(5, '2v2');
+      const [sql] = dbMock.query.mock.calls[0];
+      expect(sql).toContain("COALESCE((state->>'arena2v2Draws')::int, 0)");
+      expect(sql, 'the 1v1 field must not leak into the 2v2 query').not.toContain('arena1v1Draws');
+      expect(sql.replace(/\s+/g, ' ')).toContain(
+        "COALESCE((state->>'arena2v2Wins')::int, 0) + " +
+          "COALESCE((state->>'arena2v2Losses')::int, 0) + " +
+          "COALESCE((state->>'arena2v2Draws')::int, 0) > 0",
+      );
+    })();
+  });
+
   it('selects the draws column and counts it toward ladder eligibility', () => {
     // Pinned to the SQL TEXT, the same way the battleground ladder is: a draw
     // moves rating, so a draw-only player belongs on the ladder. Without the

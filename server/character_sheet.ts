@@ -195,10 +195,13 @@ function arenaBrackets(state: CharacterState): Record<string, SheetArenaBracket>
   const l1 = state.arena1v1Losses ?? state.arenaLosses;
   if (r1 !== undefined || w1 !== undefined || l1 !== undefined) {
     out['1v1'] = {
-      rating: r1 ?? 0,
-      wins: w1 ?? 0,
-      losses: l1 ?? 0,
-      draws: state.arena1v1Draws ?? 0,
+      rating: Number(r1 ?? 0),
+      wins: Number(w1 ?? 0),
+      losses: Number(l1 ?? 0),
+      // Number() at the boundary, not just `?? 0`: these come out of JSONB, so
+      // a legacy row can carry a string where a number is declared, and the
+      // profile page interpolates them straight into HTML.
+      draws: Number(state.arena1v1Draws ?? 0),
     };
   }
   if (
@@ -207,10 +210,10 @@ function arenaBrackets(state: CharacterState): Record<string, SheetArenaBracket>
     state.arena2v2Losses !== undefined
   ) {
     out['2v2'] = {
-      rating: state.arena2v2Rating ?? 0,
-      wins: state.arena2v2Wins ?? 0,
-      losses: state.arena2v2Losses ?? 0,
-      draws: state.arena2v2Draws ?? 0,
+      rating: Number(state.arena2v2Rating ?? 0),
+      wins: Number(state.arena2v2Wins ?? 0),
+      losses: Number(state.arena2v2Losses ?? 0),
+      draws: Number(state.arena2v2Draws ?? 0),
     };
   }
   return out;

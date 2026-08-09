@@ -3136,6 +3136,25 @@ describe('Thornhollow Fields: a drawn match is recorded, not swallowed', () => {
     expect(state.bgDraws).toBeUndefined();
     expect(state.arena1v1Draws).toBeUndefined();
   });
+
+  it('writes no draws field for a character with a record but no draw', () => {
+    // The case above uses a FRESH character, whose battleground block is not
+    // written at all, so it proves the outer gate rather than the conditional
+    // spread inside it. This one has a real record, which is the population the
+    // byte-equal promise actually matters for: their saves must not gain a key.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Veteran');
+    const meta = sim.ctx.players.get(pid)!;
+    meta.bgWins = 1;
+    meta.bgDraws = 0;
+    meta.arenaWins = 1;
+    meta.arenaDraws = 0;
+
+    const state = sim.serializeCharacter(pid) as unknown as Record<string, unknown>;
+    expect(state.bgWins, 'the arrangement really did write the block').toBe(1);
+    expect(state.bgDraws, 'a zero draw count adds no key').toBeUndefined();
+    expect(state.arena1v1Draws).toBeUndefined();
+  });
 });
 
 describe('Thornhollow Fields: talents are the fighter own to change', () => {
