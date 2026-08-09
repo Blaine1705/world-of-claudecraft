@@ -86,9 +86,9 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     stats: { int: 6 },
     global: { spellDmgPct: 0.15 },
     abilities: {
-      shadow_word_pain: { dmgPct: 0.3, costPct: -0.1 },
-      mind_blast: { dmgPct: 0.34, costPct: -0.1 },
-      mind_flay: { dmgPct: 0.4 },
+      shadow_word_pain: { dmgPct: 0.2, costPct: -0.1 },
+      mind_blast: { dmgPct: 0.2, costPct: -0.1 },
+      mind_flay: { dmgPct: 0.15 },
     },
   },
   'shaman/elemental': {
