@@ -550,6 +550,7 @@ export const cs_CZ: Record<string, string> = {
   'location.kind.dungeon': 'Dungeon',
   'location.kind.overworld': 'Otevřený svět',
   'location.kind.rift': 'Trhlina',
+  'location.kind.battleground': 'Bojiště',
   'location.nearest': 'Nejbližší orientační bod: {value}',
   'location.slot': 'Slot: {value}',
   'location.type': 'Typ: {value}',

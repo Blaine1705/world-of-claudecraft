@@ -585,6 +585,7 @@ export const zh_CN: Record<string, string> = {
   'location.kind.dungeon': '地下城',
   'location.kind.delve': '探秘',
   'location.kind.rift': '裂隙',
+  'location.kind.battleground': '战场',
   'location.type': '类型：{value}',
   'location.zone': '区域：{value}',
   'location.instance': '副本：{value}',

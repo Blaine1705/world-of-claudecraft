@@ -556,6 +556,7 @@ export const it_IT: Record<string, string> = {
   'location.kind.dungeon': 'Dungeon',
   'location.kind.delve': 'Incursione',
   'location.kind.rift': 'Squarcio',
+  'location.kind.battleground': 'Campo di battaglia',
   'location.type': 'Tipo: {value}',
   'location.zone': 'Zona: {value}',
   'location.instance': 'Istanza: {value}',

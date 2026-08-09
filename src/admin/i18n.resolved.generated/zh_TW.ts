@@ -766,6 +766,7 @@ export const zh_TW: AdminTranslations = {
   "location.kind.dungeon": "副本",
   "location.kind.delve": "秘探",
   "location.kind.rift": "裂隙",
+  "location.kind.battleground": "戰場",
   "location.type": "類型：{value}",
   "location.zone": "區域：{value}",
   "location.instance": "實例：{value}",

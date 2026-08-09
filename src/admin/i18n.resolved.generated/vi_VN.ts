@@ -766,6 +766,7 @@ export const vi_VN: AdminTranslations = {
   "location.kind.dungeon": "Hầm Ngục",
   "location.kind.delve": "Hang Sâu",
   "location.kind.rift": "Rạn Nứt",
+  "location.kind.battleground": "Chiến trường",
   "location.type": "Loại: {value}",
   "location.zone": "Vùng: {value}",
   "location.instance": "Phụ bản: {value}",

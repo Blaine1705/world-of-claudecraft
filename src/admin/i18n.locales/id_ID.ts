@@ -597,6 +597,7 @@ export const id_ID: Record<string, string> = {
   'location.kind.dungeon': 'Dungeon',
   'location.kind.delve': 'Delve',
   'location.kind.rift': 'Rift',
+  'location.kind.battleground': 'Medan Pertempuran',
   'location.type': 'Tipe: {value}',
   'location.zone': 'Zona: {value}',
   'location.instance': 'Instance: {value}',

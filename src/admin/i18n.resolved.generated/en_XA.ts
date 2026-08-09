@@ -766,6 +766,7 @@ export const en_XA: AdminTranslations = {
   "location.kind.dungeon": "[Ðúñĝéóñ]",
   "location.kind.delve": "[Ðéļʋé]",
   "location.kind.rift": "[Ŕíƒţ]",
+  "location.kind.battleground": "[Ɓáţţļéĝŕóúñð]",
   "location.type": "[Ţýþé: {value}]",
   "location.zone": "[Žóñé: {value}]",
   "location.instance": "[Íñšţáñçé: {value}]",

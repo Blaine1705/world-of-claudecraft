@@ -597,6 +597,7 @@ export const vi_VN: Record<string, string> = {
   'location.kind.dungeon': 'Hầm Ngục',
   'location.kind.delve': 'Hang Sâu',
   'location.kind.rift': 'Rạn Nứt',
+  'location.kind.battleground': 'Chiến trường',
   'location.type': 'Loại: {value}',
   'location.zone': 'Vùng: {value}',
   'location.instance': 'Phụ bản: {value}',

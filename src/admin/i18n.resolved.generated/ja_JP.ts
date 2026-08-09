@@ -766,6 +766,7 @@ export const ja_JP: AdminTranslations = {
   "location.kind.dungeon": "ダンジョン",
   "location.kind.delve": "デルヴ",
   "location.kind.rift": "裂け目",
+  "location.kind.battleground": "戦場",
   "location.type": "種類:{value}",
   "location.zone": "ゾーン:{value}",
   "location.instance": "インスタンス:{value}",
