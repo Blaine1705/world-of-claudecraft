@@ -249,10 +249,16 @@ describe('isBuffered/preload', () => {
 
 describe('mount running audio', () => {
   it('ships one generated manifest entry for every catalog mount', () => {
+    // terrorspark_groundshaker's mount_run_ entry is the sustain take of an
+    // engine mount's windup/loop/winddown set (see the "mount engine audio"
+    // suite below): it is genuinely driven through Sfx.loop() at runtime, so
+    // its manifest entry correctly carries loop: true, unlike every other
+    // mount's plain per-stride gait clip.
+    const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
     for (const mountKey of MOUNT_KEYS) {
       const entry = SFX_CLIPS[`mount_run_${mountKey}`];
       expect(entry).toMatchObject({
-        loop: false,
+        loop: ENGINE_LOOP_MOUNTS.has(mountKey),
         spatial: true,
       });
       expect(entry.url).toMatch(
@@ -430,6 +436,94 @@ describe('mount engine audio (windup/loop/winddown)', () => {
     nowT += 1;
     sfx.mountEngine(0, 0, 0, KEY, true, 1);
     expect(lastSource().buffer).toBe(START_BUF);
+  });
+
+  it('a mount swap resets to a clean windup instead of carrying the old moving state', () => {
+    // Enter the sustain loop on the engine mount.
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('mountEngine:1')).toBe(true);
+    // renderer.ts calls mountEngineReset(e.id) on every mountKey transition,
+    // including a live swap to a different mount (here, an ordinary mount
+    // with no engine take set of its own).
+    sfx.mountEngineReset(1);
+    expect(loops.has('mountEngine:1')).toBe(false);
+    expect(sfx.mountEngine(0, 0, 0, 'valorsteed', true, 1)).toBe(false);
+    // Swapping back to the engine mount must start a fresh windup, not skip
+    // straight to the loop because the old 'moving' state carried over.
+    nowT += 1;
+    const handled = sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    expect(handled).toBe(true);
+    expect(lastSource().buffer).toBe(START_BUF);
+    expect(loops.has('mountEngine:1')).toBe(false); // still winding up, no loop yet
+  });
+
+  it('reusing the same entity id for a fresh mount (e.g. a new summon) starts clean', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1); // entity 1 is now in the sustain loop
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('mountEngine:1')).toBe(true);
+    // The entity id is reused for a brand-new mount (dismount + fresh
+    // summon reusing the id): renderer.ts resets before the new mount's
+    // first mountEngine call.
+    sfx.mountEngineReset(1);
+    nowT += 1;
+    const handled = sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    expect(handled).toBe(true);
+    expect(lastSource().buffer).toBe(START_BUF); // windup, not an inherited loop
+    expect(loops.has('mountEngine:1')).toBe(false);
+  });
+
+  it('plays the windup with jitter disabled so its actual duration matches the nominal duration the loop splice is scheduled against', () => {
+    const playAtSpy = vi.spyOn(sfx, 'playAt');
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const startCall = playAtSpy.mock.calls.find((call) => call[0] === START_KEY);
+    expect(startCall).toBeDefined();
+    expect(startCall?.[4]).toMatchObject({ jitter: false });
+    playAtSpy.mockRestore();
+  });
+
+  it('preloadMountEngine warms all three engine clip keys for a mount with an engine take set', () => {
+    const loading = (sfx as unknown as { loading: Map<string, unknown> }).loading;
+    const buffers = (sfx as unknown as { buffers: Map<string, unknown> }).buffers;
+    const failedLoads = (sfx as unknown as { failedLoads: Set<string> }).failedLoads;
+    // loadBuffer short-circuits (skipping the `loading` map entirely) when a
+    // buffer is already cached, so force all three cold to observe the fetch
+    // actually get kicked off for each one.
+    for (const key of [START_KEY, LOOP_KEY, STOP_KEY]) {
+      buffers.delete(key);
+      failedLoads.delete(key);
+    }
+    loading.clear();
+    sfx.preloadMountEngine(KEY);
+    expect(loading.has(START_KEY)).toBe(true);
+    expect(loading.has(LOOP_KEY)).toBe(true);
+    expect(loading.has(STOP_KEY)).toBe(true);
+    // Restore for later tests in this file that assume these are cached.
+    buffers.set(START_KEY, START_BUF);
+    buffers.set(STOP_KEY, STOP_BUF);
+  });
+
+  it('preloadMountEngine is a no-op for a mount with no engine take set', () => {
+    const loading = (sfx as unknown as { loading: Map<string, unknown> }).loading;
+    loading.clear();
+    sfx.preloadMountEngine('valorsteed');
+    expect(loading.size).toBe(0);
+  });
+
+  it('threads the immediate flag through the cold pendingLoops path so a resumed loop still snaps to target gain instead of falling back to a fade-in', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, unknown> }).buffers;
+    const failedLoads = (sfx as unknown as { failedLoads: Set<string> }).failedLoads;
+    const coldKey = 'mount_run_never_cached_test_key';
+    buffers.delete(coldKey);
+    failedLoads.delete(coldKey);
+    sfx.loop('cold-loop-immediate', coldKey, 0.85, 0, 0, 0, undefined, true);
+    const pendingLoops = (sfx as unknown as { pendingLoops: Map<string, { immediate?: boolean }> })
+      .pendingLoops;
+    expect(pendingLoops.get('cold-loop-immediate')?.immediate).toBe(true);
   });
 });
 

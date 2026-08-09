@@ -135,6 +135,12 @@ interface PendingLoop {
   y?: number;
   z?: number;
   maxDistance?: number;
+  // Carries the caller's `immediate` request through the cold-buffer wait so
+  // a resumed loop() call (once the buffer finishes loading) still snaps
+  // straight to target gain instead of silently falling back to a fade-in.
+  // See loop()'s doc comment: this matters for mountEngine's windup-to-loop
+  // splice, which must never read as an audible swell.
+  immediate?: boolean;
 }
 
 // 'kind' is the closed set of point-ambience station sources today (campfire,
@@ -173,6 +179,15 @@ class Sfx {
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
   // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
   private mountEngines = new Map<number, MountEngineEntry>();
+  // Memoized per-mountKey engine clip key triple, or null once a mountKey is
+  // known to have no engine take set. mountEngine() is called every frame for
+  // every mounted entity in earshot, so this turns the per-frame cost for an
+  // ordinary (non-engine) mount into a plain map lookup instead of 3 fresh
+  // template-literal string allocations that are immediately thrown away.
+  private engineClipKeysCache = new Map<
+    string,
+    { startKey: string; loopKey: string; stopKey: string } | null
+  >();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
@@ -695,7 +710,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, immediate });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -720,6 +735,7 @@ class Sfx {
               pending.y,
               pending.z,
               pending.maxDistance,
+              pending.immediate,
             );
           });
         }
@@ -888,6 +904,24 @@ class Sfx {
    *  back, no loop; sustained movement crossfades into the loop and back
    *  out). Returns whether this call drives an engine mount at all, so the
    *  caller (renderer.ts) knows whether to also skip the generic gait beat. */
+  /** Resolve (and cache) the engine clip key triple for a mountKey, or null if
+   *  this mount has no dedicated windup/loop/winddown take set. Memoized so
+   *  the common case (an ordinary mount, checked every frame it is ridden)
+   *  costs one map lookup instead of building and discarding 3 strings. */
+  private engineClipKeys(
+    mountKey: string,
+  ): { startKey: string; loopKey: string; stopKey: string } | null {
+    const cached = this.engineClipKeysCache.get(mountKey);
+    if (cached !== undefined) return cached;
+    const startKey = `mount_run_${mountKey}_start`;
+    const resolved =
+      startKey in SFX_CLIPS
+        ? { startKey, loopKey: `mount_run_${mountKey}`, stopKey: `mount_run_${mountKey}_stop` }
+        : null;
+    this.engineClipKeysCache.set(mountKey, resolved);
+    return resolved;
+  }
+
   mountEngine(
     x: number,
     y: number,
@@ -896,20 +930,30 @@ class Sfx {
     moving: boolean,
     entityId: number,
   ): boolean {
-    const startKey = `mount_run_${mountKey}_start`;
-    const loopKey = `mount_run_${mountKey}`;
-    const stopKey = `mount_run_${mountKey}_stop`;
-    if (!(startKey in SFX_CLIPS)) return false;
+    const keys = this.engineClipKeys(mountKey);
+    if (!keys) return false;
+    const { startKey, loopKey, stopKey } = keys;
     const ctx = this.ctx;
     if (!ctx) return true;
     const now = ctx.currentTime;
     const prior = this.mountEngines.get(entityId);
+    // variant 0: the only take today (see mountRun/playAt's variant pool for
+    // other cues). If a second windup variant ever lands, this needs to
+    // resolve whichever variant playAt's round-robin actually picked for
+    // THIS play, not always the first.
     const startBuf = this.buffers.get(assetCacheKey(startKey, 0));
     const startDuration = startBuf?.duration ?? MOUNT_ENGINE_START_FALLBACK_SEC;
     const { next, action } = advanceMountEngine(prior, moving, now, startDuration);
     this.mountEngines.set(entityId, next);
-    if (action === 'playStart') this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0 });
-    else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
+    // jitter: false on the windup: advanceMountEngine schedules the loop
+    // splice off this clip's nominal buffer duration (startDuration above),
+    // so the actual playback must match that duration exactly. playAt's
+    // default rate jitter (+/-6%) would otherwise let the loop enter up to
+    // ~54ms early or late, and cut the windup off before (or past) the
+    // level it was authored to hand off to the loop at.
+    if (action === 'playStart') {
+      this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0, jitter: false });
+    } else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
     const loopActive = mountEngineLoopActive(next.state);
     const loopId = `mountEngine:${entityId}`;
     // immediate: true, the windup take is authored to already end at the
@@ -925,6 +969,24 @@ class Sfx {
   mountEngineReset(entityId: number): void {
     if (!this.mountEngines.delete(entityId)) return;
     this.unloop(`mountEngine:${entityId}`, 0.1);
+  }
+
+  /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
+   *  of the first time they are actually needed. Called from the mountKey
+   *  transition edge in renderer.ts (the same edge that calls
+   *  mountEngineReset), so a fresh mount or a swap has its buffers already
+   *  decoded, or at least in flight, by the time movement first calls
+   *  mountEngine. Without this, a cold first ride can still hit playAt's/
+   *  loop()'s cold paths (dropped one-shot, or a fallback fade-in) if the
+   *  rider starts moving before the fetch+decode finishes; this preload just
+   *  makes that window much smaller in practice. A no-op for a mount with no
+   *  engine take set.*/
+  preloadMountEngine(mountKey: string): void {
+    const keys = this.engineClipKeys(mountKey);
+    if (!keys) return;
+    this.preload(keys.startKey);
+    this.preload(keys.loopKey);
+    this.preload(keys.stopKey);
   }
 
   /** Jump / land / water-entry / swim-stroke. */
