@@ -131,11 +131,17 @@ export class RiftDeathZoneVisuals {
     rim.renderOrder = 10; // above terrain, below entities
     group.add(rim);
 
+    // Fill and sweep blend NORMALLY (not additively) on purpose: an S-rank
+    // deathZoneStrike barrage stacks one zone per living member, and additive
+    // fills summed the overlaps to a white-out that erased the zone EDGES,
+    // the one thing a player needs to find (verified with a five-zone
+    // capture). Alpha blending converges toward the fill color instead, so
+    // any number of overlaps stays readable; the thin rim band keeps its
+    // additive glow (overlap area is small and a brighter crossing helps).
     const fillMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(BASE_COLOR),
+      color: new THREE.Color(BASE_COLOR).multiplyScalar(1.3),
       transparent: true,
       opacity: FILL_OPACITY,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
@@ -153,7 +159,6 @@ export class RiftDeathZoneVisuals {
       color: new THREE.Color(SWEEP_COLOR).multiplyScalar(1.4),
       transparent: true,
       opacity: SWEEP_BASE_OPACITY,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
