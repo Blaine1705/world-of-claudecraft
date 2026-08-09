@@ -167,4 +167,38 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     ipcRenderer.on('desktop-gpu-status', listener);
     return () => ipcRenderer.removeListener('desktop-gpu-status', listener);
   },
+  // Whether the shell's window is minimized or hidden, pushed from the main
+  // process because the page cannot see it: the window sets
+  // backgroundThrottling:false, which keeps document.visibilityState at
+  // 'visible' the whole time it is minimized.
+  onPresentationChanged: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (payload && typeof payload === 'object' && typeof payload.hidden === 'boolean') {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-presentation-changed', listener);
+    return () => ipcRenderer.removeListener('desktop-presentation-changed', listener);
+  },
+  // The display the window sits on, pushed when its scale factor or identity
+  // changes. The finiteness checks are not ceremony: the renderer resolves a
+  // pixel ratio from scaleFactor, so a NaN would poison every frame after it.
+  onDisplayChanged: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.scaleFactor === 'number' &&
+        Number.isFinite(payload.scaleFactor) &&
+        typeof payload.displayId === 'number' &&
+        Number.isFinite(payload.displayId)
+      ) {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-display-changed', listener);
+    return () => ipcRenderer.removeListener('desktop-display-changed', listener);
+  },
 });

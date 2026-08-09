@@ -11,10 +11,18 @@ vi.mock('../src/runtime', () => ({ desktopBridge: vi.fn(() => null) }));
 vi.mock('../src/ui/desktop_update_toast', () => ({ initDesktopUpdateToast: vi.fn() }));
 vi.mock('../src/game/desktop_error_relay', () => ({ initDesktopErrorRelay: vi.fn() }));
 vi.mock('../src/game/desktop_gpu_status', () => ({ initDesktopGpuStatus: vi.fn(() => () => {}) }));
+vi.mock('../src/game/desktop_display_change', () => ({
+  initDesktopDisplayChange: vi.fn(() => () => {}),
+}));
+vi.mock('../src/game/desktop_presentation', () => ({
+  initDesktopPresentation: vi.fn(() => () => {}),
+}));
 vi.mock('../src/game/desktop_shell_strings', () => ({ initDesktopShellStrings: vi.fn() }));
 
+import { initDesktopDisplayChange } from '../src/game/desktop_display_change';
 import { initDesktopErrorRelay } from '../src/game/desktop_error_relay';
 import { initDesktopGpuStatus } from '../src/game/desktop_gpu_status';
+import { initDesktopPresentation } from '../src/game/desktop_presentation';
 import { initDesktopShellIntegration } from '../src/game/desktop_shell_integration';
 import { initDesktopShellStrings } from '../src/game/desktop_shell_strings';
 import { desktopBridge } from '../src/runtime';
@@ -26,6 +34,8 @@ const pieces = [
   initDesktopShellStrings,
   initDesktopUpdateToast,
   initDesktopGpuStatus,
+  initDesktopDisplayChange,
+  initDesktopPresentation,
 ].map((piece) => vi.mocked(piece as (bridge: unknown) => unknown));
 
 beforeEach(() => {

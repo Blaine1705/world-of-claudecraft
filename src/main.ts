@@ -38,6 +38,7 @@ import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/c
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
+import { setDisplayChangeTarget } from './game/desktop_display_change';
 import { initDesktopDownload } from './game/desktop_download';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
@@ -4778,6 +4779,9 @@ async function startGame(
   // snapshots-per-rAF count on visibility flips so the first foreground frame
   // does not fold the backlog into the 3plus histogram bucket (ruling R9).
   document.addEventListener('visibilitychange', () => online?.netPipeline().noteVisibilityChange());
+  setDisplayChangeTarget(() => {
+    if (rendererReady) renderer.noteDisplayChanged();
+  });
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>

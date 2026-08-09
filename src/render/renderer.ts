@@ -186,6 +186,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
+import { watchDevicePixelRatio } from './dpr_watch';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import {
@@ -2932,6 +2933,12 @@ export class Renderer {
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
     window.visualViewport?.addEventListener('scroll', this.onViewportResize);
     document.addEventListener('fullscreenchange', this.onViewportResize);
+    // Moving the window to a display with a different scale factor fires no
+    // resize event of its own when the CSS viewport size is unchanged, so the
+    // backing store would keep the old ratio until something else resized.
+    this.dprUnwatch = watchDevicePixelRatio(() => {
+      if (!this.shutdownStarted) this.resizeViewport();
+    });
     } catch (error) {
       this.beginRendererShutdown();
       this.disposeRendererResources();
@@ -2966,6 +2973,8 @@ export class Renderer {
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
     window.visualViewport?.removeEventListener('scroll', this.onViewportResize);
     document.removeEventListener('fullscreenchange', this.onViewportResize);
+    this.dprUnwatch?.();
+    this.dprUnwatch = null;
     for (const timer of this.resizeTimers) window.clearTimeout(timer);
     this.resizeTimers = [];
     if (this.devProbeTimer !== null) {
@@ -3131,6 +3140,18 @@ export class Renderer {
     this.camera.aspect = this.viewport.width / this.viewport.height;
     this.camera.updateProjectionMatrix();
     this.applyResolution();
+  }
+
+  private dprUnwatch: (() => void) | null = null;
+
+  /**
+   * A display change the page cannot observe on its own (the window moved to
+   * another monitor, or its scale factor changed). resizeViewport re-measures
+   * and applyResolution re-reads window.devicePixelRatio live, so this is the
+   * whole fix.
+   */
+  noteDisplayChanged(): void {
+    if (!this.shutdownStarted) this.resizeViewport();
   }
 
   // Allocate at the manual resolution ceiling. Automatic changes on the supported

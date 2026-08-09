@@ -7,6 +7,7 @@ const {
   Menu,
   net,
   protocol,
+  screen,
   session,
   shell,
 } = require('electron');
@@ -48,6 +49,8 @@ const {
   summarizeGpuDevices,
 } = require('./gpu_preference.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
+const { presentationStatePayload } = require('./presentation_events.cjs');
+const { displayChangedPayload, shouldForwardDisplayChange } = require('./display_events.cjs');
 const {
   buildWalletHandoffBrowserUrl,
   parseWalletHandoffDeepLink,
@@ -269,6 +272,41 @@ function lockDownPermissions() {
 // launch failure.
 const READY_TO_SHOW_FALLBACK_MS = 4000;
 
+// How long a window 'move' must settle before the shell re-reads the display.
+// A drag fires 'move' continuously; only the position it lands on is worth a read.
+const MOVE_DISPLAY_DEBOUNCE_MS = 250;
+
+// Whether the window is currently minimized or hidden. The renderer cannot work
+// this out for itself: the game window sets backgroundThrottling:false, which
+// keeps the Page Visibility API reporting 'visible' the whole time the window is
+// minimized, so this boolean and the push below are its only source.
+let presentationHidden = false;
+// The last display reading pushed, so an unchanged reading is not re-sent (both
+// triggers fire for reasons that leave the reading identical).
+let lastDisplayPush = null;
+
+// The single send site for 'desktop-presentation-changed'. Guarded like every
+// other push: the window can be gone by the time an event handler runs.
+function sendPresentationState() {
+  const presentationState = presentationStatePayload(presentationHidden);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('desktop-presentation-changed', presentationState);
+  }
+}
+
+// The single send site for 'desktop-display-changed'. The window guard comes
+// first because the reading itself needs live bounds, and the dedup keeps a
+// drag inside one monitor (or an unrelated monitor's metrics changing) from
+// making the renderer re-resolve its pixel ratio for nothing.
+function sendDisplayChange() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const display = screen.getDisplayMatching(mainWindow.getBounds());
+  const displayChange = displayChangedPayload(display);
+  if (!shouldForwardDisplayChange(lastDisplayPush, displayChange)) return;
+  lastDisplayPush = displayChange;
+  mainWindow.webContents.send('desktop-display-changed', displayChange);
+}
+
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -344,6 +382,49 @@ function createMainWindow() {
     showMainWindow();
   });
 
+  // Window hidden-ness, pushed from here because the page can never observe it
+  // (see the presentationHidden comment above): four window events, each setting
+  // the boolean before the one send helper reads it. A fresh window starts shown.
+  presentationHidden = false;
+  mainWindow.on('minimize', () => {
+    presentationHidden = true;
+    sendPresentationState();
+  });
+  mainWindow.on('restore', () => {
+    presentationHidden = false;
+    sendPresentationState();
+  });
+  mainWindow.on('hide', () => {
+    presentationHidden = true;
+    sendPresentationState();
+  });
+  mainWindow.on('show', () => {
+    presentationHidden = false;
+    sendPresentationState();
+  });
+
+  // Dragging the window to another monitor can change the scale factor the
+  // renderer resolves its drawing buffer from. 'moved' would be the natural
+  // event but does not fire on Linux, so listen to 'move' (which fires
+  // continuously through a drag) and debounce to the settled position. Captured
+  // `win`, not the module-level mainWindow, for the same reason as the
+  // ready-to-show fallback: this window's timer must never act on a successor.
+  lastDisplayPush = null;
+  let moveDisplayTimer = null;
+  const clearMoveDisplayTimer = () => {
+    if (moveDisplayTimer === null) return;
+    clearTimeout(moveDisplayTimer);
+    moveDisplayTimer = null;
+  };
+  mainWindow.on('move', () => {
+    clearMoveDisplayTimer();
+    moveDisplayTimer = setTimeout(() => {
+      moveDisplayTimer = null;
+      if (win.isDestroyed()) return;
+      sendDisplayChange();
+    }, MOVE_DISPLAY_DEBOUNCE_MS);
+  });
+
   // The application menu is nulled for win32/linux at module scope, before app ready (see the
   // Menu.setApplicationMenu call there), so on those platforms there is no menu and therefore
   // no default DevTools accelerator; macOS keeps its default menu deliberately. The packaged
@@ -392,6 +473,14 @@ function createMainWindow() {
   // .once here would keep only the pre-crash healthy reading in the log. logGpuStatus
   // dedupes an unchanged renderer line itself.
   mainWindow.webContents.on('did-finish-load', logGpuStatus);
+
+  // Re-push the presentation state on every load. The channel has no replay, so
+  // a reload (or the crash-recovery page) comes up knowing nothing about whether
+  // its window is hidden, exactly the reasoning behind the GPU verdict re-push.
+  // A separate listener, so neither flow can swallow the other's work.
+  mainWindow.webContents.on('did-finish-load', () => {
+    sendPresentationState();
+  });
 
   // Crash recovery for the game view: bounded auto-reload, then an i18n
   // Reload/Quit dialog (electron/crash_guard.cjs).
@@ -449,6 +538,7 @@ function createMainWindow() {
 
   mainWindow.on('closed', () => {
     clearReadyToShowFallback();
+    clearMoveDisplayTimer();
     mainWindow = null;
   });
 }
@@ -757,6 +847,14 @@ app.whenReady().then(() => {
   registerAppProtocol();
   lockDownPermissions();
   createMainWindow();
+
+  // A monitor being added, removed, or re-scaled (a DPI change mid-session)
+  // changes a reading the renderer's viewport poll cannot see: it reacts to size
+  // changes, not to a pure scale change. Registered at app level, ONCE: the
+  // screen module outlives every window, and a per-window registration would
+  // stack a duplicate each time createMainWindow ran (macOS 'activate'). Noise
+  // from an unrelated monitor is absorbed by the dedup in sendDisplayChange.
+  screen.on('display-metrics-changed', () => sendDisplayChange());
 
   // Keep 'desktop-update-install' answerable whenever the real updater did NOT
   // claim it, so a renderer installUpdate() resolves null instead of rejecting

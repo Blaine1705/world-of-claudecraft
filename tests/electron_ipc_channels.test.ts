@@ -56,8 +56,10 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const subscribed = matches(preload, /ipcRenderer\.on\('([^']+)'/g);
     const pushed = matches(mainSide, /webContents\.send\('([^']+)'/g);
     expect([...subscribed].sort()).toEqual([
+      'desktop-display-changed',
       'desktop-gpu-status',
       'desktop-login-code',
+      'desktop-presentation-changed',
       'desktop-update-event',
       'desktop-wallet-handoff-code',
     ]);
@@ -130,6 +132,8 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'onUpdateEvent',
       'installUpdate',
       'onGpuStatus',
+      'onPresentationChanged',
+      'onDisplayChanged',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',

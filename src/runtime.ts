@@ -88,6 +88,15 @@ export interface DesktopPresentationState {
   hidden: boolean;
 }
 
+// The display the shell's window currently sits on. `scaleFactor` is the OS
+// scaling the renderer resolves its pixel ratio from; `displayId` is opaque and
+// exists only so a move between two monitors with the same scale is still a
+// change. Neither bounds nor the display's label crosses the bridge.
+export interface DesktopDisplayChange {
+  scaleFactor: number;
+  displayId: number;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -135,9 +144,10 @@ export interface DesktopBridge {
   // after the notice that consumes it). Absent on older shells that predate the
   // verdict: feature-check before use, like the other post-trio methods.
   onGpuStatus?(callback: (status: DesktopGpuStatus) => void): () => void;
-  // Window hidden-ness, push-only and absent on older shells: feature-check
-  // before use, like the other post-trio methods.
+  // Window hidden-ness and display changes, both push-only and both absent on
+  // older shells: feature-check before use, like the other post-trio methods.
   onPresentationChanged?(callback: (state: DesktopPresentationState) => void): () => void;
+  onDisplayChanged?(callback: (change: DesktopDisplayChange) => void): () => void;
 }
 
 export function desktopBridge(): DesktopBridge | null {
