@@ -173,7 +173,11 @@ export function serializeReliquaryState(state: ReliquaryState): SavedReliquarySt
 
 /**
  * Restore from a saved blob. Filters firstFind and marks to catalogued ids
- * only so a hand-edited save cannot grow unbounded membership.
+ * only so a hand-edited save cannot grow unbounded membership. The marks and
+ * recent arms delegate to the narrow helpers below (restoreReliquaryMarks /
+ * restoreReliquaryRecent), which the public character-sheet path calls
+ * directly rather than restoring the whole state for one surface: same
+ * filters, one implementation, no second place for the rules to drift.
  */
 export function restoreReliquaryState(saved: SavedReliquaryState | undefined): ReliquaryState {
   const state = freshReliquaryState();
@@ -210,14 +214,14 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
       if (count !== undefined) state.counts[itemId] = count;
     }
   }
-  // Array.isArray, matching every sibling surface: restore also runs on
-  // stored blobs reached from the public character-sheet path, so a corrupt
-  // marks value (a bare number, an object) must drop whole, never throw.
-  if (Array.isArray(saved.marks)) {
-    for (const mark of saved.marks) {
-      if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) state.marks.add(mark);
-    }
-  }
+  // MERGE into the fresh state's container, never reassign it: under the sim's
+  // immutability waiver a live container is FILLED in place and its identity is
+  // what holders keep, so swapping the Set (or the array below) out detaches
+  // every existing reference instead of updating it. Every sibling arm here
+  // (firstFind, counts, illuminatedPages) already merges that way; these two are
+  // the only arms that delegate to a helper returning a fresh container, so they
+  // are the only ones where a bare assignment was ever spellable.
+  for (const m of restoreReliquaryMarks(saved)) state.marks.add(m);
   // Sticky illumination record. Same catalog filter discipline as the other
   // surfaces: only string entries naming a live page id land (Object.hasOwn,
   // not `in`, so a prototype key on the pages index cannot invent a page),
@@ -231,34 +235,73 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
       state.illuminatedPages.add(pageId);
     }
   }
-  if (Array.isArray(saved.recent)) {
-    // The ring is OLDEST-first, and restore must agree with pushRecent: the
-    // live ring holds each id once (a repeat moves to the tail rather than
-    // appending), so a hand-edited or legacy blob carrying the same id twice
-    // must not burn two of the twelve slots. LAST occurrence wins, because a
-    // repeat find refreshes recency, and when the survivors exceed the cap the
-    // NEWEST ones survive (drop from the head, the oldest side), exactly as
-    // pushRecent's shift does. Relative order is preserved either way.
-    // Walking from the newest end makes both rules fall out at once: the first
-    // time an id is seen going backwards IS its last occurrence, and stopping
-    // at the cap keeps the newest survivors.
-    const seen = new Set<string>();
-    const newestFirst: string[] = [];
-    for (let i = saved.recent.length - 1; i >= 0; i--) {
-      const id = saved.recent[i];
-      if (typeof id !== 'string') continue;
-      // Recent may hold item or mark ids that are still catalogued.
-      if (!isCataloguedRelicItem(id) && !RELIQUARY_MARK_IDS.has(id)) continue;
-      if (seen.has(id)) continue;
-      seen.add(id);
-      newestFirst.push(id);
-      if (newestFirst.length >= RELIQUARY_RECENT_CAP) break;
-    }
-    for (let i = newestFirst.length - 1; i >= 0; i--) {
-      state.recent.push(newestFirst[i]);
-    }
-  }
+  // In place for the same reason as marks above: append into the fresh ring
+  // rather than swapping the array out from under it. A push LOOP rather than
+  // one spread call, so the ring's capacity is never coupled to the engine's
+  // argument-count ceiling: RELIQUARY_RECENT_CAP is twelve today, but a spread
+  // makes every restored entry an argument, and a future cap in the tens of
+  // thousands would turn a legitimate save into a RangeError on load.
+  for (const id of restoreReliquaryRecent(saved)) state.recent.push(id);
   return state;
+}
+
+/**
+ * Narrow marks-only restore: the SAME catalog filter and the same corrupt-value
+ * tolerance restoreReliquaryState applies, without building the other three
+ * surfaces. Exists for the public character-sheet path
+ * (server/character_sheet.ts sheetReliquaryFromState), which reads marks and
+ * recent only and used to pay a full restore per sheet read for one of them.
+ * restoreReliquaryState delegates here, so the two can never drift.
+ *
+ * Array.isArray, matching every sibling surface: this runs on stored blobs
+ * reached from the public character-sheet path, so a corrupt marks value (a
+ * bare number, an object) must drop whole, never throw.
+ */
+export function restoreReliquaryMarks(saved: SavedReliquaryState | undefined): Set<string> {
+  const marks = new Set<string>();
+  const raw = saved?.marks;
+  if (!Array.isArray(raw)) return marks;
+  for (const mark of raw) {
+    if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) marks.add(mark);
+  }
+  return marks;
+}
+
+/**
+ * Narrow recent-ring restore, OLDEST-first like the live ring. Same delegation
+ * rationale as restoreReliquaryMarks; same drop-whole tolerance for a corrupt
+ * value.
+ *
+ * The ring is OLDEST-first, and restore must agree with pushRecent: the live
+ * ring holds each id once (a repeat moves to the tail rather than appending),
+ * so a hand-edited or legacy blob carrying the same id twice must not burn two
+ * of the twelve slots. LAST occurrence wins, because a repeat find refreshes
+ * recency, and when the survivors exceed the cap the NEWEST ones survive (drop
+ * from the head, the oldest side), exactly as pushRecent's shift does. Relative
+ * order is preserved either way. Walking from the newest end makes both rules
+ * fall out at once: the first time an id is seen going backwards IS its last
+ * occurrence, and stopping at the cap keeps the newest survivors.
+ */
+export function restoreReliquaryRecent(saved: SavedReliquaryState | undefined): string[] {
+  const recent: string[] = [];
+  const raw = saved?.recent;
+  if (!Array.isArray(raw)) return recent;
+  const seen = new Set<string>();
+  const newestFirst: string[] = [];
+  for (let i = raw.length - 1; i >= 0; i--) {
+    const id = raw[i];
+    if (typeof id !== 'string') continue;
+    // Recent may hold item or mark ids that are still catalogued.
+    if (!isCataloguedRelicItem(id) && !RELIQUARY_MARK_IDS.has(id)) continue;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    newestFirst.push(id);
+    if (newestFirst.length >= RELIQUARY_RECENT_CAP) break;
+  }
+  for (let i = newestFirst.length - 1; i >= 0; i--) {
+    recent.push(newestFirst[i]);
+  }
+  return recent;
 }
 
 /** Load guard for a saved obtain tally: a finite number, floored, at least 1
@@ -857,6 +900,119 @@ export function isRelicFilled(
   }
 }
 
+/**
+ * The player-INDEPENDENT half of every catalog-wide completion read: the unique
+ * relic ids per kind, de-duped across pages, in the order the page walk first
+ * encounters them. Nothing here reads ownership, so the lists (and therefore
+ * every `total`) depend only on the page table. Ownership is still counted per
+ * call against these ids; only the walk that discovers them is shared.
+ */
+export interface ReliquaryCatalogIndex {
+  items: readonly string[];
+  marks: readonly string[];
+  mounts: readonly string[];
+  skins: readonly string[];
+  titles: readonly string[];
+}
+
+/**
+ * Lazily-filled catalog index per page table, behind a WeakMap keyed on the
+ * pages array IDENTITY. Same sanctioned module-global shape as the wire memo
+ * above, in its content-table form: the key here is an immutable table rather
+ * than live state, so there is no revision to bump. RELIQUARY_PAGES is frozen
+ * at the content site (array, pages, and each page's relics list), which is
+ * what makes "the contents behind this key can never change" an enforced
+ * contract instead of an assumption. Lazy rather than eager at module load
+ * because this module is in the client bundle and most sessions never open the
+ * Reliquary: the walk is paid on the first completion read, not at import.
+ *
+ * Why identity and not length or content: a caller's own page array must never
+ * be able to answer with the default catalog's index, or a fixture that happens
+ * to look like the real catalog would hide a cache bug, and a fixture could
+ * poison the shared answer. Keying on identity gives every distinct array its
+ * own entry (a structurally identical COPY of the default included), so custom
+ * page tables memoize safely too rather than rebuilding on every call, and the
+ * entry drops with the array.
+ *
+ * Index integrity is a SAVE-CORRECTNESS matter, not a cosmetic one:
+ * catalogCharacterCompletion reads these lists for the `owned === total` gate
+ * that grants col_reliquary_complete through ctx.grantDeed
+ * (syncReliquaryCompletionDeeds below), a persisted deed and its permanent
+ * "Curator of the Vault" title, on all three hosts. An index that answered for
+ * the wrong page table would hand out or withhold that grant. Reuse and
+ * cross-table isolation are pinned in tests/reliquary_state.test.ts
+ * ("catalog index memo").
+ */
+const catalogIndexByPages = new WeakMap<readonly ReliquaryPageDef[], ReliquaryCatalogIndex>();
+
+function buildCatalogIndex(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIndex {
+  const items: string[] = [];
+  const marks: string[] = [];
+  const mounts: string[] = [];
+  const skins: string[] = [];
+  const titles: string[] = [];
+  const seenItems = new Set<string>();
+  const seenMarks = new Set<string>();
+  const seenMounts = new Set<string>();
+  const seenSkins = new Set<string>();
+  const seenTitles = new Set<string>();
+  for (const page of pages) {
+    for (const relic of page.relics) {
+      if (relic.kind === 'item') {
+        if (seenItems.has(relic.itemId)) continue;
+        seenItems.add(relic.itemId);
+        items.push(relic.itemId);
+      } else if (relic.kind === 'mark') {
+        if (seenMarks.has(relic.markId)) continue;
+        seenMarks.add(relic.markId);
+        marks.push(relic.markId);
+      } else if (relic.kind === 'mount') {
+        if (seenMounts.has(relic.mountId)) continue;
+        seenMounts.add(relic.mountId);
+        mounts.push(relic.mountId);
+      } else if (relic.kind === 'weapon_skin') {
+        if (seenSkins.has(relic.skinId)) continue;
+        seenSkins.add(relic.skinId);
+        skins.push(relic.skinId);
+      } else if (relic.kind === 'title') {
+        if (seenTitles.has(relic.deedId)) continue;
+        seenTitles.add(relic.deedId);
+        titles.push(relic.deedId);
+      }
+    }
+  }
+  // Frozen because the index is SHARED: every completion read for this page
+  // table gets these exact arrays, so one caller's in-place sort or push would
+  // rewrite what every later `total` counts, process-wide and server included.
+  return {
+    items: Object.freeze(items),
+    marks: Object.freeze(marks),
+    mounts: Object.freeze(mounts),
+    skins: Object.freeze(skins),
+    titles: Object.freeze(titles),
+  };
+}
+
+function catalogIndexFor(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIndex {
+  const cached = catalogIndexByPages.get(pages);
+  if (cached !== undefined) return cached;
+  const built = buildCatalogIndex(pages);
+  catalogIndexByPages.set(pages, built);
+  return built;
+}
+
+/** Test-only probe: the memoized index for a page table, or undefined when no
+ *  read has built one yet. Mirrors reliquaryWireCacheProbe and exists for the
+ *  same reason: a pin can prove a second read REUSED the build by object
+ *  identity, which is the thing the memo is for, and that a custom page table
+ *  never shares the default catalog's entry. Equal contents alone would pass
+ *  with no memo at all. */
+export function reliquaryCatalogIndexProbe(
+  pages: readonly ReliquaryPageDef[],
+): ReliquaryCatalogIndex | undefined {
+  return catalogIndexByPages.get(pages);
+}
+
 /** Page progress X/Y over item (+ optional other) ownership. */
 export function pageCompletion(
   page: ReliquaryPageDef,
@@ -881,17 +1037,15 @@ export function catalogItemCompletion(
   itemsDiscovered: OwnedIdLookup,
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
-  const all = new Set<string>();
+  // One ownership test per UNIQUE item id, which is what the old inline walk
+  // did too: it de-duped and counted against the same set, so a relic repeated
+  // across pages was tested (and scored) exactly once.
+  const { items } = catalogIndexFor(pages);
   let owned = 0;
-  for (const page of pages) {
-    for (const relic of page.relics) {
-      if (relic.kind !== 'item') continue;
-      if (all.has(relic.itemId)) continue;
-      all.add(relic.itemId);
-      if (itemsDiscovered.has(relic.itemId)) owned++;
-    }
+  for (const itemId of items) {
+    if (itemsDiscovered.has(itemId)) owned++;
   }
-  return { owned, total: all.size };
+  return { owned, total: items.length };
 }
 
 /**
@@ -911,38 +1065,35 @@ export function catalogRelicCompletion(
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
   const items = catalogItemCompletion(opts.itemsDiscovered, pages);
-  const allMarks = new Set<string>();
-  const allMounts = new Set<string>();
-  const allSkins = new Set<string>();
-  const allTitles = new Set<string>();
+  // Same one-test-per-unique-id shape as the item arm: the old walk de-duped
+  // against the very set it was building, so each of these ids was scored once
+  // no matter how many pages carry it. `=== true` is kept deliberately, the
+  // lookups are optional and an absent surface must score zero, not throw.
+  const index = catalogIndexFor(pages);
   let marksOwned = 0;
   let mountsOwned = 0;
   let skinsOwned = 0;
   let titlesOwned = 0;
-  for (const page of pages) {
-    for (const relic of page.relics) {
-      if (relic.kind === 'mark') {
-        if (allMarks.has(relic.markId)) continue;
-        allMarks.add(relic.markId);
-        if (opts.marks?.has(relic.markId) === true) marksOwned++;
-      } else if (relic.kind === 'mount') {
-        if (allMounts.has(relic.mountId)) continue;
-        allMounts.add(relic.mountId);
-        if (opts.ownedMounts?.has(relic.mountId) === true) mountsOwned++;
-      } else if (relic.kind === 'weapon_skin') {
-        if (allSkins.has(relic.skinId)) continue;
-        allSkins.add(relic.skinId);
-        if (opts.weaponSkins?.has(relic.skinId) === true) skinsOwned++;
-      } else if (relic.kind === 'title') {
-        if (allTitles.has(relic.deedId)) continue;
-        allTitles.add(relic.deedId);
-        if (opts.deedsEarned?.has(relic.deedId) === true) titlesOwned++;
-      }
-    }
+  for (const markId of index.marks) {
+    if (opts.marks?.has(markId) === true) marksOwned++;
+  }
+  for (const mountId of index.mounts) {
+    if (opts.ownedMounts?.has(mountId) === true) mountsOwned++;
+  }
+  for (const skinId of index.skins) {
+    if (opts.weaponSkins?.has(skinId) === true) skinsOwned++;
+  }
+  for (const deedId of index.titles) {
+    if (opts.deedsEarned?.has(deedId) === true) titlesOwned++;
   }
   return {
     owned: items.owned + marksOwned + mountsOwned + skinsOwned + titlesOwned,
-    total: items.total + allMarks.size + allMounts.size + allSkins.size + allTitles.size,
+    total:
+      items.total +
+      index.marks.length +
+      index.mounts.length +
+      index.skins.length +
+      index.titles.length,
   };
 }
 
@@ -991,13 +1142,11 @@ export function catalogCharacterCompletion(
     },
     pages,
   );
-  const skinSlots = new Set<string>();
-  for (const page of pages) {
-    for (const relic of page.relics) {
-      if (relic.kind === 'weapon_skin') skinSlots.add(relic.skinId);
-    }
-  }
-  return { owned: full.owned, total: full.total - skinSlots.size };
+  // The account weapon-skin slots to subtract are the same de-duped list the
+  // full read counted, so take the count off the shared index rather than
+  // walking the pages a second time for a number that is player-independent.
+  const skinSlots = catalogIndexFor(pages).skins.length;
+  return { owned: full.owned, total: full.total - skinSlots };
 }
 
 /**

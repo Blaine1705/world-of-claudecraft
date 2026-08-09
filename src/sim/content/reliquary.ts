@@ -662,7 +662,31 @@ export const RELIQUARY_HEROIC_GEAR = {
 // Order: append-only. Phase 1 stub id `conquerors_hollow_crypt` is kept and
 // expanded with real Hollow Crypt uniques (boundstone_helm moved to Sanctum).
 
-export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
+/**
+ * Freeze the whole page table at its one construction site: the top-level
+ * array, every page object, and every page's relics list. `readonly` is a
+ * compile-time claim only, and this table is handed out by reference to every
+ * host (the client bundle, the authoritative server, the RL env) and read by
+ * the catalog-index memo in src/sim/reliquary.ts, which keys on this array's
+ * IDENTITY and caches the id lists it walks out of it. A runtime write to a
+ * page or a relics array would leave that memo answering with a stale index
+ * for the whole process, and the index gates a persisted deed grant
+ * (col_reliquary_complete). Nothing mutates these today; freezing turns the
+ * memo's immutability assumption into an enforced contract, the same reason
+ * the relic source hints and lists are frozen at their constructors above.
+ *
+ * The relic OBJECTS are already frozen where content authoring can reach them
+ * (hint / withSource), so this covers the containers those helpers do not own.
+ */
+function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[] {
+  for (const page of pages) {
+    Object.freeze(page.relics);
+    Object.freeze(page);
+  }
+  return Object.freeze(pages);
+}
+
+export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // ---- Five-man dungeons: normal chase uniques ----
   {
     id: 'conquerors_hollow_crypt',
@@ -1123,7 +1147,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     clearSource: { kind: 'none' },
     relics: titles(...RELIQUARY_HORIZON_TITLES),
   },
-];
+]);
 
 /** Append-only page order (table order). */
 export const RELIQUARY_PAGE_ORDER: readonly string[] = RELIQUARY_PAGES.map((p) => p.id);

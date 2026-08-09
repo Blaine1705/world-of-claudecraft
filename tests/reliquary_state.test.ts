@@ -50,9 +50,12 @@ import {
   RELIQUARY_OBTAIN_COUNT_CAP,
   RELIQUARY_PAGES_BY_ID,
   RELIQUARY_RECENT_CAP,
+  reliquaryCatalogIndexProbe,
   reliquaryOwnershipOpts,
   reliquaryWireCacheProbe,
   reliquaryWireJson,
+  restoreReliquaryMarks,
+  restoreReliquaryRecent,
   restoreReliquaryState,
   type SavedReliquaryState,
   serializeReliquaryState,
@@ -980,6 +983,81 @@ describe('Reliquary recent ring cap', () => {
     for (const evicted of writes.slice(0, 3)) {
       expect(meta.reliquary.recent).not.toContain(evicted);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 20: the narrow restore helpers the public character sheet reads
+// ---------------------------------------------------------------------------
+
+describe('Reliquary narrow restore helpers (public character-sheet path)', () => {
+  const itemIds = [
+    ...new Set(
+      RELIQUARY_PAGES.flatMap((p) =>
+        p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+      ),
+    ),
+  ];
+  const markIds = [...RELIQUARY_MARK_IDS];
+
+  /** One blob that exercises every arm at once: junk entries, an uncatalogued
+   *  id on each surface, a repeated recent id, and an over-cap ring. */
+  function richBlob(): SavedReliquaryState {
+    const many = itemIds.slice(0, RELIQUARY_RECENT_CAP + 3);
+    expect(many.length, 'the catalog must supply more item ids than the cap').toBe(
+      RELIQUARY_RECENT_CAP + 3,
+    );
+    return {
+      firstFind: { [CATALOGUE_RELIC]: { clears: 3, count: 2 } },
+      illuminatedPages: ['conquerors_hollow_crypt'],
+      marks: [markIds[0], 'not_a_mark', 7 as unknown as string, markIds[1]],
+      recent: [
+        many[0],
+        NON_RELIC,
+        ...many,
+        9 as unknown as string,
+        many[1],
+        markIds[0],
+      ] as string[],
+    };
+  }
+
+  it('the narrow helpers answer exactly what the full restore answers', () => {
+    // The sheet path calls the narrow helpers instead of restoring the whole
+    // state for two of its four surfaces; this is what keeps the extraction a
+    // MOVE. Both arms carry survivors and dropped junk, so the equality is
+    // never empty === empty.
+    const blob = richBlob();
+    const full = restoreReliquaryState(blob);
+    expect(full.marks.size).toBeGreaterThan(0);
+    expect(full.recent.length).toBe(RELIQUARY_RECENT_CAP);
+    expect([...restoreReliquaryMarks(blob)]).toEqual([...full.marks]);
+    expect(restoreReliquaryRecent(blob)).toEqual(full.recent);
+    // The junk really was dropped on both sides (a helper that skipped the
+    // catalog filter would still satisfy the equality above only if the full
+    // restore skipped it too, which the next two lines refuse).
+    expect([...full.marks]).not.toContain('not_a_mark');
+    expect(full.recent).not.toContain(NON_RELIC);
+  });
+
+  it('each narrow helper reads only its own field', () => {
+    // Decisive against a copy/paste swap in the extraction: marks must not
+    // fill from the recent ring, and recent must not fill from marks.
+    expect(restoreReliquaryMarks({ recent: [CATALOGUE_RELIC, markIds[0]] }).size).toBe(0);
+    expect(restoreReliquaryRecent({ marks: [markIds[0]] })).toEqual([]);
+  });
+
+  it('a corrupt marks or recent value drops whole in the narrow helpers too', () => {
+    // Same tolerance as the full restore (see the character-sheet reach note
+    // on the corrupt-marks test below): a stored blob reached from the public
+    // sheet must never throw.
+    const corrupt = { marks: 5, recent: 5 } as unknown as SavedReliquaryState;
+    expect(restoreReliquaryMarks(corrupt).size).toBe(0);
+    expect(restoreReliquaryRecent(corrupt)).toEqual([]);
+    expect(restoreReliquaryState(corrupt).marks.size).toBe(0);
+    expect(restoreReliquaryState(corrupt).recent).toEqual([]);
+    expect(restoreReliquaryMarks(undefined).size).toBe(0);
+    expect(restoreReliquaryRecent(undefined)).toEqual([]);
   });
 });
 
@@ -2305,6 +2383,98 @@ describe('Reliquary wire memo revision bumps', () => {
         '"illuminatedPages":["conquerors_hollow_crypt","conquerors_thunzharr"],' +
         '"marks":["gather_event:pristine_vein"],"recent":["cryptbone_helm"]}',
     );
+  });
+});
+
+// The catalog-index memo: the second sanctioned module global in reliquary.ts,
+// a WeakMap keyed on the PAGES ARRAY identity. It matters beyond speed because
+// catalogCharacterCompletion reads the index for the `owned === total` gate that
+// grants col_reliquary_complete (a persisted deed and its permanent title), so
+// an index answering for the wrong page table would hand out or withhold that
+// grant. Two properties are pinned here: a repeat read REUSES the build, and no
+// page table can ever answer with another's index.
+describe('Reliquary catalog index memo', () => {
+  /** Independent oracle for the default catalog's unique item-relic count,
+   *  walked here rather than read back off the thing under test. */
+  const uniqueDefaultItemIds = (): number => {
+    const ids = new Set<string>();
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        if (relic.kind === 'item') ids.add(relic.itemId);
+      }
+    }
+    return ids.size;
+  };
+
+  /** A two-slot page table with ids the real catalog does not carry, so a
+   *  poisoned index shows up as a wrong TOTAL and not merely a wrong count. */
+  const customPages = (): ReliquaryPageDef[] => [
+    {
+      id: 'probe_page',
+      shelf: 'conquerors',
+      name: 'Probe Page',
+      relics: [
+        { kind: 'item', itemId: 'probe_relic_alpha' },
+        { kind: 'item', itemId: 'probe_relic_beta' },
+      ],
+    },
+  ];
+
+  it('reuses the built index across two default-pages reads (identity, not equal bytes)', () => {
+    // Deliberately NOT asserting the probe is undefined first: this module is
+    // shared with every describe above, so the default index may already exist.
+    // What is pinned is that a read between two probes does not REPLACE the
+    // entry, which is exactly what a rebuild would do (catalogIndexFor sets on
+    // every build). Equal contents would pass with no memo at all.
+    catalogItemCompletion(new Set());
+    const first = reliquaryCatalogIndexProbe(RELIQUARY_PAGES);
+    expect(first, 'a completion read must populate the memo').toBeDefined();
+    catalogItemCompletion(new Set());
+    expect(reliquaryCatalogIndexProbe(RELIQUARY_PAGES)).toBe(first);
+    // And the shared lists are frozen, since every reader gets these exact
+    // arrays: one caller's in-place write would move every later total.
+    expect(Object.isFrozen(first?.items)).toBe(true);
+    expect(Object.isFrozen(first?.marks)).toBe(true);
+    expect(Object.isFrozen(first?.mounts)).toBe(true);
+    expect(Object.isFrozen(first?.skins)).toBe(true);
+    expect(Object.isFrozen(first?.titles)).toBe(true);
+  });
+
+  it('interleaved custom and default reads never poison each other, in either direction', () => {
+    const oracle = uniqueDefaultItemIds();
+    const pages = customPages();
+    // Default first, so the custom read below has a live shared entry to
+    // clobber if the memo ever keyed on anything but identity.
+    expect(catalogItemCompletion(new Set()).total).toBe(oracle);
+    expect(catalogItemCompletion(new Set(), pages).total).toBe(2);
+    // The default answer must survive the custom read...
+    expect(catalogItemCompletion(new Set()).total).toBe(oracle);
+    // ...and the custom answer must survive the default read.
+    expect(catalogItemCompletion(new Set(), pages).total).toBe(2);
+    expect(reliquaryCatalogIndexProbe(pages)).toBeDefined();
+    expect(reliquaryCatalogIndexProbe(pages)).not.toBe(reliquaryCatalogIndexProbe(RELIQUARY_PAGES));
+  });
+
+  it('memoizes a custom page table too (a second custom read reuses its own entry)', () => {
+    // The old identity special-case (`pages === RELIQUARY_PAGES`) rebuilt on
+    // every custom-pages read; the WeakMap gives every array its own entry.
+    const pages = customPages();
+    catalogItemCompletion(new Set(), pages);
+    const first = reliquaryCatalogIndexProbe(pages);
+    expect(first).toBeDefined();
+    catalogItemCompletion(new Set(), pages);
+    expect(reliquaryCatalogIndexProbe(pages)).toBe(first);
+  });
+
+  it('gives a structurally identical COPY of the default table its own entry', () => {
+    // Same page objects in the same order, a different array: the key is the
+    // ARRAY, so the copy builds its own index rather than inheriting the
+    // default's. Equal answers, separate entries.
+    const copy = [...RELIQUARY_PAGES];
+    expect(catalogItemCompletion(new Set(), copy).total).toBe(uniqueDefaultItemIds());
+    const copyIndex = reliquaryCatalogIndexProbe(copy);
+    expect(copyIndex).toBeDefined();
+    expect(copyIndex).not.toBe(reliquaryCatalogIndexProbe(RELIQUARY_PAGES));
   });
 });
 
