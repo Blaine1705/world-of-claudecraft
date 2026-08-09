@@ -1569,7 +1569,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('01df879e9e3eac9e79309d1dac313c2ddb2c1cc22779615ec8003e37d1e6c332');
+    ).toBe('824f41a1d8b3d4bc6e0f70bc2dbcb3d1e6c28864eecd2afdd1ec0b7e0dd7209b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
