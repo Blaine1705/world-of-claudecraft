@@ -10649,6 +10649,17 @@ export class Hud {
         return;
       }
       case 'spellfxAt': {
+        // Meteor's landing recording is preloaded lazily (SFX_CLIPS entries
+        // preload: 'lazy' by default), so a first-cast-of-session player can
+        // hit the fx:'tick' below before the fetch+decode finishes and
+        // playAt's 0.12s unbuffered-oneshot race drops it silently. The
+        // meteorFall telegraph fires here about 2s before the ground tick
+        // lands (effect_dispatch.ts), which is exactly enough lead time to
+        // warm the buffer if we kick the preload off now.
+        if (ev.fx === 'meteorFall') {
+          sfx.preload('meteor');
+          return;
+        }
         // A ground-zone pulse (Consecration, Blizzard's damage tick, Meteor's
         // one delayed hit): a dedicated recording (Meteor) is the whole read;
         // every other zone stays silent here and keeps its procedural
