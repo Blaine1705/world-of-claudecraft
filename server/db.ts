@@ -2988,19 +2988,20 @@ export async function setCharacterHotbarLayout(
 /** Spend a character's one-shot appearance reroll: write the new look and burn
  *  the token in ONE statement, so two concurrent rerolls cannot both succeed.
  *  All eligibility lives in the WHERE arm — ownership + realm (BOLA, matching
- *  getCharacter's scoping), NO authored look yet, and the unspent token — and
- *  the row is only touched when every check passes. Returns whether the reroll
- *  was applied; false = not owned / already designed / already spent, which the
- *  route maps to its error body. The appearance is already normalized by the
+ *  getCharacter's scoping), inside the free window or never designed, and the
+ *  unspent token — and the row is only touched when every check passes. Returns
+ *  whether the reroll was applied; false = not owned / outside the window with a
+ *  look already / already spent, which the route maps to its error body. The appearance is already normalized by the
  *  caller (untrusted client input, hotbar_layout's contract).
  *
- *  `appearance IS NULL` rather than a creation-date cutoff is the point: the
- *  rule being expressed is "this character never got to choose a look, so it
- *  has one free design". A hardcoded ship date says that only for rows created
- *  before the instant it was written, and permanently strands every character
- *  created between that instant and the actual deploy — with neither an
- *  authored look (their client did not post one) nor a token. It also needs
- *  re-dating on every merge, and gets it wrong silently.
+ *  Two ways into the WHERE arm, and the unspent token is what keeps it one-shot
+ *  either way. `created_at < $6` is the PRODUCT rule: every character that
+ *  existed before the cutoff gets one redesign on the house, whether or not it
+ *  already carries an authored look. `appearance IS NULL` is the safety net
+ *  under it, and it is why the date alone is not enough: a cutoff strands every
+ *  character created after it by a client too old to post an appearance, which
+ *  would then have neither a look nor any way to choose one. The OR can only
+ *  ever widen eligibility, so the window stays exactly what it says.
  *
  *  The helm preference rides the SAME statement, because the redesign editor's
  *  helmet toggle is the creation toggle: a standing wardrobe choice, not a
@@ -3017,6 +3018,7 @@ export async function consumeAppearanceReroll(
   characterId: number,
   appearance: Record<string, unknown>,
   helmHidden: boolean,
+  createdBefore: Date,
 ): Promise<boolean> {
   const res = await pool.query(
     `UPDATE characters
@@ -3029,9 +3031,9 @@ export async function consumeAppearanceReroll(
                     END,
             updated_at = now()
       WHERE id = $1 AND account_id = $2 AND realm = $4
-        AND appearance IS NULL
+        AND (created_at < $6 OR appearance IS NULL)
         AND appearance_reroll_used = FALSE`,
-    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden],
+    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden, createdBefore],
   );
   return (res.rowCount ?? 0) > 0;
 }

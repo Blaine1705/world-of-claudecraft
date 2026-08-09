@@ -154,6 +154,11 @@ const VALID_CLASSES: readonly string[] = [
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;
+/** The free-redesign window: every character created before this instant carries
+ *  one appearance redesign, whether or not it already has an authored look. UTC
+ *  midnight, so every client agrees on who is inside the window without doing
+ *  any timezone arithmetic of its own, and compared server-side only. */
+export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-11T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
@@ -307,16 +312,23 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
   return state;
 }
 
-/** Whether this character still holds its one-shot redesign token: it has no
- *  authored look at all, and the token is unspent. Deliberately NOT a creation
- *  date — see consumeAppearanceReroll, whose WHERE arm is the authority this
- *  mirrors. Stating the rule as "never designed" also means a character created
- *  by a client too old to post an appearance is covered rather than stranded.
- *  Decided server-side so the list payload is the single truth the roster
- *  button keys on. */
+/** Whether this character still holds its one-shot redesign token. Two ways in,
+ *  and the token is what makes it one-shot either way:
+ *   - CREATED INSIDE THE FREE WINDOW (before APPEARANCE_REROLL_CUTOFF). Every
+ *     character that existed when the creator shipped gets one redesign on the
+ *     house, including one that already carries an authored look.
+ *   - NEVER DESIGNED AT ALL, whenever it was made. This arm is not the product
+ *     rule, it is the safety net under it: without it a character created after
+ *     the cutoff by a client too old to post an appearance would have neither a
+ *     look nor a way to choose one, permanently. It can only ever ADD
+ *     eligibility, so it cannot contradict the window.
+ *  Mirrors consumeAppearanceReroll's WHERE arm, which is the authority; decided
+ *  server-side so the list payload is the single truth the roster button reads. */
 function appearanceRerollAvailable(c: CharacterRow): boolean {
   if (c.appearance_reroll_used) return false;
-  return c.appearance === null || c.appearance === undefined;
+  if (c.appearance === null || c.appearance === undefined) return true;
+  const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
+  return Number.isFinite(created) && created < APPEARANCE_REROLL_CUTOFF.getTime();
 }
 
 /** Shape a realm rank lookup into the character-sheet's rank field (pure; mirrors main.ts). */
@@ -819,8 +831,9 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
 }
 
 /** POST /api/characters/:id/appearance-reroll: spend the character's one-shot
- *  redesign token on a new authored look. Eligibility (ownership + no authored
- *  look yet + unspent token) is decided ATOMICALLY inside the single UPDATE
+ *  redesign token on a new authored look. Eligibility (ownership + inside the
+ *  free window or never designed + unspent token) is decided ATOMICALLY in the
+ *  single UPDATE
  *  (consumeAppearanceReroll), so two concurrent submits cannot both land; the
  *  handler only shapes the payload and maps the outcome. Allowed while the
  *  character is online: the new look simply applies from the next world entry
@@ -846,6 +859,7 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
     character.id,
     appearance,
     helmHidden,
+    APPEARANCE_REROLL_CUTOFF,
   );
   if (!ok) {
     json(ctx.res, 400, REROLL_NOT_AVAILABLE);

@@ -20,6 +20,7 @@ import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -383,8 +384,9 @@ describe('character list handlers', () => {
           appearance: null,
           helmHidden: false,
           createdAt: null,
-          // No authored look and the token unspent: this row still owes its
-          // player one free design. Eligibility is that, not a creation date.
+          // No authored look and the token unspent, so this row still owes its
+          // player one free design (created_at is null in this fixture, so it
+          // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
         },
         {
@@ -404,8 +406,9 @@ describe('character list handlers', () => {
           appearance: null,
           helmHidden: false,
           createdAt: null,
-          // No authored look and the token unspent: this row still owes its
-          // player one free design. Eligibility is that, not a creation date.
+          // No authored look and the token unspent, so this row still owes its
+          // player one free design (created_at is null in this fixture, so it
+          // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
         },
       ],
@@ -976,6 +979,70 @@ describe('create handler appearance', () => {
   });
 });
 
+describe('free-redesign window', () => {
+  /** The list handler is where appearanceRerollAvailable is observable. */
+  async function tokensFor(rows: CharacterRow[]): Promise<Record<string, boolean>> {
+    authedDb({ listCharacters: async () => rows });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const body = res.body as { characters: { name: string; appearanceRerollAvailable: boolean }[] };
+    return Object.fromEntries(body.characters.map((c) => [c.name, c.appearanceRerollAvailable]));
+  }
+
+  const before = new Date(APPEARANCE_REROLL_CUTOFF.getTime() - 60_000).toISOString();
+  const after = new Date(APPEARANCE_REROLL_CUTOFF.getTime() + 60_000).toISOString();
+  const look = { gender: 'female' };
+
+  it('gives a free redesign to every character created inside the window', async () => {
+    // Including one that already has an authored look: the window is "you
+    // existed before the cutoff", not "you never chose".
+    const tokens = await tokensFor([
+      charRow({ id: 1, name: 'Designed', created_at: before, appearance: look }),
+      charRow({ id: 2, name: 'Bare', created_at: before, appearance: null }),
+    ]);
+    expect(tokens).toEqual({ Designed: true, Bare: true });
+  });
+
+  it('closes the window after the cutoff for a character that already has a look', async () => {
+    const tokens = await tokensFor([
+      charRow({ id: 3, name: 'Newcomer', created_at: after, appearance: look }),
+    ]);
+    expect(tokens).toEqual({ Newcomer: false });
+  });
+
+  it('still covers a character created after the cutoff with NO look', async () => {
+    // The safety net, not the product rule: a client too old to post an
+    // appearance would otherwise leave its character with neither a look nor
+    // any way to choose one.
+    const tokens = await tokensFor([
+      charRow({ id: 4, name: 'Oldclient', created_at: after, appearance: null }),
+    ]);
+    expect(tokens).toEqual({ Oldclient: true });
+  });
+
+  it('a spent token beats both arms', async () => {
+    const tokens = await tokensFor([
+      charRow({
+        id: 5,
+        name: 'Spent',
+        created_at: before,
+        appearance: look,
+        appearance_reroll_used: true,
+      }),
+      charRow({
+        id: 6,
+        name: 'SpentBare',
+        created_at: after,
+        appearance: null,
+        appearance_reroll_used: true,
+      }),
+    ]);
+    expect(tokens).toEqual({ Spent: false, SpentBare: false });
+  });
+});
+
 describe('appearance reroll handler', () => {
   it('200s the bounded look and spends the token through the atomic update', async () => {
     const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
@@ -989,18 +1056,15 @@ describe('appearance reroll handler', () => {
     const bounded = { gender: 'female', hair: 'highbun' };
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, appearance: bounded, helmHidden: false });
-    const [accountId, characterId, stored, helmHidden] = consumeAppearanceReroll.mock.calls[0] as [
-      number,
-      number,
-      Record<string, unknown>,
-      boolean,
-    ];
+    const [accountId, characterId, stored, helmHidden, cutoff] = consumeAppearanceReroll.mock
+      .calls[0] as [number, number, Record<string, unknown>, boolean, Date];
     expect(accountId).toBe(7);
     expect(characterId).toBe(5);
     expect(stored).toEqual(bounded);
-    // No creation-date argument any more: eligibility is "has never been
-    // designed", decided by the UPDATE's own `appearance IS NULL` arm.
     expect(helmHidden).toBe(false);
+    // The free window rides through to the UPDATE, which is what decides
+    // eligibility; the handler never compares dates itself.
+    expect(cutoff).toBe(APPEARANCE_REROLL_CUTOFF);
   });
 
   it('persists the editor helm toggle and pushes it onto a live session', async () => {
@@ -1024,9 +1088,9 @@ describe('appearance reroll handler', () => {
   });
 
   it('400s reroll-unavailable when the atomic update matches no row', async () => {
-    // One WHERE arm failed: not owned, already carries an authored look, or
-    // the token is already spent. The handler cannot tell which, and must not
-    // care.
+    // One WHERE arm failed: not owned, outside the free window with a look
+    // already, or the token is already spent. The handler cannot tell which,
+    // and must not care.
     setCharactersDbForTests({ consumeAppearanceReroll: async () => false });
     const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
       account: { accountId: 7, scope: 'full' },
