@@ -20,6 +20,7 @@ summaries:
 - frames at or above 50 ms
 - worst frame and p99 frame time
 - newly linked WebGL program cache keys
+- the warmup-baseline program cache key count (programs linked during boot and warmup)
 - textures and pooled visuals created
 - the render-budget submit-stall latch
 - allocation rate from the existing heap sawtooth tracker
@@ -150,7 +151,11 @@ node scripts/perf_hitch.mjs calibrate
 ```
 
 Calibration appends all three runs to `history.jsonl`, verifies the build identity did
-not change, rejects missing compile or settled-heap evidence, rejects any page error,
+not change, rejects missing or insufficient warmup-baseline program evidence in the two
+compile-heavy scenarios (each run must link at least `MIN_BASELINE_PROGRAM_COUNT`
+programs during boot and warmup; post-warmup compiles stay a mission metric only, so a
+healthy build that links zero live programs still recalibrates), rejects missing
+settled-heap evidence, rejects any page error,
 rejects a non-positive or widely spread soak settled-heap delta, rejects renderer drift,
 and rejects any calibrated metric whose gate verdict changes across runs. Mission
 metrics are exempt from that flap rule: their targets are frozen expectations the
@@ -234,5 +239,10 @@ The Chrome cache switch is documented in Chromium’s
 and its program-cache effect is applied in
 [`gpu_channel_manager.cc`](https://chromium.googlesource.com/chromium/src/+/lkgr/gpu/ipc/service/gpu_channel_manager.cc).
 Lower-level graphics-driver caches remain outside Chrome’s control, so calibration also
-requires all three fresh same-build runs to reproduce post-warmup program creation in
-both compile-heavy scenarios.
+requires all three fresh same-build runs to link a substantial warmup-baseline program
+count (`MIN_BASELINE_PROGRAM_COUNT` in `scripts/lib/perf_hitch_store.mjs`) in both
+compile-heavy scenarios. The baseline count proves each scenario exercises first-draw
+program work even when the optimized live path links zero post-warmup programs;
+post-warmup program creation itself is the mission metric with a fixed zero target and
+is never a calibration requirement, so the referee can always recalibrate after the
+compile-storm fixes land.

@@ -1,7 +1,9 @@
+import { execFileSync } from 'node:child_process';
 import { EventEmitter } from 'node:events';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   browserEvidenceFromScenarios,
@@ -57,6 +59,7 @@ import {
   HITCH_METRIC_KINDS,
   historyTable,
   MAX_SOAK_SETTLED_HEAP_RELATIVE_SPREAD,
+  MIN_BASELINE_PROGRAM_COUNT,
   makeRunRecord,
   parseHistoryJsonl,
   SCENARIO_NAMES,
@@ -111,6 +114,7 @@ const rawScenario = (name, overrides = {}) => ({
     },
   ],
   newProgramKeys: ['program-a'],
+  baselineProgramKeys: ['boot-a', 'boot-b', 'boot-b'],
   report: {
     renderer: {
       tier: 'insane',
@@ -149,6 +153,7 @@ const scenario = (name, overrides = {}) => ({
   worstFrameMs: 240,
   p99FrameMs: 24,
   programCompiles: name === 'crowd-influx' || name === 'cosmetic-churn' ? 3 : 0,
+  baselineProgramCount: 320,
   texturesCreated: 2,
   pooledVisualsCreated: 5,
   submitStallLatched: true,
@@ -205,6 +210,7 @@ describe('frozen hitch suite contract', () => {
       'combat-vfx-burst': { mode: 'offline', warmupMs: 3000, measureMs: 18_000 },
     });
     expect(MAX_SOAK_SETTLED_HEAP_RELATIVE_SPREAD).toBe(0.35);
+    expect(MIN_BASELINE_PROGRAM_COUNT).toBe(10);
   });
 
   it('pins fresh headed real-GPU browser state and the fixed deterministic bot roster', () => {
@@ -1639,6 +1645,22 @@ describe('frozen hitch suite contract', () => {
     expect(source).not.toMatch(/swiftshader/i);
   });
 
+  it('prints usage instead of a raw stack when the CLI arguments do not parse', () => {
+    // The plan is built at module top level, so an unwrapped parse error used
+    // to escape the entrypoint's try and print a raw stack with no usage.
+    const entry = fileURLToPath(new URL('../scripts/perf_hitch.mjs', import.meta.url));
+    let failure = null;
+    try {
+      execFileSync(process.execPath, [entry, 'bogus'], { encoding: 'utf8', stdio: 'pipe' });
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure?.status).toBe(1);
+    expect(failure.stdout).toContain('usage: node scripts/perf_hitch.mjs <run|calibrate|report>');
+    expect(failure.stderr).toContain('[hitch] invalid arguments: unknown command: bogus');
+    expect(failure.stderr).not.toContain('at buildHitchCliPlan');
+  });
+
   it('keeps page exception stacks separate from console error diagnostics', () => {
     const source = readFileSync(
       new URL('../scripts/lib/perf_hitch_browser.mjs', import.meta.url),
@@ -1661,6 +1683,8 @@ describe('summarizeScenario', () => {
       worstFrameMs: 60,
       p99FrameMs: 60,
       programCompiles: 1,
+      // The duplicate raw baseline key is deduplicated, matching the collector's set.
+      baselineProgramCount: 2,
       texturesCreated: 3,
       pooledVisualsCreated: 3,
       submitStallLatched: true,
@@ -1695,6 +1719,7 @@ describe('summarizeScenario', () => {
       rawScenario('soak', {
         frames: [],
         newProgramKeys: undefined,
+        baselineProgramKeys: undefined,
         report: {},
         heapFloor: null,
         heapFloorSeries: null,
@@ -1708,6 +1733,7 @@ describe('summarizeScenario', () => {
     expect(row.settledHeapDeltaMb).toBeNull();
     expect(row.allocationRateMbPerSec).toBeNull();
     expect(row.programCompiles).toBeNull();
+    expect(row.baselineProgramCount).toBeNull();
   });
 
   it('excludes frames that overlap the actual warmup boundary', () => {
@@ -1852,22 +1878,57 @@ describe('deriveCalibration', () => {
     expect(gate.scenarios.soak.allocationRateMbPerSec.bound).toBe(3.5);
   });
 
-  it.each([
-    ['crowd-influx', 'programCompiles', 'program compiles'],
-    ['cosmetic-churn', 'programCompiles', 'program compiles'],
-  ])('rejects missing critical evidence for %s %s', (name, metric, message) => {
-    const missing = run({ [name]: { [metric]: 0 } });
-    expect(() => deriveCalibration([run(), missing, run()])).toThrow(
-      new RegExp(`${name}.*${message}`, 'i'),
-    );
-  });
+  it.each([['crowd-influx'], ['cosmetic-churn']])(
+    'rejects a %s warmup baseline with no first-draw program evidence',
+    (name) => {
+      // The warmup BASELINE count is the detection proof that the scenario
+      // exercises first-draw work: the crowd links hundreds of programs
+      // during boot and warmup on any build, so a near-zero baseline means
+      // broken instrumentation or a scenario that stopped drawing.
+      const zero = run({ [name]: { baselineProgramCount: 0 } });
+      expect(() => deriveCalibration([run(), zero, run()])).toThrow(
+        new RegExp(`${name}.*baseline program count 0 is below ${MIN_BASELINE_PROGRAM_COUNT}`),
+      );
+      const below = run({ [name]: { baselineProgramCount: MIN_BASELINE_PROGRAM_COUNT - 1 } });
+      expect(() => deriveCalibration([run(), below, run()])).toThrow(/baseline program count/);
+      const atFloor = run({ [name]: { baselineProgramCount: MIN_BASELINE_PROGRAM_COUNT } });
+      expect(() => deriveCalibration([run(), atFloor, run()])).not.toThrow();
+      const missing = run({ [name]: { baselineProgramCount: null } });
+      expect(() => deriveCalibration([run(), missing, run()])).toThrow(
+        new RegExp(`${name}.*baselineProgramCount missing`),
+      );
+    },
+  );
+
+  it.each([['crowd-influx'], ['cosmetic-churn']])(
+    'freezes when %s links zero post-warmup programs on a healthy build',
+    (name) => {
+      // Once the perf wave drives live links to zero, recalibration must not
+      // deadlock: post-warmup compiles are a mission metric only, and the
+      // baseline count above carries the detection proof. The zero mission
+      // target itself stays fully enforced in every gate compare.
+      const records = [
+        run({ [name]: { programCompiles: 0 } }),
+        run({ [name]: { programCompiles: 0 } }),
+        run({ [name]: { programCompiles: 0 } }),
+      ];
+      const { gate } = deriveCalibration(records);
+      expect(gate.scenarios[name].programCompiles).toMatchObject({
+        kind: 'mission',
+        samples: [0, 0, 0],
+        target: 0,
+      });
+      const regressed = compareRunToGate(run({ [name]: { programCompiles: 1 } }), gate);
+      expect(regressed.failures.join('\n')).toContain(`${name}: programCompiles 1 above 0`);
+    },
+  );
 
   it.each([['crowd-influx'], ['cosmetic-churn']])(
     'freezes when %s shows zero long frames on a healthy build',
     (name) => {
       // PR 3161 pulled these scenarios to zero or near-zero long frames on a
       // healthy build, so long frames are deliberately not a detection
-      // requirement; compile counts above remain the detection proof.
+      // requirement; the warmup baseline count above remains the detection proof.
       const healthy = run({ [name]: { longFrames: 0 } });
       expect(() => deriveCalibration([run(), healthy, run()])).not.toThrow();
     },

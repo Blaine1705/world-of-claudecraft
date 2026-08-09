@@ -15,6 +15,17 @@ export const SCENARIO_SPECS = Object.freeze({
 export const SCENARIO_NAMES = Object.freeze(Object.keys(SCENARIO_SPECS));
 export const COMPILE_MISSION_SCENARIOS = Object.freeze(['crowd-influx', 'cosmetic-churn']);
 export const MAX_PROGRAM_COMPILES = 0;
+// Calibration detection floor for the compile-mission scenarios: each of the
+// three same-build runs must link at least this many programs during boot and
+// warmup (the collector's baseline key set). The crowd links hundreds of
+// programs there on any build because every run uses a fresh profile with
+// Chrome's shader caches disabled, so this floor only trips when the program
+// instrumentation breaks or the scenario stops drawing. Post-warmup compiles
+// are deliberately NOT a calibration requirement: they are the mission metric
+// the fixed build drives to zero, and requiring them to stay nonzero would
+// deadlock recalibration forever (the same deadlock already removed for long
+// frames).
+export const MIN_BASELINE_PROGRAM_COUNT = 10;
 export const MAX_WORST_FRAME_MS = 100;
 export const MAX_PAGE_ERRORS = 0;
 export const MAX_SOAK_SETTLED_HEAP_RELATIVE_SPREAD = 0.35;
@@ -94,6 +105,9 @@ export function summarizeScenario(raw) {
   const heapSawtooth = report.heapSawtooth ?? null;
   const heapFloorSeries = raw.heapFloorSeries ?? null;
   const newProgramKeys = Array.isArray(raw.newProgramKeys) ? new Set(raw.newProgramKeys) : null;
+  const baselineProgramKeys = Array.isArray(raw.baselineProgramKeys)
+    ? new Set(raw.baselineProgramKeys)
+    : null;
   return {
     name,
     warmupMs,
@@ -104,6 +118,7 @@ export function summarizeScenario(raw) {
     worstFrameMs: frameTimes.length ? round(Math.max(...frameTimes)) : null,
     p99FrameMs: percentile(frameTimes, 0.99),
     programCompiles: newProgramKeys !== null ? newProgramKeys.size : null,
+    baselineProgramCount: baselineProgramKeys !== null ? baselineProgramKeys.size : null,
     texturesCreated:
       finite(raw.counterBaseline?.textures) !== null && finite(raw.counterPeaks?.textures) !== null
         ? round(Math.max(0, raw.counterPeaks.textures - raw.counterBaseline.textures))
@@ -275,16 +290,22 @@ function validateCalibrationRuns(records) {
 export function deriveCalibration(records) {
   validateCalibrationRuns(records);
   for (const name of COMPILE_MISSION_SCENARIOS) {
-    if (metricValues(records, name, 'programCompiles').some((value) => value <= 0)) {
-      throw new Error(`${name}: calibration did not reproduce post-warmup program compiles`);
+    // Detection proof: the warmup BASELINE program count shows the scenario
+    // exercises first-draw work at all (the crowd links hundreds of programs
+    // during boot and warmup regardless of how clean the live path is).
+    // Post-warmup compiles and long frames are deliberately NOT detection
+    // requirements here: the perf work drives both to zero on a healthy
+    // build, so demanding brokenness would deadlock recalibration forever
+    // (long frames hit this first, PR 3161; post-warmup compiles hit it once
+    // the compile-storm fixes landed). Post-warmup compiles stay a mission
+    // metric with a fixed zero target in every gate compare, and the
+    // long-frame noise floor is still derived below and gates regressions.
+    const baselineCounts = metricValues(records, name, 'baselineProgramCount');
+    if (baselineCounts.some((value) => value < MIN_BASELINE_PROGRAM_COUNT)) {
+      throw new Error(
+        `${name}: warmup baseline program count ${Math.min(...baselineCounts)} is below ${MIN_BASELINE_PROGRAM_COUNT}; calibration cannot prove the scenario exercises first-draw work`,
+      );
     }
-    // Long frames are deliberately NOT a detection requirement here. The
-    // upstream compile-storm fixes (PR 3161) already pull the crowd and churn
-    // scenarios to zero or near-zero long frames on a healthy build, so
-    // demanding brokenness would deadlock calibration forever. The long-frame
-    // noise floor is still derived below and gates regressions; the compile
-    // count above stays the detection proof that the scenario exercises
-    // first-draw work at all.
   }
   const soakSettledHeap = metricValues(records, 'soak', 'settledHeapDeltaMb');
   if (soakSettledHeap.some((value) => value <= 0)) {

@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { buildHitchFixtureRows, soakCosmeticInputs } from '../scripts/lib/perf_hitch_scenarios.mjs';
+import * as soakModule from '../scripts/lib/perf_hitch_soak.mjs';
 import {
   buildSoakChurnPlan,
   estimateHeapFloorGrowthMb,
@@ -275,5 +277,19 @@ describe('deterministic hitch soak churn', () => {
         ['mount-a'],
       ),
     ).toThrow(/planned bow cosmetics for bot 2 holding staff/);
+  });
+
+  it('declares every runtime export in the hand-written .d.mts', () => {
+    // The tests/market_filler_listings.test.ts pattern: anchored at line start
+    // so a commented-out declaration cannot match, compared as a sorted set so
+    // the sweep runs both ways and a stale declaration fails too.
+    const dts = readFileSync(
+      new URL('../scripts/lib/perf_hitch_soak.d.mts', import.meta.url),
+      'utf8',
+    );
+    const declared = [...dts.matchAll(/^export (?:declare )?(?:function|const) (\w+)/gm)]
+      .map((match) => match[1])
+      .sort();
+    expect(declared).toEqual(Object.keys(soakModule).sort());
   });
 });

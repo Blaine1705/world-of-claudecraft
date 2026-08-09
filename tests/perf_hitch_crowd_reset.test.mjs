@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import * as crowdResetModule from '../scripts/lib/perf_hitch_crowd_reset.mjs';
 import {
   assertCrowdResetEvidence,
   assertNoRateLimiterErrors,
@@ -1199,5 +1201,19 @@ describe('crowd reset command pacing', () => {
         0,
       ),
     ).toEqual([]);
+  });
+
+  it('declares every runtime export in the hand-written .d.mts', () => {
+    // The tests/market_filler_listings.test.ts pattern: anchored at line start
+    // so a commented-out declaration cannot match, compared as a sorted set so
+    // the sweep runs both ways and a stale declaration fails too.
+    const dts = readFileSync(
+      new URL('../scripts/lib/perf_hitch_crowd_reset.d.mts', import.meta.url),
+      'utf8',
+    );
+    const declared = [...dts.matchAll(/^export (?:declare )?(?:function|const) (\w+)/gm)]
+      .map((match) => match[1])
+      .sort();
+    expect(declared).toEqual(Object.keys(crowdResetModule).sort());
   });
 });

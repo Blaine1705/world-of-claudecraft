@@ -42,7 +42,17 @@ const BEFORE_PATH = path.join(DATA_DIR, 'before.json');
 const OFFLINE_URL = (process.env.GAME_URL ?? 'http://localhost:5173').replace(/\/+$/, '');
 const SERVER_URL = (process.env.SERVER_URL ?? 'http://localhost:8787').replace(/\/+$/, '');
 const LOG_PATHS = ['tmp/logs/vite.log', 'tmp/logs/build.log', 'tmp/logs/server.log'];
-const plan = buildHitchCliPlan(process.argv.slice(2));
+function buildPlanOrExit(argv) {
+  try {
+    return buildHitchCliPlan(argv);
+  } catch (error) {
+    printHelp();
+    console.error(`[hitch] invalid arguments: ${error?.message ?? error}`);
+    process.exit(1);
+  }
+}
+
+const plan = buildPlanOrExit(process.argv.slice(2));
 const command = plan.command;
 let activeRoster = null;
 let shutdownStarted = false;
