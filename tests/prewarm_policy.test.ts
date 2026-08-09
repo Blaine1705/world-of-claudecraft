@@ -11,6 +11,7 @@ import {
   orderedPrewarmIds,
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
+  partitionResidentSkyBiomes,
   prewarmBuildDeadline,
   prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -18,7 +19,9 @@ import {
   prewarmEntryShouldDefer,
   prewarmProgramContentKeys,
   remainingPrewarmViewBudget,
+  resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
+  skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
 
@@ -42,7 +45,6 @@ const BASE: PrewarmPolicyInput = {
 // Kept in lockstep with the renderer by the "matches the renderer's real
 // manifest" case below, which parses the source.
 const MANIFEST_IDS = [
-  'sky.nearby-biomes',
   'views.required',
   'views.landmarks',
   'views.persistent-portals',
@@ -65,6 +67,7 @@ const MANIFEST_IDS = [
   'vfx.atlas',
   'vfx.weapon-skins',
   'vfx.ability-primitives',
+  'sky.nearby-biomes',
   'world.initial-frame',
   'programs.compile',
   'programs.budget-variants',
@@ -414,7 +417,7 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
     expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
     // The memory-heavy warms are skipped.
     expect(prewarmEntryRuns('entities.mob-archetypes', p)).toBe(false);
-    expect(prewarmEntryRuns('sky.biome-variants', p)).toBe(false);
+    expect(prewarmEntryRuns('sky.nearby-biomes', p)).toBe(false);
   });
 
   it('initializes scene textures in bounded batches', () => {
@@ -522,7 +525,7 @@ describe('constrained skips that still resume in the background', () => {
     for (const id of [
       'entities.mob-archetypes',
       'entities.npc-archetypes',
-      'sky.biome-variants',
+      'sky.nearby-biomes',
       'surface-detail.textures',
       'vfx.atlas',
     ]) {
@@ -764,9 +767,9 @@ describe('constrained entry view creation ramp', () => {
     ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       `await this.prewarmInitialSceneTexturesBatched(
-                policy.textureBatchSize,
-                policy.textureMaxMs,
-              )`,
+              policy.textureBatchSize,
+              policy.textureMaxMs,
+            )`,
     );
     const collectionStart = renderer.indexOf('private collectInitialSceneTextures(');
     const collectionEnd = renderer.indexOf(
@@ -814,5 +817,181 @@ describe('runtime entity-view parity', () => {
     expect(renderer).toContain('private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;');
     expect(renderer).not.toContain('options.submit');
     expect(renderer).not.toContain('postOverlayViewCreateBudget(');
+  });
+});
+
+describe('boot prewarm ordering: the sky fetch never starves the compute stages', () => {
+  const rendererSource = (): string =>
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8').replace(
+      /\r\n/g,
+      '\n',
+    );
+
+  it('declares the sky entry after the compute stages, just before the first frame', () => {
+    // Budget-hungry compute stages come first; the sky entry joins just before
+    // the first frame so inline uploads still land behind the loading screen.
+    // (parsedManifestEntries pins MANIFEST_IDS === the real source order.)
+    const skyIdx = MANIFEST_IDS.indexOf('sky.nearby-biomes');
+    expect(skyIdx).toBeGreaterThan(MANIFEST_IDS.indexOf('entities.player-archetypes'));
+    expect(skyIdx).toBeGreaterThan(MANIFEST_IDS.indexOf('vfx.ability-primitives'));
+    expect(skyIdx).toBe(MANIFEST_IDS.indexOf('world.initial-frame') - 1);
+  });
+
+  it('async arm: programs.compile interposes between the sky entry and the first frame', () => {
+    // Declaration order (above) is not the async-arm BOOT order:
+    // compileBeforeFirstFrame moves programs.compile to just before
+    // world.initial-frame, so the real order is the adjacency triple asserted
+    // here, and the sky entry's bounded inline-wait reserve is what protects
+    // compile RUN time.
+    const ordered = orderedPrewarmIds(MANIFEST_IDS, resolvePrewarmPolicy(BASE));
+    const skyIdx = ordered.indexOf('sky.nearby-biomes');
+    expect(skyIdx).toBeGreaterThan(-1);
+    expect(ordered[skyIdx + 1]).toBe('programs.compile');
+    expect(ordered[skyIdx + 2]).toBe('world.initial-frame');
+  });
+
+  it('kicks the sky prefetch off before the manifest instead of awaiting it inline', () => {
+    const source = rendererSource();
+    const prefetchAt = source.indexOf('trackPrefetch(ensureSkyBiomeAssets(initialSkyBiomes))');
+    const manifestAt = source.indexOf('const manifest: PrewarmManifestEntry[] = [');
+    expect(prefetchAt).toBeGreaterThan(-1);
+    expect(manifestAt).toBeGreaterThan(-1);
+    expect(prefetchAt).toBeLessThan(manifestAt);
+    // The starvation shape: a raw inline await of the fetch inside an entry.
+    expect(source).not.toContain('await ensureSkyBiomeAssets(');
+    // The entry waits only through the budget-bounded prefetch race.
+    expect(source).toContain('await waitForPrefetch(skyAssetPrefetch, waitMs, sleep)');
+    expect(source).toContain('reserveMs: PREWARM_BUILD_RESERVE_MS');
+    // Constrained profiles skip the sky entry, so they must not fetch either.
+    expect(source).toContain(
+      "const skyAssetPrefetch = prewarmEntryRuns('sky.nearby-biomes', policy)",
+    );
+  });
+
+  it('defers unfetched biomes to a dedicated lane, never the shared resume queue', () => {
+    const source = rendererSource();
+    const deferredLaneAt = source.indexOf('if (skyAssetPrefetch && !skyWarmComplete) {');
+    const sharedResumeAt = source.indexOf('resumeDroppedPrewarmEntries(resume, {');
+    expect(deferredLaneAt).toBeGreaterThan(-1);
+    expect(sharedResumeAt).toBeGreaterThan(-1);
+    // The dedicated lane chains off the prefetch task itself and enters the
+    // GPU queue only after the data is resident: a black-holed network can
+    // wedge neither the resume lane nor a bounded released-tail slot.
+    const lane = source.slice(deferredLaneAt, source.indexOf('const elapsed', deferredLaneAt));
+    expect(lane).toContain('void skyAssetPrefetch.task');
+    expect(lane).toContain('GPU_WORK_PRIORITY.BOOT_RESUME');
+    expect(lane).toContain('this.prewarmTextureInIdle(');
+    expect(lane).not.toContain('droppedEntries.push');
+  });
+
+  it('resolves every ran entry through the honest status gate', () => {
+    const source = rendererSource();
+    expect(source).toContain("if (status === 'completed') status = resolvePrewarmEntryStatus(");
+  });
+});
+
+describe('skyAssetInlineWaitMs: the sky wait can never eat the tail reserve', () => {
+  it('waits only up to deadline minus reserve', () => {
+    expect(
+      skyAssetInlineWaitMs({
+        nowMs: 1_000,
+        deadlineMs: 13_000,
+        reserveMs: 3_000,
+        finishFullManifestBeforeReveal: false,
+      }),
+    ).toBe(9_000);
+  });
+
+  it('returns zero once the reserve boundary has passed', () => {
+    expect(
+      skyAssetInlineWaitMs({
+        nowMs: 11_000,
+        deadlineMs: 13_000,
+        reserveMs: 3_000,
+        finishFullManifestBeforeReveal: false,
+      }),
+    ).toBe(0);
+    expect(
+      skyAssetInlineWaitMs({
+        nowMs: 20_000,
+        deadlineMs: 13_000,
+        reserveMs: 3_000,
+        finishFullManifestBeforeReveal: false,
+      }),
+    ).toBe(0);
+  });
+
+  it('property: the wait never extends past the reserve boundary', () => {
+    for (const nowMs of [0, 2_500, 9_000, 9_999, 10_000, 12_000, 30_000]) {
+      const waitMs = skyAssetInlineWaitMs({
+        nowMs,
+        deadlineMs: 13_000,
+        reserveMs: 3_000,
+        finishFullManifestBeforeReveal: false,
+      });
+      // Waiting can never push the clock past deadline - reserve; once the
+      // boundary has passed the wait is zero.
+      expect(waitMs).toBeLessThanOrEqual(Math.max(0, 13_000 - 3_000 - nowMs));
+      expect(waitMs).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('desktop Insane (finish-full-manifest) waits without bound, as its contract requires', () => {
+    expect(
+      skyAssetInlineWaitMs({
+        nowMs: 12_500,
+        deadlineMs: 13_000,
+        reserveMs: 3_000,
+        finishFullManifestBeforeReveal: true,
+      }),
+    ).toBe(Number.POSITIVE_INFINITY);
+  });
+});
+
+describe('partitionResidentSkyBiomes', () => {
+  it('splits by residency preserving order', () => {
+    const resident = new Set(['vale', 'peaks']);
+    expect(
+      partitionResidentSkyBiomes(['vale', 'marsh', 'peaks', 'fen'], (b) => resident.has(b)),
+    ).toEqual({ resident: ['vale', 'peaks'], missing: ['marsh', 'fen'] });
+  });
+
+  it('handles the all-resident and all-missing extremes', () => {
+    expect(partitionResidentSkyBiomes(['vale'], () => true)).toEqual({
+      resident: ['vale'],
+      missing: [],
+    });
+    expect(partitionResidentSkyBiomes(['vale'], () => false)).toEqual({
+      resident: [],
+      missing: ['vale'],
+    });
+    expect(partitionResidentSkyBiomes([], () => true)).toEqual({ resident: [], missing: [] });
+  });
+});
+
+describe('resolvePrewarmEntryStatus: the completed-lie stays dead', () => {
+  it('a deadline-trimmed entry with zero work is partial, never completed', () => {
+    // The original bug: entities.player-archetypes hit its build deadline with
+    // ZERO visuals built and the summary still said completed. Restoring that
+    // lie turns this red.
+    const status = resolvePrewarmEntryStatus({ done: 0, planned: 118, trimmed: true });
+    expect(status).toBe('partial');
+    expect(status).not.toBe('completed');
+  });
+
+  it('a partially built entry is partial with its counts intact', () => {
+    expect(resolvePrewarmEntryStatus({ done: 37, planned: 118, trimmed: true })).toBe('partial');
+  });
+
+  it('an untrimmed entry stays completed', () => {
+    expect(resolvePrewarmEntryStatus({ done: 118, planned: 118, trimmed: false })).toBe(
+      'completed',
+    );
+    expect(resolvePrewarmEntryStatus({ trimmed: false })).toBe('completed');
+  });
+
+  it('entries without progress tracking keep the historical completed status', () => {
+    expect(resolvePrewarmEntryStatus(null)).toBe('completed');
+    expect(resolvePrewarmEntryStatus(undefined)).toBe('completed');
   });
 });

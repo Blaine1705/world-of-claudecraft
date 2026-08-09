@@ -98,7 +98,7 @@ interface AttributionTargetFixture {
 // Re-minted for the prewarm coverage completion (settle-state entry, program
 // content keys, widened depth arm). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4590589e6b76f5774ffeb88d7ac9419f4b5f69c065be2a3f284a502659b2bfe7';
+  '9e8ee6cbd21758ebd0135789837e504b3623a9cd2184e244eee019ef22af78c5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
