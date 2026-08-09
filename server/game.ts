@@ -151,6 +151,11 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  type CosmeticOpGuardState,
+  consumeCosmeticOpToken,
+  createCosmeticOpGuard,
+} from './cosmetic_op_guard';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -981,6 +986,12 @@ export interface ClientSession {
   // log entry, so the rate is capped far above human banking cadence and
   // refusals tally into the shared abuse window like every other shed frame.
   guildBankOpGuard: GuildBankOpGuardState;
+  // Token bucket shared by the two Book of Deeds cosmetic sets (title and
+  // border): both fields are identityFields members, so every accepted set
+  // re-wires the FULL identity record to every in-range viewer, and the rate
+  // is capped far above human picking cadence with refusals tallying into the
+  // shared abuse window like every other shed frame.
+  cosmeticOpGuard: CosmeticOpGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -1353,6 +1364,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   if (e.guild) out.gd = e.guild;
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+  if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
@@ -3659,6 +3671,7 @@ export class GameServer {
       msgLanes: createMsgLanes(Date.now() / 1000),
       listReadGuard: createListReadGuard(Date.now() / 1000),
       guildBankOpGuard: createGuildBankOpGuard(Date.now() / 1000),
+      cosmeticOpGuard: createCosmeticOpGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -6143,6 +6156,22 @@ export class GameServer {
     return false;
   }
 
+  /** Draw a cosmetic-set guard token (Reliquary border review): a title or
+   *  border change bumps idVer, so every allowed set broadcasts the FULL
+   *  identity record to every in-range viewer before the distance tier can
+   *  thin it. Sets above the far-above-human budget are dropped and tally
+   *  into the same abuse window as every other shed frame. Returns whether to
+   *  run the set. */
+  private consumeCosmeticOp(session: ClientSession, nowSec: number): boolean {
+    if (consumeCosmeticOpToken(session.cosmeticOpGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('cosmetic');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
   private dispatchMessage(
     session: ClientSession,
     rawMsg: unknown,
@@ -7755,9 +7784,24 @@ export class GameServer {
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid
       // input is a silent no-op); the server only shape-checks the payload.
+      // Both cosmetic sets draw from ONE bucket (consumeCosmeticOp): each
+      // accepted change re-wires the full identity record to every in-range
+      // viewer, so alternating between the two must not buy twice the budget.
       case 'deed_set_title':
+        if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
         if (msg.deedId === null || typeof msg.deedId === 'string') {
           sim.setActiveTitle(msg.deedId, pid);
+        }
+        break;
+      // Book of Deeds: select/clear the displayed nameplate border. Same
+      // division of labour as the title above (the sim validator owns every
+      // rule: deed earned + border reward; null clears; invalid input is a
+      // silent no-op), so the server only shape-checks the payload, and the
+      // same shared cosmetic bucket meters it.
+      case 'deed_set_border':
+        if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
+        if (msg.deedId === null || typeof msg.deedId === 'string') {
+          sim.setActiveBorder(msg.deedId, pid);
         }
         break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
@@ -8851,11 +8895,13 @@ export class GameServer {
     // self deltas are authoritative and clear stale client mirrors with false/null.
     maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
     maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
-    // Book of Deeds: the Renown total and the selected title id, cheap
-    // scalars diffed per tick (grants land from sim sites that never mark
-    // this session dirty, and the title echo must not wait on the heavy gate).
+    // Book of Deeds: the Renown total and the two selected cosmetic ids
+    // (title and nameplate border), cheap scalars diffed per tick (grants land
+    // from sim sites that never mark this session dirty, and neither cosmetic
+    // echo must wait on the heavy gate).
     maybe('renown', meta.renown);
     maybe('atitle', meta.activeTitle);
+    maybe('aborder', meta.activeBorder);
     // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
     // whole minutes so the serialized form changes about once a minute and the
     // delta gate drops it from every other tick; the sheet displays minutes at

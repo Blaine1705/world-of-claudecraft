@@ -409,13 +409,15 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
-  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title reads + the
-  // title selection command ---
+  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
+  // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
   { name: 'deedStats', kind: 'data' },
   { name: 'renown', kind: 'data' },
   { name: 'activeTitle', kind: 'data' },
   { name: 'setActiveTitle', kind: 'method' },
+  { name: 'activeBorder', kind: 'data' },
+  { name: 'setActiveBorder', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
@@ -572,10 +574,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // playtimeSeconds (IWorldProgressionXp, data), for 302 on pure release.
     // The Reliquary facet adds eight members (4 data + 4 methods),
     // leaving 310. The fourth data member is reliquaryObtainCounts, the
-    // Phase 17 per-relic obtain tally.
-    expect(IWORLD_MEMBERS.length).toBe(310);
-    expect(DATA_MEMBERS.length).toBe(81);
-    expect(METHOD_MEMBERS.length).toBe(229);
+    // Phase 17 per-relic obtain tally. The Phase 19 nameplate border adds the
+    // IWorldDeeds pair activeBorder (data) + setActiveBorder (method),
+    // leaving 312.
+    expect(IWORLD_MEMBERS.length).toBe(312);
+    expect(DATA_MEMBERS.length).toBe(82);
+    expect(METHOD_MEMBERS.length).toBe(230);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -593,6 +597,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountCosmetics',
       'accountFlair',
+      'activeBorder',
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
@@ -839,6 +844,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
       'setHelmHidden',
@@ -902,6 +908,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('the sorted data-kind set is exactly the pinned contract', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
+      'activeBorder',
       'activeFrostRings',
       'activeLoadout',
       'activeMobileStationCraft',
@@ -1170,6 +1177,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
       'setHelmHidden',
@@ -1716,6 +1724,8 @@ const FACET_DEEDS = [
   'renown',
   'activeTitle',
   'setActiveTitle',
+  'activeBorder',
+  'setActiveBorder',
   'deedsRarity',
   'deedsRecent',
   'deedsLeaderboard',
@@ -1813,8 +1823,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(310);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(310);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(312);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(312);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

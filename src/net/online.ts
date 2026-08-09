@@ -1431,6 +1431,7 @@ function blankEntity(id: number): Entity {
     equippedInstances: {},
     guild: '',
     title: null,
+    border: null,
   };
 }
 
@@ -1568,7 +1569,8 @@ export class ClientWorld implements IWorld {
   private guildBankLogState: 'idle' | 'ready' | 'refused' = 'idle';
   private guildBankLogAt = 0;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
-  // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
+  // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle`/`s.aborder`
+  // per-tick diffed).
   // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
   // toasts and must NEVER mutate these mirrors; snapshot state is the single
   // authority, so reconnects and missed event frames cannot drift them. ---
@@ -1576,6 +1578,7 @@ export class ClientWorld implements IWorld {
   deedStats: DeedStats = freshDeedStats();
   renown = 0;
   activeTitle: string | null = null;
+  activeBorder: string | null = null;
   // --- IWorldReliquary: sparse firstFind / marks / recent from heavy-gated
   // `s.reliq`. Item ownership still rides deedStats.itemsDiscovered (never a
   // second discovery blob). `reliquaryUnlock` is presentation-only. ---
@@ -2827,6 +2830,7 @@ export class ClientWorld implements IWorld {
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
+        e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];
@@ -3445,8 +3449,8 @@ export class ClientWorld implements IWorld {
         if (hadGate !== (this.guildBankInfo !== null)) this.resetGuildBankLog();
       }
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
-      // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
-      // key keeps the prior mirror). The wire carries plain objects/arrays
+      // `renown`/`atitle`/`aborder` per-tick diffed (all five delta-omitted: a
+      // missing key keeps the prior mirror). The wire carries plain objects/arrays
       // (Maps and Sets do not survive JSON.stringify), so the earned Map and
       // both stat Sets rebuild here. `deedUnlocked` events are presentation
       // only and never touch these mirrors. ---
@@ -3461,6 +3465,7 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      if (s.aborder !== undefined) this.activeBorder = s.aborder ?? null;
       // --- IWorldReliquary self-decode: `reliq` is heavy-gated and delta-omitted
       // (a missing key keeps the prior mirror). Payload is the omit-empty
       // SavedReliquaryState shape; never a second full itemsDiscovered array.
@@ -4945,6 +4950,11 @@ export class ClientWorld implements IWorld {
   // sim validator accepts, so a rejected send leaves the client untouched. ---
   setActiveTitle(deedId: string | null): void {
     this.cmd({ cmd: 'deed_set_title', deedId });
+  }
+  // Nameplate-border selection, same contract as the title above: no
+  // optimistic local write, the mirror updates from the `aborder` echo.
+  setActiveBorder(deedId: string | null): void {
+    this.cmd({ cmd: 'deed_set_border', deedId });
   }
   // --- IWorldReliquary pure completion helpers: recompute from catalog +
   // mirrored ownership (itemsDiscovered, marks, mounts, account skins, deeds).

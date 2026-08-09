@@ -112,6 +112,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.reliquaryObtainCounts = {};
   c.renown = 0;
   c.activeTitle = null;
+  c.activeBorder = null;
   c.delveRun = null;
   c.companionState = null;
   c.riftFloor = null;

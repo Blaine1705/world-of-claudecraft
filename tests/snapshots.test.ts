@@ -24,6 +24,7 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
@@ -2636,6 +2637,11 @@ describe('active title wire (Book of Deeds)', () => {
     (client as any).connected = true;
     (client as any).ws = { readyState: 1, send: (p: string) => outbox.push(p) };
     client.setActiveTitle('prog_veteran');
+    // Asserted HERE, between the select and the clear: the send writes NO
+    // optimistic local copy (the mirror only moves when the server echo
+    // lands), so a refused pick can never leave a phantom worn title on the
+    // client. After the trailing clear this would read null either way.
+    expect(client.activeTitle).toBeNull();
     client.setActiveTitle(null);
     expect(outbox.map((p) => JSON.parse(p))).toEqual([
       { t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' },
@@ -2764,6 +2770,349 @@ describe('active title wire (Book of Deeds)', () => {
     expect(client.deedsEarned.size).toBe(0);
     expect(client.activeTitle).toBeNull();
     expect(client.renown).toBe(0);
+  });
+});
+
+// The Book of Deeds nameplate border rides the identity wire (key `border`, a
+// deed id, never the reward slug and never display text) so other players'
+// borders reach nameplates/inspect. Emitted only when non-null (mobs and
+// borderless players pay zero bytes); the sim validator (src/sim/deeds.ts
+// setActiveBorder) is the only writer. Every arm is the exact sibling of the
+// active-title suite above, plus the cross-kind rejection both ways: the two
+// cosmetics share one earned set and one reward field, so a validator that
+// checked "has a reward" instead of "has a reward of MY kind" would let a
+// title ride the border wire.
+describe('active border wire (Book of Deeds)', () => {
+  // prog_prestige_10 rewards { kind: 'border', slug: 'prestige_laurels' };
+  // prog_veteran rewards a title. The pair is what makes the kind checks
+  // below decisive (tests/deeds_content.test.ts pins the four border deeds).
+  const BORDER_DEED = 'prog_prestige_10';
+  const TITLE_DEED = 'prog_veteran';
+
+  it('carries the border deed id through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    expect(wireEntity(e).border).toBeUndefined();
+
+    // earn a border-reward deed, then select it through the sim setter
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    sim.setActiveBorder(BORDER_DEED, pid);
+    expect(wireEntity(e).border).toBe(BORDER_DEED);
+
+    // clearing the border drops the key, so the frame disappears for viewers
+    sim.setActiveBorder(null, pid);
+    expect(wireEntity(e).border).toBeUndefined();
+  });
+
+  it('rejects a cross-kind deed in BOTH directions and never crosses the two wire fields', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Crosskind');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    meta.deedsEarned.set(TITLE_DEED, '2026-07-08');
+
+    // an EARNED title deed is not a border: the border setter refuses it
+    sim.setActiveBorder(TITLE_DEED, pid);
+    expect(meta.activeBorder).toBeNull();
+    expect(wireEntity(e).border).toBeUndefined();
+
+    // and an EARNED border deed is not a title: the title setter refuses it
+    sim.setActiveTitle(BORDER_DEED, pid);
+    expect(meta.activeTitle).toBeNull();
+    expect(wireEntity(e).title).toBeUndefined();
+
+    // each accepts its own kind, and neither write lands on the other's field
+    sim.setActiveBorder(BORDER_DEED, pid);
+    sim.setActiveTitle(TITLE_DEED, pid);
+    expect(wireEntity(e).border).toBe(BORDER_DEED);
+    expect(wireEntity(e).title).toBe(TITLE_DEED);
+  });
+
+  it('restores entity.border on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, border: BORDER_DEED }] });
+    expect(client.entities.get(7)?.border).toBe(BORDER_DEED);
+
+    // a later full record without `border` means "borderless" -> reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.border).toBeNull();
+  });
+
+  it('server dispatch shape-checks the payload and routes through the sim validator', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Bordered');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    // The sim validator refuses a non-string too, so a state-only assertion
+    // cannot tell the server's shape check apart from the sim's: it stays
+    // green with the check deleted. Spy on the CALL, which is exactly what the
+    // shape check exists to prevent.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+
+    // a non-string, non-null payload never reaches the sim (silent no-op)
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: 42 }));
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+
+    // a raw frame naming an UNEARNED border deed DOES reach the sim (a string
+    // clears the shape check) and is refused there by the validator
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: 'dgn_deepward' }),
+    );
+    expect(setter).toHaveBeenCalledWith('dgn_deepward', session.pid);
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+    setter.mockRestore();
+
+    // the earned border-reward deed is accepted and echoes on the snapshot
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.aborder).toBe(BORDER_DEED);
+  });
+
+  it('the ClientWorld send frame round-trips through the server dispatch (key lockstep)', () => {
+    // Same reasoning as the title arm: drive the REAL ClientWorld send path and
+    // feed the produced frame verbatim into server.handleMessage, so a key
+    // rename on EITHER side reddens here instead of silently no-oping.
+    const outbox: string[] = [];
+    const client = bareClient(1);
+    (client as any).connected = true;
+    (client as any).ws = { readyState: 1, send: (p: string) => outbox.push(p) };
+    client.setActiveBorder(BORDER_DEED);
+    // Same as the title arm, and asserted at the same point: no optimistic
+    // local copy, so the mirror stays null between the select and the echo.
+    expect(client.activeBorder).toBeNull();
+    client.setActiveBorder(null);
+    expect(outbox.map((p) => JSON.parse(p))).toEqual([
+      { t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED },
+      { t: 'cmd', cmd: 'deed_set_border', deedId: null },
+    ]);
+
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lockstep');
+    const meta = server.sim.players.get(session.pid)!;
+    const e = server.sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(session, outbox[0]); // the client-built select frame
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    server.handleMessage(session, outbox[1]); // the client-built clear frame
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+  });
+
+  it('a null payload through the server dispatch clears the border and echoes null', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cleared');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: null }),
+    );
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.aborder).toBeNull();
+  });
+
+  it('a second client sees the first client entity border after the re-wire', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 1, 'Wearer');
+    const fcB = fakeWs();
+    const b = joinServer(server, fcB, 2, 'Viewer');
+    const sim = server.sim;
+    sim.players.get(a.pid)!.deedsEarned.set(BORDER_DEED, '2026-07-08');
+
+    // before the border: B's view of A carries no `border` key
+    broadcast(server);
+    const viewerB = bareClient(b.pid);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border ?? null).toBeNull();
+
+    // A selects the border; the identity change re-wires A as a full record on
+    // the next tick (the per-entity wire cache re-serializes at most once per
+    // sim tick, so the tick between command and broadcast mirrors production)
+    server.handleMessage(
+      a,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border).toBe(BORDER_DEED);
+
+    // A clears; the identity JSON loses the key, so A re-wires as a full
+    // record WITHOUT `border` and B's mirror must return to null (the ?? null
+    // default in the apply, not a stale carry-over)
+    server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: null }));
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border).toBeNull();
+  });
+
+  it('a fresh player wires a null border that decodes faithfully', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Fresh');
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // empty-value fidelity on the wire (the delta-key presence test only
+    // proves the key rides the first snapshot)
+    expect(snap.self.aborder).toBeNull();
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.activeBorder).toBeNull();
+  });
+});
+
+// The two Book of Deeds cosmetic sets share ONE per-session token bucket
+// (server/cosmetic_op_guard.ts). Both `title` and `border` are identityFields
+// members, so an accepted set bumps idVer and re-wires the FULL identity
+// record to every in-range viewer BEFORE the distance-tier thinning, and the
+// command lane alone would allow that at 30/s. These arms drive the REAL
+// dispatch, and drive the guard's clock through Date.now (which is where
+// handleMessage stamps its receive time) rather than reaching into the bucket.
+describe('cosmetic set rate guard (one bucket for title and border)', () => {
+  const BORDER_DEED = 'prog_prestige_10';
+  const TITLE_DEED = 'prog_veteran';
+  const NOW_MS = 1_700_000_000_000;
+  let clock: ReturnType<typeof vi.spyOn> | null = null;
+
+  const freezeAt = (ms: number): void => {
+    clock?.mockRestore();
+    clock = vi.spyOn(Date, 'now').mockReturnValue(ms) as ReturnType<typeof vi.spyOn>;
+  };
+
+  afterEach(() => {
+    clock?.mockRestore();
+    clock = null;
+  });
+
+  /** A joined session holding both cosmetic deeds, with the clock frozen so
+   *  every frame below lands in the same second (the command lane's own burst
+   *  is 60, far above these counts, so a refusal here is the cosmetic guard). */
+  const wearer = () => {
+    freezeAt(NOW_MS);
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Flooder');
+    const meta = server.sim.players.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    meta.deedsEarned.set(TITLE_DEED, '2026-07-08');
+    return { server, session, meta };
+  };
+
+  const setBorder = (server: GameServer, session: ClientSession, id: string | null): void => {
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: id }));
+  };
+  const setTitle = (server: GameServer, session: ClientSession, id: string | null): void => {
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: id }));
+  };
+
+  it('pins the budget against disagreeing literals', () => {
+    // The arms below spend COSMETIC_OP_BURST tokens, so they would follow a
+    // silent budget change; these literals are what makes them decisive.
+    expect(COSMETIC_OP_BURST).toBe(10);
+    expect(COSMETIC_OP_REFILL_PER_SECOND).toBe(1);
+  });
+
+  it('lets a whole burst of alternating sets through, every one landing', () => {
+    const { server, session, meta } = wearer();
+    // Checked after EVERY frame: a guard that dropped one mid-burst would be
+    // invisible to an end-state assertion on an even count.
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) {
+      const wanted = i % 2 === 0 ? BORDER_DEED : null;
+      setBorder(server, session, wanted);
+      expect(meta.activeBorder, `set ${i} of the burst was dropped`).toBe(wanted);
+    }
+  });
+
+  it('stops changing state past the budget, and the sim setter stops being called', () => {
+    const { server, session, meta } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST - 1; i++) setBorder(server, session, BORDER_DEED);
+    // The last token buys the state we then hold frozen through the flood.
+    setBorder(server, session, BORDER_DEED);
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    // A state-only assertion cannot tell a dropped frame from one the sim
+    // validator refused, so spy on the CALL: past the budget the frame never
+    // reaches the sim at all.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    for (let i = 0; i < 12; i++) setBorder(server, session, null);
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    setter.mockRestore();
+  });
+
+  it('draws BOTH commands from the same bucket (titles exhaust it for borders)', () => {
+    const { server, session, meta } = wearer();
+    // Spend the whole budget on titles only.
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) {
+      setTitle(server, session, i % 2 === 0 ? TITLE_DEED : null);
+    }
+    expect(meta.activeTitle).toBeNull(); // the even-count burst ends cleared
+
+    // A perfectly valid border set now finds the shared bucket empty: two
+    // buckets would let an alternating flooder buy twice the re-wire budget.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    setBorder(server, session, BORDER_DEED);
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBeNull();
+    setter.mockRestore();
+  });
+
+  it('refills one op per second of received time, and no more', () => {
+    const { server, session, meta } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) setBorder(server, session, BORDER_DEED);
+    setBorder(server, session, null);
+    expect(meta.activeBorder).toBe(BORDER_DEED); // drained: the clear was dropped
+
+    freezeAt(NOW_MS + 1000); // exactly one refilled token
+    setBorder(server, session, null);
+    expect(meta.activeBorder).toBeNull();
+    setBorder(server, session, BORDER_DEED);
+    expect(meta.activeBorder).toBeNull(); // and nothing beyond that one
   });
 });
 
@@ -3406,6 +3755,7 @@ describe('online mount command and race-event transport', () => {
 // (reliquaryWireJson), never shared across viewers. The count is the union of the
 // release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
 const ALL_DELTA_KEYS = [
+  'aborder',
   'achg',
   'achr',
   'arena',
@@ -3487,6 +3837,7 @@ const ALL_DELTA_KEYS = [
 // they merge into one `cupInfo` (per-viewer remainder on vcup, realm-wide fragment
 // on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
+  aborder: 'activeBorder',
   achg: 'abilityCharges',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
@@ -3717,8 +4068,10 @@ function dirtyEveryDeltaField(): {
   };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
-  // sets, and a clear record, a renown total, and an active title
-  // (prog_veteran carries a title reward, so the sim setter would accept it).
+  // sets, and a clear record, a renown total, an active title
+  // (prog_veteran carries a title reward, so the sim setter would accept it)
+  // and an active nameplate border (prog_prestige_10 carries a border reward,
+  // the other reward kind, so a swapped kind check would redden).
   meta.deedsEarned.set('prog_first_steps', '2026-07-01');
   meta.deedsEarned.set('prog_veteran', '2026-07-08');
   meta.deedStats.counters.kills = 7;
@@ -3727,6 +4080,7 @@ function dirtyEveryDeltaField(): {
   meta.deedStats.dungeonClears.hollow_crypt = 2;
   meta.renown = 15;
   meta.activeTitle = 'prog_veteran';
+  meta.activeBorder = 'prog_prestige_10';
   // Reliquary sparse blob (`reliq`): one catalogued first-find with BOTH of the
   // entry's fields (clears provenance and the Phase 17 obtain tally, which
   // rides folded onto the entry rather than as a fourth top-level key) plus a
@@ -4171,6 +4525,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.deedStats.dungeonClears).toEqual({ hollow_crypt: 2 });
     expect(client.renown).toBe(15); // renown (same name both sides, no rename)
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
+    expect(client.activeBorder).toBe('prog_prestige_10'); // aborder -> activeBorder
     // reliq fans out to reliquaryFirstFind / Marks / Recent (asserted directly like
     // tal; no TERSE_TO_IWORLD rename). Sparse blob only; not a second discovery set.
     // Phase 17 wire shape change: pageId dropped from the entry, the obtain
@@ -4368,12 +4723,13 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 68 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 69 unique keys in sorted order', () => {
     // +1 guildBank (Guild Bank Phase 2), +1 battleground bg, +1 commission
     // order board corder (issue #1298), +1 the character sheet's lifetime
-    // played-time key ptime, +1 reliq (Reliquary Phase 3 sparse blob).
-    expect(ALL_DELTA_KEYS).toHaveLength(68);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(68);
+    // played-time key ptime, +1 reliq (Reliquary Phase 3 sparse blob), +1
+    // aborder (the Book of Deeds nameplate border echo, atitle's sibling).
+    expect(ALL_DELTA_KEYS).toHaveLength(69);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(69);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4400,8 +4756,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, the commission order board key corder (issue #1298) for 66,
     // the character sheet's lifetime played-time key ptime for 67, and
-    // reliq (Reliquary Phase 3 sparse blob) for 68.
-    expect(scraped.size).toBe(68);
+    // reliq (Reliquary Phase 3 sparse blob) for 68, and the nameplate border
+    // echo aborder for 69.
+    expect(scraped.size).toBe(69);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4462,6 +4819,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       dcomp: 'companionUpgrades',
       dclears: 'delveClears',
       atitle: 'activeTitle',
+      aborder: 'activeBorder',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
       mntLesson: 'mountLessonActive',
