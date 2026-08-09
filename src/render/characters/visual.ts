@@ -47,8 +47,8 @@ import {
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
-import { characterMeshCastsShadow } from './shadow_policy';
 import type { ModularAppearance, ModularLook } from './modular';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,

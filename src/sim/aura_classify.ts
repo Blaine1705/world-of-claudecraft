@@ -57,9 +57,7 @@ export function isPlayerRemovableAura(
   aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'encounterOwned' | 'undispellable'>,
 ): boolean {
   return (
-    aura.encounterOwned !== true &&
-    !isUnbreakableControlAura(aura) &&
-    aura.undispellable !== true
+    aura.encounterOwned !== true && !isUnbreakableControlAura(aura) && aura.undispellable !== true
   );
 }
 

@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
-import type { VfxAnchorResolver } from './vfx_anchor';
 import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
@@ -11,6 +10,7 @@ import {
   ignivarJudgmentFireRate,
   writeIgnivarJudgmentFireSample,
 } from './ignivar_judgment_fire_core';
+import type { VfxAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,
   pointSpriteBoundingRadius,

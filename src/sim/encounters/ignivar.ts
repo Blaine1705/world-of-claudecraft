@@ -820,22 +820,13 @@ function finishIgnivarCast(boss: Entity): void {
 
 function spaceIgnivarMajorAbilities(st: IgnivarEncounterState): void {
   if (st.lastInfernoTriggered) {
-    st.finalFrontalTimer = Math.max(
-      st.finalFrontalTimer,
-      IGNIVAR_MAJOR_ABILITY_GAP_SECONDS,
-    );
-    st.rotatingRaysTimer = Math.max(
-      st.rotatingRaysTimer,
-      IGNIVAR_MAJOR_ABILITY_GAP_SECONDS,
-    );
+    st.finalFrontalTimer = Math.max(st.finalFrontalTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
+    st.rotatingRaysTimer = Math.max(st.rotatingRaysTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
     return;
   }
   st.frontalTimer = Math.max(st.frontalTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   st.skyfireTimer = Math.max(st.skyfireTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
-  st.rotatingRaysTimer = Math.max(
-    st.rotatingRaysTimer,
-    IGNIVAR_MAJOR_ABILITY_GAP_SECONDS,
-  );
+  st.rotatingRaysTimer = Math.max(st.rotatingRaysTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   st.forgeWaveTimer = Math.max(st.forgeWaveTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   st.soakTimer = Math.max(st.soakTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
 }
@@ -1454,8 +1445,7 @@ function releaseFrontal(
 export function resetIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   const rotatingRaysBossFacing =
     boss.ignivar &&
-    (boss.ignivar.rotatingRaysWindupRemaining > 0 ||
-      boss.ignivar.rotatingRaysActiveRemaining > 0)
+    (boss.ignivar.rotatingRaysWindupRemaining > 0 || boss.ignivar.rotatingRaysActiveRemaining > 0)
       ? boss.ignivar.rotatingRaysBossFacing
       : null;
   for (const meta of ctx.players.values()) {
@@ -1522,8 +1512,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   if (updateLastInferno(ctx, boss, st, players)) return;
   const finalPhase = st.lastInfernoTriggered;
   const sharedPyreBusy =
-    !finalPhase &&
-    updateSharedPyre(ctx, boss, st, players, !ignivarMajorAbilityActive(st));
+    !finalPhase && updateSharedPyre(ctx, boss, st, players, !ignivarMajorAbilityActive(st));
   updateMeteorRain(ctx, boss, st, players);
   players = playersInEncounter(ctx, boss);
   target = resolveLivingTarget(boss, players);

@@ -300,13 +300,15 @@ export function syncIgnivarEncounterVisuals(
       | { baseRotation: number; groupFacing: number; worldFacing: number }
       | undefined;
     if (bodyRoot && plan.rotatingRaysVisible) {
-      const lock =
-        bodyLock ??
-        (group.userData.ignivarRotatingRaysBodyLock = {
+      let lock = bodyLock;
+      if (!lock) {
+        lock = {
           baseRotation: bodyRoot.rotation.y,
           groupFacing: group.rotation.y,
           worldFacing: group.rotation.y + bodyRoot.rotation.y,
-        });
+        };
+        group.userData.ignivarRotatingRaysBodyLock = lock;
+      }
       bodyRoot.rotation.y = lock.worldFacing - group.rotation.y;
     } else if (bodyRoot && bodyLock) {
       const remainingTurn = Math.atan2(
