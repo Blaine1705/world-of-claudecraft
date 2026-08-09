@@ -95,8 +95,10 @@ interface AttributionTargetFixture {
 // No capture was retaken.
 // Re-minted for the entry-prewarm compile dedupe/batch + initial-frame reserve
 // (renderer.ts + prewarm_policy.ts edits). No capture was retaken.
+// Re-minted for the prewarm coverage completion (settle-state entry, program
+// content keys, widened depth arm). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5814282bb67c5976e6df241a7626452b229082fb6948e6abfa60f220bf2f4faf';
+  'efd1c895fca57be61dfee412d1bc03b701e6b4abb44be60a854ddcdd23ddbc3e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

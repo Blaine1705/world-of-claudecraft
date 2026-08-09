@@ -16,6 +16,7 @@ import {
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
+  prewarmProgramContentKeys,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
   withRestoredPrewarmState,
@@ -59,6 +60,7 @@ const MANIFEST_IDS = [
   'surface-detail.textures',
   'weather.materials',
   'landmarks.impact-site',
+  'world.settle-state',
   'textures.scene',
   'vfx.atlas',
   'vfx.weapon-skins',
@@ -87,10 +89,14 @@ function parsedManifestEntries(): { id: string; required: boolean; deadlineExemp
   return blocks.map((block) => {
     const id = /id: '([^']+)'/.exec(block)?.[1];
     expect(id).toBeTruthy();
+    // The VALUE matters, not the property's presence: a literal
+    // `deadlineExempt: false` is exactly the deferrable-required bug the
+    // downstream invariant hunts.
+    const exemptLiteral = /deadlineExempt: ([^,\n]+)/.exec(block)?.[1]?.trim();
     return {
       id: id as string,
       required: block.includes('required: true'),
-      deadlineExempt: block.includes('deadlineExempt:'),
+      deadlineExempt: exemptLiteral !== undefined && exemptLiteral !== 'false',
     };
   });
 }
@@ -226,6 +232,76 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
         expect(entry.deadlineExempt, `required entry ${id} is deferrable`).toBe(true);
       }
     }
+  });
+
+  it('encodes program-content keys exactly as fine as three program cache key', () => {
+    // The residue probe named the cost of a coarser key: 28 instanced-prop
+    // colour programs plus 3 instanced depth ones relinked at draw time over
+    // a missing instanceColor bit, and 4 more over morph COUNTS collapsed to
+    // a boolean. A dedupe key must distinguish every bit three keys on.
+    const base = { isSkinnedMesh: false, isInstancedMesh: true, castShadow: true };
+    const plain = prewarmProgramContentKeys({ ...base, hasInstanceColor: false }, ['mat-1']);
+    const colored = prewarmProgramContentKeys({ ...base, hasInstanceColor: true }, ['mat-1']);
+    expect(plain).toHaveLength(1);
+    expect(plain).not.toEqual(colored);
+
+    const morphs2 = prewarmProgramContentKeys({ morphTargetCount: 2 }, ['mat-1']);
+    const morphs6 = prewarmProgramContentKeys({ morphTargetCount: 6 }, ['mat-1']);
+    expect(morphs2).not.toEqual(morphs6);
+    expect(prewarmProgramContentKeys({ morphTargetCount: 2 }, ['mat-1'])).toEqual(morphs2);
+
+    // Presence vs absence: three defines USE_MORPHTARGETS on the position
+    // attribute's PRESENCE, so present-with-zero and absent are distinct.
+    expect(
+      prewarmProgramContentKeys({ hasMorphPositions: true, morphTargetCount: 0 }, ['mat-1']),
+    ).not.toEqual(prewarmProgramContentKeys({ hasMorphPositions: false }, ['mat-1']));
+
+    // Every remaining object/geometry cache-key bit is its own dimension:
+    // morph normal and colour counts, tangents, vertex colour item size
+    // (4 flips vertexAlphas), batched meshes.
+    const flat = prewarmProgramContentKeys({}, ['mat-1']);
+    expect(prewarmProgramContentKeys({ morphNormalCount: 2 }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ morphColorCount: 1 }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ hasTangents: true }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ vertexColorItemSize: 3 }, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({ vertexColorItemSize: 4 }, ['mat-1']),
+    );
+    expect(prewarmProgramContentKeys({ isBatchedMesh: true }, ['mat-1'])).not.toEqual(flat);
+
+    // Per-material keys: a two-material mesh contributes one key per slot.
+    expect(prewarmProgramContentKeys({}, ['mat-1', 'mat-2'])).toHaveLength(2);
+    // Different material, same shape: distinct keys.
+    expect(prewarmProgramContentKeys({}, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({}, ['mat-2']),
+    );
+  });
+
+  it('wires the compile dedupe and the widened shadow arm to the measured residue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    // The dedupe key comes from the shared pure helper, never a hand-rolled
+    // string that can drift from three's cache key again.
+    expect(renderer).toContain('prewarmProgramContentKeys(');
+    expect(renderer).toContain('hasInstanceColor: ');
+    expect(renderer).toContain('morphTargetCount: ');
+    // The prewarm depth material must match the REAL shadow pass variant:
+    // three's shadow depth material uses RGBADepthPacking and depthPacking is
+    // in the program cache key, so omitting it links a dead variant (the
+    // pre-existing defect the residue probe exposed: every skinned-shadow
+    // compile linked BasicDepthPacking, and the frame relinked all of them).
+    expect(renderer).toContain('depthPacking: THREE.RGBADepthPacking');
+    // The shadow arm covers every caster, not just skinned rigs: static and
+    // instanced casters' depth programs were 12 of the frame's 64 residual
+    // links.
+    const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
+    const shadowEnd = renderer.indexOf('\n  // A tiny throwaway target', shadowStart);
+    expect(shadowStart).toBeGreaterThan(-1);
+    expect(shadowEnd).toBeGreaterThan(shadowStart);
+    const shadowMethod = renderer.slice(shadowStart, shadowEnd);
+    expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.castShadow) return;');
+    expect(shadowMethod).not.toContain('if (!mesh.isSkinnedMesh || !mesh.castShadow) return;');
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -420,6 +496,10 @@ describe('the keep-list is the minimal entry set', () => {
         'views.nearby',
         'views.persistent-portals',
         'views.required',
+        // The pre-collection world-state update: without it, textures.scene
+        // and the compile units collect a visibility state the initial frame
+        // does not draw, and the frame pays the difference synchronously.
+        'world.settle-state',
         'world.initial-frame',
       ].sort(),
     );

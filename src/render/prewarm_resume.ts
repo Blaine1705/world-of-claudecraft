@@ -78,7 +78,17 @@ export function buildPrewarmCompileUnits<T extends object>(
       units.push({
         id: `${group.id}:${unitIndex++}`,
         run: async () => {
-          await Promise.all(roots.map((root) => Promise.resolve(compile(root))));
+          // allSettled, then rethrow the first failure: Promise.all would
+          // short-circuit the unit on one rejection and blur which of its
+          // batch-mates actually compiled; every root still gets its attempt
+          // and the unit's caller still sees the failure.
+          const results = await Promise.allSettled(
+            roots.map((root) => Promise.resolve(compile(root))),
+          );
+          const failed = results.find(
+            (result): result is PromiseRejectedResult => result.status === 'rejected',
+          );
+          if (failed) throw failed.reason;
         },
       });
     };

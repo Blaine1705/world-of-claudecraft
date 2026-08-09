@@ -290,7 +290,7 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(unitsSlice).toContain('else root.traverse(collect)');
     expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
     expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(unitsSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
+    expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
     expect(compileEntry).not.toContain('compileAsync(this.scene');
     expect(compileEntry).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');

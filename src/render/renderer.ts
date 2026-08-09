@@ -357,6 +357,7 @@ import {
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
+  prewarmProgramContentKeys,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
   withRestoredPrewarmState,
@@ -561,7 +562,10 @@ const PREWARM_FRAME_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
 // calls and awaits them together, so r165's 10 ms poll floors overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
-// enough that a batch's synchronous prologues stay a bounded slice.
+// enough that a batch's synchronous prologues stay a bounded slice. Coupled
+// to PREWARM_FRAME_RESERVE_MS: the deadline is checked BETWEEN units, so the
+// worst overshoot past the compile wall is one batch's prologues; the 2 s
+// reserve must stay comfortably above that slice.
 const PREWARM_COMPILE_BATCH_ROOTS = 16;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
@@ -3499,7 +3503,7 @@ export class Renderer {
                 `zone-prewarm-color:${childRoot.name || childRoot.type}`,
               );
               await this.backgroundGpuWork.run(
-                () => this.compileSkinnedShadowPrograms(childRoot),
+                () => this.compileShadowPrograms(childRoot),
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
                 `zone-prewarm-shadow:${childRoot.name || childRoot.type}`,
               );
@@ -5251,8 +5255,14 @@ export class Renderer {
       displacementScale: textured.displacementScale ?? 1,
       displacementBias: textured.displacementBias ?? 0,
       wireframe: textured.wireframe ?? false,
+      // Match the REAL shadow pass: three's shared shadow depth material uses
+      // RGBADepthPacking and depthPacking sits in the program cache key, so
+      // the default BasicDepthPacking linked a variant the shadow pass never
+      // draws, and every "prewarmed" caster relinked at its first shadow
+      // draw anyway (the residue probe measured all of them).
+      depthPacking: THREE.RGBADepthPacking,
     });
-    depth.name = `prewarm-skinned-depth:${key}`;
+    depth.name = `prewarm-depth:${key}`;
     this.prewarmDepthMaterials.set(key, depth);
     return depth;
   }
@@ -5294,15 +5304,17 @@ export class Renderer {
   /**
    * compileAsync(scene, camera) does not enumerate Three's renderer-owned
    * shadow materials. Temporarily put equivalent MeshDepthMaterials on the
-   * real skinned rigs so KHR_parallel_shader_compile can link those variants
-   * before the synchronous shadow warm pass asks getUniforms for them.
+   * real casters, skinned or not, so KHR_parallel_shader_compile can link
+   * those variants before the synchronous shadow warm pass asks getUniforms
+   * for them. Static and instanced casters count: their missing depth arm
+   * was 12 of the initial frame's 64 residual synchronous links.
    */
-  private async compileSkinnedShadowPrograms(root: THREE.Object3D): Promise<void> {
+  private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
     if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
-    const swaps: { mesh: THREE.SkinnedMesh; material: THREE.Material | THREE.Material[] }[] = [];
+    const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
     root.traverse((obj) => {
-      const mesh = obj as THREE.SkinnedMesh;
-      if (!mesh.isSkinnedMesh || !mesh.castShadow) return;
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.castShadow) return;
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
@@ -5310,36 +5322,36 @@ export class Renderer {
         : this.prewarmDepthMaterial(material);
     });
     if (swaps.length === 0) return;
+    // Match the real shadow pass's program key exactly. A bare
+    // compileAsync(root, shadowCamera) uses the canvas output colour space
+    // and sees no scene lights, producing a skinned depth program that still
+    // misses both the render-target and shadow-map bits. Conversely, passing
+    // the world scene verbatim would add fog bits that WebGLShadowMap omits
+    // (its renderBufferDirect call uses a null scene). Keep the world only as
+    // the light source, briefly suppress its fog, and compile while any
+    // offscreen target is current so outputColorSpace is the linear working
+    // space. compileAsync runs its compile() prologue synchronously; restore
+    // the globals AND the swapped materials before awaiting the parallel
+    // linker: the boot-resume lane runs these units on VISIBLE post-reveal
+    // scene meshes, and a swap held across the awaited link (10 ms+ of real
+    // frames) would draw them as depth noise. The link tracks the depth
+    // material object, not the mesh, so restoring early is safe.
+    this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+    const previousTarget = this.webgl.getRenderTarget();
+    const previousFog = this.scene.fog;
+    let compilePromise: Promise<THREE.Object3D>;
     try {
-      // Match the real shadow pass's program key exactly. A bare
-      // compileAsync(root, shadowCamera) uses the canvas output colour space
-      // and sees no scene lights, producing a skinned depth program that still
-      // misses both the render-target and shadow-map bits. Conversely, passing
-      // the world scene verbatim would add fog bits that WebGLShadowMap omits
-      // (its renderBufferDirect call uses a null scene). Keep the world only as
-      // the light source, briefly suppress its fog, and compile while any
-      // offscreen target is current so outputColorSpace is the linear working
-      // space. compileAsync runs its compile() prologue synchronously; restore
-      // both globals before awaiting parallel linker completion so live frames
-      // can continue normally.
-      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-      const previousTarget = this.webgl.getRenderTarget();
-      const previousFog = this.scene.fog;
-      let compilePromise: Promise<THREE.Object3D>;
-      try {
-        this.scene.fog = null;
-        this.webgl.setRenderTarget(this.prewarmRenderTarget);
-        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
-      } finally {
-        this.webgl.setRenderTarget(previousTarget);
-        this.scene.fog = previousFog;
-      }
-      // Do not race a timer here. The underlying linker cannot be cancelled,
-      // so a timeout only lets it overlap the next child and gameplay.
-      await compilePromise;
+      this.scene.fog = null;
+      this.webgl.setRenderTarget(this.prewarmRenderTarget);
+      compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
     } finally {
+      this.webgl.setRenderTarget(previousTarget);
+      this.scene.fog = previousFog;
       for (const swap of swaps) swap.mesh.material = swap.material;
     }
+    // Do not race a timer here. The underlying linker cannot be cancelled,
+    // so a timeout only lets it overlap the next child and gameplay.
+    await compilePromise;
   }
 
   // A tiny throwaway target for background child uploads, so a prewarm root
@@ -5720,27 +5732,52 @@ export class Renderer {
         ],
         async (root) => {
           await this.compilePrewarmColorPrograms(root, false);
-          await this.compileSkinnedShadowPrograms(root);
+          await this.compileShadowPrograms(root);
           compiledPrewarmRoots++;
         },
         {
+          // NOT batched into one compileAsync call per unit: an A/B measured
+          // no gain (11.5 s vs 11.9 s on a cold full entry) because the
+          // remaining compile time is the driver's parallel link work for
+          // genuinely new programs, not the per-call prologue walk. The
+          // driver's own shader disk cache makes that first-entry cost
+          // vanish on subsequent sessions.
           // Program-content keys: two leaves sharing materials AND the shape
-          // bits three keys a program on (skinning, instancing, morphs, the
-          // skinned-shadow variant) link the same programs, so the duplicate
-          // costs a unit for nothing. surfaceMat dedupes materials heavily,
-          // so this collapses hundreds of leaves per zone.
+          // bits three keys a program on link the same programs, so the
+          // duplicate costs a unit for nothing. surfaceMat dedupes materials
+          // heavily, so this collapses hundreds of leaves per zone. The key
+          // lives in the policy layer so its fidelity to three's cache key is
+          // pinned by tests (a coarser key measured as 35 of the initial
+          // frame's 64 residual synchronous links).
           dedupeKeys: (root) => {
             const mesh = root as THREE.Mesh & {
               isSkinnedMesh?: boolean;
               isInstancedMesh?: boolean;
+              isBatchedMesh?: boolean;
+              instanceColor?: unknown;
             };
             const material = mesh.material;
             const materials = Array.isArray(material) ? material : material ? [material] : [];
-            const morphs = (mesh.geometry?.morphAttributes?.position?.length ?? 0) > 0;
-            const shape =
-              `${mesh.isSkinnedMesh ? 's' : 'm'}${mesh.isInstancedMesh ? 'i' : ''}` +
-              `${morphs ? 'p' : ''}${mesh.castShadow ? 'c' : ''}`;
-            return materials.map((entry) => `${shape}:${entry.uuid}`);
+            const morphs = mesh.geometry?.morphAttributes;
+            const colorAttribute = mesh.geometry?.attributes?.color as
+              | { itemSize?: number }
+              | undefined;
+            return prewarmProgramContentKeys(
+              {
+                isSkinnedMesh: mesh.isSkinnedMesh === true,
+                isInstancedMesh: mesh.isInstancedMesh === true,
+                hasInstanceColor: mesh.instanceColor != null,
+                isBatchedMesh: mesh.isBatchedMesh === true,
+                hasMorphPositions: morphs?.position !== undefined,
+                morphTargetCount: morphs?.position?.length ?? 0,
+                morphNormalCount: morphs?.normal?.length ?? 0,
+                morphColorCount: morphs?.color?.length ?? 0,
+                hasTangents: mesh.geometry?.attributes?.tangent !== undefined,
+                vertexColorItemSize: colorAttribute?.itemSize ?? 0,
+                castShadow: mesh.castShadow === true,
+              },
+              materials.map((entry) => entry.uuid),
+            );
           },
           batchSize: PREWARM_COMPILE_BATCH_ROOTS,
         },
@@ -6218,6 +6255,25 @@ export class Renderer {
         detail: () => `objects=${landmarkPrewarmGroup?.children.length ?? 0}`,
       },
       {
+        // One full non-submitting frame tick (prewarmWorldFrame advances the
+        // renderer clock, camera smoothing, LOD bands, fog, zone visibility
+        // and lazily built terrain/water content; it never touches sim
+        // state), so every later collection (textures.scene's texture walk,
+        // the compile units) sees the visibility state world.initial-frame
+        // will actually draw.
+        // Measured on a full offline entry: collected before this update the
+        // compile lane visited 2807 roots yet still left the frame a
+        // 230-program, 185-texture residue costing 16.9 s; collected after,
+        // 801 roots and the frame residue fell to 64 programs and 3.8 s.
+        id: 'world.settle-state',
+        category: 'world',
+        priority: 49,
+        required: true,
+        run: () => {
+          this.prewarmWorldFrame(1 / 60);
+        },
+      },
+      {
         id: 'textures.scene',
         category: 'world',
         priority: 50,
@@ -6359,8 +6415,11 @@ export class Renderer {
         // the exempt compile above consumed the whole budget) makes the
         // initial scene link its programs at first LIVE draw, 102-318 ms
         // stalls in front of the player. The compile-unit reserve
-        // (PREWARM_FRAME_RESERVE_MS) bounds how late this can start, so the
-        // exemption cannot push the uninterruptible submit past the GPU guard.
+        // (PREWARM_FRAME_RESERVE_MS) bounds how late this normally starts;
+        // the deadline is checked between units, so one slow batch (its
+        // awaited link included) can still eat into the reserve, and the
+        // hard deadline remains the unconditional backstop that can cancel
+        // even this entry.
         deadlineExempt: true,
         run: () => {
           this.renderPrewarmPass(1 / 60);
@@ -6411,6 +6470,16 @@ export class Renderer {
               const remaining = units.slice(index);
               if (remaining.length > 0) {
                 droppedEntries.push({ id: 'programs.compile', units: remaining });
+                // Same rule as the whole-entry resumeUnits path above: the
+                // remaining units still reference pooled prewarm visuals, so
+                // pool publication must wait for the resume lane, or gameplay
+                // takes a visual out of the T-pose grid while its compile
+                // unit still swaps materials on it.
+                deferPoolPublication =
+                  deferPoolPublication ||
+                  (entityPrewarmPool.length > 0 &&
+                    (entityPrewarmGroup?.children.length ?? 0) > 0) ||
+                  (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
               }
               compileTimedOut = true;
               break;
@@ -7768,7 +7837,7 @@ export class Renderer {
     return this.liveCompileGates.run(
       () =>
         this.compilePrewarmColorPrograms(target, false).then(() =>
-          this.compileSkinnedShadowPrograms(target),
+          this.compileShadowPrograms(target),
         ),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
