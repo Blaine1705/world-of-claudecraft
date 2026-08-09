@@ -95,6 +95,7 @@ import {
   isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
+  PLAYER_INTEREST_DROP_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type SportRole,
@@ -324,7 +325,7 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 const INTEREST_RADIUS = 90;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
-export const INTEREST_DROP_RADIUS = 100;
+export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
@@ -1569,7 +1570,7 @@ function bgWideInterestApplies(
   // pet trails the enemy, so widening it would leak the same position by proxy.
   const subjectId = e.kind === 'player' ? e.id : e.ownerId;
   if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
-  return viewerBgTeam !== null && viewerBgTeam.includes(subjectId);
+  return viewerBgTeam?.includes(subjectId) ?? false;
 }
 
 // full rate close up and for anything the viewer is fighting; mid range
@@ -7501,13 +7502,28 @@ export class GameServer {
       }
       case 'saveLoadout': {
         const hasAlloc = Object.hasOwn(msg, 'alloc');
+        // Strict === true, never a truthy coerce: an absent or malformed field must
+        // read as "do not capture", so a crafted frame cannot opt a player in.
+        const captureGear = msg.captureGear === true;
         if (hasAlloc) {
           const alloc = parseTalentAllocation(msg.alloc);
           if (typeof msg.name === 'string' && alloc) {
-            sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+            sim.saveLoadout(
+              msg.name,
+              Array.isArray(msg.bar) ? msg.bar : [],
+              pid,
+              alloc,
+              captureGear,
+            );
           }
         } else if (typeof msg.name === 'string') {
-          sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid);
+          sim.saveLoadout(
+            msg.name,
+            Array.isArray(msg.bar) ? msg.bar : [],
+            pid,
+            undefined,
+            captureGear,
+          );
         }
         break;
       }
