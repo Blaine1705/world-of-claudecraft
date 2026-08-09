@@ -362,12 +362,14 @@ jobs:
         # Restores ~/.cache/ms-playwright when the Playwright version matches.
         # The install step always runs: on a hit it is a cheap no-op for the
         # browser download and only ensures OS deps; on a miss it downloads.
+        # No restore-keys: a version-prefix fallback would restore a stale
+        # Playwright version's binaries alongside the new install, which the
+        # cache never evicts, so every future bump would leave dead weight
+        # cached forever instead of a clean version-scoped miss.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-          restore-keys: |
-            playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
