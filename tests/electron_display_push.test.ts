@@ -97,7 +97,7 @@ describe('the display change push to the renderer', () => {
     expect(body).toContain('lastDisplayPush = null;');
     expect(body).toContain(
       "mainWindow.on('closed', () => { clearReadyToShowFallback(); " +
-        'clearMoveDisplayTimer(); mainWindow = null; });',
+        'clearMoveDisplayTimer(); clearHiddenRederiveTimer(); mainWindow = null; });',
     );
   });
 

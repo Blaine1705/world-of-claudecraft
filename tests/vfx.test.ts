@@ -320,7 +320,13 @@ describe('pooled VFX cloud', () => {
     // tests/frame_present.test.ts; what remains here is the camera-pose
     // invariant at its call site: the only presentFrame call follows the
     // camera-shake updateMatrixWorld.
-    const presentSites = [...source.matchAll(/\n\s*presentFrame\(host, dt, present\);/g)];
+    // The call consumes its boolean return into the presented-frames counter
+    // (phase 4 QA F4), so the pattern anchors the whole consuming statement.
+    const presentSites = [
+      ...source.matchAll(
+        /\n\s*if \(presentFrame\(host, dt, present\)\) this\.presentedFrameCount\+\+;/g,
+      ),
+    ];
     expect(presentSites).toHaveLength(1);
     for (const site of presentSites) {
       const before = source.slice(0, site.index).trimEnd();
