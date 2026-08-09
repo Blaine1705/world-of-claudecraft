@@ -53,6 +53,7 @@ import {
 import { addThreat } from '../src/sim/threat';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The staged 5v5 arms (graveyard no-auto-release, the 720s cap, the fairness
 // clocks, the honor-DR rollover) legitimately run 10 to 19s each and flake
@@ -61,7 +62,7 @@ import { groundHeight } from '../src/sim/world';
 vi.setConfig({ testTimeout: 30000 });
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 }
 
 function tp(sim: Sim, pid: number, x: number, z: number) {
@@ -912,7 +913,12 @@ describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
   it('opens both pads on the same seeded face, applies the right buff, and flips per claim', () => {
     // determinism: the same seed opens the same face
     const face = (seed: number) => {
-      const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+      const sim = new Sim({
+        seed,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: EMPTY_TEST_WORLD,
+      });
       const pids: number[] = [];
       const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
       for (let i = 0; i < 10; i++) {

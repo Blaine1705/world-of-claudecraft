@@ -51,6 +51,7 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   type NythraxisEncounterState,
+  PLAYER_INTEREST_DROP_RADIUS,
   PRESTIGE_XP_PER_RANK,
   SISTER_NHALIA_BOSS_ID,
   type SimEvent,
@@ -5105,6 +5106,64 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// Production distance-culling contract: the 100-yard host throttle changes
+// passive idle rolls from the historical shared stream to deterministic per-mob
+// lanes. Track one mob on each side of the boundary so the golden records both
+// the intended state divergence and the resulting shared RNG digest.
+function idleMobDistanceCulling(): Scenario {
+  const seed = 20061;
+  return {
+    name: 'idle_mob_distance_culling',
+    coverage: [
+      'idleMobTickRadius equals the production PLAYER_INTEREST_DROP_RADIUS',
+      'near idle ownerless mob advances inside the 100-yard boundary',
+      'far idle ownerless mob remains frozen outside the 100-yard boundary',
+      'culling-enabled passive idle rolls use deterministic per-mob RNG lanes',
+    ],
+    sampleEvery: 20,
+    build: () =>
+      new Sim({
+        seed,
+        playerClass: 'warrior',
+        idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const player = sim.player as AnyEntity;
+      teleport(sim, player, 0, -40);
+
+      // Silence the authored world mobs so this scenario instruments only the
+      // two explicit boundary probes. Their long dead timers are deterministic
+      // and cannot re-enter the idle arm during the drive.
+      for (const entity of sim.entities.values()) {
+        if (entity.kind !== 'mob') continue;
+        entity.dead = true;
+        entity.hp = 0;
+        entity.aiState = 'dead';
+        entity.inCombat = false;
+        entity.respawnTimer = 9999;
+        entity.corpseTimer = 9999;
+      }
+
+      const near = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 10, seed), 10);
+      const far = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 110, seed), 110);
+      for (const mob of [near, far]) {
+        mob.aiState = 'idle';
+        mob.inCombat = false;
+        mob.aggroTargetId = null;
+        mob.wanderTarget = null;
+        mob.wanderTimer = 0;
+      }
+      rec.notes.nearMobId = near.id;
+      rec.notes.farMobId = far.id;
+      rec.track(near.id, far.id);
+      rec.snapshot('boundary-probes-ready');
+      rec.tick(80);
+      rec.snapshot('near-advanced-far-frozen');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5166,4 +5225,5 @@ export const SCENARIOS: Scenario[] = [
   professionsGatherFine(),
   professionsFishingSession(),
   professionsToolEffectSlot(),
+  idleMobDistanceCulling(),
 ];
