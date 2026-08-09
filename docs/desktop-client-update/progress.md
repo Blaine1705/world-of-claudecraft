@@ -53,7 +53,10 @@ canRecover/canEnrich split, resolution at the end of phase A); [x] LOW monotonic
 retune (bands, caps, floors, radius, lowPlus gating, plus point lights, vfx level,
 the dressing trio and the dormant characters floor) with per-axis pins; [x] perf
 evidence LOW <= MEDIUM frame cost and calls on every scenario (town triangles
-attributed structural, see the notes).
+attributed structural, see the notes); [x] QA (verdict PASS-WITH-FOLLOWUPS, 0
+blocking in the shipped code; 5 confirmed should-fix all fixed in-session, 3 probe
+gaps closed with mutation-verified pins, both re-litigations UPHELD, two
+pre-existing stopping-rule shapes surfaced to the user; see the QA note).
 
 Phase 6: [ ] pre-upgrade perf baseline frozen + reference screenshots; [ ] three
 0.185.1 + postprocessing 6.39.4 + n8ao 2.0.0 compile and all suites green; [ ] the
@@ -789,8 +792,12 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   this.updateAdaptiveResolution( to exactly one occurrence whose whole containing
   statement is the present-guarded form (polarity included).
 - Deliberate semantics change, pinned: dense frames no longer reset stableSeconds, so
-  one frame under the 90% counter line at a fire slot permits ONE enrich step
-  (bounded by cooldown and the at-slot re-check). Comment in canEnrich names it.
+  one frame under the 90% counter line at a fire slot permits ONE enrich step.
+  [QA correction: the rate bound is the stableSeconds reset on each fired step plus
+  the recoverStableSeconds recharge (6s low); the 1.5x cooldown, 1.65s low, never
+  binds, and the at-slot re-check only picks which frame fires, so repeated dips
+  walk to the band maxima at one step per recharge window.] Comment in canEnrich
+  names it.
 - LOW derivation rule (recorded per the packet): band baseline and max are mediums
   x 0.95 rounded to 2 decimals, band minima and caps floors EQUAL mediums, caps are
   mediums x 0.9 rounded clean, grassRadius 80 -> 72 against mediums 76.
@@ -803,7 +810,12 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
 - Ground dressing: the richness trio (step 10 vs 12, density 1.24, spot boost 1.08,
   the July-investigation 1.79x) rode leanFoliage and now rides lowPlus;
   tests/foliage_dressing_profile.test.ts pins medium parity by deep equality plus
-  the cohort split and the boost ratio band.
+  the cohort split and the boost ratio band. [QA additions: the terrain lowShade
+  emissive treatment also rides lowPlus (terrain.ts lowShade requires GFX.lowPlus)
+  and changed cohort with the same gate, considered in the gate-site comment but
+  unrecorded here until now; and the iosMemoryProfile arm of lowPlus means iOS
+  sessions opted UP to medium or high silently GAINED the trio, an unmeasured
+  cosmetic gain recorded as a known consequence, not a defect.]
 - tests/foliage_perceptual_density.test.ts re-derived: the old 0.7-0.9 band measured
   ring-edge cull alignment, not thinning (at radius 72 those chunks are never
   built); the new 720p phase sits at a chunk-grid corner mid-smoothstep (6.6 px),
@@ -825,18 +837,27 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   line updated to record 72; a low-tier arm for the recovery suite is a QA
   candidate; the ability_vfx mote gate (0.5) now sits 0.08 under both tiers vfx
   floors, unguarded if a future retune drops under it.
-- Perf evidence (this machine: RTX 5090, headed, vsync off, 1280x720, rows in
-  docs/perf/baseline/history.jsonl; raw runs in tmp/perf-baseline/):
-  LOW post-retune overall 211.4 fps (min scenario 140.3), p95 6.6-24.3 ms, calls
+- Perf evidence (this machine, headed, vsync off, 1280x720; rows in
+  docs/perf/baseline/history.jsonl, whose machine field records the CPU string;
+  raw runs in tmp/perf-baseline/). [QA relabel: the numbers first quoted here as
+  "post-retune" are the POST-DRESSING-FIX row at 281a0a29ca; the actual
+  post-retune row at 4fe929d002 is LOW 204.3 fps overall, min scenario 138; the
+  medium row and the post-dressing-fix low row ran with dirty:true bench-loop
+  working trees, the post-retune low row was clean.] LOW post-dressing-fix
+  (281a0a29ca) overall 211.4 fps (min scenario 140.3), p95 6.6-24.3 ms, calls
   194-325, tris 0.68M-4.53M. MEDIUM overall 78.7 fps (min 70.2), p95 26.3-35.7 ms,
   calls 433-570, tris 2.38M-3.56M. LOW is lighter on frame cost and calls in EVERY
-  scenario and on triangles in the three field scenarios. TOWN TRIANGLES stay higher
-  on LOW (4.53M vs 3.55M): attributed STRUCTURAL, farFieldPolicy (far_terrain_core)
-  requires standardMaterials && !leanFoliage for sprites+vista, so medium culls
-  detail at the vista horizon and draws cheap far tiles while low draws classic
-  full detail to the biome fog far (700 in the vale). That asymmetry predates this
-  phase and is the upstream player-performance Packet 5 audit (its fogFar row);
-  recorded for phase 5 QA, NOT a phase 5 regression. The dressing fix does not move
+  scenario (in BOTH low rows) and on triangles in the three field scenarios. TOWN
+  TRIANGLES stay higher on LOW (4.53M vs 3.55M): attributed STRUCTURAL, and QA
+  re-verified the mechanism: farFieldPolicy (far_terrain_core) grants sprites+vista
+  only to standardMaterials && !leanFoliage && !constrainedMemory profiles; plain
+  low fails two of the three, so its vista is denied and real geometry draws to
+  CLASSIC_CAMERA_FAR (950, fogged past the biome fog far, 700 in the vale), while
+  medium's real detail ends at the vista detail horizon (about 640 yards, the
+  FAR_DISCARD_MARGIN inside the 2200-yard envelope) with cheap vista cells beyond.
+  Low's extra town triangles are that 640-to-950 annulus of real geometry. The
+  asymmetry predates this phase and is the upstream player-performance Packet 5
+  audit (its fogFar row); NOT a phase 5 regression. The dressing fix does not move
   town numbers because towns exclude random dressing.
 - Screenshots: docs/screenshots/desktop-client-update-phase5-low/ (LOW preset, real
   GPU, pr_screenshots tooling). Near-identical by design; the commit body says why.
@@ -855,3 +876,92 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   the town-triangles structural note (vista denial on lean profiles) is the one
   open perf item; the low-tier recovery-suite arm and the mote-gate margin are
   cheap coverage candidates.
+
+### Phase 5 QA (2026-08-09, governor ladder + LOW retune verification)
+
+- Verdict: PASS-WITH-FOLLOWUPS. 0 blocking in the shipped phase 5 code; the one
+  BLOCKING filing was operational (a dead duplicate probe agent left staged
+  pre-fix checkouts in the worktree mid-audit; restored to HEAD, suites re-green,
+  no commit ever contained the dirt). 5 confirmed should-fix findings all fixed
+  in-session; both pinned deliberate decisions UPHELD fresh; two pre-existing
+  oscillation shapes surfaced under the stopping rule, NOT patched.
+- QA-start base merge 2c3ca8eaab took release tip 6e1ead1fea (8 upstream
+  perf(render) commits: background GPU queue observability, prewarm compile
+  coverage, point_light_budget). Clean textual merge; the 8 phase-relevant
+  suites re-ran green (100/100) before any audit; the seam auditor verified the
+  retuned lighting level composes with the merged point_light_budget without
+  shedding light COUNT below the static preset.
+- Audit shape: two workflows (the first lost 12 of 16 agents to a session-limit
+  window; the continuation re-ran every lost auditor FRESH off journal.jsonl per
+  doctrine and finished 16/16). Six auditors (governor static, re-litigation x2,
+  numeric recompute, test quality, seam/fairness, qa-checklist), findings
+  deduped, every actionable finding CONFIRMED by two adversarial skeptics
+  (10/10 votes, no splits). The probe round ran orchestrator-side after both
+  probe agents correctly stopped on the duplicate's dirty tree.
+- Numeric audit: every derivation claim reproduces by hand, zero invented
+  numbers (bands mediums x0.95 half-up 2dp exact on all four ladder buckets;
+  minima and caps floors equal mediums exactly; caps mediums x0.9 on per-row
+  clean grains, worst deviation 1.23%, all strictly below medium; ring 53.28 vs
+  59.28; floor ring 36.0 vs 44.1; lights 4 = 4 via the real renderer rounding).
+  Medium/high/ultra/insane tables byte-identical across the range.
+- Pre-fix repro re-verified first-hand: source at 5a04133a49~1 with the fix
+  commit's test = rc 1, 3/3 arms red with the assertion diff pinning resolution
+  at the 0.7 floor (a genuine stall, not an import error); with HEAD's test all
+  5 arms red including the dense-scene pin; restore re-greens 5/5. Frame-cap
+  assertion blocks changed only baseline literals across the range (diffed from
+  the reformat commit ec3a8d8054).
+- Probe round (orchestrator-run, committed tree, restore-verified between
+  probes): 16 probes. P1, P3-P13 KILLED rc!=0 with named tests (P1 = the
+  historical M4 counter-clauses-onto-canRecover, killed by the dense-scene arm;
+  P13 = the present-guard strip, killed by the threading pin). THREE SURVIVORS,
+  each a real pin gap, each fixed and re-probed KILLED: P2 (dropping the
+  triangles clause from canEnrich survived: the dense-scene arm parks all three
+  counters high, masking every single clause) fixed by three per-clause arms;
+  P14 (DRESS_DENSITY_LOW_SCALE to 1 survived as the test-quality audit
+  predicted) fixed by the 1.5-1.7 spot-count ratio band (deterministic seed
+  measures 1.586; the dropped-scale value is about 1.44); P16 (stripping the
+  phase B grass ceiling survived: high maxima are 1.0 so high arms cannot bind
+  ceilings) fixed by the low-tier climb-to-maxima arm reaching every ceiling
+  under 1.0. P15 (low resolution band min raised above medium) confirmed the
+  sweep blindness: only the re-mintable override hash redded; fixed by deriving
+  the sweep from the band table keys plus key-set equality; re-probed, the
+  semantic suite now kills it.
+- Fixes landed (each mutation-verified after commit): per-clause enrich arms;
+  low-tier dense-scene and climb-to-maxima arms; the dressing count-ratio band;
+  the key-derived monotonicity sweep with the foliage minRadiusScale source
+  binding, render-scale floor sweep, and low caps literal pins; two long-horizon
+  frame-cap pins (dense-in-band restores baselines plus render scale and never
+  climbs; sparse climbs to the exact maxima; the older 24-frame test never
+  reached a fire slot so it could not tell those apart); the vfx mote-floor
+  guard (MOTE_QUALITY_GATE exported from ability_vfx/fx.ts, every tier's band
+  min and governor floor pinned above it); comment corrections (enrich rate
+  bound, derivation scope) and the in-place QA corrections above.
+- Re-litigations, both UPHELD fresh: (1) the stableSeconds precharge trades the
+  provably-stranded resolution defect for a slow bounded ratchet (one step per
+  recharge window, clamped by the retuned maxima, undone only by real
+  pressure); the rate-bound COMMENT was wrong and is corrected (cooldown never
+  binds). (2) the dressing trio on lowPlus is the right carrier (mediumIris
+  keeps leanFoliage's lighter knobs, loses only the cosmetic trio; cohort
+  enumeration verified). Side findings recorded above: the terrain lowShade
+  rider and the iOS opt-up gain; and commit 9e93468778's body attributes the
+  town inversion to the trio, which the phase's own bench falsifies (the
+  ledger's structural attribution is the correct one; commits are immutable).
+- Stopping-rule items surfaced for the user, deliberately NOT patched (all
+  pre-existing shapes, none introduced by phase 5): (a) enrich-degrade limit
+  cycle when one step straddles the 90-100% counter band (period >= ~7.65s low,
+  amplitude one rung; no hysteresis margin between the 90% re-arm and the 100%
+  degrade trigger relative to a single step); (b) the misclassified-cap
+  resolution sawtooth at the 48ms boundary (phase 5 shortens the path: a capped
+  session in the 90-100% band now restores baselines and resolution where it
+  previously restored nothing; the climb itself was already reachable pre-fix;
+  cap-detection window work stays out of scope per the packet); (c)
+  renderer.adaptiveGrace is write-only (pre-existing vestige, cleanup
+  candidate). The new long-horizon cap pins freeze the CURRENT semantics so any
+  future change to (b) is a deliberate pin rewrite.
+- Other records: GFX.characters appears consumer-dead (the 0.86 floor is
+  runtime-inert; the sweep pins a dormant knob, harmless); worldStreaming
+  carries governable:true in the tables while correctly non-governable (the
+  ladder never touches it; label-only, left for upstream); the retune applies
+  to any host selecting tier low including mobile (directionally helpful for
+  the thermal issue, unmeasured, per packet non-goals).
+- Gate: see state.md phase 5 QA block for the recorded result.

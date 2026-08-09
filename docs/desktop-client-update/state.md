@@ -141,16 +141,56 @@ medium-parity pin. Deliberate + pinned: dense frames no longer reset
 stableSeconds (one sub-line frame at a fire slot = one enrich step). Probes
 13/13 killed rc != 0 named on committed trees (the M4 survivor was a real gap,
 closed by the dense-scene pin). Seam review fresh: 0 blocking, fairness PASS,
-4 should-fix all fixed. Perf: LOW 211.4 fps overall vs MEDIUM 78.7, p95 and
-calls lighter on every scenario, tris lighter on the three field scenarios;
-town tris (LOW 4.53M vs 3.55M) attributed STRUCTURAL (farFieldPolicy denies
-sprites+vista to lean/non-standard-material profiles, so low draws classic
-detail to fog far 700), owned by the upstream player-performance Packet 5
-audit, recorded for QA. Evidence: docs/perf/baseline/history.jsonl + phase
-notes; screenshots docs/screenshots/desktop-client-update-phase5-low/. Gate:
-full-suite fallback red only on the 8 seal suites / 11 tests, turbo proofs
-5/5 + 3/3, biome pin proven never committed. Next up: phase 5 QA
-(phase-05-qa.md), fresh session, pull+merge first.
+4 should-fix all fixed. Perf: LOW 211.4 fps overall vs MEDIUM 78.7 (QA relabel:
+the 211.4 row is post-dressing-fix at 281a0a29ca and ran dirty:true, as did the
+medium row; the clean post-retune row at 4fe929d002 is 204.3, min 138), p95 and
+calls lighter on every scenario in both low rows, tris lighter on the three
+field scenarios; town tris (LOW 4.53M vs 3.55M) attributed STRUCTURAL and
+QA-verified (farFieldPolicy denies sprites+vista to plain low, so real geometry
+draws to CLASSIC_CAMERA_FAR 950 while medium's detail ends at the vista horizon
+near 640 yards), owned by the upstream player-performance Packet 5 audit.
+Evidence: docs/perf/baseline/history.jsonl + phase notes; screenshots
+docs/screenshots/desktop-client-update-phase5-low/. Gate: full-suite fallback
+red only on the 8 seal suites / 11 tests, turbo proofs 5/5 + 3/3, biome pin
+proven never committed.
+
+Phase 5 QA done (2026-08-09, verdict PASS-WITH-FOLLOWUPS, 0 blocking in the
+shipped code; QA-start base merge 2c3ca8eaab took release tip 6e1ead1fea, 8
+upstream perf(render) commits, clean, phase suites re-ran green pre-audit).
+Two workflows (the first lost 12 agents to a session-limit window; the
+continuation re-ran every lost auditor FRESH off journal.jsonl, 16/16). All
+actionable findings CONFIRMED by two skeptics each (10/10 votes). Probe round
+run orchestrator-side after a dead duplicate agent left staged pre-fix
+checkouts (restored; the one BLOCKING was that operational incident): 16
+probes, P1/P3-P13 killed; three survivors became fixes, each re-probed KILLED:
+per-clause canEnrich arms (the dense-scene arm masked single-clause drops),
+the dressing spot-count ratio band 1.5-1.7 (deterministic 1.586; dropped scale
+lands 1.44), and the low-tier climb-to-maxima arm (high maxima are 1.0 so only
+low can bind phase B ceilings). P15 confirmed the enumerated sweep was blind
+to the resolution row (only the byte hash redded); the sweep now derives from
+the band table keys with key-set equality, the render-scale floors sweep, the
+foliage minRadiusScale source binding, and low caps literal pins. Two
+long-horizon frame-cap pins freeze the split's capped semantics both
+directions. New guard: tests/vfx_mote_floor.test.ts pins every tier's vfx
+floor above the exported MOTE_QUALITY_GATE (0.5). Re-litigations UPHELD both
+pinned decisions; the enrich rate-bound comment was corrected (the cooldown
+never binds; the recharge is the bound). Pre-fix repro re-verified first-hand
+(3/3 arms red at 5a04133a49~1 with resolution pinned at 0.7; import error
+ruled out). Stopping-rule items surfaced, deliberately unpatched, all
+pre-existing: the band-straddle enrich-degrade limit cycle, the
+misclassified-cap resolution sawtooth (phase 5 shortens its path: capped
+sessions in the 90-100% band now restore baselines and resolution where they
+previously restored nothing), and the write-only renderer.adaptiveGrace.
+Records: GFX.characters is consumer-dead (floor pin is dormant),
+worldStreaming's governable:true label is wrong but inert, iOS opt-up sessions
+gained the dressing trio via the iosMemoryProfile arm (recorded consequence),
+commit 9e93468778's town-inversion attribution is falsified by the phase's own
+bench (the ledger's structural attribution stands). Gate: full-suite fallback
+red only on the 8 accepted seal suites, post-abort turbo proofs green, biome
+pin never committed (see the phase 5 QA note in progress.md). Next up: phase 6
+(phase-06-three-upgrade.md), fresh session, pull+merge first; phase 6 freezes
+its perf baseline AFTER this QA and must re-author or drop
+patches/three@0.165.0.patch.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -329,6 +369,18 @@ describe). Screenshots under docs/screenshots/desktop-client-update-phase5-low/.
 tests/gfx_override_core.test.ts low hash re-minted twice (retune, then the
 characters floor); scripts/lib/perf_attrib_plan.mjs + its test moved to
 grassRadius:72.
+Phase 5 QA additions: tests/vfx_mote_floor.test.ts (gate constant + per-tier
+band-min and governor-floor clearance) and the MOTE_QUALITY_GATE export on
+src/render/ability_vfx/fx.ts; tests/render_budget_recovery.test.ts grew the
+three per-clause enrich arms and the two low-tier arms (dense-scene at low,
+climb-to-the-low-maxima; the maxima literals are what bind the phase B
+ceilings); tests/render_budget.test.ts grew the two long-horizon frame-cap
+pins (dense-in-band vs sparse); tests/gfx_low_monotonicity.test.ts now derives
+its non-governable sweep from the band table keys (resolution row included),
+pins low-vs-medium key-set equality, sweeps the render-scale floors, binds its
+foliage minRadiusScale copies with a counted source pin, and pins the low caps
+as literals; tests/foliage_dressing_profile.test.ts pins the weak-to-plain
+spot-count ratio band 1.5-1.7.
 New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
 no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
 { softwareRendering, discreteInactive, adapter<=64 } whitelisted in
