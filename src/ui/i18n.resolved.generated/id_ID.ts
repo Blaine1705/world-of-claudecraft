@@ -3009,6 +3009,11 @@ export const id_ID: EnTranslations = {
       "toolEffectRechargeFull": "{effect} sudah terisi penuh.",
       "toolEffectRechargeToolCapped": "Bawa alat {profession} yang lebih baik untuk mengisi {effect} lebih jauh.",
       "toolEffectRechargeMaterials": "Mengisi ulang {effect} membutuhkan {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Tingkat {tier}",
       "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
       "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",
@@ -3303,6 +3308,14 @@ export const id_ID: EnTranslations = {
       "denyNotCrafted": "Buat dulu karya pesanan itu (dengan opsi Karya Pesanan aktif).",
       "denyOutOfRange": "Kamu harus berada di dekat peminta untuk menyerahkan komisi.",
       "denyNoSpace": "Peminta tidak memiliki ruang di tasnya."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Pencari Dungeon",
@@ -7403,6 +7416,9 @@ export const id_ID: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
     "bodyWeb": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Aktifkan akselerasi perangkat keras di pengaturan browsermu, perbarui driver grafismu, lalu nyalakan ulang browsermu.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Tutup"
   },
   "perfNudge": {
@@ -7864,6 +7880,7 @@ export const id_ID: EnTranslations = {
       "deathRecapAbility": "Kamu telah tewas. Tewas oleh {ability}.",
       "deathRecapFalling": "Kamu telah tewas. Kamu jatuh hingga tewas.",
       "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
@@ -7907,6 +7924,7 @@ export const id_ID: EnTranslations = {
       "outOfRange": "Di luar jangkauan.",
       "noTarget": "Kamu tidak memiliki sasaran.",
       "tooClose": "Terlalu dekat!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Kamu harus menghadap sasaranmu.",
       "targetHealthBelow": "Kemampuan itu membutuhkan nyawa sasaran di bawah {percent}%.",
       "dagger": "Kamu harus menggunakan belati.",
@@ -9523,6 +9541,10 @@ export const id_ID: EnTranslations = {
       "die_by_sword": {
         "name": "Mati oleh Pedang",
         "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Kenekatan",
