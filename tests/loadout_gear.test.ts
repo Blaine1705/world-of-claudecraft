@@ -12,10 +12,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { buildGearSet, planGearSwap, type SavedGearSet } from '../src/sim/loadout_gear';
 import { repairTalentLoadouts } from '../src/sim/talent_loadouts';
-import type { EquipSlot, InvSlot, ItemInstancePayload } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot, type ItemInstancePayload } from '../src/sim/types';
 
 const GIRDLE = 'warfare_girdle';
 const BOOTS = 'warfare_boots';
@@ -299,5 +300,64 @@ describe('the worn-slot limitation is real and pinned', () => {
     const plan = planGearSwap(set, [], { ring1: BOOTS, ring2: GIRDLE }, undefined);
     expect(plan.equips, 'neither can be resolved from an empty bag').toEqual([]);
     expect(plan.unavailable.map((u) => u.reason)).toEqual(['notHeld', 'notHeld']);
+  });
+});
+
+describe('every equip slot survives save, serialize, repair and apply', () => {
+  // The reviewer's closing point, as a test. Both rounds of blockers lived in a
+  // slot family the fixtures never reached: multi-piece first, then rings and
+  // offhand weapons, which the earlier `realFor` helper could not produce because
+  // it only ever found direct-slot armor. Walking ALL_EQUIP_SLOTS closes the class
+  // instead of the two instances.
+  //
+  // A ring declares the slot KIND 'ring' and a weapon declares 'mainhand' even when
+  // it legally sits in the offhand, so slot EQUALITY silently deleted both at load.
+  // This drives the real sanitizer, so any future slot family with an indirect
+  // declaration fails here rather than in play.
+  const itemForSlot = (slot: EquipSlot): string | null => {
+    const found = Object.values(ITEMS).find((d) => slotAcceptsItem(d, slot));
+    return found?.id ?? null;
+  };
+
+  it('finds a real item for every slot, so the sweep below is not vacuous', () => {
+    const missing = ALL_EQUIP_SLOTS.filter((slot) => itemForSlot(slot) === null);
+    expect(missing, 'every equip slot needs a fixture for the sweep to mean anything').toEqual([]);
+  });
+
+  it.each([...ALL_EQUIP_SLOTS])('a %s piece survives the load sanitizer', (slot) => {
+    const itemId = itemForSlot(slot);
+    if (!itemId) throw new Error(`no item for ${slot}`);
+    const { loadouts } = repairTalentLoadouts(
+      'warrior',
+      20,
+      [
+        {
+          name: 'All',
+          alloc: { spec: null, rows: {} },
+          bar: [],
+          gear: { [slot]: { itemId, pin: 'p' } },
+        },
+      ],
+      0,
+    );
+    expect(loadouts[0]?.gear?.[slot], `${slot} was dropped at load`).toEqual({
+      itemId,
+      pin: 'p',
+    });
+  });
+
+  it('keeps a WHOLE-body set intact through the sanitizer', () => {
+    const gear: Record<string, { itemId: string; pin: string }> = {};
+    for (const slot of ALL_EQUIP_SLOTS) {
+      const itemId = itemForSlot(slot);
+      if (itemId) gear[slot] = { itemId, pin: `pin_${slot}` };
+    }
+    const { loadouts } = repairTalentLoadouts(
+      'warrior',
+      20,
+      [{ name: 'Full', alloc: { spec: null, rows: {} }, bar: [], gear }],
+      0,
+    );
+    expect(Object.keys(loadouts[0]?.gear ?? {}).sort()).toEqual(Object.keys(gear).sort());
   });
 });

@@ -55,7 +55,12 @@ import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
-import { buildGearSet, planGearSwap, type SavedGearSet } from '../loadout_gear';
+import {
+  buildGearSet,
+  planGearSwap,
+  type SavedGearSet,
+  wornAsBagSlot,
+} from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -430,8 +435,7 @@ export function saveTalentLoadout(
     // to delete its pinned set silently: tweak one talent on a PvP build, hit Save,
     // and the gear was gone with no warning. Not asking to CHANGE the gear is not
     // the same as asking to remove it.
-    const existingIndex = r.meta.loadouts.findIndex((l) => l.name === clean);
-    const existingGear = existingIndex >= 0 ? r.meta.loadouts[existingIndex].gear : undefined;
+    const existingGear = r.meta.loadouts.find((l) => l.name === clean)?.gear;
     if (existingGear) lo.gear = existingGear;
   }
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
@@ -482,6 +486,12 @@ function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): v
   let equipped = 0;
   let alreadyWorn = 0;
   const reasons = { notHeld: 0, copyGone: 0, takenByOtherSlot: 0 };
+  // Re-derived here, not taken from the plan. Each per-slot re-plan starts a fresh
+  // claim set, so the planner's own takenByOtherSlot is unreachable from this loop
+  // and one held ring saved into both ring slots reported notHeld: the player was
+  // told they no longer own a copy they are wearing one slot over. Tracking the
+  // pins THIS apply has already consumed restores the distinction.
+  const consumedPins = new Set<string>();
 
   // Canonical equipment order, matching planGearSwap.
   const wanted = new Set(Object.keys(set) as EquipSlot[]);
@@ -500,7 +510,9 @@ function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): v
     }
     const step = plan.equips[0];
     if (!step) {
-      const reason = plan.unavailable[0]?.reason ?? 'notHeld';
+      let reason = plan.unavailable[0]?.reason ?? 'notHeld';
+      // An earlier slot in this same apply already took the copy this slot wants.
+      if (reason === 'notHeld' && consumedPins.has(want.pin)) reason = 'takenByOtherSlot';
       reasons[reason]++;
       continue;
     }
@@ -508,13 +520,24 @@ function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): v
     // planner does not model (level requirement, unique-equipped, a full bag on a
     // displaced piece), so reporting the plan told players pieces were restored
     // that were not.
-    const before = meta.equipment[slot];
-    const beforePin = itemCopyPin(before === undefined ? undefined : { itemId: before, count: 1 });
+    // Pin the PAYLOAD on both sides, through the same normalization the planner
+    // uses. Pinning a bare {itemId, count} made the pin comparison identical to an
+    // id comparison, so the feature's flagship case (a plain copy worn, the saved
+    // ENCHANTED copy restored over it) counted as a failure and told the player
+    // "not the copy this build pinned" about the swap that had just succeeded.
+    const pinAt = (): string => {
+      const worn = meta.equipment[slot];
+      return worn === undefined
+        ? ''
+        : itemCopyPin(wornAsBagSlot(worn, meta.equipmentInstance?.[slot]));
+    };
+    const beforePin = pinAt();
     equipItemImpl(ctx, step.itemId, meta.entityId, step.slot, step.bagIndex);
-    const after = meta.equipment[slot];
-    const afterPin = itemCopyPin(after === undefined ? undefined : { itemId: after, count: 1 });
-    if (after !== undefined && (before !== after || beforePin !== afterPin)) equipped++;
-    else reasons.copyGone++;
+    const afterPin = pinAt();
+    if (meta.equipment[slot] !== undefined && afterPin !== beforePin) {
+      equipped++;
+      consumedPins.add(afterPin);
+    } else reasons.copyGone++;
   }
 
   ctx.emit({

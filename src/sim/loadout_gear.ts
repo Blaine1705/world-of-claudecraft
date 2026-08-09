@@ -55,7 +55,7 @@ export type SavedGearSet = Partial<Record<EquipSlot, SavedGearPiece>>;
  * match itself once it was back in the bags: saved, unequipped, and then reported
  * gone with the exact copy sitting right there.
  */
-function wornAsBagSlot(itemId: string, payload: ItemInstancePayload | undefined): InvSlot {
+export function wornAsBagSlot(itemId: string, payload: ItemInstancePayload | undefined): InvSlot {
   if (!payload) return { itemId, count: 1 };
   const { craftedRecipeId, ...rest } = payload as ItemInstancePayload & {
     craftedRecipeId?: string;

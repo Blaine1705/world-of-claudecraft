@@ -269,3 +269,70 @@ describe('an overwrite does not silently discard a captured set', () => {
     expect(Object.hasOwn(meta.loadouts[plain], 'gear')).toBe(false);
   });
 });
+
+describe('the result event describes the swap that actually happened', () => {
+  it('counts a same-id copy UPGRADE as equipped, not as a failure', async () => {
+    // The flagship case, and it was being reported as a failure. The transition
+    // check pinned bare ids, which made the pin comparison identical to an id
+    // comparison, so restoring the enchanted copy over a worn plain one of the same
+    // id fell into the else arm: equipped 0, copyGone 1, and the HUD told the player
+    // "not the copy this build pinned" about the swap that had just worked. Every
+    // other apply test empties the slot first, which is why this stayed uncovered.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const itemId = await chestItemId();
+
+    meta.equipment.chest = itemId;
+    meta.equipmentInstance = { chest: ENCHANT };
+    const saved = sim.saveLoadout('PvP', [], pid, undefined, true);
+
+    // Now wear the PLAIN copy and hold the enchanted one.
+    meta.equipment.chest = itemId;
+    meta.equipmentInstance = {};
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId, count: 1, instance: ENCHANT });
+    sim.drainEvents();
+
+    sim.switchLoadout(saved, pid);
+    const results = gearResults(sim.drainEvents());
+    expect(meta.equipmentInstance?.chest, 'the enchanted copy is worn').toBeDefined();
+    expect(results[0]?.equipped, 'and it counts as restored').toBe(1);
+    expect(results[0]?.copyGone, 'not as a missing copy').toBe(0);
+  });
+
+  it('says takenByOtherSlot when an earlier slot in the same apply took the copy', async () => {
+    // Re-derived at apply time. The per-slot re-plan starts a fresh claim set each
+    // time, so the planner's own reason is unreachable from the live path and this
+    // reported notHeld: "you no longer have" a ring the player is wearing one slot
+    // over. A dead schema field that looks live is worse than no field.
+    const { ITEMS } = await import('../src/sim/data');
+    const ring = Object.values(ITEMS).find((d) => d.slot === 'ring');
+    if (!ring) throw new Error('no ring fixture');
+    const sim = makeSim();
+    sim.setPlayerLevel(20); // epic rings carry a level requirement
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+
+    meta.equipment.ring1 = ring.id;
+    meta.equipment.ring2 = ring.id;
+    meta.equipmentInstance = {};
+    const saved = sim.saveLoadout('Rings', [], pid, undefined, true);
+
+    // Only ONE copy held for two saved ring slots.
+    delete meta.equipment.ring1;
+    delete meta.equipment.ring2;
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: ring.id, count: 1 });
+    sim.drainEvents();
+
+    sim.switchLoadout(saved, pid);
+    const r = gearResults(sim.drainEvents())[0];
+    expect(r?.equipped, 'one ring goes on').toBe(1);
+    expect(r?.takenByOtherSlot, 'and the other is reported as taken, not missing').toBe(1);
+    expect(r?.notHeld).toBe(0);
+  });
+});
+

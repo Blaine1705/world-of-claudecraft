@@ -5,6 +5,7 @@ import {
   type SavedLoadout,
 } from './content/talents';
 import { ITEMS } from './data';
+import { slotAcceptsItem } from './equipment_rules';
 import type { SavedGearSet } from './loadout_gear';
 import { isEquipSlot, type PlayerClass } from './types';
 
@@ -36,11 +37,18 @@ function repairGearSet(value: unknown): SavedGearSet | undefined {
     if (!piece) continue;
     const itemId = piece.itemId;
     if (typeof itemId !== 'string' || itemId === '') continue;
-    // The id must name a real item that actually fits this slot. Without this a
-    // corrupt or stale row survived load and turned every switch into per-slot
-    // refusal spam for a piece that could never resolve.
+    // The id must name a real item that actually fits this slot, checked through
+    // the SHARED structural rule rather than slot equality.
+    //
+    // Equality was wrong in two ways that both delete real gear at load: a ring
+    // declares the slot KIND 'ring' (resolved to a finger only at equip time), and
+    // every weapon declares 'mainhand' even when it legally sits in the offhand. So
+    // equality silently dropped every saved ring and offhand weapon, and a
+    // rings-only set lost its whole gear key. slotAcceptsItem is the same predicate
+    // the equip path uses, which is the point: validation must not be able to
+    // disagree with what equipping actually allows.
     const def = ITEMS[itemId];
-    if (!def || def.slot !== key) continue;
+    if (!def || !slotAcceptsItem(def, key)) continue;
     out[key] = { itemId, pin: typeof piece.pin === 'string' ? piece.pin : '' };
     kept++;
   }
