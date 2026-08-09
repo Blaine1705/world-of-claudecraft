@@ -11,11 +11,15 @@ services:
       - "127.0.0.1:5433:5432"
     volumes:
       - eastbrook_pgdata:/var/lib/postgresql/data
+    # pg_isready is a trivial ping, so polling it often costs nothing. A short
+    # interval reports healthy within about 1-2s for the common case (volume
+    # already initialized), while the raised retries count keeps roughly the
+    # same generous outer ceiling as before for a genuinely cold initdb.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U eastbrook -d eastbrook"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      interval: 1s
+      timeout: 2s
+      retries: 30
 
   # The full game server (client + API + world). `docker compose up -d`
   # then open http://localhost:8787 — or put a TLS reverse proxy in front
