@@ -410,7 +410,11 @@ import {
   type SkyView,
 } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
+import {
+  freezeStaticMatrices,
+  freezeStaticSubtreeMatrices,
+  refreshFrozenWorldMatrix,
+} from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -2116,7 +2120,10 @@ export class Renderer {
       this.farVista.enabled ? this.farVista.cameraFar : 950,
     );
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
-    // WebGLRenderer pass from repeating it for an unchanged camera.
+    // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
+    // gates the camera's own compose on this flag, so every explicit refresh
+    // goes through refreshFrozenWorldMatrix (a plain updateMatrixWorld() no
+    // longer composes a frozen node).
     this.camera.matrixWorldAutoUpdate = false;
     // Nameplate Three/DOM ownership lives in the painter; it reads the
     // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
@@ -7737,9 +7744,10 @@ export class Renderer {
     if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light budget reads light.getWorldPosition, and r165's
-      // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
-      // ancestor, so a gated group would rank the light at a stale position.
+      // the light budget reads light.getWorldPosition, and updateWorldMatrix
+      // does NOT heal through a matrixWorldAutoUpdate=false ancestor (r185
+      // visits the gated ancestor but skips its compose; r165 never healed it
+      // either), so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
     }
     this.views.set(e.id, {
@@ -10767,15 +10775,18 @@ export class Renderer {
         ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)
         : 0;
 
-    // Hidden views skip their whole matrix subtree: three recomposes even
-    // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
-    // nodes of dead per-frame compose+multiply. Re-showing flips the gate back
-    // on, and the next scene update revisits the subtree and recomposes it
-    // from the live position/rotation properties, so nothing renders stale.
-    // (pick() skips hidden views, so a frozen matrix never ghosts a hitbox.
-    // CAUTION: getWorldPosition on a node inside a GATED subtree does not heal
-    // the chain in r165, hence the light-owner exemption; any new world-space
-    // read of a view child must use group.position or exempt the view too.)
+    // Hidden views gate their group root's world compose. Under r165 the flag
+    // also skipped the whole 30-60 node subtree walk; r185 recurses children
+    // unconditionally, so the traversal saving is gone upstream and only the
+    // root compose is skipped now. Correctness holds either way: the group's
+    // matrixAutoUpdate stays true, so every visited frame re-dirties it and
+    // the re-show frame composes from the live position/rotation properties,
+    // nothing renders stale. (pick() skips hidden views, so a frozen matrix
+    // never ghosts a hitbox. CAUTION: getWorldPosition on a node inside a
+    // GATED subtree still does not heal the chain (r185 visits the gated
+    // ancestor but skips its compose), hence the light-owner exemption; any
+    // new world-space read of a view child must use group.position or exempt
+    // the view too.)
     let visibleViews = 0;
     for (const [, v] of this.views) {
       v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
@@ -11302,7 +11313,7 @@ export class Renderer {
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
     this.updateOpaqueDrawOrder(dt);
-    if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
+    if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
     // Refresh the reused host every frame instead of building a literal: sync
     // is the rAF hot path (no per-frame allocation), and post can be torn down
     // and rebuilt by a graphics rebuild, so a cached reference would go stale.
@@ -11403,7 +11414,7 @@ export class Renderer {
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
     if (this.shutdownStarted) return null;
     try {
-      this.camera.updateMatrixWorld();
+      refreshFrozenWorldMatrix(this.camera);
       this.vfx.prepareDraw(this.camera);
       if (this.post) this.post.render();
       else this.webgl.render(this.scene, this.camera);
@@ -11804,7 +11815,7 @@ export class Renderer {
         this.camera.updateProjectionMatrix();
       }
       this.camera.lookAt(this.cameraLookAt);
-      this.camera.updateMatrixWorld();
+      refreshFrozenWorldMatrix(this.camera);
       return;
     }
     const p = this.sim.player;
@@ -11929,7 +11940,7 @@ export class Renderer {
     }
     this.cameraLookAt.set(px, eyeY, pz);
     this.camera.lookAt(this.cameraLookAt);
-    this.camera.updateMatrixWorld();
+    refreshFrozenWorldMatrix(this.camera);
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;

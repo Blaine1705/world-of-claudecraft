@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from '../src/render/static_matrix';
+import {
+  freezeStaticMatrices,
+  freezeStaticSubtreeMatrices,
+  refreshFrozenWorldMatrix,
+} from '../src/render/static_matrix';
 
 describe('static matrix traversal', () => {
   it('keeps transform-animated descendants live under a locally frozen root', () => {
@@ -40,5 +44,47 @@ describe('static matrix traversal', () => {
     child.position.x = 40;
     scene.updateMatrixWorld();
     expect(child.matrixWorld.elements[12]).toBe(7);
+  });
+});
+
+describe('refreshFrozenWorldMatrix', () => {
+  // The r185 premise the helper exists for: a plain updateMatrixWorld() on a
+  // matrixWorldAutoUpdate=false node clears the dirty bit WITHOUT composing
+  // (r165 composed here). If a future three restores the old semantics, this
+  // arm flags the helper for re-evaluation instead of letting it rot.
+  it('pins the r185 gate: a plain explicit call leaves a frozen node stale', () => {
+    const camera = new THREE.PerspectiveCamera();
+    camera.matrixWorldAutoUpdate = false;
+    camera.position.x = 5;
+    camera.updateMatrixWorld();
+    expect(camera.matrixWorld.elements[12]).toBe(0);
+    expect(camera.matrixWorldNeedsUpdate).toBe(false);
+  });
+
+  it('composes a frozen parentless camera and leaves the freeze in place', () => {
+    const camera = new THREE.PerspectiveCamera();
+    camera.matrixWorldAutoUpdate = false;
+    camera.position.set(3, 0, 0);
+    camera.lookAt(0, 0, 0);
+    refreshFrozenWorldMatrix(camera);
+    expect(camera.matrixWorld.elements[12]).toBe(3);
+    expect(camera.matrixWorldAutoUpdate).toBe(false);
+  });
+
+  it('composes a frozen node against its live parent chain', () => {
+    const scene = new THREE.Scene();
+    const parent = new THREE.Group();
+    parent.position.x = 10;
+    const frozen = new THREE.Object3D();
+    frozen.position.x = 2;
+    parent.add(frozen);
+    scene.add(parent);
+    scene.updateMatrixWorld(true);
+    frozen.matrixWorldAutoUpdate = false;
+
+    frozen.position.x = 4;
+    refreshFrozenWorldMatrix(frozen);
+    expect(frozen.matrixWorld.elements[12]).toBe(14);
+    expect(frozen.matrixWorldAutoUpdate).toBe(false);
   });
 });
