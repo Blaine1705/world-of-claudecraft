@@ -33,7 +33,7 @@ import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type OverheadEmoteId, type PlayerClass, YELL_RANGE } from '../types';
 import { requestUnstuck } from '../unstuck';
 import { setAwayState } from './away';
-import { bgAllPids } from './battleground';
+import { bgActiveFighterPids, bgActiveMatchForFighter } from './battleground';
 import * as readouts from './chat_readouts';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -806,12 +806,12 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   if (/^\/bg\s/i.test(raw)) {
     const clean = raw.replace(/^\/bg\s+/i, '').trim();
     if (!clean) return null;
-    const match = ctx.bgMatches.get(r.meta.entityId);
+    const match = bgActiveMatchForFighter(ctx, r.meta.entityId);
     if (!match) {
       ctx.error(r.meta.entityId, 'You are not in a battleground.');
       return null;
     }
-    for (const mPid of bgAllPids(match)) {
+    for (const mPid of bgActiveFighterPids(ctx, match)) {
       ctx.emit({
         type: 'chat',
         fromPid: r.meta.entityId,

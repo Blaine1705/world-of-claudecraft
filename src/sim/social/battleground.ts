@@ -292,6 +292,19 @@ export function bgMatchFor(ctx: SimContext, pid: number): BgMatch | null {
   return ctx.bgMatches.get(pid) ?? null;
 }
 
+export function bgActiveMatchForFighter(ctx: SimContext, pid: number): BgMatch | null {
+  const indexed = ctx.bgMatches.get(pid);
+  if (indexed?.state === 'active' && bgAllPids(indexed).includes(pid)) return indexed;
+  for (const match of new Set(ctx.bgMatches.values())) {
+    if (match.state === 'active' && bgAllPids(match).includes(pid)) return match;
+  }
+  return null;
+}
+
+export function bgActiveFighterPids(ctx: SimContext, match: BgMatch): number[] {
+  return match.state === 'active' ? bgAllPids(match).filter((pid) => ctx.entities.has(pid)) : [];
+}
+
 function bgEmitAll(ctx: SimContext, match: BgMatch, ev: (pid: number) => void): void {
   for (const mp of bgAllPids(match)) ev(mp);
 }

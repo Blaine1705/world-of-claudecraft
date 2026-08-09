@@ -3310,4 +3310,29 @@ describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
     expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
     expect(heard).toHaveLength(BG_TEAM_SIZE * 2 - 1);
   });
+
+  it('accepts a live fighter even if their per-player match index is stale', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    sim.ctx.bgMatches.delete(speaker);
+
+    const sent = sim.chat('/bg still in the fight', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'still in the fight' });
+    const heard = chatPidsFor(sim.tick(), 'still in the fight');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(errorTexts(sim.tick())).not.toContain('You are not in a battleground.');
+  });
+
+  it('refuses after the match leaves the active phase', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    match.state = 'ended';
+
+    expect(sim.chat('/bg postgame leak check', speaker)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
+  });
 });
