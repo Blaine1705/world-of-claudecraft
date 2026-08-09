@@ -7697,7 +7697,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapAbility": "你已經死亡。死於{ability}。",
       "deathRecapFalling": "你已經死亡。你摔死了。",
       "deathRecapDrowned": "你已經死亡。你溺死了。",
-      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
+      "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
