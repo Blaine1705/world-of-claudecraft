@@ -85,15 +85,16 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
-    // Exactly 6 consumers touched: a stray extra or missing wiring changes this
-    // count. Scoped to these 4 BIPED14-family donor basenames rather than
-    // every `_hit_variety_anims.glb` in the manifest: other families (KayKit's
-    // kaykit()/skeletonClips(), ENEMY7, ENEMY_BITE/CRAB_ENEMY_BITE, etc, issue
-    // #2889) independently wire their own hit-variety donors and would
-    // otherwise inflate an unscoped count every time one of them lands.
-    const donorPattern =
-      /yetialt_hit_variety_anims\.glb|frog_hit_variety_anims\.glb|orc_hit_variety_anims\.glb|demonalt_hit_variety_anims\.glb/g;
-    const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
+    // Exactly 6 BIPED14-family consumers touched: a stray extra or missing
+    // wiring changes this count. Scoped to this family's own donor
+    // basenames rather than every `_hit_variety_anims.glb` in the manifest,
+    // since unrelated families (KayKit's kaykit()/skeletonClips(),
+    // ENEMY_BITE/CRAB_ENEMY_BITE, the enemy7 hit-variety batch, etc, issue
+    // #2889) land their own donors independently and would otherwise break
+    // this pin.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/(yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
+    ].length;
     expect(occurrences).toBe(6);
   });
 });
