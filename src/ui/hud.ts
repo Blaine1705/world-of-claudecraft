@@ -80,7 +80,6 @@ import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rul
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
-import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
   computeRespecCost,
@@ -463,9 +462,9 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
-import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
+import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
@@ -8779,9 +8778,13 @@ export class Hud {
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
-    const fateThreads = afflictionFateThreadCount(sim.entities.values(), p.id);
+    // Hoisted behind the spec check (review 3050): the thread count walks the
+    // whole entity map times each entity's auras, and for the eight other
+    // classes it produced a discarded 0 every frame.
+    const isAffliction = this.sim.talentSpec === 'affliction';
+    const fateThreads = isAffliction ? afflictionFateThreadCount(sim.entities.values(), p.id) : 0;
     this.doomMeter.paint({
-      affliction: this.sim.talentSpec === 'affliction',
+      affliction: isAffliction,
       auras: p.auras,
       fateThreads,
     });
