@@ -2137,6 +2137,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '死亡しました。{ability}によって死亡しました。',
   'hud.system.deathRecapFalling': '死亡しました。転落死しました。',
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
+  'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
@@ -7827,6 +7828,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyWeb':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
+  'gpuNotice.hybridBodyWindows':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
+  'gpuNotice.hybridBodyLinux':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
+  'gpuNotice.hybridBodyOther':
+    'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
   'gpuNotice.dismiss': '閉じる',
   'perfNudge.integratedGpu':
     'ゲームは内蔵（省電力）GPUで動作しています。このパソコンにゲーミングGPUも搭載されている場合は、Windowsの 設定 > システム > ディスプレイ > グラフィック でブラウザーを「高パフォーマンス」に設定し、ブラウザーを再起動してください。デスクトップ版は自動的にゲーミングGPUを選択します。',
@@ -9351,6 +9358,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': 'グループ成立：{name}',
   'hudChrome.finder.proposalRole': 'あなたのロール：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 人が承認',
+  'hudChrome.bgOffer.title': 'ソーンホロウ平原の準備が整いました',
+  'hudChrome.bgOffer.accepted': '{size} 人中 {accepted} 人が承認',
+  'hudChrome.bgOffer.remaining': '残り {seconds} 秒',
+  'hudChrome.bgOffer.accept': '承認',
+  'hudChrome.bgOffer.decline': '辞退',
+  'hudChrome.bgOffer.acceptedWait': '他の参加者を待っています...',
   'hudChrome.finder.remaining': '残り {seconds} 秒',
   'hudChrome.finder.accept': '承認',
   'hudChrome.finder.decline': '辞退',
@@ -10486,6 +10499,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}はすでに完全に充填されている。',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect}の再充填には{material}x{count}が必要だ。',
+  'hudChrome.professions.craftingProgress': '製作中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.disenchantingProgress': '分解中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.enchantingProgress': '付与中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.salvagingProgress': '解体中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '道具の効果を再充填中：残り{remaining}秒（全{total}秒）。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectDepleted': '道具の効果を使い切りました',
   'hudChrome.professions.toolEffectRechargePrice': '再充填: {material} x{count}',
