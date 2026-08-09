@@ -707,7 +707,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(core).toContain('export class CompileGateQueue');
     expect(core).toContain('timedOut = true;');
     expect(core).toContain(
-      'if (this.sharedQueue) return this.sharedQueue.run(work, options.priority, options.label)',
+      'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
   });
