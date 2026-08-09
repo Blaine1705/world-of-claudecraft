@@ -611,6 +611,16 @@ describe('perf report ingestion', () => {
       unknown
     >;
     expect(prewarm.failedEntryIds).toBeUndefined();
+    // Documented contract (see the id-list sanitizer comment in
+    // server/perf_report.ts compactPrewarmSummary): the scalar counts stay
+    // authoritative and uncapped while the id lists are bounded SAMPLES, so
+    // manifestPartial: 25 stored beside a 24-element partialEntryIds is the
+    // intended shape of the signal, not a contradiction to normalize away.
+    expect(prewarm.manifestPartial).toBe(25);
+    expect((prewarm.partialEntryIds as string[]).length).toBe(24);
+    expect((prewarm.partialEntryIds as string[]).length).toBeLessThan(
+      prewarm.manifestPartial as number,
+    );
   });
 
   it('stores the four browser longtask fields inside raw summary, bounded (#2479)', async () => {

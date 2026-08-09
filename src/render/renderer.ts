@@ -5076,7 +5076,11 @@ export class Renderer {
   ): {
     group: THREE.Group;
     pooled: { key: string; visual: CharacterVisual }[];
-    processed: number;
+    /** Ids whose model ended the loop warm: freshly built here, already warm
+     *  from an earlier id or session pass, or with no static record to build.
+     *  An asset-unavailable skip stays uncounted so warmed < planned reports
+     *  the unwarmed remainder instead of masquerading as complete work. */
+    warmed: number;
     planned: number;
     trimmed: boolean;
   } {
@@ -5087,23 +5091,32 @@ export class Renderer {
     setRenderCategory(group, 'prewarm');
     let idx = 0;
     const npcIds = this.templateIdsInZone(zone, 'npc');
-    let processed = 0;
+    let warmed = 0;
     let trimmed = false;
     for (const npcId of npcIds) {
       if (performance.now() >= deadline) {
         trimmed = true;
         break;
       }
-      processed++;
       const npc = NPCS[npcId];
-      if (!npc) continue;
+      // Dynamic-entity template with no static NPC record: nothing to build.
+      if (!npc) {
+        warmed++;
+        continue;
+      }
       const entity = this.prewarmEntity('npc', npc.id, npc.color, 1);
       const modelKey = visualKeyFor(entity);
-      if (this.prewarmedNpcModels.has(modelKey)) continue;
+      // Shared model already warm: this id's planned work exists already.
+      if (this.prewarmedNpcModels.has(modelKey)) {
+        warmed++;
+        continue;
+      }
       const visual = createCharacterVisual(entity);
-      // assets unavailable: skip the seed, leave the model unmarked
+      // assets unavailable: skip the seed, leave the model unmarked and the
+      // id uncounted, so a later zone preparation can retry it
       if (!visual) continue;
       this.prewarmedNpcModels.add(modelKey);
+      warmed++;
       const poolKey = this.visualPoolKeyFor(entity);
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
@@ -5111,7 +5124,7 @@ export class Renderer {
       group.add(visual.root);
       idx++;
     }
-    return { group, pooled, processed, planned: npcIds.length, trimmed };
+    return { group, pooled, warmed, planned: npcIds.length, trimmed };
   }
 
   private buildPlayerPrewarmGroup(deadline: number): {
@@ -5500,7 +5513,7 @@ export class Renderer {
   private async prewarmInitialSceneTexturesBatched(
     batchSize: number,
     maxMs: number,
-  ): Promise<{ uploaded: number; planned: number; trimmed: boolean }> {
+  ): Promise<{ uploaded: number; initialized: number; planned: number; trimmed: boolean }> {
     const before = this.webgl.info.memory.textures;
     const deadline = performance.now() + Math.max(0, maxMs);
     const textures = this.collectInitialSceneTextures();
@@ -5512,8 +5525,12 @@ export class Renderer {
       initialized = end;
       if (end < textures.length && performance.now() < deadline) await sleep(0);
     }
+    // `initialized` is the progress unit matching `planned` (textures examined);
+    // `uploaded` is a GPU-residency delta an already-resident texture never
+    // moves, kept for the upload diagnostics only.
     return {
       uploaded: Math.max(0, this.webgl.info.memory.textures - before),
+      initialized,
       planned: textures.length,
       trimmed: initialized < textures.length,
     };
@@ -5757,6 +5774,9 @@ export class Renderer {
     let playerPrewarmProgress: PrewarmEntryProgress | null = null;
     let npcPrewarmProgress: PrewarmEntryProgress | null = null;
     let portalViewsTrimmed = false;
+    // views.persistent-portals' own created count (same per-entry rule as
+    // nearbyViewsCreated below).
+    let portalViewsCreated = 0;
     let nearbyViewsTrimmed = false;
     // views.required's own created count (same per-entry rule as
     // nearbyViewsCreated below: never report the cumulative counter as one
@@ -5767,6 +5787,9 @@ export class Renderer {
     // it as this entry's done would exceed the entry's planned candidates.
     let nearbyViewsCreated = 0;
     let sceneTextureProgress: PrewarmEntryProgress | null = null;
+    // Batched-arm-only count of scene textures actually initialized; null on
+    // the synchronous desktop path, which tracks only the upload delta.
+    let sceneTexturesInitialized: number | null = null;
     let skyWarmedInlineBiomes = 0;
     let skyDeferredBiomes: (typeof initialSkyBiomes)[number][] = [];
     let skyWarmComplete = false;
@@ -6149,11 +6172,15 @@ export class Renderer {
             buildDeadline,
             remainingPrewarmViewBudget(policy.maxViews, createdViews),
           );
+          portalViewsCreated = result.created;
           createdViews += result.created;
           portalViewsTrimmed = result.trimmed;
         },
         progress: () => ({ trimmed: portalViewsTrimmed }),
-        detail: () => `created=${createdViews}`,
+        // Per-entry count first: `createdViews` is the cumulative counter
+        // shared with the required/landmark/nearby substeps (same rule as
+        // views.nearby below).
+        detail: () => `created=${portalViewsCreated};cumulativeViews=${createdViews}`,
       },
       {
         id: 'views.nearby',
@@ -6216,10 +6243,13 @@ export class Renderer {
           const built = this.buildPlayerPrewarmGroup(buildDeadline);
           playerPrewarmGroup = built.group;
           playerPrewarmVisuals = built.visualCount;
+          // Planned is exact here, so any shortfall trims: an asset-skipped
+          // rig (createCharacterVisual returning null) leaves planned work
+          // unwarmed, and completed must mean the work actually happened.
           playerPrewarmProgress = {
             done: built.visualCount,
             planned: built.plannedVisuals,
-            trimmed: built.trimmed,
+            trimmed: built.trimmed || built.visualCount < built.plannedVisuals,
           };
           this.scene.add(playerPrewarmGroup);
         },
@@ -6250,10 +6280,13 @@ export class Renderer {
           const built = this.buildNpcPrewarmGroup(activeZone, buildDeadline);
           npcPrewarmGroup = built.group;
           npcPrewarmPool = built.pooled;
+          // Same derived rule as entities.player-archetypes above: done counts
+          // ids whose model ended warm, so an asset-skipped id leaves
+          // done < planned and the entry reports partial, never completed.
           npcPrewarmProgress = {
-            done: built.processed,
+            done: built.warmed,
             planned: built.planned,
-            trimmed: built.trimmed,
+            trimmed: built.trimmed || built.warmed < built.planned,
           };
           this.scene.add(npcPrewarmGroup);
         },
@@ -6447,8 +6480,12 @@ export class Renderer {
               policy.textureMaxMs,
             );
             textureUploads = batched.uploaded;
+            sceneTexturesInitialized = batched.initialized;
+            // done matches planned's unit (textures examined): the uploaded
+            // GPU-residency delta never moves for an already-resident texture,
+            // so it would misreport a shortfall on a fully successful run.
             sceneTextureProgress = {
-              done: batched.uploaded,
+              done: batched.initialized,
               planned: batched.planned,
               trimmed: batched.trimmed,
             };
@@ -6457,7 +6494,10 @@ export class Renderer {
           textureUploads = this.prewarmObjectTextures(this.scene);
         },
         progress: () => sceneTextureProgress,
-        detail: () => `uploaded=${textureUploads}`,
+        detail: () =>
+          sceneTexturesInitialized === null
+            ? `uploadedDelta=${textureUploads}`
+            : `initialized=${sceneTexturesInitialized};uploadedDelta=${textureUploads}`,
       },
       {
         id: 'vfx.atlas',

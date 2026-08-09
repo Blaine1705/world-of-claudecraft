@@ -357,6 +357,11 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   // The three entry-id lists are client-supplied arrays and must never be
   // copied verbatim like the scalars above (bounded only by the body cap):
   // same bounds as the entries block below, non-arrays dropped outright.
+  // Deliberate asymmetry with the scalar copy: the manifestPartial /
+  // manifestTimedOut / manifestFailed COUNTS stay authoritative and uncapped
+  // (clamping one would misreport the true count), while these id lists are
+  // bounded SAMPLES. A stored count larger than its list length is therefore
+  // the documented shape of this signal, not self-contradiction.
   for (const key of ['partialEntryIds', 'timedOutEntryIds', 'failedEntryIds']) {
     const ids = value[key];
     if (!Array.isArray(ids)) continue;

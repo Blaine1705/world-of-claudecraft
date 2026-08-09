@@ -524,6 +524,75 @@ describe('one trim rule for every entry on the shared view budget', () => {
   });
 });
 
+describe('archetype and scene-texture progress hooks stay honest (review round 2)', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const block = (id: string, nextId: string): string => {
+    const start = renderer.indexOf(`id: '${id}'`);
+    const end = renderer.indexOf(`id: '${nextId}'`, start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    return renderer.slice(start, end);
+  };
+
+  it('derives the player-archetype trim from the build shortfall, not the deadline alone', () => {
+    // Skipped builds (createCharacterVisual returning null on unavailable
+    // assets) leave planned rigs unwarmed without touching the loop-exit trim
+    // flag. Planned is exact for this entry, so done reaching planned is what
+    // completed must mean; resolvePrewarmEntryStatus (pinned in the
+    // completed-lie block below) then downgrades the shortfall to partial.
+    expect(block('entities.player-archetypes', 'entities.mob-archetypes')).toContain(
+      'trimmed: built.trimmed || built.visualCount < built.plannedVisuals',
+    );
+  });
+
+  it('gives the npc-archetype entry the same derived-trimmed rule with matching units', () => {
+    const entry = block('entities.npc-archetypes', 'objects.quest-archetypes');
+    expect(entry).toContain('done: built.warmed');
+    expect(entry).toContain('trimmed: built.trimmed || built.warmed < built.planned');
+  });
+
+  it('counts an npc id done only when its model ends warm, never on an asset skip', () => {
+    const builderStart = renderer.indexOf('private buildNpcPrewarmGroup(');
+    const builderEnd = renderer.indexOf('private buildPlayerPrewarmGroup(', builderStart);
+    expect(builderStart).toBeGreaterThan(-1);
+    expect(builderEnd).toBeGreaterThan(builderStart);
+    const builder = renderer.slice(builderStart, builderEnd);
+    // The old shape counted ids examined before any skip, so a loop that
+    // built nothing still reported full work.
+    expect(builder).not.toContain('processed');
+    const visualAt = builder.indexOf('const visual = createCharacterVisual(entity)');
+    const skipAt = builder.indexOf('if (!visual) continue', visualAt);
+    const markWarmAt = builder.indexOf('this.prewarmedNpcModels.add(modelKey)', skipAt);
+    const builtCountAt = builder.indexOf('warmed++', markWarmAt);
+    expect(visualAt).toBeGreaterThan(-1);
+    // The asset-unavailable skip leaves the id uncounted...
+    expect(skipAt).toBeGreaterThan(visualAt);
+    expect(markWarmAt).toBeGreaterThan(skipAt);
+    // ...and a built visual counts only after its model is marked warm.
+    expect(builtCountAt).toBeGreaterThan(markWarmAt);
+  });
+
+  it('reports scene textures in matching units: initialized done against examined planned', () => {
+    const entry = block('textures.scene', 'vfx.atlas');
+    expect(entry).toContain('done: batched.initialized');
+    expect(entry).toContain('planned: batched.planned');
+    // The regression shape: workDone as a GPU-residency delta an
+    // already-resident texture never moves, mismatched against a planned that
+    // counts every texture examined. The delta stays in detail(), labeled.
+    expect(entry).not.toContain('done: batched.uploaded');
+    expect(entry).toContain('uploadedDelta=${textureUploads}');
+  });
+
+  it('the portal entry details its own created count beside the labeled cumulative counter', () => {
+    const entry = block('views.persistent-portals', 'views.nearby');
+    expect(entry).toContain('portalViewsCreated = result.created');
+    expect(entry).toContain('created=${portalViewsCreated};cumulativeViews=${createdViews}');
+  });
+});
+
 describe('resolvePrewarmPolicy: constrained WITHOUT parallel compile', () => {
   const p = resolvePrewarmPolicy({
     ...BASE,

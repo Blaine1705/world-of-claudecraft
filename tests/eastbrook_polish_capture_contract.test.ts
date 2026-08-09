@@ -113,8 +113,11 @@ interface AttributionTargetFixture {
 // Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
 // sky entry, unified view-cap trim rule, deferred-lane gate and priority
 // threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '83e7bd859ba5f0dbab3d75eb4bc20a34361c71bec44ed1b363af29a21bc4843d';
+  '3455c52bb8541eeba4541c006b51f35fe833dd13574518c674d825590e76dd2f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
