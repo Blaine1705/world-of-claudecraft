@@ -108,8 +108,11 @@ function unlockEvents(events: SimEvent[]): { deedId: string; retro?: boolean }[]
 describe('the lifetime-honor rank ladder (catalog)', () => {
   it('ships three appended pvp title deeds on the meter, in ascending order', () => {
     // Appended, never inserted: DEED_ORDER derives from table order, so the
-    // three must be the LAST three ids, in ladder order.
-    expect(DEED_ORDER.slice(-3)).toEqual(LADDER.map((rank) => rank.id));
+    // three must sit contiguous in ladder order at their release point. They
+    // were the table tail until the Phase 18 Reliquary completion ladder
+    // appended its five deeds after them; the pin tracks the slice, not the
+    // absolute tail (the deeds_content tail literal owns the absolute order).
+    expect(DEED_ORDER.slice(-8, -5)).toEqual(LADDER.map((rank) => rank.id));
     for (const rank of LADDER) {
       const def = DEEDS[rank.id];
       expect(def, rank.id).toBeDefined();

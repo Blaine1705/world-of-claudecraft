@@ -200,7 +200,10 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
       // Reliquary field-note marks write through noteReliquaryMark, which
       // scores curator rank off live ownedMounts: the finder needs a real
       // sparse reliquary state AND the containers ownedMounts scans (bags and
-      // bank), not a bare stub.
+      // bank), not a bare stub. Since Phase 18 the mark path also runs the
+      // completion-ladder sync unconditionally, whose earned-set early-out
+      // reads meta.deedsEarned, so the stub carries the empty Map too (no
+      // ladder read can pass on one mark, so ctx.grantDeed stays uncalled).
       const meta = {
         entityId: pid,
         name,
@@ -208,6 +211,7 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
         bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
         reliquary: freshReliquaryState(),
         deedStats: { itemsDiscovered: new Set<string>() },
+        deedsEarned: new Map<string, number>(),
       } as unknown as PlayerMeta;
       players.set(pid, meta);
       entities.set(pid, { pos: { x, y: 0, z } });
