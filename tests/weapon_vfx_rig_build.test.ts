@@ -16,6 +16,7 @@ import {
   createWeaponVfx,
   disposeWeaponEmissiveCache,
   TIERS,
+  WEAPON_VFX,
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 
@@ -270,36 +271,59 @@ describe('weapon-skin emissive derivation sharing', () => {
 });
 
 describe('buildWeaponVfxPrewarmGroup', () => {
-  it('covers every component family off-screen, with no sky and no extra light', () => {
+  it('builds one rig per REAL catalog spec through the live world path', () => {
+    // The old single synthetic spec covered each component FAMILY but not the
+    // real program-key set: the first skin sighted in the world still linked
+    // ~108 programs inside one frame (the measured geared-arrival freeze).
+    // Coverage by construction instead: every WEAPON_VFX entry, built with
+    // the exact worn-skin options (grounded: false), so the boot compile
+    // links every key a live arrival can ask for.
     const group = buildWeaponVfxPrewarmGroup();
+    const specCount = Object.keys(WEAPON_VFX).length;
 
     expect(group.position.y).toBe(-1000);
     expect(skyCanvasCount()).toBe(0);
 
     const names = new Set<string>();
+    let hosts = 0;
     let lights = 0;
     let visibleLights = 0;
-    let shells = 0;
+    const shells: THREE.Object3D[] = [];
     group.traverse((object) => {
       if (object.name) names.add(object.name);
+      if (object.name?.startsWith('prewarm-skin-host:')) hosts++;
       if ((object as THREE.PointLight).isPointLight) {
         lights++;
         if (object.visible) visibleLights++;
       }
-      if (object.userData.__vfx) shells++;
+      if (object.userData.__vfx) shells.push(object);
     });
 
+    expect(hosts).toBe(specCount);
+    for (const key of Object.keys(WEAPON_VFX)) {
+      expect(names, `spec ${key} missing from the prewarm group`).toContain(
+        `prewarm-skin-host:${key}`,
+      );
+    }
     for (const name of ['vfx_coreSprite', 'vfx_motes', 'vfx_drift', 'vfx_twinkles', 'vfx_aurora']) {
-      expect(names, `${name} missing from the prewarm rig`).toContain(name);
+      expect(names, `${name} missing from the prewarm rigs`).toContain(name);
     }
     // The fresnel rim shell parents itself to the host mesh instead of the rig
     // group, so it is counted by its tag rather than a name.
-    expect(shells).toBeGreaterThan(0);
-    // The ground pool rides sceneExtras, which the group carries too.
+    expect(shells.length).toBeGreaterThan(0);
+    // Every shell must carry the applyMaterials skip tag itself: userData is
+    // per object, never inherited, and visual.ts only tags the rig group's own
+    // subtree. A shell without it is silently re-owned by a ShaderMaterial
+    // clone on the next material sweep, so the rig's uTime/uStr uniform writes
+    // stop reaching the rendered material.
+    for (const shell of shells) {
+      expect(shell.userData.weaponVfxMesh, 'shell missing the applyMaterials skip tag').toBe(true);
+    }
+    // The ground pool rides sceneExtras, which every rig group carries.
     expect(names).toContain('weapon_vfx_extras');
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key the boot compile warms.
-    expect(lights).toBe(1);
+    expect(lights).toBe(specCount);
     expect(visibleLights).toBe(0);
   });
 });
