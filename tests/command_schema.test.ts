@@ -47,9 +47,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // helmet-visibility eye; helmHidden persists per character like weaponStowed),
 // inv_sort as a send + dispatch pair (the one-shot bag clean-up; no payload,
 // the sim re-derives the whole arrangement deterministically), and bg_respond
-// as a send + dispatch pair (the battleground queue-pop answer).
-const EXPECTED_SEND_COUNT = 193;
-const EXPECTED_DISPATCH_COUNT = 206;
+// as a send + dispatch pair (the battleground queue-pop answer), and tabPrev as
+// a send + dispatch pair (the backward half of the Tab target cycle, Shift+Tab
+// by default; no payload, the sim walks the same ordered list in reverse).
+const EXPECTED_SEND_COUNT = 194;
+const EXPECTED_DISPATCH_COUNT = 207;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch
