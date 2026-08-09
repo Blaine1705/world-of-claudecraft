@@ -5,7 +5,10 @@ const SEEDS = [29001, 29002, 29003, 29004, 29005];
 // Keep the release gate representative without making its wall time depend on runner load.
 // The CLI probe retains the full 120-second fixture used for the PR balance evidence.
 const SECONDS = 90;
-const TEST_TIMEOUT_MS = 180_000;
+// Sized for the long-sims lane's slow-quartile runner (run 31296160254 ran
+// these at 219s and 209s against the old 180s bound, sharing the runner with
+// a harness marathon at workers=2).
+const TEST_TIMEOUT_MS = 480_000;
 
 function matrix(targets: number): Record<string, number> {
   return Object.fromEntries(
