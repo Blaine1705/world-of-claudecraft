@@ -127,9 +127,12 @@ export class CharselectRedesignEditor {
     const panel = document.getElementById('charselect-reroll');
     const host = document.getElementById('charselect-reroll-host');
     if (!panel || !host) return;
+    // Captured BEFORE close(), which hands focus back to whichever row opened
+    // the editor last. Reading it after meant clicking Redesign on row B while
+    // row A's editor was open returned focus to A's button when B closed.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.close(false);
-    this.returnFocus =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    this.returnFocus = opener;
     this.target = c;
     this.helmHidden = c.helmHidden === true;
     // Seed from the character's stored look. A window-eligible character may

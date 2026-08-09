@@ -159,13 +159,17 @@ const MAX_SKIN = 7;
  *  midnight, so every client agrees on who is inside the window without doing
  *  any timezone arithmetic of its own, and compared server-side only.
  *
- *  Set a week out (2026-08-10 + 7) rather than to the ship date, deliberately:
- *  a cutoff that has already passed when the change merges gives nothing to the
- *  characters created in between, and a current client posts a look, so the
- *  `appearance IS NULL` arm below will not catch them either. The slack is what
- *  makes the window survive a slow review. Re-check it before merging; if it has
- *  gone stale, push it out rather than shipping a window that is already shut. */
-export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-17T00:00:00Z');
+ *  Set ahead of the ship date rather than on it, deliberately: a cutoff that has
+ *  already passed when the change merges gives nothing to the characters created
+ *  in between, and a current client posts a look, so the `appearance IS NULL`
+ *  arm below will not catch them either. The slack is what makes the window
+ *  survive a slow review. Re-check it before merging; if it has gone stale, push
+ *  it out rather than shipping a window that is already shut.
+ *
+ *  Re-checked 2026-08-10 (third review round) and pushed from 08-17 to 08-24, so
+ *  the window still has two weeks of slack from the current head rather than the
+ *  one it had left. */
+export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-24T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------

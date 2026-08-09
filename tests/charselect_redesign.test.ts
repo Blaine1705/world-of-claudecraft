@@ -111,6 +111,27 @@ describe('opening', () => {
     expect(editor.isOpen).toBe(true);
   });
 
+  it('returns focus to the row that opened it, not the row before', () => {
+    // Opening on a second character closes the first, and close() hands focus
+    // back to whoever opened THAT one. Reading document.activeElement after the
+    // close therefore captured row A's button while row B was being opened, so
+    // closing B dropped a keyboard user back onto A.
+    const rowA = document.createElement('button');
+    const rowB = document.createElement('button');
+    rowA.id = 'row-a';
+    rowB.id = 'row-b';
+    document.body.append(rowA, rowB);
+
+    const editor = editorWith(fakeDeps());
+    rowA.focus();
+    editor.open(TARGET);
+    rowB.focus();
+    editor.open({ ...TARGET, id: 43, name: 'Another' });
+    editor.close(true);
+
+    expect(document.activeElement).toBe(rowB);
+  });
+
   it('does nothing at all when the panel is not in the document', () => {
     document.body.innerHTML = '';
     const deps = fakeDeps();
