@@ -34,12 +34,22 @@ describe('streamed grass perceptual density', () => {
   it('keeps near chunks full and changes only existing immutable instance buffers', async () => {
     const { foliageGrassInternalsForTest } = await import('../src/render/foliage');
     const parent = new THREE.Group();
-    const grass = foliageGrassInternalsForTest.buildGrassRing(parent, 20_061);
+    // Frozen injected build clock (the unsliced reference pacing from
+    // tests/grass_build_slicing.test.ts): the sliced builder checks its frame
+    // budget BEFORE every sub-unit on this clock, so on the real clock a slow
+    // CI machine can leave the streamed window part-built after any fixed
+    // frame count. Freezing the clock makes every started chunk finish in its
+    // frame, restoring the deterministic one-whole-chunk-per-frame pacing
+    // this suite's full-window assertions were written against.
+    const grass = foliageGrassInternalsForTest.buildGrassRing(parent, 20_061, () => 0);
     const px = 15;
     const pz = 45;
     for (let frame = 0; frame < 64; frame++) {
       grass.update(px, pz, 8, 6, 40, 623.54, 1 / 60);
     }
+    // The density and immutability assertions below stand on a fully built
+    // streamed window: nothing may still be queued or mid-build here.
+    expect(grass.perfStats().grassQueuedChunks).toBe(0);
 
     const collectAllMeshes = (): THREE.InstancedMesh[] => {
       const result: THREE.InstancedMesh[] = [];
