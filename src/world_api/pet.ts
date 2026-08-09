@@ -12,7 +12,7 @@ export interface IWorldPet {
   setPetAutoTaunt(enabled: boolean): void;
   setPetAutoWaterJet(enabled: boolean): void;
   setPetAutoSpecial(enabled: boolean): void;
-  feedPet(itemId: string): void;
+  feedPet(itemId: string, target?: { slotIndex: number }): void;
   healPet(): void;
   setPetMode(mode: PetMode): void;
 }
