@@ -245,6 +245,9 @@ type RendererGpuQueueSnapshot = NonNullable<PerfSnapshot['renderer']>['gpuQueue'
 // because a page-relative timestamp carries no fleet meaning.
 const GPU_QUEUE_REPORT_STALLS = 6;
 const GPU_QUEUE_REPORT_SLOWEST = 5;
+// The queue's own tail cap keeps this list tiny; the slice only pins the
+// beacon size against a future cap raise, mirroring the two lists above.
+const GPU_QUEUE_REPORT_TAILS = 4;
 
 function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
   return {
@@ -260,6 +263,12 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
           ageMs: gpuQueue.active.ageMs,
         }
       : null,
+    // Released compile-gate tails settling off-thread.
+    waitingTails: gpuQueue.waitingTails.slice(0, GPU_QUEUE_REPORT_TAILS).map((tail) => ({
+      label: tail.label,
+      priority: tail.priority,
+      ageMs: tail.ageMs,
+    })),
     stalls: gpuQueue.stalls.slice(-GPU_QUEUE_REPORT_STALLS).map((stall) => ({
       label: stall.label,
       priority: stall.priority,

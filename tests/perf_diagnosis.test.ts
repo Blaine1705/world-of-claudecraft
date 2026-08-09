@@ -122,6 +122,7 @@ function baseSnapshot(): PerfSnapshot {
         slowest: [],
         pending: 0,
         active: null,
+        waitingTails: [],
         stallCount: 0,
         stalls: [],
       },

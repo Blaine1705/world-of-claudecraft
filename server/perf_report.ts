@@ -257,8 +257,9 @@ function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undef
   };
 }
 
-// rendererGpuQueue (issue #3167): the background GPU queue is serial, so the
-// running unit and the units it stalled behind it are the only evidence a
+// rendererGpuQueue (issue #3167): the background GPU queue drains one unit at
+// a time (plus a small released-tail overlap), so the running unit, the
+// released tails, and the stalls they record are the only evidence a
 // never-settling unit leaves. Same JSONB-not-DDL treatment as the longtask
 // block above, with the same kind of numeric bound. A completed unit's slice
 // is a single piece of GPU work; an active unit's age is time SINCE it started
@@ -267,6 +268,9 @@ const GPU_QUEUE_RAW_MS_MAX = 60_000;
 const GPU_QUEUE_RAW_AGE_MS_MAX = 30 * 60_000;
 const GPU_QUEUE_RAW_STALLS_MAX = 8;
 const GPU_QUEUE_RAW_SLOWEST_MAX = 8;
+// Released compile-gate tails settling beside the active unit. The client caps
+// them at the queue's own tail limit; this bound only defends the ingest.
+const GPU_QUEUE_RAW_TAILS_MAX = 4;
 
 function gpuQueueUnitLabel(value: unknown): string {
   return textIn(value, 80, 'unlabeled');
@@ -287,6 +291,7 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
     : null;
   const stalls = Array.isArray(value.stalls) ? value.stalls : [];
   const slowest = Array.isArray(value.slowest) ? value.slowest : [];
+  const waitingTails = Array.isArray(value.waitingTails) ? value.waitingTails : [];
   return {
     units: intIn(value.units, 0, 10_000_000, 0),
     totalSyncMs: numberIn(value.totalSyncMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
@@ -294,6 +299,14 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
     pending: intIn(value.pending, 0, 1_000_000, 0),
     stallCount: intIn(value.stallCount, 0, 1_000_000, 0),
     active,
+    waitingTails: waitingTails
+      .slice(0, GPU_QUEUE_RAW_TAILS_MAX)
+      .filter(isRecord)
+      .map((tail) => ({
+        label: gpuQueueUnitLabel(tail.label),
+        priority: gpuQueuePriority(tail.priority),
+        ageMs: numberIn(tail.ageMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+      })),
     stalls: stalls
       .slice(0, GPU_QUEUE_RAW_STALLS_MAX)
       .filter(isRecord)
@@ -545,4 +558,5 @@ export const perfReportInternalsForTest = {
   GPU_QUEUE_RAW_MS_MAX,
   GPU_QUEUE_RAW_AGE_MS_MAX,
   GPU_QUEUE_RAW_STALLS_MAX,
+  GPU_QUEUE_RAW_TAILS_MAX,
 };

@@ -233,6 +233,7 @@ function snapshot(): PerfSnapshot {
         ],
         pending: 0,
         active: null,
+        waitingTails: [],
         stallCount: 0,
         stalls: [],
       },
@@ -476,6 +477,7 @@ describe('perf reporter payload', () => {
       slowest: [],
       pending: 7,
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
+      waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],
       stallCount: 1,
       stalls: [
         { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
@@ -493,6 +495,12 @@ describe('perf reporter payload', () => {
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
       stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
     });
+    // A released tail rides beside the active unit. Exact equality on purpose:
+    // toMatchObject's subset semantics would pass even if atMs leaked through,
+    // and dropping atMs (page-relative, fleet-meaningless) is the claim.
+    expect((wedgedQueue as { waitingTails?: unknown[] }).waitingTails).toEqual([
+      { label: 'released-gate', priority: 30, ageMs: 5000 },
+    ]);
   });
 
   it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {
