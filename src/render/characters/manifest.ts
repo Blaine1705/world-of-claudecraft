@@ -537,7 +537,7 @@ const ENEMY_BITE: ClipMap = {
   walk: 'Walk',
   run: 'Walk',
   attack: ['Bite_Front'],
-  hit: ['HitRecieve'],
+  hit: ['HitRecieve', 'HitRecieve_Dazed'],
   death: 'Death',
 };
 
@@ -2115,8 +2115,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.7,
     clips: CRAB_ENEMY_BITE,
     // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/crab_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [
+      `${CREATURES}/crabenemy_hit_variety_anims.glb`,
+      `${CREATURES}/crab_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -2141,8 +2145,9 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.6,
     clips: TREANT_ENEMY_BITE,
     // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/treant_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the yeti's
+    // hit-variety donor GLB; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/yeti_hit_variety_anims.glb`, `${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
