@@ -1966,3 +1966,105 @@ owns the push.
   mobile/styles suites pass on the merged tree.
 - Phase tip after the gate: efe93ee206 (four feature/docs commits, the sync
   merge, and the gate-found pin fix). LOCAL ONLY; Phase 18 QA owns the push.
+
+## Phase 18 QA (2026-08-08): Verify rewards ladder
+
+- Step 0: pre-flight clean at 7465e3c9da, seven first-parent commits ahead
+  of origin/feature/reliquary (LOCAL as handed off; this QA owns the push).
+  origin/release/v0.36.0 (1478f9d2ba) still contained at start; the base
+  moved MID-QA and was re-synced after the fix commit (below). Memory scan:
+  test-pin traps index, mutation-check rules (prove tests ran, restore by
+  edit), the background-gate pipe lesson, the reviewer-nudge pattern.
+- Step 1: one Explore agent mapped the immutable range 885dbaf9d2..7465e3c9da
+  (76 phase-authored files; three release-sync-only files excluded) and
+  pre-flagged six assertion-quality leads, handed to the coverage auditor
+  as leads, not conclusions.
+- Mutation checks (quiet tree, before the fan-out, both restored by edit,
+  suite green after): (A) col_reliquary_conquerors renown 0 to 5 failed
+  exactly the 3145 sum pin and the frozen catalog SHA (33 passed, 2 failed:
+  the suite provably ran); (B) removing the capstone's feat: true failed
+  the SHA, the feat biconditional, AND the capstone reachability pin: the
+  real guard against the Book dead-end bites.
+- Step 2, six fresh reviewers in parallel on the immutable range, prompted
+  for coverage with the settled refutations listed as do-not-re-raise:
+  architecture (0 blocking; parity draw-order digest green UNCHANGED
+  against the pre-phase baseline; verified the self-reference math and the
+  snapshot threading; found the mount re-acquisition hole and the
+  non-fail-closed dispatch else), cross-platform-sync (0 blocking; two
+  stale docblocks contradicting the new fan-out; verified three-host
+  parity, retro silence on all three families, no per-relic path, the
+  reconnect anti-repeat), migration-safety (0 blocking; probed the restore
+  with ten hostile shapes, verified the rollback story against the OLD
+  serializer via git show, found the reachable marks-restore throw on the
+  public character-sheet route), privacy-security (0 blocking; verified
+  authority, per-earner consent on all three arms, bidirectional block
+  filters, injection inertness, parameterized SQL; surfaced the real
+  Discord card payload and the border-class widening), test-coverage (ONE
+  BLOCKING: the retroFallbackGrants join seam was deletable-green;
+  confirmed the feat_book_complete derivation pin is a constant
+  self-comparison whose real guard is the reachability pin), qa-checklist
+  (READY; independently REPRODUCED the pre-phase catalog SHA by
+  reconstruction, proving the re-baseline hides exactly the two documented
+  changes and nothing else).
+- Fix round (commit 1e72b8d6d0, 13 files), every finding applied or
+  explicitly recorded: THREE behavioral lines (the completion-deed dispatch
+  fails closed on unpaired ids; restoreReliquaryState marks gained the
+  sibling Array.isArray guard, closing a reachable 500 through the public
+  character-sheet route; RELIQUARY_ILLUMINATION_DEED_PAGES exported for the
+  dispatch-lockstep pin), THIRTEEN new tests (the two REAL-join seam pins
+  and the mount-last arm each mutation-checked deletable-red; the mixed
+  candidate sweep naming the SECOND page; the dispatch-lockstep data pin;
+  corrupt-marks and boxed-String hostile arms; the ClientWorld decode-drop
+  pin with a sibling-mark premise arm; the honor-ladder re-anchor via
+  indexOf; the stub deedsEarned retype; the Epic-vs-Steam launch-set
+  parity pin; six duplicate it renames; tsc-only tautology notes on both
+  structural twins plus a runtime key-shape arm; rendered-English literal
+  pins on BOTH chat lines; the pid-undefined and no-session fan-out arms
+  with contrast re-fires; an end-to-end retro JOIN drive through
+  server.join proving the retro gate on the real seed pass), and the
+  comment corrections (the retro flag buys exactly THREE things now that
+  the illumination fan-out exists; the grant-order rationale states what
+  the tests actually pin; the eager-default claims rewritten to the real
+  placement constraint; the completionist steady state qualified while the
+  capstone is pended; the two-pages edge named reachable on shipped
+  content; the crash-window halves named correlated; the blob worst case
+  quantified; the join sweep's permanent forward consequence documented;
+  per-level snapshot sharing stated honestly; both server wire comments
+  enumerate four keys and the fan-out caveat).
+- Fresh fix-round review (a seventh reviewer plus two verification
+  subagents over the uncommitted diff): READY TO COMMIT after its two
+  should-fix landed (the shelf-read comment states the pinned guarantees
+  are weaker than item-only; the decode-drop premise arm decodes a sibling
+  mark instead of asserting a default-initialized field). Judgment call
+  recorded: the Epic-vs-Steam toEqual pin STAYS despite being implied by
+  the two full-literal pins today, reworded as the launch-set lockstep
+  check whose scoping or retirement is the reviewed act when a deliberate
+  storefront-specific achievement ships (D21 independence).
+- Recorded rather than coded, with rationale, in state.md: the portal
+  deploy-order constraint (batch poisoning, outage-wire blast radius,
+  reconcile cadence, the ACH_RELIQUARY_COMPLETE hold, the first-login
+  retro-wave mechanism), the real Discord border-card payload and the
+  border-class widening for release notes, the storefront mirror as a
+  consent-ungated publication surface, the mount reins re-acquisition gap
+  (family of the recorded guild-bank twin), the Collection-shelf
+  unreachable denominator and the overview-vs-capstone denominator gap,
+  and the corrected mixed-fleet rollback rendering claim (invisible in the
+  owner's Book; raw-id only in guild chat on a stale client).
+- The release base moved mid-QA: synced with merge 9f0eab8786 (PR 3162,
+  item copy addressing) after the fix commit; the release-merge-audit ran
+  (the delta overlaps server/game.ts, src/net/online.ts, src/ui/hud.ts):
+  both parents' intent verified present in all three, no legacy-arm
+  divergence, no new routes or corpus rows owed, no stale injection
+  bindings, no db-mock trap in the four new release tests, no planning
+  premise invalidated; post-merge tsc clean and 890 tests green across
+  both sides' suites.
+- Gate on the committed tree at 9f0eab8786 (TURBO_FORCE=1, run bare in the
+  background, log read, exit 0 unmasked): PASS, ALL 8 STEPS GREEN. The
+  planner fell back to the full suite (broad change): 33469 passed, 2
+  expected fail, 108 skipped across 2396 files (up from 33389 at the phase
+  gate); browser regressions 16 files 111 tests green; i18n + wiki + SFX
+  artifacts fresh; malware scan clean; changed-files biome clean; tsc +
+  env/server/bot builds + the client bundle green.
+- Verdict: PASS. Pushed to origin/feature/reliquary at QA close (the docs
+  commit recording this entry is the pushed tip); CI on PR 2976 babysat
+  from there.

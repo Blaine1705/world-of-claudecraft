@@ -1,17 +1,21 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 18 COMPLETE, LOCAL (2026-08-08, not pushed; Phase 18 QA
-owns the push). The rewards ladder landed: five zero-Renown completion
-deeds (the capstone feat-flagged so The Whole Book cannot dead-end, the
-one off-prefix feat, pinned), the sticky illuminatedPages set (fifth
-persisted surface, first-ever illumination gating), the server
-illumination marquee + discordFeedDeed border arm (rank 5 reaches the
-feed), and nine Steam/Epic achievement entries each. Six review passes
-(five phase reviewers + a fresh fix-round reviewer): the one BLOCKING
-(capstone would have dead-ended feat_book_complete) was fixed and
-re-reviewed to PASS; every should-fix and applicable nit applied. Full
-record in progress.md "Phase 18". Next: Phase 18 QA (fresh session,
-ultracode, phase-18-qa.md; gate on the committed tree, then push).
+Current phase: 18 QA COMPLETE, PASS, PUSHED (2026-08-08). The rewards
+ladder is verified: six fresh phase reviewers plus a fix-round reviewer
+and two verification subagents; the one BLOCKING coverage gap (both
+retroFallbackGrants calls were deletable-green at the real join seam)
+closed with mutation-checked pins; three behavioral hardenings (the
+fail-closed ladder dispatch, the marks restore guard that closed a
+reachable 500 on the public character-sheet route, the pairing-table
+export), thirteen new tests, stale docblocks corrected, and the
+maintainer records extended (portal deploy ordering + the
+ACH_RELIQUARY_COMPLETE hold, the real Discord card payload, the border
+class widening, the mount re-acquisition gap). Base re-synced through
+the PR 3162 merge (release-merge-audit clean); gate PASS all 8 steps
+(full suite 33469 in-gate, browser 111). Full record in progress.md
+"Phase 18 QA". Next: Phase 19 (borders in-world: nameplates +
+portraits; fresh session, phase-19-borders-inworld.md; sync
+origin/release/v0.36.0 at Step 0).
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
