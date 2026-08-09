@@ -7924,6 +7924,7 @@ export const zh_CN: EnTranslations = {
       "outOfRange": "超出范围。",
       "noTarget": "你没有目标。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必须选定一名友方目标。",
       "facing": "你必须面向目标。",
       "targetHealthBelow": "该技能要求目标生命值低于 {percent}%。",
       "dagger": "你必须装备匕首。",
@@ -9540,6 +9541,10 @@ export const zh_CN: EnTranslations = {
       "die_by_sword": {
         "name": "剑在人在",
         "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
+      },
+      "intervene": {
+        "name": "援护",
+        "description": "冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。"
       },
       "recklessness": {
         "name": "鲁莽",

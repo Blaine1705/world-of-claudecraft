@@ -77,6 +77,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。',
   'entities.abilities.die_by_sword.name': '剣に死す',
+  'entities.abilities.intervene.name': '援護',
+  'entities.abilities.intervene.description':
+    '味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。',
   'entities.abilities.emboldening_roar.description':
     '奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）',
   'entities.abilities.emboldening_roar.name': '奮起の咆哮',
@@ -2181,6 +2184,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '射程外です。',
   'hud.errors.noTarget': '対象がいません。',
   'hud.errors.tooClose': '近すぎます！',
+  'hud.errors.mustTargetAlly': '味方を対象にしてください。',
   'hud.errors.facing': '対象の方を向いている必要があります。',
   'hud.errors.targetHealthBelow': 'その能力は対象の体力が{percent}%未満でなければ使えません。',
   'hud.errors.dagger': '短剣を装備する必要があります。',

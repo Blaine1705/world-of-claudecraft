@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -556,6 +558,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -731,6 +734,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -1277,6 +1282,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -1452,6 +1458,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -1998,6 +2006,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -2173,6 +2182,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -2719,6 +2730,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -2895,6 +2907,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -3441,6 +3455,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -3616,6 +3631,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -4162,6 +4179,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -4377,6 +4395,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "pt_BR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -4923,6 +4943,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -5108,6 +5129,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "cs_CZ": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -5654,6 +5677,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -5829,6 +5853,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -6375,6 +6401,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -6550,6 +6577,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -7096,6 +7125,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -7271,6 +7301,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -7817,6 +7849,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -7992,6 +8025,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -8538,6 +8573,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -8713,6 +8749,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -9259,6 +9297,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -9434,6 +9473,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -9980,6 +10021,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",
@@ -10155,6 +10197,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
     "gpuNotice.hybridBodyOther",
     "gpuNotice.hybridBodyWindows",
@@ -10701,6 +10745,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.riftTitle",
     "guide.worldPage.travelBody",
     "guide.worldPage.travelTitle",
+    "hud.errors.mustTargetAlly",
     "hud.system.deathRecapCauterized",
     "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bags.sortButton",

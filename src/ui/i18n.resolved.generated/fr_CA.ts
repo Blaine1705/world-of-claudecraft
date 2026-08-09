@@ -7924,6 +7924,7 @@ export const fr_CA: EnTranslations = {
       "outOfRange": "Hors de portée.",
       "noTarget": "Vous n'avez pas de cible.",
       "tooClose": "Trop près !",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Vous devez faire face à votre cible.",
       "targetHealthBelow": "Cette technique requiert une cible sous {percent} % de points de vie.",
       "dagger": "Vous devez porter une dague.",
@@ -9540,6 +9541,10 @@ export const fr_CA: EnTranslations = {
       "die_by_sword": {
         "name": "Périr par l'épée",
         "description": "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Témérité",

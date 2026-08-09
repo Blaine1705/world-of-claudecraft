@@ -75,6 +75,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
   'entities.abilities.die_by_sword.name': 'Погибель от меча',
+  'entities.abilities.intervene.name': 'Вмешательство',
+  'entities.abilities.intervene.description':
+    'Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек.',
   'entities.abilities.emboldening_roar.description':
     'Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)',
   'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
@@ -2200,6 +2203,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': 'Вне дальности.',
   'hud.errors.noTarget': 'У вас нет цели.',
   'hud.errors.tooClose': 'Слишком близко!',
+  'hud.errors.mustTargetAlly': 'Нужно выбрать целью союзника.',
   'hud.errors.facing': 'Вы должны смотреть на цель.',
   'hud.errors.targetHealthBelow':
     'Эта способность требует, чтобы здоровье цели было ниже {percent}%.',
