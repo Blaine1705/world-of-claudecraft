@@ -84,8 +84,15 @@ interface AttributionTargetFixture {
 // Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
+// Re-minted after pinning the three specifier exact (PR 3165 review): only
+// the pnpm-lock.yaml specifier row moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '8af4e59e7e3c3b9c9b002c49047bb2d5ccc7483e5605de851e61ac50ef52babb';
+  '9dd239c2645c8e996d1af0a3bc20d1103e4ff338b226c8fd9b8f405c175b575a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
