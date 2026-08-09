@@ -12,7 +12,7 @@ import {
   type HitchForensicsRecord,
   type HitchForensicsState,
 } from './hitch_forensics';
-import { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
+import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
@@ -413,6 +413,8 @@ export class PerfMonitor {
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
   private readonly traceEnabled: boolean;
+  private readonly diagnosticsEnabled: boolean;
+  private diagnosticsPlayable = false;
   private inputDebugProvider: (() => PerfInputDebugState | null) | null = null;
   private devTraceFrames: DevPerfTraceFrame[] = [];
   private devTraceSpans: DevPerfTraceSpan[] = [];
@@ -422,25 +424,35 @@ export class PerfMonitor {
   constructor(
     private renderer: Renderer | null,
     private hud: { perfStats(): PerfSnapshot['hud'] } | null = null,
+    private readonly desktopShell = false,
   ) {
     const params = new URLSearchParams(location.search);
     this.traceEnabled = localDevPerfTraceEnabled();
-    const diagnosticsEnabled = params.has('diagnostics');
+    this.diagnosticsEnabled = params.has('diagnostics');
     this.enabled =
       this.traceEnabled ||
-      diagnosticsEnabled ||
+      this.diagnosticsEnabled ||
       params.has('perf') ||
       localStorage.getItem('woc_perf') === '1';
     if (this.enabled) {
       this.mountOverlay();
     }
-    if (diagnosticsEnabled) {
-      this.diagnosticsPanel = new PerfDiagnosticsPanel({
-        startMeasurement: () => this.reset(),
-        snapshot: () => this.report(),
-        runSceneCensus: () => this.runSceneCensus(),
-      });
-      this.diagnosticsPanel.setReady(Boolean(this.renderer));
+    if (this.diagnosticsEnabled) {
+      void import('./perf_diagnostics_panel')
+        .then(({ PerfDiagnosticsPanel }) => {
+          const panel = new PerfDiagnosticsPanel({
+            startMeasurement: () => this.reset(),
+            snapshot: () => this.report(),
+            runSceneCensus: () => this.runSceneCensus(),
+            desktopShell: this.desktopShell,
+          });
+          this.diagnosticsPanel = panel;
+          panel.setReady(Boolean(this.renderer));
+          if (this.diagnosticsPlayable) panel.onMonitorReset();
+        })
+        .catch((err: unknown) => {
+          console.warn('Performance diagnostics panel failed to load', err);
+        });
     }
     this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
@@ -1055,9 +1067,10 @@ export class PerfMonitor {
     this.devTraceFrames = [];
     this.devTraceSpans = [];
     this.devLongTasks = [];
-    if (this.diagnosticsPanel) {
+    if (this.diagnosticsEnabled) {
+      this.diagnosticsPlayable = true;
       this.renderer?.resetDiagnosticSamples();
-      this.diagnosticsPanel.onMonitorReset();
+      this.diagnosticsPanel?.onMonitorReset();
     }
   }
 
@@ -1136,6 +1149,6 @@ export class PerfMonitor {
   }
 }
 
-export function createPerfMonitor(renderer: Renderer | null): PerfMonitor {
-  return new PerfMonitor(renderer);
+export function createPerfMonitor(renderer: Renderer | null, desktopShell = false): PerfMonitor {
+  return new PerfMonitor(renderer, null, desktopShell);
 }

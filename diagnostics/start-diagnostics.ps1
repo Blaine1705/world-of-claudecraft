@@ -2,7 +2,7 @@
 param(
   [ValidateRange(1024, 65535)]
   [int]$Port = 5173,
-  [switch]$SkipInstall,
+  [switch]$InstallDependencies,
   [switch]$SkipAssets,
   [switch]$AllowSparseCheckoutMutation,
   [switch]$SmokeTest
@@ -66,7 +66,7 @@ if (-not $npx -or -not $node) {
   throw 'Node.js and npm are required. Install the current Node.js LTS release, then run this launcher again.'
 }
 
-if (-not $SkipInstall) {
+if ($InstallDependencies) {
   Write-Host "Synchronizing the pinned game dependencies with pnpm $expectedPnpm..."
   & $npx.Source --yes "pnpm@$expectedPnpm" install --frozen-lockfile
   if ($LASTEXITCODE -ne 0) {
@@ -76,7 +76,7 @@ if (-not $SkipInstall) {
 
 $viteEntry = Join-Path $repoRoot 'node_modules\vite\bin\vite.js'
 if (-not (Test-Path -LiteralPath $viteEntry)) {
-  throw 'The local Vite dependency is missing. Run this launcher again without -SkipInstall.'
+  throw 'The local Vite dependency is missing. Install the pinned dependencies yourself, or rerun with -InstallDependencies to authorize the launcher to do it.'
 }
 
 $url = "http://127.0.0.1:$Port/?diagnostics=1&perfTrace=1&diagnosticsAuto=1&diagnosticsCapture=1"
@@ -99,6 +99,7 @@ function Write-ServerLogTail {
   $tail | ForEach-Object { Write-Host $_ }
 }
 
+$env:WOC_DIAGNOSTICS_CAPTURE = '1'
 $server = Start-Process `
   -FilePath $node.Source `
   -ArgumentList @("`"$viteEntry`"", '--host', '127.0.0.1', '--port', "$Port", '--strictPort') `

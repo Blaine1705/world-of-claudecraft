@@ -357,6 +357,7 @@ import {
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
+  withRestoredPrewarmState,
 } from './prewarm_policy';
 import {
   buildPrewarmCompileUnits,
@@ -528,6 +529,12 @@ const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
 // compile cannot be cancelled, so returning at the threshold would let it
 // overlap later warm units and gameplay.
 const PREWARM_COMPILE_MAX_MS = 10000;
+// The soft manifest budget protects ordinary entry. A second independent wall
+// deadline also bounds desktop exemptions and Insane's full-manifest policy.
+// Already-started WebGL calls cannot be cancelled, so large compiles are split
+// into roots and the queue stops launching new units at this deadline.
+const VIEW_PREWARM_HARD_MAX_MS = 15000;
+const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 7500;
 // A background prewarm waits for a browser idle slot between its per-group
 // compile chunks; the timeout forces progress under sustained frame load.
 const IDLE_PREWARM_TIMEOUT_MS = 250;
@@ -802,6 +809,7 @@ type RendererWorldPhase =
   | 'foliage'
   | 'fish'
   | 'ambientScenery'
+  | 'zoneVisibility'
   | 'zoneFeatures'
   | 'vfx'
   | 'camera'
@@ -1152,6 +1160,7 @@ function emptyWorldPhaseMs(): RendererWorldPhaseMs {
     foliage: 0,
     fish: 0,
     ambientScenery: 0,
+    zoneVisibility: 0,
     zoneFeatures: 0,
     vfx: 0,
     camera: 0,
@@ -5510,6 +5519,7 @@ export class Renderer {
   async prewarmInitialScene(
     options: {
       maxMs?: number;
+      hardMaxMs?: number;
       onEntryStart?: (id: string, category: RendererPrewarmCategory) => void;
     } = {},
   ): Promise<RendererPrewarmStats> {
@@ -5528,10 +5538,13 @@ export class Renderer {
     });
     const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
+    const defaultHardMaxMs = constrainedPrewarm
+      ? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED
+      : VIEW_PREWARM_HARD_MAX_MS;
+    const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);
     const started = performance.now();
-    // Extended by resumeDroppedPrewarmEntries below when a dropped entry is
-    // resumed in idle time, so its own internal deadline checks see fresh room.
     const deadline = started + maxMs;
+    const hardDeadline = started + hardMaxMs;
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
@@ -5540,6 +5553,7 @@ export class Renderer {
     // a stale, already-past budget and silently build nothing (#2571 review).
     const buildDeadline = prewarmBuildDeadline(
       deadline,
+      hardDeadline,
       PREWARM_BUILD_RESERVE_MS,
       policy.finishFullManifestBeforeReveal,
     );
@@ -5590,7 +5604,7 @@ export class Renderer {
     // archetype groups were already torn down by the main pass's cleanup, so the
     // detail string below does not overstate what a resumed run actually did
     // (#2571 review).
-    let compiledSkinnedShadowGroups = 0;
+    let compiledPrewarmRoots = 0;
     let textureUploads = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
 
@@ -5612,6 +5626,40 @@ export class Renderer {
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
 
+    const compileEntryUnits = (): PrewarmResumeUnit[] => {
+      const stagedGroups: readonly [string, THREE.Group | null][] = [
+        ['doors', doorPrewarmGroup],
+        ['interiors', interiorPrewarmGroup],
+        ['players', playerPrewarmGroup],
+        ['mobs', entityPrewarmGroup],
+        ['npcs', npcPrewarmGroup],
+        ['objects', objectPrewarmGroup],
+        ['props', propMaterialPrewarmGroup],
+        ['ghost-fade-variants', ghostVariantPrewarmGroup],
+        ['foliage', foliagePrewarmGroup],
+        ['great-tree', greatTreePrewarmGroup],
+        ['weapon-vfx', weaponVfxPrewarmGroup],
+        ['landmark', landmarkPrewarmGroup],
+      ];
+      const stagedRoots = new Set<THREE.Object3D>(
+        stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
+      );
+      return buildPrewarmCompileUnits(
+        [
+          {
+            id: 'scene',
+            roots: this.scene.children.filter((root) => !stagedRoots.has(root)),
+          },
+          ...stagedGroups.flatMap(([id, group]) => (group ? [{ id, roots: group.children }] : [])),
+        ],
+        async (root) => {
+          await this.compilePrewarmColorPrograms(root, false);
+          await this.compileSkinnedShadowPrograms(root);
+          compiledPrewarmRoots++;
+        },
+      );
+    };
+
     const runEntry = async (
       entry: PrewarmManifestEntry,
       // Resumed entries record into their OWN array (see the resume kickoff
@@ -5629,6 +5677,7 @@ export class Renderer {
         prewarmEntryShouldDefer(
           entryStarted,
           deadline,
+          hardDeadline,
           entry.deadlineExempt ?? false,
           policy.finishFullManifestBeforeReveal,
         )
@@ -6242,27 +6291,7 @@ export class Renderer {
           deferPoolPublication =
             (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
             (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
-          const groups: readonly [string, THREE.Group | null][] = [
-            ['doors', doorPrewarmGroup],
-            ['interiors', interiorPrewarmGroup],
-            ['players', playerPrewarmGroup],
-            ['mobs', entityPrewarmGroup],
-            ['npcs', npcPrewarmGroup],
-            ['objects', objectPrewarmGroup],
-            ['props', propMaterialPrewarmGroup],
-            ['ghost-fade-variants', ghostVariantPrewarmGroup],
-            ['foliage', foliagePrewarmGroup],
-            ['great-tree', greatTreePrewarmGroup],
-            ['weapon-vfx', weaponVfxPrewarmGroup],
-            ['landmark', landmarkPrewarmGroup],
-          ];
-          return buildPrewarmCompileUnits(
-            groups.flatMap(([id, group]) => (group ? [{ id, roots: group.children }] : [])),
-            async (root) => {
-              await this.compilePrewarmColorPrograms(root, false);
-              await this.compileSkinnedShadowPrograms(root);
-            },
-          );
+          return compileEntryUnits();
         },
         run: async () => {
           const compileStart = performance.now();
@@ -6281,22 +6310,25 @@ export class Renderer {
             return;
           }
           compileMode = 'async';
-          for (const group of [playerPrewarmGroup, entityPrewarmGroup, npcPrewarmGroup]) {
-            if (group) {
-              await this.compileSkinnedShadowPrograms(group);
-              compiledSkinnedShadowGroups++;
+          const units = compileEntryUnits();
+          for (let index = 0; index < units.length; index++) {
+            if (performance.now() >= hardDeadline) {
+              const remaining = units.slice(index);
+              if (remaining.length > 0) {
+                droppedEntries.push({ id: 'programs.compile', units: remaining });
+              }
+              compileTimedOut = true;
+              break;
             }
+            await Promise.resolve(units[index].run()).catch((err: unknown) => {
+              console.warn(`Renderer async prewarm compile failed: ${units[index].id}`, err);
+            });
           }
-          await this.compilePrewarmColorPrograms(this.scene, false).catch((err: unknown) => {
-            console.warn('Renderer async prewarm compile failed', err);
-          });
           compileMs = roundMs(performance.now() - compileStart);
-          // Keep the historical diagnostic field as a budget-overrun signal,
-          // but never abandon a still-running compile behind the loading gate.
-          compileTimedOut = compileMs > policy.compileMaxMs;
+          compileTimedOut ||= compileMs > policy.compileMaxMs;
         },
         detail: () =>
-          `mode=${compileMode};timedOut=${compileTimedOut};skinnedShadowGroups=${compiledSkinnedShadowGroups}`,
+          `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}`,
       },
       {
         id: 'programs.budget-variants',
@@ -6307,22 +6339,29 @@ export class Renderer {
         run: async () => {
           if (!GFX.autoGovernor || !this.asyncCompileSupported) return;
           const originalState = this.renderBudgetGovernor.state();
-          const originalAppliedLevels = this.appliedBudgetLevels
-            ? { ...this.appliedBudgetLevels }
-            : null;
-          const originalQualityChange = this.lastQualityChange;
-          try {
-            for (const levels of renderBudgetShaderPrewarmLevels(originalState)) {
-              this.applyRenderBudgetState({ ...originalState, levels });
-              await this.compilePrewarmColorPrograms(this.scene, false);
-              this.renderPrewarmPass(1 / 60);
-              renderPasses++;
-            }
-          } finally {
-            this.applyRenderBudgetState(originalState);
-            this.appliedBudgetLevels = originalAppliedLevels;
-            this.lastQualityChange = originalQualityChange;
-          }
+          await withRestoredPrewarmState(
+            () => ({
+              state: originalState,
+              appliedLevels: this.appliedBudgetLevels ? { ...this.appliedBudgetLevels } : null,
+              qualityChange: this.lastQualityChange,
+            }),
+            (original) => {
+              this.applyRenderBudgetState(original.state);
+              this.appliedBudgetLevels = original.appliedLevels;
+              this.lastQualityChange = original.qualityChange;
+            },
+            async () => {
+              for (const levels of renderBudgetShaderPrewarmLevels(originalState)) {
+                if (performance.now() >= hardDeadline) {
+                  compileTimedOut = true;
+                  break;
+                }
+                this.applyRenderBudgetState({ ...originalState, levels });
+                this.renderPrewarmPass(1 / 60);
+                renderPasses++;
+              }
+            },
+          );
         },
       },
       {
@@ -6333,10 +6372,9 @@ export class Renderer {
         required: false,
         // No resumeUnits: this would present real frames in a synchronous loop.
         run: () => {
-          const finishBehindCover = !constrainedPrewarm && this.asyncCompileSupported;
           const points = [p.pos, activeZone.hub];
           for (const point of points) {
-            if (!(finishBehindCover || performance.now() < deadline)) break;
+            if (performance.now() >= hardDeadline) break;
             this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
@@ -6351,9 +6389,8 @@ export class Renderer {
         required: false,
         // No resumeUnits: this is a tight loop of real presented renders.
         run: () => {
-          const finishBehindCover = !constrainedPrewarm && this.asyncCompileSupported;
           const minPasses = this.lowGfx ? 8 : 10;
-          while (renderPasses < minPasses && (finishBehindCover || performance.now() < deadline)) {
+          while (renderPasses < minPasses && performance.now() < hardDeadline) {
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -10846,7 +10883,7 @@ export class Renderer {
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.updateZoneFeatureVisibility(fogFar);
-    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,

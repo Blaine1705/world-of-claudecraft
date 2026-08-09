@@ -16,6 +16,7 @@ import {
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
+  withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
@@ -83,10 +84,10 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
       "finishFullManifestBeforeReveal: GFX.tier === 'insane' && !GFX.constrainedMemory",
     );
     expect(renderer).toContain(
-      'const buildDeadline = prewarmBuildDeadline(\n      deadline,\n      PREWARM_BUILD_RESERVE_MS,\n      policy.finishFullManifestBeforeReveal,\n    );',
+      'const buildDeadline = prewarmBuildDeadline(\n      deadline,\n      hardDeadline,\n      PREWARM_BUILD_RESERVE_MS,\n      policy.finishFullManifestBeforeReveal,\n    );',
     );
     expect(renderer).toContain(
-      'prewarmEntryShouldDefer(\n          entryStarted,\n          deadline,\n          entry.deadlineExempt ?? false,\n          policy.finishFullManifestBeforeReveal,\n        )',
+      'prewarmEntryShouldDefer(\n          entryStarted,\n          deadline,\n          hardDeadline,\n          entry.deadlineExempt ?? false,\n          policy.finishFullManifestBeforeReveal,\n        )',
     );
     expect(renderer).toContain(
       'this.createPersistentPortalViews(\n            createdViewTypes,\n            buildDeadline,',
@@ -97,16 +98,18 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
   });
 
   it('never defers full-manifest entries and does not trim their archetype build', () => {
-    expect(prewarmEntryShouldDefer(12_000, 12_000, false, true)).toBe(false);
-    expect(prewarmEntryShouldDefer(20_000, 12_000, false, true)).toBe(false);
-    expect(prewarmBuildDeadline(12_000, 3_000, true)).toBe(Number.MAX_SAFE_INTEGER);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, false, true)).toBe(false);
+    expect(prewarmEntryShouldDefer(14_999, 12_000, 15_000, false, true)).toBe(false);
+    expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, false, true)).toBe(true);
+    expect(prewarmBuildDeadline(12_000, 15_000, 3_000, true)).toBe(15_000);
   });
 
   it('keeps the ordinary soft deadline and explicit exemption behavior', () => {
-    expect(prewarmEntryShouldDefer(11_999, 12_000, false, false)).toBe(false);
-    expect(prewarmEntryShouldDefer(12_000, 12_000, false, false)).toBe(true);
-    expect(prewarmEntryShouldDefer(12_000, 12_000, true, false)).toBe(false);
-    expect(prewarmBuildDeadline(12_000, 3_000, false)).toBe(9_000);
+    expect(prewarmEntryShouldDefer(11_999, 12_000, 15_000, false, false)).toBe(false);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, false, false)).toBe(true);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, true, false)).toBe(false);
+    expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, true, false)).toBe(true);
+    expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
   });
 
   it('uses the low view cap on the low tier', () => {
@@ -136,6 +139,26 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
   });
 });
 
+it('restores prewarm state after both successful and failed variant work', async () => {
+  let state = { level: 1, marker: 'original' };
+  const capture = () => ({ ...state });
+  const restore = (snapshot: typeof state) => {
+    state = snapshot;
+  };
+
+  await withRestoredPrewarmState(capture, restore, async () => {
+    state = { level: 0.5, marker: 'temporary' };
+  });
+  expect(state).toEqual({ level: 1, marker: 'original' });
+
+  await expect(
+    withRestoredPrewarmState(capture, restore, async () => {
+      state = { level: 0.25, marker: 'failed' };
+      throw new Error('compile failed');
+    }),
+  ).rejects.toThrow('compile failed');
+  expect(state).toEqual({ level: 1, marker: 'original' });
+});
 it('prewarms adaptive quality shader variants behind the desktop loading cover', () => {
   const renderer = readFileSync(
     new URL('../src/render/renderer.ts', import.meta.url),
@@ -150,9 +173,12 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
   expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
   expect(entry).toContain('renderPasses++');
+  expect(entry).toContain('performance.now() >= hardDeadline');
+  expect(entry).toContain('withRestoredPrewarmState(');
+  expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
 });
-it('settles linked desktop programs with hidden renders even after the soft deadline', () => {
+it('settles linked desktop programs only until the independent hard deadline', () => {
   const renderer = readFileSync(
     new URL('../src/render/renderer.ts', import.meta.url),
     'utf8',
@@ -167,7 +193,8 @@ it('settles linked desktop programs with hidden renders even after the soft dead
     expect(entryAt).toBeGreaterThan(-1);
     expect(nextEntryAt).toBeGreaterThan(entryAt);
     expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
-    expect(entry).toContain('finishBehindCover || performance.now() < deadline');
+    expect(entry).toContain('hardDeadline');
+    expect(entry).not.toContain('finishBehindCover');
   }
 });
 describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone path)', () => {

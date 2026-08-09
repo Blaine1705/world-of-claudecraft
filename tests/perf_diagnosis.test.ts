@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
@@ -209,7 +211,7 @@ describe('diagnosePerfSnapshot', () => {
       expect.arrayContaining(['gpu-submit-bound', 'scene-draw-pressure']),
     );
     const scene = diagnosis.findings.find((finding) => finding.id === 'scene-draw-pressure');
-    expect(scene?.title).toContain('Foliage');
+    expect(scene?.evidence.join(' ')).toContain('foliage');
     expect(scene?.sourceFiles).toContain('src/render/foliage.ts');
   });
 
@@ -229,8 +231,8 @@ describe('diagnosePerfSnapshot', () => {
       expect.arrayContaining(['hitch-shader-compile', 'hitch-texture-upload', 'hitch-view-create']),
     );
     expect(
-      diagnosis.findings.find((finding) => finding.id === 'hitch-shader-compile')?.codeFixes[0],
-    ).toContain('prewarm');
+      diagnosis.findings.find((finding) => finding.id === 'hitch-shader-compile')?.sourceFiles,
+    ).toContain('src/render/material_clone_hooks.ts');
   });
 
   it('does not label unattributed history critical when the measured recent window is healthy', () => {
@@ -421,12 +423,29 @@ describe('diagnosePerfSnapshot', () => {
       capturedAt: '2026-08-08T12:34:56.000Z',
     });
     expect(report).toContain('# World of ClaudeCraft performance diagnosis');
-    expect(report).toContain('Captured: 2026-08-08T12:34:56.000Z');
+    expect(report).toContain('Captured:');
+    expect(report).not.toContain('2026-08-08T12:34:56.000Z');
     expect(report).toContain('Top finding:');
     expect(report).toContain('600 measured frames');
     expect(report).toContain('Evidence:');
     expect(report).toContain('Code fix:');
     expect(report).toContain('src/render/renderer.ts');
     expect(report).toContain('## Raw snapshot');
+  });
+
+  it('keeps rendered diagnosis and report copy behind the locale catalog', () => {
+    const core = readFileSync(resolve(process.cwd(), 'src/game/perf_diagnosis_core.ts'), 'utf8');
+    const presentation = readFileSync(
+      resolve(process.cwd(), 'src/game/perf_diagnosis_i18n.ts'),
+      'utf8',
+    );
+
+    expect(core).toContain(
+      'return localizePerfDiagnosis({ status, score, headline, summary, findings }, snapshot)',
+    );
+    expect(core).not.toContain("toLocaleString('en-US')");
+    expect(presentation).toContain('tPlural(');
+    expect(presentation).toContain('.summary.findings');
+    expect(presentation).toContain('formatNumber(value, PERCENT)');
   });
 });

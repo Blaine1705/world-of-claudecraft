@@ -85,6 +85,7 @@ describe('renderer CPU hot path', () => {
       foliage: 1,
       fish: 1,
       ambientScenery: 1,
+      zoneVisibility: 1,
       zoneFeatures: 1,
       vfx: 1,
       camera: 1,
@@ -138,13 +139,13 @@ describe('renderer CPU hot path', () => {
     expect(state.stallHoldSeconds).toBe(18);
   });
 
-  it('attributes fish separately from ambient scenery and zone features', () => {
+  it('attributes visibility, fish, ambient scenery, and zone feature animation separately', () => {
     const terrainMarkAt = renderer.lastIndexOf(
       "this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart)",
     );
     const zoneVisibilityAt = renderer.lastIndexOf('this.updateZoneFeatureVisibility(fogFar);');
     const earlyZoneFeatureMarkAt = renderer.indexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart)",
+      "this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart)",
       zoneVisibilityAt,
     );
     const propsUpdateAt = renderer.indexOf('this.propsView.update(', zoneVisibilityAt);

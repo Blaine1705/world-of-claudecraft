@@ -1341,7 +1341,7 @@ async function startGame(
   });
   uiEffectsApplier.applyNow();
   const autoLoot = new AutoLoot();
-  const perf = createPerfMonitor(null);
+  const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
@@ -4842,6 +4842,7 @@ async function startGame(
         worldEntryGpuSettleCoverMs({
           adaptiveBudget: GFX.autoGovernor,
           constrainedMemory: GFX.constrainedMemory,
+          online: online !== null,
         }),
         revealWorld,
       );

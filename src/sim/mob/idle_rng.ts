@@ -25,7 +25,7 @@ import type { Entity } from '../types';
  *  Pinned by tests/off_stream_rng.test.ts and the idle_mob_distance_culling
  *  parity golden. */
 export function idleRng(ctx: SimContext, mob: Entity): Rng {
-  if (!mob.offStreamRng && ctx.cfg.idleMobTickRadius <= 0) return ctx.rng;
+  if (!mob.offStreamRng && (ctx.cfg.idleMobTickRadius ?? 0) <= 0) return ctx.rng;
   const seed = (((ctx.tickCount * 0x9e3779b1) >>> 0) ^ ((mob.id * 0x85ebca6b) >>> 0)) >>> 0;
   return new Rng(seed);
 }

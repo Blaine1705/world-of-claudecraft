@@ -168,10 +168,11 @@ const URGENT_LIGHTING_STEP = 0.12;
 const URGENT_VFX_STEP = 0.08;
 
 /** Non-resolution states visited by repeated urgent degradation.
- * Renderer prewarm walks this urgent ladder behind the loading cover to link its
- * point-light-count variants. This does not enumerate the normal-pressure ladder's
- * smaller steps; grass, foliage and VFX levels accompany the lighting states because
- * those runtime density and uniform knobs do not select shader programs themselves. */
+ * applyPointLightBudget already pins a counted light at its visible ancestry root, so
+ * hidden descendants cannot drift the live program's drawn-light count. Renderer
+ * prewarm still walks this urgent ladder as defense in depth for legitimate budget
+ * transitions behind the loading cover. It omits the normal-pressure ladder's smaller
+ * steps; grass, foliage and VFX levels do not select shader programs themselves. */
 export function renderBudgetShaderPrewarmLevels(
   state: Pick<RenderBudgetState, 'levels' | 'caps'>,
 ): RenderBudgetLevels[] {

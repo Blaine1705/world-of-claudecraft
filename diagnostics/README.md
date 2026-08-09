@@ -8,10 +8,16 @@ ClaudeCraft.
 
 Double-click `RUN_DIAGNOSTICS.cmd` in the repository root.
 
-The first run may take a while because the launcher installs the pinned dependencies.
-Later runs reuse them. If a sparse checkout omits the large media-asset tree, the launcher
-stops without changing Git state. To explicitly allow it to add `public` to the sparse
-checkout and download those assets, run:
+The launcher does not install or change dependencies by default. Install the pinned
+repository dependencies yourself first, or explicitly authorize the launcher to do it:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\diagnostics\start-diagnostics.ps1 -InstallDependencies
+```
+
+If a sparse checkout omits the large media-asset tree, the launcher stops without changing
+Git state. To explicitly allow it to add `public` to the sparse checkout and download those
+assets, run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\diagnostics\start-diagnostics.ps1 -AllowSparseCheckoutMutation
@@ -20,8 +26,8 @@ powershell -ExecutionPolicy Bypass -File .\diagnostics\start-diagnostics.ps1 -Al
 That flag permits the single `git sparse-checkout add public` mutation. It is never implied
 by double-clicking the launcher.
 
-The launcher requires Node.js and npm, and runs the repository's pinned pnpm version
-without changing your global pnpm installation. It also checks concrete runtime files across the audio, Basis, environment, font, map, model,
+The launcher requires Node.js and npm. Only `-InstallDependencies` runs the repository's
+pinned pnpm version without changing your global pnpm installation. It also checks concrete runtime files across the audio, Basis, environment, font, map, model,
 texture, UI, and VFX asset trees before starting. If Vite fails, the launcher prints the tail of its server logs and
 the exact temporary log paths.
 

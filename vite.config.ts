@@ -317,6 +317,7 @@ function diagnosticsCapturePlugin() {
               method?: string;
               headers: Record<string, string | string[] | undefined>;
               socket: { remoteAddress?: string };
+              setEncoding: (encoding: BufferEncoding) => void;
               on: (event: string, callback: (chunk?: unknown) => void) => void;
             },
             res: {
@@ -331,13 +332,14 @@ function diagnosticsCapturePlugin() {
     }) {
       server.middlewares.use((req, res, next) => {
         const pathOnly = (req.url ?? '').split('?')[0];
+        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
         if (pathOnly === '/__diagnostics/latest') {
           if (req.method !== 'GET') {
             res.statusCode = 405;
             res.end('GET only');
             return;
           }
-          if (!diagnosticsReadAllowed(req.socket.remoteAddress)) {
+          if (!diagnosticsReadAllowed(req.socket.remoteAddress, host)) {
             res.statusCode = 403;
             res.end('loopback requests only');
             return;
@@ -360,22 +362,26 @@ function diagnosticsCapturePlugin() {
         const origin = Array.isArray(req.headers.origin)
           ? req.headers.origin[0]
           : req.headers.origin;
-        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
         if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
           res.statusCode = 403;
           res.end('loopback same-origin requests only');
           return;
         }
         let body = '';
+        let bodyBytes = 0;
         let rejected = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (rejected) return;
-          body += String(chunk);
-          if (body.length > 2_000_000) {
+          const text = typeof chunk === 'string' ? chunk : String(chunk ?? '');
+          bodyBytes += Buffer.byteLength(text, 'utf8');
+          if (bodyBytes > 2_000_000) {
             rejected = true;
             res.statusCode = 413;
             res.end('report too large');
+            return;
           }
+          body += text;
         });
         req.on('end', () => {
           if (rejected) return;
@@ -397,7 +403,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
-    diagnosticsCapturePlugin(),
+    ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {

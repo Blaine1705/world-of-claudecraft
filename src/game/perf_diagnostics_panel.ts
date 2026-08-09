@@ -24,6 +24,7 @@ export interface PerfDiagnosticsPanelOptions {
   startMeasurement(): void;
   snapshot(): PerfSnapshot;
   runSceneCensus(): SceneCensusReport | null;
+  desktopShell: boolean;
 }
 
 type ScanState = 'waiting' | 'collecting' | 'complete';
@@ -364,7 +365,7 @@ export class PerfDiagnosticsPanel {
     this.scanInterrupted = false;
     this.finalSnapshot = this.options.snapshot();
     this.diagnosis = diagnosePerfSnapshot(this.finalSnapshot, location.search, {
-      desktopShell: false,
+      desktopShell: this.options.desktopShell,
     });
     this.completedAt = new Date().toISOString();
     this.progressFill.style.width = '100%';
@@ -384,7 +385,7 @@ export class PerfDiagnosticsPanel {
     if (!census) return;
     this.finalSnapshot = { ...this.finalSnapshot, census };
     this.diagnosis = diagnosePerfSnapshot(this.finalSnapshot, location.search, {
-      desktopShell: false,
+      desktopShell: this.options.desktopShell,
     });
     this.renderDiagnosis(this.diagnosis);
   }

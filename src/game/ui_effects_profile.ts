@@ -68,7 +68,11 @@ export function loadingCurtainFadeMs(reduceMotion: boolean): number {
 export function worldEntryGpuSettleCoverMs(input: {
   adaptiveBudget: boolean;
   constrainedMemory: boolean;
+  online: boolean;
 }): number {
+  // An online character is already live on the authoritative server. Do not
+  // hold movement behind a cosmetic GPU-settle cover after the first frame.
+  if (input.online) return 0;
   return input.adaptiveBudget && !input.constrainedMemory ? WORLD_ENTRY_GPU_SETTLE_COVER_MS : 0;
 }
 /**

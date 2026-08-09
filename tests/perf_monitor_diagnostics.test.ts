@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PerfMonitor } from '../src/game/perf';
 import { NumberSampleRing } from '../src/game/sample_ring';
@@ -29,15 +31,19 @@ function fakeRenderer() {
 }
 
 describe('PerfMonitor diagnostics capture boundaries', () => {
-  it('starts only after the monitor post-entry reset', () => {
+  it('starts only after the monitor post-entry reset', async () => {
     window.history.replaceState(null, '', '/?diagnostics=1');
     const perf = new PerfMonitor(null);
     const renderer = fakeRenderer();
 
     perf.setRenderer(renderer as unknown as Renderer);
-    const start = [...document.querySelectorAll('button')].find(
-      (item) => item.textContent === 'Start 15-second scan',
-    );
+    let start: HTMLButtonElement | undefined;
+    await vi.waitFor(() => {
+      start = [...document.querySelectorAll('button')].find(
+        (item) => item.textContent === 'Start 15-second scan',
+      ) as HTMLButtonElement | undefined;
+      expect(start).toBeDefined();
+    });
     expect(start?.disabled).toBe(true);
     expect(document.body.textContent).toContain('Waiting for the first playable frame');
     expect(document.body.textContent).not.toContain('Collecting representative frames');
@@ -49,7 +55,7 @@ describe('PerfMonitor diagnostics capture boundaries', () => {
     expect(document.body.textContent).toContain('Collecting active gameplay');
   });
 
-  it('restarts retained frame measurements after a hidden-tab interruption', () => {
+  it('restarts retained frame measurements after a hidden-tab interruption', async () => {
     window.history.replaceState(null, '', '/?diagnostics=1');
     setVisibility('visible');
     let now = 1000;
@@ -57,6 +63,9 @@ describe('PerfMonitor diagnostics capture boundaries', () => {
     const perf = new PerfMonitor(null);
     const renderer = fakeRenderer();
     perf.setRenderer(renderer as unknown as Renderer);
+    await vi.waitFor(() => {
+      expect(document.body.textContent).toContain('Waiting for the first playable frame');
+    });
     perf.reset();
 
     for (let frame = 0; frame < 600; frame++) {
@@ -80,6 +89,17 @@ describe('PerfMonitor diagnostics capture boundaries', () => {
     expect(resumed.windows.last10s.fps).toBeLessThan(62);
   });
 
+  it('lazy-loads diagnostics and threads the real desktop-shell state from main', () => {
+    const perfSource = readFileSync(resolve(process.cwd(), 'src/game/perf.ts'), 'utf8');
+    const mainSource = readFileSync(resolve(process.cwd(), 'src/main.ts'), 'utf8');
+
+    expect(perfSource).toContain("void import('./perf_diagnostics_panel')");
+    expect(perfSource).not.toContain(
+      "import { PerfDiagnosticsPanel } from './perf_diagnostics_panel'",
+    );
+    expect(perfSource).toContain('desktopShell: this.desktopShell');
+    expect(mainSource).toContain('createPerfMonitor(null, DESKTOP_APP)');
+  });
   it('clears old renderer phases before a second capture', () => {
     const rings = {
       setup: new NumberSampleRing(8),

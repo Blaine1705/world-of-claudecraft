@@ -11891,4 +11891,114 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.confidence.high': '高',
   'hudChrome.perf.diagnostics.confidence.medium': '中',
   'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未偵測到明顯效能問題',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒維持 {fps} FPS，影格 p95 為 {p95}。遊戲、瀏覽器、GPU、記憶體、資源與網路均未觸發門檻。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用軟體算繪',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '遊戲正在使用整合式 GPU',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高解析度算繪開銷較大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '強制高畫質正在降低效能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '裝置可用記憶體偏低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '偵測到瀏覽器或擴充功能停頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '偵測到瀏覽器記憶體壓力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '圖形內容已重設',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要影格瓶頸',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '場景繪製成本超過目前畫質預算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '陰影通道占用大量繪製呼叫',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界算繪器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '實體視圖更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌繪製成本偏高',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模擬工作占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件處理占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '遊戲過程中正在編譯著色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '紋理上傳造成遊戲卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '實體視圖建立造成卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未歸因的長影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '資源處理延遲了遊戲啟動',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '瀏覽器長任務正在阻塞影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '網路傳輸延遲了可見回應',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照處理正在阻塞客戶端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '效能規則 {rule} 需要處理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '偵測到的瀏覽器、GPU、記憶體或裝置設定可能在遊戲算繪前限制效能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次擷取測得的圖形工作超過目前影格或場景預算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某個 CPU 階段占用足以錯過影格預算的主執行緒時間。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '資源準備或首次使用工作發生在可見遊戲或啟動路徑中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '網路傳輸或客戶端快照處理延遲了最新可操作狀態。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '環境規則 {rule} 與此裝置和瀏覽器相符。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 為 {submit}，占算繪器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近視窗測得 {fps} FPS，影格 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '場景使用 {calls} 次繪製呼叫，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '場景提交 {triangles} 個三角形，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '場景類別 {category} 貢獻 {calls} 次呼叫和 {triangles} 個測量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded':
+    '重新整理場景統計以識別主要算繪類別。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '陰影通道提交 {calls} 次呼叫，占基準的 {share}，共 {triangles} 個三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '測得階段 {phase} 的 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '記錄的 {total} 次卡頓中，有 {count} 次符合原因 {cause}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '預載門檻為 {tasks} 個已登錄任務等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失敗的資源群組：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '測得 {count} 個長任務，p95 為 {p95}，最大值為 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照間隔為 {interval}，最新快照時間為 {age}，輸入回應 p95 為 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析與套用 p95 為 {work}；網路間隔 p95 為 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '診斷規則 {rule} 與本次擷取相符。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正偵測到的環境設定，重新啟動，再重複相同掃描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低畫質重複相同鏡頭路徑，確認圖形壓力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分別在靜止與移動時重複掃描，以隔離 CPU 階段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重複相同路線或首次使用操作，確認卡頓發生時機。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在離線遊戲中使用相同移動與鏡頭路徑進行比較。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '讓偵測到的備援路徑遵守共用圖形與記憶體預算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用現有算繪預算、實例化、材質共用、LOD 與隱藏工作略過機制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定階段，移除重複工作與配置，並維持遊戲行為。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '透過現有啟動與串流預算預載、池化或分攤已識別的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低傳輸或快照處理成本，同時不削弱權威伺服器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.report.statusLine': '狀態：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '擷取時間：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要問題：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '畫質：{tier}，算繪比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 個影格超過 50 毫秒，共測量 {frames} 個影格',
+  'hudChrome.perf.diagnostics.report.resultHeading': '結果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次擷取未觸發可處理門檻。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '嚴重程度：{severity}。信心度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '無法使用',
+  'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

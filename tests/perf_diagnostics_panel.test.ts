@@ -120,6 +120,7 @@ describe('PerfDiagnosticsPanel', () => {
       startMeasurement: vi.fn(),
       snapshot: () => sample,
       runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
     });
 
     panel.setReady(true);
@@ -148,6 +149,7 @@ describe('PerfDiagnosticsPanel', () => {
       startMeasurement,
       snapshot: () => sample,
       runSceneCensus,
+      desktopShell: false,
     });
 
     const start = [...document.querySelectorAll('button')].find(
@@ -228,6 +230,7 @@ describe('PerfDiagnosticsPanel', () => {
       startMeasurement: vi.fn(),
       snapshot: snapshotRead,
       runSceneCensus,
+      desktopShell: false,
     });
     panel.setReady(true);
     panel.onMonitorReset();
@@ -257,6 +260,7 @@ describe('PerfDiagnosticsPanel', () => {
       startMeasurement,
       snapshot: () => sample,
       runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
     });
     panel.setReady(true);
     panel.onMonitorReset();
@@ -278,6 +282,7 @@ describe('PerfDiagnosticsPanel', () => {
       startMeasurement: vi.fn(),
       snapshot,
       runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
     });
     panel.setReady(true);
 
@@ -300,33 +305,60 @@ describe('PerfDiagnosticsPanel', () => {
     expect(progress?.hidden).toBe(false);
   });
 
-  it('renders panel-owned chrome through the active locale catalog', async () => {
+  it('renders the completed diagnosis and report through the active locale catalog', async () => {
     history.replaceState(null, '', '/?diagnostics=1&lang=en_XA');
     vi.resetModules();
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const sample = snapshot();
+    sample.fps = 30;
+    sample.frameMs.p95 = 40;
+    sample.windows.last10s.fps = 30;
+    sample.windows.last10s.frameMs.p95 = 40;
+    sample.windows.last10s.frameMs.long50 = 4;
+    sample.mainMs.sim.p95 = 14;
     const { PerfDiagnosticsPanel: PseudoLocalizedPanel } = await import(
       '../src/game/perf_diagnostics_panel'
     );
+    const diagnosisModule = await import('../src/game/perf_diagnosis_core');
     const panel = new PseudoLocalizedPanel({
       startMeasurement: vi.fn(),
-      snapshot,
+      snapshot: () => sample,
       runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
     });
 
-    panel.update(snapshot());
+    panel.setReady(true);
+    panel.onMonitorReset();
+    now += 15_000;
+    panel.update(sample);
 
     const root = document.querySelector<HTMLElement>('#woc-diagnostics-panel');
     const panelText = root?.textContent ?? '';
     const panelAria = root?.getAttribute('aria-label') ?? '';
     const buttons = [...(root?.querySelectorAll('button') ?? [])];
-    const metrics = root?.children.item(2);
+    const report = diagnosisModule.formatPerfDiagnosisMarkdown(
+      diagnosisModule.diagnosePerfSnapshot(sample),
+      sample,
+    );
 
     expect(panelAria).toMatch(/^\[.*\]$/);
     expect(buttons).not.toHaveLength(0);
     expect(buttons.every((item) => /^\[.*\]$/.test(item.textContent ?? ''))).toBe(true);
-    expect(panelText).not.toContain('ClaudeCraft Performance Doctor');
-    expect(panelText).not.toContain('Waiting for the game world');
-    expect(panelText).not.toContain('renderer: waiting');
-    expect(panelText).not.toContain('recent  60 FPS');
-    expect(metrics?.getAttribute('aria-label')).not.toBe('Live performance measurements');
+    for (const rawEnglish of [
+      'ClaudeCraft Performance Doctor',
+      'Simulation work is consuming the frame',
+      'A measured CPU phase is taking enough main-thread time',
+      'Measured phase sim-cpu has a p95',
+      'Repeat the scan while idle and while moving',
+      'Profile the named phase',
+      'actionable finding from the last 10 seconds',
+    ]) {
+      expect(panelText).not.toContain(rawEnglish);
+      expect(report).not.toContain(rawEnglish);
+    }
+    expect(report).not.toContain('# World of ClaudeCraft performance diagnosis');
+    expect(report).not.toContain('Top finding:');
+    expect(report).not.toContain('Raw snapshot');
   });
 });

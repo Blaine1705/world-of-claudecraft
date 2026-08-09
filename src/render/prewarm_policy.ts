@@ -168,21 +168,40 @@ export interface PrewarmPolicy {
 export function prewarmEntryShouldDefer(
   entryStartedMs: number,
   deadlineMs: number,
+  hardDeadlineMs: number,
   deadlineExempt: boolean,
   finishFullManifestBeforeReveal: boolean,
 ): boolean {
+  if (entryStartedMs >= hardDeadlineMs) return true;
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
 }
 
-/** Build cutoff paired with the entry policy; full Insane prewarm does not trim archetypes. */
+/** Build cutoff paired with the entry policy. Full Insane prewarm may use the
+ * soft-deadline reserve, but it still stops at the independent hard deadline. */
 export function prewarmBuildDeadline(
   deadlineMs: number,
+  hardDeadlineMs: number,
   reserveMs: number,
   finishFullManifestBeforeReveal: boolean,
 ): number {
-  return finishFullManifestBeforeReveal
-    ? Number.MAX_SAFE_INTEGER
-    : deadlineMs - Math.max(0, reserveMs);
+  return Math.min(
+    hardDeadlineMs,
+    finishFullManifestBeforeReveal ? hardDeadlineMs : deadlineMs - Math.max(0, reserveMs),
+  );
+}
+
+/** Run temporary prewarm state under a guaranteed behavioral restore. */
+export async function withRestoredPrewarmState<T, R>(
+  capture: () => T,
+  restore: (state: T) => void,
+  work: () => R | Promise<R>,
+): Promise<R> {
+  const original = capture();
+  try {
+    return await work();
+  } finally {
+    restore(original);
+  }
 }
 
 /**

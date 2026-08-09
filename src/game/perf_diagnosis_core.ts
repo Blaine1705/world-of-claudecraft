@@ -1,4 +1,6 @@
+import { formatDateTime, formatNumber, t } from '../ui/i18n';
 import type { PerfSnapshot } from './perf';
+import { localizePerfDiagnosis } from './perf_diagnosis_i18n';
 import {
   analyzePerfSuggestions,
   type PerfSuggestion,
@@ -304,10 +306,10 @@ export function diagnosePerfSnapshot(
           'The live scene exceeds the tier target for draw calls or triangles. This is game render content, not browser overhead.',
         evidence: [
           `${renderer.calls} calls against a ${caps.targetCalls} target (${pct(callRatio)}).`,
-          `${renderer.triangles.toLocaleString('en-US')} triangles against a ${caps.targetTriangles.toLocaleString('en-US')} target (${pct(triangleRatio)}).`,
+          `${formatNumber(renderer.triangles, { maximumFractionDigits: 0 })} triangles against a ${formatNumber(caps.targetTriangles, { maximumFractionDigits: 0 })} target (${pct(triangleRatio)}).`,
           ...(dominant
             ? [
-                `${dominant.category} accounts for ${dominant.calls} calls and ${dominant.triangles.toLocaleString('en-US')} measured triangles.`,
+                `${dominant.category} accounts for ${dominant.calls} calls and ${formatNumber(dominant.triangles, { maximumFractionDigits: 0 })} measured triangles.`,
               ]
             : ['Run the scene census to identify the owning render category.']),
         ],
@@ -330,7 +332,7 @@ export function diagnosePerfSnapshot(
           'Shadow-casting geometry is drawn again into the shadow map, so dense props and actors multiply their cost.',
         evidence: [
           `${snapshot.census.shadow.calls} shadow calls, ${pct(snapshot.census.shadow.callsShare)} of the measured baseline.`,
-          `${snapshot.census.shadow.triangles.toLocaleString('en-US')} triangles are submitted to the shadow pass.`,
+          `${formatNumber(snapshot.census.shadow.triangles, { maximumFractionDigits: 0 })} triangles are submitted to the shadow pass.`,
         ],
         immediateFixes: ['Retest on Low graphics, where the shared tier reduces shadow cost.'],
         codeFixes: [
@@ -626,57 +628,127 @@ export function diagnosePerfSnapshot(
     findings.length > 0
       ? `${findings.length} actionable finding${findings.length === 1 ? '' : 's'} from the last 10 seconds at ${recent.fps} FPS and ${ms(recent.frameMs.p95)} frame p95.`
       : `The last 10 seconds held ${recent.fps} FPS with a ${ms(recent.frameMs.p95)} frame p95. No game, browser, GPU, memory, asset, or network threshold fired.`;
-  return { status, score, headline, summary, findings };
+  return localizePerfDiagnosis({ status, score, headline, summary, findings }, snapshot);
 }
 
 function oneLine(value: string): string {
   return value.replace(/[\r\n]+/g, ' ').trim();
 }
 
-/** A copyable report intended for an issue, chat, or optimization session. */
+function reportStatus(status: PerfDiagnosis['status']): string {
+  if (status === 'critical') return t('hudChrome.perf.diagnostics.report.status.critical');
+  if (status === 'needs-attention')
+    return t('hudChrome.perf.diagnostics.report.status.needsAttention');
+  return t('hudChrome.perf.diagnostics.report.status.healthy');
+}
+
+function reportSeverity(severity: PerfDiagnosisFinding['severity']): string {
+  if (severity === 'critical') return t('hudChrome.perf.diagnostics.severity.critical');
+  if (severity === 'warning') return t('hudChrome.perf.diagnostics.severity.warning');
+  return t('hudChrome.perf.diagnostics.severity.info');
+}
+
+function reportConfidence(confidence: PerfDiagnosisFinding['confidence']): string {
+  if (confidence === 'high') return t('hudChrome.perf.diagnostics.confidence.high');
+  if (confidence === 'medium') return t('hudChrome.perf.diagnostics.confidence.medium');
+  return t('hudChrome.perf.diagnostics.confidence.low');
+}
+
+function reportMilliseconds(value: number): string {
+  return t('hudChrome.perf.units.ms', {
+    value: formatNumber(value, { maximumFractionDigits: 1 }),
+  });
+}
+
+/** A localized, copyable report intended for an issue, chat, or optimization session. */
 export function formatPerfDiagnosisMarkdown(
   diagnosis: PerfDiagnosis,
   snapshot: PerfSnapshot,
   context: PerfDiagnosisReportContext = {},
 ): string {
   const renderer = snapshot.renderer;
+  const capturedDate = context.capturedAt ? new Date(context.capturedAt) : null;
+  const captured =
+    capturedDate && Number.isFinite(capturedDate.getTime())
+      ? formatDateTime(capturedDate, { dateStyle: 'medium', timeStyle: 'medium' })
+      : context.capturedAt;
+  const unavailable = t('hudChrome.perf.diagnostics.report.notAvailable');
   const lines = [
-    '# World of ClaudeCraft performance diagnosis',
+    `# ${t('hudChrome.perf.diagnostics.report.title')}`,
     '',
-    `Status: ${diagnosis.status} (${diagnosis.score}/100)`,
-    ...(context.capturedAt ? [`Captured: ${oneLine(context.capturedAt)}`] : []),
-    `Top finding: ${oneLine(diagnosis.headline)}`,
-    `Summary: ${diagnosis.summary}`,
-    `GPU: ${oneLine(renderer?.glRenderer ?? 'not available')}`,
-    `Graphics: ${renderer?.tier ?? 'not available'}, render scale ${renderer?.effectiveRenderScale ?? 0}`,
-    `Recent: ${snapshot.windows.last10s.fps} FPS, p95 ${snapshot.windows.last10s.frameMs.p95} ms, ${snapshot.windows.last10s.frameMs.long50} frames over 50 ms, ${snapshot.windows.last10s.frames} measured frames`,
+    t('hudChrome.perf.diagnostics.report.statusLine', {
+      status: reportStatus(diagnosis.status),
+      score: formatNumber(diagnosis.score, { maximumFractionDigits: 0 }),
+    }),
+    ...(captured
+      ? [t('hudChrome.perf.diagnostics.report.capturedLine', { captured: oneLine(captured) })]
+      : []),
+    t('hudChrome.perf.diagnostics.report.topFindingLine', {
+      finding: oneLine(diagnosis.headline),
+    }),
+    t('hudChrome.perf.diagnostics.report.summaryLine', { summary: diagnosis.summary }),
+    t('hudChrome.perf.diagnostics.report.gpuLine', {
+      gpu: oneLine(renderer?.glRenderer ?? unavailable),
+    }),
+    t('hudChrome.perf.diagnostics.report.graphicsLine', {
+      tier: renderer?.tier ?? unavailable,
+      scale: formatNumber(renderer?.effectiveRenderScale ?? 0, {
+        maximumFractionDigits: 2,
+      }),
+    }),
+    t('hudChrome.perf.diagnostics.report.recentLine', {
+      fps: formatNumber(snapshot.windows.last10s.fps, { maximumFractionDigits: 1 }),
+      p95: reportMilliseconds(snapshot.windows.last10s.frameMs.p95),
+      longFrames: formatNumber(snapshot.windows.last10s.frameMs.long50, {
+        maximumFractionDigits: 0,
+      }),
+      frames: formatNumber(snapshot.windows.last10s.frames, { maximumFractionDigits: 0 }),
+    }),
     '',
   ];
   if (diagnosis.findings.length === 0) {
-    lines.push('## Result', '', 'No actionable threshold fired in this capture.', '');
+    lines.push(
+      `## ${t('hudChrome.perf.diagnostics.report.resultHeading')}`,
+      '',
+      t('hudChrome.perf.diagnostics.report.noThreshold'),
+      '',
+    );
   }
   diagnosis.findings.forEach((finding, index) => {
     lines.push(
-      `## ${index + 1}. ${oneLine(finding.title)}`,
+      `## ${t('hudChrome.perf.diagnostics.report.findingHeading', {
+        index: formatNumber(index + 1, { maximumFractionDigits: 0 }),
+        title: oneLine(finding.title),
+      })}`,
       '',
-      `Severity: ${finding.severity}. Confidence: ${finding.confidence}.`,
+      t('hudChrome.perf.diagnostics.report.findingMeta', {
+        severity: reportSeverity(finding.severity),
+        confidence: reportConfidence(finding.confidence),
+      }),
       '',
       oneLine(finding.cause),
       '',
-      'Evidence:',
+      `${t('hudChrome.perf.diagnostics.sections.evidence')}:`,
       ...finding.evidence.map((item) => `- ${oneLine(item)}`),
       '',
-      'Try now:',
+      `${t('hudChrome.perf.diagnostics.sections.tryNow')}:`,
       ...finding.immediateFixes.map((item) => `- ${oneLine(item)}`),
       '',
-      'Code fix:',
+      `${t('hudChrome.perf.diagnostics.sections.codeFix')}:`,
       ...finding.codeFixes.map((item) => `- ${oneLine(item)}`),
       '',
-      'Relevant source:',
+      `${t('hudChrome.perf.diagnostics.sections.source')}:`,
       ...finding.sourceFiles.map((item) => `- ${oneLine(item)}`),
       '',
     );
   });
-  lines.push('## Raw snapshot', '', '```json', JSON.stringify(snapshot, null, 2), '```', '');
+  lines.push(
+    `## ${t('hudChrome.perf.diagnostics.report.rawSnapshotHeading')}`,
+    '',
+    '```json',
+    JSON.stringify(snapshot, null, 2),
+    '```',
+    '',
+  );
   return lines.join('\n');
 }
