@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD, DELVES, INSTANCE_X_BASE, setActiveWorldContent } from '../src/sim/data';
+import { BG_GRAVEYARDS } from '../src/sim/battleground_layout';
+import {
+  BUILTIN_WORLD,
+  battlegroundOrigin,
+  DELVES,
+  INSTANCE_X_BASE,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { swimSurfaceY } from '../src/sim/player_motion';
@@ -25,6 +32,8 @@ import {
   UNSTUCK_SUCCESS_COOLDOWN_SECONDS,
   unstuckLocationAt,
 } from '../src/sim/unstuck';
+import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type Event = Extract<SimEvent, { type: 'unstuck' }>;
 
@@ -98,6 +107,41 @@ function tickMany(sim: Sim, count: number): SimEvent[] {
   const events: SimEvent[] = [];
   for (let i = 0; i < count; i++) events.push(...sim.tick());
   return events;
+}
+
+function teleport(sim: Sim, pid: number, x: number, z: number): void {
+  const player = required(sim.entities.get(pid), 'teleported player');
+  player.pos = { x, y: groundHeight(x, z, sim.cfg.seed), z };
+  player.prevPos = { ...player.pos };
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  sim.ctx.rebucket(player);
+}
+
+function activeBattleground(): { sim: Sim; match: NonNullable<ReturnType<Sim['bgMatchFor']>> } {
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
+  const pids: number[] = [];
+  for (let i = 0; i < 10; i++) {
+    const pid = sim.addPlayer('warrior', `P${i}`);
+    teleport(sim, pid, (i % 5) * 2 - 4, -40);
+    required(sim.entities.get(pid), 'queued player').level = 20;
+    pids.push(pid);
+  }
+  for (const pid of pids) sim.bgQueueJoin(pid);
+  sim.tick();
+  const match = required(sim.bgMatchFor(pids[0]), 'seated battleground match');
+  for (let i = 0; i < 20 * 12 && match.state !== 'active'; i++) sim.tick();
+  expect(match.state).toBe('active');
+  sim.drainEvents();
+  return { sim, match };
 }
 
 function accepted(sim: Sim): {
@@ -362,6 +406,71 @@ describe('unstuck graveyard move while alive', () => {
     // Nor may the death loop offer itself: there is no corpse and no spirit to release.
     sim.releaseSpirit();
     expect(player.ghost).toBe(false);
+  });
+
+  it('recovers an idle battleground non-carrier from the wall band to their team graveyard', () => {
+    const { sim, match } = activeBattleground();
+    const pid = match.teams[0][0];
+    const player = required(sim.entities.get(pid), 'battleground player');
+    const origin = battlegroundOrigin(match.slot);
+    teleport(sim, pid, origin.x + 49.5, origin.z);
+    player.combatTimer = 999;
+    player.inCombat = false;
+
+    expect(sim.unstuck(pid)).toBe(true);
+    expect(required(sim.meta(pid), 'battleground player metadata').pendingUnstuck?.area).toEqual({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    const completion = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
+    expect(completion?.reason).toBe('moved_to_graveyard');
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    const graveyard = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + graveyard.x))).toBeLessThanOrEqual(graveyard.hw);
+    expect(Math.abs(player.pos.z - (origin.z + graveyard.z))).toBeLessThanOrEqual(graveyard.hd);
+  });
+
+  it('keeps battleground combat and flag carriers from using unstuck as a shortcut', () => {
+    const { sim, match } = activeBattleground();
+    const fighter = match.teams[0][0];
+    const opponent = match.teams[1][0];
+    const player = required(sim.entities.get(fighter), 'fighter');
+    player.inCombat = true;
+    player.combatTimer = 0;
+
+    expect(sim.unstuck(fighter)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual({
+      type: 'unstuck',
+      phase: 'blocked',
+      reason: 'combat',
+      pid: fighter,
+    });
+
+    player.inCombat = false;
+    player.combatTimer = 999;
+    teleport(sim, fighter, match.flags[1].home.x, match.flags[1].home.z);
+    sim.bgFlagAction(fighter);
+    sim.tick();
+    expect(match.flags[1].carrier).toBe(fighter);
+    expect(sim.unstuck(fighter)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual({
+      type: 'unstuck',
+      phase: 'blocked',
+      reason: 'competitive',
+      pid: fighter,
+    });
+
+    const bystander = required(sim.entities.get(opponent), 'opponent');
+    bystander.inCombat = false;
+    bystander.combatTimer = 999;
+    expect(sim.unstuck(opponent)).toBe(true);
   });
 
   it('charges Unstuck Sickness rather than The Keeper’s Toll, and clears momentum', () => {
