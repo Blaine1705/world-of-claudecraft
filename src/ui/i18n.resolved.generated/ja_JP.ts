@@ -7236,9 +7236,9 @@ export const ja_JP: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
-    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
-    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
-    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyOther": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "dismiss": "閉じる"
   },
   "perfNudge": {
