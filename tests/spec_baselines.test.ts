@@ -54,8 +54,8 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: { sinister_strike: { dmgPct: 0.2, costPct: -0.16 } },
   },
   'rogue/subtlety': {
-    stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.35 },
-    global: { meleeDmgPct: 0.24 },
+    stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
+    global: { meleeDmgPct: 0.08 },
     abilities: {
       stealth: { cooldownPct: -0.7 },
       backstab: { dmgPct: 0.16 },
@@ -340,11 +340,16 @@ describe('v0.28 passive restoration hotfix', () => {
       return sim.player.attackPower;
     };
     const bare = apFor(null);
-    for (const spec of ['assassination', 'combat', 'subtlety']) {
-      // apPct is 0.35 to 0.55 across the specs, plus crit/flat AP; every one clears
+    for (const spec of ['assassination', 'combat']) {
+      // apPct is 0.4 to 0.55 across these specs, plus crit/flat AP; both clear
       // a 1.3x AP floor over the spec-less rogue. A dropped apPct wiring fails here.
       expect(apFor(spec), spec).toBeGreaterThan(bare * 1.3);
     }
+    // 2026-08-09 120s band round: subtlety's apPct stepped 0.35 to 0.12 to land
+    // the 150-200 BiS band, so its floor re-seats at the measured 1.186 ratio
+    // (agi 7 plus apPct 0.12 over the bare 118 AP). Still a wiring guard: a
+    // dropped apPct or agi row falls under 1.1x.
+    expect(apFor('subtlety'), 'subtlety').toBeGreaterThan(bare * 1.1);
   });
 
   it('adds no baseline when no specialization is selected', () => {

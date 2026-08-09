@@ -66,8 +66,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
     subtlety: {
-      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.35 },
-      global: { meleeDmgPct: 0.24 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
+      global: { meleeDmgPct: 0.08 },
       ability: [
         { ability: 'stealth', cooldownPct: -0.7 },
         { ability: 'backstab', dmgPct: 0.16 },
