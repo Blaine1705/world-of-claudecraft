@@ -224,7 +224,9 @@ Titan's Grip tradeoff.
 The hotfix above left `scripts/fury_dps_probe.ts` behind so later changes could be measured
 against its balance point. Nothing ran it for three releases. Re-run on the same fixture, the
 v0.27.1 tree reports 147.2 sustained DPS and the tree three releases later reports 186.3, with
-no warrior content change in between. White damage carried the whole gap.
+no warrior content change in between. White damage carried the whole gap, and it kept widening
+after that: the same probe on the v0.36.0 tree reports 192.9. Those figures are dated on
+purpose. The drift, not any one of them, is the finding.
 
 The cause was a contract mismatch rather than a tuning decision. Item content authors
 `weapon.min/max` as RAW per-swing damage at the weapon's real speed, with the two-hand premium
