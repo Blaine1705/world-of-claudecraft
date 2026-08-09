@@ -111,6 +111,11 @@ function readEnum<T extends string>(raw: string | null, allowed: readonly T[], f
 /** A query-string integer with a default. Distinct from clampInt below, which
  *  clamps an already-decoded value and has no notion of an absent parameter. */
 function intParam(raw: string | null, fallback: number, min: number, max: number): number {
+  // ABSENT is checked before Number(), not after. Number(null) and Number('')
+  // are both 0, and 0 is finite, so a "not a number, use the default" guard
+  // never fires for a missing parameter: the window silently collapsed to
+  // fromMs=toMs=0 and every read came back empty.
+  if (raw === null || raw.trim() === '') return fallback;
   const n = Number(raw);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(Math.max(Math.trunc(n), min), max);
@@ -119,19 +124,28 @@ function intParam(raw: string | null, fallback: number, min: number, max: number
 /** The window, defaulting to the last 30 days. Both ends are clamped so a
  *  malformed or hostile range cannot turn an ops read into a full scan with an
  *  unbounded sort. */
-function readRange(url: URL): { fromMs: number; toMs: number } {
+function readRange(query: Ctx['query']): { fromMs: number; toMs: number } {
   const now = Date.now();
-  const toMs = intParam(url.searchParams.get('toMs'), now, 0, now + OPS_DAY_MS);
-  const fromMs = intParam(url.searchParams.get('fromMs'), toMs - 30 * OPS_DAY_MS, 0, toMs);
+  const toMs = intParam(param(query, 'toMs'), now, 0, now + OPS_DAY_MS);
+  const fromMs = intParam(param(query, 'fromMs'), toMs - 30 * OPS_DAY_MS, 0, toMs);
   return { fromMs, toMs };
 }
 
-function opsQuery(ctx: Ctx): { url: URL; page: number; pageSize: number } {
-  const url = new URL(ctx.req.url ?? '/', 'http://localhost');
+/** ctx.query, not a re-parse of ctx.req.url: the dispatcher already parsed the
+ *  request, and re-deriving it here read an empty search string, so every filter
+ *  silently fell back to its default. A repeated key arrives as an array, and
+ *  the first value is the one that counts. */
+function param(query: Ctx['query'], key: string): string | null {
+  const raw = query[key];
+  if (raw === undefined) return null;
+  return Array.isArray(raw) ? (raw[0] ?? null) : raw;
+}
+
+function opsQuery(ctx: Ctx): { query: Ctx['query']; page: number; pageSize: number } {
   return {
-    url,
-    page: intParam(url.searchParams.get('page'), 0, 0, 10_000),
-    pageSize: intParam(url.searchParams.get('pageSize'), 50, 1, 200),
+    query: ctx.query,
+    page: intParam(param(ctx.query, 'page'), 0, 0, 10_000),
+    pageSize: intParam(param(ctx.query, 'pageSize'), 50, 1, 200),
   };
 }
 
@@ -140,17 +154,17 @@ async function opsListingsHandler(ctx: Ctx): Promise<void> {
   // An unwired market is a 404, matching how an unset secret reads: the
   // dashboard learns the surface is unavailable, not that it guessed wrong.
   if (!service) return fail(ctx.res, 404, 'unknown endpoint');
-  const { url, page, pageSize } = opsQuery(ctx);
-  const status = readEnum(url.searchParams.get('status'), LISTING_STATUSES, 'active');
-  ok(ctx.res, await service.opsListings({ status, ...readRange(url), page, pageSize }));
+  const { query, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(param(query, 'status'), LISTING_STATUSES, 'active');
+  ok(ctx.res, await service.opsListings({ status, ...readRange(query), page, pageSize }));
 }
 
 async function opsP2pTradesHandler(ctx: Ctx): Promise<void> {
   const service = wocMarketOpsReads;
   if (!service) return fail(ctx.res, 404, 'unknown endpoint');
-  const { url, page, pageSize } = opsQuery(ctx);
-  const status = readEnum(url.searchParams.get('status'), OFFER_STATUSES, 'all');
-  ok(ctx.res, await service.opsP2pTrades({ status, ...readRange(url), page, pageSize }));
+  const { query, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(param(query, 'status'), OFFER_STATUSES, 'all');
+  ok(ctx.res, await service.opsP2pTrades({ status, ...readRange(query), page, pageSize }));
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads

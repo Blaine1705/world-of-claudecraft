@@ -114,6 +114,7 @@ import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
 import {
   configureInternalRuntime,
+  configureInternalWocMarketReads,
   handleInternalApi,
   type InternalRuntime,
   resetInternalRuntimeForTests,
@@ -188,7 +189,12 @@ function routeFor(method: Method, path: string) {
 async function runRoute(
   method: Method,
   path: string,
-  opts: { url?: string; body?: unknown; headers?: Record<string, string> } = {},
+  opts: {
+    url?: string;
+    body?: unknown;
+    headers?: Record<string, string>;
+    query?: Record<string, string | string[]>;
+  } = {},
 ) {
   const route = routeFor(method, path);
   let reached = false;
@@ -201,6 +207,7 @@ async function runRoute(
     url: opts.url ?? path,
     headers: opts.headers,
     body: opts.body,
+    query: opts.query,
   });
   const stack: Middleware[] = [
     withErrors({ surface: route.meta?.envelope }),
@@ -2255,5 +2262,87 @@ describe('the internal envelope is frozen', () => {
     const gate = await runRoute('POST', '/internal/restart-countdown', { headers: DEPLOY_HEADERS });
     expect(gate.status).toBe(404);
     expect(Object.keys(gate.body as object).sort()).toEqual(only);
+  });
+});
+
+describe('the dashboard ops reads: filters and the default window', () => {
+  const SECRET = 'dashboard-secret';
+  let seen: Record<string, unknown>[] = [];
+
+  beforeEach(() => {
+    seen = [];
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    configureInternalWocMarketReads({
+      opsListings: async (q) => {
+        seen.push(q);
+        return { rows: [], hasMore: false };
+      },
+      opsP2pTrades: async (q) => {
+        seen.push(q);
+        return { rows: [], hasMore: false };
+      },
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    resetInternalRuntimeForTests();
+  });
+
+  const hit = (path: string, query: Record<string, string> = {}) =>
+    runRoute('GET', path, { headers: { 'x-woc-dashboard-secret': SECRET }, query });
+
+  it('defaults the window to the last 30 days, not to zero', async () => {
+    // The bug this pins returned an empty list forever without erroring:
+    // Number(null) is 0 and 0 is finite, so a "not a number, use the default"
+    // guard never fired for an ABSENT parameter and the range collapsed to
+    // fromMs === toMs === 0.
+    const before = Date.now();
+    await hit('/internal/woc-market/listings');
+    const q = seen[0] as { fromMs: number; toMs: number };
+    expect(q.toMs).toBeGreaterThanOrEqual(before);
+    const days = Math.round((q.toMs - q.fromMs) / 86_400_000);
+    expect(days).toBe(30);
+  });
+
+  it('defaults the page SIZE to 50, which the same trap silently made 1', async () => {
+    await hit('/internal/woc-market/listings');
+    expect((seen[0] as { pageSize: number }).pageSize).toBe(50);
+  });
+
+  it('carries an explicit window and page through', async () => {
+    await hit('/internal/woc-market/listings', {
+      fromMs: '1000',
+      toMs: '5000',
+      page: '2',
+      pageSize: '7',
+    });
+    expect(seen[0]).toMatchObject({ fromMs: 1000, toMs: 5000, page: 2, pageSize: 7 });
+  });
+
+  it('defaults listings to ACTIVE and p2p trades to ALL', async () => {
+    await hit('/internal/woc-market/listings');
+    expect((seen[0] as { status: string }).status).toBe('active');
+    seen = [];
+    await hit('/internal/woc-market/p2p-trades');
+    expect((seen[0] as { status: string }).status).toBe('all');
+  });
+
+  it('falls back to the default on an unrecognised status rather than refusing', async () => {
+    // An ops read answering 400 on a typo is less useful than one showing the
+    // default; the value is never interpolated, so there is nothing to injure.
+    await hit('/internal/woc-market/listings', { status: 'nonsense' });
+    expect((seen[0] as { status: string }).status).toBe('active');
+  });
+
+  it('caps the page size, so a caller cannot ask for an unbounded read', async () => {
+    await hit('/internal/woc-market/listings', { pageSize: '100000' });
+    expect((seen[0] as { pageSize: number }).pageSize).toBe(200);
+  });
+
+  it('answers 404 when the market is not wired, the same as an unset secret', async () => {
+    resetInternalRuntimeForTests();
+    const res = await hit('/internal/woc-market/listings');
+    expect(res.status).toBe(404);
   });
 });
