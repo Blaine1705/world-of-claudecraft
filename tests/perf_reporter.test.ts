@@ -384,6 +384,11 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
+    // hiddenPresentSkips stays OUT of the beacon in both spellings (phase 4
+    // decision, upheld in QA F11: a new fleet-schema field has server
+    // implications, and with sends gated on shellHidden there are no hidden
+    // beacons to disambiguate; the counter's live sink is the perf overlay).
+    expect(JSON.stringify(body)).not.toContain('hiddenPresentSkips');
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })

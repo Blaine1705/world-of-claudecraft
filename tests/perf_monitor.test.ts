@@ -85,6 +85,34 @@ describe('hidden present skips', () => {
     expect(perf.snapshot(2000).hiddenPresentSkips).toBe(0);
   });
 
+  it('surfaces the counter in the overlay once skips exist, and stays quiet at zero', () => {
+    // The counter's ONE live sink (phase 4 QA F11): without this line the
+    // field is written, snapshotted, and read by nothing but the E2E probe.
+    const created: Array<{ textContent?: string }> = [];
+    installBrowserGlobals('?perf');
+    (globalThis as any).document.createElement = () => {
+      const el = {
+        style: {},
+        textContent: '',
+        addEventListener: () => {},
+        appendChild: () => {},
+      };
+      created.push(el);
+      return el;
+    };
+    const perf = new PerfMonitor(null);
+    expect(perf.enabled).toBe(true);
+    perf.frame(0.016, 100);
+    perf.tick(2000);
+    const overlayText = () =>
+      created.map((el) => el.textContent ?? '').find((text) => text.includes('fps ')) ?? '';
+    expect(overlayText()).not.toContain('hidden skips');
+    perf.noteHiddenPresentSkip();
+    perf.noteHiddenPresentSkip();
+    perf.tick(4000);
+    expect(overlayText()).toContain('hidden skips 2');
+  });
+
   it('records no bucket sample while frame sampling is off, and resumes when it returns', () => {
     // Phase 4 QA F10: a hidden desktop frame must reproduce the web
     // hidden-tab shape, where NO per-frame sample records (rAF pauses there),

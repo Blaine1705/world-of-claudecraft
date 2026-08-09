@@ -1156,8 +1156,14 @@ export class PerfMonitor {
       ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
       : null;
     const censusLines = this.lastCensusLines;
+    // The hidden-skip counter's one live sink (phase 4 QA F11): sampled frames
+    // exclude skipped desktop-hidden frames, so a session that spent time
+    // minimized shows its denominator here instead of leaving a diluted fps
+    // unexplained. Zero on web builds and never-hidden sessions.
+    const hiddenLine = s.hiddenPresentSkips > 0 ? `hidden skips ${s.hiddenPresentSkips}` : null;
     this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
+      ...(hiddenLine ? [hiddenLine] : []),
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
       `longtask ${lt.count}  p95 ${lt.p95}ms  max ${lt.max}ms  heap ${mem ? `${mem.usedMB}/${mem.limitMB}MB` : '-'}`,
       `render ${s.mainMs.renderer.avg}/${s.mainMs.renderer.p95}ms  hud ${s.mainMs.hud.avg}/${s.mainMs.hud.p95}ms`,
