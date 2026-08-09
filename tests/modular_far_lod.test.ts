@@ -278,14 +278,24 @@ describe('far-LOD wiring (source pins)', () => {
     expect(body).toContain('this.attemptComposedFar()');
   });
 
-  it('releases the retained variant when construction throws', () => {
+  it('releases the retained variant AND the tinted leases when construction throws', () => {
     // assembleModular retains the part set as its LAST act, so a visual that
     // throws anywhere after that (a missing clip, an atlas, a click proxy) owns
     // a ref nothing will ever release: the entry becomes permanently
     // unevictable, which is the precise failure the cache cap exists to prevent.
+    //
+    // The tinted-material leases are the same hazard one layer over:
+    // applyMaterials and the far build claim them before any of those throw
+    // points, dispose() is what normally hands them back, and a constructor
+    // that throws never reaches dispose. Both releases are asserted here
+    // because both are invisible when missing (a leak, not a failure) and the
+    // throw they have to survive is the DESIGNED streamed-asset retry.
     const text = src('src/render/characters/visual.ts');
     const ctor = text.indexOf('    } catch (err) {');
     expect(ctor).toBeGreaterThan(-1);
-    expect(text.slice(ctor, ctor + 120)).toContain('releaseModularVariant(this.model)');
+    const body = text.slice(ctor, text.indexOf('throw err;', ctor));
+    expect(body).toContain('releaseModularVariant(this.model)');
+    expect(body).toContain('releaseTintedMaterials(this.tintedRigClaims)');
+    expect(body).toContain('releaseTintedMaterials(this.tintedFarClaims)');
   });
 });
