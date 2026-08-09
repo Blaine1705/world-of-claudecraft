@@ -11,7 +11,7 @@
 | 3 | Hybrid-GPU visibility | done | 2026-08-08 | 2026-08-08 |
 | 3 QA | Verify phase 3 | done | 2026-08-08 | 2026-08-08 |
 | 4 | Presentation lifecycle | done | 2026-08-08 | 2026-08-08 |
-| 4 QA | Verify phase 4 | not started | | |
+| 4 QA | Verify phase 4 | done | 2026-08-09 | 2026-08-09 |
 | 5 | Governor and LOW tier | not started | | |
 | 5 QA | Verify phase 5 | not started | | |
 | 6 | three.js 0.185 train | not started | | |
@@ -43,7 +43,10 @@ updated; [x] web/mobile unaffected (feature-checked).
 
 Phase 4: [x] hidden-window render skip (render+paint skipped, sim/net keep running)
 with a pure decision core and tests; [x] display/DPI change push -> pixel-ratio
-re-resolve; [x] no-backlog-on-refocus evidence.
+re-resolve; [x] no-backlog-on-refocus evidence; [x] QA (verdict
+PASS-WITH-FOLLOWUPS: 1 blocking + 10 should-fix fixed in-session, 1 should-fix
+adjudicated to the ledger; 13/13 fresh mutations killed; evidence rerun green
+on the merged tree with two new deterministic probe arms).
 
 Phase 5: [ ] recovery-ladder stall fixed with a reproducing test; [ ] LOW monotonicity
 retune (bands, caps, floors, radius, lowPlus gating) with per-axis pins; [ ] perf
@@ -605,3 +608,157 @@ Phase 4 (2026-08-08, commits 87b193e31b hidden skip, 7ac4d3dbf6 shell pushes,
   armory/character preview loops draw while hidden; drawless-frame renderer
   diagnostics tail documented as accepted; hud.update SHAPE pin cannot catch a
   present-but-unreachable cut.
+
+Phase 4 QA (2026-08-09, verdict PASS-WITH-FOLLOWUPS; commits 5f51bdc76d QA-start
+base merge of 5819c005a7, 4281dc88f4 music fix, 90cc7f181b re-derive backstop,
+59e0d7eb1f presented-frames counter, cd27f7f61a hidden-frame perf silence + F7
+gates, ad8131bd48 threading/singleton pins, f436892a06 counter sink + panel
+shell-awareness, db79708ba9 F7 gate pins, 9c6d6f1f6c pin re-anchors,
+b393f17057 formatting; tree clean, LOCAL-ONLY intact):
+- QA-start base merge was LARGE: release tip moved 1478f9d2ba to 5819c005a7
+  (422 files, ~29k insertions, gate-perf CI train + warrior kit + anim PRs).
+  Eight conflicts hand-reconciled; the load-bearing one was upstream PR #3153
+  (browser hybrid-GPU notice) colliding with the phase 3 shell-verdict work:
+  resolved by growing the component model to THREE components ('software',
+  'discrete-inactive', 'hybrid') behind the one signature dismissal, with the
+  v0.36.0 per-variant key woc_gpu_notice_hybrid_dismissed honored READ-ONLY as
+  legacyHybridDismissed, per-OS hybrid bodies behind the object-input
+  gpuNoticeBodyKey, hybrid passed through mergeShellGpuVerdict as a page-only
+  input (the shell wire and its three-key whitelist are UNCHANGED), and
+  softwareNoticeShown() widened to software-or-hybrid (upstream's suppression
+  semantics; exact behavior preserved on both reachable domains since hybrid
+  never fires in-shell and discrete-inactive never fires in-browser).
+  src/main.ts: upstream rebuilt the world reveal into a revealWorld closure
+  behind worldEntryGpuSettleCoverMs + beginBackgroundPreloads; the phase 4
+  shellHidden reporter option was re-added by hand inside it (and is now
+  pinned, F9). Seventeen cross-side type breaks fixed (upstream perf fixtures
+  lacked hiddenPresentSkips; phase 3 suites lacked the new API fields).
+  release-merge-audit: desktop-publish.yml derive greps intact under the new
+  cache steps, createPerfMonitor(null, DESKTOP_APP) re-bound by upstream and
+  source-pinned by their own suite, frozen install valid. TWO PREMISE NOTES:
+  upstream pinned three@0.165.0 EXACT with a pnpm patch
+  (patches/three@0.165.0.patch + tests/three_compile_async_patch.test.ts), so
+  the phase 6 train must re-author or drop that patch and decide the pin
+  style; and upstream landed an opt-in ?diagnostics perf panel +
+  renderer_frame_telemetry_core per-phase timing, tooling phase 5 should use.
+  Post-merge, before auditing: electron/desktop + presentation + gpu +
+  parity + architecture suites green (67 files), full E2E probe both legs
+  PASS on the merged tree.
+- Workflow audit in two runs (run 1 lost three auditors to API errors plus its
+  two custom-agentType auditors never calling StructuredOutput, and a
+  workflow-script bug of the orchestrator's own; run 2 was a continuation off
+  journal.jsonl re-running the lost three FRESH with the charters inlined, 28
+  agents, zero losses): six parallel auditors (correctness, test-coverage
+  auditor, fairness, electron/security, frontend-seam, qa-checklist), 22+21
+  raw findings deduped at a barrier to 30, and TWO independent adversarial
+  skeptics per actionable finding. All 12 actionable findings CONFIRMED by
+  both skeptics (zero splits, zero refutes); orchestrator probes had
+  independently pre-verified F1, F2, and F7 before the verdicts landed.
+- F1 (the one BLOCKING, fairness): instanceMusic.update() sat below the
+  hud.update(paint) cut, so a minimized player kept hearing the STALE track
+  (combat music never ended, zone/boss changes never switched) while the
+  audio kept playing. Fixed by hoisting the machine into the non-paint head
+  on its same mediumHud band, storing the decision for the paint half; the
+  head-list pin gains the call (4281dc88f4).
+- Fixed SHOULD-FIX set: F2 a WM restore that emits none of
+  minimize/restore/hide/show/focus left a visible window unpresented until
+  the first click; the send helper now arms a 15 s re-derive interval while
+  the derived reading is hidden (each tick re-reads the live window, disarms
+  on visible/closed; whole-body pin updated + backstop pin). F4 the
+  vitest-blind main.ts threading now has tests/desktop_presentation_threading
+  .test.ts (AST-sliced frame() source pins) AND the sharpened E2E arm:
+  renderer.presentedFrames() counts presentFrame's true returns DOWNSTREAM of
+  the sync present argument, and the probe asserts it frozen-while-hidden /
+  resuming-after (kills a forced present on ANY gpu; the old kill leaned on
+  SwiftShader frame-rate collapse). F5 the start-minimized subscription
+  ordering is pinned (top-level init statement) and the F2 backstop bounds a
+  lost initial push. F6 the below-cut spot list gained the two proposal
+  popups. F7 maybeShowImmobileNote, updateClickMoveMarker, spectateBadge
+  .update, syncGroundAimReticle gated per-half with rationale;
+  updateBreathBar DELIBERATELY ungated (client-side breath timer; gating
+  would show a restored player more breath than they have); all five pinned.
+  F8 the gate's frozen-singleton contract pinned by identity (toBe) +
+  Object.isFrozen + web/desktop ALL_ON sharing. F9 the shellHidden line
+  pinned inside the startPerfReporter call slice. F10 hidden frames were
+  half-sampled (sim/events bucket rings kept filling); PerfMonitor gained a
+  frameSampling switch the loop sets from the gate, making hidden frames
+  perf-silent end to end (web hidden-tab parity; the tick-level fleet
+  trackers stay behind gate.render under the same parity reading of rulings
+  R5/R10: they were ungated by the woc_perf opt-in, not by visibility);
+  probe now asserts sim-sample freeze AND resume. F11 hiddenPresentSkips
+  gained its one live sink (a perf-overlay line at nonzero, pinned both
+  directions) and the beacon EXCLUSION is pinned (the phase 4 declined
+  decision upheld). F12 the merge-landed ?diagnostics panel keyed hidden
+  handling on visibilityState (pinned 'visible' in-shell); it now baselines
+  hiddenPresentSkips per collection and restarts the scan on a delta, the
+  same semantics as its web tab-pause path.
+- F3 ADJUDICATED to the ledger, not fixed (seam/qa/fairness filing, both
+  skeptics confirmed the mechanics): the dungeon-finder and battleground
+  proposal popups drive countdown/self-close from render() below the cut and
+  freeze while hidden. Fixing would either put DOM writes above the cut or
+  refactor an upstream-owned component; the harm is bounded to nothing a
+  player can see (show + cue ride the ungated event drain, expiry is
+  server-authoritative, and the first painted frame after restore rebuilds
+  from the live snapshot). Pinned as DELIBERATE in the below-cut list.
+- Re-litigations closed: (1) the paint cut was re-litigated call by call:
+  F1 found and fixed, the popups pinned deliberate, tutorial.update's
+  done-linger re-confirmed benign (F29). (2) The E2E threading kill was
+  sharpened as recorded: presented-frames counter landed; the forced-present
+  mutation now dies on THREE probe arms including the deterministic
+  presented 63->91-while-hidden. (3) The declined real-Renderer
+  governor-hold unit stays DEFERRED to phase 5 (which owns and restructures
+  that seam); the survivor dimension is documented in the mutation notes.
+- Probe rounds on the committed tree: 12/12 fresh vitest mutations KILLED
+  rc=1 with named failing tests (gate hidden-arm tick, precedence swap,
+  fresh-literal singleton, screen-fx aging drop, music re-paint-gated,
+  backstop deletion, shellHidden deletion, sampling-switch deletion,
+  finishTime gate deletion, overlay line suppression, panel restart
+  deletion, immobile-note gate deletion; every mutation restored and status
+  clean between runs), plus the forced-present E2E mutation killed on three
+  arms. None repeat the 11 in-phase kills.
+- Evidence rerun: scripts/desktop_hidden_skip_probe.mjs full run (offline +
+  online legs; user-space zonky PG16 on :5433 torn down after, vite under
+  VITE_DESKTOP_RELATIVE_API=1) PASS on the merged tree BEFORE fixes and PASS
+  after with the two new deterministic arms (presented frozen 58->58 hidden
+  then 65 resumed; sim bucket samples frozen 74->74 then 98 resumed; online
+  snapshots kept arriving 21129->26141 while hidden, no backlog).
+- Gate: run 1 red on changed-files biome (formatting on the merge-authored
+  gpu-notice test files; fixed in b393f17057). Run 2: i18n + wiki + sfx
+  artifacts, freshness, malware, and biome legs green; vitest full-suite
+  fallback (forced by the lockfile-touching merge) red ONLY on the 8
+  accepted asset-seal suites (11 tests, phase 11 re-mint deferral), 2415
+  files / 33162 tests otherwise green; post-vitest steps proven via turbo
+  (check:types build:env build:server build:bot 5/5, build:bundle 3/3);
+  biome defaultBranch pinned to the release branch for the run, reverted,
+  and PROVEN never committed (per-commit stat sweep).
+- New ledger from the NOTE/NICE tiers (recorded, not fixed): the first
+  post-refocus report window still spans hidden wall-clock (F19, fps
+  dilution bounded by the overlay denominator; a window reset on un-hide is
+  a phase 5/7 candidate); a display push arriving before the renderer
+  registers its target is dropped and then deduped shell-side until the
+  reading changes (F20, self-heals on any real change; boot re-reads DPR
+  anyway); entryDiagnostics.renderedFrame does not run on paused
+  (graphicsRebuildPaused) or no-tick frames, so 'unconditional' means
+  per-executed-frame (F21); setDisplayChangeTarget keeps a process-lifetime
+  renderer reference (F22, renderer is a singleton today); the
+  display_events clamp comment overstates renderer consumption (F23);
+  presentation handlers read module-level mainWindow while the move handler
+  uses the captured win (F24, equivalent while single-window);
+  desktop-publish NuGet cache key is version-blind (F25); the hud cut scan
+  reads the whole file not the method span (F26, single-occurrence pin
+  bounds it); the probe registers throwaway accounts with a hardcoded
+  password (F28, local rig only). NICE tier carried: dpr_watch silent-death
+  modes (F13), preload forwards the raw payload object (F14), vfx camera
+  pin polarity notes (F15), name-specific no-latch negative (F16),
+  perf_reporter === true / hook-absent arms unexercised (F17),
+  boot-while-minimized voids the GPU settle cover and records a
+  never-presented first paint (F18, upstream-owned reveal path). Carried
+  from phase 4 unchanged: armory/characters preview rAF loops draw while
+  hidden; occlusion OR-arm semantics; the governor hold has no vitest pin
+  (phase 5 owns it).
+- Stopping rules: neither tripped. Event queues cannot grow while hidden
+  (drainEvents + netPipeline.onAnimationFrame proven outside every gate arm
+  by the correctness auditor AND live online evidence); no visible-window
+  skip survives an interaction (derive + focus self-heal confirmed on the
+  committed triggers, and the F2 backstop now bounds even the no-event WM
+  case to 15 s).

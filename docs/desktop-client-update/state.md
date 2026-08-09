@@ -76,6 +76,51 @@ threading arm). Evidence in progress.md phase 4 notes (offline + online legs,
 snapshots kept arriving while hidden, clean resume). Next up: phase 4 QA
 (phase-04-qa.md), fresh session, pull+merge first.
 
+Phase 4 QA done (2026-08-09, verdict PASS-WITH-FOLLOWUPS; QA-start base merge
+5f51bdc76d took the moved tip 5819c005a7, 422 files, eight conflicts
+hand-reconciled; fixes 4281dc88f4 music, 90cc7f181b backstop, 59e0d7eb1f
+presented counter, cd27f7f61a perf silence + F7 gates, ad8131bd48 +
+db79708ba9 pins, f436892a06 counter sink + panel, 9c6d6f1f6c re-anchors,
+b393f17057 style; tree clean, LOCAL-ONLY intact). The merge absorbed upstream
+PR #3153 into a THREE-component gpu-notice model (software, discrete-inactive,
+hybrid; one signature dismissal, the v0.36.0 hybrid key read-only as
+legacyHybridDismissed; shell wire + three-key whitelist unchanged) and
+upstream's revealWorld boot path (shellHidden re-added by hand, now pinned).
+Workflow audit (two runs, 34 agents total, continuation off journal.jsonl for
+three lost auditors): 30 deduped findings, 12 actionable, ALL CONFIRMED by
+both skeptics. Fixed: F1 BLOCKING music state machine below the paint cut
+(hoisted to the head, mediumHud band, decision stored for the paint half);
+F2 15 s hidden re-derive backstop in sendPresentationState (bounds a
+no-event WM un-hide); F4/F9 tests/desktop_presentation_threading.test.ts
+(AST-sliced frame() pins incl. the shellHidden line) + renderer
+presentedFrames() counted downstream of the sync present argument with
+deterministic probe arms; F5 top-level shell-integration ordering pinned;
+F6 below-cut spot list refreshed; F7 immobile note / click marker /
+spectate badge / ground reticle gated per-half, updateBreathBar deliberately
+ungated (client-side breath timer), all pinned; F8 frozen-singleton identity
+pins; F10 PerfMonitor frameSampling switch makes hidden frames perf-silent
+end to end (web hidden-tab parity; probe asserts sim-sample freeze AND
+resume); F11 hiddenPresentSkips overlay line (its one live sink) + beacon
+EXCLUSION pin; F12 the ?diagnostics panel restarts its scan on a
+hiddenPresentSkips delta (its visibilityState keying never fires in-shell).
+F3 (proposal popups freeze below the cut) ADJUDICATED to the ledger and
+pinned deliberate: cue/show ride the ungated drain, expiry is
+server-authoritative, restore rebuilds from snapshot in one painted frame.
+Re-litigations: paint cut re-walked (F1 was its finding; tutorial linger
+re-confirmed benign); E2E kill SHARPENED (forced present now dies on three
+arms incl. presented-frames on any GPU); governor-hold unit deferral UPHELD
+(phase 5 owns that seam). Probes 12/12 fresh vitest mutations killed rc=1
+named + the E2E forced-present kill; full probe both legs PASS post-fix.
+Gate: full-suite fallback red ONLY on the 8 accepted seal suites (11 tests),
+2415 files / 33162 tests green, turbo 5/5 + 3/3, biome pin proven never
+committed. PHASE 6 PREMISE from the merge: upstream pinned three@0.165.0
+EXACT with patches/three@0.165.0.patch (+ tests/three_compile_async_patch
+.test.ts); the train must re-author or drop it. PHASE 5 TOOLING from the
+merge: opt-in ?diagnostics panel + renderer_frame_telemetry_core per-phase
+timings. Next up: phase 5 (phase-05-governor-low-tier.md), fresh session,
+pull+merge first; read the windows-30fps and mobile-thermal memory topics
+before touching the governor.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -220,6 +265,24 @@ update(false) untimed) with the cut pinned by an exact head list in
 tests/hud_update_drive.test.ts. PerfSnapshot grew hiddenPresentSkips;
 PerfReporterOptions grew shellHidden. renderer.sync grew present (7th arg);
 Renderer grew noteDisplayChanged().
+Phase 4 QA additions: tests/desktop_presentation_threading.test.ts (AST-sliced
+frame() source pins: gate derive/eval, no-tick return, sampling switch, both
+sync present args, both hud.update(false) sites, F7 helper gates, gated
+perf.tick + unconditional breadcrumb, the startPerfReporter shellHidden slice,
+the top-level shell-integration statement). Renderer grew presentedFrames()
+(counts presentFrame true returns at the one call site; the probe's
+deterministic forced-present kill). PerfMonitor grew setFrameSampling
+(hidden frames record no bucket/trace sample) and the overlay 'hidden skips'
+line. electron/main.cjs grew HIDDEN_REDERIVE_INTERVAL_MS (15 s) +
+hiddenRederiveTimer (armed only while the derived reading is hidden, cleared
+on visible and on closed). PerfDiagnosticsPanel restarts a collecting scan on
+a hiddenPresentSkips delta. hud.update's head gained the mediumHud
+instanceMusic.update (decision stored in lastMusicDecision for the paint
+half). The gpu-notice model is now three components (see the QA block above);
+GpuNoticeVerdict gained hybridGpuLikely, mergeShellGpuVerdict gained
+localHybridGpuLikely, initGpuNotice gained hybridGpuLikely + desktopPlatform,
+resolveGpuNotice gained legacyHybridDismissed, gpuNoticeBodyKey takes an
+object input, and LEGACY_HYBRID_DISMISSED_KEY is read-only compat.
 New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
 no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
 { softwareRendering, discreteInactive, adapter<=64 } whitelisted in
