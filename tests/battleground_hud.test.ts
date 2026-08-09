@@ -43,6 +43,8 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   queueSize: 0,
   queuedParty: 1,
   firstWinBonusReady: false,
+  proposal: null,
+  requeueIn: 0,
   match: null,
   ladder: [],
   ...over,
