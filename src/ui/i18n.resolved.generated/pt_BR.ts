@@ -7416,6 +7416,9 @@ export const pt_BR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "O jogo está funcionando sem aceleração de GPU e ficará lento. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.",
     "bodyWeb": "O jogo está funcionando sem aceleração de GPU e ficará lento. Ative a aceleração de hardware nas configurações do navegador, atualize os drivers de placa de vídeo e reinicie o navegador.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Dispensar"
   },
   "perfNudge": {
