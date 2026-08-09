@@ -376,6 +376,9 @@ export function entityTranslationKey(request: EntityTranslationRequest): string 
 // (the localized TEXT memo lives in i18n.ts behind the resolution revision).
 // The compound kinds (questObjective, zonePoi) carry an index and stay on the
 // direct builder: their surfaces (quest log, map POIs) are cold.
+// No eviction on purpose: the ids that arrive at runtime (loot and mail entity
+// ids, wire snapshots) all name entities shipped in src/sim/content, so the
+// memo stays bounded by the static content catalog.
 const entityKeyMemo = new Map<EntityTranslationKind, Map<string, Map<string, string>>>();
 
 function cachedEntityTranslationKey(request: EntityTranslationRequest): string {

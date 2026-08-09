@@ -367,6 +367,9 @@ function tableFor(lang: SupportedLanguage): EnTranslations {
 // onUntrackedKey policy (dev throw / release raw-key degrade) stays live
 // because it runs on every call, cached or not. The release-build pending
 // hard-fail likewise runs per call in t(), never from the cache.
+// No eviction within a revision on purpose: misses cache as null, so the memo
+// stays bounded by the shipped catalog plus any unknown wire ids, the same
+// growth class as entity_i18n's fallbackLog.
 const resolvedMemo = new Map<string, InterpolationMemoEntry | null>();
 let resolvedMemoRevision = -1;
 

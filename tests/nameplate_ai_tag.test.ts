@@ -239,6 +239,10 @@ describe('batched canvas nameplate state', () => {
     const state = stateOf(painter, target.id);
 
     expect(state.guild).toBe('Canvas Raiders');
+    // The drawn `<...>` wrapper is prebuilt here in resolveContent (guild's
+    // only writer), so a guild change through the resolve gate rebuilds it
+    // and the per-frame draw path never allocates it.
+    expect(state.guildLabel).toBe('<Canvas Raiders>');
     expect(state.title).toBe('Veteran');
     expect(state.opacity).toBe(0.55);
     expect(state.badges).toHaveLength(3);
@@ -256,6 +260,16 @@ describe('batched canvas nameplate state', () => {
     expect(state.castFill).toBe(0.5);
     expect(state.castSource).toBe('fireball');
     expect(state.castLabel).not.toBe('fireball');
+
+    target.guild = 'New Banner';
+    painter.update(true);
+    expect(state.guild).toBe('New Banner');
+    expect(state.guildLabel).toBe('<New Banner>');
+
+    target.guild = '';
+    painter.update(true);
+    expect(state.guild).toBe('');
+    expect(state.guildLabel).toBe('');
   });
 
   it('maps object, quest NPC, boss, and lootable corpse presentation', () => {

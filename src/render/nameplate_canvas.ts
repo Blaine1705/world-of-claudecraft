@@ -18,11 +18,10 @@ export interface NameplateCanvasState {
   level: string;
   levelColor: string;
   guild: string;
-  /** Memo of the drawn `<guild>` form, keyed on `guildLabelSource`, so the
-   *  per-frame draw path never rebuilds the string for an unchanged guild
-   *  (the resolve-diff idiom; drawBase maintains both fields). */
+  /** The drawn `<guild>` form, prebuilt by the painter's resolveContent
+   *  alongside `guild` (its only writer), so the per-frame draw path never
+   *  allocates the wrapper; drawBase only consumes it. */
   guildLabel: string;
-  guildLabelSource: string;
   title: string;
   marker: string;
   markerTone: NameplateMarkerTone;
@@ -59,7 +58,6 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     levelColor: '#fff',
     guild: '',
     guildLabel: '',
-    guildLabelSource: '',
     title: '',
     marker: '',
     markerTone: 'none',
@@ -358,13 +356,10 @@ export class NameplateCanvasSurface {
     if (state.guild) {
       y -= state.currentTarget ? 14 : 12;
       const guildStyle = state.currentTarget ? this.targetGuildStyle : this.guildStyle;
-      // Rebuild the `<guild>` wrapper only when the guild changes: this runs
-      // per plate per frame, and an unconditional template literal here was a
-      // steady per-frame allocation for every guilded plate on screen.
-      if (state.guildLabelSource !== state.guild) {
-        state.guildLabelSource = state.guild;
-        state.guildLabel = `<${state.guild}>`;
-      }
+      // The `<guild>` wrapper is prebuilt by resolveContent (guild's only
+      // writer): this runs per plate per frame, and an unconditional template
+      // literal here was a steady per-frame allocation for every guilded
+      // plate on screen.
       this.text.draw(
         ctx,
         state.guildLabel,
