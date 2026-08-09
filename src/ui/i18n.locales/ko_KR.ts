@@ -2118,6 +2118,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '사망했습니다. {ability}(으)로 사망했습니다.',
   'hud.system.deathRecapFalling': '사망했습니다. 추락사했습니다.',
   'hud.system.deathRecapDrowned': '사망했습니다. 익사했습니다.',
+  'hud.system.deathRecapCauterized': '사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
   'hud.system.noLongerIgnoring': '{name}을 더 이상 차단하지 않습니다.',
@@ -7819,6 +7820,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
   'gpuNotice.bodyWeb':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
+  'gpuNotice.hybridBodyWindows':
+    '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
+  'gpuNotice.hybridBodyLinux':
+    '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
+  'gpuNotice.hybridBodyOther':
+    '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저와 운영체제의 그래픽 설정을 확인하여 활성화하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
   'gpuNotice.dismiss': '닫기',
   'perfNudge.integratedGpu':
     '게임이 내장(절전형) GPU에서 실행되고 있습니다. 이 컴퓨터에 게이밍 GPU도 있다면, Windows의 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 "고성능"으로 설정한 뒤 브라우저를 다시 시작하세요. 데스크톱 앱은 게이밍 GPU를 자동으로 선택합니다.',
@@ -9338,6 +9345,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': '파티 결성: {name}',
   'hudChrome.finder.proposalRole': '내 역할: {role}',
   'hudChrome.finder.accepted': '{size}명 중 {accepted}명 수락',
+  'hudChrome.bgOffer.title': '쏜할로우 평원이 준비되었습니다',
+  'hudChrome.bgOffer.accepted': '{size}명 중 {accepted}명 수락',
+  'hudChrome.bgOffer.remaining': '응답까지 {seconds}초',
+  'hudChrome.bgOffer.accept': '수락',
+  'hudChrome.bgOffer.decline': '거절',
+  'hudChrome.bgOffer.acceptedWait': '다른 참가자를 기다리는 중...',
   'hudChrome.finder.remaining': '응답까지 {seconds}초',
   'hudChrome.finder.accept': '수락',
   'hudChrome.finder.decline': '거절',
@@ -10475,6 +10488,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}은(는) 이미 완전히 충전되어 있습니다.',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
+  'hudChrome.professions.craftingProgress': '제작 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.disenchantingProgress': '분해 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.enchantingProgress': '마법부여 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.salvagingProgress': '수리 재료 회수 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '도구 효과 재충전 중: {total}초 중 {remaining}초 남음.',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
   'hudChrome.professions.toolEffectDepleted': '도구 효과를 모두 소모했습니다',
   'hudChrome.professions.toolEffectRechargePrice': '재충전: {material} x{count}',
