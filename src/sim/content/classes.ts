@@ -4988,7 +4988,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 2,
         level: 12,
         cost: 30,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 40, max: 48 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 36, max: 43 }],
       },
       {
         rank: 3,
