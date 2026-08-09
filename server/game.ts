@@ -116,6 +116,7 @@ import {
   type VcViewerReadout,
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
+import { sameAppearance } from '../src/world_api/appearance';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -1303,8 +1304,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB and
-    // immutable for the life of the session, and everything in this record is
+    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
+    // default look (1474 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // and changes at most once a session, and everything in this record is
     // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
     // into the object would re-serialize half a kilobyte 20 times a second per
     // online player to produce the same bytes. It is serialized once per entity
@@ -3888,7 +3890,13 @@ export class GameServer {
     // lastSent below re-SENDS, but what it re-sends is the memo).
     if (meta.appearance !== undefined) {
       const e = this.sim.entities.get(session.pid);
-      if (e && e.modularAppearance !== meta.appearance) {
+      // Compared by VALUE, not identity. meta.appearance is a fresh parse of a
+      // fresh row read, so it is never the same object as the one already on
+      // the entity and an identity check elided nothing: every reconnect busted
+      // the memo and re-shipped the look. Serializing two ~0.6 KB documents once
+      // per resume is nothing against re-minting the wire string and forcing a
+      // full identity record on every player in view.
+      if (e && !sameAppearance(e.modularAppearance, meta.appearance ?? null)) {
         e.modularAppearance = meta.appearance ?? null;
         this.bustAppearanceWireMemo(e.id);
       }
@@ -8382,9 +8390,12 @@ export class GameServer {
   /**
    * The authored modular look as JSON, minted at most ONCE per entity.
    *
-   * `app` is by far the heaviest identity field (~0.6 KB) and the only one that
-   * cannot change during a session: it is stamped at join from the character's
-   * own column and no command mutates it. Both wire paths therefore serialize
+   * `app` is by far the heaviest identity field (~0.6 KB for a default look,
+   * 1474 bytes at the bound the shared sanitizer enforces) and the only one
+   * that a session normally never changes: it is stamped at join from the
+   * character's own column, and the sole thing that moves it is a redesign the
+   * player just paid a token for (applyAppearanceForCharacter, which busts this
+   * memo explicitly). Both wire paths therefore serialize
    * it here and reuse the string — the peer path splices it into the cached
    * identity JSON (wireCacheFor), the self path ships it through bcastSelf's
    * `maybeRaw` delta channel. Returns null when the entity has no authored
@@ -8589,11 +8600,17 @@ export class GameServer {
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
     // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
-    // and immutable for the session, so it ships on the first self record and
-    // never again. A character with no authored look sends nothing and keeps
-    // its class rig.
-    const selfAppJson = this.appearanceWireJson(p);
-    if (selfAppJson !== null) maybeRaw('app', selfAppJson);
+    // and near-immutable, so it ships on the first self record and then only if
+    // a redesign moves it.
+    //
+    // A missing look ships an explicit `"app":null` rather than nothing at all,
+    // which costs one 11-byte field once per session for a pre-creator
+    // character and makes clearing symmetric: a peer clears on ABSENCE, but
+    // absence on this record means "unchanged" (see the decode in
+    // src/net/online.ts), so a look pushed to null with nothing sent would clear
+    // for everyone in view and leave the owner looking at their old body for the
+    // rest of the session.
+    maybeRaw('app', this.appearanceWireJson(p) ?? 'null');
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,

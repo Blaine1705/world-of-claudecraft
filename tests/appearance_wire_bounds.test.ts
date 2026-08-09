@@ -6,11 +6,29 @@
 // up with the renderer's model, which is what the first test pins.
 
 import { describe, expect, it } from 'vitest';
-import { BODY_SLIDERS, DEFAULT_APPEARANCE, FACE_SLIDERS } from '../src/render/characters/modular';
+import {
+  BEARD_STYLES,
+  BLUSH_SHADES,
+  BODY_SLIDERS,
+  BROW_STYLES,
+  DEFAULT_APPEARANCE,
+  EAR_STYLES,
+  EARRING_MATERIAL_IDS,
+  EARRING_STYLES,
+  EYE_STYLES,
+  FACE_SLIDERS,
+  HAIR_STYLES,
+  LIP_SHADES,
+  MOUTH_STYLES,
+  OUTFIT_COLORWAY_IDS,
+  SHADOW_SHADES,
+} from '../src/render/characters/modular';
 import {
   APPEARANCE_BODY_SLIDER_KEYS,
   APPEARANCE_FACE_SLIDER_KEYS,
+  APPEARANCE_MAX_WIRE_BYTES,
   APPEARANCE_WIRE_KEYS,
+  sameAppearance,
   sanitizeAppearance,
 } from '../src/world_api/appearance';
 
@@ -125,5 +143,144 @@ describe('sanitizeAppearance bounds', () => {
     // owns the ranges and every consumer runs it before composing a body.
     const out = sanitizeAppearance({ lashes: true, skinLight: 99 });
     expect(out).toEqual({ lashes: true, skinLight: 99 });
+  });
+});
+
+describe('appearance value charset', () => {
+  // Allowlisting the KEYS was only half the channel. Every string VALUE was any
+  // 48 UTF-16 units, 26 of them per document, persisted on a character row and
+  // re-broadcast raw to everyone in view: about 1.2 K characters of
+  // attacker-chosen text per player, outside every chat filter. Values are style
+  // ids, so they are bounded as ids.
+
+  it('takes every id the renderer actually defines (drift guard)', () => {
+    // If a future style id needs a character this pattern rejects, this test is
+    // where it surfaces, rather than in a player's look silently not saving.
+    const everyId = [
+      ...HAIR_STYLES,
+      ...BEARD_STYLES,
+      ...BROW_STYLES,
+      ...EARRING_STYLES,
+      ...EARRING_MATERIAL_IDS,
+      ...EYE_STYLES,
+      ...EAR_STYLES,
+      ...LIP_SHADES,
+      ...BLUSH_SHADES,
+      ...SHADOW_SHADES,
+      ...MOUTH_STYLES,
+      ...OUTFIT_COLORWAY_IDS,
+      'male',
+      'female',
+      // retired ids an old row may still carry (HAIR_LEGACY / BEARD_LEGACY);
+      // normalizeAppearance remaps them, but only if they survive the bounds
+      'slickback',
+      'chinstrap',
+      'sideburns',
+      'soulpatch',
+      'handlebar',
+      'bandholz',
+    ];
+    const rejected = everyId.filter((id) => sanitizeAppearance({ hair: id })?.hair !== id);
+    expect(rejected, `style ids the bounds check would drop: ${rejected.join(', ')}`).toEqual([]);
+    expect(everyId.length).toBeGreaterThan(140); // it really walked the tables
+  });
+
+  it('drops anything that is not a bare identifier', () => {
+    // Each of these is a message someone could otherwise park on a character
+    // row and have the server hand to every player who walks past them.
+    for (const evil of [
+      'hello there',
+      'buy gold at example com',
+      '<script>alert(1)</script>',
+      'https://example.com',
+      'a\nb',
+      'a b',
+      '‮evil',
+      'crew!',
+      'x'.repeat(25),
+      '',
+    ]) {
+      expect(sanitizeAppearance({ hair: evil, gender: 'male' })).toEqual({ gender: 'male' });
+    }
+  });
+
+  it('applies the charset to EVERY string key, not just the one', () => {
+    const evil = 'BUY GOLD';
+    const doc: Record<string, unknown> = { gender: 'male' };
+    for (const key of APPEARANCE_WIRE_KEYS) {
+      if (key === 'face' || key === 'body' || key === 'gender') continue;
+      doc[key] = evil;
+    }
+    expect(sanitizeAppearance(doc)).toEqual({ gender: 'male' });
+  });
+});
+
+describe('the wire ceiling', () => {
+  /** The biggest thing sanitizeAppearance can return: every scalar key carrying
+   *  the longest legal value (a 24-character id costs 26 bytes with its quotes,
+   *  where the longest JSON number is 24), and both slider maps full of
+   *  worst-case doubles. */
+  function maximalDocument(): Record<string, unknown> {
+    const worstNumber = -Number.MAX_VALUE;
+    const doc: Record<string, unknown> = {};
+    for (const key of APPEARANCE_WIRE_KEYS) {
+      if (key === 'face') {
+        doc.face = Object.fromEntries(APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, worstNumber]));
+      } else if (key === 'body') {
+        doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, worstNumber]));
+      } else {
+        doc[key] = 'a'.repeat(24);
+      }
+    }
+    return doc;
+  }
+
+  it('is a measured ceiling, not an estimate', () => {
+    // The identity-wire reasoning (server/game.ts) sizes this document, and the
+    // number has to be true of the WORST case rather than the typical one: it is
+    // stored per character and re-broadcast to everyone in view.
+    const out = sanitizeAppearance(maximalDocument());
+    expect(out).not.toBeNull();
+    const bytes = Buffer.byteLength(JSON.stringify(out), 'utf8');
+    expect(bytes).toBe(APPEARANCE_MAX_WIRE_BYTES);
+  });
+
+  it('cannot be exceeded by an attacker document, at any size or charset', () => {
+    // Everything the old bound let through: longer values, multi-byte
+    // characters, control characters (six bytes each once escaped), hundreds of
+    // extra keys, and fat slider maps.
+    for (const fill of ['x'.repeat(4000), '一'.repeat(2000), ''.repeat(2000)]) {
+      const doc: Record<string, unknown> = {};
+      for (const key of APPEARANCE_WIRE_KEYS) doc[key] = fill;
+      for (let i = 0; i < 500; i++) doc[`junk${i}`] = fill;
+      doc.face = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [`s${i}`, 1e300]));
+      doc.body = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [fill + i, 1e300]));
+      const out = sanitizeAppearance(doc);
+      const bytes = out === null ? 0 : Buffer.byteLength(JSON.stringify(out), 'utf8');
+      expect(bytes).toBeLessThanOrEqual(APPEARANCE_MAX_WIRE_BYTES);
+    }
+  });
+
+  it('leaves a real authored look far under it', () => {
+    const bytes = Buffer.byteLength(JSON.stringify(DEFAULT_APPEARANCE), 'utf8');
+    expect(bytes).toBeLessThan(700); // the ~0.6 KB the wire reasoning quotes
+  });
+});
+
+describe('sameAppearance', () => {
+  // The resume path holds one look off an entity and one off a fresh row read,
+  // so they are never the same object: an identity check elided nothing and
+  // every reconnect re-minted the wire string and re-shipped a full identity
+  // record to every player in view.
+  it('reads two equal documents as equal, however they were built', () => {
+    expect(sameAppearance({ ...DEFAULT_APPEARANCE }, { ...DEFAULT_APPEARANCE })).toBe(true);
+    expect(sameAppearance(null, null)).toBe(true);
+  });
+
+  it('reads a real change as a change', () => {
+    expect(sameAppearance({ hair: 'crew' }, { hair: 'mohawk' })).toBe(false);
+    expect(sameAppearance({ hair: 'crew' }, null)).toBe(false);
+    expect(sameAppearance(null, { hair: 'crew' })).toBe(false);
+    expect(sameAppearance({ hair: 'crew' }, { hair: 'crew', beard: 'full' })).toBe(false);
   });
 });

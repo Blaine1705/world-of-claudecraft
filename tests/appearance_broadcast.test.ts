@@ -1,10 +1,12 @@
 // The authored look on the wire: it has to REACH both audiences, and it has to
 // cost the server almost nothing to keep sending.
 //
-// `app` is the heaviest identity field by an order of magnitude (~0.6 KB against
-// a handful of bytes for everything else) and the only one that cannot change
-// during a session — it is stamped at join from the character's own column and
-// no command mutates it. Composing it into identityFields therefore meant
+// `app` is the heaviest identity field by an order of magnitude (~0.6 KB for a
+// default look against a handful of bytes for everything else, and 1474 bytes
+// at the shared sanitizer's hard bound) and the only one a session normally
+// never changes: it is stamped at join from the character's own column, and the
+// only thing that moves it is a paid redesign. Composing it into identityFields
+// therefore meant
 // JSON.stringify walking half a kilobyte per online player 20 times a second to
 // produce the identical string, so it is serialized once per entity and spliced
 // instead. These tests pin both halves: the bytes still arrive, and the memo is
@@ -220,7 +222,7 @@ describe('authored look on the wire', () => {
     expect(client.entities.get(other.pid)?.modularAppearance).toBeNull();
   });
 
-  it('keeps the key off a character with no authored look', () => {
+  it('keeps the key off a PEER with no authored look, and sends null to the owner', () => {
     const a = fakeWs();
     const b = fakeWs();
     joinServer(server, a, 1, 'Watcher', 'warrior', null);
@@ -228,8 +230,208 @@ describe('authored look on the wire', () => {
     a.sent.length = 0;
     broadcast(server);
 
+    // Absence on a peer record IS the "no authored look" signal.
     const wire = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid);
     expect(wire).not.toHaveProperty('app');
-    expect(lastSnap(a.sent).self).not.toHaveProperty('app');
+    // On the SELF record absence means "unchanged", so nothing at all would
+    // make a cleared look unclearable for its own owner. An explicit null costs
+    // 11 bytes once per session and keeps the two readings symmetric.
+    expect(lastSnap(a.sent).self.app).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A look that moves mid-session. The redesign route is allowed while the
+// character is in world, so the look is not quite immutable after all, and the
+// memo above is precisely what makes that hard: appJson is minted once per
+// entity and the identity record only re-splices when the REST of the identity
+// moves, so setting the entity field alone leaves every viewer (and the owner)
+// looking at the old body until relog.
+//
+// Clearing appJson alone is not enough either, and that is the trap: the splice
+// runs inside the identity CHANGE arm, so a memo that is empty but an identity
+// that has not moved re-sends nothing. bustAppearanceWireMemo clears baseIdJson
+// too, which forces the next tick to re-serialize, bump idVer, and ship the full
+// record. These tests execute that path in both directions rather than reasoning
+// about it.
+// ---------------------------------------------------------------------------
+
+const REDESIGNED = { gender: 'male', hair: 'mohawk', skinLight: 0.7 };
+
+describe('a look pushed onto a live session', () => {
+  let server: GameServer;
+
+  beforeEach(() => {
+    server = new GameServer();
+  });
+
+  it('reaches every peer in view on the next tick, in a FULL record', () => {
+    const a = fakeWs();
+    const b = fakeWs();
+    joinServer(server, a, 1, 'Watcher', 'warrior', null);
+    const other = joinServer(server, b, 2, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    expect(lastSnap(a.sent).ents.find((e: any) => e.id === other.pid).app).toEqual(LOOK);
+
+    // Settle, so the peer is emitting lite records and only a real identity
+    // change can produce a full one. Without the baseIdJson half of the bust,
+    // this is where the push dies.
+    server.sim.tick();
+    broadcast(server);
+    a.sent.length = 0;
+
+    expect(server.applyAppearanceForCharacter(2, REDESIGNED)).toBe(true);
+    server.sim.tick();
+    broadcast(server);
+
+    const wire = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid);
+    expect(wire.k).toBe('player'); // a full record, so identity really moved
+    expect(wire.app).toEqual(REDESIGNED);
+  });
+
+  it('reaches the owner own self record, which the entity list never carries', () => {
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.app).toEqual(LOOK);
+    server.sim.tick();
+    broadcast(server);
+    expect(lastSnap(fc.sent).self).not.toHaveProperty('app'); // settled: omitted
+
+    server.applyAppearanceForCharacter(1, REDESIGNED);
+    fc.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    // maybeRaw is a value diff, so the new look re-enters the delta channel.
+    expect(lastSnap(fc.sent).self.app).toEqual(REDESIGNED);
+  });
+
+  it('re-mints the memo rather than re-sending the old string', () => {
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    const entityId = server.sim.entities.get(session.pid)!.id;
+    const cache = (server as any).wireCache.get(entityId);
+    expect(cache.appJson).toBe(JSON.stringify(LOOK)); // precondition: memoized
+
+    server.applyAppearanceForCharacter(1, REDESIGNED);
+    expect(cache.appJson).toBeNull(); // the memo is dropped...
+    expect(cache.baseIdJson).toBe(''); // ...and so is the identity diff
+    server.sim.tick();
+    broadcast(server);
+    expect(cache.appJson).toBe(JSON.stringify(REDESIGNED));
+  });
+
+  it('reports whether it found a live session at all', () => {
+    // The route uses the return to decide whether the DB write is the whole
+    // job: a character sitting on the roster has no session to push onto, and
+    // that is not a failure.
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Designed', 'mage', LOOK);
+    expect(server.applyAppearanceForCharacter(1, REDESIGNED)).toBe(true);
+    expect(server.applyAppearanceForCharacter(99, REDESIGNED)).toBe(false);
+  });
+
+  it('clears a look pushed to null, for peers AND for the owner', () => {
+    const a = fakeWs();
+    const b = fakeWs();
+    joinServer(server, a, 1, 'Watcher', 'warrior', null);
+    const other = joinServer(server, b, 2, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    server.sim.tick();
+    broadcast(server);
+    b.sent.length = 0;
+    a.sent.length = 0;
+
+    server.applyAppearanceForCharacter(2, null);
+    server.sim.tick();
+    broadcast(server);
+
+    // The peer reading: absence on a full record means no authored look.
+    const wire = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid);
+    expect(wire.k).toBe('player');
+    expect(wire).not.toHaveProperty('app');
+    // The owner's: absence means "unchanged" there, so the clear has to be an
+    // explicit null or the owner keeps wearing a body nobody is broadcasting.
+    expect(lastSnap(b.sent).self.app).toBeNull();
+  });
+});
+
+describe('a look saved during the linkdead grace window', () => {
+  let server: GameServer;
+
+  beforeEach(() => {
+    server = new GameServer();
+  });
+
+  /** Drop the socket and reconnect the same character, the way ws_auth does:
+   *  a fresh read of the row rides the resume meta. */
+  function reconnect(
+    characterId: number,
+    session: ClientSession,
+    meta: Record<string, unknown>,
+  ): FakeClient {
+    session.linkdead = true;
+    const fc = fakeWs();
+    const resumed = server.join(
+      fc.ws,
+      characterId,
+      characterId,
+      'Designed',
+      'mage',
+      null,
+      false,
+      meta as never,
+    );
+    if ('error' in resumed) throw new Error(resumed.error);
+    resumed.blockListLoaded = true;
+    return fc;
+  }
+
+  it('picks the new look up on resume, without waiting for a relog', () => {
+    // The redesign route writes the row and pushes onto the live session, but a
+    // player who is LINKDEAD has no session to push onto: the entity keeps the
+    // join-time look, and the memo happily serves the stale string for the rest
+    // of the session (wiping lastSent re-SENDS, but what it re-sends is the
+    // memo). The resume arm is what closes that window.
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 7, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    const entityId = server.sim.entities.get(session.pid)!.id;
+
+    const back = reconnect(7, session, { appearance: REDESIGNED });
+    server.sim.tick();
+    broadcast(server);
+
+    expect(server.sim.entities.get(session.pid)!.modularAppearance).toEqual(REDESIGNED);
+    expect((server as any).wireCache.get(entityId).appJson).toBe(JSON.stringify(REDESIGNED));
+    expect(lastSnap(back.sent).self.app).toEqual(REDESIGNED);
+  });
+
+  it('keeps the session look when the caller supplies none (absent means keep)', () => {
+    // ws_auth always supplies one, but an in-process or test caller passing
+    // `{}` must not be read as "this character has no look".
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 7, 'Designed', 'mage', LOOK);
+    broadcast(server);
+
+    reconnect(7, session, {});
+    expect(server.sim.entities.get(session.pid)!.modularAppearance).toEqual(LOOK);
+  });
+
+  it('does not bust the memo for a look that only differs by object identity', () => {
+    // The read is a fresh parse of a fresh row, so it is NEVER the same object
+    // as the one on the entity: an identity check elided nothing and every
+    // reconnect re-minted the string and re-shipped a full identity record to
+    // everyone in view. The comparison is by value.
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 7, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    const entityId = server.sim.entities.get(session.pid)!.id;
+    const memo = (server as any).wireCache.get(entityId).appJson;
+    expect(memo).toBe(JSON.stringify(LOOK)); // precondition
+
+    reconnect(7, session, { appearance: { ...LOOK } });
+    expect((server as any).wireCache.get(entityId).appJson).toBe(memo);
   });
 });

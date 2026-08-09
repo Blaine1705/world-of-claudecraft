@@ -71,11 +71,16 @@ const NESTED_KEYS: readonly string[] = ['face', 'body'];
  *  character row is broadcast to every player in view, so it must never become
  *  a channel for arbitrary attacker-chosen text. Bounding the maps by count and
  *  value type alone still let 32 keys of 48 characters ride per map, twice
- *  over, persisted and re-broadcast raw — an unmoderated text channel the chat
- *  filter never sees — and put a ~5.9 KB ceiling on a document the wire
- *  reasoning sizes at ~0.6 KB. Same drift guard as APPEARANCE_WIRE_KEYS:
+ *  over, persisted and re-broadcast raw: an unmoderated text channel the chat
+ *  filter never sees. Same drift guard as APPEARANCE_WIRE_KEYS:
  *  tests/appearance_wire_bounds.test.ts pins both lists against the renderer's
- *  own slider tables. */
+ *  own slider tables.
+ *
+ *  KEY names were only half of it. The VALUE charset (STYLE_ID_RE below) is the
+ *  other, and together they are what make the wire budget a real ceiling rather
+ *  than an estimate: APPEARANCE_MAX_WIRE_BYTES is now reachable by construction
+ *  and pinned by a test, where the same document could previously run to 8 KB
+ *  on control characters alone. */
 export const APPEARANCE_FACE_SLIDER_KEYS: readonly string[] = [
   'nose',
   'eyes',
@@ -96,9 +101,43 @@ export const APPEARANCE_BODY_SLIDER_KEYS: readonly string[] = [
   'feet',
 ];
 
-/** A style id is a short identifier ('fantasybraid'). Anything longer is not a
- *  style the renderer could match, so it is junk by definition. */
-const MAX_STRING_LENGTH = 48;
+/** Every string VALUE a look may carry is a style id: a short bare identifier
+ *  the renderer matches against a fixed list ('warriorbraid', 'bloodforged',
+ *  'default'). So bound the CHARSET, not just the length.
+ *
+ *  Length alone was the other half of the same hole the key allowlists closed.
+ *  26 keys x 48 free-form UTF-16 units is ~1.2 K characters of attacker-chosen
+ *  text, persisted on a character row and re-broadcast raw to every player in
+ *  view, outside every chat filter, and with control characters (which
+ *  JSON.stringify expands to six bytes each) it put the wire ceiling at 8 KB
+ *  against reasoning that sizes the document at well under one. Bounding the
+ *  charset closes the channel and the budget together: what survives is
+ *  alphanumerics and underscore, which cannot spell an insult, cannot carry
+ *  markup or a control code, and never escapes in JSON.
+ *
+ *  All 148 ids the renderer defines today are plain lowercase words, the
+ *  longest 14 ('longcenterpart'), so this is comfortable headroom rather than a
+ *  tight fit, and if a future id ever needs a character outside the class the
+ *  drift guard in tests/appearance_wire_bounds.test.ts fails on it at CI time
+ *  rather than a player's look silently not saving. */
+const STYLE_ID_RE = /^[a-z0-9_]{1,24}$/;
+
+/**
+ * The largest document sanitizeAppearance can return, in UTF-8 bytes.
+ *
+ * A real ceiling, not an estimate, and tests/appearance_wire_bounds.test.ts
+ * builds the maximal document and measures it rather than trusting this
+ * constant. It is reachable by construction: every one of the 26 scalar keys
+ * carrying a 24-character id (the longest thing a value can be, since the
+ * longest JSON number is 24 characters and a string of 24 costs 26 with its
+ * quotes), and both slider maps full of worst-case doubles.
+ *
+ * For scale, a default look is 586 bytes on the wire and a fully randomised one
+ * about 911, which is where the "~0.6 KB" the identity-wire reasoning quotes
+ * comes from. The gap between that and this is all numeric precision, and the
+ * charset bound is what stops the gap being unbounded text.
+ */
+export const APPEARANCE_MAX_WIRE_BYTES = 1474;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -167,10 +206,32 @@ export function sanitizeAppearance(value: unknown): Record<string, unknown> | nu
     }
     if (typeof raw === 'boolean') out[key] = raw;
     else if (typeof raw === 'number' && Number.isFinite(raw)) out[key] = raw;
-    else if (typeof raw === 'string' && raw.length <= MAX_STRING_LENGTH) out[key] = raw;
-    // anything else (nested junk, oversized string, null) is simply dropped
+    else if (typeof raw === 'string' && STYLE_ID_RE.test(raw)) out[key] = raw;
+    // anything else (nested junk, a string that is not a bare style id, null)
+    // is simply dropped
     else continue;
     kept++;
   }
   return kept > 0 ? out : null;
+}
+
+/**
+ * Whether two looks are the same DOCUMENT, by value.
+ *
+ * The callers hold one look that came off an entity and one that came off a
+ * fresh row read, so they are never the same object and `!==` elides nothing:
+ * every reconnect would bust the wire memo and re-ship an identical look to
+ * every player in view. Key ORDER is not normalized because both sides of every
+ * comparison are built by sanitizeAppearance, which emits keys in
+ * APPEARANCE_WIRE_KEYS order. A document that reached storage another way can
+ * at worst compare unequal, which is the safe direction (a redundant resend,
+ * never a stale body).
+ */
+export function sameAppearance(
+  a: Record<string, unknown> | null | undefined,
+  b: Record<string, unknown> | null | undefined,
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return JSON.stringify(a) === JSON.stringify(b);
 }
