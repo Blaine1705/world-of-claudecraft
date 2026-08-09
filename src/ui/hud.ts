@@ -686,6 +686,7 @@ import {
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
+import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
   isWindowDragPreviewMutation,
@@ -2855,6 +2856,7 @@ export class Hud {
     });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
+    $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
@@ -4381,7 +4383,8 @@ export class Hud {
     applyTalents: (allocation) => this.sim.applyTalents(allocation),
     respec: () => this.sim.respec(),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
-    saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
+    saveLoadout: (name, bar, alloc, captureGear) =>
+      this.sim.saveLoadout(name, bar, alloc, captureGear),
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
     applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
@@ -4469,7 +4472,8 @@ export class Hud {
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
-    dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
+    dropOnEquipSlot: (itemId, slot, target) =>
+      this.charWindow.dropOnEquipSlot(itemId, slot, target),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
     dropOnActionRingSlot: (itemId, ringIndex) => {
       // Bounded like mobileRingSlotFromPoint (the phase 14 QA): a stale
@@ -4795,6 +4799,18 @@ export class Hud {
       this.drawPlayerFramePortrait();
       this.renderCharIfOpen();
     },
+    playtimeVisible: () => this.optionsHooks?.settings.get('showPlaytime') ?? true,
+    togglePlaytimeVisible: () => {
+      // Per-device display preference (settings.showPlaytime), the
+      // showWalletOnPlayerCard doctrine: the total keeps accruing, this only
+      // conceals THIS client's sheet value. The flip routes through the
+      // options seam so the eye and the Options row share ONE write path;
+      // the main.ts arm owns the settings write and synchronously repaints
+      // the open sheet (which the click handler's focus re-seat relies on).
+      const hooks = this.optionsHooks;
+      if (!hooks) return;
+      hooks.onSettingChange('showPlaytime', !hooks.settings.get('showPlaytime'));
+    },
   });
   // Inspect ("Profile") window painter (inspect_view.ts pure core + inspect_window.ts
   // painter). It paints #inspect-window for both the rich in-range card (live
@@ -4838,6 +4854,7 @@ export class Hud {
       onPlacementChange: (listener) => this.auraOverlayController.onPlacementChange(listener),
     }),
     bugReport: () => this.bugReportHooks,
+    openWiki: () => this.openWiki(),
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
       const ability = this.abilityForSlot(slot);
@@ -10839,8 +10856,14 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
-          if (isPlayerTarget && (ev.absorbed ?? 0) > 0) {
-            const absorbShape = fctSpawnShape({ type: 'absorb' });
+          // An absorbed hit floats "Absorbed N" for BOTH sides of the swing: over your
+          // own character when a shield of yours soaked it, and over the TARGET when you
+          // were the attacker (without it, hitting a shielded mob looks like your attacks
+          // are doing nothing at all). The mapper owns the role split, including the
+          // no-floater case where the local player is on neither side; the amount gate
+          // stays here so a plain unabsorbed hit allocates nothing on the event path.
+          if ((ev.absorbed ?? 0) > 0) {
+            const absorbShape = fctSpawnShape({ type: 'absorb', isPlayerSource, isPlayerTarget });
             if (absorbShape)
               this.fctPainter.spawn(
                 {
@@ -10930,6 +10953,9 @@ export class Hud {
             crit: ev.crit,
             isPlayerSource,
             isPlayerTarget,
+            // Nothing got through and the absorb floater above already said so,
+            // so the number is suppressed rather than shown as a bare 0.
+            fullyAbsorbed: ev.amount === 0 && (ev.absorbed ?? 0) > 0,
           });
           if (
             hitShape &&
@@ -11696,6 +11722,43 @@ export class Hud {
               );
             audio.disenchant();
           } else this.showError(t(toast.key));
+          break;
+        }
+        case 'loadoutGearResult': {
+          // A loadout with a captured gear set was applied. The sim sends COUNTS
+          // only, so all the copy lives here. Two separate lines rather than one
+          // combined sentence: what came back and what is missing are different
+          // pieces of news, and the missing line is the one a player has to act on.
+          if (ev.equipped > 0) {
+            this.log(
+              t('hudChrome.talents.gearRestored', { n: formatNumber(ev.equipped) }),
+              '#ffd100',
+            );
+          }
+          // Three distinct reasons, three distinct lines. The event schema and the
+          // planner's doc exist to tell them apart, and "you no longer own it" is
+          // different news from "that enchanted copy is gone" or "you only have one
+          // of these". Collapsing them threw the distinction away at the last step.
+          if (ev.notHeld > 0) {
+            this.log(
+              t('hudChrome.talents.gearNotHeld', { n: formatNumber(ev.notHeld) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.copyGone > 0) {
+            this.log(
+              t('hudChrome.talents.gearCopyGone', { n: formatNumber(ev.copyGone) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.takenByOtherSlot > 0) {
+            this.log(
+              t('hudChrome.talents.gearTakenByOtherSlot', {
+                n: formatNumber(ev.takenByOtherSlot),
+              }),
+              '#ff8a5c',
+            );
+          }
           break;
         }
         case 'salvageResult': {
@@ -15557,7 +15620,10 @@ export class Hud {
     this.dailyRewardsWindow.onCosmeticsChanged();
   }
 
-  private renderCharIfOpen(): void {
+  // Public for the main.ts options arm (showPlaytime): the sheet is a cold
+  // window, so an Options-panel flip repaints it through this, the same call
+  // every internal repaint site uses.
+  renderCharIfOpen(): void {
     this.charWindow.renderIfOpen();
   }
 
@@ -17724,6 +17790,16 @@ export class Hud {
 
   toggleOptionsMenu(): void {
     this.optionsWindow.toggle();
+  }
+
+  /** Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray): the
+   *  confirm-first external hop in src/ui/wiki_link.ts, riding the one shared
+   *  confirm-dialog family so focus trap and key activation are inherited. */
+  openWiki(): void {
+    promptWikiVisit({
+      confirm: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
+    });
   }
 
   closeOptions(): void {
