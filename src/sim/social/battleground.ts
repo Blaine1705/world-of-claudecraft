@@ -1713,8 +1713,12 @@ function resolveBgResult(
       if (!meta) continue;
       const before = meta.bgRating;
       meta.bgRating = Math.max(BG_MIN_RATING, before + delta);
-      if (match.rated && winnerTeam !== null) {
-        if (won) meta.bgWins++;
+      if (match.rated) {
+        // A drawn battleground moved the ladder (eloDelta at score 0.5) but was
+        // recorded nowhere, so the match vanished from the player's record. It
+        // is now the third figure of W-L-D.
+        if (winnerTeam === null) meta.bgDraws++;
+        else if (won) meta.bgWins++;
         else meta.bgLosses++;
       }
       let firstWinBonus = 0;
@@ -1829,6 +1833,7 @@ export function bgLadder(ctx: SimContext): import('../../world_api').BgLadderEnt
       rating: meta.bgRating,
       wins: meta.bgWins,
       losses: meta.bgLosses,
+      draws: meta.bgDraws,
     });
   }
   rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
@@ -1867,6 +1872,7 @@ export function bgInfoFor(
     rating: meta.bgRating,
     wins: meta.bgWins,
     losses: meta.bgLosses,
+    draws: meta.bgDraws,
     captures: meta.bgCaptures,
     queued: group !== null,
     queueSize: bgQueueSize(ctx),

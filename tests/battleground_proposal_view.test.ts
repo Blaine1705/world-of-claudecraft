@@ -6,6 +6,7 @@ const info = (proposal: BgProposalInfo | null): BgInfo => ({
   rating: 1500,
   wins: 0,
   losses: 0,
+  draws: 0,
   captures: 0,
   queued: false,
   queueSize: 0,

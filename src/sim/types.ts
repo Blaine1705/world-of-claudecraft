@@ -238,6 +238,9 @@ export interface ArenaStanding {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level. Counted since the W-L-D record change; a
+   *  character who drew before it always reads 0, never a wrong number. */
+  draws: number;
 }
 
 export interface ArenaCombatant {
