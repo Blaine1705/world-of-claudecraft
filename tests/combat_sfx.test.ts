@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
+import { ABILITIES } from '../src/sim/content/classes';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
@@ -690,6 +691,11 @@ describe('combat SFX policy', () => {
   });
 
   it('reuses the Stealth recording for Greater Invisibility, Prowl, and Shadowform', () => {
+    // Pin these ids to real content: if any got renamed in classes.ts, this
+    // fails loudly instead of silently reverting to the buff_apply fallback.
+    for (const id of ['greater_invisibility', 'prowl', 'shadowform']) {
+      expect(ABILITIES[id]?.id).toBe(id);
+    }
     const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'greater_invisibility' })).toBe(
       'stealth',
