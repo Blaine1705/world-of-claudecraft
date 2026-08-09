@@ -22,12 +22,7 @@ export const FAMILY_CREST_ART_IDS: ReadonlySet<string> = new Set([
   'sheep',
 ]);
 
-export const STATUS_CREST_ART_IDS: ReadonlySet<string> = new Set([
-  'npc',
-  'boss',
-  'dead',
-  'combat',
-]);
+export const STATUS_CREST_ART_IDS: ReadonlySet<string> = new Set(['npc', 'boss', 'dead', 'combat']);
 
 export function classCrestId(cls: PlayerClass): `class_${PlayerClass}` {
   return `class_${cls}`;

@@ -200,6 +200,29 @@ const webpFiles = (): string[] =>
 
 type Mapping = {
   iconSize: number;
+  styleContract: {
+    id: string;
+    document: string;
+    summary: string;
+    master: {
+      minimumWidth: number;
+      minimumHeight: number;
+      square: boolean;
+      singleFrame: boolean;
+      colorSpace: string;
+      opaque: boolean;
+    };
+    shipping: {
+      width: number;
+      height: number;
+      format: string;
+      maximumBytes: number;
+      opaque: boolean;
+    };
+    reviewSizes: number[];
+    circularCropReviewSize: number;
+    anchors: { itemId: string; sha256: string }[];
+  };
   entries: {
     itemId: string;
     name: string;
@@ -404,9 +427,9 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The legacy bag family is project-owned art, so each curated entry overrides the
-    // file-level CraftPix license. Silkspun Satchel is separately generated and therefore
-    // belongs only to generatedBatches, never to the ordinary CraftPix-governed entries.
+    // The legacy bag family is project-owned art, so each ordinary entry carries its own
+    // project license. Silkspun Satchel is separately generated and therefore belongs only to
+    // generatedBatches, never to the project-owned ordinary entries.
     for (const id of [...BAG_IDS.filter((bagId) => bagId !== 'silkspun_satchel'), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(
@@ -420,6 +443,111 @@ describe('item webp icons', () => {
     expect(silkspunOwners, 'silkspun_satchel generated-art owner').toHaveLength(1);
     expect(silkspunOwners[0].source).toBe('OpenAI built-in image generation');
     expect(silkspunOwners[0].license).toContain('project asset');
+  });
+
+  it('F1) pins the canonical item-art style contract and its approved visual anchors', () => {
+    const contract = mapping().styleContract;
+    expect(contract.id).toBe('woc-item-icon-v1');
+    expect(contract.document).toBe('docs/design/item-icon-art-style.md');
+    expect(contract.summary).toBe(
+      'Classic dark-fantasy MMORPG painted inventory art; tactile material rendering; opaque dark painted ground; top-left key light; centered complete subject; no accidental writing, crop, frame, transparency, or watermark.',
+    );
+    expect(contract.master).toEqual({
+      minimumWidth: 512,
+      minimumHeight: 512,
+      square: true,
+      singleFrame: true,
+      colorSpace: 'srgb',
+      opaque: true,
+    });
+    expect(contract.shipping).toEqual({
+      width: 128,
+      height: 128,
+      format: 'webp',
+      maximumBytes: 15_360,
+      opaque: true,
+    });
+    expect(contract.reviewSizes).toEqual([128, 40, 28, 22]);
+    expect(contract.circularCropReviewSize).toBe(64);
+    expect(contract.anchors).toEqual([
+      {
+        itemId: 'eastbrook_buckler',
+        sha256: '2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156',
+      },
+      {
+        itemId: 'kingsbane_last_oath',
+        sha256: '0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30',
+      },
+      {
+        itemId: 'cinderweave_raiment',
+        sha256: '345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4',
+      },
+      {
+        itemId: 'linen_pouch',
+        sha256: 'b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937',
+      },
+      {
+        itemId: 'anglers_feast_platter',
+        sha256: '0ea8b9e92b170e277ab08a7c00daa73d641cb8803b2b8290de251a9a68f5a644',
+      },
+      {
+        itemId: 'firebottle',
+        sha256: 'c3965ddb8daa75ba1b8eb5adb75845ac3220e2eb2af0f5db3ad8d28cebd7b122',
+      },
+      {
+        itemId: 'arcanite_mining_pick',
+        sha256: '1f68e6bfbc521b2eb7c67cf7931bad05d1c68d68b132b7cf328d6c0d135f43b6',
+      },
+    ]);
+    for (const anchor of contract.anchors) {
+      const file = path.join(itemsDir, `${anchor.itemId}.webp`);
+      expect(existsSync(file), `${anchor.itemId} style anchor must exist`).toBe(true);
+      expect(createHash('sha256').update(readFileSync(file)).digest('hex')).toBe(anchor.sha256);
+    }
+
+    const guide = readFileSync(path.join(repoRoot, contract.document), 'utf8');
+    expect(guide).toContain('# Item Icon Art Style');
+    expect(guide).toContain('Contract id: `woc-item-icon-v1`');
+    expect(guide).toContain('## Reusable generation brief');
+    expect(guide).toContain('## Acceptance review');
+    expect(guide).toContain('## Provenance and replacement policy');
+    const normalizedGuide = guide.replace(/\s+/g, ' ');
+    for (const requiredRule of [
+      'The subject normally fills 68 to 76 percent of the square.',
+      'Use a warm key light from the top-left and a cool, deep shadow toward the bottom-right.',
+      'It is a painted vignette with subtle atmosphere and contact shadow, not a flat black product-photo void.',
+      'Do not add letters, numbers, words, labels, pseudo-writing, UI chrome, a frame, a checkerboard,',
+      'Do not duplicate an existing painting for a differently named authored item.',
+      '| One-handed weapon | Full weapon on a strong diagonal, distinct guard or head, grip visible |',
+      '| Helmet | One centered headpiece with no head, face, shoulders, or mannequin |',
+      '| Food | One plated serving or compact ingredient group, warm appetizing light, no table scene |',
+      '| Mount collectible | Recognizable three-quarter mount bust or vehicle portrait with tack and personality; do not show only loose reins |',
+      'Review every icon at the 512 master, 128px, 40px, 28px, and 22px.',
+      'Also inspect 28px grayscale and a 64px circular crop.',
+      'Repainting never rewrites historical evidence.',
+      'Quiet drift inside `woc-item-icon-v1` is not allowed.',
+    ]) {
+      expect(normalizedGuide, `style contract must retain: ${requiredRule}`).toContain(
+        requiredRule,
+      );
+    }
+
+    for (const instructionPath of [
+      'DESIGN.md',
+      'public/CLAUDE.md',
+      'src/sim/content/CLAUDE.md',
+      'src/ui/CLAUDE.md',
+    ]) {
+      const instructions = readFileSync(path.join(repoRoot, instructionPath), 'utf8');
+      expect(
+        instructions,
+        `${instructionPath} must route future item art through the contract`,
+      ).toContain('docs/design/item-icon-art-style.md');
+      expect(
+        instructions,
+        `${instructionPath} must name the versioned item-art contract`,
+      ).toContain('woc-item-icon-v1');
+    }
   });
 
   it('F2) ships the complete project-owned professions material art set', () => {
@@ -472,7 +600,7 @@ describe('item webp icons', () => {
       expect(entry?.sourceFile, `${id} mapping and manifest batch/version must agree`).toBe(
         `${declared?.batch}/masters/${id}.png (accepted ${declared?.acceptedVersion})`,
       );
-      expect(entry?.license, `${id} must override the mapping's CraftPix default`).toContain(
+      expect(entry?.license, `${id} must carry its explicit project license`).toContain(
         'World of ClaudeCraft original art',
       );
     }
@@ -520,7 +648,7 @@ describe('item webp icons', () => {
       expect(itemImageUrl(id), `${id} runtime URL`).toBe(`/ui/items/${id}.webp`);
       expect(
         m.entries.some((entry) => entry.itemId === id),
-        `${id} must not inherit CraftPix`,
+        `${id} must not be an ordinary mapping entry`,
       ).toBe(false);
       const owners = (m.generatedBatches ?? []).filter((batch) => batch.itemIds.includes(id));
       expect(owners, `${id} must have one generated provenance owner`).toHaveLength(1);

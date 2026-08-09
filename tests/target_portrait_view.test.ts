@@ -175,7 +175,11 @@ describe('targetPortraitUrl', () => {
     const assets = readdirSync(resolve(process.cwd(), 'public/ui/mobs'))
       .filter((file) => !file.startsWith('.'))
       .sort();
-    expect(assets).toEqual(Object.keys(MOBS).map((id) => `${id}.webp`).sort());
+    expect(assets).toEqual(
+      Object.keys(MOBS)
+        .map((id) => `${id}.webp`)
+        .sort(),
+    );
   });
 
   it('keeps corrected portraits synchronized with their current rendered models', () => {

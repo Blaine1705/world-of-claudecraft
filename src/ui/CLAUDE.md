@@ -533,6 +533,11 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   "every wired ITEM id is a real, non-weapon item" assertion intact. `tests/item_icons.test.ts`
   is the gate: WebP-only tree, art and wiring in bijection, every icon the declared square, every
   bag image-backed.
+  All new and replacement item paintings MUST follow
+  `docs/design/item-icon-art-style.md` (`woc-item-icon-v1`). That document is canonical for
+  family composition, approved references, generation prompts, opacity, 512px intake, 128px
+  shipping, small-size and circular-crop review, and superseding provenance. Do not infer item
+  style from a source pack or copy a nearby file without checking the contract.
 
 ## Small modules (pure-core + thin-consumer exemplars)
 Logic lifted out of `hud.ts`: a host-agnostic core a Vitest imports directly, plus a thin

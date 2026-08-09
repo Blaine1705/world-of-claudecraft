@@ -12,6 +12,10 @@ import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 const repoRoot = path.join(__dirname, '..');
 const evidenceDir = 'docs/achievements/placeholder-art-completion-2026-08-09';
 const manifestPath = path.join(repoRoot, evidenceDir, 'accepted-art.json');
+const itemConsistencyManifestPath = path.join(
+  repoRoot,
+  'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
+);
 
 const COMPLETION_DEED_IDS = [
   'chr_amberfall_first_cast',
@@ -127,11 +131,38 @@ type CompletionManifest = {
   [key: string]: unknown;
 };
 
+type ItemConsistencyManifest = {
+  assets: Array<{
+    id: string;
+    acceptedSha256: string;
+    acceptedBytes: number;
+    generationReport: string;
+  }>;
+  supersedes: Array<{
+    itemId: string;
+    historicalAcceptedArt?: { path: string; assetKey: string };
+    previous: {
+      shipping: { sha256: string; bytes: number };
+      owner: { batchId?: string };
+    };
+    replacement: {
+      batchId: string;
+      acceptedSha256: string;
+      acceptedBytes: number;
+      generationReport: string;
+    };
+  }>;
+};
+
 const sorted = (values: Iterable<string>): string[] => [...values].sort();
 
 function manifest(): CompletionManifest {
   expect(existsSync(manifestPath), 'completion accepted-art manifest must be committed').toBe(true);
   return JSON.parse(readFileSync(manifestPath, 'utf8')) as CompletionManifest;
+}
+
+function itemConsistencyManifest(): ItemConsistencyManifest {
+  return JSON.parse(readFileSync(itemConsistencyManifestPath, 'utf8')) as ItemConsistencyManifest;
 }
 
 function assertPinnedFile(asset: {
@@ -145,6 +176,47 @@ function assertPinnedFile(asset: {
   expect(bytes.length, `${asset.runtimeUrl} bytes`).toBe(asset.acceptedBytes);
   expect(createHash('sha256').update(bytes).digest('hex'), `${asset.runtimeUrl} sha256`).toBe(
     asset.acceptedSha256,
+  );
+}
+
+function resolvedCompletionAssetPin(asset: ManifestAsset): {
+  acceptedSha256: string;
+  acceptedBytes: number;
+} {
+  const replacementManifest = itemConsistencyManifest();
+  const supersession = replacementManifest.supersedes.find(({ itemId }) => itemId === asset.id);
+  if (!supersession) return asset;
+
+  expect(supersession.historicalAcceptedArt, `${asset.id} historical manifest link`).toEqual({
+    path: `${evidenceDir}/accepted-art.json`,
+    assetKey: `item:${asset.id}`,
+  });
+  expect(supersession.previous.shipping, `${asset.id} immutable historical pin`).toMatchObject({
+    sha256: asset.acceptedSha256,
+    bytes: asset.acceptedBytes,
+  });
+  expect(supersession.previous.owner.batchId, `${asset.id} historical owner`).toBe(
+    'placeholder-art-completion-weapons-2026-08-09',
+  );
+  const replacement = replacementManifest.assets.find(({ id }) => id === asset.id);
+  expect(replacement, `${asset.id} replacement asset`).toBeDefined();
+  expect(supersession.replacement, `${asset.id} current replacement pin`).toEqual({
+    batchId: 'item-art-consistency-2026-08-09',
+    acceptedSha256: replacement?.acceptedSha256,
+    acceptedBytes: replacement?.acceptedBytes,
+    generationReport: replacement?.generationReport,
+  });
+  return supersession.replacement;
+}
+
+function assertHistoricalOrSupersededFile(asset: ManifestAsset): void {
+  const file = path.join(repoRoot, 'public', asset.runtimeUrl.slice(1));
+  expect(existsSync(file), asset.runtimeUrl).toBe(true);
+  const bytes = readFileSync(file);
+  const currentPin = resolvedCompletionAssetPin(asset);
+  expect(bytes.length, `${asset.runtimeUrl} bytes`).toBe(currentPin.acceptedBytes);
+  expect(createHash('sha256').update(bytes).digest('hex'), `${asset.runtimeUrl} sha256`).toBe(
+    currentPin.acceptedSha256,
   );
 }
 
@@ -249,10 +321,20 @@ describe('v0.36 placeholder-art completion evidence', () => {
       expect(asset.runtimeUrl, `${asset.kind}:${asset.id} canonical URL`).toBe(
         `/ui/${asset.kind === 'item' ? 'items' : 'deeds'}/${asset.id}.webp`,
       );
-      assertPinnedFile(asset);
+      assertHistoricalOrSupersededFile(asset);
     }
 
-    const report = await auditIconAssets({ manifest: value, repoRoot });
+    const currentManifest = structuredClone(value);
+    let resolvedSupersessions = 0;
+    for (const asset of currentManifest.assets) {
+      const resolved = resolvedCompletionAssetPin(asset);
+      if (resolved.acceptedSha256 === asset.acceptedSha256) continue;
+      resolvedSupersessions += 1;
+      asset.acceptedSha256 = resolved.acceptedSha256;
+      asset.acceptedBytes = resolved.acceptedBytes;
+    }
+    expect(resolvedSupersessions).toBe(4);
+    const report = await auditIconAssets({ manifest: currentManifest, repoRoot });
     expect(report.summary).toMatchObject({
       ok: true,
       assetCount: 153,
@@ -375,8 +457,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(credits).toContain(
       'Thirty original crests generated with OpenAI built-in image generation',
     );
-    expect(credits).toContain('v0.36 painted per-item weapon inventory icons');
-    expect(credits).toContain('the exact 119 base-weapon IDs');
+    expect(credits).toContain('Historical v0.36 painted per-item weapon inventory wave');
+    expect(credits).toContain('119 base-weapon paintings');
     expect(credits).toContain('v0.36 generated specialization emblems');
     expect(credits).toContain('Twenty-one original square emblems generated');
     expect(credits).toContain('v0.36 generated creature-family and status crests');

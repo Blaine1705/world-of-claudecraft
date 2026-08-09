@@ -11,6 +11,7 @@ import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const itemsDir = path.join(repoRoot, 'public/ui/items');
 const weaponProvenanceRecord = 'docs/achievements/placeholder-art-completion-2026-08-09/';
+const itemConsistencyProvenanceRecord = 'docs/achievements/item-art-consistency-2026-08-09/';
 const weaponGenerationRecordFiles = [
   'weapons-a-generation-record.json',
   'weapons-b-generation-record.json',
@@ -58,19 +59,66 @@ describe('painted weapon inventory icons', () => {
     }
   });
 
-  it('records the exact authored weapon registry under one generated-art owner', () => {
+  it('keeps the historical registry while every weapon has one current generated-art owner', () => {
     const expected = Object.keys(ITEM_WEAPON_VARIANTS).sort();
     const batches = itemMapping.generatedBatches ?? [];
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(1);
-    expect([...weaponBatches[0].itemIds].sort()).toEqual(expected);
-    expect(weaponBatches[0].batchId).toBe('placeholder-art-completion-weapons-2026-08-09');
-    expect(weaponBatches[0].source).toBe('OpenAI built-in image generation');
-    expect(weaponBatches[0].owner).toBe('World of ClaudeCraft');
-    expect(weaponBatches[0].license).toContain('project asset');
-    expect(weaponBatches[0].provenanceRecord).toBe(weaponProvenanceRecord);
+    expect(weaponBatches).toHaveLength(2);
+    const historicalBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
+    );
+    const replacementBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'item-art-consistency-2026-08-09',
+    );
+    expect(historicalBatch).toBeDefined();
+    expect(replacementBatch).toBeDefined();
+
+    const replacementManifest = JSON.parse(
+      readFileSync(
+        path.join(repoRoot, itemConsistencyProvenanceRecord, 'accepted-art.json'),
+        'utf8',
+      ),
+    ) as {
+      supersedes: Array<{
+        itemId: string;
+        historicalAcceptedArt?: { path: string; assetKey: string };
+      }>;
+    };
+    const replacementWeaponIds = replacementManifest.supersedes
+      .filter(
+        ({ itemId, historicalAcceptedArt }) =>
+          Object.hasOwn(ITEM_WEAPON_VARIANTS, itemId) &&
+          historicalAcceptedArt?.path === `${weaponProvenanceRecord}accepted-art.json`,
+      )
+      .map(({ itemId }) => itemId)
+      .sort();
+    expect(replacementWeaponIds).toEqual([
+      'craghorn_staff',
+      'drovers_staff',
+      'hollow_vigil_staff',
+      'widowfang_dirk',
+    ]);
+    expect(historicalBatch?.itemIds).toEqual(
+      expected.filter((id) => !replacementWeaponIds.includes(id)),
+    );
+    expect(
+      replacementBatch?.itemIds.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)).sort(),
+    ).toEqual(replacementWeaponIds);
+    expect(
+      weaponBatches
+        .flatMap(({ itemIds }) => itemIds.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)))
+        .sort(),
+    ).toEqual(expected);
+
+    for (const batch of [historicalBatch, replacementBatch]) {
+      expect(batch?.source).toBe('OpenAI built-in image generation');
+      expect(batch?.owner).toBe('World of ClaudeCraft');
+      expect(batch?.license).toContain('project asset');
+    }
+    expect(historicalBatch?.provenanceRecord).toBe(weaponProvenanceRecord);
+    expect(replacementBatch?.provenanceRecord).toBe(itemConsistencyProvenanceRecord);
 
     const provenanceDir = path.join(repoRoot, weaponProvenanceRecord);
     const readJsonRecord = (filename: string): unknown =>

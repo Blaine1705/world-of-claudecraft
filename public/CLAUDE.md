@@ -111,5 +111,11 @@ are deliberately English-only (no `data-i18n`).
   gated; the existing `cursors/`/`emotes/` PNG and legacy `weapons/` JPG previews are
   grandfathered. Prefer WebP for any new icon art; inventory weapons belong in `ui/items/` by
   item id.
+- Every inventory-facing image under `ui/items/` follows the versioned
+  `docs/design/item-icon-art-style.md` contract (`woc-item-icon-v1`). New source art must be a
+  reviewed square, single-frame, fully opaque sRGB master at 512px or larger with exactly one
+  current provenance owner before `npm run assets:items` will convert and delete it. The style
+  contract also owns subject fill, lighting, family composition, small-size and circular-crop
+  review, and historical supersession records.
 - `src/game/voice_manifest.generated.ts` and `manifest.generated.ts` are generated;
   don't hand-edit (root invariant).

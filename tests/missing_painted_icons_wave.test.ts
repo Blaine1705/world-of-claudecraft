@@ -24,6 +24,10 @@ const manifestPath = path.join(
   repoRoot,
   'docs/achievements/missing-painted-icons-accepted-art.json',
 );
+const itemConsistencyManifestPath = path.join(
+  repoRoot,
+  'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
+);
 
 interface ReferenceRecord {
   path: string;
@@ -126,6 +130,30 @@ interface AcceptedArtManifest {
   assets: RasterAsset[];
 }
 
+interface ItemConsistencyManifest {
+  assets: Array<{
+    kind: 'item';
+    id: string;
+    acceptedSha256: string;
+    acceptedBytes: number;
+    generationReport: string;
+  }>;
+  supersedes: Array<{
+    itemId: string;
+    historicalAcceptedArt?: { path: string; assetKey: string };
+    previous: {
+      shipping: { sha256: string; bytes: number };
+      owner: { batchId?: string };
+    };
+    replacement: {
+      batchId: string;
+      acceptedSha256: string;
+      acceptedBytes: number;
+      generationReport: string;
+    };
+  }>;
+}
+
 interface AbilityMappingEntry {
   abilityId: string;
   sourcePack: string;
@@ -140,6 +168,40 @@ interface AbilityMappingEntry {
 
 function manifest(): AcceptedArtManifest {
   return JSON.parse(readFileSync(manifestPath, 'utf8')) as AcceptedArtManifest;
+}
+
+function itemConsistencyManifest(): ItemConsistencyManifest {
+  return JSON.parse(readFileSync(itemConsistencyManifestPath, 'utf8')) as ItemConsistencyManifest;
+}
+
+function resolvedShippingPin(asset: RasterAsset): {
+  acceptedSha256: string;
+  acceptedBytes: number;
+} {
+  if (asset.kind !== 'item') return asset;
+  const replacementManifest = itemConsistencyManifest();
+  const supersession = replacementManifest.supersedes.find(({ itemId }) => itemId === asset.id);
+  if (!supersession) return asset;
+
+  expect(supersession.historicalAcceptedArt, `${asset.id} historical manifest link`).toEqual({
+    path: 'docs/achievements/missing-painted-icons-accepted-art.json',
+    assetKey: `item:${asset.id}`,
+  });
+  expect(supersession.previous.shipping, `${asset.id} immutable historical pin`).toMatchObject({
+    sha256: asset.acceptedSha256,
+    bytes: asset.acceptedBytes,
+  });
+  expect(asset.batch, `${asset.id} historical accepted-art batch`).toBeTruthy();
+  expect(supersession.previous.owner.batchId, `${asset.id} historical owner`).toBe(asset.batch);
+  const replacement = replacementManifest.assets.find(({ id }) => id === asset.id);
+  expect(replacement, `${asset.id} replacement asset`).toBeDefined();
+  expect(supersession.replacement, `${asset.id} current replacement pin`).toEqual({
+    batchId: 'item-art-consistency-2026-08-09',
+    acceptedSha256: replacement?.acceptedSha256,
+    acceptedBytes: replacement?.acceptedBytes,
+    generationReport: replacement?.generationReport,
+  });
+  return supersession.replacement;
 }
 
 function sorted(values: Iterable<string>): string[] {
@@ -302,10 +364,11 @@ describe('missing painted icon accepted-art manifest', () => {
       const file = path.join(repoRoot, expectedLocation.shippingPath);
       expect(file).toBe(publicFile(asset.runtimeUrl));
       const bytes = readFileSync(file);
-      expect(bytes.length, `${asset.id} accepted byte pin`).toBe(asset.acceptedBytes);
+      const currentPin = resolvedShippingPin(asset);
+      expect(bytes.length, `${asset.id} accepted byte pin`).toBe(currentPin.acceptedBytes);
       expect(bytes.length, `${asset.id} weight ceiling`).toBeLessThanOrEqual(15 * 1024);
       expect(createHash('sha256').update(bytes).digest('hex'), `${asset.id} hash pin`).toBe(
-        asset.acceptedSha256,
+        currentPin.acceptedSha256,
       );
       const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       expect(decoded.info.width, `${asset.id} width`).toBe(128);
@@ -488,6 +551,7 @@ describe('missing painted item integration', () => {
         commonPrompt: string;
         itemDirections?: Record<string, { generationPrompt: string }>;
         itemIds: string[];
+        provenanceRecord?: string;
       }>;
     };
     const targets = new Set(accepted.targetSets.items);
@@ -503,8 +567,18 @@ describe('missing painted item integration', () => {
       expect(owner.styleReference).toBeTruthy();
       expect(owner.commonPrompt).toBeTruthy();
       expect(owner.itemIds).toEqual(sorted(new Set(owner.itemIds)));
-      expect(owner.styleReferencesByItem?.[id]).toEqual(asset?.generation.references);
-      expect(owner.itemDirections?.[id]?.generationPrompt).toBe(asset?.generation.prompt);
+      const supersession = itemConsistencyManifest().supersedes.find(({ itemId }) => itemId === id);
+      if (supersession) {
+        expect(owner.batchId).toBe('item-art-consistency-2026-08-09');
+        expect(owner.provenanceRecord).toBe('docs/achievements/item-art-consistency-2026-08-09/');
+        expect(supersession.previous.shipping).toMatchObject({
+          sha256: asset?.acceptedSha256,
+          bytes: asset?.acceptedBytes,
+        });
+      } else {
+        expect(owner.styleReferencesByItem?.[id]).toEqual(asset?.generation.references);
+        expect(owner.itemDirections?.[id]?.generationPrompt).toBe(asset?.generation.prompt);
+      }
     }
   });
 });

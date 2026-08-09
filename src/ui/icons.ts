@@ -2962,8 +2962,9 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
-  // Collectible mount reins ship rendered 3D face icons (WebP) via ITEM_IMAGE_IDS +
-  // scripts/render_mount_icons.mjs, so they need no procedural recipe here.
+  // Collectible mount reins ship opaque painted item icons under woc-item-icon-v1 via
+  // ITEM_IMAGE_IDS, so they need no procedural recipe here. The former GLB renderer is
+  // historical tooling only; new or revised reins follow docs/design/item-icon-art-style.md.
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),
@@ -4533,9 +4534,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'ogre_war_totem',
   'sanctum_key_shard',
   'unknown_alien_weaponry',
-  // mount (rideable) reins: 3D face/front icons rendered from the mount GLBs via
-  // scripts/render_mount_icons.mjs (a headless-Chrome front three-quarter head close-up),
-  // committed as transparent WebP. These win over the procedural recipe in iconDataUrl.
+  // Mount (rideable) reins use opaque woc-item-icon-v1 paintings. Their identities may
+  // still be informed by the corresponding mount GLBs, but their shipping inventory art
+  // follows docs/design/item-icon-art-style.md and wins over iconDataUrl's procedural recipe.
   'reins_valorsteed',
   'reins_grag_bear',
   'reins_stalkglider_snail',
