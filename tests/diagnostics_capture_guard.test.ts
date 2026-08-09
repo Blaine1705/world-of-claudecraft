@@ -9,6 +9,12 @@ import {
 } from '../scripts/lib/diagnostics_capture_guard.mjs';
 
 describe('diagnostics capture guard', () => {
+  it('keeps the guard in the production Docker build context', () => {
+    const dockerignore = readFileSync(new URL('../.dockerignore', import.meta.url), 'utf8');
+    expect(dockerignore).toContain('!scripts/lib/');
+    expect(dockerignore).toContain('!scripts/lib/diagnostics_capture_guard.mjs');
+  });
+
   it('accepts only concrete loopback socket addresses', () => {
     expect(isLoopbackRemoteAddress('127.0.0.1')).toBe(true);
     expect(isLoopbackRemoteAddress('::1')).toBe(true);

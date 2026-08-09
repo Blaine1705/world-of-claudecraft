@@ -532,9 +532,12 @@ const PREWARM_COMPILE_MAX_MS = 10000;
 // The soft manifest budget protects ordinary entry. A second independent wall
 // deadline also bounds desktop exemptions and Insane's full-manifest policy.
 // Already-started WebGL calls cannot be cancelled, so large compiles are split
-// into roots and the queue stops launching new units at this deadline.
+// into roots and the queue stops launching before this deadline.
 const VIEW_PREWARM_HARD_MAX_MS = 15000;
 const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 7500;
+// Leave room for the final already-started GPU unit to settle. WebGL driver
+// work cannot be preempted, so launching exactly at the wall can overshoot it.
+const PREWARM_GPU_SUBMIT_GUARD_MS = 1000;
 // A background prewarm waits for a browser idle slot between its per-group
 // compile chunks; the timeout forces progress under sustained frame load.
 const IDLE_PREWARM_TIMEOUT_MS = 250;
@@ -5545,6 +5548,7 @@ export class Renderer {
     const started = performance.now();
     const deadline = started + maxMs;
     const hardDeadline = started + hardMaxMs;
+    const gpuSubmitDeadline = Math.max(started, hardDeadline - PREWARM_GPU_SUBMIT_GUARD_MS);
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
@@ -5627,6 +5631,24 @@ export class Renderer {
     const droppedEntries: PrewarmResumeEntry[] = [];
 
     const compileEntryUnits = (): PrewarmResumeUnit[] => {
+      // One compileAsync call still has a synchronous traversal prologue and its
+      // linker cannot be cancelled. Material-bearing leaves keep each unit small
+      // enough for the hard-deadline check between units to remain meaningful.
+      const compileRoots = (
+        roots: readonly THREE.Object3D[],
+        visibleOnly: boolean,
+      ): THREE.Object3D[] => {
+        const materialRoots: THREE.Object3D[] = [];
+        const collect = (child: THREE.Object3D): void => {
+          const renderable = child as RenderableDiagnosticObject;
+          if (renderable.material) materialRoots.push(child);
+        };
+        for (const root of roots) {
+          if (visibleOnly) root.traverseVisible(collect);
+          else root.traverse(collect);
+        }
+        return materialRoots;
+      };
       const stagedGroups: readonly [string, THREE.Group | null][] = [
         ['doors', doorPrewarmGroup],
         ['interiors', interiorPrewarmGroup],
@@ -5648,9 +5670,14 @@ export class Renderer {
         [
           {
             id: 'scene',
-            roots: this.scene.children.filter((root) => !stagedRoots.has(root)),
+            roots: compileRoots(
+              this.scene.children.filter((root) => !stagedRoots.has(root)),
+              true,
+            ),
           },
-          ...stagedGroups.flatMap(([id, group]) => (group ? [{ id, roots: group.children }] : [])),
+          ...stagedGroups.flatMap(([id, group]) =>
+            group ? [{ id, roots: compileRoots(group.children, false) }] : [],
+          ),
         ],
         async (root) => {
           await this.compilePrewarmColorPrograms(root, false);
@@ -6277,8 +6304,8 @@ export class Renderer {
         category: 'world',
         priority: 80,
         required: true,
-        // Async-capable desktop must finish linking behind the loading cover even
-        // when the hidden world frame consumed the soft 12 s manifest budget.
+        // Async-capable desktop may continue linking behind the loading cover after
+        // the soft 12 s manifest budget, but never launches past the GPU guard.
         // Synchronous compilers and constrained WebKit keep the deadline because
         // they cannot safely wait behind the cover without a hard upper bound.
         deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
@@ -6312,7 +6339,7 @@ export class Renderer {
           compileMode = 'async';
           const units = compileEntryUnits();
           for (let index = 0; index < units.length; index++) {
-            if (performance.now() >= hardDeadline) {
+            if (performance.now() >= gpuSubmitDeadline) {
               const remaining = units.slice(index);
               if (remaining.length > 0) {
                 droppedEntries.push({ id: 'programs.compile', units: remaining });
@@ -6352,7 +6379,7 @@ export class Renderer {
             },
             async () => {
               for (const levels of renderBudgetShaderPrewarmLevels(originalState)) {
-                if (performance.now() >= hardDeadline) {
+                if (performance.now() >= gpuSubmitDeadline) {
                   compileTimedOut = true;
                   break;
                 }
@@ -6374,7 +6401,7 @@ export class Renderer {
         run: () => {
           const points = [p.pos, activeZone.hub];
           for (const point of points) {
-            if (performance.now() >= hardDeadline) break;
+            if (performance.now() >= gpuSubmitDeadline) break;
             this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
@@ -6390,7 +6417,7 @@ export class Renderer {
         // No resumeUnits: this is a tight loop of real presented renders.
         run: () => {
           const minPasses = this.lowGfx ? 8 : 10;
-          while (renderPasses < minPasses && performance.now() < hardDeadline) {
+          while (renderPasses < minPasses && performance.now() < gpuSubmitDeadline) {
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }

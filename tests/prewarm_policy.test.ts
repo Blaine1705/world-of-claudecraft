@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
   CONSTRAINED_PREWARM_RESUME,
   constrainedEntryViewCreateBudget,
@@ -58,7 +59,7 @@ const MANIFEST_IDS = [
   'diagnostics.baseline',
 ];
 
-describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical behavior', () => {
+describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   it('runs the full manifest with generous budgets and no reordering', () => {
     const p = resolvePrewarmPolicy(BASE);
     expect(p.minimalManifest).toBe(false);
@@ -67,8 +68,9 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     expect(p.maxViews).toBe(72);
     expect(p.yieldBetweenEntries).toBe(false);
     expect(p.linkPassPerEntry).toBe(false);
-    expect(p.compileBeforeFirstFrame).toBe(false);
+    expect(p.compileBeforeFirstFrame).toBe(true);
     expect(p.skipMonolithCompile).toBe(false);
+    expect(p.skipFullScenePasses).toBe(false);
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
@@ -116,10 +118,25 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
   });
 
-  it('never reorders or trims the manifest', () => {
+  it('keeps the full manifest and compiles before the first full-scene frame', () => {
     const p = resolvePrewarmPolicy(BASE);
-    expect(orderedPrewarmIds(MANIFEST_IDS, p)).toEqual(MANIFEST_IDS);
+    const ordered = orderedPrewarmIds(MANIFEST_IDS, p);
+    const frameIdx = ordered.indexOf('world.initial-frame');
+    expect(ordered.indexOf('programs.compile')).toBe(frameIdx - 1);
+    expect(new Set(ordered)).toEqual(new Set(MANIFEST_IDS));
     for (const id of MANIFEST_IDS) expect(prewarmEntryRuns(id, p)).toBe(true);
+  });
+
+  it('omits uninterruptible whole-scene submits without parallel compile', () => {
+    const p = resolvePrewarmPolicy({ ...BASE, asyncCompileSupported: false });
+    expect(p.compileBeforeFirstFrame).toBe(false);
+    expect(p.skipMonolithCompile).toBe(true);
+    expect(p.skipFullScenePasses).toBe(true);
+    expect(p.linkPassPerEntry).toBe(false);
+    for (const id of BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE) {
+      expect(prewarmEntryRuns(id, p)).toBe(false);
+    }
+    expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -173,7 +190,7 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
   expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
   expect(entry).toContain('renderPasses++');
-  expect(entry).toContain('performance.now() >= hardDeadline');
+  expect(entry).toContain('performance.now() >= gpuSubmitDeadline');
   expect(entry).toContain('withRestoredPrewarmState(');
   expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
@@ -193,7 +210,7 @@ it('settles linked desktop programs only until the independent hard deadline', (
     expect(entryAt).toBeGreaterThan(-1);
     expect(nextEntryAt).toBeGreaterThan(entryAt);
     expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
-    expect(entry).toContain('hardDeadline');
+    expect(entry).toContain('gpuSubmitDeadline');
     expect(entry).not.toContain('finishBehindCover');
   }
 });
@@ -290,12 +307,16 @@ describe('resolvePrewarmPolicy: constrained WITHOUT parallel compile', () => {
     asyncCompileSupported: false,
   });
 
-  it('links group-by-group per entry and skips the synchronous monolith', () => {
-    expect(p.linkPassPerEntry).toBe(true);
+  it('skips every uninterruptible full-scene submit', () => {
+    expect(p.linkPassPerEntry).toBe(false);
     expect(p.skipMonolithCompile).toBe(true);
+    expect(p.skipFullScenePasses).toBe(true);
     // No reorder: without off-thread compile there is nothing to front-load.
     expect(p.compileBeforeFirstFrame).toBe(false);
     expect(orderedPrewarmIds(MANIFEST_IDS, p)).toEqual(MANIFEST_IDS);
+    for (const id of BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE) {
+      expect(prewarmEntryRuns(id, p)).toBe(false);
+    }
   });
 });
 
