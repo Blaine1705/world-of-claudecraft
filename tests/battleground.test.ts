@@ -8,11 +8,13 @@ import {
   BG_POWER_RUNES,
   BG_SPEED_RUNES,
 } from '../src/sim/battleground_layout';
+import { resolvePosition } from '../src/sim/colliders';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { restorePet, summonPet } from '../src/sim/pet/pet_commands';
 import {
   awardBattlegroundHonor,
@@ -125,6 +127,11 @@ function inGraveyard(sim: Sim, match: BgMatch, pid: number, team: 0 | 1): boolea
   return (
     Math.abs(e.pos.x - (o.x + plot.x)) <= plot.hw && Math.abs(e.pos.z - (o.z + plot.z)) <= plot.hd
   );
+}
+
+function expectClearPlayerPosition(sim: Sim, e: Entity): void {
+  const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeLessThanOrEqual(1e-6);
 }
 
 function errorTexts(events: SimEvent[]): string[] {
@@ -1044,6 +1051,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.dead).toBe(false);
     expect(e.ghost).toBe(false);
     expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
     expect(e.prevPos).toEqual(e.pos);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
@@ -1080,6 +1088,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.dead).toBe(false);
     expect(e.ghost).toBe(false);
     expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
     expect(Math.hypot(e.pos.x - before.x, e.pos.z - before.z)).toBeGreaterThan(10);
     expect(completed?.distance).toBeGreaterThan(10);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
@@ -1149,6 +1158,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.dead).toBe(true);
     expect(e.ghost).toBe(false);
     expect(inGraveyard(sim, match, pid, 1)).toBe(true);
+    expectClearPlayerPosition(sim, e);
   });
 
   it('a corpse NEVER auto-releases (the press is the player own move); the ward binds the ghost', () => {

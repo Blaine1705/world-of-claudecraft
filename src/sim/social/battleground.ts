@@ -26,10 +26,12 @@ import {
   type BgTeam,
   keepInteriorBounds,
 } from '../battleground_layout';
+import { resolvePosition } from '../colliders';
 import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibility';
 import { BG_SLOT_COUNT, battlegroundOrigin } from '../data';
 import { createGroundObject } from '../entity';
 import { detachFromDungeon } from '../instances/dungeons';
+import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
 import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import {
@@ -972,7 +974,30 @@ export function bgUnstuckDestination(ctx: SimContext, pid: number): Vec3 | null 
   const team = bgTeamOf(match, pid);
   const origin = battlegroundOrigin(match.slot);
   const plot = BG_GRAVEYARDS[team];
-  return ctx.groundPos(origin.x + plot.x, origin.z + plot.z);
+  const candidates = [
+    { x: plot.x, z: plot.z },
+    { x: plot.x - plot.hw * 0.5, z: plot.z },
+    { x: plot.x + plot.hw * 0.5, z: plot.z },
+    { x: plot.x, z: plot.z - plot.hd * 0.5 },
+    { x: plot.x, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x - plot.hw * 0.5, z: plot.z - plot.hd * 0.5 },
+    { x: plot.x + plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x - plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
+    { x: plot.x + plot.hw * 0.5, z: plot.z - plot.hd * 0.5 },
+  ];
+  for (const candidate of candidates) {
+    const x = origin.x + candidate.x;
+    const z = origin.z + candidate.z;
+    const resolved = resolvePosition(ctx.seed, x, z, PLAYER_BODY_RADIUS);
+    if (
+      Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6 &&
+      Math.abs(resolved.x - (origin.x + plot.x)) <= plot.hw &&
+      Math.abs(resolved.z - (origin.z + plot.z)) <= plot.hd
+    ) {
+      return ctx.groundPos(x, z);
+    }
+  }
+  return null;
 }
 
 function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
