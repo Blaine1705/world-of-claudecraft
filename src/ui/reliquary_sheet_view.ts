@@ -43,6 +43,25 @@ export function buildReliquarySheetModel(world: ReliquarySheetWorld): ReliquaryS
 }
 
 /**
+ * The viewer's OWN live Curator standing, in the shape the inspect card takes.
+ *
+ * Lives here rather than on Hud because it needs nothing of Hud's: only the
+ * world seam this module already defines, and the same model the character
+ * sheet's Reliquary line is built from, which is what stops the card and the
+ * sheet ever printing different numbers for the same player. Hud composes it at
+ * its one call site (Hud.openInspect, gated on the inspected pid being the
+ * viewer's).
+ */
+export function selfCuratorStanding(world: ReliquarySheetWorld): {
+  curatorRank: number;
+  owned: number;
+  total: number;
+} {
+  const model = buildReliquarySheetModel(world);
+  return { curatorRank: model.curatorRank, owned: model.owned, total: model.total };
+}
+
+/**
  * Progression-block HTML for The Reliquary: completion pair, named Curator
  * rank (or unranked), and a button that opens the Reliquary window. Pure over
  * the model + t(); the painter only injects the result and wires the click.

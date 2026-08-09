@@ -46,6 +46,11 @@ const ACCENT_PATH = [
   'src/render/nameplate_painter.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_frame_painter.ts',
+  // Phase 20: the inspect card's header accent, the third surface of the same
+  // identity. It resolves the slug and palette in the pure core and hands the
+  // painter resolved values, so BOTH files join the single-source scan.
+  'src/ui/inspect_view.ts',
+  'src/ui/inspect_window.ts',
 ];
 
 describe('deedBorderSlug: deed id -> border slug', () => {
@@ -181,6 +186,93 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     );
   });
 
+  it('pins the forced-palette mapping the nameplate cartouche already had', () => {
+    // Recorded at Phase 19 QA and closed in Phase 20. The three accent custom
+    // properties are never missing (paintPortraitBorder writes them together
+    // with the data-border slug the rule gates on), so the `transparent`
+    // fallbacks cannot engage; what forced-colors does is replace the computed
+    // colors with the system palette. The arm is worth pinning for the CHOICE of
+    // replacement, three things: the same system pair the cartouche
+    // (nameplate_canvas.ts drawBorderAccent) already restated, the outline
+    // remapped so the edge contour does not flatten onto the frame line, and the
+    // decorative bloom dropped explicitly. The two surfaces must agree on WHICH
+    // system colors, or one identity reads two ways under high contrast.
+    const forced = HUD_CSS.match(
+      /@media \(forced-colors: active\) \{\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::after \{([^}]*)\}/,
+    )?.[1];
+    expect(forced, 'the portrait ring has no forced-colors arm in hud.css').toBeTruthy();
+    // The frame line is the one that must stay visible; the edge contour drops
+    // to the background color, exactly as the canvas does.
+    expect(forced).toContain('border-color: CanvasText;');
+    expect(forced).toContain('outline-color: Canvas;');
+    // The bloom is stripped by forced-colors anyway; dropping it explicitly
+    // keeps the rule honest rather than leaving a dead declaration that reads
+    // load-bearing.
+    expect(forced).toContain('box-shadow: none;');
+
+    // The canvas half of the family, read from its own source so the two cannot
+    // drift: same two system colors, same roles.
+    const canvas = read('src/render/nameplate_canvas.ts');
+    const cartouche = canvas.slice(canvas.indexOf('private drawBorderAccent('));
+    const body = cartouche.slice(0, cartouche.indexOf('private drawHealth('));
+    expect(body).toContain("forcedColors ? 'CanvasText' : accent.frame");
+    expect(body).toContain("forcedColors ? 'Canvas' : accent.edge");
+  });
+
+  it('gives the inspect header accent the same forced-colors arm', () => {
+    // The third surface of the identity joins the family in the same change,
+    // rather than inheriting the gap the ring just closed.
+    const shell = read('src/styles/shell.css');
+    const forced = shell.match(
+      /@media \(forced-colors: active\) \{\s*\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    )?.[1];
+    expect(forced, 'the inspect header accent has no forced-colors arm').toBeTruthy();
+    expect(forced).toContain('border-color: CanvasText;');
+    expect(forced).toContain('outline-color: Canvas;');
+    expect(forced).toContain('box-shadow: none;');
+  });
+
+  it('the inspect header rule gates on a NON-EMPTY slug and holds no color', () => {
+    const shell = read('src/styles/shell.css');
+    const rule = shell.match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    )?.[1];
+    expect(rule, 'the inspect header accent rule is missing from shell.css').toBeTruthy();
+    // Every color arrives through the painter's custom properties, and the
+    // property NAMES are the ring's, so one convention spans both surfaces.
+    for (const prop of [
+      PORTRAIT_BORDER_FRAME_PROP,
+      PORTRAIT_BORDER_EDGE_PROP,
+      PORTRAIT_BORDER_GLOW_PROP,
+    ]) {
+      expect(rule, `the inspect accent must consume ${prop}`).toContain(`var(${prop},`);
+    }
+    expect(rule).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(rule).not.toMatch(/\brgba?\s*\(/);
+    // Identity, so only the decorative bloom may scale with the effects tier.
+    const tiered = rule?.split(';').filter((d) => d.includes('var(--fx-shadow')) ?? [];
+    expect(tiered).toHaveLength(1);
+    expect(tiered[0]).toContain('box-shadow');
+  });
+
+  it('the inspect painter writes the ring attribute and property NAMES verbatim', () => {
+    // The card spells the four literals inline (it must not import a per-frame
+    // painter for four strings), so this is what keeps them equal to the
+    // constants the stylesheet family is written against.
+    const painter = read('src/ui/inspect_window.ts');
+    expect(painter).toContain(`${PORTRAIT_BORDER_ATTR}="\${esc(border.slug)}"`);
+    for (const prop of [
+      PORTRAIT_BORDER_FRAME_PROP,
+      PORTRAIT_BORDER_EDGE_PROP,
+      PORTRAIT_BORDER_GLOW_PROP,
+    ]) {
+      // The esc() wrapper is pinned with the name: the style attribute is the
+      // one place a future palette source could inject through, so dropping the
+      // escape must red this test, not just reordering the property names.
+      expect(painter, `the inspect card must write ${prop}`).toContain(`${prop}:\${esc(border.`);
+    }
+  });
+
   it('duplicates no slug and no palette color into CSS (one source of truth)', () => {
     // The ring rule carries no color literal at all (every color arrives through
     // the painter's custom properties), and no slug is styled anywhere in the
@@ -212,6 +304,9 @@ describe('the palette table is the only home of the accent colors', () => {
     'src/styles/components.css',
     'src/styles/hud.mobile.css',
     'src/styles/tokens.css',
+    // Phase 20: the sheet the inspect card's accent rule lives in, now that a
+    // third surface consumes the palette.
+    'src/styles/shell.css',
   ];
   const TABLE = 'src/ui/deed_border_view.ts';
 

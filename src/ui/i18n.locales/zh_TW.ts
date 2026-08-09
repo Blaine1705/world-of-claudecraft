@@ -10143,6 +10143,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rankUpBanner': '策展人等級 {rank}：{name}',
   'hudChrome.reliquary.rankUpToast': '已達到策展人等級 {rank}：{name}',
   'hudChrome.reliquary.borderWearableNote': '可在功績之書中佩戴 {name} 邊框。',
+  'hudChrome.reliquary.sigilCaption': '策展人印記',
   'hudChrome.reliquary.markFind.masterwork_first': '首件傑作',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '武器鍛造傑作',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '護甲鍛造傑作',

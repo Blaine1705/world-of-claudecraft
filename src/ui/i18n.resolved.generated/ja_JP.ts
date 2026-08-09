@@ -3477,6 +3477,7 @@ export const ja_JP: EnTranslations = {
       "rankUpBanner": "キュレーターランク {rank}：{name}",
       "rankUpToast": "キュレーターランク {rank} に到達：{name}",
       "borderWearableNote": "功績の書で{name}の枠飾りを着用できます。",
+      "sigilCaption": "キュレーターの印章",
       "recentLabel": "最近の発見：",
       "nearlyLabel": "もうすぐ完成：",
       "nearlyJumpAria": "{name}を開く、{owned}/{total} 埋め済み",

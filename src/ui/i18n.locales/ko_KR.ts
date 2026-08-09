@@ -10616,6 +10616,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rankUpBanner': '큐레이터 등급 {rank}: {name}',
   'hudChrome.reliquary.rankUpToast': '큐레이터 등급 {rank} 달성: {name}',
   'hudChrome.reliquary.borderWearableNote': '업적의 서에서 {name} 테두리를 착용할 수 있습니다.',
+  'hudChrome.reliquary.sigilCaption': '큐레이터 인장',
   'hudChrome.reliquary.markFind.masterwork_first': '첫 걸작',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '무기제작 걸작',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '방어구제작 걸작',

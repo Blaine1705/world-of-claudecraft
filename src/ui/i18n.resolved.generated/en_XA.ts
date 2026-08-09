@@ -3477,6 +3477,7 @@ export const en_XA: EnTranslations = {
       "rankUpBanner": "[Çúŕáţóŕ ŕáñķ {rank}: {name}]",
       "rankUpToast": "[Çúŕáţóŕ ŕáñķ {rank} ŕéáçĥéð: {name}]",
       "borderWearableNote": "[Ţĥé {name} ƀóŕðéŕ çáñ ƀé ŵóŕñ ƒŕóɱ ţĥé Ɓóóķ óƒ Ðééðš.]",
+      "sigilCaption": "[Çúŕáţóŕ šíĝíļ]",
       "recentLabel": "[Ŕéçéñţ ƒíñðš:]",
       "nearlyLabel": "[Ñéáŕļý çóɱþļéţé:]",
       "nearlyJumpAria": "[Óþéñ {name}, {owned} óƒ {total} ƒíļļéð]",

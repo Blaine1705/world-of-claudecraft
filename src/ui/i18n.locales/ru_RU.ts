@@ -10804,6 +10804,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rankUpBanner': 'Ранг хранителя {rank}: {name}',
   'hudChrome.reliquary.rankUpToast': 'Достигнут ранг хранителя {rank}: {name}',
   'hudChrome.reliquary.borderWearableNote': 'Рамку «{name}» можно надеть в Книге деяний.',
+  'hudChrome.reliquary.sigilCaption': 'Печать хранителя',
   'hudChrome.reliquary.markFind.masterwork_first': 'Первый шедевр',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': 'Шедевр оружейного дела',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': 'Шедевр доспешного дела',

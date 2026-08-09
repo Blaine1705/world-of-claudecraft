@@ -3477,6 +3477,7 @@ export const zh_CN: EnTranslations = {
       "rankUpBanner": "策展人等级 {rank}：{name}",
       "rankUpToast": "已达到策展人等级 {rank}：{name}",
       "borderWearableNote": "可在功绩之书中佩戴 {name} 边框。",
+      "sigilCaption": "策展人印记",
       "recentLabel": "最近发现：",
       "nearlyLabel": "即将完成：",
       "nearlyJumpAria": "打开{name}，已填入 {owned}/{total}",

@@ -180,6 +180,7 @@ import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { charBagsPaired } from './char_bags_pairing_core';
+import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
@@ -618,7 +619,11 @@ import {
   reliquaryPageName,
 } from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
-import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
+import {
+  buildReliquarySheetModel,
+  reliquarySheetProgressionHtml,
+  selfCuratorStanding,
+} from './reliquary_sheet_view';
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
@@ -1739,6 +1744,11 @@ export class Hud {
   // online cprof or professions snapshot replaces stale archetype art/title
   // and Gathering numbers without repainting for attunedZone bystanders.
   private lastProfessionSurfaceSig = '';
+  // The character sheet's WORN cosmetic rows (active title line, border badge
+  // worn state) are painted from the same cold path, and the Book of Deeds
+  // picker repaints only itself when the player wears a different one. Latch the
+  // two ids on the slow band so an already-open sheet converges in both hosts.
+  private lastCharSheetSig = '';
   // Commission opt-in state (Professions 2.0): recipe ids whose
   // NEXT craft goes out with the commission flag. Held here (not in the
   // painter) so the crafting window's staleness repaints never untick a
@@ -9312,6 +9322,7 @@ export class Hud {
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
     if (slowHud && this.reliquaryWindow.isOpen) this.reliquaryWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
+    if (slowHud) this.refreshCharSheetIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
     // The gossip dialog's intro hint row watches the same online cprof edge:
     // attunement retires it, and no quest event fires for that flip.
@@ -16173,6 +16184,51 @@ export class Hud {
     // applyState at character load, when no window can be open.)
   }
 
+  // The progression-block sibling of refreshOpenProfessionSurfacesIfChanged: the
+  // character sheet's active-title line, border badge row, and Reliquary pair are
+  // all readouts on a cold window, and the surfaces that move them take no
+  // optimistic write (the Book of Deeds picker repaints only itself; a relic fill
+  // repaints the tracker), so nothing else tells an already open sheet that the
+  // player now wears a different title, has earned another border, or has filled
+  // another relic.
+  //
+  // Same computed-even-when-closed rationale as its sibling, with the cost
+  // stated honestly rather than waved through. Three of the four size reads are
+  // O(1) `.size`; the fourth is not. Sim.ownedMounts() spreads bags AND bank
+  // into a fresh array and collects the mount keys out of it, so this pays one
+  // merged-inventory allocation every 2 Hz tick whether the sheet is open or
+  // not. That is exactly the read the Reliquary tracker defers behind a thunk
+  // (a player with pinned pages never pays it at all). The measured cost is
+  // microseconds against a 500 ms band, so it is ACCEPTED here, not unnoticed:
+  // keeping the signature warm is what stops reopening the sheet (which always
+  // paints fresh) from being followed by a redundant signature-diff repaint on
+  // the next slow tick. The sizes are still a proxy, not a second
+  // catalogCharacterCompletion walk; see the core for what that proxy does and
+  // does not catch.
+  //
+  // Rule of three: a THIRD consumer of these ownership reads on this band earns
+  // one shared once-per-tick computation the consumers read, instead of a third
+  // independent walk over the same inventories.
+  //
+  // Converges in both hosts with no optimistic write: offline the sim setters are
+  // synchronous, online the mirror updates from the server's atitle / aborder echo
+  // and the snapshot's ownership fields, both well inside one 500 ms band.
+  // render() rebuilds the whole sheet, so every row in the block (the title line,
+  // the border badge's worn word, the completion pair, the rank) comes back fresh.
+  private refreshCharSheetIfChanged(): void {
+    const sig = charSheetRefreshSig({
+      activeTitle: this.sim.activeTitle,
+      activeBorder: this.sim.activeBorder,
+      deedsEarned: this.sim.deedsEarned.size,
+      itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
+      marks: this.sim.reliquaryMarks.size,
+      mounts: this.sim.ownedMounts().length,
+    });
+    if (sig === this.lastCharSheetSig) return;
+    this.lastCharSheetSig = sig;
+    this.charWindow.renderIfOpen();
+  }
+
   renderBags(): void {
     this.bagsWindow.render();
   }
@@ -17476,7 +17532,18 @@ export class Hud {
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
-    this.inspectWindow.openInspect(e, Date.now());
+    // Inspecting YOURSELF reads the live standing instead of the mirrored wire
+    // fields, through the exact model the character sheet's Reliquary line is
+    // built from, so the card and the sheet can never print different numbers
+    // for the same player. For anyone else there is nothing local to read and
+    // the wire fields are the only (and the right) answer. This is also what
+    // makes self-inspect work OFFLINE at all: no server ever stamps crk/cro/crt
+    // in a single-player world, so the card used to show no standing there.
+    this.inspectWindow.openInspect(
+      e,
+      Date.now(),
+      pid === this.sim.playerId ? selfCuratorStanding(this.sim) : null,
+    );
   }
 
   /** Open the Loot Settings window: the leader gets the editable master-loot

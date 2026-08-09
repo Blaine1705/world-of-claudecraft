@@ -3477,6 +3477,7 @@ export const ko_KR: EnTranslations = {
       "rankUpBanner": "큐레이터 등급 {rank}: {name}",
       "rankUpToast": "큐레이터 등급 {rank} 달성: {name}",
       "borderWearableNote": "업적의 서에서 {name} 테두리를 착용할 수 있습니다.",
+      "sigilCaption": "큐레이터 인장",
       "recentLabel": "최근 발견:",
       "nearlyLabel": "거의 완성:",
       "nearlyJumpAria": "{name} 열기, {owned}/{total} 채움",

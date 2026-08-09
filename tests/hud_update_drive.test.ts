@@ -1219,6 +1219,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'repaints the character window and the crafting window when a profession number moves',
   },
   {
+    call: 'this.refreshCharSheetIfChanged',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: { kind: 'hud', proof: 'if (sig === this.lastCharSheetSig) return;' },
+    why: 'converges the open character sheet on its whole progression block: the WORN title / border (the deeds picker repaints only itself), the earned border badges, and the Reliquary pair plus Curator rank',
+  },
+  {
     call: 'this.professionsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.professionsWindow.isOpen',
@@ -1516,7 +1524,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // sync counted 45 alone (the branch's reliquary window row vs the
       // release's new window row on top of the shared 44 base); the merged
       // tree carries both, decided surface: window.
-    ).toEqual({ window: 46, chrome: 76, none: 16 });
+      // 47 = Phase 20 adds refreshCharSheetIfChanged, the progression-block
+      // latch that converges the open character SHEET (a window, not chrome: it
+      // repaints char_window, never always-on HUD furniture). It stays ONE row
+      // after the latch widened from worn cosmetics to the whole block: same
+      // single drive, more signature parts.
+    ).toEqual({ window: 47, chrome: 76, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1533,7 +1546,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
       // reliquary module guard vs the release's new module-guarded row).
       module: 24,
-      hud: 6,
+      // 7 = Phase 20's refreshCharSheetIfChanged. Its latch is a HUD field
+      // (lastCharSheetSig), like its profession sibling, because the cold
+      // char_window painter holds no signature of its own to diff.
+      hud: 7,
       callsite: 12,
       none: 4,
     });
@@ -1577,6 +1593,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
+        // Phase 20: the progression-block latch for the open character sheet.
+        'hud.ts: if (sig === this.lastCharSheetSig) return;',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud.ts: if (sig === this.lastTradeSig) return;',

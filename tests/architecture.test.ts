@@ -308,6 +308,7 @@ const UI_PURE_CORES = [
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
   'src/ui/char_stats_view.ts',
+  'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
@@ -1644,7 +1645,8 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
 // (the painter reads the --color-* CSS vars once per redraw), so a baked color in
 // the helper is a token-discipline break. Deliberately NOT applied to the default
 // bucket, where a tier or art palette IS the module (holder_tier, dev_tier,
-// percentile_tier, discord_tier, perf_overlay_model all bake theirs on purpose).
+// percentile_tier, discord_tier, curator_sigil, perf_overlay_model all bake
+// theirs on purpose).
 const COLOR_HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 

@@ -10141,6 +10141,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rankUpBanner': '策展人等级 {rank}：{name}',
   'hudChrome.reliquary.rankUpToast': '已达到策展人等级 {rank}：{name}',
   'hudChrome.reliquary.borderWearableNote': '可在功绩之书中佩戴 {name} 边框。',
+  'hudChrome.reliquary.sigilCaption': '策展人印记',
   'hudChrome.reliquary.markFind.masterwork_first': '首件杰作',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '武器锻造杰作',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '护甲锻造杰作',

@@ -9059,6 +9059,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.shelfOpenAria'
   | 'hudChrome.reliquary.shelfRecent'
   | 'hudChrome.reliquary.shelvesAria'
+  | 'hudChrome.reliquary.sigilCaption'
   | 'hudChrome.reliquary.sourceActivityCorpseHarvest'
   | 'hudChrome.reliquary.sourceActivityMasterworkCraft'
   | 'hudChrome.reliquary.sourceBoss'

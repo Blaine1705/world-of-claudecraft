@@ -895,6 +895,30 @@
     z-index: 2;
     pointer-events: none;
   }
+  /* The forced-colors arm the nameplate cartouche already had and the ring did
+     not (recorded at Phase 19 QA, completed here). The accent custom properties
+     are never missing here: paintPortraitBorder writes all three together with
+     the data-border slug this rule gates on, so the var() fallbacks cannot
+     engage. What the forced palette does instead is REPLACE the computed colors
+     with the system palette, and the value of this arm is that it chooses that
+     replacement rather than taking whatever the UA picks. Three things: frame ->
+     CanvasText and edge -> Canvas, the SAME pair drawBorderAccent uses in
+     src/render/nameplate_canvas.ts, so the two surfaces of one identity agree
+     under high contrast; the outline is remapped rather than left to be forced
+     onto the frame's color, which would flatten the two-tone contour into a
+     single line; and the decorative bloom is dropped explicitly, since
+     box-shadow is stripped in forced-colors regardless and a surviving
+     declaration would read load-bearing. Collapsing all four slugs onto one
+     system pair hides nothing: the accent is cosmetic identity and carries no
+     health, range, rank, or threat, unlike the quest marker tones that earn a
+     redundant non-color cue. */
+  @media (forced-colors: active) {
+    .portrait-wrap[data-border]:not([data-border=""])::after {
+      border-color: CanvasText;
+      outline-color: Canvas;
+      box-shadow: none;
+    }
+  }
   .level-chip {
     position: absolute;
     bottom: -3px;

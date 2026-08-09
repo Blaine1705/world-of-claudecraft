@@ -3477,6 +3477,7 @@ export const ru_RU: EnTranslations = {
       "rankUpBanner": "Ранг хранителя {rank}: {name}",
       "rankUpToast": "Достигнут ранг хранителя {rank}: {name}",
       "borderWearableNote": "Рамку «{name}» можно надеть в Книге деяний.",
+      "sigilCaption": "Печать хранителя",
       "recentLabel": "Недавние находки:",
       "nearlyLabel": "Почти готово:",
       "nearlyJumpAria": "Открыть {name}, заполнено {owned} из {total}",

@@ -3477,6 +3477,7 @@ export const pl_PL: EnTranslations = {
       "rankUpBanner": "Curator rank {rank}: {name}",
       "rankUpToast": "Curator rank {rank} reached: {name}",
       "borderWearableNote": "The {name} border can be worn from the Book of Deeds.",
+      "sigilCaption": "Curator sigil",
       "recentLabel": "Recent finds:",
       "nearlyLabel": "Nearly complete:",
       "nearlyJumpAria": "Open {name}, {owned} of {total} filled",

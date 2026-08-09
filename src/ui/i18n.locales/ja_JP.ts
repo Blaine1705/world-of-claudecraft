@@ -10632,6 +10632,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rankUpBanner': 'キュレーターランク {rank}：{name}',
   'hudChrome.reliquary.rankUpToast': 'キュレーターランク {rank} に到達：{name}',
   'hudChrome.reliquary.borderWearableNote': '功績の書で{name}の枠飾りを着用できます。',
+  'hudChrome.reliquary.sigilCaption': 'キュレーターの印章',
   'hudChrome.reliquary.markFind.masterwork_first': '初めての傑作',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '武器製作の傑作',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '防具製作の傑作',

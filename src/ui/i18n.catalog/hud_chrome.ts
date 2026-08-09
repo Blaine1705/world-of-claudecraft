@@ -4455,6 +4455,14 @@ export const hudChromeStrings = {
     // readout cannot drift; {name} is that deed's name, resolved through
     // deed_i18n, never the reward slug.
     borderWearableNote: 'The {name} border can be worn from the Book of Deeds.',
+    // Phase 20: the rank-5 Curator sigil badge on the click-inspect card. This
+    // names the honor on the badge row's VISIBLE sub-line, the slot the three
+    // sibling tier badges use for their own descriptive line. The art itself
+    // carries alt="" like those siblings, so this string is read once by
+    // everyone rather than announced a second time off the image. Sink is a
+    // visible label, NOT an aria/alt string: length and tone should match the
+    // sub-lines beside it, not an accessibility annotation.
+    sigilCaption: 'Curator sigil',
     recentLabel: 'Recent finds:',
     nearlyLabel: 'Nearly complete:',
     nearlyJumpAria: 'Open {name}, {owned} of {total} filled',
