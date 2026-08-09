@@ -3311,6 +3311,8 @@ export const ja_JP: EnTranslations = {
     },
     "bgOffer": {
       "title": "ソーンホロウ平原の準備が整いました",
+      "backfillTitle": "ソーンホロウ平原が戦士を求めています",
+      "backfillBody": "この戦いはすでに進行中です。人数の足りない側に加わります。この試合はレーティングに影響しません。",
       "accepted": "{size} 人中 {accepted} 人が承認",
       "remaining": "残り {seconds} 秒",
       "accept": "承認",

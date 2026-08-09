@@ -3311,6 +3311,8 @@ export const ko_KR: EnTranslations = {
     },
     "bgOffer": {
       "title": "쏜할로우 평원이 준비되었습니다",
+      "backfillTitle": "쏜할로우 평원에 전사가 필요합니다",
+      "backfillBody": "이 전투는 이미 진행 중입니다. 인원이 부족한 쪽에 합류하며, 이 전투는 평점에 영향을 주지 않습니다.",
       "accepted": "{size}명 중 {accepted}명 수락",
       "remaining": "응답까지 {seconds}초",
       "accept": "수락",

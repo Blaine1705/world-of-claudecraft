@@ -3311,6 +3311,8 @@ export const ru_RU: EnTranslations = {
     },
     "bgOffer": {
       "title": "Терновая Лощина готова",
+      "backfillTitle": "Терновой Лощине нужен боец",
+      "backfillBody": "Этот бой уже идёт. Вы присоединитесь к стороне, которой не хватает бойца, и этот бой не изменит ваш рейтинг.",
       "accepted": "Готовы: {accepted} из {size}",
       "remaining": "На ответ: {seconds} с",
       "accept": "Принять",

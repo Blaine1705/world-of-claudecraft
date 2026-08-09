@@ -692,11 +692,9 @@ function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number
   match.teams[team].push(pid);
   ctx.bgMatches.set(pid, match);
   placeInBg(ctx, match, pid, team, index);
-  // simFormed: this system welded the team's party at start (it recorded links
-  // to unwind). A team that queued as one whole premade recorded none, and its
-  // group is the players' own to keep.
-  const simFormed = match.autoPartyPids[team].length > 0;
-  if (joinBgTeamParty(ctx, match.teams[team], pid, { simFormed })) {
+  // The auto-added list is what marks which members this system put in the
+  // party, and so which of them the join may sweep out; see joinBgTeamParty.
+  if (joinBgTeamParty(ctx, match.teams[team], pid, { autoAdded: match.autoPartyPids[team] })) {
     match.autoPartyPids[team].push(pid);
   }
   // honorTeamKeys is deliberately NOT recomputed: it is the anti-farm identity
@@ -795,12 +793,47 @@ export function bgRespond(ctx: SimContext, accept: boolean, pid?: number): void 
     // A backfill offer holds no slot of its own, so it is simply dropped and
     // the one accepted fighter takes the seat that was held open for them.
     ctx.bgProposals.splice(ctx.bgProposals.indexOf(ready), 1);
-    seatBackfill(
-      ctx,
-      ready.backfill.match,
-      ready.backfill.team,
-      ready.teams[ready.backfill.team][0],
-    );
+    const { match, team } = ready.backfill;
+    const joiner = ready.teams[team][0];
+    // Re-resolve the seat at ACCEPT time. Everything the offer was based on is
+    // up to thirty seconds old by now, and two of those staleness windows are
+    // real damage rather than cosmetic:
+    //
+    //  - the match can have ENDED underneath the offer (a collapsing team is
+    //    what opens a seat in the first place, so the forfeit case is the
+    //    likely one). Teardown is once-only, so seating into a released match
+    //    put the joiner in bgMatches with nothing left to take them out: they
+    //    could neither play nor queue again, and the freed slot meant a fresh
+    //    match could start on the field they were standing in.
+    //  - the two cutoffs the seat rule enforces, a match not nearly over and a
+    //    side not one capture from losing, exist so nobody is dropped into
+    //    someone else's ending. Checked only at offer time, accepting at second
+    //    29 walks straight past both.
+    //
+    // Re-running the same rule answers all of it, and a seat that is no longer
+    // there costs the player nothing: they keep the place they were holding.
+    const gone =
+      match.fightersReleased ||
+      match.resultRecorded ||
+      bgBackfillSeat({
+        state: match.state,
+        secondsLeft: BG_MAX_DURATION - match.timer,
+        scores: match.scores,
+        teamSizes: [match.teams[0].length, match.teams[1].length],
+        teamSize: BG_TEAM_SIZE,
+        capsToWin: BG_CAPS_TO_WIN,
+      }) !== team;
+    if (gone) {
+      ctx.bgQueue.push(...ready.groups);
+      ctx.emit({
+        type: 'log',
+        text: 'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+        color: '#7fd4ff',
+        pid: joiner,
+      });
+      return;
+    }
+    seatBackfill(ctx, match, team, joiner);
     return;
   }
   seatBgProposal(ctx, ready);
@@ -2033,6 +2066,7 @@ export function bgInfoFor(
     proposal: proposal
       ? {
           id: proposal.id,
+          kind: proposal.backfill ? ('backfill' as const) : ('match' as const),
           size: proposal.teams[0].length + proposal.teams[1].length,
           accepted: proposal.accepted.size,
           myResponse: proposal.accepted.has(pid) ? ('accepted' as const) : ('pending' as const),

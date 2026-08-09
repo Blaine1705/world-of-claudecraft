@@ -76,7 +76,7 @@ export function joinBgTeamParty(
   ctx: SimContext,
   teamPids: number[],
   joinerPid: number,
-  opts: { simFormed: boolean },
+  opts: { autoAdded: readonly number[] },
 ): boolean {
   let existing = teamPids
     .filter((pid) => pid !== joinerPid)
@@ -84,15 +84,21 @@ export function joinBgTeamParty(
     .find((party) => party !== null);
   if (!existing) return false;
   if (existing.members.includes(joinerPid)) return false; // already linked
-  // A deserter who was the party's BASE unit is not an auto-added link, so
-  // unwindBgAutoPartyFor leaves them in it: the party stays five wide and the
-  // merge below would be refused for capacity while the team fights four.
-  // Drop anyone who has left the match, but ONLY from a party this system built
-  // (simFormed). A team that queued as one whole premade owns its group, and
-  // the deliberate rule there is that deserting the match never breaks up the
-  // friends: such a team simply gets no party seat for its backfill.
-  if (opts.simFormed) {
-    const stale = existing.members.filter((m) => !teamPids.includes(m));
+  // Clear out members who have left the match so the merge below is not refused
+  // for capacity while the team fights a man down.
+  //
+  // ONLY auto-added ones. Membership of this party is not evidence that the
+  // system built it: formBgTeamParty merges the solos INTO a premade's own
+  // group when there is one, so on a partial premade the party is the players'
+  // and a departed FRIEND is sitting in it legitimately. Sweeping by presence
+  // would evict them here, which is the same eviction the desertion path was
+  // just fixed not to do, only deferred to whenever the next backfill lands.
+  // When nothing was auto-added the filter is empty and the join fails for
+  // capacity, which is exactly what a whole premade already does.
+  {
+    const stale = existing.members.filter(
+      (m) => !teamPids.includes(m) && opts.autoAdded.includes(m),
+    );
     for (const m of stale) ctx.removeFromParty(m, LEAVE_VERB);
     if (stale.length > 0) {
       const refreshed = teamPids

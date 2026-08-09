@@ -3349,7 +3349,10 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     // Silence for the whole window is a decline, exactly as for a queue pop.
     for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
     expect(match.teams[0], 'silence never seats them').not.toContain(away);
-    expect(sim.ctx.players.get(away), 'they are still a real player').toBeTruthy();
+    // Not merely "still exists": the point is the offer lapsed WITHOUT seating
+    // them and without leaving a stale offer behind.
+    expect(bgProposalFor(sim.ctx, away), 'the lapsed offer is gone').toBeNull();
+    expect(sim.ctx.bgMatches.has(away), 'and never put them in the match').toBe(false);
   });
 
   it('holds ONE offer per match while a candidate is deciding', () => {
@@ -3374,6 +3377,99 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
       'and still only one while they decide',
     ).toHaveLength(1);
     expect(sim.ctx.bgProposals.filter((p) => p.backfill?.match === match)).toHaveLength(1);
+  });
+
+  it('does not evict a partial premade friend when the NEXT backfill lands', () => {
+    // The deferred half of the same eviction. joinBgTeamParty sweeps members
+    // who have left the match so the merge is not refused for capacity, and
+    // that sweep used to run over everyone present. On a partial premade the
+    // departed friend is sitting in the party legitimately, so the first
+    // accepted backfill threw them out: same eviction, later and conditional.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    const friends = [leader];
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Friend${i}`);
+      tp(sim, m, 0, -40);
+      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      friends.push(m);
+    }
+    for (let i = 0; i < 7; i++) {
+      const so = sim.addPlayer('rogue', `Solo${i}`);
+      tp(sim, so, 0, -40);
+      sim.entities.get(so)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(so);
+    }
+    sim.bgQueueJoin(leader);
+    sim.tick();
+    acceptAllBgOffers(sim);
+    const match = sim.bgMatchFor(leader)!;
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+    toActive(sim, match);
+
+    const deserter = friends[1];
+    bgResolveDesertion(sim.ctx, deserter);
+    expect(sim.partyOf(leader)!.members, 'the friend is still with their group').toContain(
+      deserter,
+    );
+
+    // Now land a backfill on that same team, which is what runs the sweep.
+    const spare = queueSpare(sim);
+    sim.tick();
+    if (bgProposalFor(sim.ctx, spare)) bgRespond(sim.ctx, true, spare);
+
+    expect(sim.partyOf(leader)!.members, 'and is STILL with them after a backfill joins').toContain(
+      deserter,
+    );
+    expect(match.teams[team].length + match.teams[1 - team].length).toBeGreaterThan(0);
+  });
+
+  it('does not seat into a match that ENDED while the offer was open', () => {
+    // The blocker the offer design introduced. Teardown is once-only, so a
+    // fighter seated after releaseBgFighters has run is in bgMatches with
+    // nothing left to take them out: they can neither play nor queue again,
+    // and the slot has already been freed for a fresh match on the same field.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, spare), 'the offer is live').toBeTruthy();
+
+    endBgMatch(sim.ctx, match, 1, 'caps');
+    expect(match.fightersReleased, 'the arrangement really did tear the match down').toBe(true);
+
+    bgRespond(sim.ctx, true, spare); // accept AFTER the end
+
+    expect(sim.ctx.bgMatches.has(spare), 'the joiner is not stranded in a dead match').toBe(false);
+    expect(match.teams[0], 'and never joined its roster').not.toContain(spare);
+    // ...and it costs them nothing: the seat vanishing is not their fault.
+    expect(bgQueueSize(sim.ctx), 'they keep their place in line').toBeGreaterThan(0);
+    expect(sim.ctx.bgQueue.some((g) => g.pids.includes(spare))).toBe(true);
+  });
+
+  it('re-checks the seat rule at ACCEPT time, not only when the offer opened', () => {
+    // Both cutoffs (a match not nearly over, a side not one capture from
+    // losing) are read when the offer opens and can be 30 seconds stale by the
+    // time it is answered. Here the enemy takes the deciding capture during
+    // the window, which is exactly the loss nobody should be dropped into.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, spare)).toBeTruthy();
+
+    match.scores = match.scores[0] === undefined ? match.scores : [0, BG_CAPS_TO_WIN - 1];
+    bgRespond(sim.ctx, true, spare);
+
+    expect(match.teams[0], 'the seat is refused on the fresh numbers').not.toContain(spare);
+    expect(
+      sim.ctx.bgQueue.some((g) => g.pids.includes(spare)),
+      'and they keep their place',
+    ).toBe(true);
   });
 
   it('offers the seat to the NEXT candidate after one declines', () => {
@@ -3408,7 +3504,7 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(sim.ctx.bgBusySlots.has(match.slot), 'and still holds it after the offer lapses').toBe(
       true,
     );
-    expect(away).toBeTruthy();
+    expect(sim.ctx.bgMatches.has(away), 'and never seated the candidate').toBe(false);
   });
 
   it('charges a backfilled fighter nothing if they leave too', () => {

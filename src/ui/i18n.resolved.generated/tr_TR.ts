@@ -3311,6 +3311,8 @@ export const tr_TR: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",

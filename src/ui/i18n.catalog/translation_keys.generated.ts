@@ -7290,6 +7290,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.bgOffer.accept'
   | 'hudChrome.bgOffer.accepted'
   | 'hudChrome.bgOffer.acceptedWait'
+  | 'hudChrome.bgOffer.backfillBody'
+  | 'hudChrome.bgOffer.backfillTitle'
   | 'hudChrome.bgOffer.decline'
   | 'hudChrome.bgOffer.remaining'
   | 'hudChrome.bgOffer.title'
