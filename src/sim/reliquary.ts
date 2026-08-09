@@ -1006,7 +1006,8 @@ function catalogIndexFor(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIn
 
 /**
  * The pages completion math is allowed to count: every page except the
- * excludeFromCompletion (retired) ones, rule 7 in docs/design/reliquary.md.
+ * excludeFromCompletion ones (retired shelf, class-personal grants), rule 7 in
+ * docs/design/reliquary.md.
  * Both catalog completion pairs route through this at the top so OWNED and
  * TOTAL always move together: filtering one side alone would either hand out
  * free progress or make 100% unreachable. Memoized on the pages array's
@@ -1023,8 +1024,8 @@ const completionScoringPagesByPages = new WeakMap<
 function completionScoringPages(pages: readonly ReliquaryPageDef[]): readonly ReliquaryPageDef[] {
   const cached = completionScoringPagesByPages.get(pages);
   if (cached !== undefined) return cached;
-  const scoring = pages.some((p) => p.excludeFromCompletion === true)
-    ? Object.freeze(pages.filter((p) => p.excludeFromCompletion !== true))
+  const scoring = pages.some((p) => p.excludeFromCompletion !== undefined)
+    ? Object.freeze(pages.filter((p) => p.excludeFromCompletion === undefined))
     : pages;
   completionScoringPagesByPages.set(pages, scoring);
   return scoring;
@@ -1426,12 +1427,13 @@ export function syncReliquaryCompletionDeeds(
       let shelfComplete = true;
       for (const page of RELIQUARY_PAGES) {
         if (page.shelf !== 'conquerors') continue;
-        // Future-proofing: a retired (excludeFromCompletion) page can never
-        // gate the shelf deed. No conquerors page carries the flag today (the
-        // shape pin forbids an unearnable conquerors slot), but the skip keeps
-        // this arm aligned with the completion pairs, which already exclude
-        // such pages through completionScoringPages.
-        if (page.excludeFromCompletion === true) continue;
+        // Future-proofing: an excludeFromCompletion page (retired or
+        // class-personal) can never gate the shelf deed. No conquerors page
+        // carries the flag today (the shape pin forbids an unearnable
+        // conquerors slot), but the skip keeps this arm aligned with the
+        // completion pairs, which already exclude such pages through
+        // completionScoringPages.
+        if (page.excludeFromCompletion !== undefined) continue;
         if (!pageCompletion(page, own).complete) {
           shelfComplete = false;
           break;

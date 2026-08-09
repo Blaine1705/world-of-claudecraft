@@ -3493,6 +3493,7 @@ export const cs_CZ: EnTranslations = {
       "clearsLabel": "{count} clears",
       "srankClearsLabel": "{count} S-rank clears",
       "retiredLabel": "Retired",
+      "personalLabel": "Personal",
       "backToShelf": "Back to shelf",
       "gridAria": "Relics on {name}",
       "pageProgressAria": "Page progress: {owned} of {total} relics filled",

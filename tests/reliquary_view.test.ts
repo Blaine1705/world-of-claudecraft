@@ -1775,17 +1775,22 @@ describe('nearly-complete qualification (either arm, both inclusive)', () => {
   });
 });
 
-describe('retired vault exclusion (nearly strip and tracker default)', () => {
-  // The REAL Vault of Ages def drives both arms: buildNearlyComplete reads
+describe('outside-completion exclusion (nearly strip and tracker default)', () => {
+  // The REAL page defs drive both arms: buildNearlyComplete reads
   // excludeFromCompletion off the page def it is handed, and the tracker's
   // default scan resolves the flag off the authored catalog by id (its input
   // carries ids only), so a synthetic stand-in could not exercise that lookup.
+  // BOTH flag reasons are exercised, because the skip is truthiness on the
+  // flag and a reason-scoped regression would otherwise ship on one arm.
   const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
+  const riftbound = RELIQUARY_PAGES_BY_ID.horizons_riftbound;
   const vaultIds = (): string[] =>
     vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
+  const bandIds = (): string[] =>
+    riftbound.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
 
   it('a 3/4-owned vault never reaches the nearly strip, and moves no overview total', () => {
-    expect(vault.excludeFromCompletion).toBe(true);
+    expect(vault.excludeFromCompletion).toBe('retired');
     expect(vaultIds().length).toBe(4);
     // 3/4 owned is remaining 1 AND fraction 0.75: it would pass BOTH nearly
     // arms, so only the retired skip can be keeping it off (the positive
@@ -1806,27 +1811,50 @@ describe('retired vault exclusion (nearly strip and tracker default)', () => {
     expect(model.progress.owned).toBe(1);
   });
 
-  it('the tracker default scan skips the vault; a deliberate pin still tracks it', () => {
+  it('a 1/3-owned riftbound page never reaches the nearly strip either', () => {
+    // The realistic ownership shape for the class-personal page: a character
+    // holds exactly ONE band. Remaining 2 is inside the nearly window, so only
+    // the flag skip can be keeping it off, and the positive control beside it
+    // proves the same build still ranks an unflagged page.
+    expect(riftbound.excludeFromCompletion).toBe('personal');
+    expect(bandIds().length).toBe(3);
+    const model = buildReliquaryView(
+      input({
+        pages: [...TEST_PAGES, riftbound],
+        itemsDiscovered: ownedSet('sanctum_helm', bandIds()[0]),
+      }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).not.toContain('horizons_riftbound');
+    expect(model.nearly.map((n) => n.pageId)).toContain('sanctum_n');
+    // The owned band moves no overview total either: TEST_PAGES (11 slots,
+    // 1 sanctum fill) is still the whole answer.
+    expect(model.progress.total).toBe(11);
+    expect(model.progress.owned).toBe(1);
+  });
+
+  it('the tracker default scan skips both flagged pages; a deliberate pin still tracks one', () => {
     const completion = (pageId: string) =>
       pageId === 'horizons_vault_of_ages'
         ? { owned: 3, total: 4, complete: false }
-        : { owned: 4, total: 5, complete: false };
-    // Default (nothing pinned): the vault would rank FIRST by remaining, so
-    // its absence can only be the retired skip; the control page proves the
-    // scan itself is live.
+        : pageId === 'horizons_riftbound'
+          ? { owned: 2, total: 3, complete: false }
+          : { owned: 4, total: 5, complete: false };
+    // Default (nothing pinned): both flagged pages would rank ABOVE the
+    // control by remaining, so their absence can only be the flag skip; the
+    // control page proves the scan itself is live.
     const view = buildReliquaryTrackerViewInto(makeReliquaryTrackerView(), {
       pinned: new Set(),
-      pageIds: ['horizons_vault_of_ages', 'ctrl_page'],
+      pageIds: ['horizons_vault_of_ages', 'horizons_riftbound', 'ctrl_page'],
       completion,
       ownershipSig: () => 1,
       collapsed: false,
     });
     expect(view.lines.slice(0, view.count).map((l) => l.pageId)).toEqual(['ctrl_page']);
-    // A page the player PINNED is their own choice: pass 1 applies no
-    // retired skip, so the pinned vault still tracks.
+    // A page the player PINNED is their own choice: pass 1 applies no flag
+    // skip, so a pinned flagged page still tracks.
     const pinned = buildReliquaryTrackerViewInto(makeReliquaryTrackerView(), {
       pinned: new Set(['horizons_vault_of_ages']),
-      pageIds: ['horizons_vault_of_ages', 'ctrl_page'],
+      pageIds: ['horizons_vault_of_ages', 'horizons_riftbound', 'ctrl_page'],
       completion,
       ownershipSig: () => 1,
       collapsed: false,

@@ -9060,6 +9060,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.ownedTooltipStatus'
   | 'hudChrome.reliquary.pageComplete'
   | 'hudChrome.reliquary.pageProgressAria'
+  | 'hudChrome.reliquary.personalLabel'
   | 'hudChrome.reliquary.pin'
   | 'hudChrome.reliquary.pinAria'
   | 'hudChrome.reliquary.pinFull'

@@ -3493,6 +3493,7 @@ export const ru_RU: EnTranslations = {
       "clearsLabel": "Прохождений: {count}",
       "srankClearsLabel": "Прохождений ранга S: {count}",
       "retiredLabel": "Выведено",
+      "personalLabel": "Личное",
       "backToShelf": "Назад к полке",
       "gridAria": "Реликвии на странице {name}",
       "pageProgressAria": "Прогресс страницы: {owned} из {total} реликвий",

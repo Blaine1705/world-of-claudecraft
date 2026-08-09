@@ -97,16 +97,17 @@ function discoverRelics(server: GameServer, session: ClientSession, n: number): 
 }
 
 /** Character-scoped catalog total derived by an INDEPENDENT page-table walk
- *  (dedupe per kind, account weapon-skin slots excluded, retired
- *  excludeFromCompletion pages skipped whole, the skip mirroring the
- *  weapon_skin arm: both are slots the character pair must not count),
+ *  (dedupe per kind, account weapon-skin slots excluded, every
+ *  excludeFromCompletion page skipped whole whatever its reason, the skip
+ *  mirroring the weapon_skin arm: both are slots the character pair must not
+ *  count),
  *  written here so the relicsTotal pin has a second oracle instead of
  *  re-calling the same helper pair the refresher under test calls (the
  *  function-level form of the constant-self-comparison trap). */
 function characterScopedTotalByWalk(): number {
   const byKind = new Map<string, Set<string>>();
   for (const page of RELIQUARY_PAGES) {
-    if (page.excludeFromCompletion === true) continue;
+    if (page.excludeFromCompletion !== undefined) continue;
     for (const relic of page.relics) {
       if (relic.kind === 'weapon_skin') continue;
       const id =

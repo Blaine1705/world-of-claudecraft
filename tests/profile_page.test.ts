@@ -138,7 +138,7 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands.
-    expect(catalogTotal).toBe(311);
+    expect(catalogTotal).toBe(308);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
@@ -318,7 +318,7 @@ describe('U+00B7 stays out of every middot-joined English surface', () => {
     // the shape pins of tests/reliquary_content.test.ts and the mark
     // cross-pins of tests/character_sheet.test.ts; these only guard against
     // an empty or misrouted corpus, so they are floors, not equalities).
-    expect(RELIQUARY_PAGES.length).toBeGreaterThanOrEqual(34);
+    expect(RELIQUARY_PAGES.length).toBeGreaterThanOrEqual(35);
     expect(itemSlots).toBeGreaterThanOrEqual(265);
     expect(RELIQUARY_MARK_ENGLISH.size).toBeGreaterThanOrEqual(29);
     expect(Object.keys(markFind).length).toBeGreaterThanOrEqual(29);

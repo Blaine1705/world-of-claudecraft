@@ -324,12 +324,13 @@ function refreshDefaultRows(out: ReliquaryTrackerView, input: ReliquaryTrackerIn
   if (out.memoSig === sig) return;
   const candidates: ReliquaryTrackerRow[] = [];
   for (const pageId of input.pageIds) {
-    // A retired catalog page (excludeFromCompletion) never self-selects: its
-    // missing relics can no longer be won, so nudging a player toward them
-    // would be a lie. Same skip as buildNearlyComplete in reliquary_view.ts;
-    // resolved off the authored def because this core only receives ids. A
-    // deliberate PIN on such a page still tracks (player choice, pass 1).
-    if (RELIQUARY_PAGES_BY_ID[pageId]?.excludeFromCompletion === true) continue;
+    // An excludeFromCompletion catalog page never self-selects: its missing
+    // relics can no longer be won (retired) or never could be by one character
+    // (class-personal), so nudging a player toward them would be a lie. Same
+    // skip as buildNearlyComplete in reliquary_view.ts; resolved off the
+    // authored def because this core only receives ids. A deliberate PIN on
+    // such a page still tracks (player choice, pass 1).
+    if (RELIQUARY_PAGES_BY_ID[pageId]?.excludeFromCompletion !== undefined) continue;
     const c = input.completion(pageId);
     if (c === null || !isReliquaryNearlyComplete(c.owned, c.total)) continue;
     candidates.push({ pageId, owned: c.owned, total: c.total });

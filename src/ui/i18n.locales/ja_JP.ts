@@ -10574,6 +10574,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.clearsLabel': 'クリア {count} 回',
   'hudChrome.reliquary.srankClearsLabel': 'Sランク・クリア {count} 回',
   'hudChrome.reliquary.retiredLabel': '絶版',
+  'hudChrome.reliquary.personalLabel': '専用',
   'hudChrome.reliquary.backToShelf': '棚に戻る',
   'hudChrome.reliquary.gridAria': '{name} の聖遺物',
   'hudChrome.reliquary.pageProgressAria': 'ページ進捗：聖遺物 {owned}/{total} 埋め済み',

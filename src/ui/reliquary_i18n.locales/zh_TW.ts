@@ -66,4 +66,8 @@ export const table: ReliquaryLocaleTable = {
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 寶庫策展人).
   horizons_vault_of_ages: { name: '歲月寶庫' },
+  // Riftbound (Phase 21): the shipped band noun (entities.items.
+  // riftbound_band_of_*.name read 裂隙之戒), which carries the same rift noun
+  // the Rift page uses.
+  horizons_riftbound: { name: '裂隙之戒' },
 };

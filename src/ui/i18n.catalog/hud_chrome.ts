@@ -4482,6 +4482,9 @@ export const hudChromeStrings = {
     // Phase 21: the chip a retired (excludeFromCompletion) page carries on
     // its shelf row and page header (the Vault of Ages).
     retiredLabel: 'Retired',
+    // Phase 21: the same chip on the OTHER outside-completion reason, a
+    // class-personal page no one character can fill (the Riftbound bands).
+    personalLabel: 'Personal',
     backToShelf: 'Back to shelf',
     // Phase 5: page grid, live unlock toast, Illumination celebration.
     gridAria: 'Relics on {name}',

@@ -65,4 +65,8 @@ export const table: ReliquaryLocaleTable = {
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads Хранитель Сокровищницы).
   horizons_vault_of_ages: { name: 'Сокровищница минувших эпох' },
+  // Riftbound (Phase 21): Russian has no bare adjective for the family, so the
+  // page takes the shipped band noun (entities.items.riftbound_band_of_*.name
+  // read Кольцо разлома) in the plural.
+  horizons_riftbound: { name: 'Кольца разлома' },
 };

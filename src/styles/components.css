@@ -8402,6 +8402,21 @@
     color: var(--gold);
     letter-spacing: 0.04em;
   }
+  /* The outside-completion chips (Retired, Personal) share the badge's type but
+     never its celebratory gold: those pages can never be finished, so wearing
+     the Illuminated color would read as a reward. */
+  .reliquary-complete-badge[data-retired],
+  .reliquary-complete-badge[data-personal] {
+    color: var(--color-text-muted);
+  }
+  /* The illuminated page detail frames every badge inside it (further down this
+     section). A veteran CAN complete the retired vault, so the chip has to opt
+     out of that gold frame here, where it would otherwise inherit it. */
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge[data-retired],
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge[data-personal] {
+    border-color: var(--color-border-default);
+    background: none;
+  }
   /* A real ul/li list (the .prof-list structure). role="list" is kept on the
      element as well: Safari VoiceOver drops list semantics once list-style is
      none, which is exactly what this rule sets. */

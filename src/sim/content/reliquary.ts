@@ -146,14 +146,21 @@ export interface ReliquaryPageDef {
    *  draws from); the window validates membership and floors finite positives
    *  before painting, so a drifted stat renders nothing rather than a lie. */
   secondaryClearSource?: { kind: 'deed_stat'; stat: string };
-  /** Retired shelf flag, rule 7 (docs/design/reliquary.md): retired content
-   *  stays a VISIBLE, labeled page rather than a silent delete, but its slots
-   *  can no longer be won, so completion math must not count them. Both sides
-   *  of every completion pair skip the page together (owned AND total, the
-   *  account-skin precedent: weapon skins already sit outside the character
-   *  pair the same way), and the page-local pair still renders the page's own
-   *  owned/total. `true` only: absence is the live-content default. */
-  excludeFromCompletion?: true;
+  /** Outside-completion flag, rule 7 (docs/design/reliquary.md), carrying its
+   *  REASON so the chrome can name it:
+   *  - 'retired': the retired shelf (Vault of Ages). The content stays a
+   *    VISIBLE, labeled page rather than a silent delete, but its slots can no
+   *    longer be won.
+   *  - 'personal': per-character class-personal grants no one can complete.
+   *    The Riftbound bands are minted one per character, bound and personal, so
+   *    a single character can never hold more than one of the three.
+   *  Either way completion math must not count the page: both sides of every
+   *  completion pair skip it together (owned AND total, the account-skin
+   *  precedent: weapon skins already sit outside the character pair the same
+   *  way), and the page-local pair still renders the page's own owned/total.
+   *  Absence is the live-content default; every runtime check is truthiness on
+   *  the flag, so the reason narrows presentation only. */
+  excludeFromCompletion?: 'retired' | 'personal';
   /** Source every un-hinted relic on this page inherits. Authored only where
    *  EVERY relic on the page really shares ONE source, which is why it stays a
    *  single hint rather than a list: a page whose relics need several routes
@@ -1332,15 +1339,19 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     secondaryClearSource: { kind: 'deed_stat', stat: 'riftSRankClears' },
     // Ascending chase order, each group SPREAD from its live rift/items.ts
     // array so membership and order can never trail the content: the ten
-    // themed world-drop rares (RIFT_RARE_SOURCES above), the three first-clear
-    // Riftbound bands (minted by addRiftProgressionLoot for every winner of a
-    // ranked rift's first-clear race, the rift_first_clear activity), the four
-    // clear-time epics (riftHeroicClearPool seeds them; B is the minimum rank
-    // whose clear pays from that pool), and the two S-only legendary rolls
+    // themed world-drop rares (RIFT_RARE_SOURCES above), the four clear-time
+    // epics (riftHeroicClearPool seeds them; B is the minimum rank whose clear
+    // pays from that pool), and the two S-only legendary rolls
     // (addRiftClearGearLoot rolls each independently on an S clear alone).
+    //
+    // The three first-clear Riftbound bands are deliberately NOT here: they
+    // live on horizons_riftbound instead. shellForClass maps each class to
+    // exactly ONE band, the mint stamps boundTo + personalFor, and trade, mail,
+    // and market all refuse bound instances, so no character can ever hold more
+    // than one of the three. Three slots on this page would make its completion
+    // unreachable and dead-end the Conquerors shelf deed behind it.
     relics: items(
       ...RIFT_RARE_ITEM_IDS.map((id) => [id, RIFT_RARE_SOURCES[id]] as const),
-      ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
       ...RIFT_EPIC_ITEM_IDS.map((id) => [id, fromRift('B')] as const),
       ...RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, fromRift('S')] as const),
     ),
@@ -1488,12 +1499,32 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Vault of Ages',
     desc: 'Retired treasures of a bygone age. These relics can no longer be won; the vault honors the veterans who keep them.',
     clearSource: { kind: 'none' },
-    excludeFromCompletion: true,
+    excludeFromCompletion: 'retired',
     relics: items(
       'deathless_warguard_legmail',
       'scourgehide_carapace',
       'soulforged_warplate',
       'soulrend_diadem',
+    ),
+  },
+
+  // ---- Riftbound (Phase 21): the class-personal bands, outside completion ----
+  // The showcase page for the three first-clear bands. A character is minted
+  // exactly ONE of them (shellForClass in src/sim/rift/progression.ts picks by
+  // class) and the instance is bound and personal, so no one can ever fill all
+  // three slots: the page is excludeFromCompletion 'personal' and its slots
+  // sit outside both completion pairs while the page still shows a player the
+  // whole family and their own band inside it. Spread from the live array in
+  // array order, exactly as the Rift page carried them.
+  {
+    id: 'horizons_riftbound',
+    shelf: 'horizons',
+    name: 'Riftbound',
+    desc: 'The personal Riftbound bands, minted once for each champion on their first Rift clear. A character can ever hold only their own.',
+    clearSource: { kind: 'none' },
+    excludeFromCompletion: 'personal',
+    relics: items(
+      ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
     ),
   },
 ]);

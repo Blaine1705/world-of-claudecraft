@@ -10563,6 +10563,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.clearsLabel': '클리어 {count}회',
   'hudChrome.reliquary.srankClearsLabel': 'S 등급 클리어 {count}회',
   'hudChrome.reliquary.retiredLabel': '단종',
+  'hudChrome.reliquary.personalLabel': '전용',
   'hudChrome.reliquary.backToShelf': '선반으로 돌아가기',
   'hudChrome.reliquary.gridAria': '{name}의 성물',
   'hudChrome.reliquary.pageProgressAria': '페이지 진행도: 성물 {owned}/{total} 채움',

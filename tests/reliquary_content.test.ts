@@ -301,9 +301,9 @@ describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     expect(CONQUEROR_PAGES.length).toBe(27);
     expect(PROFESSION_PAGES.length).toBe(3);
-    expect(HORIZON_PAGES.length).toBe(4);
+    expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(34);
+    expect(RELIQUARY_PAGES.length).toBe(35);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -314,6 +314,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       'horizons_weapon_skins',
       'horizons_titles',
       'horizons_vault_of_ages',
+      'horizons_riftbound',
     ]);
   });
 
@@ -334,40 +335,41 @@ describe('Reliquary Conqueror catalog structure', () => {
       weaponSkins: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands. Phase 21 adds the 19 Rift
-    // chase items (conquerors_the_rift), then the 19 rare-slain marks and the
-    // 29 NEW Spoils uniques (31 slots minus the 2 set members already
+    // Literal: update when catalog content lands. Phase 21 adds the 16 scoring
+    // Rift chase items (conquerors_the_rift), then the 19 rare-slain marks and
+    // the 29 NEW Spoils uniques (31 slots minus the 2 set members already
     // catalogued; a relic on two pages is one relic), then the 47 Warfare
     // honor pieces and the 3 fishing additions (the koi and both rods):
-    // 242 + 19 + 29 + 47 + 3 = 340. The Vault of Ages then adds FOUR retired
-    // slots and 0 to BOTH pairs: excludeFromCompletion keeps the whole page
-    // out of owned AND total (the dedicated vault pins in this file and
-    // tests/reliquary_state.test.ts hold both sides), so these two literals
-    // are deliberately UNCHANGED by the vault landing.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    // 242 + 16 + 29 + 47 + 3 = 337. The two excludeFromCompletion pages add
+    // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
+    // slots and horizons_riftbound the three class-personal Riftbound bands,
+    // and the flag keeps each whole page out of owned AND total (the dedicated
+    // vault and riftbound pins in this file and tests/reliquary_state.test.ts
+    // hold both sides), so neither page moves these two literals.
+    expect(full).toEqual({ owned: 337, total: 337 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
       ownedMounts: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands (same +19 marks +29 uniques
-    // +47 Warfare +3 fishing deltas as the overview pair above; marks are
-    // character-scoped).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    // Literal: update when catalog content lands (same +16 Rift +19 marks
+    // +29 uniques +47 Warfare +3 fishing deltas as the overview pair above;
+    // marks are character-scoped).
+    expect(character).toEqual({ owned: 308, total: 308 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
     // Literal: MEASURED through the live page table, update when catalog
     // content lands. 249 slots shipped before Phase 21 (measured at the
     // phase base; the phase plan's 245 baseline undercounted the live
-    // catalog by 4, and the measured value wins), and the six Phase 21
-    // pages add 123 slots (19 Rift + 19 slain marks + 31 Spoils + 47
-    // Warfare + 3 fishing + 4 retired vault): 372 total. Slots, not unique
-    // relics: the two Spoils set repeats count again here, and the four
-    // vault slots count here while adding zero to every completion pair
-    // (excludeFromCompletion), which is why this number exceeds the
-    // overview total above by more than the mark count.
+    // catalog by 4, and the measured value wins), and the seven Phase 21
+    // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
+    // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372 total.
+    // Slots, not unique relics: the two Spoils set repeats count again here,
+    // and the seven excludeFromCompletion slots (four vault, three bands)
+    // count here while adding zero to every completion pair, which is why this
+    // number exceeds the overview total above by more than the mark count.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     expect(slots).toBe(372);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
@@ -767,41 +769,167 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
 });
 
 describe('Reliquary Rift page pins against live rift content', () => {
-  it('derives its slots from the four live rift item arrays in ascending chase order', () => {
+  it('derives its slots from the three EARNABLE live rift item arrays in ascending chase order', () => {
     const page = RELIQUARY_PAGES_BY_ID.conquerors_the_rift;
     expect(page).toBeDefined();
     expect(page.shelf).toBe('conquerors');
     // EQUALITY against the live arrays in append-only group order (rares,
-    // first-clear bands, clear-time epics, S legendaries), so the page can
-    // never trail rift/items.ts: a new array member reds here (and the hint
-    // table in content/reliquary.ts reds tsc) until the curator authors it.
+    // clear-time epics, S legendaries), so the page can never trail
+    // rift/items.ts: a new array member reds here (and the hint table in
+    // content/reliquary.ts reds tsc) until the curator authors it. The
+    // first-clear bands are deliberately ABSENT: they are class-personal and
+    // live on horizons_riftbound (the derivation pin below).
     expect(itemRelicIds(page)).toEqual([
       ...RIFT_RARE_ITEM_IDS,
-      ...RIFT_GEAR_ITEM_IDS,
       ...RIFT_EPIC_ITEM_IDS,
       ...RIFT_LEGENDARY_ITEM_IDS,
     ]);
+    expect(page.relics.length).toBe(16);
+    // Band absence stated directly, so a re-added band reds on the claim it
+    // breaks rather than only on the ordered equality above.
+    for (const bandId of RIFT_GEAR_ITEM_IDS) {
+      expect(itemRelicIds(page), bandId).not.toContain(bandId);
+    }
     // Snug per-group vacuity floors: an emptied source array would otherwise
     // shrink the page silently while the equality above stayed green.
     expect(RIFT_RARE_ITEM_IDS.length).toBeGreaterThanOrEqual(10);
-    expect(RIFT_GEAR_ITEM_IDS.length).toBeGreaterThanOrEqual(3);
     expect(RIFT_EPIC_ITEM_IDS.length).toBeGreaterThanOrEqual(4);
     expect(RIFT_LEGENDARY_ITEM_IDS.length).toBeGreaterThanOrEqual(2);
   });
 
+  it('no conquerors item relic is class-exclusive at its mint site (the completability floor)', () => {
+    // The reachability arm behind the page split. A relic minted for SOME
+    // classes but not ALL can never be filled by every character, so a
+    // conquerors page carrying one would make its own completion, the shelf
+    // deed, and feat_book_complete unreachable for most of the roster. The
+    // class-exclusive set is DERIVED from the live mint site (drive
+    // createRiftGearInstance over every CLASSES key) rather than named, so the
+    // pin cannot go stale against a re-tuned shellForClass.
+    //
+    // Today createRiftGearInstance is the only class-exclusive mint site in
+    // the catalog's reach. A future one needs its own arm here: this sweep
+    // only sees ids this derivation produces.
+    const classes = Object.keys(CLASSES) as PlayerClass[];
+    const mintCounts = new Map<string, number>();
+    for (const cls of classes) {
+      const { itemId } = createRiftGearInstance('rift-reach-pin', 'C', cls, 1);
+      mintCounts.set(itemId, (mintCounts.get(itemId) ?? 0) + 1);
+    }
+    const classExclusive = new Set(
+      [...mintCounts].filter(([, n]) => n < classes.length).map(([id]) => id),
+    );
+    // Positive control: the three bands really ARE class-exclusive, so the
+    // sweep below is testing a populated set rather than passing vacuously.
+    expect([...classExclusive].sort()).toEqual([...RIFT_GEAR_ITEM_IDS].sort());
+    expect(classes.length).toBeGreaterThanOrEqual(9);
+    const offenders: string[] = [];
+    for (const page of RELIQUARY_PAGES) {
+      if (page.shelf !== 'conquerors') continue;
+      for (const relicId of itemRelicIds(page)) {
+        if (classExclusive.has(relicId)) offenders.push(`${page.id}:${relicId}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it('the first-clear mint site covers exactly the Riftbound band array', () => {
-    // The page composition and the activity pin both read RIFT_GEAR_ITEM_IDS,
-    // so between themselves they are a self-comparison: a fourth id appended
-    // to the array would page a slot the mint site never awards while both
-    // stayed green. This arm binds the array to the independent shellForClass
-    // literals in src/sim/rift/progression.ts: minting over EVERY playable
-    // class must produce the array as a set, in both directions.
+    // The horizons_riftbound page composition and the activity pin both read
+    // RIFT_GEAR_ITEM_IDS, so between themselves they are a self-comparison: a
+    // fourth id appended to the array would page a slot the mint site never
+    // awards while both stayed green. This arm binds the array to the
+    // independent shellForClass literals in src/sim/rift/progression.ts:
+    // minting over EVERY playable class must produce the array as a set, in
+    // both directions.
     const minted = new Set(
       (Object.keys(CLASSES) as PlayerClass[]).map(
         (cls) => createRiftGearInstance('rift-mint-pin', 'C', cls, 1).itemId,
       ),
     );
     expect([...minted].sort()).toEqual([...RIFT_GEAR_ITEM_IDS].sort());
+  });
+});
+
+describe('Reliquary Riftbound page (class-personal, outside completion)', () => {
+  const riftbound = RELIQUARY_PAGES_BY_ID.horizons_riftbound;
+
+  it('derives its slots from the live Riftbound band array, in array order', () => {
+    // EQUALITY in ORDER against the live array, both directions at once: the
+    // page spreads RIFT_GEAR_ITEM_IDS, so a fourth band reds here until it is
+    // paged, and a band removed from the content reds here until the page
+    // drops it. The array is bound to the independent shellForClass mint
+    // literals by the mint-site arm in the Rift describe above, so this pin
+    // plus that arm reach the write site.
+    expect(riftbound).toBeDefined();
+    expect(itemRelicIds(riftbound)).toEqual([...RIFT_GEAR_ITEM_IDS]);
+    expect([...RIFT_GEAR_ITEM_IDS]).toEqual(itemRelicIds(riftbound));
+    expect(riftbound.relics.length).toBe(3);
+  });
+
+  it('is a horizons page flagged personal, with every slot hinted at the first clear', () => {
+    // NOT conquerors: the shelf-shape pin forbids an unearnable conquerors
+    // slot (the capstone gate walks that shelf), and no character can ever
+    // hold more than one band. Unlike the retired vault this page IS hinted:
+    // the bands have a real live door, they are simply not all reachable by
+    // one character.
+    expect(riftbound.shelf).toBe('horizons');
+    expect(riftbound.excludeFromCompletion).toBe('personal');
+    expect(riftbound.clearSource).toEqual({ kind: 'none' });
+    expect(riftbound.secondaryClearSource).toBeUndefined();
+    expect(riftbound.sourceDefault).toBeUndefined();
+    for (const relic of riftbound.relics) {
+      expect(reliquaryRelicSource(riftbound, relic)).toEqual([
+        { sourceKind: 'activity', sourceId: 'rift_first_clear' },
+      ]);
+    }
+  });
+
+  it('moves NEITHER side of either completion pair (both-sides exclusion, measured)', () => {
+    // The production helpers over the live catalog versus the same catalog
+    // with the page removed: identical pairs with everything owned, so the
+    // page adds 3 slots and 0 to owned AND total of both pairs. Mirrors the
+    // vault arm, because the flag reason must not change the scoring rule.
+    const allOwned = { has: () => true };
+    const noBands = RELIQUARY_PAGES.filter((p) => p.id !== 'horizons_riftbound');
+    expect(noBands.length).toBe(RELIQUARY_PAGES.length - 1);
+    const surfaces = {
+      itemsDiscovered: allOwned,
+      marks: allOwned,
+      ownedMounts: allOwned,
+      weaponSkins: allOwned,
+      deedsEarned: allOwned,
+    };
+    expect(catalogRelicCompletion(surfaces)).toEqual(catalogRelicCompletion(surfaces, noBands));
+    expect(catalogCharacterCompletion(surfaces)).toEqual(
+      catalogCharacterCompletion(surfaces, noBands),
+    );
+    // And owning ONLY a band (the realistic case: one per character) scores
+    // zero in both pairs.
+    const oneBand = new Set([RIFT_GEAR_ITEM_IDS[0]]);
+    expect(catalogRelicCompletion({ itemsDiscovered: oneBand }).owned).toBe(0);
+    expect(catalogCharacterCompletion({ itemsDiscovered: oneBand }).owned).toBe(0);
+  });
+});
+
+describe('Reliquary outside-completion pages (the flagged set)', () => {
+  it('flags exactly the two pages, in catalog order, each with its reason', () => {
+    // Catalog-wide companion to the per-page pins: the flag is the one lever
+    // that removes a page from every completion pair, so its whole membership
+    // is pinned in one place. A third flagged page is a product decision and
+    // reds here until it is made deliberately.
+    expect(
+      RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
+        p.id,
+        p.excludeFromCompletion,
+      ]),
+    ).toEqual([
+      ['horizons_vault_of_ages', 'retired'],
+      ['horizons_riftbound', 'personal'],
+    ]);
+    // Both reasons are live, so neither arm of the reason-driven chrome
+    // (window chip, styles) is pinned against an empty set. Sorting keeps
+    // undefined last by spec, so the unflagged majority is asserted too.
+    const reasons = new Set(RELIQUARY_PAGES.map((p) => p.excludeFromCompletion));
+    expect([...reasons].sort()).toEqual(['personal', 'retired', undefined]);
   });
 });
 
@@ -1003,7 +1131,7 @@ describe('Reliquary Vault of Ages (retired, outside completion)', () => {
     // door to name (the retired-guard suite pins the same fact from the
     // acquisition side).
     expect(vault.shelf).toBe('horizons');
-    expect(vault.excludeFromCompletion).toBe(true);
+    expect(vault.excludeFromCompletion).toBe('retired');
     expect(vault.clearSource).toEqual({ kind: 'none' });
     expect(vault.secondaryClearSource).toBeUndefined();
     expect(vault.sourceDefault).toBeUndefined();
@@ -1611,22 +1739,29 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
 describe('Reliquary Horizons shelf (Phase 8)', () => {
   it('authors non-empty Horizons pages with only mount / skin / title relics', () => {
-    // Phase 21 amendment: the retired Vault of Ages joined this shelf as an
-    // ITEM page (horizons is the one shelf whose shape pins tolerate an
-    // unearnable page; the conquerors capstone gate must never meet one), so
+    // Phase 21 amendment: BOTH outside-completion pages joined this shelf as
+    // ITEM pages (horizons is the one shelf whose shape pins tolerate a page
+    // no one can finish; the conquerors capstone gate must never meet one), so
     // the three Phase 8 COLLECTION pages keep the mount / skin / title shape
-    // and the retired page is exempted by its flag rather than by id.
+    // and the flagged pages are exempted by their flag rather than by id.
     for (const page of HORIZON_PAGES) {
       expect(page.relics.length).toBeGreaterThan(0);
       expect(page.clearSource).toEqual({ kind: 'none' });
-      if (page.excludeFromCompletion === true) continue;
+      if (page.excludeFromCompletion !== undefined) continue;
       for (const relic of page.relics) {
         expect(['mount', 'weapon_skin', 'title']).toContain(relic.kind);
       }
     }
-    // The exemption stays snug: exactly one retired Horizons page today.
-    expect(HORIZON_PAGES.filter((p) => p.excludeFromCompletion === true).map((p) => p.id)).toEqual([
-      'horizons_vault_of_ages',
+    // The exemption stays snug: exactly the two flagged Horizons pages today,
+    // each named with the reason that exempts it.
+    expect(
+      HORIZON_PAGES.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
+        p.id,
+        p.excludeFromCompletion,
+      ]),
+    ).toEqual([
+      ['horizons_vault_of_ages', 'retired'],
+      ['horizons_riftbound', 'personal'],
     ]);
   });
 
@@ -1901,10 +2036,11 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   corpse_harvest: ['gather_event:perfect_specimen', ...Object.values(HARVEST_COMPONENT_SPECIMENS)],
   masterwork_craft: ['masterwork:first'],
   // Derived from the live array: addRiftProgressionLoot mints one
-  // class-matched band per winner of a ranked rift's first-clear race. The
-  // claim that createRiftGearInstance covers exactly this array is NOT free
-  // here (the mint literals live in shellForClass); the mint-site arm in the
-  // Rift page describe pins it over every class.
+  // class-matched band per winner of a ranked rift's first-clear race, and
+  // horizons_riftbound is the page that catalogs them. The claim that
+  // createRiftGearInstance covers exactly this array is NOT free here (the
+  // mint literals live in shellForClass); the mint-site arm in the Rift page
+  // describe pins it over every class.
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
 };
 
@@ -2232,10 +2368,12 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
   horizons_titles: 40,
-  // 30 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
-  // bosses + both citadel bosses + 17 trash carriers), plus the
-  // rift_first_clear activity, plus the B and S rank doors.
-  conquerors_the_rift: 30,
+  // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
+  // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
+  // doors. The rift_first_clear activity left with the bands.
+  conquerors_the_rift: 29,
+  // The one first-clear activity door, on all three bands (Phase 21).
+  horizons_riftbound: 1,
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
   // hollow, drakelands).
   conquerors_rares_of_the_realm: 24,
@@ -2285,8 +2423,10 @@ const KNOWN_MULTI_SOURCE_PAGES = [
   // and pinned at 1 in EXPECTED_DISTINCT_SOURCES instead.
   'horizons_titles',
   'horizons_mounts',
-  // The Rift page spans every themed environment's mobs, the first-clear
-  // activity, and two rank doors: the widest conquerors page there is.
+  // The Rift page spans every themed environment's mobs plus two rank doors:
+  // the widest conquerors page there is. (Its first-clear activity door left
+  // with the bands; horizons_riftbound is single-source and pinned at 1 in
+  // EXPECTED_DISTINCT_SOURCES instead.)
   'conquerors_the_rift',
   // The realm-rare pair (Phase 21): each spans the named rares of five (marks)
   // or four (spoils) zones, which is the point of a realm-wide page.
@@ -2972,16 +3112,18 @@ describe('Reliquary source hints resolve against live content', () => {
 
 describe('Reliquary source hint coverage', () => {
   it('every relic resolves to a source except the pinned pending rulings', () => {
-    // Retired pages (excludeFromCompletion) are EXEMPT from the source-hint
-    // obligation by design, not pended: a pending row awaits a ruling on a
-    // door content might still name, while a retired relic HAS no door (the
-    // hint would point at content that no longer awards anything), so the
-    // vault stays deliberately sourceless and never joins
-    // SOURCE_PENDING_RULING. The retired-guard test holds the exemption
-    // honest from the other side (the vault page must author zero hints).
+    // RETIRED pages are EXEMPT from the source-hint obligation by design, not
+    // pended: a pending row awaits a ruling on a door content might still
+    // name, while a retired relic HAS no door (the hint would point at content
+    // that no longer awards anything), so the vault stays deliberately
+    // sourceless and never joins SOURCE_PENDING_RULING. The retired-guard test
+    // holds the exemption honest from the other side (the vault page must
+    // author zero hints). The exemption is scoped to that ONE reason: a
+    // 'personal' page sits outside completion but its relics have a real live
+    // door (the first-clear mint), so it stays inside this obligation.
     const unhinted: string[] = [];
     for (const { page, relic, slotId } of RELIC_SLOTS) {
-      if (page.excludeFromCompletion === true) continue;
+      if (page.excludeFromCompletion === 'retired') continue;
       if (reliquaryRelicSource(page, relic).length > 0) continue;
       if (PENDING_KEYS.has(slotKey(page.id, slotId))) continue;
       unhinted.push(`${page.id}:${slotId}`);
@@ -2996,12 +3138,13 @@ describe('Reliquary source hint coverage', () => {
     // which is the same claim it used to make with null.
     // Retired pages sit outside this bidirectional pin the same way they sit
     // outside the coverage sweep above: sourceless by design, never pending.
+    // Same one-reason scope: 'personal' pages stay inside both.
     const retiredSlots = RELIC_SLOTS.filter(
-      ({ page }) => page.excludeFromCompletion === true,
+      ({ page }) => page.excludeFromCompletion === 'retired',
     ).length;
     const actuallyUnhinted = new Set<string>();
     for (const { page, relic, slotId } of RELIC_SLOTS) {
-      if (page.excludeFromCompletion === true) continue;
+      if (page.excludeFromCompletion === 'retired') continue;
       if (reliquaryRelicSource(page, relic).length === 0)
         actuallyUnhinted.add(slotKey(page.id, slotId));
     }
@@ -3474,9 +3617,10 @@ describe('Reliquary source hint coverage', () => {
     expect(groundObjectIds.length).toBeGreaterThanOrEqual(7);
     expect(groundObjectIds.filter((id) => watchedAwardIds.has(id))).toEqual([]);
     // The Rift's own item family. Phase 21 EXECUTED the inclusion decision:
-    // the whole chase ladder (rares, first-clear bands, clear-time epics, the
-    // two legendaries) is catalogued on conquerors_the_rift, so the watched
-    // set inside RIFT_ITEMS is EXACTLY those four arrays, and the currency
+    // the whole chase ladder (rares, clear-time epics, the two legendaries on
+    // conquerors_the_rift, the first-clear bands on horizons_riftbound) is
+    // catalogued, so the watched set inside RIFT_ITEMS is EXACTLY those four
+    // arrays, and the currency
     // ids (essence + the three gems) stay outside the catalog. Equality in
     // both directions: a new RIFT_ITEMS id cannot quietly join a page, nor
     // sit unwatched, without a decision landing here.

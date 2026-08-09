@@ -499,11 +499,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
 
   it('catalogRelicCompletion includes marks in overview totals', () => {
     // The item-side oracle walks the SCORING pages only: completion pairs
-    // exclude retired (excludeFromCompletion) pages on both sides, while the
-    // raw catalogItemCompletion helper deliberately counts whatever table it
-    // is handed (the catalog-index memo pins depend on that), so the filter
-    // lives here in the oracle, mirroring the production scoring rule.
-    const scoringPages = RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion !== true);
+    // exclude every excludeFromCompletion page on both sides, while the raw
+    // catalogItemCompletion helper deliberately counts whatever table it is
+    // handed (the catalog-index memo pins depend on that), so the filter lives
+    // here in the oracle, mirroring the production scoring rule.
+    const scoringPages = RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion === undefined);
     const itemsOnly = catalogItemCompletion(new Set(), scoringPages);
     const withMarks = catalogRelicCompletion({
       itemsDiscovered: new Set(),
@@ -624,7 +624,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // tests/reliquary_content.test.ts beside the catalog totals pin.
     const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
     expect(vault).toBeDefined();
-    expect(vault.excludeFromCompletion).toBe(true);
+    expect(vault.excludeFromCompletion).toBe('retired');
     const vaultIds = vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
     expect(vaultIds.length).toBe(4);
 
@@ -3016,6 +3016,34 @@ describe('Reliquary illuminated pages (Phase 18 sticky record)', () => {
     expect(syncIlluminatedPages(meta)).toBe(0);
     expect(reliquaryWireJson(meta.reliquary)).toBe(after);
     expect(reliquaryWireCacheProbe(meta.reliquary)).toBe(record);
+  });
+
+  it('the join sweep DOES illuminate a filled retired vault, and cannot illuminate riftbound', () => {
+    // Direction pin for the outside-completion flag. The flag removes a page
+    // from the completion PAIRS; it does not remove it from illumination, and
+    // the difference is deliberate: a veteran who still holds all four retired
+    // relics gets the celebration for the page they filled, while their score
+    // is untouched. So this asserts the sweep records the vault rather than
+    // asserting it stays out.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    for (const id of pageItemIds('horizons_vault_of_ages')) {
+      meta.deedStats.itemsDiscovered.add(id);
+    }
+    expect(syncIlluminatedPages(meta)).toBeGreaterThanOrEqual(1);
+    expect([...meta.reliquary.illuminatedPages]).toContain('horizons_vault_of_ages');
+
+    // The other flagged page runs the SAME direction and lands the other way,
+    // for a reason that is content, not policy: a character holds exactly one
+    // band, so pageCompletion is 1 of 3 and the page can never complete. No
+    // celebration is reachable for it, by construction rather than by a skip.
+    const other = makeSim();
+    const { meta: bandOwner } = primary(other);
+    const bandIds = pageItemIds('horizons_riftbound');
+    expect(bandIds.length).toBe(3);
+    bandOwner.deedStats.itemsDiscovered.add(bandIds[0]!);
+    syncIlluminatedPages(bandOwner);
+    expect([...bandOwner.reliquary.illuminatedPages]).not.toContain('horizons_riftbound');
   });
 
   it('one fill completing two pages records BOTH but the event names only the FIRST', () => {

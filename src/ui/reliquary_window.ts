@@ -1237,21 +1237,28 @@ export class ReliquaryWindow {
   }
 
   /**
-   * The small "Retired" chip a retired page carries on its shelf row and page
-   * header, resolved off the authored def the way the secondary meter's stat
-   * is (the def flag, not a model field): excludeFromCompletion is catalog
-   * data, not per-player state. Same markup family as the Illuminated badge
-   * (reliquary-complete-badge), with data-retired as the hook; the chip is
-   * plain visible text inside the row/header, which is exactly what a screen
-   * reader announces, so no extra aria is minted for it. Empty for every live
-   * page.
+   * The small chip an excludeFromCompletion page carries on its shelf row and
+   * page header, resolved off the authored def the way the secondary meter's
+   * stat is (the def flag, not a model field): excludeFromCompletion is catalog
+   * data, not per-player state. The flag's REASON drives both the hook and the
+   * label, so the two kinds of outside-completion page never wear each other's
+   * word: 'retired' says Retired, 'personal' says Personal. Same markup family
+   * as the Illuminated badge (reliquary-complete-badge), with data-retired /
+   * data-personal as the hooks; the chip is plain visible text inside the
+   * row/header, which is exactly what a screen reader announces, so no extra
+   * aria is minted for it. Empty for every live page.
    */
   private retiredChipHtml(pageId: string): string {
-    const retired =
-      Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId) &&
-      RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion === true;
-    if (!retired) return '';
-    return `<span class="reliquary-complete-badge" data-retired="1">${esc(t('hudChrome.reliquary.retiredLabel'))}</span>`;
+    const reason = Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)
+      ? RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion
+      : undefined;
+    if (reason === undefined) return '';
+    const attr = reason === 'personal' ? 'data-personal' : 'data-retired';
+    const key =
+      reason === 'personal'
+        ? 'hudChrome.reliquary.personalLabel'
+        : 'hudChrome.reliquary.retiredLabel';
+    return `<span class="reliquary-complete-badge" ${attr}="1">${esc(t(key))}</span>`;
   }
 
   private pageDetailHtml(

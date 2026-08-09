@@ -6482,18 +6482,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Riftbound Band of Might"
-      },
-      {
-        "kind": "item",
-        "name": "Riftbound Band of Insight"
-      },
-      {
-        "kind": "item",
-        "name": "Riftbound Band of Guile"
-      },
-      {
-        "kind": "item",
         "name": "Emberforged Bulwark"
       },
       {
@@ -6954,6 +6942,25 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Soulrend Diadem"
+      }
+    ]
+  },
+  {
+    "id": "horizons_riftbound",
+    "shelf": "horizons",
+    "name": "Riftbound",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Insight"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Guile"
       }
     ]
   }

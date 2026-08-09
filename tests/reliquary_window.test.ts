@@ -144,16 +144,20 @@ describe('painter hygiene', () => {
     expect(painter).toContain("return 'rare'");
   });
 
-  it('labels a retired page on both the page header and the shelf row', () => {
-    // The Vault of Ages chip (Phase 21): resolved off the authored def's
-    // excludeFromCompletion flag (catalog data, not player state) and painted
-    // through the shared retiredLabel key at BOTH render sites, so a retired
-    // page can never present as an ordinary chase on one surface while the
-    // completion math already ignores it.
+  it('labels an outside-completion page by REASON on both the page header and the shelf row', () => {
+    // The Vault of Ages / Riftbound chip (Phase 21): resolved off the authored
+    // def's excludeFromCompletion flag (catalog data, not player state) and
+    // painted at BOTH render sites, so such a page can never present as an
+    // ordinary chase on one surface while the completion math already ignores
+    // it. The flag's REASON picks the hook and the key, so the two kinds never
+    // wear each other's word.
     const code = stripComments(painter);
-    expect(code).toMatch(/excludeFromCompletion === true/);
-    expect(code).toContain("t('hudChrome.reliquary.retiredLabel')");
-    expect(code).toContain('data-retired="1"');
+    expect(code).toContain('RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion');
+    expect(code).toMatch(/reason === 'personal'/);
+    expect(code).toContain('hudChrome.reliquary.retiredLabel');
+    expect(code).toContain('hudChrome.reliquary.personalLabel');
+    expect(code).toContain('data-retired');
+    expect(code).toContain('data-personal');
     // Both call sites (header and shelf row) go through the one helper.
     expect(code.match(/this\.retiredChipHtml\(/g)?.length).toBe(2);
   });

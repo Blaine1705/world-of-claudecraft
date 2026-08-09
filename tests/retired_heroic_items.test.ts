@@ -189,7 +189,10 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     );
     expect(carriers.map((page) => page.id)).toEqual(['horizons_vault_of_ages']);
     const vault = carriers[0];
-    expect(vault.excludeFromCompletion).toBe(true);
+    // The REASON, not merely truthiness: the flag now carries which kind of
+    // outside-completion page this is, and only 'retired' earns the sourceless
+    // exemption the assertions below rely on.
+    expect(vault.excludeFromCompletion).toBe('retired');
     expect(vault.sourceDefault).toBeUndefined();
     for (const relic of vault.relics) {
       expect(relic.source, `${vault.id} relic carries a source hint`).toBeUndefined();
