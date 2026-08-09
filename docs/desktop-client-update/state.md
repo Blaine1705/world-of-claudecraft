@@ -45,8 +45,36 @@ verdict only exists in-shell), defense-in-depth, not load-bearing. Both-toasts
 overlap measured (gpu-notice discrete body 98px en / 114px ru_RU at the 440px cap
 vs a 56px slot offset) but the pair is unreachable today (re-push rides
 did-finish-load reloads only); shell.css comment rewritten with the numbers and
-the supersede-first rule for any future mid-session push. Next up: phase 4
-(phase-04-presentation-lifecycle.md), fresh session, pull+merge first.
+the supersede-first rule for any future mid-session push.
+
+Phase 4 done (2026-08-08, commits 87b193e31b hidden render skip, 7ac4d3dbf6
+shell pushes, 26d89a3426 review hardening; base merge was a no-op, release tip
+still 1478f9d2ba): a hidden/minimized desktop window stops GL submission, HUD
+paint, and perf frame sampling while the sim tick and network drain keep
+running (pure core src/game/presentation_gate.ts, DI draw module
+src/render/frame_present.ts, present threaded as renderer.sync's 7th arg,
+updateAdaptiveResolution held on skipped frames). KEY PLATFORM FACT: with
+backgroundThrottling:false the Page Visibility API stays 'visible' while
+minimized (Electron documented), so the hidden signal is the new
+'desktop-presentation-changed' push DERIVED at send time from
+isMinimized/isVisible (minimize/restore/hide/show/focus + did-finish-load
+re-push; the event-latched version was a seam-review blocking finding, one
+missed restore would freeze a visible window). hud.update(paint) keeps the
+audio/live-region/timer head running on hidden frames (the other blocking
+finding: the whole-method gate parked cast-loop cleanup a minimized player
+still hears). perf_reporter gained shellHidden (its visibilityState check
+never fires in the shell, minimized sessions would have beaconed fps
+collapses). 'desktop-display-changed' pushes { scaleFactor } only (displayId
+stays main-side for dedup, security least-privilege) from app-level
+display-metrics-changed + debounced window move; renderer.noteDisplayChanged()
+re-resolves the pixel ratio, src/render/dpr_watch.ts is the web fallback.
+Reviews: security PASS (both should-fixes adopted); seam 2 blocking + 5
+should-fix, all fixed in 26d89a3426 except the declined real-Renderer
+governor-hold unit (E2E rig committed instead, phase 5 owns the governor).
+Probes 11/11 killed rc=1 named (one killed by the E2E rig, the vitest-blind
+threading arm). Evidence in progress.md phase 4 notes (offline + online legs,
+snapshots kept arriving while hidden, clean resume). Next up: phase 4 QA
+(phase-04-qa.md), fresh session, pull+merge first.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -174,10 +202,35 @@ with polarity plus a send-count-of-one, the desktop_gpu_status normalizer is
 pinned to the literal three-key whitelist, the display latch is pinned empty
 under a persisted dismissal, and the perf_nudge memo tests flip their predicate
 after init so init-time sampling reds)
+Phase 4 additions: src/game/presentation_gate.ts (pure gate, UI_PURE_CORES) +
+tests/presentation_gate.test.ts, src/game/desktop_presentation.ts (shell hidden
+latch) + tests/desktop_presentation.test.ts, src/game/desktop_display_change.ts
+(display-change consumer with setDisplayChangeTarget) +
+tests/desktop_display_change.test.ts, src/render/frame_present.ts (DI terminal
+draw, RENDER_PURE_CORES) + tests/frame_present.test.ts, src/render/dpr_watch.ts
+(matchMedia DPR re-arm, deliberately NOT a registered core, it reads window) +
+tests/dpr_watch.test.ts, electron/presentation_events.cjs + display_events.cjs
+(+ .d.cts each) + their two events test files, tests/electron_presentation_push
+.test.ts + tests/electron_display_push.test.ts (whole-body toBe pins,
+send-count-of-one, push-only negatives in BOTH directions including
+ipcRenderer.send/ipcMain.on), scripts/desktop_hidden_skip_probe.mjs (the E2E
+evidence rig, also the kill for the vitest-blind main.ts threading arm).
+hud.update grew a paint parameter (default true; the hidden path calls
+update(false) untimed) with the cut pinned by an exact head list in
+tests/hud_update_drive.test.ts. PerfSnapshot grew hiddenPresentSkips;
+PerfReporterOptions grew shellHidden. renderer.sync grew present (7th arg);
+Renderer grew noteDisplayChanged().
 New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
 no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
 { softwareRendering, discreteInactive, adapter<=64 } whitelisted in
-electron/gpu_status_events.cjs and re-validated by normalizeDesktopGpuStatus
+electron/gpu_status_events.cjs and re-validated by normalizeDesktopGpuStatus;
+'desktop-presentation-changed' push (payload { hidden }, derived at send time
+from isMinimized/isVisible, triggers minimize/restore/hide/show/focus +
+did-finish-load re-push) + optional onPresentationChanged, and
+'desktop-display-changed' push (wire payload { scaleFactor } ONLY, displayId
+never crosses, main-side dedup via shouldForwardDisplayChange; triggers
+app-level display-metrics-changed + 250 ms debounced window move) + optional
+onDisplayChanged (phase 4)
 New settings keys: (none yet; the gpu notice dismissal localStorage value
 woc_gpu_notice_dismissed grew from '1' to a component signature in phase 3, legacy
 '1' still honored)
@@ -277,3 +330,8 @@ Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path record
   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
   runs; without it profile_mode fails at import (this is the known environmental
   full-gate failure).
+- A desktop-classified page (Electron UA or VITE_DESKTOP_APP=1) routes /api to
+  the PRODUCTION origin: any online E2E/probe against the local server must
+  restart vite with VITE_DESKTOP_RELATIVE_API=1. Register mode has a required
+  email field (empty = silent requestSubmit no-op) and character names reject
+  digits; scripts/desktop_hidden_skip_probe.mjs encodes all three.

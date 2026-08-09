@@ -67,8 +67,11 @@ describe('draw_stats_core', () => {
     expect(source.match(/this\.drawStats\.currentFrame\(\)/g)).toHaveLength(2);
     expect(source.match(/this\.drawStats\.governorSignal\(GFX\.tier\)/g)).toHaveLength(1);
     expect(source.match(/this\.drawStats\.discardOutOfBand\(\)/g)).toHaveLength(1);
+    // beginFrame re-arms every sync, including skipped presents (a hidden frame
+    // records an honest zero-draw submit); the adaptive-resolution step behind
+    // it is present-gated (a renderless frame carries no rendering signal).
     expect(source).toMatch(
-      /if \(this\.drawStats\) this\.drawStats\.beginFrame\(\);\n\s*this\.updateAdaptiveResolution\(dt\);/,
+      /if \(this\.drawStats\) this\.drawStats\.beginFrame\(\);\n(?:\s*\/\/[^\n]*\n)*\s*if \(present\) this\.updateAdaptiveResolution\(dt\);/,
     );
     expect(source).toContain(
       'const drawStatsFrame = this.drawStats ? this.drawStats.currentFrame() : null;',

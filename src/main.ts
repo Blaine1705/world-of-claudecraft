@@ -4081,16 +4081,18 @@ async function startGame(
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
 
+  // Reused across frames: the rAF hot path must not allocate (the frame
+  // allocation guard polices the loop body), and the gate reads it
+  // synchronously before returning a shared frozen decision.
+  const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
     // off), so document.hidden never flips there and the shell push is the only
     // truthful hidden signal.
-    const gate = presentationGate({
-      hidden: document.hidden || desktopPresentationHidden(),
-      desktopApp: DESKTOP_APP,
-      graphicsRebuildPaused,
-    });
+    gateInput.hidden = document.hidden || desktopPresentationHidden();
+    gateInput.graphicsRebuildPaused = graphicsRebuildPaused;
+    const gate = presentationGate(gateInput);
     if (!gate.tick) {
       last = now;
       acc = 0;

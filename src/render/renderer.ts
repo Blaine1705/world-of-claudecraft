@@ -239,7 +239,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
-import { presentFrame } from './frame_present';
+import { type FramePresentHost, presentFrame } from './frame_present';
 import {
   type FrostNovaRootVisual,
   isFrostNovaRootAura,
@@ -3143,6 +3143,17 @@ export class Renderer {
   }
 
   private dprUnwatch: (() => void) | null = null;
+
+  // Reused presentFrame host, refreshed field-by-field each sync (see the call
+  // site): class-field init runs before the constructor assigns the real
+  // surfaces, so it starts empty and is never read before the first refresh.
+  private readonly framePresentHost = {
+    vfx: null,
+    post: null,
+    webgl: null,
+    scene: null,
+    camera: null,
+  } as unknown as FramePresentHost;
 
   /**
    * A display change the page cannot observe on its own (the window moved to
@@ -11025,17 +11036,16 @@ export class Renderer {
     }
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
-    presentFrame(
-      {
-        vfx: this.vfx,
-        post: this.post,
-        webgl: this.webgl,
-        scene: this.scene,
-        camera: this.camera,
-      },
-      dt,
-      present,
-    );
+    // Refresh the reused host every frame instead of building a literal: sync
+    // is the rAF hot path (no per-frame allocation), and post can be torn down
+    // and rebuilt by a graphics rebuild, so a cached reference would go stale.
+    const host = this.framePresentHost;
+    host.vfx = this.vfx;
+    host.post = this.post;
+    host.webgl = this.webgl;
+    host.scene = this.scene;
+    host.camera = this.camera;
+    presentFrame(host, dt, present);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;

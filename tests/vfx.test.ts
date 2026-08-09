@@ -309,14 +309,28 @@ describe('pooled VFX cloud', () => {
     const renderSites = [
       ...source.matchAll(/this\.vfx\.prepareDraw\(this\.camera\);\n\s*if \(this\.post\)/g),
     ];
-    expect(renderSites).toHaveLength(2);
+    expect(renderSites).toHaveLength(1);
     for (const site of renderSites) {
       expect(
         source.slice(0, site.index).trimEnd().endsWith('this.camera.updateMatrixWorld();'),
       ).toBe(true);
     }
+    // The main-path draw moved into presentFrame (src/render/frame_present.ts),
+    // whose prepareDraw-then-render ORDER is behaviorally pinned in
+    // tests/frame_present.test.ts; what remains here is the camera-pose
+    // invariant at its call site: the only presentFrame call follows the
+    // camera-shake updateMatrixWorld.
+    const presentSites = [...source.matchAll(/\n\s*presentFrame\(host, dt, present\);/g)];
+    expect(presentSites).toHaveLength(1);
+    for (const site of presentSites) {
+      const before = source.slice(0, site.index).trimEnd();
+      expect(before.includes('this.camera.updateMatrixWorld();')).toBe(true);
+      expect(before.slice(before.lastIndexOf('this.camera.updateMatrixWorld();'))).not.toContain(
+        'this.camera.position',
+      );
+    }
     expect(source).toContain(`async captureScreenshot(maxEdge = 1280, quality = 0.7)`);
-    expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(3);
+    expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(2);
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);`);

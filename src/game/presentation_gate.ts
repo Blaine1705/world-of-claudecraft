@@ -24,20 +24,34 @@ export interface PresentationGateDecision {
   tick: boolean;
 }
 
+// The three possible decisions, shared frozen singletons: the gate runs on the
+// rAF hot path, which must not allocate (tests/client_frame_allocations.test.ts
+// polices the loop in main.ts; returning a fresh literal per frame would be the
+// same leak one module deeper). Frozen so no consumer can mutate shared state.
+const PAUSED: PresentationGateDecision = Object.freeze({
+  render: false,
+  paint: false,
+  tick: false,
+});
+// tick stays true while hidden: skipping the network drain lets the server
+// snapshot backlog pile up and refocus then freezes the client working
+// through it (the July WS-backlog refocus freeze).
+const HIDDEN_DESKTOP: PresentationGateDecision = Object.freeze({
+  render: false,
+  paint: false,
+  tick: true,
+});
+const ALL_ON: PresentationGateDecision = Object.freeze({ render: true, paint: true, tick: true });
+
 /**
  * Decide what a frame is allowed to do. Ordered by precedence: the graphics
  * rebuild wins over everything, then the desktop hidden state, then the
  * all-allowed default.
  */
 export function presentationGate(input: PresentationGateInput): PresentationGateDecision {
-  if (input.graphicsRebuildPaused) return { render: false, paint: false, tick: false };
-  if (input.hidden && input.desktopApp) {
-    // tick stays true while hidden: skipping the network drain lets the server
-    // snapshot backlog pile up and refocus then freezes the client working
-    // through it (the July WS-backlog refocus freeze).
-    return { render: false, paint: false, tick: true };
-  }
+  if (input.graphicsRebuildPaused) return PAUSED;
+  if (input.hidden && input.desktopApp) return HIDDEN_DESKTOP;
   // Web keeps every frame whole, hidden or not: rAF is already paused in a
   // hidden tab, so there is no frame to skip and no behavior to change.
-  return { render: true, paint: true, tick: true };
+  return ALL_ON;
 }

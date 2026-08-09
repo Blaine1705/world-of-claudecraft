@@ -10,7 +10,7 @@
 | 2 QA | Verify phase 2 | done | 2026-08-08 | 2026-08-08 |
 | 3 | Hybrid-GPU visibility | done | 2026-08-08 | 2026-08-08 |
 | 3 QA | Verify phase 3 | done | 2026-08-08 | 2026-08-08 |
-| 4 | Presentation lifecycle | not started | | |
+| 4 | Presentation lifecycle | done | 2026-08-08 | 2026-08-08 |
 | 4 QA | Verify phase 4 | not started | | |
 | 5 | Governor and LOW tier | not started | | |
 | 5 QA | Verify phase 5 | not started | | |
@@ -41,9 +41,9 @@ Phase 3: [x] desktop-gpu-status push channel (main verdict -> renderer); [x] gpu
 triggers off the shell verdict, discrete-inactive body added (M16 fills); [x] ipc pins
 updated; [x] web/mobile unaffected (feature-checked).
 
-Phase 4: [ ] hidden-window render skip (render+paint skipped, sim/net keep running)
-with a pure decision core and tests; [ ] display/DPI change push -> pixel-ratio
-re-resolve; [ ] no-backlog-on-refocus evidence.
+Phase 4: [x] hidden-window render skip (render+paint skipped, sim/net keep running)
+with a pure decision core and tests; [x] display/DPI change push -> pixel-ratio
+re-resolve; [x] no-backlog-on-refocus evidence.
 
 Phase 5: [ ] recovery-ladder stall fixed with a reproducing test; [ ] LOW monotonicity
 retune (bands, caps, floors, radius, lowPlus gating) with per-axis pins; [ ] perf
@@ -463,3 +463,126 @@ hardening, e1dd4a7798 honesty pass; tree clean, LOCAL-ONLY intact):
   fleet-beacon integratedGpu dimension inherits the analyzer's !desktopShell
   gate, so hybrid-GPU desktop sessions are invisible to it (phase 7 follow-up
   alongside the GPU-force opt-out and the analyzer premise revisit).
+
+Phase 4 (2026-08-08, commits 87b193e31b hidden skip, 7ac4d3dbf6 shell pushes,
+26d89a3426 review hardening):
+- Base merge was a no-op (release tip 1478f9d2ba unchanged since the phase 3 QA
+  merge), so no suite re-run was owed to it.
+- DESIGN FACT that reshaped the phase: the Electron BrowserWindow docs state
+  that with backgroundThrottling disabled the Page Visibility API stays
+  'visible' even while the window is minimized, occluded, or hidden, so the
+  packet's document.hidden-keyed gate could never fire in the shell. The hidden
+  signal is therefore a second push channel, 'desktop-presentation-changed'
+  (payload { hidden } via electron/presentation_events.cjs), DERIVED at send
+  time from mainWindow.isMinimized() || !mainWindow.isVisible() (the seam
+  review's blocking finding killed the original event-latched boolean: one
+  missed 'restore' would have frozen a VISIBLE window with no recovery short of
+  a reload). Triggers: minimize/restore/hide/show plus 'focus' as the explicit
+  self-heal, plus a did-finish-load re-push (no replay on the channel; reloads
+  and crash-recovery pages must re-learn). The renderer latches it in
+  src/game/desktop_presentation.ts (strict-boolean whitelist, drop-not-coerce)
+  and the frame loop ORs it with document.hidden.
+- The gate core src/game/presentation_gate.ts (registered in UI_PURE_CORES):
+  graphicsRebuildPaused wins all-false; hidden plus desktopApp gives
+  render:false paint:false tick:true (tick stays true so the net drain keeps
+  running; skipping it would rebuild the July WS-backlog refocus freeze); web
+  is all-true (rAF already pauses there, behavior unchanged). main.ts consumes
+  it thinly: perf.frame gated on render with noteHiddenPresentSkip() on the
+  else (unsampled hidden frames reproduce the web hidden-tab beacon shape),
+  overlay sync on paint, renderer.sync threads present as its 7th argument,
+  markInputVisible and perf.tick on render, the mainMs.renderer bucket times
+  only rendered frames, and entryDiagnostics.renderedFrame runs UNCONDITIONALLY
+  (a liveness breadcrumb the next launch reads as a load-failure report; a
+  client launched minimized is alive, not stuck in scene build).
+- renderer.sync keeps everything running while hidden (view lifecycle, mixers,
+  uTime, viewport poll, drawStats.beginFrame) so refocus has no create burst or
+  shader-link stall; only the terminal draw is skipped, extracted into the DI
+  module src/render/frame_present.ts (registered in RENDER_PURE_CORES; on skip
+  it still ages post.updateScreenFx, verified CPU-only, so flashes and ripples
+  do not pop stale on restore). updateAdaptiveResolution is HELD while hidden:
+  renderless wall-clock frames would read as free headroom and ratchet quality
+  up for the first visible frame (the pacer-governor trap family).
+- HUD: the seam review's other blocking finding, hud.update() gated whole
+  parked audio a minimized player still hears (reconcileSfx is the sweep that
+  unloops stale cast loops on interest-leave). hud.update(paint) now keeps the
+  non-paint head (cast-loop sweep, idle-bark hygiene, both live-region flushes,
+  quest voice, loot-roll timers) running on hidden frames and cuts before the
+  paint sinks; the hidden path calls hud.update(false) untimed so mainMs.hud
+  samples painted frames only. Pinned by an exact ordered head list plus
+  below-cut assertions in tests/hud_update_drive.test.ts (shape pin; the live
+  false-arm is covered by the E2E rig, and main.ts remains untestable by
+  design). tutorial.update sits below the cut; verified benign, its only
+  wall-clock use is the done-banner linger.
+- Fleet beacon: the reporter's own hidden-send skip keys on visibilityState,
+  which the shell pins at 'visible', so minimized desktop sessions would have
+  beaconed fps collapses (last10s.fps 0, diluted fpsAvg). perf_reporter gained
+  a shellHidden option wired to desktopPresentationHidden() and folds it into
+  the same 'hidden' skip reason. DECLINED: putting hiddenPresentSkips into the
+  beacon payload (new fleet-schema field with server implications, out of this
+  phase's scope; with sends gated there are no hidden beacons to disambiguate).
+- Display change: 'desktop-display-changed' wire payload is { scaleFactor }
+  ONLY. The security review's least-privilege finding dropped displayId from
+  the wire (a stable OS-derived identifier with zero renderer consumers); the
+  { scaleFactor, displayId } reading stays main-process-side where
+  shouldForwardDisplayChange dedups (id catches a same-scale monitor move).
+  Triggers: screen 'display-metrics-changed' registered ONCE at app level
+  (macOS activate re-create would stack per-window duplicates) and window
+  'move' debounced 250 ms on the captured-win pattern ('moved' does not fire
+  on Linux). Renderer side: desktop_display_change.ts validates the one-field
+  whitelist and notifies with NO arguments; main.ts registers
+  renderer.noteDisplayChanged() (resizeViewport, so applyResolution re-reads
+  devicePixelRatio live), and src/render/dpr_watch.ts (matchMedia resolution
+  re-arm) is composed in the renderer as the web fallback with teardown.
+- Reviews: privacy-security-review PASS, 0 blocking (both should-fixes adopted:
+  displayId off the wire, renderer-to-main ipcRenderer.send/ipcMain.on
+  negatives on both channels; renderer-side coalesce declined, main-side
+  debounce plus dedup bounds real pushes and a forged bridge already has script
+  execution; module-scope screen require noted, all uses post-whenReady, pack
+  smoke confirms in a later phase). frontend-seam-reviewer (fresh re-run after
+  the first instance died to an API error): 2 blocking, 5 should-fix, 4 notes;
+  both blockings and four should-fixes fixed in 26d89a3426; the real-Renderer
+  governor-hold unit was declined as prohibitively heavy (the committed E2E rig
+  covers threading; phase 5 owns the governor and restructures that seam).
+  Notes accepted and recorded: the drawless-frame diagnostics tail (harmless
+  now that no hidden beacons ship; forensics ingestion lives in the gated
+  perf.tick), armory_preview and characters/preview secondary rAF loops still
+  draw while hidden (follow-up: route through desktopPresentationHidden()),
+  and the document.hidden OR-arm inherits Chromium occlusion semantics
+  (judged gameplay-neutral, a fully occluded window is invisible anyway).
+- Evidence (committed rig scripts/desktop_hidden_skip_probe.mjs, run against
+  the dev stack with an Electron UA and shadowed document.hidden, which is
+  faithful because the rig page stays actually visible so rAF keeps firing
+  exactly like the shell): offline leg, skips 1 to 282 over 5 s hidden, perf
+  frames frozen at 22, per-frame draws frozen at 202, sim time advanced 5.1 s,
+  clean resume (draws 280, sampling resumed, zero page errors); online leg
+  (user-space Postgres on :5433, server on :8787, vite restarted with
+  VITE_DESKTOP_RELATIVE_API=1), skips 3 to 302, online.lastSnapAt advanced
+  27312 to 32314 continuously while hidden (snapshots kept arriving, no
+  refocus backlog), world mirror live, clean resume, zero page errors.
+- Probe-rig gotchas for QA reruns: a desktop-classified page routes /api to the
+  PRODUCTION origin, so the online leg needs vite restarted with
+  VITE_DESKTOP_RELATIVE_API=1 (the mistake cost only a read-only project-stats
+  GET against prod); register mode has a required email field (an empty one
+  makes requestSubmit a silent native-validation no-op); character names
+  reject digits (map them to letters).
+- Mutation probes on the committed tree, 11/11 killed with rc=1 and named
+  failing tests: gate hidden-arm render polarity; gate paused-arm tick; latch
+  coerce-instead-of-validate; frame_present polarity inversion; derive || to
+  &&; second display send site; wire payload displayId smuggle; hud cut
+  deleted; paint sink hoisted above the cut; reporter shellHidden inversion;
+  and present forced true at the offline sync site, killed by the E2E rig
+  (named check "skips climb while hidden", mechanism: forcing the draw back on
+  collapses the hidden frame rate under SwiftShader). That last kill is
+  environment-sensitive (a fast GPU would keep the frame rate up); the
+  sharpening candidate for QA is a renderer-side presented-frames counter,
+  since every existing counter sits upstream of the sync argument.
+- Gate at 26d89a3426 (BROWSER_PATH exported; biome defaultBranch pinned to the
+  release branch for the run and reverted, never committed; first run FAILED
+  on a biome format diff in the new probe script, fixed and amended): see the
+  gate paragraph appended below after the run.
+- Ledger (recorded, not fixed): main.ts frame-loop threading is pinned by
+  method-shape plus the E2E rig only (the coordinator has no unit seam);
+  the updateAdaptiveResolution hold has no vitest pin (phase 5 owns it);
+  armory/character preview loops draw while hidden; drawless-frame renderer
+  diagnostics tail documented as accepted; hud.update SHAPE pin cannot catch a
+  present-but-unreachable cut.
