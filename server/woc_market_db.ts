@@ -29,6 +29,7 @@ import type {
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
+  WocOpsP2pTradeRow,
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
@@ -664,6 +665,117 @@ export class PgWocMarketDb implements WocMarketDb {
     );
     const hasMore = res.rows.length > pageSize;
     const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toListing);
+    return { rows, hasMore };
+  }
+
+  /**
+   * The OPERATOR listing read: every public listing, any status, over a window.
+   *
+   * Deliberately not a widened browseListings. That one carries a security
+   * boundary (a directed sale must never reach a stranger) and a shape tuned for
+   * players; bending it to also serve ops would put an "and show me everything"
+   * switch on the query whose whole job is to withhold things. This is a
+   * separate read with its own predicate, so neither can loosen the other.
+   *
+   * Directed rows stay out here too: they are p2p trades and have their own
+   * read below, where the counterparty and the offer lifecycle are the point.
+   */
+  async opsListings(q: {
+    realm: string;
+    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+    const where: string[] = ['realm = $1', 'directed_buyer_account IS NULL'];
+    const params: unknown[] = [q.realm];
+    params.push(new Date(q.fromMs));
+    where.push(`created_at >= $${params.length}`);
+    params.push(new Date(q.toMs));
+    where.push(`created_at <= $${params.length}`);
+    if (q.status !== 'all') {
+      params.push(q.status);
+      where.push(`status = $${params.length}`);
+    }
+    const pageSize = Math.min(Math.max(1, q.pageSize), 200);
+    const offset = Math.max(0, q.page) * pageSize;
+    // The same has-more PROBE the player browse uses, for the same reason: a
+    // window count re-reads the whole matching set on every page, and an ops
+    // range can be far wider than a player's.
+    params.push(pageSize + 1, offset);
+    const res = await this.pool.query(
+      `SELECT ${LISTING_COLS}
+         FROM woc_market_listings
+        WHERE ${where.join(' AND ')}
+        ORDER BY created_at DESC, id DESC
+        LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      params,
+    );
+    const hasMore = res.rows.length > pageSize;
+    return { rows: (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toListing), hasMore };
+  }
+
+  /**
+   * The OPERATOR p2p read: directed offers with the outcome each one reached.
+   *
+   * Sourced from the OFFERS table rather than from sales, because an offer is
+   * the only row that exists for a trade that did not complete. Reading sales
+   * would show the successes and silently omit every declined, withdrawn,
+   * expired or unpaid attempt, which is the half an operator is usually looking
+   * for. The listing and settlement are joined on so a completed trade still
+   * reports what it settled for.
+   */
+  async opsP2pTrades(q: {
+    realm: string;
+    status: WocDirectedOfferStatus | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }> {
+    const cols = OFFER_COLS.split(', ')
+      .map((c) => `o.${c}`)
+      .join(', ');
+    const where: string[] = ['o.realm = $1'];
+    const params: unknown[] = [q.realm];
+    params.push(new Date(q.fromMs));
+    where.push(`o.created_at >= $${params.length}`);
+    params.push(new Date(q.toMs));
+    where.push(`o.created_at <= $${params.length}`);
+    if (q.status !== 'all') {
+      params.push(q.status);
+      where.push(`o.status = $${params.length}`);
+    }
+    const pageSize = Math.min(Math.max(1, q.pageSize), 200);
+    const offset = Math.max(0, q.page) * pageSize;
+    params.push(pageSize + 1, offset);
+    const res = await this.pool.query(
+      `SELECT ${cols},
+              l.status AS listing_status, l.resolution AS listing_resolution,
+              s.state AS settlement_state, s.settled_amount_base, s.tx_signature
+         FROM woc_market_directed_offers o
+         LEFT JOIN woc_market_listings l ON l.id = o.listing_id
+         LEFT JOIN LATERAL (
+           SELECT state, settled_amount_base, tx_signature
+             FROM woc_market_settlements
+            WHERE listing_id = o.listing_id
+            ORDER BY id DESC LIMIT 1
+         ) s ON o.listing_id IS NOT NULL
+        WHERE ${where.join(' AND ')}
+        ORDER BY o.created_at DESC, o.id DESC
+        LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      params,
+    );
+    const hasMore = res.rows.length > pageSize;
+    const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(
+      (row): WocOpsP2pTradeRow => ({
+        ...toOffer(row),
+        settlementState: (row.settlement_state ?? null) as string | null,
+        settledAmountBase: row.settled_amount_base ?? null,
+        txSignature: row.tx_signature ?? null,
+      }),
+    );
     return { rows, hasMore };
   }
 

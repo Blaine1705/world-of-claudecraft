@@ -146,6 +146,10 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/internal/discord/flaired-ids'],
   ['POST', '/internal/discord/flex-batch'],
   ['GET', '/internal/discord/outbox'],
+  // The internal dashboard's read-only ops views. RouteDef-only (no legacy
+  // ladder arm), on their own secret gate rather than the Discord bot's.
+  ['GET', '/internal/woc-market/listings'],
+  ['GET', '/internal/woc-market/p2p-trades'],
 ];
 
 /** Read status/body/content-type/headers off the fakeCtx's FakeRes. */
@@ -286,8 +290,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 11 routes matching the legacy ladder plus the RouteDef-only pair', () => {
-    expect(routes).toHaveLength(11);
+  it('registers exactly 13 routes: the legacy ladder, the RouteDef-only pair, and the dashboard reads', () => {
+    expect(routes).toHaveLength(13);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);

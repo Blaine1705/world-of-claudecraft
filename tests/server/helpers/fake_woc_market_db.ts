@@ -23,6 +23,7 @@ import type {
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
+  WocOpsP2pTradeRow,
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
@@ -222,6 +223,77 @@ export class FakeWocMarketDb implements WocMarketDb {
     const hasMore = probe.length > pageSize;
     const rows = hasMore ? probe.slice(0, pageSize) : probe;
     return { rows: rows.map((r) => this.listingOut(r)), hasMore };
+  }
+
+  /** Mirrors the real predicates: public rows only, the created_at window
+   *  INCLUSIVE at both ends, and status narrowed unless 'all'. */
+  async opsListings(q: {
+    realm: string;
+    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+    const matched = [...this.listings.values()]
+      .filter(
+        (r) =>
+          r.realm === q.realm &&
+          r.directedBuyerAccount === null &&
+          r.createdAtMs >= q.fromMs &&
+          r.createdAtMs <= q.toMs &&
+          (q.status === 'all' || r.status === q.status),
+      )
+      .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id);
+    const pageSize = Math.min(Math.max(1, q.pageSize), 200);
+    const offset = Math.max(0, q.page) * pageSize;
+    const page = matched.slice(offset, offset + pageSize + 1);
+    const hasMore = page.length > pageSize;
+    return {
+      rows: (hasMore ? page.slice(0, pageSize) : page).map((r) => this.listingOut(r)),
+      hasMore,
+    };
+  }
+
+  async opsP2pTrades(q: {
+    realm: string;
+    status: WocDirectedOfferStatus | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }> {
+    const matched = [...this.offers.values()]
+      .filter(
+        (o) =>
+          o.realm === q.realm &&
+          o.createdAtMs >= q.fromMs &&
+          o.createdAtMs <= q.toMs &&
+          (q.status === 'all' || o.status === q.status),
+      )
+      .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id);
+    const pageSize = Math.min(Math.max(1, q.pageSize), 200);
+    const offset = Math.max(0, q.page) * pageSize;
+    const page = matched.slice(offset, offset + pageSize + 1);
+    const hasMore = page.length > pageSize;
+    const settlementFor = (listingId: number | null) =>
+      listingId === null
+        ? null
+        : ([...this.settlements.values()]
+            .filter((s) => s.listingId === listingId)
+            .sort((a, b) => b.id - a.id)[0] ?? null);
+    return {
+      rows: (hasMore ? page.slice(0, pageSize) : page).map((o) => {
+        const s = settlementFor(o.listingId);
+        return {
+          ...structuredClone(o),
+          settlementState: s?.state ?? null,
+          settledAmountBase: s?.settledAmountBase ?? null,
+          txSignature: s?.txSignature ?? null,
+        };
+      }),
+      hasMore,
+    };
   }
 
   async listingsBySeller(realm: string, account: number): Promise<WocListingRow[]> {

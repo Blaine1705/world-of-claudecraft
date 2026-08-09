@@ -340,6 +340,22 @@ export interface WocMarketDb {
   /** Durable book-once claim: true only for the FIRST claim of this ref. */
   claimCustodyRef(realm: string, custodyRef: string): Promise<boolean>;
   markCustodyRefBooked(custodyRef: string): Promise<void>;
+  opsListings(q: {
+    realm: string;
+    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }>;
+  opsP2pTrades(q: {
+    realm: string;
+    status: WocDirectedOfferStatus | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }>;
   /** Persist a buyer's bags after a hand-to-hand delivery. False when the lease
    *  fence rejected the write, which means this process no longer owns the
    *  character and the delivery must take the mail route instead. */
@@ -649,6 +665,12 @@ const SWEEP_BATCH = 25;
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without
  *  it. An arm returning a FULL batch is the "backlog is not draining" signal. */
+/** A directed offer plus the outcome it reached, for the operator p2p view. */
+export interface WocOpsP2pTradeRow extends WocDirectedOfferRow {
+  settledAmountBase: string | null;
+  txSignature: string | null;
+}
+
 export interface WocSweepPassStats {
   lapsedBids: number;
   /** Directed p2p offers that timed out unanswered. */
@@ -1181,6 +1203,31 @@ export class WocMarketService {
     // the read and the write keeps its bid rather than losing it to this call.
     const done = await this.deps.db.abandonPendingBid(this.cfg.realm, bidId, account);
     return done ? { ok: true } : refuse('not_pending');
+  }
+
+  /**
+   * Operator reads for the internal dashboard. Read-only and realm-scoped; the
+   * realm comes from this service's own config rather than the caller, so a
+   * dashboard cannot ask one realm's process about another's.
+   */
+  async opsListings(q: {
+    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+    return this.deps.db.opsListings({ ...q, realm: this.cfg.realm });
+  }
+
+  async opsP2pTrades(q: {
+    status: WocDirectedOfferStatus | 'all';
+    fromMs: number;
+    toMs: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }> {
+    return this.deps.db.opsP2pTrades({ ...q, realm: this.cfg.realm });
   }
 
   /** A fresh bond quote for a still-pending bid whose previous quote expired. */

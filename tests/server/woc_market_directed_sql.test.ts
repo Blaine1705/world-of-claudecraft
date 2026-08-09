@@ -243,3 +243,78 @@ describe('the bond finality queue, in SQL', () => {
     expect(text).toContain("status = 'pending_bond'");
   });
 });
+
+describe('the operator reads behind the internal dashboard', () => {
+  it('keeps DIRECTED rows out of the listings read', async () => {
+    // The player browse withholds directed sales as a security boundary. This
+    // read withholds them for a different reason: they are p2p trades and have
+    // their own view, where the counterparty is the point. Same predicate,
+    // pinned separately, so relaxing one can never quietly relax the other.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).opsListings({
+      realm: REALM,
+      status: 'active',
+      fromMs: 0,
+      toMs: 1_000,
+      page: 0,
+      pageSize: 50,
+    });
+    expect(sql()[0]).toContain('directed_buyer_account IS NULL');
+  });
+
+  it('bounds the window and the page, never scanning the whole table', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).opsListings({
+      realm: REALM,
+      status: 'all',
+      fromMs: 1_000,
+      toMs: 2_000,
+      page: 0,
+      // Over the ceiling on purpose: an ops caller must not be able to ask for
+      // an unbounded page.
+      pageSize: 9_999,
+    });
+    const [text] = sql();
+    expect(text).toContain('created_at >= $2');
+    expect(text).toContain('created_at <= $3');
+    // 200 cap, +1 for the has-more probe.
+    expect(params()[0]).toContain(201);
+    // 'all' means no status predicate at all, rather than a list of every value.
+    expect(text).not.toContain('status = $4');
+  });
+
+  it('reads p2p trades from OFFERS, so failed attempts are visible', async () => {
+    // Sourcing from sales would show the successes and silently omit every
+    // declined, withdrawn, expired or unpaid attempt, which is usually the half
+    // an operator is looking for.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).opsP2pTrades({
+      realm: REALM,
+      status: 'all',
+      fromMs: 0,
+      toMs: 1_000,
+      page: 0,
+      pageSize: 50,
+    });
+    const [text] = sql();
+    expect(text).toContain('FROM woc_market_directed_offers o');
+    // With the outcome joined on, so a completed trade still reports what it
+    // settled for and under which signature.
+    expect(text).toContain('s.state AS settlement_state');
+    expect(text).toContain('s.settled_amount_base');
+    expect(text).toContain('ORDER BY id DESC LIMIT 1');
+  });
+
+  it('narrows the p2p read by status only when one is asked for', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).opsP2pTrades({
+      realm: REALM,
+      status: 'accepted',
+      fromMs: 0,
+      toMs: 1_000,
+      page: 0,
+      pageSize: 50,
+    });
+    expect(sql()[0]).toContain('o.status = $4');
+  });
+});

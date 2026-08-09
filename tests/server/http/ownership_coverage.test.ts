@@ -42,6 +42,8 @@ import { ADMIN_AUTH_REQUIRED } from '../../../server/http/middleware/require_adm
 import {
   DAILY_REWARD_SECRET_ENV,
   DAILY_REWARD_SECRET_HEADER,
+  DASHBOARD_SECRET_ENV,
+  DASHBOARD_SECRET_HEADER,
   DEPLOY_SECRET_ENV,
   DEPLOY_SECRET_HEADER,
   DISCORD_SECRET_ENV,
@@ -685,6 +687,16 @@ function gatePairFor(route: RouteDef): {
       unsetBody: INTERNAL_FEATURE_OFF,
     };
   }
+  if (route.path.startsWith('/internal/woc-market/')) {
+    // Its own pair, not the Discord bot's: two different callers, two different
+    // blast radii. Feature-off is a 404, the same shape the other read gates use.
+    return {
+      header: DASHBOARD_SECRET_HEADER,
+      envVar: DASHBOARD_SECRET_ENV,
+      unsetStatus: 404,
+      unsetBody: INTERNAL_FEATURE_OFF,
+    };
+  }
   if (route.path.startsWith('/internal/daily-rewards/')) {
     return {
       header: DAILY_REWARD_SECRET_HEADER,
@@ -701,7 +713,12 @@ function gatePairFor(route: RouteDef): {
   };
 }
 
-const SWEPT_SECRET_ENVS = [DEPLOY_SECRET_ENV, DISCORD_SECRET_ENV, DAILY_REWARD_SECRET_ENV] as const;
+const SWEPT_SECRET_ENVS = [
+  DEPLOY_SECRET_ENV,
+  DISCORD_SECRET_ENV,
+  DAILY_REWARD_SECRET_ENV,
+  DASHBOARD_SECRET_ENV,
+] as const;
 
 describe('internal secret-gate mounting sweep: every /internal route is gated', () => {
   const savedSecrets = new Map<string, string | undefined>();
@@ -730,12 +747,12 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 18-route internal surface (handleInternalApi 9 + 7 ops + flex-batch + outbox)', () => {
+  it('selects the full 20-route internal surface (handleInternalApi 9 + 7 ops + flex-batch + outbox + 2 dashboard reads)', () => {
     // The ops family includes finalization, four payout-service routes, and two moderation mutations.
     // flex-batch and outbox are registry-only (no legacy arm) but still ride the same Discord secret
     // gate, so the sweep below generates their unset-env and wrong-secret cases like every other route.
     // The retired relay/activity/winners GETs (#2791) are absent from the registry entirely.
-    expect(internalSurfaceRoutes.length).toBe(18);
+    expect(internalSurfaceRoutes.length).toBe(20);
   });
 
   for (const route of internalSurfaceRoutes) {

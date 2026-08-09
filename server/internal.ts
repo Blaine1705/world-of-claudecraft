@@ -31,14 +31,17 @@ import {
 import { drainRelay, type QueuedRelay, requeueRelay } from './discord_relay';
 import type { GameServer } from './game';
 import {
+  DASHBOARD_SECRET_ENV,
+  DASHBOARD_SECRET_HEADER,
   DEPLOY_SECRET_ENV,
   DEPLOY_SECRET_HEADER,
   DISCORD_SECRET_ENV,
   DISCORD_SECRET_HEADER,
   requireInternalSecret,
 } from './http/middleware/require_internal_secret';
-import type { RouteDef, RouteHandler, RouteMeta } from './http/types';
+import type { Ctx, RouteDef, RouteHandler, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
+import type { WocMarketService } from './woc_market';
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -79,6 +82,75 @@ export async function handleInternalApi(
   }
 
   return fail(res, 404, 'unknown endpoint');
+}
+
+/**
+ * Secret-gated operator READS for the internal dashboard.
+ *
+ * These exist because listings and p2p trades live only in this process's
+ * database: the economy service owns quotes and settings, and nothing else can
+ * see a listing. The dashboard reaches them the way it already reaches the
+ * payout and economy services, with a shared secret injected server-side, so no
+ * privileged user credential is stored merely to read an ops table.
+ *
+ * READ ONLY, deliberately. Every mutation the dashboard could want already
+ * exists on the role-gated /admin/api surface with its own audit trail, and
+ * moving one here would move it out from under that.
+ */
+const LISTING_STATUSES = ['active', 'ending', 'settling', 'closed', 'all'] as const;
+const OFFER_STATUSES = ['pending', 'accepted', 'declined', 'withdrawn', 'expired', 'all'] as const;
+
+const OPS_DAY_MS = 24 * 60 * 60 * 1000;
+
+/** An unrecognised value falls back to the default rather than refusing: an ops
+ *  read answering 400 on a typo is less useful than one showing the default. */
+function readEnum<T extends string>(raw: string | null, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(raw as T) ? (raw as T) : fallback;
+}
+
+/** A query-string integer with a default. Distinct from clampInt below, which
+ *  clamps an already-decoded value and has no notion of an absent parameter. */
+function intParam(raw: string | null, fallback: number, min: number, max: number): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(Math.max(Math.trunc(n), min), max);
+}
+
+/** The window, defaulting to the last 30 days. Both ends are clamped so a
+ *  malformed or hostile range cannot turn an ops read into a full scan with an
+ *  unbounded sort. */
+function readRange(url: URL): { fromMs: number; toMs: number } {
+  const now = Date.now();
+  const toMs = intParam(url.searchParams.get('toMs'), now, 0, now + OPS_DAY_MS);
+  const fromMs = intParam(url.searchParams.get('fromMs'), toMs - 30 * OPS_DAY_MS, 0, toMs);
+  return { fromMs, toMs };
+}
+
+function opsQuery(ctx: Ctx): { url: URL; page: number; pageSize: number } {
+  const url = new URL(ctx.req.url ?? '/', 'http://localhost');
+  return {
+    url,
+    page: intParam(url.searchParams.get('page'), 0, 0, 10_000),
+    pageSize: intParam(url.searchParams.get('pageSize'), 50, 1, 200),
+  };
+}
+
+async function opsListingsHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOpsReads;
+  // An unwired market is a 404, matching how an unset secret reads: the
+  // dashboard learns the surface is unavailable, not that it guessed wrong.
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  const { url, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(url.searchParams.get('status'), LISTING_STATUSES, 'active');
+  ok(ctx.res, await service.opsListings({ status, ...readRange(url), page, pageSize }));
+}
+
+async function opsP2pTradesHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOpsReads;
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  const { url, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(url.searchParams.get('status'), OFFER_STATUSES, 'all');
+  ok(ctx.res, await service.opsP2pTrades({ status, ...readRange(url), page, pageSize }));
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads
@@ -635,6 +707,23 @@ export function configureInternalRuntime(runtime: InternalRuntime): void {
 /** Clear the injected runtime so a unit test can install its own fake. */
 export function resetInternalRuntimeForTests(): void {
   internalRuntime = null;
+  wocMarketOpsReads = null;
+}
+
+/**
+ * The market's operator reads, injected at boot like the runtime above.
+ *
+ * Injected rather than imported: reaching woc_market_routes from here drags
+ * admin.ts and account.ts in behind it, and this module is loaded by tests that
+ * mock server/db down to a bare pool token. A type-only import costs nothing at
+ * runtime and keeps that graph flat.
+ */
+type WocMarketOpsReads = Pick<WocMarketService, 'opsListings' | 'opsP2pTrades'>;
+
+let wocMarketOpsReads: WocMarketOpsReads | null = null;
+
+export function configureInternalWocMarketReads(reads: WocMarketOpsReads): void {
+  wocMarketOpsReads = reads;
 }
 
 /** The injected runtime, or a loud failure if a request somehow beat boot wiring. */
@@ -653,12 +742,35 @@ const deployGate = requireInternalSecret({
   header: DEPLOY_SECRET_HEADER,
   envVar: DEPLOY_SECRET_ENV,
 });
+/** The dashboard's own gate: its own secret and header, so revoking the
+ *  dashboard's access never touches the Discord bot's. */
+const dashboardGate = requireInternalSecret({
+  header: DASHBOARD_SECRET_HEADER,
+  envVar: DASHBOARD_SECRET_ENV,
+});
+
 const discordGate = requireInternalSecret({
   header: DISCORD_SECRET_HEADER,
   envVar: DISCORD_SECRET_ENV,
 });
 
 export const routes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/internal/woc-market/listings',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsListingsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/internal/woc-market/p2p-trades',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsP2pTradesHandler,
+  },
   {
     method: 'POST',
     path: '/internal/restart-countdown',

@@ -252,7 +252,11 @@ import {
   moderationErrorBody,
   readBody,
 } from './http_util';
-import { configureInternalRuntime, handleInternalApi } from './internal';
+import {
+  configureInternalRuntime,
+  configureInternalWocMarketReads,
+  handleInternalApi,
+} from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
@@ -2774,6 +2778,9 @@ const wocMarketService = new WocMarketService({
   },
 });
 configureWocMarketRuntime({ service: wocMarketService });
+// The dashboard's read-only ops views. Injected here so internal.ts never
+// imports the market route module (and admin/account behind it).
+configureInternalWocMarketReads(wocMarketService);
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
