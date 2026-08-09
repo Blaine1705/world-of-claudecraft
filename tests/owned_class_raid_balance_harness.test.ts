@@ -110,16 +110,13 @@ describe('owned-class raid-level balance harness', () => {
       expect(thundercall.dps).toBeGreaterThanOrEqual(vespers.dps * 0.69);
       expect(thundercall.readyIdleSeconds).toBeLessThanOrEqual(15);
       expect(thundercall.buttonsPressed).toBeGreaterThanOrEqual(65);
-      // Floor lowered for the v0.36 composition (Vespers re-band landed Shadow
-      // at ~214; Elemental is a below-band kit item tracked separately);
-      // flagged for owner review. Re-measured across all three scenarios on
-      // the integrated tree: 0.8402 / 0.8290 / 0.8118 by target level, so the
-      // floor sits just under the level-24 minimum.
+      // 2026-08-09 120s band round: the Warspirit raise plus the Vespers trim
+      // re-measured across all three scenarios at 1.0581 / 1.0280 / 0.9788 by
+      // target level, so the 0.81 floor is green again with real margin.
       expect(warspirit.dps).toBeGreaterThanOrEqual(vespers.dps * 0.81);
-      // Band widened after rebasing onto the in-combat Spirit mp5 merge: the
-      // spirit-stacking Warspirit build gains more raid-length mana than
-      // Vespers (measured 1.094 on the combined tree). Re-author the pair
-      // when the owned-class stack integrates.
+      // Ceiling kept at 1.12 (level-22 measures 1.0581 this round, was 1.094
+      // on the combined tree pre-round). Re-author the pair when the
+      // owned-class stack integrates.
       expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * 1.12);
       expect(warspirit.readyIdleSeconds).toBeLessThanOrEqual(40);
       expect(warspirit.buttonsPressed).toBeGreaterThanOrEqual(55);

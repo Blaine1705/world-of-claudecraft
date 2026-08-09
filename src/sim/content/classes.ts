@@ -4536,7 +4536,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
+    effects: [{ type: 'imbue', bonus: 56, duration: 1800 }],
     description: 'Imbue both weapons for 30 min, enabling Warspirit Cadence.',
   },
   warspirit_cadence: {
