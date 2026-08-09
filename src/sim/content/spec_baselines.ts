@@ -53,8 +53,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   // and finisher share. The legendary itself is not touched here (separate PR).
   rogue: {
     assassination: {
-      stats: { crit: 0.12, apPct: 0.5 },
-      global: { meleeDmgPct: 0.34 },
+      stats: { crit: 0.12, apPct: 0.36 },
+      global: { meleeDmgPct: 0.22 },
       ability: [
         { ability: 'sinister_strike', costPct: -0.16 },
         { ability: 'eviscerate', dmgPct: 0.32 },

@@ -41,8 +41,8 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   // ships with the Thronebane hand fix. apPct/crit carry the auto-attack heavy
   // kit; meleeDmgPct tops up the builder and finisher share.
   'rogue/assassination': {
-    stats: { crit: 0.12, apPct: 0.5 },
-    global: { meleeDmgPct: 0.34 },
+    stats: { crit: 0.12, apPct: 0.36 },
+    global: { meleeDmgPct: 0.22 },
     abilities: {
       sinister_strike: { costPct: -0.16 },
       eviscerate: { dmgPct: 0.32 },
@@ -341,7 +341,7 @@ describe('v0.28 passive restoration hotfix', () => {
     };
     const bare = apFor(null);
     for (const spec of ['assassination', 'combat']) {
-      // apPct is 0.4 to 0.55 across these specs, plus crit/flat AP; both clear
+      // apPct is 0.36 to 0.55 across these specs, plus crit/flat AP; both clear
       // a 1.3x AP floor over the spec-less rogue. A dropped apPct wiring fails here.
       expect(apFor(spec), spec).toBeGreaterThan(bare * 1.3);
     }
