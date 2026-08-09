@@ -79,6 +79,14 @@ describe('dependency audit gate', () => {
     expect(workflow).toMatch(/^\s+run: pnpm install --frozen-lockfile$/m);
   });
 
+  // A hung `pnpm install` or a stalled advisory fetch must fail the job in bounded
+  // time rather than run to GitHub's 360-minute default: this workflow fires on
+  // every push touching the lockfile plus a weekly cron, so a wedged runner would
+  // sit unnoticed until someone happens to look at the Actions tab.
+  it('bounds the job with an explicit timeout', () => {
+    expect(workflow).toMatch(/^ {4}timeout-minutes: \d+$/m);
+  });
+
   // The audit must fail the job on a finding. Every way this gate turns decorative
   // while still reporting a green run is a suffix or a sibling key, never a deletion:
   // `--audit-level` raises the bar above the default `low`, and `|| true`, `|| :`,

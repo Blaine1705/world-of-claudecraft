@@ -49,6 +49,7 @@ jobs:
   audit:
     name: pnpm audit
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
