@@ -1,218 +1,3578 @@
 {
-  "amb_forge": 5,
-  "ambush": 5.1,
-  "arcane_blast": 6,
-  "backstab": 5.2,
-  "blind": 6.1,
-  "blink": 6.2,
-  "blizzard": 5.8,
-  "buff_apply": 7.9,
-  "cast_chain_heal": 4.5,
-  "cast_lightning_bolt": 5,
-  "cheap_shot": 5.3,
-  "cloak_of_shadows": 6.2,
-  "combat_block": 4.7,
-  "combat_crit": 10.3,
-  "combat_dodge": 5.3,
-  "combat_parry": 5.2,
-  "debuff_apply": 6.1,
-  "entangling_roots": 5.5,
-  "eviscerate": 5.1,
-  "fear": 7,
-  "fear_shout": 6.3,
-  "flamestrike": 6.2,
-  "foot_dirt": 5.2,
-  "foot_grass": 5.1,
-  "foot_snow": 5.2,
-  "foot_stone": 5.2,
-  "foot_water": 5.2,
-  "foot_wood": 5.2,
-  "frost_nova": 6.2,
-  "frozen_orb": 6.1,
-  "garrote": 5.4,
-  "glacial_spike": 5.9,
-  "hammer_of_justice": 6.3,
-  "heal_impact": 6.1,
-  "ice_block": 6.3,
-  "impact_arcane": 6.3,
-  "impact_bone": 6.1,
-  "impact_fire": 6.2,
-  "impact_flesh": 6,
-  "impact_frost": 5.8,
-  "impact_holy": 6.5,
-  "impact_leather": 6.3,
-  "impact_metal": 5.7,
-  "impact_nature": 6.3,
-  "impact_shadow": 6.1,
-  "lockpick_advanced_1": 4.6,
-  "lockpick_advanced_2": 4.7,
-  "lockpick_advanced_3": 4.5,
-  "lockpick_advanced_4": 4.7,
-  "lockpick_begin": 5.1,
-  "lockpick_bind": 4.6,
-  "lockpick_bonus": 4.6,
-  "lockpick_end": 5,
-  "lockpick_fail": 4.5,
-  "lockpick_page_cleared": 5,
-  "lockpick_retry": 4.9,
-  "lockpick_slip": 4.6,
-  "lockpick_success": 4.9,
-  "lockpick_trap": 4.8,
-  "melee_bow": 5.2,
-  "melee_swing_blade": 5.2,
-  "melee_swing_heavy": 5.2,
-  "melee_swing_light": 5.1,
-  "melee_unarmed": 5.2,
-  "mob_beast_aggro": 5.3,
-  "mob_beast_attack": 5.3,
-  "mob_beast_death": 6.3,
-  "mob_beast_hurt": 5.3,
-  "mob_beast_idle": 9.5,
-  "mob_boar_aggro": 5.6,
-  "mob_boar_attack": 5.3,
-  "mob_boar_death": 6.2,
-  "mob_boar_hurt": 6.6,
-  "mob_boar_idle": 5.2,
-  "mob_burrower_aggro": 5.2,
-  "mob_burrower_attack": 5.2,
-  "mob_burrower_death": 5.3,
-  "mob_burrower_hurt": 5.2,
-  "mob_burrower_idle": 5.3,
-  "mob_demon_aggro": 7.3,
-  "mob_demon_attack": 7.3,
-  "mob_demon_death": 7.3,
-  "mob_demon_hurt": 7.3,
-  "mob_demon_idle": 6.2,
-  "mob_dragonkin_aggro": 6.2,
-  "mob_dragonkin_attack": 5.2,
-  "mob_dragonkin_death": 6.2,
-  "mob_dragonkin_hurt": 6.2,
-  "mob_dragonkin_idle": 7.2,
-  "mob_elemental_aggro": 5.2,
-  "mob_elemental_attack": 5.3,
-  "mob_elemental_death": 6.2,
-  "mob_elemental_hurt": 6.2,
-  "mob_elemental_idle": 5.3,
-  "mob_humanoid_aggro": 5.5,
-  "mob_humanoid_attack": 5.9,
-  "mob_humanoid_death": 6.2,
-  "mob_humanoid_hurt": 6.2,
-  "mob_humanoid_idle": 5.2,
-  "mob_mudfin_aggro": 5.3,
-  "mob_mudfin_attack": 5.2,
-  "mob_mudfin_death": 5.2,
-  "mob_mudfin_hurt": 5.3,
-  "mob_mudfin_idle": 5.2,
-  "mob_ogre_aggro": 5.5,
-  "mob_ogre_attack": 5.2,
-  "mob_ogre_death": 6.3,
-  "mob_ogre_hurt": 7,
-  "mob_ogre_idle": 5.3,
-  "mob_reptile_aggro": 4.7,
-  "mob_reptile_attack": 5.2,
-  "mob_reptile_death": 6.2,
-  "mob_reptile_hurt": 5.6,
-  "mob_reptile_idle": 8.3,
-  "mob_spider_aggro": 5.2,
-  "mob_spider_attack": 5.2,
-  "mob_spider_death": 5.2,
-  "mob_spider_hurt": 5.3,
-  "mob_spider_idle": 7.3,
-  "mob_troll_aggro": 5.2,
-  "mob_troll_attack": 5.3,
-  "mob_troll_death": 6.2,
-  "mob_troll_hurt": 6.2,
-  "mob_troll_idle": 7.2,
-  "mob_undead_aggro": 4.6,
-  "mob_undead_attack": 5.3,
-  "mob_undead_death": 6.2,
-  "mob_undead_hurt": 6.8,
-  "mob_undead_idle": 6.8,
-  "mount_run_aether_hover_cycle": 5.2,
-  "mount_run_drakemaw_raptor": 5.2,
-  "mount_run_grag_bear": 5.3,
-  "mount_run_shadowjump_toad": 5.3,
-  "mount_run_stalkglider_snail": 5.3,
-  "mount_run_stormfeather_griffin": 5.2,
-  "mount_run_terrorspark_groundshaker": 5.3,
-  "mount_run_thunderstrut_gobbler": 5.2,
-  "mount_run_valorsteed": 5.2,
-  "move_jump": 4.6,
-  "move_land": 4.7,
-  "move_splash": 6,
-  "move_swim": 6.1,
-  "player_death": 6.3,
-  "player_drink_potion": 9.1,
-  "player_drink_water": 6.3,
-  "player_eat_food": 6.3,
-  "player_hurt": 5.2,
-  "proj_arcane": 6.1,
-  "proj_fire": 6.2,
-  "proj_frost": 5.9,
-  "proj_holy": 5.6,
-  "proj_nature": 6.1,
-  "proj_shadow": 5.8,
-  "pyroblast": 6.2,
-  "quest_accept": 7,
-  "quest_complete": 6.3,
-  "quest_ready": 13.2,
-  "sap": 5.7,
-  "scorch": 5.3,
-  "shadowstep": 5.3,
-  "sinister_strike": 8.5,
-  "spell_nova": 6.5,
-  "stealth": 6.7,
-  "temporal_clock": 4.9,
-  "ui_achievement": 4.9,
-  "ui_arena_loss": 7.4,
-  "ui_bag_close": 5.1,
-  "ui_bag_open": 5,
-  "ui_card_play": 5,
-  "ui_card_reveal": 4.8,
-  "ui_card_round_push": 5,
-  "ui_card_shuffle": 5,
-  "ui_click": 5,
-  "ui_coin": 5.7,
-  "ui_cosmetic_unlock": 5.8,
-  "ui_craft_alchemy": 5,
-  "ui_craft_armorcrafting": 5,
-  "ui_craft_cooking": 5.1,
-  "ui_craft_disenchant": 6.4,
-  "ui_craft_enchanting": 4.9,
-  "ui_craft_engineering": 4.9,
-  "ui_craft_inscription": 5,
-  "ui_craft_jewelcrafting": 5,
-  "ui_craft_leatherworking": 5,
-  "ui_craft_salvage": 5.2,
-  "ui_craft_tailoring": 4.9,
-  "ui_craft_weaponcrafting": 5,
-  "ui_duel_challenge": 5.3,
-  "ui_duel_countdown": 5,
-  "ui_duel_end": 4.7,
-  "ui_duel_start": 4.7,
-  "ui_error": 5,
-  "ui_fish_bite": 5.2,
-  "ui_fish_cast": 5.3,
-  "ui_fish_reel": 5.3,
-  "ui_gather_cast_herb": 5.3,
-  "ui_gather_cast_ore": 5.2,
-  "ui_gather_cast_wood": 5.2,
-  "ui_gather_epic": 8.5,
-  "ui_gather_herb": 5.6,
-  "ui_gather_legendary": 6.2,
-  "ui_gather_ore": 5.2,
-  "ui_gather_rare": 5.5,
-  "ui_gather_wood": 5.3,
-  "ui_level_up": 5.1,
-  "ui_loot_item": 5,
-  "ui_masterwork": 4.8,
-  "ui_ready_check": 4.7,
-  "ui_sheep": 5.1,
-  "ui_weapon_sheathe": 5,
-  "ui_weapon_unsheathe": 5.1,
-  "ui_whisper": 4.7,
-  "vanish": 6.3,
-  "wand_arcane": 7.6,
-  "wand_holy": 9.1,
-  "wand_shadow": 6.8
+  "amb_forge": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "amb_forge.mp3",
+        "mtimeMs": 1786260738982.5962,
+        "size": 343605,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ambush": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ambush.mp3",
+        "mtimeMs": 1786260738985.5962,
+        "size": 13208,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "arcane_blast": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "arcane_blast.mp3",
+        "mtimeMs": 1786260738985.5962,
+        "size": 29509,
+        "peakDb": -7
+      }
+    ]
+  },
+  "backstab": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "backstab.mp3",
+        "mtimeMs": 1786260738985.5962,
+        "size": 13835,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "blind": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "blind.mp3",
+        "mtimeMs": 1786260738985.5962,
+        "size": 25747,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "blink": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "blink.mp3",
+        "mtimeMs": 1786260738985.5962,
+        "size": 30763,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "blizzard": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "blizzard.mp3",
+        "mtimeMs": 1786260738986.5962,
+        "size": 193767,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "buff_apply": {
+    "ceilingDb": 7.9,
+    "tracks": [
+      {
+        "filename": "buff_apply.mp3",
+        "mtimeMs": 1786260738986.5962,
+        "size": 38913,
+        "peakDb": -8.9
+      }
+    ]
+  },
+  "cast_chain_heal": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "cast_chain_heal.mp3",
+        "mtimeMs": 1786260738986.5962,
+        "size": 62736,
+        "peakDb": -5.5
+      }
+    ]
+  },
+  "cast_lightning_bolt": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "cast_lightning_bolt.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 37659,
+        "peakDb": -6
+      }
+    ]
+  },
+  "cheap_shot": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "cheap_shot.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 13208,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "cloak_of_shadows": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "cloak_of_shadows.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 43301,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "combat_block": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "combat_block_1.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 9447,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "combat_block_2.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 10074,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "combat_block_3.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 12537,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "combat_crit": {
+    "ceilingDb": 10.3,
+    "tracks": [
+      {
+        "filename": "combat_crit_1.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 10074,
+        "peakDb": -11.6
+      },
+      {
+        "filename": "combat_crit_2.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 10701,
+        "peakDb": -11.3
+      },
+      {
+        "filename": "combat_crit_3.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 10701,
+        "peakDb": -11.6
+      }
+    ]
+  },
+  "combat_dodge": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "combat_dodge_1.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 11910,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "combat_dodge_2.mp3",
+        "mtimeMs": 1786260738987.5962,
+        "size": 11910,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "combat_dodge_3.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 11910,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "combat_parry": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "combat_parry_1.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 16343,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "combat_parry_2.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 10030,
+        "peakDb": -6.8
+      },
+      {
+        "filename": "combat_parry_3.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 14462,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "debuff_apply": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "debuff_apply.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 40794,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "entangling_roots": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "entangling_roots.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 67752,
+        "peakDb": -6.5
+      }
+    ]
+  },
+  "eviscerate": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "eviscerate.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 18224,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "fear": {
+    "ceilingDb": 7,
+    "tracks": [
+      {
+        "filename": "fear.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 65871,
+        "peakDb": -8
+      }
+    ]
+  },
+  "fear_shout": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "fear_shout.mp3",
+        "mtimeMs": 1786260738988.5962,
+        "size": 43301,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "flamestrike": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "flamestrike.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 60229,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "foot_dirt": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "foot_dirt_1.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.5
+      },
+      {
+        "filename": "foot_dirt_2.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_dirt_3.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_dirt_4.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_dirt_5.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "foot_grass": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "foot_grass_1.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 10701,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "foot_grass_2.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_grass_3.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 10074,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_grass_4.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_grass_5.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.7
+      }
+    ]
+  },
+  "foot_snow": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "foot_snow_1.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_snow_2.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_snow_3.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.4
+      },
+      {
+        "filename": "foot_snow_4.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_snow_5.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "foot_stone": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "foot_stone_1.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_stone_2.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_stone_3.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_stone_4.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8193,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_stone_5.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "foot_water": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "foot_water_1.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 8820,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_water_2.mp3",
+        "mtimeMs": 1786260738989.5962,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_water_3.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 10701,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_water_4.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 8820,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_water_5.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 10701,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "foot_wood": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "foot_wood_1.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_wood_2.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 8193,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_wood_3.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "foot_wood_4.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "foot_wood_5.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "frost_nova": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "frost_nova.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 34524,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "frozen_orb": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "frozen_orb.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 47063,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "garrote": {
+    "ceilingDb": 5.4,
+    "tracks": [
+      {
+        "filename": "garrote.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 13835,
+        "peakDb": -6.4
+      }
+    ]
+  },
+  "glacial_spike": {
+    "ceilingDb": 5.9,
+    "tracks": [
+      {
+        "filename": "glacial_spike.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 27628,
+        "peakDb": -6.9
+      }
+    ]
+  },
+  "hammer_of_justice": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "hammer_of_justice.mp3",
+        "mtimeMs": 1786260738990.5962,
+        "size": 69006,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "heal_impact": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "heal_impact.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 45182,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "ice_block": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "ice_block.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 42048,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "impact_arcane": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "impact_arcane.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 38913,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "impact_bone": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "impact_bone_1.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 12581,
+        "peakDb": -14.4
+      },
+      {
+        "filename": "impact_bone_2.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 15716,
+        "peakDb": -8.9
+      },
+      {
+        "filename": "impact_bone_3.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 14462,
+        "peakDb": -9
+      },
+      {
+        "filename": "impact_bone_4.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 13835,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "impact_fire": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_fire.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 27001,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "impact_flesh": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "impact_flesh_1.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 6939,
+        "peakDb": -12.5
+      },
+      {
+        "filename": "impact_flesh_2.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 6939,
+        "peakDb": -7
+      },
+      {
+        "filename": "impact_flesh_3.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 6312,
+        "peakDb": -10.2
+      },
+      {
+        "filename": "impact_flesh_4.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 6939,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "impact_frost": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "impact_frost.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 27628,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "impact_holy": {
+    "ceilingDb": 6.5,
+    "tracks": [
+      {
+        "filename": "impact_holy.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 41421,
+        "peakDb": -7.5
+      }
+    ]
+  },
+  "impact_leather": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "impact_leather_1.mp3",
+        "mtimeMs": 1786260738991.5962,
+        "size": 3804,
+        "peakDb": -8.5
+      },
+      {
+        "filename": "impact_leather_2.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 9447,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "impact_leather_3.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 4431,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "impact_leather_4.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 11328,
+        "peakDb": -11.3
+      }
+    ]
+  },
+  "impact_metal": {
+    "ceilingDb": 5.7,
+    "tracks": [
+      {
+        "filename": "impact_metal_1.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 21985,
+        "peakDb": -6.7
+      },
+      {
+        "filename": "impact_metal_2.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 19478,
+        "peakDb": -6.8
+      },
+      {
+        "filename": "impact_metal_3.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 18851,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "impact_metal_4.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 14462,
+        "peakDb": -6.9
+      }
+    ]
+  },
+  "impact_nature": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "impact_nature.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 27628,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "impact_shadow": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "impact_shadow.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 30763,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "lockpick_advanced_1": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "lockpick_advanced_1.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 8820,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "lockpick_advanced_2": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "lockpick_advanced_2.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 7566,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "lockpick_advanced_3": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "lockpick_advanced_3.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 4431,
+        "peakDb": -5.5
+      }
+    ]
+  },
+  "lockpick_advanced_4": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "lockpick_advanced_4.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 3804,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "lockpick_begin": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "lockpick_begin.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 48944,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "lockpick_bind": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "lockpick_bind.mp3",
+        "mtimeMs": 1786260738992.5962,
+        "size": 10701,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "lockpick_bonus": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "lockpick_bonus.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 48944,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "lockpick_end": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "lockpick_end.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 45809,
+        "peakDb": -6
+      }
+    ]
+  },
+  "lockpick_fail": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "lockpick_fail.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 19478,
+        "peakDb": -5.5
+      }
+    ]
+  },
+  "lockpick_page_cleared": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "lockpick_page_cleared.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 32016,
+        "peakDb": -6
+      }
+    ]
+  },
+  "lockpick_retry": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "lockpick_retry.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 33270,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "lockpick_slip": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "lockpick_slip.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 11954,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "lockpick_success": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "lockpick_success.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 60856,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "lockpick_trap": {
+    "ceilingDb": 4.8,
+    "tracks": [
+      {
+        "filename": "lockpick_trap.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 10074,
+        "peakDb": -5.8
+      }
+    ]
+  },
+  "melee_bow": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_bow_1.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 11328,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_bow_2.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_bow_3.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_bow_4.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 13835,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_bow_5.mp3",
+        "mtimeMs": 1786260738993.5962,
+        "size": 11954,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "melee_swing_blade": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_swing_blade_1.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 11954,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_swing_blade_2.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 19478,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_blade_3.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 10074,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_blade_4.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 7566,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_blade_5.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 10701,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_blade_6.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 12581,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_blade_7.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 13835,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_swing_heavy": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_swing_heavy_1.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 11954,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_swing_heavy_2.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 16343,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_heavy_3.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 21985,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_heavy_4.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 18224,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_heavy_5.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 19478,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_heavy_6.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 16343,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_swing_heavy_7.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_swing_light": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "melee_swing_light_1.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 10074,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_swing_light_2.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 12581,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_light_3.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 10701,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "melee_swing_light_4.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 13835,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_light_5.mp3",
+        "mtimeMs": 1786260738994.5962,
+        "size": 12581,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_light_6.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_swing_light_7.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 13208,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "melee_unarmed": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_unarmed_1.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 9447,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_unarmed_2.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11954,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_unarmed_3.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11328,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_unarmed_4.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 10074,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_unarmed_5.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 10701,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_unarmed_6.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11328,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_unarmed_7.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11328,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_beast_aggro": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_aggro_1.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 28882,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "mob_beast_aggro_2.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 22612,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_beast_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_attack_1.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 15089,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_attack_2.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_attack_3.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 21985,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_beast_death": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_death.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 25747,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_beast_hurt": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_hurt.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 11328,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_beast_idle": {
+    "ceilingDb": 9.5,
+    "tracks": [
+      {
+        "filename": "mob_beast_idle.mp3",
+        "mtimeMs": 1786260738995.5962,
+        "size": 26330,
+        "peakDb": -10.5
+      }
+    ]
+  },
+  "mob_boar_aggro": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "mob_boar_aggro_1.mp3",
+        "mtimeMs": 1786260738996.5962,
+        "size": 11954,
+        "peakDb": -9.7
+      },
+      {
+        "filename": "mob_boar_aggro_2.mp3",
+        "mtimeMs": 1786260738996.5962,
+        "size": 13835,
+        "peakDb": -6.6
+      },
+      {
+        "filename": "mob_boar_aggro_3.mp3",
+        "mtimeMs": 1786260738996.5962,
+        "size": 19478,
+        "peakDb": -9.9
+      }
+    ]
+  },
+  "mob_boar_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_boar_attack_1.mp3",
+        "mtimeMs": 1786260738996.5962,
+        "size": 16343,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_boar_attack_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 13835,
+        "peakDb": -9.2
+      },
+      {
+        "filename": "mob_boar_attack_3.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 14462,
+        "peakDb": -6.5
+      },
+      {
+        "filename": "mob_boar_attack_4.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 24493,
+        "peakDb": -6.5
+      }
+    ]
+  },
+  "mob_boar_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_boar_death_1.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 18224,
+        "peakDb": -8
+      },
+      {
+        "filename": "mob_boar_death_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 15089,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_boar_hurt": {
+    "ceilingDb": 6.6,
+    "tracks": [
+      {
+        "filename": "mob_boar_hurt.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 20732,
+        "peakDb": -7.6
+      }
+    ]
+  },
+  "mob_boar_idle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_boar_idle_1.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 23866,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_boar_idle_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 30763,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_burrower_aggro": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_burrower_aggro_1.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 15716,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_burrower_aggro_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 7566,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_burrower_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_burrower_attack_1.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 10074,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_burrower_attack_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 10701,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_burrower_attack_3.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_burrower_death": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_burrower_death_1.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 15716,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_burrower_death_2.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 12581,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_burrower_hurt": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_burrower_hurt.mp3",
+        "mtimeMs": 1786260738997.5962,
+        "size": 11328,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_burrower_idle": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_burrower_idle_1.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 11910,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_burrower_idle_2.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 6268,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_demon_aggro": {
+    "ceilingDb": 7.3,
+    "tracks": [
+      {
+        "filename": "mob_demon_aggro_1.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 35151,
+        "peakDb": -8.3
+      },
+      {
+        "filename": "mob_demon_aggro_2.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 23239,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "mob_demon_attack": {
+    "ceilingDb": 7.3,
+    "tracks": [
+      {
+        "filename": "mob_demon_attack_1.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 31390,
+        "peakDb": -8.3
+      },
+      {
+        "filename": "mob_demon_attack_2.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 25747,
+        "peakDb": -8.3
+      },
+      {
+        "filename": "mob_demon_attack_3.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 27001,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "mob_demon_death": {
+    "ceilingDb": 7.3,
+    "tracks": [
+      {
+        "filename": "mob_demon_death_1.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 48317,
+        "peakDb": -8.3
+      },
+      {
+        "filename": "mob_demon_death_2.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 52079,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "mob_demon_hurt": {
+    "ceilingDb": 7.3,
+    "tracks": [
+      {
+        "filename": "mob_demon_hurt.mp3",
+        "mtimeMs": 1786260738998.5962,
+        "size": 25120,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "mob_demon_idle": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_demon_idle.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 46436,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_dragonkin_aggro": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_dragonkin_aggro_1.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 32643,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_dragonkin_aggro_2.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 27628,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_dragonkin_aggro_3.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 28882,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_dragonkin_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_dragonkin_attack_1.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 18851,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_dragonkin_attack_2.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 18851,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_dragonkin_attack_3.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 20732,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_dragonkin_attack_4.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 20732,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_dragonkin_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_dragonkin_death_1.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 44555,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_dragonkin_death_2.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 49571,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_dragonkin_hurt": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_dragonkin_hurt_1.mp3",
+        "mtimeMs": 1786260738999.5962,
+        "size": 25747,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "mob_dragonkin_hurt_2.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 27001,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_dragonkin_idle": {
+    "ceilingDb": 7.2,
+    "tracks": [
+      {
+        "filename": "mob_dragonkin_idle_1.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 44511,
+        "peakDb": -8.2
+      },
+      {
+        "filename": "mob_dragonkin_idle_2.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 17553,
+        "peakDb": -8.7
+      }
+    ]
+  },
+  "mob_elemental_aggro": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_elemental_aggro_1.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 20105,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_elemental_aggro_2.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 22612,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_elemental_aggro_3.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 17597,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_elemental_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_elemental_attack_1.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 21359,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_elemental_attack_2.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 19478,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_elemental_attack_3.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 19478,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_elemental_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_elemental_death_1.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 34524,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "mob_elemental_death_2.mp3",
+        "mtimeMs": 1786260739000.5962,
+        "size": 37032,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_elemental_hurt": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_elemental_hurt.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 25747,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_elemental_idle": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_elemental_idle_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 35151,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_elemental_idle_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 23866,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_humanoid_aggro": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "mob_humanoid_aggro_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 8193,
+        "peakDb": -7.8
+      },
+      {
+        "filename": "mob_humanoid_aggro_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 20105,
+        "peakDb": -6.5
+      }
+    ]
+  },
+  "mob_humanoid_attack": {
+    "ceilingDb": 5.9,
+    "tracks": [
+      {
+        "filename": "mob_humanoid_attack_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 20732,
+        "peakDb": -6.9
+      },
+      {
+        "filename": "mob_humanoid_attack_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 15716,
+        "peakDb": -8.1
+      },
+      {
+        "filename": "mob_humanoid_attack_3.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 15089,
+        "peakDb": -6.9
+      }
+    ]
+  },
+  "mob_humanoid_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_humanoid_death_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 28882,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_humanoid_death_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 21359,
+        "peakDb": -7.9
+      }
+    ]
+  },
+  "mob_humanoid_hurt": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_humanoid_hurt_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 8193,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_humanoid_hurt_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 25120,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_humanoid_idle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_humanoid_idle_1.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 6895,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_humanoid_idle_2.mp3",
+        "mtimeMs": 1786260739001.5962,
+        "size": 6895,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_mudfin_aggro": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_mudfin_aggro_1.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 23239,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_aggro_2.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 30763,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "mob_mudfin_aggro_3.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 41421,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_mudfin_aggro_4.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 28882,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_mudfin_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_mudfin_attack_1.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_attack_2.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 8820,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_mudfin_attack_3.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_attack_4.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 8193,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_mudfin_death": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_mudfin_death_1.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_death_2.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_death_3.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 21985,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_mudfin_death_4.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 20105,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_mudfin_hurt": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_mudfin_hurt.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_mudfin_idle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_mudfin_idle_1.mp3",
+        "mtimeMs": 1786260739002.596,
+        "size": 15045,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_mudfin_idle_2.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 25703,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_ogre_aggro": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "mob_ogre_aggro_1.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 22612,
+        "peakDb": -6.5
+      },
+      {
+        "filename": "mob_ogre_aggro_2.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 23866,
+        "peakDb": -6.8
+      },
+      {
+        "filename": "mob_ogre_aggro_3.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 25120,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_ogre_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_ogre_attack_1.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 10701,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_ogre_attack_2.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 11328,
+        "peakDb": -7
+      },
+      {
+        "filename": "mob_ogre_attack_3.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 10701,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_ogre_death": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mob_ogre_death.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 52705,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_ogre_hurt": {
+    "ceilingDb": 7,
+    "tracks": [
+      {
+        "filename": "mob_ogre_hurt.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 12581,
+        "peakDb": -8
+      }
+    ]
+  },
+  "mob_ogre_idle": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_ogre_idle.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 22568,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_reptile_aggro": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "mob_reptile_aggro_1.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 21359,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_reptile_aggro_2.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 22568,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "mob_reptile_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_reptile_attack_1.mp3",
+        "mtimeMs": 1786260739003.596,
+        "size": 15672,
+        "peakDb": -6.5
+      },
+      {
+        "filename": "mob_reptile_attack_2.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 14462,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_reptile_attack_3.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 17553,
+        "peakDb": -7.7
+      }
+    ]
+  },
+  "mob_reptile_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_reptile_death_1.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 28882,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_reptile_death_2.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 25120,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "mob_reptile_hurt": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "mob_reptile_hurt.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 15045,
+        "peakDb": -6.6
+      }
+    ]
+  },
+  "mob_reptile_idle": {
+    "ceilingDb": 8.3,
+    "tracks": [
+      {
+        "filename": "mob_reptile_idle.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 27001,
+        "peakDb": -9.3
+      }
+    ]
+  },
+  "mob_spider_aggro": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_spider_aggro_1.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 22612,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_spider_aggro_2.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 23239,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_spider_attack": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_spider_attack_1.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 16343,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_spider_attack_2.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 16343,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_spider_attack_3.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 16343,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_spider_death": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_spider_death_1.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 20105,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_spider_death_2.mp3",
+        "mtimeMs": 1786260739004.596,
+        "size": 25747,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_spider_death_3.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 23239,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_spider_hurt": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_spider_hurt_1.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 26374,
+        "peakDb": -7
+      },
+      {
+        "filename": "mob_spider_hurt_2.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 12581,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_spider_idle": {
+    "ceilingDb": 7.3,
+    "tracks": [
+      {
+        "filename": "mob_spider_idle.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 7522,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "mob_troll_aggro": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_troll_aggro_1.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 25747,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_troll_aggro_2.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 15716,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_troll_aggro_3.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_troll_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_troll_attack_1.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 17597,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_troll_attack_2.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 21359,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_troll_attack_3.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_troll_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_troll_death_1.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 27001,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_troll_death_2.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 27001,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_troll_hurt": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_troll_hurt.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 25120,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_troll_idle": {
+    "ceilingDb": 7.2,
+    "tracks": [
+      {
+        "filename": "mob_troll_idle_1.mp3",
+        "mtimeMs": 1786260739005.596,
+        "size": 17553,
+        "peakDb": -8.2
+      },
+      {
+        "filename": "mob_troll_idle_2.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 21941,
+        "peakDb": -8.2
+      }
+    ]
+  },
+  "mob_undead_aggro": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "mob_undead_aggro.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 30136,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "mob_undead_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_undead_attack_1.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 10074,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_attack_2.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 10701,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_attack_3.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 10701,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_undead_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_undead_death.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 32016,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_undead_hurt": {
+    "ceilingDb": 6.8,
+    "tracks": [
+      {
+        "filename": "mob_undead_hurt.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 15089,
+        "peakDb": -7.8
+      }
+    ]
+  },
+  "mob_undead_idle": {
+    "ceilingDb": 6.8,
+    "tracks": [
+      {
+        "filename": "mob_undead_idle_1.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 32599,
+        "peakDb": -7.8
+      },
+      {
+        "filename": "mob_undead_idle_2.mp3",
+        "mtimeMs": 1786260739006.596,
+        "size": 20061,
+        "peakDb": -9.6
+      }
+    ]
+  },
+  "mount_run_aether_hover_cycle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_aether_hover_cycle.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 17102,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_drakemaw_raptor": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_drakemaw_raptor.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 11328,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_grag_bear": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_grag_bear.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_shadowjump_toad": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_shadowjump_toad.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 13835,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_stalkglider_snail": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_stalkglider_snail.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 15089,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_stormfeather_griffin": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_stormfeather_griffin.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 13835,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_terrorspark_groundshaker": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_terrorspark_groundshaker.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 15716,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_thunderstrut_gobbler": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_thunderstrut_gobbler.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 11328,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_valorsteed": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_valorsteed.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 10701,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "move_jump": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "move_jump_1.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 15716,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "move_jump_2.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 13835,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "move_jump_3.mp3",
+        "mtimeMs": 1786260739007.596,
+        "size": 8820,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "move_jump_4.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 8193,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "move_jump_5.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 13208,
+        "peakDb": -5.6
+      }
+    ]
+  },
+  "move_land": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "move_land_1.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 14462,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "move_land_2.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 10074,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "move_land_3.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 13835,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "move_land_4.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 15716,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "move_splash": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "move_splash_1.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 43301,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "move_splash_2.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 34524,
+        "peakDb": -7
+      },
+      {
+        "filename": "move_splash_3.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 40794,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "move_swim": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "move_swim_1.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 30763,
+        "peakDb": -7.1
+      },
+      {
+        "filename": "move_swim_2.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 30136,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "move_swim_3.mp3",
+        "mtimeMs": 1786260739008.596,
+        "size": 35151,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "move_swim_4.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 28882,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "move_swim_5.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 25747,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "player_death": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "player_death_1.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 38913,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "player_death_2.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 40794,
+        "peakDb": -7.3
+      },
+      {
+        "filename": "player_death_3.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 38913,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "player_drink_potion": {
+    "ceilingDb": 9.1,
+    "tracks": [
+      {
+        "filename": "player_drink_potion.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 25747,
+        "peakDb": -10.1
+      }
+    ]
+  },
+  "player_drink_water": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "player_drink_water.mp3",
+        "mtimeMs": 1786260739009.596,
+        "size": 40794,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "player_eat_food": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "player_eat_food.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 52705,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "player_hurt": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "player_hurt_1.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "player_hurt_2.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 15089,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "player_hurt_3.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 15089,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "player_hurt_4.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 11954,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "player_hurt_5.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 19478,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "proj_arcane": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "proj_arcane.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 32643,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "proj_fire": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "proj_fire.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 33270,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "proj_frost": {
+    "ceilingDb": 5.9,
+    "tracks": [
+      {
+        "filename": "proj_frost.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 40167,
+        "peakDb": -6.9
+      }
+    ]
+  },
+  "proj_holy": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "proj_holy.mp3",
+        "mtimeMs": 1786260739010.596,
+        "size": 20105,
+        "peakDb": -6.6
+      }
+    ]
+  },
+  "proj_nature": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "proj_nature.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 38913,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "proj_shadow": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "proj_shadow.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 25747,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "pyroblast": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "pyroblast.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 37659,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "quest_accept": {
+    "ceilingDb": 7,
+    "tracks": [
+      {
+        "filename": "quest_accept_1.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 48944,
+        "peakDb": -8
+      }
+    ]
+  },
+  "quest_complete": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "quest_complete_1.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 67752,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "quest_ready": {
+    "ceilingDb": 13.2,
+    "tracks": [
+      {
+        "filename": "quest_ready_1.mp3",
+        "mtimeMs": 1786260739011.596,
+        "size": 46436,
+        "peakDb": -14.2
+      }
+    ]
+  },
+  "sap": {
+    "ceilingDb": 5.7,
+    "tracks": [
+      {
+        "filename": "sap.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 7566,
+        "peakDb": -6.7
+      }
+    ]
+  },
+  "scorch": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "scorch.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 19478,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "shadowstep": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "shadowstep.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "sinister_strike": {
+    "ceilingDb": 8.5,
+    "tracks": [
+      {
+        "filename": "sinister_strike.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 13208,
+        "peakDb": -9.5
+      }
+    ]
+  },
+  "spell_nova": {
+    "ceilingDb": 6.5,
+    "tracks": [
+      {
+        "filename": "spell_nova.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 43301,
+        "peakDb": -7.5
+      }
+    ]
+  },
+  "stealth": {
+    "ceilingDb": 6.7,
+    "tracks": [
+      {
+        "filename": "stealth.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 48944,
+        "peakDb": -7.7
+      }
+    ]
+  },
+  "temporal_clock": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "temporal_clock.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 49571,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "ui_achievement": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "ui_achievement.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 65871,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "ui_arena_loss": {
+    "ceilingDb": 7.4,
+    "tracks": [
+      {
+        "filename": "ui_arena_loss.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 33270,
+        "peakDb": -8.4
+      }
+    ]
+  },
+  "ui_bag_close": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ui_bag_close.mp3",
+        "mtimeMs": 1786260739012.596,
+        "size": 11954,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "ui_bag_open": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_bag_open.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 10074,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_card_play": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_card_play_1.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 4431,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "ui_card_play_2.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 4431,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "ui_card_play_3.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 5058,
+        "peakDb": -6
+      },
+      {
+        "filename": "ui_card_play_4.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 4431,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_card_reveal": {
+    "ceilingDb": 4.8,
+    "tracks": [
+      {
+        "filename": "ui_card_reveal_1.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 8820,
+        "peakDb": -6.4
+      },
+      {
+        "filename": "ui_card_reveal_2.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 6939,
+        "peakDb": -5.9
+      },
+      {
+        "filename": "ui_card_reveal_3.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 10701,
+        "peakDb": -5.8
+      }
+    ]
+  },
+  "ui_card_round_push": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_card_round_push.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 12581,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_card_shuffle": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_card_shuffle.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 40794,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_click": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_click.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 3804,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_coin": {
+    "ceilingDb": 5.7,
+    "tracks": [
+      {
+        "filename": "ui_coin_1.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 10701,
+        "peakDb": -7.7
+      },
+      {
+        "filename": "ui_coin_2.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 13835,
+        "peakDb": -10
+      },
+      {
+        "filename": "ui_coin_3.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 15716,
+        "peakDb": -6.7
+      }
+    ]
+  },
+  "ui_cosmetic_unlock": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "ui_cosmetic_unlock.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 31390,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "ui_craft_alchemy": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_alchemy.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 32016,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_craft_armorcrafting": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_armorcrafting.mp3",
+        "mtimeMs": 1786260739013.596,
+        "size": 16970,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_craft_cooking": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ui_craft_cooking.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 50825,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "ui_craft_disenchant": {
+    "ceilingDb": 6.4,
+    "tracks": [
+      {
+        "filename": "ui_craft_disenchant.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 14462,
+        "peakDb": -7.4
+      }
+    ]
+  },
+  "ui_craft_enchanting": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "ui_craft_enchanting.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 21359,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "ui_craft_engineering": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "ui_craft_engineering.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 38913,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "ui_craft_inscription": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_inscription.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 31390,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_craft_jewelcrafting": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_jewelcrafting.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 21359,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_craft_leatherworking": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_leatherworking.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 20105,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_craft_salvage": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "ui_craft_salvage.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 17597,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "ui_craft_tailoring": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "ui_craft_tailoring.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 52705,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "ui_craft_weaponcrafting": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_craft_weaponcrafting.mp3",
+        "mtimeMs": 1786260739014.596,
+        "size": 15089,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_duel_challenge": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "ui_duel_challenge.mp3",
+        "mtimeMs": 1786260739015.596,
+        "size": 28882,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_duel_countdown": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_duel_countdown.mp3",
+        "mtimeMs": 1786260739015.596,
+        "size": 2550,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_duel_end": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "ui_duel_end.mp3",
+        "mtimeMs": 1786260739015.596,
+        "size": 25747,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "ui_duel_start": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "ui_duel_start.mp3",
+        "mtimeMs": 1786260739015.596,
+        "size": 53959,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "ui_error": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_error.mp3",
+        "mtimeMs": 1786260739015.596,
+        "size": 20732,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_fish_bite": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "ui_fish_bite_1.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 12581,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "ui_fish_bite_2.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "ui_fish_bite_3.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 15089,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_fish_cast": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "ui_fish_cast_1.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 13835,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "ui_fish_cast_2.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 13835,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_fish_reel": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "ui_fish_reel_1.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 32643,
+        "peakDb": -6.7
+      },
+      {
+        "filename": "ui_fish_reel_2.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 31390,
+        "peakDb": -6.7
+      },
+      {
+        "filename": "ui_fish_reel_3.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 33270,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_gather_cast_herb": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "ui_gather_cast_herb_1.mp3",
+        "mtimeMs": 1786260739016.596,
+        "size": 13835,
+        "peakDb": -6.4
+      },
+      {
+        "filename": "ui_gather_cast_herb_2.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 12581,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_gather_cast_ore": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "ui_gather_cast_ore_1.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 15716,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "ui_gather_cast_ore_2.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 15716,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "ui_gather_cast_wood": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "ui_gather_cast_wood_1.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 14462,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "ui_gather_cast_wood_2.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "ui_gather_epic": {
+    "ceilingDb": 8.5,
+    "tracks": [
+      {
+        "filename": "ui_gather_epic.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 35778,
+        "peakDb": -9.5
+      }
+    ]
+  },
+  "ui_gather_herb": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "ui_gather_herb_1.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 25120,
+        "peakDb": -6.6
+      },
+      {
+        "filename": "ui_gather_herb_2.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 25747,
+        "peakDb": -6.6
+      },
+      {
+        "filename": "ui_gather_herb_3.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 25747,
+        "peakDb": -7.1
+      },
+      {
+        "filename": "ui_gather_herb_4.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 24493,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "ui_gather_herb_5.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 26374,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "ui_gather_legendary": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "ui_gather_legendary.mp3",
+        "mtimeMs": 1786260739017.596,
+        "size": 79664,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "ui_gather_ore": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "ui_gather_ore_1.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 13835,
+        "peakDb": -6.4
+      },
+      {
+        "filename": "ui_gather_ore_2.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 13835,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "ui_gather_ore_3.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 13835,
+        "peakDb": -6.5
+      },
+      {
+        "filename": "ui_gather_ore_4.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 13835,
+        "peakDb": -7.5
+      },
+      {
+        "filename": "ui_gather_ore_5.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 13835,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "ui_gather_rare": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "ui_gather_rare.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 25747,
+        "peakDb": -6.5
+      }
+    ]
+  },
+  "ui_gather_wood": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "ui_gather_wood_1.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 11328,
+        "peakDb": -8.1
+      },
+      {
+        "filename": "ui_gather_wood_2.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 11328,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "ui_gather_wood_3.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 11328,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "ui_gather_wood_4.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 11328,
+        "peakDb": -7.4
+      },
+      {
+        "filename": "ui_gather_wood_5.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 11328,
+        "peakDb": -8.3
+      }
+    ]
+  },
+  "ui_level_up": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ui_level_up.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 88441,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "ui_loot_item": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_loot_item_1.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 6312,
+        "peakDb": -6
+      },
+      {
+        "filename": "ui_loot_item_2.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 8193,
+        "peakDb": -6
+      },
+      {
+        "filename": "ui_loot_item_3.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 6939,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "ui_loot_item_4.mp3",
+        "mtimeMs": 1786260739018.596,
+        "size": 5685,
+        "peakDb": -6
+      },
+      {
+        "filename": "ui_loot_item_5.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 8193,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_masterwork": {
+    "ceilingDb": 4.8,
+    "tracks": [
+      {
+        "filename": "ui_masterwork.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 48944,
+        "peakDb": -5.8
+      }
+    ]
+  },
+  "ui_ready_check": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "ui_ready_check.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 63363,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "ui_sheep": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ui_sheep.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 18224,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "ui_weapon_sheathe": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "ui_weapon_sheathe.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 6939,
+        "peakDb": -6
+      }
+    ]
+  },
+  "ui_weapon_unsheathe": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "ui_weapon_unsheathe.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 6312,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "ui_whisper": {
+    "ceilingDb": 4.7,
+    "tracks": [
+      {
+        "filename": "ui_whisper.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 16970,
+        "peakDb": -5.7
+      }
+    ]
+  },
+  "vanish": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "vanish.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 30763,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "wand_arcane": {
+    "ceilingDb": 7.6,
+    "tracks": [
+      {
+        "filename": "wand_arcane_1.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 18224,
+        "peakDb": -8.6
+      },
+      {
+        "filename": "wand_arcane_2.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 18224,
+        "peakDb": -11.8
+      },
+      {
+        "filename": "wand_arcane_3.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 19478,
+        "peakDb": -9.4
+      }
+    ]
+  },
+  "wand_holy": {
+    "ceilingDb": 9.1,
+    "tracks": [
+      {
+        "filename": "wand_holy_1.mp3",
+        "mtimeMs": 1786260739019.596,
+        "size": 15716,
+        "peakDb": -11.1
+      },
+      {
+        "filename": "wand_holy_2.mp3",
+        "mtimeMs": 1786260739020.596,
+        "size": 15089,
+        "peakDb": -13.5
+      },
+      {
+        "filename": "wand_holy_3.mp3",
+        "mtimeMs": 1786260739020.596,
+        "size": 16343,
+        "peakDb": -10.1
+      }
+    ]
+  },
+  "wand_shadow": {
+    "ceilingDb": 6.8,
+    "tracks": [
+      {
+        "filename": "wand_shadow_1.mp3",
+        "mtimeMs": 1786260739020.596,
+        "size": 18224,
+        "peakDb": -8.1
+      },
+      {
+        "filename": "wand_shadow_2.mp3",
+        "mtimeMs": 1786260739020.596,
+        "size": 15716,
+        "peakDb": -8.6
+      },
+      {
+        "filename": "wand_shadow_3.mp3",
+        "mtimeMs": 1786260739020.596,
+        "size": 16970,
+        "peakDb": -7.8
+      }
+    ]
+  }
 }
