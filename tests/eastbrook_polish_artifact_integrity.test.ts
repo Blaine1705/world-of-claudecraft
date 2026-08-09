@@ -668,10 +668,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so all three literals mint to values matching
+// neither parent. No capture was retaken.
+// Re-minted after pinning the three specifier exact (PR 3165 review): only
+// the pnpm-lock.yaml specifier row moved. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dadf948a3806c1b3acdbf5e1986665ebceb94ec1924218024171196dfa1fb85d';
+  '2ddd0d3f365faf81c4ed8f6ce43c262f505ef5319edc2c2a2262da38319c7d87';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f8e1f05120194f15d2b8095948196e3083b5c48708cf893cc4afd3d9925b4eb7';
+  '9dd239c2645c8e996d1af0a3bc20d1103e4ff338b226c8fd9b8f405c175b575a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1566,10 +1573,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // landing on top of the VFX per-frame cost work already on this release
     // branch, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
+    // compileAsync patch branch: the first-order composite follows both
+    // parents' inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted after pinning the three specifier exact (PR 3165 review): only
+    // the pnpm-lock.yaml specifier row moved. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('91779f2ea530e8045a38103630aaec54c6ae24472f9e62a8f053ab801430080f');
+    ).toBe('c56b6f222c6e235e6a5a9528c35fc90ecd528e9859cb8ee4a8abb1d7f2e460fb');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
