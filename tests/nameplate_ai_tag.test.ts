@@ -317,3 +317,24 @@ describe('batched canvas nameplate state', () => {
     expect((painter as unknown as PainterStateAccess).states.has(target.id)).toBe(false);
   });
 });
+
+describe('guild single-writer invariant', () => {
+  // The guildLabel memo is load-bearing on "resolveContent is state.guild's
+  // only writer": a second writer appearing anywhere would silently stop the
+  // guild line drawing rather than drawing something stale (the harder
+  // failure to notice). Pin the writer set so a new assignment site fails
+  // here instead.
+  it('state.guild is written only by resolveContent, and drawBase never writes it', async () => {
+    const { readFileSync } = await import('node:fs');
+    const painter = readFileSync('src/render/nameplate_painter.ts', 'utf8');
+    const canvas = readFileSync('src/render/nameplate_canvas.ts', 'utf8');
+    const painterWrites = painter.match(/state\.guild\s*=[^=]/g) ?? [];
+    expect(painterWrites).toHaveLength(2);
+    const resolveStart = painter.indexOf('resolveContent(');
+    expect(resolveStart).toBeGreaterThan(-1);
+    for (const write of painterWrites) {
+      expect(painter.indexOf(write)).toBeGreaterThan(resolveStart);
+    }
+    expect(canvas.match(/\.guild\s*=[^=]/g) ?? []).toHaveLength(0);
+  });
+});
