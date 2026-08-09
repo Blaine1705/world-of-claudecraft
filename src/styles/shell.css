@@ -5231,7 +5231,10 @@
     margin: 0;
     overflow: visible;
   }
-  body.mobile-touch #charselect-panel #charselect-news {
+  /* Both docked panels, by CLASS rather than by #charselect-news: the redesign
+     editor sits in the same slot with the same chrome, and an id-keyed override
+     left it on the desktop 520px height with none of these fixes. */
+  body.mobile-touch #charselect-panel .cs-news-panel {
     flex: none;
     width: 100%;
     height: auto;
@@ -5240,8 +5243,11 @@
     margin-bottom: 0;
   }
   /* The page is the scroller on mobile: the feed renders at natural height
-     (no nested scroll region, no bottom fade hiding the tail mid-read). */
-  body.mobile-touch #charselect-panel .cs-news-feed {
+     (no nested scroll region, no bottom fade hiding the tail mid-read). The
+     customizer follows the same rule, or it scrolls inside a panel that is
+     itself scrolling. */
+  body.mobile-touch #charselect-panel .cs-news-feed,
+  body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {
     flex: none;
     min-height: 0;
     overflow: visible;
@@ -6624,7 +6630,7 @@
       min-height: 110px;
       min-width: 0;
     }
-    body.mobile-touch #charselect-panel #charselect-news {
+    body.mobile-touch #charselect-panel .cs-news-panel {
       grid-column: 1 / -1;
       box-sizing: border-box;
       width: auto;

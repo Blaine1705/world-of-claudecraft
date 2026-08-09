@@ -1,5 +1,11 @@
-// IWorldAppearance: the authored modular-character look as a WIRE + STORAGE
-// payload, and its bounds validation.
+// The authored modular-character look as a WIRE + STORAGE payload, and its
+// bounds validation.
+//
+// No IWorld facet, unlike most of this directory: an appearance is not
+// something the world is ASKED for, it is a document that crosses the trust
+// boundary, so there is nothing for Sim and ClientWorld to implement in
+// parallel and no parity pin to hold. What this module exports is the
+// validator both sides call.
 //
 // This module is the ONE home the server and the client share for the
 // appearance payload's shape, mirroring src/world_api/action_bar.ts: it is
@@ -90,8 +96,16 @@ function sanitizeSliderMap(value: unknown): Record<string, number> | null {
 /**
  * Validate + bound an untrusted appearance payload. Returns a clean document
  * carrying only known keys with plausibly-typed values, or null when the input
- * is fundamentally malformed (not an object). Never throws: a bad payload
- * yields null so the caller can answer 400 without crashing the request.
+ * is not a usable appearance at all. Never throws: a bad payload yields null so
+ * the caller can answer 400 without crashing the request.
+ *
+ * Null covers TWO cases, and the second is load-bearing:
+ *  - not an object, so there is nothing to read;
+ *  - an object that contributed NO known key ({}, or nothing but junk keys).
+ *    An empty document is not a look. Accepting it let `{"appearance":{}}`
+ *    spend a character's one-shot redesign token and store a body nobody
+ *    authored: the reroll's whole precondition is that the player is choosing
+ *    a design, so "chose nothing" has to be a 400, not a spent token.
  *
  * The result is NOT guaranteed to name real styles: see the note above: the
  * renderer's normalizeAppearance is what turns it into a valid body.
@@ -99,18 +113,24 @@ function sanitizeSliderMap(value: unknown): Record<string, number> | null {
 export function sanitizeAppearance(value: unknown): Record<string, unknown> | null {
   if (!isPlainObject(value)) return null;
   const out: Record<string, unknown> = {};
+  let kept = 0;
   for (const key of APPEARANCE_WIRE_KEYS) {
     if (!(key in value)) continue;
     const raw = value[key];
     if (NESTED_KEYS.includes(key)) {
       const map = sanitizeSliderMap(raw);
-      if (map !== null) out[key] = map;
+      if (map !== null) {
+        out[key] = map;
+        kept++;
+      }
       continue;
     }
     if (typeof raw === 'boolean') out[key] = raw;
     else if (typeof raw === 'number' && Number.isFinite(raw)) out[key] = raw;
     else if (typeof raw === 'string' && raw.length <= MAX_STRING_LENGTH) out[key] = raw;
     // anything else (nested junk, oversized string, null) is simply dropped
+    else continue;
+    kept++;
   }
-  return out;
+  return kept > 0 ? out : null;
 }

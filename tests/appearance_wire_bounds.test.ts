@@ -41,6 +41,16 @@ describe('sanitizeAppearance bounds', () => {
     expect(sanitizeAppearance(null)).toBeNull();
   });
 
+  it('rejects a document that contributes no known key', () => {
+    // An empty look is not a look, and the caller that matters is the one-shot
+    // redesign: accepting `{"appearance":{}}` spent a character's single
+    // redesign token and stored a body nobody authored.
+    expect(sanitizeAppearance({})).toBeNull();
+    expect(sanitizeAppearance({ nothing: 'known', evil: 'x' })).toBeNull();
+    // ...and a document whose only known key is unusable is equally empty.
+    expect(sanitizeAppearance({ hair: 'x'.repeat(200) })).toBeNull();
+  });
+
   it('drops unknown keys so a character row cannot carry attacker text', () => {
     const out = sanitizeAppearance({ gender: 'female', evil: 'x'.repeat(10), nested: { a: 1 } });
     expect(out).toEqual({ gender: 'female' });

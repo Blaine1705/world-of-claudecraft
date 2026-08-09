@@ -36,7 +36,11 @@ import {
   applyModularSliderMorphs,
   assembleModel,
   ensureSkinTexture,
+  farSourceMaterials,
+  materialsByName,
+  modularFarBake,
   prepareVisual,
+  releaseModularVariant,
   setHeldOffhand,
   setHeldWeapon,
   setWeaponsStowed,
@@ -425,6 +429,15 @@ export class CharacterVisual {
   private poseWrap = new THREE.Group();
   private farMesh: THREE.Mesh | null = null;
   private farMaterials: THREE.Material | THREE.Material[] | null = null;
+  /** A COMPOSED body's own source materials, by material name, snapshotted
+   *  before applyMaterials retints the model. The far bake shares one geometry
+   *  per part set and resolves its colours through this, so a hundred players
+   *  in one haircut still each keep their own skin, hair and eyes at distance. */
+  private composedSrcMaterials: Map<string, THREE.Material> | null = null;
+  /** A composed far LOD is baked on the first crossing into the far band, not
+   *  at construction: most of a crowd stands close and never needs one. This
+   *  latches so a bake that yields nothing is not retried every crossing. */
+  private farBakeTried = false;
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
@@ -565,6 +578,9 @@ export class CharacterVisual {
     this.look = prep.def.modular ? look : null;
     this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
     configureTightBoneTextures(this.model);
+    // Before applyMaterials: the far bake needs the composed body's own
+    // recoloured materials, and this pass replaces them with tinted clones.
+    if (this.look) this.composedSrcMaterials = materialsByName(this.model);
     applyMaterials(
       this.model,
       this.def,
@@ -612,8 +628,14 @@ export class CharacterVisual {
     // far LOD + shadow proxy share the baked idle-pose geometry per key. Skin
     // aware from the start (see applySkinMaterials): a character that spawns
     // already wearing a non-default skin must not LOD out to the embedded one.
-    if (prep.idleGeo) {
-      this.farMesh = new THREE.Mesh(
+    //
+    // A COMPOSED body cannot use the key's bake: prepareVisual measures
+    // DEFAULT_LOOK, so a peer crossing into the far band would change gender,
+    // hair and outfit. Theirs is baked from their own part set instead, and
+    // lazily (buildComposedFar), because most of a crowd stands close enough
+    // that the mesh would never be drawn.
+    if (prep.idleGeo && !this.look) {
+      this.buildFarMeshes(
         prep.idleGeo,
         tintedFarMaterials(
           prep.def,
@@ -624,15 +646,6 @@ export class CharacterVisual {
           skinEmissiveTexture(key, skinIndex),
         ),
       );
-      this.farMaterials = this.farMesh.material;
-      this.farMesh.visible = false;
-      this.poseWrap.add(this.farMesh);
-      if (GFX.tier !== 'low') {
-        this.shadowProxy = new THREE.Mesh(prep.idleGeo, shadowOnlyMat());
-        this.shadowProxy.castShadow = true;
-        this.shadowProxy.visible = false;
-        this.poseWrap.add(this.shadowProxy);
-      }
     }
 
     // capsule from measured body extents, long/wide creatures (wolves,
@@ -1320,8 +1333,54 @@ export class CharacterVisual {
   setFar(far: boolean): void {
     if (far === this.far) return;
     this.far = far;
+    // First crossing of a composed body: mint its far LOD now. Cached per part
+    // set, so a crowd in one haircut pays for one bake between them, and a
+    // character that never walks away never pays at all.
+    if (far && !this.farMesh && this.look && !this.farBakeTried) this.buildComposedFar();
     this.modelWrap.visible = !far || !this.farMesh;
     if (this.farMesh) this.farMesh.visible = far;
+  }
+
+  /** Hang a baked far mesh (and, off the low tier, its shadow proxy) on the
+   *  pose wrapper. Shared by the fixed-rig path in the constructor and the
+   *  composed path below so the two cannot drift. */
+  private buildFarMeshes(geo: THREE.BufferGeometry, mats: THREE.Material[]): void {
+    this.farMesh = new THREE.Mesh(geo, mats);
+    this.farMaterials = this.farMesh.material;
+    this.farMesh.visible = false;
+    this.poseWrap.add(this.farMesh);
+    if (GFX.tier !== 'low') {
+      this.shadowProxy = new THREE.Mesh(geo, shadowOnlyMat());
+      this.shadowProxy.castShadow = true;
+      this.shadowProxy.visible = false;
+      this.poseWrap.add(this.shadowProxy);
+    }
+  }
+
+  /** Bake (or reuse) this composed body's far LOD. Leaves farMesh null if the
+   *  look bakes to nothing, in which case the character simply keeps its
+   *  articulated model at distance — correct, just not as cheap. */
+  private buildComposedFar(): void {
+    this.farBakeTried = true;
+    if (!this.look) return;
+    const bake = modularFarBake(this.key, this.look);
+    if (!bake) return;
+    const prep = prepareVisual(this.key);
+    this.buildFarMeshes(
+      bake.geo,
+      tintedFarMaterials(
+        prep.def,
+        this.entityColor,
+        farSourceMaterials(this.composedSrcMaterials ?? new Map(), bake.matNames),
+        bake.isBody,
+        skinTexture(this.key, this.skinIndex),
+        skinEmissiveTexture(this.key, this.skinIndex),
+      ),
+    );
+    // The shadow proxy is normally shown by the renderer's own band check,
+    // which already ran for this frame against a null proxy; sync it to the
+    // state the mesh was just built into.
+    if (this.shadowProxy) this.shadowProxy.visible = false;
   }
 
   get isFar(): boolean {
@@ -1463,14 +1522,18 @@ export class CharacterVisual {
     });
     // The far LOD mesh is a separate baked geometry (see the constructor):
     // it needs its own skin-aware material rebuild or a distant player LOD
-    // pop reverts to the model's embedded default skin.
+    // pop reverts to the model's embedded default skin. A composed body rebuilds
+    // from ITS bake, not the key's DEFAULT_LOOK one.
     if (this.farMesh) {
       const prep = prepareVisual(this.key);
+      const composed = this.look ? modularFarBake(this.key, this.look) : null;
       this.farMaterials = tintedFarMaterials(
         this.def,
         this.entityColor,
-        prep.idleSrcMats,
-        prep.idleSrcIsBody,
+        composed
+          ? farSourceMaterials(this.composedSrcMaterials ?? new Map(), composed.matNames)
+          : prep.idleSrcMats,
+        composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
       );
@@ -1983,6 +2046,11 @@ export class CharacterVisual {
       if (sm.isSkinnedMesh && sm.skeleton) skeletons.add(sm.skeleton);
     });
     for (const skeleton of skeletons) skeleton.dispose();
+    // Give the composed part set back. It is the one shared cache entry that IS
+    // reclaimable: keyed by the look rather than by the asset, so a populated
+    // zone mints one per distinct character and would otherwise grow for the
+    // life of the session. No-op for a fixed rig.
+    releaseModularVariant(this.model);
   }
 
   // -------------------------------------------------------------------------

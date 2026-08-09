@@ -2988,24 +2988,50 @@ export async function setCharacterHotbarLayout(
 /** Spend a character's one-shot appearance reroll: write the new look and burn
  *  the token in ONE statement, so two concurrent rerolls cannot both succeed.
  *  All eligibility lives in the WHERE arm — ownership + realm (BOLA, matching
- *  getCharacter's scoping), the pre-creator cutoff, and the unspent token —
- *  and the row is only touched when every check passes. Returns whether the
- *  reroll was applied; false = not owned / too new / already spent, which the
+ *  getCharacter's scoping), NO authored look yet, and the unspent token — and
+ *  the row is only touched when every check passes. Returns whether the reroll
+ *  was applied; false = not owned / already designed / already spent, which the
  *  route maps to its error body. The appearance is already normalized by the
- *  caller (untrusted client input, hotbar_layout's contract). */
+ *  caller (untrusted client input, hotbar_layout's contract).
+ *
+ *  `appearance IS NULL` rather than a creation-date cutoff is the point: the
+ *  rule being expressed is "this character never got to choose a look, so it
+ *  has one free design". A hardcoded ship date says that only for rows created
+ *  before the instant it was written, and permanently strands every character
+ *  created between that instant and the actual deploy — with neither an
+ *  authored look (their client did not post one) nor a token. It also needs
+ *  re-dating on every merge, and gets it wrong silently.
+ *
+ *  The helm preference rides the SAME statement, because the redesign editor's
+ *  helmet toggle is the creation toggle: a standing wardrobe choice, not a
+ *  turntable view. It is sim state, so it patches the one key inside the state
+ *  blob rather than rewriting it (a whole-blob write from an HTTP route would
+ *  clobber a live session's progress), and follows the sim's zero-default
+ *  omission convention: hidden writes the key, shown removes it. A character
+ *  that has never been saved (state IS NULL) is left alone; its blob is written
+ *  fresh on first entry. A LIVE session still holds the old value in memory and
+ *  would autosave over this, which is what the route's setHelmHiddenForCharacter
+ *  push exists to prevent. */
 export async function consumeAppearanceReroll(
   accountId: number,
   characterId: number,
   appearance: Record<string, unknown>,
-  createdBefore: Date,
+  helmHidden: boolean,
 ): Promise<boolean> {
   const res = await pool.query(
     `UPDATE characters
-        SET appearance = $3::jsonb, appearance_reroll_used = TRUE, updated_at = now()
+        SET appearance = $3::jsonb,
+            appearance_reroll_used = TRUE,
+            state = CASE
+                      WHEN state IS NULL THEN state
+                      WHEN $5::boolean THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
+                      ELSE state - 'helmHidden'
+                    END,
+            updated_at = now()
       WHERE id = $1 AND account_id = $2 AND realm = $4
-        AND created_at < $5
+        AND appearance IS NULL
         AND appearance_reroll_used = FALSE`,
-    [characterId, accountId, JSON.stringify(appearance), REALM, createdBefore],
+    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden],
   );
   return (res.rowCount ?? 0) > 0;
 }

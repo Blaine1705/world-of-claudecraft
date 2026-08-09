@@ -1303,12 +1303,15 @@ function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
-    // The authored modular look (~0.6 KB, normalized at write). Identity-only
-    // on purpose: it is immutable for the life of the session (set at join,
-    // no command mutates it), so it ships once per entity per viewer and
-    // never rides the per-tick dynamic fields — peers compose the body from
-    // it with no recurring wire cost.
-    if (e.modularAppearance) out.app = e.modularAppearance;
+    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB and
+    // immutable for the life of the session, and everything in this record is
+    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
+    // into the object would re-serialize half a kilobyte 20 times a second per
+    // online player to produce the same bytes. It is serialized once per entity
+    // instead (EntityWireCache.appJson) and spliced into the cached identity
+    // JSON; the self record picks it up through the `maybeRaw` delta channel in
+    // bcastSelf, which already exists for heavy, rarely-changing fields.
+    // appearanceWireJson() is the one place that string is minted.
     const eq = e.equippedItems;
     for (const _ in eq) {
       out.eq = eq;
@@ -1607,7 +1610,15 @@ interface EntityWireVariantCache {
 
 interface EntityWireCache {
   tick: number;
+  /** identityFields() as JSON, WITHOUT the authored look — the string actually
+   *  diffed for identity changes. Kept beside idJson so the appearance splice
+   *  below only re-runs when the rest of the identity moves. */
+  baseIdJson: string;
   idJson: string;
+  /** The authored modular look, serialized ONCE for this entity (null when it
+   *  has none). Immutable for the session, so it is minted on first use and
+   *  spliced, never re-stringified. */
+  appJson: string | null;
   baseDynJson: string;
   idVer: number;
   baseDynVer: number;
@@ -5368,6 +5379,28 @@ export class GameServer {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
   }
 
+  /**
+   * Push a helm-visibility preference onto a LIVE session, if the character has
+   * one. Returns whether anything was in world to push to.
+   *
+   * The appearance redesign writes helm visibility straight into the stored
+   * state blob (consumeAppearanceReroll), and a character who is IN WORLD while
+   * that lands still holds the old value in memory — its 30 s autosave would
+   * write it straight back. So the route mirrors the write onto the session
+   * through the same Sim entry the paperdoll's `set_helm` command uses; the
+   * value then rides the entity wire to every viewer at once, and the autosave
+   * agrees with the row instead of fighting it.
+   */
+  setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      this.sim.setHelmHidden(hidden, s.pid);
+      pushed = true;
+    }
+    return pushed;
+  }
+
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMailOwner(characterId, oldName, newName);
   }
@@ -8279,7 +8312,9 @@ export class GameServer {
     if (!cache) {
       cache = {
         tick: -1,
+        baseIdJson: '',
         idJson: '',
+        appJson: null,
         baseDynJson: '',
         idVer: 0,
         baseDynVer: 0,
@@ -8292,6 +8327,24 @@ export class GameServer {
     return cache;
   }
 
+  /**
+   * The authored modular look as JSON, minted at most ONCE per entity.
+   *
+   * `app` is by far the heaviest identity field (~0.6 KB) and the only one that
+   * cannot change during a session: it is stamped at join from the character's
+   * own column and no command mutates it. Both wire paths therefore serialize
+   * it here and reuse the string — the peer path splices it into the cached
+   * identity JSON (wireCacheFor), the self path ships it through bcastSelf's
+   * `maybeRaw` delta channel. Returns null when the entity has no authored
+   * look, which is also what keeps the key sparse for pre-creator characters.
+   */
+  private appearanceWireJson(e: Entity): string | null {
+    if (!e.modularAppearance) return null;
+    const cache = this.entityWireCacheFor(e);
+    if (cache.appJson === null) cache.appJson = JSON.stringify(e.modularAppearance);
+    return cache.appJson;
+  }
+
   // Identity and non-aura dynamics are serialized once per entity/tick. The
   // negotiated legacy and stable aura variants are then built lazily, at most
   // once each, and shared by every compatible recipient.
@@ -8300,10 +8353,16 @@ export class GameServer {
     const t0 = this.perfDetailActive ? process.hrtime.bigint() : 0n;
     if (cache.tick !== this.sim.tickCount) {
       cache.tick = this.sim.tickCount;
-      const idJson = JSON.stringify(identityFields(e));
+      const baseIdJson = JSON.stringify(identityFields(e));
       const baseDynJson = JSON.stringify(dynamicFields(e, false));
-      if (idJson !== cache.idJson) {
-        cache.idJson = idJson;
+      if (baseIdJson !== cache.baseIdJson) {
+        cache.baseIdJson = baseIdJson;
+        // The look is spliced rather than composed into identityFields so the
+        // per-tick stringify above never walks it (see appearanceWireJson).
+        // Splicing here, inside the change arm, means even the concat only runs
+        // when the rest of the identity actually moved.
+        const appJson = this.appearanceWireJson(e);
+        cache.idJson = appJson === null ? baseIdJson : jsonWithField(baseIdJson, 'app', appJson);
         cache.idVer++;
       }
       if (baseDynJson !== cache.baseDynJson) {
@@ -8475,6 +8534,14 @@ export class GameServer {
     maybe('hrat', p.hasteRating);
     maybe('hirat', p.hitRating);
     maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
+    // The viewer's OWN authored look. It cannot come from the entity list (the
+    // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
+    // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
+    // and immutable for the session, so it ships on the first self record and
+    // never again. A character with no authored look sends nothing and keeps
+    // its class rig.
+    const selfAppJson = this.appearanceWireJson(p);
+    if (selfAppJson !== null) maybeRaw('app', selfAppJson);
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,

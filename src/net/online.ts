@@ -805,15 +805,19 @@ export class Api {
     });
   }
 
-  // Spend the character's one-shot appearance redesign (pre-creator characters
-  // only; the server is the eligibility authority and burns the token
-  // atomically). Resolves with the normalized stored look.
+  // Spend the character's one-shot appearance redesign (characters with no
+  // authored look; the server is the eligibility authority and burns the token
+  // atomically). `helmHidden` is the editor's helmet toggle, which is the same
+  // standing wardrobe choice creation posts, not a preview. Resolves with the
+  // normalized stored look.
   async rerollAppearance(
     characterId: number,
     appearance: object,
+    helmHidden: boolean,
   ): Promise<Record<string, unknown>> {
     const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
       appearance,
+      helmHidden,
     });
     return (data.appearance ?? appearance) as Record<string, unknown>;
   }
@@ -2787,7 +2791,11 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: LooseJson): Entity | null => {
+    // `selfDelta` marks the one record that is not a peer broadcast: the
+    // viewer's own extended state. Fields the server delta-gates per session
+    // (bcastSelf's maybe/maybeRaw channel) are absent when unchanged there,
+    // so an absent key must not be read as "cleared".
+    const applyWire = (w: LooseJson, selfDelta = false): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -2828,8 +2836,18 @@ export class ClientWorld implements IWorld {
         // the session). Untrusted wire JSON on purpose — every consumer runs
         // it through normalizeAppearance before composing, so a hostile peer
         // payload can only ever produce a clamped, valid body.
-        e.modularAppearance =
-          w.app && typeof w.app === 'object' && !Array.isArray(w.app) ? w.app : null;
+        //
+        // For a PEER, absence on a full record is meaningful: no authored look,
+        // so clear it and let the class rig render. The SELF record is not a
+        // peer record: the viewer's own entity never rides the entity list (the
+        // broadcast loop skips it), so its look comes through bcastSelf's
+        // heavy-field delta channel, which ships a value once and then omits it.
+        // Clearing on absence there would erase the local player's body one tick
+        // after they entered the world.
+        if (!selfDelta || w.app !== undefined) {
+          e.modularAppearance =
+            w.app && typeof w.app === 'object' && !Array.isArray(w.app) ? w.app : null;
+        }
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
@@ -3091,7 +3109,7 @@ export class ClientWorld implements IWorld {
 
     // self with extended state (always a full record)
     const s = snap.self;
-    const e = s ? applyWire(s) : null;
+    const e = s ? applyWire(s, true) : null;
     if (s && e) {
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)

@@ -1495,6 +1495,7 @@ const UI_DOM_MODULES = [
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
+  'src/ui/charselect_redesign.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',

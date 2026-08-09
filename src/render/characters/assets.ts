@@ -924,19 +924,101 @@ function optimizedScene(url: string): THREE.Object3D {
 // material swap over shared geometry.
 // ---------------------------------------------------------------------------
 
-// Never evicted, matching the shared per-asset caches this file already keeps
-// (see src/render/characters/CLAUDE.md): SkeletonUtils clones SHARE geometry
-// with their source, so dropping a variant would strand any live character
-// still drawn from it. Growth is bounded by the part-set combinatorics
-// (gender x hair x brows x worn slots), and creation only walks a few dozen.
-const modularVariantCache = new Map<string, THREE.Object3D>();
-/** Dev-only tripwire on that growth (see the warn at the bottom of the builder). */
-const MODULAR_VARIANT_WARN_AT = 64;
+/** One cached composed part set: the merged root every character with this set
+ *  is cloned from, a live-clone count, and the far-LOD bake taken off it. */
+interface ModularVariant {
+  root: THREE.Object3D;
+  /** Live composed clones still drawn from this root's geometry. */
+  refs: number;
+  /** Baked idle-pose far LOD for this part set, minted on first far-band
+   *  entry. Shares the entry's lifetime (see evictModularVariants). */
+  far: ModularFarBake | null;
+}
 
-function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
-  const key = `${url}|${names.join(',')}`;
+// BOUNDED AND REFCOUNTED, and it used to be neither.
+//
+// The cache is keyed by PART SET, and the original reasoning ("creation only
+// walks a few dozen") held while a single character composed: the local player.
+// Now every peer composes, so what mints entries is no longer one player at a
+// turntable but the population of a zone — a distinct set per distinct look —
+// and it grows for as long as the session lasts as players come and go. At
+// ~6.7k merged vertices a set, an evening in a capital would run to hundreds of
+// megabytes of geometry nothing on screen is using.
+//
+// Eviction has to be refcounted rather than plain-LRU because SkeletonUtils
+// clones SHARE geometry with the root they came from, so disposing a root that
+// a live character is still drawn from would blank that character. Every clone
+// is therefore retained in assembleModular and released in
+// CharacterVisual.dispose, and only entries with NO live clone are eligible.
+// When every entry is live the cache is allowed past the cap rather than
+// breaking a body on screen — the bound is on garbage, not on the crowd.
+const modularVariantCache = new Map<string, ModularVariant>();
+/** Retained clones over the cap keep their variant; only idle ones are dropped. */
+const MODULAR_VARIANT_CACHE_MAX = 96;
+/** Dev-only tripwire on live (unevictable) variants — the one growth the cap
+ *  cannot bound, and the signal that a release site was missed. */
+const MODULAR_VARIANT_WARN_AT = 128;
+
+/** The cache key for a composed part set: the GLB plus the picked node names. */
+function modularVariantKey(url: string, names: readonly string[]): string {
+  return `${url}|${names.join(',')}`;
+}
+
+/** Drop idle variants, least-recently-used first, until the cache is back under
+ *  the cap. Map iteration is insertion order and every hit re-inserts, so the
+ *  head is the least recently composed. */
+function evictModularVariants(): void {
+  if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) return;
+  for (const [key, entry] of modularVariantCache) {
+    if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) break;
+    if (entry.refs > 0) continue;
+    modularVariantCache.delete(key);
+    // Now provably unreferenced, so the GPU buffers can actually go back:
+    // dropping the map entry alone would leak them (three.js frees a
+    // geometry's buffers on dispose(), not on GC).
+    entry.root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh) mesh.geometry.dispose();
+    });
+    entry.far?.geo.dispose();
+  }
+  if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
+    console.warn(
+      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${MODULAR_VARIANT_CACHE_MAX}); every one is still on screen`,
+    );
+  }
+}
+
+/** Note that a composed clone is no longer drawn, freeing its part set to be
+ *  evicted. Called from CharacterVisual.dispose; safe on any root (a
+ *  non-composed one carries no key). */
+export function releaseModularVariant(root: THREE.Object3D): void {
+  const key = root.userData.modularVariantKey as string | undefined;
+  if (!key) return;
+  root.userData.modularVariantKey = undefined;
+  const entry = modularVariantCache.get(key);
+  if (entry && entry.refs > 0) entry.refs--;
+}
+
+/** Composed-body cache occupancy, for the crowd-perf probe on `window.__game`:
+ *  how many part sets are cached, how many of those a live character is still
+ *  drawn from (and so cannot be evicted), and how many recoloured materials are
+ *  warm. Read beside `renderer.webgl.info` when checking a throng. */
+export function modularCacheStats(): { variants: number; live: number; recolors: number } {
+  let live = 0;
+  for (const entry of modularVariantCache.values()) if (entry.refs > 0) live++;
+  return { variants: modularVariantCache.size, live, recolors: recolorCache.size };
+}
+
+function modularVariant(url: string, names: readonly string[]): ModularVariant {
+  const key = modularVariantKey(url, names);
   const hit = modularVariantCache.get(key);
-  if (hit) return hit;
+  if (hit) {
+    // re-insert so the eviction sweep above reads insertion order as recency
+    modularVariantCache.delete(key);
+    modularVariantCache.set(key, hit);
+    return hit;
+  }
   const root = cloneSkinned(resolvedGltf(url).scene);
   const keep = new Set(names);
   const drop: THREE.Object3D[] = [];
@@ -962,28 +1044,25 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
   for (const o of empty) o.removeFromParent();
   mergeSkinnedParts(root);
   primeSkinnedSortSpheres(root);
-  modularVariantCache.set(key, root);
-  // No silent growth: the key is the whole discrete part set (gender x eyes x
-  // lashes x mouth x ears x brows x hair x beard x earrings x worn slots), and
-  // Randomize rolls most of those at once, so a long creation session keeps a
-  // merged body per combination it visited. Eviction is not the fix (clones
-  // share geometry with the cached variant, so dropping one strands any live
-  // character drawn from it): if this ever fires in anger the answer is a
-  // variant budget on the creator. Say so rather than growing quietly.
-  if (import.meta.env?.DEV && modularVariantCache.size === MODULAR_VARIANT_WARN_AT) {
-    console.warn(
-      `[modular] ${MODULAR_VARIANT_WARN_AT} composed variants cached this session (never evicted)`,
-    );
-  }
-  return root;
+  const entry: ModularVariant = { root, refs: 0, far: null };
+  modularVariantCache.set(key, entry);
+  evictModularVariants();
+  return entry;
 }
 
 // Bounded, because a colour WHEEL is a continuous input: dragging it emits a
 // new hex every pointermove, and each distinct hex would otherwise strand a
 // material here forever (and a second one in tintedMaterial's cache, which is
 // keyed off this material's uuid). An LRU keeps a drag's worth of shades warm,
-// re-picking a recent colour is still free, and disposes what falls out.
-const RECOLOR_CACHE_MAX = 48;
+// and re-picking a recent colour is still free.
+//
+// SIZED FOR A CROWD, NOT FOR ONE COLOUR PICKER. 48 was a drag's worth of shades
+// for the single character being authored. Now every peer composes, and the
+// keys are (source material x colour) across everyone in view: skin, skin
+// detail, hair, stubble, eye, lash, lipstick and an outfit dye per person. A
+// populated zone blows past 48 immediately, and each eviction means the next
+// character with that colour rebuilds a material that was already made.
+const RECOLOR_CACHE_MAX = 512;
 const recolorCache = new Map<string, THREE.Material>();
 
 /**
@@ -1236,12 +1315,21 @@ function recolored(
   while (recolorCache.size > RECOLOR_CACHE_MAX) {
     const oldestKey = recolorCache.keys().next().value as string | undefined;
     if (oldestKey === undefined) break;
-    const oldest = recolorCache.get(oldestKey);
     recolorCache.delete(oldestKey);
-    // Safe to drop: any live clone derived from one owns its own instance, and
-    // the only map any of these carries (the stubble decal's) is shared and
-    // owned by stubble.ts, Material.dispose() never touches a texture.
-    oldest?.dispose();
+    // NOT disposed, and the old dispose() here was a live-object bug the moment
+    // peers started composing. assembleModular assigns these instances straight
+    // onto the clone's meshes, so a cached material is SHARED by every character
+    // wearing that colour — evicting one while ten peers are drawn with it
+    // dropped the renderer's state for a material still in the scene, and it had
+    // to be re-initialized on the next frame.
+    //
+    // Dropping the reference alone is the whole job here, and it leaks nothing
+    // worth naming: these are colour-only clones that own no GPU buffer of their
+    // own (their textures belong to the source material, and to stubble.ts for
+    // the decal map), and the dye variant pins customProgramCacheKey to one
+    // string, so every dyed material in the game shares a single compiled
+    // program however many colourways are live. What is reclaimed on eviction is
+    // the JS object, once nothing on screen points at it.
   }
   return mat;
 }
@@ -1304,7 +1392,14 @@ export function assembleModular(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
 ): THREE.Object3D {
-  const root = cloneSkinned(modularVariant(def.url, modularPartNames(look.app, look.worn)));
+  const names = modularPartNames(look.app, look.worn);
+  const variant = modularVariant(def.url, names);
+  const root = cloneSkinned(variant.root);
+  // Retain the part set for as long as this clone is drawn: the clone shares
+  // the variant's geometry, so eviction must not reclaim it underneath.
+  // CharacterVisual.dispose calls releaseModularVariant to give it back.
+  root.userData.modularVariantKey = modularVariantKey(def.url, names);
+  variant.refs++;
   attachStubbleDecal(root, look);
   attachMakeupDecal(root, look);
   root.traverse((o) => {
@@ -1338,8 +1433,8 @@ export function assembleModular(
  * Safe to do on the shared-geometry clone: three copies `morphTargetInfluences`
  * per instance in Mesh.copy(), so two characters can wear different faces off
  * one buffer. That is the whole reason the face is morphs rather than a CPU
- * deform: a deform would mint a cache entry per slider position, and the
- * variant cache is never evicted.
+ * deform: a deform would mint a variant per slider position, turning a cache
+ * keyed by a discrete part set into one keyed by a continuous input.
  */
 function applyMorphs(root: THREE.Object3D, look: ModularLook): void {
   const want = morphInfluences(look.app);
@@ -1968,6 +2063,108 @@ export function prepareVisual(key: string): PreparedVisual {
   prepared.set(key, prep);
   return prep;
 }
+
+/** A composed body's baked far LOD: the same single-draw idle-pose mesh
+ *  prepareVisual bakes for a fixed rig, but taken off THIS part set. */
+export interface ModularFarBake {
+  geo: THREE.BufferGeometry;
+  /** Source material NAME per geometry group. A name rather than the material
+   *  itself because the geometry is shared by every character with this part
+   *  set while the COLOURS are per character: the caller resolves each name
+   *  against its own composed body's materials (see farSourceMaterials). */
+  matNames: string[];
+  /** Parallel to matNames: whether that group is the character's own body,
+   *  the distinction applyMaterials uses to gate the skin/emissive override. */
+  isBody: boolean[];
+}
+
+/**
+ * The far-LOD bake for a COMPOSED body, minted once per part set.
+ *
+ * WHY THIS EXISTS. prepareVisual bakes one idle-pose mesh per visual KEY, from
+ * `assembleModel(def)` with no look — which falls through to DEFAULT_LOOK. That
+ * was harmless while only the local player composed, because the local player
+ * never crosses into the far band. Peers do, constantly: the band starts around
+ * 58yd and pulls IN toward ~35yd exactly when a crowd makes it matter. Without
+ * this, every composed peer changed gender, hair and outfit as they crossed it.
+ *
+ * WHAT IT SHARES AND WHAT IT DOES NOT. The geometry is keyed by part set, so a
+ * hundred players in a hundred colourways with the same haircut share one baked
+ * mesh; the materials are resolved per character from their own composed body.
+ * Face and body SLIDERS are therefore not in the silhouette — two characters
+ * with the same parts and different cheekbones bake to one mesh. That is a
+ * millimetre of jaw at 35+ yards, against a per-slider mesh being a cache keyed
+ * on a continuous input (the reason the face is morphs at all; see applyMorphs).
+ *
+ * Returns null for a non-modular def, or a look that bakes to nothing.
+ */
+export function modularFarBake(key: string, look: ModularLook): ModularFarBake | null {
+  const prep = prepareVisual(key);
+  const def = prep.def;
+  if (!def.modular) return null;
+  const variant = modularVariant(def.url, modularPartNames(look.app, look.worn));
+  if (variant.far) return variant.far;
+
+  // Pose a throwaway composed clone mid-idle and bake it, exactly as
+  // prepareVisual does for a fixed rig. The clone is released immediately: it
+  // exists only to be flattened, and holding a ref would pin the part set.
+  const temp = assembleModular(def, look);
+  const idle = prep.clips.get(def.clips.idle);
+  if (idle) {
+    const mixer = new THREE.AnimationMixer(temp);
+    mixer.clipAction(idle).play();
+    mixer.update(Math.min(0.5, idle.duration * 0.5));
+    temp.updateMatrixWorld(true);
+    temp.traverse((o) => {
+      const sm = o as THREE.SkinnedMesh;
+      if (sm.isSkinnedMesh) sm.skeleton.update();
+    });
+    mixer.stopAllAction();
+    mixer.uncacheRoot(temp);
+  } else {
+    temp.updateMatrixWorld(true);
+  }
+  // The SAME normalization the key's near model is placed with (modelWrap reads
+  // prep.normScale/yOffset/yaw), so the far mesh lands in the identical spot and
+  // the swap is a change of detail rather than of pose.
+  const norm = new THREE.Matrix4()
+    .makeTranslation(0, prep.yOffset, 0)
+    .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
+    .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
+  const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  releaseModularVariant(temp);
+  if (!geo) return null;
+  const bake: ModularFarBake = { geo, matNames: mats.map((m) => m.name), isBody };
+  variant.far = bake;
+  return bake;
+}
+
+/** Index a composed body's materials by name. Taken BEFORE applyMaterials
+ *  retints the model, so these are the recoloured SOURCE materials — the same
+ *  kind of handle prepareVisual hands tintedFarMaterials for a fixed rig. */
+export function materialsByName(root: THREE.Object3D): Map<string, THREE.Material> {
+  const byName = new Map<string, THREE.Material>();
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const m of mats) if (m && !byName.has(m.name)) byName.set(m.name, m);
+  });
+  return byName;
+}
+
+/** Resolve a bake's material names against a composed body's own materials, so
+ *  the shared far geometry is drawn in THIS character's skin, hair and eye
+ *  colours. A name with no match (a decal added to the clone after the bake,
+ *  say) falls back to a plain material rather than dropping the group. */
+export function farSourceMaterials(
+  byName: Map<string, THREE.Material>,
+  matNames: readonly string[],
+): THREE.Material[] {
+  return matNames.map((name) => byName.get(name) ?? FAR_MATERIAL_FALLBACK);
+}
+
+const FAR_MATERIAL_FALLBACK = new THREE.MeshStandardMaterial();
 
 function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   let cur: THREE.Object3D | null = o;

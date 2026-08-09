@@ -154,11 +154,6 @@ const VALID_CLASSES: readonly string[] = [
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;
-/** Characters authored before the modular creator shipped (created_at earlier
- *  than this) carry ONE appearance reroll so their player can redesign them in
- *  the new creator. UTC midnight on the ship date; compared server-side only,
- *  so every client agrees on who is eligible. */
-export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-09T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
@@ -175,6 +170,9 @@ export interface CharactersRuntime {
   takeOverCharacter(accountId: number, characterId: number): Promise<'taken-over' | 'not-online'>;
   /** game.rekeyMarketSeller: re-key an online seller's listings after a rename. */
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean;
+  /** game.setHelmHiddenForCharacter: mirror a redesign's helm choice onto a live
+   *  session, so its autosave does not write the old value back over the row. */
+  setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
   /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
@@ -285,11 +283,19 @@ export function parseCreationCosmetics(
   const appearance = parseAppearanceBody(body.appearance);
   if (appearance === 'invalid') return 'invalid';
   // The creator's helmet toggle is this character's STANDING wardrobe
-  // preference, not just a turntable view: a player who authored a face
-  // should meet it in the world rather than a bucket. So hidden unless the
-  // client explicitly asks for a shown helm, which is also the right default
-  // for a legacy/API client that sends nothing.
-  return { appearance, helmHidden: body.helmHidden !== false };
+  // preference, not just a turntable view: a player who authored a face should
+  // meet it in the world rather than a bucket. So an authored look defaults to
+  // a HIDDEN helm.
+  //
+  // The default only ever applies to a client that omits the field, and the
+  // creator never does — it always posts the toggle. So an omission means a
+  // client that predates this feature: a cached web bundle, an older native
+  // shell, a script. Those characters have no authored face to bury and used to
+  // get a helm, so defaulting them to hidden would silently change what they
+  // create. Keyed off the appearance rather than a flat default, each arm
+  // therefore keeps its own status quo.
+  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : appearance !== null;
+  return { appearance, helmHidden };
 }
 
 /** Stamp the creation-time helm choice onto a fresh character state. The look
@@ -301,14 +307,16 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
   return state;
 }
 
-/** Whether this character still holds its one-shot redesign token: authored
- *  before the modular creator shipped, token unspent. The date check lives
- *  server-side so the list payload is the single authority the roster button
- *  keys on. */
+/** Whether this character still holds its one-shot redesign token: it has no
+ *  authored look at all, and the token is unspent. Deliberately NOT a creation
+ *  date — see consumeAppearanceReroll, whose WHERE arm is the authority this
+ *  mirrors. Stating the rule as "never designed" also means a character created
+ *  by a client too old to post an appearance is covered rather than stranded.
+ *  Decided server-side so the list payload is the single truth the roster
+ *  button keys on. */
 function appearanceRerollAvailable(c: CharacterRow): boolean {
   if (c.appearance_reroll_used) return false;
-  const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
-  return Number.isFinite(created) && created < APPEARANCE_REROLL_CUTOFF.getTime();
+  return c.appearance === null || c.appearance === undefined;
 }
 
 /** Shape a realm rank lookup into the character-sheet's rank field (pure; mirrors main.ts). */
@@ -811,12 +819,13 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
 }
 
 /** POST /api/characters/:id/appearance-reroll: spend the character's one-shot
- *  redesign token on a new authored look. Eligibility (ownership + pre-cutoff
- *  creation + unspent token) is decided ATOMICALLY inside the single UPDATE
+ *  redesign token on a new authored look. Eligibility (ownership + no authored
+ *  look yet + unspent token) is decided ATOMICALLY inside the single UPDATE
  *  (consumeAppearanceReroll), so two concurrent submits cannot both land; the
  *  handler only shapes the payload and maps the outcome. Allowed while the
  *  character is online: the new look simply applies from the next world entry
- *  (appearance rides the join, not the live session). */
+ *  (appearance rides the join, not the live session), and the helm half is
+ *  pushed onto the live session below. */
 async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
   const character = ownedCharacter(ctx);
   const body = (ctx.body ?? {}) as Record<string, unknown>;
@@ -827,19 +836,29 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 400, INVALID_APPEARANCE);
     return;
   }
+  // Same rule as creation (parseCreationCosmetics): the editor's helmet toggle
+  // is a standing wardrobe choice, so a redesign sets it exactly as the creator
+  // does rather than being a preview that evaporates on Save. An omitted field
+  // means a client that does not offer the toggle; those keep the helm.
+  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : false;
   const ok = await charactersDb.consumeAppearanceReroll(
     ctxAccountId(ctx),
     character.id,
     appearance,
-    APPEARANCE_REROLL_CUTOFF,
+    helmHidden,
   );
   if (!ok) {
     json(ctx.res, 400, REROLL_NOT_AVAILABLE);
     return;
   }
+  // The row now says one thing and a live session's memory says another; its
+  // 30 s autosave writes the whole blob, so without this push the helm half of
+  // the redesign would be silently reverted (and the look, which rides its own
+  // column, would not). No-op when the character is not in world.
+  useRuntime().setHelmHiddenForCharacter(character.id, helmHidden);
   // Echo the normalized look so the client can update its roster row without
   // a second list fetch.
-  json(ctx.res, 200, { ok: true, appearance });
+  json(ctx.res, 200, { ok: true, appearance, helmHidden });
 }
 
 // ---------------------------------------------------------------------------
