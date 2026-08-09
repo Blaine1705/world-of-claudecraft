@@ -155,12 +155,12 @@ describe('owned-class level 20 balance harness', () => {
     expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(1.1);
     expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(1.2);
     expect(vespersArea.dps / vespersSingle.dps).toBeGreaterThanOrEqual(1.25);
-    // 2026-08-09 120s band round: the Warspirit raise (galeheart imbue bonus,
-    // stormstrike row, baseline AP) plus the Vespers trim moved this pair to a
-    // measured 1.1551 (warspirit 204.7 / vespers 177.2), so the 0.93 floor is
-    // green again with real margin.
+    // 2026-08-09 120s band round: the Warspirit raise (stormstrike row plus
+    // the baseline AP arm, ridden on apPct after review) and the Vespers trim
+    // moved this pair to a measured 1.1539 (warspirit 204.5 / vespers 177.2),
+    // so the 0.93 floor is green again with real margin.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeGreaterThanOrEqual(0.93);
-    // Ceiling kept at 1.2 (measured 1.1551 this round, was 1.18 on the
+    // Ceiling kept at 1.2 (measured 1.1539 this round, was 1.18 on the
     // combined tree pre-round). Re-author both sides of this pair when the
     // owned-class stack integrates.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(1.2);

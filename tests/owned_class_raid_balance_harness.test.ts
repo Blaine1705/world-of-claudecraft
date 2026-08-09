@@ -111,10 +111,10 @@ describe('owned-class raid-level balance harness', () => {
       expect(thundercall.readyIdleSeconds).toBeLessThanOrEqual(15);
       expect(thundercall.buttonsPressed).toBeGreaterThanOrEqual(65);
       // 2026-08-09 120s band round: the Warspirit raise plus the Vespers trim
-      // re-measured across all three scenarios at 1.0581 / 1.0280 / 0.9788 by
+      // re-measured across all three scenarios at 1.0568 / 1.0266 / 0.9776 by
       // target level, so the 0.81 floor is green again with real margin.
       expect(warspirit.dps).toBeGreaterThanOrEqual(vespers.dps * 0.81);
-      // Ceiling kept at 1.12 (level-22 measures 1.0581 this round, was 1.094
+      // Ceiling kept at 1.12 (level-22 measures 1.0568 this round, was 1.094
       // on the combined tree pre-round). Re-author the pair when the
       // owned-class stack integrates.
       expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * 1.12);
