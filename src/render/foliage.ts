@@ -2025,8 +2025,13 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 
+// The denser step, the 1.24 density scale and the 1.08 spot boost are the same
+// compensation art direction as the fatter lowPlus grass cards (a fuller ground
+// read for weak fragment-bound GPUs), so they ride the lowPlus flag: a plain
+// low session takes medium-parity dressing density. leanFoliage keeps only the
+// LIGHTER lean knobs (model set, variants, deco filter, tint softening).
 function dressStep(): number {
-  return GFX.leanFoliage ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
+  return GFX.lowPlus ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
 }
 
 function dressKindFor(biome: BiomeId, r: number): DressKind {
@@ -2150,7 +2155,7 @@ function generateDressing(seed: number): DressingSpot[] {
   const activeContent = getActiveWorldContent();
   const xHalf = WORLD_MAX_X - 16;
   const step = dressStep();
-  const scaleBoost = GFX.leanFoliage ? DRESS_LOW_SCALE_BOOST : 1;
+  const scaleBoost = GFX.lowPlus ? DRESS_LOW_SCALE_BOOST : 1;
   for (let gx = -xHalf; gx < xHalf; gx += step) {
     for (let gz = WORLD_MIN_Z + 16; gz < WORLD_MAX_Z - 16; gz += step) {
       const r = hashAt(gx, gz, 41);
@@ -2158,7 +2163,7 @@ function generateDressing(seed: number): DressingSpot[] {
       // the Evergarden takes NO random dressing: every bush there belongs to
       // an authored parterre arrangement (appended after this scatter loop)
       if (biome === 'garden') continue;
-      const density = DRESS_DENSITY[biome] * (GFX.leanFoliage ? DRESS_DENSITY_LOW_SCALE : 1);
+      const density = DRESS_DENSITY[biome] * (GFX.lowPlus ? DRESS_DENSITY_LOW_SCALE : 1);
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
@@ -3366,6 +3371,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
 }
 
 export const foliageGrassInternalsForTest = { buildGrassRing };
+export const foliageDressingInternalsForTest = { generateDressing, dressStep };
 
 // ---------------------------------------------------------------------------
 // Entry point
