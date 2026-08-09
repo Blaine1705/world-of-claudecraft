@@ -157,8 +157,15 @@ const MAX_SKIN = 7;
 /** The free-redesign window: every character created before this instant carries
  *  one appearance redesign, whether or not it already has an authored look. UTC
  *  midnight, so every client agrees on who is inside the window without doing
- *  any timezone arithmetic of its own, and compared server-side only. */
-export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-11T00:00:00Z');
+ *  any timezone arithmetic of its own, and compared server-side only.
+ *
+ *  Set a week out (2026-08-10 + 7) rather than to the ship date, deliberately:
+ *  a cutoff that has already passed when the change merges gives nothing to the
+ *  characters created in between, and a current client posts a look, so the
+ *  `appearance IS NULL` arm below will not catch them either. The slack is what
+ *  makes the window survive a slow review. Re-check it before merging; if it has
+ *  gone stale, push it out rather than shipping a window that is already shut. */
+export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-17T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
