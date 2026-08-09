@@ -15,6 +15,7 @@
 //   cannot hide drift from committed artifacts.
 // - Standalone `npm test` / `npm run build` still regenerate via pretest/build
 //   (Phase 2 generate-once only applies inside gate.mjs).
+import { spawnSync } from 'node:child_process';
 
 /** Tasks the full gate runs through turbo for local disk cache. */
 export const GATE_CACHEABLE_TASKS = Object.freeze([
@@ -159,4 +160,40 @@ export function turboRunArgs(tasks) {
  */
 export function isTurboGateStep(cmd, args) {
   return cmd === 'npx' && Array.isArray(args) && args[0] === 'turbo' && args[1] === 'run';
+}
+
+/**
+ * Would `task` be a turbo LOCAL cache HIT right now, checked via
+ * `turbo run <task> --dry=json` without executing the task itself.
+ * `--no-install` keeps this network-free: a working tree where turbo is not
+ * already resolvable locally (the dependency-sync preflight's own throwaway
+ * fixtures, for example) fails fast instead of falling back to a registry
+ * fetch.
+ *
+ * Any failure to establish a hit (turbo not runnable from here, a nonzero
+ * exit, unparseable output, no matching task in the plan) returns false. The
+ * only consumer of this is deciding whether a preflight probe is worth
+ * running before the cached task would skip it anyway, so a false negative
+ * just costs the probe it would have run regardless (the safe fallback);
+ * only a false positive could wrongly suppress a real check, which the
+ * checks above rule out.
+ *
+ * @param {string} task package.json script name (single task)
+ * @param {{ shell: boolean, env?: Record<string, string | undefined> }} opts
+ * @returns {boolean}
+ */
+export function isTurboCacheHit(task, { shell, env = process.env }) {
+  const res = spawnSync('npx', ['--no-install', 'turbo', 'run', task, '--dry=json'], {
+    encoding: 'utf8',
+    shell,
+    env,
+  });
+  if (res.error || res.status !== 0 || !res.stdout) return false;
+  try {
+    const plan = JSON.parse(res.stdout);
+    const entry = Array.isArray(plan.tasks) ? plan.tasks.find((t) => t.task === task) : undefined;
+    return entry?.cache?.status === 'HIT';
+  } catch {
+    return false;
+  }
 }

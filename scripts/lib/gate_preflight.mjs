@@ -2,14 +2,19 @@
 // here so gate.mjs and gate_select.mjs share one copy instead of the selective
 // gate quietly losing both.
 //
-// Behavior is unchanged from the inline versions in gate.mjs; only the log prefix
-// is parameterized, because tests/dependency_sync_gate_preflight.test.ts and
-// tests/sfx_gate_preflight.test.ts spawn gate.mjs and assert on its exact stderr.
-// Both preflights exist to turn a confusing mid-gate failure into a clear early
-// one, which the selective gate needs at least as much: it is the path people
-// will run most often.
-import { spawnSync } from 'node:child_process';
+// The dependency-sync check is unchanged from the inline version in gate.mjs;
+// only the log prefix is parameterized. The audio-tooling check additionally
+// runs its two version probes concurrently and skips them outright when
+// `sfx:check` is about to be a turbo cache hit this run (see
+// isTurboCacheHit in gate_task_cache.mjs), since a broken toolchain cannot
+// fail a step that never runs. tests/dependency_sync_gate_preflight.test.ts
+// and tests/sfx_gate_preflight.test.ts spawn gate.mjs and assert on its exact
+// stderr for both. Both preflights exist to turn a confusing mid-gate failure
+// into a clear early one, which the selective gate needs at least as much: it
+// is the path people will run most often.
+import { spawn, spawnSync } from 'node:child_process';
 import { FFMPEG_PATH, FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
+import { isTurboCacheHit } from './gate_task_cache.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -41,21 +46,50 @@ export function checkDependencySync({ label, shell, env = process.env }) {
 }
 
 /**
+ * Probe one tool's resolved path BY EXECUTION (never existsSync: a present
+ * but non-executable file must still count as missing).
+ *
+ * @param {string} toolPath
+ * @param {boolean} shell
+ * @returns {Promise<boolean>} true when the tool ran and exited 0
+ */
+function probeToolByExecution(toolPath, shell) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      resolve(ok);
+    };
+    const child = spawn(toolPath, ['-version'], { stdio: 'ignore', shell });
+    child.on('error', () => finish(false));
+    child.on('exit', (code) => finish(code === 0));
+  });
+}
+
+/**
  * Probe the resolved ffmpeg/ffprobe binaries BY EXECUTION. The static packages
  * download their binary via an install script, so a scripts-skipped install
  * leaves a missing file behind the import and the PATH fallback may be absent too.
  *
- * @param {{ label: string, shell: boolean }} opts
- * @returns {string | null} error text, or null when both tools run
+ * Runs the two probes concurrently, and skips them entirely when the gate's
+ * `sfx:check` step (the only step that actually invokes ffmpeg/ffprobe) is
+ * about to be a turbo cache hit this run: a broken toolchain cannot fail a
+ * step that never runs, so the fail-fast this preflight exists for only
+ * matters when the toolchain is actually about to be used.
+ *
+ * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined> }} opts
+ * @returns {Promise<string | null>} error text, or null when skipped or both tools run
  */
-export function checkAudioTooling({ label, shell }) {
-  const missing = [
+export async function checkAudioTooling({ label, shell, env = process.env }) {
+  if (isTurboCacheHit('sfx:check', { shell, env })) return null;
+
+  const tools = [
     ['ffmpeg', FFMPEG_PATH],
     ['ffprobe', FFPROBE_PATH],
-  ].filter(([, toolPath]) => {
-    const probe = spawnSync(toolPath, ['-version'], { stdio: 'ignore', shell });
-    return probe.error !== undefined || probe.status !== 0;
-  });
+  ];
+  const ok = await Promise.all(tools.map(([, toolPath]) => probeToolByExecution(toolPath, shell)));
+  const missing = tools.filter((_, i) => !ok[i]);
   if (missing.length === 0) return null;
   return (
     `[${label}] missing required SFX audio tooling: ${missing.map(([name]) => name).join(', ')}\n` +
@@ -72,13 +106,13 @@ export function checkAudioTooling({ label, shell }) {
  *
  * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined> }} opts
  */
-export function runGatePreflights({ label, shell, env = process.env }) {
+export async function runGatePreflights({ label, shell, env = process.env }) {
   const depError = checkDependencySync({ label, shell, env });
   if (depError) {
     console.error(depError);
     process.exit(1);
   }
-  const audioError = checkAudioTooling({ label, shell });
+  const audioError = await checkAudioTooling({ label, shell, env });
   if (audioError) {
     console.error(audioError);
     process.exit(1);

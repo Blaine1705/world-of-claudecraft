@@ -13,3 +13,8 @@ export const GATE_TURBO_UI_ARGS: readonly string[];
 export function turboRunArgs(tasks: readonly string[]): string[];
 
 export function isTurboGateStep(cmd: string, args: readonly string[]): boolean;
+
+export function isTurboCacheHit(
+  task: string,
+  opts: { shell: boolean; env?: Record<string, string | undefined> },
+): boolean;
