@@ -74,17 +74,22 @@ export interface RenderBudgetGovernorOptions {
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
+  // Low must stay monotonically lighter than medium on every axis: it used to carry
+  // LOOSER caps and HIGHER quality floors than medium, so a player who dropped from
+  // medium to low got a heavier frame. Targets/urgents are medium x 0.9 rounded to
+  // clean values, and the four floors mirror low's band minima in GFX_BUCKET_BANDS
+  // (which now equal medium's), so low can always shed at least as far as medium.
   low: {
-    targetCalls: 560,
-    urgentCalls: 760,
-    targetTriangles: 2_200_000,
-    urgentTriangles: 3_000_000,
-    targetGrassTufts: 5_600,
-    urgentGrassTufts: 7_600,
-    minGrassLevel: 0.62,
-    minFoliageLevel: 0.68,
-    minVfxLevel: 0.84,
-    minLightingLevel: 0.78,
+    targetCalls: 380,
+    urgentCalls: 560,
+    targetTriangles: 1_600_000,
+    urgentTriangles: 2_350_000,
+    targetGrassTufts: 3_400,
+    urgentGrassTufts: 4_900,
+    minGrassLevel: 0.5,
+    minFoliageLevel: 0.5,
+    minVfxLevel: 0.58,
+    minLightingLevel: 0.45,
   },
   medium: {
     targetCalls: 420,

@@ -188,6 +188,14 @@ describe('graphics tier resolution', () => {
 
   it('keeps medium as a middle tier while high and ultra retain the premium pipeline', () => {
     const low = gfxInternalsForTest.settingsFor('low');
+    // A session that reports hints but whose adapter string is masked or unavailable.
+    const lowNoAdapter = gfxInternalsForTest.settingsFor('low', { search: '?gfx=low' });
+    const lowWeakIntel = gfxInternalsForTest.settingsFor('low', {
+      gpuRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)',
+    });
+    const lowSoftware = gfxInternalsForTest.settingsFor('low', {
+      gpuRenderer: 'Google SwiftShader',
+    });
     const medium = gfxInternalsForTest.settingsFor('medium');
     const mediumIris = gfxInternalsForTest.settingsFor('medium', {
       search: '?gfx=medium',
@@ -199,7 +207,13 @@ describe('graphics tier resolution', () => {
     expect(low.standardMaterials).toBe(false);
     expect(low.dynamicShadows).toBe(false);
     expect(low.leanFoliage).toBe(true);
-    expect(low.lowPlus).toBe(true);
+    // lowPlus is the weak-GPU art treatment, not a property of the low tier: a plain
+    // low session (no adapter string, so classifyGpuRenderer is 'unknown') must not
+    // take it, or low draws richer grass cards than medium.
+    expect(low.lowPlus).toBe(false);
+    expect(lowNoAdapter.lowPlus).toBe(false);
+    expect(lowWeakIntel.lowPlus).toBe(true);
+    expect(lowSoftware.lowPlus).toBe(true);
     expect(low.composer).toBe(false);
     expect(low.ao).toBe(false);
 

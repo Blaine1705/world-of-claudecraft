@@ -149,7 +149,7 @@ describe('gfx override application', () => {
     // iOS platform hint, so the field's VALUE stays false throughout), but JSON.stringify bakes
     // the key name into the byte pin same as any other field.
     expect(hashes).toEqual({
-      low: 'ffdec5a230db44fbb7ebfeaff1c7f70f41580ce717eed7fd9a25bc10c5ad21ec',
+      low: '953ddf86b179fb20bee47d583291dd9d4393dfe56aeaac1bda9bcef3b52c3146',
       medium: '469d80e5a2f24e5d154e88f187bf35d03511549089c7a07ee0dd973771184d57',
       high: 'be25f35848d170b70f25036ef8209df5ca0cdd6ced3660e53ded55ec6e65c45a',
       ultra: '8ea3fcdd2c997953394b856aceeaf5036cfb638c0834401a39db349fea2cd3be',

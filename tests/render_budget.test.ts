@@ -58,17 +58,19 @@ describe('render budget governor', () => {
         frameMs: 20,
         totalMs: 20,
         submitMs: 8,
-        calls: 610,
-        triangles: 2_350_000,
+        // Above low's targetCalls/targetTriangles and below its urgent pair, at the
+        // same pressure ratios the old 560/2.2M caps saw (610 calls, 2.35M tris).
+        calls: 415,
+        triangles: 1_710_000,
         grassVisibleTufts: 2_000,
       }),
     );
 
     expect(state.mode).toBe('degrading');
     expect(state.reason).toBe('draw');
-    expect(state.levels.foliage).toBeLessThan(0.9);
-    expect(state.levels.grass).toBe(0.9);
-    expect(state.levels.vfx).toBe(1);
+    expect(state.levels.foliage).toBeLessThan(0.7);
+    expect(state.levels.grass).toBe(0.74);
+    expect(state.levels.vfx).toBe(0.76);
     expect(state.levels.resolution).toBe(1);
   });
 
@@ -87,16 +89,18 @@ describe('render budget governor', () => {
         totalMs: 24,
         submitMs: 8,
         calls: 180,
+        // Above low's targetGrassTufts and below its urgent tuft cap, the same
+        // over-target ratio the old 5_600 target saw at 5_900 tufts.
+        grassVisibleTufts: 3_600,
         triangles: 500_000,
-        grassVisibleTufts: 5_900,
       }),
     );
 
     expect(state.mode).toBe('degrading');
     expect(state.reason).toBe('grass');
-    expect(state.levels.foliage).toBe(0.9);
-    expect(state.levels.grass).toBeLessThan(0.9);
-    expect(state.levels.vfx).toBe(1);
+    expect(state.levels.foliage).toBe(0.7);
+    expect(state.levels.grass).toBeLessThan(0.74);
+    expect(state.levels.vfx).toBe(0.76);
     expect(state.levels.resolution).toBe(1);
   });
 
@@ -121,10 +125,10 @@ describe('render budget governor', () => {
     );
 
     expect(state.mode).toBe('degrading');
-    expect(state.levels.foliage).toBeLessThan(0.9);
-    expect(state.levels.grass).toBeLessThan(0.9);
-    expect(state.levels.lighting).toBeLessThan(1);
-    expect(state.levels.vfx).toBeLessThan(1);
+    expect(state.levels.foliage).toBeLessThan(0.7);
+    expect(state.levels.grass).toBeLessThan(0.74);
+    expect(state.levels.lighting).toBeLessThan(0.68);
+    expect(state.levels.vfx).toBeLessThan(0.76);
     expect(state.levels.resolution).toBeLessThan(1);
   });
 
@@ -149,7 +153,13 @@ describe('render budget governor', () => {
     );
 
     expect(state.mode).toBe('stable');
-    expect(state.levels).toEqual({ grass: 0.9, foliage: 0.9, vfx: 1, lighting: 1, resolution: 1 });
+    expect(state.levels).toEqual({
+      grass: 0.74,
+      foliage: 0.7,
+      vfx: 0.76,
+      lighting: 0.68,
+      resolution: 1,
+    });
   });
 
   it('does not degrade when frame cadence is capped but render work is cheap', () => {
@@ -180,7 +190,13 @@ describe('render budget governor', () => {
     expect(state.mode).toBe('stable');
     expect(state.reason).toBe('frame-cap');
     expect(state.pressure).toBeLessThan(1);
-    expect(state.levels).toEqual({ grass: 0.9, foliage: 0.9, vfx: 1, lighting: 1, resolution: 1 });
+    expect(state.levels).toEqual({
+      grass: 0.74,
+      foliage: 0.7,
+      vfx: 0.76,
+      lighting: 0.68,
+      resolution: 1,
+    });
   });
 
   it('recovers quality under capped frame cadence when render work has headroom', () => {
@@ -321,8 +337,8 @@ describe('render budget governor', () => {
     expect(state.recentSubmitStalls).toBe(1);
     expect(state.lastSubmitStallMs).toBe(180);
     expect(state.stallHoldSeconds).toBeGreaterThan(10);
-    expect(state.levels.foliage).toBeLessThan(0.9);
-    expect(state.levels.grass).toBeLessThan(0.9);
+    expect(state.levels.foliage).toBeLessThan(0.7);
+    expect(state.levels.grass).toBeLessThan(0.74);
 
     state = governor.update(
       sample({

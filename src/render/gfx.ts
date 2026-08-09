@@ -380,18 +380,24 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: true,
     },
+    // Low's governable buckets are derived FROM medium so the tier is monotonically
+    // lighter: baseline and max are medium's x 0.95 (2 decimals), and the minima equal
+    // medium's so low can always shed at least as far. These used to sit ABOVE medium
+    // (grass/foliage baseline 0.9 vs 0.78/0.74, floors 0.62/0.68 vs 0.5), which made
+    // plain low render more than medium. The caps floors in render_budget.ts mirror
+    // these minima.
     grass: {
-      min: 0.62,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.74,
+      max: 0.86,
       roi: 0.9,
       cost: 'gpu',
       governable: true,
     },
     foliage: {
-      min: 0.68,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.7,
+      max: 0.82,
       roi: 0.84,
       cost: 'gpu',
       governable: true,
@@ -405,9 +411,9 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     lighting: {
-      min: 0.78,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.45,
+      baseline: 0.68,
+      max: 0.78,
       roi: 0.72,
       cost: 'gpu',
       governable: true,
@@ -429,9 +435,9 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     vfx: {
-      min: 0.84,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.58,
+      baseline: 0.76,
+      max: 0.86,
       roi: 0.9,
       cost: 'mixed',
       governable: true,
@@ -929,6 +935,8 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
 function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
+  // The one shared adapter classifier ('weak' already delegates to isWeakIntegratedGpu).
+  const gpuClass = classifyGpuRenderer(hints?.gpuRenderer);
   // WKWebView's WebContent/GPU process has a hard resident-memory ceiling which is independent
   // of frame rate. The runtime governor can reduce draw cost after a slow submit, but it cannot
   // reclaim already-created textures, programs, materials, or rigs. Keep the player's selected
@@ -1026,7 +1034,14 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     smaa: aaPolicy.postAa === 'smaa',
     bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
-    lowPlus: tier === 'low' || iosMemoryProfile,
+    // lowPlus is art direction for fragment-bound weak GPUs (fatter grass cards, the
+    // terrain lowShade emissive), not a load reduction: applying it to EVERY low-tier
+    // session made plain low draw richer than medium. Gate it to the cohort it was
+    // authored for, reusing the file's one adapter classifier rather than a second
+    // regex set. classifyGpuRenderer returns 'unknown' for a masked or absent adapter
+    // string, so an unclassifiable session lands on plain low, the lighter default.
+    lowPlus:
+      iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software')),
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
@@ -1036,7 +1051,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       : iosMemoryProfile
         ? 52
         : tier === 'low'
-          ? 80
+          ? 72
           : tier === 'medium'
             ? constrainedMemory
               ? 62
