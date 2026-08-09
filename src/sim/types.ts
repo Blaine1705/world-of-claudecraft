@@ -4671,6 +4671,12 @@ export type SimEvent = { pid?: number } & (
   // position: the group's 1-based place in the queue line
   | { type: 'bgQueued'; position: number }
   | { type: 'bgUnqueued' }
+  // The queue-pop offer opened for this player: `seconds` is the answer
+  // window. The client opens its Accept/Decline prompt on this event and
+  // polls bgInfo.proposal for the countdown thereafter.
+  | { type: 'bgProposed'; seconds: number }
+  // One more fighter accepted the offer this player is looking at.
+  | { type: 'bgProposalUpdate'; accepted: number }
   | { type: 'bgFound'; team: number }
   | { type: 'bgCountdown'; seconds: number }
   | { type: 'bgStart' }
