@@ -249,11 +249,9 @@ describe('CI workflow parity', () => {
     // builds the bot beside the server).
     expect(gate).toContain('buildFullGateSteps');
     expect(gateSteps.some((s) => s.name === 'typecheck + env/server/bot builds')).toBe(true);
-    const typesBuilds = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
-    // The local gate resolves turbo's own binary directly (no npx dispatch);
-    // cmd carries the "turbo" identity, args starts at "run" (gate_task_cache.mjs).
-    expect(typesBuilds?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
-    expect(typesBuilds?.args).toEqual(expect.arrayContaining(['run', 'check:types', 'build:bot']));
+    expect(gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds')?.args).toEqual(
+      expect.arrayContaining(['turbo', 'run', 'check:types', 'build:bot']),
+    );
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -1010,7 +1008,7 @@ describe('CI workflow parity', () => {
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     // gate.mjs still binds workers into the shared step builder.
-    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier, repoRoot })');
+    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier })');
     expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
@@ -1159,19 +1157,21 @@ describe('CI workflow parity', () => {
     // bundles still run before the slow client build.
     const combined = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
     expect(combined?.args).toEqual(
-      expect.arrayContaining(['run', 'build:env', 'build:server', 'build:bot']),
+      expect.arrayContaining(['turbo', 'run', 'build:env', 'build:server', 'build:bot']),
     );
     const combinedIdx = gateSteps.findIndex((s) => s.name === 'typecheck + env/server/bot builds');
     const clientIdx = gateSteps.findIndex((s) => s.name === 'client build');
     expect(combinedIdx).toBeGreaterThanOrEqual(0);
     expect(clientIdx).toBeGreaterThan(combinedIdx);
-    expect(gateSteps[clientIdx]?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
+    expect(gateSteps[clientIdx]?.args).toEqual(
+      expect.arrayContaining(['turbo', 'run', 'build:bundle']),
+    );
     // The profile fallback arm (types-only or builds-only runs) must carry the
     // bot build as its own step too, or --skip-types would silently drop it.
     const fallback = buildFullGateSteps(8, { skipTypes: true });
     expect(fallback.some((s) => s.name === 'bot build')).toBe(true);
     expect(fallback.find((s) => s.name === 'bot build')?.args).toEqual(
-      expect.arrayContaining(['run', 'build:bot']),
+      expect.arrayContaining(['turbo', 'run', 'build:bot']),
     );
   });
 

@@ -18,7 +18,5 @@ export function buildFullGateSteps(
     skipBuilds?: boolean;
     skipVitest?: boolean;
     skipTypes?: boolean;
-    /** Passed to resolveTurboBin for the turbo steps' cmd; defaults to process.cwd(). */
-    repoRoot?: string;
   },
 ): FullGateStep[];

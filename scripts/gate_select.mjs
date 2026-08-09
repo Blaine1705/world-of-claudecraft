@@ -83,7 +83,7 @@ const vitestBin = path.join(
 // Same preflights as gate.mjs (dependency sync, then ffmpeg/ffprobe by
 // execution). They exist to turn a confusing mid-gate failure into a clear early
 // one, and this path is the one people run most.
-await runGatePreflights({ label: 'gate:select', shell });
+runGatePreflights({ label: 'gate:select', shell });
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
@@ -153,7 +153,7 @@ console.log(`[gate:select] workers=${workers}`);
 
 const branch = git('git', ['branch', '--show-current']).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
-const steps = buildFullGateSteps(workers, { releaseTier, skipVitest: true, repoRoot });
+const steps = buildFullGateSteps(workers, { releaseTier, skipVitest: true });
 
 /** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
 const vitestSteps = [];
