@@ -90,6 +90,7 @@ import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import {
+  createRiftGearInstance,
   RIFT_BLUE_MOUNT_REINS,
   RIFT_EPIC_MOUNT_REINS,
   RIFT_GREEN_MOUNT_REINS,
@@ -786,6 +787,21 @@ describe('Reliquary Rift page pins against live rift content', () => {
     expect(RIFT_GEAR_ITEM_IDS.length).toBeGreaterThanOrEqual(3);
     expect(RIFT_EPIC_ITEM_IDS.length).toBeGreaterThanOrEqual(4);
     expect(RIFT_LEGENDARY_ITEM_IDS.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('the first-clear mint site covers exactly the Riftbound band array', () => {
+    // The page composition and the activity pin both read RIFT_GEAR_ITEM_IDS,
+    // so between themselves they are a self-comparison: a fourth id appended
+    // to the array would page a slot the mint site never awards while both
+    // stayed green. This arm binds the array to the independent shellForClass
+    // literals in src/sim/rift/progression.ts: minting over EVERY playable
+    // class must produce the array as a set, in both directions.
+    const minted = new Set(
+      (Object.keys(CLASSES) as PlayerClass[]).map(
+        (cls) => createRiftGearInstance('rift-mint-pin', 'C', cls, 1).itemId,
+      ),
+    );
+    expect([...minted].sort()).toEqual([...RIFT_GEAR_ITEM_IDS].sort());
   });
 });
 
@@ -1885,9 +1901,10 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   corpse_harvest: ['gather_event:perfect_specimen', ...Object.values(HARVEST_COMPONENT_SPECIMENS)],
   masterwork_craft: ['masterwork:first'],
   // Derived from the live array: addRiftProgressionLoot mints one
-  // class-matched band per winner of a ranked rift's first-clear race
-  // (createRiftGearInstance picks from RIFT_GEAR_ITEM_IDS), so the activity's
-  // award set IS that array.
+  // class-matched band per winner of a ranked rift's first-clear race. The
+  // claim that createRiftGearInstance covers exactly this array is NOT free
+  // here (the mint literals live in shellForClass); the mint-site arm in the
+  // Rift page describe pins it over every class.
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
 };
 
@@ -2846,8 +2863,10 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(bySlotKind.get('corpse_harvest:mark')).toEqual(['gather_event:perfect_specimen']);
     expect(bySlotKind.get('masterwork_craft:mark')).toEqual(['masterwork:first']);
     // The rift first-clear ITEM slots are EXACTLY the live Riftbound band
-    // array (createRiftGearInstance picks from it per winner class), the same
-    // bidirectional regime as the corpse-harvest specimens above.
+    // array, the same bidirectional regime as the corpse-harvest specimens
+    // above. The array itself is bound to the independent mint literals by
+    // the mint-site arm in the Rift page describe, so this line plus that arm
+    // reach the write site; alone, both sides here read the same array.
     expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
       [...RIFT_GEAR_ITEM_IDS].sort(),
     );
