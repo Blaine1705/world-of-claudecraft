@@ -1040,13 +1040,48 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     sim.drainEvents();
     for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
 
-    const spawn = BG_BASES[0].spawns[0];
     expect(sim.bgMatchFor(pid)).toBe(match);
     expect(e.dead).toBe(false);
     expect(e.ghost).toBe(false);
-    expect(e.pos.x).toBeCloseTo(origin.x + spawn.x, 3);
-    expect(e.pos.z).toBeCloseTo(origin.z + spawn.z, 3);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
     expect(e.prevPos).toEqual(e.pos);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('Unstuck relocates a fighter trapped on their indexed spawn point', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = sim.entities.get(pid)!;
+    const origin = battlegroundOrigin(match.slot);
+    const trapped = BG_BASES[0].spawns[0];
+    e.pos = sim.ctx.groundPos(origin.x + trapped.x, origin.z + trapped.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+    const before = { ...e.pos };
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    const completed = events.find(
+      (event): event is Extract<SimEvent, { type: 'unstuck'; phase: 'completed' }> =>
+        event.type === 'unstuck' && event.phase === 'completed' && event.pid === pid,
+    );
+    expect(completed).toBeTruthy();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expect(Math.hypot(e.pos.x - before.x, e.pos.z - before.z)).toBeGreaterThan(10);
+    expect(completed?.distance).toBeGreaterThan(10);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
