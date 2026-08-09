@@ -12,6 +12,9 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -732,6 +735,9 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -1452,6 +1458,9 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -2172,6 +2181,9 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -2893,6 +2905,9 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -3613,6 +3628,9 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -4373,6 +4391,9 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -5103,6 +5124,9 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -5823,6 +5847,9 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -6543,6 +6570,9 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -7263,6 +7293,9 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -7983,6 +8016,9 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -8703,6 +8739,9 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -9423,6 +9462,9 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
@@ -10143,6 +10185,9 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
+    "gpuNotice.hybridBodyLinux",
+    "gpuNotice.hybridBodyOther",
+    "gpuNotice.hybridBodyWindows",
     "guide.arenaPage.honorBody",
     "guide.arenaPage.honorFinalNote",
     "guide.arenaPage.honorHeading",
