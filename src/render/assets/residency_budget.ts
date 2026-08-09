@@ -9,8 +9,13 @@
 // summary, gated to dev browsers and the iOS WebKit profile (every iOS host, not
 // just the packaged app). Known
 // under-count: only the six common material map slots are walked; alphaMap,
-// envMap, scene.background and the standalone texture cache are not.
+// envMap, scene.background and the standalone texture cache are not. World-only
+// KTX2 textures released by ktx2_mip_release.ts truthfully report ~0 mip bytes
+// after upload; the retained restore sources that replaced them are reported
+// as their own 'ktx2 restore sources' bucket so the mip release cannot read
+// as a free win in this table.
 import type * as THREE from 'three';
+import { ktx2RetainedSourceBytes } from './ktx2_mip_release';
 
 export interface ResidencyBucket {
   category: string;
@@ -148,6 +153,10 @@ export function residencyBudget(sources: ResidencySource[]): ResidencyBucket[] {
       if (bytes > 0) acc.add(`${src.label}: textures`, bytes);
     }
   }
+  // The cost side of the KTX2 mip release: source bytes retained for the
+  // context-loss re-transcode (the released mip chains read ~0 above).
+  const retained = ktx2RetainedSourceBytes();
+  if (retained > 0) acc.add('ktx2 restore sources', retained);
   return acc.buckets();
 }
 

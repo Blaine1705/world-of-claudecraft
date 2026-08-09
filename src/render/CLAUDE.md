@@ -201,7 +201,10 @@ collision/movement.
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
   bump means re-verifying every patched chunk. A bump also touches KTX2:
   `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
-  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  fallback arm (a shape KTX2Loader owns and can change between releases), wraps
+  the private `_createTexture` hook to capture restore sources for
+  `assets/ktx2_mip_release.ts` (fails soft to resident mips if the hook moves,
+  see `tests/ktx2_support.test.ts`), and
   the shipped `public/basis/` transcoder must be regenerated from the new three
   via `node scripts/patch_basis_transcoder.mjs` (never a raw copy: the shipped
   JS carries an eval-free embind patch so the KTX2 blob worker survives the
