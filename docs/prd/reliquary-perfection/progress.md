@@ -2234,4 +2234,11 @@ owns the push.
   jailed bg_respond cage-escape from PR #3127, the stale copper comment,
   the 30/s identity-amplification through other identityFields commands).
 - Gate: TURBO_FORCE=1 node scripts/gate_select.mjs on the committed tree
-  (see the final record line for the tip and result).
+  (mode=full, broad change): PASS, all 8 steps green. Full suite 33899
+  passed / 2 expected fail / 108 skipped across 2425 files; browser
+  regressions 16 files 111 tests; malware scan clean (5730 files, 0 high
+  after priors); changed-files biome 0 errors 0 format diffs (2694
+  pre-existing warnings across the release-sync-changed files, which never
+  gate); i18n + wiki + SFX fresh; tsc + env/server/bot builds + client
+  bundle green. Then pushed to origin/feature/reliquary (fast-forward from
+  0a68865b73) and babysat CI on PR #2976.
