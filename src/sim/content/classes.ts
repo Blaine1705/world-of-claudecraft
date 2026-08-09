@@ -3696,7 +3696,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 0,
-        effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 0.1 }],
+        effects: [{ type: 'weaponStrike', bonus: 16, weaponMult: 0.1 }],
       },
     ],
     description:
@@ -3920,7 +3920,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 2,
         level: 16,
         cost: 30,
-        effects: [{ type: 'weaponStrike', bonus: 48, weaponMult: 0.45 }],
+        effects: [{ type: 'weaponStrike', bonus: 54, weaponMult: 0.45 }],
       },
     ],
     description:

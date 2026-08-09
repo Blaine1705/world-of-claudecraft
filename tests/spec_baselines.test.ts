@@ -35,7 +35,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'hunter/survival': {
     stats: { agi: 3, crit: 0.03, dodge: 0.12 },
-    global: { meleeDmgPct: 0.06 },
+    global: { meleeDmgPct: 0.44 },
   },
   // v0.34 rogue base re-band (spec_baselines.ts): the BiS-epic floor lift that
   // ships with the Thronebane hand fix. apPct/crit carry the auto-attack heavy
@@ -296,8 +296,8 @@ describe('v0.28 passive restoration hotfix', () => {
       .find(({ def }) => def.id === 'shrapnel_charge')
       ?.effects.find((effect) => effect.type === 'hunterShrapnel');
 
-    expect(bloodhook).toMatchObject({ damageMult: 1.06 });
-    expect(shrapnel).toMatchObject({ damageMult: 1.06 });
+    expect(bloodhook).toMatchObject({ damageMult: 1.44 });
+    expect(shrapnel).toMatchObject({ damageMult: 1.44 });
   });
 
   // 18, not the old 21: #2428 retired the three legacy paladin spec baselines
