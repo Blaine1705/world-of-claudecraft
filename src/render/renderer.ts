@@ -2035,9 +2035,10 @@ export class Renderer {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
     if (GFX.composer || GFX.gradePass) {
-      // three r165's render() resets info per pass (after the shadow pass, see
-      // draw_stats_core.ts header), so with the composer's multiple passes every
-      // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
+      // three's render() resets info per pass (since r185 at the top of the
+      // pass, see draw_stats_core.ts header), so with the composer's multiple
+      // passes every post-frame reader saw only the final fullscreen pass
+      // (1 call/1 triangle).
       // The session owns manual accumulation and every downstream consumer.
       // Direct profiles keep Three's normal auto-reset path.
       this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
@@ -4161,7 +4162,9 @@ export class Renderer {
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's
       // per-render auto-reset drops those passes, so add them back at 1 draw call
-      // and 2 triangles each.
+      // and 2 triangles each. (Since r185 that live read also includes the
+      // shadow pass, matching the composer tiers' semantics; direct-profile
+      // calls/triangles rose accordingly, an accepted three-train shift.)
       calls: drawStatsFrame
         ? drawStatsFrame.calls
         : info.render.calls + this.lastWaterSimulationPasses,
@@ -4560,7 +4563,11 @@ export class Renderer {
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
     // through untouched, and their water passes are already present in
-    // the logical-frame session, so they must not be counted twice.
+    // the logical-frame session, so they must not be counted twice. Since
+    // r185 the live read includes the shadow pass too (r165 excluded it),
+    // aligning the direct profiles' draw-pressure signal with the composer
+    // tiers' shadow-inclusive semantics; the shift is accepted deliberately
+    // rather than compensated (three-train record, phase 6).
     sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
     sample.triangles =
       drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
@@ -5496,6 +5503,9 @@ export class Renderer {
     const focusX = this.cameraLookAt.x;
     const focusZ = this.cameraLookAt.z;
     const input = this.opaqueSortPolicyInput;
+    // The direct arm's live read includes the shadow pass since r185 (r165
+    // excluded it), matching the drawStats arm; the sort threshold may bind
+    // a few calls earlier on direct profiles, accepted with the three train.
     input.drawCalls = this.drawStats
       ? this.drawStats.currentFrame().calls
       : this.webgl.info.render.calls;

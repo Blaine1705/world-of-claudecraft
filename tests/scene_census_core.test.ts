@@ -68,16 +68,17 @@ function makeHost(
       renders++;
       if (opts.throwOnRender === renders) throw new Error('boom');
       autoResetDuringRenders.push(autoReset);
-      // three r165 semantics: the shadow pass draws FIRST; with autoReset on,
-      // render() then calls info.reset() before the scene pass, so a
-      // post-render read drops the shadow draws. The census must therefore
-      // hold the counters in manual-reset mode or its shadow share reads 0.
+      // three r185 semantics: with autoReset on, render() calls info.reset()
+      // at the TOP of the pass, before the shadow pass (r165 reset after it).
+      // Under auto-reset a post-render read therefore holds only this
+      // render's counters, which zeroes the census's cross-render diffs; the
+      // census must hold the counters in manual-reset mode either way.
+      if (autoReset) counters = zero();
       if (shadowsEnabled && shadowAuto) {
         for (const c of children) {
           if (c.visible) counters.calls += c.shadowCalls;
         }
       }
-      if (autoReset) counters = zero();
       for (const c of children) {
         if (!c.visible) continue;
         counters.calls += c.calls;
