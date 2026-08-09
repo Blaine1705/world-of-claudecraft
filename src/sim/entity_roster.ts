@@ -161,9 +161,15 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
   const e = ctx.entities.get(id);
   if (!e) return;
-  cleanupPaladinAegis(ctx, id);
-  stripSunGodVerdicts(ctx, id);
-  stripPaladinDevotionsFromSource(ctx, id);
+  // Paladin-sourced cleanup only when the despawner could have sourced any of
+  // it (review 3050): each of these walks the full roster, two with a nested
+  // per-aura loop, and a mass-despawn tick paid all three in a world with no
+  // paladin in it.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    cleanupPaladinAegis(ctx, id);
+    stripSunGodVerdicts(ctx, id);
+    stripPaladinDevotionsFromSource(ctx, id);
+  }
   // A despawned mob keeps no per-attempt Book of Deeds state: freeInstance,
   // freeDelveRun, and spawnDelveModule drop boss mobs without a kill, so a leaked
   // encounter/taint entry (entity ids are monotonic and never reused) would linger
