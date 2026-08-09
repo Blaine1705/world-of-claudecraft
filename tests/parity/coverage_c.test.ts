@@ -539,4 +539,23 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.durability).toBeLessThan(slot.maxDurability);
     expect(slot.durability).toBe(29);
   });
+
+  it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {
+    const scenario = SCENARIOS.find((item) => item.name === 'idle_mob_distance_culling');
+    expect(scenario, 'missing the idle-mob culling parity scenario').toBeTruthy();
+    if (!scenario) return;
+
+    const { trace, rec } = record(scenario);
+    expect(rec.sim.cfg.idleMobTickRadius).toBe(100);
+    const near = rec.sim.entities.get(rec.notes.nearMobId as number);
+    const far = rec.sim.entities.get(rec.notes.farMobId as number);
+    expect(near, 'near boundary probe disappeared').toBeTruthy();
+    expect(far, 'far boundary probe disappeared').toBeTruthy();
+    if (!near || !far) return;
+    expect(Math.hypot(near.pos.x - near.spawnPos.x, near.pos.z - near.spawnPos.z)).toBeGreaterThan(
+      0.1,
+    );
+    expect({ x: far.pos.x, z: far.pos.z }).toEqual({ x: far.spawnPos.x, z: far.spawnPos.z });
+    expect(trace.draws).toBe(0);
+  });
 });
