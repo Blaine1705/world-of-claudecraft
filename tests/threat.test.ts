@@ -2,6 +2,7 @@
 // stealth, pets).
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { PET_AGGRESSIVE_RANGE, petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import {
   addThreat,
@@ -9,6 +10,7 @@ import {
   DEFENSIVE_STANCE_THREAT_MULT,
   dropThreat,
   RIGHTEOUS_FURY_THREAT_MULT,
+  stealthDetectionRadius,
 } from '../src/sim/threat';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
@@ -994,6 +996,34 @@ describe('hunter pets', () => {
     expect(rogue.hp).toBe(outsideHp);
 
     teleport(sim, rogue, 4, 0);
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(outsideHp);
+  });
+
+  it('uses the same stealth detection boundary for pet target picks and pet damage', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    sim.setPetMode('aggressive');
+    expectDefined(sim.meta(sim.playerId)).lastActiveTick = sim.tickCount;
+    sim.player.targetId = null;
+    sim.player.autoAttack = false;
+    rogue.inCombat = false;
+    teleport(sim, pet, 0, 0);
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const radius = stealthDetectionRadius(pet, rogue, PET_AGGRESSIVE_RANGE);
+    teleport(sim, rogue, radius + 0.25, 0);
+    sim.ctx.grid.refresh(sim.entities.values());
+    const outsideHp = rogue.hp;
+
+    expect(petPickTarget(sim.ctx, pet, sim.player)).toBeNull();
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(outsideHp);
+
+    teleport(sim, rogue, radius - 0.25, 0);
+    sim.ctx.grid.refresh(sim.entities.values());
+
+    expect(petPickTarget(sim.ctx, pet, sim.player)?.id).toBe(rogue.id);
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBeLessThan(outsideHp);
   });

@@ -551,5 +551,5 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
 
 function petCanSeeTarget(pet: Entity, target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  return canDetectStealthedTarget(pet, target, PET_ASSIST_RANGE);
+  return canDetectStealthedTarget(pet, target, PET_AGGRESSIVE_RANGE);
 }
