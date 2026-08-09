@@ -39,6 +39,7 @@ import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { initDesktopDownload } from './game/desktop_download';
+import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
@@ -117,6 +118,7 @@ import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -4080,7 +4082,15 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
-    if (graphicsRebuildPaused) {
+    // The desktop shell keeps rAF running while hidden (backgroundThrottling is
+    // off), so document.hidden never flips there and the shell push is the only
+    // truthful hidden signal.
+    const gate = presentationGate({
+      hidden: document.hidden || desktopPresentationHidden(),
+      desktopApp: DESKTOP_APP,
+      graphicsRebuildPaused,
+    });
+    if (!gate.tick) {
       last = now;
       acc = 0;
       return;
@@ -4089,9 +4099,16 @@ async function startGame(
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
-    perf.frame(frameDt);
-    syncPerfOverlay(frameDt, now);
-    syncOverlayDiagnostics();
+    // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
+    // pauses there, so hidden frames never reach the sampler, and the reporter
+    // already skips sends while hidden): the fleet beacon keeps its meaning,
+    // where sampling these would fake a healthy fps and p95.
+    if (gate.render) perf.frame(frameDt);
+    else perf.noteHiddenPresentSkip();
+    if (gate.paint) {
+      syncPerfOverlay(frameDt, now);
+      syncOverlayDiagnostics();
+    }
 
     // Freeze movement while the game menu is up, during the first-spawn intro,
     // the camera prompt, and through the race countdown. The sim independently
@@ -4258,7 +4275,7 @@ async function startGame(
       const rendererStart = perf.startTime();
       traceStart = perf.startTrace();
       try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
       } finally {
         perf.finishTrace(
           'renderer.sync',
@@ -4278,18 +4295,22 @@ async function startGame(
       } finally {
         perf.finishTrace('ui.clickMoveMarker', traceStart);
       }
-      perf.markInputVisible(performance.now());
+      if (gate.render) perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      const hudStart = perf.startTime();
-      traceStart = perf.startTrace();
-      try {
-        hud.update();
-      } finally {
-        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
-        perf.finishTime('hud', hudStart);
+      if (gate.paint) {
+        const hudStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.update();
+        } finally {
+          perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
+          perf.finishTime('hud', hudStart);
+        }
       }
-      perf.tick(now);
-      entryDiagnostics.renderedFrame(now);
+      if (gate.render) {
+        perf.tick(now);
+        entryDiagnostics.renderedFrame(now);
+      }
       return;
     }
 
@@ -4486,6 +4507,7 @@ async function startGame(
         adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
+        gate.render,
       );
     } finally {
       perf.finishTrace(
@@ -4509,18 +4531,22 @@ async function startGame(
       perf.finishTrace('ui.clickMoveMarker', traceStart);
     }
     maybeShowImmobileNote(now);
-    perf.markInputVisible(performance.now());
+    if (gate.render) perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    const hudStart = perf.startTime();
-    traceStart = perf.startTrace();
-    try {
-      hud.update();
-    } finally {
-      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
-      perf.finishTime('hud', hudStart);
+    if (gate.paint) {
+      const hudStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        hud.update();
+      } finally {
+        perf.finishTrace('hud.update', traceStart, 'mode', 'online');
+        perf.finishTime('hud', hudStart);
+      }
     }
-    perf.tick(now);
-    entryDiagnostics.renderedFrame(now);
+    if (gate.render) {
+      perf.tick(now);
+      entryDiagnostics.renderedFrame(now);
+    }
   }
   const controller = {
     move(moveInput: unknown, facing?: unknown) {

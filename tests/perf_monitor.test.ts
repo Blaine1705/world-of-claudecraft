@@ -61,6 +61,31 @@ function netPipelineFixture(): NetPipelineSummary {
 beforeEach(() => installBrowserGlobals());
 afterEach(() => removeBrowserGlobals());
 
+describe('hidden present skips', () => {
+  it('counts a skipped frame without sampling it, and carries it in the snapshot', () => {
+    const perf = new PerfMonitor(null);
+    expect(perf.snapshot(1000).hiddenPresentSkips).toBe(0);
+
+    perf.frame(0.016, 100);
+    perf.noteHiddenPresentSkip();
+    perf.noteHiddenPresentSkip();
+
+    const snap = perf.snapshot(2000);
+    expect(snap.hiddenPresentSkips).toBe(2);
+    // Counted, never sampled: a renderless frame folded into `frames` would
+    // inflate fps and bury a real hitch in the frame-time percentiles.
+    expect(snap.frames).toBe(1);
+  });
+
+  it('clears the counter alongside the other counters on reset', () => {
+    const perf = new PerfMonitor(null);
+    perf.noteHiddenPresentSkip();
+    expect(perf.snapshot(1000).hiddenPresentSkips).toBe(1);
+    perf.reset();
+    expect(perf.snapshot(2000).hiddenPresentSkips).toBe(0);
+  });
+});
+
 describe('perf monitor ungated net pipeline', () => {
   it('keeps netPipeline in the snapshot while the gated network block stays null when disabled', () => {
     const perf = new PerfMonitor(null);

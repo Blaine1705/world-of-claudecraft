@@ -238,6 +238,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { presentFrame } from './frame_present';
 import {
   type FrostNovaRootVisual,
   isFrostNovaRootAura,
@@ -9122,6 +9123,10 @@ export class Renderer {
     selfAlphaLead = 0,
     selfMotion: SelfMotionFrame | null = null,
     selfAuthoritativeDiscontinuity = false,
+    // False while the window is hidden: everything below still runs (view
+    // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
+    // create burst or shader link, and only the terminal draw is skipped.
+    present = true,
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
@@ -9140,7 +9145,10 @@ export class Renderer {
     // reads its draw signal below. The WebGL counters themselves stay monotonic
     // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
     if (this.drawStats) this.drawStats.beginFrame();
-    this.updateAdaptiveResolution(dt);
+    // A skipped frame draws nothing, so it carries no rendering signal at all:
+    // feeding its wall-clock dt to the governor would read hidden time as free
+    // headroom and ratchet quality up for the first frame back on screen.
+    if (present) this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
       this.viewportPollTimer = 0;
@@ -10996,13 +11004,17 @@ export class Renderer {
     }
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
-    this.vfx.prepareDraw(this.camera);
-    if (this.post) {
-      // screen-fx pass state (ripple re-projection, flash decay) advances
-      // with the camera finalized for this frame
-      this.post.updateScreenFx(dt);
-      this.post.render();
-    } else this.webgl.render(this.scene, this.camera);
+    presentFrame(
+      {
+        vfx: this.vfx,
+        post: this.post,
+        webgl: this.webgl,
+        scene: this.scene,
+        camera: this.camera,
+      },
+      dt,
+      present,
+    );
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;

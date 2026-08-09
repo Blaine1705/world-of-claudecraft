@@ -18,6 +18,11 @@ import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 export interface PerfSnapshot {
   seconds: number;
   frames: number;
+  // Frames the desktop shell skipped because the window was hidden. These are
+  // deliberately NOT counted in `frames` or sampled into frameMs (a renderless
+  // frame would fake a healthy fps and p95), so this counter is the only
+  // evidence the skip is working.
+  hiddenPresentSkips: number;
   fps: number;
   frameMs: { avg: number; p50: number; p95: number; p99: number; max: number; long50: number };
   windows: {
@@ -443,6 +448,13 @@ export class PerfMonitor {
 
   setInputDebugProvider(provider: () => PerfInputDebugState | null): void {
     this.inputDebugProvider = provider;
+  }
+
+  private hiddenPresentSkips = 0;
+
+  /** A frame the presentation gate skipped: counted, never sampled. */
+  noteHiddenPresentSkip(): void {
+    this.hiddenPresentSkips++;
   }
 
   frame(dt: number, now = performance.now()): void {
@@ -908,6 +920,7 @@ export class PerfMonitor {
     const snapshot: PerfSnapshot = {
       seconds: round(seconds),
       frames: this.frames,
+      hiddenPresentSkips: this.hiddenPresentSkips,
       fps: round(this.frames / seconds),
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
@@ -1009,6 +1022,7 @@ export class PerfMonitor {
   reset(): void {
     this.startedAt = performance.now();
     this.frames = 0;
+    this.hiddenPresentSkips = 0;
     this.frameMs.clear();
     this.frameWindow.clear();
     this.lastCensus = null;

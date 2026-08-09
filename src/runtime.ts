@@ -80,6 +80,14 @@ export interface DesktopGpuStatus {
   adapter: string;
 }
 
+// Whether the shell's window is minimized or hidden. The page cannot observe
+// this for itself: the desktop window is created with backgroundThrottling:false
+// so the render loop keeps running when backgrounded, which also means the Page
+// Visibility API reports 'visible' the entire time the window is minimized.
+export interface DesktopPresentationState {
+  hidden: boolean;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -127,6 +135,9 @@ export interface DesktopBridge {
   // after the notice that consumes it). Absent on older shells that predate the
   // verdict: feature-check before use, like the other post-trio methods.
   onGpuStatus?(callback: (status: DesktopGpuStatus) => void): () => void;
+  // Window hidden-ness, push-only and absent on older shells: feature-check
+  // before use, like the other post-trio methods.
+  onPresentationChanged?(callback: (state: DesktopPresentationState) => void): () => void;
 }
 
 export function desktopBridge(): DesktopBridge | null {
