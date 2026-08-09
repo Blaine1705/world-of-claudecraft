@@ -1454,6 +1454,173 @@ export const ko_KR: EnTranslations = {
       "badges": {
         "backgrounded": "백그라운드",
         "offline": "오프라인"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 성능 진단",
+        "title": "ClaudeCraft 성능 진단",
+        "subtitle": "게임에 맞춘 스캔으로 근거와 코드 수준의 수정안을 제공합니다.",
+        "aria": {
+          "liveMeasurements": "실시간 성능 측정",
+          "scanProgress": "진단 스캔 진행률",
+          "findings": "우선순위별 진단 결과"
+        },
+        "controls": {
+          "minimize": "최소화",
+          "expand": "펼치기",
+          "start": "15초 스캔 시작",
+          "refreshCensus": "장면 통계 새로 고침",
+          "copyReport": "명확한 보고서 복사",
+          "downloadReport": "보고서 다운로드",
+          "scanning": "스캔 중...",
+          "scanAnother": "다른 지역 스캔",
+          "reportLogged": "보고서를 콘솔에 기록했습니다",
+          "copied": "복사됨",
+          "copyBlocked": "복사 차단됨: 보고서를 기록했습니다",
+          "retestLowGraphics": "낮은 그래픽으로 다시 테스트"
+        },
+        "instruction": "가장 정확한 결과를 얻으려면 오프라인 플레이에 들어가 느린 지역을 이동하고 카메라를 돌린 뒤, 스캔 중 끊김을 일으키는 효과를 실행하세요.",
+        "status": {
+          "pausedHiddenRestart": "이 탭이 숨겨져 스캔을 일시 중지했습니다. 돌아오면 다시 시작합니다.",
+          "restoredRestart": "탭이 복원되었습니다. 15초 활성 게임플레이 수집을 처음부터 다시 시작합니다.",
+          "worldLoaded": "월드를 불러왔습니다. 조작 가능한 첫 프레임을 기다리는 중입니다.",
+          "pausedHiddenContinue": "이 탭이 숨겨져 스캔을 일시 중지했습니다. 계속하려면 게임으로 돌아오세요.",
+          "collectingRemaining": {
+            "one": "활성 게임플레이 수집 중: {seconds}초 남음",
+            "other": "활성 게임플레이 수집 중: {seconds}초 남음"
+          },
+          "waitingFrames": "대표 게임플레이 프레임 대기 중: {current}/{minimum}",
+          "collectingNow": "활성 게임플레이 수집 중: 지금 문제 지역을 지나가세요.",
+          "ready": "스캔 준비 완료. 시작을 누르고 느려짐을 재현하세요.",
+          "waitingWorld": "게임 월드를 기다리는 중입니다. 오프라인 플레이를 선택하거나 온라인 캐릭터로 입장하세요."
+        },
+        "metrics": {
+          "waitingRenderer": "렌더러: 대기 중",
+          "waitingCensus": "장면 통계: 대기 중",
+          "waitingHitch": "끊김 원인 추적: 월드 입장 시 활성화됨",
+          "recent": "최근  {fps} FPS | p95 {p95}밀리초 | 50밀리초 초과 {longFrames}",
+          "render": "렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초",
+          "scene": "장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개",
+          "hitches": "끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "대기 중"
+        },
+        "scoreHeadline": "{score}/100: {headline}",
+        "healthyNoFindings": "조치 가능한 임계값이 감지되지 않았습니다. 짧은 끊김이 계속 거슬리면 끊김을 일으키는 정확한 이동 경로에서 다시 스캔하세요.",
+        "findingMeta": "{severity} | 신뢰도 {confidence}",
+        "sections": {
+          "evidence": "근거",
+          "tryNow": "지금 시도",
+          "codeFix": "코드 수정",
+          "source": "관련 소스"
+        },
+        "severity": {
+          "critical": "심각",
+          "warning": "경고",
+          "info": "정보"
+        },
+        "confidence": {
+          "high": "높음",
+          "medium": "중간",
+          "low": "낮음"
+        },
+        "diagnosis": {
+          "noProblemTitle": "중대한 성능 문제가 감지되지 않았습니다",
+          "summary": {
+            "findings": {
+              "one": "최근 10초 동안 {fps} FPS, 프레임 p95 {p95}에서 조치 가능한 문제 {findings}개를 찾았습니다.",
+              "other": "최근 10초 동안 {fps} FPS, 프레임 p95 {p95}에서 조치 가능한 문제 {findings}개를 찾았습니다."
+            },
+            "healthy": "최근 10초 동안 {fps} FPS를 유지했고 프레임 p95는 {p95}입니다. 게임, 브라우저, GPU, 메모리, 에셋 또는 네트워크 임계값이 감지되지 않았습니다."
+          },
+          "titles": {
+            "hardwareAcceleration": "소프트웨어 렌더링이 활성화되어 있습니다",
+            "integratedGpu": "게임이 내장 GPU를 사용하고 있습니다",
+            "highDpi": "고해상도 렌더링 비용이 높습니다",
+            "forcedHighGraphics": "강제 높은 그래픽 설정이 성능을 낮춥니다",
+            "lowMemory": "기기의 사용 가능한 메모리가 부족합니다",
+            "browserStalls": "브라우저 또는 확장 프로그램 멈춤이 감지되었습니다",
+            "heapPressure": "브라우저 메모리 압박이 감지되었습니다",
+            "contextLoss": "그래픽 컨텍스트가 재설정되었습니다",
+            "gpuSubmit": "GPU 제출이 주요 프레임 병목입니다",
+            "sceneDraw": "장면 그리기 비용이 현재 그래픽 예산을 초과합니다",
+            "shadowPass": "그림자 패스가 많은 그리기 호출을 사용합니다",
+            "rendererWorld": "월드 렌더러 업데이트가 CPU에 제한됩니다",
+            "rendererEntities": "엔티티 뷰 업데이트가 CPU에 제한됩니다",
+            "rendererNameplates": "이름표 그리기 비용이 높습니다",
+            "simCpu": "시뮬레이션 작업이 프레임 시간을 사용합니다",
+            "hudCpu": "HUD 업데이트가 프레임 시간을 사용합니다",
+            "eventCpu": "이벤트 처리가 프레임 시간을 사용합니다",
+            "shaderCompile": "게임 중 셰이더가 컴파일되고 있습니다",
+            "textureUpload": "텍스처 업로드가 게임 끊김을 일으킵니다",
+            "viewCreate": "엔티티 뷰 생성이 끊김을 일으킵니다",
+            "otherHitch": "원인을 알 수 없는 긴 프레임이 남아 있습니다",
+            "assetStartup": "에셋 작업이 게임 시작을 지연시킵니다",
+            "longTasks": "브라우저의 긴 작업이 프레임을 막습니다",
+            "networkLatency": "네트워크 전송이 화면 반응을 지연시킵니다",
+            "snapshotApply": "스냅샷 처리가 클라이언트를 막습니다",
+            "generic": "성능 규칙 {rule}에 조치가 필요합니다"
+          },
+          "causes": {
+            "environment": "감지된 브라우저, GPU, 메모리 또는 기기 설정이 게임 렌더링 전부터 성능을 제한할 수 있습니다.",
+            "graphics": "이번 측정의 그래픽 작업이 현재 프레임 또는 장면 예산을 초과합니다.",
+            "cpu": "측정된 CPU 단계가 프레임 예산을 놓칠 만큼 메인 스레드 시간을 사용합니다.",
+            "loading": "리소스 준비 또는 최초 사용 작업이 보이는 게임이나 시작 경로에서 실행되었습니다.",
+            "network": "네트워크 전송 또는 클라이언트 스냅샷 처리가 최신 플레이 상태를 지연시킵니다."
+          },
+          "evidence": {
+            "environment": "환경 규칙 {rule}이 이 기기와 브라우저에 일치했습니다.",
+            "gpuSubmit": "WebGL 제출 p95는 {submit}이며 렌더러 p95의 {share}입니다.",
+            "frame": "최근 구간은 {fps} FPS, 프레임 p95 {p95}로 측정되었습니다.",
+            "sceneCalls": "장면은 {calls}개의 그리기 호출을 사용하며 목표는 {target}개입니다.",
+            "sceneTriangles": "장면은 {triangles}개의 삼각형을 제출하며 목표는 {target}개입니다.",
+            "sceneCategory": "장면 범주 {category}가 {calls}개 호출과 {triangles}개 측정 삼각형을 차지합니다.",
+            "censusNeeded": "주요 렌더 범주를 확인하려면 장면 통계를 새로 고치세요.",
+            "shadow": "그림자 패스는 {calls}개 호출, 기준의 {share}, {triangles}개 삼각형을 제출합니다.",
+            "cpuPhase": "측정된 단계 {phase}의 p95는 {p95}입니다.",
+            "hitch": "기록된 {total}개 끊김 중 {count}개가 원인 {cause}와 일치했습니다.",
+            "assets": "프리로드 게이트가 등록된 {tasks}개 작업을 {wait} 동안 기다렸습니다.",
+            "failedAssets": "실패한 에셋 그룹: {groups}.",
+            "longTasks": "긴 작업 {count}개가 측정되었고 p95는 {p95}, 최대는 {max}입니다.",
+            "network": "스냅샷 간격은 {interval}, 최신 경과 시간은 {age}, 입력 응답 p95는 {echo}입니다.",
+            "snapshot": "스냅샷 해석과 적용 p95는 {work}, 네트워크 간격 p95는 {gap}입니다.",
+            "generic": "진단 규칙 {rule}이 이번 측정과 일치했습니다."
+          },
+          "tryNow": {
+            "environment": "감지된 환경 설정을 수정하고 다시 시작한 뒤 같은 스캔을 반복하세요.",
+            "graphics": "같은 카메라 경로를 낮은 그래픽으로 다시 테스트해 그래픽 압박을 확인하세요.",
+            "cpu": "정지 상태와 이동 상태에서 스캔을 반복해 CPU 단계를 분리하세요.",
+            "loading": "같은 경로나 최초 사용 동작을 반복해 끊김 시점을 확인하세요.",
+            "network": "같은 이동과 카메라 경로를 오프라인 플레이와 비교하세요."
+          },
+          "codeFix": {
+            "environment": "감지된 대체 경로를 공유 그래픽과 메모리 예산 안에 유지하세요.",
+            "graphics": "기존 렌더 예산, 인스턴싱, 재질 공유, LOD와 숨김 작업 건너뛰기를 사용하세요.",
+            "cpu": "지정된 단계를 프로파일링하고 중복 작업과 할당을 제거하며 게임 동작을 유지하세요.",
+            "loading": "기존 시작 및 스트리밍 예산으로 최초 사용 작업을 프리로드, 풀링 또는 분산하세요.",
+            "network": "권위 서버 모델을 약화하지 않고 전송 또는 스냅샷 처리 비용을 줄이세요."
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft 성능 진단",
+          "statusLine": "상태: {status} ({score}/100)",
+          "capturedLine": "측정 시간: {captured}",
+          "topFindingLine": "최우선 결과: {finding}",
+          "summaryLine": "요약: {summary}",
+          "gpuLine": "GPU: {gpu}",
+          "graphicsLine": "그래픽: {tier}, 렌더 배율 {scale}",
+          "recentLine": "최근: {fps} FPS, p95 {p95}, 50밀리초 초과 {longFrames}프레임, 측정 {frames}프레임",
+          "resultHeading": "결과",
+          "noThreshold": "이번 측정에서는 조치 가능한 임계값이 감지되지 않았습니다.",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "심각도: {severity}. 신뢰도: {confidence}.",
+          "rawSnapshotHeading": "원본 스냅샷",
+          "notAvailable": "사용할 수 없음",
+          "status": {
+            "critical": "심각",
+            "needsAttention": "주의 필요",
+            "healthy": "정상"
+          }
+        }
       }
     },
     "auraOverlay": {

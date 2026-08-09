@@ -5973,19 +5973,18 @@ export class Sim {
   }
 
   private shouldSkipIdleMobTick(mob: Entity): boolean {
-    const radius = this.cfg.idleMobTickRadius;
+    const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (mob.dead || mob.ownerId !== null || mob.aiState !== 'idle' || mob.auras.length > 0)
+    if (
+      mob.dead ||
+      mob.ownerId !== null ||
+      mob.aiState !== 'idle' ||
+      mob.inCombat ||
+      mob.auras.length > 0
+    )
       return false;
-    const radiusSq = radius * radius;
-    for (const meta of this.players.values()) {
-      const p = this.entities.get(meta.entityId);
-      if (!p) continue;
-      const dx = p.pos.x - mob.pos.x;
-      const dz = p.pos.z - mob.pos.z;
-      if (dx * dx + dz * dz <= radiusSq) return false;
-    }
-    return true;
+    if (this.players.size === 0) return true;
+    return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
 
   private updateLootRolls(): void {
