@@ -243,8 +243,9 @@ describe('render budget recovery ladder', () => {
     // Dense scene: phase A completes, the climb never starts, and the stable
     // timer stays charged because density no longer resets it. DELIBERATE: a
     // single frame under the 90% line at a fire slot may take ONE enrich step
-    // (the at-slot gate re-check and the cooldown bound the rate); the old
-    // behavior demanded a full fresh stable window of low-density frames.
+    // (the recharge after each fired step bounds the rate; the cooldown is
+    // shorter on every tier and never binds); the old behavior demanded a
+    // full fresh stable window of low-density frames.
     let state = governor.state();
     for (let i = 0; i < 260; i++) {
       state = governor.update(

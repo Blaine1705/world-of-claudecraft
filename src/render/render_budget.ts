@@ -484,8 +484,12 @@ export class RenderBudgetGovernor {
     // so gating the return TO baseline on them lets the ladder close its own gate
     // and strand the buckets it has not restored yet (resolution recovers last).
     // Deliberate: dense frames no longer reset stableSeconds, so one frame under
-    // the line at a fire slot permits one enrich step; the cooldown and the
-    // at-slot re-check bound the rate, and only degrade() ever lowers quality.
+    // the line at a fire slot permits one enrich step. The rate bound is the
+    // stableSeconds reset on each fired step plus the recoverStableSeconds
+    // recharge (the 1.5x cooldown is shorter on every tier and never binds);
+    // the at-slot re-check only picks WHICH frame may fire, so repeated dips
+    // can walk quality to the band maxima at one step per recharge window.
+    // Only degrade() ever lowers quality.
     const canEnrich =
       sample.calls <= this.caps.targetCalls * 0.9 &&
       sample.triangles <= this.caps.targetTriangles * 0.9 &&

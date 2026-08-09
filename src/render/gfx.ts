@@ -380,8 +380,10 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: true,
     },
-    // Low's governable buckets are derived FROM medium so the tier is monotonically
-    // lighter: baseline and max are medium's x 0.95 (2 decimals), and the minima equal
+    // Low's four governor-ladder buckets (grass, foliage, lighting, vfx; the other
+    // governable-flagged rows predate the rule and keep their own values) are derived
+    // FROM medium so the tier is monotonically lighter: baseline and max are
+    // medium's x 0.95 (2 decimals), and the minima equal
     // medium's so low can always shed at least as far. These used to sit ABOVE medium
     // (grass/foliage baseline 0.9 vs 0.78/0.74, floors 0.62/0.68 vs 0.5), which made
     // plain low render more than medium. The caps floors in render_budget.ts mirror
