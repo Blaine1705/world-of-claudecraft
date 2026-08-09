@@ -1004,6 +1004,32 @@ function catalogIndexFor(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIn
   return built;
 }
 
+/**
+ * The pages completion math is allowed to count: every page except the
+ * excludeFromCompletion (retired) ones, rule 7 in docs/design/reliquary.md.
+ * Both catalog completion pairs route through this at the top so OWNED and
+ * TOTAL always move together: filtering one side alone would either hand out
+ * free progress or make 100% unreachable. Memoized on the pages array's
+ * identity (the catalogIndexByPages regime above, same reasons) and
+ * IDENTITY-STABLE: a table with nothing excluded answers with the caller's own
+ * array, and a filtered answer is minted once and reused, so catalogIndexFor's
+ * memo keys stay hot instead of rebuilding the index per read.
+ */
+const completionScoringPagesByPages = new WeakMap<
+  readonly ReliquaryPageDef[],
+  readonly ReliquaryPageDef[]
+>();
+
+function completionScoringPages(pages: readonly ReliquaryPageDef[]): readonly ReliquaryPageDef[] {
+  const cached = completionScoringPagesByPages.get(pages);
+  if (cached !== undefined) return cached;
+  const scoring = pages.some((p) => p.excludeFromCompletion === true)
+    ? Object.freeze(pages.filter((p) => p.excludeFromCompletion !== true))
+    : pages;
+  completionScoringPagesByPages.set(pages, scoring);
+  return scoring;
+}
+
 /** Test-only probe: the memoized index for a page table, or undefined when no
  *  read has built one yet. Mirrors reliquaryWireCacheProbe and exists for the
  *  same reason: a pin can prove a second read REUSED the build by object
@@ -1067,12 +1093,15 @@ export function catalogRelicCompletion(
   },
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
-  const items = catalogItemCompletion(opts.itemsDiscovered, pages);
+  // Retired pages are outside completion on BOTH sides of the pair (see
+  // completionScoringPages): the whole read below runs over the scoring set.
+  const scoring = completionScoringPages(pages);
+  const items = catalogItemCompletion(opts.itemsDiscovered, scoring);
   // Same one-test-per-unique-id shape as the item arm: the old walk de-duped
   // against the very set it was building, so each of these ids was scored once
   // no matter how many pages carry it. `=== true` is kept deliberately, the
   // lookups are optional and an absent surface must score zero, not throw.
-  const index = catalogIndexFor(pages);
+  const index = catalogIndexFor(scoring);
   let marksOwned = 0;
   let mountsOwned = 0;
   let skinsOwned = 0;
@@ -1134,6 +1163,10 @@ export function catalogCharacterCompletion(
   },
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
+  // Retired pages are outside completion on BOTH sides of the pair (see
+  // completionScoringPages); filtering here keeps the skin subtraction below
+  // reading the exact index the full read counted against.
+  const scoring = completionScoringPages(pages);
   const full = catalogRelicCompletion(
     {
       itemsDiscovered: opts.itemsDiscovered,
@@ -1143,12 +1176,12 @@ export function catalogCharacterCompletion(
       // Explicitly omit weapon skins from character-scoped sheet math.
       weaponSkins: undefined,
     },
-    pages,
+    scoring,
   );
   // The account weapon-skin slots to subtract are the same de-duped list the
   // full read counted, so take the count off the shared index rather than
   // walking the pages a second time for a number that is player-independent.
-  const skinSlots = catalogIndexFor(pages).skins.length;
+  const skinSlots = catalogIndexFor(scoring).skins.length;
   return { owned: full.owned, total: full.total - skinSlots };
 }
 
@@ -1393,6 +1426,12 @@ export function syncReliquaryCompletionDeeds(
       let shelfComplete = true;
       for (const page of RELIQUARY_PAGES) {
         if (page.shelf !== 'conquerors') continue;
+        // Future-proofing: a retired (excludeFromCompletion) page can never
+        // gate the shelf deed. No conquerors page carries the flag today (the
+        // shape pin forbids an unearnable conquerors slot), but the skip keeps
+        // this arm aligned with the completion pairs, which already exclude
+        // such pages through completionScoringPages.
+        if (page.excludeFromCompletion === true) continue;
         if (!pageCompletion(page, own).complete) {
           shelfComplete = false;
           break;

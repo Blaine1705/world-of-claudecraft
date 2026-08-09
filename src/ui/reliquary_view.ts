@@ -949,6 +949,11 @@ function buildNearlyComplete(
 ): ReliquaryNearlyPageModel[] {
   const candidates: ReliquaryNearlyPageModel[] = [];
   for (const page of pages) {
+    // A retired page (excludeFromCompletion) never qualifies: "nearly
+    // complete" is a nudge toward the missing relics, and a retired page's
+    // missing relics can no longer be won. The tracker's default scan applies
+    // the same skip (refreshDefaultRows in reliquary_tracker_view.ts).
+    if (page.excludeFromCompletion === true) continue;
     const c = pageCompletion(page, opts);
     if (!isReliquaryNearlyComplete(c.owned, c.total)) continue;
     // The needle narrows here, BEFORE the ranking cap, so a qualifying match

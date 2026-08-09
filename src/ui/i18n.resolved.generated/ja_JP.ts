@@ -3492,6 +3492,7 @@ export const ja_JP: EnTranslations = {
       "pageComplete": "照耀済み",
       "clearsLabel": "クリア {count} 回",
       "srankClearsLabel": "Sランク・クリア {count} 回",
+      "retiredLabel": "絶版",
       "backToShelf": "棚に戻る",
       "gridAria": "{name} の聖遺物",
       "pageProgressAria": "ページ進捗：聖遺物 {owned}/{total} 埋め済み",

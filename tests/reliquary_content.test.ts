@@ -11,7 +11,11 @@ import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
-import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
+import {
+  HEROIC_BOSS_LOOT,
+  NYTHRAXIS_RAID_BOSS_ID,
+  RETIRED_HEROIC_ITEMS,
+} from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
   SET_WARFARE_ASHSTALKER,
@@ -296,9 +300,9 @@ describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     expect(CONQUEROR_PAGES.length).toBe(27);
     expect(PROFESSION_PAGES.length).toBe(3);
-    expect(HORIZON_PAGES.length).toBe(3);
+    expect(HORIZON_PAGES.length).toBe(4);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(33);
+    expect(RELIQUARY_PAGES.length).toBe(34);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -308,6 +312,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       'horizons_mounts',
       'horizons_weapon_skins',
       'horizons_titles',
+      'horizons_vault_of_ages',
     ]);
   });
 
@@ -333,7 +338,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 29 NEW Spoils uniques (31 slots minus the 2 set members already
     // catalogued; a relic on two pages is one relic), then the 47 Warfare
     // honor pieces and the 3 fishing additions (the koi and both rods):
-    // 242 + 19 + 29 + 47 + 3 = 340.
+    // 242 + 19 + 29 + 47 + 3 = 340. The Vault of Ages then adds FOUR retired
+    // slots and 0 to BOTH pairs: excludeFromCompletion keeps the whole page
+    // out of owned AND total (the dedicated vault pins in this file and
+    // tests/reliquary_state.test.ts hold both sides), so these two literals
+    // are deliberately UNCHANGED by the vault landing.
     expect(full).toEqual({ owned: 340, total: 340 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
@@ -939,6 +948,63 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
   });
 });
 
+describe('Reliquary Vault of Ages (retired, outside completion)', () => {
+  const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
+
+  it('derives its slots from RETIRED_HEROIC_ITEMS bidirectionally (the retirement growth sweep)', () => {
+    // BOTH directions in one equality: every page slot is a retired id, and
+    // every retired id is paged. The catalog hand-lists the four ids (so this
+    // pin cannot self-compare a derivation against itself), which is what
+    // makes this the retirement pattern's growth sweep: a FIFTH id landing in
+    // RETIRED_HEROIC_ITEMS reds here until the curator pages it.
+    expect(vault).toBeDefined();
+    expect(itemRelicIds(vault)).toEqual(Object.keys(RETIRED_HEROIC_ITEMS).sort());
+    expect(itemRelicIds(vault).length).toBe(4);
+  });
+
+  it('is a horizons page, retired-flagged, with no clear meter and no source hints', () => {
+    // NOT conquerors: the shelf-shape pin above forbids an unearnable
+    // conquerors slot (the capstone gate walks that shelf), and the vault is
+    // unearnable by definition. Sourceless by design: a retired relic has no
+    // door to name (the retired-guard suite pins the same fact from the
+    // acquisition side).
+    expect(vault.shelf).toBe('horizons');
+    expect(vault.excludeFromCompletion).toBe(true);
+    expect(vault.clearSource).toEqual({ kind: 'none' });
+    expect(vault.secondaryClearSource).toBeUndefined();
+    expect(vault.sourceDefault).toBeUndefined();
+    for (const relic of vault.relics) {
+      expect(reliquaryRelicSource(vault, relic)).toEqual([]);
+    }
+  });
+
+  it('moves NEITHER side of either completion pair (both-sides exclusion, measured)', () => {
+    // The production helpers over the live catalog versus the same catalog
+    // with the vault page removed: identical pairs with everything owned, so
+    // the vault adds 4 slots and 0 to owned AND total of both pairs. One-sided
+    // filtering would show up here as a pair mismatch (free progress or an
+    // unreachable 100%).
+    const allOwned = { has: () => true };
+    const noVault = RELIQUARY_PAGES.filter((p) => p.id !== 'horizons_vault_of_ages');
+    expect(noVault.length).toBe(RELIQUARY_PAGES.length - 1);
+    const surfaces = {
+      itemsDiscovered: allOwned,
+      marks: allOwned,
+      ownedMounts: allOwned,
+      weaponSkins: allOwned,
+      deedsEarned: allOwned,
+    };
+    expect(catalogRelicCompletion(surfaces)).toEqual(catalogRelicCompletion(surfaces, noVault));
+    expect(catalogCharacterCompletion(surfaces)).toEqual(
+      catalogCharacterCompletion(surfaces, noVault),
+    );
+    // And owning ONLY the vault items scores zero in both pairs.
+    const vaultOnly = new Set(itemRelicIds(vault));
+    expect(catalogRelicCompletion({ itemsDiscovered: vaultOnly }).owned).toBe(0);
+    expect(catalogCharacterCompletion({ itemsDiscovered: vaultOnly }).owned).toBe(0);
+  });
+});
+
 describe('Reliquary set pages pin against col_set_* deeds', () => {
   // World-drop leveling kits stay out of Conquerors (rationale next to
   // RELIQUARY_SET_MEMBERS in content/reliquary.ts): they are world-drop haste
@@ -1511,13 +1577,23 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
 describe('Reliquary Horizons shelf (Phase 8)', () => {
   it('authors non-empty Horizons pages with only mount / skin / title relics', () => {
+    // Phase 21 amendment: the retired Vault of Ages joined this shelf as an
+    // ITEM page (horizons is the one shelf whose shape pins tolerate an
+    // unearnable page; the conquerors capstone gate must never meet one), so
+    // the three Phase 8 COLLECTION pages keep the mount / skin / title shape
+    // and the retired page is exempted by its flag rather than by id.
     for (const page of HORIZON_PAGES) {
       expect(page.relics.length).toBeGreaterThan(0);
       expect(page.clearSource).toEqual({ kind: 'none' });
+      if (page.excludeFromCompletion === true) continue;
       for (const relic of page.relics) {
         expect(['mount', 'weapon_skin', 'title']).toContain(relic.kind);
       }
     }
+    // The exemption stays snug: exactly one retired Horizons page today.
+    expect(HORIZON_PAGES.filter((p) => p.excludeFromCompletion === true).map((p) => p.id)).toEqual([
+      'horizons_vault_of_ages',
+    ]);
   });
 
   it('mount page lists every live mount key exactly once (hand list = MOUNT_KEYS)', () => {
@@ -2135,6 +2211,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
+  // The retired vault is deliberately sourceless (excludeFromCompletion:
+  // retired relics have no door to name), so it resolves to zero sources.
+  horizons_vault_of_ages: 0,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level
@@ -2856,8 +2935,16 @@ describe('Reliquary source hints resolve against live content', () => {
 
 describe('Reliquary source hint coverage', () => {
   it('every relic resolves to a source except the pinned pending rulings', () => {
+    // Retired pages (excludeFromCompletion) are EXEMPT from the source-hint
+    // obligation by design, not pended: a pending row awaits a ruling on a
+    // door content might still name, while a retired relic HAS no door (the
+    // hint would point at content that no longer awards anything), so the
+    // vault stays deliberately sourceless and never joins
+    // SOURCE_PENDING_RULING. The retired-guard test holds the exemption
+    // honest from the other side (the vault page must author zero hints).
     const unhinted: string[] = [];
     for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (page.excludeFromCompletion === true) continue;
       if (reliquaryRelicSource(page, relic).length > 0) continue;
       if (PENDING_KEYS.has(slotKey(page.id, slotId))) continue;
       unhinted.push(`${page.id}:${slotId}`);
@@ -2870,17 +2957,26 @@ describe('Reliquary source hint coverage', () => {
     // the same change, so the exclusion list can never quietly outlive the
     // ruling that retires it. "Un-hinted" is now the resolver's EMPTY LIST,
     // which is the same claim it used to make with null.
+    // Retired pages sit outside this bidirectional pin the same way they sit
+    // outside the coverage sweep above: sourceless by design, never pending.
+    const retiredSlots = RELIC_SLOTS.filter(
+      ({ page }) => page.excludeFromCompletion === true,
+    ).length;
     const actuallyUnhinted = new Set<string>();
     for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (page.excludeFromCompletion === true) continue;
       if (reliquaryRelicSource(page, relic).length === 0)
         actuallyUnhinted.add(slotKey(page.id, slotId));
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 365 = 368 slots minus the
-    // two gap mounts minus the pended masterwork:engineering.
-    const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
+    // excluded. Literal: tighten as rulings land. 365 = 372 slots minus the
+    // four retired vault slots minus the two gap mounts minus the pended
+    // masterwork:engineering.
+    const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
     expect(hinted).toBeGreaterThanOrEqual(365);
+    // The retired arm stays snug too: exactly the vault's four slots today.
+    expect(retiredSlots).toBe(4);
   });
 
   it('no relic authors an EMPTY hint list (a sourceless slot stays keyless)', () => {

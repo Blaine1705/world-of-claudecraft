@@ -3492,6 +3492,7 @@ export const ko_KR: EnTranslations = {
       "pageComplete": "조명됨",
       "clearsLabel": "클리어 {count}회",
       "srankClearsLabel": "S 등급 클리어 {count}회",
+      "retiredLabel": "단종",
       "backToShelf": "선반으로 돌아가기",
       "gridAria": "{name}의 성물",
       "pageProgressAria": "페이지 진행도: 성물 {owned}/{total} 채움",

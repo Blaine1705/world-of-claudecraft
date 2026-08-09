@@ -3492,6 +3492,7 @@ export const en_XA: EnTranslations = {
       "pageComplete": "[Íļļúɱíñáţéð]",
       "clearsLabel": "[{count} çļéáŕš]",
       "srankClearsLabel": "[{count} Š-ŕáñķ çļéáŕš]",
+      "retiredLabel": "[Ŕéţíŕéð]",
       "backToShelf": "[Ɓáçķ ţó šĥéļƒ]",
       "gridAria": "[Ŕéļíçš óñ {name}]",
       "pageProgressAria": "[Þáĝé þŕóĝŕéšš: {owned} óƒ {total} ŕéļíçš ƒíļļéð]",

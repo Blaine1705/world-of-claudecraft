@@ -3492,6 +3492,7 @@ export const id_ID: EnTranslations = {
       "pageComplete": "Illuminated",
       "clearsLabel": "{count} clears",
       "srankClearsLabel": "{count} S-rank clears",
+      "retiredLabel": "Retired",
       "backToShelf": "Back to shelf",
       "gridAria": "Relics on {name}",
       "pageProgressAria": "Page progress: {owned} of {total} relics filled",

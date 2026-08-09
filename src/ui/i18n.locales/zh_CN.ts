@@ -10088,6 +10088,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pageComplete': '已点亮',
   'hudChrome.reliquary.clearsLabel': '{count} 次通关',
   'hudChrome.reliquary.srankClearsLabel': '{count} 次S级通关',
+  'hudChrome.reliquary.retiredLabel': '绝版',
   'hudChrome.reliquary.backToShelf': '返回书架',
   'hudChrome.reliquary.gridAria': '{name} 的圣物',
   'hudChrome.reliquary.pageProgressAria': '页面进度：已填入 {owned}/{total} 件圣物',

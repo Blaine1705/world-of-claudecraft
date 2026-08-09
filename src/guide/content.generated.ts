@@ -6933,6 +6933,29 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
         "name": "Emberglass Warstaff"
       }
     ]
+  },
+  {
+    "id": "horizons_vault_of_ages",
+    "shelf": "horizons",
+    "name": "Vault of Ages",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Deathless Warguard Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Scourgehide Carapace"
+      },
+      {
+        "kind": "item",
+        "name": "Soulforged Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Soulrend Diadem"
+      }
+    ]
   }
 ];
 

@@ -146,6 +146,14 @@ export interface ReliquaryPageDef {
    *  draws from); the window validates membership and floors finite positives
    *  before painting, so a drifted stat renders nothing rather than a lie. */
   secondaryClearSource?: { kind: 'deed_stat'; stat: string };
+  /** Retired shelf flag, rule 7 (docs/design/reliquary.md): retired content
+   *  stays a VISIBLE, labeled page rather than a silent delete, but its slots
+   *  can no longer be won, so completion math must not count them. Both sides
+   *  of every completion pair skip the page together (owned AND total, the
+   *  account-skin precedent: weapon skins already sit outside the character
+   *  pair the same way), and the page-local pair still renders the page's own
+   *  owned/total. `true` only: absence is the live-content default. */
+  excludeFromCompletion?: true;
   /** Source every un-hinted relic on this page inherits. Authored only where
    *  EVERY relic on the page really shares ONE source, which is why it stays a
    *  single hint rather than a list: a page whose relics need several routes
@@ -1460,6 +1468,33 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     desc: 'Warfare jewelry and weapons purchased with hard-won honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
+  },
+
+  // ---- Vault of Ages (Phase 21): the retired shelf, outside completion ----
+  // Rule 7 (docs/design/reliquary.md): retired content becomes a visible,
+  // labeled page, never a silent delete. The four ids are the v0.24.x heroic
+  // Nythraxis drops v0.25.0 retired (RETIRED_HEROIC_ITEMS in heroic_loot.ts,
+  // save-compat defs). They can never be won again, so the page is
+  // excludeFromCompletion (see the field's doc comment) and deliberately
+  // SOURCELESS: a hint would name a door that no longer exists, and
+  // tests/retired_heroic_items.test.ts holds this page to zero hints so it
+  // can never quietly become an acquisition-route surface. Hand-listed in
+  // sorted key order on purpose: the derivation pin in
+  // tests/reliquary_content.test.ts compares against the live table, so a
+  // fifth retirement reds there until it is paged here.
+  {
+    id: 'horizons_vault_of_ages',
+    shelf: 'horizons',
+    name: 'Vault of Ages',
+    desc: 'Retired treasures of a bygone age. These relics can no longer be won; the vault honors the veterans who keep them.',
+    clearSource: { kind: 'none' },
+    excludeFromCompletion: true,
+    relics: items(
+      'deathless_warguard_legmail',
+      'scourgehide_carapace',
+      'soulforged_warplate',
+      'soulrend_diadem',
+    ),
   },
 ]);
 

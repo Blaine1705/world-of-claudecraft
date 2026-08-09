@@ -9069,6 +9069,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.recentEmpty'
   | 'hudChrome.reliquary.recentJumpAria'
   | 'hudChrome.reliquary.recentLabel'
+  | 'hudChrome.reliquary.retiredLabel'
   | 'hudChrome.reliquary.searchAria'
   | 'hudChrome.reliquary.searchEmpty'
   | 'hudChrome.reliquary.searchPlaceholder'

@@ -3492,6 +3492,7 @@ export const ru_RU: EnTranslations = {
       "pageComplete": "Озарено",
       "clearsLabel": "Прохождений: {count}",
       "srankClearsLabel": "Прохождений ранга S: {count}",
+      "retiredLabel": "Выведено",
       "backToShelf": "Назад к полке",
       "gridAria": "Реликвии на странице {name}",
       "pageProgressAria": "Прогресс страницы: {owned} из {total} реликвий",

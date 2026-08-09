@@ -64,4 +64,7 @@ export const table: ReliquaryLocaleTable = {
   // (wocStore.armoryTitle 武器庫).
   conquerors_warfare_gallery: { name: 'ウォーフェアギャラリー' },
   conquerors_warfare_armory: { name: 'ウォーフェア武器庫' },
+  // Vault of Ages (Phase 21): composed from the shipped vault noun (the
+  // col_reliquary_complete title reads 宝物庫のキュレーター).
+  horizons_vault_of_ages: { name: '古き時代の宝物庫' },
 };

@@ -144,6 +144,20 @@ describe('painter hygiene', () => {
     expect(painter).toContain("return 'rare'");
   });
 
+  it('labels a retired page on both the page header and the shelf row', () => {
+    // The Vault of Ages chip (Phase 21): resolved off the authored def's
+    // excludeFromCompletion flag (catalog data, not player state) and painted
+    // through the shared retiredLabel key at BOTH render sites, so a retired
+    // page can never present as an ordinary chase on one surface while the
+    // completion math already ignores it.
+    const code = stripComments(painter);
+    expect(code).toMatch(/excludeFromCompletion === true/);
+    expect(code).toContain("t('hudChrome.reliquary.retiredLabel')");
+    expect(code).toContain('data-retired="1"');
+    // Both call sites (header and shelf row) go through the one helper.
+    expect(code.match(/this\.retiredChipHtml\(/g)?.length).toBe(2);
+  });
+
   it('labels account-scoped weapon skins', () => {
     // Account-scope chrome (never reimplements equip/summon).
     const code = painter

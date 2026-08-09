@@ -62,4 +62,7 @@ export const table: ReliquaryLocaleTable = {
   // shipped armory noun (wocStore.armoryTitle Арсенал).
   conquerors_warfare_gallery: { name: 'Галерея Боевой мощи' },
   conquerors_warfare_armory: { name: 'Арсенал Боевой мощи' },
+  // Vault of Ages (Phase 21): composed from the shipped vault noun (the
+  // col_reliquary_complete title reads Хранитель Сокровищницы).
+  horizons_vault_of_ages: { name: 'Сокровищница минувших эпох' },
 };

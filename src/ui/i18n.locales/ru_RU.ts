@@ -10741,6 +10741,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pageComplete': 'Озарено',
   'hudChrome.reliquary.clearsLabel': 'Прохождений: {count}',
   'hudChrome.reliquary.srankClearsLabel': 'Прохождений ранга S: {count}',
+  'hudChrome.reliquary.retiredLabel': 'Выведено',
   'hudChrome.reliquary.backToShelf': 'Назад к полке',
   'hudChrome.reliquary.gridAria': 'Реликвии на странице {name}',
   'hudChrome.reliquary.pageProgressAria': 'Прогресс страницы: {owned} из {total} реликвий',

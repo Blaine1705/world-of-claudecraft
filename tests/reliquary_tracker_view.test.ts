@@ -31,8 +31,11 @@ const stripComments = (src: string): string =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 // A synthetic catalog: page ids and their (owned, total) progress. The tracker
-// core never reads the real content table (it takes pageIds + a completion
-// callback), so the selection rules can be driven exactly.
+// core takes pageIds + a completion callback, so the selection rules can be
+// driven exactly; its ONE authored-catalog read is the retired-page skip in
+// the default scan (RELIQUARY_PAGES_BY_ID excludeFromCompletion), which never
+// fires for these synthetic ids and is pinned with the real vault id in
+// tests/reliquary_view.test.ts.
 type Progress = Record<string, { owned: number; total: number }>;
 
 function completionFrom(progress: Progress): (pageId: string) => ReliquaryPageCompletion | null {

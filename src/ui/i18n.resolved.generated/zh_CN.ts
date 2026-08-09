@@ -3492,6 +3492,7 @@ export const zh_CN: EnTranslations = {
       "pageComplete": "已点亮",
       "clearsLabel": "{count} 次通关",
       "srankClearsLabel": "{count} 次S级通关",
+      "retiredLabel": "绝版",
       "backToShelf": "返回书架",
       "gridAria": "{name} 的圣物",
       "pageProgressAria": "页面进度：已填入 {owned}/{total} 件圣物",

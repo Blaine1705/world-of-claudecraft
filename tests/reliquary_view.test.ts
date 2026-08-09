@@ -11,6 +11,7 @@ import {
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_MARK_IDS,
   RELIQUARY_PAGES,
+  RELIQUARY_PAGES_BY_ID,
   RELIQUARY_STORE_SOURCE_ID,
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
@@ -29,6 +30,10 @@ import {
   reliquarySourceLines,
   reliquarySourceLineText,
 } from '../src/ui/reliquary_labels';
+import {
+  buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerView,
+} from '../src/ui/reliquary_tracker_view';
 import {
   buildReliquaryPageCells,
   buildReliquaryUnlockPlan,
@@ -1767,6 +1772,68 @@ describe('nearly-complete qualification (either arm, both inclusive)', () => {
       input({ pages: [sizedPage('two', 2)], itemsDiscovered: ownedSet(...ownedFirst('two', 2)) }),
     );
     expect(done.nearly).toEqual([]);
+  });
+});
+
+describe('retired vault exclusion (nearly strip and tracker default)', () => {
+  // The REAL Vault of Ages def drives both arms: buildNearlyComplete reads
+  // excludeFromCompletion off the page def it is handed, and the tracker's
+  // default scan resolves the flag off the authored catalog by id (its input
+  // carries ids only), so a synthetic stand-in could not exercise that lookup.
+  const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
+  const vaultIds = (): string[] =>
+    vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
+
+  it('a 3/4-owned vault never reaches the nearly strip, and moves no overview total', () => {
+    expect(vault.excludeFromCompletion).toBe(true);
+    expect(vaultIds().length).toBe(4);
+    // 3/4 owned is remaining 1 AND fraction 0.75: it would pass BOTH nearly
+    // arms, so only the retired skip can be keeping it off (the positive
+    // control below proves an unflagged page in the same shape qualifies).
+    const owned = vaultIds().slice(0, 3);
+    const model = buildReliquaryView(
+      input({
+        pages: [...TEST_PAGES, vault],
+        itemsDiscovered: ownedSet('sanctum_helm', ...owned),
+      }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).not.toContain('horizons_vault_of_ages');
+    // Positive control on the same build: sanctum_n at 1/2 qualifies.
+    expect(model.nearly.map((n) => n.pageId)).toContain('sanctum_n');
+    // And the overview pair ignores the vault page and its owned relics: the
+    // TEST_PAGES totals (11 slots, 1 sanctum fill) are the whole answer.
+    expect(model.progress.total).toBe(11);
+    expect(model.progress.owned).toBe(1);
+  });
+
+  it('the tracker default scan skips the vault; a deliberate pin still tracks it', () => {
+    const completion = (pageId: string) =>
+      pageId === 'horizons_vault_of_ages'
+        ? { owned: 3, total: 4, complete: false }
+        : { owned: 4, total: 5, complete: false };
+    // Default (nothing pinned): the vault would rank FIRST by remaining, so
+    // its absence can only be the retired skip; the control page proves the
+    // scan itself is live.
+    const view = buildReliquaryTrackerViewInto(makeReliquaryTrackerView(), {
+      pinned: new Set(),
+      pageIds: ['horizons_vault_of_ages', 'ctrl_page'],
+      completion,
+      ownershipSig: () => 1,
+      collapsed: false,
+    });
+    expect(view.lines.slice(0, view.count).map((l) => l.pageId)).toEqual(['ctrl_page']);
+    // A page the player PINNED is their own choice: pass 1 applies no
+    // retired skip, so the pinned vault still tracks.
+    const pinned = buildReliquaryTrackerViewInto(makeReliquaryTrackerView(), {
+      pinned: new Set(['horizons_vault_of_ages']),
+      pageIds: ['horizons_vault_of_ages', 'ctrl_page'],
+      completion,
+      ownershipSig: () => 1,
+      collapsed: false,
+    });
+    expect(pinned.lines.slice(0, pinned.count).map((l) => l.pageId)).toEqual([
+      'horizons_vault_of_ages',
+    ]);
   });
 });
 

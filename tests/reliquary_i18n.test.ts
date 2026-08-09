@@ -52,13 +52,13 @@ describe('reliquary_i18n English resolution', () => {
     // later contributes only its name row instead of an empty-string row.
     // This count is the FILL TRIPWIRE: adding a catalog page must be accompanied
     // by a name row in every shipped locale chunk (the per-locale row count is
-    // pinned to the same 33 below), so a new page cannot quietly render English
+    // pinned to the same 34 below), so a new page cannot quietly render English
     // to a CJK or Cyrillic reader.
-    expect(pageCount).toBe(33);
-    expect(descCount).toBe(33);
+    expect(pageCount).toBe(34);
+    expect(descCount).toBe(34);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(33);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(33);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(34);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(34);
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
       field: 'name',
@@ -99,7 +99,7 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     for (const lang of tableLocales()) {
       // Vacuity floor: an emptied chunk would satisfy every for-loop in this
       // suite silently. One row per catalog page, in every shipped locale.
-      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(33);
+      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(34);
       for (const [id, entry] of Object.entries(tables[lang])) {
         expect(RELIQUARY_PAGES_BY_ID[id], `${lang}.${id} is not a catalog page`).toBeDefined();
         for (const field of ['name', 'desc'] as const) {

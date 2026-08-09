@@ -498,14 +498,20 @@ describe('Reliquary profession marks (Phase 7)', () => {
   });
 
   it('catalogRelicCompletion includes marks in overview totals', () => {
-    const itemsOnly = catalogItemCompletion(new Set());
+    // The item-side oracle walks the SCORING pages only: completion pairs
+    // exclude retired (excludeFromCompletion) pages on both sides, while the
+    // raw catalogItemCompletion helper deliberately counts whatever table it
+    // is handed (the catalog-index memo pins depend on that), so the filter
+    // lives here in the oracle, mirroring the production scoring rule.
+    const scoringPages = RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion !== true);
+    const itemsOnly = catalogItemCompletion(new Set(), scoringPages);
     const withMarks = catalogRelicCompletion({
       itemsDiscovered: new Set(),
       marks: new Set([FIELD_NOTE]),
     });
     // Load-bearing: every authored mark, mount, skin, and title slot is a unique
     // catalogued relic. total must include all kinds (Horizons Phase 8).
-    const horizonExtra = RELIQUARY_PAGES.reduce((n, p) => {
+    const horizonExtra = scoringPages.reduce((n, p) => {
       for (const r of p.relics) {
         if (r.kind === 'mount' || r.kind === 'weapon_skin' || r.kind === 'title') n++;
       }
@@ -605,6 +611,46 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // it only accepts character-durable fields; re-call with skins only via full.
     expect(withSkins.owned).toBe(1);
     expect(withSkins.total).toBe(char.total);
+  });
+
+  it('the retired vault sits outside BOTH completion pairs (the skins-pin sibling)', () => {
+    // The Vault of Ages (excludeFromCompletion) is the retired-page arm of
+    // the same both-sides discipline the skin subtraction pins above: its
+    // slots count in NEITHER owned nor total of either pair. The smuggled-key
+    // shape mirrors the withSkins arm: vault ids arriving on itemsDiscovered
+    // (exactly where a veteran's real discovery ledger carries them) must not
+    // raise owned in either pair, and the totals must read as if the page did
+    // not exist. The measured-totals and all-owned arms live in
+    // tests/reliquary_content.test.ts beside the catalog totals pin.
+    const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
+    expect(vault).toBeDefined();
+    expect(vault.excludeFromCompletion).toBe(true);
+    const vaultIds = vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
+    expect(vaultIds.length).toBe(4);
+
+    const base = catalogRelicCompletion({ itemsDiscovered: new Set([CATALOGUE_RELIC]) });
+    const smuggled = catalogRelicCompletion({
+      itemsDiscovered: new Set([CATALOGUE_RELIC, ...vaultIds]),
+    });
+    expect(smuggled).toEqual(base);
+    expect(smuggled.owned).toBe(1);
+    const charBase = catalogCharacterCompletion({
+      itemsDiscovered: new Set([CATALOGUE_RELIC]),
+    });
+    const charSmuggled = catalogCharacterCompletion({
+      itemsDiscovered: new Set([CATALOGUE_RELIC, ...vaultIds]),
+    });
+    expect(charSmuggled).toEqual(charBase);
+    expect(charSmuggled.owned).toBe(1);
+    // Vault ownership alone never moves the curator-rank input either.
+    expect(catalogRankOwned({ itemsDiscovered: new Set(vaultIds) })).toBe(0);
+    // The PAGE-LOCAL pair deliberately still counts: the vault row shows its
+    // own owned/total to the veterans who hold the pieces.
+    const local = pageCompletion(vault, {
+      itemsDiscovered: new Set(vaultIds),
+      marks: new Set(),
+    });
+    expect(local).toEqual({ owned: 4, total: 4, complete: true });
   });
 
   it('catalogRankOwned excludes account weapon skins (grant/display rank align)', () => {
@@ -3350,6 +3396,28 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
       .drainEvents()
       .find((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_complete');
     expect(ev).toBeDefined();
+  });
+
+  it('the capstone ignores the retired vault: everything EXCEPT vault items still completes', () => {
+    // The Vault of Ages slots are excludeFromCompletion, so a character who
+    // owns every countable slot but NONE of the four retired ids must earn
+    // col_reliquary_complete: the retired page can never dead-end the
+    // capstone (rule 7, the reason the flag exists). The whole-catalog check
+    // routes through catalogCharacterCompletion, whose scoring set skips the
+    // vault on both sides.
+    const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
+    const vaultIds = vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
+    expect(vaultIds.length).toBe(4);
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    grantWholeCharacterCatalog(sim, new Set(vaultIds));
+    for (const id of vaultIds) {
+      expect(meta.deedStats.itemsDiscovered.has(id), id).toBe(false);
+    }
+    expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
+    const pair = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    expect(pair.owned).toBe(pair.total);
   });
 
   it('each Illumination deed grants on the live fill that completes its flagship page', () => {

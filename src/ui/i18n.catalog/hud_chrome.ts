@@ -4479,6 +4479,9 @@ export const hudChromeStrings = {
     // Phase 21: the Rift page's display-only SECOND meter, rendered beside
     // clearsLabel on the page header (secondaryClearSource, riftSRankClears).
     srankClearsLabel: '{count} S-rank clears',
+    // Phase 21: the chip a retired (excludeFromCompletion) page carries on
+    // its shelf row and page header (the Vault of Ages).
+    retiredLabel: 'Retired',
     backToShelf: 'Back to shelf',
     // Phase 5: page grid, live unlock toast, Illumination celebration.
     gridAria: 'Relics on {name}',
