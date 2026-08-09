@@ -93,8 +93,10 @@ interface AttributionTargetFixture {
 // changes and the PR 3165 reseal converged here. No capture was retaken.
 // Re-minted for the bounded-prewarm point-light pin (renderer.ts edit only).
 // No capture was retaken.
+// Re-minted for the entry-prewarm compile dedupe/batch + initial-frame reserve
+// (renderer.ts + prewarm_policy.ts edits). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9748e8f842391716cd2a9eea0ff89b5297cded980a670ead3e3d9ef85ac39108';
+  '5814282bb67c5976e6df241a7626452b229082fb6948e6abfa60f220bf2f4faf';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

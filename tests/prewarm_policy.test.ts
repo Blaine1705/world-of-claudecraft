@@ -12,6 +12,7 @@ import {
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
@@ -37,7 +38,10 @@ const BASE: PrewarmPolicyInput = {
 };
 
 // The full manifest id order the renderer builds, for the reorder tests.
+// Kept in lockstep with the renderer by the "matches the renderer's real
+// manifest" case below, which parses the source.
 const MANIFEST_IDS = [
+  'sky.nearby-biomes',
   'views.required',
   'views.landmarks',
   'views.persistent-portals',
@@ -49,15 +53,47 @@ const MANIFEST_IDS = [
   'entities.npc-archetypes',
   'objects.quest-archetypes',
   'props.material-variants',
+  'props.ghost-fade-variants',
   'foliage.materials',
+  'foliage.great-tree-materials',
+  'surface-detail.textures',
+  'weather.materials',
+  'landmarks.impact-site',
   'textures.scene',
   'vfx.atlas',
+  'vfx.weapon-skins',
+  'vfx.ability-primitives',
   'world.initial-frame',
   'programs.compile',
-  'sky.biome-variants',
+  'programs.budget-variants',
+  'sky.current-zone',
   'render.settle-passes',
   'diagnostics.baseline',
 ];
+
+/** The renderer's manifest entries parsed from source: id, and whether the
+ *  literal carries required / deadlineExempt properties. */
+function parsedManifestEntries(): { id: string; required: boolean; deadlineExempt: boolean }[] {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
+  const end = renderer.indexOf('const byId = new Map(', start);
+  expect(start).toBeGreaterThan(-1);
+  expect(end).toBeGreaterThan(start);
+  const slice = renderer.slice(start, end);
+  const blocks = slice.split(/\n {6}\{\n/).slice(1);
+  return blocks.map((block) => {
+    const id = /id: '([^']+)'/.exec(block)?.[1];
+    expect(id).toBeTruthy();
+    return {
+      id: id as string,
+      required: block.includes('required: true'),
+      deadlineExempt: block.includes('deadlineExempt:'),
+    };
+  });
+}
 
 describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   it('runs the full manifest with generous budgets and no reordering', () => {
@@ -137,6 +173,59 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       expect(prewarmEntryRuns(id, p)).toBe(false);
     }
     expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
+  });
+
+  it('matches the renderer real manifest order', () => {
+    expect(parsedManifestEntries().map((entry) => entry.id)).toEqual(MANIFEST_IDS);
+  });
+
+  it('reserves compile-loop room so the initial frame always fits before the GPU guard', () => {
+    // The measured failure (entry blob, 2026-08-09): programs.compile is
+    // deadline-exempt and ran to the 14 s GPU-submit guard, so
+    // world.initial-frame started past the 12 s soft deadline and was
+    // cancelled outright; the initial scene's programs then linked at first
+    // LIVE draw (102-318 ms submit stalls, 17 programs in one frame).
+    expect(prewarmCompileUnitDeadline(14_000, 2_000)).toBe(12_000);
+    // A nonsensical negative reserve never EXTENDS the compile wall.
+    expect(prewarmCompileUnitDeadline(14_000, -500)).toBe(14_000);
+
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(renderer).toContain('const compileUnitDeadline = prewarmCompileUnitDeadline(');
+    expect(renderer).toContain('PREWARM_FRAME_RESERVE_MS');
+    const compileEntryAt = renderer.indexOf("id: 'programs.compile'");
+    const nextEntryAt = renderer.indexOf("id: 'programs.budget-variants'", compileEntryAt);
+    const compileEntry = renderer.slice(compileEntryAt, nextEntryAt);
+    expect(compileEntryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(compileEntryAt);
+    // The unit loop must stop at the RESERVED deadline, not the GPU guard.
+    expect(compileEntry).toContain('performance.now() >= compileUnitDeadline');
+    expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
+  });
+
+  it('leaves no required entry deferrable downstream of the exempt compile', () => {
+    // The regression class that dropped world.initial-frame: every entry
+    // ordered at or after programs.compile (which may lawfully consume the
+    // whole soft budget) must carry a deadlineExempt property, or a slow
+    // compile silently cancels a required entry. This would have caught the
+    // granularity regression that pushed elapsed past the soft deadline.
+    const entries = parsedManifestEntries();
+    const ordered = orderedPrewarmIds(
+      entries.map((entry) => entry.id),
+      resolvePrewarmPolicy(BASE),
+    );
+    const compileAt = ordered.indexOf('programs.compile');
+    expect(compileAt).toBeGreaterThan(-1);
+    const byId = new Map(entries.map((entry) => [entry.id, entry]));
+    for (const id of ordered.slice(compileAt)) {
+      const entry = byId.get(id);
+      expect(entry).toBeTruthy();
+      if (entry?.required) {
+        expect(entry.deadlineExempt, `required entry ${id} is deferrable`).toBe(true);
+      }
+    }
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {

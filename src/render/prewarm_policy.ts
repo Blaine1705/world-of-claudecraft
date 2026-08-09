@@ -189,6 +189,21 @@ export function prewarmEntryShouldDefer(
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
 }
 
+/** Where the programs.compile unit loop must stop so world.initial-frame (the
+ * one uninterruptible whole-scene submit that links whatever compile did not
+ * reach) always has room before the GPU-submit guard. Without the reserve, an
+ * exempt compile that lawfully consumed the whole soft budget left the frame
+ * starting past the deadline, cancelled outright, and the initial scene's
+ * programs linked at first LIVE draw instead (measured: 102-318 ms submit
+ * stalls, 17 programs in one frame). Mirrors prewarmBuildDeadline's reserve,
+ * one pipeline stage later. */
+export function prewarmCompileUnitDeadline(
+  gpuSubmitDeadlineMs: number,
+  frameReserveMs: number,
+): number {
+  return gpuSubmitDeadlineMs - Math.max(0, frameReserveMs);
+}
+
 /** Build cutoff paired with the entry policy. Full Insane prewarm may use the
  * soft-deadline reserve, but it still stops at the independent hard deadline. */
 export function prewarmBuildDeadline(

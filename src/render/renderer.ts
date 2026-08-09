@@ -353,6 +353,7 @@ import {
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
@@ -553,6 +554,15 @@ const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
+// Reserve at the tail of the compile-unit loop so world.initial-frame (the one
+// whole-scene submit that links whatever compile did not reach) always has room
+// before the GPU-submit guard; see prewarmCompileUnitDeadline.
+const PREWARM_FRAME_RESERVE_MS = 2000;
+// Compile roots per entry unit: one unit launches its batch's compileAsync
+// calls and awaits them together, so r165's 10 ms poll floors overlap instead
+// of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
+// enough that a batch's synchronous prologues stay a bounded slice.
+const PREWARM_COMPILE_BATCH_ROOTS = 16;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
 // Constrained (phone WebKit): build only self plus one required/nearby view at
@@ -5570,6 +5580,14 @@ export class Renderer {
     const deadline = started + maxMs;
     const hardDeadline = started + hardMaxMs;
     const gpuSubmitDeadline = Math.max(started, hardDeadline - PREWARM_GPU_SUBMIT_GUARD_MS);
+    // Stop the compile-unit loop early so world.initial-frame always has room:
+    // an exempt compile that lawfully consumed the whole soft budget used to
+    // leave the frame starting past `deadline`, cancelled outright, and the
+    // initial scene's programs linked at first LIVE draw instead.
+    const compileUnitDeadline = prewarmCompileUnitDeadline(
+      gpuSubmitDeadline,
+      PREWARM_FRAME_RESERVE_MS,
+    );
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
@@ -5704,6 +5722,27 @@ export class Renderer {
           await this.compilePrewarmColorPrograms(root, false);
           await this.compileSkinnedShadowPrograms(root);
           compiledPrewarmRoots++;
+        },
+        {
+          // Program-content keys: two leaves sharing materials AND the shape
+          // bits three keys a program on (skinning, instancing, morphs, the
+          // skinned-shadow variant) link the same programs, so the duplicate
+          // costs a unit for nothing. surfaceMat dedupes materials heavily,
+          // so this collapses hundreds of leaves per zone.
+          dedupeKeys: (root) => {
+            const mesh = root as THREE.Mesh & {
+              isSkinnedMesh?: boolean;
+              isInstancedMesh?: boolean;
+            };
+            const material = mesh.material;
+            const materials = Array.isArray(material) ? material : material ? [material] : [];
+            const morphs = (mesh.geometry?.morphAttributes?.position?.length ?? 0) > 0;
+            const shape =
+              `${mesh.isSkinnedMesh ? 's' : 'm'}${mesh.isInstancedMesh ? 'i' : ''}` +
+              `${morphs ? 'p' : ''}${mesh.castShadow ? 'c' : ''}`;
+            return materials.map((entry) => `${shape}:${entry.uuid}`);
+          },
+          batchSize: PREWARM_COMPILE_BATCH_ROOTS,
         },
       );
     };
@@ -6315,6 +6354,14 @@ export class Renderer {
         category: 'world',
         priority: 70,
         required: true,
+        // Never sacrificed to the soft deadline: this is the one submit that
+        // exercises the real live draw path, and dropping it (measured when
+        // the exempt compile above consumed the whole budget) makes the
+        // initial scene link its programs at first LIVE draw, 102-318 ms
+        // stalls in front of the player. The compile-unit reserve
+        // (PREWARM_FRAME_RESERVE_MS) bounds how late this can start, so the
+        // exemption cannot push the uninterruptible submit past the GPU guard.
+        deadlineExempt: true,
         run: () => {
           this.renderPrewarmPass(1 / 60);
           renderPasses++;
@@ -6360,7 +6407,7 @@ export class Renderer {
           compileMode = 'async';
           const units = compileEntryUnits();
           for (let index = 0; index < units.length; index++) {
-            if (performance.now() >= gpuSubmitDeadline) {
+            if (performance.now() >= compileUnitDeadline) {
               const remaining = units.slice(index);
               if (remaining.length > 0) {
                 droppedEntries.push({ id: 'programs.compile', units: remaining });
