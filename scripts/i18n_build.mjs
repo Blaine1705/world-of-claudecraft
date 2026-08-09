@@ -32,19 +32,12 @@
 //   I18N_OUT_DIR=... node scripts/i18n_build.mjs   emit into a custom directory
 //                                 (the key union is emitted INTO that directory too)
 
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  renameSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { flatten, unflatten } from './i18n_flatten.mjs';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
+import { writeModuleDir } from './lib/write_module_dir.mjs';
 
 const root = process.cwd();
 // The generated output is a DIRECTORY of per-locale modules, not a single file.
@@ -332,46 +325,9 @@ function computePending(en, locales) {
   return pending;
 }
 
-// Write a { filename -> contents } map into `dir` ATOMICALLY and prune orphans:
-//   - mkdir -p the dir
-//   - if `<name>` already holds these exact bytes, skip it entirely (no tmp write, no
-//     rename, mtime untouched): a no-op regen (the common case once the tree is
-//     already fresh) then leaves the directory completely quiet instead of touching
-//     every slice's mtime, which is friendlier to file watchers and incremental
-//     tooling that key off mtime. Otherwise write `<name>.tmp` then renameSync it
-//     over `<name>` (an atomic same-dir replace: the destination path is never
-//     momentarily absent and never half-written). A bare rmSync(dir)+recreate would
-//     make every slice vanish for a window, and a concurrent reader resolving
-//     './en_XA' through the barrel during that gap fails with "Cannot find module"
-//     (the reproducibility tests regenerate this directory while other Vitest
-//     workers import it). It is also crash-safer: every expected path always holds
-//     valid (old or new) content.
-//   - delete any pre-existing *.ts not in the map (so a removed locale leaves no
-//     orphan) AND any stale *.ts.tmp left by a run that crashed between writeFileSync
-//     and renameSync (it never ends in plain ".ts", so it would otherwise survive and
-//     could be committed by accident). By emit time every live tmp has been renamed
-//     away, so this only sweeps leftovers, never an in-flight write.
-// Returns the total bytes across every module (written or skipped as already
-// identical), matching the directory's actual content size.
-function writeModuleDir(dir, modules) {
-  mkdirSync(dir, { recursive: true });
-  let totalBytes = 0;
-  for (const [name, text] of Object.entries(modules)) {
-    const dest = path.join(dir, name);
-    totalBytes += Buffer.byteLength(text, 'utf8');
-    if (existsSync(dest) && readFileSync(dest, 'utf8') === text) continue;
-    const tmp = `${dest}.tmp`;
-    writeFileSync(tmp, text);
-    renameSync(tmp, dest);
-  }
-  const keep = new Set(Object.keys(modules));
-  for (const entry of readdirSync(dir)) {
-    if ((entry.endsWith('.ts') || entry.endsWith('.ts.tmp')) && !keep.has(entry)) {
-      rmSync(path.join(dir, entry), { force: true });
-    }
-  }
-  return totalBytes;
-}
+// writeModuleDir (atomic per-file temp + rename, byte-identical skip, orphan sweep)
+// is shared with scripts/i18n_admin_build.mjs: see scripts/lib/write_module_dir.mjs
+// for the full contract.
 
 async function main() {
   const locales = await loadLocales();
@@ -409,7 +365,7 @@ async function main() {
   modules['loaders.ts'] = emitLoadersModule(LOCALES);
   modules['index.ts'] = emitBarrel(LOCALES);
 
-  const totalBytes = writeModuleDir(OUT_DIR, modules);
+  const { totalBytes, rewritten, total } = writeModuleDir(OUT_DIR, modules);
 
   // The flat TranslationKey union rides the same build. Written AFTER
   // writeModuleDir on purpose: in override mode the union lands inside OUT_DIR,
@@ -422,7 +378,8 @@ async function main() {
 
   console.log(
     `generated ${path.relative(root, OUT_DIR)}/ ` +
-      `(${LOCALES.length} locales + en_XA pseudo + barrel + loaders + pending, ${totalBytes} bytes)`,
+      `(${LOCALES.length} locales + en_XA pseudo + barrel + loaders + pending, ` +
+      `${totalBytes} bytes, ${rewritten}/${total} rewritten)`,
   );
   console.log(`generated ${path.relative(root, KEYS_PATH)} (flat TranslationKey union)`);
 }
