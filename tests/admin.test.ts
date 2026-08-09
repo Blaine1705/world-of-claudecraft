@@ -103,6 +103,7 @@ import {
   parsePageParams,
   resetAdminPlayersCapForTests,
 } from '../server/admin';
+import { resetAdminActivityCacheForTests } from '../server/admin_activity_cache';
 import {
   accountDetail,
   associationsForIp,
@@ -160,6 +161,7 @@ import {
   recordProfessionsRestore,
   resetChatStrikesAudited,
 } from '../server/moderation_db';
+import { resetModerationQueueCacheForTests } from '../server/moderation_queue_cache';
 import { authFailureCount, resetAuthFailures } from '../server/ratelimit';
 import {
   adminRolesForAccount,
@@ -252,6 +254,9 @@ const fakeGameState = {
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
+  // The guild bank operator read (the legacy ladder arm of
+  // GET /admin/api/guilds/:id/bank). Null is "no loaded book" for that guild.
+  adminGuildBankState: vi.fn((_guildId: number): Record<string, unknown> | null => null),
   adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
   adminCharacterOnline: vi.fn(() => true),
   adminRestoreItem: vi.fn((): 'ok' | 'offline' | 'invalid_item' => 'ok'),
@@ -264,10 +269,12 @@ const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handl
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // The overview branch reads through the shared TTL memo (admin_overview_cache),
-  // whose refresh IS the mocked overviewCounts here; start every test cold so one
-  // test's cached value never leaks into the next.
+  // The overview/activity/moderation-queue branches all read through shared TTL
+  // memos whose refresh IS the mocked admin_db/moderation_db function here; start
+  // every test cold so one test's cached value never leaks into the next.
   resetOverviewCacheForTests();
+  resetAdminActivityCacheForTests();
+  resetModerationQueueCacheForTests();
   resetAdminGuildListReadsForTests();
   resetAdminPlayersCapForTests();
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
@@ -615,8 +622,40 @@ describe('admin api auth', () => {
       fakeGame,
     );
 
-    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50);
+    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50, 'id', 'desc');
     expect(res.statusCode).toBe(200);
+  });
+
+  it('passes an allowlisted sort/dir through to the accounts query and rejects a bogus column', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(listAccounts).mockResolvedValue({ rows: [], total: 0, page: 1, limit: 25 });
+
+    const sorted = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=character_count&dir=asc',
+      }),
+      sorted,
+      fakeGame,
+    );
+    expect(sorted.statusCode).toBe(200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'character_count', 'asc');
+
+    vi.mocked(listAccounts).mockClear();
+    const bogus = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=id;%20DROP%20TABLE%20accounts&dir=asc',
+      }),
+      bogus,
+      fakeGame,
+    );
+    expect(bogus.statusCode).toBe(200);
+    // An unrecognized sort column falls back to the safe default, never the raw value.
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('passes pagination, search, and sorting through to the characters query', async () => {
@@ -925,6 +964,11 @@ describe('admin api auth', () => {
   it('serves the moderation queue to admins with online account context', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
+    // moderation_queue_cache.ts's base read is online-blind by design (see its
+    // header): the underlying moderationQueue is always called with an EMPTY
+    // set, and the live online status (fakeGameState.liveAccountIds => Set([9])
+    // below) is merged in afterward, never baked into what moderationQueue
+    // itself returns.
     vi.mocked(moderationQueue).mockResolvedValue([
       {
         accountId: 9,
@@ -936,7 +980,7 @@ describe('admin api auth', () => {
         latestReportAt: new Date().toISOString(),
         latestReason: 'spam',
         characterNames: ['Badactor'],
-        online: true,
+        online: false,
       },
     ]);
     const res = fakeRes();
@@ -948,8 +992,11 @@ describe('admin api auth', () => {
     );
 
     expect(res.statusCode).toBe(200);
-    expect(moderationQueue).toHaveBeenCalledWith(new Set([9]));
+    expect(moderationQueue).toHaveBeenCalledWith(new Set());
     expect(res.body.data.rows[0].openReports).toBe(4);
+    // fakeGameState.liveAccountIds() returns Set([9]) (below), so the cache's
+    // live merge marks account 9 online even though the base row was not.
+    expect(res.body.data.rows[0].online).toBe(true);
   });
 
   it('serves perf summaries and raw rows through existing admin auth', async () => {
@@ -968,6 +1015,7 @@ describe('admin api auth', () => {
         avgEffectiveRenderScale: 0.9,
       },
       byPreset: [],
+      byGfxTier: [],
       byGpu: [],
       byBrowser: [],
       byOs: [],
@@ -1357,6 +1405,58 @@ describe('legacy guild administration parity', () => {
     expect(historyResponse.body.data).toEqual({
       rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }],
     });
+  });
+
+  it('serves the guild bank operator read, and 404s a guild whose book is not loaded', async () => {
+    // The LEGACY arm of GET /admin/api/guilds/:id/bank (its RouteDef twin is
+    // covered in tests/server/admin.test.ts). Both run one shared body, so what
+    // this proves is that the ladder reaches it at all and answers the same
+    // envelope: a route present only in the RouteDef table would 404 here for
+    // every operator running with API_DISPATCH=legacy.
+    authenticate();
+    const state = {
+      treasury: 12_345,
+      capacity: 30,
+      purchasedSlots: 30,
+      usedSlots: 1,
+      dormantSlots: 1,
+      slots: [{ index: 0, itemId: 'final_argument_greatblade', count: 1, dormant: true }],
+    };
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(state);
+
+    const loaded = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      loaded,
+      fakeGame,
+    );
+    expect(fakeGameState.adminGuildBankState).toHaveBeenCalledWith(4);
+    expect(loaded.statusCode).toBe(200);
+    expect(loaded.body.data).toEqual({ guildId: 4, ...state });
+
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(null);
+    const missing = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      missing,
+      fakeGame,
+    );
+    expect(missing.statusCode).toBe(404);
+    expect(missing.body.error).toBe('that guild has no loaded bank');
+  });
+
+  it('denies the guild bank read to a role without moderation.read', async () => {
+    // The central fail-closed gate runs before the ladder arm, so the live sim
+    // is never read for an operator who may not see a guild's property.
+    authenticate(['support-only-unknown-role']);
+    const denied = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      denied,
+      fakeGame,
+    );
+    expect(denied.statusCode).toBe(403);
+    expect(fakeGameState.adminGuildBankState).not.toHaveBeenCalled();
   });
 
   it('returns 503 before a third distinct legacy member-count read can occupy the pool', async () => {

@@ -143,13 +143,18 @@ describe('gfx override application', () => {
       ]),
     );
 
+    // Regenerated for the GfxSettings.nativeIosMemoryProfile -> iosMemoryProfile rename (the
+    // field now covers every iOS WebKit host, not just the packaged native app; see gfx.ts).
+    // Only the serialized KEY NAME moves for these desktop-default cases (none of them pass an
+    // iOS platform hint, so the field's VALUE stays false throughout), but JSON.stringify bakes
+    // the key name into the byte pin same as any other field.
     expect(hashes).toEqual({
-      low: '42ed799774110700ab92986f9c91ca11eddf4dec10f283c840c8dceaa193678f',
-      medium: 'c050b1dcd93c42a1e3bb889d09d111a01843d40f3c2e6b18246fa29fa72df5f2',
-      high: '2c9f07d64a9bc6de9bef133b0fda15b78cf5b3caea3c1b663e2581acc4cb64a7',
-      ultra: 'a4d06e8812fb3d633004e6e0b7b0476d09fcea35bf5e4867a41c298844451345',
-      insane: 'f958af0c8455eb70663b7eb7298fc20d2508d1250897aa340eb57152b142e960',
-      advanced: 'a46ab9ada9e851a87cc5c54ce48650fbce8c704368b22d87bb6f1f21c4b8467e',
+      low: 'ffdec5a230db44fbb7ebfeaff1c7f70f41580ce717eed7fd9a25bc10c5ad21ec',
+      medium: '469d80e5a2f24e5d154e88f187bf35d03511549089c7a07ee0dd973771184d57',
+      high: 'be25f35848d170b70f25036ef8209df5ca0cdd6ced3660e53ded55ec6e65c45a',
+      ultra: '8ea3fcdd2c997953394b856aceeaf5036cfb638c0834401a39db349fea2cd3be',
+      insane: '5ce1944db03460cb8427df78b81503807405a5e26c25b5380f8b5d3557761de8',
+      advanced: '52c2de0c12c7897dd24bb600bec815f715c95aa2824eae895c8939f7d041414b',
     });
   });
 

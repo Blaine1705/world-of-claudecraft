@@ -15,6 +15,7 @@ import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import {
   ABILITY_IMAGE_IDS,
   abilityImageUrl,
+  DEED_ART_PENDING,
   deedImageUrl,
   ITEM_ART_PENDING,
   iconDataUrl,
@@ -395,8 +396,34 @@ describe('release v0.34 additional painted art', () => {
       expect(iconDataUrl('item', id)).toBe(`/ui/items/${id}.webp`);
     }
 
-    expect(sorted(DEED_ORDER.slice(-DEED_IDS.length))).toEqual([...DEED_IDS]);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
+    // No POSITIONAL pin on this wave's six. The assertion that broke on the base sync was
+    // exactly that ("the six v0.34 targets are the catalog tail"), and catalog order is
+    // incidental to what this test is for: that all nine targets resolve through their
+    // painted runtime paths. Re-pinning the tail one slot further along would just hand the
+    // same breakage to the next deed anyone appends. Membership plus painted resolution is
+    // the durable claim, and the loop below is where it lands.
+    // The artless set IS pinned, from its one owner, so unenumerated art debt still reds.
+    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
+    // This pack landed as one contiguous append block; it no longer sits at
+    // DEED_ORDER's tail once a later change appends more deeds after it (the
+    // zone chronicle extension did), so pin contiguity + membership instead
+    // of an absolute tail slice.
+    const deedIdIndices = DEED_IDS.map((id) => DEED_ORDER.indexOf(id));
+    expect(
+      deedIdIndices.every((i) => i >= 0),
+      'every DEED_IDS member is live',
+    ).toBe(true);
+    const lo = Math.min(...deedIdIndices);
+    const hi = Math.max(...deedIdIndices);
+    expect(hi - lo + 1, 'the pack is a contiguous append block').toBe(DEED_IDS.length);
+    expect(sorted(DEED_ORDER.slice(lo, hi + 1))).toEqual([...DEED_IDS]);
+    // The twelve zone chronicle deeds appended after this pack ship
+    // art-trailing (docs/design/deeds.md rule 6); this pack itself still
+    // ships fully painted.
+    expect(
+      DEED_IDS.every((id) => DEED_IMAGE_IDS.has(id)),
+      'this pack stays fully painted',
+    ).toBe(true);
     for (const id of DEED_IDS) {
       expect(DEEDS[id], `${id} live deed`).toBeDefined();
       expect(DEED_IMAGE_IDS.has(id), `${id} generated registry`).toBe(true);

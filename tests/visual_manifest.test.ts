@@ -25,6 +25,7 @@ function expectedClipNames(clips: ClipMap): string[] {
     clips.sitDown,
     clips.sitIdle,
     clips.swim,
+    clips.swimSurface,
     clips.jump,
     clips.walkBack,
     clips.flourish,
@@ -32,6 +33,20 @@ function expectedClipNames(clips: ClipMap): string[] {
     ...(clips.hit ?? []),
     ...Object.values(clips.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((name): name is string => !!name);
+}
+
+/** Every clip a def can actually resolve: its own GLB PLUS any animUrls layered
+ *  onto it (assets.ts prepareVisual merges both into one clip map, which is how
+ *  the hunter gets its bow draw and every player body gets the swim strokes). */
+async function loadableClipNames(visual: {
+  url: string;
+  animUrls?: readonly string[];
+}): Promise<Set<string>> {
+  const names = new Set<string>();
+  for (const url of [visual.url, ...(visual.animUrls ?? [])]) {
+    for (const name of await glbAnimationNames(`public/${url}`)) names.add(name);
+  }
+  return names;
 }
 
 async function glbAnimationNames(path: string): Promise<Set<string>> {
@@ -134,7 +149,7 @@ describe('character visual manifest', () => {
     expect(visual.clips.cast).toBe('Channel');
     expect(visual.clips.attack).toEqual(['Cast']);
 
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
@@ -143,7 +158,7 @@ describe('character visual manifest', () => {
 
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
@@ -160,10 +175,14 @@ describe('character visual manifest', () => {
     // (scripts/_add_dirt_throw_anim.mjs); neither is a dagger swing.
     expect(visual.clips.attackByAbility?.kick).toBe('Kick_A');
     expect(visual.clips.attackByAbility?.blind).toBe('Dirt_Throw');
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
-    expect(animationNames.has('Garrote_Choke')).toBe(true);
-    expect(animationNames.has('Kick_A')).toBe(true);
-    expect(animationNames.has('Dirt_Throw')).toBe(true);
+    // The bespoke one-shots live in the rogue GLB itself...
+    const rogueGlbNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(rogueGlbNames.has('Garrote_Choke')).toBe(true);
+    expect(rogueGlbNames.has('Kick_A')).toBe(true);
+    expect(rogueGlbNames.has('Dirt_Throw')).toBe(true);
+    // ...but full clip coverage must include the layered animUrls (the shared
+    // swim strokes ride in swim_anims.glb, not in any class body).
+    const animationNames = await loadableClipNames(visual);
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
@@ -171,7 +190,7 @@ describe('character visual manifest', () => {
 
   it('points the Stone Cantor manifest at clips present in the GLB (including the synthesized Hit)', async () => {
     const visual = VISUALS.mob_reedbound_acolyte;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
@@ -181,7 +200,7 @@ describe('character visual manifest', () => {
 
   it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
     const visual = VISUALS.mob_training_dummy;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
@@ -197,14 +216,62 @@ describe('character visual manifest', () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {
       const visual = VISUALS[key];
-      const animationNames =
-        byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
-      byUrl.set(visual.url, animationNames);
+      const baseNames = byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
+      byUrl.set(visual.url, baseNames);
+
+      // A bespoke clip (e.g. greyjaw's Greyjaw_Attack) can live in a separate
+      // mesh-free animUrls donor GLB instead of the base rig, same pattern as
+      // player_mage/mob_elemental; the runtime merges both into one clip pool
+      // (assets.ts), so the existence check must too.
+      const animationNames = new Set(baseNames);
+      for (const animUrl of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${animUrl}`);
+        for (const name of donorNames) animationNames.add(name);
+      }
 
       expect(animationNames.size).toBeGreaterThan(0);
       expect(
         [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
       ).toEqual([]);
+    }
+  });
+
+  it('gives druid Bear Form its own quadruped rig with a held jump and a landing', async () => {
+    const bear = VISUALS.form_bear;
+    expect(bear.url).toBe('models/creatures/bear_form.glb');
+    // no tint: the sculpt ships its own texture, unlike the brown-washed yeti
+    // biped that used to stand in for the form
+    expect(bear.tint).toBeUndefined();
+
+    const names = await glbAnimationNames(`public/${bear.url}`);
+    expect([...new Set(expectedClipNames(bear.clips))].filter((n) => !names.has(n))).toEqual([]);
+    // Jump/Land are a PAIR: `land` is what makes visual.ts clamp the jump clip on
+    // its airborne pose instead of looping it, so a jump without a land would
+    // silently keep the old looping behaviour.
+    expect(bear.clips.jump).toBe('Jump');
+    expect(bear.clips.land).toBe('Land');
+    expect(names.has('Jump') && names.has('Land')).toBe(true);
+
+    // An instant ability must not animate the bear. The cast base state falls
+    // back to idle without a `cast` clip, and the ability-VFX painter only plays
+    // a ceremonial gesture when the rig authors a per-ability clip
+    // (hasGestureClip), so all three of these staying absent is the mechanism.
+    // Real attacks still resolve through `attack`.
+    expect(bear.clips.cast).toBeUndefined();
+    expect(bear.clips.attackByAbility).toBeUndefined();
+    expect(bear.clips.emote).toBeUndefined();
+    expect(bear.clips.attack).toEqual(['Attack']);
+
+    // measured off the clips (see the manifest comment); full run (RUN_SPEED 7)
+    // must land clear of the 1.6 clamp in locomotionTimeScale, where feet skate
+    expect(bear.runRef).toBeDefined();
+    expect(7 / (bear.runRef as number)).toBeLessThan(1.6);
+  });
+
+  it('pairs `land` with `jump` on every rig that ships one', () => {
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!def.clips.land) continue;
+      expect(def.clips.jump, `${key} names a land clip but no jump clip to clamp`).toBeDefined();
     }
   });
 
@@ -244,9 +311,35 @@ describe('character visual manifest', () => {
       const doc = await io.read(`public/${visual.url}`);
       const animations = doc.getRoot().listAnimations();
       const names = new Set(animations.map((animation) => animation.getName()));
+      // A bespoke attack/cast clip (e.g. mob_wildheart_stalker's Wildheart_Stalker_Attack,
+      // scripts/build_wildheart_stalker_anims.mjs; mob_wildheart_hexcaller's
+      // Wildheart_Hexcaller_Attack, scripts/build_wildheart_hexcaller_anims.mjs; or
+      // mob_wildheart_high_priest's Wildheart_High_Priest_Attack,
+      // scripts/build_wildheart_high_priest_anims.mjs) ships mesh-free in its own
+      // animUrls companion GLB, not the base rig GLB this test re-cuts; merge every
+      // animUrls donor's clip names in too, same as the general animUrls-aware gate in
+      // tests/character_clipmaps.test.ts.
+      for (const url of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${url}`);
+        for (const name of donorNames) names.add(name);
+      }
       expect(names.size).toBeGreaterThan(0);
+      // animUrls donors (e.g. mob_wildheart_ravager's Wildheart_Ravager_Attack,
+      // Hit_Stagger, issue #2889 round 2) ship extra clips in a separate
+      // mesh-free GLB alongside the base rig; merge their names in before
+      // checking every clip the ClipMap references actually resolves
+      // somewhere. durationOf and the Death end-vs-start check below stay on
+      // the base-only `names`/`animations`, since none of those checks touch
+      // a donor-only clip.
+      const namesWithDonors = new Set(names);
+      for (const donorUrl of visual.animUrls ?? []) {
+        const donorDoc = await io.read(`public/${donorUrl}`);
+        for (const donorAnimation of donorDoc.getRoot().listAnimations()) {
+          namesWithDonors.add(donorAnimation.getName());
+        }
+      }
       expect(
-        [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !namesWithDonors.has(name)),
         key,
       ).toEqual([]);
 
@@ -307,11 +400,66 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('keeps the model-sharing player skins at a subtle tint, not a full-body wash (#2678)', () => {
+    // player_priest and player_warlock share mage.glb, player_shaman shares
+    // barbarian.glb; each carries a small tint so it reads apart from the
+    // class it shares a model with. At their pre-fix strengths (0.5 / 0.4 /
+    // 0.45) the tint color dominated the authored texture and the default
+    // (skin 0) appearance read as a solid-color, corrupted model on the
+    // character-create screen. Pinned to the exact 0.12 the manifest ships
+    // (the same "faint wash" strength used elsewhere for model-sharing
+    // differentiation, see mob_troll's 0.12 above), not just an upper bound,
+    // so a future bump toward the wash can't silently pass this test.
+    for (const key of ['player_priest', 'player_shaman', 'player_warlock'] as const) {
+      const visual = VISUALS[key];
+      expect(typeof visual.tint, key).toBe('number');
+      expect(visual.tintStrength, key).toBe(0.12);
+    }
+    // The classes that own their model outright (no sharing) stay tint-free:
+    // a wash there would be pure regression, never intentional.
+    for (const key of [
+      'player_warrior',
+      'player_paladin',
+      'player_hunter',
+      'player_rogue',
+      'player_mage',
+      'player_druid',
+    ] as const) {
+      expect(VISUALS[key].tint, key).toBeUndefined();
+    }
+  });
+
   it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
     // Prose-only claim otherwise (FAMILY_KEYS.reptile comment): the explicit MOB_KEYS
     // override this pins is what actually keeps the model, and nothing else does.
     expect(visualKeyFor({ kind: 'mob', templateId: 'deepfen_spearjaw' } as never)).toBe(
       'mob_spearjaw',
     );
+  });
+
+  it('keeps every player class default (skin 0) free of a corrupting full-body tint wash (issue #2678)', () => {
+    // Every player rig is ONE merged material for the whole body (skin, hair, and
+    // cloth share a single atlas), so VisualDef.tint multiplies the entire
+    // character, not just the piece it is meant to differentiate. player_priest,
+    // player_shaman, and player_warlock share their base model with another
+    // class (mage/mage/barbarian) and used tint to tell them apart, but at
+    // 0.4-0.5 strength the lerp toward the tint color read as a full-body wash
+    // for shaman and warlock (saturated blue and purple respectively); priest's
+    // near-white tint was already a near-no-op at 0.5 (measured shift ~2-4% per
+    // channel), dropped to 0.15 anyway for consistency. Kept subtle from here
+    // on, matching the same "avoid flooding" cap this file already applies to
+    // entity-tinted mobs sharing one material (mob_troll, mob_kobold, mob_ogre
+    // below stay at 0.12-0.2 for the identical reason). The acceptance criteria
+    // for issue #2678 allow subtle differentiation on any class, including the
+    // six below that ship untinted today: the cap, not a tint-free pin, is
+    // what enforces "no wash" for all of them going forward.
+    const WASH_STRENGTH_CAP = 0.2;
+    for (const [key, visual] of Object.entries(VISUALS)) {
+      if (!key.startsWith('player_') || visual.tint === undefined) continue;
+      expect(
+        visual.tintStrength ?? 0.4,
+        `${key}.tintStrength must stay <= ${WASH_STRENGTH_CAP} so the default skin never reads as a full-body wash`,
+      ).toBeLessThanOrEqual(WASH_STRENGTH_CAP);
+    }
   });
 });

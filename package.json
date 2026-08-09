@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.34.0",
+  "version": "0.35.1",
   "private": true,
   "license": "MIT",
   "author": {
@@ -129,7 +129,7 @@
     "pg": "^8.21.0",
     "postprocessing": "6.36.0",
     "prom-client": "15.1.3",
-    "three": "^0.165.0",
+    "three": "0.165.0",
     "tweetnacl": "1.0.3",
     "ws": "^8.21.0"
   },
@@ -184,7 +184,17 @@
       "build/icon.ico",
       "build/icon.icns",
       "package.json",
-      "!node_modules/**"
+      "!node_modules/**",
+      "!dist/models/**",
+      "!dist/textures/**",
+      "!dist/env/**",
+      "!dist/vfx/**",
+      "!dist/*.pdf",
+      "!dist/press.html",
+      "!dist/merch.html",
+      "!dist/links.html",
+      "!dist/CLAUDE.md",
+      "!dist/guide-stills/**"
     ],
     "directories": {
       "buildResources": "build",
@@ -249,7 +259,8 @@
       ]
     },
     "nsis": {
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "buildUniversalInstaller": false
     },
     "linux": {
       "category": "Game",
@@ -278,12 +289,32 @@
     }
   },
   "allowScripts": {
-    "sharp@0.34.5": true,
+    "sharp@0.35.3": true,
     "ffmpeg-static@5.3.0": true,
     "ffprobe-static@3.1.0": true
   },
   "packageManager": "pnpm@10.34.5",
   "pnpm": {
+    "overrides": {
+      "axios@1": "^1.19.0",
+      "brace-expansion@1": "^1.1.18",
+      "brace-expansion@2": "^2.1.4",
+      "brace-expansion@5": "^5.0.9",
+      "fast-uri@3": "^3.1.5",
+      "js-yaml@4": "^4.3.1",
+      "nanoid@3": "^3.3.17",
+      "postcss@8": "^8.5.25",
+      "sharp@0.34": "^0.35.3",
+      "tar@7": "^7.5.22",
+      "undici@6": "^6.28.0",
+      "undici@7": "^7.29.0"
+    },
+    "auditConfig": {
+      "ignoreGhsas": [
+        "GHSA-3gc7-fjrx-p6mg",
+        "GHSA-w5hq-g745-h8pq"
+      ]
+    },
     "onlyBuiltDependencies": [
       "esbuild",
       "ffmpeg-static",
@@ -295,6 +326,9 @@
       "electron-winstaller",
       "fsevents",
       "@reown/appkit"
-    ]
+    ],
+    "patchedDependencies": {
+      "three@0.165.0": "patches/three@0.165.0.patch"
+    }
   }
 }

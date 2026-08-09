@@ -76,11 +76,22 @@ function stripComments(src: string): string {
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending
-// layer/package, or null when the import is allowed.
+// layer/package, or null when the import is allowed. `server/` is banned like the
+// browser host layers (even type-only): server modules drag Node-only deps (pg,
+// node:*) that would break the sim in the browser, and shared server contracts are
+// REDECLARED in the sim with a test-side lockstep pin instead (the GuildRank
+// precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
-  const layer = spec.match(/(?:^|\/)(render|ui|game|net)\//);
-  return layer ? layer[1] : null;
+  // The trailing slash is not required: `../server` and `../../server.js` are
+  // the same ban, and the slash-only form let both through. A layer name must
+  // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
+  // extension. The leading `(?:^|\/)` still anchors the name to a path segment,
+  // so `my_server_helper` and `src/uiverse/x` are not matches.
+  const layer = spec.match(
+    /(?:^|\/)(render|ui|game|net|server)(?:\/|\.js)?$|(?:^|\/)(render|ui|game|net|server)\//,
+  );
+  return layer ? (layer[1] ?? layer[2]) : null;
 }
 
 // Same idea for a src/ui pure core: it lives in ui and may lean on sibling pure
@@ -133,6 +144,54 @@ const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
 
 const simFiles = walk(simRoot);
 
+describe('live graphics profile architecture', () => {
+  it('resolves renderer-bound layout and deferred preload choices from live GFX', () => {
+    const renderSource = (relativePath: string): string =>
+      readFileSync(join(repoRoot, 'src', 'render', relativePath), 'utf8');
+    const props = renderSource('props.ts');
+    const foliage = renderSource('foliage.ts');
+
+    expect(props).not.toMatch(/\bconst\s+MERGE_BAND_DEPTH\s*=\s*GFX\b/);
+    expect(props).toContain('const mergeBandDepth = ():');
+    expect(props).toContain('deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials)');
+    expect(foliage).not.toMatch(/\bconst\s+MODEL_URLS\s*=\s*GFX\b/);
+    expect(foliage).toContain('const foliageModelUrls = ():');
+    expect(foliage).toContain('foliageModelUrlsFor(GFX)');
+
+    const directDeferredProfiles = [
+      ['terrain.ts', 'prepareTerrainProfileAssets'],
+      ['water.ts', 'prepareWaterProfileAssets'],
+      ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
+      ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
+      ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
+      ['great_tree_prewarm.ts', 'prepareGreatTreeProfileAssets'],
+    ] as const;
+    for (const [relativePath, prepare] of directDeferredProfiles) {
+      expect(renderSource(relativePath)).toContain(
+        `registerDeferredPreload(() => ${prepare}(GFX))`,
+      );
+    }
+  });
+
+  it('registers every exported profile cache reset in the central invalidator', () => {
+    const renderFiles = walk(join(repoRoot, 'src', 'render'));
+    const resetNames = new Set<string>();
+    for (const file of renderFiles) {
+      const source = stripComments(readFileSync(file, 'utf8'));
+      for (const match of source.matchAll(/\bexport function (reset\w+ProfileCaches?)\s*\(/g)) {
+        resetNames.add(match[1]);
+      }
+    }
+
+    const coordinator = stripComments(
+      readFileSync(join(repoRoot, 'src', 'render', 'assets', 'graphics_profile.ts'), 'utf8'),
+    );
+    const resetTable = coordinator.slice(coordinator.indexOf('const RESETTERS'));
+    expect(resetNames.size).toBeGreaterThan(20);
+    for (const resetName of resetNames) expect(resetTable).toContain(resetName);
+  });
+});
+
 // Curated src/ui pure cores: host-agnostic view models hud.ts imports, each
 // paired with a DOM painter that is deliberately NOT registered here. Seeded with
 // the cores that already exist on v0.16.0; extend as new pure cores land (later
@@ -162,6 +221,7 @@ const UI_PURE_CORES = [
   'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
@@ -170,9 +230,14 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/battleground/battleground_map_view.ts',
+  'src/ui/hud/battleground/battleground_kill_feed_view.ts',
+  'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_lockout_view.ts',
+  'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
@@ -180,26 +245,43 @@ const UI_PURE_CORES = [
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
+  'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/bags_view.ts',
   'src/ui/bag_item_context_menu.ts',
   'src/ui/enchant_apply_view.ts',
   'src/ui/enchanting_view.ts',
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
+  'src/ui/material_profession_hint_view.ts',
+  'src/ui/elixir_tooltip_view.ts',
+  'src/ui/stack_size_tooltip_view.ts',
+  'src/ui/craft_name_view.ts',
+  'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/item_instance_glyph_mark.ts',
+  'src/ui/bag_corner_mark_view.ts',
+  'src/ui/bag_fine_mark_view.ts',
+  'src/ui/bag_quest_mark_view.ts',
+  'src/ui/bag_quest_tracker_highlight_view.ts',
+  'src/ui/quest_item_tooltip_view.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
+  'src/ui/guild_bank_log_view.ts',
+  'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/warfare_vendor_view.ts',
   'src/ui/hud/vendor/train_view.ts',
   'src/ui/hud/vendor/train_learn_core.ts',
   'src/ui/hud/vendor/unbind_view.ts',
@@ -211,13 +293,17 @@ const UI_PURE_CORES = [
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/craft_celebration_view.ts',
+  'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/commission_order_view.ts',
+  'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_buy_confirm_core.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
@@ -225,16 +311,25 @@ const UI_PURE_CORES = [
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
+  'src/ui/bg_field_relief_core.ts',
+  'src/ui/map_gather_tip_memo.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_land_mask_core.ts',
+  'src/ui/map_show_on_map_core.ts',
   'src/ui/continent_map_view.ts',
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/vale_cup_window_view.ts',
   'src/ui/vale_cup_indicator_view.ts',
   'src/ui/vale_cup_hud_view.ts',
+  'src/ui/hud/battleground/battleground_atlas_view.ts',
+  'src/ui/hud/battleground/battleground_window_view.ts',
+  'src/ui/hud/battleground/bg_end_banner_view.ts',
+  'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/vale_cup_briefing_view.ts',
   'src/ui/vale_cup_betting_view.ts',
   'src/ui/vale_cup_charge_view.ts',
@@ -250,6 +345,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/hud_frames.ts',
   'src/ui/stance_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
@@ -264,9 +360,12 @@ const UI_PURE_CORES = [
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
   'src/ui/gather_tool_tooltip.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
+  'src/ui/block_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
@@ -281,9 +380,12 @@ const UI_PURE_CORES = [
   'src/ui/town_focus_view.ts',
   'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/pet_frame_view.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/game/graphics_rebuild_core.ts',
+  'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
@@ -307,12 +409,22 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // the same contract for the map editor's realtime terrain/water edits.
 // day_night_core is the clock-to-grade math of the world day/night cycle
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
-// moment of the cycle.
+// moment of the cycle. night_lighting_core is the pair of ramps every
+// after-dark readability layer fades on, so it stays drivable without a
+// renderer. (The streetlamp layout and style cores used to sit here too; they
+// are `src/sim/streetlamp_layout.ts` and `src/sim/streetlamp_style.ts` now,
+// because the sim collides with the posts it lays out.)
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
+  'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
+  'src/render/biome_haze_field_core.ts',
+  'src/render/battleground_core.ts',
+  'src/render/battleground_fx_core.ts',
+  'src/render/battleground_lantern_fx_core.ts',
+  'src/render/battleground_rune_vfx_core.ts',
   'src/render/blade_grass_dense_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
@@ -320,13 +432,21 @@ const RENDER_PURE_CORES = [
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
+  'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
+  'src/render/dashed_ring_core.ts',
+  'src/render/detail_horizon_core.ts',
+  'src/render/drape_lod_core.ts',
+  'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_shader_core.ts',
+  'src/render/foliage_shadow_core.ts',
+  'src/render/frost_ice_fields_core.ts',
+  'src/render/frost_sky_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/ground_aim_reticle_core.ts',
@@ -340,6 +460,7 @@ const RENDER_PURE_CORES = [
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
   'src/render/post_bloom_shader_core.ts',
@@ -347,6 +468,10 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/camp_brazier_placement_core.ts',
+  'src/render/night_accents_core.ts',
+  'src/render/night_light_field_core.ts',
+  'src/render/night_lighting_core.ts',
   'src/render/opaque_draw_order_core.ts',
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
@@ -355,17 +480,24 @@ const RENDER_PURE_CORES = [
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
+  'src/render/shore_water_gate_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_coverage_core.ts',
+  'src/render/water_wave_core.ts',
+  'src/render/weather_field_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
   'src/render/day_night_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/garden_maze_core.ts',
   'src/render/garden_parterre_core.ts',
+  'src/render/far_surface_core.ts',
+  'src/render/far_terrain_core.ts',
+  'src/render/foliage_impostor_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
@@ -373,6 +505,8 @@ const RENDER_PURE_CORES = [
   'src/render/resident_scenery_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/weapon_vfx_apply_queue_core.ts',
+  'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
@@ -388,7 +522,9 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/banner_queue.ts',
+  'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
@@ -396,6 +532,7 @@ const BARE_NAMED = [
   'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/known_item.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
@@ -403,20 +540,24 @@ const BARE_NAMED = [
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
+  'src/ui/map_gather_tip_memo.ts',
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/hud_frames.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
@@ -468,9 +609,45 @@ describe('src/sim architecture invariants', () => {
     expect(simFiles.length).toBeGreaterThan(10);
   });
 
-  it('imports nothing from render/ui/game/net or three (host-agnostic core)', () => {
+  it('imports nothing from render/ui/game/net/server or three (host-agnostic core)', () => {
     const violations = scanImports(simFiles, forbiddenImport);
     expect(violations, `src/sim must stay host-agnostic:\n${violations.join('\n')}`).toEqual([]);
+  });
+
+  it('the ban actually FIRES on every spelling a sim file could reach a host by', () => {
+    // A guard with no self-test is a guard nobody has seen fail. The
+    // directory-with-trailing-slash spellings were caught; the BARE ones
+    // (`../server`, `../../server.js`) were not, and a type-only
+    // `import type { X } from '../server'` is exactly the shape a sim file
+    // drifts into first.
+    for (const spec of [
+      '../server',
+      '../../server.js',
+      '../../server/game',
+      './server/db',
+      '../net',
+      '../net/online',
+      '../ui/hud',
+      '../render/renderer',
+      '../game/input',
+      'three',
+      'three/examples/jsm/x',
+    ]) {
+      expect(forbiddenImport(spec), spec).not.toBeNull();
+    }
+    // ...and does NOT fire on the legitimate neighbours, so it can never be
+    // satisfied by a rule that simply bans everything.
+    for (const spec of [
+      './types',
+      '../world_api',
+      '../world_api/guild_bank',
+      './professions/training',
+      'node:assert',
+      './my_server_helper',
+      './renderer_notes',
+    ]) {
+      expect(forbiddenImport(spec), spec).toBeNull();
+    }
   });
 
   it('touches no DOM/browser globals', () => {
@@ -920,7 +1097,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
     ...new Set(
       [...uiCores, ...renderCores]
         .filter((f) => !viewOrCoreRe.test(f))
-        .map((f) => relative(repoRoot, f)),
+        .map((f) => relative(repoRoot, f).replaceAll('\\', '/')),
     ),
   ].sort();
 }
@@ -948,6 +1125,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/absorb_bar.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/clock.ts',
@@ -957,15 +1135,20 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/focus_order.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud_frames.ts',
+  'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/known_item.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/log_event_route.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
+  'src/ui/map_gather_tip_memo.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/mobile_hud_layout.ts',
@@ -978,6 +1161,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
@@ -1011,7 +1195,9 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
     const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
-    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
+    const bareNamedRel = [
+      ...new Set(BARE_NAMED.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
+    ].sort();
     expect(
       derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
@@ -1042,7 +1228,7 @@ describe('curated bare-named pure cores (cross-check)', () => {
 
     const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
     const mutatedBareNamedRel = [
-      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
     ].sort();
     // The OLD derived check: still green after the synchronized delete (the gap).
     expect(derivedBare).toEqual(mutatedBareNamedRel);
@@ -1267,7 +1453,12 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // is imported BY a painter and paints nothing itself; a window painter owns and
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
-const UI_PAINTER_HELPERS = ['src/ui/text_sprite_cache.ts'].map((rel) => join(repoRoot, rel));
+const UI_PAINTER_HELPERS = [
+  'src/ui/continent_land_mask.ts',
+  'src/ui/text_sprite_cache.ts',
+  // Detached tt-desc / tt-sub line mint (createElement + textContent only).
+  'src/ui/tooltip_line.ts',
+].map((rel) => join(repoRoot, rel));
 
 // Modules that REACH A HOST: they own browser state (the windows, the HUD
 // controllers, the drag / resize / focus plumbing, the storage-backed settings) or
@@ -1293,11 +1484,14 @@ const UI_PAINTER_HELPERS = ['src/ui/text_sprite_cache.ts'].map((rel) => join(rep
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_window.ts',
+  'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
   'src/ui/camera_prompt.ts',
   'src/ui/char_skin_window.ts',
@@ -1307,6 +1501,7 @@ const UI_DOM_MODULES = [
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',
   'src/ui/crafting_window.ts',
+  'src/ui/commission_order_window.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',
@@ -1320,6 +1515,8 @@ const UI_DOM_MODULES = [
   'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
+  'src/ui/guild_bank_log_window.ts',
+  'src/ui/guild_bank_window.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',
@@ -1342,6 +1539,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
+  'src/ui/hud/vendor/warfare_vendor_window.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
@@ -1406,6 +1604,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_briefing.ts',
   'src/ui/vale_cup_charge.ts',
   'src/ui/vale_cup_hud.ts',
+  'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));

@@ -104,6 +104,14 @@ function sourceOver(server: GameServer): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => server.lastTickAt(),
     loopStartedAt: () => server.loopStartedAt(),
+    guildBankLogCache: () => ({
+      reads: 0,
+      refreshes: 0,
+      evictions: 0,
+      busts: 0,
+      entries: 0,
+      dirtyGuilds: 0,
+    }),
   };
 }
 
@@ -399,8 +407,10 @@ function recordingSink() {
   const fishingCasts: Array<[string, string]> = [];
   const fishingCatches: Array<[string, string, boolean]> = [];
   const fishingGotAways: Array<[string, string]> = [];
+  const fishingEarlyReels: Array<[string, string]> = [];
   const fishingEmptyHooks: Array<[string, string]> = [];
   const rodFees: string[] = [];
+  const bgResolved: Array<[string, string, number, number, number]> = [];
   const sink: GameMetricsCounters = {
     wsMessage(direction) {
       if (direction === 'in') wsIn++;
@@ -418,6 +428,7 @@ function recordingSink() {
       chats++;
     },
     characterCreated() {},
+    guildBankIncident() {},
     copperCredited(source, amount) {
       credited.push([source, amount]);
     },
@@ -436,15 +447,22 @@ function recordingSink() {
     fishingGotAway(zone, band) {
       fishingGotAways.push([zone, band]);
     },
+    fishingEarlyReel(zone, band) {
+      fishingEarlyReels.push([zone, band]);
+    },
     fishingEmptyHook(zone, band) {
       fishingEmptyHooks.push([zone, band]);
     },
     rodFeePaid(recipeId) {
       rodFees.push(recipeId);
     },
+    battlegroundResolved(cause, composition, durationSec, scoreCrimson, scoreAzure) {
+      bgResolved.push([cause, composition, durationSec, scoreCrimson, scoreAzure]);
+    },
   };
   return {
     sink,
+    bgResolved,
     dropped,
     seqGaps,
     credited,
@@ -453,6 +471,7 @@ function recordingSink() {
     fishingCasts,
     fishingCatches,
     fishingGotAways,
+    fishingEarlyReels,
     fishingEmptyHooks,
     rodFees,
     wsIn: () => wsIn,
@@ -1032,6 +1051,12 @@ function fishingGotAwayEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
   return event;
 }
 
+type FishingEarlyReelEvent = Extract<SimEvent, { type: 'fishingEarlyReel' }>;
+function fishingEarlyReelEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+  const event: FishingEarlyReelEvent = { type: 'fishingEarlyReel', pid: 999, zoneId, band };
+  return event;
+}
+
 type FishingEmptyHookEvent = Extract<SimEvent, { type: 'fishingEmptyHook' }>;
 function fishingEmptyHookEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
   const event: FishingEmptyHookEvent = { type: 'fishingEmptyHook', pid: 999, zoneId, band };
@@ -1198,7 +1223,7 @@ describe('fishing telemetry counters at their emission sites', () => {
     server.stop();
   });
 
-  it('counts a got-away and an empty hook on their own counters', () => {
+  it('counts a got-away, an early reel, and an empty hook on their own counters', () => {
     const server = new GameServer();
     const rec = recordingSink();
     setGameMetricsCounters(rec.sink);
@@ -1206,6 +1231,7 @@ describe('fishing telemetry counters at their emission sites', () => {
     observe(server, [
       fishingGotAwayEvent('eastbrook_vale', 0),
       fishingEmptyHookEvent('mirefen_marsh', 1),
+      fishingEarlyReelEvent('eastbrook_vale', 0),
       fishingGotAwayEvent('thornpeak_heights', 2),
     ]);
 
@@ -1214,8 +1240,12 @@ describe('fishing telemetry counters at their emission sites', () => {
       ['thornpeak_heights', '2'],
     ]);
     expect(rec.fishingEmptyHooks).toEqual([['mirefen_marsh', '1']]);
-    // Neither one is a catch: an empty hook counted as a catch would put the
-    // koi odds denominator far above what actually landed.
+    // The early reel is self-inflicted and counts apart from the got-aways:
+    // folded together, the series could not say whether the anti-spam change
+    // burns legitimate anglers.
+    expect(rec.fishingEarlyReels).toEqual([['eastbrook_vale', '0']]);
+    // None of the three is a catch: an empty hook counted as a catch would
+    // put the koi odds denominator far above what actually landed.
     expect(rec.fishingCatches).toEqual([]);
     server.stop();
   });

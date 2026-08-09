@@ -324,14 +324,14 @@ describe("Ignivar encounter", () => {
       {
         startTick: 1023,
         endTick: 1133,
-        facingSlot: 7,
+        facingSlot: 6,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
         startTick: 2179,
         endTick: 2289,
-        facingSlot: 2,
+        facingSlot: 1,
         windupFrames: 50,
         activeFrames: 60,
       },

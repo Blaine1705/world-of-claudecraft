@@ -11,7 +11,7 @@ import {
   eastbrookNoticeboardSourceFingerprint,
 } from '../scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { GFX } from '../src/render/gfx';
+import { gfxInternalsForTest } from '../src/render/gfx';
 import {
   buildEastbrookNoticeboard,
   buildNoticeboardFromSource,
@@ -22,9 +22,14 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/eastbrook_noticeboard.glb');
 const ASSET_BYTES = 24_684;
-const ASSET_SHA256 = '765ac43c5be4942921aa48b9796a70681b030aa8f6882632a4ba5c6e6f6a97d6';
-const SOURCE_FINGERPRINT = '0517cc8bd05d333786105323fcb13bed8b3c1f00820633be568bc6098133f00c';
-const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
+const ASSET_SHA256 = '9f63803374a0dc02fad5c9d722dae3df1e069da1a36bce30c0582ddf52550887';
+const SOURCE_FINGERPRINT = '1e5d874823a85df19764c230a0dfe535774e2f03c3e4518862b0bcacc65e79ac';
+let restoreGfx: (() => void) | null = null;
+
+function setStandardMaterials(value: boolean): void {
+  restoreGfx?.();
+  restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: value });
+}
 
 function coloredBox(
   size: readonly [number, number, number],
@@ -92,8 +97,8 @@ function meshMaterialName(mesh: THREE.Mesh): string {
 }
 
 afterEach(() => {
-  (GFX as unknown as { standardMaterials: boolean }).standardMaterials =
-    ORIGINAL_STANDARD_MATERIALS;
+  restoreGfx?.();
+  restoreGfx = null;
 });
 
 describe('Eastbrook noticeboard shipping asset', () => {
@@ -370,7 +375,7 @@ describe('Eastbrook noticeboard renderer adapter', () => {
   });
 
   it('retains vertex color and the shared atlas on the Lambert-compatible Low path', () => {
-    (GFX as unknown as { standardMaterials: boolean }).standardMaterials = false;
+    setStandardMaterials(false);
     const atlas = new THREE.Texture();
     const built = buildNoticeboardFromSource(sourceModel(), atlas);
     for (const mesh of meshesOf(built)) {

@@ -95,12 +95,14 @@ function harness(
   const openChronicles = vi.fn();
   const openVendor = vi.fn();
   const openHeroicVendor = vi.fn();
+  const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
+  const openCrafting = vi.fn();
   const onOpenChange = vi.fn();
   const controller = new QuestDialogController({
     element,
@@ -130,12 +132,14 @@ function harness(
     openChronicles,
     openVendor,
     openHeroicVendor,
+    openWarfareVendor,
     openMarket,
     openDelveBoard,
     openValeCup,
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
     voice,
   });
@@ -160,12 +164,14 @@ function harness(
     openChronicles,
     openVendor,
     openHeroicVendor,
+    openWarfareVendor,
     openMarket,
     openDelveBoard,
     openValeCup,
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
   };
 }
@@ -506,6 +512,55 @@ describe('QuestDialogController', () => {
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
   });
 
+  it('REPLACES the generic goods row with the WARFARE shop row at a flagged NPC', () => {
+    // The WARFARE quartermaster shows ONE shop row, not two (owner 2026-08-07).
+    // This reverses the round-2 review decision that shipped both: the two rows
+    // open the SAME stock, because a quartermaster's vendorItems IS the whole
+    // WARFARE catalog, so the generic grid was a flat copy of what the sectioned
+    // window lays out properly. Distinct labels made them tellable apart without
+    // making the duplication any less confusing.
+    const flaggedId = Object.values(NPCS).find((definition) => definition.warfareVendor)?.id;
+    if (!flaggedId) throw new Error('warfare vendor fixture not found');
+    const flagged = npc(60, flaggedId);
+    // Non-empty on purpose, and this is the load-bearing half. The honor buy
+    // path (items.ts buyItem) is generic over vendorItems and refuses an empty
+    // list; the warfareVendor flag is a WINDOW routing hint it never reads. So
+    // the suppression has to happen on the ROW. Emptying the stock to hide the
+    // row would turn the shop itself off, which is why this fixture stocks the
+    // NPC and still expects no goods row.
+    flagged.vendorItems = ['minor_healing_potion'];
+    const both = harness(flagged);
+    both.controller.open(flagged.id);
+
+    const goods = both.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    const shop = both.element.querySelector<HTMLButtonElement>('[data-warfare-shop]');
+    expect(goods, 'no generic goods row at a flagged NPC, even with stock').toBeNull();
+    expect(shop, 'the WARFARE shop row').not.toBeNull();
+    expect(shop?.textContent).toContain(t('hudChrome.warfareShop.gossipOption'));
+    expect(shop?.getAttribute('aria-label')).toBe(
+      t('hudChrome.warfareShop.gossipOptionAria', { name: `npc:${flaggedId}` }),
+    );
+
+    // The shop row routes to the sectioned window and nowhere else.
+    shop?.click();
+    expect(both.openWarfareVendor).toHaveBeenCalledWith(flagged.id, both.trapOpener);
+    expect(both.openVendor).not.toHaveBeenCalled();
+
+    // Scoped to the FLAG, not to vendors generally: an ordinary stocked NPC
+    // still gets its goods row, routing to the ordinary window. ("closes gossip
+    // before opening every non-quest destination" above covers the same NPC;
+    // asserted here too so deleting that one cannot quietly make this vacuous.)
+    const ordinary = npc(61, ordinaryNpcId());
+    ordinary.vendorItems = ['minor_healing_potion'];
+    const generic = harness(ordinary);
+    generic.controller.open(61);
+    const genericGoods = generic.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(genericGoods, 'an unflagged stocked NPC keeps its goods row').not.toBeNull();
+    genericGoods?.click();
+    expect(generic.openVendor).toHaveBeenCalledWith(61, generic.trapOpener);
+    expect(generic.openWarfareVendor).not.toHaveBeenCalled();
+  });
+
   it("hands the successor window the DIALOG TRAP's own opener, not the in-dialog button (WCAG 2.4.3)", () => {
     // Regression for the second review finding on PR #2619: the first fix
     // captured document.activeElement (the in-dialog gossip button) BEFORE
@@ -595,13 +650,54 @@ describe('QuestDialogController', () => {
     expect(plain.element.querySelector('[data-unbind]')).toBeNull();
   });
 
-  it('does not leak Train or Unbind into a world with no authored stations', () => {
+  it('a station master offers the Crafting shortcut and routes its craft to openCrafting', () => {
+    // The Eastbrook forge master: a fresh viewer (no craft skills) resolves
+    // to weaponcrafting, the first forge craft in declaration order. The aria
+    // names the resolved craft (the {craft} placeholder is substituted).
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(51, forge.masterNpcId));
+    master.controller.open(51);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-crafting]');
+    expect(button).not.toBeNull();
+    const aria = button?.getAttribute('aria-label') ?? '';
+    expect(aria).toContain(craftNameText('weaponcrafting'));
+    expect(aria).not.toContain('{craft}');
+    button?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('weaponcrafting');
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('the Crafting shortcut follows the viewer stronger craft at the two-craft forge', () => {
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(52, forge.masterNpcId), 'available', {
+      craftSkills: { weaponcrafting: 5, armorcrafting: 30 },
+    });
+    master.controller.open(52);
+    master.element.querySelector<HTMLButtonElement>('[data-crafting]')?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('armorcrafting');
+  });
+
+  it('a non-master NPC renders no Crafting shortcut', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(53, plainId));
+    plain.controller.open(53);
+    expect(plain.element.querySelector('[data-crafting]')).toBeNull();
+  });
+
+  it('does not leak Train, Crafting, or Unbind into a world with no authored stations', () => {
     const master = harness(npc(50, STATIONS[0].masterNpcId));
     (master.world as unknown as { stationPlacements: typeof STATIONS }).stationPlacements = [];
 
     master.controller.open(50);
 
     expect(master.element.querySelector('[data-train]')).toBeNull();
+    expect(master.element.querySelector('[data-crafting]')).toBeNull();
     expect(master.element.querySelector('[data-unbind]')).toBeNull();
   });
 

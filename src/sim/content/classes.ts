@@ -1,3 +1,4 @@
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import {
   type AbilityDef,
   type AbilityEffect,
@@ -2077,8 +2078,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // The kit's hardest hit flies as the visibly heavier bolt (render-only).
     projectileFx: 'heavyBolt',
     effects: [
-      { type: 'directDamage', min: 170, max: 225 },
-      { type: 'dot', total: 48, duration: 12, interval: 2 },
+      // The first-ten-seed isolated combat sweep put 60s fire below frost.
+      // A 5% Pyrelance lift restores sustained parity while keeping the 27s
+      // burst beneath its 1.6x ceiling and leaving Ignite's contract intact.
+      { type: 'directDamage', min: 179, max: 236 },
+      { type: 'dot', total: 50, duration: 12, interval: 2 },
     ],
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
@@ -2302,6 +2306,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
   // and mana cost are provisional playtest values. It has no target and rewinds all
   // dead members on the authoritative group or raid roster at cast completion.
+  // The five-minute cooldown is the real throttle: requiresOutOfCombat alone is not
+  // one, because a backline caster who never draws aggro drops combat mid-fight the
+  // moment combatTimer passes the 5s linger (see the engagedPids pass in sim.ts), so
+  // a zero-cooldown mass rez could be chained repeatedly inside a single encounter.
   collective_reversal: {
     id: 'collective_reversal',
     name: 'Collective Reversal',
@@ -2310,7 +2318,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 250,
     castTime: 7,
-    cooldown: 0,
+    cooldown: 300,
     range: 0,
     school: 'arcane',
     requiresTarget: false,
@@ -2447,7 +2455,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'mage',
     learnLevel: 5,
     specs: ['arcane'],
-    cost: 16,
+    // The integrated level-20 stat curve pushed the conservative rotation to
+    // 65.6s OOM at 16 mana. Fourteen restores the signed 70-80s sustain window
+    // without relaxing the emergency-spam or damage-separation contracts.
+    cost: 14,
     castTime: 2,
     cooldown: 0,
     range: 30,
@@ -2456,7 +2467,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Instant impact at cast completion (no traveling bolt): keeps the charge
     // read/write in one deterministic order, see combat/chronomancy.ts.
     projectile: false,
-    // (base cost is `cost: 16` above; DERIVED via the balance harness so the
+    // (base cost is `cost: 14` above; DERIVED via the balance harness so the
     // targets hold WITH the 25% free-cast proc's mana relief.)
     // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
     // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
@@ -6358,6 +6369,12 @@ function scaleEffect(
         min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
         max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
       };
+    case 'chainDamage':
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+      };
     case 'aoeRoot':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
     case 'drainTick':
@@ -6394,6 +6411,17 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * healMult + flat),
         max: Math.round(eff.max * healMult + flat),
+      };
+    case 'massTemporalEcho':
+      // Like heal/chainHeal, the initial-heal base is talent scaled here so it
+      // matches the SP rider talentHealMult now applies at the effect_dispatch.ts
+      // call site (Chronoweave's "all healing" bonus was previously a no-op here).
+      return {
+        ...eff,
+        heal: {
+          min: Math.round(eff.heal.min * healMult + flat),
+          max: Math.round(eff.heal.max * healMult + flat),
+        },
       };
     case 'hot':
       return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
@@ -6468,15 +6496,15 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  // The melee bucket also covers hunter's ranged-AP shots regardless of magic school:
-  // `scalesWith: 'ranged'` is exclusively set on hunter abilities (arcane_shot, serpent_sting,
-  // and wyvern_sting are non-physical), so this widening cannot reach any other class's
-  // melee/spell split. Without it, Marksmanship's Iron Aim ("ranged ability damage") silently
-  // never applied to Arcane Shot, the spec's arcane-school nuke.
-  const physical = entry.def.school === 'physical' || entry.def.scalesWith === 'ranged';
-  const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
-  const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
-  const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
+  // dmgMult/healMult come from the shared talent_hit_mult resolver: the SAME
+  // function combat sites (effect_dispatch.ts/casting_lifecycle.ts/auto_attack.ts)
+  // call to scale a resolved ability's runtime SP/AP/weapon rider, so the
+  // authored-base bake here and the rider scaling at combat time can never drift
+  // apart. (The melee bucket also covers hunter's ranged-AP shots regardless of
+  // magic school: `scalesWith: 'ranged'` is exclusively set on hunter abilities
+  // (arcane_shot, serpent_sting, wyvern_sting are non-physical), so Marksmanship's
+  // Iron Aim ("ranged ability damage") reaches Arcane Shot, the spec's arcane nuke.)
+  const { dmgMult, healMult } = resolveTalentHitMult(entry.def, mods);
   const dotMult = 1 + mods.global.dotDmgPct;
   const hotMult = 1 + mods.global.hotHealPct;
   const absorbMult = 1 + mods.global.absorbPct;

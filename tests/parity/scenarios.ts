@@ -25,21 +25,24 @@ import {
   arenaOrigin,
   DELVES,
   DUNGEON_X_THRESHOLD,
-  instanceOrigin,
   LAKE,
   MOBS,
   PROPS,
   QUESTS,
 } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
+import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
+import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
-import { Sim } from '../../src/sim/sim';
+import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
 import {
   type Aura,
   CAST_QUEUE_WINDOW_SEC,
+  type DelveRun,
   DT,
   dist2d,
   type Entity,
@@ -47,18 +50,52 @@ import {
   MAX_LEVEL,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  type NythraxisEncounterState,
+  PLAYER_INTEREST_DROP_RADIUS,
   PRESTIGE_XP_PER_RANK,
   SISTER_NHALIA_BOSS_ID,
+  type SimEvent,
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
 
 // ----- shared helpers ---------------------------------------------------------
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
+type AnyEntity = Entity & { nythraxis?: NythraxisEncounterState };
+
+interface SimPrivateHarness {
+  completeTame(player: Entity, target: Entity): void;
+  stowPetForDelve(pid: number): void;
+  restorePetFromDelveStash(pid: number): void;
+  summonPet(owner: Entity, templateId: string): void;
+  fiestaOpenWave(match: ArenaMatch): void;
+  spawnDelveModule(run: DelveRun): void;
+  pendingLootRolls: Map<number, PendingLootRoll>;
+  delayedEvents: DelayedEvent[];
+  dealDamage(
+    source: Entity,
+    target: Entity,
+    amount: number,
+    crit: boolean,
+    school: string,
+    ability: string | null,
+    kind?: 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist',
+    noRage?: boolean,
+  ): void;
+  applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
+  updateMob(mob: Entity): void;
+  updateMobTarget(mob: Entity): void;
+  retargetMob(mob: Entity): void;
+}
+
+type AnySim = Sim;
+
+function asHarness(sim: Sim): SimPrivateHarness {
+  return sim as unknown as SimPrivateHarness;
+}
 
 // Combat-only fixtures need a deterministic patch that does not overlap a town
 // landmark. This south-field anchor keeps their authored relative spacing while
@@ -78,6 +115,15 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
   e.onGround = true;
   e.fallStartY = e.pos.y;
   sim.rebucket(e);
+}
+
+function requireValue<T>(value: T | null | undefined, context: string): T {
+  if (value == null) throw new Error(`${context} was not available`);
+  return value;
+}
+
+function requireEntity(sim: AnySim, id: number, context: string): AnyEntity {
+  return requireValue(sim.entities.get(id), context) as AnyEntity;
 }
 
 // Stand an entity exactly on a gather node, addressed by ID, with the position
@@ -153,7 +199,7 @@ function soloWarrior(): Scenario {
     ],
     build: () => new Sim({ seed: 1001, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -192,7 +238,7 @@ function soloMage(): Scenario {
     ],
     build: () => new Sim({ seed: 1002, playerClass: 'mage', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -228,7 +274,7 @@ function frostProcOrb(): Scenario {
     ],
     build: () => new Sim({ seed: 43, playerClass: 'mage', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(20);
       sim.setSpec('frost');
       const p = sim.player as AnyEntity;
@@ -275,7 +321,7 @@ function soloRogue(): Scenario {
     ],
     build: () => new Sim({ seed: 1003, playerClass: 'rogue', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -313,7 +359,7 @@ function affixMob(): Scenario {
     ],
     build: () => new Sim({ seed: 1004, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(13);
       const p = sim.player as AnyEntity;
       beef(p, 90000);
@@ -376,7 +422,7 @@ function mobSwingAffixes(): Scenario {
     ],
     build: () => new Sim({ seed: 1007, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(16);
       const p = sim.player as AnyEntity;
       teleport(sim, p, EASTBROOK_PARITY_OPEN_FIELD.x, EASTBROOK_PARITY_OPEN_FIELD.z);
@@ -434,13 +480,13 @@ function mobSwingAffixes(): Scenario {
           sim.mobSwing(summoner, p);
           topUp();
           sim.mobSwing(drogmar, p);
-          stunLanded = stunLanded || p.auras.some((a: any) => a.id === 'stun_mogger_lackey');
-          venomLanded = venomLanded || p.auras.some((a: any) => a.id === 'venom_webwood_spider');
+          stunLanded = stunLanded || p.auras.some((a) => a.id === 'stun_mogger_lackey');
+          venomLanded = venomLanded || p.auras.some((a) => a.id === 'venom_webwood_spider');
           silenceLanded =
-            silenceLanded || p.auras.some((a: any) => a.id === 'silence_gravecaller_summoner');
+            silenceLanded || p.auras.some((a) => a.id === 'silence_gravecaller_summoner');
           rampageStacks = Math.max(
             rampageStacks,
-            drogmar.auras.find((a: any) => a.id === 'rampage_warlord_drogmar')?.stacks ?? 0,
+            drogmar.auras.find((a) => a.id === 'rampage_warlord_drogmar')?.stacks ?? 0,
           );
           // Friendly pet swings the dummy: base hit only, no cascade procs.
           sim.mobSwing(pet, dummy);
@@ -479,7 +525,7 @@ function hunterPet(): Scenario {
     ],
     build: () => new Sim({ seed: 1005, playerClass: 'hunter', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -521,7 +567,7 @@ function warlockPet(): Scenario {
     ],
     build: () => new Sim({ seed: 1006, playerClass: 'warlock', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -560,8 +606,8 @@ function warlockPet(): Scenario {
 
 // P1a pet-AI tick: the slice paths the existing hunter_pet / warlock_pet goldens
 // leave UNPINNED. A warlock imp (a petRanged demon) runs the petRangedAttack
-// imp-bolt arm (the crit roll + AP-scaled fire damage, distinct from the shared
-// updateRangedPetAttack a ranged_dps petSpell mob uses, which hunter_pet covers); a
+// imp-bolt arm (the resist roll + crit roll + AP-scaled fire damage, distinct from the
+// shared updateRangedPetAttack a ranged_dps petSpell mob uses, which hunter_pet covers); a
 // voidwalker melee pet with NO pre-set target acquires one via petPickTarget
 // (aggressive auto-pull) then closes, auto-taunts, and mobSwings while keeping the
 // OWNER inCombat (the PET_COMBAT_LINGER coupling); and finally both pets drop their
@@ -573,21 +619,22 @@ function petAi(): Scenario {
     name: 'pet_ai',
     coverage: [
       'class:hunter (pet owner)',
-      'petRangedAttack imp-bolt arm (petRanged crit roll + AP-scaled fire damage)',
+      'petRangedAttack imp-bolt arm (petRanged resist roll + crit roll + AP-scaled fire damage)',
       'petPickTarget aggressive auto-pull',
       'updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)',
       'petFollow heel transition (pets return to a moved owner)',
     ],
     build: () => new Sim({ seed: 1016, playerClass: 'hunter', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
       teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       beef(p);
 
       // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
-      // updatePet runs the petRangedAttack arm (crit roll + AP-scaled fire damage).
+      // updatePet runs the petRangedAttack arm (resist roll + crit roll + AP-scaled
+      // fire damage; the resist BRANCH itself is pinned by pet_ranged_resist.test.ts).
       const imp = spawnMob(sim, 'emberkin', 12, p.pos.x + 2, p.pos.y, p.pos.z);
       imp.ownerId = p.id;
       imp.hostile = false;
@@ -671,7 +718,7 @@ function petCommands(): Scenario {
     ],
     build: () => new Sim({ seed: 1017, playerClass: 'hunter', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(12);
       const hunter = sim.player as AnyEntity;
       const hid = sim.playerId as number;
@@ -680,7 +727,7 @@ function petCommands(): Scenario {
       // --- HUNTER: tame -> setMode -> feed ---
       const wolf = spawnMob(sim, 'forest_wolf', 2, hunter.pos.x + 4, hunter.pos.y, hunter.pos.z);
       rec.track(wolf.id);
-      (sim as any).completeTame(hunter, wolf); // tamePet effect target -> owned pet, syncPetLevel to owner
+      asHarness(sim).completeTame(hunter, wolf); // tamePet effect target -> owned pet, syncPetLevel to owner
       const pet = sim.petOf(hid) as AnyEntity;
       rec.notes.petId = pet.id;
       rec.track(pet.id);
@@ -719,7 +766,7 @@ function petCommands(): Scenario {
       // --- HUNTER: re-tame -> revive a dead pet -> stow/restore round-trip ---
       const wolf2 = spawnMob(sim, 'forest_wolf', 2, hunter.pos.x + 4, hunter.pos.y, hunter.pos.z);
       rec.track(wolf2.id);
-      (sim as any).completeTame(hunter, wolf2);
+      asHarness(sim).completeTame(hunter, wolf2);
       const pet2 = sim.petOf(hid) as AnyEntity;
       rec.notes.pet2Id = pet2.id;
       rec.track(pet2.id);
@@ -728,9 +775,9 @@ function petCommands(): Scenario {
       rec.snapshot('pet-dead');
       sim.revivePet(); // back to life at 35% hp
       rec.snapshot('pet-revived');
-      (sim as any).stowPetForDelve(hid); // serializePet + despawnPersistentPet (beast, not demon)
+      asHarness(sim).stowPetForDelve(hid); // serializePet + despawnPersistentPet (beast, not demon)
       rec.snapshot('pet-stowed');
-      (sim as any).restorePetFromDelveStash(hid); // restorePet from the stash snapshot
+      asHarness(sim).restorePetFromDelveStash(hid); // restorePet from the stash snapshot
       rec.snapshot('pet-restored');
 
       // --- WARLOCK: summon -> Demon Heal channel -> demon swap -> despawnPet ---
@@ -742,7 +789,7 @@ function petCommands(): Scenario {
       warlock.resource = warlock.maxResource;
       rec.track(wpid);
 
-      (sim as any).summonPet(warlock, 'emberkin'); // createDemonPet -> "answers your summons"
+      asHarness(sim).summonPet(warlock, 'emberkin'); // createDemonPet -> "answers your summons"
       const imp = sim.petOf(wpid) as AnyEntity;
       rec.notes.impId = imp.id;
       rec.track(imp.id);
@@ -752,18 +799,18 @@ function petCommands(): Scenario {
       rec.tick(40); // applyDemonHealTick fires: heal2 + healingThreat
       rec.snapshot('demon-heal-tick');
 
-      (sim as any).summonPet(warlock, 'gloomshade'); // different template: despawnPersistentPet(emberkin) + "answers"
+      asHarness(sim).summonPet(warlock, 'gloomshade'); // different template: despawnPersistentPet(emberkin) + "answers"
       const vw = sim.petOf(wpid) as AnyEntity;
       rec.notes.voidId = vw.id;
       rec.track(vw.id);
-      (sim as any).summonPet(warlock, 'gloomshade'); // same template, alive: dismissed + a fresh full-health demon answers
+      asHarness(sim).summonPet(warlock, 'gloomshade'); // same template, alive: dismissed + a fresh full-health demon answers
       const vw2 = sim.petOf(wpid) as AnyEntity;
       rec.notes.void2Id = vw2.id;
       rec.track(vw2.id);
       rec.snapshot('demon-resummoned');
 
       // despawnPet (demon hard despawn): re-summon, point a player target + mob threat at it, stow the demon.
-      (sim as any).summonPet(warlock, 'emberkin');
+      asHarness(sim).summonPet(warlock, 'emberkin');
       const imp2 = sim.petOf(wpid) as AnyEntity;
       rec.notes.imp2Id = imp2.id;
       rec.track(imp2.id);
@@ -776,7 +823,7 @@ function petCommands(): Scenario {
       hater.aggroTargetId = imp2.id;
       hater.targetId = imp2.id;
       rec.track(hater.id);
-      (sim as any).stowPetForDelve(wpid); // demon -> despawnPet: scrub hunter.targetId + retargetMob(hater) draw
+      asHarness(sim).stowPetForDelve(wpid); // demon -> despawnPet: scrub hunter.targetId + retargetMob(hater) draw
       rec.snapshot('demon-despawned');
     },
   };
@@ -795,7 +842,7 @@ function paladinConsecration(): Scenario {
     ],
     build: () => new Sim({ seed: 1007, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(20); // consecration learnLevel 18
       const p = sim.player as AnyEntity;
       beef(p);
@@ -827,11 +874,16 @@ function arena1v1(): Scenario {
     sampleEvery: 25,
     build: () => new Sim({ seed: 1008, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
-      teleport(sim, sim.entities.get(a)!, 0, -40);
-      teleport(sim, sim.entities.get(b)!, 6, -40);
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
+      const playerA = sim.entities.get(a);
+      const playerB = sim.entities.get(b);
+      if (!playerA || !playerB) throw new Error('arena_1v1 setup failed to spawn players');
+      teleport(sim, playerA, 0, -40);
+      teleport(sim, playerB, 6, -40);
       sim.arenaQueueJoin(a);
       sim.arenaQueueJoin(b);
       rec.tick(1); // matchmake
@@ -865,7 +917,7 @@ function fiesta(): Scenario {
     sampleEvery: 25,
     build: () => new Sim({ seed: 1009, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const classes: Array<'warrior' | 'mage' | 'rogue' | 'hunter'> = [
         'warrior',
         'mage',
@@ -874,7 +926,7 @@ function fiesta(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -886,18 +938,18 @@ function fiesta(): Scenario {
         if (m && m.state === 'active') break;
       }
       const match = sim.arenaMatchFor(pids[0]);
-      if (match && match.fiesta && match.teamA.length && match.teamB.length) {
+      if (match?.fiesta && match.teamA.length && match.teamB.length) {
         const victimPid = match.teamB[0];
         const killer = sim.entities.get(match.teamA[0]) as AnyEntity;
         const victim = sim.entities.get(victimPid) as AnyEntity;
         // 6-arg form (kind defaulted) matches how the fiesta test drives a takedown.
-        (sim as any).dealDamage(killer, victim, victim.maxHp + 50, false, 'physical', null);
+        asHarness(sim).dealDamage(killer, victim, victim.maxHp + 50, false, 'physical', null);
         rec.tick(1); // fiestaDown + score; victim is now benched (down)
         // Open an augment wave: the downed victim is offered augments (drawing the
         // fiesta sub-stream via fiestaPickOffers), then picks one -> fiestaAugments.
-        (sim as any).fiestaOpenWave(match);
+        asHarness(sim).fiestaOpenWave(match);
         const offer = match.fiesta.offers.get(victimPid);
-        if (offer && offer.choices.length) sim.arenaAugmentPick(offer.choices[0], victimPid);
+        if (offer?.choices.length) sim.arenaAugmentPick(offer.choices[0], victimPid);
         rec.notes.fiestaVictimPid = victimPid;
         rec.tick(1);
       }
@@ -927,7 +979,7 @@ function fiestaPowerups(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 2027, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const classes: Array<'warrior' | 'mage' | 'rogue' | 'priest'> = [
         'warrior',
         'mage',
@@ -936,7 +988,7 @@ function fiestaPowerups(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -948,7 +1000,7 @@ function fiestaPowerups(): Scenario {
         if (m && m.state === 'active') break;
       }
       const match = sim.arenaMatchFor(pids[0]);
-      if (match && match.fiesta) {
+      if (match?.fiesta) {
         const f = match.fiesta;
         // First power-up attempt is ~12s into the bout; run until one spawns.
         for (let i = 0; i < 20 * 20 && f.powerups.length === 0; i++) rec.tick(1);
@@ -958,20 +1010,25 @@ function fiestaPowerups(): Scenario {
         const p = f.powerups[0];
         if (p && p.state === 'ready') {
           const grabPid = match.teamA[0];
-          teleport(sim, sim.entities.get(grabPid)! as AnyEntity, p.x, p.z);
+          teleport(sim, requireEntity(sim, grabPid, 'parity scenario entity'), p.x, p.z);
           rec.tick(1);
         }
         // Hazard ring: close it tight and push a fighter well outside -> burn.
         f.ringRadius = 6;
         const origin = arenaOrigin(match.slot);
         const ringPid = match.teamA[0];
-        teleport(sim, sim.entities.get(ringPid)! as AnyEntity, origin.x + 30, origin.z);
+        teleport(
+          sim,
+          requireEntity(sim, ringPid, 'parity scenario entity'),
+          origin.x + 30,
+          origin.z,
+        );
         rec.tick(20); // ~1s; the ring burns twice a second
         // Down a cross-team fighter, then run their respawn timer out -> revive.
         const victimPid = match.teamB[0];
         const killer = sim.entities.get(match.teamA[0]) as AnyEntity;
         const victim = sim.entities.get(victimPid) as AnyEntity;
-        (sim as any).dealDamage(killer, victim, victim.maxHp + 50, false, 'physical', null);
+        asHarness(sim).dealDamage(killer, victim, victim.maxHp + 50, false, 'physical', null);
         rec.notes.fiestaPowerupVictimPid = victimPid;
         const downedFor = f.respawn.get(victimPid) ?? 5;
         rec.tick(Math.ceil(downedFor * 20) + 10);
@@ -996,11 +1053,11 @@ function duelToWinner(): Scenario {
     ],
     build: () => new Sim({ seed: 1015, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph', { autoEquip: true });
       const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
-      teleport(sim, sim.entities.get(a)!, 0, -40);
-      teleport(sim, sim.entities.get(b)!, 4, -40);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 0, -40);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 4, -40);
       rec.track(a, b);
       sim.duelRequest(b, a); // Aleph challenges Bet
       sim.duelAccept(b); // Bet accepts -> countdown
@@ -1038,7 +1095,7 @@ function arena2v2Wipe(): Scenario {
     sampleEvery: 25,
     build: () => new Sim({ seed: 1016, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const classes: Array<'warrior' | 'mage' | 'rogue' | 'priest'> = [
         'warrior',
         'mage',
@@ -1048,7 +1105,8 @@ function arena2v2Wipe(): Scenario {
       const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
       const pids = classes.map((c, i) => sim.addPlayer(c, names[i]));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 3, -40);
+        sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 3, -40);
       });
       rec.track(...pids);
       pids.forEach((pid) => {
@@ -1111,7 +1169,7 @@ function delveLockpick(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 1010, playerClass: 'rogue', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.collapsed_reliquary;
       sim.setPlayerLevel(def.minLevel);
       const p = sim.player as AnyEntity;
@@ -1126,7 +1184,7 @@ function delveLockpick(): Scenario {
       run.bountiful = false; // pin against the rare coffer roll
       run.modules = ['reliquary_finale'];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       const boss = [...sim.entities.values()].find(
         (e: AnyEntity) => e.templateId === 'deacon_varric',
       ) as AnyEntity | undefined;
@@ -1196,7 +1254,7 @@ function delveLockpickTriesExhausted(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 2024, playerClass: 'rogue', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.collapsed_reliquary;
       sim.setPlayerLevel(def.minLevel);
       const p = sim.player as AnyEntity;
@@ -1211,12 +1269,12 @@ function delveLockpickTriesExhausted(): Scenario {
       run.bountiful = false; // pin against the rare coffer roll
       run.modules = ['reliquary_finale'];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       const boss = [...sim.entities.values()].find(
         (e: AnyEntity) => e.templateId === 'deacon_varric',
       ) as AnyEntity | undefined;
       if (boss)
-        (sim as any).dealDamage(p, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
+        asHarness(sim).dealDamage(p, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
       rec.tick(4); // reward chest spawns
       // Drop the finale swarm so the ONLY thing that can end the attempt during the
       // pause is the per-step clock under test (incidental combat is covered elsewhere).
@@ -1263,9 +1321,9 @@ function drownedLitany(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 3131, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.drowned_litany;
-      const heroic = def.tiers.find((t: any) => t.id === 'heroic');
+      const heroic = def.tiers.find((t) => t.id === 'heroic');
       sim.setPlayerLevel(heroic?.minPlayerLevel ?? def.minLevel);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -1280,7 +1338,7 @@ function drownedLitany(): Scenario {
       rec.notes.affixes = [...run.affixes];
       run.modules = ['litany_choir_loft', 'litany_apse'];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       // Open combat on a cantor so onBellRopePulled has a live, in-combat target.
       const cantor = run.mobIds
         .map((id: number) => sim.entities.get(id) as AnyEntity | undefined)
@@ -1428,13 +1486,13 @@ function partyLoot(): Scenario {
     coverage: ['party need/greed loot roll (lootCorpse/submitLootRoll)', 'multi-player party'],
     build: () => new Sim({ seed: 1011, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('mage', 'Bbb');
       sim.partyInvite(b, a);
       sim.partyAccept(b);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
       const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
         x: 20,
         y: terrainHeight(20, 22, sim.cfg.seed),
@@ -1448,7 +1506,9 @@ function partyLoot(): Scenario {
       rec.track(mob.id);
       sim.lootCorpse(mob.id, a);
       rec.tick(1);
-      const rollEv = rec.allEvents.find((e: any) => e.type === 'lootRoll') as any;
+      const rollEv = rec.allEvents.find(
+        (e): e is Extract<SimEvent, { type: 'lootRoll' }> => e.type === 'lootRoll',
+      );
       if (rollEv) {
         sim.submitLootRoll(rollEv.rollId, 'need', a);
         sim.submitLootRoll(rollEv.rollId, 'need', b);
@@ -1481,7 +1541,7 @@ function l1LootDistribution(): Scenario {
     ],
     build: () => new Sim({ seed: 1021, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('mage', 'Bbb');
       const c = sim.addPlayer('rogue', 'Ccc');
@@ -1489,9 +1549,9 @@ function l1LootDistribution(): Scenario {
       sim.partyAccept(b);
       sim.partyInvite(c, a);
       sim.partyAccept(c);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
-      teleport(sim, sim.entities.get(c)!, 22, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
+      teleport(sim, requireEntity(sim, c, 'parity scenario entity'), 22, 20);
       const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
         x: 20,
         y: terrainHeight(20, 22, sim.cfg.seed),
@@ -1589,16 +1649,24 @@ function masterLoot(): Scenario {
       'convertMasterRollToNeedGreed over a candidate subset',
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
-    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
-    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
-    // here); its extra content just moves the shared rng before the rolls, and at
-    // 1091 the need rolls stopped TYING. The tie is the whole point of the
-    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
-    // seed is re-hunted to keep two rollers level rather than re-recorded to
-    // whatever the new draw happens to be.
-    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
+    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content, 1383 -> 247 by
+    // the Galecrest unspawnable-quest camp fix, and 247 -> 38 when those late
+    // quest camps moved onto their private scatter stream. This branch never
+    // touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and
+    // at the old seed the need rolls stopped TYING. The tie is the whole point
+    // of the scenario's last coverage line (resolveLootRoll's tie-break
+    // rng.int), so the seed is re-hunted to keep two rollers level rather than
+    // re-recorded to whatever the new draw happens to be.
+    build: () =>
+      new Sim({
+        seed: 38,
+        playerClass: 'warrior',
+        noPlayer: true,
+      }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('mage', 'Bbb');
       const c = sim.addPlayer('rogue', 'Ccc');
@@ -1609,10 +1677,10 @@ function masterLoot(): Scenario {
       sim.partyAccept(c);
       sim.partyInvite(d, a);
       sim.partyAccept(d);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
-      teleport(sim, sim.entities.get(c)!, 22, 20);
-      teleport(sim, sim.entities.get(d)!, 23, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
+      teleport(sim, requireEntity(sim, c, 'parity scenario entity'), 22, 20);
+      teleport(sim, requireEntity(sim, d, 'parity scenario entity'), 23, 20);
       // Leader-only switch, both message arms: enable (looter 0 = pinned to the
       // leader, a) above the drop's quality, then lower the threshold onto it.
       sim.setPartyLootMaster(true, 0, 'epic', a);
@@ -1654,11 +1722,8 @@ function masterLoot(): Scenario {
       if (rollIds[2] !== undefined) {
         sim.submitLootRoll(rollIds[2], 'need', d);
         sim.submitLootRoll(rollIds[2], 'pass', b);
-        const pending = (sim as any).pendingLootRolls as Map<
-          number,
-          { choices: Map<number, unknown> }
-        >;
-        rec.notes.refusedChoiceCount = pending.get(rollIds[2])?.choices.size ?? -1;
+        rec.notes.refusedChoiceCount =
+          asHarness(sim).pendingLootRolls.get(rollIds[2])?.choices.size ?? -1;
       }
       rec.snapshot('curate-phase-vote-refused');
       // Arm 1: one target -> direct grant to b. No rng draw.
@@ -1703,7 +1768,7 @@ function entityRoster(): Scenario {
     sampleEvery: 2,
     build: () => new Sim({ seed: 1012, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -1723,11 +1788,7 @@ function entityRoster(): Scenario {
       rec.notes.guardId = guard.id;
       // (2) delayed-event drain: one due+fires, one due+guard-false (dropped), one
       // future (stays pending). delayedEvents is the field this slice owns.
-      const delayed = (sim as any).delayedEvents as {
-        at: number;
-        event: any;
-        guard?: () => boolean;
-      }[];
+      const delayed = asHarness(sim).delayedEvents;
       delayed.push({ at: sim.time + 0.05, event: { type: 'respawn', pid: p.id } });
       delayed.push({
         at: sim.time + 0.05,
@@ -1764,7 +1825,7 @@ function delveDeath(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1013, playerClass: 'rogue', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.collapsed_reliquary;
       sim.setPlayerLevel(def.minLevel);
       const p = sim.player as AnyEntity;
@@ -1779,7 +1840,7 @@ function delveDeath(): Scenario {
       run.bountiful = false; // pin against the rare coffer roll
       run.modules = ['reliquary_finale'];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       // First death: 50% hp respawn at the module entry.
       p.dead = true;
       sim.releaseSpirit();
@@ -1813,7 +1874,7 @@ function fiestaMidcastKill(): Scenario {
     sampleEvery: 25,
     build: () => new Sim({ seed: 1014, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const classes: Array<'warrior' | 'mage' | 'rogue' | 'hunter'> = [
         'warrior',
         'mage',
@@ -1822,7 +1883,7 @@ function fiestaMidcastKill(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `F${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -1834,7 +1895,7 @@ function fiestaMidcastKill(): Scenario {
         if (m && m.state === 'active') break;
       }
       const match = sim.arenaMatchFor(pids[0]);
-      if (match && match.fiesta && match.teamA.length && match.teamB.length) {
+      if (match?.fiesta && match.teamA.length && match.teamB.length) {
         const killer = sim.entities.get(match.teamA[0]) as AnyEntity;
         const victim = sim.entities.get(match.teamB[0]) as AnyEntity;
         beef(victim, 5000); // survive the two non-lethal cast-interrupt hits
@@ -1884,7 +1945,7 @@ function questKillCredit(): Scenario {
     ],
     build: () => new Sim({ seed: 1014, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
@@ -1934,7 +1995,7 @@ function multiClassFrenzy(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1015, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const classes: Array<'warrior' | 'mage' | 'rogue'> = ['warrior', 'mage', 'rogue'];
       const pids = classes.map((c, i) => sim.addPlayer(c, `M${i}`));
       pids.forEach((pid, i) => {
@@ -1992,7 +2053,7 @@ function mobTargeting(): Scenario {
     sampleEvery: 2,
     build: () => new Sim({ seed: 1014, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const tankId = sim.addPlayer('warrior', 'Tank');
       const bruiserId = sim.addPlayer('rogue', 'Bruiser');
       const casterId = sim.addPlayer('mage', 'Caster');
@@ -2022,12 +2083,12 @@ function mobTargeting(): Scenario {
       mob.aggroTargetId = tankId;
       mob.aiState = 'attack';
       mob.inCombat = true;
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.snapshot('baseline-tank');
 
       // 110% melee pull-over: bruiser (in melee) crosses 110% of the tank's 100.
       mob.threat.set(bruiserId, 120);
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.notes.afterMelee = mob.aggroTargetId;
       rec.snapshot('melee-pullover');
 
@@ -2035,14 +2096,14 @@ function mobTargeting(): Scenario {
       mob.aggroTargetId = tankId;
       mob.threat.set(bruiserId, 50);
       mob.threat.set(casterId, 130);
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.notes.afterRangedBoundary = mob.aggroTargetId;
       rec.snapshot('ranged-boundary-no-switch');
 
       // 130% ranged pull-over: caster (out of melee) crosses 130% of the tank's 100.
       mob.aggroTargetId = tankId;
       mob.threat.set(casterId, 140);
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.notes.afterRanged = mob.aggroTargetId;
       rec.snapshot('ranged-pullover');
 
@@ -2051,23 +2112,23 @@ function mobTargeting(): Scenario {
       mob.aggroTargetId = casterId;
       mob.forcedTargetId = tankId;
       mob.forcedTargetTimer = 3;
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.notes.afterTauntForced = mob.aggroTargetId;
       rec.snapshot('taunt-forced');
 
       // Timer about to expire: this call still honors the forced target (returns
       // before the clear), but the `-= DT` drives forcedTargetTimer negative.
       mob.forcedTargetTimer = DT / 2;
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.snapshot('taunt-decrement');
 
       // Timer expired: forcedTargetId clears and the threat scan reclaims the caster.
-      (sim as any).updateMobTarget(mob);
+      asHarness(sim).updateMobTarget(mob);
       rec.notes.afterTauntExpired = mob.aggroTargetId;
       rec.snapshot('taunt-expired');
 
       // retargetMob: with living threat it grabs the highest (caster) and chases.
-      (sim as any).retargetMob(mob);
+      asHarness(sim).retargetMob(mob);
       rec.notes.afterRetarget = mob.aggroTargetId;
       rec.snapshot('retarget-highest');
 
@@ -2079,7 +2140,7 @@ function mobTargeting(): Scenario {
       mob.threat.set(900002, 10);
       mob.aggroTargetId = casterId;
       mob.aiState = 'chase';
-      (sim as any).retargetMob(mob);
+      asHarness(sim).retargetMob(mob);
       rec.notes.finalAiState = mob.aiState;
       rec.snapshot('retarget-evade');
     },
@@ -2103,7 +2164,7 @@ function questCollectTurnIn(): Scenario {
     ],
     build: () => new Sim({ seed: 1015, playerClass: 'warrior', autoEquip: false }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const p = sim.player as AnyEntity;
       const quest = QUESTS.q_boars;
       const objective = quest.objectives[0];
@@ -2159,11 +2220,11 @@ function questLinkAbandon(): Scenario {
     ],
     build: () => new Sim({ seed: 1017, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph'); // sharer
       const b = sim.addPlayer('mage', 'Bet'); // acceptor
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
       rec.notes.a = a;
       rec.notes.b = b;
       const questId = 'q_wolves';
@@ -2207,7 +2268,7 @@ function partyRaid(): Scenario {
     ],
     build: () => new Sim({ seed: 1014, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('mage', 'Bbb');
       const c = sim.addPlayer('rogue', 'Ccc');
@@ -2263,7 +2324,7 @@ function talentsProgression(): Scenario {
     sampleEvery: 2,
     build: () => new Sim({ seed: 1014, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(MAX_LEVEL); // enough talent points for a spec'd build
       // (1) Apply a valid Arms build: the flat talentMods bakes + known list changes.
       sim.applyTalents({
@@ -2315,7 +2376,7 @@ function warriorRowCapstones(): Scenario {
     sampleEvery: 4,
     build: () => new Sim({ seed: 1015, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(MAX_LEVEL);
       sim.selectTalentRow(5, 'war_row_double_charge');
       sim.selectTalentRow(8, 'war_row_victory_rush');
@@ -2445,7 +2506,7 @@ function multiClassHeal(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1016, playerClass: 'priest', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       // Four healers, each a class that owns a heal.
       const priest = sim.addPlayer('priest', 'Pr') as number;
       const paladin = sim.addPlayer('paladin', 'Pa') as number;
@@ -2505,13 +2566,13 @@ function multiClassHeal(): Scenario {
       const forcedHeal = (e: AnyEntity, source: number, amount: number, ability: string): void => {
         const int0 = e.stats.int;
         e.stats.int = 5000;
-        (sim as any).applyHeal(sim.entities.get(source) as AnyEntity, tank, amount, ability);
+        asHarness(sim).applyHeal(sim.entities.get(source) as AnyEntity, tank, amount, ability);
         e.stats.int = int0;
       };
 
       // Heal 1: priest, plain (no mults), tank damaged -> split across all 3 mobs.
       tank.hp = 2000;
-      (sim as any).applyHeal(ePriest, tank, 600, 'Heal');
+      asHarness(sim).applyHeal(ePriest, tank, 600, 'Heal');
 
       // Heal 2: paladin, forced crit (no mults) -> *1.5 path.
       tank.hp = 2000;
@@ -2556,15 +2617,15 @@ function multiClassHeal(): Scenario {
         }),
       );
       tank.hp = 2000;
-      (sim as any).applyHeal(eShaman, tank, 1000, 'Healing Wave');
+      asHarness(sim).applyHeal(eShaman, tank, 1000, 'Healing Wave');
 
       // Heal 5: overheal -> healed clamps to 0 -> healingThreat healed<=0 early bail.
       tank.hp = tank.maxHp;
-      (sim as any).applyHeal(ePriest, tank, 500, 'Heal');
+      asHarness(sim).applyHeal(ePriest, tank, 500, 'Heal');
 
       // Heal 6: aware.length===0 early bail (target with no mob holding threat on it).
       ePaladin.hp = Math.max(1, ePaladin.maxHp - 200);
-      (sim as any).applyHeal(ePriest, ePaladin, 300, 'Heal');
+      asHarness(sim).applyHeal(ePriest, ePaladin, 300, 'Heal');
       // One checkpoint pins the cumulative result of all six heals (per-heal amount +
       // crit are folded into this window's event digest; the draw-order log + tank/mob
       // threat tables are pinned in the frame body).
@@ -2623,7 +2684,7 @@ function mobLocomotion(): Scenario {
     sampleEvery: 1,
     build: () => new Sim({ seed: 7777, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.addPlayer('warrior', 'Anvil');
       const player = sim.entities.get(pid) as AnyEntity;
       rec.track(pid);
@@ -2659,7 +2720,7 @@ function mobLocomotion(): Scenario {
         arm(m);
         reviveTarget();
         rec.track(m.id);
-        (sim as any).updateMob(m);
+        asHarness(sim).updateMob(m);
         return m;
       };
 
@@ -2675,7 +2736,7 @@ function mobLocomotion(): Scenario {
         m.stompTimer = 0.001;
       });
       rec.notes.stomperId = stomper.id;
-      rec.notes.stompStunLanded = player.auras.some((a: any) => a.id === 'stomp_stun');
+      rec.notes.stompStunLanded = player.auras.some((a) => a.id === 'stomp_stun');
       rec.snapshot('war-stomp');
 
       // Banshee terrify: draws rng.range(-PI,PI) for the fear facing + fear_incap aura.
@@ -2683,10 +2744,10 @@ function mobLocomotion(): Scenario {
         m.terrifyTimer = 0.001;
       });
       rec.notes.terrifierId = terrifier.id;
-      rec.notes.fearLanded = bystander.auras.some((a: any) => a.id === 'fear_incap');
+      rec.notes.fearLanded = bystander.auras.some((a) => a.id === 'fear_incap');
       // The tank exemption: the boss's current target draws a heading too (the
       // stream is identical either way) but is never feared.
-      rec.notes.tankFearLanded = player.auras.some((a: any) => a.id === 'fear_incap');
+      rec.notes.tankFearLanded = player.auras.some((a) => a.id === 'fear_incap');
       rec.snapshot('terrify');
 
       // Idle wander: a mob far out of aggro range whose wanderTimer is due picks a new
@@ -2703,7 +2764,7 @@ function mobLocomotion(): Scenario {
       wanderer.wanderTarget = null;
       wanderer.wanderTimer = 0.001;
       rec.track(wanderer.id);
-      (sim as any).updateMob(wanderer);
+      asHarness(sim).updateMob(wanderer);
       rec.notes.wandererId = wanderer.id;
       rec.snapshot('idle-wander');
 
@@ -2723,7 +2784,7 @@ function mobLocomotion(): Scenario {
       evader.inCombat = true;
       evader.threat.set(pid, 50);
       rec.track(evader.id);
-      (sim as any).updateMob(evader);
+      asHarness(sim).updateMob(evader);
       rec.notes.evaderHp = evader.hp;
       rec.notes.evaderState = evader.aiState;
       rec.snapshot('evade-reset');
@@ -2748,11 +2809,11 @@ function mobLocomotion(): Scenario {
       coward.hp = Math.max(1, Math.floor(coward.maxHp * 0.15)); // <= FLEE_HP_THRESHOLD (0.2)
       rec.track(coward.id);
       reviveTarget(); // the lackey needs a living target to panic away from
-      (sim as any).updateMob(coward); // attack arm -> maybeFlee triggers the flee
+      asHarness(sim).updateMob(coward); // attack arm -> maybeFlee triggers the flee
       rec.notes.cowardStateAfterPanic = coward.aiState;
       rec.snapshot('flee-panic');
       reviveTarget();
-      (sim as any).updateMob(coward); // flee arm: fleeMoveSpeed + run away from the player
+      asHarness(sim).updateMob(coward); // flee arm: fleeMoveSpeed + run away from the player
       rec.notes.cowardStateFleeing = coward.aiState;
       rec.snapshot('flee-run');
     },
@@ -2781,7 +2842,7 @@ function delveProgression(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 2010, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.collapsed_reliquary;
       sim.setPlayerLevel(def.minLevel);
       const p = sim.player as AnyEntity;
@@ -2798,7 +2859,7 @@ function delveProgression(): Scenario {
       const nonFinale = def.modules.find((m: string) => m !== def.finaleModuleId) as string;
       run.modules = [nonFinale, def.finaleModuleId];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       // Clear the chamber: down every spawned mob, then step every pressure plate
       // through the real tickDelvePressurePlates path (teleport onto the plate).
       for (const id of [...run.mobIds]) {
@@ -2825,14 +2886,23 @@ function delveProgression(): Scenario {
         rec.tick(3); // walk into the tombstone -> advanceDelveModule to the finale
       }
       rec.snapshot('advanced-to-finale');
-      // Marks shop: an 'available'-gated piece + a companion rank bump.
-      const meta = sim.players.get(sim.playerId) as any;
+      // Marks shop: an 'available'-gated piece + a companion rank bump. Both
+      // are gated to Brother Halven's board at the delve door (12 yards),
+      // like enter_delve, so step back to the door before spending.
+      p.pos = { x: def.doorPos.x, y: p.pos.y, z: def.doorPos.z };
+      p.prevPos = { ...p.pos };
+      sim.rebucket(p);
+      const meta = sim.players.get(sim.playerId) as PlayerMeta;
       meta.delveMarks = 100;
       meta.copper = 100000;
       sim.delveBuyShopItem('collapsed_reliquary', 'reliquary_legs');
       sim.companionUpgrade('companion_tessa');
-      // Daily rollover: a fresh UTC day resets firstClearXp/markClears.
+      // Daily rollover: a fresh reset window resets firstClearXp/markClears.
+      // `resetDay` is the realm's own daily boundary, which is what every daily
+      // window now reads; `utcDay` stays the calendar stamp beside it, moved in
+      // step so the scenario keeps describing one instant rather than two.
       meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['seed']), markClears: 2 };
+      sim.resetDay = '2099-06-25';
       sim.utcDay = '2099-06-25';
       sim.delveDailyWire(sim.playerId);
       rec.snapshot('shop-daily');
@@ -2864,7 +2934,7 @@ function delveCompanion(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 3010, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const def = DELVES.collapsed_reliquary;
       sim.setPlayerLevel(def.minLevel);
       const p = sim.player as AnyEntity;
@@ -2872,7 +2942,7 @@ function delveCompanion(): Scenario {
       teleport(sim, p, def.doorPos.x, def.doorPos.z);
       // Rank 2 BEFORE enter: spawnDelveCompanion scales her level AND the heal arm
       // scales by DELVE_COMPANION_HEAL_PCT[2].
-      const meta = sim.players.get(sim.playerId) as Record<string, any>;
+      const meta = requireValue(sim.players.get(sim.playerId), 'parity scenario player meta');
       meta.companionUpgrades.companion_tessa = 2;
       sim.enterDelve('collapsed_reliquary', 'normal');
       const run = sim.delveRunForPlayer(sim.playerId);
@@ -2883,7 +2953,7 @@ function delveCompanion(): Scenario {
       run.bountiful = false; // pin against the rare coffer roll
       run.modules = ['reliquary_finale'];
       run.moduleIndex = 0;
-      (sim as any).spawnDelveModule(run);
+      asHarness(sim).spawnDelveModule(run);
       const comp = run.companion
         ? (sim.entities.get(run.companion.entityId) as AnyEntity | undefined)
         : undefined;
@@ -2962,7 +3032,7 @@ function dungeonInstances(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1016, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('mage', 'Bbb');
       sim.partyInvite(b, a);
@@ -2981,8 +3051,9 @@ function dungeonInstances(): Scenario {
       // Player B walks the same door -> same instanceKeyFor -> joins A's instance.
       teleport(sim, eb, door.pos.x, door.pos.z);
       rec.tick(1);
-      const inst = (sim.instances as any[]).find(
-        (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
+      const inst = requireValue(
+        sim.instances.find((i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null),
+        'parity scenario dungeon instance',
       );
       rec.track(...inst.mobIds, ...inst.objectIds);
       if (inst.exitId != null) rec.track(inst.exitId);
@@ -2991,7 +3062,10 @@ function dungeonInstances(): Scenario {
       rec.notes.instMobIds = [...inst.mobIds];
       rec.snapshot('entered');
       // Walk both out via the exit portal (the inside branch of updateDoorTriggers).
-      const exit = sim.entities.get(inst.exitId) as AnyEntity;
+      const exit = requireValue(
+        inst.exitId === null ? null : sim.entities.get(inst.exitId),
+        'parity scenario dungeon exit',
+      ) as AnyEntity;
       teleport(sim, ea, exit.pos.x, exit.pos.z);
       rec.tick(1);
       teleport(sim, eb, exit.pos.x, exit.pos.z);
@@ -3020,7 +3094,7 @@ function dungeonRaidLockout(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 1017, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const leader = sim.addPlayer('warrior', 'Lead');
       // convertPartyToRaid requires a full party of five.
       while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
@@ -3029,7 +3103,7 @@ function dungeonRaidLockout(): Scenario {
         sim.partyAccept(pid);
       }
       sim.convertPartyToRaid(leader);
-      const meta = sim.players.get(leader) as any;
+      const meta = sim.players.get(leader) as PlayerMeta;
       meta.questsDone.add('q_nythraxis_bound_guardian'); // attune past the royal-door seal
       meta.raidLockouts.set('nythraxis_boss_arena', 999999999); // active lockout (far future ms)
       rec.snapshot('locked');
@@ -3072,14 +3146,14 @@ function nythraxisFullPull(): Scenario {
     sampleEvery: 10,
     build: () => new Sim({ seed: 1031, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const tankPid = sim.addPlayer('warrior', 'NyxTank') as number;
       sim.setPlayerLevel(MAX_LEVEL, tankPid);
       // Exercise the winning tank identity explicitly. A level-cap raid tank
       // with no committed specialization is not a representative v0.26 player
       // state and bypasses Protection's equipment/mastery revalidation.
       sim.setSpec('prot', tankPid);
-      (sim.players.get(tankPid) as any).questsDone.add('q_nythraxis_bound_guardian'); // attune
+      (sim.players.get(tankPid) as PlayerMeta).questsDone.add('q_nythraxis_bound_guardian'); // attune
       const dpsPids: number[] = [];
       for (let i = 0; i < 4; i++) {
         const pid = sim.addPlayer('mage', `NyxDps${i}`) as number;
@@ -3154,9 +3228,9 @@ function nythraxisFullPull(): Scenario {
       rec.snapshot('engage');
 
       // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
-      (boss.nythraxis as any).gravebreakerTimer = DT; // arm the charge next tick...
+      (boss.nythraxis as NythraxisEncounterState).gravebreakerTimer = DT; // arm the charge next tick...
       step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
-      (boss.nythraxis as any).raiseFallenTimer = DT; // fire the add wave next tick
+      (boss.nythraxis as NythraxisEncounterState).raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(
         (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_ADD_ID && !e.dead,
@@ -3186,16 +3260,16 @@ function nythraxisFullPull(): Scenario {
 
       // Shorten the transition timer so phase two opens without 21s of ticks, then
       // run updateNythraxisTransition (Aldric walk-in + timer) to completion.
-      (boss.nythraxis as any).transitionTimer = 1;
+      (boss.nythraxis as NythraxisEncounterState).transitionTimer = 1;
       step(20 * 8); // transition (1s) + settle (5s) + margin -> phase 2, soul-rend timer live
       // Freeze the auto cadence so the explicit Soul Rend / Deathless Rage triggers
       // below fire in a controlled order (no stray auto-cast mid-resolve).
-      (boss.nythraxis as any).soulRendTimer = 999;
-      (boss.nythraxis as any).deathlessTimer = 999;
+      (boss.nythraxis as NythraxisEncounterState).soulRendTimer = 999;
+      (boss.nythraxis as NythraxisEncounterState).deathlessTimer = 999;
       rec.snapshot('phase2');
 
       // ----- Soul Rend: the rng.int marks pick -----
-      (boss.nythraxis as any).soulRendTimer = DT;
+      (boss.nythraxis as NythraxisEncounterState).soulRendTimer = DT;
       step(1); // castNythraxisSoulRend -> rng.int pick + Soul Rend marks
       rec.snapshot('soulrend');
       step(20 * 9); // marks expire (8s duration) -> dealDamage split across the stack
@@ -3207,9 +3281,9 @@ function nythraxisFullPull(): Scenario {
       step(1);
 
       // ----- Deathless Rage + the three-wardstone interrupt -----
-      (boss.nythraxis as any).soulRendLockout = 0;
-      (boss.nythraxis as any).soulRendMarks = [];
-      (boss.nythraxis as any).deathlessTimer = DT;
+      (boss.nythraxis as NythraxisEncounterState).soulRendLockout = 0;
+      (boss.nythraxis as NythraxisEncounterState).soulRendMarks = [];
+      (boss.nythraxis as NythraxisEncounterState).deathlessTimer = DT;
       step(1); // startNythraxisDeathlessRage -> ward channels armed (10s cast)
       rec.snapshot('deathless-start');
       // Three distinct players each channel a distinct wardstone via the object click.
@@ -3230,7 +3304,7 @@ function nythraxisFullPull(): Scenario {
       // ----- Kill: grantNythraxisLockout + onBossDeath death dialogue -----
       // Clear the dialogue lock so the (non-critical) death line is not suppressed by
       // the still-active Final Stand callout.
-      (boss.nythraxis as any).dialogueBusyUntil = 0;
+      (boss.nythraxis as NythraxisEncounterState).dialogueBusyUntil = 0;
       sim.dealDamage(tank, boss, boss.hp, false, 'physical', null, 'hit', true);
       step(1); // updateMob dead-branch -> onBossDeath schedules the death dialogue
       rec.snapshot('death');
@@ -3266,7 +3340,7 @@ function c3AuraRunner(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1017, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(20); // consecration learnLevel 18
       const p = sim.player as AnyEntity;
       beef(p);
@@ -3308,10 +3382,19 @@ function c3AuraRunner(): Scenario {
       // every 40 ticks (the 2s classic tick): the food heal runs ctx.healingTakenMult +
       // the 'heal' emit, the drink restores mana, and the short buff_ap expires inside
       // updateAuras -> statsDirty -> recalcPlayerStats (+ applyNonPlayerStatAura).
+      // The hp deficit is a FRACTION of the beefed maxHp (50000, see `beef` above), not
+      // an absolute amount: recalcPlayerStats preserves the hp/maxHp FRACTION across a
+      // maxHp change (entity.ts `hpFrac`), so once the buff_ap expiry below shrinks
+      // maxHp back down to the real (unbeefed) paladin value, an absolute deficit like
+      // "600 short of 50000" collapses to a tiny few points of the real pool, small
+      // enough that a single stacked natural-regen tick (#1608: eating no longer blocks
+      // it) closes the whole gap before the food tick's own check runs, and the food
+      // heal this phase exists to cover never fires. A fractional deficit survives the
+      // rescale untouched, so the food heal still has real work left to do afterward.
       p.inCombat = false;
       p.combatTimer = 99;
       p.fiveSecondRule = 99;
-      p.hp = Math.max(1, p.maxHp - 600);
+      p.hp = Math.max(1, Math.round(p.maxHp * 0.4));
       p.resource = Math.max(0, p.maxResource - 300);
       p.eating = {
         itemId: 'parity_food',
@@ -3395,7 +3478,7 @@ function c4aCastingLifecycle(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1017, playerClass: 'mage', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const mage = sim.addPlayer('mage', 'Mg') as number;
       const priest = sim.addPlayer('priest', 'Pr') as number;
       const warlock = sim.addPlayer('warlock', 'Wl') as number;
@@ -3514,7 +3597,7 @@ function mobLifecycle(): Scenario {
     sampleEvery: 1,
     build: () => new Sim({ seed: 1015, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.addPlayer('warrior', 'Anvil');
       const player = sim.entities.get(pid) as AnyEntity;
       rec.track(pid);
@@ -3553,9 +3636,9 @@ function mobLifecycle(): Scenario {
       const boar = spawnMob(sim, 'wild_boar', 5, player.pos.x + 4, player.pos.y, player.pos.z + 4);
       rec.track(wolfA.id, wolfB.id, wolfC.id, boar.id);
       lethal(sim, player, wolfA); // handleDeath -> frenzyPackmates(wolfA)
-      rec.notes.wolfBFrenzied = wolfB.auras.some((a: any) => a.id === 'pack_frenzy');
-      rec.notes.wolfCFrenzied = wolfC.auras.some((a: any) => a.id === 'pack_frenzy');
-      rec.notes.boarFrenzied = boar.auras.some((a: any) => a.id === 'pack_frenzy');
+      rec.notes.wolfBFrenzied = wolfB.auras.some((a) => a.id === 'pack_frenzy');
+      rec.notes.wolfCFrenzied = wolfC.auras.some((a) => a.id === 'pack_frenzy');
+      rec.notes.boarFrenzied = boar.auras.some((a) => a.id === 'pack_frenzy');
       rec.snapshot('pack-frenzy');
 
       // 2) Death Throes arm: kill a bog_bloat with the player in blast radius (8).
@@ -3570,7 +3653,7 @@ function mobLifecycle(): Scenario {
       // tick the fuse reaches 0 the corpse bursts for rng.range(min,max) to the
       // in-radius player (one draw), then sets detonateTimer = Infinity (fires once).
       revive();
-      for (let i = 0; i < 31; i++) (sim as any).updateMob(bog);
+      for (let i = 0; i < 31; i++) asHarness(sim).updateMob(bog);
       rec.notes.bogDetonated = bog.detonateTimer === Infinity;
       rec.notes.playerHpAfterBurst = player.hp;
       rec.snapshot('throes-detonate');
@@ -3587,7 +3670,7 @@ function mobLifecycle(): Scenario {
       wild.corpseTimer = 0;
       wild.respawnTimer = 0;
       wild.lootable = false;
-      (sim as any).updateMob(wild); // corpse-tick gate -> respawnMob + despawnSummonedAdds(add)
+      asHarness(sim).updateMob(wild); // corpse-tick gate -> respawnMob + despawnSummonedAdds(add)
       rec.notes.wildRespawned = !wild.dead;
       rec.notes.wildState = wild.aiState;
       rec.notes.wildAtSpawn = wild.pos.x === 300 && wild.pos.z === 300;
@@ -3613,7 +3696,7 @@ function mobLifecycle(): Scenario {
       dungeonMob.corpseTimer = 0;
       dungeonMob.respawnTimer = 0;
       dungeonMob.lootable = false;
-      (sim as any).updateMob(dungeonMob);
+      asHarness(sim).updateMob(dungeonMob);
       rec.notes.dungeonStaysDead = dungeonMob.dead;
       rec.snapshot('dungeon-stays-dead');
     },
@@ -3639,7 +3722,7 @@ function targetingMarkers(): Scenario {
     ],
     build: () => new Sim({ seed: 7177, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aaa');
       const b = sim.addPlayer('priest', 'Bbb');
       const c = sim.addPlayer('mage', 'Ccc');
@@ -3739,7 +3822,7 @@ function c4bEffectDispatch(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1018, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const warrior = sim.addPlayer('warrior', 'Wr') as number;
       const mage = sim.addPlayer('mage', 'Mg') as number;
       const rogue = sim.addPlayer('rogue', 'Rg') as number;
@@ -3888,9 +3971,14 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
       'same shared-RNG draw count/order as the ungeared spell-resist path',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    // Seed re-hunted 1021 -> 1022 by the zones 1 to 3 quest-dedupe content: the
+    // shifted world stream made the geared arm's fight unfold onto a
+    // gear-conditional draw at 1021 (765 vs 761 draws), breaking the pair
+    // invariant the scenario exists to pin. Re-hunted so both arms draw
+    // identically again rather than relaxing the assert.
+    build: () => new Sim({ seed: 1022, playerClass: 'mage' }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       sim.setPlayerLevel(20);
       if (withHitGear) {
         for (const itemId of [
@@ -3946,7 +4034,7 @@ function c5AutoAttack(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1019, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const warrior = sim.addPlayer('warrior', 'Wr') as number;
       const rogue = sim.addPlayer('rogue', 'Rg') as number;
       const hunterM = sim.addPlayer('hunter', 'Hm') as number;
@@ -4049,7 +4137,7 @@ function marketRoundTrip(): Scenario {
     ],
     build: () => new Sim({ seed: 1019, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const seller = sim.addPlayer('warrior', 'Seller');
       const buyer = sim.addPlayer('mage', 'Buyer');
       const merchant = [...sim.entities.values()].find(
@@ -4060,7 +4148,7 @@ function marketRoundTrip(): Scenario {
       teleport(sim, sim.entities.get(seller) as AnyEntity, merchant.pos.x, merchant.pos.z);
       teleport(sim, sim.entities.get(buyer) as AnyEntity, merchant.pos.x, merchant.pos.z);
       sim.addItem('wolf_fang', 4, seller);
-      sim.players.get(buyer)!.copper = 5000;
+      requireValue(sim.players.get(buyer), 'parity scenario player').copper = 5000;
       rec.notes.seller = seller;
       rec.notes.buyer = buyer;
       rec.snapshot('market-setup');
@@ -4099,20 +4187,29 @@ function marketRoundTrip(): Scenario {
 
       // 3) the buyer buys it: coin leaves the buyer, goods enter their bags, the
       // seller's proceeds (less the 5% cut) wait in their collection.
-      const sale = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const sale = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       sim.marketBuy(sale.id, buyer);
       rec.snapshot('bought');
 
       // 4) list a second stack then reclaim it -> the escrow returns to the bags.
       sim.marketList('wolf_fang', 1, 150, seller);
-      const reclaim = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const reclaim = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       sim.marketCancel(reclaim.id, seller);
       rec.snapshot('cancelled');
 
       // 5) list a third stack, force it past due, then run the once-a-second
       // sweep (updateMarket fires at tickCount % 20 === 0) -> returns to collection.
       sim.marketList('wolf_fang', 1, 200, seller);
-      const expiring = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const expiring = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       expiring.expiresAt = sim.time - 1;
       rec.tick(20);
       rec.snapshot('expired');
@@ -4151,9 +4248,9 @@ function inventoryVendor(): Scenario {
     ],
     build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const buyer = sim.addPlayer('warrior', 'Buyer');
-      const meta = sim.players.get(buyer) as any;
+      const meta = sim.players.get(buyer) as PlayerMeta;
       const p = sim.entities.get(buyer) as AnyEntity;
       const wilkes = [...sim.entities.values()].find(
         (e: AnyEntity) => e.templateId === 'trader_wilkes',
@@ -4243,9 +4340,9 @@ function bankRoundTrip(): Scenario {
     ],
     build: () => new Sim({ seed: 1024, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.addPlayer('warrior', 'Vaultkeeper');
-      const meta = sim.players.get(pid) as any;
+      const meta = sim.players.get(pid) as PlayerMeta;
       // Stand at a bursar so the nearBanker gate passes (dist2d check, matching x/z
       // is enough). bankerIds is the Sim anchor list seeded by the ctor.
       const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
@@ -4256,12 +4353,12 @@ function bankRoundTrip(): Scenario {
       rec.snapshot('bank-setup');
 
       // 1) deposit a partial count: 2 of the 5-stack leaves the bags for the bank.
-      const depIdx = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+      const depIdx = meta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
       sim.bankDeposit(depIdx, 2, pid);
       rec.snapshot('deposited-partial');
 
       // 2) deposit the whole remaining stack (3): merges into the bank's wolf_fang slot.
-      const depIdx2 = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+      const depIdx2 = meta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
       sim.bankDeposit(depIdx2, undefined, pid);
       rec.snapshot('deposited-whole');
 
@@ -4300,14 +4397,17 @@ function g1bXpPrestige(): Scenario {
     ],
     build: () => new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
-      const meta = sim.meta(sim.playerId) as any;
+      const sim = rec.sim;
+      const meta = requireValue(sim.meta(sim.playerId), 'parity scenario player meta');
       const p = sim.player as AnyEntity;
 
       // 1. Rested accrual: park inside an inn footprint, out of combat, and tick.
       //    updateRested fires each regen-phase tick while isResting(p) is true,
       //    accruing a positive (sub-unit) pool off DT.
-      const innB = PROPS.buildings.find((b: any) => b.kind === 'inn')!;
+      const innB = requireValue(
+        PROPS.buildings.find((b) => b.kind === 'inn'),
+        'parity scenario building',
+      );
       teleport(sim, p, innB.x, innB.z);
       rec.tick(60);
       rec.notes.restedAfterAccrual = meta.restedXp;
@@ -4356,15 +4456,15 @@ function playerTrade(): Scenario {
     ],
     build: () => new Sim({ seed: 1021, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Ayla');
       const b = sim.addPlayer('mage', 'Borin');
       teleport(sim, sim.entities.get(a) as AnyEntity, 0, -40);
       teleport(sim, sim.entities.get(b) as AnyEntity, 3, -40);
       sim.addItem('wolf_fang', 3, a);
       sim.addItem('baked_bread', 2, b);
-      sim.players.get(a)!.copper = 100;
-      sim.players.get(b)!.copper = 50;
+      requireValue(sim.players.get(a), 'parity scenario player').copper = 100;
+      requireValue(sim.players.get(b), 'parity scenario player').copper = 50;
       rec.notes.a = a;
       rec.notes.b = b;
       rec.snapshot('trade-setup');
@@ -4415,7 +4515,7 @@ function chatSocial(): Scenario {
     ],
     build: () => new Sim({ seed: 1023, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
       const c = sim.addPlayer('rogue', 'Gimel');
@@ -4478,11 +4578,11 @@ function cardDuel(): Scenario {
     sampleEvery: 5,
     build: () => new Sim({ seed: 1010, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
-      teleport(sim, sim.entities.get(a)!, 13, 2);
-      teleport(sim, sim.entities.get(b)!, 13, 2);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 13, 2);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 13, 2);
       sim.joinCardDuelQueue(a);
       sim.joinCardDuelQueue(b);
       rec.tick(1); // updateCardDuelQueue() matchmakes the pair (createCardHand x2)
@@ -4521,11 +4621,12 @@ function cardDuel(): Scenario {
 // masterwork chance and the proc fires inside the recorded run; only the found
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
-// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
-// counts (fewer camp mobs means fewer construction-time draws, which moves every
-// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
-// drive.
-function professionsCraft(seed = 10): Scenario {
+// realms), again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
+// clutch camps, the new elites) moved the shared stream once more, again
+// (5 -> 2) after the Galecrest unspawnable-quest camp fix, and back to 5
+// when those late quest camps moved onto their private scatter stream.
+function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
@@ -4539,14 +4640,14 @@ function professionsCraft(seed = 10): Scenario {
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.playerId as number;
-      const meta = sim.players.get(pid) as any;
+      const meta = sim.players.get(pid) as PlayerMeta;
       rec.notes.pid = pid;
 
       // Step 1: DENIAL. No materials held -> insufficient_materials; the denial
       // path returns before the proc draw, so it draws zero rng.
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-denied');
 
       // Step 2: plain deterministic craft. The single proc draw happens on the
@@ -4558,7 +4659,7 @@ function professionsCraft(seed = 10): Scenario {
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('silverleaf_herb', 2, pid);
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain');
 
       // Step 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
@@ -4580,7 +4681,7 @@ function professionsCraft(seed = 10): Scenario {
       // thread volume (grants draw no rng; only golden state rows move).
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
-      sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+      runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
       rec.snapshot('craft-masterwork');
 
       // Step 4: one more plain craft so the golden shows the draw stream continuing
@@ -4588,8 +4689,23 @@ function professionsCraft(seed = 10): Scenario {
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('silverleaf_herb', 2, pid);
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
+
+      // Step 5: the ARMED craft-cast frame (Craft Cast System). Start a real
+      // batch through Sim.craftItem (the three-arg count form the offline HUD
+      // uses) and snapshot WITHOUT ticking: the sampler pins the live session
+      // shape itself (castingAbility, castTotal/castRemaining, the 1-based
+      // craftCastRecipeId capture, and the batch counters at 2 of 2) instead
+      // of only the at-rest zeros. Deliberately no ticks: this scenario's
+      // coverage pin is draw-PRECISE (each craft draws exactly once, the
+      // denial zero), and a cast start draws nothing, so the stream stays at
+      // three draws and the armed cast simply never completes in-scenario.
+      sim.addItem('linen_scrap', 2, pid);
+      sim.addItem('spider_leg', 2, pid);
+      sim.addItem('silverleaf_herb', 4, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, 2);
+      rec.snapshot('craft-cast-armed');
     },
   };
 }
@@ -4633,9 +4749,9 @@ function professionsFishingSession(seed = 1): Scenario {
     sampleEvery: 100,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.playerId as number;
-      const meta = sim.players.get(pid) as any;
+      const meta = sim.players.get(pid) as PlayerMeta;
       const p = sim.player as AnyEntity;
 
       // No mob interference: a landed hit cancels the session mid-drive
@@ -4695,9 +4811,9 @@ function professionsGather(seed = 1): Scenario {
     sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.playerId as number;
-      const meta = sim.players.get(pid) as any;
+      const meta = sim.players.get(pid) as PlayerMeta;
       const p = sim.player as AnyEntity;
 
       // No mob interference: mob damage cancels a gather cast mid-drive, so
@@ -4769,8 +4885,8 @@ function professionsGather(seed = 1): Scenario {
         // accumulating common stacks exactly as before.
         const TOOL_IDS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
         meta.inventory = [
-          ...meta.inventory.filter((s: any) => TOOL_IDS.includes(s.itemId)),
-          ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
+          ...meta.inventory.filter((s) => TOOL_IDS.includes(s.itemId)),
+          ...meta.inventory.filter((s) => s.instance?.signer !== undefined).slice(-8),
         ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
         sim.harvestNode('herb_eastbrook_1', undefined, pid);
@@ -4811,7 +4927,7 @@ function professionsGatherFine(seed = 1): Scenario {
     sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.playerId as number;
       const p = sim.player as AnyEntity;
 
@@ -4908,7 +5024,7 @@ function professionsToolEffectSlot(seed = 1): Scenario {
     sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
-      const sim = rec.sim as AnySim;
+      const sim = rec.sim;
       const pid = sim.playerId as number;
       const p = sim.player as AnyEntity;
 
@@ -4990,6 +5106,64 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// Production distance-culling contract: the 100-yard host throttle changes
+// passive idle rolls from the historical shared stream to deterministic per-mob
+// lanes. Track one mob on each side of the boundary so the golden records both
+// the intended state divergence and the resulting shared RNG digest.
+function idleMobDistanceCulling(): Scenario {
+  const seed = 20061;
+  return {
+    name: 'idle_mob_distance_culling',
+    coverage: [
+      'idleMobTickRadius equals the production PLAYER_INTEREST_DROP_RADIUS',
+      'near idle ownerless mob advances inside the 100-yard boundary',
+      'far idle ownerless mob remains frozen outside the 100-yard boundary',
+      'culling-enabled passive idle rolls use deterministic per-mob RNG lanes',
+    ],
+    sampleEvery: 20,
+    build: () =>
+      new Sim({
+        seed,
+        playerClass: 'warrior',
+        idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const player = sim.player as AnyEntity;
+      teleport(sim, player, 0, -40);
+
+      // Silence the authored world mobs so this scenario instruments only the
+      // two explicit boundary probes. Their long dead timers are deterministic
+      // and cannot re-enter the idle arm during the drive.
+      for (const entity of sim.entities.values()) {
+        if (entity.kind !== 'mob') continue;
+        entity.dead = true;
+        entity.hp = 0;
+        entity.aiState = 'dead';
+        entity.inCombat = false;
+        entity.respawnTimer = 9999;
+        entity.corpseTimer = 9999;
+      }
+
+      const near = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 10, seed), 10);
+      const far = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 110, seed), 110);
+      for (const mob of [near, far]) {
+        mob.aiState = 'idle';
+        mob.inCombat = false;
+        mob.aggroTargetId = null;
+        mob.wanderTarget = null;
+        mob.wanderTimer = 0;
+      }
+      rec.notes.nearMobId = near.id;
+      rec.notes.farMobId = far.id;
+      rec.track(near.id, far.id);
+      rec.snapshot('boundary-probes-ready');
+      rec.tick(80);
+      rec.snapshot('near-advanced-far-frozen');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5051,4 +5225,5 @@ export const SCENARIOS: Scenario[] = [
   professionsGatherFine(),
   professionsFishingSession(),
   professionsToolEffectSlot(),
+  idleMobDistanceCulling(),
 ];

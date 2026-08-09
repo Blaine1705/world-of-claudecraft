@@ -3,7 +3,8 @@
 // sim entity count, achieved sim Hz, per-phase loop timing) plus the
 // throughput counters (ws frames handled, inbound frames dropped by cause,
 // flood kicks, input frames proven missed, chat messages, characters
-// created), all registered on the SAME prom-client registry the RED exporter builds
+// created, guild-bank incidents by kind), all registered on the SAME prom-client
+// registry the RED exporter builds
 // (server/http/metrics.ts). Prometheus attaches env / service=game / server_name at
 // scrape time, so nothing here emits those.
 //
@@ -16,11 +17,12 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
-// (p95, max), the two ws directions (in, out), the fixed six inbound drop
-// causes (WS_DROP_CAUSES), and the content-derived economy and fishing
+// (p95, max), the two ws directions (in, out), the fixed inbound drop
+// causes (WS_DROP_CAUSES), the fixed guild-bank incident kinds
+// (GUILD_BANK_INCIDENTS), and the content-derived economy and fishing
 // vocabularies (COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS, FISHING_BANDS,
-// ROD_FEE_RECIPE_IDS). Nothing per-player (account id,
-// character id, name, ip) is ever a label. The tick-phase series count is fixed at
+// ROD_FEE_RECIPE_IDS). Nothing per-player and nothing per-guild (account id,
+// character id, guild id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
 // Operator note: woc_gather_harvests_total carries the tier label from its
 // first shipped release (the metric itself is new in this release, so no live
@@ -36,6 +38,15 @@
 // label reads against its metric, never across families.
 
 import { Counter, Gauge, type Registry } from 'prom-client';
+import {
+  BG_COMPOSITIONS,
+  BG_END_CAUSES,
+  BG_SCORE_SIDES,
+  type BgCompositionLabel,
+  type BgEndCauseLabel,
+  bgScoreSides,
+  isBgEndCause,
+} from '../battleground_telemetry';
 import {
   COPPER_FLOW_SOURCES,
   type CopperFlowSource,
@@ -53,6 +64,8 @@ import {
 } from '../fishing_telemetry';
 import {
   type GameMetricsCounters,
+  GUILD_BANK_INCIDENTS,
+  type GuildBankIncident,
   WS_DROP_CAUSES,
   type WsDropCause,
   type WsMessageDirection,
@@ -99,6 +112,14 @@ export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 
+/** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
+export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
+
+/** Guild bank activity log cache readout, labeled by counter name. ONE metric
+ *  with a `kind` label rather than six names: the vocabulary is closed and
+ *  fixed, and an operator reads them together or not at all. */
+export const WOC_GUILD_BANK_LOG_CACHE = 'woc_guild_bank_log_cache';
+
 /** Total copper credited to acting players, labeled by economic surface. */
 export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
 
@@ -120,6 +141,9 @@ export const WOC_FISHING_KOI_TOTAL = 'woc_fishing_koi_total';
 /** Total fishing got-aways (missed reel, timed-out session, or no bag room), same labels. */
 export const WOC_FISHING_GOT_AWAYS_TOTAL = 'woc_fishing_got_aways_total';
 
+/** Total sessions ended by a pre-bite re-press (the anti-spam early reel), same labels. */
+export const WOC_FISHING_EARLY_REELS_TOTAL = 'woc_fishing_early_reels_total';
+
 /** Total casts whose table draw resolved the empty row (nothing biting), same labels. */
 export const WOC_FISHING_EMPTY_HOOKS_TOTAL = 'woc_fishing_empty_hooks_total';
 
@@ -135,6 +159,19 @@ export const WOC_ROD_FEE_PAYMENTS_TOTAL = 'woc_rod_fee_payments_total';
  *  the realm count, and dropping the by (recipe) grouping multiplies every
  *  training by the single HIGHEST fee (the two rod fees differ 4x). */
 export const WOC_ROD_FEE_COPPER = 'woc_rod_fee_copper';
+
+/** Resolved RATED Thornhollow Fields matches, by ending cause and composition.
+ *  The denominator for the two sums below, and on its own the cap-tuning read:
+ *  the share of matches the CLOCK ended rather than the winning capture is
+ *  `sum(rate(...{cause="timer"})) / sum(rate(...))`. */
+export const WOC_BATTLEGROUND_MATCHES_TOTAL = 'woc_battleground_matches_total';
+/** Summed ACTIVE seconds of those matches, same labels. Mean match length is
+ *  this over the count above; it is a SUM, so never graph it alone. */
+export const WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL = 'woc_battleground_duration_seconds_total';
+/** Summed final scores of those matches, split into the high and low side of
+ *  each result (a draw contributes the same value to both). Mean captures per
+ *  match per side is this over the match count. */
+export const WOC_BATTLEGROUND_CAPTURES_TOTAL = 'woc_battleground_captures_total';
 
 /**
  * The FIXED set of loop phases surfaced on woc_sim_tick_phase_seconds. These are
@@ -202,6 +239,22 @@ export interface GameStateSource {
    * still reads as stale rather than as warmup forever.
    */
   loopStartedAt(): number | null;
+  /**
+   * The guild bank activity log's per-guild read cache
+   * (server/guild_bank_log.ts). The number the whole design rests on is the
+   * REFRESH rate: the cache exists because one answer serves every officer of a
+   * guild, and its coalescing floor exists because a naive bust made a busy
+   * guild's log uncached exactly when officers read it. None of that is
+   * observable without this readout.
+   */
+  guildBankLogCache(): {
+    reads: number;
+    refreshes: number;
+    evictions: number;
+    busts: number;
+    entries: number;
+    dirtyGuilds: number;
+  };
 }
 
 /**
@@ -338,6 +391,31 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const guildBankIncidents = new Counter({
+    name: WOC_GUILD_BANK_INCIDENTS_TOTAL,
+    help: 'Total guild-bank incidents on the dupe-sensitive paths (escrow save, fence-out, escrow quarantine, reconcile, unloaded book, ledger write), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  // Same zero-backfill as the drop causes: these series are the ones an
+  // operator alerts on, and an alert rule cannot fire on a series that does
+  // not exist until its first incident.
+  for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+  new Gauge({
+    name: WOC_GUILD_BANK_LOG_CACHE,
+    help: 'Guild bank activity log read cache: reads, refreshes (the query rate), evictions, busts, live entries, and guilds inside the coalescing floor.',
+    labelNames: ['kind'],
+    registers: [registry],
+    collect() {
+      const stats = source.guildBankLogCache();
+      this.set({ kind: 'reads' }, stats.reads);
+      this.set({ kind: 'refreshes' }, stats.refreshes);
+      this.set({ kind: 'evictions' }, stats.evictions);
+      this.set({ kind: 'busts' }, stats.busts);
+      this.set({ kind: 'entries' }, stats.entries);
+      this.set({ kind: 'dirty_guilds' }, stats.dirtyGuilds);
+    },
+  });
   const copperCredited = new Counter({
     name: WOC_COPPER_CREDITED_TOTAL,
     help: 'Total copper credited to acting players during their own command, by economic surface.',
@@ -405,6 +483,10 @@ export function registerGameStateMetrics(
     WOC_FISHING_GOT_AWAYS_TOTAL,
     'Total fishing got-aways (missed reel, timed-out session, or no bag room), by zone and band.',
   );
+  const fishingEarlyReels = fishingCounter(
+    WOC_FISHING_EARLY_REELS_TOTAL,
+    'Total fishing sessions ended by a pre-bite re-press (the anti-spam early reel), by zone and band.',
+  );
   const fishingEmptyHooks = fishingCounter(
     WOC_FISHING_EMPTY_HOOKS_TOTAL,
     'Total fishing casts whose table draw resolved the empty row, by water zone and effective band.',
@@ -427,6 +509,39 @@ export function registerGameStateMetrics(
     // Static content, set once at registration: the fee is a pure tier lookup
     // over a frozen recipe record, so there is nothing to re-read at scrape.
     rodFeeCopper.set({ recipe }, rodFeeForRecipe(recipe));
+  }
+
+  const bgMatches = new Counter({
+    name: WOC_BATTLEGROUND_MATCHES_TOTAL,
+    help: 'Total resolved RATED Thornhollow Fields matches, by ending (caps, timer, forfeit) and composition (premade, pug). The ending split is the BG_CAPS_TO_WIN tuning read.',
+    labelNames: ['ending', 'composition'],
+    registers: [registry],
+  });
+  const bgDurationSeconds = new Counter({
+    name: WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
+    help: 'Summed ACTIVE seconds of resolved rated Thornhollow Fields matches, same labels. A SUM: mean length is this divided by woc_battleground_matches_total.',
+    labelNames: ['ending', 'composition'],
+    registers: [registry],
+  });
+  const bgCaptures = new Counter({
+    name: WOC_BATTLEGROUND_CAPTURES_TOTAL,
+    help: 'Summed final scores of resolved rated Thornhollow Fields matches, by ending and by the high or low side of the result. A SUM: mean captures per side is this divided by woc_battleground_matches_total.',
+    labelNames: ['ending', 'side'],
+    registers: [registry],
+  });
+  // Same zero-backfill as the drop causes: an operator comparing the timer share
+  // against the caps share needs both series to exist from boot, not from the
+  // first match that happens to end that way.
+  // The label is named `ending`, deliberately NOT `cause`: the ws-drop family
+  // already owns a `cause` label whose vocabulary is pinned by a registry-wide
+  // label scan, and a second family sharing the name would widen that pin
+  // rather than merely sit beside it.
+  for (const ending of BG_END_CAUSES) {
+    for (const composition of BG_COMPOSITIONS) {
+      bgMatches.inc({ ending, composition }, 0);
+      bgDurationSeconds.inc({ ending, composition }, 0);
+    }
+    for (const side of BG_SCORE_SIDES) bgCaptures.inc({ ending, side }, 0);
   }
 
   return {
@@ -470,6 +585,14 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    guildBankIncident(kind: GuildBankIncident): void {
+      try {
+        guildBankIncidents.inc({ kind });
+      } catch {
+        // Drop the sample rather than propagate into the save / reconcile /
+        // ledger path this measures (the whole point of measuring it).
       }
     },
     copperCredited(source: CopperFlowSource, amount: number): void {
@@ -529,6 +652,14 @@ export function registerGameStateMetrics(
         // Drop the sample rather than propagate into the event-routing path.
       }
     },
+    fishingEarlyReel(zone: HarvestBand, band: FishingBandLabel): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingEarlyReels.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
     fishingEmptyHook(zone: HarvestBand, band: FishingBandLabel): void {
       try {
         if (!fishingLabelsInVocabulary(zone, band)) return;
@@ -546,6 +677,32 @@ export function registerGameStateMetrics(
         rodFeePayments.inc({ recipe: recipeId });
       } catch {
         // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    battlegroundResolved(
+      cause: BgEndCauseLabel,
+      composition: BgCompositionLabel,
+      durationSec: number,
+      scoreCrimson: number,
+      scoreAzure: number,
+    ): void {
+      try {
+        // The cause crosses an untyped seam (it is a string on the drained sim
+        // record), so the membership check is this family's cardinality bound.
+        // The composition is a boolean at its source and cannot be off-vocabulary.
+        if (!isBgEndCause(cause)) return;
+        // A non-finite or negative duration would corrupt the very mean the sum
+        // exists for; drop the whole sample rather than book a partial one.
+        if (!Number.isFinite(durationSec) || durationSec < 0) return;
+        if (!Number.isFinite(scoreCrimson) || !Number.isFinite(scoreAzure)) return;
+        if (scoreCrimson < 0 || scoreAzure < 0) return;
+        const { high, low } = bgScoreSides(scoreCrimson, scoreAzure);
+        bgMatches.inc({ ending: cause, composition });
+        bgDurationSeconds.inc({ ending: cause, composition }, durationSec);
+        bgCaptures.inc({ ending: cause, side: 'high' }, high);
+        bgCaptures.inc({ ending: cause, side: 'low' }, low);
+      } catch {
+        // Drop the sample rather than propagate into the tick path.
       }
     },
   };

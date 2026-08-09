@@ -25,6 +25,8 @@ export const MODERATION_ACTIONS = [
   'kill',
   'jail',
   'unjail',
+  'spectate',
+  'unspectate',
   'suspend',
   'unsuspend',
   'ban',
@@ -403,7 +405,37 @@ export async function ignoreReport(
      WHERE id = $1 AND status = 'open'`,
     [reportId, adminAccountId, cleanText(note, ACTION_REASON_MAX)],
   );
-  return (res.rowCount ?? 0) > 0;
+  const changed = (res.rowCount ?? 0) > 0;
+  if (changed) fireOnModerationQueueChanged();
+  return changed;
+}
+
+// Batched retention prune for player_reports (the retention-sweep primitive,
+// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). An open report is NEVER
+// touched no matter how old: moderationQueue and moderationReportsForAccount
+// above both read WHERE status = 'open' exclusively, so a report the queue
+// still surfaces would silently vanish from the admin view if the age cutoff
+// alone governed the delete. Only a resolved report ('ignored' or 'actioned')
+// ages out. retentionDays <= 0 keeps rows forever (the safe default for a
+// destructive delete); the interval floors to one whole day so a sub-day
+// setting can never reach today's rows.
+export async function prunePlayerReportsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM player_reports
+      WHERE id IN (
+        SELECT id FROM player_reports
+         WHERE status != 'open'
+           AND created_at < now() - ($1::int * INTERVAL '1 day')
+         ORDER BY created_at ASC, id ASC
+         LIMIT $2)`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 // Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind,
@@ -432,6 +464,35 @@ function fireOnAccountModerated(): void {
     onAccountModerated?.();
   } catch (err) {
     console.error('post-moderation hook failed:', err);
+  }
+}
+
+// Fired after any successful write that changes what moderationQueue would
+// return: moderateAccount and muteAccountChat (both resolve any open reports
+// on the target account, and moderateAccount also sets banned_at/
+// suspended_until) and ignoreReport (resolves the one report it targets).
+// Kept separate from onAccountModerated above: that hook's board caches are
+// unrelated to the moderation queue, and ignoreReport/muteAccountChat have no
+// reason to bust boards. Injected at boot by main.ts (bustModerationQueueCache,
+// server/moderation_queue_cache.ts). Hooking the writes themselves, not one
+// route, covers both admin dispatch arms AND the in-game GM sanctions
+// (server/game.ts ModerationService), which call moderateAccount/
+// muteAccountChat directly.
+let onModerationQueueChanged: (() => void) | null = null;
+
+/** Inject (or clear) the post-write moderation-queue-cache-bust hook (boot-only). */
+export function setOnModerationQueueChanged(hook: (() => void) | null): void {
+  onModerationQueueChanged = hook;
+}
+
+// Mirrors fireOnAccountModerated: fires only after a successful commit, outside
+// any transaction path, and swallows its own errors so a bust failure never
+// surfaces as a failed moderation action.
+function fireOnModerationQueueChanged(): void {
+  try {
+    onModerationQueueChanged?.();
+  } catch (err) {
+    console.error('post-moderation-queue-change hook failed:', err);
   }
 }
 
@@ -520,6 +581,7 @@ export async function moderateAccount(input: {
     client.release();
   }
   fireOnAccountModerated();
+  fireOnModerationQueueChanged();
 }
 
 export async function muteAccountChat(input: {
@@ -549,6 +611,17 @@ export async function muteAccountChat(input: {
       reason,
       expiresAt,
     });
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is a punitive
+    // sanction on the reported account, so it resolves whatever open reports
+    // led to it the same way ban/suspend do. Without this, muting a reported
+    // account for its chat left the report sitting open forever, silently
+    // invisible to moderationQueue even though the account was sanctioned.
+    await client.query(
+      `UPDATE player_reports
+       SET status = 'actioned', reviewed_at = now(), reviewed_by_account_id = $2, review_note = $3
+       WHERE reported_account_id = $1 AND status = 'open'`,
+      [input.accountId, input.adminAccountId, reason],
+    );
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -556,6 +629,7 @@ export async function muteAccountChat(input: {
   } finally {
     client.release();
   }
+  fireOnModerationQueueChanged();
 }
 
 export async function liftAccountChatMute(input: {
@@ -918,7 +992,7 @@ export async function setDailyRewardsIpBan(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill' | 'jail' | 'unjail';
+  action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
   accountId: number;
   adminAccountId: number;
   reason: unknown;

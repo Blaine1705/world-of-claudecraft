@@ -37,12 +37,13 @@ import {
   resolveDelveShopOffers,
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
-import { freshDeedStats } from '../sim/deeds';
+import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
+import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import type { ResolvedAbility } from '../sim/sim';
@@ -104,6 +105,9 @@ import {
   type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
+  type GuildBankInfo,
+  type GuildBankLogEntry,
+  type GuildBankLogView,
   type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
@@ -135,12 +139,16 @@ import {
 } from '../world_api/action_bar';
 import type {
   ApplyEnchantResultView,
+  CommissionOrderScope,
+  CommissionOrderView,
   DisenchantResultView,
   MasterworkView,
   SalvageResultView,
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
+import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
@@ -175,6 +183,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  und?: 1;
   bt?: 1;
 }
 
@@ -314,6 +323,11 @@ export class ApiError extends Error {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+export interface SeekerEntitlementStatus {
+  entitled: boolean;
+  mint: string | null;
 }
 
 // Builds the ApiError for a non-ok JSON response, capturing the stable `code` and
@@ -864,6 +878,22 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  async seekerEntitlement(): Promise<SeekerEntitlementStatus> {
+    const data = await this.get('/api/seeker/entitlement');
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
+  }
+
+  async claimSeekerEntitlement(nativeAttestation: unknown): Promise<SeekerEntitlementStatus> {
+    const data = await this.post('/api/seeker/entitlement', { nativeAttestation });
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
+  }
+
   // ── Discord link/login + status ────────────────────────────────────────────
   // Returns the discord.com authorize URL the browser navigates to (login = new
   // session, link = attach to the current account).
@@ -1188,8 +1218,10 @@ function blankEntity(id: number): Entity {
     warcryTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    petOwnerHpBonus: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    ccDurationReduction: 0,
     pos: { x: 0, y: 0, z: 0 },
     prevPos: { x: 0, y: 0, z: 0 },
     facing: 0,
@@ -1200,7 +1232,11 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    swimStroke: 0,
+    swimDiving: false,
     fatigueTicks: 0,
+    breathUsedTicks: 0,
+    drownTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -1264,6 +1300,17 @@ function blankEntity(id: number): Entity {
     gatherCastNodeId: '',
     gatherCastToolRarity: '',
     gatherCastEffectConfirmed: false,
+    craftCastRecipeId: '',
+    craftCastCommission: false,
+    craftCastBatchRemaining: 0,
+    craftCastBatchTotal: 0,
+    enchantCastItemId: '',
+    enchantCastBagSlot: 0,
+    enchantCastEnchantId: '',
+    enchantCastEquipSlot: '',
+    enchantCastConfirmReplace: false,
+    enchantCastTargetPin: '',
+    toolRechargeCastProfessionId: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',
@@ -1282,6 +1329,7 @@ function blankEntity(id: number): Entity {
     overpowerUntil: -1,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
+    firebottleCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -1290,6 +1338,7 @@ function blankEntity(id: number): Entity {
     sitting: false,
     afk: false,
     weaponStowed: false,
+    helmHidden: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1409,6 +1458,10 @@ export class ClientWorld implements IWorld {
   prestigeRank = 0;
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
+  // Lifetime played seconds, mirrored from snapshot self (`ptime`, quantized
+  // to whole minutes server-side so the delta gate ships it about once a
+  // minute).
+  playtimeSeconds = 0;
   unlockedMilestones: string[] = [];
   // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
   // snapshot self (display + staging). ---
@@ -1432,6 +1485,10 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldBattleground: Thornhollow Fields queue + live-match state, mirrored from
+  // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
+  // the events queue for banners and the combat log. ---
+  bgInfo: import('../world_api').BgInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -1479,6 +1536,23 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
+  // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
+  // and outside a guild (proximity + membership gated by the server; ANY rank
+  // sees it and `canEdit` marks officer-plus), so it only rides the wire for
+  // a guild member actually standing at a bursar. ---
+  guildBankInfo: GuildBankInfo | null = null;
+  // The guild bank ACTIVITY LOG mirror. Deliberately NOT a snapshot key: it is
+  // cold, identical for every member of the guild, and 50 rows wide, so it
+  // rides its own on-demand request/response pair (`guild_bank_log` ->
+  // `gbanklog`) that the guildBankLog() read below issues while the log view is
+  // open. `guildBankLogAt` is the SEND time of the last request and is the ONE
+  // gate on re-requesting: it makes a per-frame repaint idempotent, ages a
+  // response that never arrived back into a retry (so a dropped frame cannot
+  // wedge the pane on 'loading'), and bounds this client to one request per TTL.
+  private guildBankLogEntries: readonly GuildBankLogEntry[] = [];
+  private guildBankLogState: 'idle' | 'ready' | 'refused' = 'idle';
+  private guildBankLogAt = 0;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
   // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
   // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
@@ -1636,6 +1710,10 @@ export class ClientWorld implements IWorld {
   // locally (net/ optimism rules), the delta lands after the server accepts
   // the specialization-gated command, and it flips back to null on expiry.
   activeMobileStationCraft: string | null = null;
+  // Commission order board (Professions 2.0, issue #1298), mirrored from the
+  // server's `corder` self-delta below: the viewer's own projection, small
+  // and diffed per tick like professionsState/craftingIdentity above.
+  commissionOrders: readonly CommissionOrderView[] = [];
   // Title granted by the active pair attunement (#1130, pair-named under
   // Professions 2.0): the canonical pair id, derived live from the cprof
   // mirror (applySnapshot replaces craftingIdentity wholesale on every cprof
@@ -1702,6 +1780,10 @@ export class ClientWorld implements IWorld {
   onConnectionLost: ((attempt: number, maxAttempts: number, nextRetryAtMs: number) => void) | null =
     null;
   onReconnected: (() => void) | null = null;
+  // Last value passed to setStopAutoAttackOnTargetSwitch, re-pushed once the
+  // client is genuinely able to send commands again (see the hello handler):
+  // null means "never set this session", so nothing is re-sent on reconnect.
+  private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
@@ -2018,6 +2100,18 @@ export class ClientWorld implements IWorld {
     return this.sendInput(now, true);
   }
 
+  /**
+   * Drop every mirrored movement bit and send an unconditional neutral packet
+   * before the client pauses for an in-place renderer transition. This bypasses
+   * the changed-only cadence gate so a matching signature or a just-sent input
+   * can never leave the authoritative player moving during the pause.
+   */
+  neutralizeInputForClientPause(now = performance.now()): boolean {
+    Object.assign(this.moveInput, emptyMoveInput());
+    this.mouselookFacing = null;
+    return this.sendInput(now);
+  }
+
   consumeInputEchoSamples(): number[] {
     const samples = this.inputEchoSamples;
     this.inputEchoSamples = [];
@@ -2046,6 +2140,12 @@ export class ClientWorld implements IWorld {
       mi.strafeLeft ? 1 : 0,
       mi.strafeRight ? 1 : 0,
       mi.jump ? 1 : 0,
+      mi.dive ? 1 : 0,
+      mi.surface ? 1 : 0,
+      // Quantised upstream (input.ts SWIM_STEER_STEPS) precisely so that it can
+      // sit in the change-detection signature without a mouse-move resending
+      // the frame every time the camera twitches.
+      mi.swimSteer ?? 1,
       facing,
     ].join(',');
   }
@@ -2075,8 +2175,18 @@ export class ClientWorld implements IWorld {
         sl: mi.strafeLeft ? 1 : 0,
         sr: mi.strafeRight ? 1 : 0,
         j: mi.jump ? 1 : 0,
+        dv: mi.dive ? 1 : 0,
+        sf: mi.surface ? 1 : 0,
       },
     };
+    // The camera steer rides along only when it actually GRADES something.
+    // Absent means full rate on the far side (swimSteerRate), which is both the
+    // old behaviour and what every land frame wants — so walking around sends
+    // exactly the bytes it always did, and the field appears only while a
+    // swimmer is easing the view into a dive or a climb.
+    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
+      (msg.mi as Record<string, number>).ss = mi.swimSteer;
+    }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
     this.lastInputSentAt = now;
@@ -2231,6 +2341,13 @@ export class ClientWorld implements IWorld {
         this.onReconnected?.();
       }
       this.connected = true;
+      // onReconnected() above (and the join-time push in main.ts) can only
+      // queue session preferences before this point: canSendCommand() requires
+      // this.connected, so any cmd() sent from onReconnected is silently
+      // dropped (issue caught in review of #2723). Re-push the last-known
+      // value of every such preference here, now that sends genuinely reach
+      // the socket, rather than relying on callers to race this flag.
+      this.resendSessionPreferences();
       return;
     }
     if (msg.t === 'spectate') {
@@ -2246,9 +2363,25 @@ export class ClientWorld implements IWorld {
       if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
+        // cmd() drops every non-chat command while spectating (see below), so
+        // a preference toggled mid-spectate never reached the server; now
+        // that spectate has ended, re-push it the same way a reconnect does.
+        this.resendSessionPreferences();
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
+      return;
+    }
+    if (msg.t === 'gbanklog') {
+      // The one-shot answer to a `guild_bank_log` request. A refusal keeps the
+      // pane honest ("you are not allowed to read this") instead of showing an
+      // empty history; a success installs the decoded rows wholesale, because
+      // the server always answers the full most-recent window and never a delta.
+      const frame = decodeGuildBankLogFrame(msg);
+      if (frame) {
+        this.guildBankLogState = frame.refused ? 'refused' : 'ready';
+        this.guildBankLogEntries = frame.entries;
+      }
       return;
     }
     if (msg.t === 'censor') {
@@ -2777,6 +2910,7 @@ export class ClientWorld implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
+      e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
@@ -2856,6 +2990,9 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            // Presence-only mirror of the undispellable marker, so the client's
+            // isPlayerRemovableAura answers exactly as the server's does.
+            rec.undispellable = a.und === 1 ? true : undefined;
             // Presence-only mirror of the break-threshold armed marker (the
             // server emits bt = 1 when breakThreshold is defined): the one
             // client reader is the Lingering Dread victim-band alias, which
@@ -2881,6 +3018,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            undispellable: a.und === 1 ? true : undefined,
             breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
@@ -3046,6 +3184,19 @@ export class ClientWorld implements IWorld {
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
+      {
+        // A firebottle throw starts its cooldown with NO inventory echo (the
+        // bottle is not consumed), so without this edge the bags grid never
+        // learns to paint the cooldown curtain online (offline useItem is
+        // synchronous and the click-path render sees it immediately). Flag
+        // inventory-changed ONLY on the 0 -> positive start edge: a per-frame
+        // diff would rebuild the bags at 20 Hz for the whole cooldown (the
+        // copper rule above), and the drain is a self-contained CSS animation
+        // that needs no further repaint.
+        const fcd = s.fcd ?? 0;
+        if (fcd > 0 && e.firebottleCdRemaining === 0) this.invChanged = true;
+        e.firebottleCdRemaining = fcd;
+      }
       e.comboPoints = s.combo ?? 0;
       // Routed through the pending-target echo guard: a stale in-flight
       // snapshot must not clobber an optimistic targetEntity write (the target
@@ -3061,23 +3212,28 @@ export class ClientWorld implements IWorld {
       if (s.stats !== undefined) {
         e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
       }
-      e.attackPower = s.ap ?? 0;
+      // Static combat-rating scalars (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat):
+      // delta-guarded on selfWireJson like the rest of this record (server/game.ts),
+      // so an omitted key means unchanged, not zero. Fall back to the prior mirrored
+      // value, the same `s.X ?? e.X` shape already used for `weapon` below.
+      e.attackPower = s.ap ?? e.attackPower;
       e.rangedPower = s.rp ?? 0;
-      e.spellPower = s.sp ?? 0;
+      e.spellPower = s.sp ?? e.spellPower;
       // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
       // no wiring (the swing timers already ride the snapshot).
-      e.spellHaste = s.sh ?? 0;
-      e.critChance = s.crit ?? 0.05;
-      e.dodgeChance = s.dodge ?? 0.05;
-      e.blockChance = s.blk ?? 0;
-      e.blockValue = s.bval ?? 0;
+      e.spellHaste = s.sh ?? e.spellHaste;
+      e.critChance = s.crit ?? e.critChance;
+      e.dodgeChance = s.dodge ?? e.dodgeChance;
+      e.blockChance = s.blk ?? e.blockChance;
+      e.blockValue = s.bval ?? e.blockValue;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
-      // crit/sh above, and hit resolves server-side); sent always like the other self
-      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // crit/sh above, and hit resolves server-side); delta-guarded like the rest of
+      // this record so the online character sheet keeps showing the last-known value
+      // between gear/talent changes instead of flashing back to the blankEntity 0.
       // Server-recomputed.
-      e.critRating = s.crat ?? 0;
-      e.hasteRating = s.hrat ?? 0;
-      e.hitRating = s.hirat ?? 0;
+      e.critRating = s.crat ?? e.critRating;
+      e.hasteRating = s.hrat ?? e.hasteRating;
+      e.hitRating = s.hirat ?? e.hitRating;
       e.weapon = s.weapon ?? e.weapon;
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
       // the client never derives a sound decision from this local shadow (the
@@ -3103,26 +3259,32 @@ export class ClientWorld implements IWorld {
             ticksElapsed: 0,
           }
         : null;
-      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
-      // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
-      // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
+      // Craft-cast session mirror (self-only `ccast`, the eat/drk shape): the
+      // crafting window reads the SAME entity fields offline and online, so
+      // the recipe highlight and batch counter survive a mid-cast window
+      // close/reopen and always show the server's clamped batch numbers.
+      e.craftCastRecipeId = s.ccast?.r ?? '';
+      e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
+      e.craftCastBatchTotal = s.ccast?.tot ?? 0;
+      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk are delta-guarded
+      // like milestones (an omitted key keeps the prior mirror). Terse keys
+      // (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
       // milestones->unlockedMilestones) are unchanged by the re-group.
-      this.xp = s.xp ?? 0;
-      this.lifetimeXp = s.lxp ?? 0;
-      this.restedXp = s.rxp ?? 0;
-      this.prestigeRank = s.prk ?? 0;
+      this.xp = s.xp ?? this.xp;
+      this.lifetimeXp = s.lxp ?? this.lifetimeXp;
+      this.restedXp = s.rxp ?? this.restedXp;
+      this.prestigeRank = s.prk ?? this.prestigeRank;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
-      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
-      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
-      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // IWorldInventory facet (W2) self-decode: copper is delta-guarded like
+      // inv/buyback/equip (a missing field keeps the prior mirror). Terse keys
+      // (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
       // A money-only delta carries no inventory echo at all (a proceeds-only market
       // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
       // so without this the bag money row and vendor affordability sat stale until the
-      // window was reopened (#2373). DIFF against the prior mirror, never a presence
-      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
-      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
-      const copper = s.copper ?? 0;
+      // window was reopened (#2373). Falling back to the prior mirror when the key is
+      // omitted (unchanged) keeps this a true diff: the flag only raises on a real move.
+      const copper = s.copper ?? this.copper;
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
       if (s.inv !== undefined) {
@@ -3228,6 +3390,7 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.bg !== undefined) this.bgInfo = s.bg;
       if (s.df !== undefined) this.dungeonFinderInfo = s.df;
       if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
@@ -3244,6 +3407,26 @@ export class ClientWorld implements IWorld {
       // "no bank"); away from a banker the server encodes it as null. Never default
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
+      // `guildBank` follows the same delta contract; the server encodes null
+      // away from a banker, on death, and outside a guild (the proximity +
+      // membership gate lives in sim guildBankInfoFor; any rank sees it, the
+      // snapshot's canEdit flag marks officer-plus).
+      if (s.guildBank !== undefined) {
+        // BOTH EDGES of the gate reset the activity log, not just the losing
+        // one. Losing it (walked away, died, left or switched guild)
+        // invalidates the rows: they are one guild's history
+        // read under a membership this client may no longer hold, so they are
+        // dropped rather than left to paint into the next pane that opens.
+        // REGAINING it
+        // has to reset too, because the answer this client is holding was taken
+        // while the gate was shut: a member who opened the log away from the
+        // banker got a `refused`, and without this the pane went on saying
+        // refused for the rest of the TTL after they walked up. Re-arming on
+        // the transition makes it self-correct in one frame.
+        const hadGate = this.guildBankInfo !== null;
+        this.guildBankInfo = s.guildBank;
+        if (hadGate !== (this.guildBankInfo !== null)) this.resetGuildBankLog();
+      }
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
       // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
       // key keeps the prior mirror). The wire carries plain objects/arrays
@@ -3261,6 +3444,7 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
@@ -3274,6 +3458,12 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // Commission order board (issue #1298): server-gated on the board
+      // revision at the corder wire cadence (a passive party converges within
+      // one cadence window; the viewer's own commands re-arm for the next
+      // snapshot), and this is how BOTH sides of an accept/deliver converge
+      // (not the commissionOrderResult event, which is deny-toast only).
+      if (s.corder !== undefined) this.commissionOrders = s.corder ?? [];
       // Enchanting-action outcome mirrors (Professions 2.0): the
       // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
       // (the event mirror above is the immediacy arm; both feed the same field).
@@ -3412,6 +3602,10 @@ export class ClientWorld implements IWorld {
             attunedPairs: [...identity.attunedPairs],
             switchCount: identity.switchCount,
             amendsProgress: identity.amendsProgress,
+            // Jack of All Trades (#1296) does not ride CraftingIdentityView
+            // yet: there is no live quest path to become Jack online (or
+            // offline) in this change, so this is always false here.
+            isJackOfAllTrades: false,
           }
         : undefined,
       cadenceBlocked,
@@ -3610,6 +3804,27 @@ export class ClientWorld implements IWorld {
     this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
   }
+  setStopAutoAttackOnTargetSwitch(enabled: boolean): void {
+    this.lastStopAutoAttackOnTargetSwitch = enabled;
+    this.cmd({ cmd: 'stopAutoAttackOnTargetSwitch', enabled });
+  }
+
+  // Re-sends every session preference this class remembers, called once the
+  // client is actually able to send commands again: right after `connected`
+  // flips true on reconnect, and right after spectate ends. Both moments sit
+  // behind cmd()'s own guards (canSendCommand / the spectate drop), so this
+  // is a plain re-push through the normal setter, not a raw send.
+  private resendSessionPreferences(): void {
+    // typeof, not `!== null`: a bareClient built via Object.create(ClientWorld.prototype)
+    // (the pattern this suite's tests use) skips class field initializers entirely, so
+    // this field reads as undefined rather than its declared null default there.
+    if (typeof this.lastStopAutoAttackOnTargetSwitch === 'boolean') {
+      this.cmd({
+        cmd: 'stopAutoAttackOnTargetSwitch',
+        enabled: this.lastStopAutoAttackOnTargetSwitch,
+      });
+    }
+  }
 
   // --- IWorldTelemetry: fire-and-forget metrics sink ---
   reportTelemetry(kind: string, data: Record<string, number>): void {
@@ -3628,8 +3843,8 @@ export class ClientWorld implements IWorld {
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
   }
-  setTownFocus(allocation: Record<string, number>): void {
-    this.cmd({ cmd: 'set_town_focus', allocation });
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
+    this.cmd({ cmd: 'set_town_focus', allocation, tier });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
@@ -3669,43 +3884,60 @@ export class ClientWorld implements IWorld {
   // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
   // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
   // the server. The move changes no wire field or command string.
-  equipItem(itemId: string): void {
-    this.cmd({ cmd: 'equip', item: itemId });
+  equipItem(itemId: string, target?: { slotIndex: number }): void {
+    // NOTE the field name. On the `equip` token `slot` already means the EQUIP
+    // slot (see equipItemToSlot below), so the bag index rides as `bagSlot`.
+    // Everywhere else in this family `slot` is free and carries the bag index.
+    if (target === undefined) this.cmd({ cmd: 'equip', item: itemId });
+    else this.cmd({ cmd: 'equip', item: itemId, bagSlot: target.slotIndex });
   }
   moveInventoryItem(from: number, to: number): void {
     this.cmd({ cmd: 'inv_move', from, to });
   }
+  sortInventory(): void {
+    this.cmd({ cmd: 'inv_sort' });
+  }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
-  equipItemToSlot(itemId: string, slot: EquipSlot): void {
-    this.cmd({ cmd: 'equip', item: itemId, slot });
+  equipItemToSlot(itemId: string, slot: EquipSlot, target?: { slotIndex: number }): void {
+    // `slot` is the equip slot on this token, so the bag index rides as `bagSlot`
+    // (see equipItem above).
+    if (target === undefined) this.cmd({ cmd: 'equip', item: itemId, slot });
+    else this.cmd({ cmd: 'equip', item: itemId, slot, bagSlot: target.slotIndex });
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
-  upgradeRiftItem(itemId: string): void {
-    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+    else this.cmd({ cmd: 'rift_upgrade_item', item: itemId, slot: target.slotIndex });
   }
-  enchantRiftItem(itemId: string, stat: string): void {
-    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+    else this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat, slot: target.slotIndex });
   }
-  socketRiftGem(itemId: string, gemId: string): void {
-    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
+  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
+    else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
   }
-  equipBag(itemId: string, socket?: number): void {
-    this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+  equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
+    // `socket` is the BAG BAR socket, so `slot` stays free for the bag index.
+    if (target === undefined) this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+    else this.cmd({ cmd: 'equip_bag', item: itemId, socket, slot: target.slotIndex });
   }
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
   }
-  useItem(itemId: string): void {
-    this.cmd({ cmd: 'use', item: itemId });
+  useItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
+    else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
   }
-  discardItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'discard', item: itemId, count });
+  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
+    else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
@@ -3748,9 +3980,19 @@ export class ClientWorld implements IWorld {
   // opt-in, sent ONLY when true so a non-commission craft's wire message
   // stays byte-identical to the pre-phase form. The server mints the
   // bindOnTrade arm itself; no payload ever rides the command.
-  craftItem(recipeId: string, commission?: boolean): void {
-    if (commission === true) {
+  craftItem(recipeId: string, commission?: boolean, count?: number): void {
+    // Optional count (Phase 3): omit when default/1 so a single craft stays
+    // byte-identical to the pre-batch wire form. Server re-clamps.
+    const batchCount =
+      typeof count === 'number' && Number.isFinite(count) && Math.floor(count) !== 1
+        ? Math.floor(count)
+        : undefined;
+    if (commission === true && batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true, count: batchCount });
+    } else if (commission === true) {
       this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true });
+    } else if (batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, count: batchCount });
     } else {
       this.cmd({ cmd: 'craft_item', recipe: recipeId });
     }
@@ -3827,8 +4069,15 @@ export class ClientWorld implements IWorld {
       this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
     }
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
+  salvageItem(itemId: string, target?: { slotIndex: number }): void {
+    // `slot` is a BAG INDEX here, matching disenchantItem (and NOT apply_enchant,
+    // whose `slot` names an equip slot). Omitted with no selection, so the
+    // message stays byte-identical to the pre-feature form.
+    if (target === undefined) {
+      this.cmd({ cmd: 'salvage_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'salvage_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // Maker's Bond unbind service (Professions 2.0): command only,
   // never predicted. The server re-validates eligibility/bound-ness/station
@@ -3838,8 +4087,31 @@ export class ClientWorld implements IWorld {
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
-  sellItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'sell', item: itemId, count });
+  // Commission order board (Professions 2.0, issue #1298): command only,
+  // never predicted. The server re-validates every field in
+  // src/sim/professions/commission_order.ts and answers with the personal
+  // commissionOrderResult event; the durable order list itself mirrors back
+  // via the corder self-delta (applySnapshot above), for every affected
+  // viewer, not just the caller.
+  openCommissionOrder(recipeId: string, scope: CommissionOrderScope, crafterName?: string): void {
+    if (scope === 'crafter') {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope, crafter: crafterName });
+    } else {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope });
+    }
+  }
+  cancelCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'cancel_commission_order', order: orderId });
+  }
+  acceptCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'accept_commission_order', order: orderId });
+  }
+  deliverCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'deliver_commission_order', order: orderId });
+  }
+  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'sell', item: itemId, count });
+    else this.cmd({ cmd: 'sell', item: itemId, count, slot: target.slotIndex });
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
@@ -3864,6 +4136,15 @@ export class ClientWorld implements IWorld {
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Same re-resolve the offline Sim does (setPlayerSkin): the body decides
+      // which skin types apply, so the optimistic local view must swap the
+      // displayed skin with the body rather than wait for the next snapshot.
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        p.weaponSkinLoadout,
+        catalog,
+      );
     }
     this.cmd({ cmd: 'change_skin', skin: idx, catalog });
   }
@@ -3987,6 +4268,14 @@ export class ClientWorld implements IWorld {
     if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
     this.cmd({ cmd: 'stow_weapon' });
   }
+  setHelmHidden(hidden: boolean): void {
+    // Optimistic local nudge (the toggleWeaponStow idiom) so the recompose and
+    // portrait re-snapshot land instantly; the next snapshot's `hh` bit
+    // reconciles. No dead-gate: a wardrobe preference, not an action.
+    const p = this.entities.get(this.playerId);
+    if (p) p.helmHidden = hidden;
+    this.cmd({ cmd: 'set_helm', hidden });
+  }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
     const skin = mechChromaSkinIndex(chromaId);
@@ -3999,6 +4288,16 @@ export class ClientWorld implements IWorld {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
+        // Dropping the chroma drops the wearer OFF the mech body, so this is a
+        // body change and re-resolves like changeSkin and Sim.setPlayerSkin do.
+        // Without it a mech hunter's sword skin stayed displayed on a class rig
+        // that cannot render one, until the next authoritative snapshot.
+        current.weaponSkinId = resolveActiveWeaponSkin(
+          current.templateId,
+          current.mainhandItemId,
+          current.weaponSkinLoadout,
+          current.skinCatalog,
+        );
       }
       const existing = this.inventory.find((slot) => slot.itemId === itemId);
       this.inventory = existing
@@ -4027,7 +4326,12 @@ export class ClientWorld implements IWorld {
       } else delete next[type];
       if (!def) p.weaponSkinLoadout = next;
       const appliedLoadout = p.weaponSkinLoadout;
-      p.weaponSkinId = resolveActiveWeaponSkin(p.templateId, p.mainhandItemId, appliedLoadout);
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        appliedLoadout,
+        p.skinCatalog ?? 'class',
+      );
       const loadout: Record<string, string> = {};
       for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
       this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };
@@ -4126,8 +4430,9 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'pet_auto_water_jet', enabled });
   }
-  feedPet(itemId: string): void {
-    this.cmd({ cmd: 'pet_feed', item: itemId });
+  feedPet(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'pet_feed', item: itemId });
+    else this.cmd({ cmd: 'pet_feed', item: itemId, slot: target.slotIndex });
   }
   healPet(): void {
     this.cmd({ cmd: 'pet_heal' });
@@ -4220,6 +4525,21 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldBattleground: Thornhollow Fields queue + flag-action sends (bgInfo is a
+  // snapshot read, decoded in applySnapshot). ---
+  bgQueueJoin(): void {
+    this.cmd({ cmd: 'bg_queue' });
+  }
+  bgQueueLeave(): void {
+    this.cmd({ cmd: 'bg_leave' });
+  }
+
+  bgRespond(accept: boolean): void {
+    this.cmd({ cmd: 'bg_respond', accept });
+  }
+  bgFlagAction(): void {
+    this.cmd({ cmd: 'bg_flag' });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
@@ -4529,6 +4849,66 @@ export class ClientWorld implements IWorld {
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
   }
+  // --- IWorldGuildBank: the officer-plus shared treasury + item store
+  // (snake_case guild_bank_* wire strings, never a bank_* reuse). The server
+  // owns every gameplay rule (officer-plus rank, banker proximity, caps,
+  // capacity, quest-item policy) and validates shape only at dispatch; these
+  // sends are fire-and-forget like the personal bank's, with the result
+  // arriving through the maybe('guildBank') snapshot mirror + event stream. ---
+  guildBankDepositGold(amount: number): void {
+    this.cmd({ cmd: 'guild_bank_deposit_gold', amount });
+  }
+  guildBankWithdrawGold(amount: number): void {
+    this.cmd({ cmd: 'guild_bank_withdraw_gold', amount });
+  }
+  guildBankDeposit(slotIndex: number, count?: number): void {
+    this.cmd({
+      cmd: 'guild_bank_deposit',
+      slot: slotIndex,
+      ...(count !== undefined ? { count } : {}),
+    });
+  }
+  guildBankWithdraw(slotIndex: number, count?: number): void {
+    this.cmd({
+      cmd: 'guild_bank_withdraw',
+      slot: slotIndex,
+      ...(count !== undefined ? { count } : {}),
+    });
+  }
+  guildBankBuySlots(): void {
+    this.cmd({ cmd: 'guild_bank_buy_slots' });
+  }
+  /** The activity log, fetched ON DEMAND. The pane calls this only while the
+   *  log view is open, and this send is the whole fetch trigger: there is no
+   *  snapshot key and no polling timer.
+   *
+   *  Idempotence is the send-time gate, not a separate in-flight flag: a repaint
+   *  inside the TTL sends nothing, and a request whose answer never arrived
+   *  ages out on the same clock into exactly one retry. A background refresh
+   *  keeps serving the installed rows ('ready'), so only a client that has
+   *  never had an answer shows the loading state, and a REFUSAL keeps saying so
+   *  until a fresh answer replaces it, never silently degrading to an empty
+   *  log (which would read as "no officer has ever done anything"). */
+  guildBankLog(): GuildBankLogView {
+    const now = Date.now();
+    if (now - this.guildBankLogAt >= GUILD_BANK_LOG_TTL_MS) {
+      this.guildBankLogAt = now;
+      this.cmd({ cmd: 'guild_bank_log' });
+    }
+    return {
+      state: this.guildBankLogState === 'idle' ? 'loading' : this.guildBankLogState,
+      entries: this.guildBankLogEntries,
+    };
+  }
+  /** Drop the installed log and re-arm the request gate. Called when the guild
+   *  bank mirror goes null (walked away, demoted, left or switched guild): the
+   *  rows belong to a guild and a rank this client may no longer have, so they
+   *  must never survive into the next pane that opens. */
+  private resetGuildBankLog(): void {
+    this.guildBankLogEntries = [];
+    this.guildBankLogState = 'idle';
+    this.guildBankLogAt = 0;
+  }
   // --- IWorldDeeds: title selection. No optimistic local write (the bank
   // precedent): the mirror updates from the `atitle` snapshot echo once the
   // sim validator accepts, so a rejected send leaves the client untouched. ---
@@ -4552,6 +4932,29 @@ export class ClientWorld implements IWorld {
         return null;
       }
       return data;
+    } catch {
+      return null;
+    }
+  }
+  // Newest-first unlock ids for the SELF character from the server's
+  // character_deeds record (exact earn timestamps; the mirrored `deeds` map
+  // only carries the utcDay). Owner-scoped bearer read; null on any failure,
+  // the facet's documented no-data value (the recent strip then falls back to
+  // the day-granular order).
+  async deedsRecent(): Promise<readonly string[] | null> {
+    try {
+      const res = await fetch(
+        apiUrl(`/api/characters/${this.characterId}/deeds-recent`, this.base),
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { deeds?: unknown };
+      if (!Array.isArray(data?.deeds)) return null;
+      const ids: string[] = [];
+      for (const id of data.deeds) if (typeof id === 'string') ids.push(id);
+      // Clamp to the shared cap so all three enforcement points (Sim slice,
+      // server LIMIT, this read) stay identical even against an older server.
+      return ids.slice(0, DEEDS_RECENT_CAP);
     } catch {
       return null;
     }
@@ -4967,13 +5370,16 @@ export class ClientWorld implements IWorld {
   }
 
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    const nativeAttestation = NATIVE_APP
+      ? await createNativeAttestationProof(this.base, 'seeker-spin')
+      : undefined;
     const res = await fetch(apiUrl('/api/daily-rewards/spin', this.base), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`,
       },
-      body: '{}',
+      body: JSON.stringify({ nativeAttestation }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? 'daily spin unavailable');
@@ -5009,8 +5415,19 @@ export class ClientWorld implements IWorld {
   selectTalentRow(level: TalentRowLevel, optionId: string | null): void {
     this.cmd({ cmd: 'selectTalentRow', level, optionId });
   }
-  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
-    this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc?: TalentAllocation,
+    captureGear?: boolean,
+  ): void {
+    // `captureGear` rides only when true, the craftItem `commission` idiom: an
+    // ordinary talent-only save sends a byte-identical message to before.
+    if (captureGear === true) {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc, captureGear: true });
+    } else {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+    }
   }
   switchLoadout(index: number): void {
     this.cmd({ cmd: 'switchLoadout', index });

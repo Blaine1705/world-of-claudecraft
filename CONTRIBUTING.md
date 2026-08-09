@@ -165,7 +165,10 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   (`package-lock.json` / yarn.lock): dual lockfiles diverge silently and are
   forbidden. Peer dependency noise from optional wallet/solana trees is
   tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
-  further without measuring.
+  further without measuring. The repo also carries a vendored three patch under
+  `patches/` (regenerated with `pnpm patch three@0.165.0`); a three version
+  bump must re-verify the compileAsync disposal race
+  (`tests/three_compile_async_patch.test.ts`) before dropping or re-rolling it.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
@@ -174,6 +177,26 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   experimental `--tsgo` modes do not lift its TypeScript 6 API requirement, and
   its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
   `@typescript/native` alias this repo already uses, so no rename is needed.
+
+### Dependency vulnerabilities
+
+If your change touches `package.json` or `pnpm-lock.yaml`, the dependency audit
+workflow (`.github/workflows/audit.yml`) runs `pnpm audit` on it and fails on any
+finding. It also sweeps weekly on its own, so an advisory published against an
+unchanged tree does not turn an unrelated PR red.
+
+To resolve a finding, prefer a version-scoped `pnpm.overrides` entry pinning the
+fixed floor (`"undici@7": "^7.29.0"`) over bumping the direct dependency. Only
+when no fix exists, or the vulnerable path is provably unreachable here, add the
+advisory to `pnpm.auditConfig.ignoreGhsas`, with its justification recorded in
+`docs/security/dependency-audit-catalog.md`; the gate's test fails on an
+undocumented entry. That catalog holds the full model and the current exception
+register.
+
+One thing to budget for: `pnpm-lock.yaml` is a fingerprinted source input of the
+Eastbrook and Fenbridge asset pipelines, so any lockfile change also means
+re-minting their provenance seals (`scripts/assets/CLAUDE.md`). That is the bulk
+of the work in a dependency bump here, and the reason to batch them.
 
 ## Making your change
 

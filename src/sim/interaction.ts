@@ -36,6 +36,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -356,12 +357,14 @@ export function harvestCorpse(
   //
   // Scope, the other half of the #2504 comment: that one covers a tag the
   // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
-  // it carries that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills,
-  // horn) on a corpse that ALSO carries a mapped one. A corpse whose tags ALL
-  // map to nothing never reaches this gate at all any more (#2513): the
-  // isHarvestableCorpse check above answers on mapped families, so fen_troll
-  // (claw, tusk) is refused there with error.corpseNothingToHarvest, exactly
-  // like the 101 shipped templates that carry no component tags. That closed
+  // it carries that HARVEST_COMPONENT_ITEMS does not map (gills, horn) on a
+  // corpse that ALSO carries a mapped one. A corpse whose tags ALL map to
+  // nothing never reaches this gate at all any more (#2513): the
+  // isHarvestableCorpse check above answers on mapped families, so such a
+  // corpse is refused there with error.corpseNothingToHarvest, exactly like
+  // the 101 shipped templates that carry no component tags. (fen_troll (claw,
+  // tusk) was the shipped example until #2905 mapped both; the all-unmapped
+  // state now lives only in retagged test fixtures.) That closed
   // the last path to a claim spent in silence, and it is why this predicate's
   // second half (`taggedComponents.some(yields)`) is now belt and braces here
   // rather than the term that kept an all-unmapped corpse claimable.
@@ -757,6 +760,12 @@ export function pickUpObject(
   const beforeRelicNextId = ctx.nextId;
   if (activateNythraxisRelic(ctx, obj, meta)) {
     return obj.lootable !== beforeRelicLootable || ctx.nextId !== beforeRelicNextId;
+  }
+  // Murloc huts (q_deepfen_purge) are torched with a thrown firebottle, not a
+  // plain click: route them to the firebottle handler (which does its own
+  // gating, cooldown, and objective credit) so a bare click never burns one.
+  if (objectItemId === HUT_OBJECT_ID) {
+    return tryBurnHut(ctx, obj, p, meta);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

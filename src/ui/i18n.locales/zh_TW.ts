@@ -13,7 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': '放大',
+  'hudChrome.controller.zoomOut': '縮小',
+  'hudChrome.crafting.durationChip': '{seconds}秒',
+  'hudChrome.keybinds.dive': '下潛',
+  'hudChrome.materialHint.usedBy': '用於 {crafts}。',
+  'hudChrome.partyFrames.showPets': '顯示寵物',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '以 {honor} 購買 {item}',
+  'itemUi.market.saleBuyer': '售予 {buyer}',
+  'hudChrome.deeds.recentJumpAria': '跳至 {name}',
   'hudChrome.targetAuras.all': '全部',
+  'hudChrome.actionBar.done': '完成',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '精良品質上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +37,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '傳奇',
   'hudChrome.discord.roleTag.shill': '擁護者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟練度',
+  'guide.profPages.wieldNone': '不限',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '請找{name}接取《{quest}》。',
+  'itemUi.vendor.qtyMultiple': '{count} 個',
+  'itemUi.vendor.buyCountAria': '以 {price} 購買 {count} 個 {item}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '以 {price} 購買 {count} 個 {item}。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '購買',
   'entities.items.eastbrook_greatsword.name': '東溪巨劍',
   'entities.items.highwatch_greatsword.name': '高望巨劍',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
@@ -186,6 +207,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。',
   'hudChrome.abilityError.shieldRequired': '你必須裝備盾牌。',
+  'hudChrome.arenaGate.minLevelNote': '需要等級 {level}',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '關閉 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',
@@ -571,6 +593,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '等級 {level} {family}',
   'hudChrome.mobTooltip.hostile': '敵對',
   'hudChrome.mobTooltip.friendly': '友方',
+  'hudChrome.mobTooltip.elite': '精英',
+  'hudChrome.mobTooltip.boss': '首領',
   'hudChrome.targetFrame.unlock': '移動目標框',
   'hudChrome.targetFrame.lock': '鎖定目標框',
   'hudChrome.playerFrame.unlock': '移動玩家框',
@@ -596,6 +620,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '顯示法力、怒氣和能量',
   'hudChrome.partyFrames.showAbsorbs': '顯示吸收護盾',
   'hudChrome.partyFrames.showAuras': '顯示增益和減益',
+  'hudChrome.partyFrames.petHealth': '寵物{name}，生命值{pct}',
   'hudChrome.partyFrames.showSelf': '顯示你的框體',
   'hudChrome.frameReset.label': '重置框體位置',
   'hudChrome.options.playerFrameScale': '玩家框縮放',
@@ -614,6 +639,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyLabel': '你的隊伍',
   'hudChrome.unitFrame.partyChip': '隊伍',
   'hudChrome.unitFrame.playerLabel': '你的角色',
+  'hudChrome.unitFrame.petLabel': '你的寵物',
   'hudChrome.unitFrame.targetAnnounce': '目標：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目標',
   'seo.officialLabel': 'World of ClaudeCraft 官方網站',
@@ -693,6 +719,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隱藏離線公會成員',
   'hudChrome.social.billboard.label': '公會公告板',
   'hudChrome.social.billboard.empty': '公告板上還沒有內容。',
+  'hudChrome.social.billboard.loginLine': '公會公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 設定',
   'hudChrome.social.billboard.save': '儲存',
   'hudChrome.social.billboard.placeholder': '給公會寫一則訊息',
@@ -778,6 +805,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': '你必須在城鎮中才能設定專注。',
   'hudChrome.townFocus.increaseAria': '增加對{component}的專注',
   'hudChrome.townFocus.decreaseAria': '減少對{component}的專注',
+  'hudChrome.townFocus.respecTierLabel': '重新分配速度',
+  'hudChrome.townFocus.respecTierTimeOption': '免費（花費時間）',
+  'hudChrome.townFocus.respecTierPartialOption': '更快（少量花費）',
+  'hudChrome.townFocus.respecTierInstantOption': '即時（全額花費）',
+  'hudChrome.townFocus.respecCostFree': '免費',
+  'hudChrome.townFocus.respecCostLine': '花費 {coin} 和 {materials}',
   'hudChrome.theme.preset': '介面主題',
   'hudChrome.theme.customColors': '自訂顏色',
   'hudChrome.theme.reset': '重設',
@@ -806,14 +839,136 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '榮譽：{amount}',
   'hudChrome.warfare.honorFloat': '+{amount} 榮譽',
+  'hudChrome.warfare.honorFloatReason': '+{amount} 榮譽（{reason}）',
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
   'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
+  'hudChrome.warfare.reasons.battlegroundWin': '荊谷原野勝利',
+  'hudChrome.warfare.reasons.battlegroundFirstWin': '荊谷原野每日首勝',
+  'hudChrome.warfare.reasons.battlegroundComplete': '荊谷原野參戰',
+  'hudChrome.warfare.reasons.battlegroundKill': '榮譽擊殺',
+  'hudChrome.warfare.reasons.battlegroundAssist': '助攻擊殺',
+  'hudChrome.warfare.floatReasons.kill': '擊殺',
+  'hudChrome.warfare.floatReasons.assist': '助攻',
+  'hudChrome.warfare.floatReasons.firstWin': '首勝',
+  'hudChrome.warfareShop.gossipOption': '瀏覽戰爭套裝',
+  'hudChrome.warfareShop.gossipOptionAria': '瀏覽 {name} 提供的戰爭套裝商店',
+  'hudChrome.warfareShop.jewelry': '飾品',
+  'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.owned': '已擁有',
+  'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 購買 {item}，已擁有',
+  'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 購買 {item}？榮譽購買後無法退款。',
+  'hudChrome.keybinds.bgFlag': '戰場奪旗動作',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.bg.title': '荊谷原野',
+  'hudChrome.bg.blurb':
+    '兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方三次者贏得戰場。',
+  'hudChrome.bg.modeTag': '5v5奪旗戰',
+  'hudChrome.bg.offlineNote': '荊谷原野正在同步。待王國回應後即可排隊。',
+  'hudChrome.bg.ratingSummary': '評分。{wins}勝 / {losses}敗',
+  'hudChrome.bg.careerCaptures': '生涯奪旗:{count}',
+  'hudChrome.bg.enterQueue': '加入佇列',
+  'hudChrome.bg.enterQueueParty': '加入佇列({count}人隊伍)',
+  'hudChrome.bg.leaveQueue': '離開佇列',
+  'hudChrome.bg.searching': '搜尋中。佇列 {count}/{size}。',
+  'hudChrome.bg.queuedParty': '{count}人隊伍。',
+  'hudChrome.bg.queueNote':
+    '兩隊各五人。奪取敵方軍旗並送回己方要塞。先奪得3次者獲勝。可組滿5人隊伍一同排隊;拾取疾行符文,並利用掩體甩開追兵。',
+  'hudChrome.bg.matchInProgress': '戰鬥進行中。{crimson}:{azure}。',
+  'hudChrome.bg.ladderAllTime': '天梯。歷史總榜',
+  'hudChrome.bg.noRanked': '尚無勇士上榜。爭當第一。',
+  'hudChrome.bg.ladderOnline': '天梯。目前在線',
+  'hudChrome.bg.noChallengers': '目前沒有勇士在線。爭當第一。',
+  'hudChrome.bg.playerClassTitle': '{name}。{className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}。{level}級{className}',
+  'hudChrome.bg.crimson': '赤紅隊',
+  'hudChrome.bg.azure': '蔚藍隊',
+  'hudChrome.bg.formUp': '列隊:{seconds}',
+  'hudChrome.bg.firstTo': '先奪得{caps}次旗幟',
+  'hudChrome.bg.flagState.home': '旗幟在要塞',
+  'hudChrome.bg.flagState.carried': '旗幟被奪!',
+  'hudChrome.bg.flagState.dropped': '旗幟落地',
+  'hudChrome.bg.respawnIn': '下一波:{seconds}秒後復活',
+  'hudChrome.bg.killFeed': '{killer}擊殺了{victim}',
+  'hudChrome.bg.killFeedFallen': '{victim}倒下了',
+  'hudChrome.bg.resultVictory': '勝利!',
+  'hudChrome.bg.resultDefeat': '戰敗',
+  'hudChrome.bg.resultDraw': '平手',
+  'hudChrome.bg.leavingIn': '{seconds}秒後離開戰場',
+  'hudChrome.bg.foundBanner': '戰鬥已就緒。你為{team}而戰!',
+  'hudChrome.bg.countdownBanner': '荊谷原野{seconds}秒後開戰',
+  'hudChrome.bg.startBanner': '奪取旗幟!',
+  'hudChrome.bg.flagTakenLog': '{name}奪走了{team}的旗幟!',
+  'hudChrome.bg.flagDroppedLog': '{team}的旗幟掉落了。',
+  'hudChrome.bg.flagReturnedLog': '{team}的旗幟已歸還。',
+  'hudChrome.bg.dropFlagConfirmTitle': '丟下旗幟？',
+  'hudChrome.bg.dropFlagConfirmBody': '你正攜帶敵方旗幟。丟下後旗幟會留在地上，雙方都可以拾取。',
+  'hudChrome.bg.dropFlagConfirmAccept': '丟下旗幟',
+  'hudChrome.bg.yourTeamTitle': '你的隊伍',
+  'hudChrome.bg.boardToggleLabel': '比賽記分板。按 Enter 固定展開完整榜單。',
+  'hudChrome.bg.levelRequirement': '你需要達到{level}級才能解鎖此戰場的排隊。',
+  'hudChrome.bg.board.kills': '擊殺',
+  'hudChrome.bg.board.assists': '助攻',
+  'hudChrome.bg.board.deaths': '死亡',
+  'hudChrome.bg.board.captures': '奪旗',
+  'hudChrome.bg.capturedTeamBanner': '{takers}奪取了{team}的旗幟!{crimson}:{azure}',
+  'hudChrome.bg.flagTakenBanner': '{takers}奪走了{team}的旗幟!',
+  'hudChrome.bg.flagReturnedBanner': '{team}的旗幟已歸還!',
+  'hudChrome.bg.capturedLog': '{name}奪取了{team}的旗幟。比分{crimson}:{azure}。',
+  'hudChrome.bg.victoryBanner': '勝利!荊谷原野{crimson}:{azure}。評分{rating}({delta})',
+  'hudChrome.bg.defeatBanner': '戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})',
+  'hudChrome.bg.drawBanner': '荊谷原野平手{crimson}:{azure}。評分{rating}({delta})',
+  'hudChrome.bg.endLog': '荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。',
+  'hudChrome.bg.endBannerDetail': '荊谷原野{crimson}:{azure}。評分{rating}({delta})',
+  'hudChrome.bg.endedTimer': '時間到',
+  'hudChrome.bg.endedForfeit': '本場比賽以棄權告終',
+  'hudChrome.bg.endedTimerLog': '比賽時間耗盡,由比分較高的一方拿下戰場。',
+  'hudChrome.bg.endedForfeitLog': '本場比賽以棄權告終。',
+  'hudChrome.bg.firstWinBonusLine': '每日首勝:+{honor}榮譽',
+  'hudChrome.bg.firstWinBonusLog': '每日首勝:你額外獲得{honor}點榮譽。',
+  'hudChrome.bg.timeWarningMinutes': '還剩{minutes}分鐘',
+  'hudChrome.bg.timeWarningOneMinute': '還剩一分鐘',
+  'hudChrome.bg.timeWarningMinutesLog': '本場戰鬥還剩{minutes}分鐘。',
+  'hudChrome.bg.timeWarningOneMinuteLog': '本場戰鬥還剩一分鐘。',
+  'hudChrome.bg.map.crimsonKeep': '緋紅要塞',
+  'hudChrome.bg.map.azureKeep': '蔚藍要塞',
+  'hudChrome.bg.map.ruinCourtyard': '廢墟庭院',
+  'hudChrome.bg.map.graveyard': '墓地',
+  'guide.nav.thornhollow': '荊谷原野',
+  'guide.thornhollowPage.heading': '荊谷原野',
+  'guide.thornhollowPage.intro':
+    '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',
+  'guide.thornhollowPage.queueHeading': '排隊參戰',
+  'guide.thornhollowPage.queueBody':
+    '打開荊谷原野面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。',
+  'guide.thornhollowPage.fieldHeading': '戰場地形',
+  'guide.thornhollowPage.fieldBody':
+    '一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。',
+  'guide.thornhollowPage.flagsHeading': '旗幟',
+  'guide.thornhollowPage.flagsBody':
+    '每座要塞守著本隊軍旗。奪取敵旗並送到己方旗座即可得分;先奪得三次者獲勝,超時的戰鬥按比分定勝負。旗手陣亡時旗幟就地掉落:敵人可以再次拾起,而本隊隊員只需靠近便能立即將其送回。軍旗也絕不藏身:拾旗會解除潛行,旗手若以任何方式隱身,旗幟都會當場掉落。',
+  'guide.thornhollowPage.respawnBody':
+    '死亡保留經典儀式:屍體停在原地,直到你親自釋放靈魂;靈魂會在你方主堡旁的圍欄墓地中升起,並被結界束縛,直到你方下一波復活潮。復活潮會同時喚起所有等待的靈魂;兩隊的復活潮刻意錯開,戰鬥永遠不會同時完全重置。這裡沒有跑屍,也沒有靈魂醫者的交易:釋放、等潮、再戰。',
+  'guide.thornhollowPage.pickupNote':
+    '拾旗永遠需要主動按下戰場動作鍵:沒有人會因為跑過旗幟而意外成為旗手。',
+  'guide.thornhollowPage.respawnHeading': '戰場陣亡',
+  'guide.thornhollowPage.carrierHeading': '扛旗',
+  'guide.thornhollowPage.carrierBody':
+    '扛著敵旗太久的旗手會越來越脆弱,承受的傷害持續增加,直到旗幟被奪回、掉落或歸還。抱旗躲藏是敗招;把旗送回家才是勝途。',
+  'guide.thornhollowPage.ladderHeading': '天梯',
+  'guide.thornhollowPage.ladderBody':
+    '每場比賽無論勝負都會移動角色的戰場評分,歷史總榜記錄王國的冠軍。勝利與鏖戰到底的失利也會透過戰爭體系發放榮譽。',
   'hudChrome.charSheet.offense': '攻擊',
   'hudChrome.charSheet.defense': '防禦',
+  'hudChrome.charSheet.playtimeLabel': '遊戲時長',
+  'hudChrome.charSheet.playtimeParts': '{major}{minor}',
+  'hudChrome.charSheet.playtimeUnderMinute': '不到一分鐘',
+  'hudChrome.charSheet.playtimeHidden': '已隱藏',
+  'hudChrome.charSheet.showPlaytimeAria': '顯示遊戲時長',
+  'hudChrome.charSheet.hidePlaytimeAria': '隱藏遊戲時長',
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
@@ -960,15 +1115,46 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '最低',
   'hudChrome.options.browserEffectsNote':
     '自動模式會根據你的瀏覽器與裝置調低高負擔的 CSS 特效（模糊、光暈、背景動畫）。若介面感覺卡頓，可手動降低。',
+  'hudChrome.options.graphicsApply': '套用圖形設定',
+  'hudChrome.options.graphicsApplying': '正在套用圖形設定...',
+  'hudChrome.options.graphicsApplied': '圖形設定已套用。',
+  'hudChrome.options.graphicsSaved': '圖形設定已儲存。目前的渲染器已符合這些設定。',
+  'hudChrome.options.graphicsFailed': '無法套用圖形設定。先前的圖形設定仍然有效。',
+  'hudChrome.options.graphicsRetry': '重試圖形設定',
+  'hudChrome.options.graphicsFatal': '圖形復原失敗。請重新載入遊戲以繼續。',
+  'hudChrome.options.graphicsReload': '重新載入遊戲',
+  'hudChrome.options.graphicsDraftChanged': '圖形變更已準備好套用。',
+  'hudChrome.options.gfxSectionQuality': '畫質',
+  'hudChrome.options.gfxSectionWorld': '世界細節',
+  'hudChrome.options.gfxSectionLighting': '光照與特效',
+  'hudChrome.options.gfxViewDistance': '視野距離',
+  'hudChrome.options.gfxWaterQuality': '水面品質',
+  'hudChrome.options.gfxCharacterDetail': '角色細節',
+  'hudChrome.options.gfxAmbientOcclusion': '環境光遮蔽',
+  'hudChrome.options.gfxBloom': '泛光',
+  'hudChrome.options.gfxAntiAliasing': '反鋸齒',
+  'hudChrome.options.gfxDynamicLights': '動態光源',
+  'hudChrome.options.gfxParticleEffects': '粒子特效',
+  'hudChrome.options.gfxHalf': '半',
+  'hudChrome.options.gfxEffectsNote':
+    '環境光遮蔽、泛光與反鋸齒依賴後期處理鏈：當「特效與光照」為低時，處理鏈關閉，這些選項不起作用。',
+  'hudChrome.options.gfxSectionCamera': '鏡頭',
+  'hudChrome.options.gfxSectionDisplay': '顯示',
+  'hudChrome.options.gfxSectionSystem': '系統',
+  'hudChrome.options.gfxSectionTouch': '觸控操作',
+  'hudChrome.options.gfxCustomNote':
+    '調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。',
   'hudChrome.options.footstepSounds': '腳步聲',
   'hudChrome.options.interfaceSounds': '介面與回饋音效',
   'hudChrome.options.clickFeedback': '點擊標記',
   'hudChrome.options.startAttackOnAbility': '使用技能時自動攻擊',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': '切換目標時停止自動攻擊',
   'hudChrome.options.walkByAutoloot': '路過自動拾取',
   'hudChrome.options.lockCursorOnRotate': '旋轉時鎖定游標',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色畫面顯示錢包',
+  'hudChrome.options.showPlaytime': '在角色畫面顯示遊戲時長',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片顯示錢包',
   'hudChrome.options.showDevBadges': '顯示開發者徽章',
   'hudChrome.options.showOwnNameplate': '顯示我的姓名板',
@@ -979,6 +1165,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '顯示物品等級',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
+  'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',
+  'hudChrome.options.lockActionBars': '鎖定動作列',
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
@@ -986,6 +1174,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',
   'hudChrome.landing.highContrastAria': '切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰',
+  'hudChrome.landing.browserSupport.title': '提示：不受支援的瀏覽器',
+  'hudChrome.landing.browserSupport.body':
+    '此瀏覽器中效能可能會下降。為獲得最佳體驗，請下載適用於 Windows、macOS 或 Linux 的桌面應用程式。想在瀏覽器中遊玩？Chrome 效能最佳，Firefox 和 Safari 也受支援。',
+  'hudChrome.landing.browserSupport.getDesktopApp': '取得桌面應用程式',
+  'hudChrome.landing.browserSupport.continueInBrowser': '繼續在瀏覽器中遊玩',
+  'hudChrome.landing.browserSupport.dismissAria': '關閉不受支援瀏覽器的提示',
+  'hudChrome.talents.newBuildWithGear': '新增配置（同時儲存裝備）',
+  'hudChrome.talents.gearNotHeld': '你已不再擁有該配置儲存的 {n} 件裝備。',
+  'hudChrome.talents.gearCopyGone': '有 {n} 件裝備不是該配置鎖定的那一件。',
+  'hudChrome.talents.gearTakenByOtherSlot': '有 {n} 件裝備需要你沒有的另一件副本。',
+  'hudChrome.talents.gearRestored': '已從此配置恢復 {n} 件裝備。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。',
   'meta.builtOn': '建置於 {date}',
@@ -1246,6 +1445,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。',
   'wallet.mobileAppHelp':
     '選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。',
+  'wallet.seekerAppHelp':
+    '使用 Seed Vault Wallet 繼續。在 Seed Vault 中檢視連線與驗證要求，然後返回遊戲。',
   'wallet.standaloneAppHelp':
     '主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。',
   'wallet.openAppTitle': '在 {wallet} 中繼續',
@@ -1610,7 +1811,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': '聊天',
   'hud.core.combatLogTab': '戰鬥紀錄',
   'hud.core.chatPlaceholder':
-    '說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合）',
+    '說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合，! 顯示社群指令）',
   'hud.core.communityLinks': '社群連結',
   'hud.core.mobileControls': '行動控制',
   'hud.core.mobileMove': '移動',
@@ -1621,7 +1822,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': '更多',
   'hud.core.mobileMoreAria': '顯示更多選單',
   'hud.core.mobileSocial': '社交',
-  'hud.core.mobileArena': '競技場',
   'hud.core.mobileMenu': '選單',
   'hud.core.mobileSettings': '設定',
   'hud.core.mobileUse': '使用',
@@ -1707,6 +1907,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': '滑鼠鏡頭',
   'hud.options.keybindHelpMouseCamera':
     '滑鼠鏡頭關閉：A/D 轉向，拖曳環繞（經典）。開啟：WASD 依鏡頭方向移動，A/D 平移。點擊按鍵格可重新綁定；Esc 取消。',
+  'hud.keybinds.actions.arena': 'PvP(荊谷原野與競技場)',
   'hud.keybinds.categories.movement': '移動',
   'hud.keybinds.categories.targeting': '目標',
   'hud.keybinds.categories.interface': '介面',
@@ -1729,7 +1930,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': '切換姓名板',
   'hud.keybinds.actions.meters': '傷害統計',
   'hud.keybinds.actions.social': '好友與公會',
-  'hud.keybinds.actions.arena': '競技場（灰燼競技場）',
   'hud.keybinds.actions.chat': '開啟聊天',
   'hud.keybinds.actions.attack': '攻擊',
   'hud.keybinds.actions.actionBarSlot': '動作列 {slot}',
@@ -1837,6 +2037,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影響。',
   'hud.combat.auraGainOther': '{target}獲得了 {name}。',
   'hud.system.playerDeath': '你已經死亡。',
+  'hud.system.deathRecapKillerAbility': '你已經死亡。被{killer}的{ability}擊殺。',
+  'hud.system.deathRecapKiller': '你已經死亡。被{killer}擊殺。',
+  'hud.system.deathRecapAbility': '你已經死亡。死於{ability}。',
+  'hud.system.deathRecapFalling': '你已經死亡。你摔死了。',
+  'hud.system.deathRecapDrowned': '你已經死亡。你溺死了。',
+  'hud.system.deathRecapCauterized': '你已經死亡。灼燒術的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再封鎖 {name}。',
@@ -2033,6 +2239,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '會長',
   'hud.social.ranks.officer': '幹部',
   'hud.social.ranks.member': '成員',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成員',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成員',
   'hud.trade.title': '與 {name} 交易',
@@ -2232,6 +2440,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': '任務物品',
   'itemUi.kind.junk': '雜物',
   'itemUi.kind.fineMaterial': '優質材料',
+  'itemUi.kind.material': '材料',
   'itemUi.kind.food': '食物',
   'itemUi.kind.drink': '飲料',
   'itemUi.kind.tool': '工具',
@@ -2259,7 +2468,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFood': '使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。',
   'itemUi.tooltip.useDrink': '使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。',
   'itemUi.tooltip.questItem': '任務物品',
+  'itemUi.tooltip.questRelated': '任務：{quest}',
+  'itemUi.tooltip.questRules': '無法出售、存入銀行或交易。',
+  'itemUi.tooltip.questOrphaned': '目前沒有進行中的任務需要此物品。',
   'itemUi.tooltip.classes': '職業：{classes}',
+  'itemUi.tooltip.maxStack': '最大堆疊：{count}',
   'itemUi.tooltip.sellPrice': '出售價格：{money}',
   'itemUi.tooltip.clickBuy': '點擊購買',
   'itemUi.tooltip.clickSell': '點擊出售',
@@ -2273,6 +2486,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': '使用：在附近水域釣魚。',
   'itemUi.tooltip.useHealingPotion': '使用：立即恢復 {amount} 點生命值。戰鬥中可用。1 分鐘冷卻。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。',
+  'itemUi.tooltip.useElixir':
+    '使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。戰鬥中可用。',
+  'itemUi.tooltip.useElixirAura': '使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
   'itemUi.tooltip.clickUse': '點擊使用',
   'itemUi.tooltip.clickBuyback': '點擊買回',
@@ -2378,6 +2594,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '購買',
   'itemUi.market.reclaim': '取回',
   'itemUi.market.buyAria': '以 {price} 購買 {item}',
+  'itemUi.market.buyConfirmTitle': '確認購買',
+  'itemUi.market.buyConfirmBody': '以 {price} 購買 {item}？',
+  'itemUi.market.buyConfirmBodyStack': '以 {price} 購買 {item} x{count}（每個 {each}）？',
+  'itemUi.market.buyConfirmAccept': '購買',
+  'itemUi.market.buyConfirmCancel': '取消',
+  'itemUi.market.buyChanged': '該上架在你確認前已變更。請核對價格後再試一次。',
   'itemUi.market.reclaimAria': '取回 {item}',
   'itemUi.market.sellNote':
     '從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。',
@@ -2390,6 +2612,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': '沒有待領取內容。銷售收益和過期上架會在這裡領取。',
   'itemUi.market.collectNote': '商人為你保管的收益和退回貨物。',
   'itemUi.market.saleProceeds': '銷售收益',
+  'itemUi.market.saleOlder': '另有 {count} 筆較早的交易，已計入總額。',
   'itemUi.market.collectAll': '全部領取',
   'itemUi.logs.listedItem': '已將 {item} 以 {money} 上架到世界市場。',
   'itemUi.logs.sellerSold': '{buyer} 以 {money} 買走了你的 {item}。向商人領取 {proceeds}。',
@@ -3016,6 +3239,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': '鈴音碎片',
   'entities.items.gatherers_cache.name': '採集者儲囊',
   'entities.items.artisans_eye.name': '匠人之眼',
+  'entities.items.sharp_claw.name': '鋒利的爪',
+  'entities.items.curved_tusk.name': '彎曲的獠牙',
+  'entities.items.pristine_claw.name': '完美的爪',
   'entities.items.linen_scrap.name': '亞麻碎布',
   'entities.items.fen_muster_order.name': '芬橋集結令',
   'entities.items.mire_prowler_pelt.name': '泥沼潛伏者毛皮',
@@ -3078,6 +3304,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': '山脊潛伏者毛皮',
   'entities.items.old_cragmaws_pelt.name': '老裂顎的毛皮',
   'entities.items.cragmaw_huntcord.name': '裂顎的狩獵腰索',
+  'entities.items.cragmaw_huntquiver.name': '裂顎的狩獵箭袋',
   'entities.items.glowing_wax.name': '發光蠟塊',
   'entities.items.ogre_war_totem.name': '食人魔戰爭圖騰',
   'entities.items.storm_core.name': '風暴核心',
@@ -3155,6 +3382,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': '泥顎鱗甲背心',
   'entities.items.moggers_copper_cudgel.name': '莫格的銅頭短棒',
   'entities.items.moggers_shiv.name': '莫格的短刀',
+  'entities.items.moggers_hide_quiver.name': '莫格的獸皮箭袋',
   'entities.items.moggers_stomper_boots.name': '莫格的踐踏靴',
   'entities.items.necromancers_legwraps.name': '哀織腿纏',
   'entities.items.necromancers_soulsteps.name': '哀織魂步',
@@ -3179,6 +3407,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': '墓骨肩甲',
   'entities.items.deathlords_dread_visage.name': '塚陵領主的恐懼面甲',
   'entities.items.gravewyrm_gauntlets.name': '墓龍護手',
+  'entities.items.gravewyrm_bone_quiver.name': '墓龍骨箭袋',
   'entities.items.gravewyrm_mantle.name': '墓龍披肩',
   'entities.items.mistveil_cord.name': '霧幕束帶',
   'entities.items.mistveil_grips.name': '霧幕握套',
@@ -3218,6 +3447,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': '深沼鉗咬魚人',
   'entities.mobs.mire_widow.name': '泥沼寡婦蛛',
   'entities.mobs.mirefen_broodmother.name': '蛛母',
+  'entities.mobs.spider_egg.name': '蛛母之卵',
+  'entities.mobs.widow_hatchling.name': '寡婦蛛幼體',
+  'entities.mobs.drowned_warlord.name': '溺亡督軍',
+  'entities.mobs.brakka_wallbreaker.name': '破牆者布拉卡',
+  'entities.mobs.threnos_first_voice.name': '初聲瑟雷諾斯',
+  'entities.items.firebottle.name': '火油瓶',
+  'entities.items.murloc_hut.name': '泥鰭茅屋',
+  'entities.items.restless_skull.name': '不寧顱骨',
+  'entities.items.vanguard_bone.name': '先鋒之骨',
   'entities.mobs.drowned_dead.name': '溺亡死者',
   'entities.mobs.fen_troll.name': '泥沼巨魔',
   'entities.mobs.grubjaw.name': '貪食者格魯布顎',
@@ -3572,7 +3810,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '生鏽香爐',
   'entities.quests.q_no_rest.title': '蘆葦中不得安息',
   'entities.quests.q_no_rest.text':
-    '香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。',
+    '香爐上的儀式會讓溺亡者復起，如今它已喚起一個強大到足以統領他們的存在。守望者稱他為溺亡督軍，只要他還占據沉沒的禮拜堂，死者便陣列不散。打倒他，{playerName}，其餘的自會潰散回泥沼。',
   'entities.quests.q_no_rest.completion': '你給了死者比他們主人更多的憐憫。拿著，你早已應得。',
   'entities.quests.q_no_rest.objectives.0.label': '讓溺亡死者安息',
   'entities.quests.q_trolls.title': '泥沼墳丘',
@@ -3729,14 +3967,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '這筆跡...我在東溪莫森的魔典裡見過。每座墳後都是同一隻手，{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': '擊敗龍教狂熱者',
-  'entities.quests.q_cult_orders.objectives.1.label': '龍教命令',
   'entities.quests.q_necromancers.title': '護命匣之環',
   'entities.quests.q_necromancers.text':
     '命令提到一圈護命匣，{playerName}，靈魂容器圍著聖所供養它。殺8名死靈法師，帶回3個完整護命匣。',
   'entities.quests.q_necromancers.completion':
     '願聖光寬恕我們。裡面裝著谷地和濕地的死者，所有被收割的靈魂。他們從來不是在組建軍隊，{playerName}。他們是在收取貢稅。',
   'entities.quests.q_necromancers.objectives.0.label': '擊敗龍教死靈法師',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式護命匣',
   'entities.quests.q_revenants.title': '亡魂戰場',
   'entities.quests.q_revenants.text':
     '聖所路東有片古戰場，上一支攻山軍的先鋒已埋兩百年。邪教叫醒了他們，穿著鏽甲。{playerName}，讓12個歸土。',
@@ -5071,7 +5307,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'Fiesta平手！難分高下！',
   'fiesta.end.loss': 'Fiesta落敗！再來一場！',
   'fiesta.end.win': 'Fiesta獲勝！🎉 多麼盡興的派對！',
-  'fiesta.enterQueue': '加入Fiesta！',
   'fiesta.error.leaderOnly': '只有隊長能為你的隊伍排入{label}佇列。',
   'fiesta.error.noAugment': '你目前沒有可供選擇的強化。',
   'fiesta.error.notOnOffer': '那項強化未在提供之列。',
@@ -5087,8 +5322,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': '巨像',
   'fiesta.powerup.pow_moon_boots.name': '月靴',
   'fiesta.powerup.pow_speed_demon.name': '極速狂魔',
-  'fiesta.practice': '🎉 對戰機器人練習',
-  'fiesta.practiceNote': '離線練習：生成3個AI機器人並將你排入2v2 Fiesta佇列。再次點擊即可停止。',
   'fiesta.queue.join': '你加入了2v2 Fiesta佇列。準備好狂歡吧…',
   'fiesta.queue.leave': '你離開了2v2 Fiesta佇列。',
   'fiesta.queue.teamLeave': '你的隊伍離開了2v2 Fiesta佇列。',
@@ -5164,6 +5397,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '東南',
   'hudChrome.compass.SW': '西南',
   'hudChrome.compass.W': '西',
+  'hudChrome.emoteEditor.close': '關閉表情',
   'hudChrome.emoteEditor.done': '完成',
   'hudChrome.emoteEditor.title': '表情',
   'hudChrome.emotes.bow': '鞠躬',
@@ -5193,6 +5427,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.meters.breakdownRow': '{value}（{percent}）',
+  'hudChrome.meters.threatFallback': '無即時仇恨：顯示對{name}造成的傷害',
   'hudChrome.meters.breakdownSummary': '{tab}：{value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}：{ability}',
@@ -5250,6 +5485,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '剩餘 {count} 秒',
   'hudChrome.plurals.secondsRemaining.many': '剩餘 {count} 秒',
   'hudChrome.plurals.secondsRemaining.other': '剩餘 {count} 秒',
+  'hudChrome.plurals.playtimeDays.one': '{count} 天',
+  'hudChrome.plurals.playtimeDays.few': '{count} 天',
+  'hudChrome.plurals.playtimeDays.many': '{count} 天',
+  'hudChrome.plurals.playtimeDays.other': '{count} 天',
+  'hudChrome.plurals.playtimeHours.one': '{count} 小時',
+  'hudChrome.plurals.playtimeHours.few': '{count} 小時',
+  'hudChrome.plurals.playtimeHours.many': '{count} 小時',
+  'hudChrome.plurals.playtimeHours.other': '{count} 小時',
+  'hudChrome.plurals.playtimeMinutes.one': '{count} 分鐘',
+  'hudChrome.plurals.playtimeMinutes.few': '{count} 分鐘',
+  'hudChrome.plurals.playtimeMinutes.many': '{count} 分鐘',
+  'hudChrome.plurals.playtimeMinutes.other': '{count} 分鐘',
   'hudChrome.plurals.playersMatching.one': '查詢：{realm} 上有 {count} 名玩家符合「{query}」。',
   'hudChrome.plurals.playersMatching.few': '查詢：{realm} 上有 {count} 名玩家符合「{query}」。',
   'hudChrome.plurals.playersMatching.many': '查詢：{realm} 上有 {count} 名玩家符合「{query}」。',
@@ -5316,6 +5563,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': '喚風肩甲',
   'entities.items.bonewrought_greatsword.name': '骨鑄巨劍',
   'entities.items.direfang_greatblade.name': '厲牙巨刃',
+  'entities.items.direfang_quiver.name': '厲牙箭袋',
   'entities.items.bonewrought_bulwark.name': '骨鑄壁壘',
   'entities.items.wraithfire_orb.name': '怨焰寶珠',
   'hud.chat.context.convertToRaid': '轉換為團隊',
@@ -5432,6 +5680,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterMount': '坐騎',
   'hudChrome.bags.filterQuest': '任務',
   'hudChrome.bags.sortAria': '排序背包物品',
+  'hudChrome.bags.sortButton': '整理',
+  'hudChrome.bags.sortButtonAria': '整理背包',
+  'hudChrome.bags.sortButtonHint': '合併堆疊並按類型分組物品',
   'hudChrome.bags.sortRecent': '最近',
   'hudChrome.bags.sortQuality': '品質',
   'hudChrome.bags.sortName': '名稱',
@@ -5654,18 +5905,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': '鎖定目標與戰鬥',
   'guide.controls.groupInterface': '介面',
   'guide.controls.controllerBody':
-    '手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角。',
+    '手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角，也可以將某個按鍵綁定為拉近或拉遠鏡頭（預設未綁定）。',
   'guide.controls.controllerHeading': '使用手把時',
   'guide.controls.cycleFriendly': '切換友方目標',
+  'guide.controls.targetAuras': '目標增益與減益效果',
   'guide.controls.gameMenu': '開啟遊戲選單與設定',
   'guide.controls.groupCamera': '鏡頭',
   'guide.controls.talents': '天賦',
+  'guide.controls.professions': '專業',
   'guide.controls.arena': '競技場',
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功績之書',
+  'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '製作',
   'guide.controls.valeCup': '溪谷盃',
+  'guide.controls.mount': '騎乘 / 下騎',
   'guide.controls.calendar': '活動日曆',
+  'guide.controls.dungeonFinder': '地城搜尋器',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities': '使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）',
   'guide.controls.groupPet': '寵物指令',
@@ -5932,7 +6188,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.wildheartBody':
-    '一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔上迎戰祖爾加。',
+    '一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。',
   'guide.dungeonsPage.raidName': '最終團隊副本',
   'guide.dungeonsPage.raidBody':
     '在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。',
@@ -5999,17 +6255,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns': '守護友方，讓近戰攻擊者每次出手都會傷到自己。',
   'guide.abilityHook.thunder_clap': '打擊你周遭的一切並降低它們的攻擊速度。',
   'guide.abilityHook.wrath': '從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。',
-  'guide.arenaPage.augmentsNote':
-    '強化與增益只在該場對戰中有效。它們著重於即興、好玩的搭配，而非長久的力量，所以沒有人能花錢買到勝利。',
   'guide.arenaPage.coliseumBody':
     '灰燼競技場是這個王國的競技場，你會在排名對戰中面對其他玩家，進行一對一或二對二的較量。每個級別都各自保有自己的排名，因此一場勝利能讓你在那道天梯上往上爬，讓整個王國都看得見。開啟競技場視窗即可報名參加某個級別，可以獨自一人，也可以與你的搭檔一同上場。',
   'guide.arenaPage.coliseumHeading': '灰燼鬥獸場',
   'guide.arenaPage.duelsBody':
     '向你遇到的任何玩家發起一場友誼決鬥。賭上的只有顏面，所以這是學習對戰組合或解決友好爭論最簡單的方式。',
   'guide.arenaPage.duelsHeading': '決鬥',
-  'guide.arenaPage.fiestaBody':
-    '嘉年華是一種快節奏的二對二混戰，以一場連續不斷的對戰進行，每位鬥士都被拉到同一起跑線上。隨著戰鬥推進，你會抽選強化，這些快速的增益能即時重塑你的配套，讓每場對戰都不盡相同。',
-  'guide.arenaPage.fiestaHeading': '二對二嘉年華',
   'guide.arenaPage.heading': '競技場與PvP',
   'guide.arenaPage.intro':
     '想與其他玩家一較高下嗎？玩家對戰功能已內建於遊戲中，而且永遠由你自己選擇參與，絕不會被強迫。',
@@ -6178,19 +6429,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '三個地區由南而北，等級層層遞增。跟著任務的軌跡走，這片土地會帶你從谷地一路前往群峰。',
   'guide.worldPage.places': '著名地點',
   'guide.worldPage.residents': '你將遇見的人物',
-  'guide.arenaPage.powerupsBody':
-    '戰鬥進行到一半，發光的能量球也會落入競技場，誰先搶到就歸誰。它們刻意設計得誇張過火，且只持續短短一陣子：速度惡魔讓你瞬間飆出令人目眩的步伐，巨像讓你脹大成笨重的巨人，月靴帶來低重力的彈跳躍動，狂戰士則是一股突如其來的暴怒之潮。',
-  'guide.arenaPage.powerupsTitle': '鬥技場中的能量道具',
-  'guide.arenaPage.waveGoldBody': '中段那波：雙刃般的搭配組合，你的配套在此開始成形，奏出旋律。',
-  'guide.arenaPage.waveGoldTitle': '黃金',
-  'guide.arenaPage.wavePrismaticBody':
-    '最後那波：足以定義整套配套、能融化整個畫面的爆發，刻意設計得荒謬到讓人拍案叫絕。',
-  'guide.arenaPage.wavePrismaticTitle': '彩虹',
-  'guide.arenaPage.waveSilverBody': '開場那波：乾淨俐落的單一屬性增益，磨利你職業的基本功。',
-  'guide.arenaPage.waveSilverTitle': '白銀',
-  'guide.arenaPage.wavesBody':
-    '一場嘉年華對戰會隨著進行不斷發給你新的選項，而戰鬥拖得愈久，選項也愈來愈大膽。你會一波接一波地堆疊構築，每次從幾個選項中挑一個，並保留到這場對戰結束。',
-  'guide.arenaPage.wavesTitle': '強化如波浪般湧來',
   'guide.bestiary.flavor.gravecaller_cultist':
     '死亡邪教的長袍僕從，他們的作為玷污了從谷地到群峰的座座墳塚。凡他們聚集之處，亡者便不得安息。',
   'guide.bestiary.flavor.grubjaw':
@@ -6312,6 +6550,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': '你能裝備什麼',
   'guide.gear.soulboundBody':
     '許多珍貴的裝備是靈魂綁定的，從你取得的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它如今是你故事的一部分，沒有其他人能替你佩戴它。',
+  'guide.gear.uniqueTitle': '裝備唯一：同一件傳說只能穿一件',
+  'guide.gear.uniqueBody':
+    '傳說物品是裝備唯一的：你的角色同一時間只能穿戴某件傳說物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、銀行或市場裡，但試圖同時穿戴兩份會被拒絕。物品提示上還帶有金色的「裝備唯一」標籤，讓你在圍繞兩件傳說規劃配裝之前就能看到這條規則。',
   'guide.gear.soulboundTitle': '靈魂綁定：屬於你，也僅屬於你',
   'guide.gear.sourcesBody':
     '你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。',
@@ -6346,6 +6587,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.nav.stats': '角色與屬性',
   'guide.progression.bandLabel': '等級 {min} 至 {max}',
   'guide.progression.capBody': '每一級都會讓你更強韌並帶來新技能，一路直到 {cap} 級的上限。',
+  'guide.progression.capEndgameBody':
+    '裂隙是唯一真正等到滿級才開放的內容。它們按自己的節奏在各處國度中撕裂開來，分為 C 到 S 的等階，而全服的每一支隊伍都在爭當率先封印它的那一隊。秘探的告示板同樣一直都在，等你的裝備跟上之後，它更高的難度也值得再走一趟。',
   'guide.progression.capJourneyBody':
     '{cap} 級是上限，是升級的終點，卻不是成長的盡頭。從那裡開始，你會以普通與英雄難度挑戰地城與團隊副本、在世界首領崛起時與他一戰、追逐更好的裝備，並在競技場中試煉自己。',
   'guide.progression.capTitle': '抵達 {cap} 級',
@@ -6353,6 +6596,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每一場戰鬥、每一個任務、每一步北行，都會讓你的英雄更為強大。以下說明升級如何運作，以及當你登上巔峰之後，是什麼讓你持續成長。',
   'guide.progression.journeyBody':
     '這個世界是一片相連的大地，三座區域由南而北排列，每一座都高上一個等級。你從翠綠的山谷起步，奮力穿越沼澤，最終在寒冷的高峰落腳。跟著任務的軌跡走，這片土地便會帶你從一座區域前往下一座。',
+  'guide.progression.journeyBodyCount':
+    '這個世界是一片相連的大地，共有 {zones} 座區域。其中三座是你升級時所走的路，由南而北排列：你從翠綠的山谷起步，奮力穿越沼澤，最終在寒冷的高峰落腳。跟著任務的軌跡走，這片土地便會帶你從一座區域前往下一座。山谷海岸之外還有一座小島，適合低等級時前往；其餘的國度都自那同一條路旁展開，是為已經走完這段攀登的角色而建。',
   'guide.progression.journeyTitle': '北行之路',
   'guide.progression.noRush':
     '不必急。這個世界就在那裡，讓你以自己的步調盡情享受，所以儘管漫遊、接下吸引你目光的任務，讓你的英雄一路成長吧。',
@@ -6885,6 +7130,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻擊與施法速度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的傷害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的傷害降低 {pct}%',
+  'hudChrome.auraEffect.carriedFlag': '你正攜帶敵方旗幟。取消該增益即可丟下旗幟。',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一個不同元素學派法術將觸發元素匯聚',
   'hudChrome.auraEffect.heatingUp':
     '你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發',
@@ -6992,12 +7238,43 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.warfare_ashstalker.name': '灰燼追獵者裝備',
+  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「灰燼疾行」，使移動速度提高 40%，持續 6 秒。',
+  'entities.itemSets.warfare_cinderweave.name': '燼織法衣',
+  'entities.itemSets.warfare_cinderweave.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_furyforged.name': '怒鑄戰裝',
+  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「不破誓約」，吸收 200 點傷害，持續 10 秒。',
+  'entities.itemSets.warfare_stormbound.name': '縛雷法衣',
+  'entities.itemSets.warfare_stormbound.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。',
+  'entities.itemSets.warfare_thornhide.name': '荊棘皮甲',
+  'entities.itemSets.warfare_thornhide.bonus2': '戰爭防禦等級提高 40 點。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「棘刺護身」，閃躲機率提高 15%，持續 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
   'entities.itemSets.wyrmshadow.bonus4':
     '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
   'hudChrome.itemSoulbound': '靈魂綁定',
+  'hudChrome.itemUniqueEquipped': '裝備唯一',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',
@@ -7130,8 +7407,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '想要購買',
   'hudChrome.discord.relay.help.label': '需要協助',
   'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.dialogOption': '製作',
+  'hudChrome.crafting.dialogOptionAria': '開啟{craft}製作視窗',
   'hudChrome.crafting.close': '關閉製作',
-  'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
   'hudChrome.crafting.empty': '尚無已知配方。',
   'hudChrome.crafting.resultAria': '製作{name}',
@@ -7214,10 +7492,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.classicDesc': '按住滑鼠右鍵並移動滑鼠來轉動鏡頭。',
   'hudChrome.cameraPrompt.changeLater': '稍後可在 Esc 選單的「按鍵綁定」中變更。',
   'hudChrome.cameraPrompt.confirm': '確認',
-  'desktop.update.downloading': '正在下載更新 {version}...',
-  'desktop.update.ready': '更新 {version} 已就緒。離開遊戲時將自動安裝，也可立即重新啟動。',
+  'desktop.update.checkingTitle': '正在檢查更新...',
+  'desktop.update.checkingBody': '遊戲會自動保持最新版本。',
+  'desktop.update.uptodateTitle': '目前已是最新版本。',
+  'desktop.update.downloadingTitle': '正在下載更新 {version}...',
+  'desktop.update.downloadingBody': '可以繼續遊戲，更新將在離開遊戲時安裝。',
+  'desktop.update.readyTitle': '更新 {version} 已就緒',
+  'desktop.update.readyBody': '離開遊戲時將自動安裝，也可立即重新啟動。',
   'desktop.update.restart': '立即重新啟動',
   'desktop.update.later': '稍後',
+  'desktop.update.dismiss': '關閉',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '遊戲畫面已停止運作。要重新載入嗎？',
   'desktop.crash.reload': '重新載入',
@@ -7227,6 +7511,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
+  'gpuNotice.hybridBodyWindows':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請在 設定 > 系統 > 顯示 > 圖形 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇獨立顯示卡。',
+  'gpuNotice.hybridBodyLinux':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，您的瀏覽器或顯示卡驅動程式可能提供自己的顯示卡選擇設定，或您的發行版可能提供顯示卡切換工具（例如 PRIME 或 optimus-manager）。桌面版會自動選擇獨立顯示卡。',
+  'gpuNotice.hybridBodyOther':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請檢查瀏覽器與作業系統的顯示卡設定以啟用它。桌面版會自動選擇獨立顯示卡。',
   'gpuNotice.dismiss': '關閉',
   'perfNudge.integratedGpu':
     '遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。',
@@ -7309,6 +7599,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'editor.selection.radiusHint': '「自動」依資源縮放推導碰撞半徑；拖曳滑桿可覆寫它。',
   'editor.layers.blocker': '空氣牆',
   'editor.status.blockerCapReached': '已達到空氣牆上限（{max}）。新牆未被加入。',
+  'editor.status.campCapReached': '已達到營地上限（{max}）。新營地未被加入。',
   'editor.help.tool.blocker': '拖曳繪製在試玩中阻擋移動的隱形牆。',
   'editor.inspector.label': '工具選項',
   'editor.brush.title': '筆刷',
@@ -7703,6 +7994,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '點火鑰匙：乙太騎士懸浮機車',
   'entities.items.reins_shadowjump_toad.name': '影躍蟾蜍卡瑪影的韁繩',
   'entities.items.reins_stormfeather_griffin.name': '凌天風暴之羽的韁繩',
+  'entities.items.reins_drakemaw_raptor.name': '龍喉迅猛龍的韁繩',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆闊步大火雞的韁繩',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
@@ -7783,6 +8075,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.ota_updates.invalid_input': '輸入無效。',
   'apiError.steam.disabled': 'Steam 連結目前無法使用。',
   'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
+  'apiError.seeker.native_only': 'Seeker 權益僅可在原生應用程式中使用。',
+  'apiError.seeker.attestation_failed': '裝置驗證失敗。請再試一次。',
+  'apiError.seeker.solana_artifact_required': '請使用 Solana Store 版應用程式繼續。',
+  'apiError.seeker.wallet_required': '請先連結並驗證錢包。',
+  'apiError.seeker.genesis_token_required': '需要已驗證的 Seeker Genesis Token。',
+  'apiError.seeker.genesis_token_claimed': '該 Seeker Genesis Token 已被領取。',
+  'apiError.seeker.entitlement_required': '需要已驗證的 Seeker 權益。',
+  'apiError.seeker.current_ownership_required': '需要目前持有 Seeker Genesis Token。',
   'apiError.steam.invalid_ticket': 'Steam 無法驗證此連結請求。請在桌面應用程式中重試。',
   'apiError.steam.banned': '該 Steam 帳號無法連結。',
   'apiError.steam.already_linked': '你的帳號已連結一個 Steam 帳號。',
@@ -7991,8 +8291,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.raidCall.note': '守衛吹響號角：組隊前往地穴與團隊副本。',
   'hudChrome.calendar.events.marketDay.title': '集市日',
   'hudChrome.calendar.events.marketDay.note': '商人正等著新貨。今天很適合逛逛世界市場。',
-  'hudChrome.calendar.events.fiestaNight.title': '狂歡之夜',
-  'hudChrome.calendar.events.fiestaNight.note': '今晚 2v2 狂歡擂台的人氣最旺。',
   'hudChrome.calendar.events.arenaClash.title': '競技場之戰',
   'hudChrome.calendar.events.arenaClash.note': '決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。',
   'hudChrome.calendar.events.fishingDerby.title': '釣魚大賽',
@@ -8015,6 +8313,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '你釣上了：{name}',
   'hudChrome.gathering.biteLine': '有東西上鉤了！',
   'hudChrome.gathering.gotAwayLine': '牠跑掉了。',
+  'hudChrome.gathering.earlyReelLine': '收線太早了，還沒有魚上鉤。',
   'hudChrome.gathering.nodeName.ore': '礦脈',
   'hudChrome.gathering.nodeName.wood': '林木',
   'hudChrome.gathering.nodeName.herb': '草藥叢',
@@ -8098,9 +8397,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': '摺疊Protect Yumi血條',
   'yumi.hud.expand': '展開Protect Yumi血條',
-  'guide.arenaPage.yumiHeading': '守護Yumi',
-  'guide.arenaPage.yumiBody':
-    'Protect Yumi是一種在迷宮中進行的團隊目標模式：每隊守護自己的貓咪使魔，同時獵殺對方的。兩隻貓咪會不時閃現到迷宮的新角落，戰鬥在防守、追獵與尋回之間不斷搖擺。可選擇3對3或5對5排隊；陣亡只會讓你短暫離場。',
   'yumi.queue.join': '你加入了Protect Yumi佇列。守好你的使魔……',
   'yumi.queue.leave': '你離開了Protect Yumi佇列。',
   'yumi.queue.teamLeave': '你的隊伍離開了Protect Yumi佇列。',
@@ -8109,7 +8405,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'yumi.log.start': 'Protect Yumi！保衛你的使魔，獵殺敵方的使魔。',
   'yumi.bracket3': 'Yumi 3v3',
   'yumi.bracket5': 'Yumi 5v5',
-  'yumi.enterQueue': '加入Protect Yumi！',
   'yumi.hud.title': '守護YUMI',
   'yumi.hud.getReady': '做好準備……',
   'yumi.hud.teleportIn': 'Yumi將在{s}秒後傳送',
@@ -8123,7 +8418,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'yumi.end.win': '勝利！Yumi安全了！',
   'yumi.end.loss': '戰敗！你的Yumi倒下了。',
   'hudChrome.crafting.comboRequirementUnmet': '你尚未達到該配方所需組合的兩項製造技能等級。',
-  'hudChrome.crafting.throttled': '你製作得太快了，請稍等片刻後再試。',
   'hudChrome.crafting.recipeNotLearned': '你還沒有學會這個配方。',
   'hudChrome.crafting.noBagSpace': '背包空間不足，無法存放製作的物品。',
   // Professions 2.0 (M16 non-Latin fills).
@@ -8152,9 +8446,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '傑作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}製作出了傑作{name}！',
   'hudChrome.crafting.tierUpToast': '{craft}提升至階級 {tier}！',
+  'hudChrome.crafting.skillUpToast': '{skill}技能提升至 {level}！',
+  'hudChrome.crafting.skillUpSubtext': '技能提升至 {level}！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}，數量 {count}，帶工匠印記的物品',
   'hudChrome.bags.itemAriaMasterwork': '{item}，數量 {count}，傑作',
+  'hudChrome.bags.itemAriaQuest': '{item}，數量 {count}，任務物品',
+  'hudChrome.bags.filterQuestCountAria': '任務，{count} 件物品',
+  'hudChrome.bags.noQuestItems': '背包中沒有任務物品。',
   'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
   'hudChrome.crafting.stationRequired': '必須位於{station}才能製作該物品。',
@@ -8168,12 +8467,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': '第{page}頁',
   'hudChrome.mobile.spellbookPageLabel': '頁{page}',
   'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
-  'hudChrome.mobile.chatPlaceholder': '說點什麼...',
+  'hudChrome.mobile.chatPlaceholder': '說點什麼...（! 顯示社群指令）',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.keybinds.categoryPet': '寵物',
   'hudChrome.keybinds.petAttack': '寵物：攻擊',
   'hudChrome.keybinds.petStop': '寵物：停止',
+  'hudChrome.keybinds.targetPet': '寵物：選取',
   'hudChrome.keybinds.petTaunt': '寵物：嘲諷',
   'hudChrome.keybinds.petDefensive': '寵物：防禦',
   'hudChrome.keybinds.petAggressive': '寵物：攻擊性',
@@ -8417,6 +8717,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '織燼裹腿',
   'entities.items.cinderweave_handwraps.name': '織燼裹手',
   'entities.items.cinderweave_slippers.name': '織燼便鞋',
+  'entities.items.thornhide_headdress.name': '荊棘兜帽',
+  'entities.items.thornhide_mantle.name': '荊棘披肩',
+  'entities.items.thornhide_vestment.name': '荊棘法衣',
+  'entities.items.thornhide_cinch.name': '荊棘腰帶',
+  'entities.items.thornhide_leggings.name': '荊棘護腿',
+  'entities.items.thornhide_gloves.name': '荊棘護手',
+  'entities.items.thornhide_boots.name': '荊棘軟靴',
   'entities.items.final_oath_medallion.name': '最終誓約勳章',
   'entities.items.razorwind_torque.name': '剃風頸環',
   'entities.items.cinder_sigil_pendant.name': '燼印墜飾',
@@ -8432,6 +8739,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '怒焰',
   'entities.npcs.fury.title': '榮譽軍需官',
   'entities.npcs.fury.greeting': '戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。',
+  'entities.npcs.warmarshal_draven_kole.name': '戰帥德拉文·科爾',
+  'entities.npcs.warmarshal_draven_kole.title': '戰爭軍備庫總管',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '我只收榮譽這一種貨幣，戰爭軍備庫由我看守。在戰場上掙得你的軍階，我便為你披上迎接下一戰的甲冑。',
   'guide.economy.bankBody':
     '每座主城都設有鍍金保險箱的分號，它是這片大陸的銀行商號。與那裡的司庫交談即可打開你的保險庫：一處背包之外的私人儲物空間，伴隨角色終身。無論你下次造訪哪家分號，寄存的物品都會安然等候。',
   'guide.economy.bankHow':
@@ -8455,6 +8766,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': '點擊存入',
   'hudChrome.bank.depositPartialHint': 'Shift+點擊存入部分數量',
   'hudChrome.bank.cannotDeposit': '無法存入銀行',
+  'hudChrome.bank.cannotDepositNow': '暫時無法存入',
   'hudChrome.bank.depositQuantityTitle': '存入 {item}',
   'hudChrome.bank.depositQuantityInput': '要存入的數量',
   'hudChrome.bank.depositQuantityConfirm': '存入',
@@ -8465,6 +8777,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '排序銀行物品',
   'hudChrome.bank.searchAria': '依名稱搜尋銀行物品',
   'hudChrome.bank.depositAll': '存入所有材料',
+  'hudChrome.bank.depositAllTooltip':
+    '將背包中的所有製作材料和廢品一次性存入銀行。採集工具、已裝備的裝備、任務物品和消耗品不會受到影響。',
   'hudChrome.bank.depositAllDone': '已存入材料：{count}。',
   'hudChrome.bank.depositAllFull': '已存入材料：{count}。銀行已滿。',
   'hudChrome.bank.depositAllNone': '銀行已滿：未存入任何物品。',
@@ -8482,6 +8796,51 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '獎勵銀行格子及獲取方式',
+  'hudChrome.bank.tabsAria': '銀行標籤頁',
+  'hudChrome.bank.personalTab': '個人',
+  'hudChrome.bank.guildTab': '公會',
+  'hudChrome.bank.guildCapacityAria': '公會銀行格已用：{used}/{total}',
+  'hudChrome.bank.guildEmpty': '公會銀行是空的。',
+  'hudChrome.bank.guildTreasury': '公會金庫',
+  'hudChrome.bank.guildDepositGold': '存入金錢',
+  'hudChrome.bank.guildWithdrawGold': '取出金錢',
+  'hudChrome.bank.guildDepositGoldTitle': '向公會金庫存入金錢',
+  'hudChrome.bank.guildWithdrawGoldTitle': '從公會金庫取出金錢',
+  'hudChrome.bank.guildGoldAvailable': '可用：{amount}',
+  'hudChrome.bank.guildBuyConfirm': '花費公會金庫的 {price} 購買 {count} 個額外的公會銀行格子嗎？',
+  'hudChrome.bank.guildBuyNote': '由公會金庫支付',
+  'hudChrome.bank.guildTreasuryShort': '金庫不足',
+  'hudChrome.bank.guildOpenBank': '開啟公會銀行',
+  'hudChrome.bank.guildOpenConfirm': '花費 {price} 開啟公會銀行嗎？這筆費用由你自己支付。',
+  'hudChrome.bank.guildOpenAccept': '開啟',
+  'hudChrome.bank.guildOpenNote': '由你自己支付，而非公會金庫',
+  'hudChrome.bank.guildPurseShort': '金錢不足',
+  'hudChrome.bank.guildReadOnlyNote': '只有公會幹部才能更改公會銀行。',
+  'hudChrome.bank.guildUnopenedNote': '公會銀行尚未開通。',
+  'hudChrome.bank.guildDormantNote': '鎖定的物品無法取出，並會阻止解散公會。',
+  'hudChrome.bank.guildDormantHint': '該物品已鎖定在公會銀行中，無法取出。',
+  'hudChrome.bank.guildDormantAria': '{item}，數量 {count}，無法取出',
+  'hudChrome.bank.guildUnknownItem': '未知物品',
+  'hudChrome.bank.guildDepositHint': '點擊存入公會銀行',
+  'hudChrome.bank.guildCannotDeposit': '無法放入公會銀行',
+  'hudChrome.bank.guildGoldCannotMove': '目前無法轉移該金額。',
+  'hudChrome.bank.guildViewsAria': '公會銀行檢視',
+  'hudChrome.bank.guildContentsTab': '內容',
+  'hudChrome.bank.guildLogTab': '日誌',
+  'hudChrome.bank.logAria': '公會銀行活動日誌',
+  'hudChrome.bank.logNote': '最近 {count} 筆公會銀行操作。',
+  'hudChrome.bank.logLoading': '正在載入公會銀行日誌...',
+  'hudChrome.bank.logEmpty': '公會銀行中尚未存入或取出任何物品。',
+  'hudChrome.bank.logUnavailable': '目前無法讀取公會銀行日誌。',
+  'hudChrome.bank.logFormerMember': '一位已離開的公會成員',
+  'hudChrome.bank.logDepositItem': '{actor} 存入了 {count} 個 {item}',
+  'hudChrome.bank.logWithdrawItem': '{actor} 取出了 {count} 個 {item}',
+  'hudChrome.bank.logDepositMoney': '{actor} 存入了 {amount}',
+  'hudChrome.bank.logWithdrawMoney': '{actor} 取出了 {amount}',
+  'hudChrome.bank.logBuySlots': '{actor} 花費 {amount} 購買了銀行擴充',
+  'hudChrome.bank.logOpenBank': '{actor} 花費 {amount} 開啟了公會銀行',
+  'hudChrome.bank.logCharterFee': '{actor} 支付了 {amount} 的公會創建費用',
+  'hudChrome.bank.logAdminPurge': '管理員移除了 {count} 個 {item}',
   'entities.mobs.yumi_cat.name': '由美',
   'hudChrome.itemTooltip.riftTier': '{tier}級裂隙物品',
   'hudChrome.itemTooltip.riftUpgrade': '裂隙強化 {level}/{max}',
@@ -8586,6 +8945,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': '找到隊伍：{name}',
   'hudChrome.finder.proposalRole': '你的職責：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 已確認',
+  'hudChrome.bgOffer.title': '荊谷原野已準備就緒',
+  'hudChrome.bgOffer.accepted': '已確認 {accepted}/{size}',
+  'hudChrome.bgOffer.remaining': '剩餘 {seconds} 秒確認',
+  'hudChrome.bgOffer.accept': '接受',
+  'hudChrome.bgOffer.decline': '拒絕',
+  'hudChrome.bgOffer.acceptedWait': '等待其他人確認...',
   'hudChrome.finder.remaining': '剩餘 {seconds} 秒確認',
   'hudChrome.finder.accept': '接受',
   'hudChrome.finder.decline': '拒絕',
@@ -8634,6 +8999,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': '靈魂撕裂（被標記者需分散並接受治療）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在護符石處打斷）',
   'hudChrome.finder.mech.wardstones': '護符石引導（階段轉換）',
+  'hudChrome.finder.mech.dread_curse': '恐懼詛咒（僅英雄難度，累加坦克輪換減益）',
   'hudChrome.steam.link': '連結 Steam',
   'hudChrome.steam.unlink': '取消連結 Steam',
   'hudChrome.steam.linked': '已連結 Steam 帳號 {id}',
@@ -8727,6 +9093,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '編輯動作列按鍵',
   'hudChrome.actionBar.editKeysHint': '點擊動作列上的一個欄位，然後按下按鍵進行綁定。',
@@ -8756,6 +9125,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '乙太騎士懸浮機車',
   'hudChrome.mounts.name_shadowjump_toad': '影躍蟾蜍卡瑪影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
+  'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
   'hudChrome.mounts.name_terrorspark_groundshaker': '驚雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
@@ -8893,6 +9265,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '請先停下再使用脫困。',
   'hudChrome.unstuck.busy': '請先完成目前動作再使用脫困。',
   'hudChrome.unstuck.unavailable': '目前狀態下無法使用脫困。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '開啟維基？',
+  'hudChrome.wiki.confirmBody': '將在瀏覽器中開啟 World of ClaudeCraft 維基，遊戲會繼續執行。',
+  'hudChrome.wiki.confirmOpen': '開啟維基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'guide.abilityHook.revenge': '橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。',
   'guide.abilityHook.hamstring': '妨礙敵人的移動，使其無法逃脫。',
   'game.talents.choicesTab': '抉擇',
@@ -9201,8 +9578,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '你的{ability}被{target}招架了。',
   'hud.combat.floatingEvade': '迴避',
   'hud.combat.evaded': '你的{ability}被{target}迴避了。',
+  'hud.combat.floatingBlock': '{amount} 格擋',
+  'hud.combat.blockedDone': '你的{ability}被{target}格擋了，造成 {amount} 點傷害。',
+  'hud.combat.blockedTaken': '你格擋了{source}的攻擊，受到 {amount} 點傷害。',
   'hudChrome.options.mouseoverCast': '對隊伍框架滑鼠指向施法',
   'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
+  'hudChrome.options.showPetFrame': '顯示你的寵物',
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'hudChrome.mobile.professions': '專業',
@@ -9488,6 +9869,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': '學徒雯恩',
   'entities.mobs.barrow_wight.name': '古塚屍妖',
   'entities.mobs.castaway_navigator.name': '領航員蘇莉',
+  'entities.mobs.dragonkin_egg.name': '龍裔卵',
+  'entities.mobs.dragonkin_whelp.name': '龍裔幼崽',
+  'entities.mobs.dragonkin_broodguard.name': '龍裔巢衛',
+  'entities.mobs.drakemaw_broodlord.name': '龍喉巢主',
   'entities.mobs.cindraleth_maw_matriarch.name': '辛卓蕾絲，龍喉之母',
   'entities.mobs.drowned_deckhand.name': '溺亡水手',
   'entities.mobs.fisher_bram.name': '漁夫布蘭姆',
@@ -9612,6 +9997,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
   'hudChrome.professions.toolEffectName.artisansEye': '匠人之眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者儲囊',
+  'hudChrome.professions.toolEffectTooltip.kind': '工具符咒',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充能期間每次採集產出+1。',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    '充能期間將收穫品級提升1個工具等級。',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': '縮短其觸發的資源節點重生計時。',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    '在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    '普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。',
+  'hudChrome.professions.toolEffectTooltip.landOnly': '無法鑲嵌到釣竿上。',
+  'hudChrome.professions.toolEffectTooltip.openProfessions': '打開專業視窗，將其鑲嵌到採集工具上。',
   'hudChrome.professions.toolEffectSlotButton': '鑲嵌{effect}',
   'hudChrome.professions.toolEffectRechargeButton': '充能',
   'hudChrome.professions.toolEffectNoGain': '{effect}已鑲嵌且能量充盈。',
@@ -9625,6 +10021,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}上沒有鑲嵌任何效果。',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}已充滿能量。',
   'hudChrome.professions.toolEffectRechargeMaterials': '為{effect}充能需要{material}x{count}。',
+  'hudChrome.professions.craftingProgress': '正在製作：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.disenchantingProgress': '正在分解：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.enchantingProgress': '正在附魔：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.salvagingProgress': '正在回收：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '正在為工具效果充能：還剩{remaining}秒，共{total}秒。',
   'hudChrome.professions.toolEffectSpent': '已耗盡，需要充能',
   'hudChrome.professions.toolEffectDepleted': '工具效果已耗盡',
   'hudChrome.professions.toolEffectRechargePrice': '充能：{material} x{count}',
@@ -9645,6 +10047,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': '該物品已綁定，無法上架。',
   'hudChrome.enchantName.enchant_weapon_might': '附魔武器 - 威力',
   'hudChrome.enchantName.enchant_weapon_intellect': '附魔武器 - 法術強度',
+  'hudChrome.enchantName.enchant_offhand_stamina': '附魔副手 - 耐力',
   'hudChrome.enchantName.enchant_helmet_fortitude': '附魔頭部 - 堅韌',
   'hudChrome.enchantName.enchant_neck_spirit': '附魔頸部 - 精神',
   'hudChrome.enchantName.enchant_shoulder_agility': '附魔肩部 - 敏捷',
@@ -9701,9 +10104,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '你沒有那件物品。',
   'hudChrome.enchanting.notDisenchantable': '你無法分解那件物品。',
   'hudChrome.enchanting.notSalvageable': '你無法拆解那件物品。',
-  'hudChrome.enchanting.disenchantThrottled': '你分解得太快了。請稍候再試。',
-  'hudChrome.enchanting.salvageThrottled': '你拆解得太快了。請稍候再試。',
-  'hudChrome.enchanting.enchantThrottled': '你附魔得太快了。請稍候再試。',
   'hudChrome.enchanting.enchantWrongSlot': '該附魔無法施加於那件物品。',
   'hudChrome.enchanting.enchantUnknown': '該附魔不存在。',
   'hudChrome.enchanting.enchantInsufficient': '你沒有該附魔所需的材料。',
@@ -9909,6 +10309,58 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '你付不起解綁費用。',
   'hudChrome.unbind.outOfRange': '你必須站在對應的工作臺旁才能解綁。',
   'hudChrome.unbind.noSpace': '背包空間不足，無法存放解綁後的物品。',
+  // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
+  'hudChrome.commissionBoard.title': '委託訂單',
+  'hudChrome.commissionBoard.close': '關閉委託訂單',
+  'hudChrome.commissionBoard.openButton': '訂單',
+  'hudChrome.commissionBoard.openButtonAria': '開啟委託訂單板',
+  'hudChrome.commissionBoard.intro': '委託一位工匠為你製作一件物品，或接下別人發布的訂單。',
+  'hudChrome.commissionBoard.formTitle': '發布委託',
+  'hudChrome.commissionBoard.recipeLabel': '物品',
+  'hudChrome.commissionBoard.recipeEmpty': '你還不會製作任何可委託的裝備配方。',
+  'hudChrome.commissionBoard.scopeLabel': '誰可以接單',
+  'hudChrome.commissionBoard.scopeOpen': '任何人（公開板）',
+  'hudChrome.commissionBoard.scopeCrafter': '指定工匠',
+  'hudChrome.commissionBoard.crafterNameLabel': '工匠名稱',
+  'hudChrome.commissionBoard.crafterNamePlaceholder': '角色名稱',
+  'hudChrome.commissionBoard.openSubmit': '發布訂單',
+  'hudChrome.commissionBoard.sectionMine': '我的委託',
+  'hudChrome.commissionBoard.sectionToCraft': '我承接的委託',
+  'hudChrome.commissionBoard.sectionBoard': '公開委託板',
+  'hudChrome.commissionBoard.boardEmpty': '目前沒有公開的委託訂單。',
+  'hudChrome.commissionBoard.mineEmpty': '你還沒有發布任何委託。',
+  'hudChrome.commissionBoard.toCraftEmpty': '你目前沒有承接任何人的委託。',
+  'hudChrome.commissionBoard.rowFor': '{item}，委託人：{requester}',
+  'hudChrome.commissionBoard.rowTargeted': '{item}，委託人：{requester}（指定工匠：{crafter}）',
+  'hudChrome.commissionBoard.acceptedBy': '已由{name}接單',
+  'hudChrome.commissionBoard.statusOpen': '待接單',
+  'hudChrome.commissionBoard.statusAccepted': '已接單',
+  'hudChrome.commissionBoard.statusDelivered': '已交付',
+  'hudChrome.commissionBoard.statusCancelled': '已取消',
+  'hudChrome.commissionBoard.statusExpired': '已過期',
+  'hudChrome.commissionBoard.cancelButton': '取消',
+  'hudChrome.commissionBoard.acceptButton': '接單',
+  'hudChrome.commissionBoard.deliverButton': '交付',
+  'hudChrome.commissionBoard.deliverHint': '先製作出委託的物品（勾選委託選項），再回到這裡交付。',
+  'hudChrome.commissionBoard.opened': '你發布了一份{item}的委託訂單。',
+  'hudChrome.commissionBoard.cancelled': '你取消了{item}的委託訂單。',
+  'hudChrome.commissionBoard.accepted': '你接下了{item}的委託訂單。',
+  'hudChrome.commissionBoard.delivered': '你將{item}交付給了{name}。',
+  'hudChrome.commissionBoard.denyUnknownRecipe': '該配方不存在。',
+  'hudChrome.commissionBoard.denyNotCommissionEligible': '該配方無法委託製作。',
+  'hudChrome.commissionBoard.denyUnknownCrafter': '未找到該名稱的角色。',
+  'hudChrome.commissionBoard.denySelfCrafter': '你不能委託自己。',
+  'hudChrome.commissionBoard.denyTooManyOpen': '你的待接單委託訂單已達上限。',
+  'hudChrome.commissionBoard.denyUnknownOrder': '該委託訂單已不存在。',
+  'hudChrome.commissionBoard.denyOrderNotOpen': '該委託訂單已不再開放。',
+  'hudChrome.commissionBoard.denySelfOrder': '你不能接下自己發布的委託訂單。',
+  'hudChrome.commissionBoard.denyNotEligibleCrafter': '該委託訂單是發給另一位工匠的。',
+  'hudChrome.commissionBoard.denyNotYourOrder': '這不是你的委託訂單。',
+  'hudChrome.commissionBoard.denyOrderNotAccepted': '該委託訂單尚未被接單。',
+  'hudChrome.commissionBoard.denyNotYourAcceptance': '你並未接下該委託訂單。',
+  'hudChrome.commissionBoard.denyNotCrafted': '請先製作出委託物品（勾選委託選項）。',
+  'hudChrome.commissionBoard.denyOutOfRange': '你必須靠近委託人才能交付委託。',
+  'hudChrome.commissionBoard.denyNoSpace': '委託人的背包空間不足。',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作之輪',
@@ -10059,6 +10511,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '咬鉤與收線',
   'guide.profPages.fish.biteBody':
     '拋竿後{min}到{max}秒之間魚會咬鉤（更好的魚竿最多縮短{rod}秒等待），收線視窗持續{reel}秒、魚竿每高一階再加{reelRod}秒，單次垂釣最長{cap}秒。',
+  'guide.profPages.fish.earlyReelNote':
+    '心急的釣手注意：魚咬鉤之前再按魚竿，只會收回空線並結束這次垂釣（拋竿後的短暫寬限會原諒誤觸的連點）。耐心就是釣魚的全部：等咬鉤，再收線。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
   'guide.profPages.fish.scheduleNote':
     '釣魚成長按熟練度遵循固定檔位，且從{cutoff}起，釣上雜物不再有任何成長。',
@@ -10101,9 +10555,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名作品',
   'guide.profPages.econ.provenanceBody':
     '精良及以上的成品與發現都帶有製作者的署名，而署名完全相同的物品仍可堆疊。',
-  'guide.profPages.econ.throttleHeading': '操作限頻',
-  'guide.profPages.econ.throttleBody':
-    '製作、分解、附魔與回收共用一個限頻：每{seconds}秒最多{actions}次操作。',
   'guide.profPages.econ.doctrineHeading': '玩家與玩家交易',
   'guide.profPages.econ.doctrineBody':
     '製作裝備的強度始終低於團隊副本的底線，而上述費用會把貨物推向玩家之間的交易，而非商店循環。',
@@ -10266,6 +10717,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。附魔與署名件如今也能上架：每件以單件掛單出售，物品提示會顯示附魔與製作者印記，渡鴉郵驛同樣可以寄送；材料依舊是穩定的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
   'hudChrome.corpseHarvest.components.meat': '獸肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
+  'hudChrome.materialHint.cookingCatch': '烹飪材料。必須先烹飪後才能食用。',
   'hudChrome.materialHint.fineGrade':
     '優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。',
   'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和優秀品質的裝備可得。',
@@ -10377,4 +10829,1205 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
   'itemUi.vendor.buyStack': '購買 {count} 個',
   'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '製作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '附魔',
+  'abilityUi.cast.salvaging': '拆解',
+  'abilityUi.cast.tool_recharge': '充能',
+  'hudChrome.crafting.crafting': '製作中',
+  'hudChrome.crafting.create': '製作',
+  'hudChrome.crafting.createAll': '全部製作',
+  'hudChrome.crafting.createAllAria': '依目前材料可製作的最大數量製作此配方',
+  'hudChrome.crafting.qtyRowAria': '製作數量',
+  'hudChrome.crafting.qtyDecreaseAria': '減少製作數量（目前 {count}）',
+  'hudChrome.crafting.qtyIncreaseAria': '增加製作數量（目前 {count}）',
+  'hudChrome.crafting.qtyValueAria': '製作數量，{count}',
+  'hudChrome.crafting.batchRemaining': '剩餘 {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '還剩 {remaining} 個，共 {total} 個',
+  'hudChrome.crafting.durationAria': '施放時間：{seconds} 秒',
+  'hudChrome.crafting.progressAria': '製作進度',
+  'hudChrome.crafting.announceStart': '正在製作 {name}',
+  'hudChrome.crafting.announceComplete': '已完成製作 {name}',
+  'hudChrome.crafting.announceCancel': '製作已取消',
+  'hudChrome.crafting.busy': '你正忙著。',
+  'hudChrome.enchanting.disenchantBusy': '你正忙著。',
+  'hudChrome.enchanting.salvageBusy': '你正忙著。',
+  'hudChrome.enchanting.enchantBusy': '你正忙著。',
+  'guide.profPages.econ.castPaceHeading': '讀條時間與金幣消耗',
+  'guide.profPages.econ.castPaceBody':
+    '專業動作需要真實讀條時間：簡單的野外配方不到兩秒，高階階梯配方則需要數秒；分解、附魔、拆解與工具效果充能各自有固定的短讀條。中途取消不會損失材料。每次成功製作還會依物品預算支付銅幣費用。加上材料、工作台與技能上限，這種節奏在不設額外動作配額的情況下，也能讓市場保持健康。各技能區間的精確讀條時間見下表。',
+  'guide.profPages.econ.castPaceField': '無技能需求的野外配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': '技能25以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': '技能50以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': '技能75以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '頂級與組合配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔與拆解：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': '批量製作：單次最多 {count} 件，逐件施放',
+  'auth.earrings': '耳環',
+  'auth.jewelMaterial': '首飾材質',
+  'auth.jewelDefault': '原樣',
+  'auth.jewelGold': '黃金',
+  'auth.jewelSilver': '白銀',
+  'auth.jewelBone': '骨質',
+  'auth.jewelIron': '玄鐵',
+  'auth.jewelCopper': '紫銅',
+  'auth.jewelBronze': '青銅',
+  'auth.jewelObsidian': '黑曜石',
+  'auth.jewelJade': '翡翠',
+  'auth.jewelAmethyst': '紫水晶',
+  'auth.jewelRuby': '紅寶石',
+  'auth.jewelPearl': '珍珠',
+  'auth.jewelTurquoise': '綠松石',
+  'auth.earNone': '無',
+  'auth.earStud': '耳釘',
+  'auth.earBone': '骨飾',
+  'auth.earBonehoop': '骨環',
+  'auth.earMoon': '新月',
+  'auth.earMoonstar': '月華之星',
+  'auth.earRunic': '符文石',
+  'auth.earChain': '串珠墜',
+  'auth.earSeptum': '鼻環',
+  'auth.earWarden': '守望者之鐵',
+  'auth.earHoop': '圓環',
+  'auth.earCuff': '耳骨夾',
+  'auth.earFeather': '羽毛',
+  'auth.beard': '鬍鬚',
+  'auth.face': '臉型',
+  'auth.bodyShoulders': '肩膀',
+  'auth.bodyChest': '胸部',
+  'auth.bodyHips': '臀部',
+  'auth.bodyHands': '手部大小',
+  'auth.bodyElbows': '手肘',
+  'auth.bodyKnees': '膝蓋',
+  'auth.bodyFeet': '腳部',
+  'auth.faceNose': '鼻子',
+  'auth.faceEyes': '眼睛大小',
+  'auth.faceJaw': '下頜',
+  'auth.faceBrow': '眉骨',
+  'auth.faceCheeks': '臉頰',
+  'auth.faceChin': '下巴',
+  'auth.mouth': '嘴巴',
+  'auth.mouthNeutral': '普通',
+  'auth.mouthLips': '豐唇',
+  'auth.mouthSmile': '微笑',
+  'auth.mouthFrown': '皺眉',
+  'auth.mouthWide': '寬闊',
+  'auth.mouthPout': '嘟嘴',
+  'auth.mouthGrin': '咧嘴笑',
+  'auth.mouthOpen': '張開',
+  'auth.mouthAwe': '驚訝',
+  'auth.faceEars': '耳朵',
+  'auth.faceSmirk': '壞笑',
+  'auth.eyeShape': '眼型',
+  'auth.eyeColor': '瞳色',
+  'auth.earShape': '耳型',
+  'auth.lashes': '睫毛',
+  'auth.lashesOn': '開啟',
+  'auth.lashesOff': '關閉',
+  'auth.lashColor': '睫毛顏色',
+  'auth.lipstick': '口紅',
+  'auth.blush': '腮紅',
+  'auth.eyeshadow': '眼影',
+  'auth.makeupNone': '無',
+  'auth.shadeRose': '玫瑰色',
+  'auth.shadeCoral': '珊瑚色',
+  'auth.shadeRuby': '寶石紅',
+  'auth.shadeBerry': '莓果色',
+  'auth.shadePlum': '李子色',
+  'auth.shadeNude': '裸色',
+  'auth.shadePeach': '蜜桃色',
+  'auth.shadeWarm': '暖調',
+  'auth.shadeMauve': '藕荷色',
+  'auth.shadeSmoke': '煙灰色',
+  'auth.shadeBronze': '古銅色',
+  'auth.shadeTeal': '青色',
+  'auth.randomize': '隨機外觀',
+  'auth.randomizeShort': '隨機',
+  'auth.helmPreview': '顯示頭盔',
+  'auth.style': '風格',
+  'auth.resetLook': '重置外觀',
+  'auth.resetShort': '重置',
+  'auth.browFlat': '平直',
+  'auth.browArched': '拱形',
+  'auth.browThin': '細眉',
+  'auth.browBushy': '濃眉',
+  'auth.browWorried': '八字',
+  'auth.browSharp': '銳利',
+  'auth.browRound': '圓潤',
+  'auth.eyeRound': '圓眼',
+  'auth.eyeAlmond': '杏眼',
+  'auth.eyeNarrow': '細眼',
+  'auth.eyeWide': '大眼',
+  'auth.eyeSharp': '銳眼',
+  'auth.eyeDroopy': '垂眼',
+  'auth.eyeSleepy': '睡眼',
+  'auth.eyeWideset': '寬間距',
+  'auth.eyeCat': '貓眼',
+  'auth.eyeDoe': '鹿眼',
+  'auth.earRound': '圓耳',
+  'auth.earPointed': '尖耳',
+  'auth.earSmall': '小耳',
+  'auth.earWide': '寬耳',
+  'auth.hairBald': '光頭',
+  'auth.hairBuzz': '寸頭',
+  'auth.hairCrew': '小平頭',
+  'auth.hairPompadour': '飛機頭',
+  'auth.hairMessy': '凌亂刺髮',
+  'auth.hairMohawk': '莫希干',
+  'auth.hairFauxhawk': '假莫希干',
+  'auth.hairAfro': '爆炸頭',
+  'auth.hairTopknot': '頭頂髮髻',
+  'auth.hairCrewcut': '層次平頭',
+  'auth.hairSidepart': '經典側分',
+  'auth.hairCurlycap': '短捲髮',
+  'auth.hairSweptback': '中長後梳',
+  'auth.hairWarriorbraid': '戰士辮',
+  'auth.hairCurtains': '中分窗簾',
+  'auth.hairLayered': '及肩層次',
+  'auth.hairMullet': '厚重鯔魚頭',
+  'auth.hairLongpart': '長直中分',
+  'auth.hairPixie': '精靈短髮',
+  'auth.hairSweptpixie': '側梳精靈短髮',
+  'auth.hairQuiff': '蓬鬆油頭',
+  'auth.hairHighbun': '高包頭',
+  'auth.hairLowbun': '低包頭',
+  'auth.hairBraidcrown': '編髮皇冠',
+  'auth.hairCurlyafro': '捲髮爆炸頭',
+  'auth.hairChinbob': '齊下巴鮑伯頭',
+  'auth.hairBluntbangs': '齊瀏海鮑伯頭',
+  'auth.hairWavybob': '波浪鮑伯頭',
+  'auth.hairAsymbob': '不對稱鮑伯頭',
+  'auth.hairHighpony': '高馬尾',
+  'auth.hairSidepony': '側馬尾',
+  'auth.hairHalfbun': '半丸子頭',
+  'auth.hairCurls': '蓬鬆捲髮',
+  'auth.hairLongwavy': '長捲波浪髮',
+  'auth.hairLongcenterpart': '長髮中分',
+  'auth.hairTwinbraids': '雙麻花辮',
+  'auth.hairLowpony': '低馬尾',
+  'auth.hairFantasybraid': '奇幻長辮',
+  'auth.outfit': '套裝顏色',
+  'auth.outfitClassic': '經典',
+  'auth.outfitCrimson': '緋紅',
+  'auth.outfitEmber': '餘燼',
+  'auth.outfitGold': '金色',
+  'auth.outfitForest': '森林綠',
+  'auth.outfitEmerald': '翡翠綠',
+  'auth.outfitTeal': '青色',
+  'auth.outfitAzure': '蔚藍',
+  'auth.outfitRoyal': '寶藍',
+  'auth.outfitViolet': '紫羅蘭',
+  'auth.outfitMagenta': '洋紅',
+  'auth.outfitRose': '玫瑰',
+  'auth.outfitOnyx': '瑪瑙黑',
+  'auth.outfitIvory': '象牙白',
+  'auth.outfitGilded': '鎏金',
+  'auth.outfitBonewrought': '骸骨鑄造',
+  'auth.outfitObsidian': '黑曜石',
+  'auth.outfitVerdigris': '銅綠',
+  'auth.outfitBloodforged': '血鍛',
+  'auth.beardNone': '無',
+  'auth.beardStubble': '鬍渣',
+  'auth.beardScruff': '短鬚',
+  'auth.beardMutton': '大鬢角',
+  'auth.beardGoatee': '山羊鬍',
+  'auth.beardChinpuff': '下巴鬍',
+  'auth.beardStache': '鬍子',
+  'auth.beardHorseshoe': '馬蹄鬍',
+  'auth.beardShortbox': '方形鬍',
+  'auth.beardFull': '絡腮鬍',
+  'auth.beardVikingb': '編織鬍',
+  'auth.beardWizard': '法師長鬚',
+  'auth.beardStubbleBeard': '濃密鬍碴',
+  'auth.customize': '自訂',
+  'auth.body': '體型',
+  'auth.genderMale': '男性',
+  'auth.genderFemale': '女性',
+  'auth.hair': '髮型',
+  'auth.brows': '眉毛',
+  'auth.skinTone': '膚色',
+  'auth.hairColor': '髮色',
+  'auth.lightness': '明暗',
+  'auth.colorWheelAria': '{label}色環：拖曳以選擇色相與飽和度',
+  'auth.lightnessAria': '{label}明暗',
+  'auth.customColor': '自訂',
+  'auth.colorPresetAria': '{label}預設 {n}',
+  'auth.browNone': '無',
+  'auth.browSoft': '柔和',
+  'auth.browThick': '濃密',
+  'auth.browAngled': '上揚',
+  'hudChrome.paperdoll.hideHelmAria': '隱藏頭盔',
+  'hudChrome.paperdoll.showHelmAria': '顯示頭盔',
+  'hudChrome.options.waterRipples': '水面漣漪（尾波）',
+  'hudChrome.breath.label': '呼吸',
+  'hudChrome.breath.drowning': '溺水！',
+  'guide.arenaPage.honorBody':
+    '榮譽是與其他玩家交戰所用的貨幣。你會在灰燼鬥獸場以及荊谷原野上賺得它，它與你的錢幣分開存放、永遠不會混在一起，而你的角色資訊會顯示你手上握有多少。它就只有一個用途：戰爭套裝。',
+  'guide.arenaPage.honorFinalNote':
+    '榮譽購買一經完成便無法反悔。以錢幣買下的東西還能從商人的買回清單裡取消，但榮譽購買永遠不會出現在那裡，而戰爭套裝在你買下的那一刻便靈魂綁定，因此它永遠無法交易、郵寄，也無法賣回換取任何東西。商店會因此請你再確認一次：按下去之前，先把那件裝備看清楚。',
+  'guide.arenaPage.honorHeading': '榮譽',
+  'guide.arenaPage.quartermastersBody':
+    '兩位軍需官守著同一批貨架，所以哪一位比較近就找哪一位交易。榮譽軍需官怒焰站在東溪谷，而戰爭軍備庫總管、戰帥德拉文·科爾則在高望顧著櫃檯。他們的存貨就是戰爭品級：五個護甲系列，外加所有系列共用的頸飾、戒指與武器。',
+  'guide.arenaPage.rewardsBody':
+    '一場排名勝利會發放榮譽這種玩家對戰貨幣，而落敗除了評分之外不會讓你損失任何東西。榮譽的用意是獎勵真正的對戰：同一天內再次擊敗同一位對手或同一支隊伍不會再發放，連勝的一天愈打到後面，每場勝利給的也會少一些，而對手棄賽的比賽雖然仍會牽動你的評分，卻完全不發榮譽。這個「一天」是榮譽自己的一天，它按自己的時鐘換日，而不是隨王國的副本重置。',
+  'guide.arenaPage.rewardsHeading': '排名對戰的報酬',
+  'guide.arenaPage.warfareBody':
+    '每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備打起地城首領來一文不值。',
+  'guide.arenaPage.warfareHeading': '戰爭套裝',
+  'guide.arenaPage.warfareTradeBody':
+    '這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。',
+  'guide.classPage.formLine.form_cat':
+    '近戰輸出型態：像盜賊那樣使用能量與連擊點，威脅值則低上許多。',
+  'guide.classPage.formLine.form_travel':
+    '趕路型態：在地面上快得多，但在你變回來之前無法使用其他技能。',
+  'guide.classPage.formName.form_bear': '巨熊形態',
+  'guide.classPage.formName.form_travel': '迅捷形態',
+  'guide.classPage.formsHeading': '變形',
+  'guide.classPage.formsMoonwing':
+    '平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它是唯一保留你法術的動物形態，而你的魔杖也只有在它或你平常的施法形態下才能使用。',
+  'guide.classPage.formsNote':
+    '德魯伊靠變換形態作戰。大多數德魯伊技能都隸屬於某一種形態，因此你身處的形態決定了你能施放什麼，而變形本身會消耗少許法力。無論是否在戰鬥中，你都可以隨心所欲地變來變去。',
+  'guide.classPage.mageEleHeading': '水元素',
+  'guide.classPage.mageEleJet':
+    '水流噴射在寵物動作列上自成一個按鈕：點擊它可將一道冰寒光束鎖定在單一敵人身上，或是按右鍵（在手機上長按），讓水元素在冷卻結束後自行施放。',
+  'guide.classPage.mageEleNote':
+    '冰霜法師會學會召喚水元素，那是一個遠程夥伴，會自行朝你的目標投擲水箭。它和獵人的野獸或術士的惡魔一樣聽從寵物動作列，只是它並不是為了替你穩住目標而設計的。',
+  'guide.classPage.mageEleSummon': '一道冰霜法術，將水元素召喚到你身旁，並讓牠撲向你的目標。',
+  'guide.classPage.mageLore':
+    '法師駕馭火焰與冰霜摧毀敵人、召喚水元素、將威脅凍結在原地，或是扭曲時間本身來為盟友護盾與療傷。',
+  'guide.combat.allyRezBody':
+    '你並非總得自己走回去。帶有復活法術的盟友可以將你扶起，而它會化為一個提示送到你面前，由你接受或婉拒；放著不理它就會過期，所以趁它還在時就回應。接受之後，你會帶著部分生命與法力，在施法的那位夥伴身旁站起。有些治療者能一次向整支倒地的隊伍伸出援手，不過你們每個人仍得各自回應自己的提示。荊谷原野是例外：那裡沒有任何復活法術能觸及你，你只能等待己方的下一波復活潮。',
+  'guide.combat.allyRezTitle': '盟友何時能將你扶起',
+  'guide.combat.breathBody':
+    '深水可以游泳，你也可以潛入水下。頭部沒入水中時，畫面上方附近會出現一條藍色的氣息條並開始消退；浮出水面後，它回填的速度遠比消退時快得多。若你還在水下就讓它耗盡，你便會開始溺水，每秒損失一大塊生命值，直到你回到空氣中為止，所以長時間下潛時要留意那條氣息條。死亡會將它清空，因此跑屍時總是從滿滿一口氣開始。',
+  'guide.combat.climbBody':
+    '岩架並不是牆。朝著高得跨不上去的東西起跳，你的角色會在跳躍接近頂點時攀住邊緣並翻身上去，不需要按任何專屬按鍵。任何你自己就能跨過的低矮障礙都會平淡無奇地過去；完整的引體向上留給高過你頭頂的邊緣。它很短暫，而且在進行時會接管你的操控，因此你無法中途轉向脫離。若你在攀爬途中被昏迷，你會鬆手墜落，落地距離從跳躍起跳的地面算起；而昏迷或定身則會讓攀爬根本無法開始，這一點在你想從一場戰鬥的險境中脫身時很值得記住。',
+  'guide.combat.climbTitle': '翻上一道岩架',
+  'guide.combat.fatigueBody':
+    '大海沒有牆。這個世界原本就要你游過去的水路，也就是陸地與陸地之間的海峽與湖泊，以及內陸的湖泊，無論花多久橫渡都很安全。但若你從岸邊一路闖進真正的外海，它便會開始抽乾你的力氣：先出現一段警告，你有充裕的時間掉頭，在那之後，大海會持續造成愈來愈重、什麼都擋不住的傷害，直到你朝陸地折返為止。在離岸那麼遠的地方溺斃或力竭，你會像其他任何死法一樣釋放靈魂，所以請把地平線當成風景，而不是目的地。',
+  'guide.combat.hazardsTitle': '水會要你的命',
+  'guide.combat.threatTitle': '敵人會打誰',
+  'guide.combat.unstuckBody':
+    '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
+  'guide.combat.unstuckTitle': '當你真的卡住時',
+  'guide.commandsPage.abilities': '你已學會的技能。',
+  'guide.commandsPage.afk':
+    '將自己標記為暫時離開，可附上一段訊息，讓密語你的人自動收到它作為回覆。不加訊息再輸入一次即可清除；任何其他聊天發言也會清除它。',
+  'guide.commandsPage.aliasBody':
+    '大多數指令都有簡寫，而同一列中列出的每一種寫法都完全等效：/w、/t 與 /tell 是同一道指令。角括號中的字是必填，方括號中的字是選填，而指令本身的大小寫從來都無所謂。',
+  'guide.commandsPage.arena':
+    '你在灰燼鬥獸場兩個級別中的成績：一對一與二對二的評分、勝場、敗場與勝率。',
+  'guide.commandsPage.assist':
+    '將指定玩家正在鎖定的目標設為你的目標。不加名字時，則協助你當前鎖定的玩家。它在世界上任何地方都能觸及你的隊伍與團隊，以及近到你看得見的任何人。',
+  'guide.commandsPage.attack': '自動攻擊是否正在進行、對象是誰，以及你揮擊一次要花多久。',
+  'guide.commandsPage.bags': '你身上帶著什麼，品質最好的排在最前面，最後附上你的錢財。',
+  'guide.commandsPage.bangBody':
+    '有少數幾道指令以驚嘆號而非斜線開頭。它們會向整個王國宣告某件事，同時張貼到社群 Discord 上，因此沒有登入的人也看得到。它們是線上遊玩的一部分。',
+  'guide.commandsPage.bangHeading': '社群指令',
+  'guide.commandsPage.bangList':
+    '這一組包含：!lfg 用來找隊伍，!wts 與 !wtb 用來販售與收購，!recruit 用來招募公會成員，!event 用來揪團隊副本或聚會，還有 !help 用在你卡關的時候。先輸入指令，再接上你的訊息。',
+  'guide.commandsPage.block':
+    '更強硬的版本：它同時擋下對方的密語、邀請與郵件，並讓你們兩人在 /who 中彼此隱形。清單形式則會列出你封鎖了哪些人。',
+  'guide.commandsPage.buffs': '你身上的增益與減益，以及各自剩餘的時間。',
+  'guide.commandsPage.buyback': '你近期賣給商人、目前仍能買回的東西。',
+  'guide.commandsPage.casting': '你正在施放或引導什麼，以及還剩多久。',
+  'guide.commandsPage.channelsIntro':
+    '綜合頻道能觸及整個王國，而你從登入的那一刻起就在其中。世界與尋求組隊則是選擇性加入：先加入，你才能在裡面閱讀與發言。',
+  'guide.commandsPage.cmdHeader': '指令',
+  'guide.commandsPage.combat': '你是否處於戰鬥中，以及何時會脫離戰鬥。',
+  'guide.commandsPage.combo': '你手上握有多少連擊點。',
+  'guide.commandsPage.completed': '你已經繳交的任務，依你完成的先後順序排列。',
+  'guide.commandsPage.consider': '與你相比，目標的等級讓牠有多危險。',
+  'guide.commandsPage.consumable': '此刻正在你身上生效的食物與飲品，以及各自還剩多久。',
+  'guide.commandsPage.cooldowns': '你有哪些技能正在冷卻，最快好的排在最前面。',
+  'guide.commandsPage.dnd': '請勿打擾：與離開類似，只是送給你的密語會被留住而不會送達。',
+  'guide.commandsPage.doesHeader': '它的作用',
+  'guide.commandsPage.dungeonMode': '在普通與英雄難度之間切換你的地城。',
+  'guide.commandsPage.dungeonReset': '放棄你自己那些空無一人的副本，這正是你切換難度之後該做的事。',
+  'guide.commandsPage.dungeons':
+    '每一座地城，附上其入口所在的區域與它所設計的隊伍人數，以及你目前設定的難度。',
+  'guide.commandsPage.emotesBody':
+    '社交表情也是指令：/wave、/bow、/cheer、/dance、/laugh 以及其餘各種，每一個都會展示給說話範圍內的所有人。加上一個名字便能指定對象，例如「/wave Aleph」，而 /me 則能涵蓋這份清單裡沒有的任何動作。',
+  'guide.commandsPage.emotesHeading': '表情',
+  'guide.commandsPage.emotesMore': '更多關於表情與結伴同遊的說明',
+  'guide.commandsPage.falling': '你是否騰空、離地多高，以及這一下落地會不會痛。',
+  'guide.commandsPage.follow':
+    '自動跟隨另一位玩家。不加名字時則跟隨你當前的目標。移動、施法、作戰、換一個目標，或對方走遠了，都會結束跟隨，而且你無法在戰鬥中啟動它。',
+  'guide.commandsPage.form': '你正處於哪一種變形形態或戰鬥姿態。',
+  'guide.commandsPage.gAlias':
+    '一個具有兩種含意的簡寫，很值得記住：離線時它送往綜合頻道，線上時則是你的公會頻道。當你確定要說給綜合頻道聽時，請輸入 /general 或 /1。',
+  'guide.commandsPage.gear': '你已裝備的每一件東西，逐一部位列出，好讓空著的部位一目了然。',
+  'guide.commandsPage.general': '全王國通行的綜合頻道。',
+  'guide.commandsPage.gold': '你錢袋裡有什麼。',
+  'guide.commandsPage.graveyard': '若你倒在此處，你的靈魂會回到哪裡。',
+  'guide.commandsPage.groupChannels': '頻道',
+  'guide.commandsPage.groupCombat': '戰鬥中',
+  'guide.commandsPage.groupParty': '隊伍與組隊',
+  'guide.commandsPage.groupPeople': '其他玩家',
+  'guide.commandsPage.groupRecovery': '脫困與狀態',
+  'guide.commandsPage.groupSelf': '你的角色',
+  'guide.commandsPage.groupState': '你此刻的狀態',
+  'guide.commandsPage.groupTalking': '交談',
+  'guide.commandsPage.groupWorld': '世界與移動',
+  'guide.commandsPage.guild': '與你的公會交談。僅限線上遊玩，而且你得先加入一個公會。',
+  'guide.commandsPage.help': '把指令清單印到你的聊天視窗裡。',
+  'guide.commandsPage.helpTipBody':
+    '在遊戲中輸入 /help，或 /commands，甚至只打 /?，整份指令清單就會印進你的聊天視窗。指令打錯時，遊戲會告訴你它認不得，並指引你回到 /help。',
+  'guide.commandsPage.helpTipTitle': '遊戲自己也知道這份清單',
+  'guide.commandsPage.ignore':
+    '把某位玩家的公開發言與頭頂的聊天泡泡對你隱藏起來。他們的密語、擲骰、邀請與郵件仍會送達。清單形式會列出你正在忽略哪些人。',
+  'guide.commandsPage.inspect': '查看一位線上玩家的等級、職業與生命值。',
+  'guide.commandsPage.intro': '你能在聊天中輸入的每一道指令，依用途分組，並附上簡寫。',
+  'guide.commandsPage.invite': '依名字邀請一位線上玩家加入你的隊伍，無論對方站在多遠的地方。',
+  'guide.commandsPage.join':
+    '加入或離開一個選擇性頻道。你能加入的兩個是 world 與 lfg，而單獨輸入 /join 會把它們列出來。替其中一個開啟聊天分頁，也會順便替你加入。',
+  'guide.commandsPage.lfg': '在尋求組隊頻道裡發言，人們會在那裡找隊伍。請先加入它。',
+  'guide.commandsPage.listings':
+    '你自己在世界市場上的上架商品，附上開價、各自剩餘的時間，以及你還有多少上架空間。',
+  'guide.commandsPage.manaRegen': '給法力使用者：你脫離戰鬥後的法力回復是否已重新開始跳動。',
+  'guide.commandsPage.me':
+    '以第三人稱書寫的自由動作文字，所以「/me 凝視著噴泉」會顯示成你的名字接著那個動作。你附近的每個人都看得見。',
+  'guide.commandsPage.nearby': '離你最近的生靈，最近的排在前面。',
+  'guide.commandsPage.officer': '你公會的幹部頻道，開放給幹部與公會會長。僅限線上遊玩。',
+  'guide.commandsPage.overpower': '給戰士：由敵人閃躲所開啟的血手時機是否仍然有效。',
+  'guide.commandsPage.partyChat': '與你隊伍或團隊中的每一個人交談。',
+  'guide.commandsPage.partyRoster':
+    '後面不接訊息時，這道指令改為印出你的隊伍名單：每位成員的等級、職業與生命值，並標出隊長。',
+  'guide.commandsPage.peopleNote':
+    '/who 名單以及你的忽略與封鎖清單都由伺服器保管，因此那些功能僅在線上遊玩時可用。',
+  'guide.commandsPage.pet': '你寵物的名字、等級、族群與生命值。',
+  'guide.commandsPage.petTaunt': '你寵物的嘲諷冷卻，以及牠是否被設定為自行施放。',
+  'guide.commandsPage.played': '這個角色在本次遊戲階段中待在世界裡多久了。',
+  'guide.commandsPage.playtime': '這個角色累計玩了多久，橫跨每一次遊戲階段。',
+  'guide.commandsPage.pois': '你當前區域的各處地標，最近的排在前面，並附上到各處的距離。',
+  'guide.commandsPage.potion': '共用的戰鬥藥水冷卻，它與你的技能冷卻是分開的。',
+  'guide.commandsPage.quests': '你的進行中任務日誌，附上每一項目標的進度。',
+  'guide.commandsPage.queued': '已上膛、將隨你下一次近戰揮擊發動的技能。',
+  'guide.commandsPage.range': '你的目標離你多遠，以及那是否已在近戰範圍之內。',
+  'guide.commandsPage.ready':
+    '由隊伍或團隊的隊長發起就緒確認，其他每個人都會收到一個提示，回答是或否。',
+  'guide.commandsPage.reply': '回覆最後一位密語你的人，不必再打一次對方的名字。',
+  'guide.commandsPage.roll':
+    '擲一個隨機數字，除非你指定上限或範圍，否則是 1 到 100。你的隊伍會看到結果，若你不在隊伍中，則是附近所有人都看得到。擲骰由伺服器執行，所以沒有人能作假。',
+  'guide.commandsPage.savedMana':
+    '給變形中的法力使用者：你變形期間被寄放的法力，變回來時就會歸還。',
+  'guide.commandsPage.say':
+    '對站在你附近的玩家說話。不加斜線的普通一行會送往你目前選取的聊天分頁，而「說話」正是你一開始所在的那一個。',
+  'guide.commandsPage.selfIntro':
+    '這些會在你的聊天視窗印出一行只有你看得到的私人訊息。什麼都不會被廣播出去，所以在激戰之中使用它們也很安全。',
+  'guide.commandsPage.session': '你自登入以來做了什麼：擊殺、死亡、傷害與經驗。',
+  'guide.commandsPage.sit':
+    '就地坐下，以及重新站起。只要你一移動、施法或挨了一下，就會自動站起來。',
+  'guide.commandsPage.slashBody':
+    '凡是你在聊天框中輸入、以斜線開頭的內容，都是一道指令，而不是你要說出口的話。按下 Enter，它要麼直接動作（你跟隨某人、你邀請他們、你擲骰），要麼印出一行只有你看得到的私人訊息。',
+  'guide.commandsPage.speed': '與正常奔跑相比你移動得多快，以及是否有什麼東西把你定住了。',
+  'guide.commandsPage.stats':
+    '一行角色摘要：等級、職業、生命值、你的資源、攻擊強度、暴擊機率與護甲。',
+  'guide.commandsPage.stickyBody':
+    '你選取了哪個聊天分頁，決定了不加斜線的普通一行會送到哪裡。選取世界分頁，你下一行沒有標記的話就會送往世界頻道，所以打字前先瞄一眼分頁。斜線指令永遠勝過分頁，所以不管當前是哪個分頁，/w Bob hi 都會密語 Bob；而在密語分頁上，普通的一行會回覆最後一位密語你的人。',
+  'guide.commandsPage.talents': '你的專精，以及你的六列天賦已經選好了幾列。',
+  'guide.commandsPage.target': '你當前的目標：名字、等級、牠是什麼，以及生命值。',
+  'guide.commandsPage.targetBuffs': '你目標身上的光環，每一個都標示為增益或減益。',
+  'guide.commandsPage.threat': '正在與你交戰的敵人此刻把注意力放在誰身上。',
+  'guide.commandsPage.unfollow': '停止跟隨。',
+  'guide.commandsPage.unknownBody':
+    '遊戲認不得的指令會回覆一則未知指令的通知，而且什麼都不會被說出口，所以打錯字絕不會落進你正在交談的頻道裡。連續發送得太快的指令會被節流：稍微放慢一點，它們就會再度通過。有些指令需要有對象才能作用，所以沒有鎖定任何人時使用 /follow，或是沒有人密語過你時使用 /reply，都會如實告訴你。',
+  'guide.commandsPage.unknownHeading': '如果某道指令沒有作用',
+  'guide.commandsPage.unstuck':
+    '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。之後你會帶著脫困虛弱一陣子，所以它是最後手段，而不是抄近路的辦法。',
+  'guide.commandsPage.where': '你所站的區域、它的等級範圍，以及你的座標。',
+  'guide.commandsPage.whisper':
+    '向一位在線的玩家發送私訊。只要不會與別人混淆，你輸入的大小寫怎麼寫都能對上他的名字。',
+  'guide.commandsPage.who':
+    '列出目前在線的玩家。加上一段文字，即可縮小到名稱或所在區域含有該文字的玩家。',
+  'guide.commandsPage.world': '在你加入世界頻道之後，於該頻道發言。',
+  'guide.commandsPage.xp': '顯示你的等級，以及這一級已經走了多遠。',
+  'guide.commandsPage.yell': '大喊，讓遠比說話範圍更遠的玩家也聽得見你。',
+  'guide.commandsPage.zones': '依旅程順序列出每一座區域與它的等級範圍，並標出你所在的那一座。',
+  'guide.controls.attackMove': '攻擊移動（需先在選項中開啟）',
+  'guide.controls.bgFlag': '在荊谷原野奪取敵方戰旗',
+  'guide.controls.jumpSwim': '跳躍；身在水中時則向上游',
+  'guide.controls.meters': '戰鬥統計（傷害、治療與仇恨）',
+  'guide.controls.moveAlt': '移動與轉向（同樣的四個動作，使用第二組按鍵）',
+  'guide.controls.onBarBinding':
+    '你也可以直接在動作列上設定按鍵：在「按鍵設定」面板中選擇「編輯動作列按鍵」，接著點擊動作列上的一個格子，再按下你想要的按鍵。完成後點擊「完成」。這一項僅限電腦版，因為它需要實體鍵盤。',
+  'guide.controls.petMark': '寵物：標記，選取你自己的寵物（與點擊牠的頭像框相同）',
+  'guide.controls.swimDown': '身在水中時向下潛（按住）',
+  'guide.controls.swimNote':
+    '游泳會用到兩個按鍵：按住空白鍵上浮，按住左 Ctrl 下沉。一邊向前游一邊把鏡頭壓低也同樣會下潛，所以你可以用視角來掌握深度。左 Ctrl 是唯一一個本身就是輔助鍵的預設配置，而在設定按鍵時，單獨按下輔助鍵會被忽略，因此若你要重新配置「向下游」，請挑一個不是輔助鍵的按鍵。',
+  'guide.deedsPage.bookBody':
+    '功績之書會把每個功績分門別類，讓你在類別之間翻閱，並附有搜尋框，以及全部、已獲得、未獲得與即將完成這幾種篩選。靠近頂端的「最近」一列收著你最新解鎖的功績，點擊其中一個就會直接跳到它的卡片；點擊別人貼在聊天中的功績名稱也一樣。在它旁邊，「即將完成」會指出你最接近達成的那幾個。在王國之中，每個功績還帶著它的稀有度，也就是已達成它的冒險者比例，讓你一眼看出哪些稀鬆平常、哪些是真正的攀登；離線世界沒有可供統計的人口，因此不顯示稀有度。側欄的盡頭是頭銜欄，你可以在那裡挑選要佩戴的頭銜。',
+  'guide.deedsPage.bookHeading': '功績之書裡面有什麼',
+  'guide.delvesPage.lockpickAnteBody':
+    '你在碰到鎖之前就先談好條件。拿三根撬棒，你有失手的餘裕，但寶櫃只會付出最樸素的獎賞；拿兩根是折衷的交易；只拿一根，而且乾淨俐落地解開，回報最為豐厚。你手上的撬棒愈少，每一步之間可供思考的時間也愈短；而如果最後一根折斷，這道鎖就會徹底卡死：在你再次通關這座秘探之前，那只寶櫃就此無緣。',
+  'guide.delvesPage.riteBody':
+    '並非每趟秘探都以一道鎖作結。「溺亡連禱」改以一場儀式收尾：守護者倒下之後，聖物庫周圍的神龕會依序亮起，要你照樣答覆回去。開始之前你可以自行選擇要把它調得多難，正如撬棒所提出的那樁交易。寬鬆的設定會為你重播不只一次序列，也給你不只一次嘗試，但它會壓低聖物庫願意付出的獎賞；最嚴苛的設定只顯示一次順序，只給一次嘗試，也是通往最豐厚獎賞的唯一途徑。',
+  'guide.delvesPage.riteHeading': '當秘探以一場儀式作結',
+  'guide.dungeonsPage.finderBoardBody':
+    '想自己挑選同伴嗎？隊長也可以改把隊伍張貼到預組看板上，並標註這趟征程的目的：首次挑戰、任務、全通、練習，或是速通。其他玩家提出申請，由隊長決定誰能同行。看板上沒有可自由填寫的廣告文字，只有標籤；而清單上有一個項目只在看板上開放，僅供張貼招募，不提供自動排隊。',
+  'guide.dungeonsPage.finderBody':
+    '你不必在聊天中吆喝也能湊滿隊伍。開啟地城搜尋器，看看它為哪些征程排隊，挑出你願意前往的，選好你要擔任的職責，然後加入隊列。搜尋器會湊出一支坦克、治療與傷害配置齊全的完整隊伍，再同時向所有人發出邀請；隊伍接受的那一刻，你就成隊了。清單上不只有五人征程：十人團隊副本的兩種難度也在此排隊，只是搜尋器從不檢查你是否已掙得入場資格，因此那道門本身仍可能把你擋回來。王國裡並非每一趟征程都在它的清單上，所以在你指望它帶你去某座特定地城之前，先看一眼清單。',
+  'guide.dungeonsPage.finderOfferBody':
+    '湊成的隊伍只會邀請一小段時間，因此請盡快回應。讓邀請過期或直接拒絕，搜尋器會先把你擋在隊列之外一小會兒才讓你重新加入，這能避免一支只回應了一半的隊伍拖住其他所有人。',
+  'guide.dungeonsPage.finderRolesBody':
+    '在你專精之前，可選的職責來自你的職業；有了啟用中的專精之後，則來自那個專精，所以治療者就以治療者的身分排隊。過了天賦開放的等級之後，搜尋器會要求你先選定一個專精，才願意給你任何職責。清單上的每一趟征程還各有自己的等級區間，比那道門本身更嚴格，而排隊隊伍中的每一位成員都必須落在其中：搜尋器不會安排一個需要隊伍去扛的角色。',
+  'guide.dungeonsPage.finderTitle': '尋找隊伍',
+  'guide.dungeonsPage.formatsNote':
+    '地城與團隊副本是三種副本形式之一。秘探是供一到兩人進行的短程探索，而裂隙則是在世界各處撕裂而開的裂口，會把一支隊伍送進一座每次都重新生成的地城。',
+  'guide.economy.guildBankNote':
+    '在你的個人金庫之外，你的公會還有一座自己的倉庫，由同一位司庫開啟，並從同一個視窗的分頁進入：一份共享的錢幣庫，以及一批集中存放的貨物。每位成員都能查看，而能把東西存進取出的則是幹部。詳情請見社群頁面。',
+  'guide.economy.honorBody':
+    '與其他玩家作戰會帶來第三種貨幣：榮譽。贏得一場排位競技場對決會給予榮譽，而在荊谷原野打完的一場比賽無論勝負都會給予榮譽，因此在原野上一場苦戰落敗，絕不算白打。榮譽會累積在你的角色資訊面板上，永遠不會與你的錢幣混在一起。你可以在榮譽軍需官處花用它，東溪的怒焰與高望的戰帥德拉文·科爾共用同一批存貨：那些只有榮譽買得到的戰爭護甲家族、飾品與武器。這些購買一律不可退，而裝備會在你買下的那一刻與你綁定，所以在確認之前請先把它看清楚。競技場頁面說明榮譽如何賺取。',
+  'guide.editorPage.buildBody':
+    '工具排在左側的側欄上，每個按鈕都標著自己的單字母快捷鍵。挑一個，然後直接在眼前的地圖上動手。Ctrl+Z 復原，Ctrl+Y 重做，因此你所嘗試的一切都不是永久的。',
+  'guide.editorPage.buildTitle': '你能打造什麼',
+  'guide.editorPage.helpBody':
+    '頂端列的「說明」會開啟一份參考，涵蓋每個工具、鍵盤快捷鍵與滑鼠操作，而且隨時都能重新執行導覽教學。其餘的就是動手摸索：復原永遠只有一個按鍵之遙，而「匯出」會給你一份地圖副本，讓你隨時都能回頭。',
+  'guide.editorPage.helpTitle': '熟悉這些工具',
+  'guide.editorPage.intro':
+    '一個屬於你自己的地圖編輯器，就在瀏覽器裡。塑形土地，種下道具與營地，然後跳進成果之中四處走走。',
+  'guide.editorPage.playtestBody':
+    '「試玩」會把地圖交給遊戲，並讓你以戰士的身分降落其中。你所做的一切都在腳下：營地會生出怪物，空氣牆擋得住去路，帶有碰撞的放置物則會把你推開繞行。看夠了之後，回到編輯器繼續動工。',
+  'guide.editorPage.playtestTitle': '遊玩你的地圖',
+  'guide.editorPage.sandboxBody':
+    '自訂地圖絕不會改變其他人正在玩的那個遊戲。試玩是在你自己的瀏覽器中離線執行，完全不與伺服器通訊，因此其中發生的一切都不會影響你的角色或共享世界。',
+  'guide.editorPage.sandboxTitle': '一座沙盒，而非正式世界',
+  'guide.editorPage.saveBody':
+    'Ctrl+S 可以儲存，而只要還有未儲存的編輯，「儲存」按鈕上就會帶著一個圓點。沒有帳號一樣能用編輯器：地圖會保存在你自己的瀏覽器中，也可以開啟自動儲存，而「匯出」會把地圖寫成一個純 JSON 檔案，「匯入」則能原樣讀回。\n\n以你的遊戲帳號登入之後，儲存也會送到伺服器，因此你的地圖會跟著你到另一台機器上。「開啟」視窗有一個分頁放這個瀏覽器裡的草稿，另一個分頁放已儲存到你帳號的地圖。如果編輯器顯示離線標記，請在另一個分頁登入遊戲，然後重新載入編輯器。',
+  'guide.editorPage.saveTitle': '儲存你的成果',
+  'guide.editorPage.shareBody':
+    '儲存到你帳號的地圖一開始都是私人的。你可以從「開啟」視窗把其中一張發布出去，讓任何人都能瀏覽它，也可以隨時再取消發布。同一個視窗中的「公開地圖」分頁能瀏覽其他玩家發布的一切：「開啟」會載入一張地圖，讓你看看它是怎麼做出來的，「分支」則會把一份私人副本放進你自己的清單，任你隨意修改。副本是一張新的地圖：編輯它絕不會動到原作。\n\n一個帳號能保留的地圖數量有上限，所以請把玩完的實驗品收拾乾淨。\n',
+  'guide.editorPage.shareTitle': '發布與分支',
+  'guide.editorPage.toolBlockerBody':
+    '拖曳出阻擋移動卻不顯示任何東西的空氣牆，適合用來安靜地封住某一道邊界。',
+  'guide.editorPage.toolBlockerTitle': '空氣牆',
+  'guide.editorPage.toolCampBody': '配置在試玩中會活過來的怪物營地，並設定試玩時玩家降落的位置。',
+  'guide.editorPage.toolCampTitle': '營地與出生點',
+  'guide.editorPage.toolLandBody':
+    '用一支大小與強度隨時可調的筆刷，抬升、下壓、平滑與壓平底下的地面。',
+  'guide.editorPage.toolLandTitle': '塑形土地',
+  'guide.editorPage.toolPlaceBody':
+    '從內建的資源目錄中把物件放到地面上，然後移動、旋轉、縮放與複製它們。放置物可以賦予碰撞，讓玩家繞過它而不是穿過它；當你改變主意時，擦除工具能把放置物從地圖上再拿掉。',
+  'guide.editorPage.toolPlaceTitle': '放置道具',
+  'guide.editorPage.toolRegionBody':
+    '用區域工具框選地形與已放置的資源，再把那份選取貼到地圖上的其他地方。',
+  'guide.editorPage.toolRegionTitle': '複製一整片區域',
+  'guide.editorPage.toolSurfaceBody':
+    '在區域預設之上塗刷生態地表，並設定地圖所宣告的湖泊水面高度。',
+  'guide.editorPage.toolSurfaceTitle': '塗刷與注水',
+  'guide.editorPage.uploadBody':
+    '登入之後，「上傳資源」按鈕能把你自己的 GLB 模型加進資源瀏覽器，與內建目錄並列，隨時能像其他道具一樣放置。上傳的檔案存放在你的帳號上，會計入大小與儲存空間上限，不再需要時也可以從資源瀏覽器中刪除。',
+  'guide.editorPage.uploadTitle': '帶進你自己的模型',
+  'guide.editorPage.viewsBody':
+    '3D 檢視以真正的遊戲算繪器繪製你的地圖，所見即所得：拖曳環繞視角，滾輪縮放。2D 俯視圖則是平面圖，比較適合移動樞紐、墓地與興趣點這類區域標記，也適合在雕塑之前先把一大片區域取好景。切換鈕位於頂端列。',
+  'guide.editorPage.viewsTitle': '同一張地圖的兩種檢視',
+  'guide.editorPage.whereBody':
+    '編輯器是獨立的一頁，位在 /editor，與遊戲分開。開啟時是一張全新的未命名地圖，以你早已熟悉的世界為底，因此你腳下一開始就有真實的土地。第一次造訪時會執行一段簡短的導覽教學，頂端列的「說明」隨時可以再跑一次。',
+  'guide.editorPage.whereTitle': '在哪裡找到它',
+  'guide.faqPage.a12':
+    '有一家選擇性的外觀商店。它販售的是造型：以商店貨幣 Claudium 購買的第一賽季兵器庫武器外觀。裡頭沒有任何東西會增加屬性、力量或進度，外觀也絕不會改變你的武器如何命中，因此每一件真正要緊的裝備，仍然來自遊玩。',
+  'guide.faqPage.a13':
+    '瀏覽器版什麼都不需要：開啟網站就能玩。如果你比較想要應用程式，Windows、macOS 與 Linux 的電腦版下載就在遊戲官網的下載頁面。iOS 與 Android 原生應用程式正在製作中，在它們推出之前，手機或平板可以用完整的觸控操作遊玩瀏覽器版。每個版本都登入同一個帳號與同樣的世界，因此你的角色會一路跟著你。',
+  'guide.faqPage.a14':
+    '一部裝有近期瀏覽器的筆電、桌機、手機或平板。首次啟動時，遊戲會讀取你的裝置並挑選相符的圖形檔位，從「低」到「超高」，而你自己做的任何選擇永遠優先。滑鼠鍵盤、觸控與遊戲手把都能使用。設定與操作按鍵頁面有詳細說明。',
+  'guide.faqPage.a15':
+    '只有線上遊玩才需要。離線世界什麼都不要求：在起始畫面選擇「離線」，然後按下「遊玩」。線上帳號是免費的，需要一個使用者名稱、一組密碼，以及一個用於帳號救援的電子郵件地址，並會把你的角色保存在伺服器上。有了帳號之後，你可以在選項中開啟兩步驟驗證。',
+  'guide.faqPage.a16':
+    '線上遊玩發生在各個世界上，而每個世界都是一份完整的遊戲副本，有自己的玩家、自己的世界市場與自己的排名。登入時，世界列表會顯示每個世界有多熱鬧，從「低」到「已滿」，讓你挑一個清靜的世界享受空間，或挑一個熱鬧的世界找伴。你的角色住在你創建它的那個世界上，而你可以在不只一個世界上保有角色。',
+  'guide.faqPage.q12': '有現金商店嗎？',
+  'guide.faqPage.q13': '我可以在哪裡取得應用程式？',
+  'guide.faqPage.q14': '我需要什麼才能執行它？',
+  'guide.faqPage.q15': '我需要帳號嗎？',
+  'guide.faqPage.q16': '什麼是世界？',
+  'guide.gear.bagsSort':
+    '當背包變亂時，背包視窗中的「整理」按鈕一按就能把它收拾乾淨。同一種物品的零散堆疊會被合併，所有東西也會依好讀的順序重新排列：武器與護甲在前，接著是背包、消耗品、工具與坐騎，然後是製作材料，每一種優質材料都緊挨著它的普通版本，再來是任務物品，最後才是灰色雜物，讓你一眼看出該賣掉什麼。過程中絕不會憑空產生或遺失任何東西，只是重新排列，因此隨時按下都很安全。',
+  'guide.gear.bindOnTradeBody':
+    '同樣的想法還有一個較寬鬆的版本：有些東西是交易時綁定，意思是它們只能易手一次，之後便屬於收下它的人。受委託製作的成品會在製作者交出時綁定。遵循這條規則的副本絕不會出現在市場或郵驛上，因為那兩者都是匿名的；它要麼當面遞出，要麼哪兒也去不了，而一旦遞了出去，它就綁定了。物品提示會寫明一件裝備遵循哪條規則，所以在你打算轉賣之前先確認一下。',
+  'guide.gear.cosmeticsWeapons':
+    '武器外觀是第三條路線，它們改變的是你所攜帶之物，而非攜帶的人。一款外觀會為一種武器類型重新上色，因此這副外貌會跟著你當前裝備的劍、法杖或弓，而且絕不會影響武器的屬性、攻擊距離或速度。武器外觀以整個帳號為單位解鎖，而非單一角色，並和其他一切一樣分成帶有稀有度層級的收藏。它們在兵器庫的賽季收藏中提供，而不是在世界中拾獲；設定它們的地方同樣是兵器庫，每種武器類型設定一款，而不是在外觀欄位設定。站在你身旁的每個人都看得見你所佩戴的外觀。',
+  'guide.gear.offhandBody':
+    '副手能放什麼，取決於你的職業。盾牌可以放在那裡，寶珠或典籍這類手持法器，或是獵人的箭袋也可以。能雙持的職業則會在副手放上第二把武器。雙手武器通常需要兩隻手，因此裝備一把會把副手原本拿著的東西卸下，除非你的專精屬於少數能同時攜帶兩把雙手武器的那種。',
+  'guide.gear.requiredLevelBody':
+    '有些裝備還帶著需求等級，會顯示在物品提示上。你在任何等級都可以拾取、購買或收下這樣一件裝備，但要等你達到那個等級才穿得上。這項需求取決於裝備的來源，而不只是它的顏色，因此一件你在自己的等級贏得的稀有裝備，通常可以馬上穿上；而一件來自遠高於你的層級的傳承品，則會待在你的背包裡等你追上。',
+  'guide.gear.soulboundBodyBound':
+    '少數特殊獎勵是靈魂綁定的，從你掙得它們的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它只屬於你，別無他人。這一點守護著英雄徽記這類珍貴的憑證，也涵蓋每一件以榮譽購得的戰爭裝備，因此一套玩家對戰的行頭只由掙得它的那個角色穿戴。你從世界中贏得的大多數裝備，仍然可以自由交易、販售或分享。',
+  'guide.gear.sourcesHonor':
+    '榮譽是與其他玩家作戰所得的報酬，而榮譽軍需官，也就是東溪的怒焰與高望的戰帥德拉文·科爾，掌管著只有榮譽買得到的戰爭商店：整套護甲家族、飾品，以及沒有任何錢幣商人販售的武器。競技場頁面說明榮譽本身如何賺取。',
+  'guide.gear.sourcesRifts':
+    '到了等級上限之後，裂隙會再添一處來源，而裂隙是一場競賽：最先通關的隊伍贏得它的獎勵。首次通關除了這趟征程留下的一切之外，還會另外給予裝備，其中包括一枚依你職業定位裁製的裂隙之戒，那是世界上其他任何地方都找不到的戒指。第二支完成的隊伍仍然完成了自己的征程，也保有通關的紀錄；他們失去的只是首次通關的獎勵。裂隙頁面說明這場競賽本身。',
+  'guide.glossary.chronicleDef':
+    '一座區域自己的功績集合，由當地的編年史官整理成篇章。你可以照自己喜歡的順序逐章推進。',
+  'guide.glossary.chronicleTerm': '編年史',
+  'guide.glossary.claudiumDef': 'WOC 商店的貨幣，只花在外觀上，別無他用。它絕不會買到力量或進度。',
+  'guide.glossary.commissionDef':
+    '為別人製作的成品。製作者會把它標記為委託製品，它便會綁定給在交易中收下它的人；日後工位大師可以收取費用為它解綁。',
+  'guide.glossary.commissionTerm': '委託與製作者之約',
+  'guide.glossary.fatigueDef':
+    '往外海游得夠遠，海水就會開始消耗你：先是一則警告，接著是不斷升高的傷害，直到你掉頭游回陸地為止。',
+  'guide.glossary.fatigueTerm': '疲勞',
+  'guide.glossary.finderDef':
+    '這個視窗收錄了各座地城與團隊副本，讓你排入快速配對，並列出正在找人的預組隊伍。預設按 Shift+I 開啟。',
+  'guide.glossary.finderTerm': '地城搜尋器',
+  'guide.glossary.fiveSecondDef':
+    '你的法力要等到上次花用法力後過了五秒，才會開始自行回復。這正是施法者懂得掌握節奏，而不是一路傾瀉法術的原因。',
+  'guide.glossary.fiveSecondTerm': '五秒規則',
+  'guide.glossary.honorDef':
+    '與其他玩家作戰所得的報酬：競技場勝利、荊谷原野的勝場與光榮擊殺，都會為它添上一筆。你可以用它換取戰爭套裝。',
+  'guide.glossary.honorTerm': '榮譽',
+  'guide.glossary.itemLevelDef':
+    '一個總結裝備強度的數值，想快速比較兩件裝備時很好用。在選項中開啟「顯示物品等級」，即可在物品提示上看到它。只有來源明確的裝備才帶有物品等級，因此普通的商人基本貨品與新手裝備不會顯示，缺少數值是正常現象，而非瑕疵。',
+  'guide.glossary.itemLevelTerm': '物品等級',
+  'guide.glossary.marksDef':
+    '可重複挑戰的終局內容除了戰利品之外還會給予的兩種獎勵。秘探給予秘探印記，可在秘探商店購買裝備並升級你的同伴；英雄地城給予英雄徽記，可在英雄軍需官處購買裝備。',
+  'guide.glossary.marksTerm': '秘探印記與英雄徽記',
+  'guide.glossary.masterworkDef':
+    '一件成品最精良的版本，技藝高超的工匠偶爾會做出這樣一件，取代原本的普通副本。傑作永遠帶著它製作者的名字。',
+  'guide.glossary.masterworkTerm': '傑作',
+  'guide.glossary.mountDef':
+    '一頭供你騎乘、以更快穿越大地的生物。你所做的幾乎其他任何事都會把你請下來：游泳、進入戰鬥、採集與製作，全都會讓你重新站回地上。',
+  'guide.glossary.mountTerm': '坐騎',
+  'guide.glossary.offHandDef':
+    '第二個手部欄位。它可以放盾牌，或提燈、箭袋這類手持物品；只有在你的職業與專精能雙持時，才放得下第二把武器。',
+  'guide.glossary.offHandTerm': '副手',
+  'guide.glossary.premadeDef':
+    '由玩家親手組成、並張貼在地城搜尋器看板上的隊伍，而不是快速配對隊列為你湊出來的那一種。',
+  'guide.glossary.premadeTerm': '預組隊伍',
+  'guide.glossary.reinsDef':
+    '那件本身就是坐騎的物品。把一副韁繩留在背包或銀行裡，那頭坐騎就是你的了；使用它們即可騎乘。韁繩可以交易、郵寄，也可以賣給其他玩家。',
+  'guide.glossary.reinsTerm': '韁繩',
+  'guide.glossary.requiredLevelDef':
+    '你必須先達到，才能穿戴或揮舞某件裝備的等級。在你還沒達到之前，物品提示會以紅色顯示它。',
+  'guide.glossary.requiredLevelTerm': '需求等級',
+  'guide.glossary.ridingDef':
+    '讓你得以騎乘的技能。你在 20 級時向馬廄總管購買一次，此後它便永遠留在你的角色身上。',
+  'guide.glossary.ridingTerm': '騎術',
+  'guide.glossary.riftDef':
+    '在各區域中自行撕裂而開的裂口，往下通往一座以該道裂隙自己的種子重新生成的副本樓層。裂隙分為 C、B、A 與 S 級。入口過一段時間後就不再接納新的隊伍，而只有王國中第一支抵達底層的隊伍能將它封閉。',
+  'guide.glossary.riftRankDef':
+    '裂隙上的那個字母，C、B、A 或 S，也是唯一決定它有多難的東西。裂隙絕不會依你的隊伍人數調整，因此等級就是整座難度階梯：C 最溫和，S 最兇猛，而每一個等級都是為一支隊伍設計的。',
+  'guide.glossary.riftRankTerm': '等級（裂隙）',
+  'guide.glossary.setBonusDef':
+    '同時穿戴同一護甲家族的數件裝備所獲得的額外獎勵。物品提示會計算你身上穿了該套裝的幾件，件數愈多，解鎖的加成也愈多。',
+  'guide.glossary.setBonusTerm': '套裝效果',
+  'guide.glossary.talentRowDef':
+    '天賦分成六列，分別在 5、8、11、14、17 與 20 級出現。每一列提供三個選項，你從中挑一個，因此沒有點數需要存起來或花掉。',
+  'guide.glossary.talentRowTerm': '天賦列',
+  'guide.glossary.toolCharmDef':
+    '一種製作出來的符物，可從專業視窗嵌入採礦、伐木或藥草學工具，以改善它帶回來的收穫。嵌入會消耗該符物，而效果持續固定的使用次數。次數用完後，你只要用材料為那個欄位充能即可，不必再做一個新的符物。',
+  'guide.glossary.toolCharmTerm': '工具符物',
+  'guide.glossary.unstuckDef':
+    '從遊戲選單使用「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地，而此後一段時間你會帶著一份暫時的虛弱。',
+  'guide.glossary.unstuckTerm': '脫困虛弱',
+  'guide.glossary.warfareDef':
+    '玩家對戰的裝備那一面。軍需官以榮譽販售整套戰爭護甲，而它們所帶的戰爭等級，只在對抗其他玩家的戰鬥中計算。',
+  'guide.glossary.warfareTerm': '戰爭',
+  'guide.glossary.worldDef':
+    '線上遊戲的一份共享副本，有自己的玩家、市場與排名。本指南也稱它為王國，而你的角色住在你創建它的那個世界上。',
+  'guide.glossary.worldTerm': '世界',
+  'guide.groups.character': '你的角色',
+  'guide.groups.compete': '玩家對戰',
+  'guide.groups.endgame': '組隊內容',
+  'guide.groups.world': '這個世界',
+  'guide.home.world.farshoreBlurb':
+    '沙洲彼端的一座島嶼，天空在裂隙原野之上撕裂而開，而鷗港為每一道裂口敲響它的鐘。',
+  'guide.home.world.farshoreName': '遠岸',
+  'guide.home.world.galeBlurb': '海崖與呼嘯的丘原，這裡的風從不歇息，燭港則緊閉門扉。',
+  'guide.home.world.galeName': '疾風崖',
+  'guide.home.world.gardenBlurb':
+    '一座樹籬迷宮的國度，至今仍被修剪得整整齊齊，卻沒有人見過那位園丁；入口就在籬苑鎮與它的噴泉庭院之後。',
+  'guide.home.world.gardenName': '常青園',
+  'guide.home.world.hauntBlurb': '巨木華蓋之下的鬧鬼森林，絞湖鎮的燈籠是這條路上唯一誠實的光。',
+  'guide.home.world.hauntName': '怨靈林',
+  'guide.home.world.jungleBlurb':
+    '棕櫚、白沙與喧鬧的飛鳥，海灘小鎮漂流港則在岸邊守著一堆不滅的營火。',
+  'guide.home.world.jungleName': '棕櫚灣',
+  'guide.home.world.levelsCap': '等級 {level}',
+  'guide.home.world.nightBlurb': '一片星辰滿天的午夜國度，花朵照亮小徑，月棲鎮則徹夜守望。',
+  'guide.home.world.nightName': '夜綻花野',
+  'guide.howToPlay.step0Body':
+    '離線遊玩什麼都不用準備：在開始畫面選擇「離線」，按下「遊玩」即可。想和大家一起玩，就免費建立一個帳號（一個使用者名稱、一組密碼，以及一個用來找回帳號的電子郵件地址），或登入你既有的帳號，再從世界列表中挑一個世界。',
+  'guide.howToPlay.worldsBody':
+    '線上遊玩發生在各個世界上，而每個世界都是這款遊戲的完整副本，有自己的玩家、自己的世界市場，也有自己的排名。世界列表會顯示每個世界有多熱鬧，從「低」到「滿」，所以想要寬敞就挑安靜的，想要有人作伴就挑忙碌的。你的角色住在你當初建立他們的那個世界上，而你可以同時在不只一個世界上保有角色。',
+  'guide.howToPlay.worldsTitle': '挑選一個世界',
+  'guide.interfacePage.actionBarsBody':
+    '三排各十一個技能格位於你的經驗條上方，第一排的最前端還有一顆專用的攻擊按鈕。一開始只有第一排在那裡：想要更多空間時，可以在設定中開啟第二排與第三排，而第三排需要先開啟第二排。鍵盤最上方的數字鍵列發動第一條動作列，額外的動作列則預設對應數字鍵盤。\n\n技能來自你的法術書（P）：把技能從書裡拖到格位上，或使用該列上的切換鈕，把它放進第一個空著的格位。物品也是同樣的用法，所以一疊藥水或一捲繃帶也能住在格位上，用一個按鍵使用。\n\n等一條動作列排成你喜歡的樣子之後，你可以把它鎖起來。鎖定會拒絕拖曳、放置與清除，同時讓那些技能一如往常地可用，所以戰鬥中一次手滑的點擊，再也不會把你的按鈕弄亂。\n\n另外有兩條較小的動作列會在適用時加入這一排：寵物指令列，上頭是攻擊、停止、挑釁、防禦與主動，綁定在 Ctrl 加 1 到 5；以及給那些會切換姿態或形態的職業使用的姿態列。',
+  'guide.interfacePage.actionBarsTitle': '你的動作列',
+  'guide.interfacePage.aurasBody':
+    '你自己的增益會化作一排小圖示，顯示在右上角、小地圖旁邊，每個圖示都在倒數自己剩餘的時間，而你的減益排在它們下方一列。右鍵點擊自己的增益即可取消它。\n\n有一個選項能把你的增益列移到你自己的單位框架上，這樣整個角落就全留給你的減益。\n\n你目標的增益與減益則一起排在它框架下方的一條帶狀區裡。想給它們更多空間時，Shift+J 會開啟獨立的「目標增益與減益效果」視窗，你可以移動它、篩選成只看增益或只看減益，並讓它一直開著。',
+  'guide.interfacePage.aurasTitle': '增益與減益',
+  'guide.interfacePage.barsBody':
+    '你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。',
+  'guide.interfacePage.barsTitle': '各種條、計時與戰鬥文字',
+  'guide.interfacePage.chatBody':
+    '位於左下角。按 Enter 開始輸入，再按一次 Enter 送出。\n\n有兩個分頁始終都在：「聊天」，也就是你周遭一切發言的合併紀錄；以及「戰鬥」，你這場戰鬥的文字紀錄。加號按鈕可以再添更多分頁，一個頻道一個：說話、大喊、隊伍、綜合、世界、尋求組隊、公會與幹部，另外還有一個密語分頁，把你收發的每一則密語都集中在同一處。在頻道分頁中輸入，就會直接送到那個頻道，不必再重打一次指令。\n\n整個聊天框都能拖到別的位置並調整大小，而且它會記住你把它留在哪裡。',
+  'guide.interfacePage.chatTitle': '聊天框',
+  'guide.interfacePage.framePartyBody':
+    '隊伍成員在左側、你的目標框架下方一列一列疊起來，每人一列。當某位成員走出範圍時，他那一列會變暗；每一列都會顯示值得反應的效果，也可以在旁邊顯示他的寵物。一列要帶多少生命值文字由你決定：不顯示、百分比、實際數字，或兩者都要。',
+  'guide.interfacePage.framePartyTitle': '你的隊伍',
+  'guide.interfacePage.framePetBody':
+    '獵人、術士，以及任何放出寵物的人，都會在自己的框架旁多一個小框架，上頭有寵物的名字、等級與生命值。點擊那個框架即可選取你的寵物，從鍵盤按 Ctrl+6 也是一樣。',
+  'guide.interfacePage.framesBody':
+    '單位框架就是一張頭像，旁邊配上幾條數值條：一定有生命條，該單位有資源時還有一條資源條，另外還有名字與等級標記。傷害護盾會以一段較亮的區塊疊畫在生命條上方，讓你看著護盾先把自己耗盡，生命值才開始下滑。',
+  'guide.interfacePage.frameSelfBody':
+    '位於畫面正下方中央、你的動作列旁邊。上頭有頭像、等級、生命值與你的資源，戰鬥中會有一個標記，休息時會有休息標記，而會累積連擊點的職業還會多出一排連擊點。點擊這個框架即可選取你自己。',
+  'guide.interfacePage.frameSelfTitle': '你自己的框架',
+  'guide.interfacePage.framesMoveBody':
+    '你自己的框架、目標框架與隊伍框架全都可以移動。每個框架的角落都帶著一顆小小的移動按鈕：解除鎖定，把框架拖到你要的位置，再重新鎖上，這樣一次失手的點擊就無法把它挪走。萬一它們跑到你會後悔的地方，設定中的「重設框架位置」會把它們全部彈回原本的位置。',
+  'guide.interfacePage.framesTitle': '單位框架',
+  'guide.interfacePage.frameTargetBody':
+    '位於左上角，你一選取東西它就出現，取消選取便再度消失。同樣的頭像與數值條，此外較強悍的敵人還會掛上「精英」標記，一條施法條顯示你的目標正在施放什麼，還有一列它身上的各種效果。',
+  'guide.interfacePage.frameTargetTitle': '你的目標',
+  'guide.interfacePage.frameTotBody':
+    '目標框架旁的一個小框架，顯示你的目標目前正打著誰。要看出一頭怪物是在跟你的坦克交手，還是朝著你來，這是最快的辦法。它會一直隱藏，直到你在設定中把它開啟為止。',
+  'guide.interfacePage.frameTotTitle': '你目標的目標',
+  'guide.interfacePage.glanceBody':
+    '介面圍繞在畫面的邊緣，把中央讓給這個世界。你自己的框架、你的動作列與你的經驗條沿著底部排開。你的目標與你的隊伍在左上角。小地圖與區域名稱在右上角，你的追蹤面板則從它們下方沿著右側往下排。聊天框在左下角，右下角則是一排小小的方形按鈕。\n\n其餘的一切都是你自行開關的視窗。多數視窗有自己的按鍵，多數在右下角那排按鈕中也有一顆對應的按鈕，而每一個視窗都能再按一次自己的按鍵、或按 Esc 關閉。',
+  'guide.interfacePage.glanceTitle': '畫面一覽',
+  'guide.interfacePage.intro':
+    '一張畫面的地圖：介面上每個框架、每條數值條與每顆按鈕各自的作用，以及每個按鍵會開啟哪一個視窗。',
+  'guide.interfacePage.keyWindowsBody':
+    '以下每一個視窗都有預設按鍵，也都在右下角那排按鈕中有一顆按鈕。再按一次那個按鍵，或按 Esc，即可關閉。',
+  'guide.interfacePage.keyWindowsTitle': '用按鍵開啟的視窗',
+  'guide.interfacePage.lootBody':
+    '與一具你掙來的屍體互動，戰利品視窗便會開啟，列出掉落了什麼。點擊一行即可取走。\n\n在隊伍中，一件符合隊伍拾取規則的好東西，會改成在你畫面上跳出擲骰提示：想自己留著就選「需求」，想拿去賣就選「貪婪」，想留給別人就選「放棄」。接著會有一個小面板顯示誰擲過了、又選了什麼，同時計時器持續倒數。\n\n拾取規則本身住在一個自己的小視窗裡。隊長可以在那裡更改規則，其他人看到的是同一個唯讀視窗，所以規則絕不會是祕密。\n\n有些屍體還可以採收部件。可以採收時，戰利品視窗底部會出現一個「採收」區塊，你想要的每一種部件都有一個可以勾選的方框。',
+  'guide.interfacePage.lootTitle': '戰利品與擲骰',
+  'guide.interfacePage.mapBody':
+    'M 會開啟世界地圖：整片大陸攤在眼前，上頭有你自己的箭頭、各個區域與它們的名稱、你周遭的興趣地點、傳送門，以及你已經發現的採集節點。你的隊伍也會顯示在上面。進入秘探之後，地圖會切換成你目前已探索房間的示意圖。\n\n右側、小地圖下方，一疊追蹤面板讓你不必打開任何東西就能看見手邊的事務：你追蹤中的任務與它們的目標、你的功績進度、你所在的秘探，以及你正參與的任何裂隙。想把畫面要回來時，任務追蹤面板可以收合。',
+  'guide.interfacePage.mapTitle': '世界地圖與你的追蹤面板',
+  'guide.interfacePage.minimapBody':
+    '右上角：一張圓形的小地圖，上方是區域名稱，下方是你的座標，外圈還有一個描繪一天時辰的錶盤。\n\n有話要說時，上頭會出現一些小小的指示：有未讀信件在等你時是一個信封，有銷售收益或退回物品在商人處等待時是一枚錢幣，另外還有一顆列出你團隊副本鎖定狀態的按鈕。',
+  'guide.interfacePage.minimapTitle': '小地圖',
+  'guide.interfacePage.mobileBody':
+    '觸控操作會自己出現，版面也會依你的螢幕自行調整大小：小手機用緊湊的排法，大手機用標準的排法，平板則用寬鬆一些的排法。\n\n你的技能排成一圈，而不是一排數字鍵：攻擊按鈕旁邊有五顆動作按鈕，還有一顆換頁鈕，讓這一圈輪替顯示你其餘的格位；等你把三條動作列全部開啟之後，最多可以到七頁。周圍則是觸控玩家最常伸手去按的按鈕：切換目標、使用眼前的東西、跳躍，另外還有一排可以拉出來的消耗品，會自動從你身上帶的東西補上。\n\n沿著底部邊緣是「聊天」、「社交」、「任務」、「設定」與「更多」。「更多」會開啟一個托盤，收著你其餘的視窗，包括你的角色面板、地城搜尋器、PvP、溪谷盃、表情，以及這個 wiki。這裡的視窗會填滿整個畫面，而不是浮在畫面上。\n\n移動你的單位框架是桌機才有的事：在觸控裝置上，版面會替你安排好它們的位置。',
+  'guide.interfacePage.mobileTitle': '在手機或平板上',
+  'guide.interfacePage.playerCardBody':
+    '你的角色面板上有一顆按鈕可以合成一張玩家卡：一張帶著你角色特寫的圖片，加上你身上穿的裝備與你的屬性數值，隨時可以儲存或分享。它是一張用來炫耀新裝備的快照，在遊戲中不會改變任何事情。',
+  'guide.interfacePage.playerCardTitle': '你的玩家卡',
+  'guide.interfacePage.railBody':
+    '在畫面的右下角，離小地圖很遠的地方，坐著一排小小的方形按鈕，一個視窗一顆，並排成兩短行。它們多半印著自己的預設按鍵。\n\n這些按鈕涵蓋你的角色面板、法術書、天賦、任務日誌、功績之書、專業、世界地圖、背包、製作、PvP、地城搜尋器、溪谷盃、紙牌對決、排行榜、表情、音樂、好友與公會、這個 wiki，以及遊戲選單。另外還有幾顆只在適用時才會加入。',
+  'guide.interfacePage.railTitle': '按鈕列',
+  'guide.interfacePage.scopeBody':
+    '本頁提到的每一個按鍵都是預設值，而且每一個都可以重新綁定。完整的按鍵表在「操作按鍵」頁，而改變介面外觀與行為的選項則在「設定與效能」頁。Esc 會關閉最上層的視窗，沒有任何視窗開著時則會開啟遊戲選單。',
+  'guide.interfacePage.scopeTitle': '按鍵，以及在哪裡更改',
+  'guide.interfacePage.wikiBody':
+    '這個 wiki 在遊戲中只有一次點擊之遙。右下角那排按鈕裡有一顆專屬的按鈕，Esc 遊戲選單中也有一列，而在手機上，它住在「更多」托盤裡。由於開啟它會把你交給瀏覽器，所以這顆按鈕一定會先請你確認，戰鬥中誤觸一下，絕不會把你拉出戰局。遊戲會在它背後繼續運行。',
+  'guide.interfacePage.wikiTitle': 'Wiki 按鈕',
+  'guide.interfacePage.winBagsBody':
+    '你身上帶著的一切，全在同一個附有四個袋子欄位的背包裡。上方的分類標籤能把它縮小到只看武器、護甲、消耗品、材料、工具、任務物品或坐騎，搜尋框則依名稱篩選。排序下拉選單可以依最近取得、品質或名稱重新排列你眼前的內容，而這個選擇會在你下次登入時保留下來。另外有一顆獨立的「整理」按鈕，一按就整理背包實際的格位，同時清掉分類標籤與搜尋，讓你看見整理好的整個背包。',
+  'guide.interfacePage.winCharBody':
+    '一邊是你已裝備的裝備，另一邊是你的屬性以及它們所供養的各項數值，而每一個數值上都有一段提示，說明它對你的職業有什麼作用。它也載著你的終身遊戲時間，旁邊有一個小小的眼睛圖示，讓你在不想展示的時候把數字藏起來，另外還有那顆合成你玩家卡的按鈕。',
+  'guide.interfacePage.winCharTitle': '角色面板（C）',
+  'guide.interfacePage.winCraftingBody':
+    '你的配方、每個配方需要什麼材料，以及用你身上帶的東西現在就能做出什麼。',
+  'guide.interfacePage.winCraftingTitle': '製作（T）',
+  'guide.interfacePage.winDeedsBody':
+    '你已完成之事的紀錄、它們為你支付的頭銜與名望，以及仍然敞開著的那些。',
+  'guide.interfacePage.winDeedsTitle': '功績之書（Shift+Z）',
+  'guide.interfacePage.winFinderBody':
+    '你可以排隊參加的團隊內容一覽。勾選你想要的活動，自己加入隊列，或為你自己的隊伍張貼一則招募，等隊伍湊齊時按下接受。',
+  'guide.interfacePage.winFinderTitle': '地城搜尋器（Shift+I）',
+  'guide.interfacePage.winMetersBody':
+    '你與同行每一個人的傷害、治療與威脅值，逐場戰鬥分段記錄，所以你可以回頭看上一場戰鬥。治療與威脅面板可以拉出來獨立擺放。',
+  'guide.interfacePage.winMetersTitle': '傷害統計（Shift+H）',
+  'guide.interfacePage.winMoreBody':
+    '世界地圖（M）、PvP 視窗（G）、溪谷盃（Y）、排行榜（K）、活動行事曆（I）與表情輪盤（X），全都是同樣的用法。',
+  'guide.interfacePage.winMoreTitle': '還有幾個',
+  'guide.interfacePage.winProfessionsBody':
+    '你已經學會了什麼、你在每一門上有多熟練，以及每一門還能走多遠。',
+  'guide.interfacePage.winProfessionsTitle': '專業（Shift+P）',
+  'guide.interfacePage.winQuestLogBody':
+    '你接下的每一個任務、它的故事、它的目標與你的進度，並附有把其中任何一項標示在地圖上的方法，以及挑選追蹤面板要跟著哪些任務的方法。',
+  'guide.interfacePage.winQuestLogTitle': '任務日誌（L）',
+  'guide.interfacePage.winSocialBody':
+    '分頁包含你的好友、你的公會與它的成員名單、你的團隊，以及你已經忽略或封鎖的玩家。',
+  'guide.interfacePage.winSocialTitle': '好友與公會（O）',
+  'guide.interfacePage.winSpellbookBody':
+    '你的職業擁有的每一個技能，已經學會的與尚未到來的，依序排列。你就是在這裡把技能拖到你的動作列上。',
+  'guide.interfacePage.winSpellbookTitle': '法術書（P）',
+  'guide.interfacePage.winTalentsBody':
+    '在這裡選擇你的專精，還有你的六列天賦：每列提供三個選項，以及每個選項的作用。尚未抵達的列會與目前可選的列並排顯示。',
+  'guide.interfacePage.winTalentsTitle': '天賦（N）',
+  'guide.interfacePage.worldWindowsBody':
+    '有些視窗你從來不必為它按鍵：你和對的人交談、或點擊對的東西時，它們就會開啟。\n\n商人會開啟販賣視窗，裡頭有他們的存貨可以買，還有一個買回分頁收著你最近賣掉的東西，以防你賣錯了。職業訓練師則會開啟一份清單，列出你現在能學的，以及還在前方等著你的。\n\n銀行行員會開啟你的金庫，也就是那個可以再花錢購買更多格位的保險箱。如果你的公會已經開設公會銀行，那裡的第二個分頁就會顯示它：即使沒有取出東西的權限，每位成員也都能看見裡面，所以沒有人需要開口問公會存了什麼；階級決定誰可以存入、取出與動用公會的錢幣，而且每一筆異動都有紀錄。\n\n渡鴉郵驛的郵箱會開啟你的信件，一個分頁放著已經寄達的，另一個是寄信用的表單，連同附件一併處理。商人處的世界市場有自己的視窗：一個分頁瀏覽與購買，另一個上架你自己的貨物，第三個領取已經賣出的收益。與另一位玩家面對面交易，則會開啟一個雙方各佔一側的交易視窗。',
+  'guide.interfacePage.worldWindowsTitle': '世界為你開啟的視窗',
+  'guide.mountsPage.breaksBody':
+    '水永遠是贏家。只要騎進任何深到需要游泳的地方，你會立刻落地，因為沒有任何地面坐騎會游泳；而死亡會讓你摔在倒下的地方。戰鬥中、死亡或以靈魂形態趕路時，以及荊谷原野對戰的任何一刻，你都無法召喚坐騎，那場戰鬥從集結到最後守點全程都得靠雙腳。召喚到一半走進戰鬥或走進水裡，同樣會中斷召喚。\n\n你做的大部分事情也會讓你下坐騎。揮出攻擊、開始施法、採集節點、釣魚、製作、附魔與回收，都會在你一動手的瞬間讓你下馬，所以每碰上一處礦脈就準備跳下來吧。召喚坐騎也會解除你正維持著的任何變形形態：你永遠不會既變形又騎乘。',
+  'guide.mountsPage.breaksHeading': '什麼會讓你回到地上',
+  'guide.mountsPage.collectBody':
+    '除了瑪拉的櫃台之外，韁繩是找出來的，不是買來的。它們出自五人地城與團隊副本英雄難度的最終首領，也出自裂隙的通關，而且你完成的裂隙愈難，它可能留下的韁繩就愈稀有。它們照設計就是稀有的發現，沒有哪一趟保證會出，所以追坐騎最厚道的方式，是把這份追獵順帶放進你本來就要跑的行程裡。本頁不會告訴你哪一隻坐騎掛在哪個首領身上：那一段留給你自己去發現。',
+  'guide.mountsPage.collectHeading': '較稀有的坐騎從何而來',
+  'guide.mountsPage.firstBody':
+    '英勇戰馬是全世界唯一有在販售的坐騎。學會騎術之後，瑪拉會以 10 金賣給你英勇戰馬的韁繩，而那副韁繩從此就是你的了。其他每一隻坐騎都得在世界中掙來，所以幾乎每一位騎手都是從這匹馬起步的。',
+  'guide.mountsPage.firstHeading': '你的第一隻坐騎',
+  'guide.mountsPage.goodsBody':
+    '坐騎是一件物品，這也就表示經濟體系流通得了它。只要韁繩放在你的背包或你的銀行裡，這隻坐騎就屬於你；不過存進銀行的韁繩只保住所有權，卻不能讓你騎：要喚出這頭牲口，你得把韁繩帶在身上。玩家的韁繩不帶靈魂綁定，因此它們可以交易、可以郵寄，也能像其他任何收穫一樣上架到世界市場，除非物品本身另有註明。在你把它交出去之前，有兩件事值得先知道：沒有任何商人會買回一副韁繩，所以坐騎是一筆你留著或轉手的購買，而不是能變現的資產；另外，如果韁繩在你騎乘途中離手，坐騎會跟著一起走，而你會被放在原地。',
+  'guide.mountsPage.goodsHeading': '韁繩是普通的貨物',
+  'guide.mountsPage.heading': '坐騎與騎乘',
+  'guide.mountsPage.intro':
+    '坐騎是一種更快穿越世界的方式，也僅止於此。你在馬廄學會騎乘，買下你的第一副韁繩，此後的每一條路都變短了。',
+  'guide.mountsPage.learnBody':
+    '騎術是一項只需買一次的技能，並在 {level} 級開放。馬廄總管瑪拉·希琴在丘原上經營著疾風崖馬廄，她以 80 金出售騎術訓練。單單這一筆購買，就是讓你能夠騎上坐騎的關鍵，而且它會永遠跟著你。\n\n學會之後，瑪拉還有一個任務要交給你：騎術課。接下它，跟著標記走到起點拱門後方那塊發光的方格上，按下「開始比賽」。她會借你一匹訓練用的英勇戰馬來上這堂課，所以這堂課本身不花你一毛錢。跑完賽道、完成它，再回去找她領取你的錢幣與經驗值。借來的戰馬事後會回到馬廄，所以這堂課教的是騎乘的本事，而不是送你一匹馬。',
+  'guide.mountsPage.learnHeading': '學習騎乘',
+  'guide.mountsPage.raceBody':
+    '瑪拉圍場裡的障礙賽道對任何人、任何時候都開放，不是只有上課時才開。騎上坐騎，站到拱門後方那塊發光的方格上，按下「開始比賽」。倒數會先讓你定在原地，接著時鐘開始走：在時間跑完之前跳過全部七道障礙，再穿過拱門騎出來。\n\n只有當你確確實實騰空越過橫桿，那道障礙才算數，所以輕鬆騎過去是什麼都不算的。你可以用任何順序、從任何一側跳，漏掉一道也不是世界末日：繞回去再跳一次就好。死亡、下馬或離開圍場都會結束這次挑戰，而且沒有任何事情攔著你再跑一次。沒有費用、沒有冷卻，除了時間本身之外也沒有任何獎品，而且任意多位騎手都能同時跑這條賽道，彼此互不妨礙。',
+  'guide.mountsPage.raceHeading': '馬廄的賽道',
+  'guide.mountsPage.rideBody':
+    '這裡沒有坐騎視窗，也沒有最愛可以設定，因為韁繩就是坐騎。從你的背包或動作列格位使用一副韁繩，你就騎上那隻坐騎。召喚需要一點時間，是一次短暫的呼喚而不是瞬發，所以它救不了一次糟糕的拉怪。下坐騎則是瞬間完成，而且永遠不會被阻擋。\n\n使用你正騎著的那副韁繩，就會把那隻坐騎收起來。騎乘中使用另一副韁繩，則會直接換成那一隻，中間不必再召喚一次。「騎乘 / 下騎」鍵，預設是反引號鍵，永遠只會讓你下來：它是下馬的路，不是上馬的路。唯一的例外是騎術課，在那裡同一個按鍵會喚來瑪拉借你的戰馬，因為借來的馬沒有韁繩可以點。在手機或平板上，「更多」托盤裡的「坐騎」按鈕兩個方向都能用。',
+  'guide.mountsPage.rideHeading': '上馬與下馬',
+  'guide.mountsPage.speedBody':
+    '速度是坐騎與坐騎之間唯一的差別。你從瑪拉手上買到的英勇戰馬定下了基準的腳程，而你在世界中收集到的坐騎都跑在它之上：韁繩愈稀有，騎起來就愈快，而且是幾個清楚的階段，不是平滑的滑動。沒有第二階的騎術要訓練，事後也沒有升級可以買。騎術你只付一次錢，此後由你使用的那副韁繩決定你跑得多快。',
+  'guide.mountsPage.speedHeading': '速度與階級',
+  'guide.mountsPage.whatBody':
+    '坐騎是一頭你騎乘的牲口，而它給你的東西就是速度。沒有護甲、沒有傷害、沒有屬性：牠載著你在地面上跑得更快，跳躍時也彈得高一點，這就是這筆交易的全部。遊戲中的每一隻坐騎都是地面坐騎，所以沒有飛行，也沒有任何一隻會游泳。',
+  'guide.mountsPage.whatHeading': '坐騎是什麼',
+  'guide.mountsPage.whereBody':
+    '疾風崖馬廄標示在疾風崖的地圖上，位於斷崖與沉船灘之間的丘原上。瑪拉站在馬廄旁邊，面對著賽場。',
+  'guide.mountsPage.whereHeading': '到哪裡找她',
+  'guide.nav.commands': '斜線指令',
+  'guide.nav.editor': '世界編輯器',
+  'guide.nav.interface': '介面與HUD',
+  'guide.nav.mounts': '坐騎與騎乘',
+  'guide.nav.rifts': '裂隙',
+  'guide.professions.focusBodyTiers':
+    '每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把 10 點專注點數分配到你在意的部件類型上。某個部件每投入 5 點，它的採收品級就提升一階（最多兩階），而每 1 點都會為它的產量再添 10 個百分點；未受專注的部件絕不會因此變差。\n\n你的分配會跟著角色走遍天涯，日後任何一次回到鎮上都能重新調整，快慢由你決定。慢慢來是免費的：你每移動 1 點，重新分配就進行 1 分鐘。付一點錢可以加快，每點 15 秒外加 5 銅與 1 個鈴音之塵；全額付款則讓它立即完成，每點 25 銅與 5 個鈴音之塵。只有你實際移動的點數才會計算，所以微調一點很便宜，而打開面板卻什麼都沒改就關掉，在任何檔位下都不花一毛錢。',
+  'guide.professions.harvestBodyFamilies':
+    '採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、利爪、獠牙、蛛絲、毒液、布料與獸肉，直接從屍體上與牠的普通戰利品一併取得；按下同一個鍵，兩者一同開啟。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把牠能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺、完美的爪或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。',
+  'guide.professions.toolEffectsBody':
+    '採集工具上有一個插槽，而填進去的東西就是附魔師的符物。採集者儲囊會讓一次採收的產出多出一個單位；匠人之眼則會提升採上來之物的品級。Eastbrook 工坊之主 Tinker Gizzel 會把兩者都教給附魔技能達到 25 的附魔師，而兩者都在他的工坊製作。\\n\\n剛插上的符物在普通品質的工具上帶有 20 次充能，工具每高一個稀有度階級就再多 10 次，所以同一枚符物插在史詩級的鎬上就從 50 次起跳。只有當符物確實改變了結果時才會消耗一次充能，對它沒能改善的採收絕不扣減；插槽也可以設定成每次使用前先問過你，讓符物等你說了「使用一次充能」再動。插上一枚新的符物，會以你當下攜帶的工具為準重鑄這個插槽，因此它會填到那把工具所能承載的量，而不是回到先前的某個高點；而一次完全不會造成任何改變的重插，會被擋下來，不會白白吃掉那枚符物。\\n\\n充能用盡並不會毀掉符物：由工具的持有者為插槽補充，每消耗一份秘法材料補 10 次充能，而它要求哪一種材料，取決於你身上攜帶的工具與這個插槽曾經被填充過的最好工具之間較好的那一個：普通或優秀工具用鈴音之塵，精良工具用鈴音精華，史詩工具用鈴音碎片。把好工具留在銀行裡並不會換來更便宜的補充，只會在同樣的價格下換來更少的次數；想誠實地降到便宜的階級，做法是帶著較差的工具插上一枚新的符物，如此便會就地重鑄插槽。如果插槽的上限高於你目前工具所能填滿的量，補充會停在那把工具的極限，並要你帶上更好的那一把。當你就是簽下這枚符物的附魔師時，補充只需一半的材料，若你還專精附魔則更少；其他人一律付全額。補充是一次短暫的施法，和這個製作家族的其他動作一樣。',
+  'guide.professions.toolEffectsHeading': '工具效果',
+  'guide.profPages.econ.commissionsBoardNote':
+    '委託有兩種起頭的方式：你在上方的委託板張貼一則訂單，把工作送到製作者面前；或是某位製作者純粹決定為你做一件成品。兩者最後都歸於同一份製作者之約。',
+  'guide.profPages.econ.orderBoardBody':
+    '你不必在聊天頻道裡找製作者。打開你的製作視窗，委託板就在它的標題列上、一鍵之遙。任何人都能在上頭張貼訂單：指名你想要做的配方，然後或是敞開來讓任何製作者接手，或是指定給某一位製作者，那麼便只有那個人能夠接下它。瀏覽委託板的製作者接下一則訂單，而接單即代表承諾，因此一件工作在同一時間只會由一個人進行。\n\n你張貼時不會扣留任何東西：訂單不會預留任何錢幣、也不會預留任何材料，所以價格與由誰提供材料，是你們兩人之間談定的事，就像任何委託一向那樣談。訂單還開著時你可以自行取消，而沒有人接的訂單會在一天後自動失效。一旦有製作者接下，交件才是結案的方式。\n\n交件是面對面進行的。製作者以委託的形式做出成品，來到你面前交給你，所以請留一格背包空間收下它。送到的東西遵循下方一般的委託規則，會透過製作者之約綁定給你。',
+  'guide.profPages.econ.orderBoardHeading': '委託板',
+  'guide.profPages.ench.charmsBody':
+    '附魔也是採集者的符物的來源。你的附魔技能達到 25 之後，Tinker Gizzel 會在 Eastbrook 工坊把兩者都教給你：採集者儲囊，讓一次採收多出一個單位；以及匠人之眼，提升採上來之物的品級。兩者各製作一次，然後插進鎬、斧或鐮刀裡，在那裡它只有在確實改善了採收時才會消耗一次充能。\n\n補充充能才是這門手藝持續賺錢的地方。充能由工具的持有者恢復，而不是由來訪的附魔師恢復；當那位持有者就是簽下符物的附魔師時，補充只需一半的材料，有附魔專精則更少。所以隔著櫃台賣出的符物只是一筆買賣，而插在你自己工具上的符物，才是最便宜的長期用品。完整的充能與材料階梯，可在任何一門採集專業的頁面上、「工具效果」一節查看。',
+  'guide.profPages.ench.charmsHeading': '給採集者工具的符物',
+  'guide.profPages.ench.enchantsNoteOffhand':
+    '附魔分三個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。進階層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有兩個去處：兩種符物配方各需五個，以及工具效果補充的最高一階，所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼）、符文印記（武器，智力，共鳴木）、符文織紋（胸部，精神，共鳴絲線）、符文皮革（護腿，敏捷，共鳴皮革）、符文鎖鏈（頭盔，耐力，共鳴鏈環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與進階附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文皮革則是護腿唯一的敏捷附魔。確切加成數值見下表。',
+  'guide.profPages.faq.a10':
+    '符物是一種插槽式的工具效果：附魔師的手藝，坐在採集工具裡，改善它採上來的東西。採集者儲囊讓一次採收多出一個單位，匠人之眼提升它的品級，而 Tinker Gizzel 會在附魔技能 25 時於 Eastbrook 工坊傳授兩者。只有當符物確實改變了結果時才會消耗一次充能，因此一次它無法改善的採收不會讓你付出任何代價；插槽也可以設定成每次使用前先問過你，讓你一次一次自己決定。\\n\\n一枚新的符物在普通工具上帶有 20 次充能，工具每高一個稀有度階級再多 10 次，所以史詩工具從 50 次起跳。用盡並不會毀掉符物：由工具的持有者補充插槽，每份秘法材料補 10 次充能，材料取決於他們攜帶的工具與這個插槽曾被填充過的最好工具之間較好的那一個（普通或優秀工具用鈴音之塵，精良工具用鈴音精華，史詩工具用鈴音碎片）。補充前把好工具收進銀行絕不會讓它更便宜，只會在同樣的價格下變得更少；而想回到便宜的階級，做法是帶著較差的工具插上一枚新的符物。簽下這枚符物的附魔師，補充自己的符物只付一半，有附魔專精則更少。',
+  'guide.profPages.faq.a9':
+    '把它張貼到委託板上。打開製作視窗，從它的標題列開啟委託板，指名你想要做的配方：讓訂單敞開給任何製作者接手，或指定給某位你已經認識的製作者。接單即代表那位製作者承諾了這份工作，而一則訂單在同一時間只會由一個人持有。\n\n你張貼時不會扣留任何錢幣、也不會扣留任何材料，所以價格與由誰帶材料，就照委託一向的做法由你們自己談定。訂單還開著時你可以自行取消，而沒有人接的訂單一天後便會失效。交件是當面進行的：成品做好時，帶著一格空的背包空間站到你的製作者身邊。它送到時會透過製作者之約綁定給你，而任何一位工位大師都能以慣常的費用替你解綁。',
+  'guide.profPages.faq.q10': '什麼是符物？充能用完了會怎麼樣？',
+  'guide.profPages.faq.q9': '我要怎麼請人幫我製作東西？',
+  'guide.profPages.findingNodesNote':
+    '你不必靠眼睛去找這些節點。只要地圖顯示到那塊地面，該區域中的每一處節點都會畫在區域地圖上，你經過時也會出現在小地圖上，所以出發之前就能在地圖畫面上規劃好一趟採集路線。你的工具還處理不了的節點會被標示出來，而不是被藏起來：它會以一個劃掉、變暗的標記留在原位，讓你看見自己正朝著什麼樣的地面練上去。在桌機上，把游標移到世界裡的礦脈、樹叢或草叢上，會說出它的名字、告訴你它需要哪一種工具，而在你採過它之後，還會為你自己的重生倒數到秒。觸控裝置上沒有東西可以懸停，因此改由小地圖上的標記來講同一件事。',
+  'guide.profPages.specimenBodyFamilies':
+    '採集時記得多留一點背包空間：一份署名的意外之財需要屬於自己的空位，或一疊相符的署名堆疊來承接，若什麼都放不下，產出仍會送達，但署名就此消失。屍體採收也有自己的頭獎機制：每一種採收部件約有 {pct}% 會擲出精良或更高的品質。有完美標本可給的族類（獸皮、蛛絲、毒液、爪、肉）會讓普通產出保持素面，另外在旁邊鑄出署名的標本；其餘三種，尖牙、布料與獠牙，則直接把署名打在產出本身上。',
+  'guide.progression.ridingBody':
+    '騎術是這段攀登盡頭等著你的其中一件事。到了 {level} 級，馬廄總管會以一筆可觀的金幣教你這項技能，而在訓練賽道上的一堂課，會為你賺得第一副韁繩。坐騎完全不賦予任何戰力；它只是把世界變小了，而在往北走了長長一段路之後，這本身就是一種獎賞。',
+  'guide.progression.ridingTitle': '學習騎乘',
+  'guide.questsPage.availableBody':
+    '任務是成串出現的。多數任務要等你交回它前面那一個之後才會給你，許多還要求最低等級，所以今天沒有東西給你的 NPC，可能在你再升幾級之後、或在你結掉手上這個任務之後，就有一堆事情要交代。少數任務另有自己的條件，例如騎術課，就要等你買下騎術技能之後才會開放。團隊任務會一開始就講明，列出它建議你帶幾位玩家同行。有些差事是可重複的：等一段時間後你可以再接一次，而任務給予者頭上的標記會告訴你何時又輪回來了。',
+  'guide.questsPage.availableTitle': '為什麼這位 NPC 沒有東西給你',
+  'guide.questsPage.cardMasterBody':
+    'Eastbrook 有一位 NPC 發的是牌，而不是差事。找牌局大師談話，從他的選單中挑出「紙牌對決」，你就會加入一個隊列，與下一位等待中的玩家配對。任何職業都能坐下來玩，你的等級與你的裝備完全不列入考量。雙方各自使用一副二十張、數值從一到十的牌，手上同時持有四張，每一輪抽一張新的：點數較高的牌贏得該輪，兩張相同的牌則算平手，雙方都不得分。先贏兩輪的人拿下這場對局，所以一場對決是三戰兩勝。每一輪都有時限，若你有九十秒沒有出牌，這場對局就判給對面；除非還沒有任何一輪分出勝負，那樣的話它就直接作廢，沒有贏家。你自己中途走人也是同樣的結果。你必須站在牌局大師身邊才能加入隊列，但一旦配對成功，牌桌會自行開啟，你在任何地方都能出牌。它需要兩個人，所以離線世界永遠不會提供這項玩法。',
+  'guide.questsPage.cardMasterTitle': '並非每個 NPC 都有任務：牌局大師',
+  'guide.questsPage.typeEscortBody':
+    '有人需要有人陪著走過一段危險的路。接下任務，找到在路口等候的那個人，與他交談便可啟程。他會走自己的路，你只需跟上腳步，而沿途盤據的麻煩會衝著他來，並不總是衝著你。緊跟在旁：敵人會一波波伏擊這趟行程，只有把一波打倒，路才會繼續走下去。你無法攻擊你護送的對象，但可以替他治療；若他倒下，這趟行程只會直接重置，讓你重來一次。帶著他活著抵達終點，而你也站在他身旁，任務便會計入。',
+  'guide.questsPage.typeEscortTitle': '護送',
+  'guide.riftsPage.boundBody':
+    '你的隊伍在裂隙裡取得的第一次擊殺，就此定下這趟旅程。從那一刻起，你便被綁定在那個複本上：無論因為什麼理由離開，回來時進的都是你離開的那一趟，絕不會進入別隊的複本，也不會是一趟全新的。在那第一次擊殺之前，什麼都還沒定下，因此還在集合的隊伍可以重新整隊、一起走進去，不會在身後留下一堆開了頭的半成品複本。',
+  'guide.riftsPage.boundHeading': '一旦見血',
+  'guide.riftsPage.floorsHeading': '一層層向下',
+  'guide.riftsPage.groupBody':
+    '帶上一支隊伍。裂隙不會因為走進去的人少就手下留情：裡頭沒有任何東西會去數站著的有幾個人，所以傳送門上的等級就是你要面對的等級，不管你們是五個人還是一個人。門口確實會讓你獨自進去，也真的有人會試，但裂隙在每一個等級都是團隊內容，而且從第一個房間起就對此毫不掩飾。你的隊伍會拿到專屬於自己的裂隙複本，因此不會有別的隊伍闖進你的旅程。若你倒下，可以化為鬼魂走回去，等裡頭的戰鬥停下之後再把自己收拾起來。',
+  'guide.riftsPage.groupHeading': '誰能進去',
+  'guide.riftsPage.heading': '裂隙',
+  'guide.riftsPage.intro':
+    '裂隙是世界本身被撕開的一道口子，而不是一扇你走過去的門。踏進去，你會得到一趟從沒有人跑過的下潛之路：樓層、怪物，以及等在最底下的那個東西，全都是專為那一道裂隙現場生成的，因此同樣的等級絕不會有兩次相同的過程。',
+  'guide.riftsPage.levelNote':
+    '裂隙屬於終局內容。你必須達到等級上限，也就是 {n} 級，才能踏進任何一個等級的裂隙。',
+  'guide.riftsPage.openBody':
+    '裂隙撕開的地點是王國更外圍的區域，而不是最初的山谷，而且全王國都會聽見消息：它一出現，聊天視窗就會有一行字報出等級與所在區域。每個符合資格的區域大約每小時輪到一次裂隙，而已經立著一道裂隙的區域則會排隊等候，不會再開第二道。沒有人去封印的裂隙，會在幾個小時後自行坍塌，王國同樣會聽見這件事。裂隙已被封印的區域會安靜下來，直到下一輪輪到它為止，所以公告還新鮮的時候，值得動身往那裡走一趟。',
+  'guide.riftsPage.openHeading': '裂隙在哪裡開啟，多久一次',
+  'guide.riftsPage.raceBody':
+    '王國裡的每一支隊伍都能同時攻打同一道裂隙，各自在自己的複本裡進行，而只有第一個打倒最底下那個東西的隊伍能封印它。當一支隊伍獲勝，全王國都會聽見他們的名字與所用的時間，進入的通道也隨之在他們身後關上。輸掉這場競速並不會終結你的旅程：你的複本依然開著，最底下那個東西照樣會倒在你手上，你也依然能靠自己的本事走出來。它奪走的，是通關本該給你的一切。首領絕不會為第二名的隊伍留下任何東西，因此你帶回家的，就只有沿路從怪物身上掉落的那些，再無其他。功績之書仍然會計入這次通關，因為你確實把那東西放倒了。這是遊戲裡唯一一場你可能連贏家的面都沒見過就輸掉的競速。',
+  'guide.riftsPage.raceHeading': '首殺競速',
+  'guide.riftsPage.ranksBody':
+    '每一道裂隙都有 C、B、A、S 的等級，而等級會隨著公告一起送到，所以你出城之前就知道自己要走向什麼。C 最溫和，B 與 A 由此往上攀，S 則是裂隙所能達到的最艱難程度。等級是唯一的旋鈕。它決定樓層有多凶狠，除此之外別無他物，因此 C 級裂隙並不是一道比較小的裂隙，而是同樣形狀的一趟旅程，只是手下留了情。',
+  'guide.riftsPage.ranksHeading': '四種等級',
+  'guide.riftsPage.rewardsBody':
+    '封印一道裂隙，而不只是從裡頭活著出來，才是有報酬的那件事。搶先把裂隙打下來，它的報酬會比照與其等級相當的副本內容，因此愈難的等級愈值得這趟辛苦。封印同時會把一枚裂隙之戒交到在場每一個人手上，依你職業的定位裁製，並專屬於你，另外還會在你的背包裡留下裂隙精華與裂隙寶石。除了回家的路之外，最底下那個東西還會留下一只封印寶櫃，供你的隊伍撬開取得額外戰利品，用的正是你在秘探寶箱那裡熟悉的「轉珠之路」開鎖，因此手法乾淨、有耐性的一次，會比匆忙硬闖賺得更多。這一切都不會落到第二名的隊伍手上：輸掉競速，你只會留下沿路從怪物身上掉落的東西。功績之書是唯一的例外，無論輸贏它都會記下你的通關，其中一項功績表彰你封印的第一道裂隙，另一項則表彰你放倒的 S 級裂隙。',
+  'guide.riftsPage.rewardsHeading': '你帶得出來的東西',
+  'guide.riftsPage.trackerBody':
+    '在裡頭的時候，螢幕上一小條資訊會讓你隨時掌握方位：你在第幾層、總共幾層，以及一個即時倒數。仔細讀那個倒數，因為它並不是你的旅程剩下的時間。它是外面世界那道入口對新隊伍關閉的時間。只要你已經進來了，你的隊伍就能照自己的節奏把這道裂隙走完，不論花多久。',
+  'guide.riftsPage.trackerHeading': '螢幕上的追蹤條',
+  'guide.riftsPage.whatBody':
+    '地城是地方。它們始終坐落在原處，而你會一路熟悉到閉著眼都認得每個角落。秘探則是你從看板啟程的一趟短程私人下潛，為一到兩人裁製。裂隙兩者皆非：它自行開啟，就在外頭的世界裡，毫無預警，而裡頭的一切都在它開啟的那一刻才生成。沒有人能遞給你一份路線圖，因為沒有人下去過這一道。它和另外兩者一樣是副本，因此你在裡頭找到的東西只屬於你和你的隊伍，但它是遊戲中唯一一種會主動來找你、而不是等著被找到的副本內容。',
+  'guide.riftsPage.whatHeading': '何謂裂隙',
+  'guide.settingsPage.advancedLadder':
+    '只要動了其中任何一項，品質預設就會切換成「進階」，並以你當時看到的那些檔位為起點，因此你的自訂搭配是從你已經看見的樣子開始，而不是從零開始。滿意之後按下「套用」。「進階」之所以排在預設清單的最後，正是這個原因：它是屬於你自己那套搭配的專家設定檔。',
+  'guide.settingsPage.ifAurasOnPlayerFrame':
+    '除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。',
+  'guide.settingsPage.ifChatFontScale': '聊天文字大小。',
+  'guide.settingsPage.ifChatIntro': '聊天視窗讀起來的樣子。重設聊天視窗本身的按鈕也在這裡。',
+  'guide.settingsPage.ifChatOpacity': '聊天背景有多不透明。',
+  'guide.settingsPage.ifChatTimestamps': '替每一行聊天加上時間，可選 12 小時制或 24 小時制。',
+  'guide.settingsPage.ifCombatIntro': '你的動作列如何運作，以及戰鬥會在畫面上放些什麼。',
+  'guide.settingsPage.ifCompactChat': '收緊聊天行距，讓畫面裝得下更多行。',
+  'guide.settingsPage.ifDailyChest': '每日獎勵寶箱是否留在你的 HUD 上。',
+  'guide.settingsPage.ifExtraBars':
+    '顯示第二排動作列，開了第二排之後還能再開第三排。即使整排隱藏著，那些格子依然可以用快捷鍵使用。',
+  'guide.settingsPage.ifFctScale': '從目標身上飄起的傷害與治療數字的大小。',
+  'guide.settingsPage.ifFramesIntro':
+    '你自己的框、目標框，以及整個隊伍的排列方式。隊伍區塊還帶有縮放、寬度、高度、間距與欄數的滑桿，好讓團隊格線放得進你的螢幕，而分頁底部的「重設」按鈕會把每一個框都放回原位。',
+  'guide.settingsPage.ifGeneralIntro':
+    '縮放、對比，以及介面會顯示關於你的哪些資訊。語言與主題的選擇器也在這個分頁的最上方。',
+  'guide.settingsPage.ifGroundReticle': '在你瞄準一道地面法術時顯示地面圓圈。',
+  'guide.settingsPage.ifHideUnused': '隱藏空的動作格，只畫出你實際會用的按鈕。',
+  'guide.settingsPage.ifHighContrastBackground':
+    '在起始畫面與角色畫面後方使用較樸素、對比較高的背景。',
+  'guide.settingsPage.ifHighContrastText':
+    '更厚重、對比更高的介面文字。它首先是一項無障礙選項，而且在明亮的螢幕上表現很好。',
+  'guide.settingsPage.ifHudOpacity': 'HUD 面板蓋在後方世界之上時有多不透明。',
+  'guide.settingsPage.ifInvertLookY': '反轉滑鼠視角的上下方向。',
+  'guide.settingsPage.ifLockBars': '鎖定你的動作列，讓你不會不小心把技能拖出格子。',
+  'guide.settingsPage.ifMouseoverCast':
+    '讓治療或友方法術落在你滑鼠停留的那個隊伍框上，而不改變你的目標。',
+  'guide.settingsPage.ifPartyHealthText':
+    '隊伍血條上印出什麼：不顯示、百分比、目前生命，或目前與最大生命。',
+  'guide.settingsPage.ifPartyShowAuras':
+    '隊伍框上是否顯示增益與減益。另有對應的開關管理資源條、吸收護盾、寵物，以及你自己是否出現在自己的隊伍清單裡。',
+  'guide.settingsPage.ifPartySort': '隊伍成員的排列順序：入隊順序、定位，或名字。',
+  'guide.settingsPage.ifPartyStyle':
+    '隊伍的排列方式：「自動」會依你的隊伍人數調整，「經典」是傳統的直列堆疊，「團隊」則把所有人塞進緊湊的格線。',
+  'guide.settingsPage.ifPetFrame': '為你的寵物顯示一個框。',
+  'guide.settingsPage.ifPlayerFrameScale': '你自己那個單位框的大小。',
+  'guide.settingsPage.ifShowAttackButton': '在你的動作列上放一個明確的「攻擊」按鈕。',
+  'guide.settingsPage.ifShowItemLevel':
+    '在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。',
+  'guide.settingsPage.ifShowOwnNameplate':
+    '把你自己頭上的名條，完全照別的玩家看到的樣子畫出來，連裝飾都一併呈現。想要經典的視野就把它關掉。',
+  'guide.settingsPage.ifShowPlayerNameplates':
+    '畫出其他玩家的名條。關閉能讓擁擠的主據點清爽許多，而無論哪一種，你目前的目標都保持清楚可讀。',
+  'guide.settingsPage.ifShowPlaytime':
+    '在角色面板上顯示你的生涯遊戲時長。預設開啟，而面板上有一個眼睛按鈕可以依裝置切換顯示與否，實況或截圖時很好用。無論如何，總時數都會繼續累計。',
+  'guide.settingsPage.ifStartAttack':
+    '使用技能時是否同時開始自動攻擊。預設開啟，也是多數玩家預期的經典行為。',
+  'guide.settingsPage.ifStickyTarget': '當你點擊空地時保留目前的目標，而不是把它清掉。',
+  'guide.settingsPage.ifStopAutoAttack':
+    '切換目標時是否停下你的揮擊。預設關閉，因此你的攻擊會延續到新目標身上。',
+  'guide.settingsPage.ifTargetFrameScale': '你的目標框的大小。',
+  'guide.settingsPage.ifTargetOfTarget':
+    '顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。',
+  'guide.settingsPage.ifTooltipScale': '提示框文字大小，在小螢幕或超大螢幕上都很好用。',
+  'guide.settingsPage.ifUiScale':
+    '一次縮放整個介面。它會在你放開滑桿時才套用，因此拖曳時游標下的視窗不會跟著跑掉。',
+  'guide.settingsPage.ifWalkByAutoloot': '走過自己擊殺的屍體時順手把戰利品收走。預設關閉。',
+  'guide.settingsPage.ifWallet': '角色畫面上是否顯示你的錢包。玩家卡片也有一個對應的開關。',
+  'guide.settingsPage.interfaceFoot':
+    '這還不是全部。每個分頁都有比這裡列得完的更多滑桿與開關，所以打開它一次，把清單從頭讀到尾吧。這五分鐘花得很值得。',
+  'guide.settingsPage.interfaceHeading': '「介面」面板',
+  'guide.settingsPage.interfaceIntro':
+    '「介面」是遊戲中最大的一個面板，並分成四個分頁。這裡頭沒有任何東西會改變世界能對你做什麼：它改變的是你被顯示了什麼、以及顯示得多大。以下是最值得認識的那幾列。',
+  'guide.settingsPage.keybindsBody':
+    '按鍵清單只是那個面板的一半。清單上方是決定滑鼠如何驅動遊戲的那些開關：滑鼠鏡頭、旋轉視角時游標是否鎖定、點擊移動以及用哪個滑鼠鍵觸發、攻擊移動、左撇子的觸控佈局，還有聊天的髒話過濾。',
+  'guide.settingsPage.keybindsHeading': '「按鍵設定」面板',
+  'guide.settingsPage.keybindsMouseBody':
+    '那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。',
+  'guide.settingsPage.panelsMoreBody':
+    '本頁沒有列成表格的那兩個面板，還是值得看一眼。「光環」是你調整那些大型畫面警示的地方，它們會在你的職業觸發效果亮起時跳出來：哪些會顯示、它們的大小、顏色、不透明度，以及擺在畫面上的哪個位置。「效能監視器」則是你在調整本頁設定時打開、調完再收起來的那個數據面板。',
+  'guide.settingsPage.rowAmbientOcclusion':
+    '表面相接處那道柔和的接觸陰影。可選關閉、半解析度或完整。',
+  'guide.settingsPage.rowAntiAliasing':
+    '撫平遠處幾何邊緣的鋸齒。成本便宜，大多數機器都值得保持開啟。',
+  'guide.settingsPage.rowBloom': '明亮光源、火焰與法術效果周圍那圈柔和的光暈。',
+  'guide.settingsPage.rowCameraSpeed': '你用滑鼠環顧四周時，鏡頭轉動得多快。',
+  'guide.settingsPage.rowCharacterDetail':
+    '其他角色在多遠之外仍保有完整的動畫骨架，之後才降級為較簡單的版本。調高在擁擠的主據點裡更賞心悅目，負擔也更重。',
+  'guide.settingsPage.rowDynamicLights': '有多少火把、營火與法術會對周圍的場景投射真實光源。',
+  'guide.settingsPage.rowFullscreen': '讓遊戲填滿整個螢幕。',
+  'guide.settingsPage.rowInterfaceMode':
+    '你拿到的是桌面介面，還是畫面上的觸控操作。「自動」會判讀你的裝置，而你也可以強制指定其中之一：接了鍵盤的平板可以用桌面佈局，觸控螢幕的筆電也可以用觸控操作。',
+  'guide.settingsPage.rowOverflowXp':
+    '在滿級之後，你的經驗條是繼續以溢出經驗填充，還是改為顯示經典的滿級靜態文字。',
+  'guide.settingsPage.rowParticleEffects': '法術、天候與環境粒子效果可以做到多濃密。',
+  'guide.settingsPage.rowSurfaceDetail':
+    '石材與鋪面上那層磨損細節，從關閉到完整的視差質感。這是專屬城鎮街道的旋鈕：保留得愈多，一條鋪石街道畫起來就愈繁重。',
+  'guide.settingsPage.rowTouchLookSpeed':
+    '同樣的東西，只是用於滑動視角，而且只有在觸控螢幕上才會出現。',
+  'guide.settingsPage.rowViewDistance':
+    '世界在淡出之前會被繪製到多遠。每個預設都會替你設定好，直到你自己動它為止。',
+  'guide.settingsPage.rowWaterQuality': '湖泊、河流與外海的著色方式，從平坦省效能到完全反射。',
+  'guide.settingsPage.rowWaterRipples':
+    '你游泳時在身後擴散開來的尾波與漣漪。預設關閉，也是唯一一項真的會吃掉幀數的水面效果；無論怎麼設定，水花與氣泡都不受影響。',
+  'guide.settingsPage.valueUltraOrInsane': '「超高」，若你想要全部拉滿就選「極致」',
+  'guide.social.blockBody':
+    '封鎖是比較重的手段，用於一個怎麼樣都不肯放過你的玩家。封鎖會切斷對方的邀請、密語與郵件，也一併切斷聊天，讓你們兩人在 /who 中彼此看不見，並在對方原本在你好友名單上時將其移除。你可以從對方名字的右鍵選單封鎖，或使用 /block；/unblock 可以解除，而 /blocklist 會列出名單上有誰。',
+  'guide.social.chatMore': '更多關於聊天視窗與介面其餘部分的說明',
+  'guide.social.discordLinkBody':
+    '遊戲中的 Discord 面板也能反過來運作。把你的 Discord 帳號連結上去，你在那裡持有的社群身分組便會跟著你進入世界：頭上一個帶顏色的名字，以及在工作人員身分組聊天行上的標記，讓你隨時分辨得出真正的管理員與冒用名號的人。連結還會追蹤一個隨著你的參與而攀升的狀態。這一切都不會在遊戲中給予任何力量。',
+  'guide.social.finderBoardBody':
+    '搜尋器另外還維護一份現成隊伍的看板。隊長張貼一則刊登，用標籤說明這趟是為了什麼，從第一次造訪到直接全通都有，而你則向它提出申請，等隊長核准。自動排隊會填滿各座地城與終局團隊副本，普通與英雄模式各自成隊，而看板還能承載單人的調諧旅程，那是排隊永遠不會替你填的；秘探與開放世界的行程則由你自己張羅。無論走哪一條路，搜尋器都只負責把隊伍湊起來：走到門口、設定難度、談妥戰利品規則，依然是你們自己的事。',
+  'guide.social.finderBody':
+    '你不必在「尋找隊伍」頻道裡大喊也能湊滿一趟旅程。打開地城搜尋器，選擇你想跑的內容與你願意擔任的定位，然後獨自或帶著現有的隊伍加入排隊。搜尋器會一直等到定位湊齊，再同時把隊伍提供給所有人：一個彈出視窗請你們每個人確認，等最後一人點下同意，隊伍便當場成形。拒絕一次邀請，或讓它逾時，會讓你進入一段短暫的冷卻，之後排隊才會再提供下一次，好讓隊伍持續往前推進。',
+  'guide.social.finderHeading': '尋找隊伍',
+  'guide.social.finderMore': '看看每座地城裡有什麼',
+  'guide.social.guildBankBody':
+    '公會也保有屬於自己的一座金庫。走到任一主據點城鎮的銀行員面前，開啟你的銀行，再切換到「公會」分頁：那裡有一筆錢幣構成的公會金庫，以及一批公會共同持有的物品。每位成員都能打開它、看看裡頭有什麼，而面板也明白寫著誰能做得更多。只有會長與幹部能夠動手，存入錢幣與貨物、再把它們發放出去，而且每一筆存入與取出都會寫進一份公會讀得到的日誌，因此沒有任何東西能在無紀錄的情況下移動。',
+  'guide.social.guildBankHeading': '公會銀行',
+  'guide.social.guildBankRulesBody':
+    '物品倉庫一開始是關閉的。由一位幹部自掏腰包開通，之後公會可以從公會金庫出錢把它擴大。任務物品、任何已綁定的東西，以及世界市場不收的裝備，都進不了它，這和郵件與世界市場的規矩相同，因此公會銀行是給那些仍能易手的貨物用的。',
+  'guide.social.guildBoardBody':
+    '公會也有排名。排行榜視窗在玩家榜旁邊另設一份公會榜，依成員共同掙得的成績為各公會排名，好讓活躍的公會看見自己站在哪裡。',
+  'guide.social.jailBody':
+    '管理員負責維持秩序，而不願讓他人好好享受遊戲的玩家，可能會被移入牢房。刑期一定有固定長度，不過管理員可以提前結束它，而且無論你是否保持登入，時間都照樣在走。',
+  'guide.social.jailHeading': '管理員與牢房',
+  'guide.social.moderationBody':
+    '若有玩家舉止失當，對他的名字按右鍵並選擇「檢舉玩家」。挑一個理由，從騷擾、洗頻到作弊都有，再寫一行說明發生了什麼，然後送出：這份檢舉會送到管理員那裡供他們閱讀。檢舉是給他們的一張字條，本身並不是懲罰。送出檢舉不會禁言、踢除或關押任何人，也不會有回覆告訴你最後怎麼處理。在等待的期間，封鎖對方就能讓打擾停下來。',
+  'guide.social.moderationHeading': '檢舉玩家',
+  'guide.social.realmsBody':
+    '線上遊玩在多個世界上運作，而每個世界都是各自獨立的地方，有自己的玩家。開始遊玩之前，你會從「世界列表」中挑一個，而每一列都會顯示那個世界此刻有多熱鬧，從「低」經「中」、「高」到「滿載」，若某個世界目前未上線則顯示「離線」。「低」代表空間充裕，「高」代表夥伴眾多，而已達上限的世界會顯示「滿載」，並在有人登出之前拒絕新的登入，所以請挑你朋友所在之處，或還有空間的地方。',
+  'guide.social.realmsHeading': '世界',
+  'guide.social.realmsScopeBody':
+    '你所做的一切都留在你選的那個世界上：你的角色、你的好友名單、你的公會與世界市場全都活在那裡，而你在遊戲中打開的公會榜與玩家榜也只為那一個世界排名，網站上的榜單則會把所有世界匯集起來。每個世界另外也保有自己的每日團隊副本重置，依它自己的當地時間進行。',
+  'guide.stats.hitBody':
+    '命中等級來自你的裝備與套裝加成。它讓你的攻擊比較少落空、你的法術比較少被抵抗，而且在對付比你等級更高的敵人時最為划算，因為未命中正是在那裡累積得最兇。你的角色面板會把它顯示為「命中等級」。',
+  'guide.stats.hitTitle': '命中等級',
+  'guide.stats.parryBody':
+    '招架是戰士自有的防禦：一個把近戰攻擊完全格開、不受任何傷害的機率，而且它會隨力量成長。只有從你正面襲來的攻擊才能被招架，這也是你該持續面對正在打你的東西的又一個理由。其他職業在角色面板上看到的這一列會停在零。',
+  'guide.stats.parryTitle': '招架',
+  'guide.stats.warfareBody':
+    '戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
+  'guide.stats.warfareTitle': '戰爭',
+  'guide.talentsPage.loadoutNote':
+    '你不必只定下一套配置。在面板中儲存一份具名的配置，它會同時記住天賦的選擇與你的動作列，因此切換到另一套只需要點一下，適用的規則與重置相同：必須脫離戰鬥，且不在競技場對戰或戰場之中。',
+  'guide.thornhollowPage.rewardsBody':
+    '每一場結束的比賽都會發放榮譽：勝利給得更多，落敗或平手則有一份安慰獎，另外你每打出一次致命一擊、每協助一次擊殺也都會拿到少量榮譽，因此在遠離旗幟的地方作戰依然值得。你每天的第一場勝利會額外加發一份獎勵，而面板會在那份獎勵仍等著你的時候告訴你。那個「一天」屬於榮譽自己，它依自己的時鐘換日，而不是跟著王國的副本重置。反覆遇上同一支隊伍時，比賽本身的報酬在第一場之後會降低，並很快穩定在一個底線，而不是一路歸零，至於棄權的比賽則完全不給報酬。你掙得的一切都能在任一位戰爭軍需官處花用。',
+  'guide.thornhollowPage.rewardsHeading': '一場比賽的報酬',
+  'guide.worldPage.farshoreBlurb':
+    '東溪谷東岸外一座滿是鷗鳴與鹹風的島嶼，裂隙在此毫無預警地撕開，而漁鎮鷗港死守著自己的海岸。',
+  'guide.worldPage.farshoreGreeter': '守鐘人塔姆，登岸碼頭',
+  'guide.worldPage.farshoreGreeting':
+    '你是從沙洲堤道過來的？那你是這一週來的頭一個，守望者會想親自打量你。',
+  'guide.worldPage.farshorePlaceNotes':
+    '鷗港是全島唯一的城鎮，也是它的據點。登岸碼頭是沙洲堤道靠岸之處，一口警鐘立在岬角之上；守望草原佔著鎮子東南方的高地，一名裂隙守望在那裡聆聽下一道裂口；碎裂斷崖在島的南端裂開；而裂隙原野則是鷗港以東那幾行殘破的麥壟，至今仍爬滿了從那道裂口鑽出來的東西。',
+  'guide.worldPage.mountsBody':
+    '騎乘是唯一能讓世界變小的東西，而它首先是一堂課，其次才是一匹馬。到了 20 級，馬廄總管瑪拉便會收你為徒：你向她購買騎術，而騎術課本身是免費的，那是一段你騎著借來的坐騎、繞著她的圍場跑的跳躍賽道。通過它、交回課程，你的第一匹英勇戰馬就是你的了，從此你騎在馬背上橫越王國會明顯快上許多。速度是坐騎唯一給你的東西：那些出自最艱難內容的稀有坐騎跑得更快，但沒有任何一匹會改變你在戰鬥中的實力。用你操作設定中綁定的按鍵上下馬。戰鬥中無法翻身上鞍，而揮動武器、施放法術、涉入水中或在戰鬥中倒下，都會讓你重新回到雙腳上。',
+  'guide.worldPage.mountsMore': '關於坐騎的一切',
+  'guide.worldPage.mountsTitle': '坐騎',
+  'guide.worldPage.riftBody':
+    '有某種東西不斷在王國上撕出破洞。裂隙傳送門會在外頭的世界中自行開啟，絕不會開在起始之路的那三個區域，而是遍布其外的每一片王國疆域以及遠岸之上，而每當一道撕裂開來，全王國都會聽見這個消息。每道傳送門都帶著一個等級，等級愈高便代表一趟愈艱難、也愈豐厚的下潛。傳送門是一場共享事件：任何隊伍都能踏進去，並各自取得自己的一趟旅程，但首殺永遠只屬於一支隊伍，因此一道新鮮的裂隙值得你趕過去。你必須達到 20 級才能進入，而若無人及時應答，裂隙便會自行坍塌。',
+  'guide.worldPage.riftMore': '關於裂隙的一切',
+  'guide.worldPage.riftTitle': '裂隙傳送門',
+  'guide.worldPage.travelBody':
+    '王國裡的每一條路，都得用走的或用騎的。這裡沒有飛行路線、沒有計程服務，也沒有傳送網路：地圖是一整塊相連的陸地，而每一段連結都是你可以踏上去的東西。山脊把一片疆域與下一片隔開，而在兩片疆域共用一道山脊之處，道路便會攀上一處隘口。不過並非每一道邊界都是那樣。北方有一條長長的堤道，把道路從帷幕幽谷帶過水面，通往更遠處的雪國；往南回來，一條名為沙洲堤道的細長天然沙洲從東溪谷的海岸向東延伸，抵達遠岸那座島上的登岸碼頭，而那座島根本沒有任何陸上邊界。而整個外部世界中確實只有一道真正的門扉：荊峰高處一層暮色之帷，通往帷幕幽谷。幽谷的南側山脊完全封閉、沒有隘口可通，因此那層帷幕就是你最初進入的方式，而它會在你回程時於身後闔上。\n\n無論你在哪裡倒下，走回去的路都不長。每個區域都至少保有一座墓地，一位靈魂醫者盤旋在墓石之上，而釋放的靈魂會在最近的一座升起。\n\n地圖不會在一道看不見的牆前結束。陸地會延伸成沙灘與海岬，再延伸成開闊的水域。那些世界本就要你游過去的地方，也就是一片疆域與下一片之間的海峽與湖泊，都平靜而安全。但若你朝著外海一路游去，距離本身就會把你逼回來：你會收到警告，接著再收到一次，而如果你還繼續游，大海便會慢慢磨損你，直到把你殺死。潛水也有自己的限度，因為你的氣息在水面下會用盡，所以當水告訴你該回頭時，就浮上來換氣、掉頭吧。',
+  'guide.worldPage.travelTitle': '四處走動',
+  'guide.controls.clickMoveNote':
+    '點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。',
+  'guide.deedsPage.platformBody':
+    '如果你在電腦版應用程式中連結了 Steam 或 Epic Games 帳號，你所贏得的功績便會向外同步，成為該帳號上的成就。遊戲世界始終是權威所在：你在這裡贏得功績，它記在你的角色身上，成就隨後才跟上。並非每個功績都有對應的成就，而某個成就若沒有立刻送達，也會在你下次登入時補上。連結永遠只是連結，絕不是一種登入方式。',
+  'guide.deedsPage.platformHeading': 'Steam 與 Epic 成就',
+  'guide.faqPage.a17':
+    '一個帳號在每個世界上最多可有十個角色，而你也可以在不只一個世界上擁有角色。想移除某個角色，請在角色列表中刪除它：該角色必須不在世界中，而且你得輸入它的名字來確認，正因如此，一次手滑絕不會讓你失去一位英雄。刪除是永久的。那個角色的身家會隨它而去，它在世界市場上的刊登會被撤下，它的渡鴉郵驛信箱也會被清空。',
+  'guide.faqPage.a18':
+    '你自己改不了，所以請挑一個你喜歡的。名字為 2 至 16 個字母，必須以字母開頭，並允許空格、連字號與撇號，而且無論大小寫如何，每個名字在它所屬的世界上都是獨一無二的。違反行為準則的名字會被拒絕。唯一會要求你改名的情況，是管理員要求你這麼做。關閉帳號可能會把它的名字釋出給其他玩家，而單純一陣子沒上線則絕不會：閒置的帳號仍然保有它的名字。',
+  'guide.faqPage.a19':
+    '你的角色會在世界中停留約五分鐘，遊戲也會自行嘗試重新連線，因此訊號中斷、闔上筆電，或是重新整理頁面，通常都能讓你回到原處，回到同一個工作階段。也正因為你的角色真的還站在那裡，斷線並不是一種脫離戰鬥的辦法。若從遊戲選單選擇「登出」，則會立刻離開，而不會等那段時間過完。',
+  'guide.faqPage.a20':
+    '在線上遊戲中，以 Esc 開啟選單並選擇「回報錯誤」。描述發生了什麼事再送出即可：你所在的世界、你的角色，以及你當時站的位置都會自動一併附上，還有你的版本與裝置資訊，而你也可以勾選「包含截圖」，附上一張你當時所見畫面的圖片。如果你連續送出好幾份，系統可能會請你稍候片刻再送下一份。',
+  'guide.faqPage.q17': '我可以有幾個角色？可以刪除嗎？',
+  'guide.faqPage.q18': '我可以更改角色的名字嗎？',
+  'guide.faqPage.q19': '如果我斷線了會怎麼樣？',
+  'guide.faqPage.q20': '我找到一個錯誤，該如何回報？',
+  'guide.howToPlay.charactersBody':
+    '一個帳號在每個世界上最多可以保有十個角色，所以你有足夠的空間試玩好幾種職業，不必為此放棄任何東西。刪除角色則是一個慎重的動作：該角色必須不在世界中，而遊戲會要求你輸入它的名字，才肯讓它離去。被刪除的角色永遠回不來了，它在世界市場上的刊登與渡鴉郵驛的信件也會一併消失。',
+  'guide.howToPlay.charactersTitle': '你的角色',
+  'guide.howToPlay.connectionBody':
+    '訊號中斷、闔上筆電，或是重新整理頁面，都不會讓你登出。你的角色會被保留在世界中約五分鐘，遊戲則自行重新連線，而你會回到同一個工作階段的同一個位置。這也表示斷線並不是一種脫離戰鬥的辦法：你的角色仍然站在那裡。從遊戲選單登出則會立刻離開，而不是等待，用同一個帳號登入另一個角色時也是如此。',
+  'guide.howToPlay.connectionTitle': '如果你的連線中斷',
+  'guide.howToPlay.namesBody':
+    '名字長度為 2 至 16 個字母，以字母開頭，並且可以包含空格、連字號與撇號。同一個世界上的兩個角色不能共用同一個名字，而大小寫不會讓一個名字重獲自由：如果 Ashwind 已被使用，ashwind 也一樣被使用了。你自己的拼寫方式會被完整保留，一如你輸入時的模樣。請挑一個你會滿意的名字，因為它將一直伴著這個角色。',
+  'guide.howToPlay.namesTitle': '為你的英雄命名',
+  'guide.faqPage.a6Count':
+    '{cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，從最初的起始山谷，一路延伸到專為已達上限的角色所打造的地帶。',
+  'guide.home.faq.a4Count':
+    '等級上限為 {cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，其中最遙遠的幾座，正是專為已達上限的角色所打造的。',
+  'guide.home.world.subCount':
+    '一片相連的大陸，共 {zones} 座區域，從寧靜的山谷與沉沒的沼澤，到餘燼荒漠、冰封高地與樹籬迷宮花園。',
+  'guide.combat.threatBody':
+    '每個敵人心裡都默默記著一筆帳，算的是誰最惹惱了牠。傷害會加進去，治療也一樣：一次治療會把威脅值加到那些正在攻擊你所治療對象的敵人身上，並在牠們之間分攤，因此最安全的治療，是治在坦克已經穩住的人身上。坦克會開啟防禦姿態或防護形態，讓自己產生的一切倍增，而德魯伊的狼形態則反過來卸除威脅值；嘲諷則會把施放者直接抬到這筆帳的最上方，並將敵人釘在自己身上數秒。敵人並不會在有人剛超過坦克的那一瞬間就換目標：要拉走一隻敵人得領先得夠明顯，而遠程所需的領先幅度又比近戰更大，因此開場拉怪時稍有耐心，就能讓戰鬥留在它該待的地方。',
+  'guide.classPage.formLine.form_bear':
+    '坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。',
+  'guide.riftsPage.floorsBody':
+    '一道裂隙有數層樓，每一層都是現場生成的，而通往下層的路要等這一層放你走才會開啟：清掉層上還活著的東西，解開它橫在你路上的一切封鎖，向下的通道便會撕裂開來。最後一層以一場首領戰作結。每一層都有自己的性格，因此單單一趟旅程就可能帶你從嚴霜走進餘燼，而每當你抵達新的一層，聊天視窗都會念出它的名字。你螢幕上的追蹤條，正是你得知這一道有幾層的地方。有少數裂隙開啟的不是生成出來的下潛之路，而是一座手工打造的場景，它自有一段固定的長度。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 效能醫生',
+  'hudChrome.perf.diagnostics.subtitle': '針對遊戲的掃描，提供證據與程式碼層級修正建議。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '即時效能測量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '診斷掃描進度',
+  'hudChrome.perf.diagnostics.aria.findings': '依優先順序排列的診斷結果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展開',
+  'hudChrome.perf.diagnostics.controls.start': '開始 15 秒掃描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '重新整理場景統計',
+  'hudChrome.perf.diagnostics.controls.copyReport': '複製清晰報告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下載報告',
+  'hudChrome.perf.diagnostics.controls.scanning': '掃描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '掃描另一個區域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '報告已記錄至主控台',
+  'hudChrome.perf.diagnostics.controls.copied': '已複製',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '複製受阻：報告已記錄',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低畫質重新測試',
+  'hudChrome.perf.diagnostics.instruction':
+    '為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此分頁隱藏時掃描已暫停。返回後掃描將重新開始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已載入。正在等待第一個可操作影格。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此分頁隱藏時掃描已暫停。請返回遊戲以繼續。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待具代表性的遊戲影格：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在擷取活躍遊戲：現在請穿過問題區域。',
+  'hudChrome.perf.diagnostics.status.ready': '已準備掃描。按開始並重現卡頓。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '算繪器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '場景統計：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡頓歸因：進入世界時已啟用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 信心度',
+  'hudChrome.perf.diagnostics.sections.evidence': '證據',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即嘗試',
+  'hudChrome.perf.diagnostics.sections.codeFix': '程式碼修正',
+  'hudChrome.perf.diagnostics.sections.source': '相關來源檔案',
+  'hudChrome.perf.diagnostics.severity.critical': '嚴重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '資訊',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未偵測到明顯效能問題',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒維持 {fps} FPS，影格 p95 為 {p95}。遊戲、瀏覽器、GPU、記憶體、資源與網路均未觸發門檻。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用軟體算繪',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '遊戲正在使用整合式 GPU',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高解析度算繪開銷較大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '強制高畫質正在降低效能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '裝置可用記憶體偏低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '偵測到瀏覽器或擴充功能停頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '偵測到瀏覽器記憶體壓力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '圖形內容已重設',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要影格瓶頸',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '場景繪製成本超過目前畫質預算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '陰影通道占用大量繪製呼叫',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界算繪器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '實體視圖更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌繪製成本偏高',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模擬工作占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件處理占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '遊戲過程中正在編譯著色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '紋理上傳造成遊戲卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '實體視圖建立造成卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未歸因的長影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '資源處理延遲了遊戲啟動',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '瀏覽器長任務正在阻塞影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '網路傳輸延遲了可見回應',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照處理正在阻塞客戶端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '效能規則 {rule} 需要處理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '偵測到的瀏覽器、GPU、記憶體或裝置設定可能在遊戲算繪前限制效能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次擷取測得的圖形工作超過目前影格或場景預算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某個 CPU 階段占用足以錯過影格預算的主執行緒時間。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '資源準備或首次使用工作發生在可見遊戲或啟動路徑中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '網路傳輸或客戶端快照處理延遲了最新可操作狀態。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '環境規則 {rule} 與此裝置和瀏覽器相符。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 為 {submit}，占算繪器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近視窗測得 {fps} FPS，影格 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '場景使用 {calls} 次繪製呼叫，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '場景提交 {triangles} 個三角形，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '場景類別 {category} 貢獻 {calls} 次呼叫和 {triangles} 個測量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded':
+    '重新整理場景統計以識別主要算繪類別。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '陰影通道提交 {calls} 次呼叫，占基準的 {share}，共 {triangles} 個三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '測得階段 {phase} 的 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '記錄的 {total} 次卡頓中，有 {count} 次符合原因 {cause}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '預載門檻為 {tasks} 個已登錄任務等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失敗的資源群組：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '測得 {count} 個長任務，p95 為 {p95}，最大值為 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照間隔為 {interval}，最新快照時間為 {age}，輸入回應 p95 為 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析與套用 p95 為 {work}；網路間隔 p95 為 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '診斷規則 {rule} 與本次擷取相符。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正偵測到的環境設定，重新啟動，再重複相同掃描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低畫質重複相同鏡頭路徑，確認圖形壓力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分別在靜止與移動時重複掃描，以隔離 CPU 階段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重複相同路線或首次使用操作，確認卡頓發生時機。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在離線遊戲中使用相同移動與鏡頭路徑進行比較。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '讓偵測到的備援路徑遵守共用圖形與記憶體預算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用現有算繪預算、實例化、材質共用、LOD 與隱藏工作略過機制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定階段，移除重複工作與配置，並維持遊戲行為。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '透過現有啟動與串流預算預載、池化或分攤已識別的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低傳輸或快照處理成本，同時不削弱權威伺服器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.report.statusLine': '狀態：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '擷取時間：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要問題：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '畫質：{tier}，算繪比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 個影格超過 50 毫秒，共測量 {frames} 個影格',
+  'hudChrome.perf.diagnostics.report.resultHeading': '結果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次擷取未觸發可處理門檻。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '嚴重程度：{severity}。信心度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '無法使用',
+  'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error - plain Node ESM script, no types
 import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_shot_targets.mjs';
+import { ABILITIES } from '../src/sim/data';
 
 describe('classifyDiff', () => {
   it('treats a backend/data-only diff as non-visual (captures nothing)', () => {
@@ -57,17 +58,113 @@ describe('classifyDiff', () => {
     expect(captureSource).toContain("document.body.classList.contains('game-active')");
   });
 
-  it('captures both the market overview and expanded armor filters for market window changes', () => {
+  it('captures the held CC bands for any ability-vfx subsystem change', () => {
+    const plan = classifyDiff(['src/render/ability_vfx/fx.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('cc-bands');
+    // Every module the bands actually ship in resolves the target, the core
+    // included (its `when` prefix must not silently cover only the directory).
+    for (const path of [
+      'src/render/ability_vfx_core.ts',
+      'src/render/ability_vfx/painter.ts',
+      'src/render/ability_vfx/sequencer.ts',
+    ]) {
+      expect(classifyDiff([path]).specific.map((t: { key: string }) => t.key)).toContain(
+        'cc-bands',
+      );
+    }
+    const target = plan.specific.find((t: { key: string }) => t.key === 'cc-bands');
+    // One variant per band type: a shot set covering only one of the three
+    // would read as complete evidence for a change that ships all three.
+    expect(target.variants).toEqual([
+      {
+        key: 'sundering-gavel-desktop',
+        charClass: 'paladin',
+        charName: 'Aurelius',
+        abilityId: 'hammer_of_justice',
+        level: 16,
+        auraKind: 'stun',
+        settleMs: 1900,
+      },
+      {
+        key: 'icebind-desktop',
+        charClass: 'mage',
+        charName: 'Frosthollow',
+        abilityId: 'frost_nova',
+        level: 5,
+        auraKind: 'root',
+        offsetAngle: 1,
+        distance: 5.5,
+        settleMs: 1900,
+      },
+      {
+        key: 'harrow-desktop',
+        charClass: 'warlock',
+        charName: 'Vexmoor',
+        abilityId: 'fear',
+        level: 14,
+        auraKind: 'incapacitate',
+        auraId: 'fear_incap',
+        pollMs: 150,
+        settleMs: 0,
+      },
+    ]);
+    // The control must come from the real action-bar click, never an injected
+    // aura, and the poll must key off the aura KIND (plus the shared fear id,
+    // since 'incapacitate' alone does not mean fear), the same read the bands
+    // themselves use.
+    const captureSource = target.capture.toString();
+    expect(captureSource).not.toMatch(/sim\.castAbility\s*\(/);
+    expect(captureSource).not.toMatch(/auras\.push/);
+    expect(captureSource).toContain('.action-btn[data-hotbar-slot="1"]');
+    expect(captureSource).toContain('button.click()');
+    expect(captureSource).toContain('a.kind === shot.auraKind');
+    expect(captureSource).toContain('a.id === shot.auraId');
+    expect(captureSource).toContain("document.body.classList.contains('game-active')");
+  });
+
+  it('stages every CC-band variant at an ability its own class really learns', () => {
+    // A variant staged on the wrong class or below the learn level fails only
+    // at capture time, minutes into a browser run, and the failure reads as a
+    // flake ("aura never applied") rather than as bad target data.
+    const target = classifyDiff(['src/render/ability_vfx/fx.ts']).specific.find(
+      (t: { key: string }) => t.key === 'cc-bands',
+    );
+    for (const variant of target.variants) {
+      const ability = ABILITIES[variant.abilityId];
+      expect(ability, `${variant.key}: unknown ability ${variant.abilityId}`).toBeDefined();
+      expect(ability.class, `${variant.key}: wrong class for ${variant.abilityId}`).toBe(
+        variant.charClass,
+      );
+      expect(variant.level, `${variant.key}: staged below the learn level`).toBeGreaterThanOrEqual(
+        ability.learnLevel,
+      );
+    }
+  });
+
+  it('captures the market overview, collect ledger, buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'market-window',
+      'market-collect-ledger',
+      'market-buy-confirm',
       'market-armor-filters',
     ]);
-    expect(plan.specific[1].variants).toEqual([
-      { key: 'desktop' },
-      { key: 'mobile', mobile: true },
-    ]);
+    // Keyed, not indexed: this asserts the ARMOR FILTERS target's variants, and a
+    // new market target landing ahead of it must not silently move the assertion
+    // onto a different target.
+    const armor = plan.specific.find((t: { key: string }) => t.key === 'market-armor-filters');
+    expect(armor?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+  });
+
+  it('captures the buy confirmation for its own pure core too, not just the painter', () => {
+    // The prompt's terms and its confirm-time recheck live in the core, so a change
+    // there alters what the prompt SAYS with the painter untouched.
+    const keys = classifyDiff(['src/ui/market_buy_confirm_core.ts']).specific.map(
+      (target: { key: string }) => target.key,
+    );
+    expect(keys).toEqual(['market-buy-confirm']);
   });
 
   it('captures expanded armor filters for every market-specific UI module', () => {
@@ -303,5 +400,38 @@ describe('diffChangedPaths', () => {
     // through to "nothing to shoot".
     expect(classifyDiff(['src/sim/content/gather_nodes.ts']).isVisual).toBe(true);
     expect(classifyDiff(['src/sim/quest_targets.ts']).isVisual).toBe(true);
+  });
+
+  it('maps the gossip Crafting shortcut from both the core and the dialog controller', () => {
+    // A rename of the target key or a `when` trim would silently stop
+    // capturing (a missing target is just one fewer screenshot), so pin the
+    // routing from BOTH implicating paths and the variant list. The dialog
+    // controller path also implies the attunement-legibility target, so use
+    // toContain, not toEqual, for that arm.
+    const fromCore = classifyDiff(['src/ui/hud/quest/master_craft_core.ts']);
+    expect(fromCore.specific.map((t: { key: string }) => t.key)).toContain(
+      'gossip-crafting-shortcut',
+    );
+    expect(
+      classifyDiff(['src/ui/hud/quest/quest_dialog_controller.ts']).specific.map(
+        (t: { key: string }) => t.key,
+      ),
+    ).toContain('gossip-crafting-shortcut');
+    const target = fromCore.specific.find(
+      (t: { key: string }) => t.key === 'gossip-crafting-shortcut',
+    );
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual([
+      'dialog-desktop',
+      'dialog-mobile',
+      'window-desktop',
+    ]);
+    // Every variant must seed the camera-mode prompt flag before the document
+    // loads: page.screenshot clips paint overlapping chrome into the dialog
+    // region, and a live prompt was covering the Crafting row in the after
+    // desktop dialog shot. beforeLoad is a function (evaluateOnNewDocument),
+    // so pin presence rather than its body string.
+    for (const variant of target?.variants ?? []) {
+      expect(typeof variant.beforeLoad, `${variant.key} beforeLoad`).toBe('function');
+    }
   });
 });

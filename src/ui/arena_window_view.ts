@@ -19,11 +19,9 @@
 
 import { CLASSES } from '../sim/data';
 import type { ArenaMapId } from '../sim/dungeon_layout';
+import { ARENA_MIN_LEVEL } from '../sim/social/arena';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_api';
-
-/** The five brackets, in display order. */
-const ARENA_BRACKETS: readonly ArenaFormat[] = ['1v1', '2v2', 'fiesta', 'yumi3', 'yumi5'];
 
 /** Premade-party cap per team bracket (1v1 is partyless). */
 function bracketTeamCap(fmt: ArenaFormat): number {
@@ -58,13 +56,6 @@ export interface ArenaAllTimeRow extends ArenaLadderRow {
   level: number;
 }
 
-/** One bracket tab's state. */
-export interface ArenaBracketTab {
-  fmt: ArenaFormat;
-  active: boolean;
-  locked: boolean;
-}
-
 /** A 2v2/Fiesta party member row on the pre-queue party panel. */
 export interface ArenaPartyMember {
   name: string;
@@ -84,7 +75,13 @@ export type ArenaPartySection =
 export type ArenaAction =
   | { kind: 'in-match'; oppName: string }
   | { kind: 'queued'; queueSize: number }
-  | { kind: 'idle'; queueDisabled: boolean };
+  | {
+      kind: 'idle';
+      queueDisabled: boolean;
+      /** Ranked (1v1/2v2) only: the player is below ARENA_MIN_LEVEL, so the
+       *  painter shows the level requirement instead of the generic queue note. */
+      belowMinLevel: boolean;
+    };
 
 /** The full arena view-model: the offline notice, or the live panel. */
 export type ArenaView =
@@ -93,17 +90,10 @@ export type ArenaView =
       kind: 'live';
       /** The resolved bracket (a match/queue forces its bracket). */
       bracket: ArenaFormat;
-      /** True when the resolved bracket should be committed as the selection (a
-       *  queue/match pins the bracket the painter shows next). */
-      commitBracket: boolean;
-      canSwitchBracket: boolean;
       standing: ArenaStanding;
-      brackets: ArenaBracketTab[];
       isTeamBracket: boolean;
       party: ArenaPartySection;
       action: ArenaAction;
-      /** The offline Fiesta-vs-bots practice affordance is available + applicable. */
-      practice: boolean;
       /** The fixed map of the live bout's slot; null outside a match and for
        *  the Protect Yumi brackets (their maze band has no arena map). */
       matchMap: ArenaMapId | null;
@@ -123,8 +113,9 @@ export interface ArenaViewInput {
   party: PartyInfo | null;
   /** The all-time ladder cache, by bracket (painter-owned, server-fetched). */
   allTime: Partial<Record<ArenaFormat, ArenaAllTimeEntry[]>>;
-  /** The offline Fiesta practice hook is wired (offline only, hidden online). */
-  practiceAvailable: boolean;
+  /** The local character's level, checked against ARENA_MIN_LEVEL for the
+   *  ranked (1v1/2v2) brackets; Fiesta and Protect Yumi need no floor. */
+  playerLevel: number;
 }
 
 /**
@@ -140,8 +131,9 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
 
   const inMatch = a.match !== null;
   const queuedFmt = a.queued ? a.format : null;
+  // The resolved bracket (a match/queue forces its own); the merged PvP strip
+  // (pvp_tabs_view.ts) owns tab pinning and locking, fed by the same snapshot.
   const bracket = a.match?.format ?? queuedFmt ?? selectedBracket;
-  const commitBracket = Boolean(queuedFmt || a.match);
   const canSwitchBracket = !a.queued && !inMatch;
   const standing = a.standings[bracket];
   const ladderRows = a.ladders[bracket];
@@ -159,12 +151,6 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     rating: r.rating,
     wins: r.wins,
     losses: r.losses,
-  }));
-
-  const brackets: ArenaBracketTab[] = ARENA_BRACKETS.map((fmt) => ({
-    fmt,
-    active: bracket === fmt,
-    locked: !canSwitchBracket && bracket !== fmt,
   }));
 
   let partySection: ArenaPartySection = { kind: 'none' };
@@ -191,15 +177,23 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   } else if (a.queued) {
     action = { kind: 'queued', queueSize: a.queueSize };
   } else {
-    let queueDisabled = false;
+    // 2v2 is a premade queue: the server rejects the whole team if any queued
+    // member is below the floor, so a level-eligible leader with a below-level
+    // teammate must see the same disabled affordance, not just their own level.
+    const partyBelowMinLevel =
+      bracket === '2v2' && isTeamBracket && party && partySize >= 2 && partySize <= teamCap
+        ? party.members.some((m) => m.level < ARENA_MIN_LEVEL)
+        : false;
+    const belowMinLevel =
+      ((bracket === '1v1' || bracket === '2v2') && input.playerLevel < ARENA_MIN_LEVEL) ||
+      partyBelowMinLevel;
+    let queueDisabled = belowMinLevel;
     if (isTeamBracket && party && partySize >= 2 && partySize <= teamCap && !isLeader)
       queueDisabled = true;
     else if (isTeamBracket && party && partySize > teamCap) queueDisabled = true;
     else if (bracket === '1v1' && party && partySize > 1) queueDisabled = true;
-    action = { kind: 'idle', queueDisabled };
+    action = { kind: 'idle', queueDisabled, belowMinLevel };
   }
-
-  const practice = bracket === 'fiesta' && input.practiceAvailable && !inMatch;
 
   // The bout's map, shown from queue pop (countdown) through the aftermath;
   // yumi brackets play in their own maze band, so no map row for them. The
@@ -238,19 +232,16 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     bracket,
     party,
     canSwitchBracket,
+    input.playerLevel,
   ]);
 
   return {
     kind: 'live',
     bracket,
-    commitBracket,
-    canSwitchBracket,
     standing,
-    brackets,
     isTeamBracket,
     party: partySection,
     action,
-    practice,
     matchMap,
     ladder,
     allTime: allTimeView,

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { CONSTRAINED_PREWARM_KEEP } from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
   type PrewarmResumeEntry,
@@ -209,6 +210,9 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('wires the production compile resume lane to bounded units', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const unitsStart = source.indexOf('const compileEntryUnits =');
+    const unitsEnd = source.indexOf('const runEntry =', unitsStart);
+    const unitsSlice = source.slice(unitsStart, unitsEnd);
     const compileEntryStart = source.indexOf("id: 'programs.compile'");
     const compileEntryEnd = source.indexOf("id: 'sky.current-zone'", compileEntryStart);
     const compileEntry = source.slice(compileEntryStart, compileEntryEnd);
@@ -220,15 +224,22 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compileEntryEnd).toBeGreaterThan(compileEntryStart);
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
-    expect(resumeSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('roots: group.children');
-    expect(resumeSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(resumeSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
-    expect(resumeSlice).not.toContain('compileAsync(this.scene');
-    expect(resumeSlice).not.toContain('Promise.race');
+    expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    expect(resumeSlice).toContain('return compileEntryUnits()');
+    expect(unitsStart).toBeGreaterThan(-1);
+    expect(unitsEnd).toBeGreaterThan(unitsStart);
+    expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    expect(unitsSlice).toContain('else root.traverse(collect)');
+    expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
+    expect(unitsSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
+    expect(compileEntry).not.toContain('compileAsync(this.scene');
+    expect(compileEntry).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
-    expect(source).toContain('this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME)');
+    expect(source).toContain(
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+    );
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');
@@ -256,5 +267,42 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(scene).toContain("textureResumeUnits('scene', this.collectInitialSceneTextures())");
     expect(surface).not.toContain('renderPrewarmPass');
     expect(scene).not.toContain('renderPrewarmPass');
+  });
+
+  // Weapon-skin rigs are worn by OTHER players, so nothing at boot draws one
+  // and their programs otherwise link on the first sighting, mid-gameplay.
+  it('warms the weapon-skin VFX programs as small resumable units', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = source.indexOf("id: 'vfx.weapon-skins'");
+    const end = source.indexOf("id: 'vfx.ability-primitives'", start);
+    const entry = source.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(entry).toContain("category: 'vfx'");
+    expect(entry).toContain('required: false');
+    // Three explicitly bounded units, never a whole-entry rerun.
+    expect(entry).toContain("id: 'weapon-skins:group'");
+    expect(entry).toContain("id: 'weapon-skins:textures'");
+    expect(entry).toContain("id: 'weapon-skins:compile'");
+    expect(entry).toContain('await this.compilePrewarmColorPrograms(weaponVfxPrewarmGroup, false)');
+    expect(entry.match(/buildWeaponVfxPrewarmGroup\(\)/g)).toHaveLength(2); // run + resume unit
+    expect(entry).toContain('for (const texture of weaponVfxPrewarmTextures()) ');
+    // The sky dome is not warmed: the world path builds none any more.
+    expect(entry).not.toContain('skyTex');
+
+    // The staged group is torn out of the scene by both cleanup paths and
+    // hidden between resumed entries, exactly like every other prewarm group.
+    expect(source).toContain('if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup)');
+    expect(source).toContain('weaponVfxPrewarmGroup = null;');
+    const hideStart = source.indexOf('const hidePrewarmArtifacts = ');
+    const hideEnd = source.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
+    expect(source.slice(hideStart, hideEnd)).toContain('weaponVfxPrewarmGroup,');
+    // A dropped programs.compile still links it from its own bounded unit.
+    expect(source).toContain("['weapon-vfx', weaponVfxPrewarmGroup],");
+  });
+
+  it('leaves the weapon-skin warm off the constrained keep-list', () => {
+    expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.weapon-skins');
   });
 });

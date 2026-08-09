@@ -30,6 +30,8 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -67,6 +69,8 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { questGateBlocksDamage } from './quest_damage_gate';
+import { applySetProcs } from './set_procs';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -81,7 +85,14 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
-const PET_STEALTH_DETECTION_RADIUS = 50;
+// A pet's stealth-detection base radius is its aggro-radius analogue, imported from the
+// pet-AI slice so this gate and petCanSeeTarget (pet/pet_ai.ts) cannot drift: a pet that
+// cannot ACQUIRE a stealthed player must not be able to damage one either. This used to
+// be a local 50, the pet's assist scan span, which is a range and not a radius. The
+// guard below is keyed on "owned mob", so it also covers the delve companion, whose own
+// acquisition (delves/companion.ts) has never consulted stealth at all; that asymmetry
+// is pre-existing and narrowed, not introduced, by the smaller radius.
+const PET_STEALTH_DETECTION_RADIUS = PET_AGGRESSIVE_RANGE;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the
@@ -126,6 +137,9 @@ export function dealDamage(
   aoe = false,
 ): number {
   if (target.dead) return 0;
+  // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
+  // owner has the gating quest active/ready may harm it; other hits are a no-op.
+  if (questGateBlocksDamage(ctx.players, source, target)) return 0;
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
@@ -149,6 +163,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind,
         ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
       });
@@ -178,6 +193,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind: 'evade',
       });
     }
@@ -553,6 +569,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -618,6 +635,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -649,6 +667,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         ...attackAnimation,
       });
@@ -683,13 +702,14 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
@@ -768,6 +788,7 @@ export function dealDamage(
     crit,
     school,
     ability,
+    abilityId,
     kind,
     absorbed: totalAbsorbed || undefined,
     ...attackAnimation,
@@ -913,6 +934,14 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  // Thornhollow Fields assists: remember who softened a player before the blow
+  // that finishes them. Only real damage on a live player counts, and the
+  // battleground module owns every other rule (same match, opposing teams, the
+  // assist window); this hub only reports the hit.
+  if (source && amount > 0 && target.kind === 'player' && !target.dead) {
+    ctx.bgOnPlayerDamaged(target, source);
+  }
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
@@ -1010,7 +1039,7 @@ export function dealDamage(
       // the permanent death + graveyard flow.
       ctx.yumiPlayerDown(fmatch, target, null);
     } else {
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
     }
   }
   return amount;
@@ -1100,7 +1129,12 @@ function reflectSpellWard(
   );
 }
 
-export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+export function handleDeath(
+  ctx: SimContext,
+  e: Entity,
+  killer: Entity | null,
+  killerAbility?: string | null,
+): void {
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1118,10 +1152,40 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
   e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';
+  // A dragonkin egg that DIES here (a shot, the chain ripple, the broodlord
+  // shout, the proximity ambush: every real break runs through dealDamage)
+  // is CRACKED: the brood pass hatches only flagged corpses, so an egg
+  // fiat-flagged dead outside the damage path (the test-suite despawnMobs
+  // idiom, admin sweeps) never detonates the clutch (mob/dragonkin_brood.ts).
+  if (e.kind === 'mob' && MOBS[e.templateId]?.broodEgg) e.broodCracked = true;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
+
+  // The `kill` set-proc trigger, dispatched here because this is the one place
+  // every death resolves. After the death emit so the event order players and
+  // the parity samplers observe is unchanged (the death lands first, any proc
+  // aura second), and before the threat sweep below so `e` is still a live
+  // object: only its dead flag and auras have been touched.
+  //
+  // This shifts no rng for existing characters: applySetProcs returns before
+  // touching ctx.rng when no equipped proc matches the trigger, and no shipped
+  // set declares a `kill` proc. Preserve that early return.
+  if (killer && killer.id !== e.id && !killer.dead) {
+    applySetProcs(ctx, killer, e, 'kill');
+  }
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn
@@ -1179,7 +1243,22 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargePath = [];
     if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
-    ctx.emit({ type: 'playerDeath', pid: e.id });
+    // Classic-era death recap: the killer entity id (real kill credit already
+    // lives on the killer entity passed in here, the same source kill-credit /
+    // loot resolution reuses) plus the raw killing-ability name, if any. The
+    // client resolves and localizes both, and renders the ONE death log line
+    // (no separate sim-side notice: two lines on every death, and a doubled
+    // "You have died." for the no-killer case, was the earlier bug here).
+    ctx.emit({
+      type: 'playerDeath',
+      pid: e.id,
+      killerId: killer && killer.id !== e.id ? killer.id : undefined,
+      killerAbility: killerAbility ?? undefined,
+    });
+    // Thornhollow Fields: carrier death drops the flag in place. The corpse
+    // lies where it fell and the player's own Release press sends the spirit to
+    // the warded keep graveyard, where the team wave clock raises it.
+    ctx.bgOnPlayerDeath(e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left
@@ -1192,7 +1271,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
     const pet = ctx.petOf(e.id);
-    if (pet) handleDeath(ctx, pet, killer);
+    if (pet) handleDeath(ctx, pet, killer, killerAbility);
     return;
   }
 
@@ -1406,6 +1485,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
       }
+      // A destroyed Broodmother egg may hatch a widow that swarms the killer.
+      if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll. Rares pass
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed

@@ -223,11 +223,15 @@
   }
   /* Floating move joystick: a lower-left capture zone lets the thumb land
      anywhere; the joystick rests dimmed at home until touched, then springs to
-     the touch point with a gold "engaged" glow. */
+     the touch point with a gold "engaged" glow. Anchored with the same
+     env(safe-area-inset-left)/env(safe-area-inset-bottom) offsets as the
+     .mobile-joystick rule it hosts (every other touch control already does
+     this), so the capture zone itself does not sit under a notch or the home
+     indicator gesture strip; the zone's own width/height stay untouched. */
   body.mobile-touch #mobile-move-zone {
     position: absolute;
-    left: 0;
-    bottom: 0;
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
     width: min(30vw, 132px);
     min-width: 112px;
     max-width: 132px;
@@ -1407,6 +1411,15 @@
     width: 100%;
     min-width: 0;
   }
+  /* Desktop groups the pet command bar and the pet health frame into one row
+     (#pet-cluster). Mobile deliberately splits them again: the command bar belongs
+     under the thumb at the top of the screen, the health strip belongs in the
+     bottom-centre column with the player frame, and one 570px row would not fit a
+     phone anyway. display:contents dissolves the wrapper so each child keeps the
+     independent fixed seat the rules below give it. */
+  body.mobile-touch #pet-cluster {
+    display: contents;
+  }
   body.mobile-touch #petbar {
     position: fixed;
     left: 50%;
@@ -1429,6 +1442,50 @@
   }
   body.mobile-touch #daily-rewards-button {
     display: none !important;
+  }
+  /* Seeker promotes the existing mobile reward action out of More and into the
+     shortcut grid directly below Chat. Keep the same element/listener and show
+     only the established desktop chest artwork. */
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls {
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:not([hidden]) {
+    grid-column: 1;
+    grid-row: 2;
+    position: static;
+    display: flex;
+    width: 58px;
+    height: 54px;
+    min-width: 58px;
+    min-height: 54px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: url("/ui/daily-rewards/treasure_chest.webp") center / 48px 48px no-repeat;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    pointer-events: auto;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards
+    :is(.ui-icon, .mobile-label) {
+    display: none !important;
+  }
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards:active {
+    transform: scale(0.92);
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
   }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
      stretch of no touch): recedes the low-frequency chrome (the top-left
@@ -1766,6 +1823,40 @@
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
   }
+  /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
+     which does not exist here (the player frame is lifted out to position:fixed),
+     so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
+     cast and swing bars (player frame 14px, cast 68px, swing 76px). Seating it on
+     top of the column rather than between the frame and the bars is deliberate:
+     the pet strip appears and disappears with the pet, and displacing the two bars
+     would move a cast bar mid-cast. It KEEPS its portrait here, unlike the cast bar
+     which drops its label: the frame is a tap target that selects the pet, and a
+     portrait-less strip renders about 20px tall, under the 40x40 mobile touch
+     floor. With the portrait the visible frame is ~48px rendered at this scale, so
+     the tap area is the floor without an invisible band over the world. */
+  body.mobile-touch #pet-frame {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    z-index: 21;
+    width: 300px;
+    margin: 0;
+    justify-content: flex-start;
+    /* The desktop rule pays --unit-frame-content-inset because the desktop player
+       frame CENTRES its content in a 612px box. The mobile player frame is
+       flex-start with no inset, so inheriting it here pushes this strip about 18px
+       right of the frame it hangs under. Reset, do not inherit. */
+    padding-left: 0;
+    zoom: 1;
+    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform-origin: center bottom;
+  }
+  body.mobile-touch #pet-frame .uf-bars {
+    width: 224px;
+    max-width: 224px;
+    flex: none;
+  }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
   }
@@ -1781,6 +1872,13 @@
     top: calc(max(8px, env(safe-area-inset-top)) + 72px);
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
+  }
+  /* The Seeker chest occupies the shortcut grid's second row. Reserve that
+     row before seating actionable unit frames, including the maximum 1.3
+     Action Button Size setting, with at least an 8px gap below the 54px chest.
+     Non-Seeker mobile keeps the compact +72px target seat. */
+  body.mobile-touch.seeker-wallet-enabled #target-frame {
+    top: calc(max(8px, env(safe-area-inset-top)) + 140px);
   }
   /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
      showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
@@ -1811,6 +1909,9 @@
     align-items: flex-start;
     width: auto;
     z-index: 5;
+  }
+  body.mobile-touch.seeker-wallet-enabled #party-frames {
+    top: calc(max(8px, env(safe-area-inset-top)) + 142px);
   }
   /* The member-rows wrapper carries the adaptive double-stack the container used to: a
      CSS grid with grid-auto-flow: column and 2 explicit rows does the adaptive part with
@@ -1952,6 +2053,19 @@
   body.mobile-touch #party-frames .party-frame .pfm-name .lead,
   body.mobile-touch #party-frames .party-frame .pf-badge {
     font-size: 9px;
+  }
+  /* The pet sliver shrinks with the rest of the mobile row (its bars are 5px here,
+     down from 9px on desktop), staying a hairline cue rather than competing with the
+     member's own health. It is not a primary tap target on mobile: the member row
+     owns the tap, and selecting a party member's pet is a desktop-scale interaction. */
+  body.mobile-touch #party-frames .party-frame .pfm-pet {
+    height: 3px;
+    margin-top: 1px;
+    /* Makes the "the member row owns the tap" claim above actually true. At 3px this
+       is nowhere near the 40x40 touch floor, and without this a tap landing on it
+       selects the pet and stopPropagation swallows the member selection the player
+       meant. Informational on touch; the row keeps the whole tap area. */
+    pointer-events: none;
   }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;
@@ -2132,6 +2246,11 @@
   }
   /* The Merchant's coin continues the same disc-control row, left of the envelope. */
   body.mobile-touch #market-indicator {
+    /* Clear the desktop anchor before re-anchoring on the other side: the coin
+       pins left on the disc, and left + width + right all non-auto is
+       over-constrained (LTR drops `right`), so without this it never joins the
+       row. Same reason #raid-lockout clears left and #mail-indicator bottom. */
+    left: auto;
     right: calc(100% + 138px);
     top: 156px;
     width: 44px;
@@ -2270,7 +2389,7 @@
      under the mirrored action ring on the left). */
   body.mobile-touch.mobile-left-handed #mobile-move-zone {
     left: auto;
-    right: 0;
+    right: max(18px, env(safe-area-inset-right));
   }
   /* The paged action ring (Phase 1) lives bottom-right, the same corner the
      move joystick mirrors to above. Pin the ring to the LEFT in left-handed
@@ -2405,6 +2524,19 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  /* The secondary lines scale with the title. Without this they stay at the
+     desktop 18px while the verdict drops to 26px, so on a phone a three-line
+     battleground result reads as four near-equal lines instead of one headline
+     over its detail, and the taller block runs into the result scoreboard
+     below it. */
+  body.mobile-touch #banner .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+    line-height: 1.25;
+    margin-top: 4px;
+  }
+  body.mobile-touch #banner .banner-subtext + .banner-subtext {
+    margin-top: 1px;
+  }
   body.mobile-touch #banner.banner-with-art {
     gap: 6px;
   }
@@ -2416,6 +2548,18 @@
   body.mobile-touch #banner.banner-deed {
     font-size: calc(19px * var(--mobile-chrome-scale, 1));
     padding: 6px 14px;
+  }
+  body.mobile-touch #banner.banner-skill {
+    font-size: calc(20px * var(--mobile-chrome-scale, 1));
+    padding: 8px 16px 10px;
+    gap: 8px;
+  }
+  body.mobile-touch #banner.banner-skill .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-skill .banner-art {
+    width: 40px;
+    height: 40px;
   }
   body.mobile-touch #banner .banner-art {
     width: 34px;
@@ -2529,18 +2673,22 @@
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
-  /* Issue 1577 round 2 (5): the Daily Rewards window's entries (intro, the daily
-     summary, the spin section, the Verify Wallet card, tasks, leaderboard) used
-     to stack in a single tall column, wasting the wide landscape viewport and
-     forcing a long scroll. Flow them into 2 balanced columns; break-inside:avoid
-     keeps each card whole across the column break. */
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    column-count: 2;
-    column-gap: 12px;
+  /* Keep Daily Rewards in one vertical flow on touch. The rewards-only window
+     is width-capped for readability, while its body scrolls vertically and
+     suppresses horizontal overflow so no content is stranded off-screen. */
+  body.mobile-touch #daily-rewards-window:not(.store-active) {
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
   }
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body > * {
-    break-inside: avoid;
-    margin-bottom: 10px;
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
+    columns: initial;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* The spin overlay is appended directly to body. Keep it above the raised
+    mobile #ui window layer and the mobile window backdrop. */
+  body.mobile-touch .dr-spin-overlay {
+    z-index: 101;
   }
   body.mobile-touch #daily-rewards-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
@@ -2550,6 +2698,28 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
   }
+  body.mobile-touch .dr-spin-stage {
+    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
+  }
+  body.mobile-touch .dr-spin-wheel-big {
+    width: 300px;
+    max-width: 84%;
+  }
+  body.mobile-touch .dr-spin-wheel-big span {
+    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
+      rotate(calc(var(--i) * -45deg - 22.5deg));
+  }
+  body.mobile-touch .dr-spin-result {
+    width: 120px;
+    height: 120px;
+    font-size: 18px;
+  }
+  body.mobile-touch .dr-spin-pointer {
+    border-left-width: 13px;
+    border-right-width: 13px;
+    border-top-width: 24px;
+  }
+  /* Mobile touch store */
   body.mobile-touch .woc-store-tabs button {
     min-width: 112px;
     min-height: 44px;
@@ -2729,6 +2899,7 @@
   body.mobile-touch #vendor-window,
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
+  body.mobile-touch #commission-board-window,
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
@@ -2785,6 +2956,48 @@
   body.mobile-touch .crafting-tab {
     min-height: 40px;
     white-space: nowrap;
+  }
+  /* Craft cast Phase 2: readable duration + 40px craft control floor on touch. */
+  body.mobile-touch .crafting-duration-chip {
+    font-size: 12px;
+    padding: 2px 7px;
+  }
+  body.mobile-touch .crafting-recipe-btn {
+    min-height: 40px;
+  }
+  body.mobile-touch .crafting-craft-chip {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 10px 16px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch .crafting-cast-progress {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  body.mobile-touch .crafting-cast-progress-track {
+    height: 22px;
+  }
+  body.mobile-touch .crafting-cast-progress-label {
+    font-size: 13px;
+  }
+  body.mobile-touch .crafting-cast-progress-timer {
+    font-size: 13px;
+  }
+  body.mobile-touch .crafting-cast-progress-batch {
+    font-size: 12px;
+  }
+  /* Phase 3 batch: 40px touch floor on qty stepper and Create All. */
+  body.mobile-touch .crafting-qty-btn,
+  body.mobile-touch .crafting-create-all-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch .crafting-qty-value {
+    font-size: 16px;
   }
   /* Phase 22 retired the mobile-only track override, the full-width Cap wrap,
      and the Cap-header hide with the grid table itself: the rows are the
@@ -3282,7 +3495,8 @@
   body.mobile-touch #tooltip.mob-tooltip .tt-red,
   body.mobile-touch #tooltip.mob-tooltip .tt-green,
   body.mobile-touch #tooltip.mob-tooltip .tt-quest-name,
-  body.mobile-touch #tooltip.mob-tooltip .tt-quest-obj {
+  body.mobile-touch #tooltip.mob-tooltip .tt-quest-obj,
+  body.mobile-touch #tooltip.mob-tooltip .tt-rank {
     font-size: calc(10px * var(--tooltip-scale, 1));
     line-height: 1.2;
   }
@@ -3538,10 +3752,12 @@
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
+  body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.gfx-wide,
   body.mobile-touch #options-menu.perf-wide {
     left: 50%;
     right: auto;
@@ -3556,9 +3772,24 @@
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
+  body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
+  }
+  /* The WARFARE shop is many sections deep (one per armor family, plus jewelry
+     and weapons), so it takes the vendor window's full top-to-bottom treatment
+     rather than the shorter quest-log clamp: same
+     --window-scale division for the #ui zoom, same reserved 12px top offset
+     from the centered-sheet base, same safe-area bottom margin. */
+  body.mobile-touch #warfare-window {
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
+    overflow-y: auto;
   }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {
@@ -3610,6 +3841,7 @@
   body.mobile-touch #spellbook,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.gfx-wide,
   body.mobile-touch #options-menu.perf-wide {
     width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
@@ -3779,6 +4011,55 @@
   body.mobile-touch.market-open #bags .bag-chip {
     flex: 0 0 auto;
   }
+  /* Guild tab controls hold the 40px touch floor: the Personal/Guild tabs and
+     the treasury gold buttons are primary tap targets on the phone pairing. */
+  body.mobile-touch #bank-window .bank-tab,
+  body.mobile-touch #bank-window .gbank-view-tab,
+  body.mobile-touch #bank-window .gbank-gold-btn {
+    min-height: 40px;
+  }
+  /* The gold prompt's three coin fields hold the same touch floor as the
+     market's price row (its skin source): 40px tap height and the 16px
+     anti-zoom font (base.css floors it too; declared here so the intent is
+     explicit beside its siblings). */
+  body.mobile-touch .gbank-coin-row .coininput {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* Short landscape phones: the Guild pane adds fixed chrome the personal
+     pane does not have (tab strip, treasury row, dormant legend, buy note),
+     so compress its margins under the same grid-floor carve-out the buy row
+     already relies on, keeping the transactional row inside the window. */
+  @media (max-height: 480px) {
+    body.mobile-touch #bank-window .bank-tabs {
+      margin: 3px 0 1px;
+    }
+    body.mobile-touch #bank-window .gbank-treasury {
+      margin: 2px 0 3px;
+      gap: 6px;
+    }
+    body.mobile-touch #bank-window .gbank-dormant-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-readonly-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-buy-note {
+      font-size: 10px;
+    }
+    /* The log's own fixed chrome: the sub-strip and the scope line. The rows
+       themselves scroll, so only the chrome above them is compressed. */
+    body.mobile-touch #bank-window .gbank-view-tabs {
+      margin: 1px 0 2px;
+    }
+    body.mobile-touch #bank-window .gbank-log-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+  }
   /* Short landscape phones: the 50/50 pairing box (viewport minus the 10px top
      inset and the 72px tray reservation) cannot hold the full-toolbar chrome, the
      two-row grid floor (components.css .bank-scroll), AND the buy row, so the buy
@@ -3856,6 +4137,15 @@
   }
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
     border-top-color: #6a5320;
+  }
+  /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
+     device (unconditional, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too). The strip wraps horizontally, and on
+     short viewports the entry list is the flex arm that yields, so the
+     taller row cannot push the filter bar out. */
+  body.mobile-touch #deeds-window .deeds-recent-item {
+    min-width: 40px;
+    min-height: 40px;
   }
   /* Short landscape phones: the pinned chrome (title bar, summary, recent and
      nearest strips, chip row, filter bar) can eat the whole panel height and
@@ -3970,6 +4260,26 @@
   body.mobile-touch .perf-card {
     padding: 8px 15px 14px;
   }
+  /* Graphics panel on touch: the same roomier width as the perf panel, cards
+     stacked single-column (the components.css mobile-touch .gfx-cols rule).
+     Divided by the live UI scale like the shared options-panel rule above,
+     NOT a raw 100vw: #ui's zoom multiplies every author length, so a raw
+     viewport unit overflows the screen at any --ui-scale above 1. The cards
+     themselves ride the perf-card family, so the .perf-card touch rules
+     already cover them. */
+  body.mobile-touch #options-menu.gfx-wide {
+    width: min(640px, calc(var(--app-vw) / var(--ui-scale, 1) - 24px));
+  }
+  /* The inline action row wraps on touch: the status takes its own leading
+     line so the three buttons keep comfortable side-by-side targets. */
+  body.mobile-touch .gfx-footer {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .gfx-footer .graphics-apply-status {
+    flex-basis: 100%;
+    order: -1;
+    text-align: left;
+  }
   /* Options/settings row heights (Phase 4, presentation only): every touch-gated
      settings row (graphics/audio/interface panels via settingsViewShell's bare
      .set-rows > .set-row, PLUS the .perf-master/.perf-card row variants below)
@@ -4002,6 +4312,13 @@
   }
   body.mobile-touch .set-toggle {
     flex: 0 0 auto;
+    min-height: 40px;
+  }
+  body.mobile-touch .graphics-apply {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch .graphics-apply-btn {
+    width: 100%;
     min-height: 40px;
   }
   /* The master header stays centered + prominent on touch too. */
@@ -4372,6 +4689,25 @@
   body.mobile-touch #arena-window .btn {
     min-height: 40px;
     box-sizing: border-box;
+  }
+  /* Thornhollow Fields scoreboard: compacted for the 844x390 landscape HUD so it clears
+     the top button clusters; the respawn overlay rides the same midline. */
+  body.mobile-touch #bg-scoreboard {
+    top: 4px;
+    min-width: 250px;
+    padding: 3px 10px 5px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-score {
+    font-size: 19px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-team {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-under {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-respawn {
+    font-size: 18px;
   }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
@@ -5011,6 +5347,19 @@
       min-width: 0;
       height: 4px;
     }
+    /* Same bottom-centre column as portrait, one notch lower to match the shorter
+       landscape band (player frame 10px, cast 62px, swing 70px), and at the
+       landscape frame scale so the strip matches the player frame's width.
+       0.6 renders the frame ~35px, under the 40px touch floor: deliberately the
+       SAME size as the #player-frame directly below it, which is itself a tap
+       target (self-target) already shipping at this scale in landscape. Sizing
+       the pet frame larger than the frame it hangs under to win the floor would
+       invert their visual hierarchy; the landscape tier trades size for the
+       shorter viewport everywhere, and this follows the established baseline. */
+    body.mobile-touch #pet-frame {
+      bottom: calc(80px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
@@ -5062,9 +5411,17 @@
       top: calc(max(6px, env(safe-area-inset-top)) + 56px);
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
+    /* Landscape buttons use a 48px first row and 10px gap. Reserve the scaled
+       two-row grid at the maximum Action Button Size before seating target. */
+    body.mobile-touch.seeker-wallet-enabled #target-frame {
+      top: calc(max(6px, env(safe-area-inset-top)) + 132px);
+    }
     body.mobile-touch #party-frames {
       left: max(6px, env(safe-area-inset-left));
       top: calc(max(6px, env(safe-area-inset-top)) + 58px);
+    }
+    body.mobile-touch.seeker-wallet-enabled #party-frames {
+      top: calc(max(6px, env(safe-area-inset-top)) + 134px);
     }
     body.mobile-touch #party-frames .party-rows {
       max-width: calc(100dvw - max(6px, env(safe-area-inset-left)) - 10px);
@@ -5324,7 +5681,8 @@
     left: calc(50% - 15px);
   }
   body.mobile-touch.hud-mobile-compact #castbar,
-  body.mobile-touch.hud-mobile-compact #swingbar {
+  body.mobile-touch.hud-mobile-compact #swingbar,
+  body.mobile-touch.hud-mobile-compact #pet-frame {
     left: calc(50% - 15px);
   }
   /* Left-handed mirrors Jump (and the ring) to the left, so mirror this nudge
@@ -5333,7 +5691,8 @@
     left: calc(50% + 15px);
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
-  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
     left: calc(50% + 15px);
   }
   /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
@@ -5353,13 +5712,15 @@
   @media (max-width: 800px) and (orientation: landscape) {
     body.mobile-touch.hud-mobile-compact #player-frame,
     body.mobile-touch.hud-mobile-compact #castbar,
-    body.mobile-touch.hud-mobile-compact #swingbar {
+    body.mobile-touch.hud-mobile-compact #swingbar,
+    body.mobile-touch.hud-mobile-compact #pet-frame {
       left: calc(50% - 44px);
     }
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
-    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
       left: calc(50% + 44px);
     }
   }
@@ -5390,8 +5751,16 @@
   @media (orientation: landscape) {
     body.mobile-touch.hud-mobile-tablet #player-frame,
     body.mobile-touch.hud-mobile-tablet #castbar,
-    body.mobile-touch.hud-mobile-tablet #swingbar {
+    body.mobile-touch.hud-mobile-tablet #swingbar,
+    body.mobile-touch.hud-mobile-tablet #pet-frame {
       left: calc(50% - 10px);
+    }
+    /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
+      left: calc(50% + 10px);
     }
   }
 
@@ -5525,6 +5894,10 @@
   body.mobile-touch #dungeon-finder-window .btn,
   body.mobile-touch #dungeon-finder-window select,
   body.mobile-touch #dfinder-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #bg-proposal-popup .btn {
     min-height: 40px;
     box-sizing: border-box;
   }

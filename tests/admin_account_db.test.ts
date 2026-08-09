@@ -33,6 +33,7 @@ import {
   listAccounts,
   listModerationActions,
 } from '../server/admin_db';
+import { ADMIN_GUILDS_SCHEMA } from '../server/admin_guilds_schema';
 
 describe('admin account detail query', () => {
   beforeEach(() => {
@@ -236,6 +237,51 @@ describe('admin account detail query', () => {
     expect(mocks.runWithStatementTimeout).not.toHaveBeenCalled();
   });
 
+  it('defaults the accounts ORDER BY to id DESC, matching the old fixed order', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts('', 1, 25);
+
+    expect(mocks.query.mock.calls[0][0]).toContain('ORDER BY a.id DESC');
+  });
+
+  it('orders by each allowlisted accounts sort column, with an id tiebreaker', async () => {
+    const cases: Array<[Parameters<typeof listAccounts>[3], 'asc' | 'desc', string]> = [
+      ['username', 'asc', 'ORDER BY lower(a.username) ASC, a.id ASC'],
+      ['character_count', 'desc', 'ORDER BY character_count DESC, a.id DESC'],
+      ['max_level', 'asc', 'ORDER BY max_level ASC, a.id ASC'],
+      ['playtime_seconds', 'desc', 'ORDER BY playtime_seconds DESC, a.id DESC'],
+      ['created_at', 'asc', 'ORDER BY a.created_at ASC, a.id ASC'],
+      ['last_login', 'desc', 'ORDER BY a.last_login DESC NULLS LAST, a.id DESC'],
+      ['last_login', 'asc', 'ORDER BY a.last_login ASC NULLS LAST, a.id ASC'],
+    ];
+
+    for (const [sort, dir, expectedOrderBy] of cases) {
+      mocks.query.mockReset();
+      mocks.query
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+      await listAccounts('', 1, 25, sort, dir);
+
+      expect(mocks.query.mock.calls[0][0], sort).toContain(expectedOrderBy);
+    }
+  });
+
+  it('sorts last_login DESC with NULLS LAST so never-logged-in accounts sort after recent logins', async () => {
+    // accounts.last_login is nullable; PostgreSQL sorts NULL first on a bare DESC,
+    // which would put never-logged-in accounts ahead of recently active ones under
+    // a descending "Last login" sort. Pin the explicit NULLS LAST policy so that
+    // regression cannot silently return.
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts('', 1, 25, 'last_login', 'desc');
+
+    const sql = mocks.query.mock.calls[0][0] as string;
+    expect(sql).toContain('ORDER BY a.last_login DESC NULLS LAST, a.id DESC');
+    expect(sql).not.toMatch(/ORDER BY a\.last_login DESC,/);
+  });
+
   it('returns positive point events for one account, reward day, and realm', async () => {
     mocks.query.mockResolvedValueOnce({
       rows: [
@@ -418,10 +464,18 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[0][0]).toContain('UNION ALL');
     expect(mocks.query.mock.calls[0][0]).toContain('FROM blocked_ip_actions ip_action');
     expect(mocks.query.mock.calls[0][0]).toContain('FROM guild_moderation_actions guild_action');
-    // The guild arm stamps its action kind as a literal; the dashboard label table
-    // keys off the same constant, so drift between them would silently bucket every
-    // rename into "Other action".
-    expect(mocks.query.mock.calls[0][0]).toContain(`'${GUILD_RENAME_ACTION}' AS action`);
+    // The guild arm reads its action kind from the ROW, not from a hardcoded
+    // literal: guild_moderation_actions gained an additive `action` column so a
+    // guild bank dormant-slot purge shows up in the history as itself instead
+    // of being mislabeled a rename. The literal is still the column's DEFAULT,
+    // which is what keeps every pre-existing row rendering as a rename, and the
+    // dashboard label table keys off the same constant, so drift between them
+    // would silently bucket a real action into "Other action".
+    expect(mocks.query.mock.calls[0][0]).toContain('guild_action.action');
+    expect(mocks.query.mock.calls[0][0]).not.toContain(`'${GUILD_RENAME_ACTION}' AS action`);
+    expect(ADMIN_GUILDS_SCHEMA).toContain(
+      `ADD COLUMN IF NOT EXISTS action TEXT NOT NULL DEFAULT '${GUILD_RENAME_ACTION}'`,
+    );
     // Only the guild arm is realm-scoped: accounts and blocked IPs are global.
     expect(mocks.query.mock.calls[0][0]).toContain('WHERE guild_action.realm = $1');
     expect(mocks.query.mock.calls[0][0]).not.toContain('action_log.realm');

@@ -29,8 +29,14 @@ const hudStringsEn = {
       releaseSpirit: 'Release Spirit',
       chatTab: 'Chat',
       combatLogTab: 'Combat Log',
+      // Lists the slash-command legend AND, since issue #1230, a plain-language
+      // pointer to the "!" community-relay commands (LFG/WTS/WTB/recruit/event/
+      // help, src/sim/discord_relay.ts): the chatbox already opens an autocomplete
+      // on "!" (src/ui/chat_command_menu.ts), but nothing told a player it
+      // existed. Reworded value, not a new key: existing overlay translations
+      // stay in place until refreshed (README i18n workflow), same as any reword.
       chatPlaceholder:
-        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)',
+        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help, ! for community commands)',
       chatChannels: {
         add: 'Add chat channel',
         addTitle: 'Add channel',
@@ -58,7 +64,6 @@ const hudStringsEn = {
       mobileMore: 'More',
       mobileMoreAria: 'Show more menus',
       mobileSocial: 'Social',
-      mobileArena: 'Arena',
       mobileMenu: 'Menu',
       mobileSettings: 'Settings',
       mobileUse: 'Interact',
@@ -175,7 +180,7 @@ const hudStringsEn = {
         nameplates: 'Toggle Nameplates',
         meters: 'Damage Meters',
         social: 'Friends & Guild',
-        arena: 'Arena (Ashen Coliseum)',
+        arena: 'PvP (Thornhollow Fields and Arenas)',
         chat: 'Open Chat',
         attack: 'Attack',
         actionBarSlot: 'Action Bar {slot}',
@@ -281,6 +286,7 @@ const hudStringsEn = {
       floatingParry: 'Parry',
       floatingResist: 'Resist',
       floatingEvade: 'Evade',
+      floatingBlock: '{amount} Block',
       floatingHealFull: 'Full',
       floatingHealAbsorbed: 'Absorbed',
       cannotMove: "Can't move!",
@@ -294,6 +300,8 @@ const hudStringsEn = {
       parried: 'Your {ability} is parried by {target}.',
       resisted: 'Your {ability} is resisted by {target}.',
       evaded: 'Your {ability} is evaded by {target}.',
+      blockedDone: 'Your {ability} is blocked by {target}, dealing {amount}.',
+      blockedTaken: "You block {source}'s attack, taking {amount}.",
       healSelf: 'Your {ability} heals you for {amount}.',
       healSelfCrit: 'Your {ability} critically heals you for {amount}.',
       healOther: 'Your {ability} heals {target} for {amount}.',
@@ -310,6 +318,20 @@ const hudStringsEn = {
     },
     system: {
       playerDeath: 'You have died.',
+      deathRecapKillerAbility: "You have died. Slain by {killer}'s {ability}.",
+      deathRecapKiller: 'You have died. Slain by {killer}.',
+      deathRecapAbility: 'You have died. Slain by {ability}.',
+      // Environmental causes get their own sentence shape rather than being
+      // interpolated into deathRecapAbility: the raw cause string ('Falling',
+      // 'Fatigue') is not a translatable ability/aura name, and a bare "Slain by
+      // Falling" is awkward and hard to translate/inflect (see
+      // death_recap_feedback.ts).
+      deathRecapFalling: 'You have died. You fell to your death.',
+      deathRecapDrowned: 'You have died. You drowned.',
+      // Cauterize's self-inflicted burn (aura id 'cauterizing', display name
+      // 'Cauterized') is another unattributed cause: it must not read as
+      // "Slain by Cauterized", which sounds like an enemy landed the kill.
+      deathRecapCauterized: "You have died. Cauterize's burn overwhelmed you.",
       respawn: 'You feel rested and whole again.',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
@@ -534,7 +556,6 @@ export const hudStrings = {
         mobileMore: 'Más',
         mobileMoreAria: 'Mostrar más menús',
         mobileSocial: 'Comunidad',
-        mobileArena: 'Arena',
         mobileMenu: 'Menú',
         mobileUse: 'Usar',
         mobileMeters: 'Medidores',
@@ -955,7 +976,6 @@ export const hudStrings = {
         mobileMore: 'Plus',
         mobileMoreAria: 'Afficher plus de menus',
         mobileSocial: 'Relations',
-        mobileArena: 'Arène',
         mobileMenu: 'Menu',
         mobileUse: 'Utiliser',
         mobileMeters: 'Compteurs',
@@ -1363,7 +1383,6 @@ export const hudStrings = {
         mobileMore: 'Altro',
         mobileMoreAria: 'Mostra altri menu',
         mobileSocial: 'Sociale',
-        mobileArena: 'Arena',
         mobileMenu: 'Menu',
         mobileUse: 'Usa',
         mobileMeters: 'Misuratori',
@@ -1762,7 +1781,6 @@ export const hudStrings = {
         mobileMore: 'Mehr',
         mobileMoreAria: 'Weitere Menüs anzeigen',
         mobileSocial: 'Soziales',
-        mobileArena: 'Arena',
         mobileMenu: 'Menü',
         mobileUse: 'Benutzen',
         mobileMeters: 'Anzeigen',
@@ -2160,7 +2178,6 @@ export const hudStrings = {
         mobileMore: '更多',
         mobileMoreAria: '显示更多菜单',
         mobileSocial: '社交',
-        mobileArena: '竞技场',
         mobileMenu: '菜单',
         mobileUse: '使用',
         mobileMeters: '统计',
@@ -2544,7 +2561,6 @@ export const hudStrings = {
         mobileMore: '更多',
         mobileMoreAria: '顯示更多選單',
         mobileSocial: '社交',
-        mobileArena: '競技場',
         mobileMenu: '選單',
         mobileUse: '使用',
         mobileMeters: '統計',
@@ -2931,7 +2947,6 @@ export const hudStrings = {
         mobileMore: '더보기',
         mobileMoreAria: '메뉴 더 보기',
         mobileSocial: '소셜',
-        mobileArena: '투기장',
         mobileMenu: '메뉴',
         mobileUse: '사용',
         mobileMeters: '미터',
@@ -3327,7 +3342,6 @@ export const hudStrings = {
         mobileMore: 'その他',
         mobileMoreAria: 'その他のメニューを表示',
         mobileSocial: 'ソーシャル',
-        mobileArena: 'アリーナ',
         mobileMenu: 'メニュー',
         mobileUse: '使用',
         mobileMeters: 'メーター',
@@ -3725,7 +3739,6 @@ export const hudStrings = {
         mobileMore: 'Mais',
         mobileMoreAria: 'Mostrar mais menus',
         mobileSocial: 'Comunidade',
-        mobileArena: 'Arena',
         mobileMenu: 'Menu',
         mobileUse: 'Usar',
         mobileMeters: 'Medidores',
@@ -4124,7 +4137,6 @@ export const hudStrings = {
         mobileMore: 'Еще',
         mobileMoreAria: 'Показать еще меню',
         mobileSocial: 'Общение',
-        mobileArena: 'Арена',
         mobileMenu: 'Меню',
         mobileUse: 'Использовать',
         mobileMeters: 'Счетчики',

@@ -903,7 +903,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // phantom-producing seed evaporates and the pin below turns vacuous.
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
-    expect((sim.postOffice as any).unreadIndex.get('Doomed')).toBe(1);
+    expect((sim.postOffice as any).index.unread.get('Doomed')).toBe(1);
     expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
     // The parcel flew home to its live sender rather than being destroyed.
     const flown = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'returned parcel');
@@ -915,7 +915,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // here), and the next holder of the name reads exactly the truth (their
     // own welcome letter, nothing inherited).
     // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
-    expect((sim.postOffice as any).unreadIndex.has('Doomed')).toBe(false);
+    expect((sim.postOffice as any).index.unread.has('Doomed')).toBe(false);
     const nextHolder = sim.addPlayer('mage', 'Doomed', { characterId: 999 });
     expect(sim.mailUnreadFor(nextHolder)).toBe(unreadOracle(sim, nextHolder));
     expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
@@ -1143,7 +1143,7 @@ describe('purgeMailOwner - deleting a character', () => {
 
     expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
     // biome-ignore lint/suspicious/noExplicitAny: the in-flight set is module-private.
-    const undelivered = (sim.postOffice as any).undelivered as Set<unknown>;
+    const undelivered = (sim.postOffice as any).index.undelivered as Set<unknown>;
     expect(undelivered.has(note)).toBe(false);
     // Flying past the old delivery time must not resurrect it in the unread index.
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
@@ -1164,5 +1164,67 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(letterBy(sim, (m) => m.subject === 'Legacy', 'legacy letter').recipientKey).toBe(
       'Doomed',
     );
+  });
+
+  it('the rename sweep re-keys the SIGNER inside a parcel addressed to the renamer', () => {
+    // Since #2507 an instanced copy rides the raven, and its signer is a
+    // separate string the recipient rekey does not touch by itself. Upstream
+    // scopes the sweep to the recipient arm; shipped untested, so pinned here.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.addItemInstance('roasted_boar', { signer: 'Alice' }, alice, 1);
+    sim.drainEvents();
+    sim.mailSend(
+      'Bob',
+      'Signed',
+      'mine',
+      0,
+      [{ itemId: 'roasted_boar', count: 1, instance: { signer: 'Alice' } }],
+      alice,
+    );
+    const letter = sim.postOffice.mail.find((m) => m.subject === 'Signed');
+    if (!letter) throw new Error('no letter');
+    expect(letter.items[0]?.instance?.signer).toBe('Alice');
+
+    // The sweep is scoped to the recipient arm, so address the parcel to the
+    // character being renamed. (Alice signed it; the signer is what follows.)
+    letter.recipientKey = 'Alice';
+    expect(sim.rekeyMailOwner(555, 'Alice', 'Alicia')).toBe(true);
+    expect(letter.items[0]?.instance?.signer).toBe('Alicia');
+  });
+
+  it('the rename sweep leaves a parcel addressed to a STRANGER alone', () => {
+    // The deliberate scope boundary (the accepted craftedBy limitation),
+    // pinned so a later widening is a conscious choice rather than drift.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.addItemInstance('roasted_boar', { signer: 'Alice' }, alice, 1);
+    sim.drainEvents();
+    sim.mailSend(
+      'Bob',
+      'Foreign',
+      'theirs',
+      0,
+      [{ itemId: 'roasted_boar', count: 1, instance: { signer: 'Alice' } }],
+      alice,
+    );
+    const letter = sim.postOffice.mail.find((m) => m.subject === 'Foreign');
+    if (!letter) throw new Error('no letter');
+    letter.recipientKey = 'somebody-else';
+    letter.senderKey = 'somebody-else';
+    letter.senderName = 'Somebody Else';
+
+    sim.rekeyMailOwner(555, 'Alice', 'Alicia');
+    expect(letter.items[0]?.instance?.signer).toBe('Alice');
   });
 });

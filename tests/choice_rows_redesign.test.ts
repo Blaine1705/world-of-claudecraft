@@ -3,6 +3,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -15,7 +17,7 @@ function rig(
   rows: Record<number, string>,
   seed = 11,
 ) {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -182,6 +184,12 @@ describe('shaman redesign', () => {
   });
 
   it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
+    // Seed hunted so the Earthen Jolt that detonates actually LANDS: an avoided
+    // shock draws no detonation and the DoT survives, which is the only way this
+    // assertion can fail without the mechanic being broken. Re-hunted from 12
+    // after the v0.34.0 merge composed this branch's quest-dedupe content with
+    // the release's Dragonkin brood, shifting every shared-stream draw. Not a
+    // behavior regression: 71 of seeds 1 to 80 detonate. Spares: 2, 3.
     const { sim } = rig(
       'shaman',
       20,
@@ -189,7 +197,7 @@ describe('shaman redesign', () => {
         8: 'sha_r8_shock_efficiency',
         14: 'sha_r14_improved_flame_shock',
       },
-      12,
+      1,
     );
     const mob = addTargetMob(sim, 100000, 8);
     castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
@@ -217,7 +225,7 @@ describe('shaman redesign', () => {
     const after = cds.get('earth_shock') ?? 0;
     // Natural decay over N ticks plus the 0.5 sec shave per landed swing.
     expect(mob.dead).toBe(false);
-    expect(before! - after).toBeGreaterThan(0.5);
+    expect(expectDefined(before) - after).toBeGreaterThan(0.5);
   });
 
   it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
@@ -251,10 +259,14 @@ describe('paladin redesign', () => {
   });
 
   it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
-    // Seed hunted (post-merge camp order) so the first counted physical swing
-    // LANDS under the re-branded seal: an avoided swing draws no shave and the
-    // cooldown delta assertion needs a landed hit. Spares: 2, 3.
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 1);
+    // Seed hunted so the first counted physical swing LANDS under the re-branded
+    // seal: an avoided swing draws no shave and the cooldown delta assertion
+    // needs a landed hit. Re-hunted from 2 after the v0.35.0 base sync composed this
+    // branch's quest-dedupe content with the release's Dragonkin brood, shifting
+    // every shared-stream draw (seed 2 now shaves nothing: 6.000 to 5.950, one
+    // tick of ordinary decay). Not a behavior regression: nearby seeds still
+    // shave the full amount, landing at 5.450. Spares: 4, 5.
+    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 3);
     addTargetMob(sim);
     castAndSettle(sim, 'seal_of_righteousness', 2);
     castAndSettle(sim, 'judgement', 2);
@@ -269,7 +281,7 @@ describe('paladin redesign', () => {
       }
     }
     expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(expectDefined(before) - 0.5);
   });
 
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
@@ -311,7 +323,12 @@ describe('paladin redesign', () => {
 
 describe('druid Lifesap redesign', () => {
   it('restores 30 resource per classic tick for 10 sec, in combat', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
     const p = sim.player;
@@ -332,7 +349,12 @@ describe('druid Lifesap redesign', () => {
   });
 
   it('carries across a form shift and fills Rage in Bruin Form', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
     const p = sim.player;

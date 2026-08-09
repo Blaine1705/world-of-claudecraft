@@ -79,9 +79,8 @@ import {
 } from '../vale_cup_layout';
 import {
   arenaCombatants,
-  cloneAbilityCharges,
-  cloneCcDr,
   isArenaQueued,
+  restoreArenaReturnPools,
   snapshotArenaReturnPools,
 } from './arena';
 import { duelFor } from './duel';
@@ -1314,16 +1313,7 @@ function teardownCupMatch(ctx: SimContext, match: VcMatch): void {
     // returnFromArena, issue #1600). recalcPlayerStats already ran inside
     // resetForArena, so maxHp/maxResource are current for the clamp.
     const pools = match.preMatchPools?.get(pid);
-    if (pools) {
-      e.cooldowns = new Map(pools.cooldowns);
-      e.abilityCharges =
-        Object.keys(pools.abilityCharges).length > 0
-          ? cloneAbilityCharges(pools.abilityCharges)
-          : undefined;
-      e.ccDr = cloneCcDr(pools.ccDr);
-      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
-      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
-    }
+    if (pools) restoreArenaReturnPools(ctx, e, pools);
     const ret = match.returns.get(pid);
     if (ret) {
       e.pos = ctx.groundPos(ret.x, ret.z);
@@ -1918,8 +1908,11 @@ function policePitch(ctx: SimContext, match: VcMatch): void {
     else if (nearest === dE) nlx = PITCH.xMax + VC_PITCH_EJECT_MARGIN;
     else nlx = PITCH.xMin - VC_PITCH_EJECT_MARGIN;
     // A bystander swept off the pitch is displaced like any other teleport:
-    // a live gather/fishing session (a herb node sits inside the Sowfield
-    // bounds) must not travel with them.
+    // a live profession session must not travel with them. No gather node or
+    // fishing spot sits inside the ground any more (a herb patch did until the
+    // Sowfield screen landed in tests/gather_node_placement.test.ts), but every
+    // other non-spell cast still can: crafting, salvage, enchanting and tool
+    // recharge all start wherever the player is standing.
     cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(nlx + ox, nlz + oz);
     e.prevPos = { ...e.pos }; // hard teleport: no interpolated streak across the boards

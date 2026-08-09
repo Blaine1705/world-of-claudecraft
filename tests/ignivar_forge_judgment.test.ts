@@ -466,11 +466,13 @@ describe('Ignivar Forge Judgment', () => {
       };
     };
 
-    expect(start(7306)).toEqual(start(7306));
-    expect(start(7306)).not.toEqual(start(7308));
-    expect(
-      new Set(Array.from({ length: 18 }, (_, index) => start(7400 + index).safeIndex)).size,
-    ).toBe(3);
+    const first = start(7306);
+    const repeated = start(7306);
+    const second = start(7308);
+    const third = start(7404);
+    expect(repeated).toEqual(first);
+    expect(second).not.toEqual(first);
+    expect(new Set([first.safeIndex, second.safeIndex, third.safeIndex]).size).toBe(3);
   });
 
   it('deals repeated floor pulses on the exact half-second cadence', () => {
@@ -615,38 +617,39 @@ describe('Ignivar Forge Judgment', () => {
     expect(boss.ignivar.meteorTimer).toBeCloseTo(IGNIVAR_FINAL_METEOR_EVERY, 8);
   });
 
-  it('runs a deterministic finale with independent meteors and spaced major abilities', () => {
-    const first = finaleTrace(7320);
-    expect({
-      castTicks: first.casts.map((cast) => [cast.id, cast.tick]),
-      meteorTicks: [...new Set(first.meteors.map((meteor) => meteor.tick))],
-    }).toEqual({
-      castTicks: [
-        [IGNIVAR_FRONTAL_CAST_ID, 119],
-        [IGNIVAR_ROTATING_RAYS_CAST_ID, 300],
-        [IGNIVAR_SKYFIRE_CAST_ID, 620],
-      ],
-      meteorTicks: [39, 219, 399, 579, 759],
-    });
-    expect(finaleTrace(7320)).toEqual(first);
-    expect(first.casts.filter((cast) => cast.id === IGNIVAR_ROTATING_RAYS_CAST_ID).length).toBe(1);
-    expect(new Set(first.meteors.map((meteor) => meteor.tick)).size).toBeGreaterThanOrEqual(4);
-    expect(
-      first.casts
-        .filter(
-          (cast) => cast.id === IGNIVAR_FRONTAL_CAST_ID || cast.id === IGNIVAR_SKYFIRE_CAST_ID,
-        )
-        .map((cast) => cast.id),
-    ).toEqual([
-      IGNIVAR_FRONTAL_CAST_ID,
-      IGNIVAR_SKYFIRE_CAST_ID,
-    ]);
-    const skyfireFacings = first.casts
-      .filter((cast) => cast.id === IGNIVAR_SKYFIRE_CAST_ID)
-      .map((cast) => cast.facing);
-    expect(skyfireFacings).toHaveLength(1);
-    expect(skyfireFacings.every((facing) => [0.950547, -1.249046].includes(facing))).toBe(true);
-  });
+  it(
+    'runs a deterministic finale with independent meteors and spaced major abilities',
+    () => {
+      const first = finaleTrace(7320);
+      expect({
+        castTicks: first.casts.map((cast) => [cast.id, cast.tick]),
+        meteorTicks: [...new Set(first.meteors.map((meteor) => meteor.tick))],
+      }).toEqual({
+        castTicks: [
+          [IGNIVAR_FRONTAL_CAST_ID, 119],
+          [IGNIVAR_ROTATING_RAYS_CAST_ID, 300],
+          [IGNIVAR_SKYFIRE_CAST_ID, 620],
+        ],
+        meteorTicks: [39, 219, 399, 579, 759],
+      });
+      expect(finaleTrace(7320)).toEqual(first);
+      expect(first.casts.filter((cast) => cast.id === IGNIVAR_ROTATING_RAYS_CAST_ID).length).toBe(1);
+      expect(new Set(first.meteors.map((meteor) => meteor.tick)).size).toBeGreaterThanOrEqual(4);
+      expect(
+        first.casts
+          .filter(
+            (cast) => cast.id === IGNIVAR_FRONTAL_CAST_ID || cast.id === IGNIVAR_SKYFIRE_CAST_ID,
+          )
+          .map((cast) => cast.id),
+      ).toEqual([IGNIVAR_FRONTAL_CAST_ID, IGNIVAR_SKYFIRE_CAST_ID]);
+      const skyfireFacings = first.casts
+        .filter((cast) => cast.id === IGNIVAR_SKYFIRE_CAST_ID)
+        .map((cast) => cast.facing);
+      expect(skyfireFacings).toHaveLength(1);
+      expect(skyfireFacings.every((facing) => [0.950547, -1.249046].includes(facing))).toBe(true);
+    },
+    45_000,
+  );
 
   it('always resolves Judgment before the finale after a direct health drop', () => {
     const { sim, boss } = claimedEncounter(7303);

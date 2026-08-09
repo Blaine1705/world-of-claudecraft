@@ -28,9 +28,10 @@ import { loadGltf } from '../assets/loader';
 
 // Mirrors the gallery SPIRIT_URLS onto the game's creature set (wolf.glb
 // restored for the spirit pack; the gallery preview used wolf_basic).
-const SPIRIT_URLS: Record<string, string> = {
+export const SPIRIT_URLS: Record<string, string> = {
   wolf: 'models/creatures/wolf.glb',
-  bear: 'models/creatures/yetialt.glb',
+  // the real quadruped, not the brown-tinted yeti biped this used to conjure
+  bear: 'models/creatures/bear_form.glb',
   raptor: 'models/creatures/velociraptor.glb',
   stag: 'models/creatures/stag.glb',
   fox: 'models/creatures/fox.glb',
@@ -82,7 +83,7 @@ const SPIRIT_TEMPO: Record<string, number> = {
 // Clips matched by INTENT across the creature packs' naming schemes:
 // locomotion while moving, idle while standing, the attack fired only at the
 // moment that earns it (pass-through, landing).
-const MOVE_CLIPS = [
+export const MOVE_CLIPS = [
   'Gallop',
   'Run',
   'Fast_Flying',
@@ -91,8 +92,14 @@ const MOVE_CLIPS = [
   'Spider_Walk',
   'Walking_A',
 ];
-const IDLE_CLIPS = ['Idle', 'Flying_Idle', 'Idle1', 'Idle_Combat', 'Spider_Idle'];
-const ATTACK_CLIPS = ['Attack', 'Attack1 (marracca)', 'Attack_Headbutt', 'Punch', 'Spider_Attack'];
+export const IDLE_CLIPS = ['Idle', 'Flying_Idle', 'Idle1', 'Idle_Combat', 'Spider_Idle'];
+export const ATTACK_CLIPS = [
+  'Attack',
+  'Attack1 (marracca)',
+  'Attack_Headbutt',
+  'Punch',
+  'Spider_Attack',
+];
 
 const MAX_SPIRITS = 2;
 
@@ -154,6 +161,8 @@ interface SpiritSlot {
   dirX: number;
   dirZ: number;
   ghostMul: number;
+  /** this apparition is drawn ON TOP of its own caster (a shapeshift rise) */
+  overlapsCaster: boolean;
   colorHex: number;
   yaw: number;
   atkFired: boolean;
@@ -195,6 +204,13 @@ function spiritModelsByClass(): Map<string, string[]> {
 const scratch = new THREE.Vector3();
 const bbScratch = new THREE.Box3();
 
+/**
+ * Runs one puppet build. The host supplies a scheduler that spends a browser
+ * idle slot and the shared GPU arbiter on it; hosts without one (tests, the
+ * editor viewport) keep the historical inline build.
+ */
+export type SpiritBuildScheduler = (build: () => void) => void;
+
 export class SpiritApparitions {
   private slots: SpiritSlot[] = [];
   private puppets = new Map<string, SpiritPuppet>();
@@ -204,6 +220,7 @@ export class SpiritApparitions {
   private compileGroup: THREE.Group;
   private compileQueue: SpiritPuppet[] = [];
   private compiling: SpiritPuppet | null = null;
+  private buildScheduler: SpiritBuildScheduler | null = null;
   private time = 0;
 
   constructor(
@@ -232,6 +249,7 @@ export class SpiritApparitions {
         ghostMul: 1,
         colorHex: 0xffffff,
         yaw: 0,
+        overlapsCaster: false,
         atkFired: false,
         prevX: 0,
         prevY: 0,
@@ -242,6 +260,18 @@ export class SpiritApparitions {
     this.compileGroup.position.set(0, -80, 0);
     this.compileGroup.visible = false;
     scene.add(this.compileGroup);
+  }
+
+  /**
+   * Route puppet construction (a SkeletonUtils rig clone, a material rebind
+   * traverse, and a per-vertex skinned-bounds measure) off the GLB resolve's
+   * synchronous continuation. Without this the whole build lands in whatever
+   * frame the loader happens to resolve in, which is a live combat frame:
+   * warmForClass fires on first SIGHTING of a class, so a player walking into
+   * a fight resolves several models at once.
+   */
+  setBuildScheduler(schedule: SpiritBuildScheduler | null): void {
+    this.buildScheduler = schedule;
   }
 
   // Kick the async loads for every spirit model this class's kit authors.
@@ -260,8 +290,15 @@ export class SpiritApparitions {
     this.loading.add(model);
     loadGltf(url).then(
       (g) => {
-        this.loading.delete(model);
-        this.buildPuppet(model, g.scene, g.animations);
+        // The model stays marked loading until the build actually runs, so a
+        // deferred build cannot be queued twice by a second ensureLoaded.
+        const build = (): void => {
+          this.loading.delete(model);
+          if (this.puppets.has(model)) return;
+          this.buildPuppet(model, g.scene, g.animations);
+        };
+        if (this.buildScheduler) this.buildScheduler(build);
+        else build();
       },
       (err: unknown) => {
         // stays in `loading` forever on failure: never retried at frame rate
@@ -396,6 +433,7 @@ export class SpiritApparitions {
       o.path === 'swoop' ||
       (o.path === 'pounce' && o.atKind === 'target');
     slot.ghostMul = (overlaps ? 1.3 : o.scale >= 1.05 ? 1.45 : 1.9) * o.dim;
+    slot.overlapsCaster = o.path === 'rise' && o.atKind === 'caster';
 
     const targetH = (SPIRIT_HEIGHT[o.model] ?? 1.9) * o.scale;
     const s = targetH / puppet.rawHeight;
@@ -550,7 +588,14 @@ export class SpiritApparitions {
         lift += Math.sin(((t - 0.4) / 0.15) * Math.PI) * 0.4; // startled half-hop
       }
       h.position.set(slot.fx, slot.fy + Math.max(0, lift), slot.fz);
-      h.rotation.y = slot.yaw + Math.sin(t * Math.PI * 0.9) * 0.55;
+      // A rise that OVERLAYS its own caster (a shapeshift) stays locked to the
+      // caster's yaw. The surveying turn is +-0.55 rad, and on a body as long as
+      // a bear that swings the silhouette a whole body-width off centre, so the
+      // apparition reads as a second animal standing beside you rather than the
+      // spirit of the one you just became. Rise spirits anchored elsewhere (a
+      // portal summon, a target-side omen) keep the turn: it is what stops them
+      // looking like a decal.
+      h.rotation.y = slot.overlapsCaster ? slot.yaw : slot.yaw + Math.sin(t * Math.PI * 0.9) * 0.55;
       slot.prevX = h.position.x;
       slot.prevY = h.position.y;
       slot.prevZ = h.position.z;

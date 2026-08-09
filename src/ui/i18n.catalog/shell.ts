@@ -112,16 +112,24 @@ export const shellStrings = {
         crossSiteOrigin: 'Request blocked for security reasons.',
       },
     },
-    // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
+    // Desktop (Electron) shell surfaces: the auto-update card rendered by the
     // renderer (src/ui/desktop_update_toast.ts) and the crash-dialog strings
     // the renderer pushes to the main process (src/game/desktop_shell_strings.ts,
     // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
     desktop: {
       update: {
-        downloading: 'Downloading update {version}...',
-        ready: 'Update {version} is ready. It installs when you quit, or restart now.',
+        // Classic desktop-client voice (Discord / VS Code / Steam style): short
+        // titles, calm bodies, primary action first on the ready card.
+        checkingTitle: 'Checking for updates...',
+        checkingBody: 'New versions download while you play.',
+        uptodateTitle: "You're up to date",
+        downloadingTitle: 'Downloading update {version}...',
+        downloadingBody: 'You can keep playing. It installs when you quit.',
+        readyTitle: 'Update {version} is ready',
+        readyBody: 'Restart to install now, or keep playing and it installs when you quit.',
         restart: 'Restart now',
         later: 'Later',
+        dismiss: 'Dismiss',
       },
       crash: {
         title: 'World of ClaudeCraft',
@@ -141,6 +149,16 @@ export const shellStrings = {
         'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
       bodyWeb:
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      // Hybrid-GPU variant (issue #2119): shown at boot when the session is
+      // likely on an integrated GPU on a laptop that also has a discrete one.
+      // Never shown inside the desktop shell (it already forces the discrete
+      // adapter), so the split below is purely by OS.
+      hybridBodyWindows:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.',
+      hybridBodyLinux:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.',
+      hybridBodyOther:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.',
       dismiss: 'Dismiss',
     },
     // Performance nudge (src/ui/perf_nudge_toast.ts): the gpuNotice sibling

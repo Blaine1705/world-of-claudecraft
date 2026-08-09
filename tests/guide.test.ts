@@ -50,8 +50,6 @@ import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   CRAFT_RING,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   PERK_THRESHOLDS,
@@ -107,7 +105,7 @@ import {
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
-import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -170,7 +168,19 @@ describe('Guide routes', () => {
     expect(topbarRoutes().some((r) => r.id === 'classes')).toBe(true);
     expect(topbarRoutes().some((r) => r.id === 'home')).toBe(false);
     const groups = groupedRoutes();
-    expect(groups.map((g) => g.group)).toEqual(['start', 'compendium', 'reference']);
+    // The old single 'compendium' bucket reached seventeen entries once Rifts and Mounts
+    // landed; it is split by what a reader came for. Every group must be non-empty (a
+    // group with no routes is dropped by groupedRoutes, so a typo would silently vanish).
+    expect(groups.map((g) => g.group)).toEqual([
+      'start',
+      'world',
+      'character',
+      'endgame',
+      'compete',
+      'reference',
+    ]);
+    for (const g of groups)
+      expect(g.routes.length, `group "${g.group}" is empty`).toBeGreaterThan(0);
     expect(hrefFor('')).toBe(GUIDE_BASE);
     expect(hrefFor('classes')).toBe('/wiki/classes');
   });
@@ -216,6 +226,11 @@ describe('Guide entry wiring', () => {
       expect(pageFor(r.id), `route "${r.id}" has no registered page module`).toBeTruthy();
     }
   });
+
+  // Registration only proves a module exists. tests/guide_route_render.test.ts renders
+  // every route and checks it produces a readable page (one h1, no unresolved key, no
+  // stray placeholder); it lives in its own file because the bestiary and models pages
+  // paint procedural icons through a canvas and so need a DOM environment.
 
   it('lists every route and class-detail page in the sitemap', () => {
     const origin = 'https://worldofclaudecraft.com';
@@ -526,6 +541,34 @@ describe('Guide bestiary completeness', () => {
     expect(marshCard).not.toContain('#fam-burrower');
     expect(html).toContain('#fam-burrower');
   });
+
+  // The bug this pins actually shipped. The page keyed every curated string AND the card's
+  // DOM id off z.biome, which is not unique: The Farshore renders in the vale biome, so it
+  // inherited Eastbrook Vale's blurb, hub greeting, speaker and place notes, and minted a
+  // second id="zone-vale" that broke the map anchor. world.ts now resolves a per-zone key
+  // stem (ZONE_KEY_STEM, biome as the fallback). A stem collision is invisible by eye once
+  // there are fourteen zones, so it is pinned here instead: one anchor per zone, all distinct.
+  it('gives every zone its own card anchor, so no zone can inherit another zone copy', () => {
+    setLanguage('en');
+    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    const ids = [...html.matchAll(/id="(zone-[a-z0-9_]+)"/g)].map((m) => m[1]);
+    expect(ids.length, 'one card anchor per zone').toBe(GUIDE_ZONES.length);
+    expect(new Set(ids).size, `duplicate zone anchor: ${ids.join(', ')}`).toBe(ids.length);
+    // Every map band links to an anchor that exists on the page (a stem typo would
+    // otherwise scroll nowhere).
+    for (const href of [...html.matchAll(/href="#(zone-[a-z0-9_]+)"/g)].map((m) => m[1])) {
+      expect(ids, `map band links to a missing anchor #${href}`).toContain(href);
+    }
+    // The two vale-biome zones are the regression case: distinct anchors, distinct blurbs.
+    expect(ids).toContain('zone-vale');
+    expect(ids).toContain('zone-farshore');
+    const vale = html.slice(html.indexOf('id="zone-vale"'));
+    const farshore = html.slice(html.indexOf('id="zone-farshore"'));
+    const blurbOf = (s: string) => /class="guide-zone-blurb">([^<]*)</.exec(s)?.[1] ?? '';
+    expect(blurbOf(vale)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe(blurbOf(vale));
+  });
 });
 
 // The Book of Deeds page renders entirely from GUIDE_DEEDS, derived from the sim DEEDS table.
@@ -732,7 +775,9 @@ describe('Guide deeds spoiler safety', () => {
     const route = GUIDE_ROUTES.find((r) => r.id === 'deeds');
     expect(route?.sub).toBe('deeds');
     expect(route?.navKey).toBe('guide.nav.deeds');
-    expect(route?.group).toBe('compendium');
+    // 'compendium' was retired when it grew to seventeen entries and split; the Book of
+    // Deeds is endgame content, so it sits with the dungeons, delves and rifts.
+    expect(route?.group).toBe('endgame');
   });
 
   it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
@@ -1023,6 +1068,84 @@ describe('Guide deeds cross-page surfaces', () => {
     }
   });
 
+  it('never leaks a boss personal name into the dungeons page card copy', () => {
+    // Regression pin: wildheartBody once named the Wildheart Basin boss outright
+    // ("...to face Zulgar"), breaking with every sibling body's withhold-the-name
+    // idiom (sanctumBody, raidBody, sagaPeaksBody). The full-name scan the deeds
+    // page uses would have missed it (the leak was the bare personal name, not the
+    // comma-joined title), so this checks the personal name segment on its own.
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the dungeons page`,
+      ).toBe(false);
+    }
+  });
+
+  it('never leaks the Wildheart Basin boss name in a translated locale either', async () => {
+    // Follow-up regression pin (review on PR #2903): the first fix only reworded the
+    // English catalog value plus the eager en/en_CA/en_XA bundles, leaving every
+    // translated overlay still naming the boss. Drive every translated locale that
+    // carries this key, the same way a real translated visitor would
+    // (ensureLocaleLoaded before render), and check for that LOCALE's own personal-name
+    // form, not just the English "Zulgar": a second review round on this PR found the
+    // first version of this test only covered 6 of the 17 fixed overlays and compared
+    // every locale against the English name, so a translated overlay that leaked the
+    // localized form (zh_CN "祖尔加", zh_TW "祖爾加", ja_JP "ズルガー", ko_KR "줄가르",
+    // or the Cyrillic ru_RU "Зулгар") would have passed silently. The Latin-script
+    // locales below (including inflected forms like cs_CZ "Zulgarovi" and pl_PL
+    // "Zulgarowi") all still contain the "Zulgar" substring, so one shared check
+    // covers them; the four non-Latin scripts get their own literal.
+    const wildheartBoss = Object.values(MOBS).find((m) => m.id === 'wildheart_high_priest');
+    expect(wildheartBoss, 'wildheart_high_priest mob missing from content').toBeTruthy();
+    const personalName = (wildheartBoss?.name ?? '').split(',')[0];
+    expect(personalName).toBe('Zulgar');
+    const forbiddenByLocale: Partial<Record<SupportedLanguage, string>> = {
+      cs_CZ: personalName,
+      da_DK: personalName,
+      de_DE: personalName,
+      es: personalName,
+      fr_FR: personalName,
+      id_ID: personalName,
+      it_IT: personalName,
+      nl_NL: personalName,
+      pl_PL: personalName,
+      pt_BR: personalName,
+      ru_RU: 'Зулгар',
+      sv_SE: personalName,
+      tr_TR: personalName,
+      vi_VN: personalName,
+      ja_JP: 'ズルガー',
+      ko_KR: '줄가르',
+      zh_CN: '祖尔加',
+      zh_TW: '祖爾加',
+    };
+    for (const [locale, forbidden] of Object.entries(forbiddenByLocale) as [
+      SupportedLanguage,
+      string,
+    ][]) {
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const html = dungeonsPage.render({
+        params: [],
+        sub: 'dungeons',
+        titleKey: 'guide.nav.dungeons',
+      });
+      expect(
+        html.includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
+      ).toBe(false);
+    }
+    setLanguage('en');
+  });
+
   it('documents the new default binds on the controls page', () => {
     setLanguage('en');
     const html = controlsPage.render({
@@ -1045,6 +1168,68 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(defaults.get('discord')).toEqual(['KeyU']);
     expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);
     expect(defaults.get('petAggressive')).toEqual(['Ctrl+Digit5']);
+  });
+});
+
+// Five shipped keybound features (Professions, Target Buffs and Debuffs, Dungeon Finder,
+// Mount/Dismount, Sheathe) were entirely absent from the controls reference table. Each row
+// mirrors the game's real default bind (src/game/keybinds.ts), so a changed shipped default
+// reds this test instead of silently drifting the public reference.
+describe('Guide controls reference completeness', () => {
+  it('documents Professions, Target Buffs/Debuffs, Dungeon Finder, Mount, and Sheathe', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
+    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
+    expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
+    expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
+  });
+
+  // Second wave of absent rows, found by auditing the whole table against BIND_ACTIONS:
+  // swimming had no key at all, the battleground flag action was undocumented on a page
+  // that describes flag play, damage meters were missing, and the Pet group showed five
+  // of six binds. Same contract as above: a changed shipped default reds this test rather
+  // than silently drifting the public reference.
+  it('documents Swim Down, the arrow-key alternates, the flag action, meters, and Pet: Mark', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>LCtrl</kbd></td><td>Swim down while you are in the water (hold)');
+    expect(html).toContain('<kbd>Arrow Keys</kbd>');
+    expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
+    expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
+    expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+  });
+
+  it('keeps the second-wave binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('dive')).toEqual(['ControlLeft']);
+    expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
+    expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
+    expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    // The arrow keys are the SECOND default of the four movement actions, which is the
+    // whole claim the Arrow Keys row makes.
+    expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
+    expect(defaults.get('back')).toEqual(['KeyS', 'ArrowDown']);
+    expect(defaults.get('turnLeft')).toEqual(['KeyA', 'ArrowLeft']);
+    expect(defaults.get('turnRight')).toEqual(['KeyD', 'ArrowRight']);
+  });
+
+  it('keeps those five binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
+    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyJ']);
+    expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
+    expect(defaults.get('mount')).toEqual(['Backquote']);
+    expect(defaults.get('sheathe')).toEqual(['KeyZ']);
   });
 });
 
@@ -1679,7 +1864,13 @@ describe('Guide professions gathering accuracy', () => {
         d.trigger.markIds.length > 0 &&
         d.trigger.markIds.every((m) => m.startsWith('gather:')),
     );
-    const words: Record<number, string> = { 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' };
+    const words: Record<number, string> = {
+      5: 'five',
+      6: 'six',
+      7: 'seven',
+      8: 'eight',
+      12: 'twelve',
+    };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
     expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
@@ -1761,15 +1952,12 @@ describe('Guide professions enchanting and economy accuracy', () => {
     );
   });
 
-  it('publishes the exact fees, throttle, masterwork odds, and market cut', () => {
+  it('publishes the exact fees, masterwork odds, and market cut', () => {
     const e = GUIDE_PROF_ECONOMY;
     expect(e.craftFeeCopperPerBudgetPoint).toBe(CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     expect(e.craftFeeCopperPerBudgetPoint).toBe(2);
-    expect(e.actionThrottle).toEqual({
-      windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-      maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
-    });
-    expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
+    // Craft Cast System Phase 5: shared actionThrottle removed from guide data.
+    expect('actionThrottle' in e).toBe(false);
     expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
     expect(e.marketCutPct).toBe(5);
     expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);

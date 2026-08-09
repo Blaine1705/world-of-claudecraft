@@ -71,19 +71,27 @@ import {
 import { pruneApplePendingLogins } from './apple_auth_db';
 import {
   hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
   newToken,
   normalizeCharName,
   normalizeEmail,
   offensiveName,
-  validPassword,
   validUsernameShape,
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
-import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
+import {
+  BUG_DESCRIPTION_MAX,
+  BugReportRateLimitError,
+  createBugReport,
+  pruneBugReportsBatch,
+} from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   buildCharacterList,
@@ -91,6 +99,7 @@ import {
   purgeDeletedCharacterWorldState,
   rekeyReclaimedCharacterWorldState,
 } from './characters';
+import { pruneChatViolationsBatch } from './chat_filter_db';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -111,6 +120,7 @@ import {
   accountAndScopeForToken,
   accountById,
   acquireCharacterLease,
+  type BgLeaderRow,
   bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
@@ -151,6 +161,7 @@ import {
   releaseCharacterLease,
   renameCharacter,
   revokeCompanionToken,
+  runConcurrentIndexMigrations,
   saveToken,
   saveWorldState,
   scopeAllowsMutation,
@@ -158,6 +169,7 @@ import {
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topBgRatings,
   topGuilds,
   topLifetimeXp,
   touchLogin,
@@ -203,6 +215,7 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { guildBankLogCacheStats } from './guild_bank_log';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
@@ -263,11 +276,15 @@ import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
+  prunePlayerReportsBatch,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from './moderation_db';
+import { bustModerationQueueCache } from './moderation_queue_cache';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { registerParseMetrics } from './parse';
 import { handlePerfReport } from './perf_report';
 import {
   pruneAccountIpAssociationsBatch,
@@ -641,6 +658,39 @@ async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRo
   }
 }
 
+// Thornhollow Fields ladder cache. ONE entry (the battleground has a single format),
+// same compute-once / serve-from-memory shape as the arena ladder above. Wired
+// into bustBoardCaches below because the ladder is character-faced and
+// moderation-visible: a ban delists immediately in-process while cross-process
+// peers converge within one TTL, the same tradeoff the other boards make.
+// readBgLeaderboard (server/battleground.ts) is the INNER read, so
+// BG_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
+let bgLeaderboardCache: { at: number; leaders: BgLeaderRow[] } | null = null;
+
+async function refreshBg(): Promise<BgLeaderRow[]> {
+  const epoch = boardEpoch;
+  const { leaders } = await readBgLeaderboard({ topBgRatings });
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) bgLeaderboardCache = { at: Date.now(), leaders };
+  return leaders;
+}
+
+// Single-flight keyed on boardEpoch exactly like the player/guild/arena
+// refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
+// pre-ban refresh instead of handing a post-bust reader its pre-ban snapshot.
+const refreshBgShared = singleFlight(refreshBg, () => boardEpoch);
+
+async function getBgLeaderboard(): Promise<BgLeaderRow[]> {
+  const cached = bgLeaderboardCache;
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
+  try {
+    return await refreshBgShared();
+  } catch (err) {
+    console.error('battleground leaderboard refresh failed:', err);
+    return cached?.leaders ?? [];
+  }
+}
+
 // Renown (deeds) board cache. Same compute-once/serve-from-memory shape as
 // the boards above, but ONE entry, not one per scope: the board is
 // account-level and accounts span realms, so it is GLOBAL-ONLY by design.
@@ -763,14 +813,22 @@ function bustBoardCaches(): void {
   guildLeaderboardCache.global = null;
   arenaLeaderboardCache['1v1'] = null;
   arenaLeaderboardCache['2v2'] = null;
+  bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board, but the same delisting-must-be-immediate reasoning: the
+  // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
+  // A ban/unban changes every OTHER eligible character's ahead/total counts
+  // too, so the whole cache is dropped rather than just the moderated
+  // account's own key.
+  bustAllLifetimeXpRankCache();
   // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
   // and IP-ban writes fire this same hook, and they feed the
   // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
   // payouts through, so an exclusion is a content change a warm snapshot would
-  // hide. Without this a just-banned winner's username and wallet pubkey could
-  // still be announced publicly for up to the winners TTL. Scope, honestly: the
+  // hide. Without this a just-banned winner's username could still be announced
+  // publicly for up to the winners TTL (wallet pubkeys left the winner rows
+  // with the #2791 narrowing). Scope, honestly: the
   // bust is per process (the snapshot lives on this process's service singleton),
   // so it is immediate on the process that served the moderation write; a peer
   // realm process's warm snapshot converges within one TTL, the same fleet story
@@ -778,6 +836,11 @@ function bustBoardCaches(): void {
   bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
+// The admin moderation queue's cached base read (server/moderation_queue_cache.ts):
+// busted the same immediate way as the boards above, so a ban/mute/ignored
+// report never lingers in the queue for up to a TTL cycle after the write that
+// resolved it.
+setOnModerationQueueChanged(bustModerationQueueCache);
 
 // Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
 // above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
@@ -872,12 +935,14 @@ export const boardReadTestSeam = {
   getLeaderboard,
   getGuildLeaderboard,
   getArenaLeaderboard,
+  getBgLeaderboard,
   getAccountsCreatedCount,
   getCharactersCreatedCount,
   refreshDeedsRarityShared,
   refreshLeaderboardShared,
   refreshGuildLeaderboardShared,
   refreshArenaShared,
+  refreshBgShared,
   bustBoardCaches,
   reset(): void {
     leaderboardCache.realm = null;
@@ -886,6 +951,7 @@ export const boardReadTestSeam = {
     guildLeaderboardCache.global = null;
     arenaLeaderboardCache['1v1'] = null;
     arenaLeaderboardCache['2v2'] = null;
+    bgLeaderboardCache = null;
     deedsBoardCache = null;
     deedsRarityCache = null;
     projectStatsCache.bust();
@@ -1331,10 +1397,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           error: 'username is not allowed',
           code: 'account.username_not_allowed',
         });
-      if (!validPassword(body.password))
+      if (typeof body.password !== 'string' || body.password.length < MIN_PASSWORD_LENGTH)
         return json(res, 400, {
-          error: 'password must be at least 6 chars',
+          error: `password must be at least ${MIN_PASSWORD_LENGTH} chars`,
           code: 'account.password_too_short',
+        });
+      if (body.password.length > MAX_PASSWORD_LENGTH)
+        return json(res, 400, {
+          error: `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
+          code: 'account.password_too_long',
         });
       // Email is mandatory at signup: it is the recovery address that later proves
       // account ownership on a password reset, so we capture it up front.
@@ -2500,6 +2571,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'DELETE' && assetIdMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!assetUploadRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
       return assetDeleteCore(res, accountId, Number(assetIdMatch[1]));
     }
     json(res, 404, { error: 'unknown endpoint' });
@@ -2547,6 +2621,14 @@ configureLeaderboardRuntime({
   releasesMaxLimit: RELEASES_SIZE,
   publicOrigin,
   toSheetRank,
+});
+
+// Inject the main.ts runtime the Thornhollow Fields ladder handler
+// (server/battleground.ts) needs but cannot import without a cycle: the
+// cache-fronted ladder read. Done at module load, before any request,
+// mirroring configureLeaderboardRuntime above.
+configureBattlegroundRuntime({
+  getBgLeaderboard,
 });
 
 // Inject the main.ts runtime the deeds handlers (server/deeds.ts) need but
@@ -2947,6 +3029,10 @@ export async function startServer(): Promise<http.Server> {
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  // Guild bank books boot-load BEFORE listen() below, so every non-oversized
+  // guild's book is live before any player can join (Guild Bank Phase 3: this
+  // releases the deliberately silent-inert Phase 2 wire).
+  await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
@@ -3083,8 +3169,12 @@ export async function startServer(): Promise<http.Server> {
     }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
+    // Read at scrape time and never constructs the cache: an idle process must
+    // not mint one as a side effect of being measured.
+    guildBankLogCache: () => guildBankLogCacheStats(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
@@ -3110,6 +3200,25 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
+  // The CONCURRENTLY index builds run AFTER listen, deliberately. They
+  // serialize across every realm process on the schema advisory lock, and a
+  // build on a genuinely large table (bank_ledger) is two heap scans plus a
+  // wait for every transaction that could see it: before listen, a rolling
+  // restart paid that stall on every realm at once and none of them served
+  // players meanwhile. A slow build should delay the index, not the realm.
+  //
+  // Not awaited, and a failure is LOUD but not fatal: every entry is idempotent
+  // and drops its own INVALID carcass, so the next boot retries, and a realm
+  // that is already serving players must not be killed by an index build. The
+  // readers that depend on these indexes carry their own statement bounds, so a
+  // window without one degrades a query rather than the process.
+  void runConcurrentIndexMigrations().catch((err) => {
+    console.error(
+      'concurrent index migrations failed; the realm is serving WITHOUT them and the next boot will retry:',
+      err,
+    );
+  });
+
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
   // database advisory lock, so with several processes exactly one sweeps; each
   // primitive below is one bounded DELETE batch and the sweep drives iteration.
@@ -3128,6 +3237,23 @@ export async function startServer(): Promise<http.Server> {
     saveLastSweepDay: async (day) => {
       await saveWorldState('retention_sweep:last_run', { day });
     },
+    // bank_ledger is deliberately ABSENT from this table list: it is kept
+    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
+    // conservation replays the WHOLE per-guild history (items in-vs-out across
+    // officers, the treasury balance), so pruning any prefix would turn every
+    // later legitimate withdraw into a false negative_net/negative_treasury
+    // finding and erase the evidence trail a real dupe investigation needs.
+    // Growth is accepted: one row per successful op, insert-only. It carries
+    // three append-only indexes (bank_ledger_character, bank_ledger_created,
+    // and bank_ledger_container_recent), and as of the in-game guild bank
+    // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
+    // per-guild history (server/guild_bank_log.ts), which is why that third
+    // index exists and is PARTIAL to `container = 'guild'`. Anyone re-deciding
+    // whether unbounded growth is still acceptable should weigh that read: it
+    // is bounded (LIMIT 50, a backward index scan) and cached per guild, so it
+    // does not scale with table size, but it is no longer true that nothing
+    // reads this table hot.
     tables: [
       { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
       {
@@ -3189,6 +3315,25 @@ export async function startServer(): Promise<http.Server> {
       {
         name: 'email_log',
         pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
+      },
+      {
+        // Only RESOLVED reports age out; moderationQueue and
+        // moderationReportsForAccount only ever surface status = 'open' rows,
+        // so pruning is safe (see prunePlayerReportsBatch).
+        name: 'player_reports',
+        pruneBatch: (n) => prunePlayerReportsBatch(config.playerReportRetentionDays, n),
+      },
+      {
+        // Every row can carry a screenshot up to ~900 KB (bug_report_db.ts
+        // BUG_SCREENSHOT_MAX), the fastest-growing of the report tables.
+        name: 'bug_reports',
+        pruneBatch: (n) => pruneBugReportsBatch(config.bugReportRetentionDays, n),
+      },
+      {
+        // The hard-word incident log; its only reader is already
+        // LIMIT-bounded per account (chatModerationForAccount).
+        name: 'chat_violations',
+        pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
@@ -3262,6 +3407,7 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    await game.parseCapture.stop();
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);

@@ -3,13 +3,52 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   EFFECTS_QUALITY_LOW_CUTOFF,
+  loadingCurtainFadeMs,
   resolveUiEffectsProfile,
   type UiEffectsProfile,
   uiEffectsAllowFctCrit,
   uiEffectsProfilesEqual,
   uiEffectsTokens,
+  worldEntryGpuSettleCoverMs,
 } from '../src/game/ui_effects_profile';
 
+describe('loading curtain reduced-motion timing', () => {
+  it('keeps the visual fade normally and removes it immediately under reduced motion', () => {
+    expect(loadingCurtainFadeMs(false)).toBe(350);
+    expect(loadingCurtainFadeMs(true)).toBe(0);
+  });
+});
+
+it('keeps offline desktop settling covered without delaying an authoritative online player', () => {
+  expect(
+    worldEntryGpuSettleCoverMs({
+      adaptiveBudget: true,
+      constrainedMemory: false,
+      online: false,
+    }),
+  ).toBe(1800);
+  expect(
+    worldEntryGpuSettleCoverMs({
+      adaptiveBudget: true,
+      constrainedMemory: false,
+      online: true,
+    }),
+  ).toBe(0);
+  expect(
+    worldEntryGpuSettleCoverMs({
+      adaptiveBudget: false,
+      constrainedMemory: false,
+      online: false,
+    }),
+  ).toBe(0);
+  expect(
+    worldEntryGpuSettleCoverMs({
+      adaptiveBudget: true,
+      constrainedMemory: true,
+      online: false,
+    }),
+  ).toBe(0);
+});
 // The resolver is the ONLY place the HUD effect precedence lives. These tests pin
 // every documented rule so a regression (a dropped clamp, glass dropped under
 // reduced-motion, low no longer cutting cost) fails here instead of in the page.

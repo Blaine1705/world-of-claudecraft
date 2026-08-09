@@ -27,13 +27,12 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
-import { weaponHand } from '../equipment_rules';
-import { TWOHAND_DPS_MULT } from '../item_budget';
+import { CLASSES, isArenaPos, MOBS } from '../data';
 import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
 import {
   angleTo,
@@ -48,7 +47,6 @@ import {
   normAngle,
   STANCE_MASTERY_BERSERKER_HASTE,
   swingMissChance,
-  type WeaponHand,
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
@@ -73,22 +71,27 @@ const RANGED_WEAPON_COEFF = 0.6;
 const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
 const SUDDEN_DEATH_CHANCE = 0.1;
 const SUDDEN_DEATH_DURATION = 10;
-const ONE_HAND_AUTO_ATTACK_BASE_SPEED = 2;
 const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
 
-type AutoAttackHand = Extract<WeaponHand, 'onehand' | 'twohand'> | 'offhand';
+// WEAPON DAMAGE CONTRACT: `weapon.min/max` is RAW per-swing damage at the weapon's
+// real speed, with the two-hand premium already folded in by itemization. A weapon's
+// power level is `avg / speed`, which is exactly how `item_budget.ts`
+// (`weaponDpsBudget`, `scaleWeaponDamage`) authors it and how
+// `tests/twohand_rebudget.test.ts` pins every two-hander to the curve. A slow weapon
+// therefore ALREADY hits harder per swing, because the author wrote a bigger number.
+//
+// So the swing path must NOT re-derive that. v0.30.0 briefly multiplied the roll by
+// `speed / 2 * TWOHAND_DPS_MULT`, treating min/max as a speed-normalized figure. That
+// double-counted both terms: four weapons authored at an identical 15.0 dps delivered
+// 12.9 / 15.0 / 22.7 / 25.6 dps at speeds 1.7 / 2.0 / 3.0 / 3.4 (only the 2.0 baseline
+// came out right, the signature of a conversion applied to already-converted data), and
+// it silently moved sustained Fury from 147.2 to 186.3 on `scripts/fury_dps_probe.ts`
+// with no warrior change in between. The offhand's classic 50% penalty is the one
+// genuine swing-time adjustment and stays here.
+type AutoAttackHand = 'mainhand' | 'offhand';
 
-function autoAttackWeaponDamageMult(hand: AutoAttackHand, speed: number): number {
-  const speedMult = Math.max(0.1, speed) / ONE_HAND_AUTO_ATTACK_BASE_SPEED;
-  const handMult = hand === 'twohand' ? TWOHAND_DPS_MULT : 1;
-  const offhandMult = hand === 'offhand' ? OFFHAND_AUTO_ATTACK_DMG_MULT : 1;
-  return speedMult * handMult * offhandMult;
-}
-
-function mainhandAutoAttackHand(attacker: Entity): AutoAttackHand {
-  const item = attacker.mainhandItemId ? ITEMS[attacker.mainhandItemId] : undefined;
-  if (item?.kind !== 'weapon') return 'onehand';
-  return weaponHand(item) === 'twohand' ? 'twohand' : 'onehand';
+function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
+  return hand === 'offhand' ? OFFHAND_AUTO_ATTACK_DMG_MULT : 1;
 }
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
@@ -211,6 +214,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     let abilityName: string | null = null;
     let threatFlat = 0;
     let threatMult = 1;
+    // The resolved talent/mastery damage multiplier for the queued on-swing
+    // ability (weaponMult, mirroring weaponStrike's own field): meleeSwing
+    // applies it to the WHOLE swing (weapon roll + AP), not just `bonus`, so a
+    // "+X%" mastery/talent reaches the weapon+AP portion of a Heroic Strike /
+    // Raptor Strike style on-next-swing hit too (issue #1803).
+    let weaponMult = 1;
     if (p.queuedOnSwing) {
       const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
       if (queued) {
@@ -229,6 +238,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           abilityName = queued.def.name;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
+          weaponMult = resolveTalentHitMult(queued.def, ctx.playerMods(meta)).dmgMult;
         }
       }
       p.queuedOnSwing = null;
@@ -239,6 +249,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       autoAttackHand: 'mainhand',
       threatFlat,
       threatMult,
+      weaponMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
@@ -413,7 +424,7 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
-    autoAttackHand?: AutoAttackHand | 'mainhand';
+    autoAttackHand?: AutoAttackHand;
     apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
@@ -424,6 +435,14 @@ export function meleeSwing(
     critBonus?: number;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
   },
 ): boolean {
   const missChance =
@@ -482,10 +501,8 @@ export function meleeSwing(
   }
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
-  const autoAttackHand =
-    opts.autoAttackHand === 'mainhand' ? mainhandAutoAttackHand(attacker) : opts.autoAttackHand;
   const weaponRollMult =
-    autoAttackHand === undefined ? 1 : autoAttackWeaponDamageMult(autoAttackHand, weapon.speed);
+    opts.autoAttackHand === undefined ? 1 : autoAttackWeaponDamageMult(opts.autoAttackHand);
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
@@ -529,6 +546,12 @@ export function meleeSwing(
       flat: opts.threatFlat ?? 0,
       mult: opts.threatMult ?? 1,
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND

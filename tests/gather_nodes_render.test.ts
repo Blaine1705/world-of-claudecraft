@@ -25,8 +25,8 @@ describe('gather node rendering', () => {
     // batches (11 new zone:type:band combos across willowfen, galecrest,
     // and farshore_isle).
     expect(GATHER_NODES).toHaveLength(156);
-    expect(expectedBatches.size).toBe(68);
-    expect(meshes).toHaveLength(68);
+    expect(expectedBatches.size).toBe(69);
+    expect(meshes).toHaveLength(69);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);
@@ -75,11 +75,15 @@ describe('gather node rendering', () => {
         expect(node).toBeDefined();
         if (!node) continue;
         expect(position.x).toBe(node.pos.x);
+        // 5 decimal places, not 6: the instance matrix stores float32, whose
+        // quantum at double-digit heights (~2e-6) already exceeds a 5e-7
+        // tolerance; which side of it a node lands on depends on the exact
+        // terrain height, so digit 6 was a coin flip, not a pin.
         expect(position.y).toBeCloseTo(
           terrainHeight(node.pos.x, node.pos.z, seed) +
             NODE_Y_OFFSET[node.type] -
             (nodeTierScale(node.tier) - 1) * templateMinY,
-          6,
+          5,
         );
         expect(position.z).toBe(node.pos.z);
         expect(

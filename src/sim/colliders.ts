@@ -7,15 +7,18 @@ import {
   bankerChestCenterWorld,
   resolveSolidBankerChestPlacement,
 } from './banker_chest_layout';
+import { battlegroundColliders } from './battleground_layout';
 import {
   buildingCameraHeight,
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
-import { STATIONS } from './content/professions';
 import {
   arenaOriginAt,
+  BG_SLOT_COUNT,
+  BUILTIN_WORLD,
+  battlegroundOrigin,
   DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -28,14 +31,15 @@ import {
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
-  NPCS,
-  OVERWORLD_GRAVEYARDS,
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
 import {
@@ -56,6 +60,7 @@ import {
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -90,6 +95,8 @@ import {
   TOWN_WALL_SHORT_PILLAR_TOP_FRAC,
   TOWN_WALL_TALL_PILLAR_ALONG,
 } from './prop_layout';
+import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './streetlamp_layout';
+import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
@@ -102,6 +109,7 @@ import {
   generateDecorationsInBounds,
   groundHeight,
   reachPalmSpots,
+  roadDistance,
   terrainHeight,
   waterLevelAt,
 } from './world';
@@ -572,14 +580,24 @@ function staticWorldColliders(seed: number): Collider[] {
       standable: true,
     });
   }
-  // Town wall segments: the drawn wing is a stone PARAPET with an open iron
-  // railing above it, not a solid curtain, so the slab is a standable top a
-  // jump vaults onto or clean over (the railing is see-through iron: the
-  // fence rule). The wing's two pillars ride each segment: the short capped
-  // one is a standable step above the parapet, and only the tall lantern
-  // pylon (gate-side on `mirrored` wings) blocks full-height. Mob pathing is
-  // untouched: grounded movers without a jump still treat the slab as a wall.
+  // Eastbrook's town wall is a stone parapet with an open iron railing and
+  // two modeled pillars. Fenbridge's palisade is instead a solid log curtain:
+  // its one authored OBB stays full-height and carries no synthetic pillars.
   for (const wall of PROPS.walls ?? []) {
+    const cameraTopY = topY(seed, wall.x, wall.z, wall.height);
+    if (wall.assetId === FENBRIDGE_LAYOUT.wall.assetId) {
+      out.push({
+        type: 'obb',
+        x: wall.x,
+        z: wall.z,
+        hw: wall.w / 2,
+        hd: wall.d / 2,
+        rot: wall.rot,
+        cameraTopY,
+      });
+      continue;
+    }
+
     const parapet = topY(seed, wall.x, wall.z, wall.height * TOWN_WALL_PARAPET_FRAC);
     out.push({
       type: 'obb',
@@ -588,7 +606,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hw: wall.w / 2,
       hd: wall.d / 2,
       rot: wall.rot,
-      cameraTopY: topY(seed, wall.x, wall.z, wall.height),
+      cameraTopY,
       moveTopY: parapet,
       standable: true,
     });
@@ -617,6 +635,27 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
+  // Fenbridge's gate arch is a compound obstacle: the overhead beam never
+  // closes the route, while its two authored jamb OBBs remain solid. The
+  // stable wall ids gate this projection so custom worlds that remove the
+  // Fenbridge palisade do not inherit invisible builtin collision.
+  const wallIds = new Set((PROPS.walls ?? []).map((wall) => wall.id));
+  if (FENBRIDGE_LAYOUT.wall.segments.every((segment) => wallIds.has(segment.id))) {
+    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
+      for (const jamb of gate.arch.jambs) {
+        out.push({
+          type: 'obb',
+          x: jamb.center.x,
+          z: jamb.center.z,
+          hw: jamb.halfWidth,
+          hd: jamb.halfDepth,
+          rot: jamb.rotation,
+          cameraTopY: topY(seed, jamb.center.x, jamb.center.z, gate.arch.nativeDimensions.height),
+        });
+      }
+    }
+  }
+
   // Interactable town boards are authored through active WorldContent rather
   // than PROPS. The same service record drives their spawn and exact OBB, and
   // custom worlds that omit the service inherit no Eastbrook collision.
@@ -630,6 +669,22 @@ function staticWorldColliders(seed: number): Collider[] {
       rot: board.rotation,
       cameraTopY: topY(seed, board.x, board.z, board.height),
     });
+  }
+  // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
+  // service collision under the same authority so a programmatic custom world
+  // cannot create an invisible solid board by supplying musterBoards data.
+  if (content === BUILTIN_WORLD) {
+    for (const board of content.services?.musterBoards ?? []) {
+      out.push({
+        type: 'obb',
+        x: board.x,
+        z: board.z,
+        hw: board.width / 2,
+        hd: board.depth / 2,
+        rot: board.rotation,
+        cameraTopY: topY(seed, board.x, board.z, board.height),
+      });
+    }
   }
 
   // hand-placed GLB decor: circle collider matched to the model footprint;
@@ -798,7 +853,7 @@ function staticWorldColliders(seed: number): Collider[] {
       const bx = d.x + off.x;
       const bz = d.z + off.z;
       const bg = groundHeight(bx, bz, seed);
-      const wl = waterLevelAt(bx, bz);
+      const wl = waterLevelAt(bx, bz, seed);
       const afloat = bg < wl - 0.1;
       const deckY = (afloat ? wl + 0.18 : bg + 0.06) + DOCK_BOAT.deckHeight;
       out.push({
@@ -1175,6 +1230,27 @@ export const colliderInternalsForTest = { staticWorldColliders };
 // its elevation is FLOOR, not obstacle (world.ts groundHeight lifts it).
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
+// Thornhollow Fields battleground (the Thornhollow field): compiled per-asset baked
+// collision, far too many colliders for the old linear per-slot scan. Every
+// slot's copy is registered into the open-world spatial GRID instead (see
+// gridFor), so movement, sight, camera and support all reach the field
+// through the same cell reads the open world uses. Fresh copies per grid
+// build: gridFor stamps its own gridIndex onto every collider, so two grids
+// (content/seed pairs) must never share collider objects.
+function bandSlotColliders(): Collider[] {
+  const out: Collider[] = [];
+  const base = battlegroundColliders();
+  for (let slot = 0; slot < BG_SLOT_COUNT; slot++) {
+    const o = battlegroundOrigin(slot);
+    for (const c of base) {
+      // Y values (cameraTopY/moveTopY/topSlope) stay as-is: the band's ground
+      // IS the field heightfield, so field-local Y is absolute world Y.
+      out.push({ ...c, x: c.x + o.x, z: c.z + o.z });
+    }
+  }
+  return out;
+}
+
 // The Last Keep: an authored room-graph interior, so its walls (minus
 // doorways) and decor footprints all derive from the one shared layout,
 // exactly like the rift citadel floors (layoutColliders routes through
@@ -1304,6 +1380,11 @@ const CELL_KEY_SPAN = 65536;
 function cellKey(gx: number, gz: number): number {
   return (gx + CELL_KEY_BIAS) * CELL_KEY_SPAN + (gz + CELL_KEY_BIAS);
 }
+/** The grid key covering a WORLD position, for the reads that start from one
+ *  (the battleground band's sight test) rather than from a cell range. */
+function cellKeyAt(x: number, z: number): number {
+  return cellKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+}
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
 // built-in world's grid warm forever and lets swapped-out custom maps be
@@ -1334,6 +1415,12 @@ function gridFor(seed: number): ColliderGrid {
   let grid = perContent.get(seed);
   if (grid) return grid;
   const built = staticWorldColliders(seed);
+  // The battleground band rides the same grid: its cells are far past the
+  // overworld rect, so the hash map simply grows by the field's cells. Pushed
+  // in a loop, never spread as arguments: the field times BG_SLOT_COUNT is
+  // already five figures of colliders, and an argument-count limit that scales
+  // with both the field and the slot count is not a limit worth having.
+  for (const c of bandSlotColliders()) built.push(c);
   // Index every collider once so queries can dedupe against a flat stamp
   // buffer (a collider spanning cells appears in each of them).
   for (let i = 0; i < built.length; i++) built[i].gridIndex = i;
@@ -1349,23 +1436,157 @@ function gridFor(seed: number): ColliderGrid {
   // Bind the chest spots this build resolved to this grid, so a later build
   // for another world/seed can never leak its spots into this one's readers.
   bankerChestSpotsByGrid.set(grid, lastBuiltBankerChestSpots);
-  for (const c of built) {
-    const b = colliderBounds(c);
-    const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
-    const x1 = Math.floor((b.maxX + MAX_BODY_RADIUS) / GRID_CELL);
-    const z0 = Math.floor((b.minZ - MAX_BODY_RADIUS) / GRID_CELL);
-    const z1 = Math.floor((b.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
-    for (let gx = x0; gx <= x1; gx++) {
-      for (let gz = z0; gz <= z1; gz++) {
-        const key = cellKey(gx, gz);
-        const list = grid.cells.get(key);
-        if (list) list.push(c);
-        else grid.cells.set(key, [c]);
-      }
+  for (const c of built) registerInCells(grid, c);
+  perContent.set(seed, grid);
+  // Streetlamps join AFTER the grid is published, and the order is the whole
+  // trick: planning a post calls resolvePosition to check the spot is free,
+  // which routes straight back through gridFor. Caching the lamp-free grid
+  // first turns that re-entry into a plain cache hit instead of a recursive
+  // rebuild, and hands the plan exactly the rule it wants: a post is vetted
+  // against buildings, props and decorations, never against another lamp
+  // (spacing between lamps is the layout's own minSeparation).
+  addStreetlampColliders(grid, seed);
+  return grid;
+}
+
+/**
+ * Index one collider into every cell its bounds, inflated by MAX_BODY_RADIUS,
+ * touch. That margin is what makes the single-cell support and glue reads
+ * complete, so every path that adds a collider to a grid goes through here
+ * rather than repeating the arithmetic.
+ */
+function registerInCells(grid: ColliderGrid, c: Collider): void {
+  const b = colliderBounds(c);
+  const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
+  const x1 = Math.floor((b.maxX + MAX_BODY_RADIUS) / GRID_CELL);
+  const z0 = Math.floor((b.minZ - MAX_BODY_RADIUS) / GRID_CELL);
+  const z1 = Math.floor((b.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
+  for (let gx = x0; gx <= x1; gx++) {
+    for (let gz = z0; gz <= z1; gz++) {
+      const key = cellKey(gx, gz);
+      const list = grid.cells.get(key);
+      if (list) list.push(c);
+      else grid.cells.set(key, [c]);
     }
   }
-  perContent.set(seed, grid);
-  return grid;
+}
+
+// ---------------------------------------------------------------------------
+// Streetlamps
+// ---------------------------------------------------------------------------
+
+/** Body radius a candidate lamp spot is vetted with: resolvePosition pushes a
+ *  body out of whatever it overlaps, so a spot that comes back moved was
+ *  already owned by a building, stall, well or fence, and a lamp inside one of
+ *  those is worse than no lamp. */
+const LAMP_CLEARANCE = 1.1;
+/** How far a candidate may be nudged by a collider before the spot is refused. */
+const LAMP_CLEARANCE_EPSILON = 0.05;
+
+// The lamps this grid resolved, stored per grid so a later build for another
+// world or seed can never leak its posts into this one's readers. Same shape
+// (and the same reason) as bankerChestSpotsByGrid above.
+const streetlampsByGrid = new WeakMap<object, PlacedStreetlamp[]>();
+
+/** Strict authored-area identity at a point, or null outside every zone. This
+ *  decides which fixture style a stretch of road is lit with, so it must not
+ *  fall back to a nearest zone: a lamp just outside every rect is genuinely
+ *  wilderness and takes the default. */
+function lampAreaAt(x: number, z: number, zones: readonly WorldZoneRect[]): string | null {
+  for (const zone of zones) {
+    const xMin = zone.xMin ?? STRIP_MIN_X;
+    const xMax = zone.xMax ?? STRIP_MAX_X;
+    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
+  }
+  return null;
+}
+
+interface WorldZoneRect {
+  id: string;
+  zMin: number;
+  zMax: number;
+  xMin?: number;
+  xMax?: number;
+}
+
+/**
+ * Plan the whole world's streetlamps for `seed`, with each site's fixture
+ * identity resolved. The ONE list: colliders below plant a post on it and
+ * `streetlampPlacements` hands the same rows to the renderer, so what is drawn
+ * and what is walked into cannot come apart.
+ */
+function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
+  const content = getActiveWorldContent();
+  const plan = planStreetlamps(
+    content.roads,
+    content.zones.map((zone) => ({ x: zone.hub.x, z: zone.hub.z, radius: zone.hub.radius })),
+    {
+      groundAt: (x, z) => terrainHeight(x, z, seed),
+      blocked: (x, z) => {
+        const resolved = resolvePosition(seed, x, z, LAMP_CLEARANCE);
+        return (
+          Math.abs(resolved.x - x) > LAMP_CLEARANCE_EPSILON ||
+          Math.abs(resolved.z - z) > LAMP_CLEARANCE_EPSILON
+        );
+      },
+      roadClear: roadDistance,
+      areaAt: (x, z) => lampAreaAt(x, z, content.zones),
+    },
+    {
+      authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
+    },
+  );
+  return styleStreetlampSites(plan.sites, content.zones);
+}
+
+/**
+ * Plant a solid post on every lamp the plan placed, then bind the plan to this
+ * grid for the renderer to read back.
+ *
+ * The post is a full-height circle: no `moveTopY`, so it blocks at any
+ * altitude. A five-and-a-half yard lamp is not something a jump clears, and
+ * nothing about it is standable. `cameraTopY` carries its real top, which puts
+ * it above the sight line and lets it block a cast exactly as a tree trunk of
+ * the same girth does.
+ *
+ * A lamp standing where an authored NPC does keeps its mesh and loses its
+ * collider, the same rule the graveyard headstones follow: the town's furniture
+ * never walls off someone you have to walk up to and talk to.
+ */
+function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
+  const placements = buildStreetlampPlacements(seed);
+  streetlampsByGrid.set(grid, placements);
+  if (placements.length === 0) return;
+  const npcSpots = townNpcPositions();
+  let planted = 0;
+  for (const lamp of placements) {
+    const r = STREETLAMP_COLLIDER_RADIUS[lamp.style];
+    if (standsOnNpcSpot(lamp.x, lamp.z, r, npcSpots)) continue;
+    const post: Collider = {
+      type: 'circle',
+      x: lamp.x,
+      z: lamp.z,
+      r,
+      cameraTopY: lamp.y + STREETLAMP_FIXTURE_HEIGHT,
+    };
+    assignLateGridIndex(grid, post);
+    registerInCells(grid, post);
+    planted++;
+  }
+  // Vetting the sites above ran resolvePosition, which caches a combined
+  // authored-plus-decoration list per cell. Those entries predate the posts
+  // just registered, so drop the combined view (the expensive decoration
+  // cells stay) and let it rebuild with the lamps in it.
+  if (planted > 0) grid.combinedCells.clear();
+}
+
+/**
+ * The resolved streetlamp placements for the active world at `seed`: the single
+ * source `src/render/streetlamps.ts` instances its fixtures from, so the post
+ * you see is the post you collide with (the `bankerChestSpots` arrangement).
+ */
+export function streetlampPlacements(seed: number): readonly PlacedStreetlamp[] {
+  return streetlampsByGrid.get(gridFor(seed)) ?? [];
 }
 
 // Decoration scale is `0.7 + hash * 0.9` (world.ts), and rocks have the
@@ -1403,11 +1624,12 @@ function decorationCollider(seed: number, d: Decoration): Collider | null {
   };
 }
 
-/** Claim the next `gridIndex` for a lazily built decoration body, growing the
- *  grid's stamp buffer to cover it. Authored colliders are indexed eagerly in
- *  gridFor; decorations join the same id space as they materialize, which is
- *  what keeps queryOpenWorldColliders' dedupe complete. */
-function assignDecorationGridIndex(grid: ColliderGrid, c: Collider): void {
+/** Claim the next `gridIndex` for a collider built after the eager pass,
+ *  growing the grid's stamp buffer to cover it. Authored colliders are indexed
+ *  in gridFor; streetlamp posts and lazily materialized decoration bodies join
+ *  the same id space afterwards, which is what keeps queryOpenWorldColliders'
+ *  dedupe complete across all three. */
+function assignLateGridIndex(grid: ColliderGrid, c: Collider): void {
   const i = grid.nextGridIndex++;
   c.gridIndex = i;
   if (i >= grid.stamps.length) {
@@ -1446,7 +1668,7 @@ function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: numbe
       if (!collider) {
         const built = decorationCollider(seed, decoration);
         if (!built) continue;
-        assignDecorationGridIndex(grid, built);
+        assignLateGridIndex(grid, built);
         grid.decorationBodies.set(bodyKey, built);
         collider = built;
       }
@@ -1618,6 +1840,10 @@ export function resolvePosition(
   mover?: MoverHeight,
   riftToken = 0,
 ): { x: number; z: number } {
+  // The battleground band deliberately has NO branch here: its colliders live
+  // in the spatial grid at absolute coordinates and its ground is real terrain
+  // (groundHeight's band arm), so the grid fall-through below serves it with
+  // the full mover contract (pass-over, standable decks) like the open world.
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
     const local = resolveAgainst(yumiMazeColliders(), x - o.x, z - o.z, r);
@@ -1642,7 +1868,7 @@ export function resolvePosition(
     const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };
   }
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
     const colliders = interiorCollidersFor(dungeonId, interior);
     // `mover` rides through so a jumping body passes over (and lands on) the
@@ -1671,7 +1897,13 @@ export function resolvePosition(
  * physics broadphase does not apply to them.
  */
 export function isInstancedRegion(x: number): boolean {
-  return isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD;
+  // The battleground band is EXCLUDED although it sits past the dungeon
+  // threshold: the Thornhollow field has sculpted terrain and standable decks,
+  // so its movement runs the open-world character physics solver over the
+  // grid, not the flat instanced kernel.
+  return (
+    isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || (x > DUNGEON_X_THRESHOLD && !isBgPos(x))
+  );
 }
 
 /**
@@ -1749,9 +1981,11 @@ export function supportHeightAt(
   // threshold, so the specific bands must be ruled out FIRST (the same
   // routing resolvePosition uses).
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return -Infinity;
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     // Dungeon interiors: the furniture tops (coffin lids, cargo stacks) are
     // standable surfaces exactly like the open world's crates and canopies.
+    // (The battleground band falls through to the grid read below: its
+    // rampart and stair decks are ordinary standable colliders there.)
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
     return bestStandableTop(interiorCollidersFor(dungeonId, interior), x - ox, z - oz, r, maxY);
   }
@@ -1765,6 +1999,29 @@ export function supportHeightAt(
   const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
   if (list.length === 0) return -Infinity;
   return bestStandableTop(list, x, z, r, maxY);
+}
+
+/** How far above the terrain an authored deck still counts as the FLOOR for
+ *  object placement. Covers the battleground's flag podiums and stair landings
+ *  (2.5yd) while leaving the ramparts (5.7yd) obstacles overhead, so a body
+ *  seated under one lands beneath it rather than on top of it. */
+const DECK_FLOOR_REACH = 3;
+
+/**
+ * The surface an OBJECT placed at (x, z) rests on: the terrain, or an authored
+ * walkable deck close above it. The Thornhollow battleground field is the one
+ * region whose FLOOR is partly authored (flag podiums, stair landings), so a
+ * flag, rune or teleported body seated there must land on the deck instead of
+ * sinking to the terrain beneath it.
+ *
+ * Deliberately NOT used by the movement kernel: that keeps terrain height and
+ * standable prop tops separate (`supportHeightAt`) so walking UNDER a deck
+ * never lifts the body onto it.
+ */
+export function placementFloorHeight(seed: number, x: number, z: number): number {
+  const ground = groundHeight(x, z, seed);
+  if (!isBgPos(x)) return ground;
+  return Math.max(ground, supportHeightAt(seed, x, z, 0.5, ground + DECK_FLOOR_REACH));
 }
 
 /**
@@ -1789,7 +2046,7 @@ export function slopeGlueHeight(
   let ox = 0;
   let oz = 0;
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return -Infinity;
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const inst = instanceLocal(x, z);
     list = interiorCollidersFor(inst.dungeonId, inst.interior);
     ox = inst.ox;
@@ -1848,7 +2105,7 @@ export function interiorColliderFrame(
   z: number,
 ): { list: Collider[]; ox: number; oz: number } | null {
   if (x <= DUNGEON_X_THRESHOLD) return null;
-  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return null;
+  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || isBgPos(x)) return null;
   const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
   return { list: interiorCollidersFor(dungeonId, interior), ox, oz };
 }
@@ -1896,7 +2153,8 @@ export function seatGroundedAt(
   const ground = groundHeight(x, z, seed);
   // Instanced regions have no prop tops and their own bounds/door clamps
   // (applied by the caller's sweep): plain terrain seat there, untouched.
-  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD) {
+  // The battleground band is NOT one of them: its decks are grid props.
+  if (isInstancedRegion(x)) {
     return { x, z, y: ground };
   }
   const support = supportHeightAt(seed, x, z, r, prevFeetY + MOVE_TOP_EPS);
@@ -2091,6 +2349,29 @@ function sightBlockedAt(
     }
     return false;
   };
+  if (isBgPos(x)) {
+    // The field's terrain is honest cover: the ravine slopes, the keep mounds
+    // and the pit rim block casts wherever the ground itself crosses the eye
+    // line (the band arm of groundHeight serves the sculpted heightfield).
+    if (groundHeight(x, z, seed) > sightY) return true;
+    // Colliders live in the grid at absolute coordinates with known tops, so
+    // the low-obstacle skip applies exactly like the open world's.
+    //
+    // R-BOUND ASSUMPTION, mirror it if you widen the sample. This reads the ONE
+    // cell holding the sample point, not the cell RANGE the point's radius
+    // spans. That is exact only while `r` stays within the padding gridFor()
+    // indexes with (`MAX_BODY_RADIUS`, 0.8 yd): a collider is filed into every
+    // cell its bounds plus that padding touch, so anything whose surface is
+    // within 0.8 yd of the sample is already in this list. The live callers
+    // reach here through lineOfSightClear's default `r = 0.05`, an order of
+    // magnitude inside the pad. A caller passing r > MAX_BODY_RADIUS would
+    // start MISSING colliders parked in a neighbouring cell (permissive: sight
+    // reported clear through a surface), and must read the range instead, the
+    // way queryOpenWorldColliders does over its stamp dedupe.
+    const grid = gridFor(seed);
+    const list = grid.cells.get(cellKeyAt(x, z));
+    return list ? overlapsAny(list, x, z, true) : false;
+  }
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
     return overlapsAny(yumiMazeColliders(), x - o.x, z - o.z, false);
@@ -2125,8 +2406,8 @@ function sightBlockedAt(
 
 export function lineOfSightClear(
   seed: number,
-  from: { x: number; z: number },
-  to: { x: number; z: number },
+  from: { x: number; y?: number; z: number },
+  to: { x: number; y?: number; z: number },
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
@@ -2137,8 +2418,24 @@ export function lineOfSightClear(
   if (d < 1e-6) return true;
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
-  const eyeFrom = groundHeight(from.x, from.z, seed) + SIGHT_HEIGHT;
-  const eyeTo = groundHeight(to.x, to.z, seed) + SIGHT_HEIGHT;
+  //
+  // Eye height is TERRAIN-DERIVED everywhere except the battleground band, and
+  // that scoping is deliberate. Taking the caller's own `y` is the honest rule
+  // ("what you stand on, you see over"), and the band needs it: its field is
+  // the one instanced region with real sculpted terrain and standable decks,
+  // and its cover was authored against tops measured from the body's real
+  // height. But BOTH live callers pass an Entity.pos, which always carries a
+  // y, so applying it everywhere would silently retune open-world spell line
+  // of sight for every player: a caster standing on a knee-high standable prop
+  // (or mid-jump) would start seeing over cover that blocks them today. That
+  // is a global combat change, not a battleground one, so it stays scoped here
+  // and the open world keeps its historical behavior byte for byte. Widening
+  // it is a deliberate change of its own, with its own tests.
+  const eyeAt = (p: { x: number; y?: number; z: number }): number =>
+    (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed)) +
+    SIGHT_HEIGHT;
+  const eyeFrom = eyeAt(from);
+  const eyeTo = eyeAt(to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

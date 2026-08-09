@@ -31,8 +31,8 @@ import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/creatures/ignivar_herald.glb');
 const EXPECTED_SOURCE_FINGERPRINT =
-  '458376c4ce1b5513189847dc1af36d02a013e4eafa5f2fc112be111b630563b0';
-const EXPECTED_ASSET_SHA256 = 'a8aa653fcd985d2fbd783a3b15e843edf5e6d4849d2989ad059382aa6af2f3ea';
+  '29405f7d7153d1013749a948159471b40453fbfb7f3c588421cce176dea38555';
+const EXPECTED_ASSET_SHA256 = 'c449599855e79cbfd7de52b262200d48c6f69f315f2745793af7c755e07928b4';
 const SHIPPED_CLIPS = [
   'Death_A',
   'Hit_A',

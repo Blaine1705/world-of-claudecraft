@@ -25,8 +25,10 @@ import {
 } from '../sim/professions/material_grades';
 import { type StationType, stationsOfType } from '../sim/professions/stations';
 import { trainingStationTypeFor } from '../sim/professions/training';
+import type { ProfessionRecipeRecord } from '../sim/professions/types';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
+import { recipeDurationSec } from './craft_cast_view';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
@@ -112,6 +114,10 @@ export interface CraftingRecipeRow {
    *  flag would be ignored). The painter renders the per-craft checkbox only
    *  on these rows; the server re-validates eligibility on craft. */
   commissionEligible: boolean;
+  /** Expected craft-cast duration in sim seconds (Craft Cast System Phase 2).
+   *  Content table via craftCastDurationSec; actionable info, identical on
+   *  every graphics preset (duration chip is never tier-gated). */
+  durationSec: number;
 }
 
 export interface CraftingView {
@@ -287,6 +293,7 @@ export function buildCraftingView(
       difficulty,
       station,
       commissionEligible: isCommissionEligible(items[recipe.resultItemId]),
+      durationSec: recipeDurationSec(recipe),
       craftable:
         reagentRows.every((r) => r.satisfied) &&
         eligibility?.ok !== false &&
@@ -390,6 +397,23 @@ export function resolveSelectedCraft(
 ): string | null {
   if (requested !== null && tabs.some((tab) => tab.professionId === requested)) return requested;
   return tabs.length > 0 ? tabs[0].professionId : null;
+}
+
+/** True when `craftId` would own a tab for this viewer: at least one recipe
+ *  of that craft is known (craftingTabs' membership rule, restated through
+ *  the SHARED isRecipeKnownForViewer predicate without building the view).
+ *  The gossip Crafting shortcut checks this before persisting its pre-select
+ *  so it never clobbers the saved tab preference (issue #2347) with a craft
+ *  the window cannot show; resolveSelectedCraft still guards the render. */
+export function craftOwnsTab(
+  recipes: readonly ProfessionRecipeRecord[],
+  knownRecipes: readonly string[],
+  craftId: string,
+): boolean {
+  const known = new Set(knownRecipes);
+  return recipes.some(
+    (recipe) => recipe.professionId === craftId && isRecipeKnownForViewer(recipe, known),
+  );
 }
 
 /** One craft's "learnable at a master" pointer: the station type that serves it

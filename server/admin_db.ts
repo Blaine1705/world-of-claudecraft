@@ -1,4 +1,5 @@
 import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
+import type { AdminAccountSort, AdminAccountSortDirection } from './admin_accounts_sort';
 import {
   type ClientPerfSummaryBuckets,
   cleanHours,
@@ -536,12 +537,14 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
       `WITH agg AS (
          SELECT
            graphics_preset,
+           gfx_tier,
            gl_renderer_bucket,
            browser_family,
            os_family,
            zone_or_scenario,
            crowd_bucket,
            GROUPING(graphics_preset) AS g_preset,
+           GROUPING(gfx_tier) AS g_gfxtier,
            GROUPING(gl_renderer_bucket) AS g_gpu,
            GROUPING(browser_family) AS g_browser,
            GROUPING(os_family) AS g_os,
@@ -556,24 +559,25 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
          FROM client_perf_reports
          WHERE created_at > now() - ($1 || ' hours')::interval
-         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))
+         GROUP BY GROUPING SETS ((), (graphics_preset), (gfx_tier), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))
        ),
        ranked AS (
          SELECT
            agg.*,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
-             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC
+             PARTITION BY g_preset, g_gfxtier, g_gpu, g_browser, g_os, g_scenario, g_crowd
+             ORDER BY sample_count DESC, COALESCE(graphics_preset, gfx_tier, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC
            ))::int AS vol_rank,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
+             PARTITION BY g_preset, g_gfxtier, g_gpu, g_browser, g_os, g_scenario, g_crowd
              ORDER BY p95_frame_ms DESC, sample_count DESC
            ))::int AS worst_rank
          FROM agg
        )
        SELECT * FROM ranked
-       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario + g_crowd = 6)
+       WHERE (g_preset + g_gfxtier + g_gpu + g_browser + g_os + g_scenario + g_crowd = 7)
           OR (g_preset = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byPreset})
+          OR (g_gfxtier = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byGfxTier})
           OR (g_gpu = 0 AND (vol_rank <= ${PERF_SUMMARY_LIMITS.byGpu} OR worst_rank <= ${PERF_SUMMARY_LIMITS.worstGpu}))
           OR (g_browser = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byBrowser})
           OR (g_os = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byOs})
@@ -895,13 +899,41 @@ export async function associationsForIp(
   };
 }
 
+// Maps each allowlisted AdminAccountSort to the SQL it orders by. character_count,
+// max_level, and playtime_seconds address their own SELECT-list aliases (Postgres
+// resolves an ORDER BY item against the output column list), so no separate
+// aggregate expression needs repeating here.
+const ACCOUNT_SORT_COLUMNS: Record<AdminAccountSort, string> = {
+  id: 'a.id',
+  username: 'lower(a.username)',
+  character_count: 'character_count',
+  max_level: 'max_level',
+  playtime_seconds: 'playtime_seconds',
+  created_at: 'a.created_at',
+  last_login: 'a.last_login',
+};
+
 export async function listAccounts(
   search: string,
   page: number,
   limit: number,
+  sort: AdminAccountSort = 'id',
+  dir: AdminAccountSortDirection = sort === 'username' ? 'asc' : 'desc',
 ): Promise<Paginated<AdminAccountRow>> {
   const pattern = search ? `%${escapeLike(search)}%` : '%';
   const offset = (page - 1) * limit;
+  const direction = dir === 'asc' ? 'ASC' : 'DESC';
+  const column = ACCOUNT_SORT_COLUMNS[sort];
+  // a.last_login is nullable (accounts that never logged in): Postgres sorts NULL
+  // before every non-null value on DESC, which would put never-logged-in accounts
+  // ahead of recently active ones under a descending "Last login" sort, the opposite
+  // of what the header implies. Pin NULLS LAST for both directions so "never" always
+  // sorts as the oldest possible login, not the newest.
+  const nullsPolicy = sort === 'last_login' ? ' NULLS LAST' : '';
+  // a.id is always the unique tiebreaker; for the id sort itself that would
+  // just repeat "a.id DESC, a.id DESC", so it is the whole ORDER BY on its own.
+  const order =
+    sort === 'id' ? `a.id ${direction}` : `${column} ${direction}${nullsPolicy}, a.id ${direction}`;
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
@@ -916,7 +948,7 @@ export async function listAccounts(
        LEFT JOIN characters c ON c.account_id = a.id
        WHERE a.username ILIKE $1
        GROUP BY a.id
-       ORDER BY a.id DESC
+       ORDER BY ${order}
        LIMIT $2 OFFSET $3`,
       [pattern, limit, offset],
     ),
@@ -1236,12 +1268,19 @@ export async function dailyRewardPointEvents(
 
 export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
-// The one action kind the guild arm can carry. Guild moderation writes exactly one
-// row shape (a rename), so the audit query stamps the discriminator as a literal
-// rather than reading a stored column; a second guild action would add the column
-// and this constant goes away. The dashboard's label table keys off it, and
-// tests/admin_account_db.test.ts pins the SQL literal against it.
+// The action kinds the guild arm can carry, the guild-scoped sibling of the
+// account-scoped MODERATION_ACTIONS (server/moderation_db.ts). Guild moderation
+// used to write exactly one row shape, so the audit query stamped the
+// discriminator as a literal; the dormant-slot bank purge made it two, so
+// guild_moderation_actions gained an additive `action` column (defaulting to
+// the rename literal, which is what keeps every pre-existing row correct) and
+// the union now reads that column. The dashboard's label table
+// (src/admin/labels.ts) keys off these constants and
+// tests/admin/moderation_action_labels.test.ts pins the whole closed set
+// against it, so a third guild action cannot regress to "Other action".
 export const GUILD_RENAME_ACTION = 'guild_rename';
+export const GUILD_BANK_PURGE_ACTION = 'guild_bank_purge';
+export const GUILD_MODERATION_ACTIONS = [GUILD_RENAME_ACTION, GUILD_BANK_PURGE_ACTION] as const;
 
 export interface ModerationActionHistoryEntry {
   source: 'account' | 'ip' | 'guild';
@@ -1340,7 +1379,7 @@ export async function listModerationActions(
                 NULL::int AS account_id,
                 NULL::text AS username,
                 NULL::text AS ip,
-                'guild_rename' AS action,
+                guild_action.action,
                 guild_action.reason,
                 guild_action.created_at,
                 NULL::timestamptz AS expires_at,

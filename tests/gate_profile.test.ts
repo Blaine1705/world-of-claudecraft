@@ -236,12 +236,10 @@ describe('buildGateProfileSteps', () => {
     const names = steps.map((s) => s.name);
     // Phase 8: pure artifacts via turbo; typecheck + env/server parallel multi-task.
     expect(names).toEqual([
-      'i18n artifacts',
+      'i18n + wiki + sfx artifacts',
       'i18n freshness',
-      'wiki content',
       'malware scan',
       'biome (changed files)',
-      'sfx check',
       'vitest (full suite)',
       'browser regressions',
       'typecheck + env/server/bot builds',
@@ -251,9 +249,11 @@ describe('buildGateProfileSteps', () => {
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
     // Generate-once: skip pretest after i18n + wiki; client build is turbo build:bundle.
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
-    const i18n = steps.find((s) => s.name === 'i18n artifacts');
+    const i18n = steps.find((s) => s.name === 'i18n + wiki + sfx artifacts');
     expect(i18n?.cmd).toBe('npx');
-    expect(i18n?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'i18n:gen']));
+    expect(i18n?.args).toEqual(
+      expect.arrayContaining(['turbo', 'run', 'i18n:gen', 'wiki:content', 'sfx:check']),
+    );
     const client = steps.find((s) => s.name === 'client build');
     expect(client?.cmd).toBe('npx');
     expect(client?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'build:bundle']));
@@ -267,12 +267,10 @@ describe('buildGateProfileSteps', () => {
       skipTypes: true,
     });
     expect(steps.map((s) => s.name)).toEqual([
-      'i18n artifacts',
+      'i18n + wiki + sfx artifacts',
       'i18n freshness',
-      'wiki content',
       'malware scan',
       'biome (changed files)',
-      'sfx check',
     ]);
   });
 });
@@ -300,6 +298,15 @@ describe('formatters and help', () => {
     expect(text).toContain('Tier:            high');
     expect(text).toContain('gate workers:    8');
     expect(text).not.toMatch(/[\u2013\u2014]/);
+    // Availability is optional: omitted here, so the block must not invent the line.
+    expect(text).not.toContain('RAM available:');
+
+    // When the caller resolves it (gate_profile.mjs does, through the same sensor the
+    // gate uses), it prints alongside the free figure so a macOS worker count that does
+    // not follow freemem is explainable rather than surprising.
+    const withAvailable = formatMachineFacts(facts, { workers: 8, availableMemGb: 41.5 });
+    expect(withAvailable).toContain('RAM total/free:  128 / 12 GiB');
+    expect(withAvailable).toContain('RAM available:   41.5 GiB');
 
     const timings = formatStepTimings([
       { name: 'i18n artifacts', seconds: 12.34, status: 'ok' },

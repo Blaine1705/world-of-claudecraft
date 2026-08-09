@@ -3,6 +3,12 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
+  CC_BAND_SPECS,
+  type CcBandSpec,
+  type CcBandType,
+  ccBandRankKey,
+  insertCcBandPick,
+  MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
@@ -13,10 +19,15 @@ import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
-import { ArchetypeSequencer, type SequencerHost } from './sequencer';
+import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { isCrescendoArchetype, SPECTACLE } from './spectacle';
-import { asSpiritPath, SpiritApparitions, type SpiritAtKind } from './spirits';
+import {
+  asSpiritPath,
+  SpiritApparitions,
+  type SpiritAtKind,
+  type SpiritBuildScheduler,
+} from './spirits';
 
 export type { DecalStyle } from './decals';
 
@@ -35,6 +46,14 @@ export type ParticleBurst = (
 
 const camPosScratch = new THREE.Vector3();
 const camRightScratch = new THREE.Vector3();
+const camFwdScratch = new THREE.Vector3();
+// Per-frame anchor scratch (see ../vfx_anchor.ts). Three separate ones because
+// the per-frame draws below hold up to two readings at once (a windup's feet
+// AND head), and the sequencer host delegate must not clobber a reading its
+// caller is still holding.
+const anchorScratchA = new THREE.Vector3();
+const anchorScratchB = new THREE.Vector3();
+const hostAnchorScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
 // primitive families ported from the Ability VFX Gallery (ribbon trails, shock
@@ -294,6 +313,21 @@ export class AbilityVfxFx implements SequencerHost {
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
+  // Persistent crowd-control bands (holdCcBand), one entry per controlled
+  // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
+  // the MAX_CC_BANDS best-ranked entities per frame across ALL band types (the
+  // fixed pick arrays are the selection scratch, reused every frame). hx/hy/hz
+  // cache the frame's resolved body anchor so the draw never re-resolves it
+  // (the renderer's anchor delegate allocates a Vector3 per call); which end of
+  // the body that anchor is comes from the band spec's anchorFrac, so the root
+  // band rides the ankles while the stun and fear bands ride the head.
+  private ccBands = new Map<
+    number,
+    { type: CcBandType; remaining: number; stamp: number; hx: number; hy: number; hz: number }
+  >();
+  private ccPickIds: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickKeys: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickCount = 0;
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
@@ -382,6 +416,11 @@ export class AbilityVfxFx implements SequencerHost {
     private camera: THREE.Camera,
     private anchor: RibbonAnchor,
     private groundY: (x: number, z: number) => number,
+    /** Caster's world facing (radians), for the STATIONARY spirit path only:
+     *  the anchor seam carries no facing, so everything else here works in
+     *  screen space. Optional so a host that cannot supply it keeps the old
+     *  camera-relative behaviour. */
+    private facingOf?: (id: number) => number | null,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
@@ -400,6 +439,12 @@ export class AbilityVfxFx implements SequencerHost {
   // model is warm before its first cast - an unwarmed cast skips its spirit.
   warmSpiritsForClass(cls: string): void {
     this.spirits.warmForClass(cls);
+  }
+
+  // Hand the spirit puppets a host scheduler so their construction rides idle
+  // slots instead of the GLB resolve's own (live, in-combat) frame.
+  setSpiritBuildScheduler(schedule: SpiritBuildScheduler | null): void {
+    this.spirits.setBuildScheduler(schedule);
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
@@ -823,8 +868,36 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- SequencerHost surface (sequencer.ts drives these) ------------------
 
-  anchorOf(id: number, frac: number): { x: number; y: number; z: number } | null {
-    return this.anchor(id, frac);
+  anchorOf(id: number, frac: number, out?: SeqPoint): SeqPoint | null {
+    // No destination: keep the historical contract exactly (a fresh vector the
+    // caller may retain). With one, resolve through this engine's scratch and
+    // copy the three floats out, so the sequencer stays Three-free.
+    if (!out) return this.anchor(id, frac);
+    const at = this.anchor(id, frac, hostAnchorScratch);
+    if (!at) return null;
+    out.x = at.x;
+    out.y = at.y;
+    out.z = at.z;
+    return out;
+  }
+
+  // True when an aura-driven CC band of ANY type actually WON a draw slot in
+  // the latest frame, which is what the sequencer's cast-moment ccStars stand
+  // down for. Any type, not just stun: the 'cc' archetype flashes the same
+  // yellow stars for a root or a fear cast, so a victim now wearing its own
+  // green ankle shards or violet wisps must claim the read away from a burst
+  // that would name the wrong control. Membership in the pick set,
+  // deliberately not "was fed": the band count is capped, and answering on
+  // fed-ness suppressed the cast-moment band for a capped-out victim whose
+  // held band was never drawn, leaving it with no overhead read at all (worse
+  // than before this feature existed). The pick set is rebuilt at the top of
+  // every update(), before sequencer.update() consults it, so the sequencer
+  // always reads the set for the frame it is drawing.
+  heldCcBand(targetId: number): boolean {
+    for (let i = 0; i < this.ccPickCount; i++) {
+      if (this.ccPickIds[i] === targetId) return true;
+    }
+    return false;
   }
 
   groundYAt(x: number, z: number): number {
@@ -898,6 +971,26 @@ export class AbilityVfxFx implements SequencerHost {
   // aura-gain moment).
   holdGroundAura(entityId: number, band: number, colorHex: number, spin: boolean): boolean {
     return this.groundAuras.hold(entityId, band, colorHex, spin, this.frame);
+  }
+
+  // Presentation-culling transition for one entity. Semantic held state lives
+  // in the painter, while scarce render pools are released immediately so an
+  // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
+  sleepEntity(entityId: number): void {
+    this.ccBands.delete(entityId);
+    this.windups.delete(entityId);
+    const bands = this.orbits.get(entityId);
+    if (bands) {
+      this.orbitBandCount -= bands.length;
+      this.orbits.delete(entityId);
+    }
+    this.shells.sleepEntity(entityId);
+    this.groundAuras.sleepEntity(entityId);
+    const glow = this.glows.get(entityId);
+    if (glow) {
+      this.applyGlow?.(entityId, glow.color, 0);
+      this.glows.delete(entityId);
+    }
   }
 
   burstAt(
@@ -1108,6 +1201,19 @@ export class AbilityVfxFx implements SequencerHost {
     }
     const scale = spirit.scale ?? 1;
     const path = asSpiritPath(spirit.path);
+    // 'rise' is the stationary ceremonial apparition (a shapeshift, a summon):
+    // nothing travels, so there is no caster->target direction and the fallback
+    // above leaves it broadside to the camera. That reads as the spirit standing
+    // sideways next to a caster it is supposed to mirror, so point it the way the
+    // caster is actually facing. The moving paths keep the camera-relative
+    // fallback: a self-cast lunge still has to cross the screen to read at all.
+    if (path === 'rise') {
+      const facing = this.facingOf?.(casterId);
+      if (facing != null && Number.isFinite(facing)) {
+        dirX = Math.sin(facing);
+        dirZ = Math.cos(facing);
+      }
+    }
     const tint = spirit.tint ? abilityHexColor(spirit.tint) : colorHex;
     const gy = this.groundY(ax, az);
     const ok = this.spirits.spawn({
@@ -1295,6 +1401,62 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
+  // Holds the persistent CC band on the entity while a worn hard-CC aura
+  // lives: the painter re-feeds it every frame from its aura scan, and the
+  // update sweep drops it the frame the feed stops (aura faded, entity left
+  // interest), so there is no teardown bookkeeping. remaining drives the fade
+  // toward the alpha floor over the aura's final second; `type` picks the
+  // whole visual (color, cell, geometry, which end of the body it rides) from
+  // CC_BAND_SPECS, so a victim whose control changes kind mid-life (a stun
+  // landing on a rooted target) swaps to the more severe band in place.
+  holdCcBand(entityId: number, type: CcBandType, remaining: number): void {
+    let s = this.ccBands.get(entityId);
+    if (!s) {
+      s = { type, remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
+      this.ccBands.set(entityId, s);
+      return;
+    }
+    s.type = type;
+    s.remaining = remaining;
+    s.stamp = this.frame;
+  }
+
+  // One held band (the drawOrbit sibling): the spec's sprite count riding a
+  // ring around the anchor the pick loop already resolved. Alpha reads the
+  // aura's remaining time but never falls below the spec's floor while it
+  // lives: the fade above the floor is the duration read, the floor is the
+  // fairness rule (an active CC tell must stay readable to the last tick).
+  // A spec with a wobble bobs each sprite on its own phase, which is the
+  // fear band's motion signature (see CC_BAND_SPECS: color alone must not be
+  // the only thing separating the three).
+  private drawCcBand(s: {
+    type: CcBandType;
+    remaining: number;
+    hx: number;
+    hy: number;
+    hz: number;
+  }): void {
+    const spec: CcBandSpec = CC_BAND_SPECS[s.type];
+    const alpha = Math.max(spec.alphaFloor, Math.min(1, s.remaining));
+    const cell = OVERLAY_CELL[spec.cell];
+    for (let k = 0; k < spec.count; k++) {
+      const phase = (k / spec.count) * Math.PI * 2;
+      const a = this.time * spec.rate + phase;
+      const bob =
+        spec.wobble === 0 ? 0 : Math.sin(this.time * spec.rate * 1.7 + phase) * spec.wobble;
+      this.overlay.push(
+        s.hx + Math.cos(a) * spec.radius,
+        s.hy + spec.lift + bob,
+        s.hz + Math.sin(a) * spec.radius,
+        spec.color,
+        spec.size,
+        cell,
+        alpha,
+        spec.brightness,
+      );
+    }
+  }
+
   // ---- frame advance ------------------------------------------------------
 
   update(dt: number): void {
@@ -1302,6 +1464,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
     this.camera.getWorldPosition(camPosScratch);
     camRightScratch.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
+    // camera forward, for the stun-band in-front-of-camera ranking below
+    camFwdScratch.set(0, 0, -1).applyQuaternion(this.camera.quaternion);
     const rightLen = Math.hypot(camRightScratch.x, camRightScratch.z);
     if (rightLen > 1e-4) {
       this.camRightX = camRightScratch.x / rightLen;
@@ -1313,18 +1477,67 @@ export class AbilityVfxFx implements SequencerHost {
       s.t -= dt;
       if (s.t > 0) continue;
       s.active = false;
-      const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5) : s;
+      const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5, anchorScratchA) : s;
       if (at) this.screenFxAt(at.x, at.y, at.z, s.strength);
     }
+    // The small ground discs thin their terrain drape with camera distance
+    // (../drape_lod_core), so the decal pool needs this frame's camera before
+    // anything spawns into it. The shock rings deliberately do NOT thin: their
+    // footprints are too wide for an interpolated drape to stay honest.
+    this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
-    this.groundAuras.update(dt, this.time, this.frame, this.anchor, this.groundY);
+    this.groundAuras.update(
+      dt,
+      this.time,
+      this.frame,
+      this.anchor,
+      this.groundY,
+      camPosScratch.x,
+      camPosScratch.z,
+    );
     this.spirits.update(dt);
     this.overlay.beginFrame();
+    // The CC bands draw FIRST in the frame's overlay batch: a hard-CC tell is
+    // actionable information, so capacity contention with the decorative
+    // sprites that follow must never be able to drop it. The band count is
+    // itself bounded (MAX_CC_BANDS, ONE budget across all three types), so a
+    // raid-wide mass CC cannot starve the windup telegraphs and worn-debuff
+    // bands drawn after it. Slots go by severity first and then to bands IN
+    // FRONT of the camera before any behind it (ccBandRankKey owns why both
+    // are fairness rules, not polish). The sequencer's cast-moment ccStars
+    // stand down only for the bands that actually win a slot here, so the two
+    // are one continuous read for a drawn band, and a band the cap drops still
+    // reads through the burst.
+    let ccPicks = 0;
+    for (const [id, s] of this.ccBands) {
+      if (s.stamp !== this.frame) {
+        this.ccBands.delete(id);
+        continue;
+      }
+      const spec = CC_BAND_SPECS[s.type];
+      const at = this.anchorOf(id, spec.anchorFrac, anchorScratchA);
+      if (!at) continue;
+      s.hx = at.x;
+      s.hy = at.y;
+      s.hz = at.z;
+      const dx = at.x - camPosScratch.x;
+      const dy = at.y - camPosScratch.y;
+      const dz = at.z - camPosScratch.z;
+      const inFront = dx * camFwdScratch.x + dy * camFwdScratch.y + dz * camFwdScratch.z > 0;
+      const key = ccBandRankKey(spec.severity, dx * dx + dy * dy + dz * dz, inFront);
+      ccPicks = insertCcBandPick(this.ccPickIds, this.ccPickKeys, ccPicks, id, key, MAX_CC_BANDS);
+    }
+    // Published BEFORE sequencer.update below, which asks heldCcBand.
+    this.ccPickCount = ccPicks;
+    for (let i = 0; i < ccPicks; i++) {
+      const s = this.ccBands.get(this.ccPickIds[i]);
+      if (s) this.drawCcBand(s);
+    }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
     this.ribbons.drawHeads(this.time, this.headSink);
@@ -1391,6 +1604,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
+    this.ccBands.clear();
+    this.ccPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
   }
 
@@ -1416,7 +1631,7 @@ export class AbilityVfxFx implements SequencerHost {
     const q = 0.75 + 0.25 * this.qualityLevel;
     const pulse = 1 + 0.07 * Math.sin(this.time * 14);
     if (style === 'runes') {
-      const feet = this.anchor(entityId, 0.04);
+      const feet = this.anchor(entityId, 0.04, anchorScratchA);
       if (!feet) return;
       const n = 4;
       const r = 1.25 - 0.35 * p;
@@ -1433,7 +1648,7 @@ export class AbilityVfxFx implements SequencerHost {
           2.1,
         );
       }
-      const chest = this.anchor(entityId, 0.58);
+      const chest = this.anchor(entityId, 0.58, anchorScratchB);
       if (chest)
         this.overlay.push(
           chest.x,
@@ -1448,7 +1663,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'stance') {
-      const feet = this.anchor(entityId, 0.06);
+      const feet = this.anchor(entityId, 0.06, anchorScratchA);
       if (!feet) return;
       for (let k = 0; k < 3; k++) {
         const a = this.time * 1.1 + k * 2.1 + entityId;
@@ -1467,7 +1682,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'weapon') {
-      const hand = this.anchor(entityId, 0.46);
+      const hand = this.anchor(entityId, 0.46, anchorScratchA);
       if (!hand) return;
       this.overlay.push(
         hand.x,
@@ -1492,8 +1707,8 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'ascend') {
-      const feet = this.anchor(entityId, 0.04);
-      const head = this.anchor(entityId, 1.0);
+      const feet = this.anchor(entityId, 0.04, anchorScratchA);
+      const head = this.anchor(entityId, 1.0, anchorScratchB);
       if (!feet || !head) return;
       const span = head.y - feet.y + 0.8;
       for (let k = 0; k < 4; k++) {
@@ -1523,7 +1738,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     // orb (default) and vortex share the hand orb; vortex pulls from wider out
-    const at = this.anchor(entityId, 0.58);
+    const at = this.anchor(entityId, 0.58, anchorScratchA);
     if (!at) return;
     const size = (0.28 + 0.5 * p) * pulse * q;
     this.overlay.push(at.x, at.y + 0.12, at.z, colorHex, size, OVERLAY_CELL.glow, 0.85, 1.9);
@@ -1563,7 +1778,7 @@ export class AbilityVfxFx implements SequencerHost {
   // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {
     const dna = ORBIT_DNA[band.style];
-    const at = this.anchor(entityId, dna.frac);
+    const at = this.anchor(entityId, dna.frac, anchorScratchA);
     if (!at) return;
     const o = band.o;
     const fade = Math.min(1, band.age / 0.25) * (0.55 + 0.45 * this.qualityLevel);

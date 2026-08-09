@@ -2,6 +2,12 @@ import {
   type AbilityVfxFullSpec,
   type AbilityVfxMotif,
   abilityHexColor,
+  STUN_STAR_BRIGHTNESS,
+  STUN_STAR_COUNT,
+  STUN_STAR_LIFT,
+  STUN_STAR_RADIUS,
+  STUN_STAR_RATE,
+  STUN_STAR_SIZE,
 } from '../ability_vfx_core';
 import { isCrescendoArchetype, SPECTACLE } from './spectacle';
 
@@ -25,9 +31,27 @@ const IMPLODE_DUR = 0.42;
 const BARRIER_DUR = 1.35;
 const BARRIER_PLATE_LIFE = 1.1;
 
+// Per-frame anchor scratch for drawTransients (see src/render/vfx_anchor.ts).
+// Its four anchor reads live in mutually exclusive branches and each is spent
+// on plain-number overlay pushes inside its own branch, so one scratch covers
+// them; the one-shot beat paths below keep allocating (they run on an event,
+// not per frame).
+const transientAnchor = { x: 0, y: 0, z: 0 };
+
+/** A mutable world point. Kept structural so this module stays Three-free; a
+ *  THREE.Vector3 satisfies it, which is what the fx engine actually hands back. */
+export interface SeqPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
-  anchorOf(id: number, frac: number): { x: number; y: number; z: number } | null;
+  /** Resolve an entity anchor. Pass `out` from a per-frame path to fill a
+   *  caller-owned point instead of allocating (see src/render/vfx_anchor.ts);
+   *  the reading is only valid until that scratch is reused. */
+  anchorOf(id: number, frac: number, out?: SeqPoint): SeqPoint | null;
   groundYAt(x: number, z: number): number;
   ringAt(
     x: number,
@@ -119,6 +143,13 @@ export interface SequencerHost {
     brightness: number,
   ): void;
   overlayCells(): { glow: number; star: number; rune: number; spark: number };
+  // True while the host DRAWS a live aura-driven CC band for this entity (any
+  // band type: stun, fear, or root). The sequencer's cast-moment ccStars stand
+  // down for it, so one control never draws two bands, the full-alpha held
+  // band is never hidden behind the cast-moment band's fade-out tail, and a
+  // root or fear victim reads its own band's color rather than the yellow
+  // stars this archetype flashes for every control ability alike.
+  heldCcBand(targetId: number): boolean;
   // One frame of the authored windup ceremony on an entity (drives the
   // sequencer's synthetic pre-release phase for instant casts).
   windupDraw(entityId: number, colorHex: number, progress: number, style: string): void;
@@ -1664,7 +1695,7 @@ export class ArchetypeSequencer {
     const flashDur = boost ? SPECTACLE.releaseDur : 0.1;
     const sinceRelease = slot.t - slot.releaseAt;
     if (sinceRelease >= 0 && sinceRelease < flashDur) {
-      const caster = host.anchorOf(slot.casterId, 0.58);
+      const caster = host.anchorOf(slot.casterId, 0.58, transientAnchor);
       if (caster) {
         const rp = sinceRelease / flashDur;
         const size = (0.6 + 1.1 * rp) * slot.power * (boost ? SPECTACLE.releaseStar : 1);
@@ -1801,7 +1832,7 @@ export class ArchetypeSequencer {
     // inward; tier 1 runs a smaller, sparser pull)
     if (slot.implode > 0) {
       slot.implode -= dt;
-      const caster = host.anchorOf(slot.casterId, 0.55);
+      const caster = host.anchorOf(slot.casterId, 0.55, transientAnchor);
       if (caster) {
         const motes = slot.tier === 0 ? 8 : 4;
         const pull = Math.max(0, slot.implode / IMPLODE_DUR);
@@ -1824,7 +1855,7 @@ export class ArchetypeSequencer {
     // barrier plates snapping into a guarding arc (staggered in, long fade)
     if (slot.barrierT > 0) {
       slot.barrierT -= dt;
-      const center = host.anchorOf(slot.casterId, 0.55);
+      const center = host.anchorOf(slot.casterId, 0.55, transientAnchor);
       if (center) {
         const elapsed = BARRIER_DUR - slot.barrierT;
         for (let k = 0; k < 5; k++) {
@@ -1846,22 +1877,34 @@ export class ArchetypeSequencer {
         }
       }
     }
-    // stunned-star band over the victim's head
+    // Cast-moment star band over the victim's head. The STUN_STAR_* constants
+    // are shared with the fx engine's held aura-driven stun band, and a held
+    // band of ANY type OWNS the read whenever it is being drawn
+    // (host.heldCcBand): this cast-moment band stands down for it (the timer
+    // still runs), so one control never draws two bands and the held band's
+    // full alpha is never hidden behind this band's fade-out tail. Standing
+    // down for a root or fear band matters as much as for a stun: this
+    // archetype flashes yellow stars for EVERY control ability, so without the
+    // handoff a rooted victim would read as stunned for the burst's length.
+    // It still draws alone for the aura-less cases (strike.stars flourishes, a
+    // cc read with no worn aura).
     if (slot.ccStars > 0) {
       slot.ccStars -= dt;
-      const head = host.anchorOf(slot.targetId, 1.0);
+      const head = host.heldCcBand(slot.targetId)
+        ? null
+        : host.anchorOf(slot.targetId, 1.0, transientAnchor);
       if (head) {
-        for (let k = 0; k < 4; k++) {
-          const a = host.timeNow() * 2.4 + (k / 4) * Math.PI * 2;
+        for (let k = 0; k < STUN_STAR_COUNT; k++) {
+          const a = host.timeNow() * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
           host.pushOverlay(
-            head.x + Math.cos(a) * 0.45,
-            head.y + 0.55,
-            head.z + Math.sin(a) * 0.45,
+            head.x + Math.cos(a) * STUN_STAR_RADIUS,
+            head.y + STUN_STAR_LIFT,
+            head.z + Math.sin(a) * STUN_STAR_RADIUS,
             slot.accent,
-            0.2,
+            STUN_STAR_SIZE,
             cells.star,
             Math.min(1, slot.ccStars),
-            2.2,
+            STUN_STAR_BRIGHTNESS,
           );
         }
       }

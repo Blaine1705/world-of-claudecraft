@@ -496,6 +496,11 @@ const mergeStringsEn = {
     cast: {
       fishing: 'Fishing',
       gathering: 'Gathering',
+      crafting: 'Crafting',
+      disenchanting: 'Disenchanting',
+      enchanting_apply: 'Enchanting',
+      salvaging: 'Salvaging',
+      tool_recharge: 'Recharging',
       demonHeal: 'Demon Heal',
       thunzharrStormcall: 'Stormcall',
       rift_frost_execution: 'Glacial Grave',
@@ -644,6 +649,8 @@ const mergeStringsEn = {
       },
       statusWithZone: '{status} - {zone}',
       ranks: { leader: 'Guild Master', officer: 'Officer', member: 'Member' },
+      // Guild-roster tenure roles: joined under 7 days ago / 30 days or more.
+      tenure: { recruit: 'Recruit', veteran: 'Veteran' },
       guildHeadOne: 'you are {rank}, {count} member',
       guildHeadMany: 'you are {rank}, {count} members',
     },

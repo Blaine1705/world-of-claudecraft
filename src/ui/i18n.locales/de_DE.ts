@@ -13,6 +13,703 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.crafting': 'Basteln',
+  'abilityUi.cast.disenchanting': 'Entzaubern',
+  'abilityUi.cast.enchanting_apply': 'Verzaubern',
+  'abilityUi.cast.salvaging': 'Zerlegen',
+  'abilityUi.cast.tool_recharge': 'Aufladen',
+  'auth.beard': 'Bart',
+  'auth.beardChinpuff': 'Kinnbüschel',
+  'auth.beardFull': 'Voll',
+  'auth.beardGoatee': 'Ziegenbart',
+  'auth.beardHorseshoe': 'Hufeisenbart',
+  'auth.beardMutton': 'Koteletten',
+  'auth.beardNone': 'Keiner',
+  'auth.beardScruff': 'Stoppelbart',
+  'auth.beardShortbox': 'Boxbart',
+  'auth.beardStache': 'Schnurrbart',
+  'auth.beardStubble': 'Stoppeln',
+  'auth.beardStubbleBeard': 'Starke Stoppeln',
+  'auth.beardVikingb': 'Geflochten',
+  'auth.beardWizard': 'Zauberbart',
+  'auth.blush': 'Rouge',
+  'auth.bodyChest': 'Brust',
+  'auth.bodyElbows': 'Ellbogen',
+  'auth.bodyFeet': 'Füße',
+  'auth.bodyHands': 'Handgröße',
+  'auth.bodyHips': 'Hüften',
+  'auth.bodyKnees': 'Knie',
+  'auth.bodyShoulders': 'Schultern',
+  'auth.colorPresetAria': '{label}-Preset {n}',
+  'auth.customColor': 'Eigene',
+  'auth.earBone': 'Knochenanhänger',
+  'auth.earBonehoop': 'Knochenring',
+  'auth.earChain': 'Perlentropfen',
+  'auth.earCuff': 'Ohrklemme',
+  'auth.earFeather': 'Feder',
+  'auth.earHoop': 'Ring',
+  'auth.earMoon': 'Mondsichel',
+  'auth.earMoonstar': 'Mondstern',
+  'auth.earNone': 'Keine',
+  'auth.earRunic': 'Runenstein',
+  'auth.earSeptum': 'Nasenring',
+  'auth.earStud': 'Stecker',
+  'auth.earWarden': 'Wärtereisen',
+  'auth.earrings': 'Ohrringe',
+  'auth.eyeshadow': 'Lidschatten',
+  'auth.hairAfro': 'Runder Afro',
+  'auth.hairAsymbob': 'Asymmetrischer Bob',
+  'auth.hairBluntbangs': 'Bob mit Pony',
+  'auth.hairBraidcrown': 'Zopfkranz',
+  'auth.hairBuzz': 'Kurzrasur',
+  'auth.hairChinbob': 'Kinnlanger Bob',
+  'auth.hairCrew': 'Maschinenschnitt',
+  'auth.hairCrewcut': 'Texturierter Crewcut',
+  'auth.hairCurls': 'Lockere Locken',
+  'auth.hairCurlyafro': 'Lockiger Afro',
+  'auth.hairCurlycap': 'Kurze Lockenkappe',
+  'auth.hairCurtains': 'Vorhang-Mittelscheitel',
+  'auth.hairFantasybraid': 'Fantasiezopf',
+  'auth.hairFauxhawk': 'Faux Hawk',
+  'auth.hairHalfbun': 'Halber Dutt',
+  'auth.hairHighbun': 'Hoher Dutt',
+  'auth.hairHighpony': 'Hoher Pferdeschwanz',
+  'auth.hairLayered': 'Schulterlang gestuft',
+  'auth.hairLongcenterpart': 'Langer Mittelscheitel',
+  'auth.hairLongpart': 'Langer glatter Mittelscheitel',
+  'auth.hairLongwavy': 'Lange Wellen',
+  'auth.hairLowbun': 'Tiefer Dutt',
+  'auth.hairLowpony': 'Tiefer Pferdeschwanz',
+  'auth.hairMessy': 'Zerzauste Spikes',
+  'auth.hairMohawk': 'Voller Irokese',
+  'auth.hairMullet': 'Kräftiger Vokuhila',
+  'auth.hairPixie': 'Pixie Cut',
+  'auth.hairPompadour': 'Kurzer Pompadour',
+  'auth.hairQuiff': 'Toupierter Quiff',
+  'auth.hairSidepart': 'Klassischer Seitenscheitel',
+  'auth.hairSidepony': 'Seitlicher Pferdeschwanz',
+  'auth.hairSweptback': 'Mittellang zurückgekämmt',
+  'auth.hairSweptpixie': 'Zurückgekämmter Pixie',
+  'auth.hairTopknot': 'Top Knot',
+  'auth.hairTwinbraids': 'Zwei Zöpfe',
+  'auth.hairWarriorbraid': 'Kriegerzopf',
+  'auth.hairWavybob': 'Wellenbob',
+  'auth.helmPreview': 'Helm anzeigen',
+  'auth.jewelAmethyst': 'Amethyst',
+  'auth.jewelBone': 'Knochen',
+  'auth.jewelBronze': 'Bronze',
+  'auth.jewelCopper': 'Kupfer',
+  'auth.jewelDefault': 'Wie geschmiedet',
+  'auth.jewelGold': 'Gold',
+  'auth.jewelIron': 'Eisen',
+  'auth.jewelJade': 'Jade',
+  'auth.jewelMaterial': 'Schmuckmaterial',
+  'auth.jewelObsidian': 'Obsidian',
+  'auth.jewelPearl': 'Perle',
+  'auth.jewelRuby': 'Rubin',
+  'auth.jewelSilver': 'Silber',
+  'auth.jewelTurquoise': 'Türkis',
+  'auth.lashColor': 'Wimpernfarbe',
+  'auth.lashes': 'Wimpern',
+  'auth.lashesOff': 'Aus',
+  'auth.lashesOn': 'Ein',
+  'auth.lipstick': 'Lippenstift',
+  'auth.makeupNone': 'Keines',
+  'auth.outfit': 'Outfitfarbe',
+  'auth.outfitAzure': 'Azurblau',
+  'auth.outfitBloodforged': 'Blutgeschmiedet',
+  'auth.outfitBonewrought': 'Knochengeschmiedet',
+  'auth.outfitClassic': 'Klassisch',
+  'auth.outfitCrimson': 'Karmesin',
+  'auth.outfitEmber': 'Glut',
+  'auth.outfitEmerald': 'Smaragd',
+  'auth.outfitForest': 'Waldgrün',
+  'auth.outfitGilded': 'Vergoldet',
+  'auth.outfitGold': 'Gold',
+  'auth.outfitIvory': 'Elfenbein',
+  'auth.outfitMagenta': 'Magenta',
+  'auth.outfitObsidian': 'Obsidian',
+  'auth.outfitOnyx': 'Onyx',
+  'auth.outfitRose': 'Rosé',
+  'auth.outfitRoyal': 'Königsblau',
+  'auth.outfitTeal': 'Petrol',
+  'auth.outfitVerdigris': 'Grünspan',
+  'auth.outfitViolet': 'Violett',
+  'auth.randomize': 'Zufälliges Aussehen',
+  'auth.randomizeShort': 'Zufällig',
+  'auth.resetLook': 'Aussehen zurücksetzen',
+  'auth.resetShort': 'Zurücksetzen',
+  'auth.shadeBerry': 'Beere',
+  'auth.shadeBronze': 'Bronze',
+  'auth.shadeCoral': 'Koralle',
+  'auth.shadeMauve': 'Mauve',
+  'auth.shadeNude': 'Nude',
+  'auth.shadePeach': 'Pfirsich',
+  'auth.shadePlum': 'Pflaume',
+  'auth.shadeRose': 'Rosé',
+  'auth.shadeRuby': 'Rubin',
+  'auth.shadeSmoke': 'Rauch',
+  'auth.shadeTeal': 'Petrol',
+  'auth.shadeWarm': 'Warm',
+  'auth.style': 'Stil',
+  'editor.status.campCapReached':
+    'Lager-Limit erreicht ({max}). Das neue Lager wurde nicht hinzugefügt.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht.',
+  'entities.itemSets.warfare_ashstalker.name': 'Aschenpirscher-Ausrüstung',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert.',
+  'entities.itemSets.warfare_cinderweave.name': 'Gewänder aus Glutgewebe',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert.',
+  'entities.itemSets.warfare_furyforged.name': 'Zorngeschmiedete Kriegstracht',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert.',
+  'entities.itemSets.warfare_stormbound.name': 'Sturmgebundene Gewänder',
+  'entities.itemSets.warfare_thornhide.bonus2': 'Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Dornwacht zu gewähren, was die Ausweichchance 6 Sek. lang um 15% erhöht.',
+  'entities.itemSets.warfare_thornhide.name': 'Dornhautgewandung',
+  'entities.items.curved_tusk.name': 'Gebogener Hauer',
+  'entities.items.pristine_claw.name': 'Unberührte Klaue',
+  'entities.items.sharp_claw.name': 'Scharfe Klaue',
+  'entities.items.thornhide_boots.name': 'Dornhautstiefel',
+  'entities.items.thornhide_cinch.name': 'Dornhaut-Gürtel',
+  'entities.items.thornhide_gloves.name': 'Dornhauthandschuhe',
+  'entities.items.thornhide_headdress.name': 'Dornhaut-Kopfschmuck',
+  'entities.items.thornhide_leggings.name': 'Dornhautgamaschen',
+  'entities.items.thornhide_mantle.name': 'Dornhautmantel',
+  'entities.items.thornhide_vestment.name': 'Dornhautgewand',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    'Ehre ist die einzige Münze, die ich annehme, und die Vorräte der Kriegsführung sind meine, um sie zu bewachen. Verdiene dir deinen Rang auf dem Schlachtfeld, und ich rüste dich für das nächste.',
+  'entities.npcs.warmarshal_draven_kole.name': 'Kriegsmarschall Draven Kole',
+  'entities.npcs.warmarshal_draven_kole.title': 'Meister der Kriegsführungsvorräte',
+  'guide.controls.dungeonFinder': 'Instanzfinder',
+  'guide.controls.mount': 'Aufsitzen / Absitzen',
+  'guide.controls.professions': 'Berufe',
+  'guide.controls.sheathe': 'Waffe einstecken/ziehen',
+  'guide.controls.targetAuras': 'Verstärkungen und Schwächungen des Ziels',
+  'guide.gear.uniqueBody':
+    'Legendäre Gegenstände sind einzigartig ausgerüstet: Dein Charakter kann von einem bestimmten Legendären immer nur eine Kopie gleichzeitig tragen, und seine heroische Version zählt als derselbe Gegenstand. Eine zweite Kopie kann in deinen Taschen, in der Bank oder auf dem Markt liegen, aber der Versuch, beide gleichzeitig zu tragen, wird verweigert, und der Tooltip trägt eine goldene Markierung Einzigartig (ausgerüstet), damit du die Regel siehst, bevor du einen Build um zwei davon herum planst.',
+  'guide.gear.uniqueTitle': 'Einzigartig ausgerüstet: nur ein Legendäres pro Art',
+  'guide.nav.thornhollow': 'Thornhollow-Felder',
+  'guide.profPages.econ.castPaceBatch':
+    'Stapelherstellung: bis zu {count} in einem Auftrag, je ein Herstellungsvorgang',
+  'guide.profPages.econ.castPaceBody':
+    'Berufsaktionen brauchen echte Herstellungszeit: Rezepte reichen von knapp zwei Sekunden für einfache Feldarbeit bis zu einigen Sekunden an der Spitze der Leiter, und Entzaubern, Verzaubern, Zerlegen und das Aufladen von Werkzeugeffekten dauern jeweils einen festen, kurzen Vorgang. Brichst du mitten im Vorgang ab, verlierst du nichts. Jede erfolgreiche Herstellung zahlt außerdem eine Kupfergebühr, die sich am Gegenstandsbudget bemisst. Zusammen mit Materialien, Stationen und Fertigkeitsobergrenzen hält dieses Tempo den Markt ehrlich, ohne ein gesondertes Aktionslimit. Die genauen Zeiten nach Fertigkeitsband sind unten aufgeführt.',
+  'guide.profPages.econ.castPaceCombo':
+    'Rezepte an der Spitze der Leiter und Kombi-Rezepte: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceEnchantFamily':
+    'Entzaubern, Verzaubern und Zerlegen: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceField':
+    'Feldrezepte (keine Fertigkeitsanforderung): {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceHeading': 'Herstellungszeit und der Goldabfluss',
+  'guide.profPages.econ.castPaceRecharge':
+    'Aufladen von Werkzeugeffekten: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceSkill25':
+    'Rezepte bis Fertigkeit 25: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceSkill50':
+    'Rezepte bis Fertigkeit 50: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.econ.castPaceSkill75':
+    'Rezepte bis Fertigkeit 75: {seconds} Sek. Herstellungszeit',
+  'guide.profPages.fish.earlyReelNote':
+    'Eine Warnung für ungeduldige Finger: Drückst du die Angel erneut, bevor etwas anbeißt, holst du eine leere Leine ein und beendest den Wurf (ein kurzer Gnadenmoment direkt nach dem Auswerfen verzeiht einen versehentlichen Doppeldruck). Geduld ist das ganze Spiel: Warte auf den Biss, dann schlag an.',
+  'guide.thornhollowPage.carrierBody':
+    'Ein Träger, der die gegnerische Flagge zu lange hält, wird immer verwundbarer und erleidet stetig steigenden Schaden, bis die Flagge erobert, fallen gelassen oder zurückgebracht wird. Sich mit der Flagge zu verstecken, ist ein Verlustplan; sie nach Hause zu bringen, ist der Gewinnplan.',
+  'guide.thornhollowPage.carrierHeading': 'Die Flagge tragen',
+  'guide.thornhollowPage.fieldBody':
+    'Ein ummauertes, offenes Feld, in drei Kammern gegliedert: Jedes Team hat sein eigenes Feld vor seiner Festung, und der ummauerte Ruinenhof liegt dazwischen. Zwei Ringmauern überspannen die volle Breite, und jeder Wechsel zwischen den Kammern führt durch einen umkämpften Übergang: das breite Haupttor oder das Torhaus, ein kleiner Raum, der die Mauer überspannt, dessen versetzte Türen einen Sprung an einer Hinterhaltsecke vorbei erzwingen. Jede Festung ist bis auf ihre Mündung verschlossen, sodass jeder Flaggenlauf durch dieselbe Öffnung beginnt und endet, und eine niedrige Barrikade bricht den geraden Sturmlauf hinein. Der Hof birgt die hohle Ruine im Herzen und die zwei flankierenden Sprint-Runen; die anderen zwei warten an den Flaggenzugängen. Eine Kampf- oder Schutzrune (mehr zugefügter Schaden oder weniger erlittener Schaden für ein paar Sekunden) wartet an der Hofmündung jedes Haupttors: Beide Felder eröffnen das Spiel auf derselben Seite und wechseln bei jeder Einnahme.',
+  'guide.thornhollowPage.fieldHeading': 'Das Feld',
+  'guide.thornhollowPage.flagsBody':
+    'Jede Festung hält ihre Teamflagge. Nimm die gegnerische Flagge und trag sie zu deinem eigenen Ständer, um zu punkten; das erste Team mit drei Eroberungen gewinnt, und ein Kampf, dessen Zeit abläuft, wird nach Punktestand entschieden. Ein gefallener Träger lässt die Flagge dort fallen, wo er gefallen ist: Ein Gegner kann sie erneut aufnehmen, während das eigene Team sie sofort nach Hause bringt, sobald es sie erreicht. Die Flagge verweigert sich auch dem Verstecken: Sie aufzuheben bricht Tarnung, und ein Träger, der sich auf irgendeine Weise unsichtbar macht, lässt sie augenblicklich fallen.',
+  'guide.thornhollowPage.flagsHeading': 'Flaggen',
+  'guide.thornhollowPage.heading': 'Thornhollow-Felder',
+  'guide.thornhollowPage.intro':
+    'Ein gewertetes 5-gegen-5-Flaggenraub-Schlachtfeld, ausgetragen in einer ummauerten Senke im alten Baumbestand unterhalb von Thornpeak, wo sich zwei zerstörte Festungen über die Länge einer Schlucht gegenüberstehen und ein älterer Hof dazwischenliegt, den keine von beiden je gehalten hat. Zwei Teams zu fünft, zwei Festungen, ein Ziel: Stiehl das gegnerische Banner und bring es nach Hause, bevor sie deins bringen.',
+  'guide.thornhollowPage.ladderBody':
+    'Jedes Spiel verändert eine dauerhafte, charaktergebundene Schlachtfeld-Wertung, ob Sieg oder Niederlage, und die Bestenliste aller Zeiten führt die Champions des Reichs. Siege und hart erkämpfte Niederlagen zahlen außerdem Ehre über das Kriegsführungssystem aus.',
+  'guide.thornhollowPage.ladderHeading': 'Die Rangliste',
+  'guide.thornhollowPage.pickupNote':
+    'Eine Flagge aufzuheben ist immer ein bewusster Druck auf die Schlachtfeld-Aktionstaste: Niemand wird je durch Vorbeilaufen an der falschen Stelle zum Träger.',
+  'guide.thornhollowPage.queueBody':
+    'Öffne das Thornhollow-Felder-Panel und reih dich allein ein, oder bring eine Gruppe von bis zu fünf mit und reiht euch gemeinsam ein: Gruppen bleiben immer auf einem Team, und die übrigen Plätze füllen sich mit Solo-Champions. Sobald zehn bereitstehen, setzt das Spiel beide Teams für ein kurzes Antreten an ihren Festungen ein, bevor die Flaggen aktiv werden.',
+  'guide.thornhollowPage.queueHeading': 'Einreihen',
+  'guide.thornhollowPage.respawnBody':
+    'Der Tod folgt dem klassischen Ritus: Deine Leiche liegt dort, wo sie gefallen ist, bis DU dich löst, und der Geist erhebt sich auf dem eingezäunten Friedhof neben deiner Festung, dort gebannt bis zur nächsten Wiederbelebungswelle deines Teams. Die Welle erweckt alle wartenden Geister gemeinsam, und die beiden Teamwellen sind bewusst versetzt, sodass der Kampf nie vollständig auf einmal zurückgesetzt wird. Es gibt keinen Leichenlauf und keinen Handel mit dem Geistheiler: lösen, die Welle abwarten, kämpfen.',
+  'guide.thornhollowPage.respawnHeading': 'Im Kampf fallen',
+  'hud.combat.blockedDone': '{target} blockt Euer {ability} und trifft für {amount}.',
+  'hud.combat.blockedTaken': 'Ihr blockt {source}s Angriff und nehmt {amount}.',
+  'hud.combat.floatingBlock': '{amount} Block',
+  'hud.keybinds.actions.arena': 'PvP (Thornhollow-Felder und Arenen)',
+  'hudChrome.auraEffect.carriedFlag':
+    'Ihr tragt die gegnerische Flagge. Hebt diesen Effekt auf, um sie fallen zu lassen.',
+  'hudChrome.bank.guildReadOnlyNote':
+    'Nur Gildenoffiziere dürfen Änderungen an der Gildenbank vornehmen.',
+  'hudChrome.bank.guildUnopenedNote': 'Die Gildenbank wurde noch nicht eröffnet.',
+  'hudChrome.bank.logUnavailable':
+    'Das Protokoll der Gildenbank kann derzeit nicht gelesen werden.',
+  'hudChrome.bg.azure': 'Azur',
+  'hudChrome.bg.blurb':
+    'Zwei zerstörte Festungen stehen sich in einer ummauerten Senke im Schatten des Thornpeak gegenüber: Karmesin im Süden, Azur im Norden, und der ältere Ruinenhof dazwischen, den keine von beiden je gehalten hat. Fünf gegen fünf, je ein Banner, und wer zuerst drei der gegnerischen heimbringt, gewinnt das Feld.',
+  'hudChrome.bg.board.assists': 'Unterstützungen',
+  'hudChrome.bg.board.captures': 'Eroberungen',
+  'hudChrome.bg.board.deaths': 'Tode',
+  'hudChrome.bg.board.kills': 'Kills',
+  'hudChrome.bg.boardToggleLabel':
+    'Spielstatistik. Drückt Eingabe, um die vollständige Tafel angeheftet zu öffnen.',
+  'hudChrome.bg.capturedLog':
+    '{name} hat die {team}-Flagge erobert. Punktestand {crimson}:{azure}.',
+  'hudChrome.bg.capturedTeamBanner':
+    'Die {takers} haben die {team}-Flagge erobert! {crimson}:{azure}',
+  'hudChrome.bg.careerCaptures': 'Eroberungen der Karriere: {count}',
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.bg.countdownBanner': 'Thornhollow-Felder beginnt in {seconds}',
+  'hudChrome.bg.crimson': 'Karmesin',
+  'hudChrome.bg.defeatBanner':
+    'Niederlage. Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})',
+  'hudChrome.bg.drawBanner':
+    'Thornhollow-Felder unentschieden {crimson}:{azure}. Wertung {rating} ({delta})',
+  'hudChrome.bg.dropFlagConfirmAccept': 'Flagge fallen lassen',
+  'hudChrome.bg.dropFlagConfirmBody':
+    'Ihr tragt die gegnerische Flagge. Wenn Ihr sie fallen lasst, bleibt sie am Boden liegen, wo beide Teams sie erreichen können.',
+  'hudChrome.bg.dropFlagConfirmTitle': 'Flagge fallen lassen?',
+  'hudChrome.bg.endBannerDetail':
+    'Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})',
+  'hudChrome.bg.endLog': 'Thornhollow-Felder endete {crimson}:{azure}. Wertung {rating} ({delta}).',
+  'hudChrome.bg.endedForfeit': 'Das Spiel wurde aufgegeben',
+  'hudChrome.bg.endedForfeitLog': 'Das Spiel wurde aufgegeben.',
+  'hudChrome.bg.endedTimer': 'Zeit abgelaufen',
+  'hudChrome.bg.endedTimerLog': 'Die Spielzeit lief ab; der höhere Punktestand gewann das Feld.',
+  'hudChrome.bg.enterQueue': 'In Warteschlange',
+  'hudChrome.bg.enterQueueParty': 'In Warteschlange (Gruppe von {count})',
+  'hudChrome.bg.firstTo': 'Zuerst auf {caps} Eroberungen',
+  'hudChrome.bg.firstWinBonusLine': 'Erster Sieg des Tages: +{honor} Ehre',
+  'hudChrome.bg.firstWinBonusLog': 'Erster Sieg des Tages: Ihr erhaltet {honor} Bonus-Ehre.',
+  'hudChrome.bg.flagDroppedLog': 'Die {team}-Flagge wurde fallen gelassen.',
+  'hudChrome.bg.flagReturnedBanner': 'Die {team}-Flagge wurde zurückgebracht!',
+  'hudChrome.bg.flagReturnedLog': 'Die {team}-Flagge wurde zurückgebracht.',
+  'hudChrome.bg.flagState.carried': 'Flagge gestohlen!',
+  'hudChrome.bg.flagState.dropped': 'Flagge am Boden',
+  'hudChrome.bg.flagState.home': 'Flagge in der Festung',
+  'hudChrome.bg.flagTakenBanner': 'Die {takers} haben die {team}-Flagge genommen!',
+  'hudChrome.bg.flagTakenLog': '{name} hat die {team}-Flagge genommen!',
+  'hudChrome.bg.formUp': 'Antreten: {seconds}',
+  'hudChrome.bg.foundBanner': 'Kampf gefunden. Ihr kämpft für die {team}!',
+  'hudChrome.bg.killFeed': '{killer} hat {victim} niedergestreckt',
+  'hudChrome.bg.killFeedFallen': '{victim} ist gefallen',
+  'hudChrome.bg.ladderAllTime': 'Rangliste. Gesamt',
+  'hudChrome.bg.ladderOnline': 'Rangliste. Jetzt online',
+  'hudChrome.bg.leaveQueue': 'Warteschlange verlassen',
+  'hudChrome.bg.leavingIn': 'Verlasst das Schlachtfeld in {seconds}',
+  'hudChrome.bg.levelRequirement':
+    'Ihr müsst Stufe {level} erreichen, um Euch für dieses Schlachtfeld einreihen zu können.',
+  'hudChrome.bg.map.azureKeep': 'Azurfeste',
+  'hudChrome.bg.map.crimsonKeep': 'Karmesinfeste',
+  'hudChrome.bg.map.graveyard': 'Friedhof',
+  'hudChrome.bg.map.ruinCourtyard': 'Der Ruinenhof',
+  'hudChrome.bg.matchInProgress': 'Kampf läuft. {crimson}:{azure}.',
+  'hudChrome.bg.modeTag': '5v5 Flaggenraub',
+  'hudChrome.bg.noChallengers': 'Gerade keine Champions online. Seid die Ersten.',
+  'hudChrome.bg.noRanked': 'Noch keine Champions in der Wertung. Seid die Ersten.',
+  'hudChrome.bg.offlineNote':
+    'Thornhollow-Felder synchronisiert sich. Die Warteschlange öffnet, sobald das Reich antwortet.',
+  'hudChrome.bg.playerClassTitle': '{name}. {className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}. Stufe {level} {className}',
+  'hudChrome.bg.queueNote':
+    'Zwei Teams zu fünft. Stehlt das gegnerische Banner und bringt es zu Eurer Festung. Wer zuerst 3 Eroberungen erreicht, gewinnt. Gruppiert Euch zu bis zu 5 und reiht Euch gemeinsam ein; schnappt Euch Sprint-Runen und nutzt die Deckung, um Eure Verfolger abzuschütteln.',
+  'hudChrome.bg.queuedParty': 'Gruppe von {count}.',
+  'hudChrome.bg.ratingSummary': 'Wertung. {wins} Siege / {losses} Niederlagen',
+  'hudChrome.bg.respawnIn': 'Nächste Welle: Wiederbelebung in {seconds}',
+  'hudChrome.bg.resultDefeat': 'Niederlage',
+  'hudChrome.bg.resultDraw': 'Unentschieden',
+  'hudChrome.bg.resultVictory': 'Sieg!',
+  'hudChrome.bg.searching': 'Suche. {count}/{size} in der Warteschlange.',
+  'hudChrome.bg.startBanner': 'Erobert die Flagge!',
+  'hudChrome.bg.timeWarningMinutes': '{minutes} Minuten verbleiben',
+  'hudChrome.bg.timeWarningMinutesLog': '{minutes} Minuten verbleiben im Kampf.',
+  'hudChrome.bg.timeWarningOneMinute': 'Eine Minute verbleibt',
+  'hudChrome.bg.timeWarningOneMinuteLog': 'Eine Minute verbleibt im Kampf.',
+  'hudChrome.bg.title': 'Thornhollow-Felder',
+  'hudChrome.bg.victoryBanner':
+    'Sieg! Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})',
+  'hudChrome.bg.yourTeamTitle': 'Euer Team',
+  'hudChrome.commissionBoard.acceptButton': 'Annehmen',
+  'hudChrome.commissionBoard.accepted': 'Du nimmst den Auftrag für {item} an.',
+  'hudChrome.commissionBoard.acceptedBy': 'Angenommen von {name}',
+  'hudChrome.commissionBoard.boardEmpty': 'Gerade keine offenen Aufträge.',
+  'hudChrome.commissionBoard.cancelButton': 'Abbrechen',
+  'hudChrome.commissionBoard.cancelled': 'Du brichst den Auftrag für {item} ab.',
+  'hudChrome.commissionBoard.close': 'Aufträge schließen',
+  'hudChrome.commissionBoard.crafterNameLabel': 'Name des Handwerkers',
+  'hudChrome.commissionBoard.crafterNamePlaceholder': 'Charaktername',
+  'hudChrome.commissionBoard.deliverButton': 'Liefern',
+  'hudChrome.commissionBoard.deliverHint':
+    'Stelle das beauftragte Stück her (mit aktiviertem Auftragsschalter) und komm dann hierher zurück, um es zu liefern.',
+  'hudChrome.commissionBoard.delivered': 'Du lieferst {item} an {name}.',
+  'hudChrome.commissionBoard.denyNoSpace': 'Der Auftraggeber hat keinen Platz in den Taschen.',
+  'hudChrome.commissionBoard.denyNotCommissionEligible':
+    'Dieses Rezept kann nicht in Auftrag gegeben werden.',
+  'hudChrome.commissionBoard.denyNotCrafted':
+    'Stelle zuerst das beauftragte Stück her (mit aktiviertem Auftragsschalter).',
+  'hudChrome.commissionBoard.denyNotEligibleCrafter':
+    'Dieser Auftrag wurde für jemand anderen eingestellt.',
+  'hudChrome.commissionBoard.denyNotYourAcceptance': 'Du hast diesen Auftrag nicht angenommen.',
+  'hudChrome.commissionBoard.denyNotYourOrder': 'Das ist nicht dein Auftrag.',
+  'hudChrome.commissionBoard.denyOrderNotAccepted': 'Dieser Auftrag wurde noch nicht angenommen.',
+  'hudChrome.commissionBoard.denyOrderNotOpen': 'Dieser Auftrag ist nicht mehr offen.',
+  'hudChrome.commissionBoard.denyOutOfRange':
+    'Du musst in der Nähe des Auftraggebers sein, um einen Auftrag zu liefern.',
+  'hudChrome.commissionBoard.denySelfCrafter': 'Du kannst dich nicht selbst beauftragen.',
+  'hudChrome.commissionBoard.denySelfOrder': 'Du kannst deinen eigenen Auftrag nicht annehmen.',
+  'hudChrome.commissionBoard.denyTooManyOpen': 'Du hast bereits zu viele offene Aufträge.',
+  'hudChrome.commissionBoard.denyUnknownCrafter': 'Kein Charakter mit diesem Namen ist bekannt.',
+  'hudChrome.commissionBoard.denyUnknownOrder': 'Dieser Auftrag existiert nicht mehr.',
+  'hudChrome.commissionBoard.denyUnknownRecipe': 'Dieses Rezept existiert nicht.',
+  'hudChrome.commissionBoard.formTitle': 'Auftrag erteilen',
+  'hudChrome.commissionBoard.intro':
+    'Beauftrage einen Handwerker mit einem Stück, oder übernimm den Auftrag einer anderen Person.',
+  'hudChrome.commissionBoard.mineEmpty': 'Du hast noch keine Aufträge erteilt.',
+  'hudChrome.commissionBoard.openButton': 'Aufträge',
+  'hudChrome.commissionBoard.openButtonAria': 'Das Auftragsbrett öffnen',
+  'hudChrome.commissionBoard.openSubmit': 'Auftrag einstellen',
+  'hudChrome.commissionBoard.opened': 'Du stellst einen Auftrag für {item} ein.',
+  'hudChrome.commissionBoard.recipeEmpty': 'Du kennst noch keine herstellbaren Ausrüstungsrezepte.',
+  'hudChrome.commissionBoard.recipeLabel': 'Gegenstand',
+  'hudChrome.commissionBoard.rowFor': '{item} für {requester}',
+  'hudChrome.commissionBoard.rowTargeted': '{item} für {requester} (für {crafter})',
+  'hudChrome.commissionBoard.scopeCrafter': 'Ein bestimmter Handwerker',
+  'hudChrome.commissionBoard.scopeLabel': 'Wer annehmen kann',
+  'hudChrome.commissionBoard.scopeOpen': 'Jeder (offenes Brett)',
+  'hudChrome.commissionBoard.sectionBoard': 'Offenes Brett',
+  'hudChrome.commissionBoard.sectionMine': 'Meine Anfragen',
+  'hudChrome.commissionBoard.sectionToCraft': 'Meine Aufträge',
+  'hudChrome.commissionBoard.statusAccepted': 'Angenommen',
+  'hudChrome.commissionBoard.statusCancelled': 'Storniert',
+  'hudChrome.commissionBoard.statusDelivered': 'Geliefert',
+  'hudChrome.commissionBoard.statusExpired': 'Abgelaufen',
+  'hudChrome.commissionBoard.statusOpen': 'Offen',
+  'hudChrome.commissionBoard.title': 'Aufträge',
+  'hudChrome.commissionBoard.toCraftEmpty': 'Du fertigst gerade für niemanden einen Auftrag.',
+  'hudChrome.controller.zoomIn': 'Einzoomen',
+  'hudChrome.controller.zoomOut': 'Auszoomen',
+  'hudChrome.crafting.announceCancel': 'Herstellung abgebrochen',
+  'hudChrome.crafting.announceComplete': '{name} hergestellt',
+  'hudChrome.crafting.announceStart': 'Stelle {name} her',
+  'hudChrome.crafting.batchRemaining': '{remaining} von {total} verbleibend',
+  'hudChrome.crafting.batchRemainingAria': '{remaining} von {total} Herstellungen verbleibend',
+  'hudChrome.crafting.busy': 'Du bist beschäftigt.',
+  'hudChrome.crafting.crafting': 'Basteln',
+  'hudChrome.crafting.create': 'Erstellen',
+  'hudChrome.crafting.createAll': 'Alle erstellen',
+  'hudChrome.crafting.createAllAria':
+    'Die maximale Anzahl dieses Rezepts aus den vorhandenen Materialien erstellen',
+  'hudChrome.crafting.durationAria': 'Herstellungszeit: {seconds} Sekunden',
+  'hudChrome.crafting.durationChip': '{seconds}s',
+  'hudChrome.crafting.progressAria': 'Herstellungsfortschritt',
+  'hudChrome.crafting.qtyDecreaseAria': 'Herstellungsmenge verringern, aktuell {count}',
+  'hudChrome.crafting.qtyIncreaseAria': 'Herstellungsmenge erhöhen, aktuell {count}',
+  'hudChrome.crafting.qtyRowAria': 'Herstellungsmenge',
+  'hudChrome.crafting.qtyValueAria': 'Herstellungsmenge, {count}',
+  'hudChrome.crafting.skillUpSubtext': 'Fertigkeit auf {level} gestiegen!',
+  'hudChrome.crafting.skillUpToast': '{skill}-Fertigkeit auf {level} gestiegen!',
+  'hudChrome.enchanting.disenchantBusy': 'Du bist beschäftigt.',
+  'hudChrome.enchanting.enchantBusy': 'Du bist beschäftigt.',
+  'hudChrome.enchanting.salvageBusy': 'Du bist beschäftigt.',
+  'hudChrome.gathering.earlyReelLine': 'Du holst zu früh ein. Nichts hatte angebissen.',
+  'hudChrome.itemUniqueEquipped': 'Einzigartig (ausgerüstet)',
+  'hudChrome.keybinds.bgFlag': 'Schlachtfeld-Flaggenaktion',
+  'hudChrome.keybinds.dive': 'Nach unten schwimmen',
+  'hudChrome.materialHint.usedBy': 'Verwendet von {crafts}.',
+  'hudChrome.meters.threatFallback': 'Keine aktive Bedrohung: zeigt Schaden an {name}',
+  'hudChrome.options.gfxAmbientOcclusion': 'Ambient Occlusion',
+  'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
+  'hudChrome.options.gfxBloom': 'Bloom',
+  'hudChrome.options.gfxCharacterDetail': 'Charakterdetail',
+  'hudChrome.options.gfxCustomNote':
+    'Das Ändern eines Reglers wechselt die Qualitätsvoreinstellung zu Erweitert: eine eigene Mischung auf Grundlage der Hoch-Qualitätsstufe, ausgehend von den Werten deiner aktuellen Voreinstellung.',
+  'hudChrome.options.gfxDynamicLights': 'Dynamische Lichter',
+  'hudChrome.options.gfxEffectsNote':
+    'Ambient Occlusion, Bloom und Anti-Aliasing laufen über die Nachbearbeitungskette: Ist Licht und Effekte auf Niedrig gestellt, ist die Kette deaktiviert und sie haben keine Wirkung.',
+  'hudChrome.options.gfxHalf': 'Halb',
+  'hudChrome.options.gfxParticleEffects': 'Partikeleffekte',
+  'hudChrome.options.gfxSectionCamera': 'Kamera',
+  'hudChrome.options.gfxSectionDisplay': 'Anzeige',
+  'hudChrome.options.gfxSectionLighting': 'Licht und Effekte',
+  'hudChrome.options.gfxSectionQuality': 'Qualität',
+  'hudChrome.options.gfxSectionSystem': 'System',
+  'hudChrome.options.gfxSectionTouch': 'Touch-Steuerung',
+  'hudChrome.options.gfxSectionWorld': 'Weltdetail',
+  'hudChrome.options.gfxViewDistance': 'Sichtweite',
+  'hudChrome.options.gfxWaterQuality': 'Wasserqualität',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': 'Automatischen Angriff bei Zielwechsel stoppen',
+  'hudChrome.partyFrames.petHealth': 'Begleiter {name}, {pct} Gesundheit',
+  'hudChrome.partyFrames.showPets': 'Begleiter anzeigen',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    'Erhöht die Erntegüte um eine Werkzeugstufe, solange aufgeladen.',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
+    '+1 Ertrag pro Ernte, solange aufgeladen.',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
+    'Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst.',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    'Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    'Auf ein Bergbau-, Holzfäller- oder Kräuterkunde-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.',
+  'hudChrome.professions.toolEffectTooltip.kind': 'Werkzeug-Talisman',
+  'hudChrome.professions.toolEffectTooltip.landOnly': 'Lässt sich nicht auf Angelruten einsetzen.',
+  'hudChrome.professions.toolEffectTooltip.openProfessions':
+    'Öffne die Berufe, um dies auf ein Sammelwerkzeug einzusetzen.',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.townFocus.respecCostFree': 'Kostenlos',
+  'hudChrome.townFocus.respecCostLine': 'Kostet {coin} und {materials}',
+  'hudChrome.townFocus.respecTierInstantOption': 'Sofort (voller Preis)',
+  'hudChrome.townFocus.respecTierLabel': 'Umverteilungstempo',
+  'hudChrome.townFocus.respecTierPartialOption': 'Schneller (geringe Kosten)',
+  'hudChrome.townFocus.respecTierTimeOption': 'Kostenlos (Zeit lassen)',
+  'hudChrome.warfare.floatReasons.assist': 'Unterstützung',
+  'hudChrome.warfare.floatReasons.firstWin': 'Erster Sieg',
+  'hudChrome.warfare.floatReasons.kill': 'Ausschaltung',
+  'hudChrome.warfare.honorFloatReason': '+{amount} Ehre ({reason})',
+  'hudChrome.warfare.reasons.battlegroundAssist': 'Unterstützung beim Todesstoß',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'Kampf um die Thornhollow-Felder ausgetragen',
+  'hudChrome.warfare.reasons.battlegroundFirstWin':
+    'erster heutiger Sieg in den Thornhollow-Feldern',
+  'hudChrome.warfare.reasons.battlegroundKill': 'ehrenhafte Ausschaltung',
+  'hudChrome.warfare.reasons.battlegroundWin': 'Thornhollow-Felder-Sieg',
+  'hudChrome.warfareShop.buyAria': '{item} für {honor} kaufen',
+  'hudChrome.warfareShop.buyConfirmBody':
+    '{item} für {honor} kaufen? Käufe mit Ehre können nicht erstattet werden.',
+  'hudChrome.warfareShop.buyOwnedAria': '{item} für {honor} kaufen, bereits im Besitz',
+  'hudChrome.warfareShop.gossipOption': 'Kriegsführungs-Sets durchsuchen',
+  'hudChrome.warfareShop.gossipOptionAria':
+    'Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen',
+  'hudChrome.warfareShop.jewelry': 'Schmuck',
+  'hudChrome.warfareShop.owned': 'Im Besitz',
+  'hudChrome.warfareShop.weapons': 'Waffen',
+  'itemUi.market.saleBuyer': 'Verkauft an {buyer}',
+  'itemUi.market.saleOlder': 'Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.',
+  'itemUi.tooltip.maxStack': 'Max. Stapel: {count}',
+  'itemUi.tooltip.useElixir':
+    'Benutzen: Erhöht Euer {stat} {minutes} Min. lang um {value}. Im Kampf nutzbar.',
+  'itemUi.tooltip.useElixirAura': 'Benutzen: Gewährt {minutes} Min. lang {aura}. Im Kampf nutzbar.',
+  'hud.system.deathRecapAbility': 'Ihr seid gestorben. Erschlagen durch {ability}.',
+  'hud.system.deathRecapDrowned': 'Ihr seid gestorben. Ihr seid ertrunken.',
+  'hud.system.deathRecapFalling': 'Ihr seid gestorben. Ihr seid in den Tod gestürzt.',
+  'hud.system.deathRecapKiller': 'Ihr seid gestorben. Erschlagen von {killer}.',
+  'hud.system.deathRecapKillerAbility': 'Ihr seid gestorben. Erschlagen durch {killer}s {ability}.',
+  'hudChrome.bags.filterQuestCountAria': 'Quest, {count} Gegenstände',
+  'hudChrome.bags.itemAriaQuest': '{item}, Menge {count}, Questgegenstand',
+  'hudChrome.bags.noQuestItems': 'Keine Questgegenstände in Euren Taschen.',
+  'hudChrome.bank.cannotDepositNow': 'Kann derzeit nicht eingelagert werden',
+  'hudChrome.bank.depositAllTooltip':
+    'Sendet jeden Handwerksreagenz und Ramschgegenstand aus deinen Taschen in einem Rutsch zur Bank. Sammelwerkzeuge, angelegte Ausrüstung, Questgegenstände und Verbrauchsgüter werden nie angetastet.',
+  'hudChrome.bank.guildBuyConfirm':
+    '{count} zusätzliche Gildenbankfächer für {price} aus der Gildenkasse kaufen?',
+  'hudChrome.bank.guildBuyNote': 'Aus der Gildenkasse bezahlt',
+  'hudChrome.bank.guildCannotDeposit': 'Kann nicht in die Gildenbank gelegt werden',
+  'hudChrome.bank.guildCapacityAria': 'Belegte Gildenbankfächer: {used} von {total}',
+  'hudChrome.bank.guildContentsTab': 'Inhalt',
+  'hudChrome.bank.guildDepositGold': 'Geld einzahlen',
+  'hudChrome.bank.guildDepositGoldTitle': 'Geld in die Gildenkasse einzahlen',
+  'hudChrome.bank.guildDepositHint': 'Klickt, um in die Gildenbank einzulagern',
+  'hudChrome.bank.guildDormantAria': '{item}, Menge {count}, kann nicht entnommen werden',
+  'hudChrome.bank.guildDormantHint':
+    'Dieser Gegenstand ist in der Gildenbank gesperrt und kann nicht entnommen werden.',
+  'hudChrome.bank.guildDormantNote':
+    'Gesperrte Gegenstände können nicht entnommen werden und verhindern die Auflösung der Gilde.',
+  'hudChrome.bank.guildEmpty': 'Die Gildenbank ist leer.',
+  'hudChrome.bank.guildGoldAvailable': 'Verfügbar: {amount}',
+  'hudChrome.bank.guildGoldCannotMove': 'Dieser Betrag kann derzeit nicht bewegt werden.',
+  'hudChrome.bank.guildLogTab': 'Protokoll',
+  'hudChrome.bank.guildOpenAccept': 'Eröffnen',
+  'hudChrome.bank.guildOpenBank': 'Die Gildenbank eröffnen',
+  'hudChrome.bank.guildOpenConfirm':
+    'Die Gildenbank für {price} eröffnen? Dies wird aus Eurem eigenen Geld bezahlt.',
+  'hudChrome.bank.guildOpenNote': 'Aus Eurem eigenen Geld bezahlt, nicht aus der Gildenkasse',
+  'hudChrome.bank.guildPurseShort': 'Nicht genug Geld',
+  'hudChrome.bank.guildTab': 'Gilde',
+  'hudChrome.bank.guildTreasury': 'Gildenkasse',
+  'hudChrome.bank.guildTreasuryShort': 'Kasse reicht nicht',
+  'hudChrome.bank.guildUnknownItem': 'Unbekannter Gegenstand',
+  'hudChrome.bank.guildViewsAria': 'Gildenbank-Ansichten',
+  'hudChrome.bank.guildWithdrawGold': 'Geld abheben',
+  'hudChrome.bank.guildWithdrawGoldTitle': 'Geld aus der Gildenkasse abheben',
+  'hudChrome.bank.logAdminPurge': 'Ein Administrator hat {count} {item} entfernt',
+  'hudChrome.bank.logAria': 'Aktivitätsprotokoll der Gildenbank',
+  'hudChrome.bank.logBuySlots': '{actor} hat eine Bankerweiterung für {amount} gekauft',
+  'hudChrome.bank.logCharterFee': '{actor} hat die Gildengründungsgebühr von {amount} bezahlt',
+  'hudChrome.bank.logDepositItem': '{actor} hat {count} {item} eingelagert',
+  'hudChrome.bank.logDepositMoney': '{actor} hat {amount} eingezahlt',
+  'hudChrome.bank.logEmpty':
+    'Es wurde noch nichts in die Gildenbank eingelagert oder aus ihr entnommen.',
+  'hudChrome.bank.logFormerMember': 'Ein ehemaliges Gildenmitglied',
+  'hudChrome.bank.logLoading': 'Protokoll der Gildenbank wird geladen...',
+  'hudChrome.bank.logNote': 'Die {count} letzten Aktionen der Gildenbank.',
+  'hudChrome.bank.logOpenBank': '{actor} hat die Gildenbank für {amount} eröffnet',
+  'hudChrome.bank.logWithdrawItem': '{actor} hat {count} {item} entnommen',
+  'hudChrome.bank.logWithdrawMoney': '{actor} hat {amount} abgehoben',
+  'hudChrome.bank.personalTab': 'Persönlich',
+  'hudChrome.bank.tabsAria': 'Bank-Reiter',
+  'hudChrome.crafting.dialogOption': 'Basteln',
+  'hudChrome.crafting.dialogOptionAria': 'Bastelfenster für {craft} öffnen',
+  'hudChrome.deeds.recentJumpAria': 'Zu {name} springen',
+  'hudChrome.landing.browserSupport.body':
+    'In diesem Browser kann es zu verringerter Leistung kommen. Für das beste Erlebnis lade dir die Desktop-App für Windows, macOS oder Linux herunter. Du spielst lieber im Browser? Chrome läuft am besten, und Firefox sowie Safari werden ebenfalls unterstützt.',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Im Browser fortfahren',
+  'hudChrome.landing.browserSupport.dismissAria':
+    'Hinweis zum nicht unterstützten Browser schließen',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'Desktop-App herunterladen',
+  'hudChrome.landing.browserSupport.title': 'Achtung: nicht unterstützter Browser',
+  'hudChrome.materialHint.cookingCatch': 'Kochzutat. Muss vor dem Verzehr gekocht werden.',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    'Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.',
+  'hudChrome.mounts.name_drakemaw_raptor': 'Drakenrachen-Raptor',
+  'hudChrome.options.graphicsApplied': 'Grafikeinstellungen angewendet.',
+  'hudChrome.options.graphicsApply': 'Grafik anwenden',
+  'hudChrome.options.graphicsApplying': 'Grafikeinstellungen werden angewendet...',
+  'hudChrome.options.graphicsDraftChanged': 'Grafikänderungen sind bereit zum Anwenden.',
+  'hudChrome.options.graphicsFailed':
+    'Grafik konnte nicht angewendet werden. Deine vorherigen Einstellungen sind weiterhin aktiv.',
+  'hudChrome.options.graphicsFatal':
+    'Grafik-Wiederherstellung fehlgeschlagen. Lade das Spiel neu, um fortzufahren.',
+  'hudChrome.options.graphicsReload': 'Spiel neu laden',
+  'hudChrome.options.graphicsRetry': 'Grafik erneut versuchen',
+  'hudChrome.options.graphicsSaved':
+    'Grafikeinstellungen gespeichert. Der aktive Renderer entspricht ihnen bereits.',
+  'hudChrome.options.lockActionBars': 'Aktionsleisten sperren',
+  'itemUi.kind.material': 'Material',
+  'itemUi.market.buyChanged':
+    'Dieses Angebot hat sich geändert, bevor Ihr bestätigt habt. Prüft den Preis und versucht es erneut.',
+  'itemUi.market.buyConfirmAccept': 'Kaufen',
+  'itemUi.market.buyConfirmBody': '{item} für {price} kaufen?',
+  'itemUi.market.buyConfirmBodyStack': '{item} x{count} für {price} kaufen ({each} pro Stück)?',
+  'itemUi.market.buyConfirmCancel': 'Abbrechen',
+  'itemUi.market.buyConfirmTitle': 'Kauf bestätigen',
+  'itemUi.tooltip.questOrphaned': 'Für keine aktive Quest benötigt.',
+  'itemUi.tooltip.questRelated': 'Quest: {quest}',
+  'itemUi.tooltip.questRules': 'Kann nicht verkauft, eingelagert oder gehandelt werden.',
+  'desktop.update.checkingBody': 'Neue Versionen werden heruntergeladen, während du spielst.',
+  'desktop.update.checkingTitle': 'Suche nach Updates...',
+  'desktop.update.dismiss': 'Schließen',
+  'desktop.update.downloadingBody':
+    'Du kannst weiterspielen. Es installiert sich, wenn du das Spiel beendest.',
+  'desktop.update.uptodateTitle': 'Du bist auf dem neuesten Stand',
+  'entities.items.firebottle.name': 'Feuerflasche',
+  'entities.items.murloc_hut.name': 'Mudfin-Hütte',
+  'entities.items.reins_drakemaw_raptor.name': 'Zügel des Drakenrachen-Raptors',
+  'entities.items.restless_skull.name': 'Ruheloser Schädel',
+  'entities.items.vanguard_bone.name': 'Vorhut-Knochen',
+  'entities.mobs.brakka_wallbreaker.name': 'Brakka der Mauerbrecher',
+  'entities.mobs.dragonkin_broodguard.name': 'Drachkin-Brutwächter',
+  'entities.mobs.dragonkin_egg.name': 'Drachkin-Ei',
+  'entities.mobs.dragonkin_whelp.name': 'Drachkin-Welpe',
+  'entities.mobs.drakemaw_broodlord.name': 'Drakenrachen-Brutfürst',
+  'entities.mobs.drowned_warlord.name': 'Der Ertrunkene Kriegsherr',
+  'entities.mobs.spider_egg.name': 'Brutmutter-Ei',
+  'entities.mobs.threnos_first_voice.name': 'Threnos, die Erste Stimme',
+  'entities.mobs.widow_hatchling.name': 'Witwen-Schlüpfling',
+  'entities.quests.q_no_rest.text':
+    'Der Ritus auf jenen Räuchergefäßen zwingt die Ertrunkenen, sich zu erheben, und nun hat er einen erweckt, der stark genug ist, sie zu führen. Die Wärter nennen ihn den Ertrunkenen Kriegsherrn, und solange er die Ertrunkene Kapelle hält, halten die Toten ihre Reihen. Brich ihn, {playerName}, und der Rest zerstreut sich zurück ins Moor.',
+  'hud.social.tenure.recruit': 'Rekrut',
+  'hud.social.tenure.veteran': 'Veteran',
+  'hudChrome.keybinds.mouseHint':
+    'Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten.',
+  'hudChrome.social.billboard.loginLine': 'Gildenpinnwand: {text}',
+  'hudChrome.actionBar.editKeys': 'Aktionsleisten-Tasten bearbeiten',
+  'hudChrome.actionBar.editKeysHint':
+    'Klicke einen Platz auf der Aktionsleiste an, dann drücke eine Taste, um ihn zu belegen.',
+  'hudChrome.actionBar.bannerHint':
+    'Klicke einen Platz an, dann drücke eine Taste, um ihn zu belegen. Klicke zum Abschluss auf Fertig.',
+  'hudChrome.actionBar.bannerCapturing': 'Drücke eine Taste, um diesen Platz zu belegen...',
+  'hudChrome.actionBar.boundToKey': 'Belegt mit {key}.',
+  'hudChrome.actionBar.reset': 'Zurücksetzen',
+  'hudChrome.actionBar.done': 'Fertig',
+  'hudChrome.actionBar.cancel': 'Abbrechen',
+  'hudChrome.actionBar.resetConfirmTitle': 'Aktionsleisten-Tasten zurücksetzen?',
+  'hudChrome.actionBar.resetConfirmBody':
+    'Die erste Leiste kehrt zu ihren Standardtasten zurück. Die zweite und dritte Leiste verlieren ihre Belegung. Das lässt sich nicht rückgängig machen.',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    'In den Staffeln 1v1 und 2v2 spielt jeder Kämpfer das Allrounder-Repertoire. Taten, die die Staffel 3v3 oder größer verlangen, lassen sich hier nicht erringen.',
+  'hudChrome.vcup.practiceUnratedNote':
+    'Trainingsspiele sind ungewertet: Siegertafel und Fortschritt im Buch der Taten zählen nicht.',
+  'hudChrome.vcup.briefing.unratedNote':
+    'Bots stehen auf dem Platz, daher ist diese Partie ungewertet: Die Siegertafel bewegt sich nicht, und Taten für Tore, Paraden und Spiele ohne Gegentor zählen nicht.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'Dies ist ein Trainingsspiel und damit ungewertet: Die Siegertafel bewegt sich nicht, und Fortschritt im Buch der Taten zählt nicht.',
+  'hudChrome.bags.filterTool': 'Werkzeuge',
+  'hudChrome.materialHint.fineGrade':
+    'Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    'Du brauchst eine Angelrute der Stufe {tier}, um in diesen Gewässern zu angeln.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    'Du brauchst Bergbau {skill}, um die Spitzhacke in deinen Taschen zu schwingen.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    'Du brauchst Holzfällen {skill}, um die Axt in deinen Taschen zu schwingen.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    'Du brauchst Kräuterkunde {skill}, um die Sichel in deinen Taschen zu führen.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    'Du brauchst Sammelfertigkeit {skill}, um dein bestes Werkzeug einzusetzen.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing':
+    'Erforderlich, um in Gewässern bis Stufe {tier} zu angeln.',
+  'hudChrome.gathering.emptyHookNote': 'Nichts am Haken',
+  'hudChrome.gathering.stateCooldownTimed': 'Nachwachsen in {time}',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
+  'hudChrome.gathering.fineGradePreview': 'Dein Werkzeug veredelt diesen Ertrag zu feiner Güte.',
+  'hudChrome.professions.toolEffectCharges': '{charges} von {max} Ladungen',
+  'hudChrome.professions.toolEffectSpent': 'Verbraucht, muss aufgeladen werden',
+  'hudChrome.professions.toolEffectDepleted': 'Werkzeugeffekt verbraucht',
+  'hudChrome.professions.toolEffectRechargePrice': 'Aufladen: {count} x {material}',
+  'hudChrome.professions.toolEffectModeAsk': 'Bei jeder Nutzung fragen',
+  'hudChrome.professions.toolEffectModePrompt': 'Fragt bei jeder Nutzung',
+  'hudChrome.professions.toolEffectConfirmTitle': '{effect} einsetzen?',
+  'hudChrome.professions.toolEffectConfirmBody':
+    'Eine Ladung für diese Ernte einsetzen? Bei Ablehnung sammelst du trotzdem, nur ohne den Bonus. Verbleibende Ladungen: {charges}.',
+  'hudChrome.professions.toolEffectConfirmAccept': 'Ladung einsetzen',
+  'hudChrome.professions.toolEffectConfirmDecline': 'Ohne sammeln',
+  'hudChrome.professions.toolEffectName.gatherersCache': 'Vorrat des Sammlers',
+  'hudChrome.professions.toolEffectName.artisansEye': 'Auge des Handwerkers',
+  'hudChrome.professions.toolEffectName.quickeningCharm': 'Federkraft-Talisman',
+  'hudChrome.professions.toolEffectSlotButton': '{effect} einsetzen',
+  'hudChrome.professions.toolEffectRechargeButton': 'Aufladen',
+  'hudChrome.professions.toolEffectSlotted': '{effect} auf {profession} eingesetzt.',
+  'hudChrome.professions.toolEffectSlotInvalid': '{effect} lässt sich dort nicht einsetzen.',
+  'hudChrome.professions.toolEffectNoTool': 'Du brauchst zuerst ein echtes {profession}-Werkzeug.',
+  'hudChrome.professions.toolEffectNoCharm':
+    'In deinen Taschen fehlt ein gefertigter Talisman für {effect}.',
+  'hudChrome.professions.toolEffectNoGain': '{effect} ist bereits eingesetzt und voll aufgeladen.',
+  'hudChrome.professions.toolEffectRecharged':
+    '{effect} aufgeladen: {material} x{count} verbraucht.',
+  'hudChrome.professions.toolEffectRechargeNoSlot': 'Auf {profession} ist kein Effekt eingesetzt.',
+  'hudChrome.professions.toolEffectRechargeFull': '{effect} ist bereits voll aufgeladen.',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    'Trage ein besseres {profession}-Werkzeug, um {effect} weiter aufzuladen.',
+  'hudChrome.professions.toolEffectRechargeMaterials':
+    'Zum Aufladen von {effect} wird {material} x{count} benötigt.',
+  'hudChrome.crafting.reagentFineSub': '(verbraucht {count} feiner Güte)',
+  'hudChrome.crafting.identity.allCrafts': 'Alle Berufe',
+  'hudChrome.crafting.identity.skillListAria': 'Handwerkliche Fähigkeiten',
+  'hudChrome.deeds.broadcastsLabel':
+    'Taten-Freischaltungen mit Gildenmitgliedern und Followern teilen, sowie Taten- und Meisterwerkkarten mit dem Discord-Feed',
   'apiError.epic.account_taken': 'Dieses Epic-Konto ist bereits mit einem anderen Konto verknüpft.',
   'apiError.epic.already_linked': 'Dein Konto ist bereits mit einem Epic-Konto verknüpft.',
   'apiError.epic.banned': 'Dieses Epic-Konto kann nicht verknüpft werden.',
@@ -20,8 +717,165 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'apiError.epic.invalid_token':
     'Epic konnte diese Verknüpfungsanfrage nicht bestätigen. Versuche es erneut über die Desktop-App.',
   'apiError.epic.upstream': 'Epic hat nicht geantwortet. Versuche es gleich noch einmal.',
+  'apiError.seeker.native_only': 'Die Seeker-Berechtigung ist nur in der nativen App verfügbar.',
+  'apiError.seeker.attestation_failed':
+    'Geräteverifizierung fehlgeschlagen. Bitte versuche es erneut.',
+  'apiError.seeker.solana_artifact_required': 'Nutze die Solana Store App, um fortzufahren.',
+  'apiError.seeker.wallet_required': 'Verknüpfe und verifiziere zuerst eine Wallet.',
+  'apiError.seeker.genesis_token_required':
+    'Ein verifizierter Seeker Genesis Token ist erforderlich.',
+  'apiError.seeker.genesis_token_claimed': 'Dieser Seeker Genesis Token wurde bereits beansprucht.',
+  'apiError.seeker.entitlement_required': 'Eine verifizierte Seeker-Berechtigung ist erforderlich.',
+  'apiError.seeker.current_ownership_required':
+    'Der Seeker Genesis Token muss sich aktuell in deinem Besitz befinden.',
+  'guide.professions.archetypeSwitchBody':
+    'Eine Erklärung ist auch kein lebenslanges Urteil. Ein Paar, das du nie gehalten hast, ist schlicht eine frische Abstimmungsquest, während die Rückkehr zu einem Paar, das du verlassen hast, zuerst Sühne verlangt: fünf Aufgaben beim ersten Mal und drei weitere für jede Rückkehr, die du bereits hinter dir hast (ein brandneues Paar aufzunehmen erhöht die Zahl nie). Die Wahl bleibt bedeutsam, ohne je eine Tür für immer zu verschließen.',
+  'guide.professions.whatBody':
+    'Berufe sind das Arbeitsleben dieser Welt: vier Sammelberufe, die Rohmaterial direkt aus dem Land holen, und ein Ring aus zehn Handwerken, die daraus Ausrüstung, Mahlzeiten, Tränke und Werkzeuge machen. Hier speist alles etwas anderes. Das Erz, das du abbaust, wird zu einer Klinge, die Klinge nimmt eine Verzauberung auf, und die Verzauberung braucht Pulver, das aus alter Ausrüstung herausgebrochen wurde, ein Sammler, ein Handwerker und ein Tüftler sind also alle Glieder einer Kette.\n\nEs gibt keine Berufsgrenze, über der man grübeln müsste. Jeder Charakter kann sieben der acht Handwerke, die heute Inhalt haben, und alle vier Sammelberufe nebeneinander steigern (die Ingenieurskunst ist die eine Ausnahme: Ihre Rezepte beginnen alle über der freien Decke, ihre Leiter wartet also auf den Eid des Bombardiers); die einzige ausschließende Wahl ist dein Archetyp, die Identität, auf die du dich irgendwann schwörst, wobei die Handwerke, die dahinter inaktiv werden, sobald du dich abgestimmt hast, nur noch an ihren gewöhnlichen Rezepten steigen, und über Fertigkeit 75 hinaus gar nicht mehr. Fertigkeit sinkt nie, und nichts, was du lernst, wird dir je wieder genommen.',
+  'guide.professions.archetypesBody':
+    'Die zehn Handwerke sitzen auf einem festen Rad, und die Geografie auf diesem Rad zählt. Je zwei Nachbarn bilden ein benanntes Paar: Schmied für Waffenherstellung und Rüstungsherstellung, Ausrüster für Lederverarbeitung und Schneiderei, Apotheker für Alchemie und Kochen, Bombardier für Ingenieurskunst und Alchemie, und sechs weitere rund um den Ring.\n\nSich auf ein Paar abzustimmen ist eine Quest, kein Klick im Menü. Vier Paare lassen sich heute eingehen (Schmied, Ausrüster, Apotheker und Bombardier), jedes verankert bei einem ansässigen Meister in Eastbrook, dessen Aufnahmequest den ganzen Handel vorab benennt, bevor du ihn eingehst. Bis du dich erklärst, steigt jedes Handwerk frei an Rezepten bis hinauf zur Selten-Stufe (jedes Rezept, das Fertigkeit 74 oder weniger verlangt), du kannst also fast alles ausprobieren, bevor du wählst (allein die Ingenieurskunst hat kein Rezept so weit unten, ihre Zahl wartet daher).\n\nSobald du dich abstimmst, werden deine beiden Paar-Handwerke zu deinen Hauptberufen, ohne jede Decke unterhalb der Obergrenze. Der Rest des Rades erlischt darum nicht: Ein Handwerk gegenüber deinen Hauptberufen bleibt als Hobby bestehen, das weiter bis durch die Selten-Stufe steigt (eine wiederholbare Quest an der Schmiede von Schmied Haldren lässt dich tauschen, welches es ist), und jedes andere Handwerk wird inaktiv. Ein inaktives Handwerk behält seine Fertigkeit und seine gewöhnlichen Rezepte, die es auf der normalen Kurve weiter lehren, bis sie bei 75 grau werden; alles über Gewöhnlich hört auf einen Schlag auf zu zahlen, und ein inaktives Handwerk bringt im Ruhen nie ein Meisterwerk hervor.',
+  'guide.professions.startBody':
+    'Frisch von der Straße in Eastbrook angekommen? Such Vorarbeiter Odell und nimm Ein Handwerk für jede Hand an: Er weist dich auf die Erzadern rund um die Kupfergrube südöstlich der Stadt hin und verschafft dir deine ersten Schwielen. Aber Vorsicht bei der Grube selbst: Die Deeprock-Gräber, die dort lagern, stehen ein paar Stufen über einem frischen Ankömmling, arbeite also zuerst die äußeren Adern ab und heb dir das Herz des Lagers auf, bis du ein wenig aufgestiegen bist. Von da an ernte jede Ader, jede Baumgruppe und jede Kräuterpflanze, an der du beim Questen vorbeikommst; Reisenden fällt die Fertigkeit von allein zu.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und arbeitest die gewöhnlichen Rezepte ab, die jeder Charakter von Anfang an kennt. Besuch die Meister an der Schmiede, den Küchen, dem Webstuhl und der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Werkaufträge für stetige Münzen an. Wenn dich der Gildenbrief erreicht, weißt du längst, welches Paar sich wie Zuhause anfühlt.',
+  'guide.profPages.craftIntro.engineering':
+    'Ingenieurskunst baut die Werkzeuge, die jeder ernsthafte Sammler früher oder später haben will: die Spitzhacken, Äxte, Sicheln und Angelruten von Rang 4 und Rang 5, die kein Händler je gegen Münze verkauft, jedes davon verbraucht das Werkzeug darunter.',
+  'guide.profPages.craftIntro.enchanting':
+    'Verzauberung zerlegt Ausrüstung und gibt die Kraft wieder hinein: Zerbrich ungewollte Stücke zu arkanen Materialien und gib sie dann für einen dauerhaften Attributbonus an einem Stück aus, das du behalten willst. Zerbrechen und Verzaubern brauchen weder Station noch Lehrmeister, und jeder kann am ersten Tag anfangen; nur die beiden Talisman-Rezepte verlangen mehr, gelehrt in der Werkzeugmacherei.',
+  'guide.profPages.craftProse.weaponcrafting.materialsBody':
+    'Bergbau ist das Rückgrat. Kupfererz kommt von den Rang-1-Adern des Eastbrook-Tals, Eisenerz aus dem Mirefen-Moor und Osmiumerz aus den Thornpeak-Höhen, und jede Sprosse der Leiter steigt auf dieselbe Weise mit. Holzfällen zählt mehr, als du vielleicht erwartest: Eisenrinde schäftet den Eberspeer, Aschenholz trägt den Kriegshammer, und ein einzelnes Hochfichtenscheit bildet den Kampfstab.\n\nDer Rest kommt von der Jagd und vom Tresen. Raues Fell für die Griffe wird direkt von Wolfs- und Eberleichen geerntet, Knochenfragmente stammen von den ruhelosen Toten oder aus zerlegter gewöhnlicher Ausrüstung, und die Schmiedeleiter verbrennt Schmiedefluss, 20 Kupfer der Krug bei Darva selbst. Hinkt dein eigener Bergbau hinterher, rettet dich beim Erz kein Tresen: Osmium kommt von den Thornpeak-Adern, von den Startadern jeder jüngeren Zone außer der Fernküste (deren Adern Eisen graben) oder aus dem Stapel eines anderen Spielers, per Handel oder über den Weltmarkt. Nur der Glyphstahlbarren wird gegen Münze gekauft, bei Tüftler Gizzel in der Werkzeugmacherei oder bei Quartiermeisterin Bree in Highwatch.',
+  'guide.profPages.craftProse.weaponcrafting.routeBody':
+    'Jedes Stück mit einer echten Attributzeile, was auf dieser Leiter die Eisen-Sprosse und aufwärts bedeutet, kann als Meisterwerk vom Amboss kommen, solange die feinere Qualität in deine Rang-Grenze passt; die attributlosen Kupfer-Allgemeinstücke proc’en nie, weil es an ihnen nichts zu verbessern gibt. Eisen und Osmium zählen für den Meisterwerk-Bonus als Rang-1-Material, Hochfichte und Glyphstahl als Rang-2-Material, und Fertigkeit oberhalb des eigenen Rangs eines Rezepts fügt je Rang einen eigenen Punkt hinzu, sodass unter den drei Osmium-Stücken die Kriegsaxt und der Kampfstab den Materialvorteil tragen und eine Sprosse weiterhin besser proc’t, nachdem du ihr entwachsen bist.\n\nReite die Kupfer-Sprosse auf 25, lerne die Eisen-Sprosse an dem Tag, an dem sie sich öffnet, und reite sie auf 50, dann die Osmium-Sprosse auf 75. Jenseits von 75 gibt es bisher nichts Höheres, also lassen die Osmium-Rezepte auf halben und dann viertel Gewinn nach: Rechne mit rund 150 weiteren Herstellungen bis zur Obergrenze von 125, und denk an die gemeinsame Drosselung von zehn Handwerksaktionen pro Minute, wenn du dich zum Chargenlauf hinsetzt.\n\nFinanziere den Aufstieg unterwegs: Darvas Schmiede-Arbeitsauftrag nimmt dir alle 30 Minuten acht Kupfererz für ein wenig Münze und EP ab, und die Eisen- und Osmium-Sprossen verkaufen sich ehrlich an aufsteigende Nahkämpfer. Das Buch der Taten markiert Schneide und Härtung bei Fertigkeit 50 und krönt Großmeister-Waffenherstellung bei 125.',
+  'guide.profPages.craftProse.armorcrafting.identityBody':
+    'Die Leiter der Rüstungsherstellung liest sich wie die Laufbahn eines Soldaten: zu Beginn der schlichte genietete Kupfergürtel, die Sabatons und die Stulpen, dann die Eisenglieder-Halsberge, die Beinschützer und die Schulterstücke mit ihren ersten echten Attributzeilen, und schließlich der seltene Osmiumschuppen-Großhelm, der Küraß und die Beinlinge, Stärke- und Ausdauerstücke mit Rüstungswerten an der äußersten Spitze der Handwerkskunst.\n\nEs hat auch eine leisere Seite: Die Eastbrook-Schutzbeinlinge, ein Feld-Allgemeinstück mit Zauberwirker-Attributen, und der Brennschuppenmantel, eine seltene Intellekt-und-Geist-Kettenschulter bei Fertigkeit 75, halten die zauberkundigen Kettenträger auf der Kundenliste. Auf dem Rad sitzt es zwischen Waffenherstellung und Ingenieurskunst; das Schmied-Paar mit Waffenherstellung wird vor Schmiedemeisterin Darva geschworen, während das Zahnradschmied-Paar mit Ingenieurskunst zwar benannt ist, aber noch keine Eid-Quest hat.',
+  'guide.profPages.craftProse.armorcrafting.materialsBody':
+    'Kein Handwerk frisst Erz schneller. Allein die Eisenglieder-Halsberge nimmt fünf Eisenerz, und jedes Osmiumschuppen-Stück will drei oder vier Osmium plus einen Glyphstahlbarren, also baut ein ernsthafter Rüstungsschmied im Mirefen-Moor und in den Thornpeak-Höhen selbst ab oder bezahlt jemanden, der es tut. Kupfer speist die erste Sprosse, direkt aus den Adern bei der Kupferschürfe.\n\nUm das Metall herum kommen die weichen Teile: Raues Fell, von Wolfs- und Eberleichen geerntet, Knochenfragmente von den ruhelosen Toten (oder aus gewöhnlicher Ausrüstung zerlegt) und Schmiedefluss-Krüge (je 20 Kupfer an der Schmiede) in fast jedem Rezept. Kein Händler verkauft Osmium: Die Ungeduldigen kaufen es anderen Spielern ab oder bauen es selbst ab, in Thornpeak oder an den Startadern von zehn der elf jüngeren Zonen (allein die Fernküste gräbt Eisen).',
+  'guide.profPages.craftProse.armorcrafting.ladderBody':
+    'Zwei Feld-Allgemeinstücke, die Eastbrook-Kettenweste und die Schutzbeinlinge, sind von Anfang an bekannt und überall herstellbar. Die Lehrmeister-Leiter besteht aus neun Rezepten in drei Sprossen an der Eastbrook-Schmiede: Die Kupfer-Sprosse ist bei Fertigkeit 0 kostenlos, die Eisenglieder-Sprosse kostet bei Fertigkeit 25 je 25 Silber pro Rezept, und die Osmiumschuppen-Sprosse kostet bei Fertigkeit 50 je 1 Gold, wobei jede Sprosse in dem Moment lernbar wird, in dem dein Rang sie erreicht.\n\nJenseits der Leiter stehen zwei Sonderfälle. Der Gebundstein-Helm ist eines der beiden Schmied-Kombinationsrezepte (die Gravewyrm-Stulpen sind sein Geschwisterstück auf der Waffenseite), vom Lehrmeister gelehrt, ohne Station und nur von einem abgestimmten Schmied mit beiden Handwerken auf Fertigkeit 25 zu bearbeiten. Der Brennschuppenmantel braucht überhaupt keinen Lehrer: Jeder kennt ihn von Anfang an, und nichts außer der Schmiede und den Materialien beschränkt die Arbeit daran. Die angegebene Fertigkeit 75 betrifft den Gewinn, nicht die Erlaubnis: Mit Rüstungsherstellung als Hauptberuf zahlt er vom allerersten Hammerschlag an vollen Fertigkeitsgewinn bis 99, sodass ein Schmied mit Osmium im Überfluss früh darauf setzen kann. Unterhalb der Grenze eines Hauptberufs lehrt das Rang-3-Rezept nichts, also arbeitet ein nicht abgestimmter oder Hobby-Rüstungsschmied daran für das Stück, nicht für die Punkte.',
+  'guide.profPages.craftProse.leatherworking.materialsBody':
+    'Lederverarbeitung ist das Handwerk, bei dem dein Aufstiegsweg und deine Versorgungslinie dasselbe sind: Raues Fell wird direkt von fellführenden Leichen geerntet, vor allem von Wölfen und Ebern, und jede Leiche bedient nur einen Ernter, wer zuerst kommt, mahlt zuerst. Ein seltener oder besserer Erntewurf gewährt außerdem ein Unberührtes Fell, ein signiertes Exemplar, nach dem das Sumpfwächterwams verlangt, also lege jedes zur Bank, das du findest.\n\nDie Nebenrollen sind wenige: Spinnenbeine und Spinnenseide, Selbstgesponnener Stoff von Humanoiden, ein einzelnes Osmiumerz in jedem seltenen Sumpfwächter-Stück (sechs im Abschlussrezept der Dämmerfell-Wickel) und ein Gerbmittel für 16 Kupfer am Tresen der Gerberei. Osmium selbst wird nie beim Händler gekauft: Bau es selbst ab, in Thornpeak oder an den Startadern fast jeder jüngeren Zone (allein die Fernküste gräbt Eisen), oder kaufe es einem anderen Spieler ab.',
+  'guide.profPages.craftProse.leatherworking.ladderBody':
+    'Hier ist der Haken: Die Gerberei steht in Fenbridge, an der Straße ins Mirefen-Moor, was Lederverarbeitung zum einzigen Tiefhandwerk macht, das draußen im Moor ausgebildet wird. Gerber Hesk lehrt die Leiter an seinen Bottichen: die Fenbridge-Leder-Sprosse kostenlos bei Fertigkeit 0, die Marschpirscher-Sprosse für 25 Silber pro Rezept ab Fertigkeit 25 und die Sumpfwächter-Sprosse für je 1 Gold ab Fertigkeit 50, wobei sich jede Sprosse öffnet, sobald dein Rang sie erreicht.\n\nDrei Rezepte umgehen den Lehrmeister: Die Feld-Allgemeinstücke (das Gegerbte Lederwams und die Eastbrook-Druidenhaut) lassen sich von Anfang an überall herstellen, und die Dämmerfell-Wickel kennt jeder, doch sie sitzen bei Fertigkeit 75 und sind an die Gerberei gebunden. Beachte, dass der Ausrüster-Eid selbst zurück in Eastbrook bei Ottilie geschworen wird; nur der Unterricht findet im Moor statt.',
+  'guide.profPages.craftProse.leatherworking.routeBody':
+    'Jedes Stück mit echten Attributen würfelt auf die Meisterwerk-Chance, solange die feinere Qualität in deine Rang-Grenze passt, die attributtragende Eastbrook-Druidenhaut eingeschlossen, und ein signiertes Unberührtes Fell in einem Sumpfwächterwams liefert den Signiert-Reagenz-Bonus automatisch; Osmium zählt für den Proc als Rang-1-Material. Die attributlosen Leder-Allgemeinstücke können nicht proc’en.\n\nSteigere es auf natürlichem Weg: Ernte ab Stufe eins jeden Wolf und jeden Eber, den du erlegst, lass dich von den beiden Feld-Allgemeinstücken bis 25 tragen, wo immer du gerade stehst, und lerne dann die Leder-Sprosse an den Bottichen, wenn dich die Quests ohnehin ins Moor ziehen. Marschpirscher trägt dich auf 50 und Sumpfwächter auf 75; danach zahlen die Dämmerfell-Wickel, ein Rang-3-Rezept aus sechs Osmiumerz, drei Unberührten Fellen, zwei Rauen Fellen und einem Gerbmittel, einem abgestimmten Ausrüster vollen Gewinn bis 99 und danach die Hälfte, rund 75 Herstellungen für die letzten fünfzig Punkte bis zur Obergrenze von 125; unterhalb der Grenze eines Hauptberufs lehrt das Rang-3-Rezept nichts.\n\nDie mobile Gerberei zählt für dieses Handwerk mehr als für jedes andere: Spezialisiere dich bei 75, und eine Satteltasche voller Felle wird am Lagerfeuer zu fertiger Ausrüstung statt zu einem Rückweg nach Fenbridge. Hesks Gerberei-Arbeitsauftrag kauft alle 30 Minuten acht Raue Felle, ein hübscher Ertrag für Häute, die du ohnehin gesammelt hast, und das Buch der Taten markiert Das Gerberhandwerk bei Fertigkeit 50, mit Großmeister-Lederverarbeitung an der Obergrenze.',
+  'guide.profPages.craftProse.cooking.identityBody':
+    'Iss eine gekochte Mahlzeit, und sie heilt dich über 18 Sekunden Rast hinweg, was zwischen zwei Pulls die billigste Heilung im Spiel ist. Die Leiter reicht vom In der Pfanne gebratenen Flussbarsch mit 90 Leben bis hinauf zu Marlows Festtagsbraten mit 980, einer Sitzheilung, die nichts im Spiel übertrifft.\n\nAuf dem Rad sitzt Kochen zwischen Alchemie und Lederverarbeitung. Sein lebendes Paar ist der Apotheker, Alchemie und Kochen, geschworen vor Koch Marlow in den Eastbrook-Küchen, nachdem vier Wildeber für den Topf erlegt wurden; das Fallensteller-Paar mit Lederverarbeitung ist auf dem Rad benannt, hat aber noch keine Eid-Quest.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'Angeln liefert die kennzeichnenden Zutaten, Zone für Zone: Spiegelforelle und Flussbarsch aus den Gewässern des Eastbrook-Tals, Sumpfhecht und Mooraal aus dem Mirefen-Moor, Frostkiemen-Forelle und Silberkarpfen aus den Thornpeak-Höhen. Die Sprossen mischen die Zonen frei (die kostenlose Sprosse will bereits Sumpfhecht, die mittlere Thornpeaks Frostkieme, und das seltene Abendmahl faltet die Spiegelforelle des Tals wieder ein), sodass einem Koch, der überall angelt, wohin ihn die Straße führt, nie der Vorrat ausgeht.\n\nDie Metzgerseite kommt von geernteten Leichen: Wildfleisch von Ebern und ihresgleichen und, bei einem seltenen oder besseren Erntewurf, ein signiertes Erstklassiges Stück, das Herzstück des Festtagsbratens. Kräuter würzen die besseren Gerichte, ein Aschenholzscheit räuchert den Aal, und Kochsalz kostet 8 Kupfer pro Beutel an Marlows eigenem Stand.',
+  'guide.profPages.craftProse.alchemy.identityBody':
+    'Das Handwerk wird an der Apotheke in Highwatch ausgeübt, dem Sitz von Alchemist Verane, Meister der Apotheke: Verane lehrt die Rezeptleiter, verkauft Glasfläschchen für 12 Kupfer und zahlt über den eigenen Arbeitsauftrag Münze für Kräuter.\n\nAuf dem Handwerksrad sitzt Alchemie bei den Versuch-und-Irrtum-Gewerben, auf der einen Seite neben Ingenieurskunst, auf der anderen neben Kochen. Das gibt ihr zwei Paar-Identitäten: den Bombardier (Ingenieurskunst und Alchemie, aufgenommen vor Tüftler Gizzel in Eastbrook) und den Apotheker (Alchemie und Kochen, geschworen vor Koch Marlow). Stimme dich auf eines der beiden Paare ab, um Alchemie zu einem Hauptberuf zu machen und deine eigene signierte Arbeit dich zurücklehren zu lassen; das Bombardier-Paar öffnet zudem sein Kombinationsgebräu, das Elixier des Bären, während das Apotheker-Paar noch kein Kombinationsrezept mitbringt. Die Leiter selbst wartet allerdings nie, denn jedes Alchemie-Rezept liegt innerhalb des seltenen Rangs, unter dem nicht abgestimmte Handwerke arbeiten, sodass der gesamte Aufstieg bis zur Obergrenze schon vor jedem Eid offensteht.',
+  'guide.profPages.craftProse.alchemy.ladderBody':
+    'Jeder kennt den Geringen Heiltrank von Anfang an und kann ihn überall mischen, ganz ohne Station. Die eigentliche Leiter besteht aus neun Rezepten, die Verane in der Apotheke lehrt, drei je Sprosse: Die Rezepte bei Fertigkeit 0 sind kostenlos, die Sprosse bei Fertigkeit 25 kostet 25 Silber pro Rezept, und die Sprosse bei Fertigkeit 50 kostet 1 Gold pro Rezept. Jede Sprosse besteht aus einem Heiltrank, einem Manatrank und einem Ausdauerelixier und steigt von den gewöhnlichen Schimmerblatt-Flaschen (120 Leben, 160 Mana) über ungewöhnliches Goldblatt (200 Leben, 260 Mana) bis zur seltenen Sonnenblüte (280 Leben, 360 Mana).\n\nDie Elixiere steigen genauso: Das Elixier des Ebers gewährt 6 Ausdauer für 10 Minuten, das Vipersear-Elixier 9 für 15 Minuten und das Elixier der Schlange 12 für 15 Minuten, wobei allein die Schlange zwei Flaschen pro Herstellung braut. Ein weiteres Rezept steht abseits: das Elixier des Bären, ein Kombinationsgebräu, das Verane für 25 Silber lehrt, sobald deine Alchemie 25 erreicht, überall mischbar, aber nur von einem abgestimmten Bombardier mit Alchemie und Ingenieurskunst je auf 25.',
+  'guide.profPages.craftProse.alchemy.routeBody':
+    'Tränke und Elixiere würfeln nie auf Meisterwerke; dieser Proc gehört zur statusbehafteten Ausrüstung. Dein Name reist trotzdem mit: Die seltenen Sonnenblüten-Tränke kommen mit der Signatur ihres Herstellers an, und ebenso jede Flasche des doppelt gebrauten Elixiers der Schlange, sodass in diesem Handwerk nichts Seltenes die Werkbank unsigniert verlässt. Bei Fertigkeit 75 spezialisierst du dich, und jedes Alchemie-Rezept kostet von da an 20 Prozent weniger Material.\n\nNimm Kräuterkunde früh und pflücke beim Aufsteigen: Schimmerblatt wächst überall im Tal, und sobald du Veranes Werkbank erreichst, trägt dich die kostenlose Sprosse sauber bis Fertigkeit 25, und zwar mit Kräutern, die du ohnehin gepflückt hättest. Lerne die 25er-Sprosse in dem Moment, in dem sie aufgeht, verlege dein Pflücken für Goldblatt ins Moor, und lass Veranes Arbeitsauftrag (sechs Goldblattkräuter für 45 Kupfer, alle 30 Minuten wiederholbar) unterwegs ein wenig Münze zurückgeben.\n\nAb 50 braust du Sonnenblüten-Tränke und Schlangen-Chargen aus Thornpeak-Sonnenblüte, mit ein wenig Grün aus dem Tal und dem Moor noch im Ansatz. Die letzte Strecke von 100 auf 125 ist ein bewusstes Rinnsal, also braue, was sich tatsächlich verkauft, statt Kräuter für die Zahl zu verbrennen, und denk daran, dass Verbrauchsgüter die eine gefertigte Ware sind, die jeder für immer nachkauft. Das Buch der Taten markiert Seltsame Gebräue bei Fertigkeit 50 und Großmeister-Alchemie an der Obergrenze.',
+  'guide.profPages.craftProse.engineering.identityBody':
+    'Das Handwerk wird in der Werkzeugmacherei in der Südwestecke des Eastbrook-Platzes ausgeübt, dem Sitz von Tüftler Gizzel, Meister der Werkzeugmacherei. Rang 1 bis 3 jeder Werkzeuglinie sind gewöhnliche Händlerware; Rang 4 und 5 kommen von der Werkbank eines Ingenieurs oder vom Tiefgang-Tresen der Ertrunkenen Litanei gegen Tiefgang-Marken hinter deren Räumungsschranken, und niemals gegen Münze aus irgendeiner Kasse.\n\nAuf dem Rad sitzt sie bei den Versuch-und-Irrtum-Gewerben, neben Alchemie und Rüstungsherstellung, was ihr zwei Paar-Identitäten gibt: den Bombardier (Ingenieurskunst und Alchemie, aufgenommen vor Gizzel höchstpersönlich) und den Zahnradschmied (Rüstungsherstellung und Ingenieurskunst, benannt, aber noch nicht schwörbar). Eine Warnung wiegt hier schwerer als irgendwo sonst: Jede einzelne Rezeptsprosse der Ingenieurskunst liegt über der Grenze des seltenen Rangs, unter der Hobbys und nicht abgestimmte Handwerker arbeiten, sodass sich die Fertigkeitszahl nur für jemanden bewegt, dessen Hauptberufe Ingenieurskunst einschließen, was heute den Bombardier bedeutet. Die Landwerkzeuge kann trotzdem jeder bauen; ein nicht abgestimmter Handwerker lernt dabei nur nichts, und die beiden Ruten-Rezepte verlangen obendrein Gizzels Unterricht.',
+  'guide.profPages.craftProse.engineering.materialsBody':
+    'Jedes Landwerkzeug-Rezept verbraucht das Werkzeug einen Rang unter sich plus ein FEINES Material, und diese Paarung ist die ganze Landleiter: Vier Feine Eisenerze und eine Himmelsilber-Spitzhacke werden zur Osmium-Spitzhacke, dann werden zwei Glyphstahlbarren, zwei Feine Osmiumerze und eben diese Osmium-Spitzhacke zur Glyphstahl-Spitzhacke. Die Axt- und die Sichellinie spiegeln dieselbe Form aus Feinmaterial plus Vorgängerwerkzeug mit Feinen Aschenholz- und Feinen Hochfichtenscheiten sowie Feinen Goldblatt- und Feinen Sonnenblütenkräutern, doch ihre Rang-5-Sprossen verlangen keine Glyphstahlbarren: Die Spitzhacke ist die eine Linie, die oben teurer wird. Die beiden Ruten-Rezepte brechen das Muster mit Absicht: Die Sturmrolle nimmt vier Sonnenschimmer-Kois und eine Silberbach-Rute, die Gezeitengeschmiedete zwei Kois, acht Rohe Silberkarpfen und eben diese Sturmrolle, sodass die Spitze der Anglerleiter auf dem Wasser bezahlt wird und nicht an einer Ader.\n\nEin feines Material wird nirgends verkauft und fällt bei einer gewöhnlichen Ernte nicht an: Du bekommst es, indem du eine der vollwertigen Adern einer Zone mit einem Werkzeug bearbeitest, das höher eingestuft ist als das Material selbst, was in der Praxis das Werkzeug eine Sprosse unter dem bedeutet, das du bauen willst (die leichteren Adern, die eine Zone für Reisende bereithält, geben das schlichte Material her, ganz gleich, womit du zuschlägst). Das ist Absicht. Auf dem Handwerksweg entsteht ein Werkzeug von Rang 5 daraus, dass man das von Rang 4 tatsächlich schwingt, nicht aus einem Einkaufsbummel; der Tresen für Tiefgang-Marken ist der eine Weg daran vorbei. Die einzige Ausnahme ist der Glyphstahlbarren, raffiniert und nur beim Händler zu haben, 1 Silber 60 Kupfer je Barren bei Quartiermeisterin Bree in Highwatch oder an Gizzels eigenem Tresen, sodass allein die Glyphstahl-Spitzhacke einen festen Münzboden in ihren Kosten trägt.',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    'Die Leiter besteht aus acht Rezepten, alle an die Station der Werkzeugmacherei gebunden. Die sechs Landwerkzeug-Rezepte sind automatisch bekannt, nie mit einer Lehrmeistergebühr: die Spitzhacke, die Axt und die Sichel von Rang 4 bei Fertigkeit 75 und die Versionen von Rang 5 bei Fertigkeit 150. Diese zweite Zahl ist kein Tippfehler, und sie liegt mit Absicht über der aktuellen Obergrenze von 125: Fertigkeitsanforderungen sperren hier nie ein Handwerk, sie formen nur den Fertigkeitsgewinn, sodass du ein Werkzeug von Rang 5 an dem Tag bauen kannst, an dem du seine Reagenzien und seinen Rang-4-Vorgänger in Händen hältst. Die beiden gefertigten Ruten sind die gelehrte Ausnahme: Gizzel lehrt die Sturmrolle bei Fertigkeit 75 für 4 Gold und die Gezeitengeschmiedete bei Fertigkeit 125 für 16 Gold, jede in dem Moment, in dem dein Rang im Handwerk ihren eigenen erreicht.\n\nJedes fertige Werkzeug hat seltene oder epische Qualität und kommt signiert heraus, sodass dein Name an den Werkzeuggürteln anderer Spieler durch die Zonen reist. Ingenieurskunst hält außerdem die Hälfte eines Kombinationsrezepts: das Elixier des Bären, gebraut von einem abgestimmten Bombardier mit Ingenieurskunst und Alchemie je auf 25.',
+  'guide.profPages.craftProse.enchanting.identityBody':
+    'Jede Verzauberung ist von Anfang an bekannt, jeder kann vom ersten Tag an entzaubern, und beides braucht nie eine Station; die Fertigkeit endet wie bei jedem Handwerk bei 125. Die eine gelehrte Ecke des Gewerbes sind seine beiden Talisman-Rezepte: Tüftler Gizzel lehrt den Hort des Sammlers und das Auge des Handwerkers in der Werkzeugmacherei in der Südwestecke des Eastbrook-Platzes, für die übliche Ranggebühr, sobald deine Verzauberung 25 erreicht, und die Talismane selbst werden an seiner Station gefertigt.\n\nAuf dem Rad sitzt sie zwischen Inschriftenkunde und Juwelenkunde, also sind ihre beiden Paar-Identitäten der Arkanist (Inschriftenkunde und Verzauberung) und der Edelsteinbinder (Verzauberung und Juwelenkunde). Keines von beiden lässt sich bisher schwören, da beide Nachbarn noch auf ihre ersten Rezepte warten, und so steigt Verzauberung heute als Handwerk für alle: bis zum seltenen Rang frei vor jedem Eid und eine natürliche Hobbywahl für einen Bombardier oder einen Apotheker. Verzauberer halten außerdem die Sammelwelt am Laufen: Die beiden einsetzbaren Werkzeugeffekte sind Verzaubererarbeit, und wer sie ursprünglich gefertigt hat, lädt die eigenen Effekte vergünstigt wieder auf, nach der Spezialisierung sogar noch günstiger.',
+  'guide.profPages.craftProse.enchanting.levelingBody':
+    'Drei Handlungen bewegen die Fertigkeit: ein Stück entzaubern, eine Verzauberung anwenden und die beiden Talismane herstellen, die der gewöhnlichen Handwerkskurve folgen. Jeder Erfolg ist bis zu einen Punkt wert, skaliert danach, wie ernsthaft die Arbeit ist: nach der Seltenheit des Stücks, das du zerbrichst, oder nach dem Reagenzrang der Verzauberung, die du anwendest. Gewöhnliche Entzauberungen und reine Staub-Verzauberungen zählen als gewöhnliche Arbeit; ungewöhnliche Entzauberungen und Essenz-Verzauberungen als ungewöhnliche; seltene Entzauberungen und jede Runen- oder Große Verzauberung als seltene; epische und legendäre Entzauberungen stehen auf der Tabelle noch höher, doch da heute keine Verzauberungs-Identität über die seltene Sprosse hinausreicht, zahlen sie in der Praxis dasselbe wie seltene Arbeit. Eine Ehrlichkeit regiert die Zerbrecherbank: Ein Stück, das von einer Spielerwerkbank stammt (gefertigt, signiert oder als Meisterwerk), zerfällt zwar weiterhin zu Materialien, lehrt aber nichts, sodass eine Herstellen-und-Zerbrechen-Schleife niemanden aufsteigen lässt: Die Lektionen stecken in der Ausrüstung, die die Welt hergibt.\n\nDas vertraute Meisterschaftsverblassen greift in 25-Punkte-Stufen, also wird Arbeit gewöhnlicher Güte bei Fertigkeit 75 grau, ungewöhnliche bei 100 und Arbeit seltenen Rangs genau an der Obergrenze von 125. Verzauberung hat außerdem eine eigene Freundlichkeit: Was oberhalb deiner Archetyp-Grenze hereinkommt, wird auf diese Grenze abgerundet statt auf null gesetzt, sodass eine epische Entzauberung vor deiner Abstimmung schlicht als selten zählt, statt gar nichts zu lehren. Ruht die Verzauberung hinter einer anderen Identität, zählen Zerbrechen und Anwenden als gewöhnliche Arbeit und der Aufstieg bleibt bei 75 stehen, während die beiden Talismane, die der Handwerkskurve oberhalb der gewöhnlichen Grenze folgen, einem ruhenden Verzauberer überhaupt nichts beibringen; behalte sie als Hobby, und Arbeit seltenen Rangs zahlt weiterhin, nur langsamer jenseits von 75.',
+  'guide.profPages.craftProse.enchanting.marketBody':
+    'Eine Verzauberung anzuwenden verbraucht die Reagenzien und kennzeichnet genau eine Kopie des Gegenstands. Richte sie auf eine Kopie in der Tasche, und du bekommst eine eigene verzauberte Kopie zurück; richte sie auf ein Stück, das du bereits trägst, und es wird an Ort und Stelle verzaubert, genau dort, wo es sitzt, ohne das Ablegen-und-wieder-Anlegen-Theater. So oder so folgt der Bonus diesem Stück für immer, durch Ablegen, Bankgänge und Handel. Eine Verzauberung pro Stück: Wendest du eine andere Verzauberung auf eine verzauberte Kopie an, wird erst nachgefragt, und danach ersetzt sie die alte Verzauberung vollständig und zerstört sie ohne Erstattung ihrer Materialien. Verkaufen, Wegwerfen und Entzaubern greifen alle zuerst nach schlichten Kopien, damit dein fertiges Stück nicht aus Versehen verschlungen wird.\n\nMeisterwerk-Ausrüstung und Verzauberung sind Freunde: Ein Meisterwerkstück bleibt voll verzauberbar, und die Verzauberung legt sich auf den Meisterwerk-Bonus obendrauf, ohne ihn oder die Signatur des Herstellers anzutasten. Rechnet man jede Quelle zusammen, ist ein signiertes Meisterwerk mit einer Großen Verzauberung das Beste, was ein gefertigtes Stück erreicht, und es liegt konstruktionsbedingt immer noch unter Schlachtzugsbeute.\n\nAuf dem Markt wird ein verzaubertes oder signiertes Stück wie alles andere eingestellt: Es geht als eigenes Einzelstück-Angebot hoch, der Tooltip zeigt die Verzauberung und die Signatur des Herstellers, und die Rabenpost trägt es ebenso zuverlässig. Die Materialien bleiben die stetige Hälfte des Handwerks: Staub, Essenz und Splitter lassen sich frei einstellen, das Einstellen kostet nichts, und der Händler nimmt nur 5 Prozent eines abgeschlossenen Verkaufs. Damit sind die beiden klassischen Verzauberer-Einkommen der Verkauf von Materialien und der Verkauf fertiger Arbeit: über den Markt, per Rabe oder von Angesicht zu Angesicht im Handelsfenster.',
+  'guide.profPages.howBody':
+    'Öffne das Handwerksfenster (Standardtaste T), und jedes Rezept, das du kennst, steht dort mit dem, was es braucht, und dem, was du zur Hand hast. Stationsgebundene Rezepte verlangen, dass du höchstens 20 Meter von der passenden Station in der Stadt entfernt stehst, Feldrezepte lassen sich überall herstellen, und Entzaubern und Verzaubern in der Verzauberung brauchen überhaupt keine Station (nur ihre beiden Talisman-Rezepte sind Stationsarbeit, an der Werkzeugmacherei). Es gibt keinen Fehlschlagswurf: Eine Herstellung mit den Materialien in der Hand gelingt immer.\n\nZwei kleine Reibungen halten die Wirtschaft ehrlich. Jede erfolgreiche Herstellung kostet eine Gebühr von 2 Kupfer pro Punkt des Wertebudgets des Gegenstands, und Handwerksaktionen teilen sich ein Tempo: höchstens 10 Herstellungen, Entzauberungen, Verzauberungen, Zerlegungen oder Werkzeugaufladungen in jedem Fenster von 60 Sekunden. Keine von beiden wird eine normale Sitzung stören; beide hindern einen Spezialisten am Maximum daran, den Markt zu überschwemmen.',
+  'guide.profPages.masterworkBody':
+    'Jede erfolgreiche Herstellung ist genau das, was das Rezept verspricht, und manchmal ein wenig mehr: Ein Meisterwerk schließt dasselbe Stück eine Qualitätsstufe feiner ab, mit den Bonuswerten, die schon beim Herstellen eingebacken werden. Es kommt nur hinzu, nie als Verschlechterung, und es bleibt unter der Schlachtzugsgrenze, hergestellte Ausrüstung kann also hervorragend sein, ohne einen Schlachtzugsfund zu ersetzen.\n\nDie Chance ist veröffentlicht, nicht mystisch: {base}% Basis, plus {perTier}% je Stufe, die deine Fertigkeit über dem Rezept liegt, plus {signed}%, wenn ein signiertes Reagenz hineingeht, plus {spec}%, sobald du spezialisiert bist, wobei Materialien höherer Stufe 1 bis 2% mehr beisteuern, alles gedeckelt bei {cap}%. Nur ein Stück mit echten Werten kann sich verbessern, gewöhnliche Stücke ohne Werte, Werkzeuge und Verbrauchsgüter lösen also nie aus; ein inaktives Handwerk bringt nie eines hervor, und ein Hobby-Handwerk kann über seine Selten-Decke hinaus kein Meisterwerk schaffen.\n\nFeine Arbeit trägt ihren Schöpfer. Ergebnisse von Selten aufwärts sind signiert, jede einzelne Kopie (Hergestellt von; gesammelte Materialien tragen Gesammelt von), ein Meisterwerk ist immer signiert, welche Qualität es auch hat. Eine Signatur ist ein Herkunftsnachweis, kein Schloss: Signierte Waren lassen sich frei handeln, verschicken und auf dem Weltmarkt einstellen.',
+  'guide.profPages.trainingBody':
+    'Ausbilderrezepte kommen von den ansässigen Meistern und werden an ihren Stationen gelehrt. Die Regel passt in eine Zeile: Ein Meister lehrt ein Rezept, sobald deine Stufe in dem Handwerk die Stufe des Rezepts erreicht hat, und sonst verriegelt es nichts, weder dein Level noch dein Archetyp. Die Leitern für Ausrüstung und Verbrauchsgüter legen ihre Sprossen auf Fertigkeit 0, 25 und 50; die beiden Rutenlektionen der Ingenieurskunst führen die Leiter bei 75 und 125 weiter, und die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, sodass eine frische Sprosse aufgeht, während deine Stufen steigen.\n\nDie Gebühren sind einmalig und je Sprosse einheitlich: Die Anfangssprosse ist kostenlos, die Sprosse bei Fertigkeit 25 kostet {tier1} pro Rezept, die Sprosse bei Fertigkeit 50 {tier2}, und die Rutenlektionen darüber tragen ihre eigenen Gebühren, in der Tabelle neben jedem Rezept aufgeführt. Zum Lernen musst du an der tatsächlichen Station des Meisters stehen, und eine mobile Station zählt nie. Die gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte brauchen überhaupt keine Ausbildung; jeder Charakter kennt sie von Anfang an.',
+  'guide.profPages.ench.enchantsNote':
+    'Verzauberungen gibt es in drei Stufen. Die Basisstufe läuft auf Glockenpulver (am oberen Ende mit ein wenig Essenz) und deckt den Waffenplatz sowie jeden Rüstungsplatz außer der Nebenhand ab, mit genug Auswahl entlang der Werteachsen, dass jeder Build für jeden Platz etwas findet. Die Große Stufe kostet einen Glockensplitter plus Essenz: stärkere Boni auf den wirkungsvollsten Plätzen. Splitter speisen außerdem zwei weitere Abflüsse, die beiden Talisman-Rezepte zu je fünf Stück und die oberste Sprosse der Werkzeugeffekt-Aufladungen, lege also ein paar zurück, bevor du sie ausgibst.\n\nDazwischen liegen die fünf Runen-Verzauberungen, je ein Abnehmer pro typisiertem Sekundärmaterial, sodass nichts, was du zermahlst, jemals eine Sackgasse ist: Runenschneide (Waffe, Stärke, verbraucht Resonanten Stahl), Runenfokus (Waffe, Intellekt, Resonantes Holz), Runenweberei (Brust, Geist, Resonanter Faden), Runenfell (Hose, Beweglichkeit, Resonantes Fell) und Runenkette (Helm, Ausdauer, Resonante Kettenglieder). Jede nimmt zusätzlich zwei Glockenessenzen; wo es für einen Platz und einen Wert sowohl eine Basis- als auch eine Große Verzauberung gibt, landet der Runenbonus dazwischen, während die Runenweberei rundheraus die stärkste Geist-Verzauberung für die Brust ist und das Runenfell die einzige Beweglichkeits-Verzauberung für die Hose überhaupt. Die genauen Boni stehen alle in der Tabelle unten.',
+  'guide.profPages.gatherIntro.mining':
+    'Bergbau holt Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Thorium oben in den Thornpeak-Höhen, dazu Anfängeradern, verstreut über jede jüngere Zone dahinter, und speist damit die Schmiedeberufe. Ab Stufe 1 für jeden offen: Eine Bergbau-Spitzhacke für 20 Kupfer von einem Tresen in Eastbrook, Fenbridge oder Highwatch öffnet jede Anfängerader, und die höheren Sprossen der Spitzhacken-Leiter erwachen, sobald dein eigener Zähler sie verdient. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+  'guide.profPages.gatherIntro.logging':
+    'Holzfällen schlägt Holz aus Baumgruppen in der ganzen Welt: Eisenrinde im Eastbrook-Tal, Aschenholz im Mirefen-Moor, Altholz in den Thornpeak-Höhen und Anfänger-Baumgruppen in jeder jüngeren Zone, das Rohmaterial für Schäfte, Stäbe und die Werkbank des Ingenieurs. Ab Stufe 1 für jeden offen, sofern eine Holzfäller-Axt in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+  'guide.profPages.gatherIntro.herbalism':
+    'Kräuterkunde sammelt, was wild wächst: Silberblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor, Sonnenblüte in den Thornpeak-Höhen und Anfängerpflanzen in jeder jüngeren Zone, Blatt und Stängel, die die Apothekerberufe am Brauen halten. Ab Stufe 1 für jeden offen, sofern eine Kräuterkunde-Sichel in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+  'guide.profPages.gatherIntro.fishing':
+    'Angeln ist der Sonderling unter den Sammelberufen und zugleich der tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder der drei Kernlandzonen (die jungen Gewässer dahinter bedienen vorerst alle die Tabelle des Tals) und eine Fertigkeitsobergrenze von 200, doppelt so hoch wie bei den anderen. Kauf eine Angel, stell dich mit Blick aufs offene Wasser und wirf aus.',
+  'guide.profPages.rhythmBody':
+    'Eine Ernte ist ein kurzer sichtbarer Vorgang, kein sofortiger Griff: {base} Sekunden Basis, nie unter einem Minimum von {floor} Sekunden. Ein Werkzeug über der Stufe des Knotens mitzuführen, eines, das deine Fertigkeit dich auch führen lässt, beschleunigt dich um {tool} Sekunden je Stufe darüber, und jede Fertigkeitsstufe, die du überschreitest, kürzt weitere {band} Sekunden; die Stufe des Knotens bloß zu treffen bringt dich durch die Tür, schnell machen dich erst die Stufen darüber.\n\nEine volle Tasche lehnt den Vorgang höflich ab, bevor er beginnt, sodass mitten im Schwung nichts verschwendet wird, und jede Ernte zahlt ein kleines Stück Charakter-EP, skaliert nach der Stufe des Knotens gegen deine eigene, so wie die EP für Kills skalieren: Ein trivialer grauer Knoten lehrt einen Charakter am Maximum nichts.',
+  'guide.profPages.gainBody':
+    'Der Zuwachs ist deterministisch, nie ein Fertigkeitswurf: Ein Knoten auf oder über deiner Zuwachsstufe lehrt einen vollen Punkt pro Ernte, und je {step} Fertigkeitspunkte sind eine Stufe, die gegen den Knoten gewertet wird. Knoten der Stufe 1 zahlen unter 25 voll, bis 49 die Hälfte, bis 74 ein Viertel und ab 75 nichts mehr; Knoten der Stufe 2 zahlen bis 49 voll; die beiden Knoten der Stufe 3 jedes Berufs zahlen bis 74 voll und bis zur Obergrenze von {cap} die Hälfte.\n\nDer vorgesehene Weg ist schlicht: Lerne an den Anfängerknoten des Tals, zieh weiter ins Moor und beende den Aufstieg auf dem Hochland der Thornpeak-Höhen. An der Obergrenze endet das Lernen, die Erträge aber nicht: Ein Sammler am Deckel würfelt für immer weiter auf die besten Chancen, die der Beruf zu bieten hat.',
+  'guide.profPages.toolsNote':
+    'Jeder Knoten verlangt das Werkzeug seines Berufs in deinen Taschen, Stufe 1 eingeschlossen: keine Spitzhacke, kein Erz, und keine Angel, kein Fisch. Die Händlerleiter deckt die Stufen 1 bis 3 in den drei Kernland-Knotenpunkten ab: Das Werkzeug der Stufe 1 wird in allen dreien verkauft, die Sprossen darüber dort, wo das Gelände beginnt, das sie verlangt (Fenbridge kommt mit Stufe 2 dazu, Highwatch mit Stufe 3), und die jüngeren Siedlungen dahinter führen überhaupt keine Werkzeuge, rüste dich also aus, bevor du reist. Jeder Tresen verkauft jede Sprosse, die er führt, ohne Einschränkung, und jedes Werkzeug lässt sich direkt weiterhandeln; jede Sprosse lässt sich außerdem auf dem Markt einstellen und per Post verschicken, außer den drei Landanfängern für 20 Kupfer: Die kauft man an einem Tresen oder gibt sie von Hand zu Hand weiter, und sie werden nie zurückverkauft, verschickt oder eingestellt. Verriegelt ist das Führen. Ein Landwerkzeug über Stufe 1 arbeitet erst, wenn deine Fertigkeit im eigenen Beruf es verdient hat, {tier2Prof} für Stufe 2, {tier3Prof} für Stufe 3 und 85 und 100 für die beiden hergestellten Sprossen, und die Händlerzeile, der Tooltip und die Tabelle unten nennen die Anforderung alle vorab. Bis dahin wartet ein im Voraus gekauftes Werkzeug einfach in deinen Taschen, öffnet kein Gelände, kauft kein Tempo und prägt keine feinen Güten, und lässt sich in dem Moment führen, in dem dein Zähler seine Zahl berührt. Angelruten sind die eine Ausnahme: Keine Rute trägt eine Führungsanforderung, und Händler Wilkes in Eastbrook führt die Ruten der Stufen 2 und 3 bewusst für Angler, die im Voraus kaufen. Ein Werkzeug belegt nie einen Ausrüstungsplatz und nutzt sich nie ab, jedes ist also ein einmaliger Kauf, und für die Schranke zählt nur die Stufe: Ein selteneres Werkzeug derselben Stufe öffnet nichts zusätzlich. Seltenheit ist allerdings nicht nur Farbe. Sie lässt einen eingesetzten Werkzeugeffekt länger halten, und bei einer Rute verbreitert sie das Einholfenster.\n\nEin besseres Werkzeug kauft drei Dinge, nicht zwei. Es öffnet Gelände höherer Stufe, es verkürzt den Vorgang, und es verbessert, was herauskommt: Bearbeite eine Ader mit einem Werkzeug, das ÜBER dem eigenen Material der Zone rangiert, und die Ernte liefert dessen feine Güte statt der schlichten. Die Ader muss eine der vollwertigen der Zone sein, die leichteren Adern, die eine Zone für Reisende bereithält, liefern also weiterhin das gewöhnliche Material. Feine Materialien sind das, was die Rezepte der hergestellten Werkzeuge verbrauchen, und eine feine Güte zählt überall dort als ihre gewöhnliche Fassung, wo ein Rezept oder ein Werkauftrag danach verlangt, ein Aufstieg lässt dich also nie stranden: Er bedeutet nur, dass dein Kupfererz als Feines Kupfererz ankommt.\n\nÜber der Händlerleiter hat jeder Beruf zwei hergestellte Werkzeuge, Stufe 4 und Stufe 5, gefertigt an der Werkzeugmacherei (jeder Charakter kennt die Landrezepte; die Fertigkeit, die bei dieser Arbeit steigt, ist die der Ingenieurskunst), oder gekauft mit Tiefgang-Marken am Tresen der Ertrunkenen Litanei, sobald ihre Abschluss-Schranken erfüllt sind: Die Tabelle unten führt den Markenpreis und die Abschlüsse, die jede Sprosse verlangt. Kein Händler verkauft sie je für Münzen. Angeln hat sein eigenes Paar, und diese werden beim Werkzeugmacher gelernt statt von Anfang an gekannt. Kein Knoten und kein Gewässer verlangt heute mehr als Stufe 3, die obersten beiden Sprossen kaufen also Tempo, Güte und ein freundlicheres Einholfenster statt Zugang, und sie werden die Eintrittskarte sein, wenn Gelände höherer Stufe kommt.',
+  'guide.profPages.toolCraftedOrMarks':
+    'Hergestellt ({craft}) oder {marks} Tiefgang-Marken nach drei Abschlüssen der Ertrunkenen Litanei',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    'Hergestellt ({craft}) oder {marks} Tiefgang-Marken nach einem heroischen Abschluss der Ertrunkenen Litanei',
+  'guide.profPages.priceNone': 'Nicht für Münzen erhältlich',
+  'guide.profPages.colWield': 'Einsatz ab',
+  'guide.profPages.wieldNone': 'Beliebig',
+  'guide.profPages.bandsBody':
+    'Fertigkeitsstufen sind die gemeinsame 0/100/200-Leiter über dem Zähler eines Gewerbes. Bei den Landgewerben verkürzt die bei 100 überschrittene Stufe die Sammelzeit, und ihre Obergrenze macht Stufe 1 zur Decke. Die Stufen des Angelns verkürzen gar nichts: Sie wählen die Fangtabellen aus (mit passender Rute dazu), nur Angeln erreicht Stufe 2, und der Aufstieg selbst ist es, der einen Angler in tiefere Gewässer zieht, wo die besseren Tabellen und die weiteren Lektionen beide zu Hause sind.',
+  'guide.profPages.specimenBody':
+    'Halte beim Farmen ein wenig Taschenplatz frei: Ein signierter Glücksfund braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem er landen kann, und wenn nichts passt, kommt der Ertrag zwar trotzdem an, aber die Signatur geht verloren. Auch die Leichenernte hat ihren eigenen Jackpot-Arm: Etwa {pct}% jeder geernteten Komponente fallen als Selten oder besser aus. Eine Familie, die ein makelloses Exemplar zu geben hat (Haut, Seide, Gift, Fleisch), belässt ihren gewöhnlichen Ertrag schlicht und prägt das signierte Exemplar daneben; jede andere Familie signiert den Ertrag selbst.',
+  'guide.profPages.gatherDeeds.fishing':
+    'Der Meilenstein 100 verewigt den Alten Salzfisch und 200 den Meisterangler samt seinem Titel, die absolute Spitze der Anglerkunst; Angeln zählt außerdem für Meistersammler, errungen mit 100 in beliebigen drei Sammelberufen. Ein erster Fisch aus den Gewässern jeder von sechs Zonen füllt eine eigene Seite, die drei Kernlandzonen sowie das Weidenmoor, der Windkamm und die Fernküste dahinter, und der Sonnenschimmer-Koi verzeichnet Schimmer der Hoffnung, sodass Reisende mit einer Angel im Gepäck ihr Buch schneller füllen, als sie erwarten.',
+  'guide.profPages.fish.startBody':
+    'Eine Einfache Angel kostet 20 Kupfer bei Fischer Brandt in Eastbrook (halte am Ostrand der Stadt nach dem Alten Seebären Ausschau, an der Straße zum Spiegelsee); auch Tüftler Gizzel, Proviantmeister Hale in Fenbridge und Quartiermeisterin Bree in Highwatch führen Angeln. Benutze die Angel mit Blick auf Wasser, das tief genug für Fische ist, bis etwa 24 Meter vor dir, und deine Pose fliegt hinaus.\n\nDu kannst nicht auswerfen, während du im Kampf bist, schwimmst oder tot bist: Der Wurf vom Ufer aus ist die vorgesehene Haltung. Das Wasser wird allerdings genauso anspruchsvoll wie das Land: Das Moor verlangt mindestens die Eisenrolle der Stufe 2 und die Höhen den Silberbach der Stufe 3, und eine Schnur, die ohne die vom Wasser geforderte Rute ausgeworfen wird, verlässt deine Hand nie. Zwei Ruten stehen darüber, die Sturmrolle und die Flutgeschmiedete: Ingenieure fertigen sie an der Werkzeugmacherei aus dem, was eine Schnur heraufholt, und der Tiefgang-Tresen der Ertrunkenen Litanei verkauft sie hinter ihren Abschluss-Schranken für Tiefgang-Marken, doch nie für Münzen. Kein Gewässer verlangt sie, sie kaufen also eine kürzere Wartezeit und ein breiteres Einholfenster statt Zugang, was auf der obersten Sprosse einen Biss nach glatten drei Sekunden bedeutet.',
+  'guide.profPages.fish.biteBody':
+    'Nach dem Auswerfen kommt der Biss in einem verborgenen Moment zwischen {min} und {max} Sekunden; die Verzögerung wird festgelegt, sobald die Schnur aufs Wasser trifft, keine zwei Würfe fühlen sich also ganz gleich an. Wenn die Pose anbeißt, hast du ein Fenster von {reel} Sekunden, um die Angel erneut zu drücken und einzuholen: Holst du darin ein, landet der Fang, zögerst du darüber hinaus, entkommt der Fisch, und du hast nichts vorzuweisen. Ein ganzer Durchgang ist bei {cap} Sekunden gedeckelt, selbst ein ruhiger Wurf ist also schnell entschieden.\n\nBessere Ruten schärfen beide Enden des Minispiels: Jede Rutenstufe über der ersten kürzt die längstmögliche Wartezeit um {rod} Sekunden, nie unter das Minimum von drei Sekunden, das die oberste Rute ohnehin schon streift, und legt {reelRod} Sekunden auf das Einholfenster, sodass die Eisenrolle die schlimmste Wartezeit auf 6,5 Sekunden mit einem Fenster von 3,25 Sekunden drückt und der Silberbach auf 5 mit einem Fenster jenseits von 4, wobei seine Seltenheit das Einholen noch etwas weiter öffnet, als die Stufe allein zahlt. Die schnellsten Bisse ändern sich nie, was du auch hältst, und eine Rute muss nur in deinen Taschen liegen, um zu zählen.',
+  'guide.profPages.fish.scheduleNote':
+    'Der Angelzuwachs folgt einem festen Plan ohne Würfel: ein voller Punkt pro Fang unter Fertigkeit 50, ein halber Punkt unter 100, ein Zehntel unter 150 und ein langsames Rinnsal von 0,02 von 150 bis 200. Diese letzte Strecke ist mit Absicht eine Reise über Tausende von Fängen: 200 ist eine Aussage, keine Zwischenstation auf dem Weg zu etwas anderem.\n\nPlunder hört bei {cutoff} vollständig auf zu lehren: Von da an sind Kraut und Stiefel eben nur Kraut und Stiefel. Auch das Gewässer selbst deckelt die Lektion: Die Gewässer der Stufe 1 im Tal (und jede junge Küste jenseits des Kernlands) lehren über 100 hinaus nichts mehr, die des Moores hören bei 150 auf, und nur die von Thornpeak schulen einen Angler den ganzen Weg bis 200. Jeder gelandete Fang bringt ansonsten den planmäßigen Zuwachs, wenn der Zähler also stockt, sagt dir der Plan, dass du tieferes Wasser suchen sollst.',
+  'guide.profPages.fish.tablesNote':
+    'Deine Fertigkeit wählt eines von drei Fangbändern: Band 0 von Anfang an, Band 1 ab 100, Band 2 ab 200, und jedes verschiebt Gewicht von Plunder und leeren Haken zu echten Fischen, Zone für Zone. Jedes Band über dem ersten verlangt außerdem eine Rute: Band 1 will die Eisenrolle der Stufe 2, Band 2 den Silberbach der Stufe 3. Dein wirksames Band ist das niedrigere aus dem, was deine Fertigkeit verdient hat, und dem, was deine Rute trägt, und der Deckel bleibt stumm: Mit einer schwächeren Rute fängst du weiter, nur eben von der Tabelle des niedrigeren Bandes, wenn deine Fänge sich also festgefahren anfühlen, während deine Fertigkeit steigt, sieh zuerst nach deiner Rute.\n\nDie Gewässer jeder Zone halten ihr eigenes Paar Speisefische bereit, die umso mehr heilen, je tiefer die Zone liegt, allesamt Zutaten fürs Kochen und roh von der Schnur weg vollwertige Verpflegung zum Hinsetzen und Essen. Der Rest der Tabelle ist die Steuer des Anglers: Kraut, gelegentlich ein Stiefel und der leere Haken, der nie ganz verschwindet. Wie hoch sie ausfällt, hängt von dem Wasser ab, in dem deine Pose landet, nicht davon, wo du stehst: Ein Wurf reicht bis zu 24 Meter, und die Rute, die das Wasser verlangt, die Tabelle, aus der es zieht, die Tat, die es gutschreibt, und wie weit es lehrt, richten sich alle nach der Zone, zu der dieses Wasser gehört, entschieden in dem Moment, in dem die Schnur aufkommt. Das Wasser jeder Zone ist für ein eigenes Band geschrieben, das Tal für Band 0, das Moor für Band 1, die Höhen für Band 2, und ein Band darunter zu angeln macht rund ein Drittel deiner Würfe zu leeren Haken, zwei Bänder darunter mehr als die Hälfte. Die Rute bringt dich ans Wasser; die Fertigkeit ist es, die es einträglich macht, und der Aufstieg ist es, der einen Angler in die Tiefe zieht, denn bessere Bänder bringen nicht nur besseren Lohn: Jenseits des Tals sind sie die einzigen Gewässer, die weiter lehren. Der {rare} ist die eine Zeile, die sich nach deinem Fangband richtet und nach nichts sonst: dieselben Chancen in jeder Zone und bei Band 2 sechsmal wahrscheinlicher als bei Band 0, das Seltenste am Steg ist also genau das, worin ein Meisterangler wirklich besser ist.',
+  'guide.profPages.fish.koiBody':
+    'Jedes Gewässer im Spiel verbirgt denselben Preis: den Sonnenschimmer-Koi, einen ungewöhnlichen Glanz an der Schnur, einem Händler 75 Kupfer wert und deinem Stolz einiges mehr. Seine Chancen richten sich nach deinem Fangband und nach nichts sonst, in jeder Zone gleich: eine Zeile der Fangtabelle mit 1 Prozent bei Band 0, 3 bei Band 1 und 6 bei Band 2, gezogen bei jedem eingeholten Wurf, der Koi kommt also zu dem Angler, der sich die tiefen Tabellen verdient hat. Einen zu landen verzeichnet Schimmer der Hoffnung in deinem Buch der Taten, ein Sammlerzeichen ohne Ansehen. Wenn es passiert, sorgt das Protokoll dafür, dass du es mitbekommst.',
+  'guide.profPages.econ.trainingNote':
+    'Eine einheitliche Gebühr pro Rezeptsprosse, einmalig fällig, wenn ein Meister sie lehrt; jede Sprosse der Tabelle unten ist heute im Einsatz, von den kostenlosen Anfängerrezepten bis zu den Rutenlektionen des Werkzeugmachers ganz oben.',
+  'guide.profPages.econ.provenanceBody':
+    'Manche Gegenstände tragen einen Namen. Fahre mit dem Zeiger darüber, und der Tooltip sagt bei einem Rohstoff Gesammelt von Soundso oder bei einem fertigen Stück Hergestellt von Soundso: dieselbe Marke, nur danach formuliert, wie der Gegenstand entstanden ist. Eine Signatur ist Teil des Gegenstands selbst, reist mit ihm durch Handel, Bank, Post, den Weltmarkt und sogar einen Händler-Rückkauf und verblasst nie.\n\nSammeln signiert seine beste Arbeit von selbst: Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Segen. Der Glückswurf einer Leichenernte signiert den Ertrag dort, wo die Familie kein Exemplar zu geben hat, und wo sie eines hat, bleibt der Ertrag schlicht und daneben entsteht das signierte makellose Exemplar. Handwerk signiert nach derselben Regel: Jede Kopie einer seltenen oder besseren Ausgabe entsteht signiert, und ein Meisterwerk signiert immer, welche Qualität es auch hat, sodass die feinste Fassung jedes Stücks stets seinen Hersteller nennt. Das Einzige, was dich eine Signatur kosten kann, ist eine volle Tasche: Eine signierte Einheit braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem sie landen kann.\n\nEin Stapel Gegenstände teilt sich eine Identität, also verschmelzen zwei Kopien nur dann, wenn jede Marke exakt übereinstimmt: gleicher Gegenstand, gleicher Unterzeichner, gleiche Meisterwerk-Attribute, gleiche Verzauberung, gleiche Bindung. Ein signiertes Scheit gesellt sich in keine Richtung zu einem schlichten Haufen (das Verschmelzen würde jemandes Namen auslöschen), doch identische Ladungen verschmelzen bereitwillig, sodass zwanzig vom selben Sammler signierte Erze in einem Stapel sitzen und ein Segensfund deine Taschen nicht zerfetzt.\n\nSignaturen zahlen sich für Handwerker aus: Hältst du an der Werkbank irgendeine signierte Kopie eines benötigten Reagenzes, gleich wer sie signiert hat, steigt die Meisterwerk-Chance um 2 Prozentpunkte, und hältst du ein von eigener Hand signiertes Reagenz, sinkt die benötigte Menge dieses Reagenzes um eins (nie unter eins). Deine eigene signierte seltene oder bessere Arbeit lehrt dich sogar weiter, heute allein über die Flasche: Trink einen Trank, den du signiert hast, und ein kleines Rinnsal Fertigkeit fließt zurück in das Handwerk, das ihn gebraut hat, solange dieses Handwerk einer deiner aktiven Hauptberufe ist.',
+  'guide.profPages.faq.a4':
+    'Du hattest einen Glücksfund. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus (uraltes Kernholz an einem Baum, eine makellose Ader beim Erz, eine mondscheinbeleuchtete Blüte bei Kräutern): Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und verkündet den Fund der ganzen Zone. Auch ein Seltenheitswurf von Selten oder besser bei einer gewöhnlichen Ernte signiert den Ertrag.\n\nSignierte Materialien lohnt es sich aufzuheben oder teuer zu verkaufen: Wer an der Werkbank irgendeine signierte Kopie eines benötigten Reagenz hält, erhält 2 Prozentpunkte mehr Meisterwerkchance. Denk nur daran, dass sie sich nur mit identisch signierten Kopien stapeln und deshalb einen eigenen Taschenplatz belegen.',
+  'guide.profPages.faq.a6':
+    'Die neun gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte kennt jeder von Anfang an, ebenso drei stationsgebundene Abschlussrezepte (den Brennschuppenmantel, die Banngewebe-Gugel und die Dämmerfell-Wickel), die keinen Ausbilder brauchen, nur ihre Station. Alles andere lehren die ansässigen Meister an ihren Stationen in den drei größeren Städten: Die meisten stehen in Eastbrook, der Gerber führt die Gerberei in Fenbridge, und der Alchemist führt die Apotheke in Highwatch.\n\nAusbilderrezepte laufen in Sprossen: Fertigkeit 0, 25 und 50 für die Ausrüstungs- und Verbrauchsgüterberufe, als einmalige Gebühren kostenlos, 25 Silber und 1 Gold; die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, und der Werkzeugmacher lehrt die beiden herstellbaren Angelruten bei 75 und 125 für 4 und 16 Gold. Ein Meister lehrt ein Rezept, sobald deine Stufe in diesem Handwerk die Stufe des Rezepts erreicht hat, und du musst zum Lernen an seiner Station stehen: Eine mobile Station zählt nicht.',
+  'guide.profPages.faq.a7':
+    'Der Sammelvorgang beginnt bei 2,5 Sekunden und wird auf zwei Wegen gekürzt: um 0,4 Sekunden für jede Werkzeugstufe, die du über der Stufe des Knotens mitführst und auch führen darfst, und um 0,15 Sekunden, sobald der Zähler deines Berufs seine 100er-Stufe überschreitet, bei einem Minimum von 1,5 Sekunden. Wechselst du von Knoten der Stufe 1 hinauf zu Knoten der Stufe 3, verschwindet dein Überschuss, und dieselbe Spitzhacke schwingt wieder langsamer. Genau die geforderte Stufe zu halten kauft kein Tempo; sie öffnet nur den Knoten.\n\nDer Fertigkeitszuwachs verblasst genauso wie beim Herstellen: Ein Knoten wird grau, während deine Fertigkeit über seine Stufe hinaussteigt (Knoten der Stufe 1 lehren ab Fertigkeit 75 nichts mehr), die Antwort auf langsamen Zuwachs sind also Knoten höherer Stufe. Die verlangen ein Werkzeug mindestens ihrer eigenen Stufe in deinen Taschen (kein Knoten wird je mit bloßen Händen bearbeitet, Stufe 1 eingeschlossen), und ein Landwerkzeug über Stufe 1 will zuerst seine Führungsmarke, 40/70/85/100 im eigenen Beruf für die Stufen 2 bis 5. Angeln folgt seiner eigenen Verjüngung: voller Zuwachs unter Fertigkeit 50, die Hälfte unter 100, ein Rinnsal von 0,1 unter 150 und 0,02 unter 200, Plunderfänge lehren ab 100 überhaupt nichts mehr, und das Gewässer selbst deckelt die Lektion (Gewässer der Stufe 1 hören bei 100 auf zu lehren, das Moor bei 150), ein stockender Zähler kann also auch bedeuten, dass du dem Gewässer entwachsen bist.',
+  'guide.profPages.faq.a8':
+    'Teilweise. Die neun gewöhnlichen Feldrezepte (die Grundausstattung an Waffe, Rüstung, Essen und Trank für den Anfang) lassen sich überall und jederzeit herstellen, und die drei Kombinationsrezepte der geschworenen Paare ebenso. Alles darüber ist an einen Stationstyp gebunden: Schmiede, Küchen, Apotheke, Gerberei, Webstuhl oder Werkzeugmacherei, und du musst höchstens 20 Meter von der Station entfernt sein, damit die Herstellung durchgeht.\n\nBei Fertigkeit 75 in einem Handwerk spezialisierst du dich, und zusammen mit 20 Prozent Materialrabatt erhältst du eine mobile Station: Stell sie im Feld auf, und sie steht 10 Minuten lang und bedient die Rezepte dieses Handwerks, als stündest du an der echten. Die mobile Station ist nur zum Herstellen da: Rezepte lernen und Auftragsarbeiten entbinden verlangen immer die echte Station in der Stadt.',
+  'wallet.seekerAppHelp':
+    'Weiter mit Seed Vault Wallet. Prüfe die Verbindungs- und Verifizierungsanfragen in Seed Vault und kehre dann zum Spiel zurück.',
+  'questUi.tracker.unknownQuest': 'Unbekannte Quest ({id})',
+  'questUi.log.repeatableStatus': 'Wiederholbar',
+  'questUi.log.cooldownStatus': 'Bald wieder verfügbar',
+  'questUi.dialog.repeatableQuestAria': 'Wiederholbare Quest: {name}',
+  'itemUi.kind.fineMaterial': 'Feines Material',
+  'itemUi.bags.unknownItem': 'Unbekannter Gegenstand',
+  'itemUi.bags.unknownItemAria': 'Unbekannter Gegenstand {id}, Menge {count}',
+  'itemUi.bags.unknownItemAriaMasterwork':
+    'Unbekannter Gegenstand {id}, Menge {count}, Meisterwerk',
+  'itemUi.bags.unknownItemAriaEnchanted':
+    'Unbekannter Gegenstand {id}, Menge {count}, verzauberte Kopie',
+  'itemUi.bags.unknownItemAriaBound': 'Unbekannter Gegenstand {id}, Menge {count}, gebundene Kopie',
+  'itemUi.bags.unknownItemAriaInstanced':
+    'Unbekannter Gegenstand {id}, Menge {count}, herstellermarkierte Kopie',
+  'itemUi.vendor.qtyRowAria': 'Kaufmenge',
+  'itemUi.vendor.qtyMultiple': '{count}x',
+  'itemUi.vendor.qtyMultipleAria': 'Jeweils {count} auf einmal kaufen',
+  'itemUi.vendor.qtyCustom': 'Eigene',
+  'itemUi.vendor.qtyCustomAria': 'Eine eigene Kaufmenge wählen',
+  'itemUi.vendor.buyCountAria': '{count} {item} für {price} kaufen',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{count} {item} für {price} kaufen. {requirement}',
+  'itemUi.vendor.buyQuantityTitle': 'Wie viele {item} kaufen? Bis zu {max}.',
+  'itemUi.vendor.buyQuantityInput': 'Zu kaufende Menge',
+  'itemUi.vendor.buyQuantityConfirm': 'Kaufen',
   'entities.abilities.greater_invisibility.description':
     'Verschwindet für 20 Sek. und entfernt 2 Effekte mit Schaden über Zeit. Wenn die Unsichtbarkeit endet, erleidet Ihr 2 Sek. lang 90% weniger Schaden. (Magiertalent)',
+  'entities.items.fine_copper_ore.name': 'Feines Kupfererz',
+  'entities.items.fine_iron_ore.name': 'Feines Eisenerz',
+  'entities.items.fine_thorium_ore.name': 'Feines Thoriumerz',
+  'entities.items.fine_ironbark_log.name': 'Feines Eisenrindenholz',
+  'entities.items.fine_ashwood_log.name': 'Feines Aschenholzscheit',
+  'entities.items.fine_elderwood_log.name': 'Feines Altholzscheit',
+  'entities.items.fine_silverleaf_herb.name': 'Feines Silberblattkraut',
+  'entities.items.fine_goldleaf_herb.name': 'Feines Goldblattkraut',
+  'entities.items.fine_sunpetal_herb.name': 'Feines Sonnenblütenkraut',
+  'entities.items.stormreel_fishing_rod.name': 'Sturmrollen-Angelrute',
+  'entities.items.tidewrought_fishing_rod.name': 'Gezeitengeschmiedete Angelrute',
+  'entities.items.gatherers_cache.name': 'Hort des Sammlers',
+  'entities.items.artisans_eye.name': 'Auge des Handwerkers',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Zündschlüssel: Schreckfunke, der Bodenerschütterer',
   'hudChrome.auraOverlay.allOff': 'Alle aus',
@@ -350,7 +1204,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Sammler, Trophäen und der Preis einer Geschichte',
   'guide.profPages.econ.collectorsBody':
     'Händler sind blind für Provenienz: Ein signierter Gegenstand verkauft sich an einen NSC für genau seinen schlichten Preis. Der Aufpreis für eine Signatur besteht nur zwischen Spielern, und genau das macht ihn interessant: ein Stapel Glückserz, signiert von einem berühmten Sammler, ein Erstklassiges Stück aus einer glücklichen Ernte, eine Meisterwerksklinge mit dem Namen eines längst zurückgezogenen Schmieds, all das kostet, was jemandes Erinnerung sagt, dass es wert ist.\n\nDas Buch der Taten spielt mit demselben Instinkt: Makellose Ader, Altes Herzholz, Mondlichtblüte, Ein Makelloses Exemplar und Schimmer der Hoffnung sind Sammlertaten mit null Ansehen, die einzig dazu da sind, zu beweisen, dass dir ein Moment passiert ist. Behalte den Gegenstand, der die Tat verdient hat, und du hältst den Beleg. Das ist keine Macht; Provenienz kauft keine Attributpunkte und gewinnt keine Kämpfe, sie ist die Papierspur der Welt an guten Tagen.',
-  'guide.profPages.econ.throttleHeading': 'Die Aktionsdrosselung',
   'guide.profPages.econ.doctrineHeading': 'Spieler handeln mit Spielern',
   'guide.profPages.econ.doctrineBody':
     'Die Handwerkswirtschaft beruht auf einem Gedanken: Spieler versorgen Spieler. Sammler beliefern Handwerker, Handwerker versorgen Quester und Schlachtzügler, und Zerbrecher beliefern Verzauberer, während Händler und Stationsmeister an den Rändern stehen, um Plunder und Münzen aufzunehmen, anstatt mit dir zu konkurrieren. Wenn du mit einem Beruf Geld verdienen willst, ist dein Kunde ein Mensch: Lerne, was andere Spieler verbrauchen, richte deine Preise am Weltmarkt aus und behandle die NSC-Systeme als Boden unter deinen Preisen, nicht als den Markt selbst.\n\nGefertigte Ausrüstung ist so ausgewogen, dass sie unterhalb des Schlachtzugbodens liegt: Selbst ein Meisterwerk ist immer nur eine Qualitätsstufe über seinem Rezept, nie jenseits von Legendär, und sein Attributbudget bleibt unter dem Schlachtzugsbeute-Band. Die Schmiede macht dich bereit für den härtesten Inhalt; sie ersetzt ihn nicht. Das hält Handwerker, Schlachtzügler und den Markt in einem stabilen Dreieck: Schlachtzugsbeute bleibt erstrebenswert, und gefertigte Stücke bleiben die beste Ausrüstung, die man für Geld kaufen kann.',
@@ -492,6 +1345,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.name': 'Kartenmeister',
   'entities.npcs.card_master.title': 'Händler des Zufalls',
   'entities.quests.q_stalker_pelts.title': 'Erster Frost in Highwatch',
+  'entities.quests.q_the_codfather.text':
+    'Der Kabeljaupate ist nicht bloß ein Fisch, {playerName}, er ist ein kaltblütiger Killer. Die alten Hasen schwören, er frisst Moorpirscher zum Frühstück, und selbst die Mirefen-Witwen spinnen aus schierem Entsetzen kein Netz in der Nähe der Deepfen-Untiefen. Er beherrscht diese Gewässer, und Sumpfwasser verlangt nach nichts Geringerem als einer Eisenrollen-Angelrute; an meinem Tresen gibt es welche. Besorg dir eine, zerr den alten Teufel aus seinem Wasser, und ich gebe zu, dass du zur Familie gehörst.',
+  'entities.quests.q_nythraxis_graves.text':
+    'Diese Zeichen habe ich schon einmal gesehen, auf drei alten Gräbern rund um das nördliche Schlachtfeld. Hauptmann Aldren liegt auf der westlichen Anhöhe, Hohepriester Malric weiter südlich am Westrand, und der königliche Assassine Voss an der Ostklippe. Berühre jedes Grab und horche, {playerName}. Die Toten erinnern sich vielleicht an das, was die Lebenden vergessen haben.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Eine leichtere Wahl, aber eine nützliche. Folge dieser Neugier, so weit sie seltene Arbeit trägt.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kräuterpflanze geerntet',
@@ -829,6 +1686,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Hochstens eines davon kann fallen:',
   'hudChrome.finder.mech.deathless_rage':
     'Unsterbliche Raserei (an den Schutzsteinen unterbrochen)',
+  'hudChrome.finder.mech.dread_curse':
+    'Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Todjaeger-Schwung (frontaler Schwung)',
   'hudChrome.finder.mech.enrage': 'Rasiert bei geringer Gesundheit',
   'hudChrome.finder.mech.grave_cleaver': 'Grabspalter (frontaler Schwung)',
@@ -2041,9 +2900,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven markiert seine Karten: ein guter Tag, um das Eingestürzte Reliquiar zu wagen.',
   'hudChrome.calendar.events.delveDay.title': 'Tiefgang-Tag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Nacht',
   'hudChrome.calendar.events.fishingDerby.note':
     'Angler säumen die Seen. Bring eine Rute mit und tausche Anglergeschichten aus.',
   'hudChrome.calendar.events.fishingDerby.title': 'Angelderby',
@@ -2149,6 +3005,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Freundlich',
   'hudChrome.mobTooltip.hostile': 'Feindlich',
   'hudChrome.mobTooltip.levelFamily': 'Stufe {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Stärkungszauber am Spielerfenster',
   'hudChrome.options.playerFrameScale': 'Skalierung des Spielerfensters',
   'hudChrome.options.showDailyRewardsChest': 'Truhe der täglichen Belohnungen anzeigen',
@@ -2301,6 +3159,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Eure Gruppe',
   'hudChrome.unitFrame.playerLabel': 'Euer Charakter',
+  'hudChrome.unitFrame.petLabel': 'Euer Begleiter',
   'hudChrome.unitFrame.targetAnnounce': 'Ziel: {name}',
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
@@ -3120,7 +3979,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Mehr',
   'hud.core.mobileMoreAria': 'Weitere Menüs anzeigen',
   'hud.core.mobileSocial': 'Soziales',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menü',
   'hud.core.mobileSettings': 'Einstellungen',
   'hud.core.mobileUse': 'Benutzen',
@@ -3230,7 +4088,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Namensplaketten umschalten',
   'hud.keybinds.actions.meters': 'Schadensanzeigen',
   'hud.keybinds.actions.social': 'Freunde & Gilde',
-  'hud.keybinds.actions.arena': 'Arena (Aschenes Kolosseum)',
   'hud.keybinds.actions.chat': 'Chat öffnen',
   'hud.keybinds.actions.attack': 'Angreifen',
   'hud.keybinds.actions.actionBarSlot': 'Aktionsleiste {slot}',
@@ -4579,6 +5436,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Balg eines Gratpirschers',
   'entities.items.old_cragmaws_pelt.name': 'Balg des alten Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Jagdgurt von Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Jagdköcher von Cragmaw',
   'entities.items.glowing_wax.name': 'Glühendes Wachs',
   'entities.items.ogre_war_totem.name': 'Ogerkriegstotem',
   'entities.items.storm_core.name': 'Sturmkern',
@@ -4655,6 +5513,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Mirejaw-Schuppenweste',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Kupferknüppel',
   'entities.items.moggers_shiv.name': 'Moggers Messer',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Fellköcher',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stampfstiefel',
   'entities.items.necromancers_legwraps.name': 'Mournweave-Beinwickel',
   'entities.items.necromancers_soulsteps.name': 'Mournweave-Seelenschritte',
@@ -4679,6 +5538,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': 'Gruftknochenschulterstücke',
   'entities.items.deathlords_dread_visage.name': 'Barrowlords Schreckensantlitz',
   'entities.items.gravewyrm_gauntlets.name': 'Gravewyrm-Stulpen',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravewyrm-Knochenköcher',
   'entities.items.gravewyrm_mantle.name': 'Gravewyrm-Mantel',
   'entities.items.mistveil_cord.name': 'Nebelschleierkordel',
   'entities.items.mistveil_grips.name': 'Nebelschleiergriffe',
@@ -5050,8 +5910,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wie befürchtet: Sie verbrannten Grabasche, und der Ritus ist mit Voss gezeichnet.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Rostiges Räuchergefäß',
   'entities.quests.q_no_rest.title': 'Keine Ruhe im Schilf',
-  'entities.quests.q_no_rest.text':
-    'Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.',
   'entities.quests.q_no_rest.completion':
     'Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.',
   'entities.quests.q_no_rest.objectives.0.label': 'Ertrunkener Toter zur Ruhe gelegt',
@@ -5199,14 +6057,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Diese Schrift kenne ich aus Morthens Grimoire. Dieselbe Hand führte jedes Grab, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Wyrmkult-Eiferer getötet',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Befehle des Wyrmkults',
   'entities.quests.q_necromancers.title': 'Der Ring der Phylakterien',
   'entities.quests.q_necromancers.text':
     'Die Befehle nennen einen Ring von Phylakterien, {playerName}, Seelengefäße um das Heiligtum. Töte 8 Nekromanten und bring 3 unversehrt.',
   'entities.quests.q_necromancers.completion':
     'Licht, vergib uns. Darin sind die Toten aus Tal und Moor; sie bauten nie ein Heer, {playerName}. Sie sammelten einen Zehnt.',
   'entities.quests.q_necromancers.objectives.0.label': 'Wyrmkult-Nekromant getötet',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituelles Seelengefäß',
   'entities.quests.q_revenants.title': 'Die Wiedergängerfelder',
   'entities.quests.q_revenants.text':
     'Östlich der Straße liegt ein altes Schlachtfeld. Der Kult hob die Knochen in rostiger Rüstung. Leg 12 zurück in die Erde, {playerName}.',
@@ -5608,7 +6464,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA-UNENTSCHIEDEN! Zu knapp, um zu entscheiden!',
   'fiesta.end.loss': 'FIESTA VERLOREN! Versucht es erneut!',
   'fiesta.end.win': 'FIESTA GEWONNEN! 🎉 Was für ein Fest!',
-  'fiesta.enterQueue': 'Tretet der Fiesta bei!',
   'fiesta.error.leaderOnly': 'Nur der Gruppenleiter darf Euer Team für {label} anmelden.',
   'fiesta.error.noAugment': 'Ihr habt im Moment keine Augmentierung zur Wahl.',
   'fiesta.error.notOnOffer': 'Diese Augmentierung wird nicht angeboten.',
@@ -5625,9 +6480,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Mondstiefel',
   'fiesta.powerup.pow_speed_demon.name': 'Geschwindigkeitsdämon',
-  'fiesta.practice': '🎉 Übung gegen Bots',
-  'fiesta.practiceNote':
-    'Offline-Übung: erzeugt 3 KI-Bots und meldet Euch für eine 2-gegen-2-Fiesta an. Klickt erneut zum Beenden.',
   'fiesta.queue.join':
     'Ihr tretet der Warteschlange für die 2-gegen-2-Fiesta bei. Macht Euch bereit zum FEIERN…',
   'fiesta.queue.leave': 'Ihr verlasst die Warteschlange für die 2-gegen-2-Fiesta.',
@@ -5715,6 +6567,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
   'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
   'hudChrome.corpseHarvest.title': 'Verwerten',
+  'hudChrome.emoteEditor.close': 'Emotes schließen',
   'hudChrome.emoteEditor.done': 'Fertig',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Verbeugen',
@@ -5822,6 +6675,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',
+  'entities.items.direfang_quiver.name': 'Direfang-Köcher',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bollwerk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Kugel',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
@@ -6451,17 +7305,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Trifft alles um dich herum und verlangsamt deren Angriffe.',
   'guide.abilityHook.wrath':
     'Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.',
-  'guide.arenaPage.augmentsNote':
-    'Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.',
   'guide.arenaPage.coliseumBody':
     'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Öffne das Arenafenster, um dich für eine Wertungsklasse anzumelden, allein oder mit deinem Partner.',
   'guide.arenaPage.coliseumHeading': 'Das Aschene Kolosseum',
   'guide.arenaPage.duelsBody':
     'Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.',
   'guide.arenaPage.duelsHeading': 'Duelle',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta ist ein schneller Zwei-gegen-Zwei-Kampf, als ein durchgehendes Gefecht ausgetragen, bei dem jeder Kämpfer auf gleiche Ausgangslage gebracht wird. Während der Kampf läuft, draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.',
-  'guide.arenaPage.fiestaHeading': 'Zwei gegen Zwei Fiesta',
   'guide.arenaPage.heading': 'Arena und PvP',
   'guide.arenaPage.intro':
     'Willst du dich mit anderen Spielern messen? Spieler gegen Spieler ist eingebaut, und es ist immer deine Wahl, niemals etwas, das dir aufgezwungen wird.',
@@ -6620,21 +7469,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Gebiete, von Süden nach Norden, jedes eine Stufe höher im Level. Folge der Questspur, und das Land trägt dich vom Tal bis zu den Gipfeln.',
   'guide.worldPage.places': 'Bemerkenswerte Orte',
   'guide.worldPage.residents': 'Wem du begegnen wirst',
-  'guide.arenaPage.powerupsBody':
-    'Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.',
-  'guide.arenaPage.powerupsTitle': 'Powerups im Ring',
-  'guide.arenaPage.waveGoldBody':
-    'Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.',
-  'guide.arenaPage.waveGoldTitle': 'Gold',
-  'guide.arenaPage.wavePrismaticBody':
-    'Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisch',
-  'guide.arenaPage.waveSilverBody':
-    'Die Eröffnungswelle: klare Boosts auf einen einzelnen Wert, die die Grundlagen deiner Klasse schärfen.',
-  'guide.arenaPage.waveSilverTitle': 'Silber',
-  'guide.arenaPage.wavesBody':
-    'Ein Fiesta-Gefecht reicht dir im Verlauf frische Auswahlmöglichkeiten, und sie werden mutiger, je länger der Kampf dauert. Du baust von einer Welle zur nächsten auf, wählst jedes Mal eine von wenigen Optionen und behältst sie für den Rest des Gefechts.',
-  'guide.arenaPage.wavesTitle': 'Augmentierungen kommen in Wellen',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Gewandete Diener des Todeskults, deren Treiben die Gräber vom Tal bis zu den Gipfeln schändet. Wo sie sich versammeln, ruhen die Toten nicht.',
   'guide.bestiary.flavor.grubjaw':
@@ -7559,6 +8393,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kündige einen Schlachtzug, ein Treffen oder ein Event an',
   'hudChrome.discord.relay.help.label': 'Hilfe benötigt',
   'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
+  'hudChrome.options.hideUnusedActionSlots': 'Ungenutzte Aktionsfelder ausblenden',
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
   'errors.api.desktopCodeInvalid':
     'Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.',
@@ -7568,10 +8403,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Beenden',
   'desktop.crash.reload': 'Neu laden',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Update {version} wird heruntergeladen...',
+  'desktop.update.downloadingTitle': 'Update {version} wird heruntergeladen...',
   'desktop.update.later': 'Später',
-  'desktop.update.ready':
-    'Update {version} ist bereit. Es wird beim Beenden installiert, oder starte jetzt neu.',
+  'desktop.update.readyTitle': 'Update {version} ist bereit',
+  'desktop.update.readyBody': 'Es wird beim Beenden installiert, oder starte jetzt neu.',
   'desktop.update.restart': 'Jetzt neu starten',
   'hudChrome.dailyRewards.close': 'Tägliche Belohnungen schließen',
   'hudChrome.dailyRewards.endsIn': 'Endet in {time}',
@@ -7813,7 +8648,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Alles auf dieser Seite lebt im Spiel: Drücke Esc, um die Optionen zu öffnen. Das Menü öffnet mit einer Übersicht angehefteter Grundlagen, mit den Kategorien auf einer Leiste daneben: Die Einstellungen weiter unten liegen unter Grafik, Benutzeroberfläche und Barrierefreiheit in der Gruppe Anzeige, und die Leistungsüberlagerung unter System. Noch schneller: Tippe einen Namen in das Suchfeld oben und spring direkt dorthin.',
   'guide.settingsPage.whyLabel': 'Warum es funktioniert:',
   'hudChrome.crafting.close': 'Enges Basteln',
-  'hudChrome.crafting.craft': 'Handwerk',
   'hudChrome.crafting.craftedToast': 'Hergestellt: {name}',
   'hudChrome.crafting.empty': 'Noch keine Rezepte bekannt.',
   'hudChrome.crafting.insufficientMaterials': 'Dafür fehlen Ihnen die Materialien.',
@@ -7899,9 +8733,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
-  'guide.arenaPage.yumiBody':
-    'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
-  'guide.arenaPage.yumiHeading': 'Yumi beschützen',
   'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
   'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
@@ -7911,8 +8742,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Erhöht Intelligenz um {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Erhöht Ausdauer um {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Ihr habt dieses Rezept noch nicht erlernt.',
-  'hudChrome.crafting.throttled':
-    'Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.',
   'hudChrome.mobile.chatPlaceholder': 'Sag etwas...',
   'hudChrome.mobile.hideKeyboard': 'Tastatur ausblenden',
   'hudChrome.unitFrame.partyChip': 'Gruppe',
@@ -7922,7 +8751,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 gegen 5',
   'yumi.end.loss': 'NIEDERLAGE! Eure Yumi ist gefallen.',
   'yumi.end.win': 'SIEG! Yumi ist in Sicherheit!',
-  'yumi.enterQueue': 'Yumi beschützen beitreten!',
   'yumi.error.partyTooBig3':
     'Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.',
   'yumi.error.partyTooBig5':
@@ -8111,6 +8939,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Begleiter: Angreifen',
   'hudChrome.keybinds.petDefensive': 'Begleiter: Defensiv',
   'hudChrome.keybinds.petStop': 'Begleiter: Stopp',
+  'hudChrome.keybinds.targetPet': 'Begleiter: Anvisieren',
   'hudChrome.keybinds.petTaunt': 'Begleiter: Verspotten',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein Stück weniger von {item} senden',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein Stück mehr von {item} senden',
@@ -8926,6 +9755,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.',
   'hudChrome.options.mouseoverCast': 'Mouseover-Wirken auf Gruppenfenstern',
   'hudChrome.options.showTargetOfTarget': 'Ziel des Ziels anzeigen',
+  'hudChrome.options.showPetFrame': 'Euren Begleiter anzeigen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Ziel des Ziels',
   'itemUi.market.rarityLegendary': 'Legendär',
   'loading.reconnectingAttempt':
@@ -9325,6 +10155,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Amulett verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_neck_intellect': 'Amulett verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Amulett verzaubern - Geist',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Nebenhand verzaubern - Ausdauer',
   'hudChrome.enchantName.enchant_ring_agility': 'Ring verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_ring_intellect': 'Ring verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Ring verzaubern - Geist',
@@ -9346,14 +10177,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt arkane Materialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} entzaubern?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du entzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.disenchantedLine': 'Du entzauberst {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du verzauberst {item} mit {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     'Du hast nicht die Materialien für diese Verzauberung.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du verzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.enchantUnknown': 'Diese Verzauberung existiert nicht.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Diese Verzauberung kann nicht auf diesen Gegenstand angewendet werden.',
@@ -9368,8 +10195,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt Handwerksmaterialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.salvageConfirmTitle': '{item} zerlegen?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Du zerlegst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.salvagedLine': 'Du zerlegst {item}.',
   'hudChrome.enchanting.targetTitle': 'Wähle einen Gegenstand zum Verzaubern',
   'hudChrome.gathering.biteLine': 'Etwas nimmt den Köder!',
@@ -10766,7 +11591,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Das Blätterdach schließt sich über der Straße wie ein Deckel. Halte dich an die Laternen von Gallowmere, und antworte nicht, wenn der Wald deinen Namen ruft.',
   'fiesta.augment.cardAria': '{name} ({category}): {description}',
   'guide.dungeonsPage.wildheartBody':
-    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um Zulgar entgegenzutreten.',
+    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um zu sehen, wer oben wartet.',
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',
@@ -10996,4 +11821,68 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts',
   'itemUi.vendor.buyStack': '{count} kaufen',
   'itemUi.vendor.buyStackAria': '{count} {item} für {price} kaufen',
+  'auth.face': 'Gesicht',
+  'auth.faceNose': 'Nase',
+  'auth.faceEyes': 'Augengröße',
+  'auth.faceJaw': 'Kiefer',
+  'auth.faceBrow': 'Brauen',
+  'auth.faceCheeks': 'Wangen',
+  'auth.faceChin': 'Kinn',
+  'auth.mouth': 'Mund',
+  'auth.mouthNeutral': 'Neutral',
+  'auth.mouthLips': 'Volle Lippen',
+  'auth.mouthSmile': 'Lächeln',
+  'auth.mouthFrown': 'Stirnrunzeln',
+  'auth.mouthWide': 'Breit',
+  'auth.mouthPout': 'Schmollmund',
+  'auth.mouthGrin': 'Grinsen',
+  'auth.mouthOpen': 'Offen',
+  'auth.mouthAwe': 'Staunen',
+  'auth.faceEars': 'Ohren',
+  'auth.faceSmirk': 'Grinsen',
+  'auth.eyeShape': 'Augenform',
+  'auth.eyeColor': 'Augenfarbe',
+  'auth.earShape': 'Ohrform',
+  'auth.browFlat': 'Flach',
+  'auth.browArched': 'Gebogen',
+  'auth.browThin': 'Dünn',
+  'auth.browBushy': 'Buschig',
+  'auth.browWorried': 'Besorgt',
+  'auth.browSharp': 'Scharf',
+  'auth.browRound': 'Rund',
+  'auth.eyeRound': 'Rund',
+  'auth.eyeAlmond': 'Mandel',
+  'auth.eyeNarrow': 'Schmal',
+  'auth.eyeWide': 'Weit',
+  'auth.eyeSharp': 'Scharf',
+  'auth.eyeDroopy': 'Hängend',
+  'auth.eyeSleepy': 'Müde',
+  'auth.eyeWideset': 'Weit auseinander',
+  'auth.eyeCat': 'Katze',
+  'auth.eyeDoe': 'Reh',
+  'auth.earRound': 'Rund',
+  'auth.earPointed': 'Spitz',
+  'auth.earSmall': 'Klein',
+  'auth.earWide': 'Breit',
+  'auth.customize': 'Anpassen',
+  'auth.body': 'Körper',
+  'auth.genderMale': 'Männlich',
+  'auth.genderFemale': 'Weiblich',
+  'auth.hair': 'Haare',
+  'auth.brows': 'Augenbrauen',
+  'auth.skinTone': 'Hautton',
+  'auth.hairColor': 'Haarfarbe',
+  'auth.lightness': 'Hell / Dunkel',
+  'auth.colorWheelAria': 'Farbrad {label}: Ziehen, um Farbton und Sättigung zu wählen',
+  'auth.lightnessAria': 'Helligkeit {label}',
+  'auth.hairBald': 'Glatze',
+  'auth.browNone': 'Keine',
+  'auth.browSoft': 'Weich',
+  'auth.browThick': 'Dicht',
+  'auth.browAngled': 'Schräg',
+  'hudChrome.paperdoll.hideHelmAria': 'Helm verbergen',
+  'hudChrome.paperdoll.showHelmAria': 'Helm anzeigen',
+  'hudChrome.options.waterRipples': 'Wasserwellen (Kielwasser)',
+  'hudChrome.breath.label': 'Atem',
+  'hudChrome.breath.drowning': 'Ertrinken!',
 };

@@ -24,9 +24,17 @@ import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import {
+  type MatchPetSnapshot,
+  refreshMatchPetSnapshot,
+  restoreMatchPet,
+  snapshotMatchPet,
+} from '../pet/pet_match_return';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { applyResurrectionSickness, applyUnstuckSickness } from '../spirit';
 import {
   type ArenaCombatant,
   type ArenaFormat,
@@ -64,13 +72,43 @@ export function cloneAbilityCharges(
 }
 
 export function snapshotArenaReturnPools(e: Entity): ArenaReturnPools {
+  const sickness = e.auras.find((a) => SICKNESS_AURA_IDS.has(a.id));
   return {
     hp: e.hp,
     resource: e.resource,
     cooldowns: new Map(e.cooldowns),
     abilityCharges: cloneAbilityCharges(e.abilityCharges),
     ccDr: cloneCcDr(e.ccDr),
+    // A recovery sickness is owed, not carried: the bout itself runs on the clean
+    // slate (nobody fights a normalized match at a quarter of their stats), but the
+    // remaining seconds come back on the way out. Without this the wipe in
+    // readyArenaFighter laundered the whole penalty for the price of one queue.
+    sickness: sickness ? { id: sickness.id, remaining: sickness.remaining } : undefined,
   };
+}
+
+// Hand back exactly what a fighter carried in. Shared by every arena-shaped mode's
+// return path (ranked arena and Fiesta via returnFromArena, Yumi through the same,
+// and Vale Cup), which is what keeps "a match is a parenthesis, not a rest stop"
+// (issue #1600) from drifting between them.
+//
+// Order is load-bearing: the sickness goes back FIRST because applyAura recalcs the
+// player, so the hp/resource clamp below has to see the drained maxHp, not the
+// healthy one. Everything else is a straight restore.
+export function restoreArenaReturnPools(ctx: SimContext, e: Entity, pools: ArenaReturnPools): void {
+  e.cooldowns = new Map(pools.cooldowns);
+  e.abilityCharges =
+    Object.keys(pools.abilityCharges).length > 0
+      ? cloneAbilityCharges(pools.abilityCharges)
+      : undefined;
+  e.ccDr = cloneCcDr(pools.ccDr);
+  if (pools.sickness) {
+    const { id, remaining } = pools.sickness;
+    if (id === UNSTUCK_SICKNESS_ID) applyUnstuckSickness(ctx, e, remaining);
+    else applyResurrectionSickness(ctx, e, remaining);
+  }
+  e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
+  e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
 }
 
 // Ashen Coliseum 1v1 arena tuning consts (moved with the slice). FIESTA_COUNTDOWN
@@ -83,6 +121,13 @@ export const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const FIESTA_COUNTDOWN = 5;
+// Ranked (1v1/2v2) matchmaking is pure Elo: every character starts at the same
+// base rating regardless of level, so without a floor a fresh level-1 could
+// queue straight into ranked play. Reuse the Frostreach Frontier open-PvP-zone
+// entry level (docs/prd/frontier-pvp-honor.md) rather than inventing a number.
+// Fiesta needs no gate (fiestaStandardize normalizes every fighter to the same
+// level for the bout) and neither does Protect Yumi (unranked, out of scope here).
+export const ARENA_MIN_LEVEL = 15;
 
 // Standard Elo. Returns the points the winner gains (and the loser loses) for
 // an outright result; a draw moves each toward its expected score by half.
@@ -146,6 +191,10 @@ export function arenaQueueJoin(
   }
 
   if (fmt === '1v1') {
+    if (r.e.level < ARENA_MIN_LEVEL) {
+      ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+      return;
+    }
     const party = ctx.partyOf(id);
     if (party && party.members.length > 1) {
       ctx.error(id, 'Leave your party before queueing for 1v1.');
@@ -248,6 +297,12 @@ export function arenaQueueJoin(
   // destination queue and the flavour text differ.
   const isFiesta = fmt === 'fiesta';
   const label = isFiesta ? 'Fiesta' : '2v2';
+  // Ranked 2v2 only: Fiesta standardizes every fighter to the same level for
+  // the bout, so it needs no level gate (see ARENA_MIN_LEVEL above).
+  if (!isFiesta && r.e.level < ARENA_MIN_LEVEL) {
+    ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+    return;
+  }
   const party = ctx.partyOf(id);
   let unitPids: number[];
   if (!party || party.members.length === 1) {
@@ -292,6 +347,13 @@ export function arenaQueueJoin(
     }
     if (ctx.trades.has(mPid)) {
       ctx.error(id, `${mMeta.name} must finish trading before queueing.`);
+      return;
+    }
+    if (!isFiesta && e.level < ARENA_MIN_LEVEL) {
+      ctx.error(
+        id,
+        `${mMeta.name} must be at least level ${ARENA_MIN_LEVEL} to queue for the arena.`,
+      );
       return;
     }
     if (e.pos.x > DUNGEON_X_THRESHOLD) {
@@ -598,6 +660,8 @@ export function updateArena(ctx: SimContext): void {
         match.state = 'active';
         match.timer = 0;
         const matchPids = arenaAllPids(match);
+        for (const pid of matchPids)
+          refreshMatchPetSnapshot(ctx, pid, match.preMatchPets?.get(pid));
         for (const e of fighters)
           readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const mPid of arenaAllPids(match)) {
@@ -647,6 +711,7 @@ export function updateArena(ctx: SimContext): void {
 export function matchmakeArena1v1(ctx: SimContext): void {
   let guard = ARENA_SLOT_COUNT + 1;
   while (guard-- > 0) {
+    const pruned: number[] = [];
     ctx.arenaQueue1v1 = ctx.arenaQueue1v1.filter((id) => {
       const e = ctx.entities.get(id);
       // A queued player who walked into a dungeon/instance is not matchable: the
@@ -655,14 +720,30 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
       // this at entry; this is the defense-in-depth re-check for paths that seat
       // a player into Vale Cup without going through that guard, e.g. practice).
-      return (
+      const keep =
         !!e &&
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
         e.pos.x <= DUNGEON_X_THRESHOLD &&
-        !ctx.vcupSeatedOrQueued(id)
-      );
+        !ctx.vcupSeatedOrQueued(id);
+      // Only a still-connected player needs the notice below (a disconnected
+      // one has no session left to receive it).
+      if (!keep && e) pruned.push(id);
+      return keep;
     });
+    // A still-connected player silently pruned from the queue (dead, walked
+    // into an instance, or seated in Vale Cup) gets the same notice an
+    // explicit arenaQueueLeave gives, rather than finding out only when the
+    // arena window stops showing them as queued.
+    for (const pid of pruned) {
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({
+        type: 'log',
+        text: 'You leave the Ashen Coliseum queue.',
+        color: '#ffa040',
+        pid,
+      });
+    }
     if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
     const aRating = arenaRatingForPid(ctx, aPid, '1v1');
@@ -699,8 +780,31 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
         !ctx.vcupSeatedOrQueued(id)
       );
     });
-  if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
-  else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);
+  const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const pruned: ArenaQueueUnit[] = [];
+  const survivors = queue.filter((unit) => {
+    if (keep(unit)) return true;
+    pruned.push(unit);
+    return false;
+  });
+  if (fmt === 'fiesta') ctx.arenaQueueFiesta = survivors;
+  else ctx.arenaQueue2v2 = survivors;
+  if (pruned.length === 0) return;
+  // A dropped unit can carry a teammate who did nothing wrong (the OTHER member
+  // walked into an instance, died, or got seated in Vale Cup): give every
+  // still-connected member of the unit the same notice an explicit
+  // arenaQueueLeave gives, rather than leaving them silently unqueued.
+  const leaveText =
+    fmt === 'fiesta'
+      ? 'You leave the 2v2 Fiesta queue.'
+      : 'You leave the Ashen Coliseum 2v2 queue.';
+  for (const unit of pruned) {
+    for (const pid of unit.pids) {
+      if (!ctx.entities.get(pid)) continue;
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({ type: 'log', text: leaveText, color: '#ffa040', pid });
+    }
+  }
 }
 
 export function removeTeamQueueUnits(
@@ -826,10 +930,15 @@ export function startArenaMatch(
   // below, so returnFromArena restores what they walked in with instead of a free
   // full restore (issue #1600). Fiesta captures the pre-standardization pools.
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  // Same idea for the fighter's pet: a beast that walks in alive walks back out
+  // alive, so a normalized bout never costs a hunter their companion.
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i]!;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, allPids[i]);
+    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const isFiesta = format === 'fiesta';
   const countdown = isFiesta ? FIESTA_COUNTDOWN : ARENA_COUNTDOWN;
@@ -843,6 +952,7 @@ export function startArenaMatch(
     timer: countdown,
     returns,
     preMatchPools,
+    preMatchPets,
     ratingA: arenaTeamRating(ctx, teamA, format),
     ratingB: arenaTeamRating(ctx, teamB, format),
     defeated: new Set(),
@@ -994,6 +1104,17 @@ export function readyArenaFighter(
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
   e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';
@@ -1062,7 +1183,11 @@ export function endArenaMatch(
           delta,
           won,
         ));
-        if (won === true) awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
+        // Rating (addArenaResult above) and Deeds (onArenaMatchEndForDeeds below)
+        // are deliberately forfeit-inclusive; Honor is not, mirroring Fiesta's
+        // completion-honor guard a few lines down.
+        if (won === true && reason !== 'forfeit')
+          awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
         if (match.fiesta && !match.practice && reason !== 'forfeit') {
@@ -1161,24 +1286,21 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
     // restore and hand back exactly the HP, resource, cooldowns, and CC DR the fighter
     // carried in, so an arena match can never be farmed as a free heal, mana
     // refill, or cooldown reset (issue #1600). recalcPlayerStats already ran
-    // inside resetForArena, so maxHp/maxResource are current for the clamp. Auras
-    // stay cleared (the documented arena clean-slate).
+    // inside resetForArena, so maxHp/maxResource are current for the clamp. Ordinary
+    // auras stay cleared (the documented arena clean-slate); a recovery sickness is
+    // the one exception and rides back through the shared restore.
     const pools = match.preMatchPools?.get(pid);
-    if (pools) {
-      e.cooldowns = new Map(pools.cooldowns);
-      e.abilityCharges =
-        Object.keys(pools.abilityCharges).length > 0
-          ? cloneAbilityCharges(pools.abilityCharges)
-          : undefined;
-      e.ccDr = cloneCcDr(pools.ccDr);
-      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
-      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
-    }
+    if (pools) restoreArenaReturnPools(ctx, e, pools);
     e.pos = ctx.groundPos(ret.x, ret.z);
     e.prevPos = { ...e.pos };
     e.facing = ret.facing;
     e.dead = false;
     ctx.rebucket(e);
+    // The fighter is standing at their queue spot now, so the pet the bout killed
+    // is stood back up HERE, beside them in the world (never back on the sands).
+    // Runs after the Fiesta restore above so the revived pet's owner is already
+    // back at their real level and stats.
+    restoreMatchPet(ctx, e, match.preMatchPets?.get(pid));
     ctx.emit({ type: 'respawn', pid: e.id });
   }
 }

@@ -29,6 +29,7 @@ import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { attachBiomeHaze } from './biome_haze_field';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -37,11 +38,17 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { indexExactVertexTuples } from './exact_index_geometry';
-import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
+import {
+  isFenbridgeRebuildBuilding,
+  isFenbridgeRebuildStall,
+  isFenbridgeRebuildWell,
+} from './fenbridge_town';
+import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
-import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -83,7 +90,7 @@ export interface PropsResult {
   ): void;
 }
 
-const MERGE_BAND_DEPTH = GFX.standardMaterials ? 180 : 90;
+const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
 
 // ---------------------------------------------------------------------------
 // Asset registry — loads kick off at module import; main.ts awaits
@@ -357,6 +364,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
+const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 
 // The props the renderer actually RENDERS at the low graphics tier: a subset, since
@@ -418,11 +426,14 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
  * the high-performance renderer then resolves medium+), a tier-SCOPED preload set
  * would omit props that buildProps then places, and propAsset() throws "prop asset
  * not preloaded", the v0.16.0 farmCrate crash on world entry (red "Could not start
- * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, mirroring
- * foliage.ts, which sources its one frozen MODEL_URLS list for both preload and
- * placement and is structurally immune to this class of bug. Because every placement
- * key is typed PropKey (a key of PROP_ASSET_DEFS), the full set is provably a superset
- * of anything buildProps can place, on every tier and device.
+ * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, matching the
+ * same tier-independent-superset invariant foliage.ts's deferred boot lane enforces
+ * (a `deferredFoliageUrlsForBoot()` gate once broke it there too and reopened this
+ * exact crash for "models/foliage/pine_2.glb" - see the P0 comment in foliage.ts).
+ * The shapes differ (this function ignores its tier argument outright; foliage.ts's
+ * loop just never filters by tier in the first place) but the invariant is identical.
+ * Because every placement key is typed PropKey (a key of PROP_ASSET_DEFS), the full
+ * set is provably a superset of anything buildProps can place, on every tier and device.
  *
  * The arg is retained to document the invariant and to let the guard test assert it at
  * the lowest (most dangerous) import tier; the result intentionally ignores it.
@@ -431,31 +442,58 @@ function preloadPropKeys(_importTierStandardMaterials: boolean): Set<PropKey> {
   return new Set<PropKey>(ALL_PROP_KEYS);
 }
 
-// Headless sim/test imports never fetch; the browser kicks loads immediately.
-if (typeof window !== 'undefined') {
-  const preloadKeys = preloadPropKeys(GFX.standardMaterials);
-  for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
-    if (!preloadKeys.has(key as PropKey)) continue;
-    registerDeferredPreload(() =>
-      loadGltf(def.url).then((gltf) => {
-        loadedProps.set(key, gltf);
-        // Packaged iOS: extract IMMEDIATELY and release the parse, instead of
-        // holding all 194 parsed scenes until buildProps runs in the Renderer
-        // ctor. Measured on an iPhone 17 Pro, WebContent died at 1.54 GB mid
-        // preload with the renderer never reached, so build-time extraction
-        // never got the chance to release anything; extracting per-prop as it
-        // lands keeps only the float geometry + converted materials resident
-        // (exactly what build-time extraction retains) and frees the parse's
-        // duplicate buffers progressively. Tier-safe HERE ONLY because
-        // nativeIosMemoryProfile derives from hints alone and pins
-        // standardMaterials=false at import AND live resolve, so the converted
-        // material class cannot drift the way an import-time TIER read would
-        // (the farmCrate P0). Also moves the extraction CPU out of the
-        // synchronous scene build, which shortens the entry stall.
-        if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);
-      }),
-    );
-  }
+let deferredPropKeys: ReadonlySet<PropKey> | null = null;
+function deferredPropKeysForBoot(): ReadonlySet<PropKey> {
+  deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials);
+  return deferredPropKeys;
+}
+
+function profilePropKeys(target: Readonly<GfxSettings>): readonly PropKey[] {
+  return target.standardMaterials ? ALL_PROP_KEYS : LOW_TIER_PROP_KEYS;
+}
+
+function preparePropSource(key: PropKey): Promise<void> {
+  if (loadedProps.has(key)) return Promise.resolve();
+  const existing = propLoadTasks.get(key);
+  if (existing) return existing;
+  const task = loadGltf(PROP_ASSET_DEFS[key].url)
+    .then((gltf) => {
+      loadedProps.set(key, gltf);
+      propLoadTasks.delete(key);
+    })
+    .catch((err) => {
+      propLoadTasks.delete(key);
+      throw err;
+    });
+  propLoadTasks.set(key, task);
+  return task;
+}
+
+/** Prepare the prop source set selected by an explicit target profile. */
+export function preparePropProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  // Existing extracted keys belong to the active renderer. Reload their
+  // released source scenes before the coordinator clears derived caches, so
+  // its old-profile rollback arm can still rebuild after a target failure.
+  const keys = new Set<PropKey>([
+    ...profilePropKeys(target),
+    ...(extractCache.keys() as MapIterator<PropKey>),
+  ]);
+  return Promise.all([...keys].map(preparePropSource)).then(() => undefined);
+}
+
+for (const key of ALL_PROP_KEYS) {
+  registerDeferredPreload(() => {
+    // Resolve GFX when the deferred lane opens, after startup safety and device
+    // defaults have settled. The boot set remains the historical cross-tier
+    // superset; live profile preparation may load only the requested target.
+    if (!deferredPropKeysForBoot().has(key)) return Promise.resolve();
+    return preparePropSource(key).then(() => {
+      // Preserve the iOS WebKit boot path (Safari, other iOS browsers, and the
+      // packaged app alike): extract each source as it lands and release its
+      // parsed scene before the renderer build.
+      if (GFX.iosMemoryProfile) propAsset(key);
+    });
+  });
 }
 
 /** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
@@ -535,6 +573,14 @@ interface PropAsset {
 
 const extractCache = new Map<string, PropAsset>();
 const matConvCache = new Map<string, THREE.Material>();
+
+/** Drop profile-derived prop geometry/materials while retaining unresolved source recipes. */
+export function resetPropProfileCaches(): void {
+  extractCache.clear();
+  matConvCache.clear();
+  delvePortalMatCache.clear();
+  drowningVeilMatCache.clear();
+}
 
 /** Kit materials whose NAME marks them as metal (measured across the shipped
  *  kits: MI_Trim_Metal, WornIron, ArmouryMetal, MailboxMetal). Kept in
@@ -647,6 +693,9 @@ function convertMaterial(
       strength: worn.strength,
     });
   }
+  // Distant-zone air (biome_haze_field.ts): every converted kit material
+  // hazes with the ground under it, chained over the worn-detail hook.
+  attachBiomeHaze(mat);
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
@@ -786,6 +835,32 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
 // draw, so mesh and physics agree per placement.
 const propRand = propPlacementRoll;
 
+// Village-building pools and heights, shared by the placement loop in
+// buildProps and by the far-field impostor collector below so the sprite a
+// building becomes is always the asset it really renders as.
+const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
+const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
+const HOUSE_HEIGHT: Record<string, number> = {
+  house1: 8.0,
+  house2: 7.6,
+  blacksmith: 6.6,
+  inn: 7.6,
+  kmedHomeA: 8.0,
+  kmedHomeB: 8.8,
+  kmedTavern: 8.5,
+  kmedChurch: 10.5,
+  kmedBlacksmith: 6.2,
+  kmedMarket: 5.2,
+};
+// single-asset (non-pool) building kinds
+const KIND_ASSET: Partial<Record<BuildingDef['kind'], PropKey>> = {
+  inn: 'inn',
+  hollowInn: 'kmedTavern',
+  hollowChapel: 'kmedChurch',
+  hollowSmith: 'kmedBlacksmith',
+  hollowMarket: 'kmedMarket',
+};
+
 function keyRand(key: number, n: number): number {
   return hash2(Math.round(key * 97), n * 7919, 0x9e3779);
 }
@@ -795,6 +870,33 @@ function rotLocal(lx: number, lz: number, rot: number): { x: number; z: number }
   const c = Math.cos(rot),
     s = Math.sin(rot);
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
+}
+
+/**
+ * The chapel bell tower's WORLD center: its CHAPEL_TOWER.dz rear offset
+ * rotated by the building yaw. The one transform the real composed chapel
+ * (its hideable footprint), the camera collider and the far IMPOSTOR all
+ * derive from; an impostor centered at the raw (b.x, b.z) instead sits
+ * dz off its real twin and jumps sideways at the handoff.
+ */
+export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number }): {
+  x: number;
+  z: number;
+} {
+  const off = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+  return { x: b.x + off.x, z: b.z + off.z };
+}
+
+/**
+ * The one house-asset pick for a building record: the same pool and the
+ * same keyRand draw whether the consumer is the real placement loop or the
+ * impostor collector, so a far sprite can never disagree with the model it
+ * hands off to.
+ */
+function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+  const key = b.x * 13.7 + b.z * 3.1;
+  const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
+  return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
 }
 
 type Scale = number | [number, number, number];
@@ -1071,10 +1173,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
-        const ghostSrc = src.clone();
-        // Material.clone drops onBeforeCompile: re-attach the recorded
-        // surface-detail layer so ghostable buildings keep their texture.
-        reapplySurfaceDetailToClone(ghostSrc);
+        // The hook-preserving clone: a bare clone dropped BOTH own-property
+        // hooks, so the ghost lost the zone-haze layer AND minted a new
+        // program cache key, linking a program per ghosted kit material the
+        // first time a crowd arrival whipped the camera across town (the
+        // measured first-contact burst). With the hooks carried over the
+        // ghost's OPAQUE program is the source's own; only the transparent
+        // fade variant remains a distinct (prewarmable) key.
+        const ghostSrc = cloneMaterialWithHooks(src);
         tm = occluderFadeMat(ghostSrc);
         matMap.set(src, tm);
       }
@@ -1159,7 +1265,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     tmpQuat.setFromEuler(typeof rot === 'number' ? new THREE.Euler(0, rot, 0) : rot);
     if (typeof scale === 'number') tmpScale.setScalar(scale);
     else tmpScale.set(scale[0], scale[1], scale[2]);
-    const band = Math.floor((z - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
+    const band = Math.floor((z - WORLD_MIN_Z) / mergeBandDepth());
     // Split bands into x-halves (the foliage bucket pattern): a world-wide
     // band's bounding sphere always intersects the shadow frustum, so it
     // re-submits into the shadow map every frame; half-bands cull.
@@ -1173,31 +1279,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- buildings: village houses / inn / composed chapel ------------------
-  const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
-  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-  const houseHeight: Record<string, number> = {
-    house1: 8.0,
-    house2: 7.6,
-    blacksmith: 6.6,
-    inn: 7.6,
-    kmedHomeA: 8.0,
-    kmedHomeB: 8.8,
-    kmedTavern: 8.5,
-    kmedChurch: 10.5,
-    kmedBlacksmith: 6.2,
-    kmedMarket: 5.2,
-  };
-  // single-asset (non-pool) building kinds
-  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
-    inn: 'inn',
-    hollowInn: 'kmedTavern',
-    hollowChapel: 'kmedChurch',
-    hollowSmith: 'kmedBlacksmith',
-    hollowMarket: 'kmedMarket',
-  };
+  const houseHeight = HOUSE_HEIGHT;
 
   for (const b of activeContent.props.buildings) {
-    const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     const armoury = buildEastbrookGrandArmouryView(b, ground);
     if (armoury) {
@@ -1209,6 +1293,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       continue;
     }
     if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    if (builtInWorld && isFenbridgeRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1238,12 +1323,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       gTower.position.set(b.x, y - CHAPEL_HALL.sink, b.z);
       gTower.rotation.y = b.rot;
       group.add(shadowed(gTower));
-      const towerOff = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+      const towerCenter = chapelTowerWorldCenter(b);
       registerHideable(
         gTower,
         obbFootprint(
-          b.x + towerOff.x,
-          b.z + towerOff.z,
+          towerCenter.x,
+          towerCenter.z,
           (b.w * CHAPEL_TOWER.wScale) / 2,
           (b.d * CHAPEL_TOWER.dScale) / 2,
           b.rot,
@@ -1277,9 +1362,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       );
       continue;
     }
-    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
-    const asset: PropKey =
-      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+    const asset = buildingAssetPick(b);
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -1337,6 +1420,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
     if (builtInWorld && isEastbrookRebuildStall(s)) return;
+    if (builtInWorld && isFenbridgeRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -1368,6 +1452,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // ---- wells ---------------------------------------------------------------
   for (const w of activeContent.props.wells) {
     if (builtInWorld && isEastbrookRebuildWell(w)) continue;
+    if (builtInWorld && isFenbridgeRebuildWell(w)) continue;
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -2058,7 +2143,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const cv = document.createElement('canvas');
     cv.width = CW;
     cv.height = CH;
-    const ctx = cv.getContext('2d')!;
+    const ctx = cv.getContext('2d');
+    if (!ctx) throw new Error('2d canvas context unavailable');
 
     ctx.fillStyle = '#2b2722';
     ctx.fillRect(0, 0, CW, CH);
@@ -2192,7 +2278,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // Far-cell merged bakes for the hideables (dual representation): identical
   // world-baked geometry on the SHARED pre-clone materials, one mesh per
   // (cell, material, castShadow). The per-frame swap lives in update().
-  // Constrained-memory profiles (phone WebKit, native iOS) skip the bake:
+  // Constrained-memory profiles (phone WebKit, every iOS WebKit host) skip the bake:
   // duplicating the prop geometry at world entry is exactly the allocation
   // spike the v0.27.2 memory hotfix class guards against, and the draw-call
   // win matters most on the desktop tiers.
@@ -2333,12 +2419,13 @@ function pointInsideFootprint(h: Hideable, x: number, z: number): boolean {
   const dx = x - h.x,
     dz = z - h.z;
   if (h.r !== undefined) return dx * dx + dz * dz < h.r * h.r;
+  if (h.rot === undefined || h.hw === undefined || h.hd === undefined) return false;
   // world -> OBB local (three.js rotation.y convention), mirrors colliders.rotY
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  const c = Math.cos(h.rot),
+    s = Math.sin(h.rot);
   const lx = dx * c - dz * s;
   const lz = dx * s + dz * c;
-  return Math.abs(lx) < h.hw! && Math.abs(lz) < h.hd!;
+  return Math.abs(lx) < h.hw && Math.abs(lz) < h.hd;
 }
 
 function segmentCircleEntry(
@@ -2365,8 +2452,9 @@ function segmentCircleEntry(
 }
 
 function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: number): number {
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  if (h.rot === undefined || h.hw === undefined || h.hd === undefined) return Infinity;
+  const c = Math.cos(h.rot),
+    s = Math.sin(h.rot);
   const adx = ax - h.x,
     adz = az - h.z;
   const bdx = bx - h.x,
@@ -2375,17 +2463,17 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
   const laz = adx * s + adz * c;
   const lbx = bdx * c - bdz * s;
   const lbz = bdx * s + bdz * c;
-  if (Math.abs(lax) < h.hw! && Math.abs(laz) < h.hd!) return 0;
+  if (Math.abs(lax) < h.hw && Math.abs(laz) < h.hd) return 0;
 
   const dx = lbx - lax,
     dz = lbz - laz;
   let tmin = -Infinity,
     tmax = Infinity;
   if (Math.abs(dx) < 1e-9) {
-    if (lax < -h.hw! || lax > h.hw!) return Infinity;
+    if (lax < -h.hw || lax > h.hw) return Infinity;
   } else {
-    let t1 = (-h.hw! - lax) / dx,
-      t2 = (h.hw! - lax) / dx;
+    let t1 = (-h.hw - lax) / dx,
+      t2 = (h.hw - lax) / dx;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;
@@ -2395,10 +2483,10 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
     tmax = Math.min(tmax, t2);
   }
   if (Math.abs(dz) < 1e-9) {
-    if (laz < -h.hd! || laz > h.hd!) return Infinity;
+    if (laz < -h.hd || laz > h.hd) return Infinity;
   } else {
-    let t1 = (-h.hd! - laz) / dz,
-      t2 = (h.hd! - laz) / dz;
+    let t1 = (-h.hd - laz) / dz,
+      t2 = (h.hd - laz) / dz;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;
@@ -2617,7 +2705,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     // shadow via the bake exactly as they did per-material before; the
     // lowProps ghost path (whole-group hide) cannot diverge because every
     // lowProps profile also disables dynamicShadows (gfx.ts:
-    // constrainedMemory is true whenever nativeIosMemoryProfile is).
+    // constrainedMemory is true whenever iosMemoryProfile is).
     for (const h of cellBuild.hideables) {
       for (const b of h.bakeMeshes) b.mesh.castShadow = false;
     }
@@ -2647,7 +2735,7 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
     const material = mesh.material as THREE.Material;
     const worldX = mesh.matrixWorld.elements[12];
     const worldZ = mesh.matrixWorld.elements[14];
-    const band = Math.floor((worldZ - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
+    const band = Math.floor((worldZ - WORLD_MIN_Z) / mergeBandDepth());
     // x-halved like the instance batches above: world-wide merged bands
     // defeat shadow-frustum culling (their bounds always intersect it).
     const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${worldX < 0 ? 'w' : 'e'}:${band}`;
@@ -2688,3 +2776,114 @@ function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeo
 export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
 
 export const propMaterialInternalsForTest = { convertMaterial };
+
+// ---------------------------------------------------------------------------
+// Far-field building impostors
+// ---------------------------------------------------------------------------
+
+export interface BuildingImpostorPart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  isLeaf: boolean;
+}
+
+export interface BuildingImpostorInstance {
+  asset: string;
+  x: number;
+  y: number;
+  z: number;
+  rot: number;
+  widthScale: number;
+  heightScale: number;
+}
+
+/**
+ * Everything the far-field sprite layer needs to stand in for the village
+ * buildings and the skyline-scale decor (windmills, moored ships) past the
+ * detail horizon: the asset parts to bake and the placements, computed with
+ * the SAME pools, pick hash, scale rules and seating the real placement loop
+ * in buildProps uses, so a sprite can never disagree with the building it
+ * replaces. Chapels reduce to their bell tower: at sprite range the squat
+ * entry hall sits below the treeline. The Eastbrook rebuild kit and the
+ * Grand Armoury keep their bespoke views and are skipped here.
+ */
+export function collectBuildingImpostors(seed: number): {
+  sources: { asset: string; parts: BuildingImpostorPart[] }[];
+  instances: BuildingImpostorInstance[];
+} {
+  const activeContent = getActiveWorldContent();
+  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const used = new Map<string, PropAsset>();
+  const instances: BuildingImpostorInstance[] = [];
+  const use = (key: PropKey): PropAsset => {
+    const a = propAsset(key);
+    used.set(key, a);
+    return a;
+  };
+  for (const b of activeContent.props.buildings) {
+    if (b.landmark) continue;
+    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    const y = terrainHeight(b.x, b.z, seed);
+    if (b.kind === 'chapel') {
+      const tower = use('bellTower');
+      const w = Math.max(b.w * CHAPEL_TOWER.wScale, b.d * CHAPEL_TOWER.dScale);
+      // The real tower stands at the rotated CHAPEL_TOWER.dz rear offset,
+      // through the SAME helper the real loop's footprint uses; centering
+      // on the raw building origin made the sprite jump sideways at the
+      // handoff.
+      const center = chapelTowerWorldCenter(b);
+      instances.push({
+        asset: 'bellTower',
+        x: center.x,
+        // base height comes from the building ORIGIN, exactly like the real
+        // group (positioned at b.x/b.z, tower offset inside it)
+        y: y - CHAPEL_HALL.sink,
+        z: center.z,
+        rot: b.rot,
+        widthScale: w / Math.max(tower.size.x, tower.size.z),
+        heightScale: CHAPEL_TOWER.height / tower.size.y,
+      });
+      continue;
+    }
+    const asset = buildingAssetPick(b);
+    const a = use(asset);
+    instances.push({
+      asset,
+      x: b.x,
+      y: y - 0.12,
+      z: b.z,
+      rot: b.rot,
+      widthScale: Math.max(b.w, b.d) / Math.max(a.size.x, a.size.z),
+      heightScale: HOUSE_HEIGHT[asset] / a.size.y,
+    });
+  }
+  for (const d of activeContent.props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) continue;
+    const a = propAsset(d.key as PropKey);
+    const scale = typeof d.scale === 'number' ? d.scale : 1;
+    // only skyline-scale decor earns a sprite; small dressing is sub-pixel
+    // out where the sprites live
+    if (a.size.y * scale < 7) continue;
+    used.set(d.key, a);
+    const y =
+      d.float !== undefined
+        ? Math.max(terrainHeight(d.x, d.z, seed), WATER_LEVEL - d.float)
+        : terrainHeight(d.x, d.z, seed) - 0.05;
+    instances.push({
+      asset: d.key,
+      x: d.x,
+      y,
+      z: d.z,
+      rot: d.rot ?? 0,
+      widthScale: scale,
+      heightScale: scale,
+    });
+  }
+  return {
+    sources: [...used].map(([asset, a]) => ({
+      asset,
+      parts: a.parts.map((part) => ({ geometry: part.geo, material: part.mat, isLeaf: false })),
+    })),
+    instances,
+  };
+}

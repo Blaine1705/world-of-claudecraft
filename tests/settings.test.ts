@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
@@ -222,6 +222,17 @@ describe('Settings', () => {
     expect(new Settings().get('showOwnNameplate')).toBe(false);
   });
 
+  it('defaults Time Played revealed and persists concealing it across instances', () => {
+    // The character sheet's privacy eye and the Options row both write this
+    // per-device display preference; a blob saved before the setting existed
+    // resolves the same default-on path.
+    const fresh = new Settings();
+    expect(fresh.get('showPlaytime')).toBe(true);
+
+    fresh.set('showPlaytime', false);
+    expect(new Settings().get('showPlaytime')).toBe(false);
+  });
+
   it('defaults other-player nameplates off for fresh mobile sessions', () => {
     installTouchDefault(true);
 
@@ -355,6 +366,41 @@ describe('Settings', () => {
     snap.cameraSpeed = 99;
     expect(s.get('cameraSpeed')).not.toBe(99);
   });
+
+  it('patches multiple validated settings atomically with one persistence write', () => {
+    const s = new Settings();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    const applied = s.patch({
+      graphicsPreset: 99,
+      terrainDetail: -1,
+      showFps: true,
+    });
+
+    expect(applied.graphicsPreset).toBe(SETTING_RANGES.graphicsPreset.max);
+    expect(applied.terrainDetail).toBe(SETTING_RANGES.terrainDetail.min);
+    expect(applied.showFps).toBe(true);
+    expect(s.all()).toEqual(applied);
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(new Settings().get('graphicsPreset')).toBe(SETTING_RANGES.graphicsPreset.max);
+  });
+
+  it('rejects an invalid patch without changing memory or persistence', () => {
+    const s = new Settings();
+    const before = s.all();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    expect(() =>
+      s.patch({
+        cameraSpeed: 0.4,
+        showFps: 'yes' as unknown as boolean,
+      }),
+    ).toThrow(TypeError);
+
+    expect(s.all()).toEqual(before);
+    expect(write).not.toHaveBeenCalled();
+    expect(new Settings().all()).toEqual(before);
+  });
 });
 
 describe('Interface & Comfort settings pack', () => {
@@ -376,7 +422,19 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showDailyRewardsChest')).toBe(true);
     expect(s.get('showSecondaryActionBar')).toBe(false);
     expect(s.get('showThirdActionBar')).toBe(false);
+    expect(s.get('hideUnusedActionSlots')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
+  });
+
+  // Issue 2429: hide the empty-slot chrome (background/border/keybind label) on
+  // desktop action-bar slots with no ability or item bound. Off by default (the
+  // classic look, unchanged out of the box).
+  it('defaults hideUnusedActionSlots off and persists enabling it across instances', () => {
+    const a = new Settings();
+    expect(a.get('hideUnusedActionSlots')).toBe(false);
+    a.set('hideUnusedActionSlots', true);
+    const b = new Settings();
+    expect(b.get('hideUnusedActionSlots')).toBe(true);
   });
 
   it('clamps the comfort sliders to their documented bounds', () => {

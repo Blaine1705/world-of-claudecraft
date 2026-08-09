@@ -83,6 +83,7 @@ function stripComments(source: string): string {
 
 /** `call|gate`, the same key `hud_update_drive.test.ts` uses. */
 const FANOUT_ARMS: readonly string[] = [
+  'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
@@ -91,16 +92,18 @@ const FANOUT_ARMS: readonly string[] = [
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
+  'this.delvePainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
-  "this.renderVendor|this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderHeroicVendor|this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderTrain|this.openTrainNpcId !== null && $('#train-window').style.display === 'block'",
-  "this.renderUnbind|this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block'",
+  // The four service windows (copper vendor, heroic quartermaster, train,
+  // unbind) repaint through the shared helper; its per-window open-plus-shown
+  // guards are pinned by tests/train_window_hud.test.ts, since this half only
+  // sees refreshLocalizedDynamicUi's OWN statement-position calls.
+  'this.repaintOpenServiceWindows|',
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
@@ -116,6 +119,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
+  'this.bgProposalPopup.relocalize|',
   'this.valeCupWindow.relocalize|',
   'this.vcupBetting.relocalize|',
   'this.vcupIndicator.relocalize|',
@@ -190,6 +194,12 @@ interface AnsweredSurface extends GatedModule {
 
 const ANSWERED: readonly AnsweredSurface[] = [
   {
+    file: 'hud/battleground/battleground_scoreboard_painter.ts',
+    memos: ['lastSig'],
+    answer: 'this.bgScoreboard.relocalize',
+    why: 'one signature over the whole match strip (score, timer, roster), so every localized label on it would sit in the old locale until the next score or tick moved the signature',
+  },
+  {
     file: 'mount_race_controls.ts',
     memos: ['lastButtonVisible', 'lastCountdownMode', 'lastCountdownNumber'],
     answer: 'this.mountRaceControls.relocalize',
@@ -209,9 +219,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bank_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastRenderedGuildView', 'lastRenderedTab', 'lastSig'],
     answer: 'this.bankWindow.render',
-    why: 'capacity, purchased and bonus slot counts, the next expansion cost and the stored slots. render() carries no self-gate, so the arm rebuilds',
+    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended), plus lastRenderedTab and lastRenderedGuildView, two text-independent pane latches that only scope the scroll restore. render() carries no self-gate, so the arm rebuilds',
   },
   {
     file: 'calendar_window.ts',
@@ -236,6 +246,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastRemainingText', 'lastSig'],
     answer: 'this.dungeonFinderProposalPopup.relocalize',
     why: 'the proposal id and roles, plus a countdown string latch',
+  },
+  {
+    file: 'hud/battleground/battleground_proposal_popup.ts',
+    memos: ['lastRemainingText', 'lastSig'],
+    answer: 'this.bgProposalPopup.relocalize',
+    why: 'the offer id, my response and the accept tally, plus a countdown string latch',
   },
   {
     file: 'dungeon_finder_window.ts',
@@ -364,6 +380,24 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: ['paintedStoreBody', 'paintedStoreMarkup'],
     reason:
       'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
+  },
+  {
+    file: 'guild_bank_log_window.ts',
+    memos: ['lastAnnounced'],
+    reason:
+      'lastAnnounced gates nothing that is drawn: it decides only whether the refusal line RE-ANNOUNCES to assistive tech (a live region inserted already-populated is not announced, so the pane re-writes the same text one task later). The visible text is rebuilt unconditionally on every paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives. A locale switch therefore relocalizes the log by itself; at worst the refusal is not re-announced in the new locale, which is the correct behaviour anyway (the refusal did not change).',
+  },
+  {
+    file: 'guild_bank_window.ts',
+    memos: ['prevReadOnly'],
+    reason:
+      'prevReadOnly gates nothing that is drawn: it is the demotion-edge detector deciding only whether the read-only note carries live-region semantics on THIS paint (a mid-view rank loss is voiced once; steady read-only repaints stay silent, the guild_bank_log_window lastAnnounced shape). The note text and every other string are rebuilt unconditionally on each paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives, so a locale switch relocalizes the whole Guild tab by itself. The edge cannot fire from a locale switch either: readOnly derives from the snapshot canEdit flag, not from any text.',
+  },
+  {
+    file: 'bags_window.ts',
+    memos: ['lastSortBaseline'],
+    reason:
+      'lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
   },
   {
     file: 'deed_tracker_painter.ts',
@@ -565,7 +599,20 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     expect(
       NOT_A_LANGUAGE_GATE.length,
       'the exemption list grew. Every entry is a memo this repo has decided cannot hold player text; adding one should be argued in review, not absorbed by a floor.',
-    ).toBe(4);
+      // 5 as of the guild bank activity log: its `lastAnnounced` memo gates an
+      // assistive-tech RE-ANNOUNCEMENT and nothing that is drawn (argued in the
+      // frontend-seam review of that slice; the row states the reasoning).
+      // 6 as of the guild bank member read-only view: guild_bank_window's
+      // `prevReadOnly` is the same announcement-only shape (it decides whether
+      // the read-only note is a live region on the demotion-edge paint, never
+      // what is drawn; BankWindow.render repaints the pane wholesale and the
+      // fan-out already drives it).
+      // 7 as of the bags Sort button: bags_window's `lastSortBaseline`
+      // gates only whether the one-shot settle ANIMATION plays (which draws
+      // no text); fillGrid rebuilds every cell unconditionally and the
+      // existing bags fan-out arm repaints the window wholesale on a locale
+      // switch.
+    ).toBe(7);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

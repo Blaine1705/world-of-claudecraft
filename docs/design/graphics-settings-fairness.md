@@ -24,9 +24,11 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - The fishing bobber and its bite state. The reel window is a timed reaction; the bite
   affordance must read identically on every preset (splash richness may vary, the state
   may not).
-- The minimap gather-node markers: spotting, the per-viewer ready/cooldown state, and the
-  lock strike (the non-hue lock cue), plus the node tooltip's respawn countdown and
-  fine-grade preview lines.
+- The minimap and zone-map gather-node markers: spotting, the per-viewer ready/cooldown
+  state, and the lock strike (the non-hue lock cue), plus the node tooltip's respawn
+  countdown and fine-grade preview lines. Both surfaces (`minimap_markers` /
+  `minimap_painter` and `map_window_view` / `map_window_painter`) are pinned
+  profile-free by `tests/professions_graphics_fairness.test.ts`.
 - The node prop tier ladder in the 3D world (`nodeTierScale`): tier is actionable
   information expressed as SIZE, static on every preset.
 
@@ -41,6 +43,22 @@ COSMETIC (may be tiered down on lower presets):
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
   screen, so hiding a buff icon removes no actionable information.
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
+- Weapon-skin VFX richness (`src/render/weapon_vfx_shed_core.ts`). The rarity rig on a
+  VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
+  Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
+  articulated rig with one baked mesh and is shared by the entire render path. The fade exists
+  so that removal is not a pop.
+  - VIEWER DISTANCE, measured against `CHARACTER_LOD_RANGE_SQ`, the articulated-rig range
+    BEFORE the crowd and per-tier factors scale it. Deliberately that fixed constant and not
+    the live band edge: the live edge reads a per-client, per-frame count of visible rigs, so
+    a fade keyed to it would pulse as unrelated players wander past a viewer's frustum and
+    would differ between two viewers standing in the same spot. Against the constant this arm
+    is identical for every player on every preset.
+  - The frame-budget governor's `vfx` bucket, the same lever the pooled particle cloud and the
+    ability VFX already answer to, floored at `WEAPON_VFX_GOVERNOR_FLOOR`. It is the one input
+    that differs between two players looking at the same wearer, and it can only dim.
+  What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
+  auras, their position and the weapon model itself are untouched at every scale.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
@@ -149,6 +167,42 @@ it, so the boundary cannot creep back in as decoration.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
+  lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
+  so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
+  `CHARACTER_LOD_RANGE_SQ` rather than the live band edge, and the policy is scanned free of
+  any tier, preset or device-profile input and pinned to its two arguments; the applied fade is
+  proven to dim the rig light WITHOUT clearing its `visible` flag, because three counts visible
+  point lights into every lit material's program cache key and dropping one is the open-world
+  recompile freeze; and the far-LOD skip is pinned to require a baked stand-in mesh, since
+  `setFar` leaves the rig drawing when there is none.
+- `tests/drape_lod_core.test.ts`: the ground-VFX drape LOD reads viewer distance and the mark's
+  own geometry only (pinned to its two arguments), every sample it takes is one the exact drape
+  would also have taken, and the marks it is allowed to thin at all are bounded by a world-space
+  sample-spacing cap, so no mark's footprint, radius or position can move with it.
+- `tests/ability_vfx_cc_bands.test.ts`: the held crowd-control bands (the "why can't I act"
+  tell: yellow stars over a stunned victim, violet wisps over a feared one, green shards at a
+  rooted one's ankles, each keyed off what the SIM says the victim wears so every source reads,
+  mob stomps and ensnare affixes included) occupy the FIRST overlay slots, draw identically at
+  vfx quality 0, hold an alpha floor for the aura's whole life, and are bounded by a band cap
+  instead of a tier shed. One band per victim, the most severe worn, and ONE shared cap across
+  all three types (`MAX_CC_BANDS`), so adding types never widens the batch claim. The cap ranks
+  by severity first, then bands in front of the camera ahead of ones behind it, which is a
+  fairness rule and not just polish: character self-culling is enabled only on the tier that
+  casts no sun shadow (`GFX.dynamicShadows` -> `cullCharacters`), so on medium and above every
+  controlled entity in interest range competes for a slot, behind-camera ones included, while
+  on low the offscreen non-actionable ones are slept first. Ranking on raw camera distance
+  would let a medium-tier player lose an on-screen CC read that a low-tier player keeps. A band
+  that still loses its slot is not dark: the cast-moment sequence stands down only for bands
+  that WON a slot, so a dropped one keeps reading through the burst. Pinned skips: a dead body,
+  a frustum-culled non-actionable rig, and a cast-moment sequence for a band that is actually
+  being drawn.
+  The band's TYPE is itself actionable, not decoration, which is why the cast-moment stand-down
+  answers on any band type rather than stun alone: the `cc` archetype flashes the same yellow
+  stars for every control ability, so a rooted victim would otherwise read as stunned for the
+  burst's length. Each band is also separated from the others on two axes at once, colour and
+  motion signature (ring position, sprite shape, and the fear band's vertical bob), so the
+  distinction survives for a colourblind player rather than resting on hue alone.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 

@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import {
+  GRAPHICS_REBUILD_KEYS,
+  normalizeGraphicsSettingsSnapshot,
+} from '../src/game/graphics_rebuild_core';
 import { SETTING_RANGES } from '../src/game/settings';
 import {
   boolToggleNextValue,
@@ -6,8 +10,12 @@ import {
   buildBugReportInfo,
   buildControllerControls,
   buildGraphicsControls,
+  buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
+  copyGraphicsDraft,
+  flattenGraphicsSections,
+  graphicsDraftDirty,
   INTERFACE_TAB_LABEL_KEY,
   INTERFACE_TAB_ORDER,
   type InterfaceTab,
@@ -18,6 +26,7 @@ import {
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
+  withGraphicsDraft,
 } from '../src/ui/options_view';
 
 // A fake settings projection over plain records, with the real numeric ranges so
@@ -98,24 +107,99 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
 // native-shell gating preserved; the preset + interfaceMode choices re-render.
 // ---------------------------------------------------------------------------
 describe('options_view: graphics dispatch matrix (cluster 3)', () => {
-  it('lists the base desktop controls in order, no advanced sub-pickers', () => {
+  it('stages exactly the twelve renderer-bound settings over the live projection', () => {
+    expect(GRAPHICS_REBUILD_KEYS).toEqual([
+      'graphicsPreset',
+      'terrainDetail',
+      'foliageDensity',
+      'surfaceDetail',
+      'effectsQuality',
+      'shadowQuality',
+      'antiAliasing',
+      'bloomQuality',
+      'ambientOcclusion',
+      'viewDistance',
+      'waterQuality',
+      'characterDetail',
+      'dynamicLights',
+      'particleEffects',
+    ]);
+    const live = makeSource({ graphicsPreset: 2, terrainDetail: 0, renderScale: 0.75 });
+    const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
+    const staged = withGraphicsDraft(live, GRAPHICS_REBUILD_KEYS, draft);
+    expect(staged.num('graphicsPreset')).toBe(5);
+    expect(staged.num('terrainDetail')).toBe(2);
+    expect(staged.num('renderScale')).toBe(0.75);
+  });
+
+  it('tracks raw change and exact revert without mutating the applied snapshot', () => {
+    const applied = normalizeGraphicsSettingsSnapshot({
+      graphicsPreset: 5,
+      terrainDetail: 0.5,
+    });
+    const draft = copyGraphicsDraft(applied);
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(false);
+    draft.terrainDetail = 1;
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(true);
+    expect(applied.terrainDetail).toBe(0.5);
+    draft.terrainDetail = 0.5;
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(false);
+  });
+
+  it('renders the staged (not live) preset and dial values before apply', () => {
+    const live = makeSource({ graphicsPreset: 2, terrainDetail: 0 });
+    const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
+    const controls = buildGraphicsControls(withGraphicsDraft(live, GRAPHICS_REBUILD_KEYS, draft), {
+      touch: false,
+      nativeShell: false,
+    });
+    expect(find(controls, 'graphicsPreset')).toMatchObject({ control: 'choice', current: 5 });
+    expect(find(controls, 'terrainDetail')).toMatchObject({ control: 'choice', current: 2 });
+  });
+
+  it('lists the base desktop controls in card order, dials always present', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
       touch: false,
       nativeShell: false,
     });
     expect(keysOf(controls)).toEqual([
+      // Quality card: the preset row and the custom-switch note (round 12:
+      // the dials are no longer gated behind the Advanced preset).
       'graphicsPreset',
+      'note:hudChrome.options.gfxCustomNote',
+      // World Detail card: the world's geometry and dressing layers.
+      'terrainDetail',
+      'foliageDensity',
+      'surfaceDetail',
+      'viewDistance',
+      'waterQuality',
+      'characterDetail',
+      // Lighting & Effects card: the light and post passes.
+      'effectsQuality',
+      'shadowQuality',
+      'ambientOcclusion',
+      'bloomQuality',
+      'antiAliasing',
+      'dynamicLights',
+      'particleEffects',
+      'note:hudChrome.options.gfxEffectsNote',
+      // Camera card (column 2 under Lighting).
+      'cameraSpeed',
+      // Display card (full width).
+      'renderScale',
+      'brightness',
+      'cameraFov',
+      'fullscreen',
+      'weather',
+      // The wake/ripple field is a GPU cost, so it sits with Weather in the
+      // Display card rather than with the HUD comfort toggles.
+      'waterRipples',
+      'showOverflowXp',
+      // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
-      'cameraSpeed',
-      'brightness',
-      'cameraFov',
-      'renderScale',
-      'fullscreen',
-      'showOverflowXp',
-      'weather',
     ]);
   });
 
@@ -133,40 +217,68 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       expect(preset.options.map((o) => o.value)).toEqual([1, 2, 3, 4, 6, 5]);
   });
 
-  it('reveals the five advanced sub-pickers only at preset 5', () => {
-    const advanced = buildGraphicsControls(makeSource({ graphicsPreset: 5 }), {
+  it('lists the per-system dials for every preset, as re-rendering level ladders', () => {
+    // Round 12: the dials are no longer gated behind the Advanced preset; under
+    // a fixed preset they display that preset's seeded levels (the painter's
+    // graphicsDisplaySnapshot projection) and editing one switches the staged
+    // draft to the Advanced mix, so every dial re-renders (the preset row must
+    // repaint to track that switch). The persisted values are still
+    // backward-compatible: the historical binary rows stored 0 (Low) and 1
+    // (High), which keep their meaning on the four-step ladder (0 / 0.5 / 1 / 2).
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 3 }), {
       touch: false,
       nativeShell: false,
     });
-    expect(keysOf(advanced).slice(0, 6)).toEqual([
-      'graphicsPreset',
-      'terrainDetail',
-      'foliageDensity',
-      'surfaceDetail',
-      'effectsQuality',
-      'shadowQuality',
-    ]);
-    // Each advanced sub-picker is a level-ladder choice that does NOT
-    // re-render. The persisted values are backward-compatible: the
-    // historical binary rows stored 0 (Low) and 1 (High), which keep their
-    // meaning on the four-step ladder (0 / 0.5 / 1 / 2).
-    const terrain = find(advanced, 'terrainDetail');
-    expect(terrain).toMatchObject({ control: 'choice', rerender: false });
-    if (terrain?.control === 'choice')
-      expect(terrain.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
-    const foliage = find(advanced, 'foliageDensity');
-    if (foliage?.control === 'choice')
-      expect(foliage.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
-    const surface = find(advanced, 'surfaceDetail');
-    if (surface?.control === 'choice')
-      expect(surface.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
-    const shadows = find(advanced, 'shadowQuality');
-    if (shadows?.control === 'choice')
-      expect(shadows.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
+    const dialKeys = GRAPHICS_REBUILD_KEYS.filter((key) => key !== 'graphicsPreset');
+    for (const key of dialKeys) {
+      const dial = find(controls, key);
+      expect(dial, key).toMatchObject({ control: 'choice', rerender: true });
+    }
+    for (const key of ['terrainDetail', 'foliageDensity', 'surfaceDetail', 'shadowQuality']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 0.5, 1, 2]);
+    }
+    // The whole-tier ladders reuse the same four-step scale.
+    for (const key of ['viewDistance', 'waterQuality']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 0.5, 1, 2]);
+    }
     // Effects & Lighting stops at High (the full high-tier post stack).
-    const effects = find(advanced, 'effectsQuality');
+    const effects = find(controls, 'effectsQuality');
     if (effects?.control === 'choice')
       expect(effects.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
+    // The per-effect switches: Off/On binaries, AO with the half-res middle,
+    // the Low/High pairs (Character Detail, Dynamic Lights), and Particle
+    // Effects on the three-step ladder.
+    for (const key of ['antiAliasing', 'bloomQuality']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 1]);
+    }
+    const ao = find(controls, 'ambientOcclusion');
+    if (ao?.control === 'choice') expect(ao.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
+    for (const key of ['characterDetail', 'dynamicLights']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 1]);
+    }
+    const particles = find(controls, 'particleEffects');
+    if (particles?.control === 'choice')
+      expect(particles.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
     // Nearest-option select: a stored 0.5 highlights Medium, never High.
     const stored = buildGraphicsControls(makeSource({ graphicsPreset: 5, terrainDetail: 0.5 }), {
       touch: false,
@@ -174,6 +286,55 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     });
     const storedTerrain = find(stored, 'terrainDetail');
     if (storedTerrain?.control === 'choice') expect(storedTerrain.current).toBe(0.5);
+    // The custom-switch note renders only under a fixed preset; once the
+    // Advanced mix is active the dials edit in place and the note would be a
+    // no-op instruction.
+    expect(keysOf(controls)).toContain('note:hudChrome.options.gfxCustomNote');
+    expect(keysOf(stored)).not.toContain('note:hudChrome.options.gfxCustomNote');
+  });
+
+  it('groups the panel into titled two-column cards whose flatten IS the control list', () => {
+    const env = { touch: true, nativeShell: false };
+    const sections = buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env);
+    expect(sections.map((s) => s.titleKey)).toEqual([
+      'hudChrome.options.gfxSectionQuality',
+      'hudChrome.options.gfxSectionWorld',
+      'hudChrome.options.gfxSectionLighting',
+      'hudChrome.options.gfxSectionCamera',
+      'hudChrome.options.gfxSectionDisplay',
+      'hudChrome.options.gfxSectionSystem',
+      'hudChrome.options.gfxSectionTouch',
+    ]);
+    // The dial cards balance the two columns; the row-style cards span full
+    // width below them so neither column ends in a ragged gap.
+    expect(sections.map((s) => s.column)).toEqual([1, 1, 2, 2, 'full', 'full', 'full']);
+    for (const section of sections) expect(section.controls.length).toBeGreaterThan(0);
+    // buildGraphicsControls is exactly the sections flattened in order: the
+    // reset footer's key scope and the card layout can never disagree.
+    expect(keysOf(buildGraphicsControls(makeSource({ graphicsPreset: 4 }), env))).toEqual(
+      sections.flatMap((s) => keysOf(s.controls)),
+    );
+    // The Touch Controls card exists only on a touch interface.
+    const desktop = buildGraphicsSections(makeSource({ graphicsPreset: 4 }), {
+      touch: false,
+      nativeShell: false,
+    });
+    expect(desktop.map((s) => s.titleKey)).not.toContain('hudChrome.options.gfxSectionTouch');
+  });
+
+  it('keeps the native shell dial-free (its memory profile owns the dial-mapped knobs)', () => {
+    const shell = buildGraphicsSections(makeSource({ graphicsPreset: 3 }), {
+      touch: true,
+      nativeShell: true,
+    });
+    // The two dial cards are omitted wholesale, and no dial key leaks in
+    // through another card.
+    expect(shell.map((s) => s.titleKey)).not.toContain('hudChrome.options.gfxSectionWorld');
+    expect(shell.map((s) => s.titleKey)).not.toContain('hudChrome.options.gfxSectionLighting');
+    const keys = keysOf(flattenGraphicsSections(shell));
+    for (const key of GRAPHICS_REBUILD_KEYS.filter((k) => k !== 'graphicsPreset'))
+      expect(keys, key).not.toContain(key);
+    expect(keys).not.toContain('note:hudChrome.options.gfxCustomNote');
   });
 
   it('the interfaceMode choice re-renders; browserEffects does not', () => {
@@ -348,6 +509,7 @@ const GENERAL_KEYS = [
   'showDevBadges',
   'showWalletOnCharacterScreen',
   'showWalletOnPlayerCard',
+  'showPlaytime',
   'showDailyRewardsChest',
   'showItemLevel',
   'showOwnNameplate',
@@ -367,13 +529,16 @@ const FRAMES_KEYS = [
   'partyFrameShowResource',
   'partyFrameShowAbsorbs',
   'partyFrameShowAuras',
+  'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
   'showTargetOfTarget',
+  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
+  'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',
@@ -382,6 +547,8 @@ const COMBAT_KEYS = [
   'fctScale',
   'showSecondaryActionBar',
   'showThirdActionBar',
+  'hideUnusedActionSlots',
+  'lockActionBars',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,
@@ -517,6 +684,22 @@ describe('options_view: interface tab taxonomy', () => {
     expect(find(all, 'showSecondaryActionBar')?.category).toBe('combat');
     expect(find(all, 'showThirdActionBar')?.category).toBe('combat');
   });
+
+  // Issue 2429: the "Hide Unused Action Slots" toggle sits in the combat tab
+  // alongside the other action-bar controls, unconditionally enabled (unlike
+  // showThirdActionBar it has no dependency on another toggle).
+  it('renders the hide-unused-action-slots toggle in the combat tab, reflecting the stored value', () => {
+    const off = buildInterfaceControls(makeSource());
+    expect(find(off, 'hideUnusedActionSlots')).toMatchObject({
+      control: 'boolToggle',
+      category: 'combat',
+      labelKey: 'hudChrome.options.hideUnusedActionSlots',
+      on: false,
+    });
+
+    const on = buildInterfaceControls(makeSource({}, { hideUnusedActionSlots: true }));
+    expect(find(on, 'hideUnusedActionSlots')).toMatchObject({ on: true });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -533,6 +716,7 @@ describe('options_view: main menu routing', () => {
       'hudChrome.auraOverlay.title',
       'hud.options.audio',
       'hudChrome.perf.title',
+      'nav.wiki',
       'hudChrome.unstuck.menuButton',
       'hud.options.logout',
       'hud.options.returnToGame',
@@ -548,12 +732,19 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'auras',
     });
+    // The Wiki row is unconditional (offline play has a wiki too) and routes to
+    // the confirm-first external hop, never a sub-view.
+    const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
+    expect(wikiRows).toHaveLength(1);
+    expect(wikiRows[0].action).toEqual({ kind: 'wiki' });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
     const online = buildOptionsMenu({ bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
+    // The Wiki row keeps its place above the report row in both modes.
+    expect(online.find((e) => e.labelKey === 'nav.wiki')?.action).toEqual({ kind: 'wiki' });
     expect(online.slice(-4)).toEqual([
       { labelKey: 'hudChrome.bugReport.menuButton', action: { kind: 'goto', view: 'bugreport' } },
       { labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } },
