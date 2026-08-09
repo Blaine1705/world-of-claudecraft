@@ -15,8 +15,10 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import {
+  bgOriginAt,
   INSTANCE_X_BASE,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
@@ -26,10 +28,16 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
+import { bgUnstuckDestination } from './social/battleground';
+import {
+  applyUnstuckSickness,
+  moveToGraveyardForUnstuck,
+  reviveAtGraveyardForUnstuck,
+} from './spirit';
 import {
   DT,
   type Entity,
+  emptyMoveInput,
   isConsuming,
   type UnstuckArea,
   type UnstuckBlockedReason,
@@ -118,6 +126,22 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
+  if (isBgPos(pos.x)) {
+    const match = ctx.bgMatches.get(pid);
+    if (!match || match.slot !== bgOriginAt(pos.z).slot) return null;
+    const origin = bgOriginAt(pos.z);
+    return located(
+      {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+      pos,
+      origin,
+    );
+  }
+
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
@@ -170,6 +194,7 @@ function forcedMovement(p: Entity): boolean {
 }
 
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
+  if (ctx.bgMatches.has(pid) && isBgPos(p.pos.x)) return false;
   return (
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
@@ -276,8 +301,9 @@ function cancelReason(
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (
     hasMoveInput(meta) ||
-    Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
-    Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE
+    (pending.area.kind !== 'battleground' &&
+      (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
+        Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
   )
     return 'moved';
   // Crossing the life/death line either way invalidates the attempt: a living player who
@@ -330,6 +356,34 @@ export function cancelPendingUnstuckForDisconnect(
   return cancelUnstuck(ctx, meta, pending, 'disconnected', emitEvent);
 }
 
+function completeBattlegroundUnstuck(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  p: Entity,
+): UnstuckPosition | null {
+  const destination = bgUnstuckDestination(ctx, p.id);
+  if (!destination) return null;
+  p.pos = destination;
+  p.prevPos = { ...p.pos };
+  ctx.rebucket(p);
+  Object.assign(meta.moveInput, emptyMoveInput());
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  p.targetId = null;
+  p.autoAttack = false;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  if (!p.dead && !p.ghost) applyUnstuckSickness(ctx, p);
+  return unstuckLocationAt(ctx, p.id, p.pos)?.point ?? null;
+}
+
 function completeUnstuck(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -340,19 +394,24 @@ function completeUnstuck(
   // Both outcomes land on the same graveyard and charge the same Unstuck Sickness; they
   // differ only in whether a revive is needed on arrival. A living player is never killed.
   const wasDead = p.dead || p.ghost;
-  if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
-  else moveToGraveyardForUnstuck(ctx, p.id);
+  const battlegroundDestination =
+    pending.area.kind === 'battleground' ? completeBattlegroundUnstuck(ctx, meta, p) : null;
+  if (!battlegroundDestination) {
+    if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
+    else moveToGraveyardForUnstuck(ctx, p.id);
+  }
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
 
-  const destination = unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
-    ...p.pos,
-    localX: p.pos.x,
-    localZ: p.pos.z,
-  };
+  const destination = battlegroundDestination ??
+    unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
+      ...p.pos,
+      localX: p.pos.x,
+      localZ: p.pos.z,
+    };
   ctx.emit({
     type: 'unstuck',
     phase: 'completed',
-    reason: wasDead ? 'revived_at_graveyard' : 'moved_to_graveyard',
+    reason: battlegroundDestination || !wasDead ? 'moved_to_graveyard' : 'revived_at_graveyard',
     area: pending.area,
     origin: pending.origin,
     destination,

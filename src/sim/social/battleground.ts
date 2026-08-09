@@ -965,6 +965,23 @@ function placeInBg(
   e.mountCastKey = '';
 }
 
+export function bgUnstuckDestination(ctx: SimContext, pid: number): Vec3 | null {
+  const match = ctx.bgMatches.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!match || !e || match.fightersReleased) return null;
+  const team = bgTeamOf(match, pid);
+  if (e.dead || e.ghost) {
+    const origin = battlegroundOrigin(match.slot);
+    const plot = BG_GRAVEYARDS[team];
+    return ctx.groundPos(origin.x + plot.x, origin.z + plot.z);
+  }
+  const origin = battlegroundOrigin(match.slot);
+  const spawns = BG_BASES[team].spawns;
+  const index = match.teams[team].indexOf(pid);
+  const spawn = spawns[Math.max(0, index) % spawns.length];
+  return ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z);
+}
+
 function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
   const e = createGroundObject(ctx.nextId++, '', `${BG_TEAM_NAMES[flag.team]} Flag`, {
     ...flag.pos,

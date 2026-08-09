@@ -2,7 +2,12 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
-import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
+import {
+  BG_BASES,
+  BG_GRAVEYARDS,
+  BG_POWER_RUNES,
+  BG_SPEED_RUNES,
+} from '../src/sim/battleground_layout';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
@@ -17,6 +22,7 @@ import {
   BATTLEGROUND_LOSS_HONOR,
   BATTLEGROUND_WIN_HONOR,
 } from '../src/sim/pvp';
+import { UNSTUCK_SICKNESS_ID } from '../src/sim/resurrection';
 import { eloDelta, Sim } from '../src/sim/sim';
 import {
   BG_CAPS_TO_WIN,
@@ -54,6 +60,7 @@ import {
 } from '../src/sim/social/battleground_outcomes';
 import { addThreat } from '../src/sim/threat';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -1013,6 +1020,59 @@ describe('Thornhollow Fields: the form-up hold', () => {
 });
 
 describe('Thornhollow Fields: the graveyard rite', () => {
+  it('Unstuck recovers a living fighter from a wall trap without leaving the match', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = sim.entities.get(pid)!;
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x + 50, origin.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+    const spawn = BG_BASES[0].spawns[0];
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(e.pos.x).toBeCloseTo(origin.x + spawn.x, 3);
+    expect(e.pos.z).toBeCloseTo(origin.z + spawn.z, 3);
+    expect(e.prevPos).toEqual(e.pos);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('Unstuck moves a trapped battleground corpse to its graveyard without respawning it', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[1][0];
+    kill(sim, pid);
+    sim.tick();
+    const e = sim.entities.get(pid)!;
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x - 50, origin.z);
+    e.prevPos = { ...e.pos };
+    sim.ctx.rebucket(e);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(true);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 1)).toBe(true);
+  });
+
   it('a corpse NEVER auto-releases (the press is the player own move); the ward binds the ghost', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
