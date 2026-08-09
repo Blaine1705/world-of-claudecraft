@@ -675,13 +675,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // neither parent. No capture was retaken.
 // Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
 // prewarm changes converged with the 3165 reseal. No capture was retaken.
-// Re-minted for the render cache-lifecycle port: the rendererIntegration leaf
-// follows renderer.ts's bounded character-visual pool wiring and the emissive
-// cache teardown comment. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into the render caches branch:
+// both sides moved the rendererIntegration leaf (the release's prewarm compile
+// and point-light reseals; this branch's bounded character-visual pool wiring),
+// so all three literals mint to values matching neither parent. No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ed55aa77beb548ff412761a710201011371b6eff23ea0deb9870345d7e5bc025';
+  '66ce3087e7606beb07e432722d02758ee3f1b9091c1565116e3a3c8dce26b72c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9345197315c6d496bf17b6e7c195a786a0d51ee5fb1742418d297803f256bdf1';
+  '81f51a4aee0cecfd6275660ab746f9397f4329d600500655bce1952619a721e4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1582,14 +1584,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-minted after pinning the three specifier exact (PR 3165 review): only
     // the pnpm-lock.yaml specifier row moved. No capture was retaken.
-    // Re-minted for the render cache-lifecycle port: the first-order composite
-    // follows renderer.ts's bounded character-visual pool wiring and emissive
-    // cache teardown comment, then this second-order performance seal follows
+    // Re-minted for the merge of release/v0.36.0 into the render caches branch:
+    // the first-order composite follows both parents' renderer.ts and
+    // prewarm_policy.ts inputs, then this second-order performance seal follows
     // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('79eee8675f91a81bf644a5011968b0b8e5b132897ef49c3892003b2192513dc0');
+    ).toBe('5a1da417f9d3f6824697632026761e4496301ea606ef30930eda70417e436f4a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
