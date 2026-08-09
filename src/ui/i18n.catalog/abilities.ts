@@ -1364,7 +1364,7 @@ const classAbilityNamesEn = {
       [
         'shadow_word_pain',
         'Dirge of Decay',
-        'Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 25% more damage, and each tick on your Effigy grants 1 Gloomtithe.',
+        'Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 10% more damage, and each tick on your Effigy grants 1 Gloomtithe.',
       ],
       [
         'power_word_shield',

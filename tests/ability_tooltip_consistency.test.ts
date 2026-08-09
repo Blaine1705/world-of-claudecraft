@@ -101,7 +101,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   trailbreak: [15, 18, 24],
   // The Priest spec relationship rules are post-damage hooks rather than ability effects.
   smite: [15, 30],
-  shadow_word_pain: [1],
+  // 10 = VESPERS_DOT_DAMAGE_MULT (1.1), applied by resolveVespersAbility at
+  // cast time, not by the ability effect table.
+  shadow_word_pain: [1, 10],
   mind_blast: [1, 3, 30],
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
