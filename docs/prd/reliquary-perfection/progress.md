@@ -2506,3 +2506,61 @@ owns the push.
   decodeURIComponent sites on its own routes; the happy-dom suites'
   residual localhost fetch noise (asset-path img srcs) wants a suite-level
   cure. gate_select on the committed tree recorded below with the commit.
+
+## Phase 21 (2026-08-09): Catalog growth
+
+Implementation LOCAL and unpushed at a27961a355 plus the docs commit; Phase 21
+QA owns gate_select, the deeper gate, the screenshot set, and the push. Base
+synced at STEP 0 (merge 61452f4439 of origin/release/v0.36.0 at 6e1ead1fea;
+release-merge-audit clean: render-perf delta only, the two eastbrook provenance
+overlaps correctly resolved to the release side, both suites green, tsc clean).
+
+- Seven pages appended (append-only held, the 28-page prefix untouched):
+  conquerors_the_rift (16), conquerors_rares_of_the_realm (19 marks),
+  conquerors_spoils_of_the_realm (31), conquerors_warfare_gallery (35),
+  conquerors_warfare_armory (12), horizons_vault_of_ages (4, 'retired'),
+  horizons_riftbound (3, 'personal'); professions_specimens grew koi + 2 rods.
+  Measured finals, all pinned: 35 pages (27/3/5), overview 337, character 308,
+  372 slots, 237 catalogued item ids, 29 marks.
+- New runtime: excludeFromCompletion ('retired' | 'personal') with the memoized
+  identity-stable completionScoringPages (probe exported) symmetric on both
+  sides of both pairs, honored by completion deeds, nearly-complete, tracker
+  default, shelf-card sums, and the reason-driven chip (exhaustive record);
+  secondaryClearSource rendered via the pure reliquarySecondaryClears core off
+  the existing deeds facet (zero IWorld growth); the slain kill site dual-writes
+  noteReliquaryMark (retro free via the join sync); rift_first_clear joined
+  RELIQUARY_ACTIVITY_SOURCE_IDS.
+- Mark growth obligations all landed in-change: 19 x four table rows (page,
+  server English derived-pinned to MOBS, client markFind cross-pinned to
+  server, wiki guide names transitively pinned through the generated page),
+  M16 fills x5 locales for every new hudChrome value, page-name fills x5 in the
+  reliquary_i18n chunks, wiki + i18n artifacts regenerated and freshness-green.
+- Authoring ran as a five-stage serial workflow (each stage committing
+  suite-green), then five independent skeptics re-deriving every live-table id
+  set (catch: the rift_first_clear activity pin was a constant-self-comparison;
+  fixed with the all-classes mint-set equality), two mutation batteries (18
+  mutations, 17 red; M4 is the documented dead future-proof guard, compensated
+  by the catalog-wide flagged-set pin), four fresh reviewers, a consolidated
+  fix round applying every finding, and a fresh review of the fix round
+  (READY; its two doc lines and four nits landed as the polish commit).
+- THE BLOCKING CATCH (architecture + qa-checklist independently, verified
+  first-hand): the three riftbound bands are one-per-class bound personal
+  mints (shellForClass, boundTo, trade-locked), so paging them on conquerors
+  dead-ended col_reliquary_conquerors and feat_book_complete for every player.
+  Remedy: the horizons_riftbound 'personal' showcase move plus a reachability
+  arm deriving the class-exclusive mint set from shellForClass over every
+  class, so the next class-exclusive conquerors slot reds at authoring time.
+- Blob re-measure (Phase 17 method, both trees, stored scaled by the 1.67x raw
+  ratio): about +2,950 stored bytes mid model / +4,150 all-stamped; the design
+  doc's autosave write-amplification bound moved from 2.5 KB to 4.2 KB, with
+  the catalog-membership-vs-realistic-ceiling nuance recorded in the row.
+- Validation evidence at tip: tsc clean; 14-suite targeted sweep 1168 green
+  re-run first-hand; fix-round close 16 files 934 green; polish close 670
+  green; ci:changed exit 0 (unpiped); world_api_parity green (no IWorld
+  growth); S3 guard green (no new server-sent localized text); architecture,
+  i18n freshness, and guide freshness green post-commit.
+- Deviations from the phase brief, recorded: rares = TWO pages (single-kind
+  pin); warfare = TWO pages at 47 epics (live FURY_STOCK wins over the stale
+  28/4-kits figure); five rares contribute marks only (no rare+ drop, the
+  off-by-quality precedent); growth ran ~+123 slots vs the brief's ~+80, linear
+  budget holds per the re-measure.

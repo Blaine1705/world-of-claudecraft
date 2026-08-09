@@ -865,10 +865,103 @@ Update this line as phases complete.
   and green: perf:tour, browser/axe (111), tray + overlap sweeps (only the
   four inherited chat keyboard-dock violations), four-badge card down to
   667x375, /c/ strip down to 320 wide.
-- Phase 21: (pending)
+- Phase 21: COMPLETE with in-session review rounds, LOCAL and unpushed (Phase 21
+  QA owns gate_select, the deeper gate, the screenshot set, and the push). Catalog
+  growth, ten commits (ecddf534ad rift, 91d986fb1b rares, 8e108bb1b7
+  warfare+fishing, b5b1331ff2 vault, ad66ad28bd guards, 1bfbe535b8 skeptic fix,
+  46c409c4f4 band move, 2ed047b411 review closures, a27961a355 polish, plus the
+  docs commit) off the synced base 6e1ead1fea. Seven new pages appended:
+  conquerors_the_rift (16 slots: 10 rares with every-door boss multi-hints, 4 pool
+  epics fromRift B, 2 S-only legendaries; clearSource riftClears plus the NEW
+  display-only secondaryClearSource riftSRankClears read off the existing deeds
+  facet, zero IWorld growth, resolved by the pure reliquarySecondaryClears core);
+  conquerors_rares_of_the_realm (19 slain:<templateId> marks, boss+zone hints);
+  conquerors_spoils_of_the_realm (31 derived rare+ drops; five rares contribute
+  marks only, off by quality: old_greyjaw, grubjaw, drakemaw_broodlord,
+  old_marrowshell, aurelhorn); conquerors_warfare_gallery (35) and
+  conquerors_warfare_armory (12) partitioning live FURY_STOCK (47, all epic; the
+  phase brief's 28/4-kits was stale, the live table won); horizons_vault_of_ages
+  (the 4 RETIRED_HEROIC_ITEMS, excludeFromCompletion 'retired', the guard test
+  amended with compensating display-only assertions); horizons_riftbound (the 3
+  class-personal bands, excludeFromCompletion 'personal'). professions_specimens
+  extended with glimmerfin_koi (profession:fishing) and the two chase rods
+  (engineering craft + Drowned Litany marks board). Kill site dual-writes
+  noteReliquaryMark beside markVisited (retro free via the existing join sync);
+  marks 10 to 29, each new mark carrying four table rows (page relic, server
+  RELIQUARY_MARK_ENGLISH derived-pinned to MOBS, client markFind cross-pinned to
+  server, wiki RELIQUARY_MARK_GUIDE_NAMES now transitively pinned through the
+  generated page). New runtime: ReliquaryPageDef.excludeFromCompletion
+  ('retired' | 'personal') honored symmetrically on both sides of both completion
+  pairs via the memoized identity-stable completionScoringPages (probe exported,
+  identity-pinned), by the completion-deed arms, nearly-complete, tracker default,
+  and the shelf-card sums; the flagged page's own row keeps its local pair; the
+  vault deliberately still illuminates for a full-holding veteran (pinned), the
+  riftbound page cannot (1 of 3, pinned); the chip is reason-driven (Retired /
+  Personal) through an exhaustive record so a third reason fails tsc. Middot
+  guard: no page name, relic name, mark English, or markFind value may carry
+  U+00B7 (four axes, occurrence-bound, mutation-verified; voidsong_dirk joins
+  kingsbane_last_oath as a comma fixture). Measured finals, all pinned: 35 pages
+  (27 conquerors / 3 professions / 5 horizons), overview 337, character pair (crt)
+  308, 372 slots, 237 catalogued item ids, 29 marks. THE BLOCKING CATCH (two
+  reviewers independently): the riftbound bands are one-per-class bound personal
+  mints, so paging them on conquerors dead-ended col_reliquary_conquerors and
+  feat_book_complete; remedied by the horizons_riftbound move plus a NEW
+  reachability arm deriving the class-exclusive mint set from shellForClass over
+  every class so the next class-exclusive conquerors slot reds. Blob re-measure
+  (Phase 17 method: worst-case SavedReliquaryState raw JSON on both trees, stored
+  figures scaled by the 1.67x raw ratio): about +2,950 stored bytes mid model,
+  +4,150 all-stamped; the design doc's autosave write-amplification bound moved
+  from 2.5 KB to 4.2 KB. Review shape: five-stage authoring workflow, five
+  independent skeptics (one constant-self-comparison caught: the rift_first_clear
+  activity pin, fixed with the all-classes mint-set equality), two mutation
+  batteries (18 mutations, 17 red; the one green is the documented dead
+  future-proof guard in the conquerors deed arm, compensated by the catalog-wide
+  flagged-set pin), four fresh reviewers (architecture, cross-platform-sync,
+  test-coverage, qa-checklist), a consolidated fix round applying every finding,
+  and a fresh review of the fix round (READY, its 2 doc lines + 4 nits applied in
+  the polish commit). Deviations from the phase brief, recorded: rares landed as
+  TWO pages (the single-kind-per-page pin forbids the brief's one mixed page);
+  warfare landed as TWO pages at 47 epics; relic growth ran ~+123 slots vs the
+  brief's ~+80 (warfare 47 vs 28 and spoils 31 account for it; the linear budget
+  holds per the re-measure).
 - Phase 22: (pending)
 
 ## OPEN items / known gotchas
+- Phase 21 QA owes (implementation local and unpushed): gate_select then the
+  deeper gate; the Phase 21 screenshot set under docs/screenshots (desktop and
+  mobile, lowest preset per the capture rule): the Rift page header with both
+  meters, the Rares of the Realm grid with the slain trophy glyph, the Vault of
+  Ages shelf row and header with the Retired chip, the Riftbound page with the
+  Personal chip; then the push to feature/reliquary (PR #2976).
+- OWNER-VISIBLE consequence of the Phase 21 band remedy (deliberate, pinned, not
+  a defect): a player's own Riftbound band scores ZERO toward Curator rank and
+  both completion pairs (the both-sides exclusion); an earned chase item that
+  contributes nothing to the collection score is a product call the maintainer
+  may want to revisit (a per-relic exclusion or an alternates relic kind would be
+  the shapes if so).
+- RECORDED at Phase 21, no change: the sourceRift line renders the same
+  minimum-rank sentence for the pool epics (B names the door-opening rank; A and
+  S also pay) as for the rank-exact mounts; rewording would stale five shipped
+  locale fills, so the convention is documented on the fromRift constructor
+  instead. The dead future-proof excluded-page guard in the conquerors
+  completion-deed arm is untestable while no conquerors page is flagged
+  (mutation battery M4); the catalog-wide flagged-set pin is the compensating
+  guard. Shelf-card sums still run above the headline pair because they count a
+  shared id once per page while the headline de-dupes across pages
+  (pre-existing, deliberate, now stated in the view comment).
+- Perf notes from Phase 21 (context for a future scale pass, no action owed): a
+  rare kill now runs the completion ladder once per eligible party member at the
+  kill tick (allowlist and already-has early-outs bound it; the first kill of
+  each rare per character pays the ownership scan); the secondary S-rank meter
+  rides the dstats safety refresh (under 2 s) like the primary and is folded
+  into the repaint digest.
+- Phase 22 i18n worklist additions from Phase 21: four hudChrome.reliquary keys
+  (srankClearsLabel, retiredLabel, personalLabel, sourceActivityRiftFirstClear)
+  and the 19 markFind.slain_* leaves pending in the 15 Latin locales (five
+  non-Latin fills landed in-change per M16); the seven new page names are filled
+  in all five non-Latin reliquary_i18n chunks, their descs English-only by the
+  Phase 11 channel design; the Latin page-name chunks and all desc fills remain
+  the standing Phase 22 worklist.
 - OWNER CALLS from Phase 20 QA (no ruling exists; raised by three
   independent QA legs, recorded here for the maintainer, NOT decided and
   NOT filed as issues):
