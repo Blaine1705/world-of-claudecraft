@@ -29,6 +29,7 @@ import { RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
@@ -56,6 +57,7 @@ import {
 } from './reliquary_tracker_view';
 import {
   buildReliquaryView,
+  CURATOR_BORDER_REWARD,
   CURATOR_RANK_NAME_KEYS,
   curatorRankNameKey,
   isReliquaryNavId,
@@ -944,6 +946,20 @@ export class ReliquaryWindow {
     // disagree with the catalog total from the very first open (245 slots over
     // 219 relics), so the player at 0 owned needs the explanation too.
     html += `<p class="reliquary-uniques-note">${esc(t('hudChrome.reliquary.sharedUniquesNote'))}</p>`;
+    // The rank whose deed bridge rewards a nameplate border says so once the
+    // rank is held: the summary strip names the rank but never tells the
+    // player the border exists or where it is worn. Same line the rank-up
+    // moment logs, so the durable surface and the moment cannot drift.
+    if (
+      CURATOR_BORDER_REWARD !== null &&
+      model.progress.curatorRank >= CURATOR_BORDER_REWARD.rank
+    ) {
+      html += `<p class="reliquary-border-note">${esc(
+        t('hudChrome.reliquary.borderWearableNote', {
+          name: deedName(CURATOR_BORDER_REWARD.deedId),
+        }),
+      )}</p>`;
+    }
     html += this.recentStripHtml(model.recent, recentHint);
     html += this.nearlyStripHtml(model.nearly, nearlyHint);
     html += this.shelfCardsHtml(model.shelfCards);

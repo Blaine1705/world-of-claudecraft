@@ -15,7 +15,8 @@ import {
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
 import { DELVES, DUNGEONS, QUESTS, ZONES } from '../src/sim/data';
-import { CURATOR_RANK_DEFS } from '../src/sim/reliquary';
+import { CURATOR_RANK_DEFS, type CuratorRankDef } from '../src/sim/reliquary';
+import type { DeedDef } from '../src/sim/types';
 import { deedName } from '../src/ui/deed_i18n';
 import { dungeonDisplayName, tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
 import { getLanguage, languageTag } from '../src/ui/i18n';
@@ -31,7 +32,9 @@ import {
   buildReliquaryPageCells,
   buildReliquaryUnlockPlan,
   buildReliquaryView,
+  CURATOR_BORDER_REWARD,
   CURATOR_RANK_NAME_KEYS,
+  curatorBorderReward,
   curatorRankNameKey,
   isReliquaryNavId,
   RELIQUARY_NAV,
@@ -163,6 +166,85 @@ describe('curatorRankNameKey', () => {
     // Cross-source pin: a new CURATOR_RANK_DEFS entry stays red here until a
     // matching curatorRankName chrome key is authored (no silent generic fall).
     expect(CURATOR_RANK_NAME_KEYS).toHaveLength(CURATOR_RANK_DEFS.length);
+  });
+});
+
+describe('curatorBorderReward', () => {
+  const def = (rank: number, deedId?: string): CuratorRankDef => ({
+    rank,
+    threshold: rank * 10,
+    sealId: `seal_${rank}`,
+    ...(deedId === undefined ? {} : { deedId }),
+  });
+  const deeds = {
+    bridge_title: {
+      id: 'bridge_title',
+      name: 'A Title Bridge',
+      desc: '',
+      category: 'collection',
+      renown: 0,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'title', text: 'the Curator' },
+    },
+    bridge_border: {
+      id: 'bridge_border',
+      name: 'A Border Bridge',
+      desc: '',
+      category: 'collection',
+      renown: 0,
+      trigger: { kind: 'manual' },
+      reward: { kind: 'border', slug: 'test_gilt' },
+    },
+  } as unknown as Record<string, DeedDef>;
+
+  it('picks the rank whose deed bridge rewards a border, not a title bridge', () => {
+    const found = curatorBorderReward(
+      [def(1), def(2, 'bridge_title'), def(3, 'bridge_border')],
+      deeds,
+    );
+    expect(found).toEqual({ rank: 3, deedId: 'bridge_border' });
+  });
+
+  it('takes the FIRST border bridge in ladder order when two exist', () => {
+    // The return type is one reward, so with two border bridges the answer is
+    // an ordering decision, not an arbitrary one: the copy names a single rank
+    // ("wearable at rank N"), and naming the later one would tell a player
+    // who already earned the earlier border that it is still ahead of them.
+    const second = {
+      ...deeds,
+      bridge_border_2: {
+        id: 'bridge_border_2',
+        name: 'A Later Border Bridge',
+        desc: '',
+        category: 'collection',
+        renown: 0,
+        trigger: { kind: 'manual' },
+        reward: { kind: 'border', slug: 'test_gilt_2' },
+      },
+    } as unknown as Record<string, DeedDef>;
+    expect(
+      curatorBorderReward([def(1), def(3, 'bridge_border'), def(5, 'bridge_border_2')], second),
+    ).toEqual({ rank: 3, deedId: 'bridge_border' });
+    // Ladder ORDER decides, not the rank number: the same two defs passed in
+    // reverse answer with the other bridge.
+    expect(
+      curatorBorderReward([def(5, 'bridge_border_2'), def(3, 'bridge_border')], second),
+    ).toEqual({ rank: 5, deedId: 'bridge_border_2' });
+  });
+
+  it('answers null when no rank bridges a border (and never invents one)', () => {
+    expect(curatorBorderReward([def(1), def(2, 'bridge_title')], deeds)).toBe(null);
+    // A bridge naming a deed this catalog does not hold is not a border either.
+    expect(curatorBorderReward([def(1, 'gone_deed')], deeds)).toBe(null);
+    expect(curatorBorderReward([], deeds)).toBe(null);
+  });
+
+  it('resolves the live ladder to the rank 5 bridge and its deed', () => {
+    // The copy that says "your border is wearable" is gated on this, so the
+    // live answer is pinned as a literal: re-tiering the ladder, or moving the
+    // border reward to another bridge, has to move this pin.
+    expect(CURATOR_BORDER_REWARD).toEqual({ rank: 5, deedId: 'col_reliquary_rank_5' });
+    expect(CURATOR_BORDER_REWARD).toEqual(curatorBorderReward(CURATOR_RANK_DEFS, DEEDS));
   });
 });
 

@@ -242,6 +242,7 @@ import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
+import { deedBorderSlug } from './deed_border_view';
 import {
   deedBroadcastRendered,
   deedName,
@@ -626,6 +627,7 @@ import {
 } from './reliquary_tracker_view';
 import {
   buildReliquaryUnlockPlan,
+  CURATOR_BORDER_REWARD,
   type ReliquaryUnlockEventModel,
   reliquaryFlashKey,
   reliquaryRelicPageId,
@@ -898,6 +900,7 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   levelText: null,
   name: '',
   portraitKey: '',
+  borderSlug: '',
   absorb: null,
   dead: false,
   outOfRange: false,
@@ -1418,6 +1421,9 @@ export class Hud {
   private mountRaceInstructionTimer: number | undefined;
   private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
+  // The portrait frame the Book of Deeds border paints on (both entry
+  // documents carry the id); the unit_frame painter owns every write to it.
+  private pfPortraitWrapEl = $('#pf-portrait-wrap');
   private pfHpEl = $('#pf-hp');
   private pfHpTextEl = $('#pf-hp-text');
   private pfResEl = $('#pf-res');
@@ -1427,6 +1433,7 @@ export class Hud {
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
   private targetFrameEl = $('#target-frame');
+  private targetPortraitWrapEl = $('#tf-portrait-wrap');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
   // The target name line splits into three inline children (pre-decoration,
@@ -4045,6 +4052,7 @@ export class Hud {
     levelText: null,
     name: '',
     portraitKey: PLAYER_PORTRAIT_KEY,
+    borderSlug: '',
     absorb: null,
     dead: false,
     outOfRange: false,
@@ -4096,6 +4104,7 @@ export class Hud {
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
+    portraitBorder: this.pfPortraitWrapEl,
     resource: { container: this.pfResourceEl, fill: this.pfResEl, text: this.pfResTextEl },
   });
   // The two cast bars are ONE instance-parameterized painter, over the
@@ -4149,6 +4158,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      portraitBorder: this.targetPortraitWrapEl,
       resource: {
         container: this.targetResourceEl,
         fill: this.targetResEl,
@@ -8598,6 +8608,10 @@ export class Hud {
       playerFrame.levelText = String(p.level);
     }
     playerFrame.name = p.name;
+    // SELF reads its worn border from the deeds facet, not the entity wire
+    // (the wire carries other players' borders). One guarded record lookup per
+    // frame, cheap enough that a signature cache would only add state.
+    playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
@@ -8717,6 +8731,10 @@ export class Hud {
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
         targetFrame.titlePost = this.targetTitleDecoration.post;
+        // entity.border is the Book of Deeds deed id on the identity wire, the
+        // title field's sibling (players only; deedBorderSlug answers '' for a
+        // mob, an absent field, or an id this build does not know).
+        targetFrame.borderSlug = deedBorderSlug(target.border ?? null);
         // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
         // the painter resets it on hide so an id reused by a new mob still redraws.
         targetFrame.portraitKey = String(target.id);
@@ -13562,6 +13580,17 @@ export class Hud {
           ),
           '#ffd100',
         );
+        // The one rank whose deed bridge rewards a nameplate border earns a
+        // second, durable line: the rank banner alone never says the border is
+        // now wearable, and the Book of Deeds is where it is put on.
+        if (CURATOR_BORDER_REWARD !== null && banner.rank === CURATOR_BORDER_REWARD.rank) {
+          this.log(
+            t('hudChrome.reliquary.borderWearableNote', {
+              name: deedName(CURATOR_BORDER_REWARD.deedId),
+            }),
+            '#ffd100',
+          );
+        }
       } else if (banner.kind === 'illuminate') {
         const pageName = reliquaryPageName(banner.pageId);
         bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });
@@ -13658,6 +13687,12 @@ export class Hud {
     }
     for (const id of plan.titleHintIds) {
       this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
+    }
+    // The border sibling of the title hint, same color and placement. A border
+    // reward carries no display text of its own (only a palette slug), so the
+    // line names the DEED, which is also what the picker lists it under.
+    for (const id of plan.borderHintIds) {
+      this.log(t('hudChrome.deeds.unlockedBorderHint', { name: deedName(id) }), '#ffd100');
     }
     if (plan.bannerId !== null) {
       const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
@@ -16345,11 +16380,18 @@ export class Hud {
     const vlevel = virtualLevel(sim.lifetimeXp);
     const unlocked = new Set(sim.unlockedMilestones);
     // Earned Book of Deeds border rewards join the badge row through the same
-    // ms-badge plumbing (nameplate border display is a deliberate v1 cut).
+    // ms-badge plumbing. The row is now a WORN-state readout: borders render on
+    // nameplates and unit-frame portraits, and the one the player wears carries
+    // the worn word in its own label, so the state never rides colour alone.
     const borderBadges = DEED_ORDER.filter(
       (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
     )
-      .map((id) => `<span class="ms-badge ms-deed-border">${esc(deedName(id))}</span>`)
+      .map((id) => {
+        const worn = id === sim.activeBorder;
+        const name = deedName(id);
+        const label = worn ? t('hudChrome.deeds.charBorderWorn', { name }) : name;
+        return `<span class="ms-badge ms-deed-border${worn ? ' ms-active' : ''}">${esc(label)}</span>`;
+      })
       .join('');
     const badges =
       MILESTONES.filter((m) => unlocked.has(m.id))

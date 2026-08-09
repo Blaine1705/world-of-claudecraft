@@ -5717,7 +5717,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.renownHeading': '名望',
   'guide.deedsPage.rewardBorder': '边框',
   'guide.deedsPage.rewardsBody':
-    '这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔，它便会显示在你的铭牌上、聊天中和排行榜上，供所有人观看。',
+    '这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔与边框：头衔会显示在你的铭牌上、聊天中和排行榜上，供所有人观看，而边框会以自己的颜色环绕你的铭牌与头像。',
   'guide.deedsPage.rewardsHeading': '头衔与边框',
   'guide.deedsPage.standingsNote':
     '各王国会统计所有账号累积的名望：排行榜按账号的累计名望排名，每个功绩在你所有角色中只计一次，且榜上只显示名望，因此不带名望的功绩即使计入你的功绩之书，也绝不会影响排名。想知道谁位居何处，请在游戏内打开排行榜并转到它的名望标签页；排名在那里，而不在维基上。',
@@ -9040,17 +9040,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.earnedDate': '获得于 {date}',
   'hudChrome.deeds.hiddenBadge': '隐藏',
   'hudChrome.deeds.titleChip': '头衔奖励',
+  'hudChrome.deeds.borderChip': '边框奖励',
   'hudChrome.deeds.watch': '追踪',
   'hudChrome.deeds.unwatch': '取消追踪',
   'hudChrome.deeds.watchFull': '追踪列表已满（最多 {cap} 项）',
   'hudChrome.deeds.watchAria': '在界面追踪器中追踪{name}',
   'hudChrome.deeds.unwatchAria': '停止追踪{name}',
+  'hudChrome.deeds.cosmeticsSection': '头衔与边框',
   'hudChrome.deeds.titlesSection': '头衔',
   'hudChrome.deeds.titlesAria': '选择要展示的头衔',
   'hudChrome.deeds.titlesNone': '无头衔',
   'hudChrome.deeds.titlesEmpty': '获得带头衔的功绩后即可解锁此栏。',
+  'hudChrome.deeds.bordersSection': '边框',
+  'hudChrome.deeds.bordersNone': '无边框',
+  'hudChrome.deeds.bordersEmpty': '获得带边框的功绩后即可解锁此栏。',
   'hudChrome.deeds.unlockedBanner': '达成功绩：{name}',
   'hudChrome.deeds.unlockedTitleHint': '获得新头衔：{title}。可在功绩之书中选用。',
+  'hudChrome.deeds.unlockedBorderHint': '获得新边框：{name}。可在功绩之书中佩戴。',
   'hudChrome.plurals.deedsRetroSummary.one': '你的编年史已更新：补录 {count} 项功绩。',
   'hudChrome.plurals.deedsRetroSummary.few': '你的编年史已更新：补录 {count} 项功绩。',
   'hudChrome.plurals.deedsRetroSummary.many': '你的编年史已更新：补录 {count} 项功绩。',
@@ -9064,6 +9070,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.charTitleLabel': '头衔',
   'hudChrome.deeds.charTitleNone': '未选择头衔',
   'hudChrome.deeds.charOpenBook': '功绩之书',
+  'hudChrome.deeds.charBorderWorn': '{name}（佩戴中）',
   'hudChrome.deeds.lbTab': '名望',
   'hudChrome.deeds.lbTitleCol': '头衔',
   'hudChrome.deeds.lbScopeNote':
@@ -10105,6 +10112,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.curatorRankName5': '永恒策展人',
   'hudChrome.reliquary.rankUpBanner': '策展人等级 {rank}：{name}',
   'hudChrome.reliquary.rankUpToast': '已达到策展人等级 {rank}：{name}',
+  'hudChrome.reliquary.borderWearableNote': '可在功绩之书中佩戴 {name} 边框。',
   'hudChrome.reliquary.markFind.masterwork_first': '首件杰作',
   'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '武器锻造杰作',
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '护甲锻造杰作',
@@ -11380,7 +11388,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.swimNote':
     '游泳用到两个键：按住空格上浮，按住左 Ctrl 下沉。向前游动时把镜头压低同样会下潜，所以你可以用视角来掌控自己的深度。左 Ctrl 是默认按键中唯一一个单独的修饰键，而在绑定按键时，单独按下的修饰键会被忽略，因此若要重新绑定“下潜”，请挑一个不是修饰键的按键。',
   'guide.deedsPage.bookBody':
-    '功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔架，你在那里挑选自己佩戴的那一个。',
+    '功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔与边框的架子，那里有两个挑选栏：一个选你佩戴的头衔，一个选环绕你铭牌的边框。',
   'guide.deedsPage.bookHeading': '走进功绩之书',
   'guide.delvesPage.lockpickAnteBody':
     '在碰到锁之前，你先定下条件。取三根撬锁针，便留有失手的余地，但箱子只付出最朴素的奖赏；取两根，是折中的交易；只取一根，一次干净利落的开锁将付出最丰厚的回报。手上的撬锁针越少，每一步之间可供思考的时间就越短；而若最后一根也折断，锁便彻底卡死：那口箱子就此失去，直到你再通关一次这处探秘为止。',

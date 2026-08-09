@@ -9518,8 +9518,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yiğitlikler Kitabı, dünyanın yaptığın her şeyin hesabını tuttuğu yerdir; başlangıç vadisinden attığın ilk adımlardan diyarın sunabileceği en çetin dövüşlere kadar. Oynadıkça yiğitlikler kazan, verdikleri unvanları taşı ve Ününün tırmanışını izle.',
   'guide.deedsPage.renownHeading': 'Ün',
   'guide.deedsPage.rewardBorder': 'Çerçeve',
-  'guide.deedsPage.rewardsBody':
-    "Ödüllerin hepsi gösteriş içindir ve mesele de zaten budur. Bazı yiğitlikler taşıyabileceğin bir unvan ya da adını kuşatan bir çerçeve verir; kahramanını güçlendiren hiçbir şey vermez. İstediğin unvanı Yiğitlikler Kitabı'ndan seç; o da isim levhanda, sohbette ve lider tablolarında herkesin göreceği biçimde seninle gezsin.",
   'guide.deedsPage.rewardsHeading': 'Unvanlar ve çerçeveler',
   'guide.nav.deeds': 'Yiğitlikler Kitabı',
   'hudChrome.deeds.broadcastLine': '{name} bir yiğitliğe imza attı: {deed}',

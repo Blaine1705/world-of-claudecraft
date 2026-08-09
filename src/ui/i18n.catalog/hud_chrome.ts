@@ -4233,6 +4233,12 @@ export const hudChromeStrings = {
     curatorRankName5: 'Eternal Curator',
     rankUpBanner: 'Curator rank {rank}: {name}',
     rankUpToast: 'Curator rank {rank} reached: {name}',
+    // Phase 19: the one Curator rank whose deed bridge rewards a wearable
+    // nameplate border. ONE key for both surfaces that say it (the rank-up
+    // chat line and the standing Overview note), so the moment and the durable
+    // readout cannot drift; {name} is that deed's name, resolved through
+    // deed_i18n, never the reward slug.
+    borderWearableNote: 'The {name} border can be worn from the Book of Deeds.',
     recentLabel: 'Recent finds:',
     nearlyLabel: 'Nearly complete:',
     nearlyJumpAria: 'Open {name}, {owned} of {total} filled',
@@ -4409,17 +4415,32 @@ export const hudChromeStrings = {
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
+    borderChip: 'Border reward',
     watch: 'Watch',
     unwatch: 'Unwatch',
     watchFull: 'Watchlist full ({cap} max)',
     watchAria: 'Watch {name} on the HUD tracker',
     unwatchAria: 'Stop watching {name}',
+    // The worn-cosmetics shelf: the rail button names both pickers it holds,
+    // then one heading, group label, None option and empty line per picker.
+    // Border options are named by their DEED (a border reward carries a slug,
+    // never player-facing display text of its own).
+    cosmeticsSection: 'Titles and Borders',
     titlesSection: 'Titles',
+    // UNRENDERED since the picker groups took their accessible name from the
+    // visible headings (aria-labelledby); kept because the shipped locale
+    // fills carry it. Candidate for removal at a release locale fill.
     titlesAria: 'Choose your displayed title',
     titlesNone: 'No Title',
     titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
+    bordersSection: 'Borders',
+    bordersNone: 'No Border',
+    bordersEmpty: 'Earn a border-bearing deed to unlock this shelf.',
     unlockedBanner: 'Deed accomplished: {name}',
     unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
+    // The border sibling. It names the DEED rather than a reward text, since a
+    // border reward carries only a palette slug.
+    unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
     trackerLabel: 'Deeds',
@@ -4431,6 +4452,9 @@ export const hudChromeStrings = {
     charTitleLabel: 'Title',
     charTitleNone: 'No title chosen',
     charOpenBook: 'Book of Deeds',
+    // The character sheet's earned-border badges: the worn one says so in its
+    // own label, so the state never rides the badge colour alone.
+    charBorderWorn: '{name} (worn)',
     // The Renown tab of the high-score window: tab label, the deeds-board
     // column headers (rank/name reuse the shared game.leaderboard.* headers,
     // the Renown column reuses renownLabel above), the visible account-scope

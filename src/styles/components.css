@@ -7942,11 +7942,25 @@
     color: var(--gold-dim);
     text-align: center;
   }
-  .deeds-titles {
+  .deeds-titles,
+  .deeds-borders {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 2px;
+  }
+  /* Which picker a run of options belongs to. The two groups sit in one
+     scroll column, so without a heading the border options read as more
+     titles. It is an h3 (the window family's section-heading level; the group
+     is named by it through aria-labelledby), so BOTH the size and the weight
+     are declared here: the UA sheet renders h3 bold and at 1.17em, and this
+     shelf label is neither. The base reset already zeroes the UA margins. */
+  .deeds-picker-head {
+    font-family: var(--title-font);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gold-dim);
+    padding: 6px 2px 2px;
   }
   .deed-title-option {
     font-family: var(--title-font);
@@ -8025,6 +8039,13 @@
     border-color: #7a5aa0;
     color: #d9c2f2;
     background: #201628;
+  }
+  /* The border currently worn. The badge label already carries the worn word
+     (charBorderWorn), so this is reinforcement, never the only cue. */
+  .ms-badge.ms-deed-border.ms-active {
+    border-color: #c97bff;
+    color: #f0e2ff;
+    background: #33204a;
   }
   .inspect-title {
     font-size: 12px;
@@ -8713,7 +8734,8 @@
   }
   /* The reconciliation line under the Overview header: it says why the owned
      count and the shelf counts added up do not have to match. */
-  .reliquary-uniques-note {
+  .reliquary-uniques-note,
+  .reliquary-border-note {
     margin: 0;
     font-size: 12px;
     color: var(--color-text-muted);

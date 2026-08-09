@@ -550,14 +550,17 @@ same file), and each module's header carries its own contract.
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
 - **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
   **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
-  **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds
+  **deed_image_ids.ts**, **deed_border_view.ts**): the Book of Deeds achievements window. The DOM-free core builds
   the category/entry model, search, progress fractions, crest-id resolution, and the
   drain-batched unlock moment (banners coalesce, retro grants fold to one summary line);
   the painter is a cold window plus the write-elided HUD watch tracker. `deed_i18n.ts`
   re-localizes deed names/descriptions/titles/broadcast lines from ids (the
   `talent_i18n.ts` entity-style pattern; per-base-locale release-fill chunks under
   `deed_i18n.locales/` fetched lazily via `DEED_LOCALE_LOADERS`);
-  `deeds_leaderboard_view.ts` is the Renown-board tab's pure core.
+  `deeds_leaderboard_view.ts` is the Renown-board tab's pure core. `deed_border_view.ts` is
+  the worn-border channel: a pure deed id -> slug -> palette resolution that BOTH the
+  overhead nameplate canvas and the unit-frame portrait ring paint from, and the one
+  sanctioned home of those accent colors (`src/styles/CLAUDE.md` documents the exception).
 - **reliquary_view.ts** / **reliquary_window.ts** (+ **reliquary_i18n.ts**,
   **reliquary_i18n.locales/**, **reliquary_sheet_view.ts**, **reliquary_cell_art.ts**,
   **reliquary_tracker_view.ts** / **reliquary_tracker_painter.ts**): The Reliquary collection

@@ -8841,8 +8841,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Im Buch der Taten führt die Welt Buch über alles, was du vollbracht hast: von deinen ersten Schritten aus dem Starttal bis zu den härtesten Kämpfen, die das Reich zu bieten hat. Erringe Taten, während du spielst, trage die Titel, die sie verleihen, und sieh zu, wie dein Ansehen wächst.',
   'guide.deedsPage.renownHeading': 'Ansehen',
   'guide.deedsPage.rewardBorder': 'Rahmen',
-  'guide.deedsPage.rewardsBody':
-    'Die Belohnungen sind reine Zierde, und genau das ist der Sinn. Manche Taten verleihen einen Titel, den du tragen kannst, oder einen Rahmen für deinen Namen, aber niemals etwas, das deinen Helden stärker macht. Wähle im Buch der Taten den Titel, der dir gefällt, und er begleitet dich auf deinem Namensschild, im Chat und auf den Ranglisten, für alle sichtbar.',
   'guide.deedsPage.rewardsHeading': 'Titel und Rahmen',
   'guide.nav.deeds': 'Buch der Taten',
   'hudChrome.deeds.broadcastLine': '{name} hat eine Tat vollbracht: {deed}',

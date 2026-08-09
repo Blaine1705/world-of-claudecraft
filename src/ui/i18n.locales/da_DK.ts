@@ -8859,8 +8859,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.',
   'guide.deedsPage.renownHeading': 'Hæder',
   'guide.deedsPage.rewardBorder': 'Ramme',
-  'guide.deedsPage.rewardsBody':
-    'Belønningerne er ren pynt, og det er hele pointen. Nogle bedrifter skænker en titel, du kan bære, eller en ramme om dit navn, men aldrig noget, der gør din helt stærkere. Vælg den titel, du ønsker, i Bedrifternes Bog, så følger den med på dit navneskilt, i chatten og på ranglisterne, hvor alle kan se den.',
   'guide.deedsPage.rewardsHeading': 'Titler og rammer',
   'guide.nav.deeds': 'Bedrifternes Bog',
   'hudChrome.deeds.broadcastLine': '{name} har fuldbragt en bedrift: {deed}',

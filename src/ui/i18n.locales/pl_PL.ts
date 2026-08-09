@@ -9028,8 +9028,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Księga Czynów to miejsce, w którym świat prowadzi rachunek wszystkiego, czego dokonałeś: od pierwszych kroków poza początkową doliną po najtrudniejsze starcia, jakie królestwo ma do zaoferowania. Zdobywaj czyny podczas gry, noś tytuły, które przyznają, i patrz, jak twoja Renoma rośnie.',
   'guide.deedsPage.renownHeading': 'Renoma',
   'guide.deedsPage.rewardBorder': 'Obramowanie',
-  'guide.deedsPage.rewardsBody':
-    'Nagrody służą wyłącznie ozdobie i właśnie o to chodzi. Niektóre czyny przyznają tytuł do noszenia albo obramowanie, które oprawi twoje imię, nigdy zaś nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł w Księdze Czynów, a będzie ci towarzyszył na plakietce z imieniem, na czacie i w rankingach, na oczach wszystkich.',
   'guide.deedsPage.rewardsHeading': 'Tytuły i obramowania',
   'guide.nav.deeds': 'Księga Czynów',
   'hudChrome.deeds.broadcastLine': '{name} dokonuje czynu: {deed}',

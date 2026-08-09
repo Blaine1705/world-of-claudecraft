@@ -8802,8 +8802,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.',
   'guide.deedsPage.renownHeading': 'Ryktbarhet',
   'guide.deedsPage.rewardBorder': 'Ram',
-  'guide.deedsPage.rewardsBody':
-    'Belöningarna är enbart för syns skull, och det är hela poängen. Vissa bedrifter skänker en titel att bära eller en ram som pryder ditt namn, men aldrig något som gör din hjälte starkare. Välj den titel du vill ha i Bedrifternas bok, så följer den med på din namnskylt, i chatten och på topplistorna där alla kan se den.',
   'guide.deedsPage.rewardsHeading': 'Titlar och ramar',
   'guide.nav.deeds': 'Bedrifternas bok',
   'hudChrome.deeds.broadcastLine': '{name} har fullbordat en bedrift: {deed}',

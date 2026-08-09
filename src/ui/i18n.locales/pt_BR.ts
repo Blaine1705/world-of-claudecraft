@@ -9036,8 +9036,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.',
   'guide.deedsPage.renownHeading': 'Renome',
   'guide.deedsPage.rewardBorder': 'Moldura',
-  'guide.deedsPage.rewardsBody':
-    'As recompensas servem só para exibir, e é justamente essa a intenção. Alguns feitos concedem um título para ostentar ou uma moldura para o seu nome, e nunca nada que torne seu herói mais forte. Escolha o título que quiser no Livro dos Feitos e ele acompanha você na placa de nome, no chat e nos placares, para que todos vejam.',
   'guide.deedsPage.rewardsHeading': 'Títulos e molduras',
   'guide.nav.deeds': 'Livro dos Feitos',
   'hudChrome.deeds.broadcastLine': '{name} realizou um feito: {deed}',

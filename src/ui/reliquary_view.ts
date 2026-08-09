@@ -16,6 +16,7 @@
 // the deeds_view searchText idiom), never on the raw catalog English the models
 // carry, so a player searches the names their own client shows them.
 
+import { DEEDS } from '../sim/content/deeds';
 import {
   type ReliquaryClearSource,
   type ReliquaryPageDef,
@@ -25,6 +26,8 @@ import {
   reliquaryRelicSource,
 } from '../sim/content/reliquary';
 import {
+  CURATOR_RANK_DEFS,
+  type CuratorRankDef,
   catalogRankOwned,
   catalogRelicCompletion,
   curatorRankFromOwned,
@@ -32,6 +35,7 @@ import {
   isRelicFilled,
   pageCompletion,
 } from '../sim/reliquary';
+import type { DeedDef } from '../sim/types';
 import type { TranslationKey } from './i18n';
 
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
@@ -65,6 +69,36 @@ export function curatorRankNameKey(rank: number): TranslationKey {
   }
   return 'hudChrome.reliquary.curatorRank';
 }
+
+/**
+ * The Curator rank bridge whose deed reward is a wearable nameplate border:
+ * the rank the copy announces plus the deed that names the border. Derived by
+ * crossing the rank ladder with the deed catalog instead of writing the rank
+ * as a literal, so a re-tiered ladder moves the note with it rather than
+ * stranding it on a rank that grants nothing. Null when no bridge carries one.
+ */
+export interface CuratorBorderReward {
+  rank: number;
+  deedId: string;
+}
+
+export function curatorBorderReward(
+  defs: readonly CuratorRankDef[],
+  deeds: Readonly<Record<string, DeedDef>>,
+): CuratorBorderReward | null {
+  for (const def of defs) {
+    const deedId = def.deedId;
+    if (deedId === undefined) continue;
+    // The deeds table is a plain object, so a bare index resolves prototype
+    // keys; same guard as the sim validators (src/sim/deeds.ts).
+    if (!Object.hasOwn(deeds, deedId)) continue;
+    if (deeds[deedId]?.reward?.kind === 'border') return { rank: def.rank, deedId };
+  }
+  return null;
+}
+
+/** The live ladder's border bridge, resolved once (both tables are static). */
+export const CURATOR_BORDER_REWARD = curatorBorderReward(CURATOR_RANK_DEFS, DEEDS);
 
 /**
  * i18n key for a catalogued profession mark find label.

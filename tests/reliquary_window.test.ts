@@ -376,6 +376,12 @@ describe('painter hygiene', () => {
     expect(code).toContain("'hudChrome.reliquary.recentEmpty'");
     expect(code).toContain("'hudChrome.reliquary.nearlyEmpty'");
     expect(code).toContain("t('hudChrome.reliquary.sharedUniquesNote')");
+    // Phase 19: the standing border note. Gated on the DERIVED bridge, never a
+    // literal rank 5, and it renders from the rank the player HOLDS (>=), so a
+    // future rank 6 does not silently drop the line.
+    expect(code).toContain("t('hudChrome.reliquary.borderWearableNote', {");
+    expect(code).toContain('model.progress.curatorRank >= CURATOR_BORDER_REWARD.rank');
+    expect(code).toContain('CURATOR_BORDER_REWARD !== null &&');
     // The interpolated Phase 14 keys ride the same literal rule.
     expect(code).toContain("t('hudChrome.reliquary.recentJumpAria', { name })");
     expect(code).toContain("t('hudChrome.reliquary.shelfNoFinds')");
@@ -925,6 +931,11 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("curatorRankName5: 'Eternal Curator'");
     expect(chrome).toContain("rankUpBanner: 'Curator rank {rank}: {name}'");
     expect(chrome).toContain("rankUpToast: 'Curator rank {rank} reached: {name}'");
+    // Phase 19: ONE key for both surfaces that say the border is wearable (the
+    // rank-up chat line and the standing Overview note), so they cannot drift.
+    expect(chrome).toContain(
+      "borderWearableNote: 'The {name} border can be worn from the Book of Deeds.'",
+    );
     // Phase 7 profession mark find labels.
     expect(chrome).toContain('markFind: {');
     expect(chrome).toContain("masterwork_first: 'First Masterwork'");
@@ -1013,6 +1024,13 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).not.toMatch(/lastIndexOf\(':'\)/);
     expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
     expect(handler).toContain("banner.kind === 'rankUp'");
+    // Phase 19: the rank whose bridge rewards a border logs a second line
+    // naming it. Gated on the derived bridge and on EQUALITY with that rank
+    // (the moment fires once, unlike the standing Overview note), and the deed
+    // name is resolved through deed_i18n rather than printing a reward slug.
+    expect(handler).toContain("t('hudChrome.reliquary.borderWearableNote', {");
+    expect(handler).toContain('banner.rank === CURATOR_BORDER_REWARD.rank');
+    expect(handler).toContain('name: deedName(CURATOR_BORDER_REWARD.deedId),');
     // On-join catch-up: one localized summary line off plan.retroCount, the
     // deeds idiom (tests/deeds_window.test.ts pins its sibling the same way).
     // One regex, so the guard and its body cannot drift apart: two independent

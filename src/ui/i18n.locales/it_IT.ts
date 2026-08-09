@@ -9199,8 +9199,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il Libro delle Imprese è il luogo dove il mondo tiene il conto di tutto ciò che hai fatto, dai primi passi fuori dalla valle iniziale agli scontri più duri che il reame possa offrire. Ottieni imprese giocando, indossa i titoli che concedono e guarda salire la tua Fama.',
   'guide.deedsPage.renownHeading': 'Fama',
   'guide.deedsPage.rewardBorder': 'Bordo',
-  'guide.deedsPage.rewardsBody':
-    'Le ricompense sono tutte estetiche, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo che incornicia il tuo nome, e mai nulla che renda più forte il tuo eroe. Scegli il titolo che preferisci dal Libro delle Imprese e ti seguirà sulla targhetta del nome, in chat e in classifica, sotto gli occhi di tutti.',
   'guide.deedsPage.rewardsHeading': 'Titoli e bordi',
   'guide.nav.deeds': 'Libro delle Imprese',
   'hudChrome.deeds.broadcastLine': "{name} ha compiuto un'impresa: {deed}",

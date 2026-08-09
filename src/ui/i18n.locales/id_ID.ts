@@ -9641,8 +9641,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kitab Jasa adalah tempat dunia mencatat segala yang telah kamu lakukan, dari langkah pertamamu keluar dari lembah permulaan hingga pertarungan tersulit yang bisa disodorkan realm ini. Raih jasa sembari bermain, sandang gelar yang dianugerahkannya, dan saksikan Kemasyhuranmu menanjak.',
   'guide.deedsPage.renownHeading': 'Kemasyhuran',
   'guide.deedsPage.rewardBorder': 'Bingkai',
-  'guide.deedsPage.rewardsBody':
-    'Semua hadiahnya sekadar untuk dipamerkan, dan memang itulah intinya. Sebagian jasa menganugerahkan gelar yang bisa kamu sandang atau bingkai untuk menghiasi namamu, dan tidak pernah ada yang membuat pahlawanmu lebih kuat. Pilih gelar yang kamu inginkan dari Kitab Jasa, dan gelar itu akan menyertaimu di papan namamu, dalam obrolan, dan di papan peringkat untuk dilihat semua orang.',
   'guide.deedsPage.rewardsHeading': 'Gelar dan bingkai',
   'guide.nav.deeds': 'Kitab Jasa',
   'hudChrome.deeds.broadcastLine': '{name} telah mengukir jasa: {deed}',

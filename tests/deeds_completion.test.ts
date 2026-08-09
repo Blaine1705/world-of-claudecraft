@@ -194,6 +194,7 @@ describe('cross-surface parity', () => {
       deedStats: freshDeedStats(),
       renown: 15,
       activeTitle: null,
+      activeBorder: null,
       deeds: DEEDS,
       order: DEED_ORDER,
       category: 'progression',
