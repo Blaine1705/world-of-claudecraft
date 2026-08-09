@@ -238,6 +238,101 @@ describe('render budget governor', () => {
     expect(state.levels.grass).toBeGreaterThan(degradedGrass);
   });
 
+  it('restores baselines and render scale under a frame cap but never climbs while dense', () => {
+    // Long-horizon cap pin (the 24-frame test above never reaches a fire slot,
+    // so it cannot distinguish holds-at-baseline from climbs-to-maxima). With
+    // counters parked in the 90 to 100% band, a capped session restores every
+    // baseline and the render scale (phase A runs on measured headroom alone)
+    // and the climb above baseline never starts. This pins the capped arm of
+    // the canRecover/canEnrich split in both directions.
+    const governor = new RenderBudgetGovernor({
+      tier: 'low',
+      budget: GFX_BUDGETS.low,
+      enabled: true,
+    });
+    governor.reset(1, 0.65, 1);
+    governor.update(sample({ dt: 0.6 }));
+
+    let state = governor.state();
+    for (let i = 0; i < 12; i++) {
+      state = governor.update(
+        sample({
+          dt: 0.5,
+          frameMs: 90,
+          totalMs: 90,
+          submitMs: 16,
+          calls: 300,
+          triangles: 1_200_000,
+          grassVisibleTufts: 1_500,
+        }),
+      );
+    }
+    expect(state.levels.resolution).toBe(0.65);
+    expect(state.levels.grass).toBe(0.5);
+
+    for (let i = 0; i < 3_600; i++) {
+      state = governor.update(
+        sample({
+          dt: 1 / 30,
+          frameMs: 33.4,
+          totalMs: 8.3,
+          submitMs: 4.6,
+          calls: 370,
+          triangles: 1_550_000,
+          grassVisibleTufts: 3_300,
+        }),
+      );
+    }
+
+    expect(state.externalFrameCap).toBe(true);
+    expect(state.levels).toEqual({
+      grass: 0.74,
+      foliage: 0.7,
+      vfx: 0.76,
+      lighting: 0.68,
+      resolution: 1,
+    });
+  });
+
+  it('climbs to the band maxima under a frame cap once the counters leave the band', () => {
+    // The sparse capped arm: with counters under every 90% line, a capped
+    // session may legally climb past baseline to the band maxima (identical to
+    // the pre-split behavior; the phase 5 QA governor audit recorded this as
+    // the deliberate cap semantics). A future change that holds capped
+    // sessions at baseline is a design decision and must rewrite this pin.
+    const governor = new RenderBudgetGovernor({
+      tier: 'low',
+      budget: GFX_BUDGETS.low,
+      enabled: true,
+    });
+    governor.reset(1, 0.65, 1);
+    governor.update(sample({ dt: 0.6 }));
+
+    let state = governor.state();
+    for (let i = 0; i < 3_600; i++) {
+      state = governor.update(
+        sample({
+          dt: 1 / 30,
+          frameMs: 33.4,
+          totalMs: 8.3,
+          submitMs: 4.6,
+          calls: 232,
+          triangles: 882_236,
+          grassVisibleTufts: 2_922,
+        }),
+      );
+    }
+
+    expect(state.externalFrameCap).toBe(true);
+    expect(state.levels).toEqual({
+      grass: 0.86,
+      foliage: 0.82,
+      vfx: 0.86,
+      lighting: 0.78,
+      resolution: 1,
+    });
+  });
+
   it('keeps high quality stable when fast frames carry premium foliage density', () => {
     const governor = new RenderBudgetGovernor({
       tier: 'high',
