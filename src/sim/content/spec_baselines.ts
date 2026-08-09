@@ -38,7 +38,7 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     survival: {
-      stats: { agi: 3, crit: 0.03, dodge: 0.12, agiPct: 0.26 },
+      stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
       global: { meleeDmgPct: 0.3 },
     },
   },

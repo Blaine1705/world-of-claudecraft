@@ -42,7 +42,8 @@ describe('Hunter v0.29 deterministic DPS alignment', () => {
     'holds the single-target loops between design parity and the band-round ceiling',
     () => {
       const dps = matrix(1);
-      // Measured this round: mm/bm 1.5227 (116.3 / 76.4), sv/bm 1.2301.
+      // Measured this round: mm/bm 1.5227 (116.3 / 76.4), sv/bm 1.2010 (the
+      // survival percent arm is apPct after review round 3).
       expect(dps.marksmanship / dps.beast_mastery).toBeGreaterThanOrEqual(0.95);
       expect(dps.marksmanship / dps.beast_mastery).toBeLessThanOrEqual(1.58);
       expect(dps.survival / dps.beast_mastery).toBeGreaterThanOrEqual(0.92);

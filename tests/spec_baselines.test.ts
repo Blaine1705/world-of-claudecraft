@@ -33,8 +33,12 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       concussive_shot: { cooldownPct: -0.1 },
     },
   },
+  // The percent arm is apPct on purpose (review, PR 3201): it feeds melee AP
+  // and hunter ranged AP only (entity.ts), where agiPct would also lift the
+  // Agility-derived armor, dodge, and crit. This deep-equal is the guard that
+  // no defensive key sneaks back into the damage baseline.
   'hunter/survival': {
-    stats: { agi: 3, crit: 0.03, dodge: 0.12, agiPct: 0.26 },
+    stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
     global: { meleeDmgPct: 0.3 },
   },
   // v0.34 rogue base re-band (spec_baselines.ts): the BiS-epic floor lift that
