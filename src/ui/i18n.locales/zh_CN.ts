@@ -11826,4 +11826,178 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
   'guide.riftsPage.floorsBody':
     '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 性能医生',
+  'hudChrome.perf.diagnostics.subtitle': '针对游戏的扫描，提供证据和代码级修复建议。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '实时性能测量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '诊断扫描进度',
+  'hudChrome.perf.diagnostics.aria.findings': '按优先级排序的诊断结果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展开',
+  'hudChrome.perf.diagnostics.controls.start': '开始 15 秒扫描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '刷新场景统计',
+  'hudChrome.perf.diagnostics.controls.copyReport': '复制清晰报告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下载报告',
+  'hudChrome.perf.diagnostics.controls.scanning': '扫描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '扫描另一个区域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '报告已记录到控制台',
+  'hudChrome.perf.diagnostics.controls.copied': '已复制',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '复制受阻：报告已记录',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低画质重新测试',
+  'hudChrome.perf.diagnostics.instruction':
+    '为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此标签页隐藏时扫描已暂停。返回后扫描将重新开始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已加载。正在等待第一个可操作帧。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此标签页隐藏时扫描已暂停。请返回游戏以继续。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待有代表性的游戏帧：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在采集活跃游戏：现在请穿过问题区域。',
+  'hudChrome.perf.diagnostics.status.ready': '已准备扫描。按开始并重现卡顿。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待游戏世界。请选择离线游戏或进入一个在线角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '渲染器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '场景统计：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡顿归因：进入世界时已启用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 置信度',
+  'hudChrome.perf.diagnostics.sections.evidence': '证据',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即尝试',
+  'hudChrome.perf.diagnostics.sections.codeFix': '代码修复',
+  'hudChrome.perf.diagnostics.sections.source': '相关源文件',
+  'hudChrome.perf.diagnostics.severity.critical': '严重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '信息',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未检测到明显性能问题',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒保持 {fps} FPS，帧 p95 为 {p95}。游戏、浏览器、GPU、内存、资源和网络均未触发阈值。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用软件渲染',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '游戏正在使用集成显卡',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高分辨率渲染开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '强制高画质正在降低性能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '设备可用内存较低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '检测到浏览器或扩展程序停顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '检测到浏览器内存压力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '图形上下文已重置',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要帧瓶颈',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '场景绘制开销超过当前画质预算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '阴影通道占用大量绘制调用',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界渲染器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '实体视图更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌绘制开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模拟工作占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件处理占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '游戏过程中正在编译着色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '纹理上传导致游戏卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '实体视图创建导致卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未归因的长帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '资源处理延迟了游戏启动',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '浏览器长任务正在阻塞帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '网络传输延迟了可见响应',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照处理正在阻塞客户端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '性能规则 {rule} 需要处理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '检测到的浏览器、GPU、内存或设备设置可能在游戏渲染前限制性能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次采集测得的图形工作超过当前帧预算或场景预算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某个 CPU 阶段占用了足以错过帧预算的主线程时间。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '资源准备或首次使用工作发生在可见游戏或启动路径中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '网络传输或客户端快照处理延迟了最新可操作状态。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '环境规则 {rule} 与此设备和浏览器匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 为 {submit}，占渲染器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近窗口测得 {fps} FPS，帧 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '场景使用 {calls} 次绘制调用，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '场景提交 {triangles} 个三角形，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '场景类别 {category} 贡献 {calls} 次调用和 {triangles} 个测量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': '刷新场景统计以识别主要渲染类别。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '阴影通道提交 {calls} 次调用，占基线的 {share}，共 {triangles} 个三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '测得阶段 {phase} 的 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '记录的 {total} 次卡顿中，有 {count} 次与原因 {cause} 匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '预加载门为 {tasks} 个已注册任务等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失败的资源组：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '测得 {count} 个长任务，p95 为 {p95}，最大值为 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照间隔为 {interval}，最新快照年龄为 {age}，输入回显 p95 为 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析和应用 p95 为 {work}；网络间隔 p95 为 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '诊断规则 {rule} 与本次采集匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正检测到的环境设置，重新启动，然后重复相同扫描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低画质重复相同镜头路径，确认图形压力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分别在静止和移动时重复扫描，以隔离 CPU 阶段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重复相同路线或首次使用操作，确认卡顿发生时机。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在离线游戏中使用相同移动和镜头路径进行比较。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '让检测到的备用路径遵守共享图形和内存预算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用现有渲染预算、实例化、材质共享、LOD 和隐藏工作跳过机制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定阶段，移除重复工作和分配，并保持游戏行为。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '通过现有启动和流式预算预加载、池化或分摊已识别的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低传输或快照处理成本，同时不削弱权威服务器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.report.statusLine': '状态：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '采集时间：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要问题：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '画质：{tier}，渲染比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 帧超过 50 毫秒，共测量 {frames} 帧',
+  'hudChrome.perf.diagnostics.report.resultHeading': '结果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次采集未触发可处理阈值。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '严重程度：{severity}。置信度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
+  'hudChrome.perf.diagnostics.report.status.critical': '严重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };
