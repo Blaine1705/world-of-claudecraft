@@ -3792,7 +3792,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 26, max: 33 },
+      { type: 'directDamage', min: 38, max: 48 },
       { type: 'gainResource', amount: 20 },
     ],
     description:
@@ -4042,7 +4042,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 61, max: 75 }],
+    effects: [{ type: 'directDamage', min: 89, max: 109 }],
     description:
       'Shoot the target for $d Physical damage. Damage increases with Ranged Attack Power.',
   },
@@ -4063,7 +4063,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true,
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 13, max: 18 }],
+    effects: [{ type: 'directDamage', min: 19, max: 26 }],
     description:
       'Fire 6 shots over 2.4 sec while moving. Each shot deals $d Physical damage and increases with Ranged Attack Power.',
   },
