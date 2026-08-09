@@ -209,8 +209,13 @@ const fromProfession = (professionId: string): ReliquarySourceHint =>
   hint({ sourceKind: 'profession', sourceId: professionId });
 const fromDelve = (delveId: string): ReliquarySourceHint =>
   hint({ sourceKind: 'delve', sourceId: delveId });
-/** Rank typed against the live ladder, so a rift hint cannot name a rank that
- *  awards no reins (C) without failing tsc. */
+/** Rank typed against the live ladder (see RELIQUARY_RIFT_RANK_SOURCE_IDS, which
+ *  excludes C), so a rift hint cannot name C without failing tsc.
+ *
+ *  Three authoring uses today, which is why the rank vocabulary is shared
+ *  rather than reins-specific: the Horizons mount reins (one rarity tier per
+ *  rank), the Rift page's clear-time epics (B is the MINIMUM rank whose clear
+ *  pays from the heroic pool), and its S-only legendaries. */
 const fromRift = (rank: ReliquaryRiftRank): ReliquarySourceHint =>
   hint({ sourceKind: 'rift', sourceId: rank });
 const fromQuest = (questId: string): ReliquarySourceHint =>

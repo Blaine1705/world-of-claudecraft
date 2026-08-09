@@ -1295,9 +1295,10 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // Veterans who crossed Curator rank thresholds before the rank deed bridges
   // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
   // idempotent). Live rank-ups still grant from onItemDiscovered.
-  // Profession marks reuse the visit ledger (gather_event:*, masterwork:*),
-  // which their own live call sites write when the real event happens: silent
-  // retro only (no unlock toast), and never a craft history nobody performed.
+  // Catalog marks reuse the visit ledger (gather_event:*, masterwork:*, and
+  // since Phase 21 the slain:* rare proofs), which their own live call sites
+  // write when the real event happens: silent retro only (no unlock toast),
+  // and never a kill or a craft history nobody performed.
   // Deliberately UNCOUNTED too: the client's one join summary line spends
   // retro reliquaryUnlock events (item fills only); mark refills emit nothing
   // and stay out of that count, so this call's return value is dropped.

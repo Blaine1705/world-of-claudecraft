@@ -58,6 +58,7 @@ import {
   RELIQUARY_RECENT_CAP,
   reliquaryCatalogIndexProbe,
   reliquaryOwnershipOpts,
+  reliquaryScoringPagesProbe,
   reliquaryWireCacheProbe,
   reliquaryWireJson,
   restoreReliquaryMarks,
@@ -2604,6 +2605,51 @@ describe('Reliquary catalog index memo', () => {
     const copyIndex = reliquaryCatalogIndexProbe(copy);
     expect(copyIndex).toBeDefined();
     expect(copyIndex).not.toBe(reliquaryCatalogIndexProbe(RELIQUARY_PAGES));
+  });
+
+  it('the scoring-pages memo answers by identity, and never with the default catalog', () => {
+    // The layer ABOVE the index memo, pinned the same way. Identity is the
+    // whole point: catalogIndexFor keys on the array this returns, so an equal
+    // but fresh array would rebuild the catalog index on every read.
+    catalogRelicCompletion({ itemsDiscovered: new Set() });
+    const first = reliquaryScoringPagesProbe(RELIQUARY_PAGES);
+    expect(first, 'a completion read must populate the scoring memo').toBeDefined();
+    catalogRelicCompletion({ itemsDiscovered: new Set() });
+    expect(reliquaryScoringPagesProbe(RELIQUARY_PAGES)).toBe(first);
+    // The live catalog HAS flagged pages, so the answer is a filtered copy and
+    // it is frozen (every reader gets this exact array).
+    expect(first).not.toBe(RELIQUARY_PAGES);
+    expect(Object.isFrozen(first)).toBe(true);
+    expect(first?.length).toBe(
+      RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion === undefined).length,
+    );
+    expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
+
+    // An UNFLAGGED synthetic table answers the caller's own array by identity:
+    // nothing to filter means nothing to allocate.
+    const unflagged = customPages();
+    catalogRelicCompletion({ itemsDiscovered: new Set() }, unflagged);
+    expect(reliquaryScoringPagesProbe(unflagged)).toBe(unflagged);
+
+    // A FLAGGED synthetic table gets its own filtered, frozen answer, and
+    // never the default catalog's.
+    const flagged: ReliquaryPageDef[] = [
+      ...customPages(),
+      {
+        id: 'probe_flagged',
+        shelf: 'horizons',
+        name: 'Probe Flagged',
+        excludeFromCompletion: 'personal',
+        relics: [{ kind: 'item', itemId: 'probe_relic_gamma' }],
+      },
+    ];
+    expect(catalogRelicCompletion({ itemsDiscovered: new Set() }, flagged).total).toBe(2);
+    const flaggedAnswer = reliquaryScoringPagesProbe(flagged);
+    expect(flaggedAnswer).toBeDefined();
+    expect(flaggedAnswer).not.toBe(flagged);
+    expect(flaggedAnswer).not.toBe(first);
+    expect(Object.isFrozen(flaggedAnswer)).toBe(true);
+    expect(flaggedAnswer?.map((p) => p.id)).toEqual(['probe_page']);
   });
 });
 

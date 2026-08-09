@@ -629,7 +629,9 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
 
 /**
  * Join / load retro: copy every catalog mark id already on the deed visit
- * ledger (gather_event:*, masterwork:*) into the sparse marks Set. Silent:
+ * ledger (gather_event:*, masterwork:*, slain:*) into the sparse marks Set.
+ * The namespaces are an enumeration of what the ledger holds today, never a
+ * filter: the sweep copies every id RELIQUARY_MARK_IDS knows. Silent:
  * no unlock toast and no recent push. Nothing is invented here: a mark only
  * fills from a visit its own live call site wrote when the real event
  * happened, so the ledger is proof, never a guess. Returns how many marks
@@ -1043,6 +1045,19 @@ export function reliquaryCatalogIndexProbe(
   return catalogIndexByPages.get(pages);
 }
 
+/** Test-only probe for the SCORING-pages memo, the sibling of
+ *  reliquaryCatalogIndexProbe and the same shape: the memoized answer for a
+ *  page table, or undefined before any read has built one. The identity claim
+ *  it exists to prove is load-bearing rather than cosmetic: catalogIndexFor
+ *  keys its own memo on the array this function returns, so an answer that is
+ *  merely EQUAL instead of identical would rebuild the whole catalog index on
+ *  every completion read. */
+export function reliquaryScoringPagesProbe(
+  pages: readonly ReliquaryPageDef[],
+): readonly ReliquaryPageDef[] | undefined {
+  return completionScoringPagesByPages.get(pages);
+}
+
 /** Page progress X/Y over item (+ optional other) ownership. */
 export function pageCompletion(
   page: ReliquaryPageDef,
@@ -1062,7 +1077,16 @@ export function pageCompletion(
   return { owned, total, complete: total > 0 && owned === total };
 }
 
-/** Catalog-wide unique item-relic progress (item ids de-duped across pages). */
+/**
+ * Catalog-wide unique item-relic progress (item ids de-duped across pages).
+ *
+ * The ONE completion read that deliberately does NOT apply
+ * completionScoringPages: it counts whatever table it is handed, because its
+ * single internal caller (catalogRelicCompletion) has already filtered, and
+ * the catalog-index memo pins drive it with synthetic tables on purpose. Do
+ * not call it directly for a shipped surface: an excludeFromCompletion page in
+ * the table would score, and the pair would disagree with every other read.
+ */
 export function catalogItemCompletion(
   itemsDiscovered: OwnedIdLookup,
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
@@ -1164,9 +1188,17 @@ export function catalogCharacterCompletion(
   },
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
-  // Retired pages are outside completion on BOTH sides of the pair (see
+  // Excluded pages are outside completion on BOTH sides of the pair (see
   // completionScoringPages); filtering here keeps the skin subtraction below
   // reading the exact index the full read counted against.
+  //
+  // This filters, then hands `scoring` to catalogRelicCompletion, which
+  // filters again: the memo therefore holds TWO entries per table, the
+  // original mapping to its filtered answer and the filtered answer mapping to
+  // ITSELF. Deliberate. The second pass is a WeakMap hit that returns the same
+  // array by identity, so it costs nothing and no walk repeats, and the
+  // alternative (an unfiltered internal entry point) would be one more way to
+  // score an excluded page by accident.
   const scoring = completionScoringPages(pages);
   const full = catalogRelicCompletion(
     {

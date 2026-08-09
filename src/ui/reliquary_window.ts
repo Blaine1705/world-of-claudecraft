@@ -28,7 +28,6 @@ import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
-import { DEED_STAT_KEYS, type DeedStatKey, type DeedStats } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
@@ -83,6 +82,7 @@ import {
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
+  reliquarySecondaryClears,
 } from './reliquary_view';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
@@ -766,22 +766,14 @@ export class ReliquaryWindow {
       clearCount: (pageId) => world.reliquaryPageClearCount(pageId),
       // The display-only second meter for pages whose def carries a
       // secondaryClearSource: read straight off the deeds facet's counter
-      // block (both worlds already mirror it; zero IWorld change). Membership
-      // in DEED_STAT_KEYS is validated and the value floored to finite
-      // positives, exactly the clearCountForSource regime, so a drifted stat
-      // name reads 0 rather than inventing a parallel counter channel.
-      secondaryClearCount: (pageId) => {
-        const src = Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)
-          ? RELIQUARY_PAGES_BY_ID[pageId].secondaryClearSource
-          : undefined;
-        if (src === undefined) return undefined;
-        if (!(DEED_STAT_KEYS as readonly string[]).includes(src.stat)) return 0;
-        // Typed | undefined: a stub world in a test may omit the counter
-        // block, and the meter must degrade to 0 rather than throw mid-paint.
-        const counters: DeedStats['counters'] | undefined = world.deedStats.counters;
-        const n = counters?.[src.stat as DeedStatKey];
-        return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
-      },
+      // block (both worlds already mirror it; zero IWorld change). The
+      // validation and flooring live in the pure core, so a Vitest can drive
+      // every refusal arm without a window.
+      secondaryClearCount: (pageId) =>
+        reliquarySecondaryClears(
+          Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId) ? RELIQUARY_PAGES_BY_ID[pageId] : undefined,
+          world.deedStats.counters,
+        ),
       firstFind: world.reliquaryFirstFind,
       // Live reference, never a copy: this half of the input is built on every
       // slow-band poll and most of them elide, so the record is read only when

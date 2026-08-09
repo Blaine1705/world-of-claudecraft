@@ -57,6 +57,7 @@ import {
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
+  reliquarySecondaryClears,
   reliquarySourceLinePlan,
 } from '../src/ui/reliquary_view';
 
@@ -583,6 +584,64 @@ describe('Overview shelf cards', () => {
     ]);
   });
 
+  it('an excludeFromCompletion page counts in NEITHER the card nor the rail sum', () => {
+    // QA S1: the shelf sums used to walk every page while the headline pair
+    // excluded the flagged ones, so the rail and the Overview cards disagreed
+    // with the number at the top of the same window. Both flag reasons are
+    // driven, with an unflagged page of the same shape beside them as the
+    // positive control that the sum is live at all.
+    const flagged: ReliquaryPageDef[] = [
+      {
+        id: 'retired_x',
+        shelf: 'horizons',
+        name: 'Retired X',
+        excludeFromCompletion: 'retired',
+        relics: [
+          { kind: 'item', itemId: 'rx_a' },
+          { kind: 'item', itemId: 'rx_b' },
+        ],
+      },
+      {
+        id: 'personal_x',
+        shelf: 'horizons',
+        name: 'Personal X',
+        excludeFromCompletion: 'personal',
+        relics: [
+          { kind: 'item', itemId: 'px_a' },
+          { kind: 'item', itemId: 'px_b' },
+        ],
+      },
+    ];
+    const model = buildReliquaryView(
+      input({
+        pages: [...TEST_PAGES, ...flagged],
+        // Owning relics on BOTH flagged pages: neither side of the pair moves.
+        itemsDiscovered: ownedSet('crypt_helm', 'rx_a', 'rx_b', 'px_a'),
+        ownedMounts: ownedSet('steed_a'),
+      }),
+    );
+    const horizons = model.shelfCards.find((c) => c.shelf === 'horizons');
+    const rail = model.shelves.find((s) => s.id === 'horizons');
+    // The unflagged Horizons page in TEST_PAGES is the whole answer: 1 of 1.
+    expect({ owned: horizons?.owned, total: horizons?.total }).toEqual({ owned: 1, total: 1 });
+    expect({ owned: rail?.owned, total: rail?.total }).toEqual({ owned: 1, total: 1 });
+    // Positive control: the unflagged conquerors sum still moves with a fill.
+    const conquerors = model.shelfCards.find((c) => c.shelf === 'conquerors');
+    expect({ owned: conquerors?.owned, total: conquerors?.total }).toEqual({ owned: 1, total: 9 });
+    // The flagged pages keep their OWN page-local pairs, which is the number a
+    // player can actually move; only the SUM ignores them.
+    const shelf = buildReliquaryView(
+      input({
+        nav: 'horizons',
+        pages: [...TEST_PAGES, ...flagged],
+        itemsDiscovered: ownedSet('rx_a', 'rx_b', 'px_a'),
+      }),
+    );
+    const rows = new Map(shelf.shelfPages.map((p) => [p.pageId, `${p.owned}/${p.total}`]));
+    expect(rows.get('retired_x')).toBe('2/2');
+    expect(rows.get('personal_x')).toBe('1/2');
+  });
+
   it('shows the NEWEST ring find on each shelf and ignores the other shelves', () => {
     // Oldest-first ring spanning all three shelves, with two conqueror finds so
     // "newest" is a real choice rather than "the only one".
@@ -853,7 +912,11 @@ describe('buildReliquaryView shelf and page', () => {
 });
 
 describe('secondary clear meter (the display-only second meter)', () => {
-  it('populates secondaryClears only for pages the injected callback answers', () => {
+  it('keeps the second meter OFF the shelf rows (only the open page paints it)', () => {
+    // QA S6: the shelf list renders the primary clear meter and nothing else,
+    // so a shelf row carrying a second number was a model field nothing could
+    // ever paint. The field is now detail-scoped; the primary meter's presence
+    // on the same rows is the positive control that this build is live.
     const model = buildReliquaryView(
       input({
         nav: 'conquerors',
@@ -863,14 +926,14 @@ describe('secondary clear meter (the display-only second meter)', () => {
     );
     const crypt = model.shelfPages.find((p) => p.pageId === 'crypt_n');
     expect(crypt?.clears).toBe(7);
-    expect(crypt?.secondaryClears).toBe(2);
-    // Every other page stays undefined (the meter is absent, not zero).
+    expect(crypt).not.toHaveProperty('secondaryClears');
+    // Every other page stays undefined on the primary too (absent, not zero).
     const sanctum = model.shelfPages.find((p) => p.pageId === 'sanctum_n');
     expect(sanctum?.clears).toBeUndefined();
-    expect(sanctum?.secondaryClears).toBeUndefined();
+    expect(sanctum).not.toHaveProperty('secondaryClears');
   });
 
-  it('carries secondaryClears onto the active page header and detail', () => {
+  it('carries secondaryClears onto the page DETAIL, and the header stub stays clean', () => {
     const model = buildReliquaryView(
       input({
         nav: 'conquerors',
@@ -878,8 +941,8 @@ describe('secondary clear meter (the display-only second meter)', () => {
         secondaryClearCount: (id) => (id === 'crypt_n' ? 4 : undefined),
       }),
     );
-    expect(model.activePage?.secondaryClears).toBe(4);
     expect(model.pageDetail?.secondaryClears).toBe(4);
+    expect(model.activePage).not.toHaveProperty('secondaryClears');
     // The full-catalog resolve path (nav elsewhere) threads it too.
     const overview = buildReliquaryView(
       input({
@@ -888,12 +951,50 @@ describe('secondary clear meter (the display-only second meter)', () => {
         secondaryClearCount: (id) => (id === 'crypt_n' ? 4 : undefined),
       }),
     );
-    expect(overview.activePage?.secondaryClears).toBe(4);
+    expect(overview.pageDetail?.secondaryClears).toBe(4);
+    expect(overview.activePage).not.toHaveProperty('secondaryClears');
   });
 
   it('without the callback the model carries undefined (offline parity shape)', () => {
     const model = buildReliquaryView(input({ nav: 'conquerors', pageId: 'crypt_n' }));
     expect(model.pageDetail?.secondaryClears).toBeUndefined();
+  });
+
+  it('reliquarySecondaryClears answers every refusal arm without throwing', () => {
+    // The window used to spell this inline, where no unit test could reach the
+    // refusal arms. Each arm is driven directly here; the shape of the answer
+    // is what the painter branches on, so undefined and 0 are pinned apart.
+    const counters = { riftSRankClears: 4.9, riftClears: 11 } as never;
+    const withMeter: ReliquaryPageDef = {
+      id: 'meter_page',
+      shelf: 'conquerors',
+      name: 'Meter',
+      secondaryClearSource: { kind: 'deed_stat', stat: 'riftSRankClears' },
+      relics: [],
+    };
+    // No secondaryClearSource, and an absent page def, both mean "no meter".
+    expect(reliquarySecondaryClears(TEST_PAGES[0], counters)).toBeUndefined();
+    expect(reliquarySecondaryClears(undefined, counters)).toBeUndefined();
+    // Valid: floored, never rounded.
+    expect(reliquarySecondaryClears(withMeter, counters)).toBe(4);
+    // Absent counters block (a stub world, or a host that has not mirrored the
+    // facet): zero, not a throw and not undefined.
+    expect(reliquarySecondaryClears(withMeter, undefined)).toBe(0);
+    expect(reliquarySecondaryClears(withMeter, {} as never)).toBe(0);
+    // A stat OUTSIDE DEED_STAT_KEYS refuses to zero rather than reading a
+    // counter that is not part of the sanctioned space.
+    const drifted: ReliquaryPageDef = {
+      ...withMeter,
+      secondaryClearSource: { kind: 'deed_stat', stat: 'notAStatKey' },
+    };
+    expect(reliquarySecondaryClears(drifted, { notAStatKey: 9 } as never)).toBe(0);
+    // Non-finite and non-positive values all floor to zero.
+    for (const bad of [-3, 0, Number.NaN, Number.POSITIVE_INFINITY, '7']) {
+      expect(
+        reliquarySecondaryClears(withMeter, { riftSRankClears: bad } as never),
+        String(bad),
+      ).toBe(0);
+    }
   });
 
   it('the live catalog authors the meter on the Rift page alone today', () => {

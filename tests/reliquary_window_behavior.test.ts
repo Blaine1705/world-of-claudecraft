@@ -170,6 +170,13 @@ interface WorldState {
   curatorRank: number;
   /** reliquaryPageClearCount(pageId). */
   clears: Map<string, number>;
+  /**
+   * world.deedStats.counters, the block the display-only SECOND clear meter
+   * reads. Optional on purpose: a host that has not mirrored the facet (and a
+   * stub that never seeds it) is a live path the meter must survive, so the
+   * default state leaves it absent and one test drives that arm directly.
+   */
+  counters?: Record<string, number>;
   /** reliquaryPageCompletion(pageId).owned (the signature, and the pin prune). */
   pageOwned: Map<string, number>;
   /** Overrides reliquaryPageCompletion(pageId).total; the catalog count otherwise. */
@@ -245,7 +252,7 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         // a character switch, rather than frozen into the deps at construction.
         cfg: { playerClass: state.identity.playerClass },
         player: { name: state.identity.name },
-        deedStats: { itemsDiscovered: state.itemsDiscovered },
+        deedStats: { itemsDiscovered: state.itemsDiscovered, counters: state.counters },
         reliquaryMarks: state.marks,
         reliquaryRecent: state.recent,
         reliquaryFirstFind: state.firstFind,
@@ -3028,5 +3035,94 @@ describe('pinning a page to the HUD tracker', () => {
     // passes the switch above on its own.
     state.identity = { playerClass: 'warrior', name: 'Testwright' };
     expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11. The display-only SECOND clear meter, and the outside-completion chips
+// ---------------------------------------------------------------------------
+
+describe('ReliquaryWindow: the S-rank second clear meter', () => {
+  // The live page that authors a secondaryClearSource. Asserted as a premise so
+  // a content move fails loudly here instead of making both arms vacuous.
+  const RIFT_PAGE_ID = 'conquerors_the_rift';
+
+  it('paints the S-rank line from the deed counter block', () => {
+    const def = pageDef(RIFT_PAGE_ID);
+    expect(
+      def.secondaryClearSource?.stat,
+      'content premise: the Rift page names the S counter',
+    ).toBe('riftSRankClears');
+    const state = baseState();
+    state.counters = { riftSRankClears: 7 };
+    const rig = openPage(state, RIFT_PAGE_ID);
+    const meters = [...rig.el.querySelectorAll<HTMLElement>('[data-secondary-clears]')];
+    expect(meters).toHaveLength(1);
+    // Live t() call, never hardcoded English: a locale fill must not red this.
+    expect(meters[0]?.textContent).toBe(
+      t('hudChrome.reliquary.srankClearsLabel', { count: fmt(7) }),
+    );
+  });
+
+  it('renders the meter as zero, without throwing, when the world has NO counters block', () => {
+    // The default stub omits deedStats.counters entirely, which is the shape a
+    // host that has not mirrored the facet really presents. This path executes
+    // today; it must degrade to 0 rather than throw mid-paint.
+    const state = baseState();
+    expect(state.counters).toBeUndefined();
+    const rig = openPage(state, RIFT_PAGE_ID);
+    const meters = [...rig.el.querySelectorAll<HTMLElement>('[data-secondary-clears]')];
+    expect(meters).toHaveLength(1);
+    expect(meters[0]?.textContent).toBe(
+      t('hudChrome.reliquary.srankClearsLabel', { count: fmt(0) }),
+    );
+  });
+
+  it('paints NO second meter on a page that authors no secondaryClearSource', () => {
+    const state = baseState();
+    state.counters = { riftSRankClears: 7 };
+    const rig = openPage(state, PAGE_ID);
+    expect(pageDef(PAGE_ID).secondaryClearSource).toBeUndefined();
+    expect(rig.el.querySelectorAll('[data-secondary-clears]')).toHaveLength(0);
+  });
+});
+
+describe('ReliquaryWindow: the outside-completion chips', () => {
+  const VAULT_PAGE_ID = 'horizons_vault_of_ages';
+  const RIFTBOUND_PAGE_ID = 'horizons_riftbound';
+
+  it('wears the Retired chip on the vault shelf row AND its page header', () => {
+    expect(pageDef(VAULT_PAGE_ID).excludeFromCompletion).toBe('retired');
+    const rig = makeWindow(baseState(), { nav: 'horizons' });
+    // Shelf row first, before any navigation.
+    const rowChips = [...rig.el.querySelectorAll<HTMLElement>('[data-retired]')];
+    expect(rowChips).toHaveLength(1);
+    expect(rowChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
+    // Then the page header, on the same live window.
+    click(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
+    const headerChips = [...rig.el.querySelectorAll<HTMLElement>('[data-retired]')];
+    expect(headerChips).toHaveLength(1);
+    expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
+  });
+
+  it('wears the Personal chip on the riftbound row, never the Retired word', () => {
+    expect(pageDef(RIFTBOUND_PAGE_ID).excludeFromCompletion).toBe('personal');
+    const rig = makeWindow(baseState(), { nav: 'horizons' });
+    const row = must(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
+    const chip = row.querySelector<HTMLElement>('[data-personal]');
+    expect(chip, 'the riftbound shelf row carries the personal chip').toBeTruthy();
+    expect(chip?.textContent).toBe(t('hudChrome.reliquary.personalLabel'));
+    // The two reasons never wear each other's word: this row carries no
+    // data-retired hook, and the vault row (same paint) carries no personal one.
+    expect(row.querySelector('[data-retired]')).toBeNull();
+    const vaultRow = must(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
+    expect(vaultRow.querySelector('[data-personal]')).toBeNull();
+  });
+
+  it('paints no chip at all on an ordinary page', () => {
+    const rig = openPage(baseState(), PAGE_ID);
+    expect(pageDef(PAGE_ID).excludeFromCompletion).toBeUndefined();
+    expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(0);
+    expect(rig.el.querySelectorAll('[data-personal]')).toHaveLength(0);
   });
 });

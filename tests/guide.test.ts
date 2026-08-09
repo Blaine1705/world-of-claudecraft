@@ -4,6 +4,9 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+// The English the /c/ public sheet resolves a mark id to. Imported here so the
+// generator's own hand table cannot drift away from what the sheet says.
+import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
 import { BIND_ACTIONS } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
@@ -838,6 +841,46 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     ]) {
       expect(blob.includes(`"${leak}"`), `leaked field token ${leak}`).toBe(false);
     }
+  });
+
+  it('every generated mark name equals the shipped English the sheet resolves', () => {
+    // The generator keeps its OWN hand table of mark names
+    // (RELIQUARY_MARK_GUIDE_NAMES in scripts/wiki/build_content.mjs), so the
+    // wiki could print a name the /c/ sheet never says. Anchor the two
+    // together on RELIQUARY_MARK_ENGLISH, which the character-sheet cross-pin
+    // already binds to the live MOBS display names: through that pin this
+    // reaches MOBS transitively, without re-deriving it here.
+    //
+    // The generated relics carry {kind, name} only (no markId, by the field
+    // allowlist above), so the id comes from the live catalog page at the SAME
+    // index: the emit walks page.relics in order, which the id-order pin above
+    // already holds.
+    let checked = 0;
+    const nonSlain: string[] = [];
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((p) => p.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      expect(guidePage.relics.length, `${guidePage.id} relic count`).toBe(live.relics.length);
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mark') continue;
+        const expected = RELIQUARY_MARK_ENGLISH.get(relic.markId);
+        expect(expected, `${relic.markId} has shipped English`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.markId}`).toBe(expected);
+        checked += 1;
+        if (!relic.markId.startsWith('slain:')) nonSlain.push(relic.markId);
+      }
+    }
+    // Floor at today's measured catalog: 19 rare-slain proofs plus the 10
+    // profession marks. A page that stopped emitting marks would otherwise
+    // make every assertion above vacuous.
+    expect(checked).toBeGreaterThanOrEqual(29);
+    // And the sweep really spans the whole table FAMILY, not just the slain
+    // namespace the Rares page contributes: masterwork and gather_event rows
+    // are checked too, so a generator edit scoped to one family cannot hide.
+    expect(nonSlain.some((id) => id.startsWith('masterwork:'))).toBe(true);
+    expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
   });
 
   it('pins the reliquary route wiring to literals', () => {

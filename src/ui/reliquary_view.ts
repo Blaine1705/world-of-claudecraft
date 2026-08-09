@@ -35,7 +35,7 @@ import {
   isRelicFilled,
   pageCompletion,
 } from '../sim/reliquary';
-import type { DeedDef } from '../sim/types';
+import { DEED_STAT_KEYS, type DeedDef, type DeedStatKey, type DeedStats } from '../sim/types';
 import type { TranslationKey } from './i18n';
 
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
@@ -418,11 +418,12 @@ export interface ReliquaryShelfPageModel {
   owned: number;
   total: number;
   complete: boolean;
-  /** Lifetime clears when the page has a clear source; undefined otherwise. */
+  /** Lifetime clears when the page has a clear source; undefined otherwise.
+   *
+   *  The SECOND meter is deliberately not here: only the open page renders it,
+   *  so it lives on ReliquaryPageDetailModel and a shelf row never carries a
+   *  number nothing paints. */
   clears: number | undefined;
-  /** Lifetime count for the page's display-only secondaryClearSource meter;
-   *  undefined for every page without one (the common case). */
-  secondaryClears: number | undefined;
 }
 
 /** One relic slot on an open page grid. */
@@ -457,6 +458,10 @@ export interface ReliquaryGridCellModel {
 
 /** Full page view: header progress plus ordered grid cells. */
 export interface ReliquaryPageDetailModel extends ReliquaryShelfPageModel {
+  /** Lifetime count for the page's display-only secondaryClearSource meter;
+   *  undefined for every page without one (the common case). Detail-scoped:
+   *  the open page header is the ONE surface that paints it. */
+  secondaryClears: number | undefined;
   /** Grid cells AFTER search / ownership filtering. owned and total above stay
    *  the page's true completion, so the header meter never lies under a filter. */
   cells: ReliquaryGridCellModel[];
@@ -530,7 +535,6 @@ function shelfPageModel(
   page: ReliquaryPageDef,
   opts: ReturnType<typeof ownershipOpts>,
   clearCount?: (pageId: string) => number | undefined,
-  secondaryClearCount?: (pageId: string) => number | undefined,
 ): ReliquaryShelfPageModel {
   const c = pageCompletion(page, opts);
   return {
@@ -541,8 +545,35 @@ function shelfPageModel(
     total: c.total,
     complete: c.complete,
     clears: clearCount?.(page.id),
-    secondaryClears: secondaryClearCount?.(page.id),
   };
+}
+
+/**
+ * The display-only SECOND clear meter's value for one page: undefined for
+ * every page without a secondaryClearSource (the common case), else the named
+ * counter floored to a finite non-negative integer.
+ *
+ * Fail-closed on purpose, and the reason it is a unit rather than a lambda
+ * inside the window: a stat name outside DEED_STAT_KEYS, an absent counters
+ * block (a stub world in a test, or a host that has not mirrored the facet
+ * yet), and a negative / NaN / Infinity counter all answer 0 rather than
+ * throwing mid-paint or inventing a parallel counter channel. Zero and
+ * undefined are DIFFERENT answers here: undefined means the page has no second
+ * meter and the painter renders no line at all.
+ *
+ * Takes the page DEF rather than an id, the reliquaryRelicSource convention: a
+ * synthetic test page reusing a live id must resolve its own source, never the
+ * catalog row that shares the id.
+ */
+export function reliquarySecondaryClears(
+  page: ReliquaryPageDef | undefined,
+  counters: DeedStats['counters'] | undefined,
+): number | undefined {
+  const src = page?.secondaryClearSource;
+  if (src === undefined) return undefined;
+  if (!(DEED_STAT_KEYS as readonly string[]).includes(src.stat)) return 0;
+  const n = counters?.[src.stat as DeedStatKey];
+  return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
 function relicSlotId(relic: ReliquaryRelicDef): string {
@@ -698,6 +729,13 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     shelfTotals.set(shelf, { owned: 0, total: 0 });
   }
   for (const page of input.pages) {
+    // Same scoring rule the headline pair uses (completionScoringPages in
+    // src/sim/reliquary.ts): an excludeFromCompletion page contributes to
+    // NEITHER side of a shelf sum. Counting it here while the headline
+    // excluded it made the rail and the Overview cards disagree with the
+    // number at the top of the same window. The flagged page's OWN row keeps
+    // its local owned/total, which is the pair a player can actually move.
+    if (page.excludeFromCompletion !== undefined) continue;
     const c = pageCompletion(page, opts);
     const bucket = shelfTotals.get(page.shelf);
     if (!bucket) continue;
@@ -732,7 +770,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   if (input.nav !== 'overview') {
     for (const page of input.pages) {
       if (!pageIsShelf(page, input.nav)) continue;
-      allShelfPages.push(shelfPageModel(page, opts, input.clearCount, input.secondaryClearCount));
+      allShelfPages.push(shelfPageModel(page, opts, input.clearCount));
     }
   }
   // Typing a relic name from the shelf shows you which page holds it instead
@@ -751,7 +789,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
       // Page selected but not on this shelf (or unknown): resolve from full catalog.
       const page = pagesById.get(input.pageId);
       if (page) {
-        activePage = shelfPageModel(page, opts, input.clearCount, input.secondaryClearCount);
+        activePage = shelfPageModel(page, opts, input.clearCount);
       }
     }
     if (activePage !== null) {
@@ -772,6 +810,9 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
         );
         pageDetail = {
           ...header,
+          // Resolved HERE and not on the shelf row: the second meter paints on
+          // the open page header alone, so only the detail model carries it.
+          secondaryClears: input.secondaryClearCount?.(header.pageId),
           cells: visible,
           filtered: visible.length !== cells.length,
           illuminated: header.complete,

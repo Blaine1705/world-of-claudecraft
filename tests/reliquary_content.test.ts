@@ -371,10 +371,27 @@ describe('Reliquary Conqueror catalog structure', () => {
     // count here while adding zero to every completion pair, which is why this
     // number exceeds the overview total above by more than the mark count.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
-    expect(slots).toBe(372);
+    // Diagnostic names the per-page breakdown, so a red here says WHICH page
+    // moved instead of only that the sum did.
+    expect(
+      slots,
+      `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
+    ).toBe(372);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
-    expect(RELIQUARY_MARK_IDS.size).toBe(29);
+    expect(
+      RELIQUARY_MARK_IDS.size,
+      `mark total moved; by namespace: ${[
+        ...[...RELIQUARY_MARK_IDS]
+          .reduce((acc, id) => {
+            const ns = id.includes(':') ? `${id.slice(0, id.indexOf(':'))}:*` : id;
+            return acc.set(ns, (acc.get(ns) ?? 0) + 1);
+          }, new Map<string, number>())
+          .entries(),
+      ]
+        .map(([ns, n]) => `${ns}=${n}`)
+        .join(', ')}`,
+    ).toBe(29);
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -488,18 +505,23 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // sets are empty of relics today; this reds the day a content edit
     // changes either, forcing the classification decision instead of silently
     // inheriting "counts".
-    const honorOnly = (itemId: string): boolean => {
-      const def = ITEMS[itemId];
-      const copper = def?.buyValue !== undefined && def.buyValue > 0;
-      const honor = def?.priceHonor !== undefined && def.priceHonor > 0;
+    // Takes the PRICE PAIR rather than an id, so the classifier can be driven
+    // with a synthetic row no live item has to exhibit.
+    const honorOnly = (price: { buyValue?: number; priceHonor?: number }): boolean => {
+      const copper = price.buyValue !== undefined && price.buyValue > 0;
+      const honor = price.priceHonor !== undefined && price.priceHonor > 0;
       return honor && !copper;
     };
+    const priceOf = (itemId: string): { buyValue?: number; priceHonor?: number } => ({
+      buyValue: ITEMS[itemId]?.buyValue,
+      priceHonor: ITEMS[itemId]?.priceHonor,
+    });
     const vendorOffenders: string[] = [];
     let honorExempt = 0;
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!isCataloguedRelicItem(itemId)) continue;
-        if (honorOnly(itemId)) {
+        if (honorOnly(priceOf(itemId))) {
           honorExempt += 1;
           continue;
         }
@@ -512,8 +534,19 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
     expect(honorExempt).toBe(FURY_STOCK.length * 2);
-    expect(FURY_STOCK.every((id) => honorOnly(id))).toBe(true);
-    expect(honorOnly('deacon_reliquary_helm')).toBe(false);
+    expect(FURY_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
+    expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
+    // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
+    // item purchasable with BOTH honor and copper is not exempt, because the
+    // copper half is exactly the gold-repeatable tally climb this sweep exists
+    // to catch. Synthetic on purpose; a live-only assertion here would be
+    // vacuous until someone authored the very row that must not slip through.
+    expect(honorOnly({ buyValue: 100, priceHonor: 50 })).toBe(false);
+    // The two neighbouring arms, so the negative above is not the only shape
+    // the classifier is driven with.
+    expect(honorOnly({ priceHonor: 50 })).toBe(true);
+    expect(honorOnly({ buyValue: 100 })).toBe(false);
+    expect(honorOnly({})).toBe(false);
     const yieldOffenders = [
       ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
       ...Object.values(ARMOR_SECONDARY_BY_TYPE),
@@ -1081,6 +1114,17 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
       ].sort(),
     );
     for (const [kit, count] of byKit) expect(count, kit).toBe(7);
+    // ORDER, not just membership and per-kit counts: the page spreads the live
+    // stock, so the five kits must appear as five contiguous runs of seven in
+    // the authored defs order. A defs edit that interleaved two kits would keep
+    // every assertion above green while the page painted a scrambled gallery.
+    expect(itemRelicIds(gallery).map((id) => WARFARE_ITEMS[id].set)).toEqual([
+      ...Array<string>(7).fill(SET_WARFARE_FURYFORGED),
+      ...Array<string>(7).fill(SET_WARFARE_STORMBOUND),
+      ...Array<string>(7).fill(SET_WARFARE_ASHSTALKER),
+      ...Array<string>(7).fill(SET_WARFARE_CINDERWEAVE),
+      ...Array<string>(7).fill(SET_WARFARE_THORNHIDE),
+    ]);
     // The quality arm: epic-only is vacuous as a page filter today (the whole
     // stock is epic), so it is asserted as a STOCK fact instead; a sub-epic
     // honor row would red here and force the museum-in-or-out decision.

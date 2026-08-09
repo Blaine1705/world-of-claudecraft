@@ -368,6 +368,14 @@ describe('painter hygiene', () => {
     expect(sigBody, 'sigFromInput body').toBeTruthy();
     expect(sigBody).toContain('search: input.search');
     expect(sigBody).toContain('ownedFilter: input.ownedFilter');
+    // The clears digest is fed BOTH meters. A secondary-only bump (an S-rank
+    // clear with no ownership change) must move the signature, or an open page
+    // header keeps painting the old number until something else repaints it.
+    // Scoped to the same body, and matched on the CALL text so dropping the
+    // argument reds here rather than only in the pure fold's own unit test.
+    expect(sigBody).toMatch(
+      /reliquaryClearsDigest\(\s*input\.pages,\s*input\.clearCount,\s*input\.secondaryClearCount,?\s*\)/,
+    );
     // The chip value is re-validated before the cast (the DOM is untrusted).
     expect(code).toContain('isReliquaryOwnedFilter(filter) ? filter : ');
     expect(code).toContain('aria-pressed');
@@ -766,6 +774,57 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
       expect(form?.trim(), `ru ${PLURAL_LEAVES[i]} empty`).not.toBe('');
     }
     expect(new Set(ruForms).size, `ru one/few/many were ${JSON.stringify(ruForms)}`).toBe(3);
+  });
+
+  it('authors the Phase 21 English keys and fills all five non-Latin locales', () => {
+    // Same shape as the Phase 13 and 17 arms above, for the keys this phase
+    // added: the two outside-completion chip words, the second clear meter, the
+    // first-clear source sentence, and the 19 rare-slain markFind leaves. All
+    // are short chip / label copy rather than plural bases, so each is one leaf.
+    const FLAT_KEYS = [
+      'retiredLabel',
+      'personalLabel',
+      'srankClearsLabel',
+      'sourceActivityRiftFirstClear',
+    ];
+    const chromeCode = stripComments(chrome);
+    for (const key of FLAT_KEYS) {
+      expect(chromeCode, key).toContain(`${key}:`);
+    }
+    // The slain leaves are DERIVED from the live catalog rather than listed, so
+    // a twentieth rare cannot ship a mark with no name in any language.
+    const slainLeaves = [...RELIQUARY_MARK_IDS]
+      .filter((id) => id.startsWith('slain:'))
+      .map((id) => id.replace(/:/g, '_'))
+      .sort();
+    expect(slainLeaves.length, 'the live catalog carries the rare-slain proofs').toBe(19);
+    for (const leaf of slainLeaves) {
+      expect(chromeCode, leaf).toContain(`${leaf}:`);
+    }
+    // Reads a fill's VALUE, tolerating biome's wrap: key presence alone would
+    // pass on the empty string a half-finished fill leaves behind.
+    const fillValue = (table: string, key: string): string | undefined =>
+      table.match(new RegExp(`'${key.replace(/\./g, '\\.')}':\\s*\\n?\\s*'([^']*)'`))?.[1];
+    for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']) {
+      const table = stripComments(read(`../src/ui/i18n.locales/${locale}.ts`));
+      for (const key of FLAT_KEYS) {
+        const value = fillValue(table, `hudChrome.reliquary.${key}`);
+        expect(typeof value, `${locale} ${key} missing`).toBe('string');
+        expect(value?.trim(), `${locale} ${key} empty`).not.toBe('');
+      }
+      for (const leaf of slainLeaves) {
+        const value = fillValue(table, `hudChrome.reliquary.markFind.${leaf}`);
+        expect(typeof value, `${locale} markFind.${leaf} missing`).toBe('string');
+        expect(value?.trim(), `${locale} markFind.${leaf} empty`).not.toBe('');
+      }
+      // The two chip words must not collapse onto one string: Retired and
+      // Personal name different reasons, and a copy-paste fill would make the
+      // riftbound page read as retired content in that language.
+      expect(
+        fillValue(table, 'hudChrome.reliquary.retiredLabel'),
+        `${locale} chip words collapsed`,
+      ).not.toBe(fillValue(table, 'hudChrome.reliquary.personalLabel'));
+    }
   });
 
   it('authors the Phase 17 obtain-count plurals and fills all five non-Latin locales', () => {
