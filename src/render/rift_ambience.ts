@@ -9,11 +9,19 @@
 import type { Entity } from '../sim/types';
 import type { AmbientPointSource } from './audio_sink';
 
-export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): AmbientPointSource[] {
-  const sources: AmbientPointSource[] = [];
+// Writes the live rift ambience set into a CALLER-OWNED scratch array (cleared
+// first), so a hot per-frame caller (renderer.ts updateCamera) can reuse one
+// array across frames instead of allocating a fresh one every tick regardless
+// of whether any rift entity is nearby (review finding, PR #2687; see
+// src/render/CLAUDE.md "Performance discipline": reuse, don't allocate).
+export function collectRiftAmbientSources(
+  entities: ReadonlyMap<number, Entity>,
+  out: AmbientPointSource[],
+): void {
+  out.length = 0;
   for (const e of entities.values()) {
     if (e.templateId === 'rift_portal') {
-      sources.push({
+      out.push({
         id: `rift_portal:${e.id}`,
         kind: 'rift_portal',
         x: e.pos.x,
@@ -21,7 +29,7 @@ export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): Ambie
         z: e.pos.z,
       });
     } else if (e.templateId === 'rift_roller') {
-      sources.push({
+      out.push({
         id: `rift_roller:${e.id}`,
         kind: 'rift_roller',
         x: e.pos.x,
@@ -33,7 +41,7 @@ export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): Ambie
       // riftSliding already syncs for every entity (server/game.ts's `sld`
       // field drives the frozen-pose visual for anyone sliding), so this
       // reuses the same wire state rather than adding new sync surface.
-      sources.push({
+      out.push({
         id: `rift_ice_glide:${e.id}`,
         kind: 'rift_ice_glide',
         x: e.pos.x,
@@ -42,5 +50,12 @@ export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): Ambie
       });
     }
   }
+}
+
+// Allocating convenience wrapper, kept for tests and any cold-path caller
+// that wants a plain return value rather than the scratch-array contract.
+export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): AmbientPointSource[] {
+  const sources: AmbientPointSource[] = [];
+  collectRiftAmbientSources(entities, sources);
   return sources;
 }

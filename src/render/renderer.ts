@@ -373,7 +373,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
-import { riftAmbientSources } from './rift_ambience';
+import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
@@ -1814,6 +1814,11 @@ export class Renderer {
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
   private readonly ambientPointSources: readonly AmbientPointSource[];
+  // Reused scratch buffers for the per-frame rift ambience merge in
+  // updateCamera: avoids allocating two arrays plus an object per match every
+  // frame regardless of whether a rift is nearby (review finding, PR #2687).
+  private readonly riftAmbienceScratch: AmbientPointSource[] = [];
+  private readonly ambientPointsMergedScratch: AmbientPointSource[] = [];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -11468,7 +11473,16 @@ export class Renderer {
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
-      const points = this.ambientPointSources.concat(riftAmbientSources(this.sim.entities));
+      collectRiftAmbientSources(this.sim.entities, this.riftAmbienceScratch);
+      // Early-out: no live rift ambience this frame, so skip building the
+      // merged array entirely and hand the static set straight through.
+      let points: readonly AmbientPointSource[] = this.ambientPointSources;
+      if (this.riftAmbienceScratch.length > 0) {
+        this.ambientPointsMergedScratch.length = 0;
+        for (const p of this.ambientPointSources) this.ambientPointsMergedScratch.push(p);
+        for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
+        points = this.ambientPointsMergedScratch;
+      }
       sink.ambience(biome, inDungeon, precip, nearWater, crowd, points);
     }
   }
