@@ -78,8 +78,21 @@ interface AttributionTargetFixture {
 // the rendererIntegration leaf (the release's PR #2983 re-land, this branch's
 // creator review pass), so the merged tree mints a value matching neither
 // parent. Captures adopted verbatim; no measured value moved on either side.
+// Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
+// follows the anchor seam, the weapon-skin fade and the census tag. No capture
+// was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
+// Re-minted after pinning the three specifier exact (PR 3165 review): only
+// the pnpm-lock.yaml specifier row moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '532c7b4b907fc86b1847b415bb8d915428c2e3abac19ac1d1128d51e117b01a6';
+  '9dd239c2645c8e996d1af0a3bc20d1103e4ff338b226c8fd9b8f405c175b575a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

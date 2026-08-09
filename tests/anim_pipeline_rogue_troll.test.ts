@@ -142,7 +142,10 @@ describe('mob_troll bespoke attack (issue #2889 rogue-troll batch)', () => {
     // A specific sibling family this batch does not touch (a concurrent
     // in-flight batch may independently migrate a DIFFERENT BIPED14 member,
     // so this asserts one named family rather than an exact remaining count).
-    const yetiBlock = manifestBlock('mob_yeti: {', 'mob_spider: {');
-    expect(yetiBlock).toContain('clips: BIPED14,');
+    // mob_yeti, mob_murloc, and mob_bear were all later migrated off the
+    // shared constant too (issue #2889 round 2, their own bespoke attacks),
+    // so mob_demon is the still-untouched sibling this assertion now names.
+    const demonBlock = manifestBlock('mob_demon: {', 'mob_demon_flying: {');
+    expect(demonBlock).toContain('clips: BIPED14,');
   });
 });
