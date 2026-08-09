@@ -9,11 +9,13 @@ import { sourceFilesUnder } from './helpers/source_files_under';
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 describe('three compileAsync disposal race patch', () => {
-  it('keeps the installed three r165 currentProgram guard applied', () => {
+  it('keeps the installed three currentProgram guard applied', () => {
     // Install-integrity trap: compileAsync polls after a churned material can
     // lose its renderer properties. A three upgrade must re-evaluate the race.
+    // Re-evaluated for the 0.185.1 train: upstream r185 still ships the
+    // unguarded poll, so the guard was re-authored against 0.185.1.
     //
-    // Scope: patches/three@0.165.0.patch covers build/three.module.js ONLY.
+    // Scope: patches/three@0.185.1.patch covers build/three.module.js ONLY.
     // build/three.cjs and build/three.module.min.js still carry the race. The
     // bundle-scope guard below proves nothing outside node_modules consumes
     // either one: no CommonJS require('three') (which would resolve the
@@ -35,11 +37,11 @@ describe('three compileAsync disposal race patch', () => {
     // dump the whole 1.28 MB bundle into the reporter.
     expect(
       source.includes('if ( program === undefined || program.isReady() ) {'),
-      'the three r165 compileAsync patch is not applied; re-run pnpm install',
+      'the three compileAsync patch is not applied; re-run pnpm install',
     ).toBe(true);
     expect(
-      source.includes('three r165 compileAsync disposal race'),
-      'the three r165 compileAsync patch marker comment is missing; re-run pnpm install',
+      source.includes('three compileAsync disposal race'),
+      'the three compileAsync patch marker comment is missing; re-run pnpm install',
     ).toBe(true);
   });
 });
@@ -127,7 +129,7 @@ describe('the unpatched three bundles stay unconsumed', () => {
     expect(
       scan.offenders,
       'a module reaches a three bundle the compileAsync patch does not cover: extend ' +
-        'patches/three@0.165.0.patch to that bundle (and update the scope note in this file) ' +
+        'patches/three@0.185.1.patch to that bundle (and update the scope note in this file) ' +
         'before consuming it',
     ).toEqual([]);
   });
