@@ -323,12 +323,17 @@ export function createArmoryPreview(
     frameCamera();
   }
 
-  const clock = new THREE.Clock();
+  // THREE.Timer, not the r183-deprecated Clock. Clock's stop()/start() pause
+  // protocol maps to reset-on-resume: while inactive the loop never calls
+  // update(), and reset() re-anchors before the first resumed frame so the
+  // paused span never enters a delta.
+  const timer = new THREE.Timer();
   let raf: number | null = null;
   const animate = () => {
     raf = null;
     if (disposed || !active || prewarming) return;
-    const dt = Math.min(clock.getDelta(), 0.1);
+    timer.update();
+    const dt = Math.min(timer.getDelta(), 0.1);
     if (mode === 'character') {
       characterGroup.rotation.y += dt * 0.45;
       visual.update(dt, IDLE_STATE, true);
@@ -382,11 +387,10 @@ export function createArmoryPreview(
       if (!active) {
         if (raf !== null) cancelAnimationFrame(raf);
         raf = null;
-        clock.stop();
         return;
       }
       resize();
-      clock.start();
+      timer.reset();
       if (!prewarming && raf === null) raf = requestAnimationFrame(animate);
     },
     setAppearance(next: PreviewAppearance): void {
@@ -431,7 +435,6 @@ export function createArmoryPreview(
       if (raf !== null) cancelAnimationFrame(raf);
       raf = null;
       active = false;
-      clock.stop();
       prewarming = true;
       try {
         renderer.setPixelRatio(1);
@@ -487,7 +490,7 @@ export function createArmoryPreview(
         active = wasActive;
         if (active && !disposed) {
           resize();
-          clock.start();
+          timer.reset();
           raf = requestAnimationFrame(animate);
         }
       }

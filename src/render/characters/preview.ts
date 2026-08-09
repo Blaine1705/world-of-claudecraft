@@ -67,7 +67,10 @@ export class CharacterPreview {
   private appearanceSig: string | null = null;
   /** Look handed to the next modular rebuild (setVisualKey reads it back). */
   private pendingLook: ModularLook | null = null;
-  private clock = new THREE.Clock();
+  // THREE.Timer, not the r183-deprecated Clock: update() advances it once per
+  // frame, reset() re-anchors it after a non-animating span (Clock's
+  // discard-getDelta drain pattern).
+  private timer = new THREE.Timer();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private unregisterContext: (() => void) | null = null;
@@ -378,7 +381,7 @@ export class CharacterPreview {
       this.camera.aspect = previousAspect;
       this.camera.updateProjectionMatrix();
       this.renderActive = wasActive;
-      this.clock.getDelta();
+      this.timer.reset();
     }
   }
 
@@ -466,12 +469,14 @@ export class CharacterPreview {
         this.container.clientHeight,
       )
     ) {
-      // Drain the clock while hidden so reopening cannot produce a large animation step.
-      this.clock.getDelta();
+      // Re-anchor the timer while hidden so reopening cannot produce a large
+      // animation step.
+      this.timer.reset();
       return;
     }
 
-    const dt = Math.min(this.clock.getDelta(), 0.1); // cap dt to prevent huge jumps
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), 0.1); // cap dt to prevent huge jumps
     if (!this.renderActive) return;
 
     // No idle auto-rotation: the character holds its face-on pose (the classic
