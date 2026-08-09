@@ -3173,6 +3173,20 @@ export class Renderer {
     camera: null,
   } as unknown as FramePresentHost;
 
+  // Frames whose terminal draw actually submitted, counted at the one
+  // presentFrame call site. Every other counter sits UPSTREAM of the sync
+  // present argument, so this is the only evidence downstream of the skip
+  // decision; the E2E probe (scripts/desktop_hidden_skip_probe.mjs) asserts
+  // it freezes while hidden, which kills a forced-present mutation
+  // deterministically instead of leaning on SwiftShader frame-rate collapse
+  // (phase 4 QA F4).
+  private presentedFrameCount = 0;
+
+  /** Frames whose terminal draw actually submitted this session. */
+  presentedFrames(): number {
+    return this.presentedFrameCount;
+  }
+
   /**
    * A display change the page cannot observe on its own (the window moved to
    * another monitor, or its scale factor changed). resizeViewport re-measures
@@ -11161,7 +11175,7 @@ export class Renderer {
     host.webgl = this.webgl;
     host.scene = this.scene;
     host.camera = this.camera;
-    presentFrame(host, dt, present);
+    if (presentFrame(host, dt, present)) this.presentedFrameCount++;
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
