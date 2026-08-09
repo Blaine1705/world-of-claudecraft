@@ -9,6 +9,7 @@ import {
   SENTENCE_TRANSFER_MAX_SECONDS,
   SENTENCE_TRANSFER_MIN_SECONDS,
   SENTENCE_TRANSFER_SPEED,
+  sentenceImpactPlan,
   sentenceTransferSeconds,
   writeSentenceBurstPlan,
   writeSentenceInvocationPlan,
@@ -188,5 +189,25 @@ describe('Sentence burst VFX plan', () => {
 
     expect(second).toEqual(first);
     expect(secondCast).toEqual(firstCast);
+  });
+});
+
+describe('Sentence impact feedback plan', () => {
+  it('scales the shadow pulse with the Condemnation spend tiers', () => {
+    expect(sentenceImpactPlan(0, false)).toMatchObject({ light: 7.5, duration: 0.52 });
+    expect(sentenceImpactPlan(49, false)).toMatchObject({ light: 7.5, duration: 0.52 });
+    expect(sentenceImpactPlan(50, false)).toMatchObject({ light: 9, duration: 0.6 });
+    expect(sentenceImpactPlan(80, false)).toMatchObject({ light: 10.5, duration: 0.68 });
+    expect(sentenceImpactPlan(100, false)).toMatchObject({ light: 11.5, duration: 0.72 });
+  });
+
+  it('shakes and punches FOV only for the local caster', () => {
+    expect(sentenceImpactPlan(80, false)).toMatchObject({ shake: 0, fovPunch: 0 });
+    expect(sentenceImpactPlan(80, true)).toMatchObject({ shake: 0.48, fovPunch: 1.6 });
+  });
+
+  it('reserves the heavy shake for a maximum spend', () => {
+    expect(sentenceImpactPlan(99, true)).toMatchObject({ shake: 0.48, fovPunch: 1.6 });
+    expect(sentenceImpactPlan(100, true)).toMatchObject({ shake: 0.9, fovPunch: 4 });
   });
 });

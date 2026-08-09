@@ -270,3 +270,32 @@ export function writeSentenceBurstPlan(
   }
   return out;
 }
+
+export interface SentenceImpactPlan {
+  light: number;
+  duration: number;
+  shake: number;
+  fovPunch: number;
+}
+
+// Impact feedback for the Sentence hit: heavier Condemnation spends land with a
+// brighter, longer shadow pulse, and the local caster additionally feels a
+// screen shake and FOV punch (nobody else's camera moves). Thresholds follow
+// the Condemnation spend breakpoints; a maximum (100) spend is the only tier
+// with the heavy shake.
+export function sentenceImpactPlan(condemnation: number, localCaster: boolean): SentenceImpactPlan {
+  const tier =
+    condemnation >= 100
+      ? { light: 11.5, duration: 0.72 }
+      : condemnation >= 80
+        ? { light: 10.5, duration: 0.68 }
+        : condemnation >= 50
+          ? { light: 9, duration: 0.6 }
+          : { light: 7.5, duration: 0.52 };
+  return {
+    light: tier.light,
+    duration: tier.duration,
+    shake: localCaster ? (condemnation >= 100 ? 0.9 : 0.48) : 0,
+    fovPunch: localCaster ? (condemnation >= 100 ? 4 : 1.6) : 0,
+  };
+}

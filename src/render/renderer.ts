@@ -461,6 +461,7 @@ import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { SentenceVfx } from './sentence_vfx';
+import { sentenceImpactPlan } from './sentence_vfx_core';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import {
   buildSky,
@@ -6719,19 +6720,10 @@ export class Renderer {
   // Visual reactions to sim events (called by the HUD for every event,
   // including those between other players and mobs).
   private sentenceImpactFeedback(sourceId: number, targetId: number, condemnation: number): void {
-    const tier =
-      condemnation >= 100
-        ? { light: 11.5, duration: 0.72 }
-        : condemnation >= 80
-          ? { light: 10.5, duration: 0.68 }
-          : condemnation >= 50
-            ? { light: 9, duration: 0.6 }
-            : { light: 7.5, duration: 0.52 };
-    this.pulseAt(targetId, 'shadow', tier.light, tier.duration);
-    if (sourceId === this.sim.playerId) {
-      this.addShake(condemnation >= 100 ? 0.9 : 0.48);
-      this.punchFov(condemnation >= 100 ? 4 : 1.6);
-    }
+    const plan = sentenceImpactPlan(condemnation, sourceId === this.sim.playerId);
+    this.pulseAt(targetId, 'shadow', plan.light, plan.duration);
+    if (plan.shake > 0) this.addShake(plan.shake);
+    if (plan.fovPunch > 0) this.punchFov(plan.fovPunch);
   }
 
   handleEvent(ev: SimEvent): void {
