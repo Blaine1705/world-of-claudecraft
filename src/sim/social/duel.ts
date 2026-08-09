@@ -179,12 +179,14 @@ export function updateDuels(ctx: SimContext): void {
  * control. Delegates the removal to `clearAurasFromSource` per distinct source
  * so the fade events and the stat recalc stay that function's business.
  *
- * KNOWN RESIDUAL: an `Aura` carries only `sourceId`, so a dot from a pet that
- * has already DESPAWNED cannot be attributed to its owner at all, by this or
- * any other reader. The fallback below keeps that case exactly as bad as it was
- * before this function existed rather than worse; closing it properly would
- * mean recording the controller on the aura at apply time, which is a wider
- * change than this fix.
+ * An `Aura` carries only `sourceId`, so a dot from a pet that has already
+ * DESPAWNED cannot be attributed to its owner by any reader at the moment the
+ * duel ends. That is what `controlled` is for: the duel records the ids while
+ * they are still resolvable (see `updateDuels`), and this clears against that
+ * set as well, so a despawned source is covered too.
+ *
+ * The raw-id fallback below is still load-bearing for the case `controlled`
+ * cannot cover: a duel restored or hand-built without the map (it is optional).
  */
 function clearAurasFromController(
   ctx: SimContext,
