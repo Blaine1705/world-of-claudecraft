@@ -62,30 +62,61 @@ export const APPEARANCE_WIRE_KEYS: readonly string[] = [
   'outfit',
 ];
 
-/** The two nested maps (face + body morph sliders). Their KEYS are slider
- *  names and their values are numbers; both are bounded below. */
+/** The two nested maps (face + body morph sliders). Their KEYS are the slider
+ *  allowlists below and their values are numbers. */
 const NESTED_KEYS: readonly string[] = ['face', 'body'];
+
+/** The slider names each nested map may carry — ALLOWLISTED, exactly like the
+ *  top-level key set, and for the same reason the module header gives: a
+ *  character row is broadcast to every player in view, so it must never become
+ *  a channel for arbitrary attacker-chosen text. Bounding the maps by count and
+ *  value type alone still let 32 keys of 48 characters ride per map, twice
+ *  over, persisted and re-broadcast raw — an unmoderated text channel the chat
+ *  filter never sees — and put a ~5.9 KB ceiling on a document the wire
+ *  reasoning sizes at ~0.6 KB. Same drift guard as APPEARANCE_WIRE_KEYS:
+ *  tests/appearance_wire_bounds.test.ts pins both lists against the renderer's
+ *  own slider tables. */
+export const APPEARANCE_FACE_SLIDER_KEYS: readonly string[] = [
+  'nose',
+  'eyes',
+  'ears',
+  'jaw',
+  'brow',
+  'cheeks',
+  'chin',
+  'smirk',
+];
+export const APPEARANCE_BODY_SLIDER_KEYS: readonly string[] = [
+  'shoulders',
+  'chest',
+  'hips',
+  'hands',
+  'elbows',
+  'knees',
+  'feet',
+];
 
 /** A style id is a short identifier ('fantasybraid'). Anything longer is not a
  *  style the renderer could match, so it is junk by definition. */
 const MAX_STRING_LENGTH = 48;
-/** Generous next to the ~10 real sliders per map, tight enough to bound a row. */
-const MAX_NESTED_KEYS = 32;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** One morph-slider map: string keys, finite numeric values, bounded count.
- *  Values are NOT range-clamped here (normalizeAppearance owns the -1..1
- *  rule); this only keeps the document small and numeric. */
-function sanitizeSliderMap(value: unknown): Record<string, number> | null {
+/** One morph-slider map: allowlisted keys, finite numeric values. Values are
+ *  NOT range-clamped here (normalizeAppearance owns the -1..1 rule); this
+ *  keeps the document small, numeric, and free of foreign key names. */
+function sanitizeSliderMap(
+  value: unknown,
+  allowed: readonly string[],
+): Record<string, number> | null {
   if (!isPlainObject(value)) return null;
   const out: Record<string, number> = {};
   let kept = 0;
-  for (const [key, raw] of Object.entries(value)) {
-    if (kept >= MAX_NESTED_KEYS) break;
-    if (key.length > MAX_STRING_LENGTH) continue;
+  for (const key of allowed) {
+    if (!(key in value)) continue;
+    const raw = value[key];
     if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
     out[key] = raw;
     kept++;
@@ -124,7 +155,10 @@ export function sanitizeAppearance(value: unknown): Record<string, unknown> | nu
     if (!(key in value)) continue;
     const raw = value[key];
     if (NESTED_KEYS.includes(key)) {
-      const map = sanitizeSliderMap(raw);
+      const map = sanitizeSliderMap(
+        raw,
+        key === 'face' ? APPEARANCE_FACE_SLIDER_KEYS : APPEARANCE_BODY_SLIDER_KEYS,
+      );
       if (map !== null) {
         out[key] = map;
         kept++;

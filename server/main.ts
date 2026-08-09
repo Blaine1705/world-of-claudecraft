@@ -2680,6 +2680,8 @@ configureCharactersRuntime({
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
   setHelmHiddenForCharacter: (characterId, hidden) =>
     liveGame().setHelmHiddenForCharacter(characterId, hidden),
+  applyAppearanceForCharacter: (characterId, appearance) =>
+    liveGame().applyAppearanceForCharacter(characterId, appearance),
   saveMarket: () => liveGame().saveMarket(),
   purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>

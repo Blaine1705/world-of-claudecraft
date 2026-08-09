@@ -3558,7 +3558,9 @@ export const vi_VN: EnTranslations = {
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
-      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới."
+      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tài khoản này bị đình chỉ đến {date}.",

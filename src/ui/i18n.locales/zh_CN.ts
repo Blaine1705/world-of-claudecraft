@@ -8134,6 +8134,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': '角色已在世界中。',
   'apiError.character.taken_over': '你的角色已被另一个会话接管。',
   'apiError.character.rename_required': '此角色必须先改名才能进入世界。',
+  'apiError.character.invalid_appearance': '无法保存该外观。请调整设计后重试。',
+  'apiError.character.reroll_unavailable': '此角色没有可用的免费重新设计。',
   'apiError.moderation.suspended_until': '此账号被停用至 {date}。',
   'apiError.moderation.suspended': '该账号已被暂停。',
   'apiError.moderation.banned': '此账号已被封禁。',

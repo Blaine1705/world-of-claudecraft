@@ -3558,7 +3558,9 @@ export const sv_SE: EnTranslations = {
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
-      "rename_required": "Denna karaktär måste byta namn innan den går in i världen."
+      "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",

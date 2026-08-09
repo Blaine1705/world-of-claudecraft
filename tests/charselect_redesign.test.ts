@@ -157,6 +157,50 @@ describe('saving', () => {
     expect((document.getElementById('btn-reroll-save') as HTMLButtonElement).disabled).toBe(false);
   });
 
+  it('posts exactly the draft the player authored, not a default', async () => {
+    // Mutation check this closes: making save() post DEFAULT_APPEARANCE
+    // instead of the draft stayed green, because nothing drove the customizer
+    // before saving. Drive a real control (the gender row), then assert the
+    // POSTED document carries the change and IS the last previewed draft.
+    const deps = fakeDeps();
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    const before = deps.previewModular.mock.calls.at(-1)![0] as { gender: string };
+    const flipTo = before.gender === 'female' ? 'Male' : 'Female';
+    const btn = [...document.querySelectorAll('#charselect-reroll-host button')].find(
+      (b) => b.textContent?.trim() === flipTo,
+    ) as HTMLButtonElement;
+    expect(btn, 'gender control not found in the mounted customizer').toBeTruthy();
+    btn.click();
+    const previewed = deps.previewModular.mock.calls.at(-1)![0] as { gender: string };
+    expect(previewed.gender).not.toBe(before.gender); // the draft really moved
+    await editor.save();
+    expect(deps.saveAppearance.mock.calls[0][1]).toEqual(previewed);
+  });
+
+  it('a rejected save keeps the DRAFT itself, not just the panel', async () => {
+    const deps = fakeDeps({
+      saveAppearance: vi
+        .fn()
+        .mockRejectedValueOnce(new Error('reroll unavailable'))
+        .mockResolvedValueOnce(undefined),
+    });
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    const btn = [...document.querySelectorAll('#charselect-reroll-host button')].find(
+      (b) => b.textContent?.trim() === 'Female',
+    ) as HTMLButtonElement;
+    btn.click();
+    const authored = deps.previewModular.mock.calls.at(-1)![0];
+    await editor.save(); // rejected
+    await editor.save(); // retried
+    // The retry posts the SAME authored draft: a failure did not reset it.
+    const calls = (deps.saveAppearance as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls).toHaveLength(2);
+    expect(calls[1][1]).toEqual(authored);
+    expect(calls[1][1]).toEqual(calls[0][1]);
+  });
+
   it('is a no-op with no editor open, so a stray click cannot spend a token', async () => {
     const deps = fakeDeps();
     await editorWith(deps).save();

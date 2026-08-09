@@ -3558,7 +3558,9 @@ export const zh_CN: EnTranslations = {
       "delete_confirm": "输入角色名称以确认删除。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
-      "rename_required": "此角色必须先改名才能进入世界。"
+      "rename_required": "此角色必须先改名才能进入世界。",
+      "invalid_appearance": "无法保存该外观。请调整设计后重试。",
+      "reroll_unavailable": "此角色没有可用的免费重新设计。"
     },
     "moderation": {
       "suspended_until": "此账号被停用至 {date}。",

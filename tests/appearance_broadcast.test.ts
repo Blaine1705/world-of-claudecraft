@@ -31,6 +31,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerClass } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 const LOOK = { gender: 'female', hair: 'highbun', skinLight: 0.4 };
 
@@ -165,6 +166,58 @@ describe('authored look on the wire', () => {
     const changed = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid && e.k);
     expect(changed.lv).toBe(42);
     expect(changed.app).toEqual(LOOK);
+  });
+
+  it('CLIENT decode: an omitted app on a SELF record keeps the look', () => {
+    // The other half of the wire contract, pinned on the DECODER rather than
+    // the emitter: bcastSelf ships `app` once and then omits it, so the client
+    // reading absence-as-cleared on a self record would erase the local
+    // player's own body one tick after they entered the world. This is the
+    // guard in applyWire's selfDelta arm; without it, this test reds.
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    const first = lastSnap(fc.sent);
+    expect(first.self.app).toEqual(LOOK); // precondition: the look shipped
+
+    const client = bareClient(session.pid, { playerClass: 'mage' });
+    (client as any).applySnapshot(structuredClone(first));
+    expect(client.entities.get(session.pid)?.modularAppearance).toEqual(LOOK);
+
+    // The delta channel's steady state: the second self record has no `app`.
+    server.sim.tick();
+    fc.sent.length = 0;
+    broadcast(server);
+    const second = lastSnap(fc.sent);
+    expect(second.self).not.toHaveProperty('app'); // precondition: really omitted
+    (client as any).applySnapshot(structuredClone(second));
+    // Absence on a SELF record means "unchanged", never "cleared".
+    expect(client.entities.get(session.pid)?.modularAppearance).toEqual(LOOK);
+  });
+
+  it('CLIENT decode: an absent app on a full PEER record clears the look', () => {
+    // ...and the same absence on a PEER's full record means the opposite: no
+    // authored look, so the class rig. Both readings, one flag.
+    const a = fakeWs();
+    const b = fakeWs();
+    const watcher = joinServer(server, a, 1, 'Watcher', 'warrior', null);
+    const other = joinServer(server, b, 2, 'Designed', 'mage', LOOK);
+    broadcast(server);
+    const snap = lastSnap(a.sent);
+    const peer = snap.ents.find((e: any) => e.id === other.pid);
+    expect(peer.app).toEqual(LOOK);
+
+    const client = bareClient(watcher.pid, { playerClass: 'warrior' });
+    (client as any).applySnapshot(structuredClone(snap));
+    expect(client.entities.get(other.pid)?.modularAppearance).toEqual(LOOK);
+
+    // A full peer record WITHOUT app (a redesign cleared it, or a fresh look
+    // never existed): the decode must clear, not keep serving the old body.
+    const wiped = structuredClone(snap);
+    const wipedPeer = wiped.ents.find((e: any) => e.id === other.pid);
+    delete wipedPeer.app;
+    (client as any).applySnapshot(wiped);
+    expect(client.entities.get(other.pid)?.modularAppearance).toBeNull();
   });
 
   it('keeps the key off a character with no authored look', () => {

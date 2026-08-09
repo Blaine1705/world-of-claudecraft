@@ -158,6 +158,7 @@ function installFakeRuntime(): void {
     takeOverCharacter: vi.fn(async () => 'not-online' as const),
     rekeyMarketSeller: vi.fn(() => false),
     setHelmHiddenForCharacter: vi.fn(() => false),
+    applyAppearanceForCharacter: vi.fn(() => false),
     saveMarket: vi.fn(async () => {}),
     purgeMarketSeller: vi.fn(() => false),
     rekeyMailOwner: vi.fn(() => false),

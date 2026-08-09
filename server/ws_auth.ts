@@ -21,6 +21,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
+import { sanitizeAppearance } from '../src/world_api/appearance';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,

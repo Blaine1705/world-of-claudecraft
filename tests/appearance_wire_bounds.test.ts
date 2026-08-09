@@ -6,8 +6,13 @@
 // up with the renderer's model, which is what the first test pins.
 
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_APPEARANCE } from '../src/render/characters/modular';
-import { APPEARANCE_WIRE_KEYS, sanitizeAppearance } from '../src/world_api/appearance';
+import { BODY_SLIDERS, DEFAULT_APPEARANCE, FACE_SLIDERS } from '../src/render/characters/modular';
+import {
+  APPEARANCE_BODY_SLIDER_KEYS,
+  APPEARANCE_FACE_SLIDER_KEYS,
+  APPEARANCE_WIRE_KEYS,
+  sanitizeAppearance,
+} from '../src/world_api/appearance';
 
 describe('appearance wire key set', () => {
   it('covers every field of the renderer model (drift guard)', () => {
@@ -30,6 +35,16 @@ describe('appearance wire key set', () => {
 
   it('round-trips a real authored look unchanged', () => {
     expect(sanitizeAppearance(DEFAULT_APPEARANCE)).toEqual(DEFAULT_APPEARANCE);
+  });
+
+  it('pins the slider allowlists against the renderer tables (drift guard)', () => {
+    // The nested maps are key-allowlisted for the same reason the top level is:
+    // a character row is re-broadcast to everyone in view, so unlisted keys are
+    // an attacker-writable text channel. If this fails, a slider was added to
+    // the renderer without being added to the wire allowlist, and the server
+    // would silently strip it from every save.
+    expect([...APPEARANCE_FACE_SLIDER_KEYS].sort()).toEqual([...FACE_SLIDERS].sort());
+    expect([...APPEARANCE_BODY_SLIDER_KEYS].sort()).toEqual([...BODY_SLIDERS].sort());
   });
 });
 
@@ -77,14 +92,32 @@ describe('sanitizeAppearance bounds', () => {
     expect(out).toEqual({ outfit: 'crimson' });
   });
 
-  it('keeps slider maps numeric and bounded', () => {
+  it('keeps slider maps numeric and drops every unlisted key name', () => {
     const fat = Object.fromEntries(Array.from({ length: 80 }, (_, i) => [`s${i}`, 0.5]));
-    const out = sanitizeAppearance({ face: { jaw: 0.5, bogus: 'no' }, body: fat }) as {
+    const out = sanitizeAppearance({
+      face: { jaw: 0.5, bogus: 'no' },
+      body: { ...fat, chest: 0.25 },
+    }) as {
       face: Record<string, number>;
       body: Record<string, number>;
     };
     expect(out.face).toEqual({ jaw: 0.5 });
-    expect(Object.keys(out.body).length).toBe(32);
+    // 80 attacker-named keys are gone entirely; only the real slider survives.
+    expect(out.body).toEqual({ chest: 0.25 });
+  });
+
+  it('never persists an attacker-chosen key name, even a short numeric one', () => {
+    // The old bound was count + value type, which let 32 keys of 48 chars ride
+    // per map — persisted and re-broadcast to everyone in view, outside every
+    // chat filter. Key NAMES are the channel, so they are allowlisted.
+    const evil = Object.fromEntries(
+      Array.from({ length: 40 }, (_, i) => [`ATTACKER TEXT ${i} ${'x'.repeat(30)}`, 1]),
+    );
+    expect(sanitizeAppearance({ face: evil })).toBeNull();
+    const mixed = sanitizeAppearance({ face: { ...evil, jaw: 1 } }) as {
+      face: Record<string, number>;
+    };
+    expect(Object.keys(mixed.face)).toEqual(['jaw']);
   });
 
   it('accepts booleans (the lashes toggle) and passes ranges through to the renderer', () => {

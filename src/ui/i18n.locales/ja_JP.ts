@@ -8516,6 +8516,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
+  'apiError.character.invalid_appearance':
+    'この外見は保存できませんでした。デザインを調整してもう一度お試しください。',
+  'apiError.character.reroll_unavailable': 'このキャラクターには無料の再デザインがありません。',
   'apiError.moderation.suspended_until': 'このアカウントは {date} まで停止されています。',
   'apiError.moderation.suspended': 'このアカウントは停止されています。',
   'apiError.moderation.banned': 'このアカウントは利用停止されています。',

@@ -2424,6 +2424,9 @@ export async function exportAccountData(
       level: c.level,
       state: c.state,
       realm: c.realm,
+      // The authored modular look: per-character personal data the account
+      // created, so it belongs in the export beside the state blob.
+      appearance: c.appearance ?? null,
     })),
     playtimeTotals: playtimeTotals.rows,
     ipAssociations: ipAssociations.rows,
@@ -2945,13 +2948,15 @@ export async function listCharacters(accountId: number): Promise<CharacterRow[]>
 // self-service surface, same as characterCountForAccount, so it must not stop
 // at this process's realm the way listCharacters above deliberately does.
 // Selects the realm column so the export can label which realm each character
-// belongs to. One query, no per-realm loop: `characters` is already indexed
+// belongs to, and `appearance`: the authored look is per-character personal
+// data the account created, so the GDPR export must carry it. One query, no per-realm loop: `characters` is already indexed
 // on account_id (characters_account), so this stays a single indexed read.
 export async function listCharactersAllRealms(
   accountId: number,
 ): Promise<(CharacterRow & { realm: string })[]> {
   const res = await pool.query(
-    `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm
+    `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm,
+            appearance
        FROM characters
       WHERE account_id = $1
       ORDER BY realm, id`,
@@ -3008,7 +3013,11 @@ export async function setCharacterHotbarLayout(
  *  turntable view. It is sim state, so it patches the one key inside the state
  *  blob rather than rewriting it (a whole-blob write from an HTTP route would
  *  clobber a live session's progress), and follows the sim's zero-default
- *  omission convention: hidden writes the key, shown removes it. A NULL
+ *  omission convention: hidden writes the key, shown removes it — and BOTH
+ *  arms are guarded on an actual change, because jsonb_set and `-` each mint a
+ *  whole new datum: an unguarded write detoasts, re-serializes and re-TOASTs
+ *  the entire state blob even when the value is identical, leaving dead chunks
+ *  behind for autovacuum. A NULL
  *  helmHidden means the client did not offer the toggle at all and the blob is
  *  left untouched — defaulting that to false would actively UN-hide a helm the
  *  player had hidden in world. A character that has never been saved (state IS
@@ -3029,8 +3038,11 @@ export async function consumeAppearanceReroll(
             appearance_reroll_used = TRUE,
             state = CASE
                       WHEN state IS NULL OR $5::boolean IS NULL THEN state
-                      WHEN $5::boolean THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
-                      ELSE state - 'helmHidden'
+                      WHEN $5::boolean AND state->'helmHidden' IS DISTINCT FROM 'true'::jsonb
+                        THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
+                      WHEN NOT $5::boolean AND state ? 'helmHidden'
+                        THEN state - 'helmHidden'
+                      ELSE state
                     END,
             updated_at = now()
       WHERE id = $1 AND account_id = $2 AND realm = $4

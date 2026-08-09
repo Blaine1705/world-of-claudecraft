@@ -16,6 +16,8 @@
 // situation the cache exists for. That is the same shape as the recolorCache
 // bug this workstream fixed, one layer down.
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { variantOwnedGeometries } from '../src/render/characters/assets';
@@ -96,5 +98,36 @@ describe('variantOwnedGeometries', () => {
   it('claims everything when nothing is shared (a fully merged root)', () => {
     const { variantRoot } = scene();
     expect(variantOwnedGeometries(variantRoot, new Set())).toHaveLength(4);
+  });
+});
+
+describe('modularVariant insertion order (source pin)', () => {
+  it('sweeps BEFORE inserting, so a fresh variant can never evict itself', () => {
+    // At the cap with every other entry live, a sweep run AFTER the insert
+    // reaches the newest refs-0 entry last, deletes it, disposes it, and hands
+    // the caller a disposed root — after which that look re-mints and
+    // re-evicts itself forever and its far bake writes to an orphan. The
+    // property is pure statement order, so pin it as source (the mntOwn
+    // pattern): the sweep call must precede the cache insert.
+    const src = readFileSync(resolve(process.cwd(), 'src/render/characters/assets.ts'), 'utf8');
+    const fnStart = src.indexOf('function modularVariant(');
+    const fnEnd = src.indexOf('\n}', fnStart);
+    const body = src.slice(fnStart, fnEnd);
+    const sweepAt = body.indexOf('evictModularVariants()');
+    const insertAt = body.indexOf('modularVariantCache.set(key, entry)');
+    expect(sweepAt).toBeGreaterThan(-1);
+    expect(insertAt).toBeGreaterThan(-1);
+    expect(sweepAt).toBeLessThan(insertAt);
+  });
+
+  it('retains LAST in assembleModular, after every throw point', () => {
+    // attachAllProps throws for streamed assets (the designed retry path) and
+    // the retry never reaches dispose, so a retain taken before it leaked one
+    // ref per attempt until the entry could never be evicted.
+    const src = readFileSync(resolve(process.cwd(), 'src/render/characters/assets.ts'), 'utf8');
+    const fnStart = src.indexOf('export function assembleModular(');
+    const fnEnd = src.indexOf('\n}', fnStart);
+    const body = src.slice(fnStart, fnEnd);
+    expect(body.indexOf('attachAllProps(')).toBeLessThan(body.indexOf('variant.refs++'));
   });
 });

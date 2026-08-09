@@ -8637,6 +8637,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': 'Персонаж уже находится в мире.',
   'apiError.character.taken_over': 'Вашего персонажа перехватила другая сессия.',
   'apiError.character.rename_required': 'Перед входом в мир этому персонажу нужно сменить имя.',
+  'apiError.character.invalid_appearance': 'Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.',
+  'apiError.character.reroll_unavailable': 'У этого персонажа нет доступного бесплатного редизайна.',
   'apiError.moderation.suspended_until': 'Эта учетная запись заблокирована до {date}.',
   'apiError.moderation.suspended': 'Эта учетная запись заблокирована.',
   'apiError.moderation.banned': 'Эта учетная запись заблокирована.',

@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -734,6 +736,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -1458,6 +1462,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -2182,6 +2188,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -2907,6 +2915,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -3631,6 +3641,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -4395,6 +4407,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "pt_BR": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -5129,6 +5143,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "cs_CZ": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -5853,6 +5869,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -6577,6 +6595,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -7301,6 +7321,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -8025,6 +8047,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -8749,6 +8773,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -9473,6 +9499,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",
@@ -10197,6 +10225,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
+    "apiError.character.invalid_appearance",
+    "apiError.character.reroll_unavailable",
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "gpuNotice.hybridBodyLinux",

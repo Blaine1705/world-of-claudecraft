@@ -185,6 +185,13 @@ export interface CharactersRuntime {
   /** game.setHelmHiddenForCharacter: mirror a redesign's helm choice onto a live
    *  session, so its autosave does not write the old value back over the row. */
   setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean;
+  /** game.applyAppearanceForCharacter: mirror a redesign's LOOK onto a live
+   *  session (entity field + wire-memo bust), so the player and every peer see
+   *  the new body now rather than at next relog. */
+  applyAppearanceForCharacter(
+    characterId: number,
+    appearance: Record<string, unknown> | null,
+  ): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
   /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
@@ -881,6 +888,10 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
   // the redesign would be silently reverted (and the look, which rides its own
   // column, would not). No-op when the character is not in world.
   if (helmHidden !== null) useRuntime().setHelmHiddenForCharacter(character.id, helmHidden);
+  // ...and the look itself, for the same reason: the route is allowed while
+  // the character is online, and a body that only updates at relog leaves the
+  // player and every peer on the old look while the roster shows the new one.
+  useRuntime().applyAppearanceForCharacter(character.id, appearance);
   // Echo the normalized look so the client can update its roster row without
   // a second list fetch.
   json(ctx.res, 200, { ok: true, appearance, helmHidden });

@@ -1,7 +1,9 @@
 // The char-select "Redesign" editor: a character's one-shot appearance change.
 //
-// Characters with no authored look (everything created before the modular
-// creator shipped) carry a single server-tracked redesign token. The editor
+// Every character created inside the free window (plus, as a safety net, any
+// character with no authored look at all) carries a single server-tracked
+// redesign token — so the target may well arrive with a look AND a helm
+// preference it already chose, which is why both seed from the row. The editor
 // reuses the creation customizer, docked where the news panel sits, and drives
 // the shared 3D stage with a DRAFT look; nothing is written anywhere until Save
 // posts it and the server burns the token atomically. Cancel — or navigating
@@ -69,6 +71,10 @@ const PANEL_ID = '#charselect-reroll';
 
 export class CharselectRedesignEditor {
   private target: RedesignTarget | null = null;
+  /** Where keyboard focus was when the editor opened (the row's Redesign
+   *  button). close() hides the panel, and hiding the element that holds focus
+   *  drops it to <body>; handing it back is the chrome's focus contract. */
+  private returnFocus: HTMLElement | null = null;
   private draft: ModularAppearance | null = null;
   private ui: AppearanceCustomizer | null = null;
   /** The editor's helmet toggle. Unlike the creation turntable's preview flag,
@@ -122,10 +128,14 @@ export class CharselectRedesignEditor {
     const host = document.getElementById('charselect-reroll-host');
     if (!panel || !host) return;
     this.close(false);
+    this.returnFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.target = c;
     this.helmHidden = c.helmHidden === true;
-    // Seed from the character's stored look; an eligible character has none by
-    // definition, so this is the default body until they touch a control.
+    // Seed from the character's stored look. A window-eligible character may
+    // already have one (the free redesign covers everyone created before the
+    // cutoff, designed or not); only a never-designed one starts from the
+    // default body.
     this.draft = normalizeAppearance((c.appearance as Partial<ModularAppearance>) ?? null);
     const title = document.getElementById('charselect-reroll-title');
     if (title) title.textContent = t('character.redesignTitle', { name: c.name });
@@ -172,7 +182,14 @@ export class CharselectRedesignEditor {
     forgetAppearancePanel(PANEL_ID);
     this.target = null;
     this.draft = null;
-    document.getElementById('charselect-reroll')?.setAttribute('hidden', '');
+    const panel = document.getElementById('charselect-reroll');
+    // Hand focus back BEFORE hiding: hiding the element that holds it drops
+    // focus to <body> and a keyboard user loses their place in the roster.
+    if (panel && !panel.hasAttribute('hidden') && this.returnFocus?.isConnected) {
+      this.returnFocus.focus();
+    }
+    this.returnFocus = null;
+    panel?.setAttribute('hidden', '');
     document.getElementById('charselect-news')?.removeAttribute('hidden');
     if (restoreStage) this.deps.restoreStage();
   }

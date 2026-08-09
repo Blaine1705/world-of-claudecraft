@@ -3558,7 +3558,9 @@ export const fr_CA: EnTranslations = {
       "delete_confirm": "Saisissez le nom du personnage pour confirmer la suppression.",
       "already_in_world": "Le personnage est déjà dans le monde.",
       "taken_over": "Votre personnage a été pris en main par une autre session.",
-      "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde."
+      "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Ce compte est suspendu jusqu'au {date}.",

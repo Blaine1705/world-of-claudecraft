@@ -3880,6 +3880,19 @@ export class GameServer {
     if (meta.hotbarLayout !== undefined) {
       session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
     }
+    // The freshly-read look, same "absent means keep" contract as the layout
+    // above. ws_auth always supplies it on a real reconnect, so a redesign
+    // saved during the linkdead grace window lands here — the join-time value
+    // on the entity would otherwise outlive the row for the whole session,
+    // with the appearance memo happily serving the stale string (the wipe of
+    // lastSent below re-SENDS, but what it re-sends is the memo).
+    if (meta.appearance !== undefined) {
+      const e = this.sim.entities.get(session.pid);
+      if (e && e.modularAppearance !== meta.appearance) {
+        e.modularAppearance = meta.appearance ?? null;
+        this.bustAppearanceWireMemo(e.id);
+      }
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     // Load-bearing for every rev + cadence gate (market, mail, corder):
@@ -5399,6 +5412,45 @@ export class GameServer {
       pushed = true;
     }
     return pushed;
+  }
+
+  /**
+   * Push a freshly saved look onto a LIVE session, if the character has one.
+   *
+   * The redesign route is allowed while the character is in world, and it used
+   * to apply only its helm half live: the look stayed the old body for the
+   * player and every peer until relog, while the roster row it was saved from
+   * showed the new one. Setting the entity field is NOT enough on its own —
+   * `EntityWireCache.appJson` is minted once per entity and the identity only
+   * re-splices when the rest of the identity moves, so the memo would serve
+   * the old string for the rest of the session. Busting both (appJson and the
+   * diffed base identity string) makes the next tick re-serialize, bump idVer,
+   * and re-send the full record to every viewer; the self record follows
+   * through the `maybeRaw('app')` diff for the same reason.
+   */
+  applyAppearanceForCharacter(
+    characterId: number,
+    appearance: Record<string, unknown> | null,
+  ): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      const e = this.sim.entities.get(s.pid);
+      if (!e) continue;
+      e.modularAppearance = appearance;
+      this.bustAppearanceWireMemo(e.id);
+      pushed = true;
+    }
+    return pushed;
+  }
+
+  /** Invalidate the per-entity appearance memo + identity diff so the next
+   *  tick re-serializes and re-ships the full record (see above). */
+  private bustAppearanceWireMemo(entityId: number): void {
+    const cache = this.wireCache.get(entityId);
+    if (!cache) return; // never broadcast yet; the first serialize is fresh
+    cache.appJson = null;
+    cache.baseIdJson = '';
   }
 
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {

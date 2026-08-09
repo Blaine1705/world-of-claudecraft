@@ -83,6 +83,26 @@ export function inWorldLookFor(
 }
 
 /**
+ * Which armour-set source an entity's composed body reads from: the LOCAL
+ * player honours the per-class localStorage override (a dev knob, supplied by
+ * the caller), every peer wears the class's own kit.
+ *
+ * A two-line ternary, in the core rather than inline at the provider install
+ * site, because it is the line that ENFORCES "a peer cannot wear this
+ * machine's stored armour set" — and inline in the coordinator no test could
+ * reach it (nothing imports src/main.ts), so flipping it to always return the
+ * override broke nothing. Here it sits beside the rules it serves, under the
+ * same purity guard and test file.
+ */
+export function armorSetSourceFor(
+  isSelf: boolean,
+  localOverride: (cls: PlayerClass) => ArmorSetId,
+  classKit: (cls: PlayerClass) => ArmorSetId,
+): (cls: PlayerClass) => ArmorSetId {
+  return isSelf ? localOverride : classKit;
+}
+
+/**
  * A roster character's composed pieces, or null when the row renders a fixed
  * rig: no authored look (a pre-creator character), or the Combat Mech
  * replacement body, which is never composed over. The worn kit mirrors the

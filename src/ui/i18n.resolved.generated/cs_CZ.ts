@@ -3558,7 +3558,9 @@ export const cs_CZ: EnTranslations = {
       "delete_confirm": "Pro potvrzení smazání napiš jméno postavy.",
       "already_in_world": "Postava už je ve světě.",
       "taken_over": "Tvoje postava byla převzata jinou relací.",
-      "rename_required": "Tato postava musí být před vstupem do světa přejmenována."
+      "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tento účet je pozastavený do {date}.",

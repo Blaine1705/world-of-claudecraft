@@ -240,7 +240,11 @@ import {
   type ModularLook,
   normalizeAppearance,
 } from './render/characters/modular';
-import { charselectLook, inWorldLookFor } from './render/characters/player_look_core';
+import {
+  armorSetSourceFor,
+  charselectLook,
+  inWorldLookFor,
+} from './render/characters/player_look_core';
 import {
   onPortraitsReady,
   onPortraitUpdate,
@@ -5223,13 +5227,11 @@ function modularLookForClass(cls: PlayerClass): ModularLook | null {
   return { app: modularAppearance, worn: creationLoadout(cls) };
 }
 
-/** The armour set an entity's composed body wears. The one thing the look core
- *  cannot decide for itself: only the LOCAL player honours the per-class
- *  localStorage override (a dev knob), because dressing peers from this
- *  machine's store would put whatever set it last picked on other people's
- *  characters. */
+/** The armour set an entity's composed body wears: the core's decision
+ *  (armorSetSourceFor), fed the two sources only this file knows — the
+ *  localStorage dev override for the local player, the class kit for peers. */
 function armorSetForEntity(isSelf: boolean): (cls: PlayerClass) => ArmorSetId {
-  return isSelf ? readStoredArmorSet : classArmorSet;
+  return armorSetSourceFor(isSelf, readStoredArmorSet, classArmorSet);
 }
 
 /** Whether the creation turntable shows the set's helm. A view of the
@@ -6550,6 +6552,13 @@ async function refreshCharacters(): Promise<void> {
       }
 
       const selectRow = () => {
+        // A redesign in progress belongs to the row it was opened FROM. Leaving
+        // it up while the selection moves splits the screen: the panel says
+        // "Redesign A" holding A's draft, the stage and name label show B, and
+        // Save writes A. Close it (draft discarded, nothing saved) before the
+        // selection moves; the reroll button's own click re-opens it after its
+        // selectRow() call, so redesigning the new row still works.
+        redesignEditor.close(false);
         // Deselect other characters
         document.querySelectorAll('#char-list .char-row').forEach((r) => {
           r.classList.remove('sel');

@@ -14,6 +14,7 @@
 import { describe, expect, it } from 'vitest';
 import { type ArmorSetId, DEFAULT_APPEARANCE } from '../src/render/characters/modular';
 import {
+  armorSetSourceFor,
   charselectLook,
   composedLook,
   inWorldLookFor,
@@ -135,6 +136,18 @@ describe('charselectLook', () => {
       CLASS_KIT,
     );
     expect(row).toEqual(world);
+  });
+});
+
+describe('armorSetSourceFor', () => {
+  it('hands the local override ONLY to the local player', () => {
+    // The line that enforces "a peer cannot wear this machine's stored armour
+    // set". It used to live inline in the coordinator, where no test could
+    // reach it: flipping it to always return the override broke nothing.
+    const override = (): ArmorSetId => 'barbarian';
+    const kit = (): ArmorSetId => 'mage';
+    expect(armorSetSourceFor(true, override, kit)('mage')).toBe('barbarian');
+    expect(armorSetSourceFor(false, override, kit)('mage')).toBe('mage');
   });
 });
 

@@ -1463,11 +1463,6 @@ export function assembleModular(
   const names = modularPartNames(look.app, look.worn);
   const variant = modularVariant(def.url, names);
   const root = cloneSkinned(variant.root);
-  // Retain the part set for as long as this clone is drawn: the clone shares
-  // the variant's geometry, so eviction must not reclaim it underneath.
-  // CharacterVisual.dispose calls releaseModularVariant to give it back.
-  root.userData.modularVariantKey = modularVariantKey(def.url, names);
-  variant.refs++;
   attachStubbleDecal(root, look);
   attachMakeupDecal(root, look);
   root.traverse((o) => {
@@ -1503,6 +1498,15 @@ export function assembleModular(
     Array.isArray(mesh.material) ? mesh.material[0] : mesh.material,
   );
   attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  // Retain LAST, after every throw point above. attachAllProps throws for a
+  // streamed weapon GLB that has not landed yet, and that throw is a designed
+  // path: the fail-soft visual build catches it and the retry gate re-attempts
+  // on a cooldown. A retain taken before it leaked one ref per attempt with no
+  // dispose ever running, which made the entry permanently unevictable — the
+  // precise failure the cap exists to prevent. Down here, a throw anywhere in
+  // assembly means no ref was ever taken, so there is nothing to leak.
+  root.userData.modularVariantKey = modularVariantKey(def.url, names);
+  variant.refs++;
   return root;
 }
 
@@ -2163,6 +2167,42 @@ export interface ModularFarBake {
   /** One entry per geometry group: whether that group is the character's own
    *  body, the distinction applyMaterials uses to gate the skin override. */
   isBody: boolean[];
+}
+
+/** An already-minted far bake for this key + look, or null — WITHOUT baking.
+ *  The cheap arm of the budgeted far path: a character whose part set was
+ *  already baked (by anyone sharing the look) assembles its far mesh for the
+ *  cost of the material tint alone, so only genuinely new part sets compete
+ *  for the per-frame bake budget below. Never mints a variant: a peek that
+ *  composed would be the cost it exists to avoid. */
+export function peekModularFarBake(key: string, look: ModularLook): ModularFarBake | null {
+  const def = VISUALS[key];
+  if (!def?.modular) return null;
+  const entry = modularVariantCache.get(
+    modularVariantKey(def.url, modularPartNames(look.app, look.worn)),
+  );
+  return entry?.far ?? null;
+}
+
+// The composed far bake is real synchronous work (a full compose, a mixer
+// step, a static rebake), and setFar drives it on the crossing EDGE — so a
+// camera riding away from a capital used to flip every composed peer to far in
+// one frame and pay for every distinct unbaked part set in that frame. The
+// budget spreads the mint: at most one bake per window, everyone else stays
+// articulated (correct, just not yet cheap) and retries from their per-frame
+// update until a slot frees. Cached bakes bypass it entirely via the peek
+// above, so a crowd sharing looks drains in a frame or two.
+let lastFarBakeAtMs = Number.NEGATIVE_INFINITY;
+/** One bake per ~2 frames at 60 Hz: long enough that a burst cannot own a
+ *  frame, short enough that a 20-look crowd finishes inside a second. */
+const FAR_BAKE_MIN_INTERVAL_MS = 30;
+
+/** Claim the current bake slot, or false to retry next frame. */
+export function takeFarBakeBudget(): boolean {
+  const now = performance.now();
+  if (now - lastFarBakeAtMs < FAR_BAKE_MIN_INTERVAL_MS) return false;
+  lastFarBakeAtMs = now;
+  return true;
 }
 
 /**

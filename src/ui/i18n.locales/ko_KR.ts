@@ -8493,6 +8493,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': '캐릭터가 이미 세계에 있습니다.',
   'apiError.character.taken_over': '다른 세션이 캐릭터를 넘겨받았습니다.',
   'apiError.character.rename_required': '이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.',
+  'apiError.character.invalid_appearance':
+    '해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.',
+  'apiError.character.reroll_unavailable': '이 캐릭터는 무료 재디자인을 사용할 수 없습니다.',
   'apiError.moderation.suspended_until': '이 계정은 {date}까지 정지되었습니다.',
   'apiError.moderation.suspended': '이 계정은 정지되었습니다.',
   'apiError.moderation.banned': '이 계정은 이용 정지되었습니다.',

@@ -18,6 +18,7 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase12_u
 
 import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   APPEARANCE_REROLL_CUTOFF,
@@ -106,6 +107,7 @@ function fakeRuntime(overrides: Partial<CharactersRuntime> = {}): CharactersRunt
     takeOverCharacter: async () => 'not-online',
     rekeyMarketSeller: () => false,
     setHelmHiddenForCharacter: () => false,
+    applyAppearanceForCharacter: () => false,
     saveMarket: async () => {},
     purgeMarketSeller: () => false,
     rekeyMailOwner: () => false,
@@ -1040,6 +1042,41 @@ describe('free-redesign window', () => {
       }),
     ]);
     expect(tokens).toEqual({ Spent: false, SpentBare: false });
+  });
+});
+
+describe('roster appearance echoes', () => {
+  it('carries the stored look and helm preference through the list body', async () => {
+    // charselectLook reads exactly these two fields off the roster row; a
+    // handler that hardcoded null/false would silently draw every row as a
+    // bare class rig with the helm on, and nothing else would fail.
+    const look = { gender: 'female', hair: 'highbun' };
+    authedDb({
+      listCharacters: async () => [
+        charRow({ id: 1, name: 'Designed', appearance: look, state: st({ helmHidden: true }) }),
+        charRow({ id: 2, name: 'Bare', appearance: null, state: null }),
+      ],
+    });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const rows = (res.body as { characters: Record<string, unknown>[] }).characters;
+    expect(rows[0]).toMatchObject({ name: 'Designed', appearance: look, helmHidden: true });
+    expect(rows[1]).toMatchObject({ name: 'Bare', appearance: null, helmHidden: false });
+  });
+});
+
+describe('reroll route hardening', () => {
+  it('mounts the per-action limiter on the token-spending route (source pin)', () => {
+    // The one new mutation that spends a one-shot token and takes an untrusted
+    // body must not be the one character mutation without a limiter. Source
+    // pin, the mntOwn pattern: the RouteDef arm is data, not reachable
+    // middleware, so assert the mount in the table itself.
+    const src = readFileSync(resolve(process.cwd(), 'server/characters.ts'), 'utf8');
+    const at = src.indexOf("path: '/api/characters/:id/appearance-reroll'");
+    expect(at).toBeGreaterThan(-1);
+    expect(src.slice(at, at + 400)).toContain('rateLimit(CHARACTER_REROLL_POLICY');
   });
 });
 

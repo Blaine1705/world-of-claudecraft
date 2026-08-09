@@ -8134,6 +8134,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': '角色已在世界中。',
   'apiError.character.taken_over': '你的角色已被另一個工作階段接管。',
   'apiError.character.rename_required': '此角色必須先更名才能進入世界。',
+  'apiError.character.invalid_appearance': '無法儲存該外觀。請調整設計後再試一次。',
+  'apiError.character.reroll_unavailable': '此角色沒有可用的免費重新設計。',
   'apiError.moderation.suspended_until': '此帳號停權至 {date}。',
   'apiError.moderation.suspended': '此帳號已被停權。',
   'apiError.moderation.banned': '此帳號已被封鎖。',

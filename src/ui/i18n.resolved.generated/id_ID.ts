@@ -3558,7 +3558,9 @@ export const id_ID: EnTranslations = {
       "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
       "already_in_world": "Karakter sudah berada di dalam dunia.",
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
-      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia."
+      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Akun ini ditangguhkan hingga {date}.",

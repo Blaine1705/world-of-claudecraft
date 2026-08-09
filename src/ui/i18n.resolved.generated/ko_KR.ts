@@ -3558,7 +3558,9 @@ export const ko_KR: EnTranslations = {
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
-      "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다."
+      "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
+      "invalid_appearance": "해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.",
+      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다."
     },
     "moderation": {
       "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
