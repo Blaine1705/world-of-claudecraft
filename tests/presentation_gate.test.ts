@@ -41,4 +41,24 @@ describe('presentationGate', () => {
       presentationGate({ hidden: true, desktopApp: false, graphicsRebuildPaused: false }),
     ).toEqual({ render: true, paint: true, tick: true });
   });
+
+  it('returns the same frozen decision object per arm on every call (phase 4 QA F8)', () => {
+    // The gate runs on the rAF hot path and its allocation-free contract is
+    // the shared frozen singletons; toEqual alone would keep passing if a
+    // rewrite returned fresh literals per frame. Identity plus frozen-ness is
+    // the actual contract, so pin both, one case per arm.
+    const paused = { hidden: false, desktopApp: false, graphicsRebuildPaused: true };
+    const hiddenDesktop = { hidden: true, desktopApp: true, graphicsRebuildPaused: false };
+    const allOn = { hidden: false, desktopApp: true, graphicsRebuildPaused: false };
+    for (const input of [paused, hiddenDesktop, allOn]) {
+      const first = presentationGate(input);
+      expect(presentationGate({ ...input })).toBe(first);
+      expect(Object.isFrozen(first)).toBe(true);
+    }
+    // The web arm shares the ALL_ON singleton with the visible desktop arm:
+    // one decision, not two equal copies.
+    expect(
+      presentationGate({ hidden: true, desktopApp: false, graphicsRebuildPaused: false }),
+    ).toBe(presentationGate(allOn));
+  });
 });
