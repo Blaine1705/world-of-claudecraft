@@ -850,10 +850,69 @@ Update this line as phases complete.
   extraction byte-identical. gate_select and the screenshots follow with
   the commit cadence; LOCAL and unpushed, so Phase 20 QA owns the push, the
   deeper gate, and the perf:tour / browser-axe / mobile E2E VERIFY items.
+- Phase 20 QA (2026-08-09): PASS with the fix round applied (full record in
+  progress.md "Phase 20 QA"). Nine legs, zero blocking against the shipped
+  surfaces, one blocking TEST gap (selfCuratorStanding behavioral arm)
+  closed with mutation verification. Hardening landed at QA:
+  wireCount-coerced crk/cro/crt decode plus the curatorRankNameKey integer
+  guard; refreshCuratorStanding clears before the walk and rank-gates the
+  stamp cluster (CURATOR_WRITE pins moved 3 to 6, still one writer);
+  identityFields nests the pair under the rank; relic OBJECTS frozen in
+  freezePageTable and the freeze pinned at every depth; the /c/ strip joins
+  with a middle dot (kingsbane_last_oath carries a comma); the char sheet
+  carries focus across the 2 Hz rebuild; publicSheetHandler survives a
+  malformed percent-escape (decodedRouteName). VERIFY items all executed
+  and green: perf:tour, browser/axe (111), tray + overlap sweeps (only the
+  four inherited chat keyboard-dock violations), four-badge card down to
+  667x375, /c/ strip down to 320 wide.
 - Phase 21: (pending)
 - Phase 22: (pending)
 
 ## OPEN items / known gotchas
+- OWNER CALLS from Phase 20 QA (no ruling exists; raised by three
+  independent QA legs, recorded here for the maintainer, NOT decided and
+  NOT filed as issues):
+  (a) Public recent-finds strip design bundle: movement acquisitions (a
+  trade, a mail, a market buy, an enchant re-mint, an unbind stack split,
+  a returned commission; NOT a bank withdrawal, which moves slots without
+  re-granting) push the ring exactly like a loot drop, so "Recent finds"
+  means "recently first acquired, however acquired"; order-plus-polling reconstructs sub-minute acquisition
+  timing on an unauthenticated crawlable page whose deeds sibling coarsens
+  earnedAt to the UTC day (the floor is PUBLIC_READ_MAX_PER_MINUTE per IP);
+  a relic sold or traded away still prints; /c/ has no character-level
+  suppression (pre-existing); and the strip renders as one bold block at
+  narrow widths. Candidate mitigations if wanted: owner-only arm, window
+  shuffle, or dropping movement pushes. docs/design/reliquary.md now states
+  the honest version; the behavior is unchanged.
+  (b) Out-of-range remote inspect card omits the Curator standing the
+  public sheet already publishes: ClientWorld.characterProfile drops
+  sheet.reliquary and CharacterProfile has no slot for it, so proximity
+  shows a rank that a by-name lookup hides while /c/ shows everything.
+  A clean Phase 21 candidate (facet field + parse + remote card + a
+  by-name flair cache like rememberFlair), not a QA drive-by.
+  (c) Borrowed-reins visibility, extending the recorded bags-only
+  maintainer call: nine mount relics score by CURRENT possession of
+  tradeable reins, so a borrowed bagful can raise the broadcast rank until
+  the sweep after they leave, and crossing rank 5 grants the permanent deed
+  (that grant is pre-existing). The wire surface is what Phase 20 added.
+- DEFERRED WITH RECIPES (Phase 20 QA): inspect window is absent from the
+  relocalize() fanout (pre-existing; the card has no re-render path beyond
+  openInspect, so joining the fanout means storing the last input and
+  choosing between replaying possibly stale data and closing on switch);
+  a committed mobile rig for the inspect surface (the overlap audit's
+  WINDOW_MATRIX is toggle-driven and cannot open inspect; the QA session's
+  scratchpad rig qa_inspect_667.mjs is the seed but needs the
+  enterOfflineGame-timeout hardening first); capture-rig cold-boot
+  robustness on a loaded host (enterOfflineGame's 30s gameBootTimeoutMs
+  returns false unchecked in mobile_tray_overflow.mjs and friends).
+- Perf ledger numbers from Phase 20 QA (context for a future scale pass,
+  no action owed now): the 60s curator sweep is the first non-trivial
+  fully synchronous full-client sweep in game.ts (about 2.75 us per player
+  typical; 2.75 ms at 1000 sessions, 13.7 ms at the 5000 cap, once per
+  60s); if a realm nears the cap, slice the client list across cycles. A
+  standing change re-broadcasts the WHOLE identity record (idVer is one
+  version over the blob), bounded to one per player per sweep. The ranked
+  identity record grows 28 bytes; the sheet read path got about 5x cheaper.
 - OPEN (Phase 18, human/maintainer release work): register the nine new
   achievement ids on BOTH portals (Steamworks App Admin and the Epic Dev
   Portal): ACH_RELIQUARY_RANK_2..5, ACH_RELIQUARY_COMPLETE,

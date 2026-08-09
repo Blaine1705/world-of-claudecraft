@@ -154,25 +154,41 @@ The public character sheet (`sheetReliquaryFromState` in
 `server/profile_page.ts`) carries these Reliquary fields and no others: the
 character-scoped completion pair, the Curator rank derived from it, and the
 capped recent-finds strip. The strip is ids plus kinds, newest first, bounded
-by `SHEET_RECENT_RELICS`. It fails closed on any id the live catalog does not
-know, and it carries no first-find provenance, no obtain tally, and no
-timestamp (the recent ring stores none, so there is nothing to coarsen the way
-the deeds strip coarsens `earnedAt`). It rides both visibilities unfiltered
-because the Reliquary has no hidden concept to strip: hidden deeds never enter
-the catalog at all, so the strip cannot name one.
+by `SHEET_RECENT_RELICS`; when authored marks sit in the window, up to that
+many mark ids surface individually (the full marks SET never does). It fails
+closed on any id the live catalog does not know, and it carries no first-find
+provenance, no obtain tally, and no timestamp (the recent ring stores none, so
+there is nothing to coarsen the way the deeds strip coarsens `earnedAt`). It
+rides both visibilities unfiltered because the Reliquary has no hidden concept
+to strip: hidden deeds never enter the catalog at all, so the strip cannot
+name one.
 
 The missing timestamp bounds what the payload STATES, not what a determined
 reader can infer, and the honest version of the claim is worth writing down. A
 poller differencing successive reads of one sheet still sees a new entry appear
 between two fetches, so it can date each find as coarsely as its poll rate
-allows. Two floors bound that rate: the 120 second `Cache-Control: public,
-max-age=120` the `/c/` page serves, and the per-IP public-read budget
+allows. The floor on that rate is the per-IP public-read budget
 (`PUBLIC_READ_MAX_PER_MINUTE` in `server/ratelimit.ts`, shared by the page and
-the public sheet read). The point is that this is the IDENTICAL property
-`deeds.recent` already has on the same sheet, where the entry additionally
-carries a day-granularity `earnedAt`. The relic strip therefore adds no exposure
-class the sheet did not already carry, and closing it would be a change to both
-strips, not a Reliquary fix.
+the public sheet read), and a per-IP budget widens with IP rotation. The
+`Cache-Control: public, max-age=120` header the `/c/` page serves bounds only a
+poller that goes through a shared cache (the origin re-renders per request),
+and the JSON sheet read sends no cache header at all. The timing property
+itself is one `deeds.recent` already has on the same sheet, where the entry
+additionally carries a day-granularity `earnedAt`.
+
+What IS new: the strip is the first PER-ITEM acquisition naming on the
+crawlable `/c/` page (`deeds.recent` rides the JSON sheet but the page renders
+no deed names), and the ring pushes on every first acquisition, movement finds
+included: a trade, a mail, a market buy, an enchant re-mint, an unbind stack
+split, or a returned commission pushes the ring exactly like a loot drop
+(`pushRecent` is deliberately unchanged on a movement find; a bank withdrawal
+is NOT one, it moves slots without re-granting). So "Recent finds" reads as discovery while meaning "recently first
+acquired, however acquired", the page is crawlable and archivable, and a relic
+later traded away still prints. Whether movement acquisitions should push the
+ring, whether the public arm should carry the strip at all, and whether any
+character-level suppression is wanted are OWNER CALLS recorded in the packet
+state ledger, not decided here; closing the timing channel itself would be a
+change to both strips, not a Reliquary fix.
 
 One consequence is deliberate and stated here rather than left to be
 rediscovered: mount ownership behind that pair reads bags **and** bank, the
@@ -185,10 +201,19 @@ else the bank holds. Narrowing it to bags alone here would also put the public
 pair at odds with the collection the owner sees in game, which counts both
 containers.
 
+This acceptance covers BOTH audiences, not just the sheet: the entity-wire
+standing below is bank-inclusive through the same seam
+(`refreshCuratorStanding` scores `characterReliquaryOwnership`, whose mount
+surface is live `ownedMounts`), so everyone within interest radius receives
+the same bank-derived aggregate the sheet publishes. Because reins trade like
+any item, borrowed reins raise the broadcast standing until the next sweep
+after they leave; the aggregate bound above is what keeps that a cosmetic
+oddity rather than a leak.
+
 Bags-only is a **recorded follow-up and an owner call**, not a defect to fix in
 passing: it would visibly drop the pair for every character with banked reins,
-so it belongs in its own change that moves the sheet, the window, and the
-Curator rank bridges together.
+so it belongs in its own change that moves the sheet, the window, the Curator
+rank bridges, and the wire stamp together.
 
 ### Inspect and identity-wire exposure (privacy note)
 
@@ -201,8 +226,11 @@ player entity, and `wireEntity` encodes them as `crk`, `cro`, and `crt`. Every
 client holding that player in interest therefore receives them on first sight
 and again on every change. Interest is proximity, not consent: a player enters a
 viewer's set at `INTEREST_RADIUS` and persists out to
-`PLAYER_INTEREST_DROP_RADIUS` (roughly a hundred yards today), so the standing
-reaches everyone nearby whether or not one of them ever clicks inspect. That is
+`PLAYER_INTEREST_DROP_RADIUS` (roughly a hundred yards today; inside a
+battleground slot the same record reaches same-team members out to the wider
+`BG_MATCH_INTEREST_RADIUS` / `BG_MATCH_DROP_RADIUS` band, per
+`bgWideInterestApplies`), so the standing reaches everyone nearby whether or
+not one of them ever clicks inspect. That is
 a wider audience than the card implies, and the gap between the two is the
 reason this note exists.
 

@@ -2373,3 +2373,136 @@ owns the push.
   computation.
 - LOCAL ONLY per the runner prompt: the implementation is complete and
   unpushed; Phase 20 QA owns the push and the deeper gate.
+
+## Phase 20 QA (2026-08-09): inspect + social surfaces verified
+
+- Session shape: ultracode. STEP 0 sync was a no-op (origin/release/v0.36.0
+  still at the contained 5819c005a7; no merge commit, no release-merge-audit
+  owed). Nine parallel legs over the immutable range 0d9fa3ecd0..07ae0c5401:
+  authority/exploit, privacy audience (plus the contract's three explicit
+  probes), wire parity + reconnect (plus delta-guard and bandwidth addendum),
+  frontend seams, server perf, test-pin quality, sim determinism, the
+  visual/mobile E2E rig leg, and the cross-cutting qa-checklist. ZERO
+  blocking findings against the shipped surfaces; one blocking TEST gap
+  (below). Full suite ran green inside the gate leg (34,018 tests), tsc
+  clean, security gate clean, i18n artifacts fresh.
+- QA-owned VERIFY items, all executed: npm run perf:tour exit 0 (prewarm 0
+  fail 0 timeout, hudSkip 97 percent, FCT cap-bounded; absolute fps
+  meaningless under a contended software-GL host, no threshold tripped);
+  npm run test:browser 16 files / 111 tests green (the axe pass);
+  hud_perf_budget ARM 3 (HUD_PERF_BUDGET_TOUR=1) run against that artifact:
+  the two run-length-independent arms that judge this phase's latch, the
+  elision-bypass write count and the FCT pool cap, both PASS; the two
+  wall-clock arms (tourMinFrames floor, frameLong50 anchor) are same-machine
+  PERF_GPU=1 values per the baseline's own note and are not judgeable on a
+  loaded software-GL host (34 frames rendered; the PERF_GPU=1 re-capture
+  attempt crashed at boot under host load), so they stay with the owner's
+  machine and CI;
+  mobile E2E families: tray overflow OK at 740x360 and 844x390, the overlap
+  audit's only strict violations are the four inherited chat keyboard-dock
+  ones, and the mobile-autorun family is unreachable from these rigs (its 9
+  stay recorded, not re-counted). The four-badge inspect card (holder +
+  Discord + contributor + sigil) holds with zero overlaps and zero clipping
+  at desktop, 844x390, 740x360, and 667x375 (the card WRAPS, verified by
+  scrollWidth equality, sigil caption above the fold); the /c/ strip holds
+  at 1000, 390, and 320 wide with a 16-letter name and the five longest
+  catalogued relic names, cap enforced.
+- Verified-clean highlights (each against real code, not the description):
+  no client write path to crk/cro/crt in any spelling (whole-server token
+  count); hostile decode values cannot corrupt the mirror; sparse-absent
+  resets on full records; reconnect/linkdead/interest re-entry all re-send
+  identity; spectate resolves the anchor's standing through the same
+  selfStanding branch; another player's firstFind/marks/counts are
+  structurally unreadable from every player-facing surface (the one read is
+  moderator spectate: admin-gated, audited, pre-existing); hidden deeds
+  cannot move or be named by any new field; the 60s sweep does no DB work
+  and re-broadcasts only on a real change (serialize-and-diff idVer); the
+  sheet path got about 5x cheaper via the narrow restores; the catalog memo
+  hits (object-identity probe) at about 5.7x; no unbounded growth.
+- Findings applied (every one, blocking through nit), fix round on top of
+  07ae0c5401: the one BLOCKING test gap, selfCuratorStanding had only
+  source scrapes, now has behavioral arms on both world shapes
+  (tests/reliquary_sheet_view.test.ts, transposition mutation KILLED); the
+  latch's compare-before-assign order pinned (mutation KILLED); crk/cro/crt
+  decode hardened through wireCount (floor, positive, 1e9 clamp; a
+  fractional rank no longer throws t(undefined) out of the inspect painter,
+  and curatorRankNameKey gained the Number.isInteger guard for every future
+  caller); refreshCuratorStanding clears before the walk (fail-to-absent)
+  and gates all three stamps on the RANK; identityFields nests cro/crt
+  under crk so all-or-nothing is structural and pinned with a positive
+  control; relic OBJECTS are now frozen in freezePageTable (they were 0 of
+  249; the comment claimed otherwise) and the whole freeze is pinned at
+  every depth (wrapper-deletion mutation KILLED); the relicsTotal pin
+  gained an independent page-table walk oracle; the sheet strip's
+  restore-then-strip composition pinned over an over-cap ring with a
+  duplicate; a cross-player reliq absence pin landed WITH its positive
+  control (self reliq present); the /c/ strip now joins with a middle dot
+  because kingsbane_last_oath ("Thronebane, Last Oath of Thornpeak")
+  carries a comma and read as two finds; the dead
+  .inspect-meta.inspect-reliquary CSS rule (byte-identical to the base
+  family color) was removed with its comment and pin retargeted to the
+  base-rule reach plus an occurrence bound; publicSheetHandler decodes the
+  name through decodedRouteName (malformed escape 404s instead of 500,
+  mirroring the /c/ arm, unit-pinned); the char sheet now CARRIES FOCUS
+  across the 2 Hz rebuild (focusedWithin + restoreFirstEnabled, same-act
+  then Close, both arms happy-dom-pinned, disable mutation KILLED); the 60s
+  cadence setInterval registration is source-pinned (registration AND the
+  60_000 value); the inspect suite's itemIcon stub returns a data URL (a
+  guard for future filled-slot fixtures; the suite's residual happy-dom
+  fetch noise has a different source and stays a recorded hygiene
+  follow-up); the capture rig's two fixable Biome warnings fixed; comment
+  accuracy fixes (esc() scope, memo custom-table ownership, types.ts trio
+  wording, SheetRelicRecent no-client-consumer note, hud.ts latch comment
+  condensed); docs/design/reliquary.md corrected (per-item acquisition
+  naming IS new on the crawlable page and movement finds push the ring; the
+  bank-inclusive ruling now names the WIRE audience too; the poller floor
+  is the per-IP budget, not the cache header; battleground interest
+  widening stated; up-to-five mark ids qualified).
+- CURATOR_WRITE authority pins moved 3 to 6 deliberately: the refresher now
+  has a clear cluster and a rank-gated stamp cluster, still the only writer.
+- Owner calls RECORDED, not decided (no ruling exists; see state.md):
+  public-strip design bundle (movement pushes, timing signal vs the
+  deeds-arm coarsening doctrine, traded-away labeling, no character-level
+  suppression, the single bold block); the out-of-range remote card
+  omitting the standing the public sheet publishes (CharacterProfile has no
+  slot; a Phase 21 candidate); borrowed-reins visibility extending the
+  bags-only maintainer call.
+- Deferred with recipes (state.md): inspect window absent from the
+  relocalize() fanout (pre-existing, widened here; re-render-from-stored
+  input vs close-on-switch is a design choice); a committed mobile rig for
+  the inspect surface (qa-visual's scratchpad rig is the seed; needs the
+  enterOfflineGame timeout check hardening first); rig cold-boot robustness
+  on a loaded host.
+- Fix round re-verified: tsc clean and 20 suites / 1163 tests green over
+  every touched file.
+- Fix-round review (two FRESH reviewers over the uncommitted diff, per the
+  packet cadence): the pin auditor found one BLOCKING (the decode-guard test
+  pinned the helper, not the WIRING, and the retained legacy ladder in
+  server/main.ts carried the same unguarded decodeURIComponent, live under
+  the API_DISPATCH=legacy rollback) and the correctness reviewer converged
+  on the same legacy arm plus three more: "a bank withdrawal" was a factual
+  error in the new doc prose (bankWithdraw moves slots and never reaches
+  noteRelicItemFind; corrected in both files), the itemIcon stub change was
+  a verified NO-OP for the fetch noise it cited (comment and record
+  rewritten honestly), and the focus ladder missed the helm eye (the one
+  repeated-press sheet control without a data-act). Round 2 applied ALL of
+  it: decodedRouteName wired into the legacy arm with a both-arms wiring
+  pin; the helm eye carries data-act="toggle-helm"; the Close-fallback rung
+  got its own happy-dom arm; the reliq positive control asserts the seeded
+  mark CONTENT (key presence was soft: reliq rides as an empty object on a
+  first broadcast); an in-snapshot sibling witness (ht) rides beside the
+  all-or-nothing absences; the HOLDER_TIER_REFRESH_MS VALUE is pinned, not
+  just the registration; an above-ladder crk passes through by RECORDED
+  DECISION (mixed-version rule: a future rank 6 must still read
+  at-least-rank-5 on old clients); wireCount clamps through
+  RELIQUARY_OBTAIN_COUNT_CAP instead of a bare 1e9 and its comment covers
+  the below-one floor; the order pin's slice asserts block-comment-free;
+  the composition-test comment stops claiming the cap arm; the
+  fail-to-absent comment states its trade. Round-2 verification: tsc clean,
+  the full touched battery green, and the new wiring/fallback pins
+  mutation-checked.
+- Recorded out-of-scope from the fix-round review (pre-existing, not this
+  packet's defects): server/claudium.ts carries four more unguarded
+  decodeURIComponent sites on its own routes; the happy-dom suites'
+  residual localhost fetch noise (asset-path img srcs) wants a suite-level
+  cure. gate_select on the committed tree recorded below with the commit.
