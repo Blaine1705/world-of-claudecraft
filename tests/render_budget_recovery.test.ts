@@ -153,6 +153,30 @@ describe('render budget recovery ladder', () => {
     expect(levels.lighting).toBeGreaterThanOrEqual(HIGH_BASELINE.lighting);
   });
 
+  it('returns to baseline and restores render scale in a scene dense from the start', () => {
+    const governor = highGovernor();
+    floorEverything(governor);
+
+    // Counters parked in the 90 to 100% band from the FIRST recovery frame: a
+    // genuinely dense scene, not the ladder's own ratchet. The other repro only
+    // crosses the band via the climb, after resolution has already recovered,
+    // so it cannot tell a counter-gated phase A from an ungated one. Here the
+    // return to baseline and the render scale rung must proceed on measured
+    // headroom alone, and the climb above baseline must never start.
+    let state = governor.state();
+    for (let i = 0; i < 260; i++) {
+      state = governor.update(
+        headroomSample({ calls: 600, triangles: 4_300_000, grassVisibleTufts: 5_800 }),
+      );
+    }
+
+    expect(state.levels.resolution).toBe(1);
+    expect(state.levels.grass).toBe(HIGH_BASELINE.grass);
+    expect(state.levels.foliage).toBe(HIGH_BASELINE.foliage);
+    expect(state.levels.vfx).toBe(HIGH_BASELINE.vfx);
+    expect(state.levels.lighting).toBe(HIGH_BASELINE.lighting);
+  });
+
   it('holds the climb above baseline while the counters sit inside the gate band', () => {
     const governor = highGovernor();
     floorEverything(governor);
