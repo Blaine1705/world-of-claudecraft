@@ -21,39 +21,46 @@ function matrix(targets: number): Record<string, number> {
 
 // 2026-08-09 120s band round: MM and SV ability values were raised to land the
 // gear-tier BiS bench inside the 150-200 band (MM 141 to 167.6, SV 136.8 to
-// 163.7 at 120s BiS, BM unchanged at 200.7). This no-rows level-20 probe
+// 167.7 at 120s BiS, BM unchanged at 200.7). This no-rows level-20 probe
 // scenario weights the raised base literals far more heavily than the BiS
 // bench does (AP riders are small in blues), so its ratios moved much further
 // than the BiS ones (BiS single-target still has BM ahead: 200.7 vs 167.6 and
-// 163.7). The bands below re-seat at the measured probe values of this round;
-// they remain regression pins on the fixed seeds, not a sign-off of the
-// probe-scenario spread. The pre-existing acknowledged debt stands (owner
-// 2026-08-09): the hunter kit-item pass closes the spread from BELOW by
-// lifting BM, then these bands re-tighten.
+// 167.7). The acknowledged debt stands (owner 2026-08-09): the hunter
+// kit-item pass closes the spread from BELOW by lifting BM.
+//
+// Band shape (review, PR 3201): every edge below either pins the DESIGN
+// target or catches drift AWAY from it, and none goes red when the BM lift
+// lands. Design intent: single-target parity within about five percent
+// (ratios near 1.0) and a 1.10 to 1.15 Packlord three-target lead. The
+// ceilings on mm/bm and sv/bm sit at this round's measured values (further
+// MM/SV runaway fails); the floors sit just under the design parity band
+// (paying the BM debt lands the ratios inside, still green); the 3T ceiling
+// IS the design 1.15 and its floor is this round's measured value. After the
+// kit-item pass, collapse these back to the design bands.
 describe('Hunter v0.29 deterministic DPS alignment', () => {
   it(
-    'keeps the single-target loops at the band-round measured ratios',
+    'holds the single-target loops between design parity and the band-round ceiling',
     () => {
       const dps = matrix(1);
-      // Measured 1.5227 (MM 116.3 / BM 76.4) and 1.2338 (SV 94.2 / BM 76.4).
-      expect(dps.marksmanship / dps.beast_mastery).toBeGreaterThanOrEqual(1.45);
+      // Measured this round: mm/bm 1.5227 (116.3 / 76.4), sv/bm 1.2301.
+      expect(dps.marksmanship / dps.beast_mastery).toBeGreaterThanOrEqual(0.95);
       expect(dps.marksmanship / dps.beast_mastery).toBeLessThanOrEqual(1.58);
-      expect(dps.survival / dps.beast_mastery).toBeGreaterThanOrEqual(1.17);
+      expect(dps.survival / dps.beast_mastery).toBeGreaterThanOrEqual(0.92);
       expect(dps.survival / dps.beast_mastery).toBeLessThanOrEqual(1.29);
     },
     TEST_TIMEOUT_MS,
   );
 
   it(
-    'keeps the Packlord three-target lead at the band-round measured ratio',
+    'holds the Packlord three-target lead under the design 1.15 ceiling',
     () => {
       const dps = matrix(3);
       const nextBest = Math.max(dps.marksmanship, dps.survival);
-      // Measured 0.8455 (BM 98.3 / MM 116.3): the 1.10-1.15 lead premise does
-      // not hold at this probe scenario after the raise; the BM lead survives
-      // at BiS. Re-tighten upward in the kit-item pass.
+      // Measured this round: 0.8455 (BM 98.3 / MM 116.3). The design lead is
+      // 1.10 to 1.15; the floor catches further MM/SV cleave runaway and the
+      // ceiling stays the design bound so the BM lift lands inside it.
       expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(0.8);
-      expect(dps.beast_mastery / nextBest).toBeLessThanOrEqual(0.89);
+      expect(dps.beast_mastery / nextBest).toBeLessThanOrEqual(1.15);
     },
     TEST_TIMEOUT_MS,
   );
