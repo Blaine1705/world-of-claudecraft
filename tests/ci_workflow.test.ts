@@ -8,6 +8,7 @@ import {
   isGeneratedI18nArtifactPath,
 } from '../scripts/lib/gate_select_plan.mjs';
 import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
+import { shouldDisableVitestFsModuleCache } from '../scripts/lib/vitest_fs_module_cache.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -1096,15 +1097,22 @@ describe('CI workflow parity', () => {
     // The store is enabled in the normal-checkout config this cache serves, at
     // the DEFAULT path the workflow hardcodes. Comment-stripped first (a `//`
     // prefix must fail the pin, not satisfy it), then anchored to the real
-    // config line shape. OSS Brain linked worktrees disable the experimental
-    // store because their node_modules is symlinked to the parent checkout and
-    // concurrent local gates would share one temp-file cache.
+    // config line shape. OSS Brain checkouts disable the experimental store
+    // because linked worktrees symlink node_modules to the parent checkout and
+    // base-health gates run from that parent under ORCH, so both can share one
+    // temp-file cache.
     const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
     expect(viteConfigCode).toMatch(
-      /\nconst isOssBrainLinkedWorktree = root\.split\(path\.sep\)\.includes\('\.wt'\);/,
+      /\nconst disableVitestFsModuleCache = shouldDisableVitestFsModuleCache\(root\);/,
     );
-    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: !isOssBrainLinkedWorktree,/);
+    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: !disableVitestFsModuleCache,/);
     expect(viteConfigCode).not.toContain('fsModuleCachePath');
+    expect(
+      shouldDisableVitestFsModuleCache('/opt/ossbrain/work/world-of-claudecraft', {
+        ORCH: '/opt/ossbrain',
+      }),
+    ).toBe(true);
+    expect(shouldDisableVitestFsModuleCache('/home/runner/work/world/world', {})).toBe(false);
     // Exactly the two shard matrices plus the long-sims lane carry the step,
     // counted workflow-wide so a copy added to ANY other job fails
     // (browser-gate has no matrix, so ${{ matrix.shard }} would render empty
