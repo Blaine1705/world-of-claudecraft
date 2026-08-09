@@ -676,9 +676,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
 // prewarm changes converged with the 3165 reseal. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ec9d9ca628a22172ee8e989c3ac88d563b43929ce6d0ffc2b66881d462ca79f9';
+  '62c01972c7e2e2c45d25e47036e7a0c263b1a2e874085f0e80d199e3543c57f2';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a1ee3eaafc63148b46a8af7029cd990f82b4128ee7789e1a1a35e9126926fcca';
+  '9748e8f842391716cd2a9eea0ff89b5297cded980a670ead3e3d9ef85ac39108';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1582,7 +1582,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('cab95c2e4617b24251ccf355ba0519caf9069d0b8a90788bc8148eae276f98ca');
+    ).toBe('0775034c85045a0aaff737f5e2b9fe0edaf921dc7ccb07a1a0db43f51b16e0eb');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

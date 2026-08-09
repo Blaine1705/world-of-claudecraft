@@ -333,6 +333,7 @@ import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import {
   applyPointLightBudget,
+  countDrawnPointLights,
   flickerContributingFireLights,
   pointLightPadCount,
   type RankedPointLight,
@@ -5436,6 +5437,7 @@ export class Renderer {
   private renderBoundedPrewarmRoot(group: THREE.Group, childRoot: THREE.Object3D): void {
     const sceneVisibility = this.scene.children.map((entry) => entry.visible);
     const groupVisibility = group.children.map((entry) => entry.visible);
+    const previousPadVisibility = this.lightPads.map((pad) => pad.visible);
     const previousTarget = this.webgl.getRenderTarget();
     const previousShadowAutoUpdate = this.webgl.shadowMap.autoUpdate;
     const previousShadowNeedsUpdate = this.webgl.shadowMap.needsUpdate;
@@ -5447,6 +5449,22 @@ export class Renderer {
       }
       group.visible = true;
       for (const entry of group.children) entry.visible = entry === childRoot;
+
+      // The mask above hides entity views, and their nested chosen lights
+      // leave Three's counted set with them, out of band of the budget pass:
+      // NUM_POINT_LIGHTS would drift below the pinned total for THIS render
+      // only, and every first-drawn material would synchronously link a
+      // program variant the live render never draws (the measured 100-280 ms
+      // prewarm-unit stalls). Recount in the masked state and raise the pads
+      // so this render draws the exact variant the compile lane linked.
+      const boundedDrawn = countDrawnPointLights(this.lightRank, this.scene);
+      const boundedPadCount = Math.min(
+        this.lightPads.length,
+        pointLightPadCount(boundedDrawn, GFX.maxPointLights),
+      );
+      for (let i = 0; i < this.lightPads.length; i++) {
+        this.lightPads[i].visible = i < boundedPadCount;
+      }
 
       // Keep the real shadow-enabled colour-program variant, but do not rebuild
       // Insane's 4096px shadow map for every child upload. The separate shadow
@@ -5460,6 +5478,9 @@ export class Renderer {
       this.webgl.setRenderTarget(previousTarget);
       this.webgl.shadowMap.autoUpdate = previousShadowAutoUpdate;
       this.webgl.shadowMap.needsUpdate = previousShadowNeedsUpdate;
+      for (let i = 0; i < this.lightPads.length; i++) {
+        this.lightPads[i].visible = previousPadVisibility[i];
+      }
       for (let i = 0; i < group.children.length; i++) {
         group.children[i].visible = groupVisibility[i];
       }
