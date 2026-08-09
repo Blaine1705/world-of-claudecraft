@@ -4325,7 +4325,8 @@ export const cs_CZ: EnTranslations = {
     "resourceName": {
       "rage": "Vztek",
       "mana": "Mana",
-      "energy": "Energie"
+      "energy": "Energie",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Všechny třídy",

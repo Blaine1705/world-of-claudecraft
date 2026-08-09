@@ -6064,6 +6064,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': '怒气',
   'guide.resourceName.mana': '法力',
   'guide.resourceName.energy': '能量',
+  'guide.resourceName.focus': '集中',
   'guide.classPage.back': '所有职业',
   'guide.classPage.roleLabel': '定位',
   'guide.classPage.resourceLabel': '资源',

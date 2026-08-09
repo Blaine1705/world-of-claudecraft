@@ -1194,6 +1194,7 @@ export const guideStrings = {
     rage: 'Rage',
     mana: 'Mana',
     energy: 'Energy',
+    focus: 'Focus',
   },
   classPage: {
     back: 'All classes',

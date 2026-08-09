@@ -4325,7 +4325,8 @@ export const sv_SE: EnTranslations = {
     "resourceName": {
       "rage": "Raseri",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Alla klasser",

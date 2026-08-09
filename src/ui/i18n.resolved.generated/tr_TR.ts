@@ -4325,7 +4325,8 @@ export const tr_TR: EnTranslations = {
     "resourceName": {
       "rage": "Öfke",
       "mana": "Mana",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Tüm sınıflar",

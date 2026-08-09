@@ -4325,7 +4325,8 @@ export const vi_VN: EnTranslations = {
     "resourceName": {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",

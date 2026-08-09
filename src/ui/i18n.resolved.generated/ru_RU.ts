@@ -4325,7 +4325,8 @@ export const ru_RU: EnTranslations = {
     "resourceName": {
       "rage": "Ярость",
       "mana": "Мана",
-      "energy": "Энергия"
+      "energy": "Энергия",
+      "focus": "Концентрация"
     },
     "classPage": {
       "back": "Все классы",

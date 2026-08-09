@@ -6307,6 +6307,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': 'レイジ',
   'guide.resourceName.mana': 'マナ',
   'guide.resourceName.energy': 'エナジー',
+  'guide.resourceName.focus': 'フォーカス',
   'guide.classPage.back': 'すべてのクラス',
   'guide.classPage.roleLabel': 'ロール',
   'guide.classPage.resourceLabel': 'リソース',

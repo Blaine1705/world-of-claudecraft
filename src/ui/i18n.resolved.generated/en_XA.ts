@@ -4325,7 +4325,8 @@ export const en_XA: EnTranslations = {
     "resourceName": {
       "rage": "[Ŕáĝé]",
       "mana": "[Ɱáñá]",
-      "energy": "[Éñéŕĝý]"
+      "energy": "[Éñéŕĝý]",
+      "focus": "[Ƒóçúš]"
     },
     "classPage": {
       "back": "[Áļļ çļáššéš]",

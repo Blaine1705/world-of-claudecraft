@@ -10,7 +10,7 @@
 // Spoiler-safe: no balance numbers; ability "what it's for" lines are authored guide keys,
 // never the number-laden sim ability descriptions.
 
-import type { PlayerClass } from '../../sim/types';
+import type { PlayerClass, ResourceType } from '../../sim/types';
 import { CLASS_DETAILS } from '../../ui/class_details_data';
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
@@ -232,10 +232,20 @@ function notFoundInline(): string {
   </article>`;
 }
 
+// Typed per-resource key map: adding a ResourceType without a guide string is
+// a compile error here, instead of an untracked-key throw on the class page
+// (review 3050 finding: the `as TranslationKey` cast hid the focus gap).
+const RESOURCE_NAME_KEYS: Record<ResourceType, TranslationKey> = {
+  rage: 'guide.resourceName.rage',
+  mana: 'guide.resourceName.mana',
+  energy: 'guide.resourceName.energy',
+  focus: 'guide.resourceName.focus',
+};
+
 function factsHtml(c: GuideClassInfo): string {
   const details = CLASS_DETAILS[c.id as PlayerClass];
   const rows: [TranslationKey, string][] = [
-    ['classDetails.labels.resource', t(`guide.resourceName.${c.resource}` as TranslationKey)],
+    ['classDetails.labels.resource', t(RESOURCE_NAME_KEYS[c.resource])],
   ];
   if (details) {
     rows.unshift(['classDetails.labels.weapons', t(details.weaponsKey)]);
@@ -395,7 +405,7 @@ function detailHtml(id: string): string {
           <h1 class="guide-class-hero-name">${esc(className(c.id))}</h1>
           <div class="guide-badges">
             ${roleBadges(c.roles)}
-            ${badge(t(`guide.resourceName.${c.resource}` as TranslationKey), 'guide-badge-resource')}
+            ${badge(t(RESOURCE_NAME_KEYS[c.resource]), 'guide-badge-resource')}
           </div>
           ${classTags(c.id)}
         </div>

@@ -4325,7 +4325,8 @@ export const id_ID: EnTranslations = {
     "resourceName": {
       "rage": "Amukan",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Semua kelas",

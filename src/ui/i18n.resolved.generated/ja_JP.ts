@@ -4325,7 +4325,8 @@ export const ja_JP: EnTranslations = {
     "resourceName": {
       "rage": "レイジ",
       "mana": "マナ",
-      "energy": "エナジー"
+      "energy": "エナジー",
+      "focus": "フォーカス"
     },
     "classPage": {
       "back": "すべてのクラス",

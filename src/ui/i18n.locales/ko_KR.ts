@@ -6292,6 +6292,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': '분노',
   'guide.resourceName.mana': '마나',
   'guide.resourceName.energy': '기력',
+  'guide.resourceName.focus': '집중',
   'guide.classPage.back': '전체 직업',
   'guide.classPage.roleLabel': '역할',
   'guide.classPage.resourceLabel': '자원',

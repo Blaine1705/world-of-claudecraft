@@ -4325,7 +4325,8 @@ export const de_DE: EnTranslations = {
     "resourceName": {
       "rage": "Wut",
       "mana": "Mana",
-      "energy": "Energie"
+      "energy": "Energie",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Alle Klassen",

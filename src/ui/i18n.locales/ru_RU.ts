@@ -6360,6 +6360,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': 'Ярость',
   'guide.resourceName.mana': 'Мана',
   'guide.resourceName.energy': 'Энергия',
+  'guide.resourceName.focus': 'Концентрация',
   'guide.classPage.back': 'Все классы',
   'guide.classPage.roleLabel': 'Роль',
   'guide.classPage.resourceLabel': 'Ресурс',

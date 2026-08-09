@@ -6099,6 +6099,7 @@ export type TranslationKeyFlat =
   | 'guide.questsPage.typesTitle'
   | 'guide.related'
   | 'guide.resourceName.energy'
+  | 'guide.resourceName.focus'
   | 'guide.resourceName.mana'
   | 'guide.resourceName.rage'
   | 'guide.riftsPage.boundBody'

@@ -4325,7 +4325,8 @@ export const ko_KR: EnTranslations = {
     "resourceName": {
       "rage": "분노",
       "mana": "마나",
-      "energy": "기력"
+      "energy": "기력",
+      "focus": "집중"
     },
     "classPage": {
       "back": "전체 직업",

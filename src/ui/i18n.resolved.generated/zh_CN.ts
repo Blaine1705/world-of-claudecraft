@@ -4325,7 +4325,8 @@ export const zh_CN: EnTranslations = {
     "resourceName": {
       "rage": "怒气",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "集中"
     },
     "classPage": {
       "back": "所有职业",
