@@ -921,6 +921,23 @@ export interface DuelState {
   // resolving later in the SAME tick still finds it and gets clamped too:
   // duels never produce a real death, even on a simultaneous double-kill.
   endedTick?: number;
+  /**
+   * Entity ids each duelist CONTROLLED at some point during the bout, keyed by
+   * the controlling pid: their pets, essentially.
+   *
+   * Recorded as the duel ticks because an `Aura` carries only `sourceId`, so a
+   * pet that despawns before the end can no longer be resolved back to its
+   * owner by any reader. The lethal clamp treats a pet's damage as the
+   * opponent's for the whole bout (it resolves through `pvpController`), so
+   * without this the end could not clear what the clamp had been protecting
+   * against, and the dot killed the loser at 1 hp seconds later.
+   *
+   * Session-only and tiny (one id per duelist), never serialized.
+   * OPTIONAL so a hand-built duel (tests, and any future direct construction)
+   * needs no knowledge of it: absent simply means nothing was recorded, which
+   * degrades to clearing by live controller alone.
+   */
+  controlled?: Map<number, Set<number>>;
 }
 
 // GroundAoE type moved to entity_roster.ts (the ground-AoE drain's home); imported above.
@@ -5973,19 +5990,18 @@ export class Sim {
   }
 
   private shouldSkipIdleMobTick(mob: Entity): boolean {
-    const radius = this.cfg.idleMobTickRadius;
+    const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (mob.dead || mob.ownerId !== null || mob.aiState !== 'idle' || mob.auras.length > 0)
+    if (
+      mob.dead ||
+      mob.ownerId !== null ||
+      mob.aiState !== 'idle' ||
+      mob.inCombat ||
+      mob.auras.length > 0
+    )
       return false;
-    const radiusSq = radius * radius;
-    for (const meta of this.players.values()) {
-      const p = this.entities.get(meta.entityId);
-      if (!p) continue;
-      const dx = p.pos.x - mob.pos.x;
-      const dz = p.pos.z - mob.pos.z;
-      if (dx * dx + dz * dz <= radiusSq) return false;
-    }
-    return true;
+    if (this.players.size === 0) return true;
+    return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
 
   private updateLootRolls(): void {

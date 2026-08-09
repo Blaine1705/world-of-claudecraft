@@ -1454,6 +1454,173 @@ export const zh_TW: EnTranslations = {
       "badges": {
         "backgrounded": "背景執行中",
         "offline": "離線"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 效能診斷",
+        "title": "ClaudeCraft 效能醫生",
+        "subtitle": "針對遊戲的掃描，提供證據與程式碼層級修正建議。",
+        "aria": {
+          "liveMeasurements": "即時效能測量",
+          "scanProgress": "診斷掃描進度",
+          "findings": "依優先順序排列的診斷結果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展開",
+          "start": "開始 15 秒掃描",
+          "refreshCensus": "重新整理場景統計",
+          "copyReport": "複製清晰報告",
+          "downloadReport": "下載報告",
+          "scanning": "掃描中...",
+          "scanAnother": "掃描另一個區域",
+          "reportLogged": "報告已記錄至主控台",
+          "copied": "已複製",
+          "copyBlocked": "複製受阻：報告已記錄",
+          "retestLowGraphics": "使用低畫質重新測試"
+        },
+        "instruction": "為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。",
+        "status": {
+          "pausedHiddenRestart": "此分頁隱藏時掃描已暫停。返回後掃描將重新開始。",
+          "restoredRestart": "分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。",
+          "worldLoaded": "世界已載入。正在等待第一個可操作影格。",
+          "pausedHiddenContinue": "此分頁隱藏時掃描已暫停。請返回遊戲以繼續。",
+          "collectingRemaining": {
+            "one": "正在擷取活躍遊戲：剩餘 {seconds} 秒",
+            "other": "正在擷取活躍遊戲：剩餘 {seconds} 秒"
+          },
+          "waitingFrames": "正在等待具代表性的遊戲影格：{current}/{minimum}",
+          "collectingNow": "正在擷取活躍遊戲：現在請穿過問題區域。",
+          "ready": "已準備掃描。按開始並重現卡頓。",
+          "waitingWorld": "正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。"
+        },
+        "metrics": {
+          "waitingRenderer": "算繪器：等待中",
+          "waitingCensus": "場景統計：等待中",
+          "waitingHitch": "卡頓歸因：進入世界時已啟用",
+          "recent": "最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}",
+          "render": "算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒",
+          "scene": "場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖",
+          "hitches": "卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "等待中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。",
+        "findingMeta": "{severity} | {confidence} 信心度",
+        "sections": {
+          "evidence": "證據",
+          "tryNow": "立即嘗試",
+          "codeFix": "程式碼修正",
+          "source": "相關來源檔案"
+        },
+        "severity": {
+          "critical": "嚴重",
+          "warning": "警告",
+          "info": "資訊"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        },
+        "diagnosis": {
+          "noProblemTitle": "未偵測到明顯效能問題",
+          "summary": {
+            "findings": {
+              "one": "最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。",
+              "other": "最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。"
+            },
+            "healthy": "最近 10 秒維持 {fps} FPS，影格 p95 為 {p95}。遊戲、瀏覽器、GPU、記憶體、資源與網路均未觸發門檻。"
+          },
+          "titles": {
+            "hardwareAcceleration": "正在使用軟體算繪",
+            "integratedGpu": "遊戲正在使用整合式 GPU",
+            "highDpi": "高解析度算繪開銷較大",
+            "forcedHighGraphics": "強制高畫質正在降低效能",
+            "lowMemory": "裝置可用記憶體偏低",
+            "browserStalls": "偵測到瀏覽器或擴充功能停頓",
+            "heapPressure": "偵測到瀏覽器記憶體壓力",
+            "contextLoss": "圖形內容已重設",
+            "gpuSubmit": "GPU 提交是主要影格瓶頸",
+            "sceneDraw": "場景繪製成本超過目前畫質預算",
+            "shadowPass": "陰影通道占用大量繪製呼叫",
+            "rendererWorld": "世界算繪器更新受 CPU 限制",
+            "rendererEntities": "實體視圖更新受 CPU 限制",
+            "rendererNameplates": "姓名牌繪製成本偏高",
+            "simCpu": "模擬工作占用影格時間",
+            "hudCpu": "HUD 更新占用影格時間",
+            "eventCpu": "事件處理占用影格時間",
+            "shaderCompile": "遊戲過程中正在編譯著色器",
+            "textureUpload": "紋理上傳造成遊戲卡頓",
+            "viewCreate": "實體視圖建立造成卡頓",
+            "otherHitch": "仍有未歸因的長影格",
+            "assetStartup": "資源處理延遲了遊戲啟動",
+            "longTasks": "瀏覽器長任務正在阻塞影格",
+            "networkLatency": "網路傳輸延遲了可見回應",
+            "snapshotApply": "快照處理正在阻塞客戶端",
+            "generic": "效能規則 {rule} 需要處理"
+          },
+          "causes": {
+            "environment": "偵測到的瀏覽器、GPU、記憶體或裝置設定可能在遊戲算繪前限制效能。",
+            "graphics": "本次擷取測得的圖形工作超過目前影格或場景預算。",
+            "cpu": "某個 CPU 階段占用足以錯過影格預算的主執行緒時間。",
+            "loading": "資源準備或首次使用工作發生在可見遊戲或啟動路徑中。",
+            "network": "網路傳輸或客戶端快照處理延遲了最新可操作狀態。"
+          },
+          "evidence": {
+            "environment": "環境規則 {rule} 與此裝置和瀏覽器相符。",
+            "gpuSubmit": "WebGL 提交 p95 為 {submit}，占算繪器 p95 的 {share}。",
+            "frame": "最近視窗測得 {fps} FPS，影格 p95 為 {p95}。",
+            "sceneCalls": "場景使用 {calls} 次繪製呼叫，目標為 {target}。",
+            "sceneTriangles": "場景提交 {triangles} 個三角形，目標為 {target}。",
+            "sceneCategory": "場景類別 {category} 貢獻 {calls} 次呼叫和 {triangles} 個測量三角形。",
+            "censusNeeded": "重新整理場景統計以識別主要算繪類別。",
+            "shadow": "陰影通道提交 {calls} 次呼叫，占基準的 {share}，共 {triangles} 個三角形。",
+            "cpuPhase": "測得階段 {phase} 的 p95 為 {p95}。",
+            "hitch": "記錄的 {total} 次卡頓中，有 {count} 次符合原因 {cause}。",
+            "assets": "預載門檻為 {tasks} 個已登錄任務等待了 {wait}。",
+            "failedAssets": "失敗的資源群組：{groups}。",
+            "longTasks": "測得 {count} 個長任務，p95 為 {p95}，最大值為 {max}。",
+            "network": "快照間隔為 {interval}，最新快照時間為 {age}，輸入回應 p95 為 {echo}。",
+            "snapshot": "快照解析與套用 p95 為 {work}；網路間隔 p95 為 {gap}。",
+            "generic": "診斷規則 {rule} 與本次擷取相符。"
+          },
+          "tryNow": {
+            "environment": "修正偵測到的環境設定，重新啟動，再重複相同掃描。",
+            "graphics": "以低畫質重複相同鏡頭路徑，確認圖形壓力。",
+            "cpu": "分別在靜止與移動時重複掃描，以隔離 CPU 階段。",
+            "loading": "重複相同路線或首次使用操作，確認卡頓發生時機。",
+            "network": "在離線遊戲中使用相同移動與鏡頭路徑進行比較。"
+          },
+          "codeFix": {
+            "environment": "讓偵測到的備援路徑遵守共用圖形與記憶體預算。",
+            "graphics": "使用現有算繪預算、實例化、材質共用、LOD 與隱藏工作略過機制。",
+            "cpu": "分析指定階段，移除重複工作與配置，並維持遊戲行為。",
+            "loading": "透過現有啟動與串流預算預載、池化或分攤已識別的首次使用工作。",
+            "network": "降低傳輸或快照處理成本，同時不削弱權威伺服器模型。"
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft 效能診斷",
+          "statusLine": "狀態：{status}（{score}/100）",
+          "capturedLine": "擷取時間：{captured}",
+          "topFindingLine": "首要問題：{finding}",
+          "summaryLine": "摘要：{summary}",
+          "gpuLine": "GPU：{gpu}",
+          "graphicsLine": "畫質：{tier}，算繪比例 {scale}",
+          "recentLine": "最近：{fps} FPS，p95 {p95}，{longFrames} 個影格超過 50 毫秒，共測量 {frames} 個影格",
+          "resultHeading": "結果",
+          "noThreshold": "本次擷取未觸發可處理門檻。",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "嚴重程度：{severity}。信心度：{confidence}。",
+          "rawSnapshotHeading": "原始快照",
+          "notAvailable": "無法使用",
+          "status": {
+            "critical": "嚴重",
+            "needsAttention": "需要注意",
+            "healthy": "正常"
+          }
+        }
       }
     },
     "auraOverlay": {

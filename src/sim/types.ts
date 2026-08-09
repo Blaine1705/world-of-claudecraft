@@ -28,6 +28,11 @@ export const INTERACT_RANGE = 5;
 // code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
+// Shared host interest boundary: the renderer destroys ordinary entity views at
+// 96 yards, and the network keeps known entities through this slightly wider
+// hysteresis edge. Offline and server Sims may therefore skip only idle,
+// ownerless mob AI beyond this radius without freezing anything a player sees.
+export const PLAYER_INTEREST_DROP_RADIUS = 100;
 export const OBJECT_RESPAWN = 30;
 // How many of a party member's auras ride the party wire (PartyMemberInfo.auras,
 // the mini icon strip under each party frame row). A cap, not a filter: the first
@@ -5957,11 +5962,11 @@ export interface SimConfig {
   // host reads it, the sim never does), so the parity/determinism gates are untouched.
   perfLap?: (phase: string, entity?: Entity) => void;
   // Distance-cull throttle: when positive, idle ownerless mobs farther than this many
-  // world units from every player skip their per-tick idle AI. Per host: the offline
-  // browser Sim and every deterministic golden/test Sim leave it unset (0, fully live,
-  // draw-order stable); the live GameServer sets it to INTEREST_DROP_RADIUS (the same
-  // distance a mob stays known/rendered to a viewer, see server/game.ts, #2703); the
-  // headless RL env sets its own throttle (headless/env_server.ts).
+  // world units from every player skip their per-tick idle AI. The offline browser and
+  // live GameServer set it to PLAYER_INTEREST_DROP_RADIUS; deterministic tests leave it
+  // unset unless they are explicitly pinning the culling contract. The headless RL env
+  // keeps its own intentional 80-unit throttle (headless/env_server.ts). Positive values
+  // also move every passive idle roll to the per-mob lane; see mob/idle_rng.ts.
   idleMobTickRadius?: number;
   // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
   // of no queue activity, so a walk-up spectator always has a game to watch (and
