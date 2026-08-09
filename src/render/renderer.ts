@@ -208,7 +208,7 @@ import {
   transitionAlpha,
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
-import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -9535,7 +9535,7 @@ export class Renderer {
       const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
-      let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
+      let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
         // (up to 180deg when engaging after an orbit) under the rate limiter
@@ -12090,11 +12090,4 @@ export class Renderer {
       behind: this.tmpV.z > 1,
     };
   }
-}
-
-function shortestAngle(from: number, to: number): number {
-  let d = to - from;
-  while (d > Math.PI) d -= 2 * Math.PI;
-  while (d < -Math.PI) d += 2 * Math.PI;
-  return d;
 }

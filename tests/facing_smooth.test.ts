@@ -11,6 +11,31 @@ import {
 
 const FRAME_60 = 1 / 60;
 
+describe('wrapAngle as a shortest-signed-angle helper', () => {
+  it('reproduces the old renderer-local shortestAngle(from, to) via wrapAngle(to - from)', () => {
+    // renderer.ts used to carry its own `shortestAngle(from, to)` helper, byte
+    // for byte the same wrap this module already exports. wrapAngle(to - from)
+    // must match it exactly, including across the +/-PI wrap boundary.
+    const shortestAngle = (from: number, to: number): number => {
+      let d = to - from;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      return d;
+    };
+    const cases: Array<[number, number]> = [
+      [3.0, -3.0],
+      [-3.1, 3.1],
+      [0, 0],
+      [0, Math.PI],
+      [-Math.PI, Math.PI],
+      [1.2, -2.5],
+    ];
+    for (const [from, to] of cases) {
+      expect(wrapAngle(to - from)).toBeCloseTo(shortestAngle(from, to), 12);
+    }
+  });
+});
+
 describe('approachAngle', () => {
   it('takes the shortest path across the +/-PI wrap', () => {
     // from 3.0 to -3.0 is +0.28 the short way, not -6.0 the long way
