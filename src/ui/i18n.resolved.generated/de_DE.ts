@@ -7924,6 +7924,7 @@ export const de_DE: EnTranslations = {
       "outOfRange": "Außer Reichweite.",
       "noTarget": "Ihr habt kein Ziel.",
       "tooClose": "Zu nah!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Ihr müsst Eurem Ziel zugewandt sein.",
       "targetHealthBelow": "Diese Fähigkeit erfordert, dass das Ziel unter {percent}% Gesundheit hat.",
       "dagger": "Ihr müsst einen Dolch führen.",
@@ -9540,6 +9541,10 @@ export const de_DE: EnTranslations = {
       "die_by_sword": {
         "name": "Tod durch das Schwert",
         "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Tollkühnheit",

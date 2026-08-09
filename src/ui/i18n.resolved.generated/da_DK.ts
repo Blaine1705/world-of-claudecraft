@@ -7924,6 +7924,7 @@ export const da_DK: EnTranslations = {
       "outOfRange": "Uden for rækkevidde.",
       "noTarget": "Du har intet mål.",
       "tooClose": "For tæt på!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Du skal vende ansigtet mod dit mål.",
       "targetHealthBelow": "Den evne kræver, at målet er under {percent}% helbred.",
       "dagger": "Du skal føre en daggert.",
@@ -9540,6 +9541,10 @@ export const da_DK: EnTranslations = {
       "die_by_sword": {
         "name": "Dø ved Sværdet",
         "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Dumdristighed",

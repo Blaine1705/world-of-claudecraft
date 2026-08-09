@@ -7924,6 +7924,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Fuori portata.",
       "noTarget": "Non hai un bersaglio.",
       "tooClose": "Troppo vicino!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",
@@ -9540,6 +9541,10 @@ export const it_IT: EnTranslations = {
       "die_by_sword": {
         "name": "Morte per la Spada",
         "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temerarietà",

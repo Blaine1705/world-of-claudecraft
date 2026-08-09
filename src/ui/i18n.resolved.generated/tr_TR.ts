@@ -7924,6 +7924,7 @@ export const tr_TR: EnTranslations = {
       "outOfRange": "Menzil dışında.",
       "noTarget": "Hiçbir hedefin yok.",
       "tooClose": "Çok yakın!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Hedefine dönük olmalısın.",
       "targetHealthBelow": "O yetenek, hedefin canının %{percent} altında olmasını gerektirir.",
       "dagger": "Bir hançer kuşanmalısın.",
@@ -9540,6 +9541,10 @@ export const tr_TR: EnTranslations = {
       "die_by_sword": {
         "name": "Kılıçla Ölüm",
         "description": "Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Pervasızlık",

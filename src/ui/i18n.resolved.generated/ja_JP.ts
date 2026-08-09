@@ -7924,6 +7924,7 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "射程外です。",
       "noTarget": "対象がいません。",
       "tooClose": "近すぎます！",
+      "mustTargetAlly": "味方を対象にしてください。",
       "facing": "対象の方を向いている必要があります。",
       "targetHealthBelow": "その能力は対象の体力が{percent}%未満でなければ使えません。",
       "dagger": "短剣を装備する必要があります。",
@@ -9540,6 +9541,10 @@ export const ja_JP: EnTranslations = {
       "die_by_sword": {
         "name": "剣に死す",
         "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。"
       },
       "recklessness": {
         "name": "無謀",

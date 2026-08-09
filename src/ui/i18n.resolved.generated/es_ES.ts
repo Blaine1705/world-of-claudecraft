@@ -7924,6 +7924,7 @@ export const es_ES: EnTranslations = {
       "outOfRange": "Fuera de alcance.",
       "noTarget": "No tienes objetivo.",
       "tooClose": "¡Demasiado cerca!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Debes mirar a tu objetivo.",
       "targetHealthBelow": "Esa habilidad requiere que el objetivo tenga menos de {percent}% de salud.",
       "dagger": "Debes llevar una daga.",
@@ -9540,6 +9541,10 @@ export const es_ES: EnTranslations = {
       "die_by_sword": {
         "name": "Morir por la Espada",
         "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temeridad",

@@ -7924,6 +7924,7 @@ export const vi_VN: EnTranslations = {
       "outOfRange": "Ngoài tầm.",
       "noTarget": "Bạn không có mục tiêu.",
       "tooClose": "Quá gần!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Bạn phải đối mặt với mục tiêu.",
       "targetHealthBelow": "Kỹ năng đó cần mục tiêu có sinh lực dưới {percent}%.",
       "dagger": "Bạn phải trang bị một con dao găm.",
@@ -9540,6 +9541,10 @@ export const vi_VN: EnTranslations = {
       "die_by_sword": {
         "name": "Sống Chết Cùng Kiếm",
         "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Liều Lĩnh",

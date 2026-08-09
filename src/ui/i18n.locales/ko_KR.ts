@@ -77,6 +77,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다.',
   'entities.abilities.die_by_sword.name': '검의 승부',
+  'entities.abilities.intervene.name': '엄호',
+  'entities.abilities.intervene.description':
+    '아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다.',
   'entities.abilities.emboldening_roar.description':
     '대담한 포효를 내질러 자신과 40yd 이내의 아군 플레이어에게 대담함을 부여하며, 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노 특성)',
   'entities.abilities.emboldening_roar.name': '대담한 포효',
@@ -2162,6 +2165,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '사정거리 밖입니다.',
   'hud.errors.noTarget': '대상이 없습니다.',
   'hud.errors.tooClose': '너무 가깝습니다!',
+  'hud.errors.mustTargetAlly': '아군을 대상으로 지정해야 합니다.',
   'hud.errors.facing': '대상을 바라봐야 합니다.',
   'hud.errors.targetHealthBelow': '그 능력은 대상 생명력이 {percent}% 미만이어야 합니다.',
   'hud.errors.dagger': '단검을 착용해야 합니다.',

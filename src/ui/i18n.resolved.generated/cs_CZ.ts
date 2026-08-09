@@ -7924,6 +7924,7 @@ export const cs_CZ: EnTranslations = {
       "outOfRange": "Mimo dosah.",
       "noTarget": "Nemáš cíl.",
       "tooClose": "Příliš blízko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musíš čelit svému cíli.",
       "targetHealthBelow": "Tato schopnost vyžaduje cíl pod {percent} % zdraví.",
       "dagger": "Musíš mít dýku.",
@@ -9540,6 +9541,10 @@ export const cs_CZ: EnTranslations = {
       "die_by_sword": {
         "name": "Smrt s mečem v ruce",
         "description": "Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Bezhlavost",

@@ -7924,6 +7924,7 @@ export const en: EnTranslations = {
       "outOfRange": "Out of range.",
       "noTarget": "You have no target.",
       "tooClose": "Too close!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "You must be facing your target.",
       "targetHealthBelow": "That ability requires the target below {percent}% health.",
       "dagger": "You must wield a dagger.",
@@ -9541,6 +9542,10 @@ export const en: EnTranslations = {
         "name": "Die by the Sword",
         "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+      },
       "recklessness": {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
@@ -9555,7 +9560,7 @@ export const en: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect."
       },
       "revenge": {
         "name": "Revenge",

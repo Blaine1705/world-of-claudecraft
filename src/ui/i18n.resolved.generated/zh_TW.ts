@@ -7924,6 +7924,7 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "超出範圍。",
       "noTarget": "你沒有目標。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必須選定一名友方目標。",
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
@@ -9540,6 +9541,10 @@ export const zh_TW: EnTranslations = {
       "die_by_sword": {
         "name": "劍在人在",
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。"
       },
       "recklessness": {
         "name": "魯莽",

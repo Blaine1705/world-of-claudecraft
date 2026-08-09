@@ -78,6 +78,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。',
   'entities.abilities.die_by_sword.name': '劍在人在',
+  'entities.abilities.intervene.name': '援護',
+  'entities.abilities.intervene.description':
+    '衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）',
   'entities.abilities.emboldening_roar.name': '壯膽怒吼',
@@ -2083,6 +2086,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出範圍。',
   'hud.errors.noTarget': '你沒有目標。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必須選定一名友方目標。',
   'hud.errors.facing': '你必須面向目標。',
   'hud.errors.targetHealthBelow': '該技能要求目標生命值低於 {percent}%。',
   'hud.errors.dagger': '你必須裝備匕首。',
