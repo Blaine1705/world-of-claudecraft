@@ -132,3 +132,27 @@ describe('the shell integration boot ordering (phase 4 QA F5)', () => {
     expect(sourceText).not.toMatch(/import\(['"]\.\/game\/desktop_shell_integration['"]\)/);
   });
 });
+
+describe('the renderer governor hold on hidden frames (phase 4 QA F6)', () => {
+  // The one behavioral seam upstream of this call is frame telemetry, which
+  // runs BEFORE the guard and so cannot observe it; presentedFrames() sits
+  // downstream but only in E2E territory. Pin the statement itself: a hidden
+  // frame carries no rendering signal, so feeding its wall-clock dt to the
+  // governor reads hidden time as free headroom and ratchets quality up for
+  // the first frame back on screen.
+  const rendererText = stripLineComments(
+    fs.readFileSync(path.resolve(process.cwd(), 'src/render/renderer.ts'), 'utf8'),
+  );
+
+  it('drives the adaptive-resolution governor from exactly one guarded call site', () => {
+    const body = flat(rendererText);
+    expect(body.match(/this\.updateAdaptiveResolution\(/g)).toHaveLength(1);
+    // The full containing statement, sliced back to the previous statement or
+    // brace boundary, so guard deletion, a polarity flip to !present, and a
+    // second unguarded call site each fail here.
+    const statements = (body.match(/[^;{}]*this\.updateAdaptiveResolution\([^;]*;/g) ?? []).map(
+      (statement) => statement.trim(),
+    );
+    expect(statements).toEqual(['if (present) this.updateAdaptiveResolution(dt);']);
+  });
+});

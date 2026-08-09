@@ -387,7 +387,10 @@ describe('render budget governor', () => {
     );
     const degradedResolution = state.levels.resolution;
 
-    for (let i = 0; i < 12; i++) {
+    // Long enough for the ladder to finish every quality bucket back to its
+    // baseline and reach the render-scale rung: a >= pin here is satisfied by no
+    // recovery at all, which is the state this test is supposed to rule out.
+    for (let i = 0; i < 60; i++) {
       state = governor.update(
         sample({
           dt: 1,
@@ -401,7 +404,7 @@ describe('render budget governor', () => {
       );
     }
 
-    expect(state.levels.resolution).toBeGreaterThanOrEqual(degradedResolution);
+    expect(state.levels.resolution).toBeGreaterThan(degradedResolution);
     expect(state.levels.grass).toBeLessThanOrEqual(1);
   });
 });

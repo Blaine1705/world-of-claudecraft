@@ -1,0 +1,189 @@
+import { describe, expect, it } from 'vitest';
+import { GFX_BUDGETS } from '../src/render/gfx';
+import {
+  RenderBudgetGovernor,
+  type RenderBudgetLevels,
+  type RenderBudgetSample,
+  type RenderBudgetState,
+} from '../src/render/render_budget';
+
+// Render scale is dropped FIRST under severe frame pressure and sits LAST on the
+// recovery ladder, so the ladder's own ratchet can strand it: every above-baseline
+// quality rung widens the drawn ring, which grows the same call / triangle / tuft
+// counters the recovery gate tests at 90% of target. Once the climb passes that
+// line the gate closes, stableSeconds is zeroed every frame, and the resolution
+// rung is never reached again. These pins hold the split that fixes it: measured
+// headroom gates ALL recovery, the counters gate only the climb above baseline.
+
+// The high tier is the retune-immune arm; tests/render_budget_ultra.test.ts pins
+// these caps as literals.
+const HIGH_TARGET_CALLS = 620;
+const HIGH_TARGET_TRIANGLES = 4_500_000;
+const HIGH_TARGET_TUFTS = 6_000;
+const HIGH_BASELINE = { grass: 0.88, foliage: 0.9, vfx: 0.92, lighting: 0.9 };
+const MIN_RENDER_SCALE = 0.7;
+
+function severeSample(): RenderBudgetSample {
+  return {
+    dt: 0.5,
+    frameMs: 90,
+    totalMs: 90,
+    submitMs: 16,
+    calls: 300,
+    triangles: 1_200_000,
+    grassVisibleTufts: 1_500,
+    grassVisibleChunks: 8,
+    activeViews: 25,
+    createdViews: 0,
+    minRenderScale: MIN_RENDER_SCALE,
+    maxRenderScale: 1,
+  };
+}
+
+// Mimics the real feedback loop: foliage and grass levels scale the drawn ring
+// (foliage activeRadius is grassRadius * quality), so richer quality means more
+// calls, triangles and tufts from the very same scene. Quality at its band
+// baselines lands the counters UNDER the gate's 90% line; quality above baseline
+// pushes them into the 90 to 100% band, still strictly under target so no
+// degrade reason fires and the frames stay pure headroom.
+function counters(
+  levels: RenderBudgetLevels,
+): Pick<RenderBudgetSample, 'calls' | 'triangles' | 'grassVisibleTufts'> {
+  const foliageRatio = 0.6 + (0.35 * (levels.foliage - 0.6)) / 0.4;
+  const grassRatio = 0.62 + (0.3 * (levels.grass - 0.6)) / 0.4;
+  return {
+    calls: Math.round(HIGH_TARGET_CALLS * foliageRatio),
+    triangles: Math.round(HIGH_TARGET_TRIANGLES * foliageRatio),
+    grassVisibleTufts: Math.round(HIGH_TARGET_TUFTS * grassRatio),
+  };
+}
+
+function headroomSample(
+  counts: Pick<RenderBudgetSample, 'calls' | 'triangles' | 'grassVisibleTufts'>,
+): RenderBudgetSample {
+  return {
+    dt: 0.5,
+    frameMs: 10,
+    totalMs: 8,
+    submitMs: 4,
+    ...counts,
+    grassVisibleChunks: 8,
+    activeViews: 25,
+    createdViews: 0,
+    minRenderScale: MIN_RENDER_SCALE,
+    maxRenderScale: 1,
+  };
+}
+
+function highGovernor(): RenderBudgetGovernor {
+  const governor = new RenderBudgetGovernor({
+    tier: 'high',
+    budget: GFX_BUDGETS.high,
+    enabled: true,
+  });
+  governor.reset(1, MIN_RENDER_SCALE, 1);
+  return governor;
+}
+
+/** Severe frame pressure until every governable bucket, resolution included, is floored. */
+function floorEverything(governor: RenderBudgetGovernor): RenderBudgetState {
+  let state = governor.state();
+  for (let i = 0; i < 8; i++) state = governor.update(severeSample());
+  return state;
+}
+
+/** Full-headroom frames whose counters follow the quality the governor just set. */
+function driveHeadroom(
+  governor: RenderBudgetGovernor,
+  frames: number,
+  onFrame?: (state: RenderBudgetState) => void,
+): RenderBudgetState {
+  let state = governor.state();
+  for (let i = 0; i < frames; i++) {
+    state = governor.update(headroomSample(counters(state.levels)));
+    onFrame?.(state);
+  }
+  return state;
+}
+
+describe('render budget recovery ladder', () => {
+  it('restores render scale after the quality climb pushes the counters past the gate', () => {
+    const governor = highGovernor();
+    const degraded = floorEverything(governor);
+
+    expect(degraded.levels.resolution).toBe(MIN_RENDER_SCALE);
+    expect(degraded.levels.grass).toBeLessThan(HIGH_BASELINE.grass);
+
+    const state = driveHeadroom(governor, 260);
+
+    // The counters end in the 90 to 100% band because quality climbed, which is
+    // exactly the state that used to freeze the ladder short of this rung.
+    const finalCounters = counters(state.levels);
+    expect(finalCounters.calls).toBeGreaterThan(HIGH_TARGET_CALLS * 0.9);
+    expect(finalCounters.calls).toBeLessThan(HIGH_TARGET_CALLS);
+    expect(finalCounters.triangles).toBeLessThan(HIGH_TARGET_TRIANGLES);
+    expect(finalCounters.grassVisibleTufts).toBeLessThan(HIGH_TARGET_TUFTS);
+
+    expect(state.levels.resolution).toBe(1);
+    expect(state.levels.grass).toBeGreaterThanOrEqual(HIGH_BASELINE.grass);
+    expect(state.levels.foliage).toBeGreaterThanOrEqual(HIGH_BASELINE.foliage);
+    expect(state.levels.vfx).toBeGreaterThanOrEqual(HIGH_BASELINE.vfx);
+    expect(state.levels.lighting).toBeGreaterThanOrEqual(HIGH_BASELINE.lighting);
+  });
+
+  it('finishes every bucket back to baseline before the first render scale step', () => {
+    const governor = highGovernor();
+    floorEverything(governor);
+
+    let previousResolution = governor.state().levels.resolution;
+    let atFirstScaleStep: RenderBudgetLevels | null = null;
+    driveHeadroom(governor, 260, (state) => {
+      if (atFirstScaleStep === null && state.levels.resolution > previousResolution) {
+        atFirstScaleStep = { ...state.levels };
+      }
+      previousResolution = state.levels.resolution;
+    });
+
+    expect(atFirstScaleStep).not.toBeNull();
+    const levels = atFirstScaleStep as unknown as RenderBudgetLevels;
+    expect(levels.resolution).toBeGreaterThan(MIN_RENDER_SCALE);
+    expect(levels.grass).toBeGreaterThanOrEqual(HIGH_BASELINE.grass);
+    expect(levels.foliage).toBeGreaterThanOrEqual(HIGH_BASELINE.foliage);
+    expect(levels.vfx).toBeGreaterThanOrEqual(HIGH_BASELINE.vfx);
+    expect(levels.lighting).toBeGreaterThanOrEqual(HIGH_BASELINE.lighting);
+  });
+
+  it('holds the climb above baseline while the counters sit inside the gate band', () => {
+    const governor = highGovernor();
+    floorEverything(governor);
+    const recovered = driveHeadroom(governor, 260).levels;
+
+    // Literals, never the value this same run produced: a comparison against a
+    // captured state passes even when the climb runs away, because the captured
+    // state runs away with it. Foliage takes the one above-baseline rung the
+    // counters still allow, which is what closes the band on the rest.
+    expect(recovered).toEqual({
+      grass: 0.88,
+      foliage: 0.98,
+      vfx: 0.92,
+      lighting: 0.9,
+      resolution: 1,
+    });
+
+    // Counters parked between 90% and 100% of target: full headroom, nothing to
+    // restore, and no slot left that may fire. The ladder must claim nothing.
+    let state = governor.state();
+    for (let i = 0; i < 40; i++) {
+      state = governor.update(
+        headroomSample({
+          calls: 600,
+          triangles: 4_300_000,
+          grassVisibleTufts: 5_800,
+        }),
+      );
+    }
+
+    expect(state.mode).toBe('stable');
+    expect(state.levels).toEqual(recovered);
+  });
+});

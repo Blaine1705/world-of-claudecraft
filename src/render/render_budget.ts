@@ -466,12 +466,19 @@ export class RenderBudgetGovernor {
       return this.state(out);
     }
 
+    // Measured headroom, the gate on ALL recovery: every clause is a real cost
+    // reading, never inferred from wall cadence.
     const canRecover =
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
       rawSubmitMs <= SUBMIT_STALL_RECOVERY_CEILING_MS &&
-      this.stallPressure < 0.5 &&
+      this.stallPressure < 0.5;
+    // Scene-density headroom, the gate on the climb ABOVE baseline only. Raising a
+    // bucket past its baseline widens the drawn ring and grows these very counters,
+    // so gating the return TO baseline on them lets the ladder close its own gate
+    // and strand the buckets it has not restored yet (resolution recovers last).
+    const canEnrich =
       sample.calls <= this.caps.targetCalls * 0.9 &&
       sample.triangles <= this.caps.targetTriangles * 0.9 &&
       sample.grassVisibleTufts <= this.caps.targetGrassTufts * 0.9;
@@ -479,7 +486,7 @@ export class RenderBudgetGovernor {
     if (canRecover) {
       this.stableSeconds += sample.dt;
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
-        const changed = this.recover(maxRenderScale);
+        const changed = this.recover(maxRenderScale, canEnrich);
         if (changed) {
           this.mode = 'recovering';
           this.reason = 'recover';
@@ -571,16 +578,20 @@ export class RenderBudgetGovernor {
     return changed;
   }
 
-  private recover(maxRenderScale: number): boolean {
+  /** Phase A restores what pressure took, quality buckets before render scale, and runs on
+   * measured headroom alone. Phase B climbs past the baselines and additionally needs scene
+   * density under the draw caps. Returning false claims nothing: no cooldown, no mode change. */
+  private recover(maxRenderScale: number, allowAboveBaseline: boolean): boolean {
     if (this.raiseLevel('grass', this.bands.grass.baseline, 0.08)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.baseline, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.baseline, 0.08)) return true;
     if (this.raiseLevel('foliage', this.bands.foliage.baseline, 0.08)) return true;
+    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
+    if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.max, 0.08)) return true;
     if (this.raiseLevel('grass', this.bands.grass.max, 0.06)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.max, 0.05)) return true;
-    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
     return false;
   }
 }
