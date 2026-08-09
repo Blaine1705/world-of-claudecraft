@@ -1842,3 +1842,105 @@ owns the push.
   origin/feature/reliquary (PR 2976). Handoff: Phase 18 (rewards ladder)
   starts from a pushed, fully green tree; sync origin/release/v0.36.0 at
   Step 0 as always.
+
+## Phase 18 (2026-08-08): Rewards ladder
+
+- Step 0: pre-flight clean at 885dbaf9d2, in sync with origin/feature/reliquary
+  (the Phase 17 QA pushed). The release base had NOT moved since the QA merge
+  (origin/release/v0.36.0 still 4d52f151eb, already contained), so no sync
+  merge was needed; containment re-verified before work and again before the
+  commits. Memory scan: test-pin traps index, QA-gap-vs-ruling, S3 scanner
+  blindness, M16 wordy fills, shared-worktree care.
+- Context load: two parallel Explore agents (sim/content/tests and
+  server/platform) instead of one; both returned dense seam maps that the
+  implementation specs were written from.
+- Execution: two sequential implementation agents (A: content + sim, B:
+  server + platform + client line), each on a full spec with every design
+  decision pre-made in the orchestrator; the fix round was done by the
+  orchestrator directly.
+- Self-reference tie-break (the phase's first stopping rule): resolved
+  WITHOUT a maintainer ask. col_reliquary_complete on the titles page is a
+  genuine deadlock (its own title grows total past reach before the grant);
+  the other four titles have no feedback into their own triggers and joined
+  RELIQUARY_HORIZON_TITLES. The marquee reuses the deed fan-out shape (an
+  id-only SocialEvent/SimEvent sibling of deedBroadcast), so the second
+  stopping rule never fired either.
+- Spec conflict discovered and resolved: the phase file (authored Aug 5)
+  predates the 13b QA engineering-mark pend (Aug 7), and the capstone's
+  owned === total is unearnable in production while THREE slots stay
+  owner-pended (masterwork:engineering, reins_drakemaw_raptor,
+  reins_terrorspark_groundshaker). Authored as specified (forward-correct,
+  derived check, no code change needed at un-pend), surfaced to the
+  maintainer in state.md.
+- Reviews, round 1 (five fresh agents on the uncommitted diff:
+  architecture, cross-platform-sync, migration-safety,
+  privacy-security-review, qa-checklist): ONE real BLOCKING, found by
+  architecture and independently ranked the sole NOT-READY cause by
+  qa-checklist: col_reliquary_complete, as a plain collection deed, entered
+  BOOK_COMPLETE_REQUIREMENTS and would have dead-ended feat_book_complete
+  for every player (the exact failure the retroFallbackGrants stranded-heal
+  doctrine names). Fix: feat: true on the capstone (the catalog's ONE
+  off-prefix feat; the biconditional pin gained a named, commented
+  exception), a feat_book_complete reachability pin (capstone OUT, the four
+  earnable ladder deeds IN), and the frozen deed SHA re-baselined for its
+  REAL double cause (five appended deeds AND the book-meta trigger change
+  the hash correctly caught). Every reviewer should-fix applied: ownership
+  snapshot threading at all five multi-sync sites (two reviewers flagged the
+  eager double scans), the conquerors gate on the whole-catalog walk, the
+  border-deed-set literal pin (a public-surface class widening is now a
+  reviewed act), the all-four-border-cards arm, the hud fallback rendered
+  through text nodes (structurally inert to the chat token parser,
+  hostile-token pinned), byte-equality and catalog-churn fixed-point arms,
+  the multi-page-single-fill pin, the real serializeCharacter -> addPlayer
+  round-trip arm, once-per-durable-record docstrings, the Horizons no-emit
+  exemption note, the wire-ballast ruling (the set stays on the wire blob
+  because wire shape IS save shape; ClientWorld drops it, commented on both
+  sides), the stale guard-test title, and the rollback fourth-category note.
+- Review findings REFUTED with the source (recorded so QA does not
+  re-raise): (1) migration's titles-page re-marquee scenario cannot occur:
+  horizons_titles never reaches emitReliquaryUnlock (title grants sync deeds
+  without an unlock emit), so no marquee can ever fire for it; the sweep
+  records it at a later join, a recording delay only. (2) qa-checklist's ru
+  present-tense drift: the ru deedBroadcast line uses the same present-tense
+  gender-avoidance construction; the fill matches the precedent and joins
+  the flagged native-speaker release pass. (3) privacy's
+  retroFallbackGrants-gating concern: sim.ts calls it unconditionally on
+  every world join (verified at the call site).
+- Accepted costs, recorded with rationale: the duplicate getDeedBroadcasts
+  read when one fill illuminates AND grants a deed (once-per-page-lifetime
+  cardinality, max 28 events per character ever, not worth a cache); no
+  forced save on illumination (the design doc's "never save because a
+  silhouette filled" rule is the ruling; once per durable record is the
+  honest contract and is documented); the flagship pages produce BOTH a deed
+  marquee and an illumination marquee in the same tick (each once-ever, the
+  two biggest moments in the ladder).
+- Reviews, round 2 (fresh architecture agent over the fix round only):
+  PASS, zero blocking. Its two should-fix landed (the conquerors-shelf
+  shape pin including the no-pending-conquerors-slot arm, and the SHA
+  comment's direction corrected to gained-four-did-not-gain-the-capstone
+  after the reviewer reproduced BOTH hashes by catalog reconstruction);
+  applicable nits landed (syncIlluminatedPages converted off the eager
+  default, the grant-order literal pin ahead of the positional slice, the
+  production-caller note). Its N5 (DEED_NAME_TOKEN in a character name
+  could mint an extra link node, theoretical, pre-existing with
+  deedBroadcast) is recorded here, not acted on.
+- Parity goldens: verified byte-identical after regen (the empty Set is
+  inert to the parity canonicalization exactly like marks, UNLIKE the
+  Phase 17 counts Record which stamped {} everywhere); no regen commit
+  exists, deliberately.
+- The Whole Book difficulty note for the owner: the four earnable ladder
+  deeds joined BOOK_COMPLETE_REQUIREMENTS, so feat_book_complete now
+  requires the whole Conquerors shelf and the three flagship Illuminations.
+  Earnable (no conquerors slot is pended, now pinned), but a real
+  escalation; the capstone stays out by feat flag.
+- Validation at close: tsc clean; ci:changed errors-free; the phase suite
+  (architecture, reliquary_state/_content/_wire/_view/_window/_sheet_view/
+  _cell_art, deeds_content/_completion/_view, deed_i18n/_icons/
+  _records_table, discord_activity_professions, social_system, steam/epic
+  maps, snapshots, env_protocol, world_api_parity, localization_fixes,
+  deed_unlock_chat_link, hud_perf_budget, profile_page, guide,
+  missing_painted_icons_wave, deeds, parity) all green; the one known red
+  is the guide git-diff freshness arm, which goes green at commit. Copy
+  scan clean (no dashes, emojis, .only, debugger).
+- LOCAL ONLY per the runner prompt: committed, never pushed; Phase 18 QA
+  owns the gate-on-committed-tree run and the push.

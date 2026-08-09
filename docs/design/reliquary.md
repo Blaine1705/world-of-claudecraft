@@ -147,6 +147,28 @@ it), optional links to deeds (`col_*`, clear milestones).
 | Wiki `/wiki` | Spoiler-safe catalog of pages and relic names; no personal progress. |
 | Discord / marquee | Optional marquee only for full-page Illumination or high Curator ranks; never spam per-relic. |
 
+### Rewards ladder (shipped)
+
+Five zero-Renown collection deeds sit on top of the Curator rank bridges:
+two capstones (`col_reliquary_complete` for the whole character catalog,
+`col_reliquary_conquerors` for the Conquerors shelf) and three flagship page
+Illuminations (Heroic Nythraxis Raid, Thunzharr, Heroic Gravewyrm Sanctum),
+all title rewards, all sticky (catalog growth lowers the live read but never
+revokes the earned record). `col_reliquary_complete` carries `feat: true`
+(the one off-prefix feat, pinned): it is a dynamic meta over a growing
+catalog, so it stays out of `feat_book_complete`'s requirement set and the
+Book completion pair, and its title stays off the titles page (the
+non-terminating self-reference).
+
+First-ever page Illumination is a persisted, sticky record
+(`illuminatedPages` on the reliquary blob, once per durable record): the
+`reliquaryUnlock` event names a page only on its first-ever completion, so
+the client banner and the guild/follower marquee inherit once-ever semantics.
+The three no-emit Horizons pages (mounts, titles, weapon skins) never fire
+an Illumination celebration; their payoff is the deed channel. One consent
+flag, `accounts.deed_broadcasts`, covers all celebration broadcasts: deed
+marquees, Discord deed and border cards, and illumination marquees.
+
 ## Deliberately deferred (do not "fix" by shipping)
 
 - Per-drop full loot history: quantity streams, every common, one entry per
@@ -186,6 +208,9 @@ it), optional links to deeds (`col_*`, clear milestones).
 | UI | `src/ui/reliquary_view.ts`, `src/ui/reliquary_window.ts`, `src/ui/reliquary_sheet_view.ts` |
 | Discovery hub | `src/sim/deeds.ts` `markItemDiscovered` |
 | Obtain counts | `src/sim/reliquary.ts` (state, serialize, `reliquaryWireJson`), `IWorldReliquary.reliquaryObtainCounts`, `src/ui/reliquary_view.ts` `reliquaryObtainCountsDigest` |
+| Illuminated set | `src/sim/reliquary.ts` (`illuminatedPages`, `syncIlluminatedPages`, the emit gate in `emitReliquaryUnlock`); save-only from the client's perspective |
+| Completion ladder | `src/sim/reliquary.ts` `RELIQUARY_COMPLETION_DEED_IDS` + `syncReliquaryCompletionDeeds`; records in `src/sim/content/deeds.ts` |
+| Illumination marquee | `server/game.ts` `fanOutIllumination`, `server/social.ts` `broadcastIllumination`, hud arm `reliquaryIlluminationBroadcast` |
 | Clear counts | `DeedStats.dungeonClears`, `PlayerMeta.delveClears` |
 | Heroic uniques | `src/sim/content/heroic_loot.ts` |
 | Sets | `src/sim/content/item_sets.ts` |

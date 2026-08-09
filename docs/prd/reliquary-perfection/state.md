@@ -1,16 +1,17 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 17 QA COMPLETE, PASS, PUSHED (2026-08-08). All five
-acceptance rigs green on real runs (offline, online with wire-frame
-thrift proof, pre-packet blob on the live server path, memo probe,
-mobile landscape touch); seven fresh review passes zero blocking; the
-QA fix round landed provably decisive pins (two of them corrected by
-mutation testing). Gate: the FIRST fully green in-gate run of the
-packet, all 8 steps (the inherited biome stop is RETIRED: the release
-tip biome-formatted the noisy manifest), full suite 33350 in-gate,
-browser regressions step green. Full record in progress.md "Phase 17
-QA". Next: Phase 18 (rewards ladder; fresh session; sync
-origin/release/v0.36.0 at start as always).
+Current phase: 18 COMPLETE, LOCAL (2026-08-08, not pushed; Phase 18 QA
+owns the push). The rewards ladder landed: five zero-Renown completion
+deeds (the capstone feat-flagged so The Whole Book cannot dead-end, the
+one off-prefix feat, pinned), the sticky illuminatedPages set (fifth
+persisted surface, first-ever illumination gating), the server
+illumination marquee + discordFeedDeed border arm (rank 5 reaches the
+feed), and nine Steam/Epic achievement entries each. Six review passes
+(five phase reviewers + a fresh fix-round reviewer): the one BLOCKING
+(capstone would have dead-ended feat_book_complete) was fixed and
+re-reviewed to PASS; every should-fix and applicable nit applied. Full
+record in progress.md "Phase 18". Next: Phase 18 QA (fresh session,
+ultracode, phase-18-qa.md; gate on the committed tree, then push).
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
@@ -122,7 +123,15 @@ Update this line as phases complete.
   obtain tallies are a third unrecoverable loss category, and the milder rollback
   to a pre-Phase-17-but-Reliquary-aware binary also wipes them: that binary's
   restore ignores the folded count field and its first autosave drops every tally
-  while membership and provenance survive).
+  while membership and provenance survive). Since Phase 18, the illuminated-pages
+  set is a FOURTH category with a milder profile: a pre-Phase-18 binary's restore
+  drops the key and its first autosave rewrites the blob without it (bounded, at
+  most the page-id list), but the join sweep on roll-forward re-records every page
+  whose live read is still complete, so only pages made incomplete by catalog
+  growth inside the rollback window lose their record permanently (their later
+  re-completion celebrates as a first). Mixed-fleet display artifact, not loss:
+  a rolled-back client keeps the five Phase 18 ladder deeds in deedsEarned but
+  its deed_i18n cannot name them (raw-id rendering until roll-forward).
 - Phase 10 QA (2026-08-05): fix round applied 1 blocking (Biome format diff in
   tests/reliquary_state.test.ts), the emission pin (tests/reliquary_window.test.ts now
   pins this.log + combatAnnouncer.push of retroText inside the reliquary handler body,
@@ -579,13 +588,97 @@ Update this line as phases complete.
   docs/screenshots/reliquary-phase17. Surfaced, not acted on: the
   guild-bank withdrawal discovery gap wants an explicit maintainer
   decision (named in the buyback comment; self-heals at next login).
-- Phase 18: (pending)
+- Phase 18 (2026-08-08): Rewards ladder. FIVE zero-Renown collection deeds
+  granted by the new syncReliquaryCompletionDeeds (manual, sticky, pure
+  reads over the hoisted ownership snapshot, never reliquaryObtainCounts):
+  col_reliquary_complete (title Curator of the Vault; owned === total from
+  catalogCharacterCompletion; carries feat: true, the catalog's ONE
+  off-prefix feat, pinned with rationale: it is a dynamic meta over a
+  growing catalog AND unearnable while THREE slots stay owner-pended
+  (masterwork:engineering, reins_drakemaw_raptor,
+  reins_terrorspark_groundshaker), so a non-feat capstone would dead-end
+  feat_book_complete for every player; it becomes earnable with no code
+  change when the owner un-pends all three), col_reliquary_conquerors
+  (title Vaultbreaker; every conquerors-shelf page complete; also the gate
+  that keeps the whole-catalog walk off the common path), and three
+  flagship Illuminations col_reliquary_illum_nythraxis_heroic /
+  _illum_thunzharr / _illum_gravewyrm_heroic (titles Light of Nythraxis /
+  Light of Thunzharr / Light of the Sanctum). Grant points: onItemDiscovered
+  (unconditional on a new fill), noteReliquaryMark, the mount-reins branch,
+  grantDeed's horizons-title hook (a pvp title as the last relic completes
+  immediately; recursion terminates: monotone grants + early-out), and
+  retroFallbackGrants with {retro: true}; every multi-sync site shares ONE
+  ownership snapshot. RELIQUARY_HORIZON_TITLES +4 (conquerors + the three
+  illum titles); col_reliquary_complete EXCLUDED from the titles page
+  (non-terminating self-reference, pinned bidirectionally). Totals 223/223
+  and 194/194; DEED_ORDER 271; renown sum 3145 unchanged; deed SHA
+  re-frozen TWICE-CAUSED (five appended deeds AND the book-meta trigger
+  shrink when the capstone took feat: true); Book visible denominator 258.
+  ReliquaryState.illuminatedPages (sticky Set, FIFTH persisted surface):
+  serialize sorted in alphabetical key position, omit-empty, restore
+  filters to live page ids (hasOwn, dedupe), isReliquaryStateEmpty counts
+  it (no carrier, unlike counts), RELIQUARY_SURFACES widened, writers bump
+  the wire rev. emitReliquaryUnlock emits illuminatedPageId only on
+  FIRST-EVER illumination (set-gated; once per DURABLE record: rides the
+  normal save cadence by design-doc rule; re-completion after catalog
+  growth is silent; one fill completing two pages records both, names the
+  first, pinned). syncIlluminatedPages join sweep self-heals pre-Phase-18
+  blobs (idempotent, silent, deliberately not save-forcing). The three
+  no-emit Horizons pages (mounts, titles, weapon skins) never celebrate an
+  Illumination BY DESIGN (no emit path; their payoff is the deed channel);
+  the weapon-skins page additionally can never read complete sim-side (W3).
+  Parity goldens verified byte-identical (empty Set inert like marks; NO
+  regen, unlike the Phase 17 counts precedent). The set rides the reliq
+  wire blob (wire shape IS save shape, byte-pinned) and ClientWorld
+  DELIBERATELY does not mirror it (no facet member; commented at the
+  decode, the facet header, and SavedReliquaryState).
+  Server: detectActivity reliquaryUnlock arm -> fanOutIllumination
+  (fail-closed on RELIQUARY_PAGES_BY_ID, one deed_broadcasts read, retro
+  never fans out, no save, no feed arm); SocialEvent + SimEvent gained
+  reliquaryIlluminationBroadcast (id-only, structurally identical, pinned);
+  broadcastDeedUnlock's audience body moved to the shared
+  broadcastToEarnerAudience (pure move). discordFeedDeed border arm: ALL
+  FOUR border deeds card name-only (set literal-pinned in deeds_content;
+  curator rank 5 Eternal Spoils now reaches the feed). Steam + Epic maps
+  +9 identical entries each (84; ACH_RELIQUARY_RANK_2..5, _COMPLETE,
+  _CONQUERORS, _ILLUM_*), completeness arm pins every col_reliquary_* deed
+  mapped. Client: hudChrome.reliquary.illuminationBroadcastLine (five
+  non-Latin fills in-change; ru present-tense matches the deedBroadcast
+  gender-avoidance precedent), thin hud arm with clickable page jump
+  (deed_chat_line family + reliquaryWindow.openWithPage), pure core in
+  reliquary_i18n; the catalog-unknown fallback renders TEXT NODES (inert
+  to the chat token parser, hostile-token pinned). deed_i18n five
+  non-Latin fills for all five deeds. New real-path pins: serializeCharacter
+  -> addPlayer round trip keeps the set with zero join illumination events;
+  byte-equality and catalog-churn fixed points; the blob-ran-ahead
+  divergence tolerance documented on the emit gate.
 - Phase 19: (pending)
 - Phase 20: (pending)
 - Phase 21: (pending)
 - Phase 22: (pending)
 
 ## OPEN items / known gotchas
+- OPEN (Phase 18, human/maintainer release work): register the nine new
+  achievement ids on BOTH portals (Steamworks App Admin and the Epic Dev
+  Portal): ACH_RELIQUARY_RANK_2..5, ACH_RELIQUARY_COMPLETE,
+  ACH_RELIQUARY_CONQUERORS, ACH_RELIQUARY_ILLUM_NYTHRAXIS_HEROIC,
+  ACH_RELIQUARY_ILLUM_THUNZHARR, ACH_RELIQUARY_ILLUM_GRAVEWYRM_HEROIC. The
+  code-side maps landed in Phase 18 (84 entries each, literal-pinned); an
+  unregistered id is a silent no-op at runtime, so nothing reds if this is
+  missed.
+- SURFACED (Phase 18 privacy review, maintainer copy decision): the
+  accounts.deed_broadcasts settings label describes deed announcements, and
+  the flag now also gates illumination marquees and border feed cards (the
+  conservative reading, documented in docs/design/reliquary.md). If the
+  label should say "achievements and collection milestones", that is a
+  reword with i18n staleness cost; recorded rather than done.
+- NOTE (Phase 18): reliquary page ids are effectively append-only: restore
+  filters illuminatedPages to live page ids, so renaming or retiring a page
+  silently drops every character's sticky illumination record for it on the
+  next save (pinned as a one-time trim with a byte-stable fixed point). Same
+  discipline as marks and firstFind, but for a once-ever celebration record
+  the loss shows as a repeat celebration after a rename; treat a page-id
+  rename as a migration, not an edit.
 - RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
   the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
   release root-caused it and restored the strict contract (heal-through loop plus a
@@ -808,7 +901,15 @@ Update this line as phases complete.
   at release fill. Phase 17 adds to the worklist: the three obtain-count plural
   bases (hudChrome.plurals.reliquaryObtainedTimes, reliquaryCellOwnedObtainedAria,
   reliquaryCellOwnedClearsObtainedAria) pending in the 15 Latin locales (the five
-  non-Latin fills landed in-change per M16).
+  non-Latin fills landed in-change per M16). Phase 18 adds:
+  hudChrome.reliquary.illuminationBroadcastLine pending in the 15 Latin locales,
+  and the five completion-ladder deeds (col_reliquary_complete,
+  col_reliquary_conquerors, the three col_reliquary_illum_*) need rows in the
+  13 Latin deed_i18n.locales overlays (the five non-Latin fills landed
+  in-change; the deed channel still has no pending tracker, so this row is the
+  tracking mechanism). The ru fills deliberately use present tense (the
+  deedBroadcast gender-avoidance precedent); include them in the release-fill
+  native-speaker pass already flagged for the ru retro plurals.
 - RESOLVED (Phase 11): the wiki shelf-name glossary conflict. One term per locale
   locked in scripts/i18n_glossary.json (reliquaryShelves row); see the Phase 11
   surfaces entry for the deviation rationale on Professions.
