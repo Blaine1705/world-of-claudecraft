@@ -5621,9 +5621,22 @@ export class Sim {
     name: string,
     bar: (string | null)[],
     pidOrAlloc?: number | TalentAllocation,
-    allocMaybe?: TalentAllocation,
+    allocOrCapture?: TalentAllocation | boolean,
+    captureMaybe = false,
   ): number {
-    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, allocMaybe);
+    // BOTH overloaded positions, because the two caller families disagree on every
+    // slot after `bar`. An IWorld caller passes (alloc?, captureGear?); a
+    // sim/server/RL caller passes (pid, alloc?, captureGear?). So position 3 is
+    // pid-or-alloc and position 4 is alloc-or-captureGear, and all four live call
+    // shapes resolve unambiguously because the types are disjoint.
+    const alloc =
+      typeof pidOrAlloc === 'object'
+        ? pidOrAlloc
+        : typeof allocOrCapture === 'object'
+          ? allocOrCapture
+          : undefined;
+    const captureGear = typeof allocOrCapture === 'boolean' ? allocOrCapture : captureMaybe;
+    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, alloc, captureGear);
     // A successful save applies the staged allocation (the UI's Save flow always
     // passes it), so mark the talent deeds like the sibling wrappers; -1 is a
     // rejected save. saveTalentLoadout derives its pid the same way.
