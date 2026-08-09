@@ -193,7 +193,9 @@ export function setLanguage(lang: SupportedLanguage): void {
 // statically available (only `en` is), so the bootstrap await (src/main.ts startGame,
 // behind the loading screen) is a REAL per-locale fetch that populates resident before the
 // HUD's first localized paint.
-const resident: Partial<Record<SupportedLanguage, EnTranslations>> = { en };
+const resident: Partial<Record<SupportedLanguage, EnTranslations>> & { en: EnTranslations } = {
+  en,
+};
 // One in-flight load promise per locale so concurrent callers coalesce onto a single
 // import instead of racing N of them.
 const inflight = new Map<SupportedLanguage, Promise<void>>();
@@ -343,7 +345,7 @@ function tableFor(lang: SupportedLanguage): EnTranslations {
   // resident.en is the universal English fallback for a locale not yet loaded (or one whose
   // chunk failed to fetch): the synchronous read never blocks and never throws. Callers that
   // need the localized table await ensureLocaleLoaded(lang) first (bootstrap / picker).
-  return resident[lang] ?? resident.en!;
+  return resident[lang] ?? resident.en;
 }
 
 export function t(key: TranslationKey, values?: InterpolationValues): string {
