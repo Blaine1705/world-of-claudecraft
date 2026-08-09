@@ -675,11 +675,14 @@ export const RELIQUARY_HEROIC_GEAR = {
  * memo's immutability assumption into an enforced contract, the same reason
  * the relic source hints and lists are frozen at their constructors above.
  *
- * The relic OBJECTS are already frozen where content authoring can reach them
- * (hint / withSource), so this covers the containers those helpers do not own.
+ * The relic OBJECTS are frozen here too: hint / withSource freeze only the
+ * source-hint VALUES on a relic, never the relic record itself, so without the
+ * inner loop a runtime write to relic.itemId (or any id member) would still
+ * invalidate the cached index while every container stayed frozen.
  */
 function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[] {
   for (const page of pages) {
+    for (const relic of page.relics) Object.freeze(relic);
     Object.freeze(page.relics);
     Object.freeze(page);
   }

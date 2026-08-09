@@ -141,7 +141,9 @@ export const SHEET_RECENT_RELICS = 5;
  * can hold: pushRecent is called from the item first-find path and from the
  * authored-mark path, never for mounts, weapon skins, or titles.
  * Clients localize the id; the English-by-design /c/ SSR page resolves display
- * text through sheetRelicRecentText.
+ * text through sheetRelicRecentText. No in-game client consumes this JSON
+ * field yet (the in-game strip reads the snapshot facet, exactly as with
+ * deeds.recent): it exists for the page and for external readers.
  */
 export interface SheetRelicRecent {
   id: string;

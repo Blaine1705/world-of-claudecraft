@@ -140,6 +140,8 @@ describe('inspect_window: the Curator standing surfaces', () => {
     expect(body).toContain(
       '<div class="inspect-holder-sub">${esc(t(\'hudChrome.reliquary.sigilCaption\'))}</div>',
     );
+    // Rename-residue negative, decisive only as a PAIR: the caption-div
+    // positive above is the control proving this slice sees the live row.
     expect(body).not.toContain('sigilAria');
     // The key it replaced must be gone from this row, or both would render.
     expect(body).not.toContain("t('hudChrome.reliquary.title')");
@@ -234,19 +236,25 @@ describe('inspect_window: the Curator standing surfaces', () => {
   });
 
   it('the Reliquary line joins the .inspect-meta pill family, and CSS reaches it', () => {
-    // Class presence proves only that the painter wrote the hook. The line wears
-    // the family class itself (.inspect-meta), so the pill chrome reaches it by
-    // construction; what needs pinning is that the modifier the painter also
-    // writes is a real rule in the real sheet and not decoration.
+    // Class presence proves only that the painter wrote the hook. The line
+    // wears the family class itself (.inspect-meta), so the pill chrome
+    // reaches it by construction, and that base rule is the reach pin. The
+    // modifier is a semantic hook by DESIGN, not an override: an earlier
+    // revision shipped a .inspect-meta.inspect-reliquary rule that repeated
+    // the base color byte for byte (a dead declaration certified by this very
+    // test), so the negative bound below keeps a repainted override from
+    // coming back without the comment above it being rewritten on purpose.
     const line = code.slice(code.indexOf('private curatorLineHtml('));
     const body = line.slice(0, line.indexOf('private curatorHtml('));
     expect(body).toContain('class="inspect-meta inspect-reliquary"');
     const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
-    const rule = shell.match(/\.inspect-meta\.inspect-reliquary \{([^}]*)\}/)?.[1];
-    expect(rule, 'no .inspect-meta.inspect-reliquary rule in shell.css').toBeTruthy();
-    expect(rule).toContain('color: var(--color-text-muted);');
-    // The base pill rule it composes with is still there to compose WITH.
+    // Positive controls: the base family rule exists and carries the pill
+    // chrome the standing line inherits.
     expect(shell).toMatch(/\n {2}\.inspect-meta \{[^}]*display: inline-block;/);
+    expect(shell).toMatch(/\n {2}\.inspect-meta \{[^}]*color: var\(--color-text-muted\);/);
+    // The semantic hook stays rule-free (occurrence bound, not a bare
+    // negative: the two positive matches above prove this scan sees the file).
+    expect(shell.match(/\.inspect-meta\.inspect-reliquary\s*\{/g) ?? []).toHaveLength(0);
   });
 });
 
@@ -315,7 +323,13 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       slotName: (slot) => slot,
       showDevBadges: () => false,
       mountPreview: vi.fn(),
-      itemIcon: () => '',
+      // A real data URL, not '': an empty-string src resolves against the
+      // document URL in happy-dom and fetches. NOTE the honest scope: this
+      // stub is the FILLED-slot resolver and these fixtures equip nothing, so
+      // it guards future filled-slot fixtures; the suite's residual
+      // localhost fetch noise comes from other asset-path srcs and is a
+      // recorded hygiene follow-up, not this line.
+      itemIcon: () => STUB_DATA_URL,
       moneyHtml: () => '',
       itemTooltip: () => '',
       attachTooltip: vi.fn(),

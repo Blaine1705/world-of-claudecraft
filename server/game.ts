@@ -1369,19 +1369,23 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
   // Curator standing (cosmetic): rank plus the character-scoped completion pair
   // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
-  // Sparse like the flair above: refreshCuratorStanding only stamps them when
-  // the character owns at least one relic, so an unranked player ships nothing
-  // and a full record with the keys absent resets the mirror.
-  if (e.curatorRank) out.crk = e.curatorRank; // Curator rank 1-5
-  if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
-  // relicsTotal is the one player-INDEPENDENT number of the three: it is the
-  // character-scoped catalog size, so a client could derive it from its own
-  // content tables and never ask. It rides the wire anyway because a
-  // MIXED-VERSION client must not print a total that disagrees with the
-  // server's catalog: the denominator on the card is whatever the server counted
-  // when it stamped the pair, so an older or newer client shows the server's
-  // completion rather than a locally-derived one that quietly differs.
-  if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
+  // Sparse like the flair above: refreshCuratorStanding only stamps them for a
+  // ranked character, so an unranked player ships nothing and a full record
+  // with the keys absent resets the mirror. The pair NESTS under the rank so
+  // all-or-nothing is structural at the encoder, not a convention the
+  // refresher must remember.
+  if (e.curatorRank) {
+    out.crk = e.curatorRank; // Curator rank 1-5
+    if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
+    // relicsTotal is the one player-INDEPENDENT number of the three: it is the
+    // character-scoped catalog size, so a client could derive it from its own
+    // content tables and never ask. It rides the wire anyway because a
+    // MIXED-VERSION client must not print a total that disagrees with the
+    // server's catalog: the denominator on the card is whatever the server counted
+    // when it stamped the pair, so an older or newer client shows the server's
+    // completion rather than a locally-derived one that quietly differs.
+    if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
+  }
   if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
   // Official streamer's platform links (player menu). Already gated by
   // wireStreamerLinks at the point they were set on the entity, so an account whose
@@ -3251,13 +3255,28 @@ export class GameServer {
     const e = this.sim.entities.get(session.pid);
     const meta = this.sim.meta(session.pid);
     if (!e || !meta) return;
+    // Cleared BEFORE the walk so a throw inside the resolution fails to
+    // ABSENT, not to a stale stamp riding the wire (both call sites catch).
+    // The trade is explicit: a transient throw now hides a CORRECT standing
+    // for up to one sweep where the old code kept the last value; absent is
+    // the honest degraded state for a cosmetic, and the walk is pure CPU
+    // with no realistic throw path.
+    // Assigning unconditionally is free either way: wireCacheFor diffs the
+    // identity JSON, so an unchanged stamp re-broadcasts nothing and a changed
+    // one re-broadcasts itself, exactly like the flair refreshers above.
+    e.curatorRank = undefined;
+    e.relicsOwned = undefined;
+    e.relicsTotal = undefined;
     const { owned, total } = catalogCharacterCompletion(characterReliquaryOwnership(meta));
-    // Assigned unconditionally: wireCacheFor diffs the identity JSON, so an
-    // unchanged stamp re-broadcasts nothing and a changed one re-broadcasts
-    // itself, exactly like the flair refreshers above.
-    e.curatorRank = owned > 0 ? curatorRankFromOwned(owned) : undefined;
-    e.relicsOwned = owned > 0 ? owned : undefined;
-    e.relicsTotal = owned > 0 ? total : undefined;
+    const rank = curatorRankFromOwned(owned);
+    // Gated on the RANK, not the raw count, so all three move as one by
+    // construction: a raised rank-1 threshold could otherwise strand the pair
+    // on the wire with the rank absent. Today rank >= 1 iff owned >= 1.
+    if (rank > 0) {
+      e.curatorRank = rank;
+      e.relicsOwned = owned;
+      e.relicsTotal = total;
+    }
   }
 
   // The periodic identity-flair cycle, in two halves that are deliberately NOT

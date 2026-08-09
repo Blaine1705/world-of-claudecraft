@@ -256,6 +256,7 @@ import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
   buildDeedsBoard,
   configureLeaderboardRuntime,
+  decodedRouteName,
   type ReleaseEntry,
   readArenaLeaderboard,
   readProjectStats,
@@ -1679,7 +1680,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     const publicSheetMatch = /^\/api\/public\/characters\/(.+)\/sheet$/.exec(url);
     if (req.method === 'GET' && publicSheetMatch) {
       if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
-      const rawName = decodeURIComponent(publicSheetMatch[1]);
+      // Same decode arm as the RouteDef handler in leaderboard.ts: a malformed
+      // escape falls back to the raw segment and 404s, never a URIError 500.
+      // This legacy arm stays live under the API_DISPATCH=legacy rollback, so
+      // it must mirror the migrated handler.
+      const rawName = decodedRouteName(publicSheetMatch[1]);
       const target = await findCharacterReportTargetByName(rawName);
       if (!target)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });

@@ -23,6 +23,7 @@ import {
   isCataloguedRelicItem,
   RELIQUARY_MARK_IDS,
   RELIQUARY_PAGES,
+  RELIQUARY_RECENT_CAP,
 } from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import { type PlayerClass, virtualLevel } from '../src/sim/types';
@@ -346,6 +347,33 @@ describe('characterSheet: reliquary completion pair + rank', () => {
         .slice(-SHEET_RECENT_RELICS)
         .reverse()
         .map((id) => ({ id, kind: 'item' })),
+    );
+  });
+
+  it('dedupes a repeated id through the full restore-then-strip composition', () => {
+    // An over-cap ring carrying the newest id a second time inside the strip
+    // window, driven through sheetReliquaryFromState so the last-occurrence
+    // dedupe and the take-5 window run TOGETHER (each half is pinned alone
+    // elsewhere; this is the composition). The RELIQUARY_RECENT_CAP trim runs
+    // on this input but cannot change the strip's output (the take-5 window
+    // is smaller than the cap); its own literal pin lives in
+    // tests/reliquary_state.test.ts.
+    const ids = cataloguedItemIds().slice(0, RELIQUARY_RECENT_CAP + 3);
+    expect(ids.length, 'the catalog must overfill the ring cap').toBe(RELIQUARY_RECENT_CAP + 3);
+    const ring = [...ids];
+    ring[ids.length - 3] = ids[ids.length - 1]; // newest id repeats two slots down
+    const reliquary = sheetReliquaryFromState(
+      makeState({ reliquary: { firstFind: {}, marks: [], recent: ring } }),
+    );
+    // Newest-first, the repeat surviving exactly ONCE at the head; the entry
+    // it displaced (ids[len-3]) must not appear, and the window backfills from
+    // the next-older distinct ids instead of shifting a duplicate in.
+    const len = ids.length;
+    expect(reliquary.recent).toEqual(
+      [ids[len - 1], ids[len - 2], ids[len - 4], ids[len - 5], ids[len - 6]].map((id) => ({
+        id,
+        kind: 'item',
+      })),
     );
   });
 

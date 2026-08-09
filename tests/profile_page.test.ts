@@ -176,10 +176,24 @@ describe('profile page recent-finds strip', () => {
       reliquary: { marks: ['masterwork:first'], recent: ['cryptbone_helm', 'masterwork:first'] },
     });
     expect(html).toContain(
-      '<li>Recent finds: <strong>First Masterwork, Cryptbone Helm</strong></li>',
+      '<li>Recent finds: <strong>First Masterwork · Cryptbone Helm</strong></li>',
     );
     expect(html).not.toContain('cryptbone_helm');
     expect(html).not.toContain('masterwork:first');
+  });
+
+  it('separates with a middot so a comma-carrying relic name stays ONE find', async () => {
+    // The one catalogued name with a comma in it, fixture-guarded: if the item
+    // renames, this test must say so rather than silently losing its point. A
+    // comma join would render these two finds as three.
+    expect(ITEMS.kingsbane_last_oath.name).toBe('Thronebane, Last Oath of Thornpeak');
+    const html = await renderProfile({
+      level: 12,
+      reliquary: { recent: ['cryptbone_helm', 'kingsbane_last_oath'] },
+    });
+    expect(html).toContain(
+      '<li>Recent finds: <strong>Thronebane, Last Oath of Thornpeak · Cryptbone Helm</strong></li>',
+    );
   });
 
   it('renders at most the sheet bound, dropping the oldest', async () => {
@@ -201,7 +215,7 @@ describe('profile page recent-finds strip', () => {
     const html = await renderProfile({ level: 12, reliquary: { recent: ids } });
     const strip = /<li>Recent finds: <strong>([^<]*)<\/strong><\/li>/.exec(html);
     if (!strip) throw new Error('recent-finds line missing from the rendered page');
-    const names = strip[1].split(', ');
+    const names = strip[1].split(' · ');
     expect(names.length).toBe(SHEET_RECENT_RELICS);
     // The last name in the strip is the OLDEST survivor (newest-first), and
     // the dropped one is absent entirely. This fixture deliberately reads a

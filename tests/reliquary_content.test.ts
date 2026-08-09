@@ -3019,3 +3019,21 @@ describe('reliquaryRelicSource precedence', () => {
     ]);
   });
 });
+
+describe('the page table freeze (the catalog-index memo contract)', () => {
+  it('freezes the table, every page, every relics array, and every relic record', () => {
+    // The WeakMap catalog index caches id lists walked out of this table, and
+    // the index gates the persisted col_reliquary_complete grant, so the
+    // freeze IS the enforcement the memo's comment promises. Deleting the
+    // freezePageTable wrapper (or its inner relic loop) reds here and nowhere
+    // else: no other suite asserts frozenness of the table itself.
+    expect(Object.isFrozen(RELIQUARY_PAGES)).toBe(true);
+    for (const page of RELIQUARY_PAGES) {
+      expect(Object.isFrozen(page), `page ${page.id} must be frozen`).toBe(true);
+      expect(Object.isFrozen(page.relics), `relics of ${page.id} must be frozen`).toBe(true);
+      for (const relic of page.relics) {
+        expect(Object.isFrozen(relic), `a relic on ${page.id} must be frozen`).toBe(true);
+      }
+    }
+  });
+});

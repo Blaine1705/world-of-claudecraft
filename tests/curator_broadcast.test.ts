@@ -96,6 +96,37 @@ function discoverRelics(server: GameServer, session: ClientSession, n: number): 
   for (const itemId of CATALOGUED_ITEM_IDS.slice(0, n)) meta.deedStats.itemsDiscovered.add(itemId);
 }
 
+/** Character-scoped catalog total derived by an INDEPENDENT page-table walk
+ *  (dedupe per kind, account weapon-skin slots excluded), written here so the
+ *  relicsTotal pin has a second oracle instead of re-calling the same helper
+ *  pair the refresher under test calls (the function-level form of the
+ *  constant-self-comparison trap). */
+function characterScopedTotalByWalk(): number {
+  const byKind = new Map<string, Set<string>>();
+  for (const page of RELIQUARY_PAGES) {
+    for (const relic of page.relics) {
+      if (relic.kind === 'weapon_skin') continue;
+      const id =
+        relic.kind === 'item'
+          ? relic.itemId
+          : relic.kind === 'mark'
+            ? relic.markId
+            : relic.kind === 'mount'
+              ? relic.mountId
+              : relic.deedId;
+      let ids = byKind.get(relic.kind);
+      if (!ids) {
+        ids = new Set();
+        byKind.set(relic.kind, ids);
+      }
+      ids.add(id);
+    }
+  }
+  let total = 0;
+  for (const ids of byKind.values()) total += ids.size;
+  return total;
+}
+
 /** The mocked pg pool's query spy. server/game.ts imports `pool` from './db'
  *  and hands it straight to its db helpers, so this is the very object the code
  *  under test queries through; the positive control below proves that rather
@@ -138,6 +169,35 @@ describe('Curator standing: the identity wire codec', () => {
 
     const snap = lastSnap(fc.sent);
     for (const key of ['crk', 'cro', 'crt']) expect(snap.self).not.toHaveProperty(key);
+  });
+
+  it('never ships the pair without the rank (all-or-nothing is structural)', () => {
+    // The encoder nests cro/crt under crk, so a refresher bug (or a future
+    // rank-1 threshold above one relic) cannot strand the pair on the wire
+    // with the rank absent. Stamp the inconsistent state directly: the
+    // refresher itself can no longer produce it.
+    const player = server.sim.entities.get(session.pid)!;
+    player.curatorRank = undefined;
+    player.relicsOwned = 137;
+    player.relicsTotal = 402;
+    player.holderTier = 2;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // In-snapshot witness: a sibling identity key rides in the SAME payload,
+    // so the three absences below cannot pass because identity was never
+    // built at all in this broadcast.
+    expect(snap.self.ht).toBe(2);
+    for (const key of ['crk', 'cro', 'crt']) expect(snap.self).not.toHaveProperty(key);
+
+    // Positive control: the same pair rides again once the rank is present.
+    player.curatorRank = 5;
+    server.sim.tick();
+    fc.sent.length = 0;
+    broadcast(server);
+    const ranked = lastSnap(fc.sent);
+    expect(ranked.self.crk).toBe(5);
+    expect(ranked.self.cro).toBe(137);
+    expect(ranked.self.crt).toBe(402);
   });
 
   it("round-trips another player's standing through the full entity record", () => {
@@ -255,6 +315,143 @@ describe('Curator standing: the identity wire codec', () => {
     expect(decoded.relicsTotal).toBeUndefined();
   });
 
+  it("the self payload carries reliq while another player's record never does", () => {
+    // The cross-player privacy rule, pinned with its positive control: reliq
+    // (firstFind, marks, recent, illuminated pages) is omit-empty on the self
+    // payload, so seed one authored mark on the SELF character first and prove
+    // the key actually rides. Without that arm the absence pin below would
+    // pass with the whole feature deleted (the dead-alternate-negative trap).
+    server.sim.meta(session.pid)!.reliquary.marks.add('masterwork:first');
+    const fc2 = fakeWs();
+    const other = joinServer(server, fc2, 2, 'Hoarder', 'mage');
+    const otherEnt = server.sim.entities.get(other.pid)!;
+    otherEnt.curatorRank = 5;
+    otherEnt.relicsOwned = 137;
+    otherEnt.relicsTotal = 402;
+    server.sim.tick();
+    fc.sent.length = 0;
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    // The control asserts the seeded CONTENT, not mere key presence: reliq
+    // rides as an empty object on a first broadcast even for a fresh
+    // character (maybeRaw diffs against the previously sent string), so a
+    // bare truthiness check would pass with the seed deleted.
+    expect(snap.self.reliq.marks, 'the self payload must carry the seeded mark').toContain(
+      'masterwork:first',
+    );
+    const wire = snap.ents.find((e: any) => e.id === other.pid);
+    expect(wire.crk).toBe(5); // the aggregate standing rides the record...
+    expect(wire).not.toHaveProperty('reliq'); // ...the per-relic blob never does
+  });
+
+  it('coerces hostile wire values: wrong types, fractions, and huge counts degrade', () => {
+    // The decode guards' wrong-type arm, previously indistinguishable from the
+    // absent-key arm: a string rank must not flow into the `rank >= 5` sigil
+    // gate ('9' >= 5 is true in JS), a fractional rank must floor rather than
+    // index between rungs, and a huge count must clamp to the sim's 1e9
+    // obtain-count ceiling instead of rendering a 300-digit line.
+    const client = bareClient(99);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [
+        {
+          id: 44,
+          k: 'player',
+          tid: 'player',
+          nm: 'Forged',
+          lv: 60,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 1,
+          mhp: 1,
+          crk: '5',
+          cro: {},
+          crt: [],
+        },
+        {
+          id: 45,
+          k: 'player',
+          tid: 'player',
+          nm: 'Fraction',
+          lv: 60,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 1,
+          mhp: 1,
+          crk: 3.5,
+          cro: 2.5,
+          crt: 1e308,
+        },
+        {
+          id: 46,
+          k: 'player',
+          tid: 'player',
+          nm: 'Negative',
+          lv: 60,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 1,
+          mhp: 1,
+          crk: -2,
+          cro: Number.NaN,
+          crt: Number.POSITIVE_INFINITY,
+        },
+      ],
+    });
+    const forged = client.entities.get(44)!;
+    expect(forged.curatorRank).toBe(0);
+    expect(forged.relicsOwned).toBeUndefined();
+    expect(forged.relicsTotal).toBeUndefined();
+    const fraction = client.entities.get(45)!;
+    expect(fraction.curatorRank).toBe(3);
+    expect(fraction.relicsOwned).toBe(2);
+    expect(fraction.relicsTotal).toBe(1e9);
+    const negative = client.entities.get(46)!;
+    expect(negative.curatorRank).toBe(0);
+    expect(negative.relicsOwned).toBeUndefined();
+    expect(negative.relicsTotal).toBeUndefined();
+  });
+
+  it('passes an above-ladder INTEGER rank through, deliberately (mixed-version rule)', () => {
+    // No clamp to today's five rungs, decided at Phase 20 QA: a NEWER server
+    // whose ladder grew a rank 6 must keep reading as at-least-rank-5 on this
+    // client (the name falls to the generic key; the sigil gate rank >= 5
+    // still lights, which is the honest rendering of a higher rank). A forged
+    // high rank needs a hostile SERVER, which already owns every cosmetic.
+    const client = bareClient(99);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [
+        {
+          id: 47,
+          k: 'player',
+          tid: 'player',
+          nm: 'Future',
+          lv: 60,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 1,
+          mhp: 1,
+          crk: 9,
+          cro: 200,
+          crt: 260,
+        },
+      ],
+    });
+    const future = client.entities.get(47)!;
+    expect(future.curatorRank).toBe(9);
+    expect(future.relicsOwned).toBe(200);
+  });
+
   it('defaults the rank to 0 on a record that carries no standing at all', () => {
     const client = bareClient(99);
     (client as any).applySnapshot({
@@ -315,10 +512,13 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
     expect(e.curatorRank).toBe(1);
     expect(e.relicsOwned).toBe(1);
     // The total is the character-scoped catalog size, which excludes the
-    // account weapon-skin slots; pinned against the live helper so a catalog
-    // that grows moves both together instead of stranding a literal.
+    // account weapon-skin slots. Two oracles: the live helper (so a catalog
+    // that grows moves both together instead of stranding a literal) AND the
+    // independent page-table walk above, which is what catches a refresher
+    // that swapped in a different helper agreeing with itself.
     const meta = server.sim.meta(session.pid)!;
     expect(e.relicsTotal).toBe(catalogCharacterCompletion(characterReliquaryOwnership(meta)).total);
+    expect(e.relicsTotal).toBe(characterScopedTotalByWalk());
     expect(e.relicsTotal).toBeGreaterThan(1);
   });
 
@@ -601,8 +801,10 @@ function codeOnly(src: string): string {
  * the receiver is dropped entirely and the field name carries the match, with a
  * trailing `\b` (or `curatorRankFromOwned` would count) and a `(?!=)` lookahead
  * (or `===` would). Verified against the live tree: this matches exactly the
- * three sanctioned sites and none of the reads beside them (`=== 5`,
- * `!== total`, `>= 3`, the `curatorRank: number` field, the imported helper).
+ * six sanctioned writes, all inside refreshCuratorStanding (the fail-to-absent
+ * clear cluster plus the rank-gated stamp cluster), and none of the reads
+ * beside them (`=== 5`, `!== total`, `>= 3`, the `curatorRank: number` field,
+ * the imported helper).
  */
 const CURATOR_WRITE =
   /\b(?:curatorRank|relicsOwned|relicsTotal)\b\s*(?:\*\*|<<|>>>?|\?\?|\|\||&&|[+\-*/%&|^])?=(?!=)/g;
@@ -633,7 +835,7 @@ describe('Curator standing is server authority, never a client claim', () => {
 
   it('no client command anywhere can write a rank or a relic count', () => {
     const writes = serverCode.match(CURATOR_WRITE) ?? [];
-    expect(writes, 'only refreshCuratorStanding may write a Curator standing').toHaveLength(3);
+    expect(writes, 'only refreshCuratorStanding may write a Curator standing').toHaveLength(6);
 
     const game = codeOnly(readFileSync(GAME_SRC, 'utf8'));
     const start = game.indexOf('private refreshCuratorStanding(');
@@ -644,7 +846,7 @@ describe('Curator standing is server authority, never a client claim', () => {
     // whole-tree match is a substring of it, is what makes containment
     // decisive: three identical `curatorRank =` strings anywhere else in the
     // tree satisfy a substring check while sitting outside the refresher.
-    expect(game.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(3);
+    expect(game.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(6);
   });
 
   it('the terse wire keys are WRITE-ONLY on the server', () => {
@@ -660,5 +862,21 @@ describe('Curator standing is server authority, never a client claim', () => {
     const encodes = serverCode.match(/\bout\.(?:crk|cro|crt)\s*=(?!=)/g) ?? [];
     expect(encodes, 'the three identityFields encodes').toHaveLength(3);
     expect(tokens, 'crk/cro/crt may appear ONLY as those three encodes').toHaveLength(3);
+  });
+
+  it('the sweep is scheduled on the 60s flair interval (join is the only other entry)', () => {
+    // The cadence a NEW surface now depends on: deleting the setInterval
+    // registration would leave every suite green while live standings never
+    // refreshed after join. Matched over comment-stripped code, so a
+    // commented-out copy cannot satisfy it, and anchored on both the callback
+    // body and the HOLDER_TIER_REFRESH_MS constant so neither can drift alone.
+    const game = codeOnly(readFileSync(GAME_SRC, 'utf8'));
+    expect(game).toMatch(
+      /this\.holderTierInterval = setInterval\(\(\) => \{\s*void this\.refreshAllHolderTiers\(\);\s*\}, HOLDER_TIER_REFRESH_MS\);/,
+    );
+    // The VALUE too, or "the 60s cycle" in every doc and comment is a claim
+    // no test owns: the registration pin above survives a retune to ten
+    // minutes; this line does not.
+    expect(game).toMatch(/const HOLDER_TIER_REFRESH_MS = 60_000;/);
   });
 });

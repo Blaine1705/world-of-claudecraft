@@ -162,6 +162,15 @@ describe('curatorRankNameKey', () => {
     expect(curatorRankNameKey(6)).toBe('hudChrome.reliquary.curatorRank');
   });
 
+  it('falls back on a NON-INTEGER rank instead of indexing between rungs', () => {
+    // 3.5 passes the range check but indexes CURATOR_RANK_NAME_KEYS[2.5],
+    // which is undefined behind the non-null assertion, and t(undefined)
+    // throws out of the inspect painter. Only a hostile or buggy upstream can
+    // produce a fraction, which is exactly when the card must degrade, not die.
+    expect(curatorRankNameKey(3.5)).toBe('hudChrome.reliquary.curatorRank');
+    expect(curatorRankNameKey(Number.NaN)).toBe('hudChrome.reliquary.curatorRank');
+  });
+
   it('authors exactly one name key per live sim Curator rank', () => {
     // Cross-source pin: a new CURATOR_RANK_DEFS entry stays red here until a
     // matching curatorRankName chrome key is authored (no silent generic fall).

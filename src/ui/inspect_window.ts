@@ -320,10 +320,13 @@ export class InspectWindow {
   // nothing at all, exactly like paintPortraitBorder writing ''.
   private borderAttrs(border: InspectBorderModel | null): string {
     if (!border) return '';
-    // The three palette values are escaped like the slug on the line above, not
-    // because today's values need it (they come from the frozen deed_border_view
-    // palette) but so the style attribute never becomes the one unescaped hole a
-    // future palette source could inject through.
+    // The three palette values are escaped like the slug on the line above.
+    // Honest scope: esc() blocks an attribute BREAKOUT (quotes, angle
+    // brackets), which is the exploitable hole; it does NOT neutralize CSS
+    // declaration syntax inside the attribute. Today that distinction is moot
+    // (values come from the frozen deed_border_view palette and the core nulls
+    // unknown slugs); if a palette source ever becomes dynamic, validate the
+    // values against a hex pattern instead of leaning on this escape.
     return (
       ` data-border="${esc(border.slug)}"` +
       ` style="--border-accent-frame:${esc(border.frame)};--border-accent-edge:${esc(border.edge)};--border-accent-glow:${esc(border.glow)}"`

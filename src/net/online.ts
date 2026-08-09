@@ -52,6 +52,7 @@ import {
   clearCountForSource,
   curatorRankFromOwned,
   pageCompletion,
+  RELIQUARY_OBTAIN_COUNT_CAP,
   RELIQUARY_PAGES_BY_ID,
   reliquaryOwnershipOpts,
   restoreReliquaryState,
@@ -239,6 +240,21 @@ function stringRecord(value: unknown): Record<string, string> {
     if (typeof entry === 'string' && entry.length > 0) out[key] = entry;
   }
   return out;
+}
+
+/** Bounded positive-integer wire read for cosmetic counts. NEVER trust the
+ *  wire: a fractional value floors (3.5 reads as 3, and anything below 1
+ *  floors to 0 and reads ABSENT, which loses no legitimate value since the
+ *  server only stamps counts of 1 and up); a zero, negative, non-finite, or
+ *  non-number value reads as absent; and a huge one clamps to the sim's
+ *  obtain-count ceiling, so a misbehaving server can degrade a badge but
+ *  never throw a render or print a 300-digit count. Deliberately NO upper
+ *  clamp to today's rank ladder: a newer server's rank 6 must keep reading
+ *  as at-least-rank-5 on this client (the crt mixed-version rule). */
+function wireCount(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  const n = Math.floor(value);
+  return n > 0 ? Math.min(n, RELIQUARY_OBTAIN_COUNT_CAP) : undefined;
 }
 
 function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
@@ -2814,10 +2830,13 @@ export class ClientWorld implements IWorld {
         // Curator standing (cosmetic, server-computed): rank plus the
         // character-scoped completion pair. Same split as ht/hb above: the rank
         // defaults to 0 (unranked) and the pair stays undefined, so an identity
-        // record that omits them RESETS a previously ranked mirror.
-        e.curatorRank = typeof w.crk === 'number' ? w.crk : 0; // Curator rank 1-5
-        e.relicsOwned = typeof w.cro === 'number' ? w.cro : undefined; // relics owned
-        e.relicsTotal = typeof w.crt === 'number' ? w.crt : undefined; // relic total
+        // record that omits them RESETS a previously ranked mirror. wireCount
+        // bounds each read: the sibling decodes tolerate loose numbers, but the
+        // rank INDEXES a key table downstream, so a fractional or huge value
+        // must degrade instead of throwing out of the inspect painter.
+        e.curatorRank = wireCount(w.crk) ?? 0; // Curator rank 1-5
+        e.relicsOwned = wireCount(w.cro); // character-scoped relics owned
+        e.relicsTotal = wireCount(w.crt); // character-scoped relic total
         // Account flair (cosmetic, operator-set): the AI-operated mark and, for a
         // flagged streamer, their platform links. NEVER trust the wire: the links are
         // re-sanitized here (they end up in a window.open), and stay sparse/undefined

@@ -62,9 +62,13 @@ export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
   'hudChrome.reliquary.curatorRankName5',
 ];
 
-/** Shared key picker for Overview seal chrome, sheet lines, and rank-up toast. */
+/** Shared key picker for Overview seal chrome, sheet lines, and rank-up toast.
+ *  Integer-guarded: a fractional rank (only reachable from a hostile or buggy
+ *  upstream) falls to the generic key like an out-of-range one, because the
+ *  indexed lookup below would otherwise answer undefined behind the non-null
+ *  assertion and throw inside t() at the caller. */
 export function curatorRankNameKey(rank: number): TranslationKey {
-  if (rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
+  if (Number.isInteger(rank) && rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
     return CURATOR_RANK_NAME_KEYS[rank - 1]!;
   }
   return 'hudChrome.reliquary.curatorRank';

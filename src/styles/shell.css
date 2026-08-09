@@ -6110,12 +6110,13 @@
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
-  /* The Reliquary standing line (labeled completion pair + named Curator rank).
-     Reuses the level/class chip family so the card keeps one pill language; only
-     the muted tint separates the standing from the identity line above it. */
-  .inspect-meta.inspect-reliquary {
-    color: var(--color-text-muted);
-  }
+  /* The Reliquary standing line (labeled completion pair + named Curator rank)
+     reuses the level/class chip family UNCHANGED, so the card keeps one pill
+     language and the two lines render identically by design. .inspect-reliquary
+     is a semantic hook for tests and future rules, not an override: the base
+     .inspect-meta rule above is what paints it. (This note documents that
+     deliberate ABSENCE of a compound rule; it is not about the remote-card
+     rule below.) */
   .inspect-card-remote .inspect-meta {
     padding: 0;
     font-size: 13px;

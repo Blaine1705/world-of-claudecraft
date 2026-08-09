@@ -199,10 +199,10 @@ try {
   page.on('pageerror', (e) => console.log('[pageerror]', e.message));
   const url = `${BASE}/c/${encodeURIComponent(CHAR)}`;
   const res = await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
-  if (!res || res.status() !== 200) throw new Error(`GET /c/ returned ${res?.status()}`);
+  if (res?.status() !== 200) throw new Error(`GET /c/ returned ${res?.status()}`);
   await sleep(600);
   const body = await page.evaluate('document.body.innerText');
-  log('page text:\n' + body.split('\n').slice(0, 24).join('\n'));
+  log(`page text:\n${body.split('\n').slice(0, 24).join('\n')}`);
   const file = `${OUT}/${NAME}.png`;
   await page.screenshot({ path: file });
   log('shot:', file);

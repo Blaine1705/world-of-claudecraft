@@ -169,9 +169,14 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
     const relicName = sheetRelicRecentText(entry);
     return relicName === null ? [] : [escapeHtml(relicName)];
   });
+  // Joined with a middle dot, never a comma: one catalogued relic name carries
+  // a comma of its own (kingsbane_last_oath, "Thronebane, Last Oath of
+  // Thornpeak"), so a comma join would render five finds that read as six. No
+  // authored name contains the middot, and the inspect card's meta line
+  // already separates with it for the same reason.
   const reliqRecentLine =
     recentRelicNames.length > 0
-      ? `<li>Recent finds: <strong>${recentRelicNames.join(', ')}</strong></li>`
+      ? `<li>Recent finds: <strong>${recentRelicNames.join(' · ')}</strong></li>`
       : '';
   // The selected Book of Deeds title, under the name. sheetTitleText returns
   // null for unset/stale/non-title ids, so the line simply disappears (never

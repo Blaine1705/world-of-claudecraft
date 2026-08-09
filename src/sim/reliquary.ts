@@ -932,7 +932,10 @@ export interface ReliquaryCatalogIndex {
  * poison the shared answer. Keying on identity gives every distinct array its
  * own entry (a structurally identical COPY of the default included), so custom
  * page tables memoize safely too rather than rebuilding on every call, and the
- * entry drops with the array.
+ * entry drops with the array. The caller owns a CUSTOM table's immutability:
+ * identity keying isolates it from the shared catalog, but a caller mutating
+ * its own array between reads gets the stale entry back, and a fresh array
+ * built per call memoizes correctly while gaining nothing.
  *
  * Index integrity is a SAVE-CORRECTNESS matter, not a cosmetic one:
  * catalogCharacterCompletion reads these lists for the `owned === total` gate

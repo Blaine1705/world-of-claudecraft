@@ -4128,8 +4128,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Reliquary ownership; the sim never reads any of it): the Curator rank
   // (0/undefined = unranked, 1-5 = Apprentice…Eternal Curator) and the
   // character-scoped completion pair behind it, for the inspect card's
-  // Reliquary line and the rank-5 sigil. All three ride together and are
-  // absent for an unranked character, exactly like the dev fields above.
+  // Reliquary line and the rank-5 sigil. Stamped and cleared together
+  // server-side; the wire omits all three for an unranked character, and the
+  // client mirror resolves that to rank 0 with the pair undefined, the same
+  // 0/undefined split as the dev fields above.
   curatorRank?: number;
   relicsOwned?: number;
   relicsTotal?: number;

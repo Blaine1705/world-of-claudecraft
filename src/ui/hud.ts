@@ -16184,37 +16184,25 @@ export class Hud {
     // applyState at character load, when no window can be open.)
   }
 
-  // The progression-block sibling of refreshOpenProfessionSurfacesIfChanged: the
-  // character sheet's active-title line, border badge row, and Reliquary pair are
-  // all readouts on a cold window, and the surfaces that move them take no
-  // optimistic write (the Book of Deeds picker repaints only itself; a relic fill
-  // repaints the tracker), so nothing else tells an already open sheet that the
-  // player now wears a different title, has earned another border, or has filled
-  // another relic.
+  // The progression-block sibling of refreshOpenProfessionSurfacesIfChanged:
+  // the sheet's title line, border badge row, and Reliquary pair are readouts
+  // on a cold window, and no surface that moves them repaints an already open
+  // sheet (the deeds picker repaints only itself; a relic fill, the tracker).
   //
-  // Same computed-even-when-closed rationale as its sibling, with the cost
-  // stated honestly rather than waved through. Three of the four size reads are
-  // O(1) `.size`; the fourth is not. Sim.ownedMounts() spreads bags AND bank
-  // into a fresh array and collects the mount keys out of it, so this pays one
-  // merged-inventory allocation every 2 Hz tick whether the sheet is open or
-  // not. That is exactly the read the Reliquary tracker defers behind a thunk
-  // (a player with pinned pages never pays it at all). The measured cost is
-  // microseconds against a 500 ms band, so it is ACCEPTED here, not unnoticed:
-  // keeping the signature warm is what stops reopening the sheet (which always
-  // paints fresh) from being followed by a redundant signature-diff repaint on
-  // the next slow tick. The sizes are still a proxy, not a second
-  // catalogCharacterCompletion walk; see the core for what that proxy does and
-  // does not catch.
+  // Computed even when closed, like the sibling, with the cost stated rather
+  // than waved through: three size reads are O(1), and Sim.ownedMounts() pays
+  // one merged bags-plus-bank allocation per 2 Hz tick (the read the Reliquary
+  // tracker defers behind a thunk). Microseconds against a 500 ms band,
+  // ACCEPTED so the warm signature stops a reopen from being followed by a
+  // redundant signature-diff repaint. The sizes are a proxy, not a second
+  // completion walk; the core's own header says what the proxy misses.
   //
   // Rule of three: a THIRD consumer of these ownership reads on this band earns
-  // one shared once-per-tick computation the consumers read, instead of a third
-  // independent walk over the same inventories.
+  // one shared once-per-tick computation instead of a third inventory walk.
   //
-  // Converges in both hosts with no optimistic write: offline the sim setters are
-  // synchronous, online the mirror updates from the server's atitle / aborder echo
-  // and the snapshot's ownership fields, both well inside one 500 ms band.
-  // render() rebuilds the whole sheet, so every row in the block (the title line,
-  // the border badge's worn word, the completion pair, the rank) comes back fresh.
+  // Converges in both hosts with no optimistic write (offline setters are
+  // synchronous; online the atitle/aborder echo and the snapshot's ownership
+  // fields land well inside one band), and render() rebuilds every row fresh.
   private refreshCharSheetIfChanged(): void {
     const sig = charSheetRefreshSig({
       activeTitle: this.sim.activeTitle,

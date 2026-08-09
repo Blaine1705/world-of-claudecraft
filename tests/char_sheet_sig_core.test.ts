@@ -220,6 +220,17 @@ describe('the HUD latch that converges the open character sheet', () => {
     expect(body).toContain('mounts: this.sim.ownedMounts().length,');
     expect(body).toContain('if (sig === this.lastCharSheetSig) return;');
     expect(body).toContain('this.lastCharSheetSig = sig;');
+    // ORDER, not just presence: hoisting the assignment above the compare
+    // leaves both literals in the body while the sheet never repaints again,
+    // which is the exact staleness this latch exists to fix. The slice must
+    // stay block-comment-free, or a /* commented copy */ of the compare above
+    // a hoisted assignment could satisfy the ordering while the latch is dead
+    // (read() strips line comments only for this file).
+    expect(body).not.toContain('/*');
+    expect(
+      body.indexOf('if (sig === this.lastCharSheetSig) return;'),
+      'the latch must compare before it assigns',
+    ).toBeLessThan(body.indexOf('this.lastCharSheetSig = sig;'));
     // renderIfOpen, not render: a closed sheet must never be painted.
     expect(body).toContain('this.charWindow.renderIfOpen();');
   });

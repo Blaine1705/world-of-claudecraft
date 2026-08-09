@@ -4,6 +4,7 @@ import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/r
 import {
   buildReliquarySheetModel,
   reliquarySheetProgressionHtml,
+  selfCuratorStanding,
 } from '../src/ui/reliquary_sheet_view';
 
 function world(
@@ -96,6 +97,36 @@ describe('buildReliquarySheetModel', () => {
     expect(asMap.owned).toBe(2);
     expect(asMap.curatorRank).toBe(1);
     expect(asMap.total).toBe(empty.total);
+  });
+});
+
+describe('selfCuratorStanding', () => {
+  // Behavioral arm, not a source scrape: the adapter feeds the inspect card the
+  // viewer's OWN standing, so a transposed field here would print the pair
+  // backwards on every self-inspect while the wire path for other players
+  // stays green. Three DISTINCT values (owned 2, rank 1, total = the full
+  // character-scoped catalog) make any field swap observable.
+  it('mirrors the sheet model triple field by field', () => {
+    const w = world({ items: ['cryptbone_helm'], marks: ['masterwork:first'] });
+    const model = buildReliquarySheetModel(w);
+    const standing = selfCuratorStanding(w);
+    expect(standing).toEqual({
+      curatorRank: model.curatorRank,
+      owned: model.owned,
+      total: model.total,
+    });
+    // Anchor the fixture so the distinctness premise cannot rot silently: a
+    // swap of owned and total flips 2 against the catalog size.
+    expect(standing.owned).toBe(2);
+    expect(standing.curatorRank).toBe(1);
+    expect(standing.total).toBeGreaterThan(standing.owned);
+  });
+
+  it('builds the same standing from the online Map-shaped deedsEarned', () => {
+    const asMap = selfCuratorStanding(world({ deeds: new Map([['prog_veteran', '2026-08-01']]) }));
+    const asSet = selfCuratorStanding(world({ deeds: ['prog_veteran'] }));
+    expect(asMap).toEqual(asSet);
+    expect(asMap.owned).toBe(1);
   });
 });
 
