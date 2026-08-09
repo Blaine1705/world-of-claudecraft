@@ -127,6 +127,10 @@ jobs:
   release-version-gate:
     name: Release version gate
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Checkout, pnpm install, and one small version-surface check: comparable
+    # in shape to release-i18n's toolchain overhead. 10 gives ample margin
+    # over a script that runs in a fraction of a second locally.
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
@@ -214,6 +218,11 @@ jobs:
   # Biome-eligible file (docs, assets, generated i18n).
   lint:
     name: Format + lint (Biome, changed files)
+    # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
+    # browser-gate: checkout, pnpm install, a base-ref fetch, then one biome
+    # pass. 15 keeps a margin over browser-gate's 10 minute bound for the extra
+    # base-ref resolution step.
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     steps:
@@ -632,6 +641,12 @@ jobs:
     # every build on the merge result, not just the PR head.
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
+    # browser-gate, but heavier: i18n generation, the malware gate, a
+    # typecheck, and four builds. 20 matches the shard matrices' bound so a
+    # stalled runner here dies and reruns instead of holding a required check
+    # for hours.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     steps:
@@ -800,6 +815,10 @@ jobs:
   release-i18n:
     name: Release i18n (21-locale fill)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Unsharded and seconds long by design (five test files, see the job
+    # comment above): the toolchain setup dominates the wall time. 10 mirrors
+    # release-version-gate's bound for the same shape.
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     env:
@@ -834,6 +853,9 @@ jobs:
   release-checks:
     name: Release checks (freshness, typecheck, builds)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Mirrors pr-checks: same step list (i18n generation, malware gate,
+    # typecheck, four builds), so the same 20 minute bound.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     steps:
