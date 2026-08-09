@@ -244,6 +244,10 @@ export interface BgMatch {
   // is being scored against either way. Their absence from the rating math is
   // what keeps the seat worth accepting.
   backfilled: Set<number>;
+  // Candidates who were offered a seat in THIS match and said no. A decline
+  // costs them nothing (see declineBgBackfill), so without this the still-open
+  // seat would offer them the same match again on the very next tick, forever.
+  backfillDeclined: Set<number>;
   // Per team: pids auto-added to the team party at start (never the surviving
   // base premade), unwound at match end or on desertion (battleground_party.ts).
   autoPartyPids: [number[], number[]];
@@ -653,6 +657,7 @@ function backfillBgMatches(ctx: SimContext): void {
       // ...and never double-offer: a solo already holding a queue-pop offer, or
       // sitting out the lockout from one they just failed, is not available.
       if (bgProposalFor(ctx, cand) || bgRequeueLockedUntil(ctx, cand) > 0) return;
+      if (match.backfillDeclined.has(cand)) return;
       eligible.push({ index: i, size: g.pids.length, waited: g.waited });
     });
     const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
@@ -1049,6 +1054,7 @@ export function startBgMatch(
     grouped: opts?.grouped === true,
     ratingAvg: [bgTeamAvg(ctx, teamA), bgTeamAvg(ctx, teamB)],
     backfilled: new Set(),
+    backfillDeclined: new Set(),
     autoPartyPids: [[], []],
     resultRecorded: false,
     fightersReleased: false,

@@ -231,6 +231,32 @@ export function failBgProposal(
 }
 
 /**
+ * Refuse a backfill seat, which costs the player nothing.
+ *
+ * A queue pop charges a decline the lockout because the fighter is refusing the
+ * very thing they queued for. A backfill is NOT that thing: it is a live match,
+ * unrated, carrying a scoreline they had no part in. Charging their whole wait
+ * for saying no to a different offer than the one they lined up for is the kind
+ * of rule that teaches people to stop answering prompts, and silence is already
+ * the worse outcome for the team.
+ *
+ * Silence still costs the lockout (see sweepBgProposals), because that IS the
+ * away player this feature exists to catch. The match remembers the refusal so
+ * the still-open seat does not ask the same person again next tick.
+ */
+function declineBgBackfill(ctx: SimContext, proposal: BgProposal, pid: number): void {
+  removeBgProposal(ctx, proposal);
+  proposal.backfill?.match.backfillDeclined.add(pid);
+  for (const group of proposal.groups) ctx.bgQueue.push(group);
+  ctx.emit({
+    type: 'log',
+    text: 'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+    color: '#7fd4ff',
+    pid,
+  });
+}
+
+/**
  * Answer a live proposal. Returns the proposal when THIS response completed it
  * (every fighter has accepted), so the caller seats it; null otherwise. The
  * caller owns seating rather than this module, which keeps the dependency
@@ -250,7 +276,8 @@ export function bgProposalRespond(
     return null;
   }
   if (!accept) {
-    failBgProposal(ctx, proposal, new Set([id]));
+    if (proposal.backfill) declineBgBackfill(ctx, proposal, id);
+    else failBgProposal(ctx, proposal, new Set([id]));
     return null;
   }
   if (proposal.accepted.has(id)) return null;

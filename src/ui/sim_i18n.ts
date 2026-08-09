@@ -8635,7 +8635,8 @@ type BgExtraKey =
   | 'errOfferWaiting'
   | 'errRequeueLocked'
   | 'offerBackfill'
-  | 'offerBackfillGone';
+  | 'offerBackfillGone'
+  | 'offerBackfillDeclined';
 
 const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   errMemberRequeueLocked: 'A party member must wait before queueing for Thornhollow Fields again.',
@@ -8644,6 +8645,8 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
     'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
   offerBackfillGone:
     'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+  offerBackfillDeclined:
+    'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
   offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
   groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
   errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
@@ -8684,6 +8687,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     offerBackfill:
       '一场正在进行的荆谷原野战斗需要一名战士。接受即可加入；本场对战不会改变你的评分。',
     offerBackfillGone: '那场战斗不再需要战士了。你保留在荆谷原野队列中的位置。',
+    offerBackfillDeclined: '你拒绝了这场已经开始的战斗，并保留在荆谷原野队列中的位置。',
     offerKeptPlace: '战斗未能成行。你保留了荆谷原野队列中的位置。',
     groupLeaveQueue: '你的队伍离开了荆谷原野队列。',
     errNoOffer: '你没有可以回应的荆谷原野邀请。',
@@ -8720,6 +8724,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     offerBackfill:
       '一場正在進行的荊谷原野戰鬥需要一名戰士。接受即可加入；本場對戰不會改變你的評分。',
     offerBackfillGone: '那場戰鬥不再需要戰士了。你保留在荊谷原野隊列中的位置。',
+    offerBackfillDeclined: '你拒絕了這場已經開始的戰鬥，並保留在荊谷原野隊列中的位置。',
     offerKeptPlace: '戰鬥未能成行。你保留了荊谷原野佇列中的位置。',
     groupLeaveQueue: '你的隊伍離開了荊谷原野佇列。',
     errNoOffer: '你沒有可以回應的荊谷原野邀請。',
@@ -8758,6 +8763,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       '進行中のソーンホロウ平原の戦いに戦士が必要です。承諾すると参加できます。この試合はレーティングに影響しません。',
     offerBackfillGone:
       'その戦いはもう戦士を必要としていません。ソーンホロウ平原の待機列での順番は保持されます。',
+    offerBackfillDeclined:
+      '進行中の戦いを辞退しました。ソーンホロウ平原の待機列での順番は保持されます。',
     offerKeptPlace: '戦闘は成立しませんでした。ソーンホロウ平原のキューでの順番は保持されます。',
     groupLeaveQueue: 'あなたのパーティーはソーンホロウ平原のキューから離脱しました。',
     errNoOffer: '応答できるソーンホロウ平原の招待がありません。',
@@ -8800,6 +8807,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       '이미 진행 중인 쏜할로우 평원 전투에 전사가 필요합니다. 수락하면 참여합니다. 이 전투는 평점에 영향을 주지 않습니다.',
     offerBackfillGone:
       '그 전투는 더 이상 전사가 필요하지 않습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
+    offerBackfillDeclined:
+      '이미 진행 중인 전투를 거절했습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
     offerKeptPlace: '전투가 성사되지 않았습니다. 쏜할로우 평원 대기열의 순번은 유지됩니다.',
     groupLeaveQueue: '당신의 파티가 쏜할로우 평원 대기열에서 나왔습니다.',
     errNoOffer: '응답할 쏜할로우 평원 초대가 없습니다.',
@@ -8843,6 +8852,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Уже идущему бою в Терновой Лощине нужен боец. Примите, чтобы вступить; этот бой не изменит ваш рейтинг.',
     offerBackfillGone:
       'Тому бою больше не нужен боец. Ваше место в очереди Терновой Лощины сохранено.',
+    offerBackfillDeclined:
+      'Вы отказались от уже идущего боя и сохранили место в очереди Терновой Лощины.',
     offerKeptPlace: 'Бой не состоялся. Ваше место в очереди Терновой Лощины сохранено.',
     groupLeaveQueue: 'Ваша группа покинула очередь Терновой Лощины.',
     errNoOffer: 'У вас нет приглашения в Терновую Лощину, на которое можно ответить.',
@@ -8886,6 +8897,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
     offerBackfillGone:
       'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+    offerBackfillDeclined:
+      'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
     offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
     groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
     errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
@@ -8928,6 +8941,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
     offerBackfillGone:
       'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
     offerKeptPlace:
       'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
     groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
@@ -8976,6 +8991,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
     offerBackfillGone:
       'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
     offerKeptPlace:
       'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
     groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
@@ -9024,6 +9041,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
     offerBackfillGone:
       'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
     offerKeptPlace:
       'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
     groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
@@ -9071,6 +9090,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
     offerBackfillGone:
       'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
     offerKeptPlace:
       'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
     groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
@@ -9118,6 +9139,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Una battaglia già in corso nei Campi di Thornhollow ha bisogno di un combattente. Accetta per unirti; questo scontro non cambierà il tuo punteggio.',
     offerBackfillGone:
       'Quella battaglia non ha più bisogno di un combattente. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    offerBackfillDeclined:
+      'Rifiuti la battaglia già in corso e mantieni il tuo posto nella coda dei Campi di Thornhollow.',
     offerKeptPlace:
       'La battaglia non si è formata. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
     groupLeaveQueue: 'Il tuo gruppo esce dalla coda dei Campi di Thornhollow.',
@@ -9165,6 +9188,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Eine laufende Schlacht auf den Thornhollow-Feldern braucht einen Kämpfer. Nimm an, um beizutreten; dieses Spiel ändert deine Wertung nicht.',
     offerBackfillGone:
       'Diese Schlacht braucht keinen Kämpfer mehr. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    offerBackfillDeclined:
+      'Du lehnst die laufende Schlacht ab und behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
     offerKeptPlace:
       'Die Schlacht kam nicht zustande. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
     groupLeaveQueue: 'Deine Gruppe verlässt die Warteschlange der Thornhollow-Felder.',
@@ -9214,6 +9239,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Uma batalha em andamento nos Campos de Thornhollow precisa de um lutador. Aceite para entrar; esta partida não mudará sua classificação.',
     offerBackfillGone:
       'Aquela batalha não precisa mais de um lutador. Você mantém seu lugar na fila dos Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Você recusa a batalha em andamento e mantém seu lugar na fila dos Campos de Thornhollow.',
     offerKeptPlace:
       'A batalha não se formou. Você mantém seu lugar na fila dos Campos de Thornhollow.',
     groupLeaveQueue: 'Seu grupo sai da fila dos Campos de Thornhollow.',
@@ -9262,6 +9289,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Probíhající bitva na Trnitých polích potřebuje bojovníka. Přijmi a připoj se; tento zápas nezmění tvé hodnocení.',
     offerBackfillGone:
       'Ta bitva už bojovníka nepotřebuje. Své místo ve frontě na Trnitá pole si ponecháváš.',
+    offerBackfillDeclined:
+      'Odmítáš probíhající bitvu a ponecháváš si své místo ve frontě na Trnitá pole.',
     offerKeptPlace:
       'Bitva se nenaplnila. Své místo ve frontě na Thornhollowská pole si ponecháváš.',
     groupLeaveQueue: 'Tvoje skupina opouští frontu na Thornhollowská pole.',
@@ -9307,6 +9336,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Een lopend gevecht op de Thornhollow-velden heeft een strijder nodig. Accepteer om mee te doen; deze wedstrijd verandert je waardering niet.',
     offerBackfillGone:
       'Dat gevecht heeft geen strijder meer nodig. Je behoudt je plek in de wachtrij voor de Thornhollow-velden.',
+    offerBackfillDeclined:
+      'Je wijst het lopende gevecht af en behoudt je plek in de wachtrij voor de Thornhollow-velden.',
     offerKeptPlace:
       'De strijd kwam niet rond. Je behoudt je plaats in de wachtrij van de Doornholte-Velden.',
     groupLeaveQueue: 'Je groep verlaat de wachtrij van de Doornholte-Velden.',
@@ -9354,6 +9385,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Trwająca bitwa na Polach Thornhollow potrzebuje wojownika. Zaakceptuj, aby dołączyć; ten mecz nie zmieni twojego rankingu.',
     offerBackfillGone:
       'Ta bitwa nie potrzebuje już wojownika. Zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
+    offerBackfillDeclined:
+      'Odrzucasz trwającą bitwę i zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
     offerKeptPlace:
       'Bitwa nie doszła do skutku. Zachowujesz swoje miejsce w kolejce na Pola Ciernistej Kotliny.',
     groupLeaveQueue: 'Twoja drużyna opuszcza kolejkę na Pola Ciernistej Kotliny.',
@@ -9401,6 +9434,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Pertempuran yang sedang berlangsung di Padang Thornhollow membutuhkan seorang petarung. Terima untuk bergabung; pertandingan ini tidak akan mengubah peringkatmu.',
     offerBackfillGone:
       'Pertempuran itu tidak lagi membutuhkan petarung. Kamu tetap memegang tempatmu di antrean Padang Thornhollow.',
+    offerBackfillDeclined:
+      'Kamu menolak pertempuran yang sedang berlangsung dan tetap memegang tempatmu di antrean Padang Thornhollow.',
     offerKeptPlace:
       'Pertempuran tidak terisi penuh. Posisimu di antrean Padang Thornhollow tetap terjaga.',
     groupLeaveQueue: 'Kelompokmu keluar dari antrean Padang Thornhollow.',
@@ -9448,6 +9483,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Devam eden bir Thornhollow Ovaları savasinin bir savasciya ihtiyaci var. Katilmak icin kabul et; bu mac derecelendirmeni degistirmeyecek.',
     offerBackfillGone:
       'O savasin artik bir savasciya ihtiyaci yok. Thornhollow Ovalari sirandaki yerini koruyorsun.',
+    offerBackfillDeclined:
+      'Devam eden savasi reddediyorsun ve Thornhollow Ovalari sirandaki yerini koruyorsun.',
     offerKeptPlace: 'Savaş dolmadı. Dikenvadi Ovaları sırasındaki yerini koruyorsun.',
     groupLeaveQueue: 'Grubun Dikenvadi Ovaları sırasından ayrıldı.',
     errNoOffer: 'Yanıtlayabileceğin bir Dikenvadi Ovaları daveti yok.',
@@ -9490,6 +9527,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'En pågående strid på Thornhollow-fälten behöver en kämpe. Acceptera för att gå med; den här matchen ändrar inte din rankning.',
     offerBackfillGone:
       'Den striden behöver inte längre en kämpe. Du behåller din plats i kön till Thornhollow-fälten.',
+    offerBackfillDeclined:
+      'Du tackar nej till den pågående striden och behåller din plats i kön till Thornhollow-fälten.',
     offerKeptPlace: 'Striden blev inte fulltalig. Du behåller din plats i kön till Törnhålefälten.',
     groupLeaveQueue: 'Din grupp lämnar kön till Törnhålefälten.',
     errNoOffer: 'Du har ingen inbjudan till Törnhålefälten att svara på.',
@@ -9531,6 +9570,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Một trận chiến đang diễn ra ở Cánh Đồng Thornhollow cần một chiến binh. Chấp nhận để tham gia; trận này sẽ không thay đổi thứ hạng của bạn.',
     offerBackfillGone:
       'Trận chiến đó không còn cần chiến binh nữa. Bạn vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
+    offerBackfillDeclined:
+      'Bạn từ chối trận chiến đang diễn ra và vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
     offerKeptPlace: 'Trận đấu không đủ người. Bạn vẫn giữ chỗ trong hàng chờ Cánh Đồng Thung Gai.',
     groupLeaveQueue: 'Nhóm của bạn rời hàng chờ Cánh Đồng Thung Gai.',
     errNoOffer: 'Bạn không có lời mời Cánh Đồng Thung Gai nào để trả lời.',
@@ -9573,6 +9614,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'En igangværende kamp på Thornhollow-sletterne mangler en kæmper. Accepter for at deltage; denne kamp ændrer ikke din rangering.',
     offerBackfillGone:
       'Den kamp mangler ikke længere en kæmper. Du beholder din plads i køen til Thornhollow-sletterne.',
+    offerBackfillDeclined:
+      'Du afviser den igangværende kamp og beholder din plads i køen til Thornhollow-sletterne.',
     offerKeptPlace: 'Kampen blev ikke fyldt. Du beholder din plads i køen til Tornehule Sletter.',
     groupLeaveQueue: 'Din gruppe forlader køen til Tornehule Sletter.',
     errNoOffer: 'Du har ingen invitation til Tornehule Sletter at svare på.',
@@ -10885,6 +10928,10 @@ const RULES: Rule[] = [
   {
     re: /^That battle no longer needs a fighter\. You keep your place in the Thornhollow Fields queue\.$/,
     build: () => tBg('offerBackfillGone'),
+  },
+  {
+    re: /^You decline the battle already under way, and keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerBackfillDeclined'),
   },
   {
     re: /^The battle did not fill\. You keep your place in the Thornhollow Fields queue\.$/,

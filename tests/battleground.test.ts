@@ -52,7 +52,11 @@ import {
   drainBgOutcomes,
   recordBgOutcome,
 } from '../src/sim/social/battleground_outcomes';
-import { BG_PROPOSAL_SECONDS, bgProposalFor } from '../src/sim/social/battleground_proposal';
+import {
+  BG_PROPOSAL_SECONDS,
+  bgProposalFor,
+  bgRequeueLockedUntil,
+} from '../src/sim/social/battleground_proposal';
 import { addThreat } from '../src/sim/threat';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -3426,6 +3430,105 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
       deserter,
     );
     expect(match.teams[team].length + match.teams[1 - team].length).toBeGreaterThan(0);
+  });
+
+  it('charges a DECLINE nothing, and never re-asks that match', () => {
+    // A queue pop charges a decline the lockout, because the fighter is
+    // refusing the thing they queued for. A backfill is not that thing: it is
+    // live, unrated, and carries a scoreline they had no part in. Charging the
+    // whole wait for saying no to a different offer teaches people to stop
+    // answering, and silence is already worse for the team.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const picky = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, picky)).toBeTruthy();
+
+    bgRespond(sim.ctx, false, picky);
+
+    expect(bgRequeueLockedUntil(sim.ctx, picky), 'no lockout for a decline').toBe(0);
+    expect(
+      sim.ctx.bgQueue.some((g) => g.pids.includes(picky)),
+      'and they keep their place in line',
+    ).toBe(true);
+
+    // The seat is still open, so the pass runs again: it must not ask the same
+    // person forever just because refusing was free.
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(bgProposalFor(sim.ctx, picky), 'this match does not ask them again').toBeNull();
+    expect(match.teams[0], 'and they were never seated').not.toContain(picky);
+  });
+
+  it('charges SILENCE the lockout, and reopens the seat for the next candidate', () => {
+    // The away player this whole prompt exists to catch. Unlike a decline, a
+    // lapse costs the lockout, or an idle client would be re-offered the seat
+    // every time it reopened and burn it indefinitely.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, away)).toBeTruthy();
+
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(bgRequeueLockedUntil(sim.ctx, away), 'silence costs the lockout').toBeGreaterThan(0);
+
+    // ...and the seat is genuinely back on offer after a LAPSE, not only after
+    // a decline, which was the arm with no coverage.
+    const next = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, next), 'the seat reopens for the next candidate').toBeTruthy();
+    bgRespond(sim.ctx, true, next);
+    expect(match.teams[0]).toContain(next);
+  });
+
+  it('gives a WHOLE premade no party seat for its backfill, and keeps them together', () => {
+    // The premade arms so far are partial (3+2). A team that queued as one
+    // whole five records no auto-added links at all, so the join has nothing to
+    // sweep and correctly refuses for capacity rather than inventing a group or
+    // evicting one of the five.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Cap');
+    tp(sim, leader, 0, -40);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    const five = [leader];
+    for (let i = 0; i < 4; i++) {
+      const m = sim.addPlayer('priest', `Mate${i}`);
+      tp(sim, m, 0, -40);
+      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      five.push(m);
+    }
+    for (let i = 0; i < 5; i++) {
+      const so = sim.addPlayer('rogue', `Sol${i}`);
+      tp(sim, so, 0, -40);
+      sim.entities.get(so)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(so);
+    }
+    sim.bgQueueJoin(leader);
+    // A whole five against five solos is the premade-vs-pugs shape the
+    // matchmaker deliberately holds back, so wait it out rather than fighting
+    // the fairness rule.
+    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 2) && !sim.bgMatchFor(leader); i++) {
+      sim.tick();
+      acceptAllBgOffers(sim);
+    }
+    const match = sim.bgMatchFor(leader)!;
+    expect(match, 'the arrangement needs a live match').toBeTruthy();
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+    expect(match.autoPartyPids[team], 'a whole premade records no auto links').toEqual([]);
+    toActive(sim, match);
+
+    const deserter = five[2];
+    bgResolveDesertion(sim.ctx, deserter);
+    const spare = queueSpare(sim);
+    sim.tick();
+    if (bgProposalFor(sim.ctx, spare)) bgRespond(sim.ctx, true, spare);
+
+    // The four who stayed still have their own group, with the deserter in it.
+    const party = sim.partyOf(leader)!;
+    expect(party.members, 'the friends are not broken up').toContain(deserter);
+    expect(party.members, 'and the backfill got no seat in their group').not.toContain(spare);
   });
 
   it('does not seat into a match that ENDED while the offer was open', () => {
