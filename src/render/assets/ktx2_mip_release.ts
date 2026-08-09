@@ -323,7 +323,9 @@ export function ktx2MipsRestored(): Promise<void> {
 
 /** Source bytes currently retained for restore (stashed plus armed/released),
  *  so the residency diagnostic can report the cost side of the mip release
- *  instead of silently under-counting (residency_budget.ts). */
+ *  instead of silently under-counting. The Renderer's build summary feeds
+ *  this in as a pre-counted ResidencySource (residency_budget.ts stays a
+ *  pure function of its sources argument). */
 export function ktx2RetainedSourceBytes(): number {
   let total = 0;
   for (const [, source] of pendingSources.entries()) total += source.byteLength;

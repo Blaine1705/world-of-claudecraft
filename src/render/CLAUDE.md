@@ -134,6 +134,9 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
+- **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
+  KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
+  its restore source drops on dispose, so a later re-upload renders black.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load

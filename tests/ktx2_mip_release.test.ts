@@ -519,15 +519,22 @@ describe('category policy', () => {
     expect(ktx2RetainedSourceBytes()).toBe(SOURCE_BYTES.length);
     simulateUpload(tex);
     expect(ktx2RetainedSourceBytes()).toBe(SOURCE_BYTES.length);
-    // And the residency table carries the cost as its own bucket, so the
-    // released mip chains (which truthfully read ~0) cannot present the
-    // release as free.
-    const buckets = residencyBudget([]);
+    // residencyBudget is a pure function of its sources argument: the caller
+    // (the Renderer's build summary, pinned below) feeds the retained bytes in
+    // as a pre-counted source, so the released mip chains (which truthfully
+    // read ~0) cannot present the release as free.
+    expect(residencyBudget([])).toEqual([]);
+    const buckets = residencyBudget([
+      { label: 'ktx2 restore sources', bytes: ktx2RetainedSourceBytes() },
+    ]);
     expect(buckets).toEqual([
       { category: 'ktx2 restore sources', bytes: SOURCE_BYTES.length, count: 1 },
     ]);
     tex.dispose();
     expect(ktx2RetainedSourceBytes()).toBe(0);
+    expect(
+      residencyBudget([{ label: 'ktx2 restore sources', bytes: ktx2RetainedSourceBytes() }]),
+    ).toEqual([]);
   });
 
   it('fails soft on partial GLTF shapes', () => {
@@ -554,6 +561,15 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
     const loaderSrc = read('src/render/assets/loader.ts');
     expect(loaderSrc).toContain('classifyGltfKtx2Textures(gltf, resolved)');
     expect(loaderSrc).toContain('dismissKtx2Source(tex)');
+  });
+
+  it("renderer.ts feeds the retained restore-source bytes into the residency table's sources", () => {
+    // residencyBudget is a pure function of its argument, so the cost side of
+    // the mip release shows up only if the one real caller passes it in.
+    const rendererSrc = read('src/render/renderer.ts');
+    const sources = between(rendererSrc, 'residencyBudget([', ']),');
+    expect(sources).toContain("label: 'ktx2 restore sources'");
+    expect(sources).toContain('bytes: ktx2RetainedSourceBytes()');
   });
 
   it('main.ts opts in and wires both recovery paths, at their load-bearing positions', () => {
