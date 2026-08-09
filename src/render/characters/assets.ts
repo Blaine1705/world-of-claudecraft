@@ -1639,9 +1639,9 @@ function applyLowReadabilityLift(
 function applyWeaponMaterialPolish(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
 ): void {
-  // Same guard as the tint step in tintedMaterial: a shader-derived clone on a
-  // weapon-tagged mesh has no color property.
-  if (mat.color) mat.color.lerp(weaponHighlight, 0.08);
+  // Colorless sources never reach here: tintedMaterial returns them unchanged
+  // before cloning, so every mat this helper sees carries a color.
+  mat.color.lerp(weaponHighlight, 0.08);
   const std = mat as THREE.MeshStandardMaterial;
   if (std.isMeshStandardMaterial) {
     std.roughness = Math.min(std.roughness, 0.55);
@@ -1678,6 +1678,13 @@ export function tintedMaterial(
   const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
   const cached = matCache.get(key);
   if (cached) return cached;
+
+  // A source with no color property (the weapon-skin fresnel shell's
+  // ShaderMaterial) has nothing this factory can tint, lift, or polish.
+  // Return it unchanged: cloning would detach the rig's live uniform handles
+  // (its per-frame uTime/uStr writes would land on a material nothing
+  // renders), and caching that clone would strand it forever.
+  if (!(src as THREE.MeshStandardMaterial).color) return src;
 
   const s = src as THREE.MeshStandardMaterial;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -1727,7 +1734,7 @@ export function tintedMaterial(
       });
     }
   }
-  if (tint !== null && mat.color) {
+  if (tint !== null) {
     // subtle pull toward the template color — hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
