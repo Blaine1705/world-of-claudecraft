@@ -1,5 +1,18 @@
 # Nythraxis: every spec, its BiS build, its rotation, and what the numbers say
 
+> **STALENESS (added 2026-08-09, review 3050):** measured at `94675f5a14`,
+> before the nerf rounds and re-bands that followed; see the marker in
+> `nythraxis-class-balance-monte-carlo.md`. Reproduce at any head with:
+> `node_modules/.bin/tsx tmp/mc/gear_tiers.ts <class>/` for each of the nine
+> classes (24 seeds x naked/fresh-20/BiS-epic over the reconciled
+> `tmp/mc/builds_noLegendary_<class>_.json` builds; ~15 min wall for all nine
+> in parallel). The full optimizer pipeline that CHOOSES gear and talents is
+> `tmp/mc/run_rev4_simple_table.sh` and costs hours; re-measuring held builds
+> is the everyday operation. NOTE: tmp/mc/ is deliberately untracked
+> (gitignored scratch); the harness plus reconciled builds are archived in
+> the maintainer replication bundle (woc-nythraxis-replication-20260807.zip)
+> and live on the measurement machine.
+
 Monte Carlo over all 28 class/spec/role combinations at level 20, best-in-slot,
 against the real `nythraxis_scourge_of_thornpeak` template. 24 combat seeds per
 spec per difficulty. Gear AND talents are chosen by measurement, not opinion: the

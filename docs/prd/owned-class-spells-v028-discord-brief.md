@@ -81,17 +81,14 @@ disagree.
 
 ## Responsive prototype access
 
-The prototype is implemented as a standalone static page at:
-
-`prototypes/talents-v028/index.html`
-
-It is committed with this design companion. Reviewers can check out the design branch or open the
-file from a class PR that includes the companion. It is not deployed to a public URL.
-
-To open it locally from the worktree root:
+The prototype was implemented as a standalone static page at
+`prototypes/talents-v028/index.html`. It was a design-phase artifact and was
+removed from the tree when the overhauls landed (review 3050); it was never
+deployed to a public URL. To open it now, restore it from git history:
 
 ```sh
-open prototypes/talents-v028/index.html
+git log --diff-filter=D --format=%H -- prototypes/talents-v028 | head -1
+git show <that-commit>^:prototypes/talents-v028/index.html > /tmp/talents-lab.html
 ```
 
 No dependency installation or game server is required. A single clickable link for Discord still

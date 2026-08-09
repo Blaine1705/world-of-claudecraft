@@ -1,8 +1,9 @@
 # Hunter, Shaman, and Priest v0.29.0 Spell Implementation Plan
 
-> Review companion: use the standalone
-> [Talents 2.0 class design lab](../../prototypes/talents-v028/index.html) for a mobile-first comparison
-> of all nine specializations. This document and the linked class PRDs remain authoritative.
+> Review companion: the standalone Talents 2.0 class design lab
+> (`prototypes/talents-v028/`) was a design-phase artifact and was removed from
+> the tree when the overhauls landed (review 3050); retrieve it from git
+> history if needed. This document and the linked class PRDs remain authoritative.
 
 Status: owner implementations complete; reconciliation and PBE validation pending
 Owner: Ryze

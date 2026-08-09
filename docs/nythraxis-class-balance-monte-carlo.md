@@ -1,5 +1,16 @@
 # Nythraxis: every spec, its BiS build, its rotation, and what the numbers say
 
+> **STALENESS (added 2026-08-09, review 3050):** every number below was
+> measured at `94675f5a14`, roughly 230 `src/sim/` commits behind the branch
+> head: BEFORE the executor nerf round (Destruction 259 to 208, Demonology
+> 245 to 215, Shadow 233 to 214), the rogue base re-band, the Balance
+> spell-power trim, and the v0.35/v0.36 release absorptions. Its 2.04x/4.94x
+> spreads describe THAT tree, not the branch as it lands; the current-head
+> gear-tier table and its spread live in the PR 3050 body, re-measured with
+> the same harness (`tmp/mc/gear_tiers.ts` per class over the reconciled
+> `builds_noLegendary_*.json`, 24 seeds). This document stays as the
+> methodology record and the round-by-round narrative.
+
 **Revision 3, 2026-08-06, measured at `integration/v031-class-overhauls` @ `94675f5a14`.**
 Revision 2 (2026-08-04, measured at `5f35bbeb44`) was written but never committed; this
 revision folds it in. Its numbers appear throughout as the comparison column and its raw

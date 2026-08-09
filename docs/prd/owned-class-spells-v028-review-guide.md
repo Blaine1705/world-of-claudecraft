@@ -13,9 +13,11 @@ spec-owned rotations and Talents 2.0 choices for the three classes owned by Ryze
 each specialization feel deliberate without creating a large mobile action bar or one sweeping
 gameplay PR.
 
-Use the standalone [Talents 2.0 class design lab](../../prototypes/talents-v028/index.html) to switch
+The standalone Talents 2.0 class design lab (`prototypes/talents-v028/`) let reviewers switch
 between all nine specializations, step through their proposed loops, inspect shared and exclusive
-actions, and build one choice from each talent row. The linked PRDs remain the source of truth.
+actions, and build one choice from each talent row. It was a design-phase artifact, removed from
+the tree when the overhauls landed (review 3050); retrieve it from git history if needed. The
+linked PRDs remain the source of truth.
 
 ## The nine identities
 
