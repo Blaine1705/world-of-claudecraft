@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GFX_BUCKET_BANDS, GFX_BUDGETS, gfxInternalsForTest } from '../src/render/gfx';
 import { type RenderBudgetCaps, RenderBudgetGovernor } from '../src/render/render_budget';
@@ -24,15 +25,15 @@ function activeRadius(baseRadius: number, minRadiusScale: number, quality: numbe
 }
 
 const GOVERNABLE_BUCKETS = ['grass', 'foliage', 'lighting', 'vfx'] as const;
-const NON_GOVERNABLE_BUCKETS = [
-  'props',
-  'materials',
-  'waterSky',
-  'worldStreaming',
-  'ui',
-  'characters',
-  'weapons',
-] as const;
+type BucketId = keyof typeof GFX_BUCKET_BANDS.low;
+// Derived from the live table, never enumerated: the phase 5 QA probe round
+// raised low's resolution band min above medium's and the old hand-written
+// list swept right past it, and a brand-new bucket would have dodged it the
+// same way. Everything that is not a governor-ladder bucket takes the
+// at-or-under sweep below.
+const NON_GOVERNABLE_BUCKETS = (Object.keys(GFX_BUCKET_BANDS.low) as BucketId[]).filter(
+  (bucket) => !(GOVERNABLE_BUCKETS as readonly string[]).includes(bucket),
+);
 
 describe('low tier stays monotonically lighter than medium', () => {
   const low = gfxInternalsForTest.settingsFor('low');
@@ -91,6 +92,59 @@ describe('low tier stays monotonically lighter than medium', () => {
       );
     },
   );
+
+  it('keeps the low and medium band tables on the same bucket set', () => {
+    // The derived sweep above can only see rows that exist in low's table; this
+    // equality closes the remaining dodge (a medium-only or low-only row).
+    expect(Object.keys(GFX_BUCKET_BANDS.low).sort()).toEqual(
+      Object.keys(GFX_BUCKET_BANDS.medium).sort(),
+    );
+  });
+
+  it('mirrors the foliage minRadiusScale constants it compares with', () => {
+    // The ring comparison above uses copies of foliage.ts's lush/lean floor
+    // scales; this pin binds the copies to the one real declaration so a
+    // foliage retune cannot silently de-sync them (found by the phase 5 QA).
+    const foliageSource = readFileSync(
+      new URL('../src/render/foliage.ts', import.meta.url),
+      'utf8',
+    );
+    const declaration = /const minRadiusScale = lush \? ([0-9.]+) : ([0-9.]+);/g;
+    const matches = [...foliageSource.matchAll(declaration)];
+    expect(matches).toHaveLength(1);
+    expect(Number(matches[0][1])).toBe(LUSH_MIN_RADIUS_SCALE);
+    expect(Number(matches[0][2])).toBe(LEAN_MIN_RADIUS_SCALE);
+  });
+
+  it('lets low shed render scale at least as far as medium on both hosts', () => {
+    // The render-scale analog of the quality-floor sweep: the governor's
+    // resolution rung floors at these budget values, not at the band row.
+    expect(GFX_BUDGETS.low.minRenderScaleDesktop).toBeLessThanOrEqual(
+      GFX_BUDGETS.medium.minRenderScaleDesktop,
+    );
+    expect(GFX_BUDGETS.low.minRenderScaleMobile).toBeLessThanOrEqual(
+      GFX_BUDGETS.medium.minRenderScaleMobile,
+    );
+    expect(GFX_BUDGETS.low.maxRenderScale).toBeLessThanOrEqual(GFX_BUDGETS.medium.maxRenderScale);
+  });
+
+  it('pins the retuned low caps as literals', () => {
+    // Mediums x 0.9 on per-row clean grains (the derivation recorded in the
+    // phase 5 ledger). The inequalities above allow silent drift like 380 to
+    // 395; this mirrors the literal pins the ultra suite keeps for high/ultra.
+    expect(lowCaps).toEqual({
+      targetCalls: 380,
+      urgentCalls: 560,
+      targetTriangles: 1_600_000,
+      urgentTriangles: 2_350_000,
+      targetGrassTufts: 3_400,
+      urgentGrassTufts: 4_900,
+      minGrassLevel: 0.5,
+      minFoliageLevel: 0.5,
+      minVfxLevel: 0.58,
+      minLightingLevel: 0.45,
+    });
+  });
 
   it('keeps every render budget cap at or under medium', () => {
     expect(lowCaps.targetCalls).toBeLessThan(mediumCaps.targetCalls);
