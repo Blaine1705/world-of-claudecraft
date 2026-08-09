@@ -220,7 +220,7 @@ export const TARGETS = [
       const staged = await page.evaluate(() => {
         const game = window.__game;
         const sim = game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         if (!sim.bgMatchFor(sim.player.id)) {
           const classes = [
             'warrior',
@@ -424,9 +424,7 @@ export const TARGETS = [
           document.querySelector('.gpu-notice-dismiss')?.click();
           const el = document.querySelector('#banner');
           return (
-            el !== null &&
-            el.classList.contains('banner-skill') &&
-            Number(getComputedStyle(el).opacity) > 0.95
+            el?.classList.contains('banner-skill') && Number(getComputedStyle(el).opacity) > 0.95
           );
         });
         if (visible) break;
@@ -775,6 +773,164 @@ export const TARGETS = [
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
       return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'weapon-vfx-shed',
+    label: 'Weapon-skin VFX fade with wearer distance (a legendary skin worn by another player)',
+    when: ['render/weapon_vfx', 'render/characters/visual.ts'],
+    variants: [
+      // Inside the full-strength band the pair must be IDENTICAL in rig
+      // strength: that is the fairness half of the shed's contract.
+      { key: 'near-12yd-desktop', charClass: 'warrior', charName: 'Thorgar', wearerDist: 12 },
+      // Past the ease-in knee and still well inside the articulated-rig band
+      // on every tier (58yd at this crowd size), so the fade is unmistakable
+      // while the rig on screen is the real one, not the baked far mesh.
+      { key: 'far-52yd-desktop', charClass: 'warrior', charName: 'Thorgar', wearerDist: 52 },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Stage: a second offline player wearing the legendary solheim_sword
+      // skin (the loudest shipped rig, so the fade is legible at range), stood
+      // a fixed distance along the entry camera's own facing (so no camera
+      // steering is needed), on open ground east of town where the sightline
+      // is clear. The skin id is written directly: it is the display-only
+      // cosmetic the render diff applies; ownership and loadout resolution
+      // are sim-side concerns a staged dummy has no business exercising.
+      const staged = await page.evaluate((shot) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        if (typeof sim.addPlayer !== 'function')
+          return { ok: false, reason: 'sim.addPlayer is unavailable offline' };
+        // Flattest dry stretch with a clear 55yd sightline along the entry
+        // facing (probed against the fixed-seed terrain: relief under a yard).
+        player.pos.x = 100;
+        player.pos.z = -80;
+        const wearerId = sim.addPlayer('warrior', 'Frostbearer', { autoEquip: true });
+        const w = sim.entities.get(wearerId);
+        if (!w) return { ok: false, reason: 'wearer entity missing after addPlayer' };
+        const ray = player.facing + 0.1; // nudged off-axis so the local rig cannot occlude
+        w.pos.x = player.pos.x + Math.sin(ray) * shot.wearerDist;
+        w.pos.z = player.pos.z + Math.cos(ray) * shot.wearerDist;
+        w.pos.y = player.pos.y;
+        if (w.prevPos) {
+          w.prevPos.x = w.pos.x;
+          w.prevPos.y = w.pos.y;
+          w.prevPos.z = w.pos.z;
+        }
+        // Face the wearer at the camera so the skinned blade reads, computed
+        // explicitly in the sim's forward = (sin f, cos f) convention.
+        w.facing = Math.atan2(player.pos.x - w.pos.x, player.pos.z - w.pos.z);
+        w.weaponSkinId = 'solheim_sword';
+        sim.rebucket?.(w);
+        // The stage sits in the open world, so wandering hostiles walk through
+        // the frame and aggro the pair mid-shot (a bandit occluding the wearer,
+        // FCT over the local player). Relocate every mob near the sightline;
+        // the re-home mirrors the stun-stars idiom, just pointed away.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.hp = player.maxHp;
+        game.input.camDist = shot.wearerDist > 25 ? 8 : 6.5;
+        return { ok: true, wearerId };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+      // The skin apply rides the deferred per-frame queue; hold until the
+      // wearer's view carries it, AND until the VFX rig itself exists: the
+      // skin model arrives over an async GLB load, so the blade can be on
+      // screen seconds before the rig (light, motes, aurora) is built, and a
+      // shutter in that gap captures a bare blade on both sides of a pair.
+      await page.waitForFunction(
+        (id) => window.__game?.renderer?.views?.get(id)?.weaponSkinId === 'solheim_sword',
+        { timeout: 30000, polling: 250 },
+        staged.wearerId,
+      );
+      await page.waitForFunction(
+        (id) => (window.__game?.renderer?.views?.get(id)?.visual?.weaponVfx?.length ?? 0) > 0,
+        { timeout: 45000, polling: 400 },
+        staged.wearerId,
+      );
+      await wait(1800);
+      // The frame-budget governor's vfx bucket also feeds the fade. A
+      // software-GL host can sit shedding after entry, which would taint the
+      // pair with dim that is NOT the distance arm; hold the shutter until
+      // the applied level reads 1 so distance is the only live input. On a
+      // host where the governor never settles (swiftshader at full size),
+      // run the capture with GAME_URL=...?governor=off, the sanctioned
+      // debug override (gfx.ts shouldUseAutoGovernor), which pins every
+      // bucket at 1 and leaves distance as the only input by construction.
+      let calm = false;
+      for (let poll = 0; poll < 40 && !calm; poll++) {
+        calm = await page.evaluate(
+          () => (window.__game?.renderer?.appliedBudgetLevels?.vfx ?? 1) >= 1,
+        );
+        if (!calm) await wait(500);
+      }
+      if (!calm)
+        throw new Error('frame-budget governor never settled; the pair would overstate the fade');
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Companion crop around the wearer: at range the full frame leaves the
+      // rig a few dozen pixels tall, and the pair is about the rig.
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 1.8) * 0.6;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, staged.wearerId);
+      if (spot) {
+        const box = variant.wearerDist > 25 ? { w: 320, h: 360 } : { w: 560, h: 560 };
+        const width = Math.min(box.w, spot.w);
+        const height = Math.min(box.h, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/weapon-vfx-shed-${variant.key}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
     },
   },
   {
@@ -1175,6 +1331,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'inventory-sort',
+    label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
+    when: ['sim/inventory_sort', 'ui/bags_window'],
+    // A deliberately messy bag (scattered partial stacks of the same material,
+    // fine grades split from their base, gear and trash interleaved), then the
+    // REAL Sort button press. On a base checkout the button does not exist and
+    // the click is skipped, so the same recipe shoots the honest BEFORE state.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.values?.().next?.()?.value;
+        const scramble = [
+          { itemId: 'copper_ore', count: 12 },
+          { itemId: 'baked_bread', count: 3 },
+          { itemId: 'copper_ore', count: 7 },
+          { itemId: 'fine_copper_ore', count: 4 },
+          { itemId: 'silverleaf_herb', count: 9 },
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'fine_silverleaf_herb', count: 2 },
+          { itemId: 'silverleaf_herb', count: 6 },
+        ];
+        if (meta) for (const s of scramble) meta.inventory.push({ ...s });
+        for (const id of ['eastbrook_arming_sword', 'cryptbone_helm', 'minor_healing_potion']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      await page.evaluate(() => {
+        document.querySelector('button.bag-sort-btn')?.click();
+      });
+      // Past the settle ripple (160ms + capped stagger) so the shot is stable.
+      await wait(900);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
@@ -1248,8 +1446,14 @@ export const TARGETS = [
   },
   {
     key: 'bank-instance-marks',
-    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
-    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
+    when: [
+      'ui/bank_window',
+      'ui/guild_bank_window',
+      'ui/item_instance_glyph_mark',
+      'ui/bag_fine_mark',
+      'ui/bag_corner_mark',
+    ],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
@@ -1258,7 +1462,9 @@ export const TARGETS = [
         // One copy per corner-mark kind plus a plain control stack, so the
         // vault shows the masterwork seal and the enchanted / signed / bound
         // glyphs beside an unmarked cell. The personal bank has no transfer
-        // lock, so every copy deposits.
+        // lock, so every copy deposits. A fine grade beside its base material
+        // shows the fine rim/wash/seal surviving deposit against the unmarked
+        // base stack (the bags `inventory` target's contrast idiom).
         try {
           sim?.addItemInstance?.('worn_sword', {
             signer: 'Thorgar',
@@ -1270,6 +1476,8 @@ export const TARGETS = [
           // so a quest-flagged fixture would silently drop the bound cell.
           sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
           sim?.addItem?.('baked_bread', 3);
+          sim?.addItem?.('copper_ore', 2);
+          sim?.addItem?.('fine_copper_ore', 2);
         } catch {}
         // Stand beside the banker so the proximity-gated bank snapshot is
         // live (bankInfo is null out of reach; the bank-chips recipe idiom).
@@ -1299,8 +1507,10 @@ export const TARGETS = [
           if (idx < 0) break;
           world.bankDeposit(idx);
         }
-        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
-        if (plain >= 0) world.bankDeposit(plain);
+        for (const id of ['baked_bread', 'copper_ore', 'fine_copper_ore']) {
+          const at = world.inventory.findIndex((s) => s?.itemId === id);
+          if (at >= 0) world.bankDeposit(at);
+        }
       });
       // Poll for the deposited cells, not the marks: the same recipe shoots
       // the BEFORE tree, where the bank paints no corner mark at all.
@@ -1347,8 +1557,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('tidewrought_fishing_rod')) ||
-            (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+            bg?.includes('tidewrought_fishing_rod') ||
+            img?.getAttribute('src')?.includes('tidewrought_fishing_rod')
           );
         });
         if (!el) return;
@@ -1405,8 +1615,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('silverleaf_healing_draught')) ||
-            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+            bg?.includes('silverleaf_healing_draught') ||
+            img?.getAttribute('src')?.includes('silverleaf_healing_draught')
           );
         });
         if (!el) return;
@@ -1482,10 +1692,7 @@ export const TARGETS = [
         const el = cells.find((c) => {
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
-          return (
-            (bg && bg.includes('rough_hide')) ||
-            (img && img.getAttribute('src')?.includes('rough_hide'))
-          );
+          return bg?.includes('rough_hide') || img?.getAttribute('src')?.includes('rough_hide');
         });
         if (!el) return;
         const r = el.getBoundingClientRect();
@@ -1545,8 +1752,8 @@ export const TARGETS = [
           const img = c.querySelector?.('img');
           const aria = c.getAttribute?.('aria-label') ?? '';
           return (
-            (bg && bg.includes('elixir_of_the_boar')) ||
-            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            bg?.includes('elixir_of_the_boar') ||
+            img?.getAttribute('src')?.includes('elixir_of_the_boar') ||
             aria.startsWith('Elixir of the Boar')
           );
         });
@@ -3471,11 +3678,17 @@ export const TARGETS = [
   },
   {
     key: 'hunter-quiver-paperdoll',
-    label: 'Hunter paperdoll with a quiver in the off-hand',
+    label: 'Hunter paperdoll: a two-hander and a quiver worn together',
     // Quivers are the first items that put anything in a hunter's off-hand, so
     // the paperdoll is the view that shows the change. Keyed on the quiver
     // records themselves rather than a ui/ path: the diff is content-only.
-    when: ['content/zone3', 'content/items'],
+    //
+    // The recipe equips a TWO-HANDER before the quiver on purpose. A quiver on
+    // its own paints the same paperdoll either way, so it cannot show the
+    // two-hand exclusion: on the base tree the quiver benches the greatblade and
+    // the main hand shoots up EMPTY, which is the reported bug. Both slots
+    // filled is the fix.
+    when: ['content/zone3', 'content/items', 'equipment_rules', 'item_budget'],
     variants: [
       { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
       { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
@@ -3494,11 +3707,18 @@ export const TARGETS = [
           'cragmaw_huntquiver',
           'gravewyrm_bone_quiver',
           'direfang_quiver',
+          'direfang_greatblade',
         ]) {
           try {
             sim?.addItem(id, 1);
           } catch {}
         }
+        // Two-hander FIRST, then the quiver: this is the exact order a player
+        // hits the bug in, and the order that leaves the main hand empty on the
+        // base tree.
+        try {
+          sim?.equipItem('direfang_greatblade');
+        } catch {}
         try {
           sim?.equipItem('direfang_quiver');
         } catch {}
@@ -7938,6 +8158,51 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
       return {};
+    },
+  },
+  {
+    key: 'wiki-launcher',
+    label: 'Wiki launcher: micro-bar button, Esc game-menu row, confirm dialog, mobile More tray',
+    when: ['ui/wiki_link'],
+    variants: [
+      { key: 'microbar' },
+      { key: 'game-menu' },
+      { key: 'confirm' },
+      { key: 'more-tray', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.key ?? 'microbar';
+      if (scene === 'microbar') {
+        const ready = await pollForSize(page, '#side-buttons');
+        if (!ready) return { skip: 'the micro-button bar never became visible' };
+        return { clip: '#side-buttons' };
+      }
+      if (scene === 'game-menu') {
+        await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+        const ready = await pollForSize(page, '#options-menu');
+        if (!ready) return { skip: 'the game menu never became visible' };
+        return { clip: '#options-menu' };
+      }
+      if (scene === 'confirm') {
+        // Guarded so a BEFORE capture on the base build (no hud.openWiki yet)
+        // skips cleanly instead of throwing.
+        const opened = await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          if (!hud?.openWiki) return { ok: false, reason: 'hud.openWiki is not present' };
+          hud.openWiki();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#confirm-dialog');
+        if (!ready) return { skip: 'the wiki confirm dialog never became visible' };
+        return { clip: '#confirm-dialog' };
+      }
+      // more-tray (mobile): open the tray through the real More button handler,
+      // the same path a player taps, so the shot proves the binding is live.
+      await page.evaluate(() => document.getElementById('mobile-more')?.click());
+      const ready = await pollForSize(page, '#mobile-extra-controls');
+      if (!ready) return { skip: 'the mobile More tray never opened' };
+      return { clip: '#mobile-extra-controls' };
     },
   },
 ];

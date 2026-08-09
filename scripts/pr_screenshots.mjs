@@ -87,6 +87,12 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 1600, height: 900 },
 });
 
+// Under swiftshader the class cards get their box only after the procedural
+// icons software-render, and the world boot takes correspondingly longer; the
+// entry helper's defaults are tuned for a GPU host and time out here (its own
+// header says so). One shared override for every entry below.
+const ENTRY_OPTS = { settleMs: 3000, selectorTimeoutMs: 60000, gameBootTimeoutMs: 60000 };
+
 // One guarded shot: a failure in one frame must not lose the others, so the run always
 // keeps whatever it managed to capture. `clip` is an optional CSS selector; when given
 // and found, the shot is cropped to that element (plus a small margin) instead of full frame.
@@ -178,8 +184,7 @@ async function shootSpecific(targets) {
             await enterOfflineGame(page, {
               charClass: variant.charClass,
               charName: variant.charName,
-              settleMs: 3000,
-              selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT,
+              ...ENTRY_OPTS,
             });
         } else if (!page) {
           page = await browser.newPage();
@@ -190,8 +195,7 @@ async function shootSpecific(targets) {
           await enterOfflineGame(page, {
             charClass: 'warrior',
             charName: 'Thorgar',
-            settleMs: 3000,
-            selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT,
+            ...ENTRY_OPTS,
           });
         }
         const region = await t.capture(page, variant);
@@ -220,12 +224,7 @@ async function shootGenericHud(frames) {
     watch(page, 'desktop');
     await suppressGpuNotice(page);
     await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
-    await enterOfflineGame(page, {
-      charClass: 'warrior',
-      charName: 'Thorgar',
-      settleMs: 3000,
-      selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT,
-    });
+    await enterOfflineGame(page, { charClass: 'warrior', charName: 'Thorgar', ...ENTRY_OPTS });
     await shoot(page, `${next()}-hud-desktop`);
     await page.close();
   }
@@ -244,12 +243,7 @@ async function shootGenericHud(frames) {
       });
       await mobile.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
       await mobile.evaluate(() => document.body.classList.add('mobile-touch'));
-      await enterOfflineGame(mobile, {
-        charClass: 'mage',
-        charName: 'Aldwin',
-        settleMs: 3000,
-        selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT,
-      });
+      await enterOfflineGame(mobile, { charClass: 'mage', charName: 'Aldwin', ...ENTRY_OPTS });
       await shoot(mobile, `${next()}-hud-mobile`);
       await mobile.close();
     } catch (e) {
