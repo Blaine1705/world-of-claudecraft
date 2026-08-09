@@ -17,11 +17,15 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 //    a deliberate re-audit of prewarmProgramContentKeys (the same bump-means-
 //    re-verify policy src/render/CLAUDE.md applies to patched shader chunks).
 //
-// 2. The repo adopts a feature the key deliberately does not cover. Today
-//    that is BatchedMesh (its batchingColor bit) and Points-with-uv
-//    (pointsUvs); both can only arrive through CODE, so the source scan
-//    below fails the moment one is constructed under src/render, naming the
-//    key to extend first.
+// 2. The repo adopts a feature the key deliberately does not cover. For
+//    BatchedMesh (its batchingColor bit) the source scan below fails the
+//    moment one is constructed under src/render, naming the key to extend
+//    first. Points-with-uv (pointsUvs) has NO tripwire here on purpose:
+//    Points are already constructed in several src/render files and land on
+//    the compile path today, so a construction grep cannot discriminate; the
+//    bit only flips for a uv-mapped TEXTURED Points, which no cheap static
+//    scan can see. It stays comment-only in the key's doc, covered at
+//    runtime by the same first-draw link it always was.
 
 const THREE_PROGRAM_PARAMETERS = [
   'shaderID',

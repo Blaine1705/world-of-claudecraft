@@ -49,8 +49,12 @@ export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primi
  * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
  * once WebGL enters the driver, so omit them to preserve the entry hard limit.
  * world.settle-state joins them: its lazy world builds (and a woken water
- * height-field's real submits) have no internal deadline, and on this profile
- * every collection it would align is itself skipped, so it buys nothing. */
+ * height-field's real submits) have no internal deadline on a profile whose
+ * whole point is bounded main-thread slices. The cost of skipping it is that
+ * textures.scene (which still runs here) collects against pre-settle state,
+ * an accepted residual misalignment: this profile also skips the compile
+ * monolith and the initial frame, the two consumers the alignment mostly
+ * serves. */
 export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
   'world.settle-state',
   'world.initial-frame',
