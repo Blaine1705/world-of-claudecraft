@@ -27,6 +27,19 @@ the flair broadcast path (server periodic per-player flair stamp); server/
 character_sheet.ts SHEET_RECENT_DEEDS/deedsRecent (the deeds recent-5 sheet pattern) +
 server/profile_page.ts; Phase 19's activeBorder facet surface. Return: the inspect
 payload shape, the flair pipeline recipe, the sheet recent pattern.
+NOTE (Phase 19 QA sync 4e6092128b, premises shifted not broken): the sheet rank read
+now serves through the release's NEW server/character_rank_cache.ts (30s keyed cache,
+wired via configureLifetimeXpRankCache in server/db.ts, moderation-busted via
+bustAllLifetimeXpRankCache in main.ts bustBoardCaches), so "cache behavior unchanged"
+(STEP 2 tests) and "no new uncached viewer-identical read" (acceptance criterion) now
+mean PRESERVING that cached behavior; any new SHEET_RECENT_RELICS read follows that
+house pattern (including test resets/busts). SocialService guild-roster reads (the flair
+audience path, incl. the branch's broadcastToEarnerAudience) are now 4s TTL cached in
+server/guild_roster_cache.ts (guildMembersFresh is the uncached escape hatch, guild-bank
+carrier only). And the shareable player card's layout moved to
+src/ui/hud/player_card/card_layout.ts (#3125 reflow): a Curator sigil mirrored onto the
+shareable card must target that layout module, not inline constants (the click-inspect
+card in inspect_view.ts is untouched by the release and still models three flair slots).
 
 STEP 2 - EXECUTE (two agents: wire+inspect, sheet+docs):
 

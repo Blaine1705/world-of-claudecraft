@@ -2148,3 +2148,90 @@ owns the push.
   fairness doc.
 - LOCAL ONLY per the runner prompt: committed, never pushed; Phase 19 QA
   owns the push after its PASS.
+
+## Phase 19 QA (2026-08-09): Verify borders in-world (PASS-WITH-FOLLOWUPS)
+
+- Step 0: pre-flight found HEAD at e25f5608ca clean, but the base had moved
+  a FOURTH time during Phase 19 (origin/release/v0.36.0 2a10e0f621 ->
+  5819c005a7: the gate-perf CI batch, warrior intervene + fear DR, the
+  cc-band family, bg queue confirm + talent respec, three anim clips,
+  admin/guild cache perf, the shareable-card reflow). Merged it as
+  4e6092128b: conflicts were the two parity goldens both sides re-recorded
+  (release side taken, reminted at 91c3c8e1bc on the merged tree; the diff
+  moves exactly the reliquary block returning plus the state hashes the
+  warrior/fear work shifted), generated pending.ts (regenerated via
+  i18n:build), and four count pins each side had bumped alone. The pins
+  were resolved by RUNNING the suites, never by diff arithmetic: commands
+  194 send / 207 dispatch (deed_set_border plus bg_respond), hud drives
+  window 46 / chrome 76 / none 16 and module 24, IWorld 313 (82 data / 231
+  methods, bgRespond joining), ALL_DELTA_KEYS 85 (the release's 16 static
+  combat scalars plus reliq and aborder). Full parity suite green post-remint.
+- Release-merge audit (5 legs + adversarial verify, 13 agents): CLEAN on
+  every code mechanism. All 9 both-sides-changed core files are a perfect
+  textual union (tsc 0, parity 326/326, sim 52/52); the four hand-resolved
+  count pins keep both sides and run green; no legacy-arm divergence, no new
+  db-mock export gap, i18n overlap kept both sides' keys and did not
+  resurrect the dropped stale fills. Only doc-staleness findings surfaced,
+  all corrected in this record (the state.md Guards parity anchor to
+  313/82/231 naming the sync's bgRespond, the header and line-270 sync
+  references, the Phase 19 ledger totals, the phase-20 cache-seam pointers,
+  and the "nine keys" -> eight correction).
+- Step 1: one Explore agent mapped the four feat commits' authority, perf,
+  parity, fairness, visual, and test surfaces with acceptance-criterion
+  cross-checks.
+- Step 2: eight fresh reviewers/legs in parallel (authority exploit,
+  architecture, cross-platform-sync, frontend-seam, perf, qa-checklist,
+  parity, plus the release-merge workflow), prompted for coverage. ZERO
+  blocking across all. Authority proved all 8 exploit paths fail closed
+  server-side and mutation-proved three of them decisive against a mutated
+  dispatch. Perf re-confirmed nameplates are not re-implicated (+31 canvas
+  ops per bordered plate, bounded/constant, no allocation, no raster, no
+  layer, no new timer). Parity confirmed offline/online identity, reconnect,
+  and old-save null-safety, running the pinned suites (688 tests).
+- Step 3 fixes (one latent code defect, the rest hardening; all mutation-
+  checked, restored by editing back on the shared tree):
+  - grantDeed (src/sim/deeds.ts) gained the Object.hasOwn(DEEDS, deedId)
+    guard the two cosmetic setters already carry. Without it a prototype
+    key resolved def = Object.prototype (truthy, past `!def`), then ran
+    `renown += undefined` (NaN, and it seeds the SQL sort index) and added
+    a non-string legacy value to unlockedMilestones. Latent (no caller
+    passes a non-content id today), fixed at the source with a decisive
+    test; recomputeRenown given the same guard for module consistency; the
+    setActiveTitle hasOwn comment trued up (the reward-kind check already
+    refuses a bare prototype key, so the guard's real value is against
+    Object.prototype pollution introduced elsewhere).
+  - Pinned the Sim.activeBorder getter VALUE (a getter wired to
+    primary.activeTitle passed every field-level assertion; distinct ids
+    make it decisive), mutation-checked both directions.
+  - Three CSS/TS fairness-decisiveness hardenings in
+    tests/deed_border_accent.test.ts: the level-chip (z-index 3) and
+    combat-flash (z-index 4) siblings pinned in the ordering test; a
+    negative scan for any data-fx-level selector targeting the ring
+    (nesting-robust); a windowed tier-token scan around the two hud.ts
+    borderSlug assignments (the ACCENT_PATH scan cannot include hud.ts).
+    Both new guards verified non-vacuous against synthetic regressions.
+  - paintPortraitBorder now gates the data-border attribute on the palette:
+    a drifted/uncolorable slug writes '' (not the raw slug), so the CSS
+    :not([data-border=""]) gate stays closed and no transparent ::after box
+    paints, matching the nameplate's borderless early-return.
+  - Object.freeze on the BORDER_ACCENTS records (Readonly is compile-time
+    only; both surfaces hand the same record to canvas + CSS, so a stray
+    runtime write would silently repaint every plate and ring of that slug).
+  - Permanent authority pins in tests/snapshots.test.ts: the redirect path
+    (no message field can retarget the write off session.pid, safe today
+    only by a single binding), object/array/boolean/absent payload shapes
+    via the real dispatch, the cosmetic drop-cause metric on a bucket
+    refusal, and the broadened no-sprite pin cycling all four slugs. Plus
+    the col_reliquary_rank_5 earn-and-wear arm the acceptance criterion
+    names. A comment ceiling added on BORDER_ACCENT_PAD_TOP vs the marker
+    row geometry.
+  - Fresh fix-round review (test-coverage-auditor + a code reviewer):
+    see the verdicts below.
+- Deferred should-fix: the character-sheet worn-badge staleness (recorded
+  in state.md, routed to Phase 20; pre-existing title-line pattern, live
+  surfaces show truth, correct fix needs a signature-driven cold-window
+  refresh). Release-side observations recorded for the maintainer (the
+  jailed bg_respond cage-escape from PR #3127, the stale copper comment,
+  the 30/s identity-amplification through other identityFields commands).
+- Gate: TURBO_FORCE=1 node scripts/gate_select.mjs on the committed tree
+  (see the final record line for the tip and result).

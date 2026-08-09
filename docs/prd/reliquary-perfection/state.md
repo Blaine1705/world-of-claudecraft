@@ -1,23 +1,28 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 19 COMPLETE, GATED, LOCAL (2026-08-09, tip c41d83a896;
-sync merge 76e4abb05d brought release tip 2a10e0f621; Phase 19 QA owns
-the push). Previous: 18 QA COMPLETE, PASS, PUSHED (2026-08-08). The rewards
-ladder is verified: six fresh phase reviewers plus a fix-round reviewer
-and two verification subagents; the one BLOCKING coverage gap (both
-retroFallbackGrants calls were deletable-green at the real join seam)
-closed with mutation-checked pins; three behavioral hardenings (the
-fail-closed ladder dispatch, the marks restore guard that closed a
-reachable 500 on the public character-sheet route, the pairing-table
-export), thirteen new tests, stale docblocks corrected, and the
-maintainer records extended (portal deploy ordering + the
-ACH_RELIQUARY_COMPLETE hold, the real Discord card payload, the border
-class widening, the mount re-acquisition gap). Base re-synced through
-the PR 3162 merge (release-merge-audit clean); gate PASS all 8 steps
-(full suite 33469 in-gate, browser 111). Full record in progress.md
-"Phase 18 QA". Next: Phase 19 (borders in-world: nameplates +
-portraits; fresh session, phase-19-borders-inworld.md; sync
-origin/release/v0.36.0 at Step 0).
+Current phase: 19 QA COMPLETE, PASS-WITH-FOLLOWUPS (2026-08-09). The
+QA-start sync 4e6092128b brought release tip 5819c005a7 (the base moved a
+FOURTH time during Phase 19: 2a10e0f621 -> 5819c005a7, the gate-perf CI
+batch, warrior intervene + fear DR, cc-band family, bg queue confirm,
+three anim clips, admin/guild cache perf); the two conflicted parity
+goldens were reminted at 91c3c8e1bc and the four count pins hand-resolved
+(commands 194/207, hud drives 46/76/16 + module 24, IWorld 313/82/231,
+delta keys 85), all suite-verified. Release-merge-audit clean on
+mechanisms (13 agents, adversarially verified); only doc-staleness
+findings, all corrected here. Eight fresh reviewers/legs ran (authority,
+arch, xplat, front, perf, qa, parity, plus the release-merge audit): ZERO
+blocking. Fix round: grantDeed prototype-key hardening (the one latent
+code defect, renown += undefined = NaN feeding the SQL sort index) with a
+mutation-checked pin, the Sim.activeBorder getter-value pin, three CSS/TS
+fairness-decisiveness hardenings, the paintPortraitBorder borderless-
+contract fix, Object.freeze on the palette records, and permanent
+authority pins (redirect path, hostile shapes, guard drop-metric) + the
+col_reliquary_rank_5 earn-and-wear arm. Deferred should-fix: the
+character-sheet worn-badge staleness (a pre-existing title-line pattern
+extended to borders; live surfaces show truth; needs a signature-driven
+cold-window refresh = Phase 20). Full record in progress.md "Phase 19 QA".
+Next: Phase 20 (inspect + social surfaces; fresh session,
+phase-20-inspect-social.md; sync origin/release/v0.36.0 at Step 0).
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
@@ -95,11 +100,12 @@ Update this line as phases complete.
   deed_chat_line.ts (clickable chat), deed tracker painter + #deed-tracker, deed_i18n.ts
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
 - Guards: tests/architecture.test.ts (UI_PURE_CORES x3 lists), tests/
-  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (312/82/230 since
-  Phase 19 added activeBorder plus its setter to the deeds facet; 310/81/229
-  was the Phase 17 reliquaryObtainCounts state, 309/80/229 the Phase 16 QA
-  state; the v0.36.0 sync at 76e4abb05d added no members, the release's
-  saveLoadout change is a trailing parameter),
+  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (313/82/231 at the
+  Phase 19 QA tip: Phase 19 added activeBorder + setActiveBorder to the deeds
+  facet for 312/82/230, then the QA-start sync 4e6092128b added the release's
+  bgRespond method for 313/82/231; 310/81/229 was the Phase 17
+  reliquaryObtainCounts state, 309/80/229 the Phase 16 QA state; run the suite
+  for the truth, never reconcile these by arithmetic),
   tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
 
 ## Surfaces added by this packet (append per phase as they land)
@@ -267,7 +273,10 @@ Update this line as phases complete.
   budget them as expected reds. RESOLVED at the Phase 15 QA sync (PR 3111):
   tests/anim_pipeline_hunter_ghost.test.ts is green (its anchor
   player_hunter: swims({ resolves in src/render/characters/manifest.ts).
-  No inherited red is budgeted at the v0.36.0 tip as of sync 76e4abb05d.
+  No inherited red is budgeted at the v0.36.0 tip as of the Phase 19 QA
+  sync 4e6092128b (release tip 5819c005a7); the release tip's own two red
+  checks are release-owned (Release version gate + Release i18n 21-locale
+  fill), not suites this gate runs.
   Release-fill native-pass notes (join the ru retro note): ja colon conventions
   split (deed dungeon-heroics ASCII vs delve-heroics full-width; deedsRetroSummary
   ASCII vs reliquaryRetroSummary full-width); cs/pl plural few leaves carry the
@@ -676,11 +685,16 @@ Update this line as phases complete.
   blankEntity init null); setActiveBorder in src/sim/deeds.ts, the exact
   setActiveTitle sibling (earned + reward.kind border + silent no-op;
   meta and entity written together; both cosmetic validators hasOwn-guarded
-  against prototype keys). Facet: IWorldDeeds.activeBorder +
-  setActiveBorder both worlds (IWORLD_MEMBERS 310 to 312); command
-  deed_set_border (COMMAND_NAMES appended, 193 send / 206 dispatch); wire:
-  entity key `border` on identityFields (emit when non-null, full-record
-  reset semantics), self echo `aborder` per-tick diffed (ALL_DELTA_KEYS 69).
+  against prototype keys; grantDeed + recomputeRenown given the same guard
+  at Phase 19 QA, closing a latent NaN-renown path). Facet:
+  IWorldDeeds.activeBorder + setActiveBorder both worlds (IWORLD_MEMBERS 310
+  to 312 at landing; the QA-start sync added bgRespond, so the merged tip is
+  313/82/231); command deed_set_border (COMMAND_NAMES appended, 193/206 at
+  landing, 194/207 after the sync added bg_respond); wire: entity key
+  `border` on identityFields (emit when non-null, full-record reset
+  semantics), self echo `aborder` per-tick diffed (ALL_DELTA_KEYS 69 at
+  landing, 85 after the sync moved 16 static combat scalars behind the same
+  delta gate).
   server/cosmetic_op_guard.ts: ONE shared per-session token bucket (burst
   10, refill 1/s) consumed by BOTH deed_set_title and deed_set_border,
   closing the identity-rewire amplification a toggling client could buy
@@ -721,9 +735,13 @@ Update this line as phases complete.
   border bridge wins by LADDER order, pinned both directions), overview
   uses >=, banner uses ===. index.html AND play.html carry the two
   portrait-wrap ids (pinned in both entries; an index-only edit ships a
-  ring online players never see). Nine new hudChrome keys with five
-  non-Latin fills each (M16); guide bookBody/rewardsBody trued up (the 13
-  stale Latin rewardsBody fills DROPPED to pending per the reword rule).
+  ring online players never see). EIGHT new hudChrome keys (borderChip,
+  cosmeticsSection, bordersSection, bordersNone, bordersEmpty,
+  unlockedBorderHint, charBorderWorn, reliquary.borderWearableNote) with
+  five non-Latin fills each (M16); bordersAria was drafted then deleted as
+  unrendered, so an earlier "nine" count is off by that dropped key. Guide
+  bookBody/rewardsBody trued up (the 13 stale Latin rewardsBody fills
+  DROPPED to pending per the reword rule).
   Party/tot/pet frames deliberately ring-free (zero-write path pinned);
   inspect/chat/profile/rosters stay title-only (inspect is Phase 20; text
   rows have no slug to render). Six domain reviews (zero blocking), two
@@ -848,6 +866,37 @@ Update this line as phases complete.
   Packet suites are unaffected (none set the radius). A future seed hunt
   must state which host profile it recorded under; three parity goldens
   were reminted at 089e2788da with the cause named per the re-pin policy.
+- NOTE (Phase 19 QA sync 4e6092128b, RELEASE-side, for the maintainer, NOT
+  this branch's defects): (1) SECURITY: bg_respond (PR #3127, bg queue
+  confirm) is missing from JAILED_BLOCKED_COMMANDS in server/game.ts, so a
+  player jailed during the 30s battleground offer window can send
+  bg_respond {accept:true}, seat the proposal, and be teleported OUT of the
+  cage; jailSession strips queues and live matches but never the pending
+  proposal (bgProposalDisconnect exists for the disconnect path, unused by
+  jail). Fix release-side: add bg_respond to JAILED_BLOCKED_COMMANDS and/or
+  tear down the proposal in jailSession. (2) server/game.ts HEAVY_SELF_CMDS
+  comment (~:846) is stale: it justifies omitting guild-bank gold ops with
+  "copper rides the ALWAYS-SENT base self object", but the same sync moved
+  copper (and the 15 other static scalars) behind a maybe() delta key; the
+  conclusion holds (a maybe key is still not the heavy gate), only the
+  reason is now wrong. (3) the identity-amplification vector the cosmetic
+  guard closes stays open at the 30/s command lane through other
+  identityFields commands (equip/unequip/change_skin/mount_toggle/guild
+  ops); pre-existing, sibling of the switchLoadout note above.
+- DEFERRED should-fix (Phase 19 QA, cross-platform-sync, to Phase 20 which
+  owns the char/inspect surfaces): the character-sheet worn-badge row does
+  not repaint when a cosmetic is picked with both windows open, because the
+  char window is a cold window absent from the slow-band refreshIfChanged
+  cycle and the deeds picker fires no char-window refresh. It reads a
+  visibly wrong "(worn)" until the next char-window render trigger. NOT
+  fixed here: it is a pre-existing pattern (the title worn-badge beside it
+  has had identical staleness since it shipped; Phase 19 only extended the
+  row to borders), the live primary surfaces (own portrait ring + nameplate)
+  always show the true worn border, and a correct online+offline fix needs a
+  signature-driven cold-window refresh (either add the char window to the
+  slow-band cycle with a cheap signature, or a HUD-level cosmetic-signature
+  latch calling charWindow.renderIfOpen), which is char/inspect architecture
+  Phase 20 owns. Fix BOTH the title and border row when addressed.
 - Follow-ups recorded, do NOT file as issues (Phase 19): the third
   near-identical per-session token bucket (list_read, guild_bank,
   cosmetic) has earned a shared helper by the rule of three; the picker's
@@ -856,7 +905,29 @@ Update this line as phases complete.
   is owed before the border catalog grows; the TITLE suite's server
   shape-check arm is still vacuous (the border twin has the decisive spy
   form, mirror it when touched); titlesAria removal belongs to a release
-  locale fill.
+  locale fill. Added at Phase 19 QA: the portrait ring has no forced-colors
+  arm while the nameplate cartouche does (the four rings read identically
+  under forced colors; cosmetic-only, so not a fairness break, complete the
+  family in Phase 20); the "Titles and Borders" category rail label is the
+  longest on the mobile horizontally-scrolling rail and sits past the
+  off-screen items (a sticky trailing item or the shorter "Cosmetics" label
+  is a copy call for the maintainer); unit_frame_painter imports borderAccent
+  from deed_border_view, dragging the DEEDS catalog into the painter's import
+  graph for a function that never reads it (no bundle change; a palette/lookup
+  split would keep the graph honest); the crowd-bench pass for many bordered
+  plates was measured at Phase 19 QA (perf leg: +31 canvas ops per bordered
+  plate, bounded and constant, no allocation/raster/layer) so the owed bench
+  is a byte-bound bandwidth arm, not a perf unknown. Coverage arms NOT added
+  this round (behavior proven by the QA legs, recorded as owed): an aborder
+  linkdead/resume pin (the server/game.ts resume warning names it), a real
+  Sim-entity-to-nameplate-painter-state span, and a fully-bordered-crowd
+  bandwidth byte-bound. Family-uniformity nit (fix-round review, pre-existing,
+  unreachable today): server/deeds_records.ts isPubliclyListableDeedId uses the
+  same bare DEEDS[id] index the Phase 19 QA fix closed in grantDeed, so a
+  prototype key answers TRUE from that fail-closed predicate; both callers then
+  need a real reward.kind so nothing leaks, and the only path to the deeds table
+  is grantDeed which is now guarded. Add a hasOwn there if closing the family
+  uniformly; not a defect.
 - RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
   the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
   release root-caused it and restored the strict contract (heal-through loop plus a
