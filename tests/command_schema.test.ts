@@ -45,12 +45,17 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
 // The v0.36.0 base adds set_helm as a send + dispatch pair (the paperdoll
 // helmet-visibility eye; helmHidden persists per character like weaponStowed),
-// and inv_sort as a send + dispatch pair (the one-shot bag clean-up; no
-// payload, the sim re-derives the whole arrangement deterministically).
+// inv_sort as a send + dispatch pair (the one-shot bag clean-up; no payload,
+// the sim re-derives the whole arrangement deterministically), and bg_respond
+// as a send + dispatch pair (the battleground queue-pop answer).
 // The Reliquary packet's nameplate border adds deed_set_border as a send +
-// dispatch pair, the exact sibling of deed_set_title.
-const EXPECTED_SEND_COUNT = 193;
-const EXPECTED_DISPATCH_COUNT = 206;
+// dispatch pair, the exact sibling of deed_set_title. NOTE (merge trap): both
+// sides of the v0.36.0 sync bumped these counts by one command each
+// (deed_set_border vs bg_respond) and git auto-merged the identical numbers;
+// the merged tree carries BOTH pairs, so the counts below are one higher than
+// either side pinned alone. Only the suite says what they really are.
+const EXPECTED_SEND_COUNT = 194;
+const EXPECTED_DISPATCH_COUNT = 207;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b7e2dc0d",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,10 +73,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -153,8 +149,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "265b1893",
-      "events": "42eb0bb0",
+      "state": "136718e4",
+      "events": "fb6c8fd7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -210,10 +206,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -294,7 +286,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e96f761e",
+      "state": "a4ea70c9",
       "events": "2d4bbbe3",
       "rng": {
         "draws": 0,
@@ -351,10 +343,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {},
             "spec": "arms"
@@ -432,7 +420,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "5e5331bb",
+      "state": "733d497c",
       "events": "edb445f3",
       "rng": {
         "draws": 0,
@@ -504,10 +492,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {
               "8": "war_row_victory_rush"
@@ -587,7 +571,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "feae1870",
+      "state": "bfa504e7",
       "events": "eb14db1f",
       "rng": {
         "draws": 0,
@@ -659,10 +643,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"
@@ -742,7 +722,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "386d8c3e",
+      "state": "203a05a7",
       "events": "66ad36ea",
       "rng": {
         "draws": 0,
@@ -814,10 +794,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"
@@ -897,7 +873,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "386d8c3e",
+      "state": "203a05a7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -969,10 +945,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"

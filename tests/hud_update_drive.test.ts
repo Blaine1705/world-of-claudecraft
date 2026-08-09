@@ -969,6 +969,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the ready-check popup; a bare-named module the painter gate does not sweep',
   },
   {
+    call: 'this.bgProposalPopup.render',
+    band: 'medium',
+    gate: 'this.bgProposalPopup.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/battleground/battleground_proposal_popup.ts',
+      proof: VIEW_SIG_BLOCK,
+    },
+    why: 'the battleground queue-pop prompt; a *_popup name the painter gate does not sweep either',
+  },
+  {
     call: 'this.valeCupWindow.render',
     band: 'medium',
     gate: "$('#valecup-window').style.display === 'block'",
@@ -1500,10 +1512,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-      // 45 = both sides of the v0.35.0 warfare sync counted 44 alone (the
-      // branch's reliquary window vs the release's warfare quartermaster
-      // window); the merged tree carries both, decided surface: window.
-    ).toEqual({ window: 45, chrome: 76, none: 16 });
+      // 46 = the same merge trap a second time: both sides of the v0.36.0
+      // sync counted 45 alone (the branch's reliquary window row vs the
+      // release's new window row on top of the shared 44 base); the merged
+      // tree carries both, decided surface: window.
+    ).toEqual({ window: 46, chrome: 76, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1517,7 +1530,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       // Reliquary cold window (module) + craft-cast single-surface strip (hud)
       // both land on this pin; keep both counts, do not drop either side.
-      module: 23,
+      // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
+      // reliquary module guard vs the release's new module-guarded row).
+      module: 24,
       hud: 6,
       callsite: 12,
       none: 4,
@@ -1558,6 +1573,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
+        'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
@@ -1609,6 +1625,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toBeGreaterThan(15);
     expect(modules.filter((m) => !adapterName.test(m)).sort()).toEqual([
       'dungeon_finder_proposal_popup.ts',
+      'hud/battleground/battleground_proposal_popup.ts',
       'meters.ts',
       'mount_race_controls.ts',
       'mount_race_strip.ts',
