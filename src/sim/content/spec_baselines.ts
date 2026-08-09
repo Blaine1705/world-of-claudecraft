@@ -38,6 +38,13 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     survival: {
+      // 2026-08 120s band round: the raise rides apPct, not agiPct, on
+      // purpose. apPct feeds only the two Attack Power lines (melee and
+      // hunter ranged); agiPct would also lift the Agility-derived armor,
+      // dodge, and crit on the spec that already dodges the most. The
+      // deep-equal pin in spec_baselines.test.ts guards the damage-only
+      // shape. Both arms are relatively level-invariant, an accepted
+      // remainder for the hunter kit-item pass alongside Marksmanship.
       stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
       global: { meleeDmgPct: 0.3 },
     },
