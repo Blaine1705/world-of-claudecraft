@@ -10492,6 +10492,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}はすでに完全に充填されている。',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect}の再充填には{material}x{count}が必要だ。',
+  'hudChrome.professions.craftingProgress': '製作中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.disenchantingProgress': '分解中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.enchantingProgress': '付与中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.salvagingProgress': '解体中：残り{remaining}秒（全{total}秒）。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '道具の効果を再充填中：残り{remaining}秒（全{total}秒）。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectDepleted': '道具の効果を使い切りました',
   'hudChrome.professions.toolEffectRechargePrice': '再充填: {material} x{count}',

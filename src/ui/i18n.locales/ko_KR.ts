@@ -10481,6 +10481,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}은(는) 이미 완전히 충전되어 있습니다.',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
+  'hudChrome.professions.craftingProgress': '제작 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.disenchantingProgress': '분해 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.enchantingProgress': '마법부여 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.salvagingProgress': '수리 재료 회수 중: {total}초 중 {remaining}초 남음.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '도구 효과 재충전 중: {total}초 중 {remaining}초 남음.',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
   'hudChrome.professions.toolEffectDepleted': '도구 효과를 모두 소모했습니다',
   'hudChrome.professions.toolEffectRechargePrice': '재충전: {material} x{count}',

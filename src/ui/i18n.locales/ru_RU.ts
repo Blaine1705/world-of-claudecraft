@@ -10656,6 +10656,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': 'Эффект не установлен: {profession}.',
   'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
   'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
+  'hudChrome.professions.craftingProgress': 'Вы создаете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.disenchantingProgress': 'Вы распыляете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.enchantingProgress': 'Вы накладываете чары: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.salvagingProgress': 'Вы разбираете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    'Вы перезаряжаете эффект инструмента: осталось {remaining} с из {total} с.',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
   'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
   'hudChrome.professions.toolEffectRechargePrice': 'Подзарядка: {material} x{count}',
