@@ -18,6 +18,7 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
+import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -449,7 +450,9 @@ export const RELIQUARY_PROFESSION_MARKS = {
  * The corpse block mirrors HARVEST_COMPONENT_SPECIMENS values (pinned
  * bidirectionally in tests/reliquary_content.test.ts so a new harvest family
  * cannot land without its Reliquary slot); the fine_* trio are the gathering
- * jackpots.
+ * jackpots, and glimmerfin_koi is fishing's (FISHING_RARE_ID, the one rare
+ * catch every band table pays; fishing has no world nodes, so no fine_* grade
+ * exists for it and the koi is the ladder's jackpot instead).
  */
 export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
   'pristine_hide',
@@ -460,6 +463,7 @@ export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
   'fine_thorium_ore',
   'fine_elderwood_log',
   'fine_sunpetal_herb',
+  'glimmerfin_koi',
 ] as const;
 
 /** Field-note flavor to the gathering profession that works its node type
@@ -486,6 +490,10 @@ const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = Object.freeze({
   fine_thorium_ore: 'mining',
   fine_elderwood_log: 'logging',
   fine_sunpetal_herb: 'herbalism',
+  // The rare catch (FISHING_RARE_ID): every FISHING_TABLES_BY_BAND cell pays
+  // it, and only the fishing profession can reel it in, so it takes the
+  // profession hint like the fine_* trio rather than the corpse fallback.
+  glimmerfin_koi: 'fishing',
 });
 
 /** Ids carrying a profession hint where the map has one, and the `fallback`
@@ -777,6 +785,28 @@ const REALM_RARE_ZONES = [
   ['aurelhorn', 'veiled_hollow'],
   ['drakemaw_broodlord', 'drakelands'],
 ] as const;
+
+// ---------------------------------------------------------------------------
+// Warfare pages (Phase 21)
+// ---------------------------------------------------------------------------
+// Both quartermasters front the SAME canonical honor stock: FURY at the
+// Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
+// Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = FURY_STOCK.
+// Every slot therefore names both counters through one shared tuple. Honor
+// purchases flow through the ordinary buyItem discovery path
+// (markItemDiscovered + noteRelicObtain), so ownership needs no new state.
+const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_kole')] as const;
+// The two pages PARTITION the live stock by the defs' own set field: the five
+// battle kits (set-tagged armor, seven pieces each) fill the gallery in
+// FURY_STOCK order (the authored-defs kit order: furyforged, stormbound,
+// ashstalker, cinderweave, thornhide, each helmet to feet; the shop window's
+// WARFARE_SHOP_SET_ORDER re-sorts by armor class instead and stays a display
+// concern), and the set-less jewelry and weapons fill the armory. Deriving
+// from FURY_STOCK keeps membership and order from ever trailing the content;
+// the partition and both floors are pinned in tests/reliquary_content.test.ts.
+const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
+const WARFARE_ARMORY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -1209,21 +1239,38 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'professions_specimens',
     shelf: 'professions',
     name: 'Key Specimens',
-    desc: 'Pristine corpse specimens and apex fine-grade field materials that stock a crafter museum.',
+    desc: "Pristine corpse specimens, apex fine-grade field materials, and the angler's chase: a crafter museum in miniature.",
     clearSource: { kind: 'none' },
     // The fine_* trio are gathering-node jackpots, so each names the profession
     // that works its node family (MATERIAL_GRADES in
     // src/sim/professions/material_grades.ts pairs the base material with its
-    // fine id). The five pristine specimens come from corpse harvest, which no
-    // gathering profession owns, so they name the corpse_harvest activity, the
-    // same answer gather_event:perfect_specimen gives (one write site,
-    // src/sim/interaction.ts, awards the mark and these five items together).
+    // fine id), and glimmerfin_koi is fishing's counterpart (see
+    // SPECIMEN_PROFESSIONS). The five pristine specimens come from corpse
+    // harvest, which no gathering profession owns, so they name the
+    // corpse_harvest activity, the same answer gather_event:perfect_specimen
+    // gives (one write site, src/sim/interaction.ts, awards the mark and these
+    // five items together). The two top fishing rods close the angler's chase:
+    // engineering crafts both at the toolworks (ROD_RECIPES in
+    // content/recipes.ts, trainer-taught), and the Drowned Litany Marks
+    // counter sells both (content/delves/shop.ts, the non-crafter route), so
+    // each names the craft plus the board keeper, the Marks-stock-only vendor
+    // idiom the Litany page set (sister_nhalia_choir_plate). They are shop
+    // rows on the Litany board ONLY; the Collapsed Reliquary counter carries
+    // no tool rows, so no second delve door exists to name.
     relics: items(
       ...withProfessions(
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
         SPECIMEN_PROFESSIONS,
         fromActivity('corpse_harvest'),
       ),
+      [
+        'stormreel_fishing_rod',
+        [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
+      ],
+      [
+        'tidewrought_fishing_rod',
+        [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
+      ],
     ),
   },
 
@@ -1395,6 +1442,24 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       // The Gleamstag (Veiled Hollow)
       ['gleamstag_charm', [fromBoss('gleamstag'), fromZone('veiled_hollow')]],
     ),
+  },
+
+  // ---- Warfare pages (Phase 21): the whole honor stock, kits then armory ----
+  {
+    id: 'conquerors_warfare_gallery',
+    shelf: 'conquerors',
+    name: 'Warfare Gallery',
+    desc: 'The five Warfare battle kits, earned piece by piece with honor.',
+    clearSource: { kind: 'none' },
+    relics: items(...WARFARE_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
+  },
+  {
+    id: 'conquerors_warfare_armory',
+    shelf: 'conquerors',
+    name: 'Warfare Armory',
+    desc: 'Warfare jewelry and weapons purchased with hard-won honor.',
+    clearSource: { kind: 'none' },
+    relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);
 

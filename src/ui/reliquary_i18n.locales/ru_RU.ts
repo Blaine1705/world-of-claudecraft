@@ -56,4 +56,10 @@ export const table: ReliquaryLocaleTable = {
   // inside page names.
   conquerors_rares_of_the_realm: { name: 'Имена всех земель' },
   conquerors_spoils_of_the_realm: { name: 'Добыча именных чудовищ' },
+  // Warfare pages (Phase 21): the shipped WARFARE brand (statInfo and the
+  // itemSets.warfare_* bonus lines both say Боевая мощь, genitive Боевой
+  // мощи) plus the gallery noun the masterwork page uses (Галерея) and the
+  // shipped armory noun (wocStore.armoryTitle Арсенал).
+  conquerors_warfare_gallery: { name: 'Галерея Боевой мощи' },
+  conquerors_warfare_armory: { name: 'Арсенал Боевой мощи' },
 };

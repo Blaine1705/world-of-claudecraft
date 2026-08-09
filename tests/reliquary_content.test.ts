@@ -13,6 +13,14 @@ import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import {
+  SET_WARFARE_ASHSTALKER,
+  SET_WARFARE_CINDERWEAVE,
+  SET_WARFARE_FURYFORGED,
+  SET_WARFARE_STORMBOUND,
+  SET_WARFARE_THORNHIDE,
+} from '../src/sim/content/item_sets';
+import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import {
   CRAFT_RING,
@@ -20,6 +28,7 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
+import { FURY_NPC_ID, FURY_STOCK, WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -285,11 +294,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(25);
+    expect(CONQUEROR_PAGES.length).toBe(27);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(3);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(31);
+    expect(RELIQUARY_PAGES.length).toBe(33);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -322,8 +331,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Literal: update when catalog content lands. Phase 21 adds the 19 Rift
     // chase items (conquerors_the_rift), then the 19 rare-slain marks and the
     // 29 NEW Spoils uniques (31 slots minus the 2 set members already
-    // catalogued; a relic on two pages is one relic): 242 + 19 + 29 = 290.
-    expect(full).toEqual({ owned: 290, total: 290 });
+    // catalogued; a relic on two pages is one relic), then the 47 Warfare
+    // honor pieces and the 3 fishing additions (the koi and both rods):
+    // 242 + 19 + 29 + 47 + 3 = 340.
+    expect(full).toEqual({ owned: 340, total: 340 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -331,8 +342,9 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same +19 marks +29 uniques
-    // delta as the overview pair above; marks are character-scoped).
-    expect(character).toEqual({ owned: 261, total: 261 });
+    // +47 Warfare +3 fishing deltas as the overview pair above; marks are
+    // character-scoped).
+    expect(character).toEqual({ owned: 311, total: 311 });
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -435,20 +447,43 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
   it('no copper vendor and no disenchant yield stocks a catalogued relic', () => {
     // Two unflagged world-source grant paths whose SAFETY is a content fact,
     // not a code property. buyItem (src/sim/items.ts) counts every purchase,
-    // sanctioned for CURRENCY vendors (delve Marks, heroic marks) where the
-    // coin is earned in the world; a catalogued relic on a plain copper
-    // vendorItems list would open a gold-repeatable tally climb. Disenchant
-    // yields (materials plus typed secondaries) also count, a self-loop only
-    // if a yield id were ever catalogued. Both sets are empty of relics today;
-    // this reds the day a content edit changes either, forcing the
-    // classification decision instead of silently inheriting "counts".
+    // sanctioned for CURRENCY vendors (delve Marks, heroic marks, WARFARE
+    // honor) where the coin is earned in the world; a catalogued relic on a
+    // plain copper vendorItems list would open a gold-repeatable tally climb.
+    // Honor-ONLY rows (priceHonor with no copper buyValue, buyItem's own
+    // price classification) are therefore exempt: the Warfare pages catalog
+    // the two honor quartermasters' whole stock, and honor is never
+    // gold-buyable. Disenchant yields (materials plus typed secondaries) also
+    // count, a self-loop only if a yield id were ever catalogued. Both swept
+    // sets are empty of relics today; this reds the day a content edit
+    // changes either, forcing the classification decision instead of silently
+    // inheriting "counts".
+    const honorOnly = (itemId: string): boolean => {
+      const def = ITEMS[itemId];
+      const copper = def?.buyValue !== undefined && def.buyValue > 0;
+      const honor = def?.priceHonor !== undefined && def.priceHonor > 0;
+      return honor && !copper;
+    };
     const vendorOffenders: string[] = [];
+    let honorExempt = 0;
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
-        if (isCataloguedRelicItem(itemId)) vendorOffenders.push(`${npcId}:${itemId}`);
+        if (!isCataloguedRelicItem(itemId)) continue;
+        if (honorOnly(itemId)) {
+          honorExempt += 1;
+          continue;
+        }
+        vendorOffenders.push(`${npcId}:${itemId}`);
       }
     }
     expect(vendorOffenders).toEqual([]);
+    // The exemption's own premises: it really covers the two Warfare counters
+    // (47 stock ids on both NPCS rows) and nothing rides it that could also
+    // be bought for copper (a dual-priced row would fall back into the sweep
+    // above by construction; this pins the classifier's copper half live).
+    expect(honorExempt).toBe(FURY_STOCK.length * 2);
+    expect(FURY_STOCK.every((id) => honorOnly(id))).toBe(true);
+    expect(honorOnly('deacon_reliquary_helm')).toBe(false);
     const yieldOffenders = [
       ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
       ...Object.values(ARMOR_SECONDARY_BY_TYPE),
@@ -521,12 +556,14 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // (per-copy counting is right for it, but so is the window's phrasing).
     // gleamstag_charm joined with the Spoils page (Phase 21): a stackable rare
     // junk trophy off The Gleamstag, obtained and counted per copy like the
-    // specimens.
+    // specimens. glimmerfin_koi joined the specimen page in the same phase
+    // (the fishing jackpot, stackable junk like the raw catches around it).
     expect([...new Set(stackable)].sort()).toEqual([
       'fine_elderwood_log',
       'fine_sunpetal_herb',
       'fine_thorium_ore',
       'gleamstag_charm',
+      'glimmerfin_koi',
       'prime_cut',
       'pristine_claw',
       'pristine_hide',
@@ -826,6 +863,78 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
         expect(isCataloguedRelicItem(itemId), `${templateId}:${itemId}`).toBe(false);
       }
       expect(markRelicIds(marksPage), templateId).toContain(`slain:${templateId}`);
+    }
+  });
+});
+
+describe('Reliquary Warfare pages pin against the live honor stock', () => {
+  const gallery = RELIQUARY_PAGES_BY_ID.conquerors_warfare_gallery;
+  const armory = RELIQUARY_PAGES_BY_ID.conquerors_warfare_armory;
+
+  it('the two pages partition FURY_STOCK by the defs own set field, in stock order', () => {
+    // Derivation regime like the Rift page: the pages spread the live stock,
+    // so this re-derives the SAME partition and adds the arms the content
+    // cannot self-check. Membership: kit pieces are exactly the set-tagged
+    // defs, the armory is exactly the set-less remainder, and together they
+    // are the WHOLE stock (a new honor row can never land unpaged). Order:
+    // FURY_STOCK order, the authored-defs kit order (furyforged, stormbound,
+    // ashstalker, cinderweave, thornhide, helmet to feet within each), NOT
+    // the shop window's armor-class re-sort (WARFARE_SHOP_SET_ORDER stays a
+    // display concern).
+    const setTagged = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
+    const setless = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
+    expect(itemRelicIds(gallery)).toEqual(setTagged);
+    expect(itemRelicIds(armory)).toEqual(setless);
+    expect([...itemRelicIds(gallery), ...itemRelicIds(armory)].sort()).toEqual(
+      [...FURY_STOCK].sort(),
+    );
+    // Snug vacuity floors (a defs edit that dropped the set tags would
+    // otherwise drain the gallery into the armory with the union still green).
+    expect(itemRelicIds(gallery).length).toBe(35);
+    expect(itemRelicIds(armory).length).toBe(12);
+    // The kit half really is the five Warfare families at seven pieces each,
+    // pinned against the item_sets.ts set ids (the partition's other axis).
+    const byKit = new Map<string, number>();
+    for (const id of itemRelicIds(gallery)) {
+      const set = WARFARE_ITEMS[id].set;
+      expect(set, id).toBeDefined();
+      byKit.set(set as string, (byKit.get(set as string) ?? 0) + 1);
+    }
+    expect([...byKit.keys()].sort()).toEqual(
+      [
+        SET_WARFARE_FURYFORGED,
+        SET_WARFARE_STORMBOUND,
+        SET_WARFARE_ASHSTALKER,
+        SET_WARFARE_CINDERWEAVE,
+        SET_WARFARE_THORNHIDE,
+      ].sort(),
+    );
+    for (const [kit, count] of byKit) expect(count, kit).toBe(7);
+    // The quality arm: epic-only is vacuous as a page filter today (the whole
+    // stock is epic), so it is asserted as a STOCK fact instead; a sub-epic
+    // honor row would red here and force the museum-in-or-out decision.
+    for (const id of FURY_STOCK) expect(ITEMS[id]?.quality, id).toBe('epic');
+  });
+
+  it('both hinted quartermasters really sell every slot (and every slot names both)', () => {
+    // The generic vendor truth arm walks these hints too; this arm pins the
+    // page-level premise directly: one canonical stock behind two NPCS rows
+    // (FURY at the arena, the Warmarshal at Highwatch), so every relic on
+    // both pages answers the same two counters, byte-stable in authored
+    // order.
+    expect(FURY_NPC_ID).toBe('fury');
+    for (const npcId of ['fury', 'warmarshal_draven_kole']) {
+      const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
+      expect(stock.size, npcId).toBe(FURY_STOCK.length);
+      for (const id of FURY_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+    }
+    for (const page of [gallery, armory]) {
+      for (const relic of page.relics) {
+        expect(reliquaryRelicSource(page, relic)).toEqual([
+          { sourceKind: 'vendor', sourceId: 'fury' },
+          { sourceKind: 'vendor', sourceId: 'warmarshal_draven_kole' },
+        ]);
+      }
     }
   });
 });
@@ -1305,7 +1414,11 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
   it('specimen page item ids all exist in ITEMS and match the curated export', () => {
     const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
-    // Literal pin (not only self-comparison of the content export).
+    // Literal pin (not only self-comparison of the content export). The two
+    // rods sit AFTER the curated specimen export on purpose: they are the
+    // angler's chase (crafted / Marks-bought tools), not signed field
+    // specimens, so they are authored as explicit page entries rather than
+    // joining RELIQUARY_PROFESSION_SPECIMEN_ITEMS.
     expect(itemRelicIds(page)).toEqual([
       'pristine_hide',
       'pristine_silk',
@@ -1315,11 +1428,58 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'fine_thorium_ore',
       'fine_elderwood_log',
       'fine_sunpetal_herb',
+      'glimmerfin_koi',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
     ]);
-    expect([...RELIQUARY_PROFESSION_SPECIMEN_ITEMS]).toEqual(itemRelicIds(page));
+    expect([
+      ...RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ]).toEqual(itemRelicIds(page));
     for (const id of itemRelicIds(page)) {
       expect(ITEMS[id], id).toBeDefined();
       expect(isCataloguedRelicItem(id)).toBe(true);
+    }
+    // The koi premise: the specimen row really is the live fishing jackpot id
+    // (the rare catch every band table pays), not a re-spelled cousin.
+    expect(FISHING_RARE_ID).toBe('glimmerfin_koi');
+    expect((RELIQUARY_PROFESSION_SPECIMEN_ITEMS as readonly string[]).at(-1)).toBe(FISHING_RARE_ID);
+  });
+
+  it('the two rods are really craftable and really on the Litany Marks counter (and only there)', () => {
+    // The rod slots' two doors, walked back to their live tables. Craft half:
+    // both recipes output the rods under the engineering profession (the same
+    // derivation the profession truth arm uses; this arm pins the recipe IDS
+    // so a renamed recipe reds here first). Vendor half: both rods are
+    // DELVE_SHOPS rows of the Drowned Litany board, whose keeper is
+    // brother_halven_marsh, the authored vendor hint. The spec that planned
+    // this page assumed the rods sat on BOTH delve boards; live content stocks
+    // them on the Litany board ONLY, so the inverse arm below pins the
+    // Collapsed Reliquary counter rod-free and the page authors no second
+    // delve door (following the Marks-stock-only vendor idiom,
+    // sister_nhalia_choir_plate precedent).
+    const rodIds = ['stormreel_fishing_rod', 'tidewrought_fishing_rod'];
+    for (const rodId of rodIds) {
+      const recipes = ALL_RECIPES.filter((r) => r.resultItemId === rodId);
+      expect(recipes.length, rodId).toBe(1);
+      expect(recipes[0].id, rodId).toBe(`recipe_${rodId}`);
+      expect(recipes[0].professionId, rodId).toBe('engineering');
+      const litanyRow = DELVE_SHOPS.drowned_litany.find((e) => e.itemId === rodId);
+      expect(litanyRow, `${rodId} on the Litany Marks counter`).toBeDefined();
+      const collapsedRow = DELVE_SHOPS.collapsed_reliquary.find((e) => e.itemId === rodId);
+      expect(collapsedRow, `${rodId} must not sit on the entry-delve counter`).toBeUndefined();
+    }
+    expect(DELVES.drowned_litany.boardNpcId).toBe('brother_halven_marsh');
+    // Both slots answer craft + keeper, byte-stable in authored order.
+    const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
+    for (const rodId of rodIds) {
+      const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === rodId);
+      expect(relic, rodId).toBeDefined();
+      expect(reliquaryRelicSource(page, relic!)).toEqual([
+        { sourceKind: 'profession', sourceId: 'engineering' },
+        { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
+      ]);
     }
   });
 
@@ -1952,7 +2112,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
   professions_masterwork: 5,
   professions_field_notes: 4,
-  professions_specimens: 4,
+  // 7 = corpse_harvest + the four gathering professions with a jackpot slot
+  // (mining, logging, herbalism, fishing) + the rods' engineering craft and
+  // their Litany board keeper (Phase 21).
+  professions_specimens: 7,
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
@@ -1969,6 +2132,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // contribute nothing here), their 4 camp zones (no drakelands: the
   // broodlord is marks-only), plus gutripper_shiv's q_drogmar door.
   conquerors_spoils_of_the_realm: 19,
+  // The two honor quartermasters, on every slot of both pages (Phase 21).
+  conquerors_warfare_gallery: 2,
+  conquerors_warfare_armory: 2,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level
@@ -2012,6 +2178,11 @@ const KNOWN_MULTI_SOURCE_PAGES = [
   // or four (spoils) zones, which is the point of a realm-wide page.
   'conquerors_rares_of_the_realm',
   'conquerors_spoils_of_the_realm',
+  // The Warfare pair (Phase 21): one canonical honor stock behind TWO
+  // counters (the arena and Highwatch quartermasters), so a single page
+  // default could only ever name half the doors.
+  'conquerors_warfare_gallery',
+  'conquerors_warfare_armory',
 ];
 
 /** `sourceKind:sourceId`, the stable comparison key for one hint. */
@@ -2223,9 +2394,11 @@ describe('Reliquary source hints resolve against live content', () => {
     }
     expect(offenders).toEqual([]);
     // Vacuity floor: two Drowned Litany Marks-stock rares, two Collapsed
-    // Reliquary rares off Brother Halven's counter, and the Valorsteed reins
-    // off Marla's. Update deliberately with the authoring.
-    expect(checked).toBeGreaterThanOrEqual(5);
+    // Reliquary rares off Brother Halven's counter, the Valorsteed reins off
+    // Marla's, the two rods off the Litany board keeper, and the 47 Warfare
+    // slots naming both quartermasters (94 claims). Update deliberately with
+    // the authoring.
+    expect(checked).toBeGreaterThanOrEqual(101);
     // Premise guard for the NPCS half specifically: without it every vendor
     // hint could still pass on delve stock alone while Marla's arm sat dead.
     expect(STOCK_BY_NPC.get('stablemaster_marla')?.has('reins_valorsteed')).toBe(true);
@@ -2264,15 +2437,28 @@ describe('Reliquary source hints resolve against live content', () => {
         if (fineItemId !== undefined) remember(fineItemId, professionId);
       }
     }
+    // The fishing arm (Phase 21): fishing is the one gathering profession with
+    // NO world nodes, so no fine_* grade exists for it and the koi cannot ride
+    // the MATERIAL_GRADES derivation above. Its live award table is
+    // FISHING_TABLES_BY_BAND (professions/fishing.ts draws every catch from
+    // it), so every id those cells can pay derives 'fishing'.
+    for (const bandTables of FISHING_TABLES_BY_BAND) {
+      for (const rows of Object.values(bandTables)) {
+        for (const row of rows) {
+          if (row.itemId !== null) remember(row.itemId, 'fishing');
+        }
+      }
+    }
     // A slot deriving two professions would make the comparison below
     // meaningless, so it fails here rather than silently picking the last one.
     expect(conflicts).toEqual([]);
-    // Premise guard: the derivation really reached both families and every
-    // node type, so a table that stopped contributing cannot leave this test
-    // quietly comparing nothing.
+    // Premise guard: the derivation really reached all three families and
+    // every node type, so a table that stopped contributing cannot leave this
+    // test quietly comparing nothing.
     expect(nodeTypes.length).toBe(3);
     expect(expectedBySlotId.get('gather_event:pristine_vein')).toBeDefined();
     expect(expectedBySlotId.get('fine_thorium_ore')).toBeDefined();
+    expect(expectedBySlotId.get('glimmerfin_koi')).toBe('fishing');
 
     // The crafted half, from the live recipe table. A slot can have several
     // recipes, so this is a SET: any profession that really makes the item is
@@ -2312,9 +2498,10 @@ describe('Reliquary source hints resolve against live content', () => {
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: three field-note marks, three fine-material jackpots, and
-    // the two crafted Sanctum combo pieces.
-    expect(checked).toBeGreaterThanOrEqual(8);
+    // Vacuity floor: three field-note marks, three fine-material jackpots, the
+    // two crafted Sanctum combo pieces, the fishing koi, and the two
+    // engineering-crafted rods (Phase 21).
+    expect(checked).toBeGreaterThanOrEqual(11);
   });
 
   it('authored craft professions resolve through the live craftById lookup', () => {
@@ -2690,10 +2877,10 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 315 = 318 slots minus the
+    // excluded. Literal: tighten as rulings land. 365 = 368 slots minus the
     // two gap mounts minus the pended masterwork:engineering.
     const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
-    expect(hinted).toBeGreaterThanOrEqual(315);
+    expect(hinted).toBeGreaterThanOrEqual(365);
   });
 
   it('no relic authors an EMPTY hint list (a sourceless slot stays keyless)', () => {
@@ -2947,18 +3134,21 @@ describe('Reliquary source hint coverage', () => {
     // is the arm that caught wyrmcult_grand_robe.
     // Phase 21 Spoils growth on the mob family: 29 single-rare drops, the two
     // shared drops' two rares each, and the two dominated trash routes (35);
-    // the quest family gains gutripper_shiv's q_drogmar door.
+    // the quest family gains gutripper_shiv's q_drogmar door. The Warfare
+    // pages grow the vendor family by 94 (47 slots on two counters each) and
+    // the rods add their Litany board keeper (2) plus their two engineering
+    // recipes on the recipe family.
     expect(routesByFamily.mob).toBeGreaterThanOrEqual(209);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
-    expect(routesByFamily.vendor).toBeGreaterThanOrEqual(5);
+    expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
-    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(2);
+    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(4);
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(324);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(422);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {

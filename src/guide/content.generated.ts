@@ -6087,6 +6087,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fine Sunpetal Herb"
+      },
+      {
+        "kind": "item",
+        "name": "Sunglint Koi"
+      },
+      {
+        "kind": "item",
+        "name": "Stormreel Fishing Rod"
+      },
+      {
+        "kind": "item",
+        "name": "Tidewrought Fishing Rod"
       }
     ]
   },
@@ -6717,6 +6729,208 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gleamstag Charm"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_warfare_gallery",
+    "shelf": "conquerors",
+    "name": "Warfare Gallery",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Furyforged Warhelm"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Warspaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Waistguard"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Greaves"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Waistband"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Raiment"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Headdress"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Boots"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_warfare_armory",
+    "shelf": "conquerors",
+    "name": "Warfare Armory",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Medallion of the Final Oath"
+      },
+      {
+        "kind": "item",
+        "name": "Razorwind Torque"
+      },
+      {
+        "kind": "item",
+        "name": "Cinder-Sigil Pendant"
+      },
+      {
+        "kind": "item",
+        "name": "Iron Vow Band"
+      },
+      {
+        "kind": "item",
+        "name": "The Unbroken Circle"
+      },
+      {
+        "kind": "item",
+        "name": "Fleetblood Band"
+      },
+      {
+        "kind": "item",
+        "name": "Last-Step Signet"
+      },
+      {
+        "kind": "item",
+        "name": "Ashen Focus Ring"
+      },
+      {
+        "kind": "item",
+        "name": "Spellbreaker's Seal"
+      },
+      {
+        "kind": "item",
+        "name": "Final Argument Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "First-Blood Razor"
+      },
+      {
+        "kind": "item",
+        "name": "Emberglass Warstaff"
       }
     ]
   }

@@ -91,8 +91,12 @@ const CATALOGUE_RELIC = 'cryptbone_helm';
  *  per-copy half of the counting contract is reachable through plain addItem.
  *  File-scoped: the obtain-counts AND determinism describes both drive it. */
 const STACKABLE_RELIC = 'pristine_hide';
-/** Real item that is NOT a catalogued Reliquary relic. */
-const NON_RELIC = 'glimmerfin_koi';
+/** Real stackable item that is NOT a catalogued Reliquary relic. Was
+ *  glimmerfin_koi until Phase 21 catalogued the koi on the specimen page;
+ *  bone_fragments is boss-table junk the curation-bounds pin in
+ *  tests/reliquary_content.test.ts holds OUT of the catalog, so this control
+ *  cannot silently become a relic again. */
+const NON_RELIC = 'bone_fragments';
 
 describe('Reliquary fresh state + serialize omit-empty', () => {
   it('a new character has empty reliquary state and serializes without the key', () => {

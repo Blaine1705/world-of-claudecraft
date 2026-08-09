@@ -57,4 +57,10 @@ export const table: ReliquaryLocaleTable = {
   // 霧中之名); no mob names inside page names.
   conquerors_rares_of_the_realm: { name: '天下惡煞' },
   conquerors_spoils_of_the_realm: { name: '惡煞的戰利品' },
+  // Warfare pages (Phase 21): the shipped WARFARE brand noun (statInfo and
+  // the itemSets.warfare_* bonus lines both say 戰爭) plus the gallery noun
+  // the masterwork page uses (展廳) and the shipped armory noun
+  // (wocStore.armoryTitle 兵器庫).
+  conquerors_warfare_gallery: { name: '戰爭展廳' },
+  conquerors_warfare_armory: { name: '戰爭兵器庫' },
 };

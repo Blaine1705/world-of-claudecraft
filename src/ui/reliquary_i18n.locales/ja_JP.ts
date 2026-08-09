@@ -58,4 +58,10 @@ export const table: ReliquaryLocaleTable = {
   // inside page names.
   conquerors_rares_of_the_realm: { name: '大地に名だたる者' },
   conquerors_spoils_of_the_realm: { name: '名だたる者の戦利品' },
+  // Warfare pages (Phase 21): the shipped WARFARE brand noun (statInfo and
+  // the itemSets.warfare_* bonus lines both say ウォーフェア) plus the gallery
+  // noun the masterwork page uses (ギャラリー) and the shipped armory noun
+  // (wocStore.armoryTitle 武器庫).
+  conquerors_warfare_gallery: { name: 'ウォーフェアギャラリー' },
+  conquerors_warfare_armory: { name: 'ウォーフェア武器庫' },
 };

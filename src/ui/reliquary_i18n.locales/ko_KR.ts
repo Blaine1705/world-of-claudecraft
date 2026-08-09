@@ -58,4 +58,10 @@ export const table: ReliquaryLocaleTable = {
   // inside page names.
   conquerors_rares_of_the_realm: { name: '온 땅의 이름들' },
   conquerors_spoils_of_the_realm: { name: '이름난 자들의 전리품' },
+  // Warfare pages (Phase 21): the shipped WARFARE brand noun (statInfo and
+  // the itemSets.warfare_* bonus lines both say 워페어) plus the gallery noun
+  // the masterwork page uses (갤러리) and the shipped armory noun
+  // (wocStore.armoryTitle 무기고).
+  conquerors_warfare_gallery: { name: '워페어 갤러리' },
+  conquerors_warfare_armory: { name: '워페어 무기고' },
 };
