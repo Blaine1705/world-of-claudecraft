@@ -18,7 +18,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
-import { loadGltf, loadTexture } from '../assets/loader';
+import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
@@ -35,6 +35,7 @@ import {
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
+  SKINS_DIR,
   VISUALS,
   type VisualDef,
   visibleAttachmentsForGraphics,
@@ -74,6 +75,7 @@ import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
+import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -505,17 +507,20 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Packaged iOS carves the mob bodies out of the boot gate and STREAMS them after
-// first frame instead. They are the heaviest character content (creature +
-// skeleton-family GLBs with embedded 1024-class atlases; 47 files, and by far
-// the largest share of the decoded character residency) and nothing on the
-// launcher, the character-select preview, or the player's own spawn needs them:
-// mob views are created fail-soft (createCharacterVisual returns null and
-// view_create_retry retries, the #2079 seam; mounts already stream exactly this
-// way), so a mob whose GLB is still arriving pops in a beat later instead of
-// crashing anything. Measured on an iPhone 17 Pro, decoding the full set inside
-// the entry gate put WebContent at 1.54 GB before the renderer ever existed;
-// streaming defers that mass to after the entry spike has cleared. Weapons and
+// Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged
+// native app: see GFX.iosMemoryProfile in gfx.ts) carves the mob bodies out of
+// the boot gate and STREAMS them after first frame instead. They are the
+// heaviest character content (creature + skeleton-family GLBs with embedded
+// 1024-class atlases; 47 files, and by far the largest share of the decoded
+// character residency) and nothing on the launcher, the character-select
+// preview, or the player's own spawn needs them: mob views are created
+// fail-soft (createCharacterVisual returns null and view_create_retry retries,
+// the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
+// is still arriving pops in a beat later instead of crashing anything.
+// Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
+// WebContent at 1.54 GB before the renderer ever existed; streaming defers that
+// mass to after the entry spike has cleared, and that WebContent ceiling is
+// identical whether the process hosts Safari or the packaged app. Weapons and
 // NPC bodies stay in the gate: the char-select preview builds CharacterVisual
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
@@ -530,7 +535,7 @@ const streamableUrls = allPreloadUrls.filter(
   (url) =>
     STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
 );
-let streamedUrls = GFX.nativeIosMemoryProfile ? streamableUrls : [];
+let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
 let streamedUrlSet = new Set(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
@@ -590,8 +595,9 @@ let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
  * this call started). main.ts calls it once the entry is past its allocation
- * spike (prewarm complete). Empty everywhere but the packaged iOS shell, where
- * the boot gate above deliberately excluded these urls. A failed fetch re-arms
+ * spike (prewarm complete). Empty everywhere but iOS WebKit hosts (Safari,
+ * other iOS browsers, and the packaged app), where the boot gate above
+ * deliberately excluded these urls. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -616,9 +622,21 @@ export function startStreamedCharacterPreloads(): number {
 const skinTexByUrl = new Map<string, THREE.Texture>();
 const skinEmisTexByUrl = new Map<string, THREE.Texture>();
 
+// scripts/assets/compress_standalone_textures.mjs ships a `.ktx2` sibling next
+// to every atlas under this prefix, so those ~34 1024x1024 atlases stay
+// GPU-compressed in memory instead of decoding to full RGBA bitmaps (the
+// eagerSkinAtlases comment below has the numbers). The player_mech chromas
+// (MECH_DIR) are not under this prefix, stay on the plain PNG path, and are
+// out of scope here: they are lazyPreload-only, never part of the eager boot
+// sweep this pass targets.
+const KTX2_ATLAS_PREFIX = `${SKINS_DIR}/`;
+
 /** Load a skin/emissive atlas with the glTF body-UV conventions (sRGB, no flip). */
 function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise<void> {
-  return loadTexture(url, { srgb: true }).then((t) => {
+  const load = url.startsWith(KTX2_ATLAS_PREFIX)
+    ? loadKtx2Texture(`${url.slice(0, -'.png'.length)}.ktx2`)
+    : loadTexture(url, { srgb: true });
+  return load.then((t) => {
     t.flipY = false;
     t.needsUpdate = true;
     into.set(url, t);
@@ -632,7 +650,7 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) defers
 // the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
 // decode to well over 100 MB of RGBA inside the same WebContent process whose
 // jetsam ceiling the entry spike already presses against (the iPhone 13 report),
@@ -643,20 +661,20 @@ for (const [key, list] of Object.entries(SKINS)) {
 // profile hints derive from static boot signals (never the tier), so this
 // import-time read cannot drift from the live profile the way an import-time
 // TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
+const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = target.nativeIosMemoryProfile ? streamableUrls : [];
+  const nextStreamedUrls = target.iosMemoryProfile ? streamableUrls : [];
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
   const skinTasks =
-    target.nativeIosMemoryProfile || target.tightMemory
+    target.iosMemoryProfile || target.tightMemory
       ? []
       : [...bootSkinUrls].map((url) =>
           skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),
@@ -687,8 +705,8 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    // Deferred atlases (native iOS) are not boot assets: gating the preview on
-    // them would re-create the exact entry-footprint spike the deferral removes.
+    // Deferred atlases (every iOS WebKit host) are not boot assets: gating the
+    // preview on them would re-create the exact entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
       ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];
@@ -963,8 +981,10 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
 
 // Bounded, because a colour WHEEL is a continuous input: dragging it emits a
 // new hex every pointermove, and each distinct hex would otherwise strand a
-// material here forever (and a second one in tintedMaterial's cache, which is
-// keyed off this material's uuid). An LRU keeps a drag's worth of shades warm,
+// material here forever. (Its downstream twin in tintedMaterial's cache, keyed
+// off this material's uuid, becomes a dead-source entry when the LRU evicts
+// here; the tinted cache reclaims those through its own idle bound, see
+// tinted_material_cache_core.ts.) An LRU keeps a drag's worth of shades warm,
 // re-picking a recent colour is still free, and disposes what falls out.
 const RECOLOR_CACHE_MAX = 48;
 const recolorCache = new Map<string, THREE.Material>();
@@ -1552,7 +1572,7 @@ export function setHeldOffhand(
 export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   const url = weaponSkinModelUrl(skinId);
   if (!url) return null;
-  // Streamed skin not arrived yet (packaged iOS: the Armory prewarm starts
+  // Streamed skin not arrived yet (every iOS WebKit host: the Armory prewarm starts
   // microseconds after the stream pass): degrade to null, which the preview
   // rig treats as unavailable, and kick the fetch. Throwing here lost the
   // whole 29-skin warmup and could escape an ArmoryInspect click handler.
@@ -1594,10 +1614,17 @@ export function setWeaponsStowed(
 }
 
 // ---------------------------------------------------------------------------
-// Tinted material cache (shared across all instances; never disposed)
+// Tinted material cache (shared across all instances; claim-counted and
+// bounded, see tinted_material_cache_core.ts). Two visuals asking for the
+// same (source, tint, tier, atlases, role) still share one clone; a clone is
+// disposed only once nothing claims it (idle LRU overflow, or a profile
+// reset's retire-on-last-release), so eviction can never touch a material a
+// live mesh still mounts.
 // ---------------------------------------------------------------------------
 
-const matCache = new Map<string, THREE.Material>();
+const matCache = new TintedMaterialCache<THREE.Material>(TINTED_MATERIAL_IDLE_CACHE_MAX, (mat) =>
+  mat.dispose(),
+);
 const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
@@ -1622,6 +1649,8 @@ function applyLowReadabilityLift(
 function applyWeaponMaterialPolish(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
 ): void {
+  // Colorless sources never reach here: tintedMaterial returns them unchanged
+  // before cloning, so every mat this helper sees carries a color.
   mat.color.lerp(weaponHighlight, 0.08);
   const std = mat as THREE.MeshStandardMaterial;
   if (std.isMeshStandardMaterial) {
@@ -1648,6 +1677,27 @@ function applyWeaponMaterialPolish(
   }
 }
 
+/**
+ * A lease of shared tinted-material cache keys. A material sweep passes its
+ * visual's lease so every cache entry it mounts stays claimed (pinned against
+ * eviction) until the visual releases the lease via releaseTintedMaterials
+ * (on the next full re-apply sweep, and at dispose). The set also makes
+ * claims idempotent per lease: a sweep meeting the same source material on
+ * several meshes claims its key once.
+ *
+ * A caller that passes NO lease (tests, tools) still shares the memoized
+ * clone, but its entry stays evictable: never mount a leaseless result on a
+ * long-lived mesh.
+ */
+export type TintedMaterialClaims = Set<string>;
+
+/** Release one lease's claims (see TintedMaterialClaims). Keys the cache no
+ *  longer tracks are a refused no-op, so a double release cannot underflow
+ *  another visual's pin. */
+export function releaseTintedMaterials(claims: Iterable<string>): void {
+  for (const key of claims) matCache.release(key);
+}
+
 export function tintedMaterial(
   src: THREE.Material,
   tint: number | null,
@@ -1655,12 +1705,48 @@ export function tintedMaterial(
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material {
+  // A source with no color property (the weapon-skin fresnel shell's
+  // ShaderMaterial) has nothing this factory can tint, lift, or polish.
+  // Return it unchanged: cloning would detach the rig's live uniform handles
+  // (its per-frame uTime/uStr writes would land on a material nothing
+  // renders), and caching that clone would strand it forever.
+  if (!(src as THREE.MeshStandardMaterial).color) return src;
   const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
-  const cached = matCache.get(key);
-  if (cached) return cached;
+  const build = () =>
+    buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
+  if (claims) {
+    if (claims.has(key)) {
+      // This lease already claimed the key (the same source material on an
+      // earlier mesh of the sweep): serve the held clone without a second
+      // claim, keeping claims and releases exactly paired per lease.
+      const held = matCache.peek(key);
+      if (held) return held;
+    }
+    claims.add(key);
+    return matCache.claim(key, build);
+  }
+  // Leaseless: share the memo and stay warm, but hold no claim (claim then
+  // release parks the entry at the idle tail). Every production mount path
+  // leases; see TintedMaterialClaims.
+  const mat = matCache.claim(key, build);
+  matCache.release(key);
+  return mat;
+}
 
-  const s = src as THREE.MeshStandardMaterial;
+/** The tinted-clone derivation: a pure function of its arguments plus the
+ *  static graphics tier, which is why an evicted cache entry rebuilds
+ *  identically on the next request (see tinted_material_cache_core.ts). */
+function buildTintedClone(
+  s: THREE.MeshStandardMaterial,
+  tint: number | null,
+  strength: number,
+  skinTex: THREE.Texture | null,
+  emisTex: THREE.Texture | null,
+  role: MaterialRole,
+): THREE.Material {
+  const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
   if (GFX.standardMaterials) {
     mat = s.clone();
@@ -1688,7 +1774,7 @@ export function tintedMaterial(
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();
     } else {
-      // low tier: Lambert with the same texture map — no PBR, no rim
+      // low tier: Lambert with the same texture map (no PBR, no rim)
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
         color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
@@ -1709,7 +1795,7 @@ export function tintedMaterial(
     }
   }
   if (tint !== null) {
-    // subtle pull toward the template color — hard multiplies turn the
+    // subtle pull toward the template color: hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
   }
@@ -1734,7 +1820,6 @@ export function tintedMaterial(
     std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
-  matCache.set(key, mat);
   return mat;
 }
 
@@ -1744,13 +1829,17 @@ function tintFor(def: VisualDef, entityColor: number): number | null {
 }
 
 /** Swap every mesh material in an assembled clone for the shared tinted
- *  (and tier-appropriate) variant. Returns nothing — mutates the clone. */
+ *  (and tier-appropriate) variant. Returns nothing, mutates the clone. Pass
+ *  the owning visual's `claims` lease so every mounted cache entry stays
+ *  pinned against eviction until the visual releases it (see
+ *  TintedMaterialClaims). */
 export function applyMaterials(
   root: THREE.Object3D,
   def: VisualDef,
   entityColor: number,
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): void {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
@@ -1778,9 +1867,11 @@ export function applyMaterials(
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
     if (Array.isArray(source)) {
-      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
+      mesh.material = source.map((m) =>
+        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+      );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
     }
   });
 }
@@ -1798,11 +1889,20 @@ export function tintedFarMaterials(
   isBody: boolean[],
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
   return srcMats.map((m, i) =>
-    tintedMaterial(m, tint, strength, isBody[i] ? skinTex : null, isBody[i] ? emisTex : null),
+    tintedMaterial(
+      m,
+      tint,
+      strength,
+      isBody[i] ? skinTex : null,
+      isBody[i] ? emisTex : null,
+      'body',
+      claims,
+    ),
   );
 }
 
@@ -1834,12 +1934,24 @@ export interface PreparedVisual {
 
 const prepared = new Map<string, PreparedVisual>();
 
-/** Drop profile-derived character templates/materials while retaining loaded source assets. */
+/** Drop profile-derived character templates/materials while retaining loaded
+ *  source assets. The tinted-material cache resets rather than clears: idle
+ *  clones dispose now, and any clone a not-yet-torn-down visual still mounts
+ *  is retired to dispose on that visual's release instead of leaking (see
+ *  tinted_material_cache_core.ts). In the graphics-rebuild flow every visual
+ *  is already disposed before this runs, so normally everything disposes
+ *  here. */
 export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
-  matCache.clear();
+  matCache.reset();
   prepared.clear();
 }
+
+/** Test-only observation window into the shared tinted-material cache. */
+export const tintedMaterialInternalsForTest = {
+  cacheSize: (): number => matCache.size,
+  cacheIdleSize: (): number => matCache.idleSize,
+};
 
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);

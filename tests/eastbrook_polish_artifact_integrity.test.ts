@@ -662,13 +662,31 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the rendererIntegration leaf, so all three literals mint to values matching
 // neither parent. No capture was retaken on either side (the two parents'
 // evidence differs only in its provenance bytes).
-// Re-minted again for the retarget onto release/v0.36.0 (v0.35.0 shipped to
-// main without this PR merging): the release moved the rendererIntegration
-// leaf further. No Eastbrook input, geometry value, or capture moved.
+// Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
+// follows the anchor seam, the weapon-skin fade and the census tag. No capture
+// was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so all three literals mint to values matching
+// neither parent. No capture was retaken.
+// Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
+// prewarm changes converged with the 3165 reseal. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into the render caches branch:
+// both sides moved the rendererIntegration leaf (the release's prewarm compile
+// and point-light reseals; this branch's bounded character-visual pool wiring),
+// so all three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so all three literals mint
+// to values matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'eff9ebfd6e37fefe51e34fa2431098fcf065a23effa21ef8a93cef4c90b77d6a';
+  '870f988b7a735840429101d5231703d5477337662a1d5d1c30e3dfaba6c3e8e3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '71bdfcabb1bedd81b179cb290f1ed8fb9c1579b5c34f1e3f4caa749f650572c2';
+  'c54ca4bb6e4feb07c49af5bbdbf4261cf81a1e817bbf718f3dd82d7884591482';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1554,13 +1572,33 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // reverted renderer while preserving PR #2982's prewarm-policy leaf.
     // Re-pinned for the PR #2983 re-land: the swept evidence follows the
     // re-landed renderer, itself on top of the release's bow-aim edit.
-    // Re-pinned again for the retarget onto release/v0.36.0 (v0.35.0 shipped
-    // to main without this PR merging): the release moved the
-    // rendererIntegration leaf further.
+    // Re-pinned for the VFX per-frame cost work: the first-order composite
+    // follows the renderer's anchor seam, weapon-skin fade and census tag,
+    // then this second-order seal follows the swept evidence bytes. No capture
+    // was retaken.
+    // Re-pinned for the iOS WebKit memory-profile fix: the first-order composite
+    // follows renderer.ts's nativeIosMemoryProfile -> iosMemoryProfile rename,
+    // landing on top of the VFX per-frame cost work already on this release
+    // branch, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
+    // compileAsync patch branch: the first-order composite follows both
+    // parents' inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted after pinning the three specifier exact (PR 3165 review): only
+    // the pnpm-lock.yaml specifier row moved. No capture was retaken.
+    // Re-minted for the merge of release/v0.36.0 into the render caches branch:
+    // the first-order composite follows both parents' renderer.ts and
+    // prewarm_policy.ts inputs, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3220/3221) into the
+    // KTX2 mip-release branch: the first-order composite follows both parents'
+    // renderer.ts inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('3a2702ca26c33ffd38fa123a179cc1b8d1cfa0ebf1e5b6eaae0f8aaef61b930c');
+    ).toBe('0e699fa51b4b49530766dc39ea126f3c3d8c6c91a812d011964173d67e1766e9');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
