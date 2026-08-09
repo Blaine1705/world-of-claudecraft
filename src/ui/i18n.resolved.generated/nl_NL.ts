@@ -5320,6 +5320,8 @@ export const nl_NL: EnTranslations = {
       "chanWhisperBody": "Een privébericht aan één speler bij naam, waar diegene ook is. Gebruik het voor een stil woordje.",
       "chanParty": "Groep.",
       "chanPartyBody": "Praat met iedereen in je groep, hoe verspreid je ook bent.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Algemeen.",
       "chanGeneralBody": "Een altijd actief kanaal voor het hele rijk dat iedereen die online is bereikt, handig om een vraag te stellen of te kletsen. Anders dan World en Looking for Group hoef je je nooit aan te melden.",
       "chanWorld": "Wereld.",
@@ -7417,6 +7419,7 @@ export const nl_NL: EnTranslations = {
           "say": "Zeggen",
           "yell": "Schreeuwen",
           "party": "Groep",
+          "battleground": "Battleground",
           "general": "Algemeen",
           "world": "Wereld",
           "lfg": "LFG",
@@ -7578,6 +7581,7 @@ export const nl_NL: EnTranslations = {
     "chat": {
       "rightClickName": "Klik met rechts op {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Groep] {name}: {message}",
         "yell": "{name} schreeuwt: {message}",
         "whisper": "{name} fluistert: {message}",

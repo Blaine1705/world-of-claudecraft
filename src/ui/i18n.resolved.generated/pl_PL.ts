@@ -5320,6 +5320,8 @@ export const pl_PL: EnTranslations = {
       "chanWhisperBody": "Prywatna wiadomość do jednego gracza po imieniu, gdziekolwiek się znajduje. Użyj jej na ciche słówko.",
       "chanParty": "Drużyna.",
       "chanPartyBody": "Rozmawiaj ze wszystkimi w swojej grupie, bez względu na to, jak bardzo jesteście rozproszeni.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Ogólny.",
       "chanGeneralBody": "Zawsze aktywny kanał obejmujący całe królestwo, docierający do wszystkich zalogowanych, dobry do zadania pytania lub ogólnej pogawędki. W przeciwieństwie do World i Looking for Group, nigdy nie musisz się do niego zapisywać.",
       "chanWorld": "Świat.",
@@ -7417,6 +7419,7 @@ export const pl_PL: EnTranslations = {
           "say": "Mów",
           "yell": "Krzycz",
           "party": "Drużyna",
+          "battleground": "Battleground",
           "general": "Ogólny",
           "world": "Świat",
           "lfg": "LFG",
@@ -7578,6 +7581,7 @@ export const pl_PL: EnTranslations = {
     "chat": {
       "rightClickName": "Kliknij prawym {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Drużyna] {name}: {message}",
         "yell": "{name} krzyczy: {message}",
         "whisper": "{name} szepcze: {message}",

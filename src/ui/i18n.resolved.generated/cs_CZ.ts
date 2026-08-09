@@ -5320,6 +5320,8 @@ export const cs_CZ: EnTranslations = {
       "chanWhisperBody": "Soukromá zpráva jednomu hráči podle jména, ať je kdekoli. Použij pro tichou domluvu.",
       "chanParty": "Party.",
       "chanPartyBody": "Mluv se všemi ve skupině bez ohledu na to, jak jsou rozptýlení.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Obecný.",
       "chanGeneralBody": "Vždy zapnutý kanál pro celý svět, který dosáhne ke všem online, dobrý na otázku nebo běžné povídání. Na rozdíl od World a Looking for Group se do něj nemusíš přihlašovat.",
       "chanWorld": "World.",
@@ -7417,6 +7419,7 @@ export const cs_CZ: EnTranslations = {
           "say": "Říct",
           "yell": "Křik",
           "party": "Skupina",
+          "battleground": "Battleground",
           "general": "Obecné",
           "world": "Svět",
           "lfg": "Hledání skupiny",
@@ -7578,6 +7581,7 @@ export const cs_CZ: EnTranslations = {
     "chat": {
       "rightClickName": "Pravé kliknutí na {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Skupina] {name}: {message}",
         "yell": "{name} křičí: {message}",
         "whisper": "{name} šeptá: {message}",

@@ -2059,6 +2059,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': 'Закрыть счетчики',
   'hud.chat.rightClickName': 'ПКМ по {name}',
   'hud.chat.templates.party': '[Группа] {name}: {message}',
+  'hud.chat.templates.battleground': '[Поле боя] {name}: {message}',
   'hud.chat.templates.yell': '{name} кричит: {message}',
   'hud.chat.templates.whisper': '{name} шепчет: {message}',
   'hud.chat.templates.toWhisper': 'Кому {name}: {message}',
@@ -5466,6 +5467,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': 'Поиск группы',
   'hud.core.chatChannels.names.officer': 'Офицеры',
   'hud.core.chatChannels.names.party': 'Группа',
+  'hud.core.chatChannels.names.battleground': 'Поле боя',
   'hud.core.chatChannels.names.say': 'Сказать',
   'hud.core.chatChannels.names.world': 'Мир',
   'hud.core.chatChannels.names.yell': 'Крик',
@@ -7032,6 +7034,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'Поиск группы.',
   'guide.social.chanLfgBody':
     'Добровольный канал на всё королевство, чтобы найти людей для прохождения подземелья. Откройте его вкладку, чтобы присоединиться.',
+  'guide.social.chanBattleground': 'Поле боя.',
+  'guide.social.chanBattlegroundBody':
+    'Разговор со всеми бойцами на поле боя, с обеими сторонами. Только пока идёт бой.',
   'guide.social.chanParty': 'Группа.',
   'guide.social.chanPartyBody':
     'Говорите со всеми в своей группе, как бы далеко друг от друга вы ни разошлись.',

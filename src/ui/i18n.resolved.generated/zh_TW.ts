@@ -5320,6 +5320,8 @@ export const zh_TW: EnTranslations = {
       "chanWhisperBody": "依名稱向單一玩家發送的私人訊息，無論對方身在何處。用它來說幾句悄悄話。",
       "chanParty": "隊伍。",
       "chanPartyBody": "與你隊伍中的每一個人交談，無論你們分得多開。",
+      "chanBattleground": "戰場。",
+      "chanBattlegroundBody": "與戰場中的所有戰士交談，雙方陣營都能看到。僅在比賽進行時可用。",
       "chanGeneral": "綜合。",
       "chanGeneralBody": "一個常駐的全王國頻道，能觸及所有在線的人，適合用來提問或閒聊。不同於「世界」與「尋求組隊」，你永遠不需要主動加入。",
       "chanWorld": "世界。",
@@ -7417,6 +7419,7 @@ export const zh_TW: EnTranslations = {
           "say": "說話",
           "yell": "大喊",
           "party": "隊伍",
+          "battleground": "戰場",
           "general": "綜合",
           "world": "世界",
           "lfg": "尋求組隊",
@@ -7578,6 +7581,7 @@ export const zh_TW: EnTranslations = {
     "chat": {
       "rightClickName": "右鍵點擊 {name}",
       "templates": {
+        "battleground": "[戰場] {name}：{message}",
         "party": "[隊伍] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄說：{message}",

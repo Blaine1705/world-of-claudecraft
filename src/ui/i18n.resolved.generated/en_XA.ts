@@ -5320,6 +5320,8 @@ export const en_XA: EnTranslations = {
       "chanWhisperBody": "[Á þŕíʋáţé ɱéššáĝé ţó óñé þļáýéŕ ƀý ñáɱé, ŵĥéŕéʋéŕ ţĥéý áŕé. Úšé íţ ƒóŕ á ɋúíéţ ŵóŕð.]",
       "chanParty": "[Þáŕţý.]",
       "chanPartyBody": "[Ţáļķ ţó éʋéŕýóñé íñ ýóúŕ ĝŕóúþ, ñó ɱáţţéŕ ĥóŵ šþŕéáð óúţ ýóú áŕé.]",
+      "chanBattleground": "[Ɓáţţļéĝŕóúñð.]",
+      "chanBattlegroundBody": "[Ţáļķ ţó éʋéŕý ƒíĝĥţéŕ íñ ýóúŕ ƀáţţļéĝŕóúñð, ƀóţĥ šíðéš. Óñļý ŵĥíļé á ɱáţçĥ íš ŕúññíñĝ.]",
       "chanGeneral": "[Ĝéñéŕáļ.]",
       "chanGeneralBody": "[Áñ áļŵáýš-óñ ŕéáļɱ-ŵíðé çĥáññéļ ţĥáţ ŕéáçĥéš éʋéŕýóñé óñļíñé, ĝóóð ƒóŕ ášķíñĝ á ɋúéšţíóñ óŕ ĝéñéŕáļ çĥáţţéŕ. Úñļíķé Ŵóŕļð áñð Ļóóķíñĝ ƒóŕ Ĝŕóúþ, ýóú ñéʋéŕ ĥáʋé ţó óþţ íñ.]",
       "chanWorld": "[Ŵóŕļð.]",
@@ -7417,6 +7419,7 @@ export const en_XA: EnTranslations = {
           "say": "[Šáý]",
           "yell": "[Ýéļļ]",
           "party": "[Þáŕţý]",
+          "battleground": "[Ɓáţţļéĝŕóúñð]",
           "general": "[Ĝéñéŕáļ]",
           "world": "[Ŵóŕļð]",
           "lfg": "[ĻƑĜ]",
@@ -7578,6 +7581,7 @@ export const en_XA: EnTranslations = {
     "chat": {
       "rightClickName": "[Ŕíĝĥţ-çļíçķ {name}]",
       "templates": {
+        "battleground": "[[Ɓáţţļéĝŕóúñð] {name}: {message}]",
         "party": "[[Þáŕţý] {name}: {message}]",
         "yell": "[{name} ýéļļš: {message}]",
         "whisper": "[{name} ŵĥíšþéŕš: {message}]",

@@ -5320,6 +5320,8 @@ export const ru_RU: EnTranslations = {
       "chanWhisperBody": "Личное сообщение одному игроку по имени, где бы он ни был. Используйте его для тихого слова.",
       "chanParty": "Группа.",
       "chanPartyBody": "Говорите со всеми в своей группе, как бы далеко друг от друга вы ни разошлись.",
+      "chanBattleground": "Поле боя.",
+      "chanBattlegroundBody": "Разговор со всеми бойцами на поле боя, с обеими сторонами. Только пока идёт бой.",
       "chanGeneral": "Общий.",
       "chanGeneralBody": "Всегда включённый канал на всё королевство, что достаёт до каждого, кто в сети, — удобный, чтобы задать вопрос или просто поболтать. В отличие от каналов World и Looking for Group, подписываться на него вовсе не нужно.",
       "chanWorld": "Мир.",
@@ -7417,6 +7419,7 @@ export const ru_RU: EnTranslations = {
           "say": "Сказать",
           "yell": "Крик",
           "party": "Группа",
+          "battleground": "Поле боя",
           "general": "Общий",
           "world": "Мир",
           "lfg": "Поиск группы",
@@ -7578,6 +7581,7 @@ export const ru_RU: EnTranslations = {
     "chat": {
       "rightClickName": "ПКМ по {name}",
       "templates": {
+        "battleground": "[Поле боя] {name}: {message}",
         "party": "[Группа] {name}: {message}",
         "yell": "{name} кричит: {message}",
         "whisper": "{name} шепчет: {message}",

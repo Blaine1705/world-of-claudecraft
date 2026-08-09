@@ -1945,6 +1945,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': '关闭统计',
   'hud.chat.rightClickName': '右键点击 {name}',
   'hud.chat.templates.party': '[队伍] {name}：{message}',
+  'hud.chat.templates.battleground': '[战场] {name}：{message}',
   'hud.chat.templates.yell': '{name}大喊：{message}',
   'hud.chat.templates.whisper': '{name}悄悄说：{message}',
   'hud.chat.templates.toWhisper': '对{name}说：{message}',
@@ -5233,6 +5234,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '组队',
   'hud.core.chatChannels.names.officer': '官员',
   'hud.core.chatChannels.names.party': '小队',
+  'hud.core.chatChannels.names.battleground': '战场',
   'hud.core.chatChannels.names.say': '说话',
   'hud.core.chatChannels.names.world': '世界',
   'hud.core.chatChannels.names.yell': '大喊',
@@ -6648,6 +6650,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': '寻求组队。',
   'guide.social.chanLfgBody':
     '一个需自行加入、覆盖全服的频道，用于寻找一起打地下城的人。打开它的标签页即可加入。',
+  'guide.social.chanBattleground': '战场。',
+  'guide.social.chanBattlegroundBody':
+    '与战场中的所有战士交谈，双方阵营都能看到。仅在比赛进行时可用。',
   'guide.social.chanParty': '小队。',
   'guide.social.chanPartyBody': '与你队伍中的每一个人交谈，无论你们相隔多远。',
   'guide.social.chanSay': '说。',

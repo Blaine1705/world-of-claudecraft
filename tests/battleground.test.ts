@@ -3259,3 +3259,55 @@ describe('Thornhollow Fields: the wave brings your pet back too', () => {
     expect(sim.petOf(warrior, true)).toBeFalsy();
   });
 });
+
+describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
+  // Players were falling back to General to say anything to the opposing side,
+  // which broadcasts it realm-wide. /bg is deliberately CROSS-TEAM for exactly
+  // that reason; the team already has /p, since the match welds each side into
+  // one party.
+  const chatPidsFor = (events: SimEvent[], text: string): number[] =>
+    events
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'chat' }> =>
+          e.type === 'chat' && e.channel === 'battleground' && e.text === text,
+      )
+      .map((e) => e.pid ?? -1)
+      .sort((a, b) => a - b);
+
+  it('delivers to every fighter in the match, including the enemy team', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+
+    const sent = sim.chat('/bg incoming mid', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'incoming mid' });
+    const heard = chatPidsFor(sim.tick(), 'incoming mid');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    // Decisive on the cross-team claim: the OTHER side really is in that list.
+    for (const enemy of match.teams[1]) expect(heard).toContain(enemy);
+  });
+
+  it('refuses outside a match, and says so', () => {
+    const sim = makeWorld();
+    const lone = sim.addPlayer('warrior', 'Lone');
+    sim.entities.get(lone)!.level = 20;
+
+    expect(sim.chat('/bg anyone there', lone)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
+  });
+
+  it('reaches a backfilled or mid-match roster, not a snapshot taken at start', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[1][0];
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+
+    sim.chat('/bg they are a man down', speaker);
+    const heard = chatPidsFor(sim.tick(), 'they are a man down');
+    // The deserter is gone from the roster, so they are gone from the channel.
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(heard).toHaveLength(BG_TEAM_SIZE * 2 - 1);
+  });
+});
