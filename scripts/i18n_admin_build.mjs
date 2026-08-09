@@ -26,7 +26,15 @@
 //   node scripts/i18n_admin_build.mjs
 //   I18N_OUT_DIR=... node scripts/i18n_admin_build.mjs   emit into a custom directory
 
-import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
@@ -222,21 +230,25 @@ function computePending(enKeys, locales) {
 }
 
 // Write a { filename -> contents } map into `dir` ATOMICALLY (per-file temp + rename)
-// and prune orphan *.ts. Mirrors scripts/i18n_build.mjs writeModuleDir: an atomic
-// same-dir replace keeps every slice path continuously present, so a concurrent reader
-// resolving './en_XA' through the barrel never sees it missing (a bare rmSync(dir)
-// would create that gap), and a removed locale leaves no orphan. The sweep also
-// removes any stale *.ts.tmp left by a crashed run (it never ends in plain ".ts"),
-// so a crash leftover cannot be committed. Returns total bytes.
+// and prune orphan *.ts. Mirrors scripts/i18n_build.mjs writeModuleDir: if `<name>`
+// already holds these exact bytes, skip it entirely (no tmp write, no rename, mtime
+// untouched), so a no-op regen leaves an already-fresh directory completely quiet.
+// Otherwise an atomic same-dir replace keeps every slice path continuously present,
+// so a concurrent reader resolving './en_XA' through the barrel never sees it missing
+// (a bare rmSync(dir) would create that gap), and a removed locale leaves no orphan.
+// The sweep also removes any stale *.ts.tmp left by a crashed run (it never ends in
+// plain ".ts"), so a crash leftover cannot be committed. Returns the total bytes
+// across every module (written or skipped as already identical).
 function writeModuleDir(dir, modules) {
   mkdirSync(dir, { recursive: true });
   let totalBytes = 0;
   for (const [name, text] of Object.entries(modules)) {
     const dest = path.join(dir, name);
+    totalBytes += Buffer.byteLength(text, 'utf8');
+    if (existsSync(dest) && readFileSync(dest, 'utf8') === text) continue;
     const tmp = `${dest}.tmp`;
     writeFileSync(tmp, text);
     renameSync(tmp, dest);
-    totalBytes += Buffer.byteLength(text, 'utf8');
   }
   const keep = new Set(Object.keys(modules));
   for (const entry of readdirSync(dir)) {
