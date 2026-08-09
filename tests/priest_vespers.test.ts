@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   addGloomtithe,
   GLOOMTITHE_GRACE,
-  MINDFRACTURE_SPELL_POWER_COEFF,
   resolveVespersAbility,
   TITHEFIEND_BASE_SPELL_POWER_COEFF,
   TITHEFIEND_ECHO_RATE,
@@ -102,7 +101,7 @@ describe('Vespers baseline loop', () => {
     expect(dirgeDot?.type === 'dot' ? dirgeDot.total : 0).toBe(105);
     expect(
       mindfractureHit?.type === 'directDamage' ? mindfractureHit.spellPowerCoeff : undefined,
-    ).toBe(MINDFRACTURE_SPELL_POWER_COEFF);
+    ).toBe(0.6);
   });
 
   it('binds Effigy only through Mindfracture on the priest own Dirge', () => {

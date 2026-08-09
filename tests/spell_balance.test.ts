@@ -74,6 +74,10 @@ describe('nuke damage is proportional to cast time (the balance framework rule)'
     // second than the filler).
     const ratio = nukeBaseDps('druid', 'starfire') / nukeBaseDps('druid', 'wrath');
     expect(ratio).toBeGreaterThan(0.9);
+    // Re-based, not removed (review 3050): the authored engine ratio measures
+    // 2.48; a ceiling at 3.0 keeps runaway growth red without fighting the
+    // Moontide design the old 1.3 bound predated.
+    expect(ratio).toBeLessThan(3.0);
   });
 
   it('no mage single-target nuke is a strict trap (every nuke within band of the best)', () => {

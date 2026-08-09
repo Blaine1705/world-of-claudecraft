@@ -6,6 +6,10 @@
 // pin the rng roll into the block window instead.
 import { describe, expect, it } from 'vitest';
 import { meleeSwing } from '../src/sim/combat/auto_attack';
+import {
+  blockedMeleeDamage,
+  PROTECTION_PALADIN_BLOCK_DAMAGE_REDUCTION,
+} from '../src/sim/combat/shield_block';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -349,5 +353,28 @@ describe('shield block', () => {
     const block = damageEvents(sim.drainEvents()).find((e) => e.sourceId === mob.id);
     expect(block?.kind).toBe('block');
     expect(block?.amount).toBe(14);
+  });
+});
+
+// Direct pins for the pure leaf itself (review 3050): the scenarios above
+// exercise blockedMeleeDamage only through the full swing pipeline.
+describe('blockedMeleeDamage', () => {
+  it('subtracts flat block value from a non-paladin block', () => {
+    expect(blockedMeleeDamage(100, 30, false)).toBe(70);
+  });
+
+  it('applies the Protection paladin 20% reduction before the flat block value', () => {
+    // 100 * (1 - 0.2) - 30 = 50. The order matters: subtracting first would
+    // give (100 - 30) * 0.8 = 56, so this value pins percentage-then-flat.
+    expect(blockedMeleeDamage(100, 30, true)).toBe(50);
+  });
+
+  it('never reduces a blocked hit below 1 damage', () => {
+    expect(blockedMeleeDamage(10, 50, false)).toBe(1);
+    expect(blockedMeleeDamage(10, 50, true)).toBe(1);
+  });
+
+  it('pins the Protection paladin reduction constant', () => {
+    expect(PROTECTION_PALADIN_BLOCK_DAMAGE_REDUCTION).toBe(0.2);
   });
 });

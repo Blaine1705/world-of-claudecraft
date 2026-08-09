@@ -559,10 +559,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // cancelCommissionOrder/acceptCommissionOrder/deliverCommissionOrder
     // (methods), and the paperdoll helmet-visibility eye adds setHelmHidden
     // (method), leaving 300 on the v0.35.0 base. Composed with the
-    // class-overhauls wave: Paladin Consecration ground-state, priest marker
-    // projections, and the controlled Warlock pet's pet-bar mirror add three
-    // data members; the pet's signature-skill command and autocast toggle add
-    // two methods (305). The bag clean-up button adds sortInventory
+    // class-overhauls wave: activeConsecrations, petSpecialCommandsSupported,
+    // and accountAdmin add three data members; the pet's signature-skill
+    // command and autocast toggle add two methods (305). The bag clean-up button adds sortInventory
     // (IWorldInventory, a method, 306), and the character sheet's Time Played
     // line adds playtimeSeconds (IWorldProgressionXp, data), leaving 307.
     expect(IWORLD_MEMBERS.length).toBe(307);
