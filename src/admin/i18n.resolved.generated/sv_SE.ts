@@ -766,7 +766,6 @@ export const sv_SE: AdminTranslations = {
   "location.kind.dungeon": "Fängelsehåla",
   "location.kind.delve": "Delve",
   "location.kind.rift": "Reva",
-  "location.kind.battleground": "Slagfält",
   "location.type": "Typ: {value}",
   "location.zone": "Zon: {value}",
   "location.instance": "Instans: {value}",

@@ -15,10 +15,8 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import {
-  battlegroundOrigin,
   INSTANCE_X_BASE,
   isArenaPos,
-  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
@@ -28,7 +26,6 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { bgCarryingFlag } from './social/battleground';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
@@ -87,21 +84,6 @@ function located(area: UnstuckArea, pos: Vec3, origin: { x: number; z: number })
 
 /** Resolve a position into a stable content identity plus instance-local coords. */
 export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): LocatedPoint | null {
-  const bgMatch = ctx.bgMatches.get(pid) ?? null;
-  if (bgMatch && isBgPos(pos.x)) {
-    return located(
-      {
-        kind: 'battleground',
-        id: 'thornhollow_fields',
-        instanceId: String(bgMatch.id),
-        slot: bgMatch.slot,
-      },
-      pos,
-      battlegroundOrigin(bgMatch.slot),
-    );
-  }
-  if (isBgPos(pos.x)) return null;
-
   const rift = riftInstanceAtPos(ctx, pos);
   if (rift) {
     if (!rift.memberIds.has(pid)) return null;
@@ -192,9 +174,7 @@ function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
     isValeCupPlayer(ctx, pid) ||
-    (!p.dead && !p.ghost && bgCarryingFlag(ctx, pid)) ||
-    isArenaPos(p.pos.x) ||
-    (isBgPos(p.pos.x) && !ctx.bgMatches.has(pid))
+    isArenaPos(p.pos.x)
   );
 }
 

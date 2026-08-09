@@ -597,7 +597,6 @@ export const ru_RU: Record<string, string> = {
   'location.kind.dungeon': 'Подземелье',
   'location.kind.delve': 'Вылазка',
   'location.kind.rift': 'Разлом',
-  'location.kind.battleground': 'Поле боя',
   'location.type': 'Тип: {value}',
   'location.zone': 'Зона: {value}',
   'location.instance': 'Инстанс: {value}',

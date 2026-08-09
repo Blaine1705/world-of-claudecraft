@@ -1,13 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BG_GRAVEYARDS, battlegroundColliders } from '../src/sim/battleground_layout';
-import {
-  BUILTIN_WORLD,
-  battlegroundOrigin,
-  DELVES,
-  INSTANCE_X_BASE,
-  isBgPos,
-  setActiveWorldContent,
-} from '../src/sim/data';
+import { BUILTIN_WORLD, DELVES, INSTANCE_X_BASE, setActiveWorldContent } from '../src/sim/data';
 import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { swimSurfaceY } from '../src/sim/player_motion';
@@ -19,10 +11,8 @@ import {
   unstuckSicknessDuration,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
-import { type BgMatch, startBgMatch } from '../src/sim/social/battleground';
 import {
   applyResurrectionSickness,
-  bgGraveyardSpot,
   moveToGraveyardForUnstuck,
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
@@ -108,37 +98,6 @@ function tickMany(sim: Sim, count: number): SimEvent[] {
   const events: SimEvent[] = [];
   for (let i = 0; i < count; i++) events.push(...sim.tick());
   return events;
-}
-
-function makeBattleground(): { sim: Sim; match: BgMatch; crimson: number } {
-  const sim = makeWorld();
-  const pids: number[] = [];
-  for (let i = 0; i < 10; i++) {
-    const pid = sim.addPlayer('warrior', `Fighter${i}`);
-    required(sim.entities.get(pid), 'battleground fighter').level = 20;
-    pids.push(pid);
-  }
-  startBgMatch(sim.ctx, pids.slice(0, 5), pids.slice(5), { rated: false });
-  const match = required(sim.ctx.bgMatches.get(pids[0]), 'battleground match');
-  match.state = 'active';
-  match.timer = 0;
-  sim.drainEvents();
-  return { sim, match, crimson: pids[0] };
-}
-
-function placePlayer(sim: Sim, pid: number, x: number, z: number): Sim['player'] {
-  const player = required(sim.entities.get(pid), 'player to place');
-  player.pos = sim.groundPos(x, z);
-  player.prevPos = { ...player.pos };
-  player.vx = 0;
-  player.vy = 0;
-  player.vz = 0;
-  player.onGround = true;
-  player.jumping = false;
-  player.inCombat = false;
-  player.combatTimer = 999;
-  sim.ctx.rebucket(player);
-  return player;
 }
 
 function accepted(sim: Sim): {
@@ -745,116 +704,6 @@ describe('unstuck while dead', () => {
 });
 
 describe('unstuck area identity', () => {
-  it('blocks a live battleground flag carrier before the graveyard move starts', () => {
-    const { sim, match, crimson } = makeBattleground();
-    const flag = match.flags[1];
-    const player = placePlayer(sim, crimson, flag.home.x, flag.home.z);
-    sim.bgFlagAction(crimson);
-    sim.tick();
-    sim.drainEvents();
-
-    expect(flag.state).toBe('carried');
-    expect(flag.carrier).toBe(crimson);
-    const carriedAt = { ...player.pos };
-
-    expect(sim.unstuck(crimson)).toBe(false);
-    expect(eventsOf(sim.drainEvents())).toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'competitive' }),
-    );
-    expect(required(sim.meta(crimson), 'carrier metadata').pendingUnstuck).toBeNull();
-
-    tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20 + 1);
-    expect(flag.state).toBe('carried');
-    expect(flag.carrier).toBe(crimson);
-    expect(player.pos).toMatchObject(carriedAt);
-  });
-
-  it('cancels a battleground recovery if the player becomes a live flag carrier', () => {
-    const { sim, match, crimson } = makeBattleground();
-    const flag = match.flags[1];
-    placePlayer(sim, crimson, flag.home.x, flag.home.z);
-
-    expect(sim.unstuck(crimson)).toBe(true);
-    sim.drainEvents();
-    sim.bgFlagAction(crimson);
-    sim.tick();
-    expect(flag.state).toBe('carried');
-    expect(flag.carrier).toBe(crimson);
-
-    expect(eventsOf(sim.tick())).toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'state_changed' }),
-    );
-    expect(required(sim.meta(crimson), 'carrier metadata').pendingUnstuck).toBeNull();
-  });
-
-  it('keeps a trapped live battleground fighter in their match and moves them to the team graveyard', () => {
-    const { sim, match, crimson } = makeBattleground();
-    const player = required(sim.entities.get(crimson), 'crimson fighter');
-    const origin = battlegroundOrigin(match.slot);
-    const wall = required(
-      battlegroundColliders().find((c) => c.type === 'obb' && !c.standable),
-      'battleground wall collider',
-    );
-    player.pos = sim.groundPos(origin.x + wall.x, origin.z + wall.z);
-    player.prevPos = { ...player.pos };
-    player.vx = 0;
-    player.vy = 0;
-    player.vz = 0;
-    player.onGround = true;
-    player.jumping = false;
-    player.inCombat = false;
-    player.combatTimer = 999;
-    sim.ctx.rebucket(player);
-
-    const current = required(unstuckLocationAt(sim.ctx, crimson, player.pos), 'bg location');
-    expect(current.area).toMatchObject({
-      kind: 'battleground',
-      id: 'thornhollow_fields',
-      instanceId: String(match.id),
-      slot: match.slot,
-    });
-    expect(sim.unstuck(crimson)).toBe(true);
-    sim.drainEvents();
-
-    const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
-      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
-    );
-    const destination = bgGraveyardSpot(match, crimson);
-    const plot = BG_GRAVEYARDS[0];
-    expect(completed?.reason).toBe('moved_to_graveyard');
-    expect(completed?.area).toMatchObject(current.area);
-    expect(completed?.destination).toMatchObject({
-      x: player.pos.x,
-      y: player.pos.y,
-      z: player.pos.z,
-    });
-    expect(player.pos).toMatchObject(sim.groundPos(destination.x, destination.z));
-    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
-    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
-    expect(isBgPos(player.pos.x)).toBe(true);
-    expect(sim.ctx.bgMatches.get(crimson)).toBe(match);
-    expect(player.dead).toBe(false);
-    expect(player.ghost).toBe(false);
-    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
-    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
-  });
-
-  it('does not classify the battleground band for players outside that match', () => {
-    const { sim, match, crimson } = makeBattleground();
-    const bystander = sim.addPlayer('warrior', 'Bystander');
-    const bystanderPlayer = required(sim.entities.get(bystander), 'bystander');
-    const fighter = required(sim.entities.get(crimson), 'fighter');
-    bystanderPlayer.pos = { ...fighter.pos };
-    bystanderPlayer.prevPos = { ...bystanderPlayer.pos };
-
-    expect(unstuckLocationAt(sim.ctx, bystander, bystanderPlayer.pos)).toBeNull();
-    expect(sim.unstuck(bystander)).toBe(false);
-    expect(eventsOf(sim.drainEvents())).toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'competitive' }),
-    );
-    expect(sim.ctx.bgMatches.get(crimson)).toBe(match);
-  });
-
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
     const dungeon = makeWorld();
     dungeon.enterDungeon('hollow_crypt', dungeon.player.id);

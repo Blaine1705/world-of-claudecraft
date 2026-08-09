@@ -553,7 +553,6 @@ export const de_DE: Record<string, string> = {
   'location.kind.overworld': 'Oberwelt',
   'location.kind.dungeon': 'Dungeon',
   'location.kind.delve': 'Tiefgang',
-  'location.kind.battleground': 'Schlachtfeld',
   'location.type': 'Typ: {value}',
   'location.zone': 'Zone: {value}',
   'location.instance': 'Instanz: {value}',

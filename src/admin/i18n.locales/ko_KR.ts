@@ -592,7 +592,6 @@ export const ko_KR: Record<string, string> = {
   'location.kind.dungeon': '던전',
   'location.kind.delve': '탐굴',
   'location.kind.rift': '균열',
-  'location.kind.battleground': '전장',
   'location.type': '유형: {value}',
   'location.zone': '지역: {value}',
   'location.instance': '인스턴스: {value}',

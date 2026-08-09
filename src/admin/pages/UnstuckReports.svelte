@@ -35,7 +35,6 @@
     if (kind === 'overworld') return t('location.kind.overworld');
     if (kind === 'dungeon') return t('location.kind.dungeon');
     if (kind === 'delve') return t('location.kind.delve');
-    if (kind === 'battleground') return t('location.kind.battleground');
     return t('location.kind.rift');
   }
 

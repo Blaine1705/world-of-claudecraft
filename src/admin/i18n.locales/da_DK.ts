@@ -548,7 +548,6 @@ export const da_DK: Record<string, string> = {
   'location.kind.dungeon': 'Fangehul',
   'location.kind.delve': 'Delve',
   'location.kind.rift': 'Rift',
-  'location.kind.battleground': 'Slagmark',
   'location.type': 'Type: {value}',
   'location.zone': 'Zone: {value}',
   'location.instance': 'Instans: {value}',

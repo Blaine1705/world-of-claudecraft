@@ -556,7 +556,6 @@ export const es: Record<string, string> = {
   'location.kind.dungeon': 'Mazmorra',
   'location.kind.delve': 'Expedición',
   'location.kind.rift': 'Brecha',
-  'location.kind.battleground': 'Campo de batalla',
   'location.type': 'Tipo: {value}',
   'location.zone': 'Zona: {value}',
   'location.instance': 'Instancia: {value}',

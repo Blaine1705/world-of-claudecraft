@@ -766,7 +766,6 @@ export const pl_PL: AdminTranslations = {
   "location.kind.dungeon": "Loch",
   "location.kind.delve": "Wyprawa",
   "location.kind.rift": "Szczelina",
-  "location.kind.battleground": "Pole bitwy",
   "location.type": "Typ: {value}",
   "location.zone": "Strefa: {value}",
   "location.instance": "Instancja: {value}",

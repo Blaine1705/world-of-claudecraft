@@ -786,7 +786,6 @@ export const en = {
   'location.kind.dungeon': 'Dungeon',
   'location.kind.delve': 'Delve',
   'location.kind.rift': 'Rift',
-  'location.kind.battleground': 'Battleground',
   'location.type': 'Type: {value}',
   'location.zone': 'Zone: {value}',
   'location.instance': 'Instance: {value}',

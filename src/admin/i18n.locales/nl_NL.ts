@@ -553,7 +553,6 @@ export const nl_NL: Record<string, string> = {
   'location.kind.dungeon': 'Kerker',
   'location.kind.delve': 'Delve',
   'location.kind.rift': 'Rift',
-  'location.kind.battleground': 'Slagveld',
   'location.type': 'Type: {value}',
   'location.zone': 'Gebied: {value}',
   'location.instance': 'Instantie: {value}',

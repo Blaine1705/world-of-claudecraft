@@ -592,7 +592,6 @@ export const tr_TR: Record<string, string> = {
   'location.kind.dungeon': 'Zindan',
   'location.kind.delve': 'Mağara Seferi',
   'location.kind.rift': 'Yarık',
-  'location.kind.battleground': 'Savaş Alanı',
   'location.type': 'Tür: {value}',
   'location.zone': 'Bölge: {value}',
   'location.instance': 'Örnek: {value}',
