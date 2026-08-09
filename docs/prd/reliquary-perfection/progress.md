@@ -1944,3 +1944,25 @@ owns the push.
   scan clean (no dashes, emojis, .only, debugger).
 - LOCAL ONLY per the runner prompt: committed, never pushed; Phase 18 QA
   owns the gate-on-committed-tree run and the push.
+- Gate on the committed tree (TURBO_FORCE=1): first run FAILED at the full
+  vitest step with three real finds the targeted suites could not see (the
+  first run's exit code was also masked by a grep pipe in the runner, the
+  recorded background-gate lesson firing again; the failure was caught by
+  reading the log): tests/warfare_titles.test.ts pinned the honor ladder as
+  DEED_ORDER's absolute tail, displaced by the five appended deeds
+  (re-pinned as the contiguous slice at its release point), and
+  tests/gather_rare_events.test.ts's stub meta lacked deedsEarned, which
+  the mark path's unconditional completion sync now reads (the stub gained
+  the empty Map; the sim keeps no defensive guard since real PlayerMeta
+  always carries it). Fix commit efe93ee206, then a clean re-run: PASS,
+  ALL 8 STEPS GREEN, exit 0 unmasked; full suite 33389 passed in-gate (2
+  expected fail, 108 skipped, workers 8, up from 33350 at the Phase 17
+  push), browser regressions 16 files 111 tests green, i18n + wiki + SFX
+  artifacts fresh, malware scan clean, tsc + env/server/bot builds + the
+  client bundle green.
+- The release base moved mid-phase (PR 2974, mobile Seeker rewards layout):
+  synced with merge b2c79558cc after the four phase commits; the delta
+  touched zero branch-owned files (no release-merge-audit owed) and its
+  mobile/styles suites pass on the merged tree.
+- Phase tip after the gate: efe93ee206 (four feature/docs commits, the sync
+  merge, and the gate-found pin fix). LOCAL ONLY; Phase 18 QA owns the push.
