@@ -121,6 +121,37 @@ timings. Next up: phase 5 (phase-05-governor-low-tier.md), fresh session,
 pull+merge first; read the windows-30fps and mobile-thermal memory topics
 before touching the governor.
 
+Phase 5 done (2026-08-09, commits ec3a8d8054 style reformat, 5a04133a49 ladder
+fix, 4fe929d002 LOW retune + lowPlus gate, 0d24d50e9b dense-scene pin,
+9e93468778 dressing fix, 281a0a29ca review hardening, 1fad312836 screenshots;
+base merge no-op, tip still 5819c005a7; tree clean, LOCAL-ONLY intact): the
+recovery gate is split (canRecover = measured headroom only, gating all
+recovery and stableSeconds; canEnrich = the three counter clauses, gating only
+the above-baseline climb) and recover() restores every bucket to baseline and
+then render scale BEFORE any above-baseline rung; the reproducing test failed
+red pre-fix. The phase 4 governor-hold debt is closed (threading-suite pin:
+exactly one present-guarded updateAdaptiveResolution call site, polarity
+included). LOW DERIVATION RULE: band baseline/max = medium x 0.95 (2 decimals),
+band minima and caps floors EQUAL mediums, caps = medium x 0.9 rounded clean,
+grassRadius 72; derived axes point lights 6 -> 4 and vfx 1.0 -> 0.76. LOWPLUS
+GATE: iosMemoryProfile || (tier low AND classifyGpuRenderer in {weak,
+software}); masked adapter = plain low. The dressing richness trio (10/1.24/
+1.08, the 1.79x) moved from leanFoliage onto lowPlus with a deep-equality
+medium-parity pin. Deliberate + pinned: dense frames no longer reset
+stableSeconds (one sub-line frame at a fire slot = one enrich step). Probes
+13/13 killed rc != 0 named on committed trees (the M4 survivor was a real gap,
+closed by the dense-scene pin). Seam review fresh: 0 blocking, fairness PASS,
+4 should-fix all fixed. Perf: LOW 211.4 fps overall vs MEDIUM 78.7, p95 and
+calls lighter on every scenario, tris lighter on the three field scenarios;
+town tris (LOW 4.53M vs 3.55M) attributed STRUCTURAL (farFieldPolicy denies
+sprites+vista to lean/non-standard-material profiles, so low draws classic
+detail to fog far 700), owned by the upstream player-performance Packet 5
+audit, recorded for QA. Evidence: docs/perf/baseline/history.jsonl + phase
+notes; screenshots docs/screenshots/desktop-client-update-phase5-low/. Gate:
+full-suite fallback red only on the 8 seal suites / 11 tests, turbo proofs
+5/5 + 3/3, biome pin proven never committed. Next up: phase 5 QA
+(phase-05-qa.md), fresh session, pull+merge first.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -283,6 +314,21 @@ GpuNoticeVerdict gained hybridGpuLikely, mergeShellGpuVerdict gained
 localHybridGpuLikely, initGpuNotice gained hybridGpuLikely + desktopPlatform,
 resolveGpuNotice gained legacyHybridDismissed, gpuNoticeBodyKey takes an
 object input, and LEGACY_HYBRID_DISMISSED_KEY is read-only compat.
+Phase 5 additions: tests/render_budget_recovery.test.ts (repro, phase A
+ordering, dense-scene counter-independence, one-dip enrich; HIGH tier by
+design), tests/gfx_low_monotonicity.test.ts (per-axis low vs medium pins over
+the live tables incl. the non-governable sweep and the caps-floor/band-min
+mirror), tests/foliage_dressing_profile.test.ts (medium-parity deep equality +
+lowPlus cohort split). recover() gained the allowAboveBaseline parameter and
+canEnrich sits beside canRecover in render_budget.ts. gfx.ts: lowPlus is
+classifier-gated, low bands/caps/radius retuned, characters floor 0.86.
+foliage.ts: dressing trio keyed on GFX.lowPlus, new export
+foliageDressingInternalsForTest { generateDressing, dressStep }. The governor
+hold pin lives in tests/desktop_presentation_threading.test.ts (phase 4 QA F6
+describe). Screenshots under docs/screenshots/desktop-client-update-phase5-low/.
+tests/gfx_override_core.test.ts low hash re-minted twice (retune, then the
+characters floor); scripts/lib/perf_attrib_plan.mjs + its test moved to
+grassRadius:72.
 New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
 no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
 { softwareRendering, discreteInactive, adapter<=64 } whitelisted in
@@ -346,7 +392,10 @@ Vendor bundle sha256 baselines (recorded by phase 1 QA; regen-stability verified
 rebuild reproduced identical bytes): electron_log_main.cjs
 784caa8281339772203a5881f442bbf4199163d6ef0914fc5d26eca8e3a967bd, electron_updater.cjs
 0605218d342a1c1b219677cebf64c848a1b55ff5d865daf8c71b70395c83287f.
-Perf baselines: (none yet; Phase 6 freezes the pre-upgrade baseline, path recorded here)
+Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
+pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
+raw runs in tmp/perf-baseline/, gitignored). Phase 6 freezes the pre-upgrade
+baseline with `node scripts/perf_baseline.mjs baseline --preset <p>`.
 
 ## Known gotchas for this packet
 

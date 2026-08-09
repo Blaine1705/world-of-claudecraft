@@ -12,7 +12,7 @@
 | 3 QA | Verify phase 3 | done | 2026-08-08 | 2026-08-08 |
 | 4 | Presentation lifecycle | done | 2026-08-08 | 2026-08-08 |
 | 4 QA | Verify phase 4 | done | 2026-08-09 | 2026-08-09 |
-| 5 | Governor and LOW tier | not started | | |
+| 5 | Governor and LOW tier | done | 2026-08-09 | 2026-08-09 |
 | 5 QA | Verify phase 5 | not started | | |
 | 6 | three.js 0.185 train | not started | | |
 | 6 QA | Verify phase 6 | not started | | |
@@ -48,9 +48,12 @@ PASS-WITH-FOLLOWUPS: 1 blocking + 10 should-fix fixed in-session, 1 should-fix
 adjudicated to the ledger; 13/13 fresh mutations killed; evidence rerun green
 on the merged tree with two new deterministic probe arms).
 
-Phase 5: [ ] recovery-ladder stall fixed with a reproducing test; [ ] LOW monotonicity
-retune (bands, caps, floors, radius, lowPlus gating) with per-axis pins; [ ] perf
-evidence LOW <= MEDIUM load at baseline and floors.
+Phase 5: [x] recovery-ladder stall fixed with a reproducing test (red pre-fix, the
+canRecover/canEnrich split, resolution at the end of phase A); [x] LOW monotonicity
+retune (bands, caps, floors, radius, lowPlus gating, plus point lights, vfx level,
+the dressing trio and the dormant characters floor) with per-axis pins; [x] perf
+evidence LOW <= MEDIUM frame cost and calls on every scenario (town triangles
+attributed structural, see the notes).
 
 Phase 6: [ ] pre-upgrade perf baseline frozen + reference screenshots; [ ] three
 0.185.1 + postprocessing 6.39.4 + n8ao 2.0.0 compile and all suites green; [ ] the
@@ -762,3 +765,93 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   skip survives an interaction (derive + focus self-heal confirmed on the
   committed triggers, and the F2 backstop now bounds even the no-event WM
   case to 15 s).
+
+### Phase 5 (2026-08-09, governor recovery ladder + LOW monotonicity)
+
+- Base merge: no-op (release tip 5819c005a7 was already absorbed by the phase 4 QA
+  merge). Both residual verdicts were RE-VERIFIED on the merged tree before any code
+  (Explore agent report plus main-session spot-checks of recover(), canRecover,
+  CAPS_BY_TIER, the lowPlus gate site and both test suites).
+- Commits: ec3a8d8054 (style-only reformat of tests/render_budget.test.ts, which was
+  format-dirty at HEAD, kept separate so the fix diff stays readable), 5a04133a49
+  ladder fix, 4fe929d002 LOW retune + lowPlus gate, 0d24d50e9b dense-scene pin,
+  9e93468778 dressing richness fix, 281a0a29ca seam-review hardening, 1fad312836
+  screenshots.
+- Ladder mechanism: canRecover keeps only the measured-headroom clauses and gates all
+  recovery plus stableSeconds; the three counter clauses moved to canEnrich, gating
+  only the climb above baseline; recover(maxRenderScale, allowAboveBaseline) is
+  phase A (grass, lighting, vfx, foliage to baseline, then resolution) then phase B
+  (band maxima). The reproducing test failed pre-fix exactly as predicted (resolution
+  stuck at the 0.7 floor across 260 full-headroom frames); the old recovers-slowly
+  pin was constant-true (12 frames never reached recoverStableSeconds and >= passes
+  with no recovery) and is now a strict-increase second repro at 60 frames.
+- The phase 4 governor-hold ledger debt is CLOSED: the threading suite pins
+  this.updateAdaptiveResolution( to exactly one occurrence whose whole containing
+  statement is the present-guarded form (polarity included).
+- Deliberate semantics change, pinned: dense frames no longer reset stableSeconds, so
+  one frame under the 90% counter line at a fire slot permits ONE enrich step
+  (bounded by cooldown and the at-slot re-check). Comment in canEnrich names it.
+- LOW derivation rule (recorded per the packet): band baseline and max are mediums
+  x 0.95 rounded to 2 decimals, band minima and caps floors EQUAL mediums, caps are
+  mediums x 0.9 rounded clean, grassRadius 80 -> 72 against mediums 76.
+  Derived axes: effective point lights 6 -> 4 (equal medium), vfx
+  quality 1.0 -> 0.76, effective baseline grass ring 72.0 -> 53.28 vs mediums 59.28.
+- lowPlus gate (recorded per the packet): iosMemoryProfile || (tier === low AND
+  classifyGpuRenderer(hints.gpuRenderer) in {weak, software}). No second regex set;
+  undefined/masked adapters land on plain low. Pins: plain and no-adapter negative,
+  weak-Intel and SwiftShader positive, mediumIris negative, iOS arm positive.
+- Ground dressing: the richness trio (step 10 vs 12, density 1.24, spot boost 1.08,
+  the July-investigation 1.79x) rode leanFoliage and now rides lowPlus;
+  tests/foliage_dressing_profile.test.ts pins medium parity by deep equality plus
+  the cohort split and the boost ratio band.
+- tests/foliage_perceptual_density.test.ts re-derived: the old 0.7-0.9 band measured
+  ring-edge cull alignment, not thinning (at radius 72 those chunks are never
+  built); the new 720p phase sits at a chunk-grid corner mid-smoothstep (6.6 px),
+  derives a 0.88-0.97 band, and adds a partial-visible-chunk assertion only true
+  thinning can satisfy. Corrections worth keeping: activeRadius in that rig is 72
+  (quality stays 1, the governor never runs there) and the camera distance is
+  per-chunk, not a boom.
+- Mutation probes on committed trees: 13/13 killed rc != 0 with named tests. The
+  original M4 (counter clauses restored onto the whole gate) SURVIVED the first
+  round: the organic repro crosses the band only via the climb, after resolution
+  already recovered. Closed by the dense-scene pin (0d24d50e9b), which parks the
+  counters in-band from the first recovery frame.
+- Reviewer (frontend-seam-reviewer, fresh): 0 blocking, fairness PASS (vfx and
+  lighting consumers traced cosmetic end to end; the AoE telegraph spawns outside
+  every quality gate; light count stays maxPointLights, only intensity scales).
+  All 4 should-fix fixed: characters floor 0.86 + the non-governable sweep, the
+  stableSeconds precharge pinned deliberate, the constant-true grass bound now reads
+  the live band max, screenshots captured. Notes: the player-performance brainstorm
+  line updated to record 72; a low-tier arm for the recovery suite is a QA
+  candidate; the ability_vfx mote gate (0.5) now sits 0.08 under both tiers vfx
+  floors, unguarded if a future retune drops under it.
+- Perf evidence (this machine: RTX 5090, headed, vsync off, 1280x720, rows in
+  docs/perf/baseline/history.jsonl; raw runs in tmp/perf-baseline/):
+  LOW post-retune overall 211.4 fps (min scenario 140.3), p95 6.6-24.3 ms, calls
+  194-325, tris 0.68M-4.53M. MEDIUM overall 78.7 fps (min 70.2), p95 26.3-35.7 ms,
+  calls 433-570, tris 2.38M-3.56M. LOW is lighter on frame cost and calls in EVERY
+  scenario and on triangles in the three field scenarios. TOWN TRIANGLES stay higher
+  on LOW (4.53M vs 3.55M): attributed STRUCTURAL, farFieldPolicy (far_terrain_core)
+  requires standardMaterials && !leanFoliage for sprites+vista, so medium culls
+  detail at the vista horizon and draws cheap far tiles while low draws classic
+  full detail to the biome fog far (700 in the vale). That asymmetry predates this
+  phase and is the upstream player-performance Packet 5 audit (its fogFar row);
+  recorded for phase 5 QA, NOT a phase 5 regression. The dressing fix does not move
+  town numbers because towns exclude random dressing.
+- Screenshots: docs/screenshots/desktop-client-update-phase5-low/ (LOW preset, real
+  GPU, pr_screenshots tooling). Near-identical by design; the commit body says why.
+- Gate (gate_select, BROWSER_PATH exported, biome defaultBranch pinned for the run
+  and reverted, proven in no commit): full-suite fallback (biome.json in the
+  changed set) red ONLY on the 8 accepted asset-seal suites / 11 tests; 2418 files
+  / 33189 tests green; i18n gen + freshness, malware scan (0 high), biome changed
+  files all PASS; post-abort turbo proofs 5/5 (check:types build:env build:server
+  build:bot) and 3/3 (build:bundle). No dungeon_finder flake this run.
+- Untaken free candidates: F19 (first post-refocus report window spans hidden
+  wall-clock) did not fall out free, still a phase 7 item; the cap-detection window
+  (the brainstorm residual, 28-48 ms) untouched per scope.
+- QA handoff for phase 5 QA: re-run the 13 probes fresh on the committed tree;
+  re-litigate the stableSeconds precharge decision and the dressing-on-lowPlus
+  keying (mediumIris cohort lost the dressing boost, deliberate, tier parity);
+  the town-triangles structural note (vista denial on lean profiles) is the one
+  open perf item; the low-tier recovery-suite arm and the mote-gate margin are
+  cheap coverage candidates.
