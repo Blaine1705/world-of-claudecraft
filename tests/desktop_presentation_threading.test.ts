@@ -76,6 +76,22 @@ describe('the presentation gate threading in main.ts frame()', () => {
     expect(body.match(/} else hud\.update\(false\);/g)).toHaveLength(2);
   });
 
+  it('keeps the stateless paint/render helpers gated and the breath timer ungated (F7)', () => {
+    expect(body.match(/if \(gate\.render\) syncGroundAimReticle\(\);/g)).toHaveLength(2);
+    expect(body).toContain('if (gate.paint) spectateBadge.update(net.spectating);');
+    expect(body).toContain('if (gate.paint) maybeShowImmobileNote(now);');
+    expect(
+      body.match(
+        /if \(gate\.render\) \{ traceStart = perf\.startTrace\(\); try \{ updateClickMoveMarker\(\);/g,
+      ),
+    ).toHaveLength(2);
+    // The breath bar accumulates a client-side timer; gating it would show a
+    // restored player more breath than they have. One arm per direction.
+    expect(body).toContain('updateBreathBar(frameDt);');
+    expect(body).not.toContain('if (gate.paint) updateBreathBar');
+    expect(body).not.toContain('if (gate.render) updateBreathBar');
+  });
+
   it('gates perf.tick on render and keeps the liveness breadcrumb unconditional at BOTH sites', () => {
     expect(body.match(/if \(gate\.render\) perf\.tick\(now\);/g)).toHaveLength(2);
     const breadcrumbs = body.match(/entryDiagnostics\.renderedFrame\(now\);/g) ?? [];
