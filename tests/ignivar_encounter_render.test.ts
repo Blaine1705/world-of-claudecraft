@@ -13,6 +13,7 @@ import {
   buildIgnivarSkyfireTelegraph,
   buildIgnivarSoakCircle,
   disposeIgnivarEncounterVisuals,
+  hasVisibleIgnivarEncounterTelegraph,
   IGNIVAR_BRAND_VISUAL_NAME,
   IGNIVAR_FRONTAL_VISUAL_NAME,
   IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
@@ -163,6 +164,25 @@ describe('Ignivar encounter renderer', () => {
     expect(campfireEmber).toHaveBeenCalledTimes(2);
     expect(model.userData.ignivarModelVfxTime).toBeCloseTo(0.2);
     expect(flameMaterials.some((material) => material.uniforms.uTime.value > 0)).toBe(true);
+
+    syncIgnivarEncounterVisuals(
+      model,
+      {
+        kind: 'mob',
+        templateId: IGNIVAR_BOSS_ID,
+        castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+        auras: [],
+        scale: 3.4,
+      },
+      0.2,
+      { campfireEmber, syncIgnivarJudgmentGroundFire: vi.fn() } as unknown as Vfx,
+      undefined,
+      false,
+    );
+    expect(campfireEmber).toHaveBeenCalledTimes(2);
+    expect(model.userData.ignivarModelVfxTime).toBeCloseTo(0.2);
+    expect(model.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME)?.visible).toBe(true);
+    expect(hasVisibleIgnivarEncounterTelegraph(model)).toBe(true);
 
     disposeIgnivarEncounterVisuals(model);
     expect(model.getObjectByName(IGNIVAR_CHEST_FIRE_NAME)).toBeUndefined();
@@ -932,9 +952,12 @@ describe('Ignivar encounter renderer', () => {
     expect(renderer).toContain('e.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID');
     expect(renderer).toContain('e.castingAbility === IGNIVAR_JUDGMENT_CAST_ID');
     expect(renderer).toContain(
-      'syncIgnivarEncounterVisuals(v.group, e, dt, this.vfx, v.visual?.root);',
+      'characterBodyOnScreen || ignivarEncounterBypassesCharacterCulling(e)',
     );
-    expect(renderer).toContain('!ignivarEncounterBypassesCharacterCulling(e)');
+    expect(renderer).toContain(
+      '(e.templateId === IGNIVAR_BOSS_ID && hasVisibleIgnivarEncounterTelegraph(v.group))',
+    );
+    expect(renderer).toContain('v.visual.root, characterBodyOnScreen');
     expect(renderer).toContain('warningLead: ev.warningLead');
     expect(hud).toContain('resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label)');
   });

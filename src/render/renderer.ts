@@ -293,7 +293,11 @@ import {
   isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
-import { disposeIgnivarEncounterVisuals, syncIgnivarEncounterVisuals } from './ignivar_encounter';
+import {
+  disposeIgnivarEncounterVisuals,
+  hasVisibleIgnivarEncounterTelegraph,
+  syncIgnivarEncounterVisuals,
+} from './ignivar_encounter';
 import { ignivarEncounterBypassesCharacterCulling } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
@@ -9599,7 +9603,6 @@ export class Renderer {
         this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
-      syncIgnivarEncounterVisuals(v.group, e, dt, this.vfx, v.visual?.root);
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
@@ -9719,16 +9722,23 @@ export class Renderer {
       if (!v.visual) continue;
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
-      let charOnScreen = true;
-      if (this.cullCharacters && id !== p.id && !ignivarEncounterBypassesCharacterCulling(e)) {
+      let characterBodyOnScreen = true;
+      if (this.cullCharacters && id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
-        charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
+        characterBodyOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
+      const charOnScreen = characterBodyOnScreen || ignivarEncounterBypassesCharacterCulling(e);
       const runCharacterPresentation = shouldRunCharacterPresentationWork(
         charOnScreen,
         actionablePose,
       );
+      if (
+        runCharacterPresentation ||
+        (e.templateId === IGNIVAR_BOSS_ID && hasVisibleIgnivarEncounterTelegraph(v.group))
+      ) {
+        syncIgnivarEncounterVisuals(v.group, e, dt, this.vfx, v.visual.root, characterBodyOnScreen);
+      }
 
       let iceBlockActivated = false;
       if (runCharacterPresentation) {

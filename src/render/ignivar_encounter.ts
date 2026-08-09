@@ -286,6 +286,20 @@ export function disposeIgnivarEncounterVisuals(group: THREE.Group): void {
   }
 }
 
+/** Keeps one offscreen cleanup frame alive after an arena telegraph ends. */
+export function hasVisibleIgnivarEncounterTelegraph(group: THREE.Group): boolean {
+  for (const name of [
+    IGNIVAR_FRONTAL_VISUAL_NAME,
+    IGNIVAR_SKYFIRE_VISUAL_NAME,
+    IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
+    IGNIVAR_FORGE_WAVE_VISUAL_NAME,
+    IGNIVAR_JUDGMENT_VISUAL_NAME,
+  ]) {
+    if (group.getObjectByName(name)?.visible) return true;
+  }
+  return false;
+}
+
 /** Lazily adds and toggles encounter telegraphs on existing entity groups. */
 export function syncIgnivarEncounterVisuals(
   group: THREE.Group,
@@ -293,7 +307,9 @@ export function syncIgnivarEncounterVisuals(
   dt = 0,
   vfx?: Vfx,
   bodyRoot?: THREE.Object3D,
+  syncModelVfx = true,
 ): void {
+  if (entity.templateId !== IGNIVAR_BOSS_ID && entity.kind !== 'player') return;
   const plan = ignivarEncounterVisualPlan(entity);
   if (entity.templateId === IGNIVAR_BOSS_ID) {
     const bodyLock = group.userData.ignivarRotatingRaysBodyLock as
@@ -322,7 +338,7 @@ export function syncIgnivarEncounterVisuals(
         delete group.userData.ignivarRotatingRaysBodyLock;
       }
     }
-    syncIgnivarModelVfx(group, dt, vfx);
+    if (syncModelVfx) syncIgnivarModelVfx(group, dt, vfx);
     let frontal = group.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME);
     if (!frontal) {
       frontal = buildIgnivarFrontalTelegraph();
