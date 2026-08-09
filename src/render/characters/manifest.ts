@@ -531,13 +531,23 @@ const GLUB_FLOATING: ClipMap = {
   attack: ['Glub_Attack'],
 };
 
+// The flying demon family's own attack (scripts/build_demon_flying_anims.mjs,
+// issue #2889): same FLOATING sharing problem as the elemental above, baked
+// off demon.glb's own donor poses (a forward lunge plus its two unused
+// gesture clips, same playbook as ELEMENTAL_FLOATING). Only mob_demon_flying
+// gets it; every other FLOATING family is untouched.
+const DEMON_FLYING_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['DemonFlying_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Walk',
   attack: ['Bite_Front'],
-  hit: ['HitRecieve'],
+  hit: ['HitRecieve', 'HitRecieve_Dazed'],
   death: 'Death',
 };
 
@@ -781,7 +791,7 @@ function swims(def: VisualDef): VisualDef {
   };
 }
 
-const SKINS_DIR = 'textures/skins';
+export const SKINS_DIR = 'textures/skins';
 
 // ---------------------------------------------------------------------------
 // Combat Mech — a class-agnostic cosmetic body. Unlike the per-class skins
@@ -1215,7 +1225,46 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+      // Ability-specific spellcasts (scripts/build_shaman_ability_anims.mjs,
+      // issue #2889): the shaman had zero attackByAbility overrides across
+      // its kit, so every spell played the same melee chop/slice. Mapped by
+      // school (src/sim/content/classes.ts): Cast_Bolt is the class's
+      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earth/Flame/
+      // Frost Shock are all instant (0s cast) and differ only in damage
+      // school, so they share Cast_Shock's snappy point-and-release;
+      // Healing Wave and the Restoration signature Chain Heal share
+      // Cast_Heal's sustained mending channel instead of a sharp release;
+      // Earthquake borrows the two-hand chop's committed downswing energy
+      // for Cast_Quake, the same "slam and radiate outward" read the mage's
+      // Cast_Nova makes; Stormstrike (physical) gets its own charged
+      // diagonal slice, Storm_Strike. The weapon imbues (Rockbiter,
+      // Flametongue, Frostbrand) and the short self buffs (Ghost Wolf,
+      // Elemental Mastery) have no swing to author, so they read fine on the
+      // rig's existing Spellcast_Raise gesture, the same no-bake call the
+      // priest's renew and the warlock's sanguine_aura make; Lightning
+      // Shield reads as a defensive ward instead, so it reuses Block, the
+      // same call the warrior's raised_guard makes. This covers every
+      // ability tagged class: 'shaman' in classes.ts.
+      attackByAbility: {
+        lightning_bolt: 'Cast_Bolt',
+        earth_shock: 'Cast_Shock',
+        flame_shock: 'Cast_Shock',
+        frost_shock: 'Cast_Shock',
+        healing_wave: 'Cast_Heal',
+        chain_heal: 'Cast_Heal',
+        earthquake: 'Cast_Quake',
+        stormstrike: 'Storm_Strike',
+        rockbiter_weapon: 'Spellcast_Raise',
+        flametongue_weapon: 'Spellcast_Raise',
+        frostbrand_weapon: 'Spellcast_Raise',
+        ghost_wolf: 'Spellcast_Raise',
+        elemental_mastery: 'Spellcast_Raise',
+        lightning_shield: 'Block',
+      },
     },
+    // Ability-specific spellcast clips (scripts/build_shaman_ability_anims.mjs):
+    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
+    animUrls: [`${PLAYERS}/shaman_ability_anims.glb`],
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
@@ -1996,7 +2045,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/demon.glb`,
     height: 1.7,
     hover: 0.35,
-    clips: FLOATING,
+    clips: DEMON_FLYING_FLOATING,
+    // Bespoke attack clip (scripts/build_demon_flying_anims.mjs): a
+    // mesh-free clip donor GLB baked off this rig's own donor poses.
+    animUrls: [`${CREATURES}/demon_flying_anims.glb`],
     tint: 'entity',
     tintStrength: 0.25,
   },
@@ -2078,8 +2130,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.7,
     clips: CRAB_ENEMY_BITE,
     // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/crab_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the hit-variety
+    // donor GLB below; both are mesh-free so their clips just merge in.
+    animUrls: [
+      `${CREATURES}/crabenemy_hit_variety_anims.glb`,
+      `${CREATURES}/crab_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -2104,8 +2160,9 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.6,
     clips: TREANT_ENEMY_BITE,
     // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/treant_ability_anims.glb`],
+    // baked off this same rig's own poses. Loads alongside the yeti's
+    // hit-variety donor GLB; both are mesh-free so their clips just merge in.
+    animUrls: [`${CREATURES}/yeti_hit_variety_anims.glb`, `${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
