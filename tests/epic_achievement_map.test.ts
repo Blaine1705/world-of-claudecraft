@@ -4,6 +4,7 @@
 // a bulk regeneration that would scramble, drop, or rename an entry.
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENT_MAP, MAX_EPIC_ACHIEVEMENTS } from '../server/epic/achievement_map';
+import { ACHIEVEMENT_MAP as STEAM_ACHIEVEMENT_MAP } from '../server/steam/achievement_map';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 
 const ACH_NAME_RE = /^ACH_[A-Z0-9_]+$/;
@@ -51,6 +52,19 @@ describe('Epic achievement map', () => {
     expect(ACHIEVEMENT_MAP.pvp_vcup_golden_goal).toBe('ACH_VCUP_GOLDEN_GOAL');
     expect(ACHIEVEMENT_MAP.prog_crown_below).toBe('ACH_CROWN_BELOW');
     expect(ACHIEVEMENT_MAP.prog_guildsworn).toBe('ACH_GUILDSWORN');
+  });
+
+  it('carries the exact same table as the Steam twin (the shared launch set)', () => {
+    // The LAUNCH SET is one id vocabulary across both storefronts (the Epic
+    // header's claim), and each side carries its own independent 84-line
+    // literal. The full-literal pins in each file already red any one-map
+    // edit; what this cross-pin adds is the twin-awareness step in the
+    // routine flow where a map and its own literal are updated together.
+    // The storefronts are documented as independent (D21), so a deliberate
+    // storefront-specific achievement is legal future content: when one
+    // ships, scoping or retiring THIS pin is the reviewed act that records
+    // the divergence.
+    expect(ACHIEVEMENT_MAP).toEqual(STEAM_ACHIEVEMENT_MAP);
   });
 
   it('pins the full 84-entry registered map as a literal (permanent Epic achievement ids)', () => {

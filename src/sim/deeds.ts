@@ -631,6 +631,10 @@ export function grantDeed(
   if (def.reward?.kind === 'title' && isHorizonsTitleDeed(deedId)) {
     // ONE ownership snapshot shared by both syncs (its deed surface is a
     // live reference, so the rank sync's grants are visible to the ladder).
+    // The sharing is per LEVEL, not per cascade: each ladder grant re-enters
+    // grantDeed and this hook builds a fresh snapshot for its own level, so
+    // a full ladder cascade builds a handful of snapshots. Bounded by the
+    // ladder depth and once-ever per character; accepted.
     const titleOwnership = characterReliquaryOwnership(meta);
     const retroOpts = opts?.retro ? ({ retro: true } as const) : undefined;
     maybeSyncCuratorRankDeeds(ctx, meta, retroOpts, titleOwnership);
@@ -1149,12 +1153,16 @@ const RETRO_SEED = { retro: true } as const;
  *  Every call here is RETRO: the character already owned these before the
  *  join, so the Reliquary fills silently (no recent push, no invented clear
  *  provenance) and the events carry the retro flag. This is the ONLY caller
- *  that sets it, and the flag buys exactly two things: the CLIENT collapses
- *  the fills into one catch-up summary line instead of a toast per relic, and
- *  the deedUnlocked grants this join pass produces skip the server's guild /
- *  activity-feed fan-out through its ev.retro gate (server/game.ts gates
- *  deedUnlocked only). reliquaryUnlock is self-scoped (HEAVY_SELF_EVENTS) and
- *  is never fanned out on any path, retro or live. */
+ *  that sets it, and the flag buys exactly three things: the CLIENT collapses
+ *  the fills into one catch-up summary line instead of a toast per relic; the
+ *  deedUnlocked grants this join pass produces skip the server's guild /
+ *  activity-feed fan-out through its ev.retro gate; and the server's
+ *  illumination marquee (the detectActivity reliquaryUnlock arm in
+ *  server/game.ts) drops retro events, so a seed-pass fill that completes a
+ *  page never marquees. reliquaryUnlock's presentation payload is self-scoped
+ *  (HEAVY_SELF_EVENTS), but its illuminatedPageId field drives that marquee
+ *  fan-out since Phase 18: a new retro-shaped emit path that drops the flag
+ *  would announce every back-catalog illumination at join. */
 export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.inventory) {
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);

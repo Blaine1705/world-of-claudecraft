@@ -159,6 +159,10 @@ describe('the broadcast line (case deedBroadcast)', () => {
     expect(line.textContent).toBe(
       t('hudChrome.deeds.broadcastLine', { name: 'Hilda', deed: `[${deedName(BROADCAST_ID)}]` }),
     );
+    // Same discipline as the illumination twin below: the t() assertion shares
+    // the key and substitution with production, so this literal is the pin on
+    // the English prose itself, names substituted.
+    expect(line.textContent).toBe('Hilda has accomplished a deed: [First Blood]');
     expect(line.style.color).toBe(cssColor('#40d264'));
     const link = line.querySelector('span.chat-deed-link') as HTMLElement;
     expect(link.textContent).toBe(`[${deedName(BROADCAST_ID)}]`);
@@ -181,6 +185,10 @@ describe('the illumination broadcast line (case reliquaryIlluminationBroadcast)'
         page: `[${reliquaryPageName(ILLUMINATED_PAGE_ID)}]`,
       }),
     );
+    // The assertion above shares the key and the substitution with production,
+    // so it cannot see a reword of the template. This literal is the pin on the
+    // English prose itself, names substituted.
+    expect(line.textContent).toBe('Hilda has illuminated a Reliquary page: [The Hollow Crypt]');
     expect(line.style.color).toBe(cssColor('#40d264'));
     const link = line.querySelector('span.chat-deed-link') as HTMLElement;
     expect(link).not.toBeNull();

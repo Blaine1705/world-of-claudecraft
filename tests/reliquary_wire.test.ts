@@ -30,6 +30,7 @@ import {
   noteReliquaryMark,
   RELIQUARY_PAGES_BY_ID,
   reliquaryWireCacheProbe,
+  restoreReliquaryState,
 } from '../src/sim/reliquary';
 import type { Sim } from '../src/sim/sim';
 import { bareClient } from './helpers/bare_client';
@@ -497,6 +498,43 @@ describe('Reliquary online / offline parity for scripted state', () => {
     expect(client.reliquaryPageClearCount(PAGE_ID)).toBe(sim.reliquaryPageClearCount(PAGE_ID));
     expect(client.reliquaryPageClearCount(PAGE_ID)).toBe(4);
     expect(client.reliquaryPageCompletion('not_a_page')).toBeNull();
+  });
+
+  it('the wire blob carries illuminatedPages and ClientWorld DROPS it on decode', () => {
+    // The deliberate encode/decode asymmetry: the sticky set rides the reliq
+    // blob because wire shape IS save shape, and the client discards it (no
+    // facet member, no mirror field). Until now only comments guarded the
+    // drop; this pin makes mirroring it a reviewed act, not a drive-by "fix".
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 6, 'RelicF');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+    meta.reliquary = restoreReliquaryState({
+      illuminatedPages: [PAGE_ID],
+      marks: [SEEDED_MARK_ID],
+    });
+    sim.tick();
+
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap = lastSnap(fw.sent);
+    // Premise arm first: the set really is on the wire, so the emptiness
+    // below is a decode decision, never an absent field.
+    expect(snap.self.reliq.illuminatedPages).toEqual([PAGE_ID]);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    // A sibling surface from the SAME blob decoded (a mark, not a
+    // default-initialized field), so the decode arm provably ran and the
+    // emptiness below cannot come from a skipped block. Then the sharp claim:
+    // no own property of the client names the set; a future mirror
+    // assignment would mint one and red this filter.
+    expect([...client.reliquaryMarks]).toEqual([SEEDED_MARK_ID]);
+    const illumKeys = Object.keys(client as unknown as Record<string, unknown>).filter((k) =>
+      /illuminated/i.test(k),
+    );
+    expect(illumKeys).toEqual([]);
   });
 
   it('does not invent membership from a presentation-only reliquaryUnlock event', () => {

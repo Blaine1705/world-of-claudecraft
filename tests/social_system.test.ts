@@ -2033,7 +2033,9 @@ describe('broadcastDeedUnlock', () => {
     // SimEvent so the one client event switch stays well-typed) and the client
     // casts one to the other on the events-frame passthrough. A field added or
     // retyped on either side alone reds tsc here: the literal must satisfy the
-    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back. The
+    // runtime toEqual below is a tautology (one object compared with itself);
+    // the pin lives in the annotations, enforced by tsc --noEmit, not vitest.
     const fromSocial: Extract<SimEvent, { type: 'deedBroadcast' }> = {
       type: 'deedBroadcast',
       characterName: 'Earner',
@@ -2055,7 +2057,7 @@ describe('broadcastDeedUnlock', () => {
 describe('broadcastIllumination', () => {
   const PAGE_ID = 'conquerors_thunzharr';
 
-  it('delivers one id-based frame to online guildmates and followers, never the earner', async () => {
+  it('delivers one id-based illumination frame to guildmates and followers, never the earner', async () => {
     const h = await deedSetup();
     await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
     // The exact wire shape: the page id and the earner's name only. Pinning
@@ -2074,7 +2076,7 @@ describe('broadcastIllumination', () => {
     expect(h.tx.eventsFor(5)).toEqual([]); // strangers never hear it
   });
 
-  it('skips offline members and recipients who ignore the earner', async () => {
+  it('skips offline members and recipients who ignore the illumination earner', async () => {
     const h = await deedSetup();
     h.tx.setOffline(2);
     await h.db.addBlock(3, 1); // 3 ignores the earner
@@ -2084,7 +2086,7 @@ describe('broadcastIllumination', () => {
     expect(h.tx.eventsFor(4)).toHaveLength(1);
   });
 
-  it('skips a recipient the earner has ignored', async () => {
+  it('skips a recipient the illumination earner has ignored', async () => {
     const h = await deedSetup();
     await h.db.addBlock(1, 2); // the earner blocks guildmate 2
     await h.db.addBlock(1, 4); // and follower 4 (blockAdd cannot unfriend THEIR edge)
@@ -2094,14 +2096,14 @@ describe('broadcastIllumination', () => {
     expect(h.tx.eventsFor(3)).toHaveLength(1); // unblocked guildmate still hears it
   });
 
-  it('delivers exactly once to a follower who is also a guildmate', async () => {
+  it('delivers the illumination exactly once to a follower who is also a guildmate', async () => {
     const h = await deedSetup();
     await h.db.addFriend(2, 1); // guildmate 2 also follows the earner
     await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
     expect(h.tx.eventsFor(2)).toHaveLength(1);
   });
 
-  it('is a quiet no-op for a guildless earner nobody follows', async () => {
+  it('is a quiet no-op for a guildless illumination earner nobody follows', async () => {
     const h = setup();
     h.add(9, 'Hermit');
     h.tx.setOnline(9);
@@ -2109,9 +2111,12 @@ describe('broadcastIllumination', () => {
     expect(h.tx.delivered.size).toBe(0);
   });
 
-  it('keeps the SocialEvent and SimEvent declarations structurally identical', () => {
+  it('keeps the illumination SocialEvent and SimEvent declarations structurally identical', () => {
     // The deedBroadcast pin's Phase 18 twin: the literal must satisfy the
     // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    // The runtime toEqual below is a tautology (one object compared with
+    // itself): the real pin is the two type annotations plus satisfies, which
+    // only `tsc --noEmit` in the gate enforces, never vitest.
     const fromSocial: Extract<SimEvent, { type: 'reliquaryIlluminationBroadcast' }> = {
       type: 'reliquaryIlluminationBroadcast',
       characterName: 'Earner',
@@ -2119,6 +2124,8 @@ describe('broadcastIllumination', () => {
     } satisfies Extract<SocialEvent, { type: 'reliquaryIlluminationBroadcast' }>;
     const fromSim: Extract<SocialEvent, { type: 'reliquaryIlluminationBroadcast' }> = fromSocial;
     expect(fromSim).toEqual(fromSocial);
+    // The one runtime-decisive claim: the wire shape is exactly these keys.
+    expect(Object.keys(fromSim).sort()).toEqual(['characterName', 'pageId', 'type']);
   });
 });
 

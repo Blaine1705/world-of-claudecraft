@@ -111,7 +111,8 @@ export interface SavedReliquaryFirstFind {
  *  reliq wire blob because wire shape IS save shape (the byte-pinned memo
  *  contract), but ClientWorld deliberately does not mirror it (no facet
  *  consumer; the banner keys off the event). Accepted cost: at most the
- *  page-id list, bounded by the catalog, on the rarely-dirty reliq key. */
+ *  page-id list, bounded by the catalog, on the rarely-dirty reliq key
+ *  (worst case every page id at once, roughly a kilobyte). */
 export interface SavedReliquaryState {
   firstFind?: Record<string, SavedReliquaryFirstFind>;
   illuminatedPages?: string[];
@@ -209,8 +210,13 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
       if (count !== undefined) state.counts[itemId] = count;
     }
   }
-  for (const mark of saved.marks ?? []) {
-    if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) state.marks.add(mark);
+  // Array.isArray, matching every sibling surface: restore also runs on
+  // stored blobs reached from the public character-sheet path, so a corrupt
+  // marks value (a bare number, an object) must drop whole, never throw.
+  if (Array.isArray(saved.marks)) {
+    for (const mark of saved.marks) {
+      if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) state.marks.add(mark);
+    }
   }
   // Sticky illumination record. Same catalog filter discipline as the other
   // surfaces: only string entries naming a live page id land (Object.hasOwn,
@@ -326,13 +332,17 @@ function dungeonClearCount(
  *
  * `opts.retro` is the join-time seed pass (seedItemDiscovery): the fill stays
  * SILENT (no recent push, no fabricated clear provenance) and every event it
- * emits carries the retro flag. That flag buys two things, and nothing else:
- * the CLIENT collapses retro fills into one catch-up summary line instead of
- * a toast per relic, and the deedUnlocked grants this same join pass produces
- * stay out of the server's guild / activity-feed fan-out through its ev.retro
- * gate (server/game.ts, which gates deedUnlocked only). reliquaryUnlock itself
- * is never fanned out on any path: it is a self-scoped HEAVY_SELF_EVENTS
- * member, so it only ever reaches the earner.
+ * emits carries the retro flag. That flag buys three things, and nothing
+ * else: the CLIENT collapses retro fills into one catch-up summary line
+ * instead of a toast per relic; the deedUnlocked grants this same join pass
+ * produces stay out of the server's guild / activity-feed fan-out through
+ * its ev.retro gate; and since Phase 18 the server's illumination marquee
+ * (the detectActivity reliquaryUnlock arm in server/game.ts) drops retro
+ * events too. reliquaryUnlock's presentation payload is self-scoped
+ * (HEAVY_SELF_EVENTS), but its illuminatedPageId field DOES drive that
+ * guild / follower fan-out: a new emit path that omits the retro flag on a
+ * join-time or catch-up fill would marquee every back-catalog illumination
+ * to the earner's guild.
  *
  * Mount reins are not catalogued item relics (Horizons owns them via live
  * ownedMounts). On first discovery of reins the item is already in bags, so
@@ -609,6 +619,16 @@ export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
  * Deliberately not save-forcing: the sweep is idempotent and re-runs on
  * every join, so a save lost to a crash costs a repeat sweep, never state.
  *
+ * Running on EVERY join, forever, has two standing consequences beyond the
+ * Phase 18 migration. Forward: when later content ships a page a veteran's
+ * collection already completes, their next join records it silently, so its
+ * first-illumination celebration never fires for them (consistent with the
+ * retro doctrine: the seed pass would have flagged it retro anyway). And the
+ * sticky record is join-eventually-consistent for the non-emit live paths: a
+ * page completed by a mount fill or by a title grant is recorded here at the
+ * NEXT join, not at the moment of completion, which any Phase 19+ celebration
+ * added to those pages must account for.
+ *
  * The sweep records the three no-emit Horizons pages too (mounts, titles,
  * weapon skins) BY DESIGN: those pages never pass through emitReliquaryUnlock
  * (mount and title fills sync deeds without an unlock emit), so they never
@@ -657,15 +677,19 @@ export function syncIlluminatedPages(
  *
  * Phase 18 semantics: `illuminatedPageId` on the event means FIRST-EVER
  * illumination for this character, not "some page reads complete right now".
- * Every complete candidate page missing from the sticky
- * meta.reliquary.illuminatedPages set is recorded there; the event names the
- * FIRST newly illuminated one and stays silent (undefined) when none is new.
+ * Despite the emit name this function is a WRITER: every complete candidate
+ * page missing from the sticky meta.reliquary.illuminatedPages set is
+ * recorded there (one wire-rev bump per sweep); the event names the FIRST
+ * newly illuminated one and stays silent (undefined) when none is new.
  * Every downstream celebration (the client banner, the Phase 18 server
  * marquee) therefore inherits once-ever semantics: after catalog growth, a
  * re-completion of an already-recorded page adds nothing to the set and emits
- * no illuminatedPageId. Accepted edge: one fill completing two pages at once
- * records BOTH in the set, but the event still names only the first (the
- * single-id event shape is pinned in tests/reliquary_wire.test.ts).
+ * no illuminatedPageId. Accepted edge, reachable on shipped content rather
+ * than theoretical: relics sitting on two Conquerors pages at once (a
+ * dungeon or raid page plus its tier-set page) mean one drop can complete
+ * both, and the second page's Illumination is then permanently uncelebrated
+ * because the event still names only the first (the single-id event shape is
+ * pinned in tests/reliquary_wire.test.ts) and the set records both.
  *
  * Two bounded tolerances on "once-ever", both accepted: (1) it means once
  * per DURABLE record, not an absolute guarantee: the write rides the normal
@@ -673,7 +697,11 @@ export function syncIlluminatedPages(
  * doc's "never save because a silhouette filled" rule), so a crash before
  * the next save loses the record; the join sweep re-heals it silently while
  * the page still reads complete, and only catalog growth landing inside
- * that same window can produce a second celebration. (2) The blob-ran-ahead
+ * that same window can produce a second celebration. The two halves of that
+ * window are CORRELATED, not independent rarities: an unclean restart that
+ * also ships catalog growth is one event, and the graceful-shutdown save
+ * plus the unconditional autosave sweep confine the loss to a SIGKILL/OOM
+ * class stop, not an ordinary deploy. (2) The blob-ran-ahead
  * re-discover tolerance (see the noteRelicItemFind gate in onItemDiscovered)
  * skips this emit entirely, so a flagship completion deed can in that shape
  * be granted while the set records nothing until the next join sweep; the
@@ -683,10 +711,11 @@ function emitReliquaryUnlock(
   ctx: SimContext,
   meta: PlayerMeta,
   ids: { itemId?: string; markId?: string; curatorRank?: number; retro?: boolean },
-  // Required, not defaulted: the old code built this snapshot lazily, inside
-  // the multi-page branch below, while a default parameter evaluates eagerly
-  // at every call. Module-private with two call sites, both already holding
-  // their chain's snapshot, so there is nothing for a default to serve.
+  // Required, not defaulted: both call sites already hold their chain's
+  // snapshot, and a default initializer would silently hand any future
+  // caller that omits the argument a fresh inventory + bank scan. Requiring
+  // it makes that cost a visible decision at the call site. Module-private,
+  // so the stricter signature costs nothing.
   ownership: ReliquaryOwnershipSurfaces,
 ): void {
   const pageIds =
@@ -1110,12 +1139,18 @@ export function syncCuratorRankDeeds(
 /**
  * The Phase 18 completion-ladder deed ids in GRANT-CHECK order: the three
  * flagship page Illuminations, then the Conquerors shelf, then the whole
- * character catalog. The order is load-bearing: the ownership snapshot's
- * deedsEarned surface is a LIVE reference, and each of these deeds except
- * col_reliquary_complete is itself a title relic on horizons_titles, so a
- * title granted earlier in the pass is visible to the later checks in the
- * SAME pass (an illumination title can be the fill that completes the shelf
- * read, and the shelf title the fill that completes the catalog read).
+ * character catalog. The order is load-bearing for the CATALOG read only:
+ * the ownership snapshot's deedsEarned surface is a LIVE reference, and each
+ * of these deeds except col_reliquary_complete is itself a title relic on
+ * horizons_titles, which feeds catalogCharacterCompletion, so a title granted
+ * earlier in the pass is visible to the capstone check in the SAME pass. No
+ * title moves the SHELF read today: every Conquerors page currently holds
+ * item relics only (what the tests pin is weaker: single-kind pages and no
+ * weapon-skin conquerors relic, so an all-title conquerors page remains legal
+ * future content; the order here is robust to one, since the illumination
+ * titles grant before the shelf check). The shelf sits before the catalog
+ * because the capstone branch gates on the shelf grant this same pass just
+ * made.
  */
 export const RELIQUARY_COMPLETION_DEED_IDS = [
   'col_reliquary_illum_nythraxis_heroic',
@@ -1125,8 +1160,12 @@ export const RELIQUARY_COMPLETION_DEED_IDS = [
   'col_reliquary_complete',
 ] as const;
 
-/** Flagship page each Illumination deed reads (single-page, hand-paired). */
-const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>> = {
+/** Flagship page each Illumination deed reads (single-page, hand-paired).
+ *  Exported for the dispatch-totality pin only (tests/reliquary_state.test.ts
+ *  holds every key to RELIQUARY_COMPLETION_DEED_IDS membership and every
+ *  ladder id to exactly one dispatch arm); no production consumer exists
+ *  outside this module. */
+export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>> = {
   col_reliquary_illum_nythraxis_heroic: 'conquerors_nythraxis_heroic',
   col_reliquary_illum_thunzharr: 'conquerors_thunzharr',
   col_reliquary_illum_gravewyrm_heroic: 'conquerors_gravewyrm_sanctum_heroic',
@@ -1162,19 +1201,24 @@ export function syncReliquaryCompletionDeeds(
   /** The chain's already-built ownership snapshot, when a caller has one. Its
    *  item / mark / deed surfaces are live references, so a snapshot taken
    *  earlier in the same fill chain scores exactly what a rebuild here would.
-   *  Optional rather than defaulted so the early-out below costs five Set
-   *  lookups, never an eager inventory + bank mount scan (a default
-   *  parameter evaluates at every call, the trap emitReliquaryUnlock's own
-   *  hoist note documents). Every production caller threads one today; the
-   *  optional form keeps the early-out free for any future caller that
-   *  cannot. */
+   *  Optional rather than defaulted because of PLACEMENT: a default
+   *  initializer runs at call entry whenever the argument is omitted, which
+   *  is BEFORE the five-Set early-out below, so an omitting caller would pay
+   *  the inventory + bank mount scan even in the all-earned steady state.
+   *  The `??` inside the body sits after the early-out, where the scan is
+   *  only ever paid when there is ladder work to score. Every production
+   *  caller threads one today; the optional form keeps the early-out free
+   *  for any future caller that cannot. */
   ownership?: ReliquaryOwnershipSurfaces,
 ): void {
-  // Fast no-op once the whole ladder is earned (the steady state for a
-  // completionist, and the recursion floor: a grant below re-enters this sync
-  // through the grantDeed title hook, and grants are monotone over this
-  // finite id set, so the re-entrant pass either grants something new or
-  // falls through the per-deed earned checks and terminates).
+  // Fast no-op once the whole ladder is earned, and the recursion floor: a
+  // grant below re-enters this sync through the grantDeed title hook, and
+  // grants are monotone over this finite id set, so the re-entrant pass
+  // either grants something new or falls through the per-deed earned checks
+  // and terminates. While col_reliquary_complete stays owner-pended the
+  // all-earned state is unreachable, so a shelf-complete player re-runs the
+  // walks below on each new fill; per-new-fill cadence bounded by the
+  // catalog's own size, accepted until the pends land.
   let missing = false;
   for (const deedId of RELIQUARY_COMPLETION_DEED_IDS) {
     if (!meta.deedsEarned.has(deedId)) {
@@ -1203,18 +1247,24 @@ export function syncReliquaryCompletionDeeds(
         }
       }
       if (!shelfComplete) continue;
-    } else {
-      // col_reliquary_complete: every character-durable slot filled. The
-      // shelf capstone is a NECESSARY precondition (the whole catalog
-      // contains every Conquerors slot, and the ladder order above grants
-      // the shelf deed earlier in this same pass), so gate the expensive
-      // whole-catalog walk behind it: while the shelf is incomplete, and
-      // for every player who is not one shelf slot from the capstone, this
-      // check stays a Set lookup. Also the reason the loop cannot be
-      // reordered: the gate reads a grant the same pass just made.
+    } else if (deedId === 'col_reliquary_complete') {
+      // Every character-durable slot filled. The shelf capstone is a
+      // NECESSARY precondition (the whole catalog contains every Conquerors
+      // slot, and the ladder order above grants the shelf deed earlier in
+      // this same pass), so gate the expensive whole-catalog walk behind it:
+      // while the shelf is incomplete, and for every player who is not one
+      // shelf slot from the capstone, this check stays a Set lookup. Also
+      // the reason the loop cannot be reordered: the gate reads a grant the
+      // same pass just made.
       if (!meta.deedsEarned.has('col_reliquary_conquerors')) continue;
       const { owned, total } = catalogCharacterCompletion(own);
       if (owned !== total) continue;
+    } else {
+      // Fail closed: an id appended to RELIQUARY_COMPLETION_DEED_IDS without
+      // its own branch here (and absent from the pages map) must skip, never
+      // inherit another deed's grant condition. Dispatch totality is pinned
+      // in tests/reliquary_state.test.ts.
+      continue;
     }
     ctx.grantDeed(meta, deedId, grantOpts);
   }

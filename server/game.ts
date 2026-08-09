@@ -850,8 +850,10 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'levelup',
   'virtualLevelUp',
   'deedUnlocked', // the earned map + stat block ride the heavy-gated deeds/dstats keys
-  // Reliquary sparse firstFind / marks / recent ride the heavy-gated `reliq`
-  // key. Presentation-only event (no saveCharacter on pure fill).
+  // The Reliquary sparse blob (firstFind / illuminatedPages / marks / recent)
+  // rides the heavy-gated `reliq` key. No saveCharacter on pure fill; since
+  // Phase 18 the event is NOT presentation-only: detectActivity derives the
+  // illumination marquee fan-out from its illuminatedPageId field.
   'reliquaryUnlock',
   'questAccepted',
   'questProgress',
@@ -8867,7 +8869,7 @@ export class GameServer {
         dungeonClears: meta.deedStats.dungeonClears,
       });
       // Reliquary sparse blob only: firstFind (with its folded obtain tally) /
-      // marks / recent, omit-empty. Item ownership stays on
+      // illuminatedPages / marks / recent, omit-empty. Item ownership stays on
       // dstats.itemsDiscovered; never a second full discovery array.
       // Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS member so a fill
       // re-diffs on the next snapshot without saveCharacter.

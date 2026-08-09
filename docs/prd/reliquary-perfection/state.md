@@ -129,9 +129,14 @@ Update this line as phases complete.
   most the page-id list), but the join sweep on roll-forward re-records every page
   whose live read is still complete, so only pages made incomplete by catalog
   growth inside the rollback window lose their record permanently (their later
-  re-completion celebrates as a first). Mixed-fleet display artifact, not loss:
-  a rolled-back client keeps the five Phase 18 ladder deeds in deedsEarned but
-  its deed_i18n cannot name them (raw-id rendering until roll-forward).
+  re-completion celebrates as a first). Mixed-fleet display artifact, not loss
+  (CORRECTED at Phase 18 QA, verified against both render paths): a rolled-back
+  client keeps the five Phase 18 ladder deeds in deedsEarned, but its own Book
+  shows them NOWHERE AT ALL: buildDeedsView skips catalog-unknown ids outright,
+  so the earned records are invisible to the owner until roll-forward. Raw-id
+  rendering happens only on the guild-chat deedBroadcast path (a stale client
+  watching an up-to-date guildmate earn one renders the id verbatim; the click
+  lands gracefully in an unfocused Book, no crash).
 - Phase 10 QA (2026-08-05): fix round applied 1 blocking (Biome format diff in
   tests/reliquary_state.test.ts), the emission pin (tests/reliquary_window.test.ts now
   pins this.log + combatAnnouncer.push of retroText inside the reliquary handler body,
@@ -665,13 +670,43 @@ Update this line as phases complete.
   ACH_RELIQUARY_ILLUM_THUNZHARR, ACH_RELIQUARY_ILLUM_GRAVEWYRM_HEROIC. The
   code-side maps landed in Phase 18 (84 entries each, literal-pinned); an
   unregistered id is a silent no-op at runtime, so nothing reds if this is
-  missed.
+  missed. Two consequences the Phase 18 QA surfaced harden this into a
+  DEPLOY-ORDER constraint, not a cosmetic gap: (1) pushAchievementUnlocks
+  batches names into one SetUserStatsForGame call and returns one ok, so if
+  the portal rejects a batch over one unregistered name, the batch burns its
+  retries, two consecutive exhausted batches trip the outage wire (which
+  fast-drops OTHER accounts' queued unlocks), and reconcile-on-login re-sends
+  the poisoned set on its cadence forever. The rank_2..5 wave arrives at
+  FIRST LOGIN on the shipping binary: the whole packet is unreleased, so no
+  player has the deeds from a prior deploy, but the join-time retro pass
+  grants every qualifying rank deed in the same session that then feeds the
+  reconcile push. Register all nine BEFORE the mapping binary goes live with
+  a storefront mirror enabled (inert today: STEAM_ENABLED and EPIC_ENABLED
+  both default off). (2) HOLD the portal registration of
+  ACH_RELIQUARY_COMPLETE until the three owner-pended catalog slots land: the
+  deed is unearnable until then, and a registered impossible achievement is
+  player-visible on both storefronts (a permanent 0.0% unlock rate). Also
+  recorded: the mirror is its own publication surface, NOT gated by
+  accounts.deed_broadcasts (the account link is the consent act); the login
+  reconcile will push retroactive unlocks for every already-earned mapped
+  deed to linked players' public storefront profiles.
 - SURFACED (Phase 18 privacy review, maintainer copy decision): the
   accounts.deed_broadcasts settings label describes deed announcements, and
   the flag now also gates illumination marquees and border feed cards (the
   conservative reading, documented in docs/design/reliquary.md). If the
   label should say "achievements and collection milestones", that is a
-  reword with i18n staleness cost; recorded rather than done.
+  reword with i18n staleness cost; recorded rather than done. Phase 18 QA
+  adds the real payload so the decision is made with it in view: a border
+  feed card is "name-only" in its deed payload, but the rendered public
+  Discord card identifies the earner with a real Discord mention (cards only
+  post for Discord-linked accounts; the mention stands in for the character
+  name) plus the realm, a public profile deep link (when the realm public
+  origin is configured), and the linked account's Discord avatar. The
+  same QA also noted the class widening for release notes: the border arm
+  admits all four border deeds, so three non-Reliquary deeds
+  (prog_prestige_10, dgn_deepward, col_discovery_250) newly reach the
+  public feed beside col_reliquary_rank_5 (deliberate, literal-pinned in
+  tests/deeds_content.test.ts).
 - NOTE (Phase 18): reliquary page ids are effectively append-only: restore
   filters illuminatedPages to live page ids, so renaming or retiring a page
   silently drops every character's sticky illumination record for it on the
@@ -679,6 +714,30 @@ Update this line as phases complete.
   discipline as marks and firstFind, but for a once-ever celebration record
   the loss shows as a repeat celebration after a rename; treat a page-id
   rename as a migration, not an edit.
+- NOTE (Phase 18 QA, inherited shape, becomes visible when the three pends
+  land): RE-ACQUIRING an already-discovered mount's reins never runs the
+  completion ladder live: markItemDiscovered fires the Reliquary hub on
+  FIRST discovery only, while mount relic ownership is possession-based
+  (bags + bank, reins are tradeable). A player whose LAST missing relic is a
+  reins they once owned gets the capstone at their next join via
+  retroFallbackGrants, silently (retro), instead of at the pickup with a
+  marquee. Same family as the recorded guild-bank withdrawal discovery gap
+  (both self-heal at join); the pre-existing curator rank mount arm has the
+  identical shape. Recorded, not changed: the discovery-hub semantics are a
+  maintainer decision alongside the guild-bank twin. The FIRST-discovery
+  mount-last arm is live-granted and now test-pinned.
+- NOTE (Phase 18 QA, display surfaces of the accepted capstone pend, named
+  so the ruling record is complete): (1) the Book of Deeds Collection shelf
+  carries the catalog's first unreachable denominator outside the Feats
+  shelf: buildDeedsView counts the feat-flagged capstone in the per-category
+  visible count while the completion pair excludes it (deliberate, pinned in
+  tests/deeds_view.test.ts); Collection is a shelf players try to finish, so
+  the one-short count will read as a bug report until the pends land. (2) A
+  capstone holder's own Reliquary overview can read below its denominator:
+  the overview totals include the account weapon-skin slots that
+  catalogCharacterCompletion deliberately excludes; the deed copy defuses it
+  ("every relic ... that a character can keep"). Both resolve themselves
+  when the pended slots land; neither is host drift.
 - RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
   the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
   release root-caused it and restored the strict contract (heal-through loop plus a

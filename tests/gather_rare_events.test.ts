@@ -211,7 +211,7 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
         bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
         reliquary: freshReliquaryState(),
         deedStats: { itemsDiscovered: new Set<string>() },
-        deedsEarned: new Map<string, number>(),
+        deedsEarned: new Map<string, string>(),
       } as unknown as PlayerMeta;
       players.set(pid, meta);
       entities.set(pid, { pos: { x, y: 0, z } });

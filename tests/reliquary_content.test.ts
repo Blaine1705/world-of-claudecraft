@@ -355,6 +355,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // arm reds the catalog edit before the gate can strand anyone; a
     // conquerors-shelf pending slot would be the same hazard one step
     // removed, so the pending table must never name a conquerors page.
+    // Since Phase 18 the stake is doubled: the shelf deed and the three
+    // flagship Illumination deeds are non-feat BOOK_COMPLETE_REQUIREMENTS
+    // members, so a pended conquerors slot would also dead-end
+    // feat_book_complete for every player, the exact failure the capstone's
+    // feat flag exists to avoid.
     expect(CONQUEROR_PAGES.length).toBeGreaterThan(0);
     for (const page of CONQUEROR_PAGES) {
       expect(page.relics.length, `${page.id} is empty`).toBeGreaterThan(0);

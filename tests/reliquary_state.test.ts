@@ -45,6 +45,7 @@ import {
   onItemDiscovered,
   pageCompletion,
   RELIQUARY_COMPLETION_DEED_IDS,
+  RELIQUARY_ILLUMINATION_DEED_PAGES,
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_OBTAIN_COUNT_CAP,
   RELIQUARY_PAGES_BY_ID,
@@ -2651,6 +2652,11 @@ describe('Reliquary illuminated pages (Phase 18 sticky record)', () => {
         // must drop them like any other unknown id.
         '__proto__',
         'constructor',
+        // A boxed String NAMES a live page but is not a string: Object.hasOwn
+        // coerces its key argument, so only the typeof gate rejects it. This
+        // member is what makes that gate decisive (JSON.parse can never
+        // produce one; the guard exists for clone-mangled callers).
+        new String('conquerors_nythraxis_heroic') as unknown as string,
         'conquerors_hollow_crypt',
         'conquerors_thunzharr',
       ],
@@ -2783,6 +2789,116 @@ describe('Reliquary illuminated pages (Phase 18 sticky record)', () => {
       .filter((e) => e.pid === pid && e.type === 'reliquaryUnlock' && e.illuminatedPageId);
     expect(joinIllums).toEqual([]);
   });
+
+  /** A pre-Phase-18 veteran CharacterState: the discovery ledger owns the
+   *  whole flagship page, but the blob predates BOTH Phase 18 surfaces (no
+   *  illuminatedPages key, no ladder deed). Built from a real serialize so
+   *  the shape can never drift from production, then stripped to the old
+   *  save's field set. */
+  function prePhase18VeteranState(): CharacterState {
+    const donor = makeSim();
+    const { meta } = primary(donor);
+    for (const id of pageItemIds('conquerors_thunzharr')) {
+      markItemDiscovered(donor.ctx, meta, id);
+    }
+    const saved = JSON.parse(JSON.stringify(donor.serializeCharacter(donor.playerId)!)) as Record<
+      string,
+      unknown
+    >;
+    const reliq = saved.reliquary as Record<string, unknown>;
+    delete reliq.illuminatedPages;
+    const deeds = saved.deeds as Record<string, string>;
+    for (const id of RELIQUARY_COMPLETION_DEED_IDS) delete deeds[id];
+    return saved as unknown as CharacterState;
+  }
+
+  it('the REAL join self-heals a pre-Phase-18 blob: recorded by the sweep, never celebrated', () => {
+    // This is the seam pin for the syncIlluminatedPages call inside
+    // retroFallbackGrants (src/sim/deeds.ts): every other test drives the
+    // sweep directly, so without this arm that call could be deleted green
+    // and a veteran's first catalog-growth re-completion would marquee as a
+    // FIRST illumination.
+    const host = makeSim();
+    host.drainEvents();
+    const pid = host.addPlayer('warrior', 'Veteran', { state: prePhase18VeteranState() });
+    const meta = host.players.get(pid)!;
+    expect(meta.reliquary.illuminatedPages.has('conquerors_thunzharr')).toBe(true);
+    const joinIllums = host
+      .drainEvents()
+      .filter((e) => e.pid === pid && e.type === 'reliquaryUnlock' && e.illuminatedPageId);
+    expect(joinIllums).toEqual([]);
+  });
+
+  it('the REAL join grants ladder credit retroactively, flagged retro', () => {
+    // Seam pin for the syncReliquaryCompletionDeeds call inside
+    // retroFallbackGrants: a finished collection must not wait for a next
+    // fill that may never come, and the join credit must ride the retro flag
+    // so the server never fans it out.
+    const host = makeSim();
+    host.drainEvents();
+    const pid = host.addPlayer('warrior', 'Veteran', { state: prePhase18VeteranState() });
+    const meta = host.players.get(pid)!;
+    expect(meta.deedsEarned.has('col_reliquary_illum_thunzharr')).toBe(true);
+    const ev = host
+      .drainEvents()
+      .find(
+        (e) =>
+          e.pid === pid &&
+          e.type === 'deedUnlocked' &&
+          e.deedId === 'col_reliquary_illum_thunzharr',
+      );
+    expect(ev).toBeDefined();
+    if (!ev || ev.type !== 'deedUnlocked') throw new Error('expected deedUnlocked');
+    expect(ev.retro).toBe(true);
+  });
+
+  it('a candidate page already recorded is skipped: the event names the SECOND page', () => {
+    // The mixed arm of the candidate sweep: first candidate sticky, second
+    // newly complete. The `continue` on the recorded page must not consume
+    // the event's single id slot, or the genuinely new illumination would be
+    // silently lost.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    let sharedId: string | undefined;
+    let sharedPages: readonly string[] = [];
+    for (const [itemId, pages] of RELIQUARY_ITEM_TO_PAGES) {
+      if (
+        pages.length >= 2 &&
+        pages.every((p) => RELIQUARY_PAGES_BY_ID[p]?.shelf === 'conquerors')
+      ) {
+        sharedId = itemId;
+        sharedPages = pages;
+        break;
+      }
+    }
+    if (!sharedId) throw new Error('catalog premise broken: no two-page conquerors relic');
+    meta.reliquary = restoreReliquaryState({ illuminatedPages: [sharedPages[0]!] });
+    for (const pageId of sharedPages) {
+      for (const id of pageItemIds(pageId)) {
+        if (id !== sharedId) markItemDiscovered(sim.ctx, meta, id);
+      }
+    }
+    sim.drainEvents();
+    markItemDiscovered(sim.ctx, meta, sharedId);
+    const unlock = sim
+      .drainEvents()
+      .find((e) => e.type === 'reliquaryUnlock' && e.itemId === sharedId);
+    if (!unlock || unlock.type !== 'reliquaryUnlock') throw new Error('expected reliquaryUnlock');
+    expect(unlock.illuminatedPageId).toBe(sharedPages[1]);
+    for (const pageId of sharedPages) {
+      expect(meta.reliquary.illuminatedPages.has(pageId), pageId).toBe(true);
+    }
+  });
+
+  it('a corrupt marks value drops whole instead of throwing (character-sheet reach)', () => {
+    // restoreReliquaryState also runs on stored blobs from the public
+    // character-sheet path, so every surface must tolerate a corrupt value.
+    // marks gained its Array.isArray guard at the Phase 18 QA; this arm is
+    // what makes the guard decisive.
+    const state = restoreReliquaryState({ marks: 5 as unknown as string[] });
+    expect(state.marks.size).toBe(0);
+    expect(isReliquaryStateEmpty(state)).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -2810,6 +2926,22 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
   });
   const ILLUMINATION_IDS = RELIQUARY_COMPLETION_DEED_IDS.slice(0, 3);
   const LADDER_IDS = new Set<string>(RELIQUARY_COMPLETION_DEED_IDS);
+
+  it('the ladder id list and the pairing table stay in dispatch lockstep', () => {
+    // DATA-side totality only: the sync dispatches on
+    // RELIQUARY_ILLUMINATION_DEED_PAGES membership, then the two named
+    // branches, then a fail-closed continue, and this pin holds the two
+    // constants to that shape. Both drift directions red here: a pairing key
+    // outside the id list would never be checked (its deed could never
+    // grant), and an id with no pairing and no named branch would silently
+    // fall to the continue. The BRANCHES themselves are pinned behaviorally
+    // by the ladder grant tests below, not by this data check.
+    const ids: readonly string[] = RELIQUARY_COMPLETION_DEED_IDS;
+    const pageKeys = Object.keys(RELIQUARY_ILLUMINATION_DEED_PAGES).sort();
+    expect(pageKeys).toEqual([...ids.slice(0, 3)].sort());
+    const armed = new Set([...pageKeys, 'col_reliquary_conquerors', 'col_reliquary_complete']);
+    expect(ids.filter((id) => !armed.has(id))).toEqual([]);
+  });
 
   /** Every character-durable slot the catalog carries, split by surface. */
   const CATALOG_SLOTS = (() => {
@@ -2912,6 +3044,33 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
 
     sim.drainEvents();
     expect(noteReliquaryMark(sim.ctx, meta, lastMark)).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
+    const ev = sim
+      .drainEvents()
+      .find((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_complete');
+    expect(ev).toBeDefined();
+    if (!ev || ev.type !== 'deedUnlocked') throw new Error('expected deedUnlocked');
+    expect('retro' in ev).toBe(false);
+  });
+
+  it('a MOUNT reins as the last missing relic completes the catalog (the reins discover arm)', () => {
+    // The fourth fill order: the mount arm of onItemDiscovered is the only
+    // caller of the ladder sync on a reins pickup, so without this arm that
+    // call could be deleted green and a mount-last capstone would slip to the
+    // next join, silent.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const lastMount = CATALOG_SLOTS.mountIds[0]!;
+    grantWholeCharacterCatalog(sim, new Set([lastMount]));
+    // Every item landed, so the shelf deed is already earned; only the reins
+    // (and with it the catalog deed) is missing.
+    expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(false);
+
+    sim.drainEvents();
+    const reins = mountItemId(lastMount);
+    expect(reins, lastMount).toBeTruthy();
+    sim.addItem(reins!, 1, sim.playerId);
     expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
     const ev = sim
       .drainEvents()
