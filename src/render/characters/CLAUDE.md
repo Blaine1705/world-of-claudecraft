@@ -229,6 +229,13 @@ per part.
     part set and minted on the first crossing into the far band; the colours are
     resolved per character from their own materials. Face/body sliders are not
     in that silhouette, deliberately.
+    The bake hands back geometry GROUPS and each character resolves group N
+    against its own captured `userData.farMaterials[N]`, so the two walks have to
+    be one list: both go through `composedFarMeshes`, which drops held props for
+    the reason the key gives (a part set says nothing about what anyone is
+    holding, and a prop lands mid-traversal, between the unmerged parts and the
+    merged body). The fixed-rig bake keeps its props: it reads its materials back
+    out of the same walk, so it is self-consistent whatever it collects.
   - `modularVariantCache` is keyed by LOOK, so what mints entries is now the
     population of a zone. It is refcounted (retained in `assembleModular`,
     released in `CharacterVisual.dispose`) and evicts idle entries over a cap;

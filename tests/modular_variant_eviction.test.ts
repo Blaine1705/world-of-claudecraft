@@ -120,6 +120,29 @@ describe('modularVariant insertion order (source pin)', () => {
     expect(sweepAt).toBeLessThan(insertAt);
   });
 
+  it('routes eviction through the predicate, never a whole-root dispose', () => {
+    // variantOwnedGeometries is exhaustively covered above, and none of it
+    // matters if the CALLER stops asking. Reverting evictModularVariants to the
+    // pre-fix `entry.root.traverse(o => o.geometry?.dispose())` reintroduces the
+    // whole bug one line above the predicate that exists to prevent it, and
+    // leaves every test above green: they exercise the predicate, not the sweep.
+    // The sweep needs a parsed GLB to run, so pin it as source.
+    const src = readFileSync(resolve(process.cwd(), 'src/render/characters/assets.ts'), 'utf8');
+    const fnStart = src.indexOf('function evictModularVariants(');
+    const fnEnd = src.indexOf('\n}', fnStart);
+    expect(fnStart).toBeGreaterThan(-1);
+    const body = src.slice(fnStart, fnEnd);
+    // the geometry it frees comes from the predicate, diffed against the parse
+    expect(body).toContain('variantOwnedGeometries(entry.root, sourceGeometries(entry.url))');
+    // ...and nothing here walks the root itself
+    expect(body).not.toMatch(/entry\.root\.traverse/);
+    // the far bake is the one thing eviction frees unconditionally: this code
+    // minted it (bakeStaticPose), so no other variant can be pointing at it
+    expect(body).toContain('entry.far?.geo.dispose()');
+    // and an entry with a live clone is never touched, whatever the cap says
+    expect(body).toMatch(/entry\.refs\s*>\s*0/);
+  });
+
   it('retains LAST in assembleModular, after every throw point', () => {
     // attachAllProps throws for streamed assets (the designed retry path) and
     // the retry never reaches dispose, so a retain taken before it leaked one

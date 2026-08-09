@@ -967,7 +967,7 @@ function modularVariantKey(url: string, names: readonly string[]): string {
   return `${url}|${names.join(',')}`;
 }
 
-/** Every BufferGeometry the parsed GLB owns, memoized per url.
+/** Every BufferGeometry the parsed GLB owns, memoized against the PARSED SCENE.
  *
  *  This is the set a variant must NOT dispose. A variant root is a
  *  SkeletonUtils clone, which SHARES geometry with its source, and
@@ -976,8 +976,18 @@ function modularVariantKey(url: string, names: readonly string[]): string {
  *  mouth) and skips buckets of one. Every one of those meshes is still pointing
  *  at the parsed scene's buffers, which every other variant and every future
  *  compose also point at, and nothing re-creates them. Disposing one would be
- *  the recolorCache bug in a worse place. */
-const sourceGeometryCache = new Map<string, Set<THREE.BufferGeometry>>();
+ *  the recolorCache bug in a worse place.
+ *
+ *  Keyed by scene OBJECT, not by url, and that is the whole point of the
+ *  WeakMap: a url-keyed memo is a promise that a url always parses to the same
+ *  buffers, which nothing enforces. Re-parse a character GLB (a hot reload, an
+ *  asset-cache eviction, any future re-fetch) and a variant built from the new
+ *  scene would be diffed against the OLD scene's set, so every one of its
+ *  unmerged parts reads as "minted here" and eviction frees the live parse's
+ *  buffers: exactly the bug this predicate exists to close, re-opened by a stale
+ *  key. Against the scene object the question cannot be asked of the wrong
+ *  parse, and a dropped parse takes its entry with it. */
+const sourceGeometryCache = new WeakMap<THREE.Object3D, Set<THREE.BufferGeometry>>();
 
 /**
  * The geometries an evicted variant is allowed to free: the ones it MINTED,
@@ -1002,14 +1012,15 @@ export function variantOwnedGeometries(
 }
 
 function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
-  const hit = sourceGeometryCache.get(url);
+  const scene = resolvedGltf(url).scene;
+  const hit = sourceGeometryCache.get(scene);
   if (hit) return hit;
   const owned = new Set<THREE.BufferGeometry>();
-  resolvedGltf(url).scene.traverse((o) => {
+  scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (mesh.isMesh && mesh.geometry) owned.add(mesh.geometry);
   });
-  sourceGeometryCache.set(url, owned);
+  sourceGeometryCache.set(scene, owned);
   return owned;
 }
 
@@ -1486,18 +1497,25 @@ export function assembleModular(
       : recolored(mesh.material, look, onMouth, onJewel, onBand);
   });
   applyMorphs(root, look);
-  // The far LOD's material slots, captured HERE and nowhere else. This is the
-  // one moment the tree is exactly the part set wearing THIS look's colours:
-  // the recolour sweep above has run, the face decals are tagged out, and the
-  // held props below have not been attached yet. The far bake walks a clone of
-  // the same variant with the same filter, so slot N here is group N there —
-  // which resolving by material NAME could not promise, because `mod_skin` is
-  // on both the head and the mouth's lip body and a first-wins lookup could
-  // paint an entire distant body in lipstick.
-  root.userData.farMaterials = farBakeMeshes(root).map((mesh) =>
+  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  // The far LOD's material slots, captured HERE and nowhere else, off the SAME
+  // filter (composedFarMeshes) the composed bake walks, so slot N here is group
+  // N there. Resolving by material NAME could not promise that: `mod_skin` is on
+  // both the head and the mouth's lip body, and a first-wins lookup could paint
+  // an entire distant body in lipstick.
+  //
+  // Captured AFTER attachAllProps on purpose, so the two walks see the same tree
+  // shape whichever order the caller assembles in. What makes the orders agree
+  // is composedFarMeshes dropping held props entirely: modularFarBake composes
+  // its throwaway with NO weapon ids, so its temp carries the class default
+  // while this root carries whatever this character actually equipped, and a
+  // held prop lands mid-traversal (under the bone root, which the GLB stores
+  // LAST, while mergeSkinnedParts appends the merged body after it). Counting
+  // props would therefore shift every merged group by the prop's mesh count and
+  // paint the armour and cloth in the material of the slot before it.
+  root.userData.farMaterials = composedFarMeshes(root).map((mesh) =>
     Array.isArray(mesh.material) ? mesh.material[0] : mesh.material,
   );
-  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
   // Retain LAST, after every throw point above. attachAllProps throws for a
   // streamed weapon GLB that has not landed yet, and that throw is a designed
   // path: the fail-soft visual build catches it and the retry gate re-attempts
@@ -2130,7 +2148,7 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  const { geo, mats, isBody } = bakeStaticPose(norm, farBakeMeshes(temp));
   // The throwaway retained a variant when the def is modular (assembleModular
   // retains every clone it makes). It exists only to be measured and flattened,
   // so give it back rather than pinning one part set per modular key forever
@@ -2258,12 +2276,18 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
     .makeTranslation(0, prep.yOffset, 0)
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
-  const { geo, isBody } = bakeStaticPose(temp, norm);
+  const { geo, isBody } = bakeStaticPose(norm, composedFarMeshes(temp));
+  // Pin the entry across the handover. Giving the throwaway's ref back can drop
+  // this variant to zero live clones, and a release at zero sweeps: without the
+  // pin the sweep could evict the very entry the bake is about to be written to,
+  // leaving the bake attached to an orphan (never cached, never freed). Pinning
+  // first keeps refs above zero through the release, so no sweep runs, and the
+  // unpin below leaves the entry idle for the next sweep to judge normally.
+  variant.refs++;
   releaseModularVariant(temp);
-  if (!geo) return null;
-  const bake: ModularFarBake = { geo, isBody };
-  variant.far = bake;
-  return bake;
+  variant.far = geo ? { geo, isBody } : null;
+  variant.refs--;
+  return variant.far;
 }
 
 /** Tag an attached face decal so the far-LOD passes skip it. Decals vary WITHIN
@@ -2279,12 +2303,15 @@ function markFaceDecal(decal: THREE.Object3D): void {
   });
 }
 
-/** The meshes the far LOD bakes, in traversal order.
+/** The meshes a far-LOD bake flattens, in traversal order. Face decals are out
+ *  (they vary WITHIN a part set: buzz and bald pick the same nodes and only the
+ *  decal tells them apart, so counting them would break the order guarantee),
+ *  as is anything hidden or without positions.
  *
- *  ONE function, called from two places on purpose: bakeStaticPose walks it to
- *  build the geometry groups, and assembleModular walks it to capture the
- *  matching material slots. Two hand-written traversals that had to agree would
- *  be a silent mis-colouring the day one of them changed. */
+ *  This arm keeps held props, and prepareVisual's fixed-rig bake is its only
+ *  caller: that bake reads its materials back out of the SAME walk, so it is
+ *  self-consistent whatever it collects, and weapons are gameplay-readable
+ *  silhouettes worth carrying into the distance. */
 function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
   const out: THREE.Mesh[] = [];
   root.traverse((o) => {
@@ -2297,11 +2324,37 @@ function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
   return out;
 }
 
+/** The meshes a COMPOSED far-LOD bake flattens: farBakeMeshes minus held props.
+ *
+ *  ONE function, called from two places on purpose: modularFarBake walks it to
+ *  build the geometry groups, and assembleModular walks it to capture the
+ *  matching material slots. Two hand-written traversals that had to agree would
+ *  be a silent mis-colouring the day one of them changed.
+ *
+ *  Props are dropped rather than merely ordered around because the composed bake
+ *  is shared by PART SET and a part set says nothing about what anyone is
+ *  holding: modularFarBake composes its throwaway with no weapon ids, so its
+ *  temp wears the class default while the characters resolving materials
+ *  against it wear whatever they equipped. Keeping props would mean baking one
+ *  player's sword into every peer who shares their haircut, on top of shifting
+ *  every group after it. Exported for the test that pins the two walks to one
+ *  list. */
+export function composedFarMeshes(root: THREE.Object3D): THREE.Mesh[] {
+  return farBakeMeshes(root).filter((mesh) => !mesh.userData.weaponMesh);
+}
+
 /** This composed body's far-LOD material slots, in bake-group order (captured by
  *  assembleModular). Padded to `count` so a mismatch can never leave a group
- *  without a material rather than mis-colouring one. */
+ *  without a material rather than mis-colouring one, and loud about it in dev:
+ *  the pad is a fail-soft, and a length that does not match means the two walks
+ *  have drifted and everything past the drift is drawing the wrong colour. */
 export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
   const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
+  if (import.meta.env?.DEV && slots.length > 0 && slots.length !== count) {
+    console.warn(
+      `[modular] far bake wants ${count} material slots, the composed body captured ${slots.length}; the two far walks have drifted`,
+    );
+  }
   return Array.from({ length: count }, (_, i) => slots[i] ?? FAR_MATERIAL_FALLBACK);
 }
 
@@ -2320,8 +2373,8 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
  *  (skinned verts via applyBoneTransform), normalized into world units. */
 function bakeStaticPose(
-  root: THREE.Object3D,
   norm: THREE.Matrix4,
+  meshes: THREE.Mesh[],
 ): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
@@ -2329,9 +2382,11 @@ function bakeStaticPose(
   const v = new THREE.Vector3();
   const full = new THREE.Matrix4();
 
-  // The SAME list assembleModular captures its far material slots from, so
-  // group N here is slot N there (see farBakeMeshes).
-  for (const mesh of farBakeMeshes(root)) {
+  // The caller passes the walk, so which filter a bake belongs to is decided at
+  // the one place that also knows where its materials come from: the composed
+  // bake is handed composedFarMeshes, the same list assembleModular captured its
+  // slots from, and group N here is slot N there.
+  for (const mesh of meshes) {
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
     const out = new THREE.BufferGeometry();
