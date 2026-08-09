@@ -4530,6 +4530,10 @@ export class ClientWorld implements IWorld {
   bgQueueLeave(): void {
     this.cmd({ cmd: 'bg_leave' });
   }
+
+  bgRespond(accept: boolean): void {
+    this.cmd({ cmd: 'bg_respond', accept });
+  }
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
   }

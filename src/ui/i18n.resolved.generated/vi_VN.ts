@@ -3304,6 +3304,14 @@ export const vi_VN: EnTranslations = {
       "denyOutOfRange": "Bạn phải ở gần người yêu cầu để giao đồ ủy thác.",
       "denyNoSpace": "Người yêu cầu không còn chỗ trống trong túi đồ."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Tìm Hầm Ngục",
       "close": "Đóng",

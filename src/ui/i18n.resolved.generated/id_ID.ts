@@ -3304,6 +3304,14 @@ export const id_ID: EnTranslations = {
       "denyOutOfRange": "Kamu harus berada di dekat peminta untuk menyerahkan komisi.",
       "denyNoSpace": "Peminta tidak memiliki ruang di tasnya."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Pencari Dungeon",
       "close": "Tutup",

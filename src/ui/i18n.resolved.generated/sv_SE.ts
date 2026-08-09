@@ -3304,6 +3304,14 @@ export const sv_SE: EnTranslations = {
       "denyOutOfRange": "Du måste vara nära beställaren för att leverera en beställning.",
       "denyNoSpace": "Beställaren har ingen plats i sina väskor."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Fängelsehålsletaren",
       "close": "Stäng",

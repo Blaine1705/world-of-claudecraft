@@ -3304,6 +3304,14 @@ export const cs_CZ: EnTranslations = {
       "denyOutOfRange": "Pro doručení zakázky musíš být poblíž zadavatele.",
       "denyNoSpace": "Zadavatel nemá místo v batozích."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Hledač dungeonů",
       "close": "Zavřít",

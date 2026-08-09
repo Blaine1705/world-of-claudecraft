@@ -4235,6 +4235,17 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',

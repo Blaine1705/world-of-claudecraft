@@ -3304,6 +3304,14 @@ export const pl_PL: EnTranslations = {
       "denyOutOfRange": "Musisz być blisko zleceniodawcy, aby dostarczyć zamówienie.",
       "denyNoSpace": "Zleceniodawca nie ma miejsca w torbach."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Znajdywacz Lochów",
       "close": "Zamknij",

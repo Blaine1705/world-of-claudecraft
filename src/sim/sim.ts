@@ -584,6 +584,7 @@ import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
 import * as bgMod from './social/battleground';
 import * as bgOutcomesMod from './social/battleground_outcomes';
+import * as bgProposalMod from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
@@ -1974,6 +1975,12 @@ export class Sim {
   // (server/game.ts) and by nobody else; the log caps itself, so the offline
   // and headless hosts that never drain hold a fixed, trivial tail.
   readonly bgOutcomes: bgOutcomesMod.BgOutcomeRecord[] = bgOutcomesMod.createBgOutcomeLog();
+  // Live queue-pop offers plus the requeue lockouts a failed one books. Both
+  // are session state: an offer cannot outlive the tick loop that expires it,
+  // and a 30 second lockout is not worth persisting across a relog.
+  readonly bgProposals: bgProposalMod.BgProposal[] = [];
+  readonly bgProposalLockouts = new Map<number, number>();
+  nextBgProposalId = 1;
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
@@ -3695,6 +3702,10 @@ export class Sim {
     // battleground: drop out of the queue; leaving a live match drops any
     // carried flag and the team fights on a player down (a fully vacated
     // side forfeits). social/battleground.ts owns the rule.
+    // A live queue-pop offer fails with the departing player as the offender:
+    // the nine who are still here must not hold a reserved field open for a
+    // client that is gone, and they keep their place in line.
+    bgProposalMod.bgProposalDisconnect(this.ctx, pid);
     bgMod.bgDequeue(this.ctx, pid);
     bgMod.bgResolveDesertion(this.ctx, pid);
     // Card Duel: leaving the queue is free; a live match is forfeited to the
@@ -4977,6 +4988,18 @@ export class Sim {
       },
       get bgBusySlots() {
         return sim.bgBusySlots;
+      },
+      get bgProposals() {
+        return sim.bgProposals;
+      },
+      get bgProposalLockouts() {
+        return sim.bgProposalLockouts;
+      },
+      get nextBgProposalId() {
+        return sim.nextBgProposalId;
+      },
+      set nextBgProposalId(v) {
+        sim.nextBgProposalId = v;
       },
       get bgOutcomes() {
         return sim.bgOutcomes;
@@ -10216,6 +10239,10 @@ export class Sim {
 
   bgQueueJoin(pid?: number): void {
     bgMod.bgQueueJoin(this.ctx, pid);
+  }
+
+  bgRespond(accept: boolean, pid?: number): void {
+    bgMod.bgRespond(this.ctx, accept, pid);
   }
 
   bgQueueLeave(pid?: number): void {

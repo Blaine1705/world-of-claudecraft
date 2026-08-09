@@ -3304,6 +3304,14 @@ export const es_ES: EnTranslations = {
       "denyOutOfRange": "Debes estar cerca del solicitante para entregar un encargo.",
       "denyNoSpace": "El solicitante no tiene espacio en sus bolsas."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Buscador de Mazmorras",
       "close": "Cerrar",

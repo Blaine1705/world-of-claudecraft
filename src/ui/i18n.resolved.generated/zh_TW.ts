@@ -3304,6 +3304,14 @@ export const zh_TW: EnTranslations = {
       "denyOutOfRange": "你必須靠近委託人才能交付委託。",
       "denyNoSpace": "委託人的背包空間不足。"
     },
+    "bgOffer": {
+      "title": "荊谷原野已準備就緒",
+      "accepted": "已確認 {accepted}/{size}",
+      "remaining": "剩餘 {seconds} 秒確認",
+      "accept": "接受",
+      "decline": "拒絕",
+      "acceptedWait": "等待其他人確認..."
+    },
     "finder": {
       "title": "地城搜尋器",
       "close": "關閉",

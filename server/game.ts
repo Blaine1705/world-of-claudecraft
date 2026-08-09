@@ -551,6 +551,10 @@ const BG_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * BG_WIRE_HZ)));
 const BG_WIRE_RESET_EVENTS = new Set([
   'bgQueued',
   'bgUnqueued',
+  // The offer prompt is a 30 second clock the player must act on, so it must
+  // never wait up to a BG_WIRE_HZ period to appear or to show a new accept.
+  'bgProposed',
+  'bgProposalUpdate',
   'bgFound',
   'bgStart',
   'bgFlag',
@@ -7311,6 +7315,12 @@ export class GameServer {
       case 'bg_queue':
         sim.bgQueueJoin(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'bg_respond':
+        // The client sends a real boolean; anything else is a malformed frame
+        // and must not be read as an accept.
+        if (typeof msg.accept !== 'boolean') break;
+        sim.bgRespond(msg.accept, pid);
         break;
       case 'bg_leave':
         sim.bgQueueLeave(pid);

@@ -3304,6 +3304,14 @@ export const ko_KR: EnTranslations = {
       "denyOutOfRange": "의뢰를 전달하려면 의뢰인 근처에 있어야 합니다.",
       "denyNoSpace": "의뢰인의 가방에 공간이 없습니다."
     },
+    "bgOffer": {
+      "title": "쏜할로우 평원이 준비되었습니다",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 참가자를 기다리는 중..."
+    },
     "finder": {
       "title": "던전 찾기",
       "close": "닫기",

@@ -3304,6 +3304,14 @@ export const nl_NL: EnTranslations = {
       "denyOutOfRange": "Je moet in de buurt van de aanvrager zijn om een opdracht af te leveren.",
       "denyNoSpace": "De aanvrager heeft geen ruimte in de tassen."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Kerkerzoekmachine",
       "close": "Sluiten",

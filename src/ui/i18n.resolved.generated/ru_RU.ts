@@ -3304,6 +3304,14 @@ export const ru_RU: EnTranslations = {
       "denyOutOfRange": "Чтобы доставить заказ, нужно быть рядом с заказчиком.",
       "denyNoSpace": "У заказчика нет места в сумках."
     },
+    "bgOffer": {
+      "title": "Терновая Лощина готова",
+      "accepted": "Готовы: {accepted} из {size}",
+      "remaining": "На ответ: {seconds} с",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "acceptedWait": "Ожидание остальных..."
+    },
     "finder": {
       "title": "Поиск подземелий",
       "close": "Закрыть",

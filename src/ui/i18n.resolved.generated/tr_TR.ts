@@ -3304,6 +3304,14 @@ export const tr_TR: EnTranslations = {
       "denyOutOfRange": "Bir komisyonu teslim etmek için isteyen kişiye yakın olmalısın.",
       "denyNoSpace": "İsteyen kişinin çantalarında yer yok."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Zindan Bulucu",
       "close": "Kapat",

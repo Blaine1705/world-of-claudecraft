@@ -3304,6 +3304,14 @@ export const zh_CN: EnTranslations = {
       "denyOutOfRange": "你必须靠近委托人才能交付委托。",
       "denyNoSpace": "委托人的背包空间不足。"
     },
+    "bgOffer": {
+      "title": "荆谷原野已准备就绪",
+      "accepted": "已确认 {accepted}/{size}",
+      "remaining": "剩余 {seconds} 秒确认",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptedWait": "等待其他人确认..."
+    },
     "finder": {
       "title": "地下城查找器",
       "close": "关闭",

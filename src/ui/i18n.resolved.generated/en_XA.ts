@@ -3304,6 +3304,14 @@ export const en_XA: EnTranslations = {
       "denyOutOfRange": "[Ýóú ɱúšţ ƀé ñéáŕ ţĥé ŕéɋúéšţéŕ ţó ðéļíʋéŕ á çóɱɱíššíóñ.]",
       "denyNoSpace": "[Ţĥé ŕéɋúéšţéŕ ĥáš ñó ŕóóɱ íñ ţĥéíŕ ƀáĝš.]"
     },
+    "bgOffer": {
+      "title": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš íš ŕéáðý]",
+      "accepted": "[{accepted} óƒ {size} ŕéáðý]",
+      "remaining": "[{seconds}š ţó áñšŵéŕ]",
+      "accept": "[Áççéþţ]",
+      "decline": "[Ðéçļíñé]",
+      "acceptedWait": "[Ŵáíţíñĝ ƒóŕ ţĥé óţĥéŕš...]"
+    },
     "finder": {
       "title": "[Ðúñĝéóñ Ƒíñðéŕ]",
       "close": "[Çļóšé]",

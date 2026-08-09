@@ -3304,6 +3304,14 @@ export const da_DK: EnTranslations = {
       "denyOutOfRange": "Du skal være tæt på bestilleren for at aflevere en bestilling.",
       "denyNoSpace": "Bestilleren har ikke plads i sine tasker."
     },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
+    },
     "finder": {
       "title": "Fangekældersfinder",
       "close": "Luk",

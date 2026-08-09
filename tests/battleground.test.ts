@@ -37,6 +37,7 @@ import {
   bgAllPids,
   bgCarryingFlag,
   bgResolveDesertion,
+  bgRespond,
   CARRIED_FLAG_AURA_ID,
   devEndBg,
   devStartBg,
@@ -72,7 +73,20 @@ function tp(sim: Sim, pid: number, x: number, z: number) {
   sim.ctx.rebucket(e);
 }
 
-// Ten solo players, queued, advanced one tick so matchmaking seats a 5v5.
+/** Answer a live queue-pop offer for every listed fighter. */
+function acceptBgOffer(sim: Sim, pids: number[]): void {
+  for (const pid of pids) bgRespond(sim.ctx, true, pid);
+}
+
+/** Accept EVERY live offer, seating whatever the matchmaker just picked. For
+ *  tests whose subject is the pick itself, which do not know the pids up front. */
+function acceptAllBgOffers(sim: Sim): void {
+  for (const proposal of [...sim.ctx.bgProposals]) {
+    acceptBgOffer(sim, [...proposal.teams[0], ...proposal.teams[1]]);
+  }
+}
+
+// Ten solo players, queued, offered, and accepted, so a 5v5 is live.
 function tenInQueue(): { sim: Sim; pids: number[] } {
   const sim = makeWorld();
   const pids: number[] = [];
@@ -84,7 +98,10 @@ function tenInQueue(): { sim: Sim; pids: number[] } {
     pids.push(pid);
   }
   for (const pid of pids) sim.bgQueueJoin(pid);
-  sim.tick(); // matchmakeBg seats them
+  // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+  // what seats the match, so every helper that wants a live 5v5 answers first.
+  sim.tick();
+  acceptBgOffer(sim, pids);
   return { sim, pids };
 }
 
@@ -163,7 +180,8 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
     const { sim, rider } = tenQueuedWithRider();
     const e = sim.entities.get(rider)!;
     expect(e.mountKey, 'the fixture really did put them in the saddle').toBe('valorsteed');
-    sim.tick(); // matchmakeBg seats the two teams (placeInBg)
+    sim.tick(); // the pop lands as an offer...
+    acceptAllBgOffers(sim);
     expect(sim.bgMatchFor(rider), 'the seat really happened').not.toBeNull();
     expect(e.mountKey, 'rode into the battleground').toBe('');
     expect(e.mountCastRemaining, 'a summon survived the seat').toBe(0);
@@ -314,6 +332,7 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     sim.entities.get(tenth)!.level = BG_MIN_LEVEL;
     sim.bgQueueJoin(tenth);
     sim.tick();
+    acceptBgOffer(sim, [...pids, tenth]);
     const match = sim.bgMatchFor(pids[0])!;
     expect(match).toBeTruthy();
     expect(match.teams[0]).toHaveLength(5);
@@ -352,7 +371,10 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     sim.tick();
     expect(sim.bgMatchFor(leader), 'a premade vs pugs must not seat instantly').toBeNull();
     // ...and then it seats anyway rather than stranding the queue.
-    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 1) && !sim.bgMatchFor(leader); i++) sim.tick();
+    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 1) && !sim.bgMatchFor(leader); i++) {
+      sim.tick();
+      acceptAllBgOffers(sim);
+    }
     const match = sim.bgMatchFor(leader)!;
     expect(match).toBeTruthy();
     const teamOfLeader = match.teams[0].includes(leader) ? 0 : 1;
@@ -416,7 +438,8 @@ describe('Thornhollow Fields: the queue survives the wait', () => {
     const dead = sim.entities.get(corpse)!;
     expect(dead.dead, 'the arrangement itself must hold').toBe(true);
 
-    sim.tick(); // the pop
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(corpse);
     expect(match, 'dying while waiting must not cost the seat').toBeTruthy();
     expect(bgAllPids(match!)).toContain(corpse);
@@ -453,7 +476,8 @@ describe('Thornhollow Fields: the queue survives the wait', () => {
     addThreat(mob, diver, 500);
     expect(mob.threat.get(diver)).toBe(500);
 
-    sim.tick(); // the pop
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(diver);
     expect(match, 'a dungeon pull must not cost the seat').toBeTruthy();
     expect(isBgPos(e.pos.x)).toBe(true);
@@ -540,6 +564,7 @@ describe('Thornhollow Fields: team parties for the match', () => {
     }
     sim.bgQueueJoin(leader); // queues the whole premade as one group
     sim.tick();
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(leader)!;
     const team = match.teams[0].includes(leader) ? 0 : 1;
     const party = sim.partyOf(leader)!;
@@ -928,6 +953,7 @@ describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
         sim.bgQueueJoin(pid);
       }
       sim.tick();
+      acceptBgOffer(sim, pids);
       return { sim, match: sim.bgMatchFor(pids[0])! };
     };
     // The sprint pads are spawned first, the power pads after, so the field's
@@ -2068,6 +2094,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     sim.resetDay = '2026-07-27';
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
+    acceptAllBgOffers(sim);
     const rematch = sim.bgMatchFor(winner)!;
     toActive(sim, rematch);
     const rewinner = rematch.teams[0].includes(winner) ? winner : rematch.teams[1][0];
@@ -2120,6 +2147,7 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     // queue always drains: an empty battleground is the worse outcome.
     for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(pids[0]); i++) {
       sim.tick();
+      acceptAllBgOffers(sim);
     }
     expect(sim.bgMatchFor(pids[0]), 'the queue must never starve').toBeTruthy();
   });
@@ -2138,6 +2166,7 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     }
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
+    acceptAllBgOffers(sim);
     expect(sim.bgMatchFor(pids[0]), 'an even ten seats on the tick').toBeTruthy();
     const left = sim.ctx.bgQueue;
     expect(
@@ -2194,6 +2223,7 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     // queue never starves: the band widens until the 300 gap fits.
     for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(high[0]); i++) {
       sim.tick();
+      acceptAllBgOffers(sim);
     }
     const match = sim.bgMatchFor(high[0])!;
     expect(match, 'the queue must never starve').toBeTruthy();
@@ -2210,6 +2240,7 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     const { sim, pids } = tenAtRatings([2400, 2400, 2400, 2400, 900, 900, 900, 900, 900, 900]);
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(pids[0]);
     expect(match, 'a packable ten seats on the tick').toBeTruthy();
     const avg = (team: number[]) =>
@@ -2906,6 +2937,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     }
     sim.bgQueueJoin(leader); // queues the whole premade as one group
     sim.tick();
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(leader)!;
     // The flag is snapshotted at START, which is the only moment it is knowable:
     // by resolve time both teams are welded into match parties.
@@ -2934,6 +2966,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     sim2.partyInvite(queued[1], queued[0]);
     sim2.partyAccept(queued[1]);
     sim2.tick();
+    acceptAllBgOffers(sim2);
     const match2 = sim2.bgMatchFor(queued[0])!;
     expect(match2.grouped, 'nobody queued as a group').toBe(false);
     expect(sim.bgMatchFor(pids[0])!.grouped, 'the plain solo ten too').toBe(false);

@@ -3304,6 +3304,14 @@ export const ja_JP: EnTranslations = {
       "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
       "denyNoSpace": "依頼者のバッグに空きがありません。"
     },
+    "bgOffer": {
+      "title": "ソーンホロウ平原の準備が整いました",
+      "accepted": "{size} 人中 {accepted} 人が承認",
+      "remaining": "残り {seconds} 秒",
+      "accept": "承認",
+      "decline": "辞退",
+      "acceptedWait": "他の参加者を待っています..."
+    },
     "finder": {
       "title": "ダンジョンファインダー",
       "close": "閉じる",
