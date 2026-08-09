@@ -192,6 +192,37 @@ pin never committed (see the phase 5 QA note in progress.md). Next up: phase 6
 its perf baseline AFTER this QA and must re-author or drop
 patches/three@0.165.0.patch.
 
+Phase 6 done (2026-08-09, the three.js 0.185 train; commits: 4 baseline data +
+4e124fb4b7 deps bump + patch re-author, a0e61e2683 post chain, 1f5b8b0ee0
+types churn, 6f53f72879 frozen-camera matrix gate, ff8e667db6 Clock to Timer,
+0bb6273b51 prewarm vertexNormals bit, f3c9a8fdd5 sky comment + gizmo helper,
+daa963da45 transcoder regen + ktx2 cache keys, 018ed52dd3 info-reset sweep,
+39490b4c49 vColor.rgb emissive fix, e092f26e3a + the re-freeze fix review
+hardening, 5 post-upgrade perf rows; QA-start merge 519f1c328d took tip
+f53e5a37d1). three 0.185.1 + postprocessing 6.39.4 (peer-only) + n8ao 2.0.0 +
+@types/three 0.185.4; the compileAsync guard is RE-AUTHORED as
+patches/three@0.185.1.patch (upstream r185 still unguarded). Migration walk:
+31-agent workflow audit (per-item + 3 chunk-anchor groups + adversarial
+skeptics on every no-hit, zero losses); 92 chunk anchors all ok; 8 items
+confirmed no-hit; the big fixes were the r185 matrix gate (frozen camera
+refresh helper refreshFrozenWorldMatrix + flag-preserving re-freeze bake in
+static_matrix.ts), the restored r165-shaped bloom composite behind
+OutputGradePass's bloom.rgb * bloom.a contract, the n8ao 2.0.0 anchor drop,
+the transcoder patcher re-author (r185 Emscripten shapes, ships paired wasm),
+the ktx2 'file:' cache-key fix, and the shader-smoke-caught vColor vec4 break
+(r185 declares vColor vec4 under plain USE_COLOR). Shader smoke clean at low
+and ultra with checkShaderErrors ON. Seam review PASS-WITH-FOLLOWUPS, 0
+blocking, all but one follow-up landed (ledger: hidden-view gate cost
+inversion mitigation). Perf after (informational): medium/high/ultra FASTER
+everywhere; LOW reproducibly splits (town/east +24-28 percent, open-run
+-22.6, combat-vfx -17.5) with the r185 traversal-skip removal as the working
+hypothesis, handed to phase 6 QA with the r181 lighting decision
+(before/after pairs in tmp/perf-parity/, low at noise floor, composer tiers
+show the shift). Baselines + after rows in docs/perf/baseline/history.jsonl,
+all dirty:false via commit-per-run. Next up: phase 6 QA (phase-06-qa.md),
+fresh session, pull+merge first; the r181 acceptance and the low-tier
+open-run/combat regression are the two user-facing decisions.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -444,6 +475,25 @@ Vendor bundle sha256 baselines (recorded by phase 1 QA; regen-stability verified
 rebuild reproduced identical bytes): electron_log_main.cjs
 784caa8281339772203a5881f442bbf4199163d6ef0914fc5d26eca8e3a967bd, electron_updater.cjs
 0605218d342a1c1b219677cebf64c848a1b55ff5d865daf8c71b70395c83287f.
+Phase 6 additions: patches/three@0.185.1.patch (re-authored compileAsync
+guard; the r165 patch file is deleted), src/render/static_matrix.ts grew
+refreshFrozenWorldMatrix plus a flag-preserving freezeStaticMatrices bake,
+src/render/post_bloom_shader_core.ts is now restoreClassicBloomComposite
+(fail-closed r182+ main() rewrite to the r165-equivalent tint-free body),
+ProgramContentMeshShape grew hasNormals (r185 vertexNormals program bit),
+scripts/patch_basis_transcoder.mjs re-authored for the r185 Emscripten
+embind shapes and now copies the paired wasm, scripts/lib/ktx2_entry.js
+pre-seeds THREE.Cache under the 'file:' namespace, and the three preview
+loops plus fit_studio use THREE.Timer. New tests:
+tests/ktx2_cache_preseed.test.ts; extended: static_matrix (r185 gate pins,
+re-freeze arm), post_bloom_shader_core (r185 fixture flip, r165-equivalence
+pin, _fsQuad handle pin), post_n8ao (reversed-depth premise pins),
+post_output_grade (tonemapping chunk-name cross-check), gfx (direct-profile
+no-shadows invariant), prewarm_program_key_contract (r185 surface re-pin),
+prewarm_policy (hasNormals arm), scene_census_core (r185 ordering fake +
+source pin), basis_transcoder_csp (two-site shapes), eastbrook pins
+(vColor.rgb). tests/three_compile_async_patch.test.ts wording moved off
+r165.
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
 raw runs in tmp/perf-baseline/, gitignored). Phase 6 freezes the pre-upgrade
@@ -494,6 +544,16 @@ baseline with `node scripts/perf_baseline.mjs baseline --preset <p>`.
   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
   runs; without it profile_mode fails at import (this is the known environmental
   full-gate failure).
+- perf_baseline runs DIRTY THE TREE for the next run (history.jsonl + the
+  frozen baseline file are the run's own outputs): commit after every run or
+  the following row lands dirty:true (struck in phase 6's first batch; the
+  fix is commit-per-run, one data commit per preset).
+- The shader-error smoke lever is the ?shaderdebug URL param (renderer.ts
+  flips checkShaderErrors); run scripts/prewarm_travel_bench.mjs with
+  GAME_URL='http://localhost:5173/?shaderdebug' and PERF_BOOT_TIMEOUT_MS
+  raised (checkShaderErrors makes the swiftshader boot exceed the 120s
+  default), at BOTH gfx=low and the ultra default; page errors print at the
+  end without failing the exit code, so grep the output.
 - A desktop-classified page (Electron UA or VITE_DESKTOP_APP=1) routes /api to
   the PRODUCTION origin: any online E2E/probe against the local server must
   restart vite with VITE_DESKTOP_RELATIVE_API=1. Register mode has a required

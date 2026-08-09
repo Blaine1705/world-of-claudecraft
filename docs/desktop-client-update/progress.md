@@ -13,8 +13,8 @@
 | 4 | Presentation lifecycle | done | 2026-08-08 | 2026-08-08 |
 | 4 QA | Verify phase 4 | done | 2026-08-09 | 2026-08-09 |
 | 5 | Governor and LOW tier | done | 2026-08-09 | 2026-08-09 |
-| 5 QA | Verify phase 5 | not started | | |
-| 6 | three.js 0.185 train | not started | | |
+| 5 QA | Verify phase 5 | done | 2026-08-09 | 2026-08-09 |
+| 6 | three.js 0.185 train | done | 2026-08-09 | 2026-08-09 |
 | 6 QA | Verify phase 6 | not started | | |
 | 7 | Desktop prefs store and window memory | not started | | |
 | 7 QA | Verify phase 7 | not started | | |
@@ -58,10 +58,12 @@ blocking in the shipped code; 5 confirmed should-fix all fixed in-session, 3 pro
 gaps closed with mutation-verified pins, both re-litigations UPHELD, two
 pre-existing stopping-rule shapes surfaced to the user; see the QA note).
 
-Phase 6: [ ] pre-upgrade perf baseline frozen + reference screenshots; [ ] three
-0.185.1 + postprocessing 6.39.4 + n8ao 2.0.0 compile and all suites green; [ ] the
-migration action list from brainstorm.md walked item by item; [ ] shader-error smoke
-pass clean; [ ] perf/visual comparison recorded (QA gates it).
+Phase 6: [x] pre-upgrade perf baseline frozen + reference screenshots; [x] three
+0.185.1 + postprocessing 6.39.4 + n8ao 2.0.0 compile and all suites green; [x] the
+migration action list from brainstorm.md walked item by item (workflow audit, every
+no-hit adversarially verified); [x] shader-error smoke pass clean (after it caught
+and the phase fixed the r185 vColor vec4 break); [x] perf/visual comparison recorded
+(QA gates it; low-tier open-run/combat regression flagged, r181 pairs saved).
 
 Phase 7: [ ] electron/desktop_prefs.cjs store (atomic, corrupt-tolerant, Node-tested);
 [ ] bounds + display persistence with on-screen validation; [ ] GPU-force opt-out
@@ -965,3 +967,127 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   to any host selecting tier low including mobile (directionally helpful for
   the thermal issue, unmeasured, per packet non-goals).
 - Gate: see state.md phase 5 QA block for the recorded result.
+
+### Phase 6 (2026-08-09, three.js 0.185 train)
+
+- Base merge 519f1c328d took release tip f53e5a37d1 (PR 3168 rift death-zone
+  telegraphs; new src/render/rift_death_zone_core.ts). Clean; the 13
+  phase-relevant render suites re-ran green (133 tests) before any work.
+- Dependency moves (4e124fb4b7): three 0.165.0 to 0.185.1 (exact),
+  postprocessing 6.36.0 to 6.39.4 (exact; consumed only as n8ao's peer, no
+  first-party import exists), n8ao 1.10.3 to 2.0.0, @types/three 0.185.4
+  (closest published to three 0.185.1, same minor). The compileAsync
+  disposal-race patch was re-evaluated: upstream r185 still ships the
+  unguarded program.isReady() poll (verified in the r185 source and the
+  installed bundle), so the guard was RE-AUTHORED as
+  patches/three@0.185.1.patch via pnpm patch; the pin test dropped its r165
+  wording and its bundle-scope scan is unchanged.
+- Pre-upgrade baselines frozen on the merged base BEFORE the bump, commit-per
+  run so every history row lands dirty:false (the phase 5 relabel lesson; the
+  first batch tripped exactly that trap, one preset's outputs dirtying the
+  next row, and was stripped and re-run): low 190.8 / medium 57.9 / high 40.9
+  / ultra 34.7 overall fps at 1280x720 vsync-off on the RTX 5090. Reference
+  shots (swiftshader MECHANICAL references, never showcase evidence) in
+  gitignored tmp/perf-parity/before-<preset>/.
+- Migration walk: a 31-agent workflow (17 per-item auditors, 3 chunk-anchor
+  groups, 11 adversarial skeptics; zero losses) produced the hit matrix;
+  implementation stayed in the main session. Confirmed no-hits (each
+  skeptic-verified): r170 Material.type, r170 mipmaps, r174 RenderTarget
+  clone, r176 GLTF WebP/AVIF, r177 ColorManagement renames, r178
+  Multiply/Subtractive blending (none exist), r184 pixelStorei (all raw
+  context uses are reads), postprocessing direct API use. Chunk-anchor audit:
+  92 onBeforeCompile anchors across 29 render files, every one ok against the
+  r185 GLSL sources, zero missing or ambiguous.
+- Hits patched, one commit per cluster: n8ao 2.0.0 dropped computeNormal's
+  REVERSEDEPTH arm (one surgery anchor deleted; a0e61e2683) and the r182+
+  UnrealBloom composite rewrite (rgb-only 3.0-scaled sum, max-component
+  alpha, One-factor premultiplied blend) is NOT a drop-in for
+  OutputGradePass's bloom.rgb * bloom.a add, so restoreClassicBloomComposite
+  rebuilds the r165-shaped tint-free accumulation, pinned equal (whitespace
+  aside) to the pre-upgrade shipped shader; fsQuad became _fsQuad, SMAAPass
+  constructs sizeless, OptimizedCineonToneMapping became CineonToneMapping.
+  @types 0.185 nullability churn (1f5b8b0ee0). THE BIG ONE (6f53f72879):
+  r185 gates updateMatrixWorld's own compose on matrixWorldAutoUpdate and
+  recurses children unconditionally, so the frozen chase camera's four
+  explicit updateMatrixWorld() calls became compose-skipping no-ops that
+  also ate the dirty bit (frozen view); refreshFrozenWorldMatrix
+  (static_matrix.ts) flips the flag around the stock walk, all four sites
+  rewired, both r185 premises pinned. Clock to Timer in the four preview
+  loops + fit-studio PCFSoft (ff8e667db6). Prewarm dedupe learned r185's
+  vertexNormals program bit and the parameter tripwire re-pinned after the
+  audit (0bb6273b51). Basis transcoder patcher re-authored for the r185
+  Emscripten shapes (two dynamic sites now: craftInvokerFunction with
+  isAsync, arrow __emval_get_method_caller with kind; createNamedFunction is
+  upstream-clean and craftEmvalAllocator is gone), regen ships the paired
+  wasm, ktx2_entry cache pre-seed re-keyed to r185 FileLoader's 'file:' + url
+  namespace, both sides pinned (daa963da45). TransformControls getHelper in
+  the asset-pipeline live viewer; sky envRotationY VERIFIED needing NO sign
+  flip (r185's transpose build equals r165's negated euler for a Y-only
+  rotation, both sources compared; the audit's "almost certainly flip" was
+  refuted by the probe) so only the comment moved (f3c9a8fdd5). r185 moved
+  info.reset() before the shadow pass: comment sweep + census test fake
+  reordered; the direct-profile shift is provably EMPTY because every
+  shipped direct profile disables dynamic shadows, now pinned in
+  tests/gfx.test.ts (018ed52dd3, hardened in e092f26e3a).
+- Shader smoke (checkShaderErrors ON via ?shaderdebug, prewarm tour at low
+  AND ultra): caught ONE real break the anchor audit structurally cannot
+  (the anchor matched; the chunk's declared TYPE changed): r185 declares
+  vColor vec4 under plain USE_COLOR, so vertex_color_emissive's injected
+  block failed GLSL compilation on Eastbrook two-material emissives at low.
+  Fixed (39490b4c49), smoke re-run CLEAN on both tours (the only console
+  error is the pre-existing training-dummy lazy-preload race under fast
+  teleports, identical at both tiers, not a loader regression).
+- Seam review (frontend-seam-reviewer, fresh): PASS-WITH-FOLLOWUPS, 0
+  blocking, 4 should-fix + 4 notes, all but one landed in-session
+  (e092f26e3a + the re-freeze fix): the re-freeze root-compose gap (r185
+  force does not bypass the flag gate; flag-preserving bake + parent-move
+  test arm, mutation-verified killed), the over-claiming shadow-shift
+  comments (now state the pinned no-shadows-on-direct invariant), the
+  _fsQuad handle pin, the r165-equivalence bloom pin, reversed-depth premise
+  pins, and the census-fake ordering source pin. NOT landed (ledger): the
+  hidden-view gate cost inversion mitigation (drop matrixAutoUpdate on
+  hidden subtrees or detach), an optimization decision handed to QA/upstream.
+- Perf after (informational, QA holds the 5 percent gate; rows commit-per
+  run): medium/high/ultra are FASTER across effectively every scenario
+  (medium 57.9 to ~71 overall, high 40.9 to ~51, ultra 34.7 to ~44; r184/r185
+  render-list and pixel-storage work). LOW splits and the split REPRODUCES on
+  a quiet machine: town-idle +27.5, town-look +24.2, east-run +25.9, but
+  open-run -22.6 and combat-vfx -17.5 percent. Mechanism hypothesis for QA:
+  r185 removed the matrixWorldAutoUpdate subtree traversal-skip and the
+  hidden-view gate now composes hidden rigs' children every frame; plain low
+  leans hardest on both (vista denial draws real geometry to camera-far, so
+  its open-world scenes carry the largest frozen node counts). The
+  ?diagnostics per-phase telemetry can attribute the matrix-walk share.
+- Visual: before/after shot pairs for all four presets in
+  tmp/perf-parity/{before,after}-<preset>/ with diff-shots stats. Low sits at
+  the noise floor (meanAbsDiff 0.16-2.73); medium/high/ultra show the
+  expected broad r181 lighting shift (meanAbsDiff up to 12.4, 7-34 percent of
+  pixels over threshold). The r181 acceptance decision is QA's, with the
+  user; the bloom high-pass also moved from Rec.601 to Rec.709 luminance
+  weights (identical for neutrals, a few percent on saturated emissives),
+  same review bucket.
+- Deferred, recorded: scripts/assets/*/export_entry.js still set the
+  r182-deprecated PCFSoftShadowMap (warning-only in dev exporters); they are
+  seal-fingerprinted, so the rename batches with the phase 11 re-mint.
+  checkShaderErrors stays false in prod (the ?shaderdebug toggle is the dev
+  lever, unchanged).
+- Gate (gate_select, BROWSER_PATH exported, biome defaultBranch pinned to the
+  release branch for the run and reverted, proven in no commit): full-suite
+  fallback (lockfile in the changed set) red ONLY on the 8 accepted asset-seal
+  suites / 11 tests; 2422 files / 33275 tests green (the first full run also
+  surfaced four legitimate three-train reds, fixed in 5f4a16657c: the
+  texture-upload native-ranges premise flip, two camera-refresh source-pin
+  spellings, and the canopy fragment hash re-mint). Post-abort turbo proofs
+  5/5 (check:types build:env build:server build:bot) and 3/3 (build:bundle).
+- QA handoff for phase 6 QA (phase-06-qa.md): (1) the r181 lighting decision
+  with the user (pairs in tmp/perf-parity/{before,after}-<preset>, low at
+  noise floor, composer tiers shifted; includes the Rec.709 bloom high-pass
+  weighting); (2) the reproducible low-tier open-run/combat-vfx perf
+  regression (~-20 percent; traversal-skip removal hypothesis, ?diagnostics
+  per-phase telemetry attributes it; the hidden-view gate mitigation from the
+  seam review is the candidate lever); (3) re-run the migration probes fresh
+  on the committed tree; (4) re-litigate the accepted r185 semantic shifts
+  (bloom composite restore vs adopting upstream's 3.0-scaled blend, the
+  direct-profile no-shadows invariant pin, the re-freeze flag-preserving
+  bake); (5) the export_entry.js PCFSoft renames stay batched with the phase
+  11 seal re-mint.
