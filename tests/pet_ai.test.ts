@@ -428,6 +428,28 @@ describe('petPickTarget: grid scan preserves the selection contract', () => {
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(b);
   });
 
+  it('defensive pets assist against the owner-targeted hostile player while the owner is in combat', () => {
+    const { sim, a, b } = startedDuelHunter();
+    expect(sim.duels.get(a)?.state).toBe('active');
+    const owner = expectDefined(sim.entities.get(a));
+    const enemy = expectDefined(sim.entities.get(b));
+    const pet = adopt(sim, a);
+    pet.petMode = 'defensive';
+    expect(sim.isHostileTo(pet, enemy)).toBe(true);
+    isolate(sim, [a, b, pet.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(enemy, 10, 0);
+    owner.targetId = enemy.id;
+    owner.autoAttack = false;
+    owner.inCombat = true;
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(b);
+
+    owner.inCombat = false;
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
   it('centers the radius query on the PET, not the owner', () => {
     const { sim, pid, owner } = world();
     const pet = adopt(sim, pid);

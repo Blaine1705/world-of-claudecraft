@@ -66,7 +66,7 @@ const PET_FORCE_RECOVERY_DISTANCE = 96; // beyond this separation, snap after a 
 const PET_PATH_STALE_DISTANCE = 4; // path end this far from the (now-moved) owner: recompute the heel route
 const PET_WAYPOINT_REACHED = 1; // pet within this of the next waypoint: pop it and home on the next leg
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
-const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this close
+export const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this close
 // A pet pulls idle wild mobs by proximity just like its owner. The max mob detection
 // radius is 20 (see the clamp below), so any mob that could notice the pet is within
 // 20yd of it; scanning from the pet (there are at most a handful) keeps this off every
@@ -533,7 +533,10 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     const ownerOffense =
-      owner.targetId === m.id && (owner.autoAttack || (m.kind === 'mob' && m.threat.has(owner.id)));
+      owner.targetId === m.id &&
+      (owner.autoAttack ||
+        (m.kind === 'mob' && m.threat.has(owner.id)) ||
+        (m.kind === 'player' && owner.inCombat));
     const aggressive =
       pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
     if (!engagingUs && !ownerOffense && !aggressive) return;
