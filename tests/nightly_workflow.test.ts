@@ -165,6 +165,12 @@ describe('nightly gate workflow', () => {
     expect(browser).toMatch(stepLine('run: npx playwright install --with-deps chromium'));
     expect(browser).toMatch(stepLine('run: npm run test:browser'));
     expect(browser).toContain('path: ~/.cache/ms-playwright');
+    // No restore-keys on the Playwright cache: a version-prefix fallback can
+    // only ever restore a stale Chromium build, so the exact-version key is
+    // the only key worth having. Anchored to the YAML key shape (bare,
+    // double- or single-quoted) so a comment mentioning the word cannot
+    // satisfy the pin.
+    expect(browser).not.toMatch(/\n\s+["']?restore-keys["']?:/);
   });
 
   it('always reports, and only the report job may write issues', () => {

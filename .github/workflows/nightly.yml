@@ -229,12 +229,14 @@ jobs:
         run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright Chromium browsers
+        # No restore-keys: a version-prefix fallback can only ever restore a
+        # stale Chromium build, which npx playwright install then either
+        # ignores (dead weight) or, on an API mismatch, runs against, so the
+        # exact-version key is the only key worth having.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-          restore-keys: |
-            playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
