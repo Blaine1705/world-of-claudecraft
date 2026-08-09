@@ -97,8 +97,13 @@ interface AttributionTargetFixture {
 // (renderer.ts + prewarm_policy.ts edits). No capture was retaken.
 // Re-minted for the prewarm coverage completion (settle-state entry, program
 // content keys, widened depth arm). No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3217/3219) into the KTX2
+// mip-release branch: both sides move the rendererIntegration leaf (this
+// branch's KTX2 mip-chain release hooks; the release's GPU queue and prewarm
+// work with its PR 3219 reseal), so the merged tree mints a value matching
+// neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4590589e6b76f5774ffeb88d7ac9419f4b5f69c065be2a3f284a502659b2bfe7';
+  'c13899c7f328dd0c57cc07ba842e5398003475c4f1e25f6cb1d13132e33a313b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
