@@ -17,10 +17,6 @@ export function snapshotTimerWireMode(value: unknown): SnapshotTimerWireMode {
   return 'unsupported';
 }
 
-export function isStableTimerWireVersion(value: unknown): value is StableTimerWireVersion {
-  return value === STABLE_TIMER_WIRE_VERSION;
-}
-
 export function stableDeadlineRemaining(value: unknown, now: number): number | null {
   if (
     typeof value !== 'number' ||
