@@ -263,6 +263,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmProgramContentKeys({ morphNormalCount: 2 }, ['mat-1'])).not.toEqual(flat);
     expect(prewarmProgramContentKeys({ morphColorCount: 1 }, ['mat-1'])).not.toEqual(flat);
     expect(prewarmProgramContentKeys({ hasTangents: true }, ['mat-1'])).not.toEqual(flat);
+    // r185 keys vertexNormals (normal-attribute presence) for every material.
+    expect(prewarmProgramContentKeys({ hasNormals: true }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ hasNormals: true }, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({ hasTangents: true }, ['mat-1']),
+    );
     expect(prewarmProgramContentKeys({ vertexColorItemSize: 3 }, ['mat-1'])).not.toEqual(
       prewarmProgramContentKeys({ vertexColorItemSize: 4 }, ['mat-1']),
     );

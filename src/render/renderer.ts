@@ -5827,6 +5827,7 @@ export class Renderer {
                 morphNormalCount: morphs?.normal?.length ?? 0,
                 morphColorCount: morphs?.color?.length ?? 0,
                 hasTangents: mesh.geometry?.attributes?.tangent !== undefined,
+                hasNormals: mesh.geometry?.attributes?.normal !== undefined,
                 vertexColorItemSize: colorAttribute?.itemSize ?? 0,
                 castShadow: mesh.castShadow === true,
               },
