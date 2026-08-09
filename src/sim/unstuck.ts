@@ -15,10 +15,8 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import {
-  battlegroundOrigin,
   INSTANCE_X_BASE,
   isArenaPos,
-  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
@@ -120,21 +118,6 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
-  const bgMatch = ctx.bgMatches.get(pid);
-  if (bgMatch && isBgPos(pos.x)) {
-    return located(
-      {
-        kind: 'battleground',
-        id: 'thornhollow_fields',
-        instanceId: String(bgMatch.id),
-        slot: bgMatch.slot,
-      },
-      pos,
-      battlegroundOrigin(bgMatch.slot),
-    );
-  }
-  if (isBgPos(pos.x)) return null;
-
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
@@ -186,18 +169,12 @@ function forcedMovement(p: Entity): boolean {
   );
 }
 
-function carryingBattlegroundFlag(ctx: SimContext, pid: number): boolean {
-  const match = ctx.bgMatches.get(pid);
-  return match ? match.flags.some((flag) => flag.carrier === pid) : false;
-}
-
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
   return (
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
     isValeCupPlayer(ctx, pid) ||
-    isArenaPos(p.pos.x) ||
-    carryingBattlegroundFlag(ctx, pid)
+    isArenaPos(p.pos.x)
   );
 }
 
