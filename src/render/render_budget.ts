@@ -483,6 +483,9 @@ export class RenderBudgetGovernor {
     // bucket past its baseline widens the drawn ring and grows these very counters,
     // so gating the return TO baseline on them lets the ladder close its own gate
     // and strand the buckets it has not restored yet (resolution recovers last).
+    // Deliberate: dense frames no longer reset stableSeconds, so one frame under
+    // the line at a fire slot permits one enrich step; the cooldown and the
+    // at-slot re-check bound the rate, and only degrade() ever lowers quality.
     const canEnrich =
       sample.calls <= this.caps.targetCalls * 0.9 &&
       sample.triangles <= this.caps.targetTriangles * 0.9 &&

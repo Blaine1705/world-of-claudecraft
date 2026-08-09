@@ -443,7 +443,10 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: true,
     },
     characters: {
-      min: 1.0,
+      // Dormant while governable is false, but the shed floor still states how
+      // far the tier COULD go: low matches medium's so the monotonicity sweep
+      // holds on every row.
+      min: 0.86,
       baseline: 1.0,
       max: 1.0,
       roi: 1.0,

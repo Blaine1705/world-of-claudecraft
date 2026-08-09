@@ -24,6 +24,15 @@ function activeRadius(baseRadius: number, minRadiusScale: number, quality: numbe
 }
 
 const GOVERNABLE_BUCKETS = ['grass', 'foliage', 'lighting', 'vfx'] as const;
+const NON_GOVERNABLE_BUCKETS = [
+  'props',
+  'materials',
+  'waterSky',
+  'worldStreaming',
+  'ui',
+  'characters',
+  'weapons',
+] as const;
 
 describe('low tier stays monotonically lighter than medium', () => {
   const low = gfxInternalsForTest.settingsFor('low');
@@ -62,6 +71,24 @@ describe('low tier stays monotonically lighter than medium', () => {
         GFX_BUCKET_BANDS.medium[bucket].baseline,
       );
       expect(GFX_BUCKET_BANDS.low[bucket].max).toBeLessThan(GFX_BUCKET_BANDS.medium[bucket].max);
+    },
+  );
+
+  it.each(NON_GOVERNABLE_BUCKETS)(
+    'keeps the non-governable bucket %s at or under medium on min, baseline and max',
+    (bucket) => {
+      // Several of these rows are deliberately equal (weapons, the ui max), so
+      // this sweep bounds rather than demands strictness; the point is that NO
+      // row, dormant or not, sits above medium.
+      expect(GFX_BUCKET_BANDS.low[bucket].min).toBeLessThanOrEqual(
+        GFX_BUCKET_BANDS.medium[bucket].min,
+      );
+      expect(GFX_BUCKET_BANDS.low[bucket].baseline).toBeLessThanOrEqual(
+        GFX_BUCKET_BANDS.medium[bucket].baseline,
+      );
+      expect(GFX_BUCKET_BANDS.low[bucket].max).toBeLessThanOrEqual(
+        GFX_BUCKET_BANDS.medium[bucket].max,
+      );
     },
   );
 

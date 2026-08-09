@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GFX_BUDGETS } from '../src/render/gfx';
+import { GFX_BUCKET_BANDS, GFX_BUDGETS } from '../src/render/gfx';
 import { RenderBudgetGovernor, type RenderBudgetSample } from '../src/render/render_budget';
 
 function sample(overrides: Partial<RenderBudgetSample> = {}): RenderBudgetSample {
@@ -421,6 +421,8 @@ describe('render budget governor', () => {
     }
 
     expect(state.levels.resolution).toBeGreaterThan(degradedResolution);
-    expect(state.levels.grass).toBeLessThanOrEqual(1);
+    // The band max is the real ceiling (1 was constant-true: low's grass band
+    // tops out below it, so nothing reachable could ever fail that bound).
+    expect(state.levels.grass).toBeLessThanOrEqual(GFX_BUCKET_BANDS.low.grass.max);
   });
 });

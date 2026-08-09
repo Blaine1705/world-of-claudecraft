@@ -177,6 +177,39 @@ describe('render budget recovery ladder', () => {
     expect(state.levels.lighting).toBe(HIGH_BASELINE.lighting);
   });
 
+  it('permits one enrich step when the counters dip under the line for a single frame', () => {
+    const governor = highGovernor();
+    floorEverything(governor);
+
+    // Dense scene: phase A completes, the climb never starts, and the stable
+    // timer stays charged because density no longer resets it. DELIBERATE: a
+    // single frame under the 90% line at a fire slot may take ONE enrich step
+    // (the at-slot gate re-check and the cooldown bound the rate); the old
+    // behavior demanded a full fresh stable window of low-density frames.
+    let state = governor.state();
+    for (let i = 0; i < 260; i++) {
+      state = governor.update(
+        headroomSample({ calls: 600, triangles: 4_300_000, grassVisibleTufts: 5_800 }),
+      );
+    }
+    expect(state.levels.foliage).toBe(HIGH_BASELINE.foliage);
+
+    state = governor.update(
+      headroomSample({ calls: 300, triangles: 2_000_000, grassVisibleTufts: 2_000 }),
+    );
+    expect(state.levels.foliage).toBeGreaterThan(HIGH_BASELINE.foliage);
+    const afterDip = { ...state.levels };
+
+    // Back inside the band: the climb must hold again even across another
+    // charged window.
+    for (let i = 0; i < 60; i++) {
+      state = governor.update(
+        headroomSample({ calls: 600, triangles: 4_300_000, grassVisibleTufts: 5_800 }),
+      );
+    }
+    expect(state.levels).toEqual(afterDip);
+  });
+
   it('holds the climb above baseline while the counters sit inside the gate band', () => {
     const governor = highGovernor();
     floorEverything(governor);
