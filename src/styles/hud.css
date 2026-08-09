@@ -867,6 +867,34 @@
     display: block;
     border-radius: 50%;
   }
+  /* Book of Deeds border accent: the cosmetic ring around the portrait, keyed by
+     the unit's active border deed. The unit_frame painter writes the SLUG into
+     data-border (this rule gates on a non-empty value) and that slug's palette
+     into the three custom properties, so ONE treatment lives here and zero
+     per-slug colors do: src/ui/deed_border_view.ts stays the single source of
+     truth. The ring is identity, never actionable info, so it renders at every
+     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
+     the portrait combat glow above. z-index 2 sits it over the portrait but UNDER
+     the level chip (3) and the combat flash (4), whose corners it crosses.
+     The inset is ASYMMETRIC on purpose: the 60x60 .portrait disc sits at the
+     top-left of the 64x64 wrap, so its center is (30,30) while the wrap's is
+     (32,32). -6px top/left with -2px bottom/right keeps the same 72px ring but
+     centers it on the DISC; a uniform inset rings the wrap and reads visibly
+     off-center. */
+  .portrait-wrap[data-border]:not([data-border=""])::after {
+    content: "";
+    position: absolute;
+    inset: -6px -2px -2px -6px;
+    border-radius: 50%;
+    border: 2px solid var(--border-accent-frame, transparent);
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -3px;
+    box-shadow:
+      0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
+      inset 0 0 4px var(--border-accent-edge, transparent);
+    z-index: 2;
+    pointer-events: none;
+  }
   .level-chip {
     position: absolute;
     bottom: -3px;

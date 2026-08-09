@@ -339,6 +339,7 @@ const UI_PURE_CORES = [
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
+  'src/ui/deed_border_view.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/reliquary_view.ts',

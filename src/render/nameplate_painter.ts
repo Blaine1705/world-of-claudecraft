@@ -12,6 +12,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
@@ -303,6 +304,7 @@ export class NameplatePainter {
     state.levelColor = '#fff';
     state.guild = '';
     state.title = '';
+    state.border = '';
     state.marker = '';
     state.markerTone = 'none';
     state.hpVisible = false;
@@ -354,6 +356,7 @@ export class NameplatePainter {
       state.guild = entity.guild;
       state.hpVisible = !entity.dead;
       state.title = entity.title ? deedTitleText(entity.title) : '';
+      state.border = deedBorderSlug(entity.border);
       state.aiLabel = entity.aiAccount === true ? t('hudChrome.playerMenu.aiTag') : '';
       state.devOutline = showDevBadges ? devTierNameOutlineColor(entity.devTier ?? 0) : null;
       for (const aura of entity.auras) {
