@@ -24,12 +24,7 @@ export function setDisplayChangeTarget(cb: (() => void) | null): void {
 function isDisplayChange(raw: unknown): raw is DesktopDisplayChange {
   if (!raw || typeof raw !== 'object') return false;
   const candidate = raw as Partial<DesktopDisplayChange>;
-  return (
-    typeof candidate.scaleFactor === 'number' &&
-    Number.isFinite(candidate.scaleFactor) &&
-    typeof candidate.displayId === 'number' &&
-    Number.isFinite(candidate.displayId)
-  );
+  return typeof candidate.scaleFactor === 'number' && Number.isFinite(candidate.scaleFactor);
 }
 
 /**
@@ -38,8 +33,8 @@ function isDisplayChange(raw: unknown): raw is DesktopDisplayChange {
  * so neither the web build nor an outdated install changes behavior at all.
  *
  * The payload is re-validated here even though the preload already checked it:
- * the shell is a separately installed binary, and only the two whitelisted
- * numeric fields are ever read (extra fields a future or tampered shell might
+ * the shell is a separately installed binary, and the one whitelisted numeric
+ * field is all that is ever read (extra fields a future or tampered shell might
  * send are simply never forwarded, because nothing but the notify call crosses).
  */
 export function initDesktopDisplayChange(bridge: DesktopBridge): () => void {

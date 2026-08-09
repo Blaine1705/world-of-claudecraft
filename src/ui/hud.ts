@@ -8394,7 +8394,7 @@ export class Hud {
       });
   }
 
-  update(): void {
+  update(paint = true): void {
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
@@ -8421,12 +8421,23 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.questDialog.updateVoice();
+    // Self-contained timer controller: a roll must keep expiring on schedule
+    // whether or not this frame paints.
+    this.lootRolls.update(now);
+
+    // The cut between the non-paint half of the frame and the paint half. A
+    // hidden desktop window calls update(false) and still runs everything
+    // above: the fast-tier reconcileSfx sweep (which unloops a stale
+    // cast:<id> loop the player would otherwise keep hearing after the caster
+    // leaves interest, and prunes the mob bark maps), the idle-bark sweep, the
+    // combat and chat live-region flushes, quest voice, and the loot timers.
+    // Nothing below this line does anything but paint.
+    if (!paint) return;
     this.meters.update();
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();

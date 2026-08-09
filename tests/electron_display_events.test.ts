@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { displayChangedPayload, shouldForwardDisplayChange } from '../electron/display_events.cjs';
+import {
+  displayChangedPayload,
+  displayWirePayload,
+  shouldForwardDisplayChange,
+} from '../electron/display_events.cjs';
 
 describe('displayChangedPayload (renderer-facing display whitelist)', () => {
   it('passes only the two whitelisted fields, never the rest of the Display object', () => {
@@ -49,6 +53,25 @@ describe('displayChangedPayload (renderer-facing display whitelist)', () => {
       'displayId',
       'scaleFactor',
     ]);
+  });
+});
+
+describe('displayWirePayload (what actually crosses the bridge)', () => {
+  it('narrows a reading to the scale factor alone, dropping the display id', () => {
+    // The id is a stable OS-derived identifier that exists only for the
+    // main-side dedup; the renderer re-resolves a pixel ratio and needs nothing
+    // else. Pin the exact key set, so a pass-through rewrite cannot smuggle it.
+    const wire = displayWirePayload({ scaleFactor: 1.5, displayId: 2528732444 });
+    expect(wire).toEqual({ scaleFactor: 1.5 });
+    expect(Object.keys(wire)).toEqual(['scaleFactor']);
+  });
+
+  it('re-applies the coercion, so a raw Display or a junk reading is still safe', () => {
+    expect(displayWirePayload({ scaleFactor: 64, id: 1 })).toEqual({ scaleFactor: 10 });
+    expect(displayWirePayload({ scaleFactor: 0.1 })).toEqual({ scaleFactor: 0.25 });
+    expect(displayWirePayload({ scaleFactor: Number.NaN })).toEqual({ scaleFactor: 1 });
+    expect(displayWirePayload(null)).toEqual({ scaleFactor: 1 });
+    expect(displayWirePayload(undefined)).toEqual({ scaleFactor: 1 });
   });
 });
 

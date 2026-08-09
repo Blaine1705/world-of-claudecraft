@@ -4102,8 +4102,9 @@ async function startGame(
     if (frameDt > 0.25) frameDt = 0.25;
     // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
     // pauses there, so hidden frames never reach the sampler, and the reporter
-    // already skips sends while hidden): the fleet beacon keeps its meaning,
-    // where sampling these would fake a healthy fps and p95.
+    // is gated on this same shell signal via its shellHidden option below): the
+    // fleet beacon keeps its meaning, where sampling these would fake a healthy
+    // fps and p95.
     if (gate.render) perf.frame(frameDt);
     else perf.noteHiddenPresentSkip();
     if (gate.paint) {
@@ -4273,7 +4274,9 @@ async function startGame(
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      const rendererStart = perf.startTime();
+      // A hidden frame skips the draw, so timing it would dilute the renderer
+      // bucket with work that never happened.
+      const rendererStart = gate.render ? perf.startTime() : 0;
       traceStart = perf.startTrace();
       try {
         renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
@@ -4288,7 +4291,7 @@ async function startGame(
           'alpha',
           offlineAlpha,
         );
-        perf.finishTime('renderer', rendererStart);
+        if (gate.render) perf.finishTime('renderer', rendererStart);
       }
       traceStart = perf.startTrace();
       try {
@@ -4307,11 +4310,13 @@ async function startGame(
           perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
           perf.finishTime('hud', hudStart);
         }
-      }
-      if (gate.render) {
-        perf.tick(now);
-        entryDiagnostics.renderedFrame(now);
-      }
+      } else hud.update(false);
+      if (gate.render) perf.tick(now);
+      // Liveness breadcrumb the NEXT launch reads as a load-failure report: a
+      // client launched minimized is alive, not stuck building the scene, so
+      // this stays at tick level. Under gate.render it would leave the stale
+      // pre-first-frame checkpoint on disk and report a phantom failure.
+      entryDiagnostics.renderedFrame(now);
       return;
     }
 
@@ -4494,7 +4499,9 @@ async function startGame(
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    const rendererStart = perf.startTime();
+    // A hidden frame skips the draw, so timing it would dilute the renderer
+    // bucket with work that never happened.
+    const rendererStart = gate.render ? perf.startTime() : 0;
     traceStart = perf.startTrace();
     try {
       renderer.sync(
@@ -4523,7 +4530,7 @@ async function startGame(
         'frameDtMs',
         frameDtMs,
       );
-      perf.finishTime('renderer', rendererStart);
+      if (gate.render) perf.finishTime('renderer', rendererStart);
     }
     traceStart = perf.startTrace();
     try {
@@ -4543,11 +4550,13 @@ async function startGame(
         perf.finishTrace('hud.update', traceStart, 'mode', 'online');
         perf.finishTime('hud', hudStart);
       }
-    }
-    if (gate.render) {
-      perf.tick(now);
-      entryDiagnostics.renderedFrame(now);
-    }
+    } else hud.update(false);
+    if (gate.render) perf.tick(now);
+    // Liveness breadcrumb the NEXT launch reads as a load-failure report: a
+    // client launched minimized is alive, not stuck building the scene, so
+    // this stays at tick level. Under gate.render it would leave the stale
+    // pre-first-frame checkpoint on disk and report a phantom failure.
+    entryDiagnostics.renderedFrame(now);
   }
   const controller = {
     move(moveInput: unknown, facing?: unknown) {
@@ -4804,6 +4813,7 @@ async function startGame(
             simEntities: world.entities.size,
           }),
           desktopShell: DESKTOP_APP,
+          shellHidden: desktopPresentationHidden,
         });
         // One-time machine-local performance nudge (packet 0 rulings R14-R16):
         // the assembler polls the same PerfMonitor the reporter reads.

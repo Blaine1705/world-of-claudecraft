@@ -6,7 +6,7 @@ import type { DesktopBridge, DesktopDisplayChange } from '../src/runtime';
 // the interesting part: this suite drives both, plus the payload validation, the
 // feature check that keeps web and older shells untouched, and the unsubscribe.
 
-const CHANGE: DesktopDisplayChange = { scaleFactor: 2, displayId: 2528732444 };
+const CHANGE: DesktopDisplayChange = { scaleFactor: 2 };
 
 // Each boot is a fresh module registry, because the target latch is module state
 // that lives for exactly one page session.
@@ -49,7 +49,7 @@ describe('initDesktopDisplayChange', () => {
     mod.setDisplayChangeTarget(target);
     push(CHANGE);
     expect(target).toHaveBeenCalledTimes(1);
-    push({ scaleFactor: 1, displayId: 7 });
+    push({ scaleFactor: 1 });
     expect(target).toHaveBeenCalledTimes(2);
   });
 
@@ -75,9 +75,10 @@ describe('initDesktopDisplayChange', () => {
     expect(target).toHaveBeenCalledTimes(1);
   });
 
-  it('never forwards a payload missing either finite number', async () => {
-    // The shell is an independently updated binary, so each field is checked on
-    // this side of the boundary too, one arm per field.
+  it('never forwards a payload without a finite scale factor', async () => {
+    // The shell is an independently updated binary, so the field is re-checked
+    // on this side of the boundary too. A non-finite scale factor is the arm
+    // that matters: it would poison the renderer's pixel-ratio math outright.
     const { mod, push } = await boot();
     const target = vi.fn();
     mod.setDisplayChangeTarget(target);
@@ -87,14 +88,12 @@ describe('initDesktopDisplayChange', () => {
       'change',
       42,
       {},
-      { scaleFactor: 2 },
       { displayId: 7 },
-      { scaleFactor: '2', displayId: 7 },
-      { scaleFactor: 2, displayId: '7' },
-      { scaleFactor: Number.NaN, displayId: 7 },
-      { scaleFactor: Number.POSITIVE_INFINITY, displayId: 7 },
-      { scaleFactor: 2, displayId: Number.NaN },
-      { scaleFactor: 2, displayId: Number.POSITIVE_INFINITY },
+      { scaleFactor: '2' },
+      { scaleFactor: null },
+      { scaleFactor: Number.NaN },
+      { scaleFactor: Number.POSITIVE_INFINITY },
+      { scaleFactor: Number.NEGATIVE_INFINITY },
     ]) {
       push(raw);
     }
@@ -102,6 +101,18 @@ describe('initDesktopDisplayChange', () => {
     // The rig itself is not vacuous: a well-formed payload still lands.
     push(CHANGE);
     expect(target).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts a payload carrying extra fields but forwards none of them', async () => {
+    // A future or tampered shell sending more than the one whitelisted field
+    // must not be able to get that data across: the target takes no arguments,
+    // so the extras have nowhere to go even when the payload is otherwise valid.
+    const { mod, push } = await boot();
+    const target = vi.fn();
+    mod.setDisplayChangeTarget(target);
+    push({ scaleFactor: 1.5, displayId: 2528732444, label: 'Built-in Retina Display' });
+    expect(target).toHaveBeenCalledTimes(1);
+    expect(target).toHaveBeenCalledWith();
   });
 
   it('returns the shell unsubscribe hook', async () => {

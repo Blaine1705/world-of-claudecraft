@@ -181,9 +181,11 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     ipcRenderer.on('desktop-presentation-changed', listener);
     return () => ipcRenderer.removeListener('desktop-presentation-changed', listener);
   },
-  // The display the window sits on, pushed when its scale factor or identity
-  // changes. The finiteness checks are not ceremony: the renderer resolves a
-  // pixel ratio from scaleFactor, so a NaN would poison every frame after it.
+  // The scale factor of the display the window sits on, pushed when it changes.
+  // The display's identity decides main-side whether a change is worth sending
+  // and never crosses the bridge. The finiteness check is not ceremony: the
+  // renderer resolves a pixel ratio from this, so a NaN would poison every
+  // frame after it.
   onDisplayChanged: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, payload) => {
@@ -191,9 +193,7 @@ contextBridge.exposeInMainWorld('wocDesktop', {
         payload &&
         typeof payload === 'object' &&
         typeof payload.scaleFactor === 'number' &&
-        Number.isFinite(payload.scaleFactor) &&
-        typeof payload.displayId === 'number' &&
-        Number.isFinite(payload.displayId)
+        Number.isFinite(payload.scaleFactor)
       ) {
         callback(payload);
       }

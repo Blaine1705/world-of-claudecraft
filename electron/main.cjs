@@ -50,7 +50,11 @@ const {
 } = require('./gpu_preference.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
-const { displayChangedPayload, shouldForwardDisplayChange } = require('./display_events.cjs');
+const {
+  displayChangedPayload,
+  displayWirePayload,
+  shouldForwardDisplayChange,
+} = require('./display_events.cjs');
 const {
   buildWalletHandoffBrowserUrl,
   parseWalletHandoffDeepLink,
@@ -276,22 +280,26 @@ const READY_TO_SHOW_FALLBACK_MS = 4000;
 // A drag fires 'move' continuously; only the position it lands on is worth a read.
 const MOVE_DISPLAY_DEBOUNCE_MS = 250;
 
-// Whether the window is currently minimized or hidden. The renderer cannot work
-// this out for itself: the game window sets backgroundThrottling:false, which
-// keeps the Page Visibility API reporting 'visible' the whole time the window is
-// minimized, so this boolean and the push below are its only source.
-let presentationHidden = false;
 // The last display reading pushed, so an unchanged reading is not re-sent (both
 // triggers fire for reasons that leave the reading identical).
 let lastDisplayPush = null;
 
-// The single send site for 'desktop-presentation-changed'. Guarded like every
-// other push: the window can be gone by the time an event handler runs.
+// The single send site for 'desktop-presentation-changed'. The renderer cannot
+// work hidden-ness out for itself: the game window sets backgroundThrottling:false,
+// which keeps the Page Visibility API reporting 'visible' the whole time the
+// window is minimized, so this push is its only source.
+//
+// The state is DERIVED from the live window here rather than tracked in a latch
+// the window events write. That is the load-bearing choice: Electron's restore
+// events have WM-specific misfire history, and a latch that missed one 'restore'
+// would park the renderer on a window the player is looking at, with nothing
+// able to correct it. Deriving means every later event re-reads the truth, so a
+// missed event costs one stale push instead of the rest of the session.
 function sendPresentationState() {
-  const presentationState = presentationStatePayload(presentationHidden);
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('desktop-presentation-changed', presentationState);
-  }
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const hidden = mainWindow.isMinimized() || !mainWindow.isVisible();
+  const presentationState = presentationStatePayload(hidden);
+  mainWindow.webContents.send('desktop-presentation-changed', presentationState);
 }
 
 // The single send site for 'desktop-display-changed'. The window guard comes
@@ -304,7 +312,8 @@ function sendDisplayChange() {
   const displayChange = displayChangedPayload(display);
   if (!shouldForwardDisplayChange(lastDisplayPush, displayChange)) return;
   lastDisplayPush = displayChange;
-  mainWindow.webContents.send('desktop-display-changed', displayChange);
+  const displayWire = displayWirePayload(displayChange);
+  mainWindow.webContents.send('desktop-display-changed', displayWire);
 }
 
 function createMainWindow() {
@@ -382,26 +391,17 @@ function createMainWindow() {
     showMainWindow();
   });
 
-  // Window hidden-ness, pushed from here because the page can never observe it
-  // (see the presentationHidden comment above): four window events, each setting
-  // the boolean before the one send helper reads it. A fresh window starts shown.
-  presentationHidden = false;
-  mainWindow.on('minimize', () => {
-    presentationHidden = true;
-    sendPresentationState();
-  });
-  mainWindow.on('restore', () => {
-    presentationHidden = false;
-    sendPresentationState();
-  });
-  mainWindow.on('hide', () => {
-    presentationHidden = true;
-    sendPresentationState();
-  });
-  mainWindow.on('show', () => {
-    presentationHidden = false;
-    sendPresentationState();
-  });
+  // Window hidden-ness, pushed from here because the page can never observe it.
+  // Each event just re-derives (see sendPresentationState above), so none of
+  // them carries a polarity of its own to get wrong. 'focus' is the self-heal
+  // and the reason a missed event cannot strand the renderer: restoring a window
+  // focuses it, so the first click or alt-tab into the game re-derives and
+  // clears a stale hidden even if the WM swallowed the 'restore'.
+  mainWindow.on('minimize', sendPresentationState);
+  mainWindow.on('restore', sendPresentationState);
+  mainWindow.on('hide', sendPresentationState);
+  mainWindow.on('show', sendPresentationState);
+  mainWindow.on('focus', sendPresentationState);
 
   // Dragging the window to another monitor can change the scale factor the
   // renderer resolves its drawing buffer from. 'moved' would be the natural

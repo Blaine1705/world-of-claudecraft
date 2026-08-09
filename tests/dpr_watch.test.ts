@@ -120,6 +120,33 @@ describe('watchDevicePixelRatio', () => {
     expect(queries).toHaveLength(1);
   });
 
+  it('re-arms even when onChange throws, so one bad notify cannot end the watch', () => {
+    // The re-arm happens BEFORE the notify for exactly this reason: the media
+    // query listener is a one-shot, so a throw after an un-re-armed fire would
+    // leave the session deaf to every later display change.
+    setDpr(1);
+    const queries = installMatchMedia();
+    let calls = 0;
+    const onChange = (): void => {
+      calls += 1;
+      throw new Error('resizeViewport blew up');
+    };
+    watchDevicePixelRatio(onChange);
+
+    setDpr(2);
+    expect(() => fire(queries[0])).toThrow('resizeViewport blew up');
+    expect(calls).toBe(1);
+    expect(queries).toHaveLength(2);
+    expect(queries[1].media).toBe('(resolution: 2dppx)');
+
+    // The watch is still live: the next change is still observed.
+    setDpr(3);
+    expect(() => fire(queries[1])).toThrow('resizeViewport blew up');
+    expect(calls).toBe(2);
+    expect(queries).toHaveLength(3);
+    expect(queries[2].media).toBe('(resolution: 3dppx)');
+  });
+
   it('is a no-op without matchMedia, and its unsubscribe is safe to call', () => {
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,

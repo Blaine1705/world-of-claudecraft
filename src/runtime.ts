@@ -88,13 +88,14 @@ export interface DesktopPresentationState {
   hidden: boolean;
 }
 
-// The display the shell's window currently sits on. `scaleFactor` is the OS
-// scaling the renderer resolves its pixel ratio from; `displayId` is opaque and
-// exists only so a move between two monitors with the same scale is still a
-// change. Neither bounds nor the display's label crosses the bridge.
+// The OS scaling of the display the shell's window currently sits on, pushed
+// when it changes. One field on purpose: the display's identity is what decides
+// main-side whether a move between two same-scale monitors is worth forwarding,
+// so that stable OS-derived id never crosses the bridge, and neither do bounds
+// or the display label. The scale factor is no new capability, the page already
+// reads window.devicePixelRatio; what it cannot do is notice a pure scale change.
 export interface DesktopDisplayChange {
   scaleFactor: number;
-  displayId: number;
 }
 
 export interface DesktopBridge {

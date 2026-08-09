@@ -32,48 +32,52 @@ const createMainWindowBody = (): string => {
 };
 
 describe('the window presentation push to the renderer', () => {
-  it('guards the one send on a live window and builds it through the reducer', () => {
-    // One send site only: a second, unguarded send beside the guarded one would
-    // reintroduce exactly what the guard exists to prevent (the window can be
-    // gone by the time a window event handler runs). Pin the whole guarded
-    // statement so an inverted guard or a hoisted send cannot pass.
-    const body = sendHelperBody();
-    expect(flat(body)).toContain(
-      "if (mainWindow && !mainWindow.isDestroyed()) { mainWindow.webContents.send('desktop-presentation-changed', presentationState); }",
+  it('pins the whole send helper: guard, live derive, reducer, then send', () => {
+    // The derive is the contract. An event-written latch would strand the
+    // renderer on a VISIBLE window after a single missed 'restore' (Electron's
+    // restore events have WM-specific misfire history) with nothing able to
+    // correct it; reading the live window means every later event heals it.
+    // Pin the body verbatim, so neither the derive nor the guard polarity can
+    // flip and no latch can creep back in between the lines.
+    const body = flat(sendHelperBody());
+    expect(body).toBe(
+      'function sendPresentationState() { ' +
+        'if (!mainWindow || mainWindow.isDestroyed()) return; ' +
+        'const hidden = mainWindow.isMinimized() || !mainWindow.isVisible(); ' +
+        'const presentationState = presentationStatePayload(hidden); ' +
+        "mainWindow.webContents.send('desktop-presentation-changed', presentationState); }",
     );
-    expect(
-      [...main.matchAll(/webContents\.send\('desktop-presentation-changed'/g)].length,
-      'desktop-presentation-changed must have exactly one send site in main.cjs',
-    ).toBe(1);
+    // No module-level latch anywhere: the whole point is that there is no second
+    // copy of this state to go stale.
+    expect(main).not.toContain('presentationHidden');
+  });
 
+  it('has exactly one send site, built through the reducer, never an inline literal', () => {
+    expect(main).toContain("require('./presentation_events.cjs')");
+    const body = sendHelperBody();
     // The payload argument must be a bare identifier (this regex refuses an
     // inline object literal), and that identifier must come from the reducer.
-    expect(main).toContain("require('./presentation_events.cjs')");
     const send = /webContents\.send\('desktop-presentation-changed', (\w+)\)/.exec(body);
     expect(send, 'the send does not pass a prebuilt payload').not.toBeNull();
     const arg = (send as RegExpExecArray)[1];
     expect(body).toContain(`const ${arg} = presentationStatePayload(`);
+    expect(
+      [...main.matchAll(/webContents\.send\('desktop-presentation-changed'/g)].length,
+      'desktop-presentation-changed must have exactly one send site in main.cjs',
+    ).toBe(1);
   });
 
-  it('registers all four window events with the right polarity', () => {
-    // Polarity IS the contract: a swapped pair would tell the renderer a
-    // minimized window is visible, and it parks work on this.
+  it('registers all five window events, including the focus self-heal', () => {
+    // 'focus' is the recovery path, not decoration: restoring a window focuses
+    // it, so even a WM that swallows 'restore' still clears a stale hidden on
+    // the first click or alt-tab into the game. Losing it silently reintroduces
+    // the frozen-HUD-on-a-visible-window failure.
     const body = flat(createMainWindowBody());
-    expect(body).toContain(
-      "mainWindow.on('minimize', () => { presentationHidden = true; sendPresentationState(); });",
-    );
-    expect(body).toContain(
-      "mainWindow.on('restore', () => { presentationHidden = false; sendPresentationState(); });",
-    );
-    expect(body).toContain(
-      "mainWindow.on('hide', () => { presentationHidden = true; sendPresentationState(); });",
-    );
-    expect(body).toContain(
-      "mainWindow.on('show', () => { presentationHidden = false; sendPresentationState(); });",
-    );
-    // A newly created window starts shown, and createMainWindow can run again
-    // (macOS 'activate'), so the module-level flag must be reset here.
-    expect(body).toContain("presentationHidden = false; mainWindow.on('minimize'");
+    for (const event of ['minimize', 'restore', 'hide', 'show', 'focus']) {
+      expect(body, `the '${event}' presentation registration is missing`).toContain(
+        `mainWindow.on('${event}', sendPresentationState);`,
+      );
+    }
   });
 
   it('re-pushes on did-finish-load without entangling the GPU flow', () => {
@@ -100,8 +104,12 @@ describe('the window presentation push to the renderer', () => {
     expect(body).toContain("ipcRenderer.removeListener('desktop-presentation-changed', listener)");
   });
 
-  it('is push-only: no invoke side and no handler side', () => {
+  it('is push-only in BOTH directions: no invoke/handle, no send/on', () => {
+    // The renderer-to-main direction is the one that historically forgets the
+    // trustedSender gate, so pin its absence rather than trusting review.
     expect(preload).not.toContain("ipcRenderer.invoke('desktop-presentation-changed'");
     expect(main).not.toContain("ipcMain.handle('desktop-presentation-changed'");
+    expect(preload).not.toContain("ipcRenderer.send('desktop-presentation-changed'");
+    expect(main).not.toContain("ipcMain.on('desktop-presentation-changed'");
   });
 });

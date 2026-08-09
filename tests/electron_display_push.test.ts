@@ -48,8 +48,13 @@ describe('the display change push to the renderer', () => {
         'const displayChange = displayChangedPayload(display); ' +
         'if (!shouldForwardDisplayChange(lastDisplayPush, displayChange)) return; ' +
         'lastDisplayPush = displayChange; ' +
-        "mainWindow.webContents.send('desktop-display-changed', displayChange); }",
+        'const displayWire = displayWirePayload(displayChange); ' +
+        "mainWindow.webContents.send('desktop-display-changed', displayWire); }",
     );
+    // The dedup reading (which needs the display id) and the wire payload (which
+    // must not carry it) are deliberately two different objects: the send takes
+    // the narrowed one.
+    expect(body).toContain('displayWirePayload(displayChange)');
     expect(main).toContain("require('./display_events.cjs')");
     expect(
       [...main.matchAll(/webContents\.send\('desktop-display-changed'/g)].length,
@@ -107,21 +112,33 @@ describe('the display change push to the renderer', () => {
     expect(body).toContain("typeof callback !== 'function'");
     expect(body).toContain("typeof payload.scaleFactor === 'number'");
     expect(body).toContain('Number.isFinite(payload.scaleFactor)');
-    expect(body).toContain("typeof payload.displayId === 'number'");
-    expect(body).toContain('Number.isFinite(payload.displayId)');
+    // The display id is main-process-only, so the preload must not be gating on
+    // a field the shell no longer sends (that would drop every valid payload).
+    expect(body).not.toContain('displayId');
     expect(body).toContain("ipcRenderer.on('desktop-display-changed', listener)");
     expect(body).toContain("ipcRenderer.removeListener('desktop-display-changed', listener)");
   });
 
-  it('is push-only: no invoke side and no handler side', () => {
+  it('is push-only in BOTH directions: no invoke/handle, no send/on', () => {
+    // The renderer-to-main direction is the one that historically forgets the
+    // trustedSender gate, so pin its absence rather than trusting review.
     expect(preload).not.toContain("ipcRenderer.invoke('desktop-display-changed'");
     expect(main).not.toContain("ipcMain.handle('desktop-display-changed'");
+    expect(preload).not.toContain("ipcRenderer.send('desktop-display-changed'");
+    expect(main).not.toContain("ipcMain.on('desktop-display-changed'");
   });
 
-  it('carries only the two whitelisted fields: no bounds, no label', () => {
-    // Window bounds are a separate, later contract; nothing here may leak them.
-    const body = createMainWindowBody() + main.slice(main.indexOf('function sendDisplayChange()'));
-    expect(body).not.toContain('getNormalBounds()');
+  it('carries only the scale factor: no id, no bounds, no label', () => {
+    // Window bounds are a separate, later contract, and the display id is a
+    // stable OS-derived identifier the renderer has no use for.
+    expect(main).not.toContain('getNormalBounds()');
     expect(/webContents\.send\('desktop-display-changed', \{/.test(main)).toBe(false);
+    const wire = read('electron/display_events.cjs');
+    const start = wire.indexOf('function displayWirePayload(');
+    expect(start, 'displayWirePayload is gone from electron/display_events.cjs').toBeGreaterThan(
+      -1,
+    );
+    const body = wire.slice(start, wire.indexOf('\n}', start));
+    expect(body).not.toContain('displayId');
   });
 });

@@ -7,7 +7,14 @@ export interface DisplayChangedPayload {
   displayId: number;
 }
 
+// What actually crosses the bridge: the display id is main-process-only.
+export interface DisplayWirePayload {
+  scaleFactor: number;
+}
+
 export function displayChangedPayload(display?: unknown): DisplayChangedPayload;
+
+export function displayWirePayload(reading?: unknown): DisplayWirePayload;
 
 export function shouldForwardDisplayChange(
   prev: DisplayChangedPayload | null | undefined,

@@ -892,6 +892,66 @@ describe('perf reporter worst-window drain', () => {
     }
   });
 
+  it('skips the send while the desktop shell is hidden, even though the page reads visible', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    // The shell disables background throttling, so a minimized window still
+    // reports 'visible' here: without the shell's own signal this session would
+    // keep beaconing reports for frames it never drew.
+    (globalThis as any).document.visibilityState = 'visible';
+    let shellHidden = true;
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+      shellHidden: () => shellHidden,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      // Same retry cadence as the page-hidden skip: it IS the 'hidden' skip.
+      const hiddenRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(hiddenRetry);
+
+      // Negative arm: nothing about the page changed, only the shell verdict,
+      // and the report goes out.
+      shellHidden = false;
+      await vi.advanceTimersByTimeAsync(hiddenRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('sends normally when the shell hook is present and reports shown', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).document.visibilityState = 'visible';
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+      shellHidden: () => false,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+    } finally {
+      stop();
+    }
+  });
+
   it('advances the jitter sequence when renderer evidence is not ready', async () => {
     const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
     installReporterFlowGlobals(fetchImpl);

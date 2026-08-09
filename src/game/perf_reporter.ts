@@ -37,6 +37,12 @@ export interface PerfReporterOptions {
   // (PR #1991), so the perf-doctor 'integrated-gpu' suggestion never fires
   // there (ruling R15). Absent (benchmark harness callers) means false.
   desktopShell?: boolean;
+  // The desktop shell keeps document.visibilityState pinned at 'visible' even
+  // while the window is minimized (backgroundThrottling is off), so the hidden
+  // check in send() needs the shell's own signal: without it a minimized
+  // session keeps beaconing reports whose frames were never rendered, diluting
+  // the fleet fps average with zeros. Absent means never shell-hidden.
+  shellHidden?: () => boolean;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -394,7 +400,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   function send(sendOptions: { allowHidden?: boolean; final?: boolean } = {}): void {
     timer = null;
     if (stopped) return;
-    if (!sendOptions.allowHidden && document.visibilityState !== 'visible') {
+    if (
+      !sendOptions.allowHidden &&
+      (document.visibilityState !== 'visible' || options.shellHidden?.() === true)
+    ) {
       skip('hidden', cadenceDelay(REPEAT_REPORT_MS));
       return;
     }

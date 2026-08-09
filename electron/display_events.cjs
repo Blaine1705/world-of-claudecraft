@@ -38,4 +38,15 @@ function shouldForwardDisplayChange(prev, next) {
   return next.displayId !== prev.displayId || next.scaleFactor !== prev.scaleFactor;
 }
 
-module.exports = { displayChangedPayload, shouldForwardDisplayChange };
+// Narrow a reading to what actually crosses the bridge. The display identity is
+// needed for the dedup above (two monitors at the same scale are still a move
+// worth forwarding), but the renderer only ever re-resolves a pixel ratio from
+// the scale factor, so the id stops here: it is a stable OS-derived identifier
+// and the page has no use for one. The scale factor itself is no new capability,
+// the page already reads window.devicePixelRatio. Re-runs the coercion so the
+// bound holds even if a caller hands this a raw Display object.
+function displayWirePayload(reading) {
+  return { scaleFactor: displayChangedPayload(reading).scaleFactor };
+}
+
+module.exports = { displayChangedPayload, displayWirePayload, shouldForwardDisplayChange };
