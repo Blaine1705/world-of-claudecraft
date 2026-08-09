@@ -83,6 +83,16 @@ export interface ReliquaryState {
    * (ownership stays on deedStats.itemsDiscovered).
    */
   counts: Record<string, number>;
+  /**
+   * Page ids this character has EVER illuminated (completed), sticky: catalog
+   * growth can make a page's live completion read incomplete again, but the
+   * record of the first illumination stays, so every once-ever celebration
+   * (the client banner, the server marquee) keys off membership here rather
+   * than re-firing on a re-completion. The field name is deliberately not a
+   * prefix of the event field `illuminatedPageId`, so the architecture
+   * guard's surface regex cannot false-positive on the emit path.
+   */
+  illuminatedPages: Set<string>;
 }
 
 /** One serialized firstFind entry: sparse provenance plus the folded tally. */
@@ -94,26 +104,39 @@ export interface SavedReliquaryFirstFind {
 }
 
 /** Serialized shape (CharacterState.reliquary). Omit-empty on write. The
- *  tally rides the firstFind entries rather than a fourth top-level key, so a
- *  relic costs one object either way and the blob keeps three keys. */
+ *  tally rides the firstFind entries rather than a fifth top-level key, so a
+ *  relic costs one object either way and the blob keeps four keys at most
+ *  (firstFind, illuminatedPages, marks, recent, each omitted when empty).
+ *  illuminatedPages is save-only from the client's perspective: it rides the
+ *  reliq wire blob because wire shape IS save shape (the byte-pinned memo
+ *  contract), but ClientWorld deliberately does not mirror it (no facet
+ *  consumer; the banner keys off the event). Accepted cost: at most the
+ *  page-id list, bounded by the catalog, on the rarely-dirty reliq key. */
 export interface SavedReliquaryState {
   firstFind?: Record<string, SavedReliquaryFirstFind>;
+  illuminatedPages?: string[];
   marks?: string[];
   recent?: string[];
 }
 
 export function freshReliquaryState(): ReliquaryState {
-  return { firstFind: {}, marks: new Set(), recent: [], counts: {} };
+  return { firstFind: {}, marks: new Set(), recent: [], counts: {}, illuminatedPages: new Set() };
 }
 
 /** True when the state has nothing worth persisting. `counts` is deliberately
  *  NOT read here: every counted relic carries a firstFind entry (noteRelicObtain
  *  writes the carrier the saved tally rides on), so a counts-only state cannot
  *  exist, and testing it would let a state with a tally and nothing else
- *  serialize to a firstFind-less object the count could not survive. */
+ *  serialize to a firstFind-less object the count could not survive.
+ *  `illuminatedPages` MUST count, in contrast: the set has no carrier (a page
+ *  membership rides no firstFind entry), so an illuminated-only state really
+ *  can exist and would lose its record if this read skipped it. */
 export function isReliquaryStateEmpty(state: ReliquaryState): boolean {
   return (
-    Object.keys(state.firstFind).length === 0 && state.marks.size === 0 && state.recent.length === 0
+    Object.keys(state.firstFind).length === 0 &&
+    state.marks.size === 0 &&
+    state.recent.length === 0 &&
+    state.illuminatedPages.size === 0
   );
 }
 
@@ -139,6 +162,9 @@ export function serializeReliquaryState(state: ReliquaryState): SavedReliquarySt
     }
     out.firstFind = firstFind;
   }
+  // Alphabetical key position (firstFind, illuminatedPages, marks, recent):
+  // the wire memo's byte pin depends on insertion order here.
+  if (state.illuminatedPages.size > 0) out.illuminatedPages = [...state.illuminatedPages].sort();
   if (state.marks.size > 0) out.marks = [...state.marks].sort();
   if (state.recent.length > 0) out.recent = [...state.recent];
   return out;
@@ -185,6 +211,19 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
   }
   for (const mark of saved.marks ?? []) {
     if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) state.marks.add(mark);
+  }
+  // Sticky illumination record. Same catalog filter discipline as the other
+  // surfaces: only string entries naming a live page id land (Object.hasOwn,
+  // not `in`, so a prototype key on the pages index cannot invent a page),
+  // and the Set target dedupes a hand-edited blob's repeats. A pre-Phase-18
+  // blob has no field at all and restores to the empty set, a fixed point
+  // (serialize omits the empty set right back).
+  if (Array.isArray(saved.illuminatedPages)) {
+    for (const pageId of saved.illuminatedPages) {
+      if (typeof pageId !== 'string') continue;
+      if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)) continue;
+      state.illuminatedPages.add(pageId);
+    }
   }
   if (Array.isArray(saved.recent)) {
     // The ring is OLDEST-first, and restore must agree with pushRecent: the
@@ -307,7 +346,15 @@ export function onItemDiscovered(
   opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
 ): void {
   if (!isCataloguedRelicItem(itemId)) {
-    if (ITEMS[itemId]?.kind === 'mount') maybeSyncCuratorRankDeeds(ctx, meta, opts);
+    if (ITEMS[itemId]?.kind === 'mount') {
+      // ONE snapshot for both syncs: the reins discover is the join-heavy
+      // path where rebuilding it per sync would rescan inventory + bank.
+      const mountOwnership = characterReliquaryOwnership(meta);
+      maybeSyncCuratorRankDeeds(ctx, meta, opts, mountOwnership);
+      // Reins ownership is a Horizons mount fill, so the completion ladder
+      // (shelf / catalog reads) can cross here too, beside the rank bridges.
+      syncReliquaryCompletionDeeds(ctx, meta, opts, mountOwnership);
+    }
     return;
   }
   // ONE ownership snapshot for this whole fill chain, threaded into the emit
@@ -340,6 +387,10 @@ export function onItemDiscovered(
     );
   }
   if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta, opts, ownership);
+  // The completion ladder runs on EVERY new fill, not only on a rank-up: any
+  // single fill can be the one that completes a flagship page, the Conquerors
+  // shelf, or the whole catalog, none of which need a threshold crossing.
+  syncReliquaryCompletionDeeds(ctx, meta, opts, ownership);
 }
 
 /**
@@ -360,12 +411,16 @@ export function maybeSyncCuratorRankDeeds(
   ctx: SimContext,
   meta: PlayerMeta,
   opts?: Readonly<{ retro?: boolean }>,
+  /** The caller's already-built snapshot, when it has one (the mount-reins
+   *  arm and the grantDeed title hook share one with the completion-ladder
+   *  sync so neither path scans inventory + bank twice). */
+  callerOwnership?: ReliquaryOwnershipSurfaces,
 ): void {
   // One snapshot for this chain too, handed to the sync below rather than
   // rebuilt there: the mount-reins arm is the join-time path, where a veteran
   // holding a bagful of reins would otherwise rescan inventory + bank twice
   // per discover. See the reuse note in onItemDiscovered.
-  const ownership = characterReliquaryOwnership(meta);
+  const ownership = callerOwnership ?? characterReliquaryOwnership(meta);
   const owned = catalogRankOwned(ownership);
   const rank = curatorRankFromOwned(owned);
   if (rank <= 0) return;
@@ -512,6 +567,10 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
   const rankedUp = newRank > previousRank ? newRank : undefined;
   emitReliquaryUnlock(ctx, meta, { markId, curatorRank: rankedUp }, ownership);
   if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta, undefined, ownership);
+  // Every new mark fill can complete a shelf or catalog read (see the item
+  // path); a mark is never a flagship-page relic today, but the catalog read
+  // counts it, so the ladder runs here too.
+  syncReliquaryCompletionDeeds(ctx, meta, undefined, ownership);
   return true;
 }
 
@@ -540,6 +599,47 @@ export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
 }
 
 /**
+ * Join-time self-heal for the sticky illumination record: sweep every catalog
+ * page and record the complete ones missing from illuminatedPages. Exists for
+ * pre-Phase-18 blobs, which predate the set entirely: a veteran whose pages
+ * were already complete before the set shipped must have them recorded at
+ * join, or a later catalog-growth re-completion would read as a FIRST
+ * illumination and marquee. Silent (no events, no recent push); bumps the
+ * wire revision once when anything landed. Returns how many pages were added.
+ * Deliberately not save-forcing: the sweep is idempotent and re-runs on
+ * every join, so a save lost to a crash costs a repeat sweep, never state.
+ *
+ * The sweep records the three no-emit Horizons pages too (mounts, titles,
+ * weapon skins) BY DESIGN: those pages never pass through emitReliquaryUnlock
+ * (mount and title fills sync deeds without an unlock emit), so they never
+ * banner or marquee; their celebrations are the rank bridges and capstone
+ * deeds, which fan out through the deed channel. Recording them silently
+ * here is the correct migration posture for any celebration a later phase
+ * adds. The weapon-skins page is further out of reach on this side: the
+ * ownership surfaces deliberately omit account skins (the W3 note above),
+ * so it can never read complete from the sim even when the client shows it
+ * complete.
+ */
+export function syncIlluminatedPages(
+  meta: PlayerMeta,
+  /** Optional-with-?? like the ladder sync (never an eager default), for the
+   *  same reason: the shape must not re-teach the eager-default trap even
+   *  though this sweep has no early-out to protect. */
+  ownership?: ReliquaryOwnershipSurfaces,
+): number {
+  const own = ownership ?? characterReliquaryOwnership(meta);
+  let added = 0;
+  for (const page of RELIQUARY_PAGES) {
+    if (meta.reliquary.illuminatedPages.has(page.id)) continue;
+    if (!pageCompletion(page, own).complete) continue;
+    meta.reliquary.illuminatedPages.add(page.id);
+    added++;
+  }
+  if (added > 0) bumpReliquaryWireRev(meta.reliquary);
+  return added;
+}
+
+/**
  * Id-only presentation event for a new catalogued relic or mark. Never
  * English. Membership authority stays on itemsDiscovered + sparse blob.
  * Optional curatorRank is the new cosmetic rank index when this fill ranked up.
@@ -554,6 +654,30 @@ export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
  * fill can only ever reach item or mark pages, never a weapon-skin page. The
  * online window-vs-emit skin gap (parity W3) stays open BY DESIGN until a
  * mixed-kind page ships; the single-kind pin is what keeps that honest.
+ *
+ * Phase 18 semantics: `illuminatedPageId` on the event means FIRST-EVER
+ * illumination for this character, not "some page reads complete right now".
+ * Every complete candidate page missing from the sticky
+ * meta.reliquary.illuminatedPages set is recorded there; the event names the
+ * FIRST newly illuminated one and stays silent (undefined) when none is new.
+ * Every downstream celebration (the client banner, the Phase 18 server
+ * marquee) therefore inherits once-ever semantics: after catalog growth, a
+ * re-completion of an already-recorded page adds nothing to the set and emits
+ * no illuminatedPageId. Accepted edge: one fill completing two pages at once
+ * records BOTH in the set, but the event still names only the first (the
+ * single-id event shape is pinned in tests/reliquary_wire.test.ts).
+ *
+ * Two bounded tolerances on "once-ever", both accepted: (1) it means once
+ * per DURABLE record, not an absolute guarantee: the write rides the normal
+ * save cadence (an immediate saveCharacter here would break the design
+ * doc's "never save because a silhouette filled" rule), so a crash before
+ * the next save loses the record; the join sweep re-heals it silently while
+ * the page still reads complete, and only catalog growth landing inside
+ * that same window can produce a second celebration. (2) The blob-ran-ahead
+ * re-discover tolerance (see the noteRelicItemFind gate in onItemDiscovered)
+ * skips this emit entirely, so a flagship completion deed can in that shape
+ * be granted while the set records nothing until the next join sweep; the
+ * two records answer the same question and re-agree there.
  */
 function emitReliquaryUnlock(
   ctx: SimContext,
@@ -573,14 +697,19 @@ function emitReliquaryUnlock(
         : undefined;
   let illuminatedPageId: string | undefined;
   if (pageIds && pageIds.length > 0) {
+    let added = false;
     for (const pageId of pageIds) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
       if (!page) continue;
-      if (pageCompletion(page, ownership).complete) {
-        illuminatedPageId = pageId;
-        break;
-      }
+      if (meta.reliquary.illuminatedPages.has(pageId)) continue;
+      if (!pageCompletion(page, ownership).complete) continue;
+      meta.reliquary.illuminatedPages.add(pageId);
+      added = true;
+      if (illuminatedPageId === undefined) illuminatedPageId = pageId;
     }
+    // One bump for the whole candidate sweep, not one per page: the memo only
+    // needs to know the serialized surfaces moved.
+    if (added) bumpReliquaryWireRev(meta.reliquary);
   }
   ctx.emit({
     type: 'reliquaryUnlock',
@@ -602,8 +731,9 @@ function emitReliquaryUnlock(
 
 /**
  * Monotonic revision per live ReliquaryState, bumped by every writer that can
- * move the serialized blob (a find, a mark, an obtain). Restore needs no bump:
- * it returns a NEW state object, so the cache below simply has no entry for it.
+ * move the serialized blob (a find, a mark, an obtain, an illumination
+ * landing in the sticky set). Restore needs no bump: it returns a NEW state
+ * object, so the cache below simply has no entry for it.
  *
  * Both maps are WeakMaps keyed on state IDENTITY. That buys three things at
  * once: nothing leaks into the save shape or the live-meta goldens (the
@@ -974,6 +1104,119 @@ export function syncCuratorRankDeeds(
     const deedId = CURATOR_RANK_DEFS[i]?.deedId;
     if (!deedId) continue;
     ctx.grantDeed(meta, deedId, opts?.retro ? { retro: true } : undefined);
+  }
+}
+
+/**
+ * The Phase 18 completion-ladder deed ids in GRANT-CHECK order: the three
+ * flagship page Illuminations, then the Conquerors shelf, then the whole
+ * character catalog. The order is load-bearing: the ownership snapshot's
+ * deedsEarned surface is a LIVE reference, and each of these deeds except
+ * col_reliquary_complete is itself a title relic on horizons_titles, so a
+ * title granted earlier in the pass is visible to the later checks in the
+ * SAME pass (an illumination title can be the fill that completes the shelf
+ * read, and the shelf title the fill that completes the catalog read).
+ */
+export const RELIQUARY_COMPLETION_DEED_IDS = [
+  'col_reliquary_illum_nythraxis_heroic',
+  'col_reliquary_illum_thunzharr',
+  'col_reliquary_illum_gravewyrm_heroic',
+  'col_reliquary_conquerors',
+  'col_reliquary_complete',
+] as const;
+
+/** Flagship page each Illumination deed reads (single-page, hand-paired). */
+const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>> = {
+  col_reliquary_illum_nythraxis_heroic: 'conquerors_nythraxis_heroic',
+  col_reliquary_illum_thunzharr: 'conquerors_thunzharr',
+  col_reliquary_illum_gravewyrm_heroic: 'conquerors_gravewyrm_sanctum_heroic',
+};
+
+/**
+ * Grant the zero-Renown Phase 18 completion-ladder deeds the player's pure
+ * completion reads already satisfy. Idempotent via grantDeed. Sticky by
+ * construction: this only ever grants, so later catalog growth lowers the
+ * live read without revoking the earned record. Pure reads only, and it MUST
+ * NOT read reliquaryObtainCounts / state.counts: counts are information,
+ * never a score (the pinned doctrine), and no completion read may depend on
+ * how many copies the world handed over.
+ *
+ * col_reliquary_complete is unearnable in production while THREE catalogued
+ * slots stay owner-pended: the masterwork:engineering mark (13b QA ruling: no
+ * engineering recipe can proc a masterwork, so the slot is catalogued but
+ * unwritable) and the two SOURCE_PENDING_RULING mounts (reins_drakemaw_raptor
+ * has no acquisition path in content; reins_terrorspark_groundshaker is
+ * dev-grant only). All three are owner decisions outside this packet; the
+ * capstone becomes earnable with NO code change here once they all land.
+ * Tests may still reach owned === total by granting marks and reins directly.
+ * The deed carries feat: true so this pending window can never dead-end
+ * feat_book_complete (see the record's comment in content/deeds.ts).
+ *
+ * Does not force saveCharacter itself: grantDeed (title durability) is the
+ * existing durability-critical path when a new deed lands.
+ */
+export function syncReliquaryCompletionDeeds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  opts?: Readonly<{ retro?: boolean }>,
+  /** The chain's already-built ownership snapshot, when a caller has one. Its
+   *  item / mark / deed surfaces are live references, so a snapshot taken
+   *  earlier in the same fill chain scores exactly what a rebuild here would.
+   *  Optional rather than defaulted so the early-out below costs five Set
+   *  lookups, never an eager inventory + bank mount scan (a default
+   *  parameter evaluates at every call, the trap emitReliquaryUnlock's own
+   *  hoist note documents). Every production caller threads one today; the
+   *  optional form keeps the early-out free for any future caller that
+   *  cannot. */
+  ownership?: ReliquaryOwnershipSurfaces,
+): void {
+  // Fast no-op once the whole ladder is earned (the steady state for a
+  // completionist, and the recursion floor: a grant below re-enters this sync
+  // through the grantDeed title hook, and grants are monotone over this
+  // finite id set, so the re-entrant pass either grants something new or
+  // falls through the per-deed earned checks and terminates).
+  let missing = false;
+  for (const deedId of RELIQUARY_COMPLETION_DEED_IDS) {
+    if (!meta.deedsEarned.has(deedId)) {
+      missing = true;
+      break;
+    }
+  }
+  if (!missing) return;
+  const own = ownership ?? characterReliquaryOwnership(meta);
+  const grantOpts = opts?.retro ? ({ retro: true } as const) : undefined;
+  for (const deedId of RELIQUARY_COMPLETION_DEED_IDS) {
+    // Live re-check on purpose: a grant earlier in this loop can have
+    // re-entrantly granted a LATER ladder deed already.
+    if (meta.deedsEarned.has(deedId)) continue;
+    const flagshipPageId = RELIQUARY_ILLUMINATION_DEED_PAGES[deedId];
+    if (flagshipPageId !== undefined) {
+      const page = RELIQUARY_PAGES_BY_ID[flagshipPageId];
+      if (!page || !pageCompletion(page, own).complete) continue;
+    } else if (deedId === 'col_reliquary_conquerors') {
+      let shelfComplete = true;
+      for (const page of RELIQUARY_PAGES) {
+        if (page.shelf !== 'conquerors') continue;
+        if (!pageCompletion(page, own).complete) {
+          shelfComplete = false;
+          break;
+        }
+      }
+      if (!shelfComplete) continue;
+    } else {
+      // col_reliquary_complete: every character-durable slot filled. The
+      // shelf capstone is a NECESSARY precondition (the whole catalog
+      // contains every Conquerors slot, and the ladder order above grants
+      // the shelf deed earlier in this same pass), so gate the expensive
+      // whole-catalog walk behind it: while the shelf is incomplete, and
+      // for every player who is not one shelf slot from the capstone, this
+      // check stays a Set lookup. Also the reason the loop cannot be
+      // reordered: the gate reads a grant the same pass just made.
+      if (!meta.deedsEarned.has('col_reliquary_conquerors')) continue;
+      const { owned, total } = catalogCharacterCompletion(own);
+      if (owned !== total) continue;
+    }
+    ctx.grantDeed(meta, deedId, grantOpts);
   }
 }
 

@@ -32,10 +32,13 @@ import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
+  characterReliquaryOwnership,
   isHorizonsTitleDeed,
   maybeSyncCuratorRankDeeds,
   onItemDiscovered as onReliquaryItemDiscovered,
   syncCuratorRankDeeds,
+  syncIlluminatedPages,
+  syncReliquaryCompletionDeeds,
   syncReliquaryMarksFromVisited,
 } from './reliquary';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
@@ -626,7 +629,19 @@ export function grantDeed(
   // border chrome, so it never scores rank in turn), and maybeSync early-outs
   // when every bridge for the current rank is already earned.
   if (def.reward?.kind === 'title' && isHorizonsTitleDeed(deedId)) {
-    maybeSyncCuratorRankDeeds(ctx, meta, opts?.retro ? { retro: true } : undefined);
+    // ONE ownership snapshot shared by both syncs (its deed surface is a
+    // live reference, so the rank sync's grants are visible to the ladder).
+    const titleOwnership = characterReliquaryOwnership(meta);
+    const retroOpts = opts?.retro ? ({ retro: true } as const) : undefined;
+    maybeSyncCuratorRankDeeds(ctx, meta, retroOpts, titleOwnership);
+    // A title relic earned ANYWHERE (a pvp title as the last missing relic)
+    // can complete a completion-ladder read the moment it lands, so the
+    // ladder syncs here beside the rank bridges rather than waiting for the
+    // next item/mark fill. Recursion through grantDeed terminates: grants are
+    // monotone over a finite id set (deedsEarned only grows, checked live per
+    // deed) and the sync's early-out short-circuits once all five ladder
+    // deeds are earned.
+    syncReliquaryCompletionDeeds(ctx, meta, retroOpts, titleOwnership);
   }
   return true;
 }
@@ -1237,7 +1252,22 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // and stay out of that count, so this call's return value is dropped.
   // Must run BEFORE the rank sync so a mark that refills here can rank up.
   syncReliquaryMarksFromVisited(meta);
-  syncCuratorRankDeeds(ctx, meta, { retro: true });
+  // ONE ownership snapshot for the three syncs below (deed surface live, so
+  // each sync sees the grants of the one before it; a join would otherwise
+  // scan inventory + bank once per sync).
+  const joinOwnership = characterReliquaryOwnership(meta);
+  syncCuratorRankDeeds(ctx, meta, { retro: true }, joinOwnership);
+  // Phase 18 completion ladder, retro-flagged like the rank bridges: a
+  // veteran who finished a flagship page, the Conquerors shelf, or the whole
+  // catalog before the ladder shipped is credited silently at join.
+  syncReliquaryCompletionDeeds(ctx, meta, { retro: true }, joinOwnership);
+  // The join sweep for the sticky illumination record (silent, no events): a
+  // pre-Phase-18 blob has no illuminatedPages at all, and without this sweep
+  // a veteran's already-complete pages would marquee as FIRST illuminations
+  // on a later catalog-growth re-completion. Runs AFTER the ladder sync by
+  // choice, though order is inert today: the ladder emits no reliquaryUnlock,
+  // so it cannot race the sweep's silent recording.
+  syncIlluminatedPages(meta, joinOwnership);
 }
 
 // ---------------------------------------------------------------------------

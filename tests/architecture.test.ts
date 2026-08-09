@@ -763,14 +763,14 @@ function posixRel(rel: string): string {
 // NOTHING and the client keeps the old blob forever with no error on any
 // surface. Nothing reds, nothing logs, the player just stops seeing finds.
 //
-// So the invariant is scope, not spelling: the four mutable surfaces
-// (firstFind, marks, recent, counts) are written only by the module that owns
-// the revision counter. REPLACING the whole `meta.reliquary` object is
-// deliberately allowed (sim.ts does it on character load) and is safe for the
-// opposite reason: a fresh object has a fresh identity, so the identity-keyed
-// cache simply has no entry for it.
+// So the invariant is scope, not spelling: the five mutable surfaces
+// (firstFind, marks, recent, counts, illuminatedPages) are written only by
+// the module that owns the revision counter. REPLACING the whole
+// `meta.reliquary` object is deliberately allowed (sim.ts does it on
+// character load) and is safe for the opposite reason: a fresh object has a
+// fresh identity, so the identity-keyed cache simply has no entry for it.
 const RELIQUARY_STATE_OWNER = join(simRoot, 'reliquary.ts');
-const RELIQUARY_SURFACES = 'firstFind|marks|recent|counts';
+const RELIQUARY_SURFACES = 'firstFind|marks|recent|counts|illuminatedPages';
 // Every assignment operator spelling: plain `=`, the compound forms
 // (`+=`, `??=`, `||=`, `&&=`, `**=`, shifts, bitwise), guarded so `==`,
 // `===`, `>=`, `<=`, and `!=` comparisons never fire (the operator class
@@ -840,7 +840,7 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
     expect(scanned).not.toContain(RELIQUARY_STATE_OWNER);
   });
 
-  it('no module outside src/sim/reliquary.ts writes firstFind / marks / recent / counts', () => {
+  it('no module outside src/sim/reliquary.ts writes firstFind / marks / recent / counts / illuminatedPages', () => {
     const violations = scanLines(scanned, RELIQUARY_WRITE_RE)
       .concat(scanLines(scanned, RELIQUARY_DELETE_RE))
       .concat(scanLines(scanned, RELIQUARY_PREFIX_RE))
@@ -910,6 +910,12 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
       'meta.reliquary.firstFind[id] ??= {};',
       'meta.reliquary.recent.length = 0;',
       'Object.assign(meta.reliquary.counts, saved);',
+      // The Phase 18 sticky illumination record: every write spelling an
+      // outside module would plausibly use against the Set surface.
+      'meta.reliquary.illuminatedPages.add(pageId);',
+      'meta.reliquary.illuminatedPages.delete(pageId);',
+      'meta.reliquary.illuminatedPages.clear();',
+      'meta.reliquary.illuminatedPages = new Set();',
     ]) {
       expect(reliquaryStateWrite(line), line).toBe(true);
     }
@@ -930,6 +936,15 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
       'while (meta.reliquary.recent.length > cap) {',
       'const more = meta.reliquary.counts[id] + 1;',
       'if (meta.reliquary.counts[id] != null) draw();',
+      // Reads of the illumination record are everywhere-legal like the rest.
+      'if (meta.reliquary.illuminatedPages.has(pageId)) continue;',
+      // The NEAR-MISS identifier: `illuminatedPageId` is the reliquaryUnlock
+      // EVENT field, not a state surface, and the surface name was chosen so
+      // neither is a prefix of the other. Even a write spelled through it
+      // must not match (tsc rejects the field anyway); a sloppy prefix-style
+      // alternation would false-positive on exactly these lines.
+      'meta.reliquary.illuminatedPageId = pageId;',
+      'const bannerPage = ev.illuminatedPageId;',
     ]) {
       expect(reliquaryStateWrite(line), line).toBe(false);
     }
