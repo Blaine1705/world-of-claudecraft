@@ -419,11 +419,16 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
     }
   });
 
-  it('writes an unknown slug through verbatim but paints no palette (content drift)', () => {
+  it('renders an unknown slug as borderless: the palette gates the attribute (content drift)', () => {
+    // A slug with no palette (a drifted id the table cannot color) writes '' into
+    // the gate attribute AND the three props, so the CSS :not([data-border=""])
+    // gate stays closed and no transparent ::after box paints. This matches the
+    // nameplate, which early-returns to nothing for the same case, so both
+    // surfaces of one identity render a drifted id identically.
     const calls = paint(playerDescriptor({ borderSlug: 'slug_with_no_palette' }), BORDERED_ELEMENTS)
       .filter((c) => c.args[0] === PORTRAIT_BORDER)
       .map((c) => c.args[2]);
-    expect(calls).toEqual(['slug_with_no_palette', '', '', '']);
+    expect(calls).toEqual(['', '', '', '']);
   });
 
   it('elides every border write on a repeat paint (the facet caches, no local field)', () => {

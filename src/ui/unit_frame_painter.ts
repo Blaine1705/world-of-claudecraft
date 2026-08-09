@@ -155,17 +155,18 @@ export class UnitFramePainter {
   }
 
   // The Book of Deeds portrait ring: the slug attribute the CSS rule gates on plus
-  // that slug's palette as custom properties. A borderless (or stale / title-reward)
-  // unit resolves to no accent and writes '' into all three, so clearing a border
-  // removes the ring rather than leaving the last owner's colors behind. No
-  // lastBorderSlug field: setAttr / setStyleProp are multi-slot cached, so a repeat
-  // paint elides every one of these writes. Skipped entirely for a frame with no
-  // border surface.
+  // that slug's palette as custom properties. The PALETTE gates the attribute too:
+  // a borderless, stale, title-reward, or otherwise uncolorable slug resolves to no
+  // accent and writes '' into all four slots, so the CSS :not([data-border=""])
+  // gate stays closed and no transparent ::after box paints (the same borderless
+  // outcome the nameplate reaches by early-returning). No lastBorderSlug field:
+  // setAttr / setStyleProp are multi-slot cached, so a repeat paint elides every
+  // one of these writes. Skipped entirely for a frame with no border surface.
   private paintPortraitBorder(view: UnitFrameView): void {
     const host = this.el.portraitBorder;
     if (!host) return;
-    this.writers.setAttr(host, PORTRAIT_BORDER_ATTR, view.borderSlug);
     const accent = borderAccent(view.borderSlug);
+    this.writers.setAttr(host, PORTRAIT_BORDER_ATTR, accent ? view.borderSlug : '');
     this.writers.setStyleProp(host, PORTRAIT_BORDER_FRAME_PROP, accent ? accent.frame : '');
     this.writers.setStyleProp(host, PORTRAIT_BORDER_EDGE_PROP, accent ? accent.edge : '');
     this.writers.setStyleProp(host, PORTRAIT_BORDER_GLOW_PROP, accent ? accent.glow : '');

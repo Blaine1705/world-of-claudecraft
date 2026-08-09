@@ -52,12 +52,17 @@ export interface BorderAccent {
 // visible separation from elite chrome (at this distance the two golds read
 // the same, which is fine, since the border is identity and the elite frame
 // is not something a player reads off a portrait ring).
-const BORDER_ACCENTS: Readonly<Record<string, BorderAccent>> = {
-  curators_gilt: { frame: '#e3d9ae', edge: '#5b5030', glow: '#f6efd2' },
-  deepward: { frame: '#4fb3c8', edge: '#123a4a', glow: '#8fe3f2' },
-  prestige_laurels: { frame: '#8fbf6a', edge: '#2f4a1e', glow: '#c6e79a' },
-  reliquary_gilt: { frame: '#f4ca43', edge: '#6b4a12', glow: '#ffe28f' },
-};
+// Each record is Object.frozen, not merely `Readonly` (which is compile-time
+// only): borderAccent hands the SAME record straight to a canvas strokeStyle and
+// to CSS custom properties on both surfaces, so a stray runtime write to one
+// field would silently repaint every plate and ring of that slug. Freezing makes
+// such a write throw in strict mode instead.
+const BORDER_ACCENTS: Readonly<Record<string, BorderAccent>> = Object.freeze({
+  curators_gilt: Object.freeze({ frame: '#e3d9ae', edge: '#5b5030', glow: '#f6efd2' }),
+  deepward: Object.freeze({ frame: '#4fb3c8', edge: '#123a4a', glow: '#8fe3f2' }),
+  prestige_laurels: Object.freeze({ frame: '#8fbf6a', edge: '#2f4a1e', glow: '#c6e79a' }),
+  reliquary_gilt: Object.freeze({ frame: '#f4ca43', edge: '#6b4a12', glow: '#ffe28f' }),
+});
 
 /** Every slug the palette table covers, sorted. Derived from the table so the
  *  two can never disagree; the literal pin lives in the test. */
