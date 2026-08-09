@@ -28,7 +28,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { bgUnstuckDestination } from './social/battleground';
+import { bgCarryingFlag, bgUnstuckDestination } from './social/battleground';
 import {
   applyUnstuckSickness,
   moveToGraveyardForUnstuck,
@@ -231,6 +231,7 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   const motion = motionBlock(p);
   if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
+  if (bgCarryingFlag(ctx, p.id)) return 'competitive';
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
@@ -299,6 +300,7 @@ function cancelReason(
   if (meta.counters.damageTaken > pending.damageTaken) return 'damaged';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
+  if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
     hasMoveInput(meta) ||
     (pending.area.kind !== 'battleground' &&

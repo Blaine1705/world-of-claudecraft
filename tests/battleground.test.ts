@@ -1050,6 +1050,49 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
+  it('refuses Unstuck for an alive flag carrier before the completion teleport can run', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const carrier = match.teams[0][0];
+    const flag = match.flags[1];
+    tp(sim, carrier, flag.pos.x, flag.pos.z);
+    sim.bgFlagAction(carrier);
+    sim.tick();
+    expect(flag.carrier).toBe(carrier);
+    expect(bgCarryingFlag(sim.ctx, carrier)).toBe(true);
+
+    const e = sim.entities.get(carrier)!;
+    e.inCombat = false;
+    e.combatTimer = 999;
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    const before = { ...e.pos };
+
+    expect(sim.unstuck(carrier)).toBe(false);
+    expect(sim.meta(carrier)?.pendingUnstuck).toBeNull();
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid: carrier,
+      }),
+    );
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+    expect(events).not.toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid: carrier }),
+    );
+    expect(sim.bgMatchFor(carrier)).toBe(match);
+    expect(flag.carrier).toBe(carrier);
+    expect(e.pos).toEqual(before);
+  });
+
   it('Unstuck moves a trapped battleground corpse to its graveyard without respawning it', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
