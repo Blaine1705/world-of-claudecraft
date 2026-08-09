@@ -3167,6 +3167,42 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(pids).toContain(deserter);
   });
 
+  it('detaches a DUNGEON-STANDING backfill at the door, like a start-of-match seat', () => {
+    // Post-#3122 the queue hygiene deliberately keeps a player queued through a
+    // dungeon pull, so a backfill candidate really can be standing inside an
+    // instance. startBgMatch detaches such a fighter and stores the DOOR as
+    // their return point; the backfill seat has to do the same, or the match
+    // ends by teleporting them back to interior coordinates whose claim may be
+    // gone, with the instance still holding their aggro.
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    enterDungeon(sim.ctx, 'gravewyrm_sanctum', spare);
+    const e = sim.entities.get(spare)!;
+    expect(e.pos.x, 'the arrangement itself must hold').toBeGreaterThan(DUNGEON_X_THRESHOLD);
+
+    // Put them on a live hate table so the scrub has something to undo.
+    const inst = sim.ctx.instances.find((i) => i.partyKey !== null)!;
+    const mob = inst.mobIds.map((id) => sim.entities.get(id)).find((m) => m && !m.dead)!;
+    addThreat(mob, spare, 500);
+    expect(mob.threat.get(spare)).toBe(500);
+
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    expect(match.teams[0], 'the arrangement needs the seat actually filled').toContain(spare);
+
+    expect(mob.threat.has(spare), 'the seat must scrub instance threat').toBe(false);
+    const ret = match.returns.get(spare)!;
+    expect(ret.x, 'the return point must be the door, not the interior').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    expect(e.pos.x, 'the fighter must not be sent back inside').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    expect(e.dead).toBe(false);
+  });
+
   it('leaves the backfilled fighter off the ladder while the rest are scored', () => {
     const { sim, match } = staged();
     const deserter = match.teams[0][0];

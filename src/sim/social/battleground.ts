@@ -619,7 +619,14 @@ function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number
   // Snapshot the same per-fighter state startBgMatch takes, so the release path
   // sends them home and hands their pools back exactly like a start-of-match
   // fighter. Skipping either would strand them on the field at match end.
-  match.returns.set(pid, { x: e.pos.x, z: e.pos.z, facing: e.facing });
+  //
+  // detachFromDungeon FIRST, for the same reason startBgMatch does it: the queue
+  // hygiene deliberately holds a spot through a dungeon pull, so a candidate can
+  // be standing inside an instance. Storing the interior position would send
+  // them back to a claim that may be gone by match end, and would leave the
+  // instance holding their aggro for the whole match.
+  const door = detachFromDungeon(ctx, e);
+  match.returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
   match.preMatchPools.set(pid, snapshotArenaReturnPools(e));
   match.stats.set(pid, { kills: 0, deaths: 0, captures: 0, assists: 0 });
   match.backfilled.add(pid);
