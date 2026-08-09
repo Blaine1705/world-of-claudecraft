@@ -91,8 +91,11 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted on PR 3150's v0.36.0 base merge: the branch's renderer.ts prewarm
 // changes and the PR 3165 reseal converged here. No capture was retaken.
+// Re-minted for the render cache-lifecycle port: the rendererIntegration leaf
+// follows renderer.ts's bounded character-visual pool wiring and the emissive
+// cache teardown comment. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a1ee3eaafc63148b46a8af7029cd990f82b4128ee7789e1a1a35e9126926fcca';
+  '9345197315c6d496bf17b6e7c195a786a0d51ee5fb1742418d297803f256bdf1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

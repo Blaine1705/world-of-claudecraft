@@ -675,10 +675,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // neither parent. No capture was retaken.
 // Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
 // prewarm changes converged with the 3165 reseal. No capture was retaken.
+// Re-minted for the render cache-lifecycle port: the rendererIntegration leaf
+// follows renderer.ts's bounded character-visual pool wiring and the emissive
+// cache teardown comment. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ec9d9ca628a22172ee8e989c3ac88d563b43929ce6d0ffc2b66881d462ca79f9';
+  'ed55aa77beb548ff412761a710201011371b6eff23ea0deb9870345d7e5bc025';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a1ee3eaafc63148b46a8af7029cd990f82b4128ee7789e1a1a35e9126926fcca';
+  '9345197315c6d496bf17b6e7c195a786a0d51ee5fb1742418d297803f256bdf1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1579,10 +1582,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-minted after pinning the three specifier exact (PR 3165 review): only
     // the pnpm-lock.yaml specifier row moved. No capture was retaken.
+    // Re-minted for the render cache-lifecycle port: the first-order composite
+    // follows renderer.ts's bounded character-visual pool wiring and emissive
+    // cache teardown comment, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('cab95c2e4617b24251ccf355ba0519caf9069d0b8a90788bc8148eae276f98ca');
+    ).toBe('79eee8675f91a81bf644a5011968b0b8e5b132897ef49c3892003b2192513dc0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

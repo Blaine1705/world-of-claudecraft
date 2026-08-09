@@ -97,6 +97,7 @@ import {
   type GfxSettings,
   sharedUniforms,
 } from './gfx';
+import { runSlicedBuild } from './grass_build_slicer_core';
 import {
   type GrassCapCollapseBand,
   grassCapCollapseBand,
@@ -2353,6 +2354,8 @@ interface GrassChunk {
   centerZ: number;
   ready: boolean;
   queued: boolean;
+  /** True while a sliced build for this chunk is in flight across frames. */
+  building: boolean;
   lastSeen: number;
   lastUsed: number;
   prioritySq: number;
@@ -2362,6 +2365,14 @@ interface GrassChunk {
   flowerMesh?: THREE.InstancedMesh;
   flowerFullCount?: number;
   flowerTransitionCarry: number;
+}
+
+// The under-construction meshes of a sliced chunk build. They are parented
+// only in the finalize step, so a paused build never renders half-built; an
+// abandoned build releases them through this handle.
+interface GrassChunkPartialMeshes {
+  im: THREE.InstancedMesh | null;
+  fm: THREE.InstancedMesh | null;
 }
 
 // Tags every vertex of a tuft/flower card part with the aCap attribute the
@@ -2596,7 +2607,13 @@ function emptyGrassStats(
   return stats;
 }
 
-function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
+function buildGrassRing(
+  parent: THREE.Group,
+  seed: number,
+  // Injected so tests can drive the build budget with a fake clock; production
+  // always uses the real frame clock via the default.
+  now: () => number = () => performance.now(),
+): GrassRing {
   const baseRadius = GFX.grassRadius;
   const step = GFX.grassStep;
   const chunkCells = Math.ceil(GRASS_CHUNK_SIZE / step) + 3;
@@ -2806,6 +2823,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       centerZ: chunkCenter(cz),
       ready: false,
       queued: false,
+      building: false,
       lastSeen: -1,
       lastUsed: -1,
       prioritySq: Infinity,
@@ -2817,13 +2835,24 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   };
 
   const queueChunk = (chunk: GrassChunk): void => {
-    if (chunk.ready || chunk.queued) return;
+    if (chunk.ready || chunk.queued || chunk.building) return;
     chunk.queued = true;
     buildQueue.push(chunk);
   };
 
-  const buildChunk = (chunk: GrassChunk): void => {
-    const started = performance.now();
+  // A chunk build is a resumable generator: each yield marks a sub-unit
+  // boundary (setup, then one grid row per sub-unit, then finalize), and
+  // buildQueuedChunks below checks the frame budget BEFORE resuming each
+  // sub-unit. The rows a chunk produces depend only on chunk coordinates,
+  // seed, and the static tables (no clock reads between yields), so the
+  // finished geometry is byte-identical however the frames divide the work;
+  // only WHEN the rows run moves. `partial` exposes the under-construction
+  // meshes so an abandoned build can release them (they are parented only in
+  // the finalize step, so a paused chunk never renders half-built).
+  const buildChunk = function* (
+    chunk: GrassChunk,
+    partial: GrassChunkPartialMeshes,
+  ): Generator<undefined, void, undefined> {
     let n = 0;
     const chunkBiome = zoneBiomeAt(chunk.centerX, chunk.centerZ);
     // dense-grass biomes get a matching buffer so the extra tufts are never
@@ -2836,6 +2865,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
+    partial.im = im;
     const fieldChunk = FIELD_BIOMES.has(chunkBiome);
     // a gale chunk that reaches the stable paddock's bloom band needs a
     // field-sized buffer, or the band's drifts hit the cap and vanish
@@ -2868,6 +2898,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     fm.frustumCulled = true;
     fm.receiveShadow = true;
     fm.count = 0;
+    partial.fm = fm;
     let fn = 0;
 
     const minX = chunk.cx * GRASS_CHUNK_SIZE;
@@ -2895,6 +2926,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
         )
       : [];
+    yield; // setup (buffer allocation + chunk classification) is one sub-unit
 
     for (let i = i0; i <= i1 && n < chunkCap; i++) {
       for (let j = j0; j <= j1 && n < chunkCap; j++) {
@@ -3021,6 +3053,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           }
         }
       }
+      yield; // one grid row per sub-unit: the budget gates between rows
     }
 
     // Authored meadows also bloom independent of grass anchors: the scrubby
@@ -3054,6 +3087,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             fn++;
           }
         }
+        yield; // one meadow grid row per sub-unit
       }
     }
     // The Evergarden: no grass anchors exist (mown lawn), so the parterre
@@ -3084,6 +3118,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             fn++;
           }
         }
+        yield; // one parterre grid row per sub-unit
       }
     }
     if (n > 0) {
@@ -3126,8 +3161,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
     chunk.ready = true;
     builtChunks++;
-    lastBuildMs = Math.round((performance.now() - started) * 100) / 100;
-    buildMs = Math.round((buildMs + lastBuildMs) * 100) / 100;
+    // Ownership handed to the chunk (or dropped when a mesh stayed empty,
+    // exactly as before); the abandon path no longer needs to release them.
+    partial.im = null;
+    partial.fm = null;
   };
 
   const disposeChunk = (chunk: GrassChunk): void => {
@@ -3154,19 +3191,81 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
   };
 
+  // The one in-flight sliced build. runSlicedBuild checks the budget BEFORE
+  // resuming each sub-unit (a grid row), so a frame never pays more than the
+  // budget plus one row, where the old check-after-build paid a whole chunk
+  // (18.6ms observed against the 2.2ms budget). An oversized chunk simply
+  // spans more frames; its pop-in when ready is the same pop-in the queue
+  // already implied, just a few frames later.
+  let activeBuild: {
+    chunk: GrassChunk;
+    job: { step(): boolean };
+    partial: GrassChunkPartialMeshes;
+    activeMs: number;
+  } | null = null;
+
+  const startChunkBuild = (chunk: GrassChunk): void => {
+    const partial: GrassChunkPartialMeshes = { im: null, fm: null };
+    const gen = buildChunk(chunk, partial);
+    chunk.building = true;
+    activeBuild = { chunk, job: { step: () => !gen.next().done }, partial, activeMs: 0 };
+  };
+
+  const abandonActiveBuild = (): void => {
+    if (!activeBuild) return;
+    // Partial meshes were never parented, so they never rendered: disposing
+    // releases their instance buffers without touching the shared geometry
+    // or material. The chunk rebuilds from scratch if it comes back into
+    // range, producing the same geometry (the build is a pure function of
+    // chunk coordinates and seed).
+    activeBuild.partial.im?.dispose();
+    activeBuild.partial.fm?.dispose();
+    activeBuild.chunk.building = false;
+    activeBuild = null;
+  };
+
   const buildQueuedChunks = (): void => {
-    if (buildQueue.length === 0) return;
-    buildQueue.sort((a, b) => a.prioritySq - b.prioritySq || a.key.localeCompare(b.key));
-    const deadline = performance.now() + buildBudgetMs;
-    let built = 0;
-    while (buildQueue.length > 0 && built < GRASS_CHUNK_MAX_BUILDS_PER_FRAME) {
-      const chunk = buildQueue.shift();
-      if (!chunk) break;
-      chunk.queued = false;
-      if (chunks.get(chunk.key) !== chunk || chunk.ready || chunk.lastSeen !== generation) continue;
-      buildChunk(chunk);
-      built++;
-      if (performance.now() >= deadline) break;
+    if (!activeBuild && buildQueue.length === 0) return;
+    const deadline = now() + buildBudgetMs;
+    let completed = 0;
+    let sorted = false;
+    while (completed < GRASS_CHUNK_MAX_BUILDS_PER_FRAME) {
+      if (activeBuild) {
+        const { chunk } = activeBuild;
+        // A mid-build chunk that left the streamed window (or was retired)
+        // is abandoned rather than finished into a hidden mesh.
+        if (chunks.get(chunk.key) !== chunk || chunk.lastSeen !== generation) {
+          abandonActiveBuild();
+          continue;
+        }
+      } else {
+        if (buildQueue.length === 0) return;
+        if (!sorted) {
+          buildQueue.sort((a, b) => a.prioritySq - b.prioritySq || a.key.localeCompare(b.key));
+          sorted = true;
+        }
+        const chunk = buildQueue.shift();
+        if (!chunk) return;
+        chunk.queued = false;
+        if (chunks.get(chunk.key) !== chunk || chunk.ready || chunk.building) continue;
+        if (chunk.lastSeen !== generation) continue;
+        // Starting a build costs nothing yet: the generator body only runs
+        // once runSlicedBuild passes its first pre-step budget check.
+        startChunkBuild(chunk);
+      }
+      const active = activeBuild;
+      if (!active) continue;
+      const sliceStart = now();
+      const outcome = runSlicedBuild(active.job, deadline, now);
+      active.activeMs += now() - sliceStart;
+      if (outcome === 'paused') return;
+      active.chunk.building = false;
+      activeBuild = null;
+      // grassLastBuildMs is the chunk's total active build time summed over
+      // its slices (inter-frame waiting excluded), same meaning as before.
+      lastBuildMs = Math.round(active.activeMs * 100) / 100;
+      buildMs = Math.round((buildMs + lastBuildMs) * 100) / 100;
+      completed++;
     }
   };
 
@@ -3346,7 +3445,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       stats.grassQuality = Math.round(quality * 100) / 100;
       stats.grassActiveRadius = activeRadius();
       stats.grassChunks = chunks.size;
-      stats.grassQueuedChunks = buildQueue.length;
+      // The in-flight sliced build still counts as queued work until ready.
+      stats.grassQueuedChunks = buildQueue.length + (activeBuild ? 1 : 0);
       stats.grassBuiltChunks = builtChunks;
       stats.grassDisposedChunks = disposedChunks;
       stats.grassLastBuildMs = lastBuildMs;

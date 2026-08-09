@@ -1,8 +1,10 @@
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
-// mid-distance band. All geometry/materials are shared caches, dispose()
-// only releases mixer bindings.
+// mid-distance band. All geometry/materials are shared caches; dispose()
+// releases mixer bindings, this clone's Skeletons, and the visual's claims
+// on the shared tinted-material cache (which disposes a clone only once no
+// visual mounts it).
 import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
@@ -37,11 +39,13 @@ import {
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
+  releaseTintedMaterials,
   setHeldOffhand,
   setHeldWeapon,
   setWeaponsStowed,
   skinEmissiveTexture,
   skinTexture,
+  type TintedMaterialClaims,
   tintedFarMaterials,
 } from './assets';
 import { HairSwayDriver } from './hair_sway';
@@ -443,8 +447,19 @@ export class CharacterVisual {
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
   // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
   // (weakest treatment: every form/death tint above wins). Keyed per source
-  // material AND color, since the wearer can chain different runes.
-  private runeTintMaterials = new Map<string, THREE.Material>();
+  // material, one clone each (the live rune color rides the clone's userData);
+  // chaining to a different rune replaces and disposes the old clone inside
+  // the same applyVisualMaterials sweep that unmounts it, and dispose()
+  // releases whatever remains, so rune wear can never strand materials.
+  private runeTintMaterials = new Map<THREE.Material, THREE.Material>();
+  // Leases over the shared tinted-material cache (assets.ts): every cache
+  // clone mounted on the rig (and, separately, on the far LOD) stays claimed
+  // through these sets so the cache can never dispose a mounted material. A
+  // full re-apply sweep claims into a fresh lease first and releases the old
+  // one after (shared keys never dip to zero claims mid-swap); dispose()
+  // releases both.
+  private tintedRigClaims: TintedMaterialClaims = new Set();
+  private tintedFarClaims: TintedMaterialClaims = new Set();
   // Ability VFX body glow (the gallery rim read): per-visual material clones
   // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
   // once per original because base materials are SHARED per-asset caches;
@@ -571,6 +586,7 @@ export class CharacterVisual {
       entityColor,
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),
+      this.tintedRigClaims,
     );
     // Class halo (the priest's Light): a glowing ring behind the head bone.
     // Added AFTER applyMaterials (its additive material must not be re-mapped)
@@ -622,6 +638,7 @@ export class CharacterVisual {
           prep.idleSrcIsBody,
           skinTexture(key, skinIndex),
           skinEmissiveTexture(key, skinIndex),
+          this.tintedFarClaims,
         ),
       );
       this.farMaterials = this.farMesh.material;
@@ -1416,6 +1433,22 @@ export class CharacterVisual {
     }
   }
 
+  /** Re-tint this visual for a new owner entity (pooled reuse across per-instance
+   *  colors: rift spawns jitter mob.color per instance, so the reuse-pool key is
+   *  per-template and color is applied at acquire time; see
+   *  characters/visual_pool.ts). Runs the same shared-material sweep setSkin
+   *  does, so the reused visual picks the exact tinted-material clones a fresh
+   *  construction with this color would, re-snapshots the ghost/restore map, and
+   *  re-applies any active overlay. No-op when the color already matches; a def
+   *  that ignores entity color (fixed or absent tint) only records the new
+   *  color, because no material reads it. */
+  setEntityColor(color: number): void {
+    if (color === this.entityColor) return;
+    this.entityColor = color;
+    if (this.def.tint !== 'entity') return;
+    this.applySkinMaterials(this.skinIndex);
+  }
+
   /** Swap the body skin (alternate texture atlas) at runtime; no-op if unchanged.
    *  Reuses the shared skin-keyed material cache, so this is a cheap reassign. */
   setSkin(skinIndex: number): void {
@@ -1441,13 +1474,22 @@ export class CharacterVisual {
   }
 
   private applySkinMaterials(skinIndex: number): void {
+    // Full-rig sweep: claim the new material set into a fresh lease BEFORE
+    // releasing the old one, so a key kept across the swap (same source, same
+    // tint) never dips to zero claims and can never be evicted mid-swap. Old
+    // keys nothing re-claimed (a previous entity color's tints, a previous
+    // skin's atlas variants) go idle and age out of the shared cache.
+    const prevRigClaims = this.tintedRigClaims;
+    this.tintedRigClaims = new Set();
     applyMaterials(
       this.model,
       this.def,
       this.entityColor,
       skinTexture(this.key, skinIndex),
       skinEmissiveTexture(this.key, skinIndex),
+      this.tintedRigClaims,
     );
+    releaseTintedMaterials(prevRigClaims);
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
     this.model.traverse((o) => {
@@ -1466,6 +1508,8 @@ export class CharacterVisual {
     // pop reverts to the model's embedded default skin.
     if (this.farMesh) {
       const prep = prepareVisual(this.key);
+      const prevFarClaims = this.tintedFarClaims;
+      this.tintedFarClaims = new Set();
       this.farMaterials = tintedFarMaterials(
         this.def,
         this.entityColor,
@@ -1473,7 +1517,9 @@ export class CharacterVisual {
         prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
+        this.tintedFarClaims,
       );
+      releaseTintedMaterials(prevFarClaims);
     }
     this.applyVisualMaterials();
   }
@@ -1519,12 +1565,17 @@ export class CharacterVisual {
     );
     for (const payload of payloads) {
       configureTightBoneTextures(payload);
+      // Payload-subtree sweep: claim ADDITIVELY into the live rig lease (the
+      // rest of the rig keeps its mounts). Keys of the removed offhand's
+      // materials overstay in the lease until the next full sweep or dispose;
+      // an overstay only pins, it can never dispose a mounted material.
       applyMaterials(
         payload,
         this.def,
         this.entityColor,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
+        this.tintedRigClaims,
       );
     }
     this.originalMaterials.clear();
@@ -1614,13 +1665,20 @@ export class CharacterVisual {
           }))
         : [];
     }
+    // Full-rig sweep (the whole model graph, weapon meshes included): swap
+    // the rig lease like applySkinMaterials does, so the removed weapon's
+    // material claims release and can age out of the shared cache.
+    const prevRigClaims = this.tintedRigClaims;
+    this.tintedRigClaims = new Set();
     applyMaterials(
       this.model,
       this.def,
       this.entityColor,
       skinTexture(this.key, this.skinIndex),
       skinEmissiveTexture(this.key, this.skinIndex),
+      this.tintedRigClaims,
     );
+    releaseTintedMaterials(prevRigClaims);
     // A VFX-tier skin's emissive derive mutates its payload materials in place,
     // so give each payload exclusive clones BEFORE the caster snapshot: the
     // shared tinted-material cache must never carry derived state (two players
@@ -1859,6 +1917,7 @@ export class CharacterVisual {
       this.shadowformMaterials,
       this.moonkinMaterials,
       this.metamorphMaterials,
+      this.runeTintMaterials,
       this.auraGlowMaterials,
     ]);
   }
@@ -1870,6 +1929,7 @@ export class CharacterVisual {
       ...this.shadowformMaterials.values(),
       ...this.moonkinMaterials.values(),
       ...this.metamorphMaterials.values(),
+      ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
@@ -1878,6 +1938,7 @@ export class CharacterVisual {
     this.shadowformMaterials.clear();
     this.moonkinMaterials.clear();
     this.metamorphMaterials.clear();
+    this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
   }
 
@@ -1969,14 +2030,24 @@ export class CharacterVisual {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     this.disposeEffectMaterials();
+    // Release the shared tinted-material leases (never disposing directly:
+    // another visual may still mount the same clones; the shared cache
+    // disposes an entry only once nothing claims it). Cleared so a double
+    // dispose cannot release another visual's claims.
+    releaseTintedMaterials(this.tintedRigClaims);
+    this.tintedRigClaims.clear();
+    releaseTintedMaterials(this.tintedFarClaims);
+    this.tintedFarClaims.clear();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();
     this.root.removeFromParent();
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
     // bone textures the renderer allocates lazily, release them here or
-    // online interest churn strands one per despawned entity. Geometries and
-    // materials remain shared per-asset caches and are never disposed.
+    // online interest churn strands one per despawned entity. Geometries
+    // remain shared per-asset caches and are never disposed; shared tinted
+    // materials were claim-released above and dispose through the bounded
+    // cache once no visual mounts them.
     const skeletons = new Set<THREE.Skeleton>();
     this.model.traverse((o) => {
       const sm = o as THREE.SkinnedMesh;
@@ -2062,10 +2133,18 @@ export class CharacterVisual {
   }
 
   private runeTintMaterial(material: THREE.Material, tint: number): THREE.Material {
-    const key = `${tint}:${material.uuid}`;
-    const cached = this.runeTintMaterials.get(key);
-    if (cached) return cached;
+    const cached = this.runeTintMaterials.get(material);
+    if (cached && cached.userData.runeTintHex === tint) return cached;
+    // Chained to a different rune color: replace the clone and dispose the
+    // old one. Safe because every runeTintMaterial call happens inside an
+    // applyVisualMaterials sweep, and a tint change reaches here only while
+    // that sweep is rewriting every mount of the old clone (same synchronous
+    // pass, no render in between), so disposal lands exactly as the material
+    // is unmounted, and the map stays at one clone per source instead of one
+    // per (source, color) forever.
+    cached?.dispose();
     const marked = material.clone();
+    marked.userData.runeTintHex = tint;
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;
@@ -2078,7 +2157,7 @@ export class CharacterVisual {
       withColor.emissive.setHex(tint);
       withColor.emissiveIntensity = 0.18;
     }
-    this.runeTintMaterials.set(key, marked);
+    this.runeTintMaterials.set(material, marked);
     return marked;
   }
 
