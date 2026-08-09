@@ -19,6 +19,10 @@ export interface NameplateCanvasState {
   level: string;
   levelColor: string;
   guild: string;
+  /** The drawn `<guild>` form, prebuilt by the painter's resolveContent
+   *  alongside `guild` (its only writer), so the per-frame draw path never
+   *  allocates the wrapper; drawBase only consumes it. */
+  guildLabel: string;
   title: string;
   /** The Book of Deeds border SLUG (never a deed id, never display text), '' for
    *  a borderless player and every mob/npc/object. Resolved by the painter
@@ -58,6 +62,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     level: '',
     levelColor: '#fff',
     guild: '',
+    guildLabel: '',
     title: '',
     border: '',
     marker: '',
@@ -377,9 +382,13 @@ export class NameplateCanvasSurface {
     if (state.guild) {
       y -= state.currentTarget ? 14 : 12;
       const guildStyle = state.currentTarget ? this.targetGuildStyle : this.guildStyle;
+      // The `<guild>` wrapper is prebuilt by resolveContent (guild's only
+      // writer): this runs per plate per frame, and an unconditional template
+      // literal here was a steady per-frame allocation for every guilded
+      // plate on screen.
       this.text.draw(
         ctx,
-        `<${state.guild}>`,
+        state.guildLabel,
         screenX,
         y + (state.currentTarget ? 11 : 10),
         this.configureTextStyle(guildStyle, GUILD_STYLE.fill),

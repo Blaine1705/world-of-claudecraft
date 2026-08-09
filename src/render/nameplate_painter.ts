@@ -303,6 +303,7 @@ export class NameplatePainter {
     state.level = '';
     state.levelColor = '#fff';
     state.guild = '';
+    state.guildLabel = '';
     state.title = '';
     state.border = '';
     state.marker = '';
@@ -354,6 +355,11 @@ export class NameplatePainter {
       state.name = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
       state.nameColor = roleColor ?? '#7fb8ff';
       state.guild = entity.guild;
+      // Build the drawn `<guild>` wrapper here, not in the per-frame drawBase:
+      // resolveContent is guild's only writer and runs strictly less often (the
+      // init / fullPass / urgent / languageChanged gate), so the label can
+      // never diverge from the guild it wraps.
+      if (entity.guild) state.guildLabel = `<${entity.guild}>`;
       state.hpVisible = !entity.dead;
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);

@@ -54,6 +54,7 @@ import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import {
@@ -141,6 +142,7 @@ import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
+import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
@@ -1965,8 +1967,7 @@ export class Renderer {
   private renderDiagnosticsLastTextures = 0;
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: RendererQualityChangeStats | null = null;
-  private visualPool = new Map<string, CharacterVisual[]>();
-  private pooledVisualCount = 0;
+  private visualPool = new CharacterVisualPool<CharacterVisual>();
   private objectPool = new Map<string, PooledObjectView[]>();
   private pooledObjectCount = 0;
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
@@ -2609,6 +2610,14 @@ export class Renderer {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
             },
+            {
+              // The cost side of the KTX2 mip release: source bytes retained
+              // for the context-loss re-transcode (the released mip chains
+              // truthfully read ~0 in the texture walks above). Pre-counted
+              // here so residencyBudget stays a pure function of its sources.
+              label: 'ktx2 restore sources',
+              bytes: ktx2RetainedSourceBytes(),
+            },
           ]),
         ),
       );
@@ -3045,20 +3054,18 @@ export class Renderer {
     this.chatBubbles.clear();
     for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
     this.views.clear();
-    for (const pool of this.visualPool.values()) {
-      for (const visual of pool) bestEffort(() => visual.dispose());
-    }
-    this.visualPool.clear();
-    this.pooledVisualCount = 0;
+    for (const visual of this.visualPool.drain()) bestEffort(() => visual.dispose());
     this.objectPool.clear();
     this.pooledObjectCount = 0;
-    // The memoized weapon-skin emissive derivations are renderer-lifetime, not
-    // page-lifetime: they are shared across wearers, so no individual rig may
-    // release them, and a megabyte-class texture pair per skin would otherwise
-    // ride a WebGL context recycle into the next context. Safe here and only
-    // here, after every view (and every rig that borrowed them) is torn down
-    // above. Best-effort like its neighbours: nothing in terminal cleanup may
-    // abort the WebGL disposal below.
+    // The memoized weapon-skin emissive derivations are bounded, not
+    // page-lifetime: every rig releases its reference on dispose (never
+    // disposing the shared pair itself) and the cache evicts idle derivations
+    // past its idle cap as the session runs. This terminal drain releases
+    // whatever is still resident, or a megabyte-class texture pair per pinned
+    // skin would ride a WebGL context recycle into the next context. Safe here
+    // and only here, after every view (and every rig that borrowed them) is
+    // torn down above. Best-effort like its neighbours: nothing in terminal
+    // cleanup may abort the WebGL disposal below.
     bestEffort(() => this.weaponSkinApplies.clear());
     bestEffort(() => disposeWeaponEmissiveCache());
     this.clickTargets.length = 0;
@@ -4118,7 +4125,7 @@ export class Renderer {
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
       views: this.views.size,
-      pooledVisuals: this.pooledVisualCount,
+      pooledVisuals: this.visualPool.size,
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
@@ -4880,22 +4887,22 @@ export class Renderer {
   }
 
   private visualPoolKeyFor(e: Entity): string | null {
-    if (e.kind === 'mob') return `mob:${e.templateId}:${e.color}:${e.scale}`;
-    // NPCs are skinned characters too: pool them like mobs so their Skeleton (and its
-    // bone-matrix DataTexture) survives interest churn instead of being disposed and
-    // re-uploaded every time one streams out and back into view - that dispose +
-    // re-upload cycle is the open-world "asset-upload" travel hitch (Skeleton.dispose
-    // via CharacterVisual.dispose in removeView, pinned by GPU-upload profiling).
-    if (e.kind === 'npc') return `npc:${e.templateId}:${e.skin}:${e.color}:${e.scale}`;
-    return null;
+    // Normalized per-TEMPLATE key (characters/visual_pool.ts): per-instance
+    // color/scale (rift spawns re-grade both per mob) is applied at acquire
+    // time instead of partitioning the key, so rift visuals pool and reuse
+    // like everything else instead of minting dead never-matching entries.
+    // NPCs are skinned characters too: pool them like mobs so their Skeleton
+    // (and its bone-matrix DataTexture) survives interest churn instead of
+    // being disposed and re-uploaded every time one streams out and back into
+    // view - that dispose + re-upload cycle is the open-world "asset-upload"
+    // travel hitch (Skeleton.dispose via CharacterVisual.dispose in
+    // removeView, pinned by GPU-upload profiling). Players never pool (A6).
+    return characterVisualPoolKey(e);
   }
 
-  private takePooledVisual(key: string): CharacterVisual | null {
-    const pool = this.visualPool.get(key);
-    const visual = pool?.pop() ?? null;
+  private takePooledVisual(key: string, entityColor: number): CharacterVisual | null {
+    const visual = this.visualPool.take(key);
     if (!visual) return null;
-    this.pooledVisualCount = Math.max(0, this.pooledVisualCount - 1);
-    if (pool?.length === 0) this.visualPool.delete(key);
     visual.root.removeFromParent();
     visual.root.visible = true;
     visual.root.position.set(0, 0, 0);
@@ -4903,26 +4910,27 @@ export class Renderer {
     visual.root.scale.set(1, 1, 1);
     visual.setFar(false);
     visual.setGhost(false);
+    // The pool key is per-template, so the pooled tint may belong to another
+    // instance (rift spawns jitter mob.color per mob): re-tint to THIS
+    // entity's color from the shared tinted-material cache. No-op when the
+    // color already matches; entity scale is applied at the view group by the
+    // caller, exactly as for a freshly built visual.
+    visual.setEntityColor(entityColor);
     return visual;
   }
 
   private storePooledVisual(key: string, visual: CharacterVisual): void {
     visual.root.removeFromParent();
-    if (!shouldRetainPooledCharacterVisual(this.pooledVisualCount, GFX.maxPooledCharacterVisuals)) {
-      visual.dispose();
-      return;
-    }
     visual.root.visible = false;
     visual.root.position.set(0, 0, 0);
     visual.root.rotation.set(0, 0, 0);
     visual.root.scale.set(1, 1, 1);
-    let pool = this.visualPool.get(key);
-    if (!pool) {
-      pool = [];
-      this.visualPool.set(key, pool);
-    }
-    pool.push(visual);
-    this.pooledVisualCount++;
+    // Bounded, least-recently-released-first: the pool disposes the coldest
+    // overflow (or the incoming visual when pooling is disabled) so eviction
+    // genuinely frees the per-instance Skeleton + GPU bone-matrix DataTexture
+    // while the hot working set keeps its reuse. An evicted key transparently
+    // rebuilds from the live entity on its next request.
+    this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals);
   }
 
   private objectPoolKeyFor(e: Entity): string | null {
@@ -7617,7 +7625,7 @@ export class Renderer {
         return;
       }
       visualPoolKey = this.visualPoolKeyFor(e);
-      visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
+      visual = visualPoolKey ? this.takePooledVisual(visualPoolKey, e.color) : null;
       if (!visual) {
         // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
         // it to the pool (which self-sizes to demand) instead of disposing it. Disposing

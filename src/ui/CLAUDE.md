@@ -79,7 +79,9 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   (`setText`/`setDisplay`/`setTransform`/`setWidth` + the multi-slot `setStyleProp`/
   `toggleClass`/`setAttr`), bound over the private `hotWriteCache` field in `src/ui/hud.ts`
   and exposed to painters via `src/ui/painter_host.ts` (`PainterHostWriters` /
-  `makeWriterFacet`). The cache key is byte-identical so an unchanged value skips the DOM.
+  `makeWriterFacet`). Elision compares the cached (kind, value) components per element on the
+  painter-host seam (multi-slot writers per (element, slot)), never a composed key string, so
+  an unchanged value skips the DOM and an elided call allocates nothing.
   ALSO elide the expensive upstream RESOLVE, not just the write: diff a stable key and re-run
   the costly producer (icon data-URL, image decode, tooltip HTML) only when the key changes
   (`action_bar_painter` `lastIcon`, `auras_painter` `lastIconKey`, `unit_portrait_painter`
