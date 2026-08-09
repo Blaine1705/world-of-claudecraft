@@ -5,8 +5,9 @@
 // Responsibilities:
 // - The persisted per-character deed surface: `PlayerMeta.deedsEarned`,
 //   `PlayerMeta.deedStats` (lifetime counters + the itemsDiscovered/visited
-//   mark sets + dungeonClears), `activeTitle`, and the incrementally
-//   maintained `renown` sum.
+//   mark sets + dungeonClears), the two selected cosmetics (`activeTitle` and
+//   `activeBorder`, each a deed id), and the incrementally maintained
+//   `renown` sum.
 // - The generic trigger evaluator (`updateDeeds`), run at the very end of the
 //   tick tail over dirty players only, and once per player on world join with
 //   `retro: true` so veterans get credit for state they verifiably already
@@ -661,10 +662,35 @@ export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | nul
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
     if (!meta.deedsEarned.has(deedId)) return;
+    // DEEDS is a plain object, so a bare index resolves prototype keys
+    // ('__proto__', 'constructor') for a hostile or drifted id.
+    if (!Object.hasOwn(DEEDS, deedId)) return;
     if (DEEDS[deedId]?.reward?.kind !== 'title') return;
   }
   meta.activeTitle = deedId;
   e.title = deedId;
+}
+
+/** Select (or clear, with null) the displayed nameplate border: the ONE
+ *  validator both worlds reach, the exact sibling of setActiveTitle above. The
+ *  stored value is the DEED ID, never the reward slug (consumers derive the
+ *  slug via DEEDS[id].reward.slug), so a slug rename is a content edit rather
+ *  than a save migration. A non-null id is accepted only when the player has
+ *  EARNED the deed and its reward is a border; invalid input is a SILENT no-op
+ *  (defensive against stale clients: no error event, no player text). On
+ *  accept the meta field and the entity wire field are written together, so
+ *  both read paths agree within the same tick. */
+export function setActiveBorder(meta: PlayerMeta, e: Entity, deedId: string | null): void {
+  if (deedId !== null) {
+    if (typeof deedId !== 'string') return;
+    if (!meta.deedsEarned.has(deedId)) return;
+    // Same prototype-key guard as setActiveTitle above: the two validators
+    // stay identical in shape so neither drifts into a weaker check.
+    if (!Object.hasOwn(DEEDS, deedId)) return;
+    if (DEEDS[deedId]?.reward?.kind !== 'border') return;
+  }
+  meta.activeBorder = deedId;
+  e.border = deedId;
 }
 
 // ---------------------------------------------------------------------------

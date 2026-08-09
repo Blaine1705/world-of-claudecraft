@@ -1546,13 +1546,15 @@ export interface PlayerMeta {
   // utcDay it was earned ('' when the host set no calendar). `deedStats` is
   // the persisted lifetime surface behind the counter/collection/visit
   // triggers (the session RewardCounters stay the RL reward channel).
-  // `activeTitle` is the selected cosmetic title (a deed id; the setter
-  // command is a later slice, only persist/load lives here). `renown` is the
-  // incrementally maintained sum of earned deeds' renown, recomputed from the
-  // earned set on every load (the saved number exists for a SQL sort index).
+  // `activeTitle` is the selected cosmetic title and `activeBorder` the
+  // selected nameplate border, each a DEED ID (never display text, never the
+  // reward slug). `renown` is the incrementally maintained sum of earned
+  // deeds' renown, recomputed from the earned set on every load (the saved
+  // number exists for a SQL sort index).
   deedsEarned: Map<string, string>;
   deedStats: DeedStats;
   activeTitle: string | null;
+  activeBorder: string | null;
   renown: number;
   // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
@@ -1809,6 +1811,7 @@ export interface CharacterState {
   deeds?: Record<string, string>;
   deedStats?: SavedDeedStats;
   activeTitle?: string | null;
+  activeBorder?: string | null;
   renown?: number;
   // The Reliquary (JSONB; optional, written only when non-empty so pre-system
   // saves load cleanly and stay byte-equal until the system engages).
@@ -2898,6 +2901,7 @@ export class Sim {
       deedsEarned: new Map(),
       deedStats: freshDeedStats(),
       activeTitle: null,
+      activeBorder: null,
       renown: 0,
       reliquary: freshReliquaryState(),
     };
@@ -3322,6 +3326,16 @@ export class Sim {
         meta,
         player,
         typeof s.activeTitle === 'string' ? s.activeTitle : null,
+      );
+      // The saved border re-applies through its own validator for the same
+      // reasons (stale id from a content change loads as no border rather
+      // than a dangling entity-wire reference). Stamps the entity `border`
+      // field alongside; a save written before borders existed has no key and
+      // lands null.
+      deedsMod.setActiveBorder(
+        meta,
+        player,
+        typeof s.activeBorder === 'string' ? s.activeBorder : null,
       );
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
@@ -4083,6 +4097,7 @@ export class Sim {
         return deedStats ? { deedStats } : {};
       })(),
       ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
+      ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
       ...(meta.renown > 0 ? { renown: meta.renown } : {}),
       // Reliquary: absent while empty (zero-default omission), same contract as
       // deedStats so pre-system saves stay byte-equal until a catalogued find.
@@ -4643,8 +4658,8 @@ export class Sim {
   get questsDone(): Set<string> {
     return this.primary.questsDone;
   }
-  // --- IWorldDeeds: the Book of Deeds read surface + title selection. The
-  // reads expose the live per-player state (the questLog precedent above);
+  // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
+  // The reads expose the live per-player state (the questLog precedent above);
   // the facet types them Readonly so no seam consumer mutates them. ---
   get deedsEarned(): ReadonlyMap<string, string> {
     return this.primary.deedsEarned;
@@ -4661,6 +4676,13 @@ export class Sim {
   setActiveTitle(deedId: string | null, pid?: number): void {
     const r = this.resolve(pid);
     if (r) deedsMod.setActiveTitle(r.meta, r.e, deedId);
+  }
+  get activeBorder(): string | null {
+    return this.primary.activeBorder;
+  }
+  setActiveBorder(deedId: string | null, pid?: number): void {
+    const r = this.resolve(pid);
+    if (r) deedsMod.setActiveBorder(r.meta, r.e, deedId);
   }
   // --- IWorldReliquary: sparse firstFind / marks / recent + pure completion.
   // Thin reads over primary.reliquary; item ownership still rides deedStats. ---
