@@ -160,6 +160,17 @@ catalog, so it stays out of `feat_book_complete`'s requirement set and the
 Book completion pair, and its title stays off the titles page (the
 non-terminating self-reference).
 
+The rank 5 bridge deed's border reward (`reliquary_gilt`, Eternal Spoils) is
+wearable in-world: one active border per character, selected in the Book of
+Deeds beside the title picker, rendered as a slug-keyed accent on the
+wearer's nameplate and on the player and target portrait rings (the deeds
+design doc owns the border reward definition; palettes live in
+`src/ui/deed_border_view.ts`). The rank-up banner and the Overview note say
+so at rank 5, and every LIVE border deed unlock logs a wear hint. Retro
+back-credits (the on-join catch-up) log no hint at all, by the same rule that
+keeps them free of banners and celebration audio; the pure unlock plan is what
+draws that line, and `tests/deeds_view.test.ts` pins it.
+
 First-ever page Illumination is a persisted, sticky record
 (`illuminatedPages` on the reliquary blob, once per durable record): the
 `reliquaryUnlock` event names a page only on its first-ever completion, so
