@@ -3009,6 +3009,11 @@ export const en_CA: EnTranslations = {
       "toolEffectRechargeFull": "{effect} is already fully charged.",
       "toolEffectRechargeToolCapped": "Carry a better {profession} tool to charge {effect} further.",
       "toolEffectRechargeMaterials": "Recharging {effect} needs {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Tier {tier}",
       "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
       "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
@@ -3303,6 +3308,14 @@ export const en_CA: EnTranslations = {
       "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
       "denyOutOfRange": "You must be near the requester to deliver a commission.",
       "denyNoSpace": "The requester has no room in their bags."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Dungeon Finder",
@@ -7403,6 +7416,9 @@ export const en_CA: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Dismiss"
   },
   "perfNudge": {
@@ -7864,6 +7880,7 @@ export const en_CA: EnTranslations = {
       "deathRecapAbility": "You have died. Slain by {ability}.",
       "deathRecapFalling": "You have died. You fell to your death.",
       "deathRecapDrowned": "You have died. You drowned.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "You feel rested and whole again.",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
@@ -7907,6 +7924,7 @@ export const en_CA: EnTranslations = {
       "outOfRange": "Out of range.",
       "noTarget": "You have no target.",
       "tooClose": "Too close!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "You must be facing your target.",
       "targetHealthBelow": "That ability requires the target below {percent}% health.",
       "dagger": "You must wield a dagger.",
@@ -9524,6 +9542,10 @@ export const en_CA: EnTranslations = {
         "name": "Die by the Sword",
         "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+      },
       "recklessness": {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
@@ -9538,7 +9560,7 @@ export const en_CA: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect."
       },
       "revenge": {
         "name": "Revenge",
@@ -16072,33 +16094,33 @@ export const en_CA: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Kit",
-        "bonus2": "Increases WARFARE Defense Rating by 40.",
-        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
-        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
       },
       "warfare_cinderweave": {
         "name": "Cinderweave Regalia",
-        "bonus2": "Increases WARFARE Defense Rating by 40.",
-        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
-        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
       "warfare_furyforged": {
         "name": "Furyforged Battlegear",
-        "bonus2": "Increases WARFARE Defense Rating by 40.",
-        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
-        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
       },
       "warfare_stormbound": {
         "name": "Stormbound Vestments",
-        "bonus2": "Increases WARFARE Defense Rating by 40.",
-        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
-        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
       "warfare_thornhide": {
         "name": "Thornhide Garb",
-        "bonus2": "Increases WARFARE Defense Rating by 40.",
-        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
-        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
+        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",

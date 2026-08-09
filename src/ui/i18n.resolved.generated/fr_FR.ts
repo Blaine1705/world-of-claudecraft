@@ -3009,6 +3009,11 @@ export const fr_FR: EnTranslations = {
       "toolEffectRechargeFull": "{effect} : charges déjà au maximum.",
       "toolEffectRechargeToolCapped": "Portez un meilleur outil de {profession} pour charger davantage {effect}.",
       "toolEffectRechargeMaterials": "Recharger {effect} nécessite {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "{points} pointe vers le niveau suivant : les chances de chef-d'œuvre s'améliorent",
       "nextUnlockSpecialized": "{points} points avant la spécialisation : les coûts des matériaux diminuent",
@@ -3303,6 +3308,14 @@ export const fr_FR: EnTranslations = {
       "denyNotCrafted": "Fabriquez d'abord la pièce commandée (avec l'option commande activée).",
       "denyOutOfRange": "Vous devez être près du demandeur pour livrer une commande.",
       "denyNoSpace": "Le demandeur n'a plus de place dans ses sacs."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Chercheur de donjons",
@@ -7403,6 +7416,9 @@ export const fr_FR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
     "bodyWeb": "Le jeu fonctionne sans accélération GPU et sera lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Ignorer"
   },
   "perfNudge": {
@@ -7864,6 +7880,7 @@ export const fr_FR: EnTranslations = {
       "deathRecapAbility": "Vous êtes mort. Tué par {ability}.",
       "deathRecapFalling": "Vous êtes mort. Vous avez fait une chute mortelle.",
       "deathRecapDrowned": "Vous êtes mort. Vous vous êtes noyé.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Vous vous sentez reposé et entier à nouveau.",
       "ignoringChat": "Discussion de {name} ignorée.",
       "noLongerIgnoring": "Vous n'ignorez plus {name}.",
@@ -7907,6 +7924,7 @@ export const fr_FR: EnTranslations = {
       "outOfRange": "Hors de portée.",
       "noTarget": "Vous n'avez pas de cible.",
       "tooClose": "Trop près !",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Vous devez faire face à votre cible.",
       "targetHealthBelow": "Cette technique requiert une cible sous {percent} % de points de vie.",
       "dagger": "Vous devez porter une dague.",
@@ -9523,6 +9541,10 @@ export const fr_FR: EnTranslations = {
       "die_by_sword": {
         "name": "Périr par l'épée",
         "description": "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Témérité",
