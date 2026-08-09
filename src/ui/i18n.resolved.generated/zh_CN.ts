@@ -3009,6 +3009,11 @@ export const zh_CN: EnTranslations = {
       "toolEffectRechargeFull": "{effect}已充满能量。",
       "toolEffectRechargeToolCapped": "携带更好的{profession}工具才能继续为{effect}充能。",
       "toolEffectRechargeMaterials": "为{effect}充能需要{material}x{count}。",
+      "craftingProgress": "正在制作：还剩{remaining}秒，共{total}秒。",
+      "disenchantingProgress": "正在分解：还剩{remaining}秒，共{total}秒。",
+      "enchantingProgress": "正在附魔：还剩{remaining}秒，共{total}秒。",
+      "salvagingProgress": "正在回收：还剩{remaining}秒，共{total}秒。",
+      "rechargingToolEffectProgress": "正在为工具效果充能：还剩{remaining}秒，共{total}秒。",
       "tierPipAria": "阶级 {tier}",
       "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
       "nextUnlockSpecialized": "距离专精还差 {points} 点：材料消耗将降低",
@@ -3303,6 +3308,14 @@ export const zh_CN: EnTranslations = {
       "denyNotCrafted": "请先制作出委托物品（勾选委托选项）。",
       "denyOutOfRange": "你必须靠近委托人才能交付委托。",
       "denyNoSpace": "委托人的背包空间不足。"
+    },
+    "bgOffer": {
+      "title": "荆谷原野已准备就绪",
+      "accepted": "已确认 {accepted}/{size}",
+      "remaining": "剩余 {seconds} 秒确认",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptedWait": "等待其他人确认..."
     },
     "finder": {
       "title": "地下城查找器",
@@ -7403,6 +7416,9 @@ export const zh_CN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "hybridBodyWindows": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。",
+    "hybridBodyLinux": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。",
+    "hybridBodyOther": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。",
     "dismiss": "关闭"
   },
   "perfNudge": {
@@ -7864,6 +7880,7 @@ export const zh_CN: EnTranslations = {
       "deathRecapAbility": "你已经死亡。死于{ability}。",
       "deathRecapFalling": "你已经死亡。你摔死了。",
       "deathRecapDrowned": "你已经死亡。你淹死了。",
+      "deathRecapCauterized": "你已经死亡。灼烧术的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢复、身体完整。",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
