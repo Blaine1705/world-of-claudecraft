@@ -39,6 +39,20 @@ const themeSeed = (preset) => async (page) => {
   );
 };
 
+// Seed the LOWEST graphics preset before the document loads, the same beforeLoad
+// storage slot themeSeed uses and for the same reason: the renderer reads
+// woc_settings.graphicsPreset during startup (tier choice gates preload), so a
+// staging-time write lands too late. graphicsDefaultApplied rides along because
+// main.ts otherwise probes the device on a first run and PERSISTS its own tier
+// over the seed. A window/HUD shot is evidence about the DOM, never about render
+// fidelity, so tier 1 is what it should cost: less to software-render under
+// SwiftShader on a host that usually has other work on it.
+const lowGraphicsSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 // Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
 // passes, then open the Browse tab. Shared by the market filter-chrome targets below.
 //
@@ -4314,6 +4328,51 @@ export const TARGETS = [
         return {};
       }
       return variant?.key === 'desktop' ? { clip: '#reliquary-tracker' } : {};
+    },
+  },
+  {
+    key: 'inspect-curator-standing',
+    label: 'Inspect card: Reliquary standing line, border accent, Curator sigil',
+    when: ['ui/inspect_view', 'ui/inspect_window', 'ui/curator_sigil', 'ui/reliquary_sheet_view'],
+    // SELF-inspect, which is the only arm that renders offline: no server ever
+    // stamps the crk/cro/crt wire fields in a single-player world, so a spawned
+    // bystander would show an empty standing no matter what is seeded. Hud gates
+    // the live read on the inspected pid being the viewer's, so opening the card
+    // on sim.playerId is what exercises selfCuratorStanding.
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        // Own enough of the catalog to reach the top rung. The ids come from the
+        // live page table rather than a hand-copied list, so a content edit that
+        // renames or re-shelves a relic cannot quietly leave this seeding short
+        // of the rank-5 threshold.
+        const mod = await import('/src/sim/content/reliquary.ts');
+        const itemIds = new Set();
+        for (const page of mod.RELIQUARY_PAGES) {
+          for (const relic of page.relics) if (relic.kind === 'item') itemIds.add(relic.itemId);
+        }
+        for (const id of itemIds) sim.primary.deedStats.itemsDiscovered.add(id);
+        // Wear the rank-5 border through the REAL validator (which demands the
+        // deed be earned and its reward be a border), so the accent on the name
+        // row is the one a rank-5 Curator actually gets rather than a field
+        // written past the gate.
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        window.__game.hud.openInspect(sim.playerId);
+        return { ok: true, rank: sim.reliquaryCuratorRank() };
+      })()`);
+      if (!seeded.ok) throw new Error(`inspect standing seeding failed: ${seeded.reason}`);
+      if (seeded.rank !== 5) throw new Error(`seeded Curator rank ${seeded.rank}, expected 5`);
+      const opened = await pollForSize(page, '#inspect-window');
+      if (!opened) throw new Error('inspect window did not open');
+      return { clip: '#inspect-window' };
     },
   },
   {
