@@ -565,7 +565,12 @@ import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
-import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
+import {
+  makeWriterFacet,
+  type PainterHostPresentation,
+  type SingleSlotCache,
+  shouldWriteSingleSlot,
+} from './painter_host';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
@@ -1521,7 +1526,7 @@ export class Hud {
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
-  private hotWriteCache = new Map<HTMLElement, string>();
+  private hotWriteCache: SingleSlotCache = new Map();
   // Multi-slot caches for the per-frame writers: one element holds many
   // custom properties / toggled classes, so these key per (element, prop) and
   // (element, class) instead of the single slot per element hotWriteCache uses.
@@ -2916,23 +2921,26 @@ export class Hud {
     this.log(t('hudChrome.tips.joinChannels'), '#7fd4ff');
   }
 
+  // The two Hud-direct single-slot writers. The elision DECISION is
+  // shouldWriteSingleSlot (painter_host.ts), shared verbatim with the painter
+  // facet over the SAME hotWriteCache: it compares (kind, value) components so
+  // an elided call composes no key string and allocates nothing (the old shape
+  // built a `display:` + value key BEFORE the skip check, allocating a discarded
+  // string on every elided write).
   private setText(el: HTMLElement, text: string): void {
-    if (this.hotWriteCache.get(el) === text) {
+    if (!shouldWriteSingleSlot(this.hotWriteCache, el, 'text', text)) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, text);
     this.hotDomWrites++;
     el.textContent = text;
   }
 
   private setDisplay(el: HTMLElement, display: string): void {
-    const key = `display:${display}`;
-    if (this.hotWriteCache.get(el) === key) {
+    if (!shouldWriteSingleSlot(this.hotWriteCache, el, 'display', display)) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, key);
     this.hotDomWrites++;
     el.style.display = display;
   }
@@ -2941,8 +2949,8 @@ export class Hud {
   // (makeWriterFacet's setTransform/setWidth, painter_host.ts). The target hp bar was
   // the last Hud-direct setTransform caller and the cast bars were the last
   // setWidth caller; with both on their painters, every transform/width write
-  // routes through the facet over the SAME hotWriteCache + `transform:`/`width:` keys,
-  // so the Hud no longer mirrors a private setTransform or setWidth.
+  // routes through the facet over the SAME hotWriteCache + the shared (kind, value)
+  // single-slot entries, so the Hud no longer mirrors a private setTransform or setWidth.
 
   // Write-elision extension. setStyleProp drives a custom
   // property (or any standard property) and toggleClass drives a class, each
