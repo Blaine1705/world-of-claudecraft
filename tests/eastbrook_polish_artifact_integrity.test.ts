@@ -669,9 +669,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
 // per-frame cost work already on this release branch. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'efc8f52c79b9997c14646243242653db0bce022d9fc38a0e9063840b8c708522';
+  '68a8a8475bb70c95ad23f89cd137169a3badffe7f860b8eda597f67ec0209b80';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'fc2d858f1f6c099d400ca5d31dbe1653993fd1ac7433a3cea6b9e1b5c7a026bd';
+  '75fac51f5e4a6f875c0991cade6fb0922d691a73248a77ab34416985946bce20';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1566,10 +1566,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // landing on top of the VFX per-frame cost work already on this release
     // branch, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
+    // Re-pinned for the review 3050 Sentence-impact extraction: the first-order
+    // composite follows renderer.ts's sentenceImpactFeedback thinning onto the
+    // sentence_vfx_core plan, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('1d0bcc373f1c53b97e30c6d48bd7dff997c6681f1f8706332fc1d73860a95a61');
+    ).toBe('b2a0b5eb9325ec9cc93e98a32ccf56f01c52d5f726a6319357222e2d69358b1a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
