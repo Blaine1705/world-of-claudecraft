@@ -17,8 +17,8 @@
 import { activeGpuRendererName, gfxSoftwareRendering } from '../render/gfx';
 import { probeMajorPerformanceCaveat } from '../render/software_renderer';
 import { gpuNoticeDisplayed, initGpuNotice } from '../ui/gpu_notice_toast';
-import { latchedDesktopGpuStatus, mergeShellGpuVerdict } from './desktop_gpu_status';
 import { detectDesktopPlatform } from './desktop_download';
+import { latchedDesktopGpuStatus, mergeShellGpuVerdict } from './desktop_gpu_status';
 import { hybridGpuLikely } from './hybrid_gpu_detect';
 
 /** Call AFTER the Renderer is constructed (initGfxTier has resolved by then). */

@@ -95,9 +95,9 @@ describe('gpu notice dismissal signature', () => {
     const oversized = `software,${'x'.repeat(80)}`;
     expect(oversized.length).toBeGreaterThan(64);
     expect(parseGpuNoticeSignature(oversized)).toEqual([]);
-    expect(
-      resolveGpuNotice({ ...SOFTWARE, ...FRESH, dismissedSignature: oversized }).shown,
-    ).toBe(true);
+    expect(resolveGpuNotice({ ...SOFTWARE, ...FRESH, dismissedSignature: oversized }).shown).toBe(
+      true,
+    );
   });
 
   it('parses the legacy shipped value as a software dismissal', () => {
@@ -141,9 +141,9 @@ describe('resolveGpuNotice', () => {
       dismissed: true,
       components: ['software'],
     });
-    expect(
-      resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: 'hybrid' }).shown,
-    ).toBe(false);
+    expect(resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: 'hybrid' }).shown).toBe(
+      false,
+    );
     expect(
       resolveGpuNotice({
         ...SOFTWARE_AND_DISCRETE,
@@ -169,12 +169,10 @@ describe('resolveGpuNotice', () => {
     // is not re-nagged about software rendering, yet the inactive-dedicated-GPU
     // and hybrid verdicts were never dismissed and must show.
     expect(
-      resolveGpuNotice({ ...SOFTWARE, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE })
-        .shown,
+      resolveGpuNotice({ ...SOFTWARE, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE }).shown,
     ).toBe(false);
     expect(
-      resolveGpuNotice({ ...DISCRETE, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE })
-        .shown,
+      resolveGpuNotice({ ...DISCRETE, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE }).shown,
     ).toBe(true);
     expect(
       resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE }).shown,
@@ -188,23 +186,20 @@ describe('resolveGpuNotice', () => {
       resolveGpuNotice({ ...HYBRID, dismissedSignature: '', legacyHybridDismissed: true }).shown,
     ).toBe(false);
     expect(
-      resolveGpuNotice({ ...SOFTWARE, dismissedSignature: '', legacyHybridDismissed: true })
-        .shown,
+      resolveGpuNotice({ ...SOFTWARE, dismissedSignature: '', legacyHybridDismissed: true }).shown,
     ).toBe(true);
     expect(
-      resolveGpuNotice({ ...DISCRETE, dismissedSignature: '', legacyHybridDismissed: true })
-        .shown,
+      resolveGpuNotice({ ...DISCRETE, dismissedSignature: '', legacyHybridDismissed: true }).shown,
     ).toBe(true);
   });
 
   it('a hybrid dismissal never suppresses a later software trigger, and vice versa', () => {
     expect(
-      resolveGpuNotice({ ...SOFTWARE, dismissedSignature: '', legacyHybridDismissed: true })
-        .shown,
+      resolveGpuNotice({ ...SOFTWARE, dismissedSignature: '', legacyHybridDismissed: true }).shown,
     ).toBe(true);
-    expect(
-      resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: 'software' }).shown,
-    ).toBe(true);
+    expect(resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: 'software' }).shown).toBe(
+      true,
+    );
     expect(
       resolveGpuNotice({ ...HYBRID, ...FRESH, dismissedSignature: LEGACY_DISMISSED_VALUE }).shown,
     ).toBe(true);
@@ -260,15 +255,15 @@ describe('gpuNoticeBodyKey', () => {
   });
 
   it('picks per-OS copy for the hybrid verdict, generic for anything else', () => {
-    expect(
-      gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'win', verdict: HYBRID }),
-    ).toBe('gpuNotice.hybridBodyWindows');
+    expect(gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'win', verdict: HYBRID })).toBe(
+      'gpuNotice.hybridBodyWindows',
+    );
     expect(
       gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'linux', verdict: HYBRID }),
     ).toBe('gpuNotice.hybridBodyLinux');
-    expect(
-      gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'mac', verdict: HYBRID }),
-    ).toBe('gpuNotice.hybridBodyOther');
+    expect(gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'mac', verdict: HYBRID })).toBe(
+      'gpuNotice.hybridBodyOther',
+    );
     expect(
       gpuNoticeBodyKey({ desktopShell: false, desktopPlatform: 'other', verdict: HYBRID }),
     ).toBe('gpuNotice.hybridBodyOther');

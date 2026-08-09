@@ -30,7 +30,13 @@ describe('the languagechange listener rides the DOM', () => {
   it('binds no listener and builds no node on a session that never shows the notice', async () => {
     const toast = await bootToast();
     const spy = vi.spyOn(document, 'addEventListener');
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: false,
+        desktopShell: true,
+        desktopPlatform: 'other',
+      }),
+    ).toBe(false);
     expect(languageBindings(spy)).toBe(0);
     document.dispatchEvent(new Event(LANGUAGE_EVENT));
     expect(noticeRoot()).toBeNull();
@@ -39,7 +45,13 @@ describe('the languagechange listener rides the DOM', () => {
   it('binds exactly once for a shown notice, and a locale flip cannot resurrect a dismissal', async () => {
     const toast = await bootToast();
     const spy = vi.spyOn(document, 'addEventListener');
-    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true, desktopPlatform: 'other' })).toBe(true);
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: true,
+        desktopShell: true,
+        desktopPlatform: 'other',
+      }),
+    ).toBe(true);
     expect(languageBindings(spy)).toBe(1);
 
     (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
@@ -59,7 +71,13 @@ describe('the displayed latch under a persisted dismissal', () => {
     // state.shown early-return in render(); this is that pin.
     const toast = await bootToast();
     localStorage.setItem('woc_gpu_notice_dismissed', 'software');
-    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: true,
+        desktopShell: true,
+        desktopPlatform: 'other',
+      }),
+    ).toBe(false);
     expect(noticeRoot()).toBeNull();
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
@@ -80,7 +98,12 @@ describe('the displayed latch on a both-component verdict', () => {
     // The WARP-flip shape reports both components at once.
     const toast = await bootToast();
     expect(
-      toast.initGpuNotice({ softwareRendering: true, discreteInactive: true, desktopShell: true, desktopPlatform: 'other' }),
+      toast.initGpuNotice({
+        softwareRendering: true,
+        discreteInactive: true,
+        desktopShell: true,
+        desktopPlatform: 'other',
+      }),
     ).toBe(true);
     expect(document.querySelector('#gpu-notice .gpu-notice-message')?.textContent ?? '').toContain(
       'without GPU acceleration',
