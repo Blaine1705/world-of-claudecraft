@@ -2154,6 +2154,7 @@ export class Hud {
       itemIcon: (item) => this.itemIcon(item),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      hideTooltip: () => this.hideTooltip(),
       writers: this.writerFacet,
     });
     this.playerCard = new PlayerCardController({
