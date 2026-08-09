@@ -124,7 +124,6 @@ export const IWORLD_MEMBERS = [
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
-  { name: 'tabTargetPrev', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
   { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
@@ -561,9 +560,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // sortInventory (IWorldInventory, a method), leaving 301. The character
     // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
     // data), leaving 302. This branch's battleground queue-pop confirmation
-    // adds bgRespond (IWorldBattleground, a method), leaving 303. This branch's
-    // backward target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a
-    // method), leaving 304.
+    // adds bgRespond (IWorldBattleground, a method), leaving 303.
     //
     // NOTE for the next merge, twice over now: BOTH sides of this pin bumped it
     // to the same number independently, so git merged the count with no
@@ -571,9 +568,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // increment is a silent off-by-one at merge time, and the data/method split
     // can disagree even when the total agrees. Only running the suite says what
     // these numbers really are; never reconcile them by arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(304);
+    expect(IWORLD_MEMBERS.length).toBe(303);
     expect(DATA_MEMBERS.length).toBe(77);
-    expect(METHOD_MEMBERS.length).toBe(227);
+    expect(METHOD_MEMBERS.length).toBe(226);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -852,7 +849,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
-      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'talentRole',
@@ -1175,7 +1171,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
-      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'targetEntity',
@@ -1296,7 +1291,6 @@ type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMB
 const FACET_TARGETING = [
   'targetEntity',
   'tabTarget',
-  'tabTargetPrev',
   'targetNearestFriendly',
   'friendlyTabTarget',
   'setStopAutoAttackOnTargetSwitch',
@@ -1784,8 +1778,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(303);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(303);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

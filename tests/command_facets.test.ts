@@ -22,7 +22,6 @@ const W6_TAGS: Readonly<Record<string, string>> = {
   resurrect_respond: 'IWorldCombat',
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
-  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   lootRoll: 'IWorldLoot',

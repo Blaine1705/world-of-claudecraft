@@ -58,9 +58,6 @@ type ContextMenuTarget = {
 
 export interface InputCallbacks {
   onTab(): void;
-  // The backward Tab cycle (Shift+Tab by default): the previous enemy in the
-  // same ordered list onTab walks forward.
-  onTabPrev(): void;
   onTargetFriendly(): void;
   onCycleFriendly(): void;
   // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
@@ -1091,9 +1088,6 @@ export class Input {
         return;
       case 'target':
         this.cb.onTab();
-        return;
-      case 'targetPrev':
-        this.cb.onTabPrev();
         return;
       case 'targetFriendly':
         this.cb.onTargetFriendly();

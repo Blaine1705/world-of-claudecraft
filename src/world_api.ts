@@ -575,10 +575,6 @@ export const COMMAND_NAMES = [
   // sim consolidates and restamps cell hints deterministically. Appended
   // because wire tokens are never reordered.
   'inv_sort',
-  // The backward half of the Tab cycle (IWorldTargeting.tabTargetPrev): no
-  // payload, the sim resolves the previous enemy in the same ordered list Tab
-  // walks forward. Appended because wire tokens are never reordered.
-  'tabPrev',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -681,7 +677,6 @@ export const COMMAND_FACETS = {
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
-  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   stopAutoAttackOnTargetSwitch: 'IWorldTargeting',
