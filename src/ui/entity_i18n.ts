@@ -367,6 +367,39 @@ export function entityTranslationKey(request: EntityTranslationRequest): string 
   }
 }
 
+// tEntity sits on per-frame paths (nameplates, aura names, HUD frames), and
+// entityTranslationKey allocates a template literal plus runs the
+// entityPathSegment regex on EVERY call for ids that never change
+// (hitch-elimination B3). The nested memo serves a stable (kind, id, field)
+// triple with three Map reads and zero allocation. Keys derive only from
+// static content ids, never from the locale, so the memo never invalidates
+// (the localized TEXT memo lives in i18n.ts behind the resolution revision).
+// The compound kinds (questObjective, zonePoi) carry an index and stay on the
+// direct builder: their surfaces (quest log, map POIs) are cold.
+const entityKeyMemo = new Map<EntityTranslationKind, Map<string, Map<string, string>>>();
+
+function cachedEntityTranslationKey(request: EntityTranslationRequest): string {
+  if (request.kind === 'questObjective' || request.kind === 'zonePoi') {
+    return entityTranslationKey(request);
+  }
+  let byId = entityKeyMemo.get(request.kind);
+  if (!byId) {
+    byId = new Map();
+    entityKeyMemo.set(request.kind, byId);
+  }
+  let byField = byId.get(request.id);
+  if (!byField) {
+    byField = new Map();
+    byId.set(request.id, byField);
+  }
+  let key = byField.get(request.field);
+  if (key === undefined) {
+    key = entityTranslationKey(request);
+    byField.set(request.field, key);
+  }
+  return key;
+}
+
 function requestManifestEntry(request: EntityTranslationRequest): EntityTranslationManifestEntry {
   const id =
     request.kind === 'questObjective'
@@ -399,7 +432,7 @@ function recordFallback(request: EntityTranslationRequest, value: string): void 
 }
 
 export function tEntity(request: EntityTranslationRequest): string {
-  const key = entityTranslationKey(request);
+  const key = cachedEntityTranslationKey(request);
   const translated = tOptional(key, request.values);
   if (translated !== null) return translated;
   const fallback = interpolateSource(canonicalEntityText(request), request.values);

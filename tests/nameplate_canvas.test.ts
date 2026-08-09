@@ -168,6 +168,31 @@ describe('nameplate canvas surface', () => {
     expect(traces[0].drawImage).toHaveBeenCalledTimes(2);
   });
 
+  it('draws the byte-identical guild wrapper from the memo, rebuilt only on change', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    state.initialized = true;
+    state.name = 'Guilded Hero';
+    state.guild = 'The Testers';
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+
+    const drawnText = (): string[] =>
+      traces.flatMap((trace) => trace.fillText.mock.calls.map(([value]) => value as string));
+    // Same content as the old per-frame template build: the exact `<...>` form
+    // rasterized ONCE, then re-blitted from the sprite cache on later frames.
+    expect(drawnText().filter((text) => text === '<The Testers>')).toHaveLength(1);
+
+    state.guild = 'New Banner';
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    expect(drawnText()).toContain('<New Banner>');
+  });
+
   it('rasterizes text at capped high DPR and blits it at logical dimensions', () => {
     const parent = document.createElement('div');
     const surface = new NameplateCanvasSurface(parent);
