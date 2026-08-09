@@ -84,7 +84,7 @@
     "perf:professions": "node scripts/load_professions.mjs",
     "audit:quests": "node scripts/quest_audit_graph.mjs",
     "audit:zone1": "npm run audit:quests",
-    "db:up": "docker compose up -d postgres",
+    "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose down",
     "db:cleanup-zone1-removed": "tsx scripts/cleanup_removed_zone1_content.ts",
     "db:migrate-old-cragmaw-pelt": "tsx scripts/migrate_old_cragmaw_pelt.ts",
