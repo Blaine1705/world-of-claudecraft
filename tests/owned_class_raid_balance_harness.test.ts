@@ -96,7 +96,9 @@ describe('owned-class raid-level balance harness', () => {
       expect(vespersDps).toBeLessThanOrEqual(topDps * 1.05);
     }
     // OWNED_DPS_SPECS grew 6 -> 8 with the druid overhaul (moongrove/wildfang).
-  }, 240_000);
+    // Long-sims lane contention (workers=2, run 31288946173) roughly doubles
+    // the shard-calibrated wall.
+  }, 600_000);
 
   it('keeps Shaman and Vespers raid sustain and cast cadence stable across five seeds', () => {
     for (const scenario of OWNED_CLASS_RAID_SCENARIOS) {
@@ -127,6 +129,8 @@ describe('owned-class raid-level balance harness', () => {
       expect(vespers.outcomes.resist).toBeGreaterThan(0);
     }
     // 3 scenarios x 3 specs x 5 seeds of raid-length sim: ~510s measured on
-    // the integrated tree.
-  }, 600_000);
+    // the integrated tree solo; in the long-sims lane (workers=2) it shares
+    // the runner with the level-20 harness marathon and run 31288946173
+    // killed it at 600s.
+  }, 1_200_000);
 });

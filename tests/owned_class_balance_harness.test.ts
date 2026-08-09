@@ -164,8 +164,10 @@ describe('owned-class level 20 balance harness', () => {
     // rogue-layer drift (measured 1.18 on the combined tree). Re-author both
     // sides of this pair when the owned-class stack integrates.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(1.2);
-    // The grown owned-class matrix runs ~180s under shard load.
-  }, 240_000);
+    // The grown owned-class matrix runs ~180s under shard load; in the
+    // long-sims lane (workers=2) it shares the runner with the raid harness
+    // and roughly doubles (run 31288946173 killed it at 240s).
+  }, 600_000);
 
   it('keeps the Druid damage arms sane on the fixed low-SP probe', () => {
     // IMPORTANT: this fixed PBE loadout is a level-20 caster PROXY (spell power
@@ -260,8 +262,9 @@ describe('owned-class level 20 balance harness', () => {
     ).toBeGreaterThanOrEqual(120);
     expect(doctrineGroup.resourceEnd).toBeGreaterThanOrEqual(150);
     expect(spiritmendSingle.hps).toBeGreaterThan(0);
-    // Same owned-class matrix growth as the DPS metric test above.
-  }, 120_000);
+    // Same owned-class matrix growth as the DPS metric test above, same
+    // long-sims lane contention doubling.
+  }, 360_000);
 
   it('runs Priest healer pressure through shields and Seraphic Vigil', () => {
     const doctrine = runOwnedHealerProbe('doctrine', 3, 29_912);

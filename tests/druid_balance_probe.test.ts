@@ -39,8 +39,10 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     expect(wildfang?.value).toBeLessThanOrEqual(205);
     expect(best.find((result) => result.profile === 'moongrove_3t')?.value).toBeGreaterThan(0);
     expect(best.find((result) => result.profile === 'groveheart')?.value).toBeGreaterThan(0);
-    // 12 profile x capstone combos over a 123s window: ~90-105s solo.
-  }, 150_000);
+    // 12 profile x capstone combos over a 123s window: ~90-105s solo. In the
+    // long-sims lane (workers=2) two heavy suites share the runner, roughly
+    // doubling wall time (run 31288946173 killed this at 150s mid-matrix).
+  }, 420_000);
 
   it.each(['moongrove', 'wildfang', 'bruin'] as const)(
     'executes the %s rotation against an attacking live mob',
