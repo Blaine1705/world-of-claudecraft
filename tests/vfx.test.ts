@@ -311,8 +311,11 @@ describe('pooled VFX cloud', () => {
     ];
     expect(renderSites).toHaveLength(1);
     for (const site of renderSites) {
+      // refreshFrozenWorldMatrix is the r185 explicit-refresh spelling for the
+      // frozen camera (static_matrix.ts); a plain updateMatrixWorld() would
+      // no longer compose it.
       expect(
-        source.slice(0, site.index).trimEnd().endsWith('this.camera.updateMatrixWorld();'),
+        source.slice(0, site.index).trimEnd().endsWith('refreshFrozenWorldMatrix(this.camera);'),
       ).toBe(true);
     }
     // The main-path draw moved into presentFrame (src/render/frame_present.ts),
@@ -330,10 +333,12 @@ describe('pooled VFX cloud', () => {
     expect(presentSites).toHaveLength(1);
     for (const site of presentSites) {
       const before = source.slice(0, site.index).trimEnd();
-      expect(before.includes('this.camera.updateMatrixWorld();')).toBe(true);
-      expect(before.slice(before.lastIndexOf('this.camera.updateMatrixWorld();'))).not.toContain(
-        'this.camera.position',
-      );
+      // The camera-shake refresh spells refreshFrozenWorldMatrix since the
+      // r185 matrix gate (static_matrix.ts).
+      expect(before.includes('refreshFrozenWorldMatrix(this.camera);')).toBe(true);
+      expect(
+        before.slice(before.lastIndexOf('refreshFrozenWorldMatrix(this.camera);')),
+      ).not.toContain('this.camera.position');
     }
     expect(source).toContain(`async captureScreenshot(maxEdge = 1280, quality = 0.7)`);
     expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(2);
