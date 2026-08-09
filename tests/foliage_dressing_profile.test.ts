@@ -53,8 +53,17 @@ describe('ground dressing richness profile', () => {
     live.lowPlus = true;
     expect(dressStep()).toBe(10);
     const weakLow = generateDressing(20_061);
-    // Tighter grid AND the 1.24 density scale: strictly more spots.
+    // Tighter grid AND the 1.24 density scale: strictly more spots. The
+    // strictly-more assertion alone is satisfied by the tighter grid ((12/10)^2
+    // is about 1.44x cells), so the phase 5 QA probe round set the density
+    // scale to 1 and stayed green. Pin the RATIO instead: this seed lands at
+    // 1.586 (the July 1.79x compressed where density x 1.24 saturates past a
+    // biome's acceptance ceiling); a dropped density scale lands near 1.44 and
+    // reds the floor, a runaway one reds the ceiling.
     expect(weakLow.length).toBeGreaterThan(plainLow.length);
+    const countRatio = weakLow.length / plainLow.length;
+    expect(countRatio).toBeGreaterThan(1.5);
+    expect(countRatio).toBeLessThan(1.7);
     // The 1.08 spot boost: the two grids sample different hash positions, so
     // compare the scale distribution maxima as a RATIO band around 1.08 (dense
     // sampling puts both maxima near the distribution ceiling). A dropped boost
