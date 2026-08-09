@@ -30,35 +30,90 @@ export interface GpuWorkUnitStat {
   atMs: number;
 }
 
+/** The unit the drain loop is awaiting right now. The queue is serial, so this
+ *  one unit is what every pending unit in every lane is waiting on. */
+export interface GpuWorkActiveUnit {
+  label: string;
+  priority: number;
+  /** Wall time since the unit started, i.e. how long it has been running. */
+  ageMs: number;
+  atMs: number;
+}
+
+/** A unit observed past the stall threshold. `settled: false` is the case a
+ *  completed-unit ring can never show: it had still not finished when the
+ *  stats were read. */
+export interface GpuWorkStallStat {
+  label: string;
+  priority: number;
+  /** Longest unsettled age observed, or the final wall time once it settled. */
+  ageMs: number;
+  atMs: number;
+  settled: boolean;
+}
+
 export interface BackgroundGpuQueueStats {
   units: number;
   totalSyncMs: number;
   worstSyncMs: number;
   /** Slowest units by sync slice, worst first, bounded. */
   slowest: GpuWorkUnitStat[];
+  /** Units queued behind the running one: the backlog a wedge accumulates. */
+  pending: number;
+  /** The running unit, or null when the queue is idle. */
+  active: GpuWorkActiveUnit | null;
+  /** Every unit seen past the stall threshold, including evicted records. A
+   *  non-zero count is not by itself a wedged queue: a long hold that ended
+   *  counts too. A wedge is an unsettled stall plus an `active` naming it. */
+  stallCount: number;
+  /** Most recent stalls, bounded. */
+  stalls: GpuWorkStallStat[];
 }
 
 export interface BackgroundGpuQueue {
   run<T>(work: () => T | Promise<T>, priority?: number, label?: string): Promise<T>;
-  /** Per-unit timing: names which lane's units block the main thread. */
+  /** Per-unit timing plus the running unit: names which lane's units block the
+   *  main thread, and which one is currently blocking the whole queue. */
   stats(): BackgroundGpuQueueStats;
   /** Reject queued work, stop accepting more, and await the active unit. */
   shutdown(reason?: Error): Promise<void>;
 }
 
 const DEFAULT_SLOWEST_LIMIT = 20;
+// Low on purpose, because a hold this long is worth seeing whether or not it
+// ends. A live compile gate waiting out a non-cancellable driver link really
+// does occupy the serial queue for seconds (a local run measured 7.5 s on a
+// unit that cost 2.5 ms of main-thread time), and every other lane waits behind
+// it. Those records settle; a wedge is the record that never does.
+const DEFAULT_STALL_MS = 4000;
+const DEFAULT_STALL_LIMIT = 8;
+
+interface RunningGpuWork {
+  entry: PendingGpuWork<unknown>;
+  startedAt: number;
+  stall: GpuWorkStallStat | null;
+}
+
+const round1 = (value: number): number => Math.round(value * 10) / 10;
 
 export function createBackgroundGpuQueue(opts?: {
   now?: () => number;
   slowestLimit?: number;
+  stallMs?: number;
+  stallLimit?: number;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
+  const stallMs = Math.max(1, opts?.stallMs ?? DEFAULT_STALL_MS);
+  const stallLimit = Math.max(1, opts?.stallLimit ?? DEFAULT_STALL_LIMIT);
   const pending: PendingGpuWork<unknown>[] = [];
   const slowest: GpuWorkUnitStat[] = [];
+  const stalls: GpuWorkStallStat[] = [];
   let units = 0;
   let totalSyncMs = 0;
   let worstSyncMs = 0;
+  let stallCount = 0;
+  let running: RunningGpuWork | null = null;
   let active = false;
   let accepting = true;
   let nextOrder = 0;
@@ -66,16 +121,40 @@ export function createBackgroundGpuQueue(opts?: {
   let shutdownPromise: Promise<void> | null = null;
   let resolveShutdown: (() => void) | null = null;
 
-  const recordUnit = (entry: PendingGpuWork<unknown>, startedAt: number, syncMs: number): void => {
+  // A unit that never settles has no completion callback to record it, so the
+  // threshold is evaluated wherever the queue is observed instead: at every
+  // stats() read while the unit is still running, and once more if it settles.
+  const noteStall = (unit: RunningGpuWork, ageMs: number): void => {
+    if (ageMs < stallMs) return;
+    if (unit.stall) {
+      if (ageMs > unit.stall.ageMs) unit.stall.ageMs = ageMs;
+      return;
+    }
+    stallCount++;
+    unit.stall = {
+      label: unit.entry.label,
+      priority: unit.entry.priority,
+      ageMs,
+      atMs: unit.startedAt,
+      settled: false,
+    };
+    stalls.push(unit.stall);
+    if (stalls.length > stallLimit) stalls.shift();
+  };
+
+  const recordUnit = (unit: RunningGpuWork, syncMs: number): void => {
     units++;
     totalSyncMs += syncMs;
     if (syncMs > worstSyncMs) worstSyncMs = syncMs;
+    const wallMs = now() - unit.startedAt;
+    noteStall(unit, wallMs);
+    if (unit.stall) unit.stall.settled = true;
     const stat: GpuWorkUnitStat = {
-      label: entry.label,
-      priority: entry.priority,
+      label: unit.entry.label,
+      priority: unit.entry.priority,
       syncMs,
-      wallMs: now() - startedAt,
-      atMs: startedAt,
+      wallMs,
+      atMs: unit.startedAt,
     };
     let index = slowest.length;
     while (index > 0 && slowest[index - 1].syncMs < stat.syncMs) index--;
@@ -103,17 +182,19 @@ export function createBackgroundGpuQueue(opts?: {
         }
       }
       const [next] = pending.splice(selectedIndex, 1);
-      const startedAt = now();
+      const unit: RunningGpuWork = { entry: next, startedAt: now(), stall: null };
+      running = unit;
       let syncMs = 0;
       try {
         const returned = next.work();
-        syncMs = now() - startedAt;
+        syncMs = now() - unit.startedAt;
         next.resolve(await returned);
       } catch (error) {
-        if (syncMs === 0) syncMs = now() - startedAt;
+        if (syncMs === 0) syncMs = now() - unit.startedAt;
         next.reject(error);
       } finally {
-        recordUnit(next, startedAt, syncMs);
+        running = null;
+        recordUnit(unit, syncMs);
       }
     }
     active = false;
@@ -152,15 +233,34 @@ export function createBackgroundGpuQueue(opts?: {
       return result;
     },
     stats(): BackgroundGpuQueueStats {
+      let activeUnit: GpuWorkActiveUnit | null = null;
+      if (running) {
+        const ageMs = now() - running.startedAt;
+        noteStall(running, ageMs);
+        activeUnit = {
+          label: running.entry.label,
+          priority: running.entry.priority,
+          ageMs: round1(ageMs),
+          atMs: Math.round(running.startedAt),
+        };
+      }
       return {
         units,
-        totalSyncMs: Math.round(totalSyncMs * 10) / 10,
-        worstSyncMs: Math.round(worstSyncMs * 10) / 10,
+        totalSyncMs: round1(totalSyncMs),
+        worstSyncMs: round1(worstSyncMs),
         slowest: slowest.map((stat) => ({
           ...stat,
-          syncMs: Math.round(stat.syncMs * 10) / 10,
-          wallMs: Math.round(stat.wallMs * 10) / 10,
+          syncMs: round1(stat.syncMs),
+          wallMs: round1(stat.wallMs),
           atMs: Math.round(stat.atMs),
+        })),
+        pending: pending.length,
+        active: activeUnit,
+        stallCount,
+        stalls: stalls.map((stall) => ({
+          ...stall,
+          ageMs: round1(stall.ageMs),
+          atMs: Math.round(stall.atMs),
         })),
       };
     },

@@ -183,6 +183,137 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.worstSyncMs).toBe(30);
   });
 
+  it('exposes the running unit with its age and reports none while idle', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    expect(queue.stats().active).toBeNull();
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const running = queue.run(() => gate, GPU_WORK_PRIORITY.LIVE_VIEW, 'live-view-compile');
+    const behind = queue.run(async () => {}, GPU_WORK_PRIORITY.BACKGROUND, 'texture-chunk');
+    await Promise.resolve();
+    clock += 250;
+
+    const busy = queue.stats();
+    expect(busy.active).toEqual({
+      label: 'live-view-compile',
+      priority: GPU_WORK_PRIORITY.LIVE_VIEW,
+      ageMs: 250,
+      atMs: 0,
+    });
+    expect(busy.pending).toBe(1);
+    expect(busy.units).toBe(0);
+
+    release();
+    await Promise.all([running, behind]);
+    const idle = queue.stats();
+    expect(idle.active).toBeNull();
+    expect(idle.pending).toBe(0);
+    expect(idle.units).toBe(2);
+  });
+
+  it('records a never-settling unit past the threshold without counting it as completed', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, stallMs: 4000 });
+    // The shape of the r165 compileAsync deadlock: the unit's promise never
+    // settles, so no completion callback ever runs for it.
+    void queue.run(
+      () => new Promise<void>(() => {}),
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'wedged-compile',
+    );
+    void queue.run(async () => {}, GPU_WORK_PRIORITY.BACKGROUND, 'texture-chunk');
+    await Promise.resolve();
+
+    clock += 3999;
+    expect(queue.stats().stalls).toEqual([]);
+    clock += 1;
+    const stalled = queue.stats();
+    expect(stalled.stallCount).toBe(1);
+    expect(stalled.stalls).toEqual([
+      {
+        label: 'wedged-compile',
+        priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+        ageMs: 4000,
+        atMs: 0,
+        settled: false,
+      },
+    ]);
+    expect(stalled.active?.label).toBe('wedged-compile');
+    expect(stalled.pending).toBe(1);
+    // It is a stall, not a completed unit: nothing lands in the completed-unit
+    // reporting, which is exactly why it used to be invisible.
+    expect(stalled.units).toBe(0);
+    expect(stalled.totalSyncMs).toBe(0);
+    expect(stalled.worstSyncMs).toBe(0);
+    expect(stalled.slowest).toEqual([]);
+
+    clock += 10_000;
+    const later = queue.stats();
+    expect(later.stallCount).toBe(1);
+    expect(later.stalls[0].ageMs).toBe(14_000);
+    expect(later.stalls[0].settled).toBe(false);
+    expect(later.active?.ageMs).toBe(14_000);
+  });
+
+  it('settles a stall when the unit finishes and leaves the slowest ring on sync time', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, stallMs: 1000 });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const slow = queue.run(
+      () => {
+        clock += 8;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      'zone-prewarm',
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 5000;
+    release();
+    await slow;
+
+    const stats = queue.stats();
+    expect(stats.active).toBeNull();
+    expect(stats.stallCount).toBe(1);
+    expect(stats.stalls).toEqual([
+      {
+        label: 'zone-prewarm',
+        priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        ageMs: 5008,
+        atMs: 0,
+        settled: true,
+      },
+    ]);
+    // Completed-unit reporting is unchanged: the sync slice, not the wall time,
+    // still drives worstSyncMs and the slowest ring.
+    expect(stats.units).toBe(1);
+    expect(stats.worstSyncMs).toBe(8);
+    expect(stats.slowest[0].syncMs).toBe(8);
+    expect(stats.slowest[0].wallMs).toBe(5008);
+  });
+
+  it('bounds the retained stalls while counting every one of them', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, stallMs: 100, stallLimit: 2 });
+    for (const label of ['first', 'second', 'third']) {
+      await queue.run(
+        () => {
+          clock += 500;
+        },
+        GPU_WORK_PRIORITY.BACKGROUND,
+        label,
+      );
+    }
+    const stats = queue.stats();
+    expect(stats.stallCount).toBe(3);
+    expect(stats.stalls.map((stall) => stall.label)).toEqual(['second', 'third']);
+    expect(stats.stalls.every((stall) => stall.settled)).toBe(true);
+    expect(stats.units).toBe(3);
+  });
+
   it('wires sky, feature, archetype, and boot-resume units through one renderer queue', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const method = (startText: string, endText: string): string => {
