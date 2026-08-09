@@ -1,9 +1,9 @@
-// Wildheart Basin round 2 (issue #2889): the Sunbone Hexcaller's own bespoke
-// attack/cast clip. mob_wildheart_hexcaller shared the literal TRIPO_BIPED_FULL_RIG
+// Wildheart Basin round 2 (issue #2889): Zulgar, Voice of the Basin's own bespoke
+// attack/cast clip. mob_wildheart_high_priest shared the literal TRIPO_BIPED_FULL_RIG
 // ClipMap object, by reference, with the other 4 Wildheart Basin mobs; this clip is
 // authored by pose-sample-and-blend (scripts/anim/pose_blend.mjs,
-// scripts/build_wildheart_hexcaller_anims.mjs) off the rig's own Cast and Attack
-// donors. Follows the shipped-GLB-plus-manifest-source contract test pattern
+// scripts/build_wildheart_high_priest_anims.mjs) off the rig's own Cast and Jump donors.
+// Follows the shipped-GLB-plus-manifest-source contract test pattern
 // (tests/anim_pipeline_batch1.test.ts's elemental family describe block).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -35,25 +35,22 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
   return MANIFEST_SRC.slice(start, end);
 }
 
-describe('Sunbone Hexcaller bespoke attack/cast (issue #2889 round 2)', () => {
-  it('ships Wildheart_Hexcaller_Attack in a mesh-free donor GLB', () => {
-    const glbPath = 'public/models/creatures/wildheart_hexcaller_ability_anims.glb';
-    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_Hexcaller_Attack']);
+describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)', () => {
+  it('ships Wildheart_High_Priest_Attack in a mesh-free donor GLB', () => {
+    const glbPath = 'public/models/creatures/wildheart_high_priest_ability_anims.glb';
+    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_High_Priest_Attack']);
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
-  it('gives mob_wildheart_hexcaller its own ClipMap (attack and cast) instead of mutating the shared TRIPO_BIPED_FULL_RIG constant', () => {
-    const hexcallerBlock = manifestBlock(
-      'mob_wildheart_hexcaller: {',
-      'mob_wildheart_beastmaster: {',
-    );
-    expect(hexcallerBlock).toContain('wildheart_hexcaller_ability_anims.glb');
-    expect(hexcallerBlock).toContain('clips: WILDHEART_HEXCALLER');
-    expect(hexcallerBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
+  it('gives mob_wildheart_high_priest its own ClipMap (attack and cast) instead of mutating the shared TRIPO_BIPED_FULL_RIG constant', () => {
+    const highPriestBlock = manifestBlock('mob_wildheart_high_priest: {', 'mob_elemental: {');
+    expect(highPriestBlock).toContain('wildheart_high_priest_ability_anims.glb');
+    expect(highPriestBlock).toContain('clips: WILDHEART_HIGH_PRIEST');
+    expect(highPriestBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
 
-    const hexcallerConstBlock = manifestBlock('const WILDHEART_HEXCALLER: ClipMap = {', '};');
-    expect(hexcallerConstBlock).toContain("attack: ['Wildheart_Hexcaller_Attack']");
-    expect(hexcallerConstBlock).toContain("cast: 'Wildheart_Hexcaller_Attack'");
+    const highPriestConstBlock = manifestBlock('const WILDHEART_HIGH_PRIEST: ClipMap = {', '};');
+    expect(highPriestConstBlock).toContain("attack: ['Wildheart_High_Priest_Attack']");
+    expect(highPriestConstBlock).toContain("cast: 'Wildheart_High_Priest_Attack'");
 
     // TRIPO_BIPED_FULL_RIG itself (the constant definition, not a VisualDef using it) must
     // still read the original shared Attack and Cast clips: the other 4 Wildheart mobs
@@ -64,8 +61,8 @@ describe('Sunbone Hexcaller bespoke attack/cast (issue #2889 round 2)', () => {
 
     // Every other VisualDef still pointing at the shared constant is untouched: exactly 1
     // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usage (mob_wildheart_beastmaster; 5
-    // originally, minus the ones migrated to WILDHEART_HEXCALLER above, WILDHEART_STALKER,
-    // WILDHEART_RAVAGER, and WILDHEART_HIGH_PRIEST, issue #2889 round 2).
+    // originally, minus the ones migrated to WILDHEART_STALKER, WILDHEART_RAVAGER,
+    // WILDHEART_HEXCALLER, and WILDHEART_HIGH_PRIEST above).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
     expect(remaining).toBe(1);
   });

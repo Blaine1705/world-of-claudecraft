@@ -381,6 +381,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/wildheart_hexcaller_ability_anims.glb": "/media/models/creatures/wildheart_hexcaller_ability_anims.e9771819f8f1.glb",
   "models/creatures/wildheart_hexcaller_hit_variety_anims.glb": "/media/models/creatures/wildheart_hexcaller_hit_variety_anims.48abda8e3815.glb",
   "models/creatures/wildheart_high_priest.glb": "/media/models/creatures/wildheart_high_priest.a43393cb43b9.glb",
+  "models/creatures/wildheart_high_priest_ability_anims.glb": "/media/models/creatures/wildheart_high_priest_ability_anims.38c2c1788e40.glb",
   "models/creatures/wildheart_high_priest_hit_variety_anims.glb": "/media/models/creatures/wildheart_high_priest_hit_variety_anims.00fd573d03a7.glb",
   "models/creatures/wildheart_ravager.glb": "/media/models/creatures/wildheart_ravager.1d07968792a6.glb",
   "models/creatures/wildheart_ravager_ability_anims.glb": "/media/models/creatures/wildheart_ravager_ability_anims.bc278ac1148e.glb",
