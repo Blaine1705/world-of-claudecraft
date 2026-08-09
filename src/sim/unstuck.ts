@@ -28,6 +28,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { bgCarryingFlag } from './social/battleground';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
@@ -191,6 +192,7 @@ function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
     isValeCupPlayer(ctx, pid) ||
+    (!p.dead && !p.ghost && bgCarryingFlag(ctx, pid)) ||
     isArenaPos(p.pos.x) ||
     (isBgPos(p.pos.x) && !ctx.bgMatches.has(pid))
   );

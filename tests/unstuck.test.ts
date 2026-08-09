@@ -126,6 +126,21 @@ function makeBattleground(): { sim: Sim; match: BgMatch; crimson: number } {
   return { sim, match, crimson: pids[0] };
 }
 
+function placePlayer(sim: Sim, pid: number, x: number, z: number): Sim['player'] {
+  const player = required(sim.entities.get(pid), 'player to place');
+  player.pos = sim.groundPos(x, z);
+  player.prevPos = { ...player.pos };
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  sim.ctx.rebucket(player);
+  return player;
+}
+
 function accepted(sim: Sim): {
   pid: number;
   player: Sim['player'];
@@ -730,6 +745,48 @@ describe('unstuck while dead', () => {
 });
 
 describe('unstuck area identity', () => {
+  it('blocks a live battleground flag carrier before the graveyard move starts', () => {
+    const { sim, match, crimson } = makeBattleground();
+    const flag = match.flags[1];
+    const player = placePlayer(sim, crimson, flag.home.x, flag.home.z);
+    sim.bgFlagAction(crimson);
+    sim.tick();
+    sim.drainEvents();
+
+    expect(flag.state).toBe('carried');
+    expect(flag.carrier).toBe(crimson);
+    const carriedAt = { ...player.pos };
+
+    expect(sim.unstuck(crimson)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'competitive' }),
+    );
+    expect(required(sim.meta(crimson), 'carrier metadata').pendingUnstuck).toBeNull();
+
+    tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20 + 1);
+    expect(flag.state).toBe('carried');
+    expect(flag.carrier).toBe(crimson);
+    expect(player.pos).toMatchObject(carriedAt);
+  });
+
+  it('cancels a battleground recovery if the player becomes a live flag carrier', () => {
+    const { sim, match, crimson } = makeBattleground();
+    const flag = match.flags[1];
+    placePlayer(sim, crimson, flag.home.x, flag.home.z);
+
+    expect(sim.unstuck(crimson)).toBe(true);
+    sim.drainEvents();
+    sim.bgFlagAction(crimson);
+    sim.tick();
+    expect(flag.state).toBe('carried');
+    expect(flag.carrier).toBe(crimson);
+
+    expect(eventsOf(sim.tick())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'state_changed' }),
+    );
+    expect(required(sim.meta(crimson), 'carrier metadata').pendingUnstuck).toBeNull();
+  });
+
   it('keeps a trapped live battleground fighter in their match and moves them to the team graveyard', () => {
     const { sim, match, crimson } = makeBattleground();
     const player = required(sim.entities.get(crimson), 'crimson fighter');
