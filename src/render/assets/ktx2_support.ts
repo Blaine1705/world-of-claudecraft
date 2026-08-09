@@ -39,6 +39,7 @@ function detectViaThrowawayContext(loader: KTX2Loader): void {
     console.warn('[ktx2] no probe context; transcoding to uncompressed RGBA');
     loader.workerConfig = {
       astcSupported: false,
+      astcHDRSupported: false,
       etc1Supported: false,
       etc2Supported: false,
       dxtSupported: false,
