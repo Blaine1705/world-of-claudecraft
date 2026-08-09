@@ -4,6 +4,7 @@
 import './styles/index.css';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
+import { afterActiveAnimationMs } from './game/active_animation_timer';
 import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
@@ -136,8 +137,12 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
-import { currentUtcDay } from './game/utc_day';
+import {
+  loadingCurtainFadeMs,
+  resolveUiEffectsProfile,
+  worldEntryGpuSettleCoverMs,
+} from './game/ui_effects_profile';
+import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
@@ -207,7 +212,16 @@ import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
 } from './render/assets/graphics_profile';
-import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
+import {
+  enableKtx2MipRelease,
+  ktx2MipsOnContextLost,
+  ktx2MipsRestored,
+} from './render/assets/ktx2_mip_release';
+import {
+  assetsReady,
+  beginBackgroundPreloads,
+  beginDeferredPreloads,
+} from './render/assets/preload';
 import {
   CharacterPreview,
   type PreviewAppearance,
@@ -286,6 +300,7 @@ import {
   DT,
   dist2d,
   MELEE_RANGE,
+  PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,
   RUN_SPEED,
   type WorldContent,
@@ -457,6 +472,18 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
+// World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
+// transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
+// every renderer that can draw those categories is the world renderer, whose
+// context loss and recycle paths route through the re-transcode hook below.
+// The editor and guide entries never call this, so their extra renderers
+// (asset thumbnails, wiki viewer) keep resident mips. Runs at module
+// evaluation so no deferred-preload GLB can classify before the switch is on.
+// The probe reads the LIVE GFX binding (initGfxTier and graphics rebuilds
+// reassign it): constrained-memory profiles (the whole iOS WebKit ladder plus
+// phone-class browsers) keep resident mips, because their semi-routine
+// in-place context loss has no curtain for the restore's re-transcode window.
+enableKtx2MipRelease(() => GFX.constrainedMemory);
 let pendingDeleteCharacter: CharacterSummary | null = null;
 // The desktop roster shows one shared "Enter World" button (in .cs-list-actions)
 // instead of a per-row one; it acts on whichever character is selected. Mobile
@@ -1193,7 +1220,7 @@ async function startGame(
       ...baseEntryDiagnostics(),
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
-      nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      iosMemoryProfile: GFX.iosMemoryProfile,
       tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
@@ -1335,8 +1362,13 @@ async function startGame(
   });
   uiEffectsApplier.applyNow();
   const autoLoot = new AutoLoot();
-  const perf = createPerfMonitor(null);
+  const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
+    // Start re-transcoding released KTX2 mip chains NOW: the restored (or
+    // recycled) context re-uploads from texture.mipmaps, and the sooner the
+    // worker starts the shorter any stub-black window. Fires for in-place GPU
+    // loss AND the graphics-rebuild recycle (both dispatch on this canvas).
+    ktx2MipsOnContextLost();
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
       contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
@@ -1384,7 +1416,7 @@ async function startGame(
     // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
     console.info(
       `[entry-guard] scene built: tier=${GFX.tier} constrainedMemory=${GFX.constrainedMemory} ` +
-        `nativeIosMemoryProfile=${GFX.nativeIosMemoryProfile} ` +
+        `iosMemoryProfile=${GFX.iosMemoryProfile} ` +
         `pooledVisualCap=${GFX.maxPooledCharacterVisuals} ` +
         `dynamicShadows=${GFX.dynamicShadows} shadowMap=${GFX.shadowMap} ` +
         `msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
@@ -1922,6 +1954,7 @@ async function startGame(
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
+    onWiki: () => hud.openWiki(),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),
@@ -2424,6 +2457,14 @@ async function startGame(
       settings.set('showWalletOnPlayerCard', !!value);
       return;
     }
+    if (key === 'showPlaytime') {
+      settings.set('showPlaytime', !!value);
+      // The character sheet is a cold window (no repeating driver), so repaint
+      // it now; this is also the repaint the sheet's own privacy eye relies on
+      // (its toggle routes through this arm).
+      hud.renderCharIfOpen();
+      return;
+    }
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
       return;
@@ -2736,6 +2777,10 @@ async function startGame(
       // eagerly behind this opaque curtain; hold (bounded) so the commit
       // reveals a finished horizon instead of easing the fog out on screen.
       await next.farVistaReady();
+      // Released KTX2 mip chains re-transcode after the recycle's context
+      // loss; hold the curtain until they are back so the reveal never shows
+      // stub-black world textures (settles on failure too, never hangs).
+      await ktx2MipsRestored();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);
@@ -4167,6 +4212,7 @@ async function startGame(
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
       // clock itself, to stay deterministic).
       offlineSim.utcDay = currentUtcDay();
+      offlineSim.resetDay = currentResetDay();
       while (acc >= DT) {
         const { mi, facing } = resolveMove(
           mouselook,
@@ -4611,7 +4657,6 @@ async function startGame(
     seen: introSeen,
     playerLevel: world.player.level,
     reducedMotion: settings.get('reduceMotion') || osReducedMotion,
-    native: isNativeRuntime(),
     platform: mobilePlatform(),
     engine: startupBrowserEnv.engine,
     constrainedMemory: GFX.constrainedMemory,
@@ -4632,7 +4677,7 @@ async function startGame(
   } else {
     if (introPolicy.reason === 'constrained-ios-webkit') {
       console.info(
-        `[entry-guard] spawn cinematic suppressed: constrained native iOS WebKit ` +
+        `[entry-guard] spawn cinematic suppressed: constrained iOS WebKit ` +
           `preset=${settings.get('graphicsPreset')} tier=${GFX.tier}`,
       );
     }
@@ -4696,10 +4741,10 @@ async function startGame(
     console.warn('Renderer prewarm failed', err);
   }
   // The entry allocation spike is over: start streaming the mob bodies the
-  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
-  // whose GLB is still arriving renders a beat late through the fail-soft
-  // view-create path, instead of its decode competing with the scene build for
-  // the WebContent memory ceiling.
+  // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
+  // the packaged app; empty everywhere else). A mob whose GLB is still arriving
+  // renders a beat late through the fail-soft view-create path, instead of its
+  // decode competing with the scene build for the WebContent memory ceiling.
   const streamedCount = startStreamedCharacterPreloads();
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
@@ -4748,79 +4793,101 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
-      hideLoadingScreen();
-      // Start the intro clock as the loading screen begins to fade: the camera
-      // holds the opening pose until now, so the fade doubles as the cut in.
-      if (intro) intro.startedAt = performance.now();
-      window.setTimeout(() => {
-        gameInputReady = true;
-        perf.reset();
-        startPerfReporter({
-          perf,
-          settings,
-          tokenProvider: () => api.token,
-          characterIdProvider: () => online?.characterId ?? null,
-          worldTelemetryProvider: () => ({
-            zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
-            simEntities: world.entities.size,
-          }),
-          desktopShell: DESKTOP_APP,
-        });
-        // One-time machine-local performance nudge (packet 0 rulings R14-R16):
-        // the assembler polls the same PerfMonitor the reporter reads.
-        initPerfNudge({ perf, desktopShell: DESKTOP_APP });
-        // First-run camera-mode prompt (issue #1727): show once per browser on a
-        // mouse-driven interface, after any spawn cinematic has finished. Applies
-        // the choice through the same applySetting path as the Key Bindings toggle.
-        maybeShowFirstRunCameraPrompt({
-          applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
-          isBlocked: () => intro !== null,
-        });
-        (
-          window as Window &
-            typeof globalThis & {
-              __game?: Record<string, unknown>;
-            }
-        ).__game = {
-          sim: world,
-          world,
-          renderer,
-          input,
-          hud,
-          online,
-          controller,
-          perf,
-          gamepad,
-          music,
-          // The live content table, for E2E rigs that stage a template state
-          // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs
-          // retags a template all-unmapped, the tests' withUnmappedTemplate
-          // idiom). Debug surface only; never written by game code.
-          MOBS,
-          /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
-          lockpickEngage: (objectId: number, ante: number) =>
-            hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
-          /** Syncs HUD col/row from sim before acting; always drains step events. Use instead of sim.lockpickAction. */
-          lockpickAction: (action: string) =>
-            hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
-          flushLockpickEvents: () => hud.flushLockpickEvents(),
-        };
-        // Console realm teleports (go.vale() ... go.fen()): offline dev only,
-        // never online (server-authoritative movement) and never production.
-        if (import.meta.env.DEV && offlineSim && !online) {
-          installDevTeleports(
-            ZONES.map((zn) => ({ id: zn.id, town: zn.hub.name, x: zn.hub.x, z: zn.hub.z })),
-            (x, z) => {
-              const me = offlineSim.entities.get(offlineSim.playerId);
-              if (!me) return;
-              me.pos.x = x;
-              me.pos.z = z;
-              me.prevPos = { ...me.pos };
-              me.hp = me.maxHp;
-            },
-          );
-        }
-      }, loadingCurtainFadeDelayMs());
+      // Open the background preload lane now that the first frame is actually on
+      // screen: content tagged 'background' (a lazily streamed-in proximity
+      // build that tolerates its assets arriving late) never had to share the
+      // boot gate with the launcher's own fetches; starting it here just keeps
+      // it from competing with the deferred-critical lane for bandwidth/decode
+      // slots during the loading screen either.
+      const backgroundStarted = beginBackgroundPreloads();
+      if (backgroundStarted > 0) {
+        console.info(
+          `[entry-guard] world assets: started ${backgroundStarted} background preloads`,
+        );
+      }
+      const revealWorld = (): void => {
+        hideLoadingScreen();
+        // Start the intro clock as the loading screen begins to fade: the camera
+        // holds the opening pose until now, so the fade doubles as the cut in.
+        if (intro) intro.startedAt = performance.now();
+        window.setTimeout(() => {
+          gameInputReady = true;
+          perf.reset();
+          startPerfReporter({
+            perf,
+            settings,
+            tokenProvider: () => api.token,
+            characterIdProvider: () => online?.characterId ?? null,
+            worldTelemetryProvider: () => ({
+              zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
+              simEntities: world.entities.size,
+            }),
+            desktopShell: DESKTOP_APP,
+          });
+          // One-time machine-local performance nudge (packet 0 rulings R14-R16):
+          // the assembler polls the same PerfMonitor the reporter reads.
+          initPerfNudge({ perf, desktopShell: DESKTOP_APP });
+          // First-run camera-mode prompt (issue #1727): show once per browser on a
+          // mouse-driven interface, after any spawn cinematic has finished. Applies
+          // the choice through the same applySetting path as the Key Bindings toggle.
+          maybeShowFirstRunCameraPrompt({
+            applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
+            isBlocked: () => intro !== null,
+          });
+          (
+            window as Window &
+              typeof globalThis & {
+                __game?: Record<string, unknown>;
+              }
+          ).__game = {
+            sim: world,
+            world,
+            renderer,
+            input,
+            hud,
+            online,
+            controller,
+            perf,
+            gamepad,
+            music,
+            // The live content table, for E2E rigs that stage a template state
+            // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs
+            // retags a template all-unmapped, the tests' withUnmappedTemplate
+            // idiom). Debug surface only; never written by game code.
+            MOBS,
+            /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
+            lockpickEngage: (objectId: number, ante: number) =>
+              hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
+            /** Syncs HUD col/row from sim before acting; always drains step events. Use instead of sim.lockpickAction. */
+            lockpickAction: (action: string) =>
+              hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
+            flushLockpickEvents: () => hud.flushLockpickEvents(),
+          };
+          // Console realm teleports (go.vale() ... go.fen()): offline dev only,
+          // never online (server-authoritative movement) and never production.
+          if (import.meta.env.DEV && offlineSim && !online) {
+            installDevTeleports(
+              ZONES.map((zn) => ({ id: zn.id, town: zn.hub.name, x: zn.hub.x, z: zn.hub.z })),
+              (x, z) => {
+                const me = offlineSim.entities.get(offlineSim.playerId);
+                if (!me) return;
+                me.pos.x = x;
+                me.pos.z = z;
+                me.prevPos = { ...me.pos };
+                me.hp = me.maxHp;
+              },
+            );
+          }
+        }, loadingCurtainFadeDelayMs());
+      };
+      afterActiveAnimationMs(
+        worldEntryGpuSettleCoverMs({
+          adaptiveBudget: GFX.autoGovernor,
+          constrainedMemory: GFX.constrainedMemory,
+          online: online !== null,
+        }),
+        revealWorld,
+      );
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -4863,6 +4930,11 @@ async function startOffline(
     // server (custom editor play-test maps keep it off: their zones differ).
     riftPortals: world === undefined,
     valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+    // Match the live server's proven-safe idle-AI interest throttle. Ordinary
+    // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
+    // full-world wilderness AI from the browser's 20 Hz tick without changing
+    // anything visible or interactable.
+    idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
@@ -6684,7 +6756,7 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
   // entry instead of holding all of them at the launcher, so the preview of a
   // character wearing one needs ITS skin fetched on demand (the mech lazy-load
   // pattern). Memoized and a no-op when resident or on eager platforms; a
@@ -10846,7 +10918,12 @@ function wireStartScreens(): void {
       const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
       if (container && canvas) {
         characterPreview = new CharacterPreview(container, canvas, {
-          constrainedMemory: NATIVE_APP,
+          // GFX.constrainedMemory covers every iOS WebKit host (Safari and other iOS
+          // browsers, not just the packaged app) plus the general touch/coarse-pointer
+          // detector, not just NATIVE_APP: the launcher's char-select preview sits in the
+          // same entry-allocation window the boot preload defers/streams for
+          // (assets/preload.ts: "a 12 GB iPhone 17 Pro was killed 1.6s into the LAUNCHER").
+          constrainedMemory: GFX.constrainedMemory,
         });
         // If a token auto-login already rendered the roster and selected a
         // character before assets finished, show its real appearance; otherwise
@@ -10932,6 +11009,11 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // here, boot straight into that offline world and skip the start screen. Any
 // malformed/absent request falls through to the normal home flow.
 const editorPlaytest = takeEditorPlaytestRequest();
+const startupParams = new URLSearchParams(location.search);
+const diagnosticsAutoOffline =
+  import.meta.env.DEV &&
+  startupParams.get('diagnostics') === '1' &&
+  startupParams.get('diagnosticsAuto') === '1';
 if (editorPlaytest) {
   startSitePresence('home');
   void startOffline(
@@ -10941,6 +11023,9 @@ if (editorPlaytest) {
     editorPlaytest.content,
     editorPlaytest.seed,
   );
+} else if (diagnosticsAutoOffline) {
+  startSitePresence('home');
+  void startOffline('warrior', 'Diagnostics', 0);
 } else {
   startSitePresence('home');
   wireStartScreens();

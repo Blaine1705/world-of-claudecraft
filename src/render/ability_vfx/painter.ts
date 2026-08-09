@@ -17,7 +17,7 @@ import {
   localCasterTier,
   planCast,
   planImpact,
-  wornStunIndex,
+  wornCcBand,
 } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
@@ -592,7 +592,10 @@ export class AbilityVfx {
             this.spawned++;
           }
         }
-        if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') {
+          this.mobThrowFallback(ev.sourceId);
+          this.playerGestureRelease(ev.sourceId, ev.ability);
+        }
         break;
       }
       case 'lightning':
@@ -604,7 +607,10 @@ export class AbilityVfx {
           if (full)
             fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
-        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl) {
+          this.mobThrowFallback(ev.sourceId);
+          this.playerGestureRelease(ev.sourceId, ev.ability);
+        }
         break;
       case 'beam':
         // Channel rays (drains, mind flay): the school beam recolored plus a
@@ -656,6 +662,7 @@ export class AbilityVfx {
           this.spawned++;
         }
         this.spawnRing(ev.targetId, plan, ev.school);
+        if (!plan.whirl) this.playerGestureRelease(ev.sourceId, ev.ability);
         break;
       }
       case 'tick':
@@ -939,8 +946,13 @@ export class AbilityVfx {
           tier,
           this.windupDelayFor(ev.ability, full, casterId),
         );
-        // ground slams from the local player still read on the rig
-        if (this.deps.localPlayerId?.() === casterId) {
+        // An authored ground-nova/AoE clip (Earthquake's Cast_Quake) reads on
+        // every client that sees the cue, same gate as selfCast's ceremony
+        // arm. Without one, a strike/dash-archetype slam still echoes on the
+        // local player only (the pre-existing minimal read).
+        if (this.deps.hasGestureClip?.(casterId, ev.ability)) {
+          this.playerGestureRelease(casterId, ev.ability);
+        } else if (this.deps.localPlayerId?.() === casterId) {
           const arch = full.archetype;
           if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(casterId, ev.ability);
         }
@@ -1329,22 +1341,24 @@ export class AbilityVfx {
       }
       bands++;
     }
-    // The stunned-star tell: ANY worn stun aura circles a star band over the
-    // victim's head for the aura's whole life. Matched by aura KIND, never
-    // the spec table, so every stun source reads (mob stomps and traps
+    // The hard-CC tell: a worn stun, fear, or root aura wears its band for the
+    // aura's whole life. Matched by what the SIM says the victim is suffering
+    // (aura kind, plus the sim's own fear rule for the fear family), never the
+    // spec table, so every source reads (mob stomps, ensnare affixes and traps
     // included) and it works online for any victim in interest range, exactly
     // like the bands above. Actionable information: it rides outside the cast
     // budget, every quality tier keeps it, and the fx engine sweeps it the
-    // frame the aura fades. A dead body sheds it (an unbreakable stun can
+    // frame the aura fades. One band per victim, the most severe the victim
+    // wears, which is also what keeps a stunned target (always isRooted() in
+    // the sim) from wearing two. A dead body sheds it (an unbreakable stun can
     // survive death by design, e.g. the Nythraxis transition ghosts; a corpse
     // must not wear a frozen band). Deadness is the renderer's own
     // isVisuallyDead rule, not a bare `dead` flag: a mob at 0 hp whose flag
-    // has not landed yet would otherwise keep the band for that window. One
-    // uniform yellow for every source, the classic dizzy-stars read
-    // (STUN_STAR_COLOR in the core owns the why).
+    // has not landed yet would otherwise keep the band for that window.
+    // CC_BAND_SPECS in the core owns each band's look and why.
     if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
-      const stunAt = wornStunIndex(e.auras);
-      if (stunAt >= 0) fx.holdStunStars(e.id, e.auras[stunAt].remaining ?? 1);
+      const band = wornCcBand(e.auras);
+      if (band) fx.holdCcBand(e.id, band.type, band.remaining);
     }
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
@@ -1447,6 +1461,19 @@ export class AbilityVfx {
     if (d.castingAbilityOf?.(sourceId)) return;
     if (d.isMidOneShot?.(sourceId)) return;
     d.triggerAttack(sourceId);
+  }
+
+  // Player projectile/lightning/nova release had no rig read at all: only
+  // mobs got mobThrowFallback's generic swing, and selfCast was the only cue
+  // that consulted hasGestureClip for its ceremony gesture (review #2961). A
+  // player caster whose ability authors a bespoke clip (Cast_Bolt, Cast_Shock,
+  // Cast_Quake, ...) now plays it here too, on every client that sees the
+  // cue, the same authored-clip gate selfCast already uses.
+  private playerGestureRelease(sourceId: number, abilityId: string): void {
+    const d = this.deps;
+    if (d.isMob?.(sourceId)) return;
+    if (!d.hasGestureClip?.(sourceId, abilityId)) return;
+    d.triggerAttack(sourceId, abilityId);
   }
 
   private spawnRing(entityId: number, plan: AbilityVfxPlan, school: string): void {

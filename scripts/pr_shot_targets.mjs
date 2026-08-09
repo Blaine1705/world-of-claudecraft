@@ -196,6 +196,10 @@ export const TARGETS = [
       { key: 'carry-scoreboard', scene: 'carry' },
       { key: 'scoreboard-mobile', scene: 'carry', mobile: true },
       { key: 'match-board', scene: 'board' },
+      // The kill feed carries PLAYER NAMES, which run to 24 characters, so the
+      // shot deliberately uses long ones: the shearing this scene exists to
+      // witness only shows up once a name is wider than the banner.
+      { key: 'kill-feed', scene: 'killfeed' },
       { key: 'field-map', scene: 'map' },
       // last on purpose: it kills the player, which would pollute later scenes
       { key: 'graveyard', scene: 'graveyard' },
@@ -220,7 +224,7 @@ export const TARGETS = [
       const staged = await page.evaluate(() => {
         const game = window.__game;
         const sim = game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         if (!sim.bgMatchFor(sim.player.id)) {
           const classes = [
             'warrior',
@@ -307,6 +311,34 @@ export const TARGETS = [
           window.__game.input.camPitch = 0.4;
         });
         await wait(800);
+      }
+      if (scene === 'killfeed') {
+        // Push straight at the feed rather than staging real deaths: the banner
+        // is the subject, and real kills give no control over the NAME LENGTHS
+        // that decide whether it shears.
+        await page.evaluate(() => {
+          const feed = window.__game.hud.bgKillFeed;
+          const now = performance.now() / 1000;
+          feed.push(
+            { killerName: 'MYTxMeykolZ', victimName: 'PEEKOMAXIMUS', killerTeam: 1, victimTeam: 0 },
+            now,
+          );
+          feed.push(
+            { killerName: 'Nine', victimName: 'NUNCHUCKS', killerTeam: 0, victimTeam: 1 },
+            now,
+          );
+          feed.push(
+            {
+              killerName: 'Bramblethornwick',
+              victimName: 'Stormhammerfel',
+              killerTeam: 1,
+              victimTeam: 0,
+            },
+            now,
+          );
+        });
+        await wait(400);
+        return { clip: '#bg-killfeed' };
       }
       if (scene === 'board') {
         // pin the hover-expanded match board open and shoot just the strip
@@ -424,9 +456,7 @@ export const TARGETS = [
           document.querySelector('.gpu-notice-dismiss')?.click();
           const el = document.querySelector('#banner');
           return (
-            el !== null &&
-            el.classList.contains('banner-skill') &&
-            Number(getComputedStyle(el).opacity) > 0.95
+            el?.classList.contains('banner-skill') && Number(getComputedStyle(el).opacity) > 0.95
           );
         });
         if (visible) break;
@@ -531,24 +561,93 @@ export const TARGETS = [
     },
   },
   {
-    key: 'stun-stars',
-    label: 'Persistent stunned-star band over a stunned mob, past the cast moment',
-    // One token, and it covers the whole shipping surface: the band lives in
+    key: 'cc-bands',
+    label: 'Held crowd-control bands (stun, root, fear) worn past the cast moment',
+    // How long to wait for the cast to land its aura. Generous on purpose:
+    // the offline sim advances on the client's own frame loop, which under
+    // headless SwiftShader runs in stalled bursts, so a 1.5s cast has taken
+    // anywhere from 3s to past 12s of wall clock on a loaded host. Expiring
+    // early reports "aura never applied", which reads as bad target data
+    // rather than a slow machine.
+    ccAuraPollBudgetMs: 25000,
+    // One token, and it covers the whole shipping surface: the bands live in
     // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
     // sequencer}.ts', all of which this prefix matches. (An earlier
     // 'stun_stars' token named no shipping module at all, so it only ever
     // matched the test file.)
     when: ['render/ability_vfx'],
     variants: [
-      // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
-      // capture pipeline spends ~0.7s between the aura poll and the shutter,
-      // and the star alpha fades over the stun's final second, so the longer
-      // stun is what keeps the shot inside the full-alpha read.
+      // One variant per band type, each staged on a class that actually owns
+      // the ability. `level` is the ability's own learn level (the rank the
+      // duration below refers to), `auraKind`/`auraId` are exactly what the
+      // band rule keys off, and `settleMs` is how long past the aura landing
+      // the shutter waits.
+      //
+      // settleMs is set per variant against ONE constraint: land inside the
+      // band's full-alpha read (the alpha fades over the aura's final second)
+      // while clearing the sequencer's cast-moment burst (~1.8s). The capture
+      // pipeline spends another ~0.7s between the aura poll and the shutter.
       {
+        // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
+        // longer stun is what keeps the shot inside the full-alpha read.
         key: 'sundering-gavel-desktop',
         charClass: 'paladin',
         charName: 'Aurelius',
         abilityId: 'hammer_of_justice',
+        level: 16,
+        auraKind: 'stun',
+        settleMs: 1900,
+      },
+      {
+        // Icebind (frost_nova): 8s, instant, and self-centred, so the nearby
+        // victim is rooted with no cast to stall on. Chosen over Gripping
+        // Roots deliberately. Every player root ability has an authored vfx
+        // spec, so all of them ALREADY wear a spec-coloured worn-debuff
+        // ground band, and shot against the nature-green Gripping Roots the
+        // new band is green on green and proves nothing. Icebind's spec is
+        // frost BLUE, so the green ankle shards this change adds are
+        // unmistakably the new read. (The genuinely uncovered root sources
+        // are the unspec'd ones, above all the mob ensnare affix, but those
+        // land on an rng chance during a mob swing and cannot be staged
+        // deterministically in a screenshot.)
+        // Staged wider off-axis and a yard further out than the head-space
+        // variants: a first capture put the victim's feet behind the
+        // player's own rig.
+        key: 'icebind-desktop',
+        charClass: 'mage',
+        charName: 'Frosthollow',
+        abilityId: 'frost_nova',
+        level: 5,
+        auraKind: 'root',
+        offsetAngle: 1,
+        distance: 5.5,
+        settleMs: 1900,
+      },
+      {
+        // Harrow: 8s. A feared mob RUNS, and that is the one framing problem
+        // in this family: a first capture at 1.1s found the victim already
+        // across the square and illegible. So this variant shoots as soon as
+        // the aura lands rather than settling past the cast-moment burst,
+        // which is safe precisely because of the handoff this change adds:
+        // the held band stands the cast stars down the frame it wins a slot,
+        // so what is on screen is already the violet band, not yellow stars.
+        // (On the BEFORE side of the pair that same moment shows the yellow
+        // stun stars this archetype flashed for every control ability alike,
+        // which is exactly the misread the band replaces.)
+        key: 'harrow-desktop',
+        charClass: 'warlock',
+        charName: 'Vexmoor',
+        abilityId: 'fear',
+        level: 14,
+        auraKind: 'incapacitate',
+        auraId: 'fear_incap',
+        // Left on the default off-axis placement. Swinging it to the player's
+        // other side to clear the town NPCs from the flee path stopped the
+        // cast landing at all (two runs, "aura never applied"), so the
+        // occasional frame where the victim ends up behind a guard is the
+        // better trade against a variant that does not capture.
+        pollMs: 150,
+        settleMs: 0,
       },
     ],
     async capture(page, variant) {
@@ -569,11 +668,11 @@ export const TARGETS = [
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      // Stage: level to the Gavel rank 2 learn level, stand a durable mob in
+      // Stage: level to the ability's learn level, stand a durable mob in
       // front of the player (pumped hp so stray aggro damage cannot kill it:
-      // the shot needs the mob ALIVE and stunned), and arm the ability on
-      // slot 1. The stun itself is applied by the real cast click below,
-      // never injected.
+      // the shot needs the mob ALIVE and controlled), and arm the ability on
+      // slot 1. The control aura itself is applied by the real cast click
+      // below, never injected.
       const staged = await page.evaluate((shot) => {
         // The entry overlays can race the shared dismissal on a cold profile;
         // clear them here too (the bags-target idiom) so they cannot sit over
@@ -584,7 +683,7 @@ export const TARGETS = [
         const sim = game?.sim;
         const player = sim?.player;
         if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
-        sim.setPlayerLevel?.(16, player.id);
+        sim.setPlayerLevel?.(shot.level, player.id);
         player.resource = player.maxResource;
         let mob = null;
         let best = Infinity;
@@ -623,9 +722,10 @@ export const TARGETS = [
       await wait(5200);
 
       // Exercise the same click a player uses; poll the MOB's auras for the
-      // worn stun (kind, not id: exactly what the star band keys off).
-      let stunApplied = false;
-      for (let attempt = 0; attempt < 2 && !stunApplied; attempt++) {
+      // worn control aura (the kind, plus the shared fear id where the kind
+      // alone does not say fear: exactly what the band rule keys off).
+      let ccApplied = false;
+      for (let attempt = 0; attempt < 2 && !ccApplied; attempt++) {
         const clicked = await page.evaluate(
           (shot) => {
             document.querySelector('.camera-prompt-confirm')?.click();
@@ -639,10 +739,16 @@ export const TARGETS = [
             // The banner wait gave the mob seconds to drift: re-place it just
             // before the click, at melee-cast range and nudged off the facing
             // axis so the player's own rig cannot occlude it, and pull the
-            // chase camera in so the star band reads at PR-screenshot size.
+            // chase camera in so the band reads at PR-screenshot size. Melee
+            // range suits the ranged casts here too (Gripping Roots is 30 yd,
+            // Harrow 20 yd). The ROOT variant swings further off-axis than the
+            // others because its band rides the ANKLES, the one screen region
+            // the player's own body reliably covers at this camera distance.
             game.input.camDist = 6;
-            mob.pos.x = player.pos.x + Math.sin(player.facing + 0.5) * 4.5;
-            mob.pos.z = player.pos.z + Math.cos(player.facing + 0.5) * 4.5;
+            const offAxis = shot.offsetAngle ?? 0.5;
+            const range = shot.distance ?? 4.5;
+            mob.pos.x = player.pos.x + Math.sin(player.facing + offAxis) * range;
+            mob.pos.z = player.pos.z + Math.cos(player.facing + offAxis) * range;
             mob.pos.y = player.pos.y;
             if (mob.prevPos) {
               mob.prevPos.x = mob.pos.x;
@@ -660,26 +766,203 @@ export const TARGETS = [
           { ...variant, mobId: staged.mobId },
         );
         if (!clicked) throw new Error('primary action slot 1 is unavailable');
-        for (let poll = 0; poll < 24 && !stunApplied; poll++) {
-          await wait(200);
-          stunApplied = await page.evaluate(
-            (mobId) =>
-              !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
-            staged.mobId,
+        // ~12s of polling, not the 4.8s an instant stun needed. Harrow has a
+        // 1.5s cast, and the offline sim advances on the client's own frame
+        // loop, which under headless SwiftShader runs in stalled bursts: a
+        // measured 1.5s cast took over 4s of wall clock to spend its first
+        // 1.1s of cast time. The old window expired mid-cast and reported
+        // "aura never applied", which reads as a target-data bug rather than
+        // a slow host.
+        //
+        // The poll INTERVAL is the shutter latency for a victim that moves,
+        // so the fear variant tightens it: a feared mob starts running the
+        // moment the aura lands, and at a 200ms interval how far it got by
+        // the shot was pure luck (one capture framed it, the next lost it
+        // across the square). Everything else holds still and keeps the
+        // cheaper interval.
+        const pollMs = variant.pollMs ?? 200;
+        const budgetMs = this.ccAuraPollBudgetMs;
+        for (let poll = 0; poll < Math.ceil(budgetMs / pollMs) && !ccApplied; poll++) {
+          await wait(pollMs);
+          ccApplied = await page.evaluate(
+            (shot) =>
+              !!window.__game?.sim?.entities
+                ?.get(shot.mobId)
+                ?.auras.some(
+                  (a) => a.kind === shot.auraKind && (!shot.auraId || a.id === shot.auraId),
+                ),
+            { ...variant, mobId: staged.mobId },
           );
         }
       }
-      if (!stunApplied) throw new Error('stun aura never applied to the mob');
+      if (!ccApplied) throw new Error(`${variant.auraKind} aura never applied to the mob`);
 
-      // Shoot PAST the sequencer's cast-moment stars (~1.8s): with the
-      // runner's own shot overhead (~0.7s) the shutter lands around 2.5s in,
-      // where what remains on screen is exactly the held, aura-driven band
-      // this change adds, and the before side of the pair shows nothing.
-      await wait(1900);
+      // Settle past the sequencer's cast-moment burst (see settleMs on each
+      // variant): what remains on screen is the held, aura-driven band this
+      // change adds.
+      await wait(variant.settleMs);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
       return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'weapon-vfx-shed',
+    label: 'Weapon-skin VFX fade with wearer distance (a legendary skin worn by another player)',
+    when: ['render/weapon_vfx', 'render/characters/visual.ts'],
+    variants: [
+      // Inside the full-strength band the pair must be IDENTICAL in rig
+      // strength: that is the fairness half of the shed's contract.
+      { key: 'near-12yd-desktop', charClass: 'warrior', charName: 'Thorgar', wearerDist: 12 },
+      // Past the ease-in knee and still well inside the articulated-rig band
+      // on every tier (58yd at this crowd size), so the fade is unmistakable
+      // while the rig on screen is the real one, not the baked far mesh.
+      { key: 'far-52yd-desktop', charClass: 'warrior', charName: 'Thorgar', wearerDist: 52 },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Stage: a second offline player wearing the legendary solheim_sword
+      // skin (the loudest shipped rig, so the fade is legible at range), stood
+      // a fixed distance along the entry camera's own facing (so no camera
+      // steering is needed), on open ground east of town where the sightline
+      // is clear. The skin id is written directly: it is the display-only
+      // cosmetic the render diff applies; ownership and loadout resolution
+      // are sim-side concerns a staged dummy has no business exercising.
+      const staged = await page.evaluate((shot) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        if (typeof sim.addPlayer !== 'function')
+          return { ok: false, reason: 'sim.addPlayer is unavailable offline' };
+        // Flattest dry stretch with a clear 55yd sightline along the entry
+        // facing (probed against the fixed-seed terrain: relief under a yard).
+        player.pos.x = 100;
+        player.pos.z = -80;
+        const wearerId = sim.addPlayer('warrior', 'Frostbearer', { autoEquip: true });
+        const w = sim.entities.get(wearerId);
+        if (!w) return { ok: false, reason: 'wearer entity missing after addPlayer' };
+        const ray = player.facing + 0.1; // nudged off-axis so the local rig cannot occlude
+        w.pos.x = player.pos.x + Math.sin(ray) * shot.wearerDist;
+        w.pos.z = player.pos.z + Math.cos(ray) * shot.wearerDist;
+        w.pos.y = player.pos.y;
+        if (w.prevPos) {
+          w.prevPos.x = w.pos.x;
+          w.prevPos.y = w.pos.y;
+          w.prevPos.z = w.pos.z;
+        }
+        // Face the wearer at the camera so the skinned blade reads, computed
+        // explicitly in the sim's forward = (sin f, cos f) convention.
+        w.facing = Math.atan2(player.pos.x - w.pos.x, player.pos.z - w.pos.z);
+        w.weaponSkinId = 'solheim_sword';
+        sim.rebucket?.(w);
+        // The stage sits in the open world, so wandering hostiles walk through
+        // the frame and aggro the pair mid-shot (a bandit occluding the wearer,
+        // FCT over the local player). Relocate every mob near the sightline;
+        // the re-home mirrors the stun-stars idiom, just pointed away.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.hp = player.maxHp;
+        game.input.camDist = shot.wearerDist > 25 ? 8 : 6.5;
+        return { ok: true, wearerId };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+      // The skin apply rides the deferred per-frame queue; hold until the
+      // wearer's view carries it, AND until the VFX rig itself exists: the
+      // skin model arrives over an async GLB load, so the blade can be on
+      // screen seconds before the rig (light, motes, aurora) is built, and a
+      // shutter in that gap captures a bare blade on both sides of a pair.
+      await page.waitForFunction(
+        (id) => window.__game?.renderer?.views?.get(id)?.weaponSkinId === 'solheim_sword',
+        { timeout: 30000, polling: 250 },
+        staged.wearerId,
+      );
+      await page.waitForFunction(
+        (id) => (window.__game?.renderer?.views?.get(id)?.visual?.weaponVfx?.length ?? 0) > 0,
+        { timeout: 45000, polling: 400 },
+        staged.wearerId,
+      );
+      await wait(1800);
+      // The frame-budget governor's vfx bucket also feeds the fade. A
+      // software-GL host can sit shedding after entry, which would taint the
+      // pair with dim that is NOT the distance arm; hold the shutter until
+      // the applied level reads 1 so distance is the only live input. On a
+      // host where the governor never settles (swiftshader at full size),
+      // run the capture with GAME_URL=...?governor=off, the sanctioned
+      // debug override (gfx.ts shouldUseAutoGovernor), which pins every
+      // bucket at 1 and leaves distance as the only input by construction.
+      let calm = false;
+      for (let poll = 0; poll < 40 && !calm; poll++) {
+        calm = await page.evaluate(
+          () => (window.__game?.renderer?.appliedBudgetLevels?.vfx ?? 1) >= 1,
+        );
+        if (!calm) await wait(500);
+      }
+      if (!calm)
+        throw new Error('frame-budget governor never settled; the pair would overstate the fade');
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Companion crop around the wearer: at range the full frame leaves the
+      // rig a few dozen pixels tall, and the pair is about the rig.
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 1.8) * 0.6;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, staged.wearerId);
+      if (spot) {
+        const box = variant.wearerDist > 25 ? { w: 320, h: 360 } : { w: 560, h: 560 };
+        const width = Math.min(box.w, spot.w);
+        const height = Math.min(box.h, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/weapon-vfx-shed-${variant.key}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
     },
   },
   {
@@ -1080,6 +1363,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'inventory-sort',
+    label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
+    when: ['sim/inventory_sort', 'ui/bags_window'],
+    // A deliberately messy bag (scattered partial stacks of the same material,
+    // fine grades split from their base, gear and trash interleaved), then the
+    // REAL Sort button press. On a base checkout the button does not exist and
+    // the click is skipped, so the same recipe shoots the honest BEFORE state.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.values?.().next?.()?.value;
+        const scramble = [
+          { itemId: 'copper_ore', count: 12 },
+          { itemId: 'baked_bread', count: 3 },
+          { itemId: 'copper_ore', count: 7 },
+          { itemId: 'fine_copper_ore', count: 4 },
+          { itemId: 'silverleaf_herb', count: 9 },
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'fine_silverleaf_herb', count: 2 },
+          { itemId: 'silverleaf_herb', count: 6 },
+        ];
+        if (meta) for (const s of scramble) meta.inventory.push({ ...s });
+        for (const id of ['eastbrook_arming_sword', 'cryptbone_helm', 'minor_healing_potion']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      await page.evaluate(() => {
+        document.querySelector('button.bag-sort-btn')?.click();
+      });
+      // Past the settle ripple (160ms + capped stagger) so the shot is stable.
+      await wait(900);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
@@ -1153,8 +1478,14 @@ export const TARGETS = [
   },
   {
     key: 'bank-instance-marks',
-    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
-    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
+    when: [
+      'ui/bank_window',
+      'ui/guild_bank_window',
+      'ui/item_instance_glyph_mark',
+      'ui/bag_fine_mark',
+      'ui/bag_corner_mark',
+    ],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
@@ -1163,7 +1494,9 @@ export const TARGETS = [
         // One copy per corner-mark kind plus a plain control stack, so the
         // vault shows the masterwork seal and the enchanted / signed / bound
         // glyphs beside an unmarked cell. The personal bank has no transfer
-        // lock, so every copy deposits.
+        // lock, so every copy deposits. A fine grade beside its base material
+        // shows the fine rim/wash/seal surviving deposit against the unmarked
+        // base stack (the bags `inventory` target's contrast idiom).
         try {
           sim?.addItemInstance?.('worn_sword', {
             signer: 'Thorgar',
@@ -1175,6 +1508,8 @@ export const TARGETS = [
           // so a quest-flagged fixture would silently drop the bound cell.
           sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
           sim?.addItem?.('baked_bread', 3);
+          sim?.addItem?.('copper_ore', 2);
+          sim?.addItem?.('fine_copper_ore', 2);
         } catch {}
         // Stand beside the banker so the proximity-gated bank snapshot is
         // live (bankInfo is null out of reach; the bank-chips recipe idiom).
@@ -1204,8 +1539,10 @@ export const TARGETS = [
           if (idx < 0) break;
           world.bankDeposit(idx);
         }
-        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
-        if (plain >= 0) world.bankDeposit(plain);
+        for (const id of ['baked_bread', 'copper_ore', 'fine_copper_ore']) {
+          const at = world.inventory.findIndex((s) => s?.itemId === id);
+          if (at >= 0) world.bankDeposit(at);
+        }
       });
       // Poll for the deposited cells, not the marks: the same recipe shoots
       // the BEFORE tree, where the bank paints no corner mark at all.
@@ -1252,8 +1589,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('tidewrought_fishing_rod')) ||
-            (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+            bg?.includes('tidewrought_fishing_rod') ||
+            img?.getAttribute('src')?.includes('tidewrought_fishing_rod')
           );
         });
         if (!el) return;
@@ -1310,8 +1647,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('silverleaf_healing_draught')) ||
-            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+            bg?.includes('silverleaf_healing_draught') ||
+            img?.getAttribute('src')?.includes('silverleaf_healing_draught')
           );
         });
         if (!el) return;
@@ -1387,10 +1724,7 @@ export const TARGETS = [
         const el = cells.find((c) => {
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
-          return (
-            (bg && bg.includes('rough_hide')) ||
-            (img && img.getAttribute('src')?.includes('rough_hide'))
-          );
+          return bg?.includes('rough_hide') || img?.getAttribute('src')?.includes('rough_hide');
         });
         if (!el) return;
         const r = el.getBoundingClientRect();
@@ -1450,8 +1784,8 @@ export const TARGETS = [
           const img = c.querySelector?.('img');
           const aria = c.getAttribute?.('aria-label') ?? '';
           return (
-            (bg && bg.includes('elixir_of_the_boar')) ||
-            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            bg?.includes('elixir_of_the_boar') ||
+            img?.getAttribute('src')?.includes('elixir_of_the_boar') ||
             aria.startsWith('Elixir of the Boar')
           );
         });
@@ -3376,11 +3710,17 @@ export const TARGETS = [
   },
   {
     key: 'hunter-quiver-paperdoll',
-    label: 'Hunter paperdoll with a quiver in the off-hand',
+    label: 'Hunter paperdoll: a two-hander and a quiver worn together',
     // Quivers are the first items that put anything in a hunter's off-hand, so
     // the paperdoll is the view that shows the change. Keyed on the quiver
     // records themselves rather than a ui/ path: the diff is content-only.
-    when: ['content/zone3', 'content/items'],
+    //
+    // The recipe equips a TWO-HANDER before the quiver on purpose. A quiver on
+    // its own paints the same paperdoll either way, so it cannot show the
+    // two-hand exclusion: on the base tree the quiver benches the greatblade and
+    // the main hand shoots up EMPTY, which is the reported bug. Both slots
+    // filled is the fix.
+    when: ['content/zone3', 'content/items', 'equipment_rules', 'item_budget'],
     variants: [
       { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
       { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
@@ -3399,11 +3739,18 @@ export const TARGETS = [
           'cragmaw_huntquiver',
           'gravewyrm_bone_quiver',
           'direfang_quiver',
+          'direfang_greatblade',
         ]) {
           try {
             sim?.addItem(id, 1);
           } catch {}
         }
+        // Two-hander FIRST, then the quiver: this is the exact order a player
+        // hits the bug in, and the order that leaves the main hand empty on the
+        // base tree.
+        try {
+          sim?.equipItem('direfang_greatblade');
+        } catch {}
         try {
           sim?.equipItem('direfang_quiver');
         } catch {}
@@ -7843,6 +8190,51 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
       return {};
+    },
+  },
+  {
+    key: 'wiki-launcher',
+    label: 'Wiki launcher: micro-bar button, Esc game-menu row, confirm dialog, mobile More tray',
+    when: ['ui/wiki_link'],
+    variants: [
+      { key: 'microbar' },
+      { key: 'game-menu' },
+      { key: 'confirm' },
+      { key: 'more-tray', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.key ?? 'microbar';
+      if (scene === 'microbar') {
+        const ready = await pollForSize(page, '#side-buttons');
+        if (!ready) return { skip: 'the micro-button bar never became visible' };
+        return { clip: '#side-buttons' };
+      }
+      if (scene === 'game-menu') {
+        await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+        const ready = await pollForSize(page, '#options-menu');
+        if (!ready) return { skip: 'the game menu never became visible' };
+        return { clip: '#options-menu' };
+      }
+      if (scene === 'confirm') {
+        // Guarded so a BEFORE capture on the base build (no hud.openWiki yet)
+        // skips cleanly instead of throwing.
+        const opened = await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          if (!hud?.openWiki) return { ok: false, reason: 'hud.openWiki is not present' };
+          hud.openWiki();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#confirm-dialog');
+        if (!ready) return { skip: 'the wiki confirm dialog never became visible' };
+        return { clip: '#confirm-dialog' };
+      }
+      // more-tray (mobile): open the tray through the real More button handler,
+      // the same path a player taps, so the shot proves the binding is live.
+      await page.evaluate(() => document.getElementById('mobile-more')?.click());
+      const ready = await pollForSize(page, '#mobile-extra-controls');
+      if (!ready) return { skip: 'the mobile More tray never opened' };
+      return { clip: '#mobile-extra-controls' };
     },
   },
 ];
