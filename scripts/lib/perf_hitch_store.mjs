@@ -308,6 +308,14 @@ export function deriveCalibration(records) {
     }
   }
   const soakSettledHeap = metricValues(records, 'soak', 'settledHeapDeltaMb');
+  // DELIBERATE (reviewed): unlike the removed compile requirement, this
+  // positive-delta check stays. No mission targets driving the soak's settled
+  // delta to zero (its gate bound is calibrated, not aspirational), and a
+  // non-positive delta across a ten-minute cosmetic churn is far more likely
+  // broken settle instrumentation than a healthy build, which is exactly what
+  // calibration exists to refuse. Revisit only if a retention fix ever
+  // legitimately flattens the soak, in which case this check, its tests, and
+  // this comment move together.
   if (soakSettledHeap.some((value) => value <= 0)) {
     throw new Error('soak: calibration did not reproduce a positive settled heap delta');
   }

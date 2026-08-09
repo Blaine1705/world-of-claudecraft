@@ -241,8 +241,13 @@ and its program-cache effect is applied in
 Lower-level graphics-driver caches remain outside Chrome’s control, so calibration also
 requires all three fresh same-build runs to link a substantial warmup-baseline program
 count (`MIN_BASELINE_PROGRAM_COUNT` in `scripts/lib/perf_hitch_store.mjs`) in both
-compile-heavy scenarios. The baseline count proves each scenario exercises first-draw
-program work even when the optimized live path links zero post-warmup programs;
-post-warmup program creation itself is the mission metric with a fixed zero target and
-is never a calibration requirement, so the referee can always recalibrate after the
+compile-heavy scenarios. The baseline count is a coarse guard: it covers boot plus
+warmup together, so on its own it only trips when the program instrumentation breaks
+or the scenario stops drawing entirely. The real scenario-potency guarantee lives in
+the scenario validations: the crowd influx fails closed below 80 percent of bots
+rendered or on incomplete cosmetic variety (skins, weapon skins, mounts each above
+their floors), and the cosmetic churn carries the same 80 percent floor, which checks
+strictly more than the old nonzero-compile requirement did. Post-warmup program
+creation itself is the mission metric with a fixed zero target and is never a
+calibration requirement, so the referee can always recalibrate after the
 compile-storm fixes land.
