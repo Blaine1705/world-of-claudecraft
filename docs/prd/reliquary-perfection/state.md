@@ -1,28 +1,30 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 19 QA COMPLETE, PASS-WITH-FOLLOWUPS (2026-08-09). The
-QA-start sync 4e6092128b brought release tip 5819c005a7 (the base moved a
-FOURTH time during Phase 19: 2a10e0f621 -> 5819c005a7, the gate-perf CI
-batch, warrior intervene + fear DR, cc-band family, bg queue confirm,
-three anim clips, admin/guild cache perf); the two conflicted parity
-goldens were reminted at 91c3c8e1bc and the four count pins hand-resolved
-(commands 194/207, hud drives 46/76/16 + module 24, IWorld 313/82/231,
-delta keys 85), all suite-verified. Release-merge-audit clean on
-mechanisms (13 agents, adversarially verified); only doc-staleness
-findings, all corrected here. Eight fresh reviewers/legs ran (authority,
-arch, xplat, front, perf, qa, parity, plus the release-merge audit): ZERO
-blocking. Fix round: grantDeed prototype-key hardening (the one latent
-code defect, renown += undefined = NaN feeding the SQL sort index) with a
-mutation-checked pin, the Sim.activeBorder getter-value pin, three CSS/TS
-fairness-decisiveness hardenings, the paintPortraitBorder borderless-
-contract fix, Object.freeze on the palette records, and permanent
-authority pins (redirect path, hostile shapes, guard drop-metric) + the
-col_reliquary_rank_5 earn-and-wear arm. Deferred should-fix: the
-character-sheet worn-badge staleness (a pre-existing title-line pattern
-extended to borders; live surfaces show truth; needs a signature-driven
-cold-window refresh = Phase 20). Full record in progress.md "Phase 19 QA".
-Next: Phase 20 (inspect + social surfaces; fresh session,
-phase-20-inspect-social.md; sync origin/release/v0.36.0 at Step 0).
+Current phase: 20 COMPLETE (implementation, 2026-08-09), LOCAL and
+unpushed, awaiting Phase 20 QA per the phase-file cadence (QA owns the
+push and the deeper gate). Step 0 found the tree clean at 0d9fa3ecd0 with
+origin/release/v0.36.0 (5819c005a7) already an ancestor through the Phase
+19 QA sync, so no sync merge was owed and the base did not move during
+the phase. Landed: curator standing on the identity wire (Entity
+curatorRank/relicsOwned/relicsTotal, sparse keys crk/cro/crt, server-
+computed only, no facet member so the parity pin is unchanged), the
+inspect card's Reliquary standing line + border accent + rank-5 Curator
+sigil (the fourth flair badge), a live self-inspect overlay through
+selfCuratorStanding that fixes offline self-inspect and the up-to-60s
+online staleness at once, and SHEET_RECENT_RELICS on the public sheet and
+/c/ derived from the persisted blob with NO new DB read. The Phase 19
+deferred should-fix is CLOSED: the char-sheet signature latch
+(src/ui/char_sheet_sig_core.ts + refreshCharSheetIfChanged on the slow
+band) self-corrects the worn title AND border rows plus the earned-badge
+row and the completion pair. The portrait-ring forced-colors follow-up
+landed with it. Six fresh reviewers ZERO blocking (the db reviewer
+re-confirmed the no-new-read criterion by measurement), then three fresh
+fix-round reviewers found two blocking items (a stale inspect_instances
+pin, the unpinned accent placement), both applied and mutation-verified;
+differential harnesses proved the catalog memo hoist and the restore
+extraction byte-identical. Full record in progress.md "Phase 20".
+Next: Phase 20 QA (fresh session, phase-20-qa.md; re-check
+origin/release/v0.36.0 at Step 0, it moves often).
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
@@ -95,7 +97,9 @@ Update this line as phases complete.
   core in all three lists), src/ui/reliquary_sheet_view.ts, hud wiring src/ui/hud.ts
   (handleReliquaryUnlocks, the progression block, the border badge row).
 - Server sheet: server/character_sheet.ts (SheetReliquary, CURATOR_RANK_ENGLISH),
-  server/profile_page.ts (:149-155, :214-215).
+  server/profile_page.ts (the reliquary list rows built from
+  sheetCuratorRankText and sheetRelicRecentText; the offsets recorded here
+  before Phase 20 rotted when the recent strip landed, so grep the symbols).
 - Deeds exemplars: src/ui/deeds_window.ts (openWithDeed), src/ui/hud/chat/
   deed_chat_line.ts (clickable chat), deed tracker painter + #deed-tracker, deed_i18n.ts
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
@@ -107,6 +111,26 @@ Update this line as phases complete.
   reliquaryObtainCounts state, 309/80/229 the Phase 16 QA state; run the suite
   for the truth, never reconcile these by arithmetic),
   tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
+- Inspect + social (Phase 20): src/ui/curator_sigil.ts (the rank-5 badge
+  art, curatorSigilDataUrl + curatorSigilBadgeClass on the holder_tier
+  inline-SVG recipe; it sits in the architecture gate's DEFAULT bucket
+  beside holder_tier and dev_tier, where an art palette IS the module and
+  baked colors are deliberate, not a token-discipline break) consumed by
+  src/ui/inspect_view.ts (the pure core in UI_PURE_CORES:
+  CURATOR_SIGIL_MIN_RANK, the standing line, the accent) and
+  src/ui/inspect_window.ts; selfCuratorStanding in
+  src/ui/reliquary_sheet_view.ts (the live self overlay Hud.openInspect
+  passes for the local pid only); src/ui/char_sheet_sig_core.ts
+  (charSheetRefreshSig, the cold-window staleness latch the hud drives
+  through refreshCharSheetIfChanged); SHEET_RECENT_RELICS +
+  sheetRecentRelicsFromRing + RELIQUARY_MARK_ENGLISH +
+  sheetRelicRecentText in server/character_sheet.ts; refreshCuratorStanding
+  in server/game.ts (the standing stamp, above the holderTierRefreshing
+  guard); restoreReliquaryMarks / restoreReliquaryRecent and the
+  reliquaryCatalogIndexProbe memo seam in src/sim/reliquary.ts. Authority
+  for the wire shape and the stamp cadence is tests/curator_broadcast.test.ts
+  alongside the reliquary wire suite; tests/curator_sigil.test.ts and
+  tests/char_sheet_sig_core.test.ts pin the two new cores.
 
 ## Surfaces added by this packet (append per phase as they land)
 - Phase 10: reliquaryUnlock gained retro?: boolean (emitted only when true; client-only
@@ -754,7 +778,78 @@ Update this line as phases complete.
   auto-attack state hashes, nothing else); release-merge audit clean.
   Screenshots: docs/screenshots/reliquary-phase19 (15, before/after,
   desktop + mobile, lowest preset).
-- Phase 20: (pending)
+- Phase 20 (2026-08-09): Inspect + social surfaces. Wire: Entity gained
+  curatorRank / relicsOwned / relicsTotal in the FLAIR cluster (the sim
+  never reads them), carried by the sparse identity keys crk / cro / crt
+  and decoded in src/net/online.ts with the ht/hb precedent defaults.
+  Server-computed ONLY: refreshCuratorStanding (server/game.ts) is pure
+  CPU off live meta (characterReliquaryOwnership +
+  catalogCharacterCompletion + curatorRankFromOwned), stamped at join and
+  on the existing 60s flair cycle, ABOVE the holderTierRefreshing RPC
+  guard so a degraded wallet/Discord cycle cannot freeze standing; owned 0
+  clears the keys back to absent. Online-only flair shape, so NO IWorld
+  facet member landed and the parity pin is unchanged at its
+  suite-verified counts. crt rides the wire deliberately (mixed-version
+  honesty: it is the one player-INDEPENDENT number of the three, and the
+  card must show the denominator the SERVER counted rather than a
+  locally-derived total that quietly differs on an older or newer client;
+  the comment at the emit says exactly that). Inspect card: a standing
+  line at rank >= 1 (curatorRankNameKey + the charCompletion pair keys),
+  the border accent on the name row (Phase 19's Entity.border, read-only
+  through deedBorderSlug / borderAccent, palette-gated so a drifted slug
+  paints nothing, zero hex in the painter), and the rank-5 Curator sigil
+  as the FOURTH flair badge: CURATOR_SIGIL_MIN_RANK is a literal 5
+  cross-pinned to the ladder top, the img carries alt="" and the visible
+  sub-line is labeled by the new hudChrome.reliquary.sigilCaption key
+  (renamed from the phase file's sigilAria when the a11y fix moved the
+  string into visible chrome; five non-Latin M16 fills in-change, Latin
+  pending).
+  Self-inspect: InspectInput.selfStanding wins over the entity fields and
+  is passed by Hud.openInspect for the local pid ONLY, sourced from
+  selfCuratorStanding over the same buildReliquarySheetModel the character
+  sheet reads, which fixes offline self-inspect (rendered nothing) and the
+  up-to-60s online staleness in one change. Public sheet: SheetReliquary
+  gained recent (SHEET_RECENT_RELICS = 5, ids + kinds, newest-first,
+  fail-closed through the ring-level core sheetRecentRelicsFromRing),
+  derived entirely from the persisted state blob so there is NO new DB
+  read (pinned by a pool.query-never-called arm plus per-read call-count
+  tests; the release's character_rank_cache and guild_roster_cache seams
+  are preserved by adding no read at all). /c/ resolves names in English
+  by design (ITEMS names + the module-private RELIQUARY_MARK_ENGLISH table
+  with forward and reverse growth pins), escaped, and a raw id never
+  reaches the HTML. Bank-privacy handling documented, not changed: the
+  note is in docs/design/reliquary.md and at the character_sheet.ts union
+  site (bags-only remains a recorded follow-up). restoreReliquaryMarks and
+  restoreReliquaryRecent were extracted move-not-rewrite in
+  src/sim/reliquary.ts (restoreReliquaryState delegates through in-place
+  merges), so the sheet path no longer pays a full restore. Staleness:
+  src/ui/char_sheet_sig_core.ts (charSheetRefreshSig, renamed from the
+  initial char_cosmetic name once the signature widened past cosmetics)
+  plus refreshCharSheetIfChanged on the 2 Hz slow band calling
+  charWindow.renderIfOpen; the signature covers activeTitle, activeBorder,
+  the deedsEarned size, and the itemsDiscovered / marks / mounts sizes, so
+  the worn title AND border rows plus the earned-badge row and the
+  completion pair self-correct, echo-driven online and synchronous
+  offline, with no optimistic write. Perf: the player-independent catalog
+  index is hoisted behind a WeakMap keyed on the page table (the
+  sanctioned memo shape; reliquaryCatalogIndexProbe is the test seam,
+  reuse-by-identity and interleave isolation are pinned, RELIQUARY_PAGES
+  is Object.frozen at the content site). The Phase 19 portrait-ring
+  forced-colors follow-up landed here too (src/styles/hud.css, matching
+  the nameplate cartouche mapping, with the same arm on the new inspect
+  accent and a test reading the canvas source so they cannot drift).
+  Deliberately NOT done: no nameplate sigil (badge-count pin untouched),
+  no shareable-card sigil (card_layout.ts untouched), ENTITY_EXCLUDE in
+  the parity trace left as it stands per the devTier precedent. Six domain
+  reviews (zero blocking; the db reviewer re-confirmed the no-new-read
+  criterion by measurement), one consolidated fix round, then three fresh
+  fix-round reviews that found two blocking items (a stale
+  inspect_instances pin left red by the pid-gate call-shape change, the
+  unpinned accent placement), both applied with mutation verification;
+  differential harnesses proved the catalog hoist and the restore
+  extraction byte-identical. gate_select and the screenshots follow with
+  the commit cadence; LOCAL and unpushed, so Phase 20 QA owns the push, the
+  deeper gate, and the perf:tour / browser-axe / mobile E2E VERIFY items.
 - Phase 21: (pending)
 - Phase 22: (pending)
 
@@ -883,8 +978,9 @@ Update this line as phases complete.
   guard closes stays open at the 30/s command lane through other
   identityFields commands (equip/unequip/change_skin/mount_toggle/guild
   ops); pre-existing, sibling of the switchLoadout note above.
-- DEFERRED should-fix (Phase 19 QA, cross-platform-sync, to Phase 20 which
-  owns the char/inspect surfaces): the character-sheet worn-badge row does
+- CLOSED by Phase 20 (was a DEFERRED should-fix from Phase 19 QA,
+  cross-platform-sync, routed to Phase 20 which owns the char/inspect
+  surfaces): the character-sheet worn-badge row does
   not repaint when a cosmetic is picked with both windows open, because the
   char window is a cold window absent from the slow-band refreshIfChanged
   cycle and the deeds picker fires no char-window refresh. It reads a
@@ -897,6 +993,15 @@ Update this line as phases complete.
   slow-band cycle with a cheap signature, or a HUD-level cosmetic-signature
   latch calling charWindow.renderIfOpen), which is char/inspect architecture
   Phase 20 owns. Fix BOTH the title and border row when addressed.
+  FIXED in Phase 20 by the second option: src/ui/char_sheet_sig_core.ts
+  (charSheetRefreshSig) plus refreshCharSheetIfChanged on the 2 Hz slow
+  band calling charWindow.renderIfOpen. BOTH the title and border rows are
+  covered as required, and the signature was widened past cosmetics to the
+  deedsEarned size and the itemsDiscovered / marks / mounts sizes, so the
+  earned-badge row and the completion pair self-correct too. Echo-driven
+  online, synchronous offline, no optimistic write. Total XP, Virtual
+  Level, Prestige, and the milestones stay unsigned; see the Phase 20
+  follow-ups below.
 - Follow-ups recorded, do NOT file as issues (Phase 19): the third
   near-identical per-session token bucket (list_read, guild_bank,
   cosmetic) has earned a shared helper by the rule of three; the picker's
@@ -927,7 +1032,26 @@ Update this line as phases complete.
   prototype key answers TRUE from that fail-closed predicate; both callers then
   need a real reward.kind so nothing leaks, and the only path to the deeds table
   is grantDeed which is now guarded. Add a hasOwn there if closing the family
-  uniformly; not a defect.
+  uniformly; not a defect. DONE in Phase 20 (one item off this list): the
+  portrait ring's forced-colors arm landed in src/styles/hud.css on the
+  nameplate cartouche mapping, the new inspect accent got the same arm in
+  the same change, and a test reads the canvas source so the two surfaces
+  cannot drift apart. Everything else above stands.
+- Follow-ups recorded, do NOT file as issues (Phase 20): the character
+  sheet's Total XP, Virtual Level, Prestige, and milestone rows are
+  deliberately left out of charSheetRefreshSig, so they keep the
+  pre-existing staleness they have always had while the cosmetic,
+  earned-badge, and completion rows now self-correct; profileTitle in
+  server/profile_page.ts carries a pre-existing em dash, outside this
+  phase's diff, recorded for a copy pass; and a THIRD consumer of the
+  ownership size reads on the slow band would earn a shared once-per-tick
+  computation by the rule of three, so nothing is owed until one appears.
+  Also still open from the phase file's locked handling: the public
+  sheet's mount ownership derives partly from BANK contents (bagOwnedMounts
+  over inventory plus bank). Phase 20 documented it in
+  docs/design/reliquary.md and at the character_sheet.ts union site and
+  changed NO behavior; a bags-only reading is a maintainer call, not a
+  defect.
 - RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
   the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
   release root-caused it and restored the strict contract (heal-through loop plus a
@@ -1166,6 +1290,9 @@ Update this line as phases complete.
   guide.deedsPage.rewardsBody DROPPED back to pending in its 13 Latin
   overlays (the border reword staled the shipped fills; the release fill
   re-authors them; fr_FR/tr_TR rewardsHeading fills verified intact).
+  Phase 20 adds one key: hudChrome.reliquary.sigilCaption (the Curator
+  sigil's visible sub-line) pending in the 15 Latin locales, with its five
+  non-Latin fills in-change per M16.
 - RESOLVED (Phase 11): the wiki shelf-name glossary conflict. One term per locale
   locked in scripts/i18n_glossary.json (reliquaryShelves row); see the Phase 11
   surfaces entry for the deviation rationale on Professions.

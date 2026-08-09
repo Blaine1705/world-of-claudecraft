@@ -2242,3 +2242,134 @@ owns the push.
   gate); i18n + wiki + SFX fresh; tsc + env/server/bot builds + client
   bundle green. Then pushed to origin/feature/reliquary (fast-forward from
   0a68865b73) and babysat CI on PR #2976.
+
+## Phase 20 (2026-08-09): Inspect + social surfaces
+
+- Step 0: pre-flight clean at 0d9fa3ecd0; origin/release/v0.36.0
+  (5819c005a7) was already an ancestor through the Phase 19 QA sync, so
+  no sync merge was owed, and the base did not move during this phase.
+- Step 1: Explore legs mapped the inspect data path (the entity identity
+  record on the wire; Hud.openInspect reads the entity mirror; NO inspect
+  facet exists and none was needed), the flair stamp pipeline
+  (refreshAllHolderTiers on its 60s cycle plus the join stamp), the
+  SHEET_RECENT_DEEDS pattern and its four privacy rules, the release
+  cache seams (server/character_rank_cache.ts and
+  server/guild_roster_cache.ts, both preserved by adding NO new read),
+  and the char-window staleness infrastructure (the
+  refreshOpenProfessionSurfacesIfChanged signature-latch template). One
+  naming trap resolved up front: the phase file's "armory inspect window"
+  means the player click-inspect card (src/ui/inspect_view.ts +
+  inspect_window.ts); src/ui/armory_inspect.ts is the Season 1 store skin
+  panel and was not touched.
+- Step 2, two implementation agents on a fixed cross-agent contract (both
+  were killed mid-run by a session usage limit and resumed from their
+  transcripts):
+  - Wire: Entity.curatorRank / relicsOwned / relicsTotal join the flair
+    cluster (the sim never reads them), sparse identity-wire keys
+    crk/cro/crt decoded in src/net/online.ts with the ht/hb precedent
+    defaults. Server-computed ONLY (refreshCuratorStanding in
+    server/game.ts: pure CPU off live meta via
+    characterReliquaryOwnership + catalogCharacterCompletion +
+    curatorRankFromOwned, at join and on the 60s cycle; owned 0 clears
+    the keys back to absent). Online-only flair shape, so no IWorld facet
+    member and the parity pin is unchanged at its current suite-verified
+    counts.
+  - Inspect card: a Reliquary standing line (rank >= 1, curatorRankNameKey
+    plus the charCompletion pair keys), the border accent on the name row
+    (Phase 19's Entity.border read-only through deedBorderSlug /
+    borderAccent, palette-gated, zero hex in the painter), and the rank-5
+    Curator sigil as the fourth flair badge (new src/ui/curator_sigil.ts
+    on the holder_tier inline-SVG recipe; CURATOR_SIGIL_MIN_RANK is a
+    literal 5 cross-pinned to the ladder top; the img carries alt="" and
+    the visible sub-line is labeled by the new
+    hudChrome.reliquary.sigilCaption key, renamed from the phase file's
+    sigilAria when the a11y fix moved the string to visible chrome, with
+    its five non-Latin M16 fills).
+  - Self-inspect: a live standing overlay. InspectInput.selfStanding is
+    preferred over the entity fields and is passed by Hud.openInspect only
+    for the local pid, sourced from selfCuratorStanding
+    (src/ui/reliquary_sheet_view.ts, the same buildReliquarySheetModel
+    source the character sheet reads). One change fixes both offline
+    self-inspect (showed nothing at all) and online staleness (up to 60s).
+  - Public sheet: SheetReliquary gains recent (SHEET_RECENT_RELICS = 5,
+    ids plus kinds, newest-first, fail-closed through the ring-level core
+    sheetRecentRelicsFromRing), derived entirely from the persisted state
+    blob: NO new DB read, pinned by a pool.query-never-called arm and
+    per-read call-count tests. /c/ renders the strip in English by design
+    (ITEMS names plus the module-private RELIQUARY_MARK_ENGLISH table,
+    with forward and reverse growth pins), escaped, and raw ids never
+    reach the HTML. The bank-privacy note landed in
+    docs/design/reliquary.md and at the character_sheet.ts union site;
+    behavior is unchanged and bags-only stays a recorded follow-up.
+  - Narrow restore helpers restoreReliquaryMarks and
+    restoreReliquaryRecent extracted move-not-rewrite in
+    src/sim/reliquary.ts; restoreReliquaryState delegates through in-place
+    merges, so the sheet path no longer pays the full restore.
+  - Staleness fix, the deferred Phase 19 should-fix, CLOSED this phase:
+    src/ui/char_sheet_sig_core.ts (renamed from the initial char_cosmetic
+    name once the signature widened past cosmetics) plus
+    refreshCharSheetIfChanged on the 2 Hz slow band calling
+    charWindow.renderIfOpen. The signature covers activeTitle,
+    activeBorder, the deedsEarned size, and the itemsDiscovered / marks /
+    mounts sizes, so the worn title AND border rows plus the earned-badge
+    row and the completion pair all self-correct, echo-driven online and
+    synchronous offline, with no optimistic write. Total XP, Virtual
+    Level, Prestige, and the milestones are deliberately unsigned
+    (recorded follow-up: the staleness there is pre-existing).
+  - The other recorded Phase 19 follow-up landed with it: the portrait
+    ring's forced-colors arm in src/styles/hud.css, matching the nameplate
+    cartouche mapping, plus the same arm on the new inspect accent, with a
+    test that reads the canvas source so the surfaces cannot drift apart.
+  - Performance: the player-independent catalog index is hoisted behind a
+    WeakMap keyed on the page table (the sanctioned memo shape, with the
+    reliquaryCatalogIndexProbe test seam; guard tests pin reuse-by-identity
+    and interleave isolation, and RELIQUARY_PAGES is now Object.frozen at
+    the content site). The curator sweep runs ABOVE the
+    holderTierRefreshing RPC guard, so a degraded wallet/Discord cycle
+    cannot freeze standing updates.
+- Step 3: six fresh reviewers in parallel (privacy-security primary,
+  cross-platform-sync, frontend-seam, database-performance, architecture,
+  qa-checklist): ZERO BLOCKING across all six. The db reviewer re-confirmed
+  the no-new-read acceptance criterion with measurements (the sheet read is
+  strictly cheaper than before; the corrupt-blob output bound holds). ALL
+  findings applied in one consolidated fix round, then THREE fresh
+  fix-round reviewers (test-coverage-auditor, architecture, frontend-seam)
+  found two blocking items: a stale inspect_instances pin left red by the
+  pid-gate call-shape change, and the border accent placement unpinned.
+  Round 2 applied both plus the should-fixes, each mutation-verified.
+  Differential harnesses proved the catalog hoist and the restore
+  extraction byte-identical (thousands of randomized comparisons, zero
+  mismatches).
+- Acceptance criteria: (1) a ranked player's inspect shows rank, pair,
+  border accent, and at rank 5 the sigil, while a fresh character shows
+  none of it, both pinned with the rank-4 boundary; (2) the /c/ page
+  renders the recent strip beside the deeds strip and the sheet JSON
+  carries ids plus kinds only, with names resolved through
+  sheetRelicRecentText (English by design like the rest of /c/, and a
+  drifted id drops out instead of printing raw); (3) the privacy note is
+  in docs/design/reliquary.md and at the code site, with no new
+  viewer-identical read (the db reviewer re-confirmed by measurement).
+- Validation at completion: npx tsc --noEmit clean; every matrix suite
+  green (wire/facet, UI, styles, server sheet, i18n, parity); npm run
+  ci:changed clean; the full suite green except the known
+  uncommitted-tree i18n_resolved_equivalence artifact that clears at
+  commit. gate_select and the screenshots follow with the commit cadence;
+  perf:tour, browser/axe, and the mobile E2E families stay Phase 20 QA
+  VERIFY items.
+- Decisions recorded, do NOT re-litigate: no nameplate sigil (the
+  badge-count pin stays untouched) and no shareable-card sigil
+  (card_layout.ts untouched), both deliberate scope; the tests/parity
+  trace ENTITY_EXCLUDE left as it stands, following the devTier
+  precedent; the sigil sub-line stays the caption (a fact-shaped sub would
+  duplicate the adjacent pair line); crt rides the wire for mixed-version
+  honesty (a comment states why); the sheet lagging live meta is inherent
+  (the persisted blob catches up at the next save, and the comments were
+  softened to the guarantee that is actually true, one shared formula).
+- Follow-ups recorded for later phases: the Total XP row staleness on the
+  character sheet (pre-existing, deliberately unsigned this phase); the
+  pre-existing em dash in profileTitle (server/profile_page.ts, outside
+  this diff); and a third consumer of the ownership size reads on the slow
+  band, which by the rule of three earns a shared once-per-tick
+  computation.
+- LOCAL ONLY per the runner prompt: the implementation is complete and
+  unpushed; Phase 20 QA owns the push and the deeper gate.

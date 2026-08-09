@@ -56,7 +56,8 @@ Agent A (inspect surface):
 - Curator sigil: a fourth flair badge on the click-inspect card for rank 5 players
   (locked: rank 5 only, keeps it exclusive), following the holder_tier inline-SVG
   data-URL pattern; server includes rank in the flair stamp; localized label
-  (hudChrome.reliquary.sigilAria). Fail-closed when absent.
+  (hudChrome.reliquary.sigilCaption, renamed from sigilAria at Phase 20 QA when
+  the string became the badge row's visible sub-line). Fail-closed when absent.
 - Tests: payload shape pin (wire test), inspect window render with and without rank,
   sigil only at rank 5 (boundary: rank 4 none), parity pin if a facet member landed.
 
