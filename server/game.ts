@@ -6472,8 +6472,13 @@ export class GameServer {
           // re-validates the slot against the item itself.
           const aimed =
             typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
-          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
-          else sim.equipItem(msg.item, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          // `bagSlot`, not `slot`: on this token `slot` is already the equip slot.
+          const bag = Number.isInteger(msg.bagSlot) ? Number(msg.bagSlot) : undefined;
+          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid, bag);
+          else sim.equipItem(msg.item, pid, undefined, bag);
         }
         break;
       case 'inv_move':
@@ -6495,13 +6500,26 @@ export class GameServer {
         break;
       case 'use':
         if (typeof msg.item === 'string') {
-          const result = sim.useItem(msg.item, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          const result = sim.useItem(msg.item, pid, slot);
           if (result?.type === 'mechChroma') this.noteAccountMechChroma(session, result.chromaId);
         }
         break;
       case 'discard':
         if (typeof msg.item === 'string') {
-          sim.discardItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.discardItem(
+            msg.item,
+            typeof msg.count === 'number' ? msg.count : undefined,
+            pid,
+            slot,
+          );
         }
         break;
       case 'buy':
@@ -6521,7 +6539,11 @@ export class GameServer {
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
-          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid, slot);
         }
         break;
       case 'buyback':
@@ -6599,7 +6621,13 @@ export class GameServer {
         }
         break;
       case 'salvage_item':
-        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          // Same bag-index parsing as disenchant_item: an unrecognized slot reads
+          // as undefined (the legacy id-only path), never as index 0, and the sim
+          // re-validates it against ITS inventory.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.salvageItem(msg.item, pid, slot);
+        }
         break;
       case 'unbind_item':
         // Maker's Bond unbind service (Professions 2.0): the sim
@@ -6641,16 +6669,29 @@ export class GameServer {
         if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
         break;
       case 'rift_upgrade_item':
-        if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.upgradeRiftItem(msg.item, pid, slot);
+        }
         break;
       case 'rift_enchant_item':
         if (typeof msg.item === 'string' && typeof msg.stat === 'string') {
-          sim.enchantRiftItem(msg.item, msg.stat, pid);
+          sim.enchantRiftItem(
+            msg.item,
+            msg.stat,
+            pid,
+            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+          );
         }
         break;
       case 'rift_socket_gem':
         if (typeof msg.item === 'string' && typeof msg.gem === 'string') {
-          sim.socketRiftGem(msg.item, msg.gem, pid);
+          sim.socketRiftGem(
+            msg.item,
+            msg.gem,
+            pid,
+            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+          );
         }
         break;
       case 'place_mobile_station':
@@ -6700,7 +6741,11 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           const socket =
             typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
-          sim.equipBag(msg.item, socket, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.equipBag(msg.item, socket, pid, slot);
         }
         break;
       case 'unequip_bag':
@@ -7035,7 +7080,10 @@ export class GameServer {
         if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
       case 'pet_feed':
-        if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.feedPet(msg.item, pid, slot);
+        }
         break;
       case 'pet_heal':
         sim.healPet(pid);
