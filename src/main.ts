@@ -5228,7 +5228,7 @@ function modularLookForClass(cls: PlayerClass): ModularLook | null {
 }
 
 /** The armour set an entity's composed body wears: the core's decision
- *  (armorSetSourceFor), fed the two sources only this file knows — the
+ *  (armorSetSourceFor), fed the two sources only this file knows: the
  *  localStorage dev override for the local player, the class kit for peers. */
 function armorSetForEntity(isSelf: boolean): (cls: PlayerClass) => ArmorSetId {
   return armorSetSourceFor(isSelf, readStoredArmorSet, classArmorSet);
