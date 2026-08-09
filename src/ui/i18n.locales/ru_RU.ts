@@ -2156,6 +2156,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': 'Вы погибли. Причина: {ability}.',
   'hud.system.deathRecapFalling': 'Вы погибли. Вы разбились насмерть.',
   'hud.system.deathRecapDrowned': 'Вы погибли. Вы утонули.',
+  'hud.system.deathRecapCauterized': 'Вы погибли. Ожог Прижигания одолел вас.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
@@ -7941,6 +7942,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyWeb':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
+  'gpuNotice.hybridBodyWindows':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, установите в браузере режим "Высокая производительность" в разделе Параметры > Система > Дисплей > Графика, а затем перезапустите браузер. Настольное приложение выбирает дискретную видеокарту автоматически.',
+  'gpuNotice.hybridBodyLinux':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, в вашем браузере или драйвере видеокарты может быть собственная настройка выбора видеокарты, либо ваш дистрибутив может предлагать инструмент переключения видеокарт (например, PRIME или optimus-manager). Настольное приложение выбирает дискретную видеокарту автоматически.',
+  'gpuNotice.hybridBodyOther':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, проверьте настройки графики браузера и операционной системы, чтобы включить ее. Настольное приложение выбирает дискретную видеокарту автоматически.',
   'gpuNotice.dismiss': 'Закрыть',
   'perfNudge.integratedGpu':
     'Игра работает на встроенном (энергосберегающем) графическом процессоре. Если в этом компьютере есть и игровая видеокарта, выберите для браузера режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика в Windows, затем перезапустите браузер. Настольная версия выбирает игровую видеокарту автоматически.',
@@ -9494,6 +9501,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': 'Группа найдена: {name}',
   'hudChrome.finder.proposalRole': 'Ваша роль: {role}',
   'hudChrome.finder.accepted': 'Подтвердили: {accepted} из {size}',
+  'hudChrome.bgOffer.title': 'Терновая Лощина готова',
+  'hudChrome.bgOffer.accepted': 'Готовы: {accepted} из {size}',
+  'hudChrome.bgOffer.remaining': 'На ответ: {seconds} с',
+  'hudChrome.bgOffer.accept': 'Принять',
+  'hudChrome.bgOffer.decline': 'Отклонить',
+  'hudChrome.bgOffer.acceptedWait': 'Ожидание остальных...',
   'hudChrome.finder.remaining': 'На ответ: {seconds} с',
   'hudChrome.finder.accept': 'Принять',
   'hudChrome.finder.decline': 'Отклонить',
@@ -10650,6 +10663,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': 'Эффект не установлен: {profession}.',
   'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
   'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
+  'hudChrome.professions.craftingProgress': 'Вы создаете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.disenchantingProgress': 'Вы распыляете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.enchantingProgress': 'Вы накладываете чары: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.salvagingProgress': 'Вы разбираете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    'Вы перезаряжаете эффект инструмента: осталось {remaining} с из {total} с.',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
   'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
   'hudChrome.professions.toolEffectRechargePrice': 'Подзарядка: {material} x{count}',

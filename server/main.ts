@@ -91,6 +91,7 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   buildCharacterList,
@@ -277,7 +278,9 @@ import {
   createSuspiciousRegistrationReport,
   prunePlayerReportsBatch,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from './moderation_db';
+import { bustModerationQueueCache } from './moderation_queue_cache';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
@@ -813,6 +816,12 @@ function bustBoardCaches(): void {
   bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board, but the same delisting-must-be-immediate reasoning: the
+  // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
+  // A ban/unban changes every OTHER eligible character's ahead/total counts
+  // too, so the whole cache is dropped rather than just the moderated
+  // account's own key.
+  bustAllLifetimeXpRankCache();
   // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
   // and IP-ban writes fire this same hook, and they feed the
   // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
@@ -827,6 +836,11 @@ function bustBoardCaches(): void {
   bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
+// The admin moderation queue's cached base read (server/moderation_queue_cache.ts):
+// busted the same immediate way as the boards above, so a ban/mute/ignored
+// report never lingers in the queue for up to a TTL cycle after the write that
+// resolved it.
+setOnModerationQueueChanged(bustModerationQueueCache);
 
 // Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
 // above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
