@@ -988,7 +988,7 @@ export function bgUnstuckDestination(ctx: SimContext, pid: number): Vec3 | null 
   for (const candidate of candidates) {
     const x = origin.x + candidate.x;
     const z = origin.z + candidate.z;
-    const resolved = resolvePosition(ctx.seed, x, z, PLAYER_BODY_RADIUS);
+    const resolved = resolvePosition(ctx.cfg.seed, x, z, PLAYER_BODY_RADIUS);
     if (
       Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6 &&
       Math.abs(resolved.x - (origin.x + plot.x)) <= plot.hw &&
