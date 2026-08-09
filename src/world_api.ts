@@ -153,6 +153,7 @@ export type {
   BgLadderEntry,
   BgMatchInfo,
   BgPlayerInfo,
+  BgProposalInfo,
 } from './world_api/battleground';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
@@ -540,6 +541,7 @@ export const COMMAND_NAMES = [
   // env-gated force-start (dispatch-only, below).
   'bg_queue',
   'bg_leave',
+  'bg_respond',
   'bg_flag',
   'dev_bg_start',
   // Profiler-only server authority: idempotently prevents incoming damage while
@@ -569,6 +571,10 @@ export const COMMAND_NAMES = [
   // Paperdoll eye toggle: helmet-visibility preference on the composed body.
   // Appended because wire tokens are never reordered.
   'set_helm',
+  // One-shot bag clean-up (IWorldInventory.sortInventory): no payload, the
+  // sim consolidates and restamps cell hints deterministically. Appended
+  // because wire tokens are never reordered.
+  'inv_sort',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -684,6 +690,9 @@ export const COMMAND_FACETS = {
   rift_upgrade_item: 'IWorldInventory',
   rift_enchant_item: 'IWorldInventory',
   rift_socket_gem: 'IWorldInventory',
+  // IWorldInventory: the one-shot bag clean-up; the sim re-derives the whole
+  // arrangement, so there is no payload to validate.
+  inv_sort: 'IWorldInventory',
   // IWorldTelemetry: fire-and-forget metrics sink.
   telemetry: 'IWorldTelemetry',
   // IWorldProgressionXp: opt-in cosmetic prestige (leaderboard is a REST GET, no
@@ -755,6 +764,7 @@ export const COMMAND_FACETS = {
   // IWorldBattleground: the Thornhollow Fields queue + the deliberate flag action.
   bg_queue: 'IWorldBattleground',
   bg_leave: 'IWorldBattleground',
+  bg_respond: 'IWorldBattleground',
   bg_flag: 'IWorldBattleground',
   // IWorldCardMinigame: the Card Duel minigame queue + in-match card plays.
   // cardMinigameInfo is a snapshot read (no send).

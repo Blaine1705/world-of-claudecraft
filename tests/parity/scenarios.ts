@@ -34,9 +34,11 @@ import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
+import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
 import {
   type Aura,
@@ -50,6 +52,7 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   type NythraxisEncounterState,
+  PLAYER_INTEREST_DROP_RADIUS,
   PRESTIGE_XP_PER_RANK,
   SISTER_NHALIA_BOSS_ID,
   type SimEvent,
@@ -875,6 +878,8 @@ function arena1v1(): Scenario {
       const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
       const playerA = sim.entities.get(a);
       const playerB = sim.entities.get(b);
       if (!playerA || !playerB) throw new Error('arena_1v1 setup failed to spawn players');
@@ -1101,6 +1106,7 @@ function arena2v2Wipe(): Scenario {
       const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
       const pids = classes.map((c, i) => sim.addPlayer(c, names[i]));
       pids.forEach((pid, i) => {
+        sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
         teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 3, -40);
       });
       rec.track(...pids);
@@ -2363,7 +2369,7 @@ function warriorRowCapstones(): Scenario {
   return {
     name: 'warrior_row_capstones',
     coverage: [
-      'double charge: two spends while one recharge runs',
+      'intervene: friendly-target charge, ally absorb, no rage and no combat entry',
       'aoeFear headings + Lingering Dread breakThreshold',
       'victory rush on-kill window + selfHealPctMax',
       'bladestorm self-centered channel ticks',
@@ -2373,6 +2379,7 @@ function warriorRowCapstones(): Scenario {
     drive(rec: Recorder) {
       const sim = rec.sim;
       sim.setPlayerLevel(MAX_LEVEL);
+      // Frozen option id; the level-5 row now grants Intervene, not Double Charge.
       sim.selectTalentRow(5, 'war_row_double_charge');
       sim.selectTalentRow(8, 'war_row_victory_rush');
       sim.selectTalentRow(11, 'war_row_lingering_dread');
@@ -2393,24 +2400,51 @@ function warriorRowCapstones(): Scenario {
       beef(mobB, 8000);
       rec.track(mobA.id);
       rec.track(mobB.id);
-      // Double Charge: two back-to-back charges while the first recharge runs.
+      // Onrush: the hostile charge, unchanged by the level-5 row swap. Recorded here
+      // so the trace still pins the rage grant and the combat entry the friendly
+      // branch below must NOT take.
       teleport(sim, p, ax - 12, az);
       sim.targetEntity(mobA.id);
       face(p, mobA);
+      p.resource = 0;
       sim.castAbility('charge');
       rec.tick(8);
-      teleport(sim, p, mobB.pos.x - 12, mobB.pos.z);
-      sim.targetEntity(mobB.id);
-      face(p, mobB);
-      sim.castAbility('charge');
-      // Coverage anchor: both stored uses spent while one recharge timer runs
-      // (the classic single-cooldown gate would have blocked cast #2).
-      const chargeState = p.abilityCharges?.charge;
-      rec.notes.chargeSpent = chargeState
-        ? chargeState.maxCharges - chargeState.charges
-        : undefined;
-      rec.notes.chargeRecharging = (chargeState?.recharge ?? 0) > 0;
-      rec.snapshot('double-charge-spent');
+      rec.notes.onrushRage = p.resource > 0;
+      rec.notes.onrushInCombat = p.inCombat === true;
+      rec.snapshot('onrush-landed');
+      // Intervene: the same charge effect against a FRIENDLY player. It repositions
+      // the warrior and shields the ally, but mints no rage and never flags combat.
+      const allyPid = sim.addPlayer('priest', 'Warden');
+      const ally = sim.entities.get(allyPid) as AnyEntity;
+      teleport(sim, p, ax - 12, az);
+      teleport(sim, ally, ax - 12, az + 15);
+      p.resource = 0;
+      p.inCombat = false;
+      p.combatTimer = 999;
+      p.autoAttack = false;
+      p.gcdRemaining = 0;
+      sim.targetEntity(ally.id);
+      face(p, ally);
+      const gapBefore = Math.hypot(p.pos.x - ally.pos.x, p.pos.z - ally.pos.z);
+      sim.castAbility('intervene');
+      // CAST-TIME anchors. A friendly cast resolves its effects inline, so the absorb,
+      // the (absent) rage grant, and the (absent) combat entry all land on this line.
+      // They must be read BEFORE ticking: the wolves engaged by the Onrush above are
+      // still live, so within a tick or two they will soak the ally's shield and drag
+      // the warrior back into combat for reasons that have nothing to do with Intervene.
+      // Fresh lookups because assigning the flags above narrows their literal types.
+      const atCast = sim.entities.get(p.id) as AnyEntity;
+      rec.notes.interveneShield = ally.auras.find((a) => a.kind === 'absorb')?.value;
+      rec.notes.interveneRage = atCast.resource;
+      rec.notes.interveneInCombat = atCast.inCombat;
+      rec.tick(16);
+      // ARRIVAL anchors: the rush is forced movement over several ticks, and the
+      // auto-attack engage (suppressed for a friendly target) fires when it lands.
+      const onArrival = sim.entities.get(p.id) as AnyEntity;
+      rec.notes.interveneClosed =
+        Math.hypot(onArrival.pos.x - ally.pos.x, onArrival.pos.z - ally.pos.z) < gapBefore;
+      rec.notes.interveneAutoAttack = onArrival.autoAttack;
+      rec.snapshot('intervene-landed');
       rec.tick(8);
       // Intimidating Shout with the Lingering Dread threshold armed: both wolves
       // are inside the 8yd shout (two flee-heading rng draws).
@@ -2418,6 +2452,20 @@ function warriorRowCapstones(): Scenario {
       p.resource = 50;
       p.gcdRemaining = 0;
       sim.castAbility('intimidating_shout');
+      // Record the fear AT APPLY. Reading it from end-of-run state only worked
+      // while the fear was 8 sec: the Victory Rush and Bladestorm legs below run
+      // over five seconds, so a 4 sec fear is long expired by then and the
+      // coverage anchor silently found nothing to assert on.
+      {
+        const feared = [...sim.entities.values()].find((e) =>
+          (e as AnyEntity).auras.some((a) => a.id === 'fear_incap'),
+        ) as AnyEntity | undefined;
+        const fear = feared?.auras.find((a) => a.id === 'fear_incap');
+        rec.notes.fearApplied = fear !== undefined;
+        rec.notes.fearDuration = fear?.duration;
+        rec.notes.fearBreaksOnDamage = fear?.breaksOnDamage === true;
+        rec.notes.fearBreakThreshold = fear?.breakThreshold;
+      }
       rec.snapshot('feared');
       rec.tick(8);
       // Victory Rush: a lethal blow opens the window; the strike on a fresh
@@ -2892,8 +2940,12 @@ function delveProgression(): Scenario {
       meta.copper = 100000;
       sim.delveBuyShopItem('collapsed_reliquary', 'reliquary_legs');
       sim.companionUpgrade('companion_tessa');
-      // Daily rollover: a fresh UTC day resets firstClearXp/markClears.
+      // Daily rollover: a fresh reset window resets firstClearXp/markClears.
+      // `resetDay` is the realm's own daily boundary, which is what every daily
+      // window now reads; `utcDay` stays the calendar stamp beside it, moved in
+      // step so the scenario keeps describing one instant rather than two.
       meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['seed']), markClears: 2 };
+      sim.resetDay = '2099-06-25';
       sim.utcDay = '2099-06-25';
       sim.delveDailyWire(sim.playerId);
       rec.snapshot('shop-daily');
@@ -5097,6 +5149,167 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// Rift boss floor: a real S-rank rift instance with a hand-placed, stamped
+// death-zone boss and a control-proc dais guard (the enterRiftWithBoss fixture
+// from tests/rift_boss_reactable_mechanics.test.ts). Before this scenario the
+// gate had NO rift coverage at all: the death-zone driver's rng anchor draw,
+// the S tempo, the impairment-stretched fuse, the escape window, and the
+// instance-wide proc suppression were all invisible to a green parity run
+// (the v0.36.0 retune shipped against that blindness). Pins: the anchor draw
+// + spacing lock at cast start, the stretched fuse (S tempo x the hand-applied
+// 50% slow, riftDeathZoneSpawn durationSecs), the fuse tick to detonation, the
+// guard's suppressed-but-drawn control rolls inside the window, and the
+// boss-death zone clear (riftDeathZoneClear) plus the floor claim it triggers.
+function riftBossFloor(): Scenario {
+  return {
+    name: 'rift_boss_floor',
+    coverage: [
+      'runDeathZoneDriver: anchor draw, S tempo, impairment-stretched fuse (~locomotion 1044/1062)',
+      'tickRiftBossDeathZones: fuse tick to detonation',
+      'riftControlSuppressed: guard rolls drawn, effects skipped inside the window',
+      'clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1021, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(20);
+      const p = sim.player as AnyEntity;
+      beef(p);
+      p.gm = true; // survive swings + the lethal detonation; auras still apply
+      sim.enterRift(3, 28, sim.playerId); // baseLevel 28 = S rank (zone tempo live)
+      const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+      if (!inst) {
+        rec.tick(2);
+        return;
+      }
+      // Clear the generated floor so only the hand-placed pair drives combat.
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+        }
+      }
+      const boss = spawnMob(sim, 'rift_boss_venom', 22, p.pos.x, p.pos.y, p.pos.z);
+      boss.spawnPos = { ...p.pos };
+      boss.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
+      aggroOnto(boss, p);
+      boss.inCombat = true;
+      addThreat(boss, sim.playerId, 1000);
+      // Park every governed sibling so the death zone under test owns the lock.
+      boss.pulseTimer = 999;
+      boss.bigCastTimer = 999;
+      boss.stompTimer = 999;
+      boss.terrifyTimer = 999;
+      boss.aoeSlowTimer = 999; // the slow under test is hand-applied below
+      boss.deathZoneStrikeTimer = 999;
+      boss.deathZoneCastTimer = 1;
+      inst.mobIds.push(boss.id);
+      inst.bossId = boss.id; // the boss-death sweep + zone clear key on this
+      const guard = spawnMob(sim, 'rift_venom_weaver', 22, p.pos.x, p.pos.y, p.pos.z);
+      guard.spawnPos = { ...p.pos };
+      aggroOnto(guard, p);
+      guard.inCombat = true;
+      addThreat(guard, sim.playerId, 1000);
+      inst.mobIds.push(guard.id);
+      rec.track(boss.id, guard.id);
+      // A 50% slow on the anchor BEFORE the cast: the per-anchor fuse stretch
+      // arm (impairedZoneFuseMult, capped) must run on top of the S tempo.
+      p.auras.push({
+        id: 'test_slow',
+        name: 'Test Slow',
+        kind: 'slow',
+        remaining: 30,
+        duration: 30,
+        value: 0.5,
+        sourceId: boss.id,
+        school: 'nature',
+      } as Aura);
+      rec.tick(25); // engage warm-up; the cast starts (anchor draw + spacing lock)
+      rec.snapshot('cast-armed');
+      // Probe mid-fuse: the window is open over the whole instance and the
+      // guard's web rolls are drawn but never land (riftControlSuppressed).
+      rec.tick(40);
+      rec.notes.windowOpenDuringGuardFight = (boss.escapeWindowUntil ?? 0) > (sim as AnySim).time;
+      rec.notes.playerRootedInWindow = p.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+      rec.tick(85); // fuse (4.5 * 0.7 tempo * 2 stretch = 6.3s) runs out: detonation
+      rec.snapshot('detonated');
+      // A second zone goes up, then the boss dies mid-fuse: the sweep clears
+      // the pending zone and tells online mirrors (riftDeathZoneClear), and
+      // the floor claim + reward flow runs. The first cast's spacing lock
+      // (RIFT_MECHANIC_SPACING_SEC + the 6.3s fuse) would otherwise hold the
+      // due zone past the probe, so clear it the way a real fight's clock
+      // would have.
+      boss.mechanicLockTimer = 0;
+      boss.deathZoneCastTimer = 0.05;
+      rec.tick(8);
+      boss.hp = 0;
+      boss.dead = true;
+      rec.tick(8);
+      rec.snapshot('boss-dead-clear');
+    },
+  };
+}
+
+// Production distance-culling contract: the 100-yard host throttle changes
+// passive idle rolls from the historical shared stream to deterministic per-mob
+// lanes. Track one mob on each side of the boundary so the golden records both
+// the intended state divergence and the resulting shared RNG digest.
+function idleMobDistanceCulling(): Scenario {
+  const seed = 20061;
+  return {
+    name: 'idle_mob_distance_culling',
+    coverage: [
+      'idleMobTickRadius equals the production PLAYER_INTEREST_DROP_RADIUS',
+      'near idle ownerless mob advances inside the 100-yard boundary',
+      'far idle ownerless mob remains frozen outside the 100-yard boundary',
+      'culling-enabled passive idle rolls use deterministic per-mob RNG lanes',
+    ],
+    sampleEvery: 20,
+    build: () =>
+      new Sim({
+        seed,
+        playerClass: 'warrior',
+        idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const player = sim.player as AnyEntity;
+      teleport(sim, player, 0, -40);
+
+      // Silence the authored world mobs so this scenario instruments only the
+      // two explicit boundary probes. Their long dead timers are deterministic
+      // and cannot re-enter the idle arm during the drive.
+      for (const entity of sim.entities.values()) {
+        if (entity.kind !== 'mob') continue;
+        entity.dead = true;
+        entity.hp = 0;
+        entity.aiState = 'dead';
+        entity.inCombat = false;
+        entity.respawnTimer = 9999;
+        entity.corpseTimer = 9999;
+      }
+
+      const near = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 10, seed), 10);
+      const far = spawnMob(sim, 'forest_wolf', 5, 0, terrainHeight(0, 110, seed), 110);
+      for (const mob of [near, far]) {
+        mob.aiState = 'idle';
+        mob.inCombat = false;
+        mob.aggroTargetId = null;
+        mob.wanderTarget = null;
+        mob.wanderTimer = 0;
+      }
+      rec.notes.nearMobId = near.id;
+      rec.notes.farMobId = far.id;
+      rec.track(near.id, far.id);
+      rec.snapshot('boundary-probes-ready');
+      rec.tick(80);
+      rec.snapshot('near-advanced-far-frozen');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5158,4 +5371,6 @@ export const SCENARIOS: Scenario[] = [
   professionsGatherFine(),
   professionsFishingSession(),
   professionsToolEffectSlot(),
+  idleMobDistanceCulling(),
+  riftBossFloor(),
 ];

@@ -38,6 +38,16 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
+  // button label reuses nav.wiki; these are the confirm dialog's strings
+  // (confirm-first so a mid-fight tap never opens the browser by accident).
+  wiki: {
+    confirmTitle: 'Open the Wiki?',
+    confirmBody:
+      'This opens the World of ClaudeCraft wiki in your browser. The game keeps running.',
+    confirmOpen: 'Open Wiki',
+    confirmCancel: 'Cancel',
+  },
   // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
   // authoritative sim; new semantics use new keys so stale safe-spot translations
   // cannot be shown while locale fills catch up.
@@ -85,7 +95,7 @@ export const hudChromeStrings = {
   },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
-    absorbed: 'Absorbed {amount}',
+    absorbed: 'Absorbed ({amount})',
     cheap: 'Cheap!',
   },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
@@ -899,7 +909,7 @@ export const hudChromeStrings = {
       'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
-    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses / {draws} draws',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
     enterQueueParty: 'Enter the Queue (party of {count})',
@@ -1262,6 +1272,9 @@ export const hudChromeStrings = {
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
+    // Interface panel twin of the character sheet's privacy eye: the same
+    // per-device settings.showPlaytime preference, discoverable from Options.
+    showPlaytime: 'Show Time Played on Character Screen',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
@@ -1402,7 +1415,8 @@ export const hudChromeStrings = {
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
   // the overlay run through formatNumber and these unit strings. Distinct from
-  // the dev `?perf` diagnostic, which stays English like console.*.
+  // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
+  // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
     title: 'Performance Overlay',
     enable: 'Show Performance Overlay',
@@ -1479,6 +1493,193 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+    diagnostics: {
+      panelAria: 'World of ClaudeCraft performance diagnostics',
+      title: 'ClaudeCraft Performance Doctor',
+      subtitle: 'A game-specific scan with evidence and code-level fixes.',
+      aria: {
+        liveMeasurements: 'Live performance measurements',
+        scanProgress: 'Diagnostic scan progress',
+        findings: 'Ranked diagnostic findings',
+      },
+      controls: {
+        minimize: 'Minimize',
+        expand: 'Expand',
+        start: 'Start 15-second scan',
+        refreshCensus: 'Refresh scene census',
+        copyReport: 'Copy clear report',
+        downloadReport: 'Download report',
+        scanning: 'Scanning...',
+        scanAnother: 'Scan another area',
+        reportLogged: 'Report logged to console',
+        copied: 'Copied',
+        copyBlocked: 'Copy blocked: report logged',
+        retestLowGraphics: 'Retest on Low graphics',
+      },
+      instruction:
+        'For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.',
+      status: {
+        pausedHiddenRestart:
+          'Scan paused while this tab is hidden. It will restart when you return.',
+        restoredRestart: 'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+        worldLoaded: 'World loaded. Waiting for the first playable frame.',
+        pausedHiddenContinue:
+          'Scan paused while this tab is hidden. Return to the game to continue.',
+        collectingRemaining: {
+          one: 'Collecting active gameplay: {seconds} second remaining',
+          other: 'Collecting active gameplay: {seconds} seconds remaining',
+        },
+        waitingFrames: 'Waiting for representative gameplay frames: {current}/{minimum}',
+        collectingNow: 'Collecting active gameplay: move through the problem area now.',
+        ready: 'Ready to scan. Press Start and reproduce the slowdown.',
+        waitingWorld:
+          'Waiting for the game world. Choose Play Offline or enter an online character.',
+      },
+      metrics: {
+        waitingRenderer: 'renderer: waiting',
+        waitingCensus: 'scene census: waiting',
+        waitingHitch: 'hitch attribution: armed on world entry',
+        recent: 'recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}',
+        render: 'render  submit {submit} ms | world {world} ms | entities {entities} ms',
+        scene: 'scene   {calls} calls | {triangles} tris | {views} views',
+        hitches: 'hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}',
+        gpu: 'GPU     {renderer}',
+        waitingValue: 'waiting',
+      },
+      scoreHeadline: '{score}/100: {headline}',
+      healthyNoFindings:
+        'No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.',
+      findingMeta: '{severity} | {confidence} confidence',
+      sections: {
+        evidence: 'Evidence',
+        tryNow: 'Try now',
+        codeFix: 'Code fix',
+        source: 'Relevant source',
+      },
+      severity: {
+        critical: 'CRITICAL',
+        warning: 'WARNING',
+        info: 'INFO',
+      },
+      confidence: {
+        high: 'high',
+        medium: 'medium',
+        low: 'low',
+      },
+      diagnosis: {
+        noProblemTitle: 'No material performance problem detected',
+        summary: {
+          findings: {
+            one: '{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+            other:
+              '{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+          },
+          healthy:
+            'The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired.',
+        },
+        titles: {
+          hardwareAcceleration: 'Software rendering is active',
+          integratedGpu: 'The game is using the integrated GPU',
+          highDpi: 'High resolution rendering is expensive here',
+          forcedHighGraphics: 'Forced high graphics is reducing performance',
+          lowMemory: 'Available device memory is low',
+          browserStalls: 'Browser or extension stalls were detected',
+          heapPressure: 'Browser memory pressure was detected',
+          contextLoss: 'The graphics context was reset',
+          gpuSubmit: 'GPU submission is the main frame bottleneck',
+          sceneDraw: 'Scene draw cost exceeds the active graphics budget',
+          shadowPass: 'The shadow pass uses a large share of draw calls',
+          rendererWorld: 'World renderer updates are CPU-bound',
+          rendererEntities: 'Entity view updates are CPU-bound',
+          rendererNameplates: 'Nameplate painting is expensive',
+          simCpu: 'Simulation work is consuming the frame',
+          hudCpu: 'HUD updates are consuming the frame',
+          eventCpu: 'Event processing is consuming the frame',
+          shaderCompile: 'Shaders are compiling during gameplay',
+          textureUpload: 'Texture uploads are causing gameplay hitches',
+          viewCreate: 'Entity view creation is causing hitches',
+          otherHitch: 'Unattributed long frames remain',
+          assetStartup: 'Game startup is delayed by asset work',
+          longTasks: 'Long browser tasks are blocking frames',
+          networkLatency: 'Network delivery is delaying visible response',
+          snapshotApply: 'Snapshot processing is blocking the client',
+          generic: 'Performance rule {rule} needs attention',
+        },
+        causes: {
+          environment:
+            'A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.',
+          graphics:
+            'Measured graphics work is above the active frame or scene budget for this capture.',
+          cpu: 'A measured CPU phase is taking enough main-thread time to miss the frame budget.',
+          loading:
+            'Resource preparation or first-use work happened on a visible gameplay or startup path.',
+          network:
+            'Network delivery or client snapshot processing is delaying the latest playable state.',
+        },
+        evidence: {
+          environment: 'The environment rule {rule} matched this device and browser.',
+          gpuSubmit: 'WebGL submission p95 is {submit}, or {share} of renderer p95.',
+          frame: 'The recent window measured {fps} FPS with a {p95} frame p95.',
+          sceneCalls: 'The scene uses {calls} draw calls against a target of {target}.',
+          sceneTriangles: 'The scene submits {triangles} triangles against a target of {target}.',
+          sceneCategory:
+            'Scene category {category} contributes {calls} calls and {triangles} measured triangles.',
+          censusNeeded: 'Refresh the scene census to identify the leading render category.',
+          shadow:
+            'The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.',
+          cpuPhase: 'Measured phase {phase} has a p95 of {p95}.',
+          hitch: '{count} of {total} recorded hitches matched cause {cause}.',
+          assets: 'The preload gate waited {wait} for {tasks} registered tasks.',
+          failedAssets: 'Failed asset groups: {groups}.',
+          longTasks: '{count} long tasks were measured, with p95 {p95} and maximum {max}.',
+          network:
+            'Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.',
+          snapshot: 'Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.',
+          generic: 'Diagnostic rule {rule} matched this capture.',
+        },
+        tryNow: {
+          environment:
+            'Correct the detected environment setting, restart, and repeat the same scan.',
+          graphics: 'Retest the same camera path on Low graphics to confirm graphics pressure.',
+          cpu: 'Repeat the scan while idle and while moving to isolate the CPU phase.',
+          loading: 'Repeat the same route or first-use action to confirm when the hitch occurs.',
+          network: 'Compare Play Offline with the same movement and camera path.',
+        },
+        codeFix: {
+          environment:
+            'Keep the detected fallback path within the shared graphics and memory budgets.',
+          graphics:
+            'Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.',
+          cpu: 'Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.',
+          loading:
+            'Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.',
+          network:
+            'Reduce delivery or snapshot processing cost without weakening the authoritative server model.',
+        },
+      },
+      report: {
+        title: 'World of ClaudeCraft performance diagnosis',
+        statusLine: 'Status: {status} ({score}/100)',
+        capturedLine: 'Captured: {captured}',
+        topFindingLine: 'Top finding: {finding}',
+        summaryLine: 'Summary: {summary}',
+        gpuLine: 'GPU: {gpu}',
+        graphicsLine: 'Graphics: {tier}, render scale {scale}',
+        recentLine:
+          'Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames',
+        resultHeading: 'Result',
+        noThreshold: 'No actionable threshold fired in this capture.',
+        findingHeading: '{index}. {title}',
+        findingMeta: 'Severity: {severity}. Confidence: {confidence}.',
+        rawSnapshotHeading: 'Raw snapshot',
+        notAvailable: 'not available',
+        status: {
+          critical: 'critical',
+          needsAttention: 'needs attention',
+          healthy: 'healthy',
+        },
+      },
     },
   },
   auraOverlay: {
@@ -1608,6 +1809,19 @@ export const hudChromeStrings = {
   charSheet: {
     offense: 'Offense',
     defense: 'Defense',
+    // The lifetime "Time Played" line at the foot of the sheet (the same
+    // running total the /playtime chat command reports). The value composes
+    // the two coarsest units from the plurals.playtime* fragments through
+    // playtimeParts ({major}/{minor} arrive pre-localized), so a locale can
+    // reorder or drop the separator.
+    playtimeLabel: 'Time Played',
+    playtimeParts: '{major}, {minor}',
+    playtimeUnderMinute: 'Less than a minute',
+    // Shown in place of the value while the eye toggle conceals it
+    // (screenshot/stream privacy; the total keeps accruing).
+    playtimeHidden: 'Hidden',
+    showPlaytimeAria: 'Show time played',
+    hidePlaytimeAria: 'Hide time played',
   },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
@@ -1693,6 +1907,14 @@ export const hudChromeStrings = {
   // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The gear-capturing save entry, beside the plain one in the loadout menu.
+    newBuildWithGear: 'New Build (save gear too)',
+    // Applying a loadout that captured gear. Counts come from the text-free
+    // loadoutGearResult event, so the sim carries none of this copy.
+    gearRestored: 'Restored {n} gear pieces from this build.',
+    gearNotHeld: "You no longer have {n} of this build's saved pieces.",
+    gearCopyGone: '{n} saved pieces were not the copy this build pinned.',
+    gearTakenByOtherSlot: '{n} saved pieces need another copy you do not have.',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.
@@ -1777,6 +1999,26 @@ export const hudChromeStrings = {
       few: '{count} seconds remaining',
       many: '{count} seconds remaining',
       other: '{count} seconds remaining',
+    },
+    // Unit fragments for the character sheet's Time Played line ({count} is
+    // pre-formatted through formatNumber at the call site).
+    playtimeDays: {
+      one: '{count} day',
+      few: '{count} days',
+      many: '{count} days',
+      other: '{count} days',
+    },
+    playtimeHours: {
+      one: '{count} hour',
+      few: '{count} hours',
+      many: '{count} hours',
+      other: '{count} hours',
+    },
+    playtimeMinutes: {
+      one: '{count} minute',
+      few: '{count} minutes',
+      many: '{count} minutes',
+      other: '{count} minutes',
     },
     playersOnline: {
       one: 'Who: {count} player online on {realm}.',
@@ -2163,6 +2405,12 @@ export const hudChromeStrings = {
     sortRecent: 'Recent',
     sortQuality: 'Quality',
     sortName: 'Name',
+    // The one-shot clean-up button beside the view controls: combines partial
+    // stacks and rearranges the real cells server-side (IWorldInventory
+    // sortInventory), unlike the view-only dropdown above it.
+    sortButton: 'Sort',
+    sortButtonAria: 'Sort your bags',
+    sortButtonHint: 'Combine stacks and group items by type',
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',
@@ -3456,6 +3704,15 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // In-progress readouts for the four crafting/gathering-service actions plus
+    // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
+    // countdown chat lines shown while the action channels.
+    craftingProgress: 'You are crafting: {remaining}s of {total}s remaining.',
+    disenchantingProgress: 'You are disenchanting: {remaining}s of {total}s remaining.',
+    enchantingProgress: 'You are enchanting: {remaining}s of {total}s remaining.',
+    salvagingProgress: 'You are salvaging: {remaining}s of {total}s remaining.',
+    rechargingToolEffectProgress:
+      'You are recharging a tool effect: {remaining}s of {total}s remaining.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -3987,6 +4244,20 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    backfillTitle: 'Thornhollow Fields needs a fighter',
+    backfillBody:
+      'This battle is already under way. You will join the side that is short, and this match will not change your rating.',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',
@@ -4200,5 +4471,11 @@ export const hudChromeStrings = {
     toggleAria: 'Switch between the world map and the zone map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
+  },
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
+  // when the local character is below the floor.
+  arenaGate: {
+    minLevelNote: 'Requires level {level}',
   },
 };

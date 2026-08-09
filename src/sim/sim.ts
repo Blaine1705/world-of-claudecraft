@@ -321,6 +321,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -329,6 +330,7 @@ import {
   stepPlayerMotion,
   swimSurfaceY,
 } from './player_motion';
+import { livePlaytimeSeconds } from './playtime';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -582,6 +584,7 @@ import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
 import * as bgMod from './social/battleground';
 import * as bgOutcomesMod from './social/battleground_outcomes';
+import * as bgProposalMod from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
@@ -796,8 +799,18 @@ const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune sch
 const PVP_POLYMORPH_DR_RESET = 60;
 const PVP_FEAR_DR_RESET = 60;
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
+// Polymorph keeps an ABSOLUTE ladder on purpose: exactly one ability rides it
+// (mage polymorph, authored 15s), so the 10s first rung reads as a deliberate PvP
+// cap on a longer PvE value rather than an accident.
 const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
-const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
+// Fear is a MULTIPLIER ladder, and must stay one. It was absolute seconds
+// ([8, 4, 2, 1]) returned without reading the ability's authored duration, so in
+// PvP every fear lasted 8s on first application no matter what its tooltip said:
+// Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
+// doubled or better. Five abilities across three classes share this ladder, so an
+// absolute table can only ever be right for one of them. These factors reproduce
+// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
+const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 // Exported for social/chat.ts (broadcastEmote) + the /roll say/yell ranges; the in-sim
 // say/yell distance checks read it too. /say carries a short distance; /yell across a camp.
 export const SAY_RANGE = 25;
@@ -919,6 +932,23 @@ export interface DuelState {
   // resolving later in the SAME tick still finds it and gets clamped too:
   // duels never produce a real death, even on a simultaneous double-kill.
   endedTick?: number;
+  /**
+   * Entity ids each duelist CONTROLLED at some point during the bout, keyed by
+   * the controlling pid: their pets, essentially.
+   *
+   * Recorded as the duel ticks because an `Aura` carries only `sourceId`, so a
+   * pet that despawns before the end can no longer be resolved back to its
+   * owner by any reader. The lethal clamp treats a pet's damage as the
+   * opponent's for the whole bout (it resolves through `pvpController`), so
+   * without this the end could not clear what the clamp had been protecting
+   * against, and the dot killed the loser at 1 hp seconds later.
+   *
+   * Session-only and tiny (one id per duelist), never serialized.
+   * OPTIONAL so a hand-built duel (tests, and any future direct construction)
+   * needs no knowledge of it: absent simply means nothing was recorded, which
+   * degrades to clearing by live controller alone.
+   */
+  controlled?: Map<number, Set<number>>;
 }
 
 // GroundAoE type moved to entity_roster.ts (the ground-AoE drain's home); imported above.
@@ -1340,15 +1370,18 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  arenaDraws: number;
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  arena2v2Draws: number;
   // Thornhollow Fields 5v5 battleground standing (rated, not matched); bgCaptures is
   // the career flag-capture count feeding the Book of Deeds meters. All
   // persisted in CharacterState, absent until the first result.
   bgRating: number;
   bgWins: number;
   bgLosses: number;
+  bgDraws: number;
   bgCaptures: number;
   // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
   // role while seated in a Sowfield match: SESSION-ONLY, never serialized
@@ -1618,15 +1651,18 @@ export interface CharacterState {
   arena1v1Rating?: number;
   arena1v1Wins?: number;
   arena1v1Losses?: number;
+  arena1v1Draws?: number;
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  arena2v2Draws?: number;
   // Thornhollow Fields battleground standing (JSONB; optional and written only once a
   // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
   // unchanged saves stay byte-equal).
   bgRating?: number;
   bgWins?: number;
   bgLosses?: number;
+  bgDraws?: number;
   bgCaptures?: number;
   // The Vale Cup standing (JSONB; optional and written only once a result
   // exists, so pre-cup saves load cleanly and unchanged saves stay byte-equal).
@@ -1955,6 +1991,12 @@ export class Sim {
   // (server/game.ts) and by nobody else; the log caps itself, so the offline
   // and headless hosts that never drain hold a fixed, trivial tail.
   readonly bgOutcomes: bgOutcomesMod.BgOutcomeRecord[] = bgOutcomesMod.createBgOutcomeLog();
+  // Live queue-pop offers plus the requeue lockouts a failed one books. Both
+  // are session state: an offer cannot outlive the tick loop that expires it,
+  // and a 30 second lockout is not worth persisting across a relog.
+  readonly bgProposals: bgProposalMod.BgProposal[] = [];
+  readonly bgProposalLockouts = new Map<number, number>();
+  nextBgProposalId = 1;
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
@@ -1993,6 +2035,13 @@ export class Sim {
   // "no calendar known" (headless/replay), the daily window then never rolls over,
   // keeping same-seed runs reproducible. Tests may set it to pin a date.
   utcDay = '';
+  // The daily-reset WINDOW key ('YYYY-MM-DD' of the reset that opened it), set by
+  // the host each tick alongside utcDay. Every daily rollover reads THIS, not the
+  // calendar date: the server derives it from the realm's own 3 AM reset boundary
+  // (server/raid_reset.ts `resetDayKey`), the offline client from the player's
+  // local one, so a daily never rolls over mid-evening the way midnight UTC did.
+  // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
+  resetDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -2017,6 +2066,16 @@ export class Sim {
   // In-memory only, like trades/duels, swept by updateCommissionOrders in
   // the end-of-tick block.
   commissionOrderBoard: CommissionOrder[] = [];
+  // Change signal for the server's corder snapshot gate (the market
+  // browseRevFor pattern). The counter lives here (state stays on Sim) but
+  // every WRITER lives in professions/commission_order.ts, reaching it
+  // through the ctx.bumpCommissionOrderBoardRev callback at each board
+  // mutation site (open/accept/cancel/deliver on success, the retention
+  // sweep per settled or dropped row); a future mutation site must bump the
+  // same way or the server gate serves a stale projection until its
+  // staleness backstop. Never persisted; the board is in-memory only, so
+  // both reset together on boot.
+  commissionOrderBoardRev = 0;
   private nextCommissionOrderId = 1;
   // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
   // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
@@ -2713,11 +2772,15 @@ export class Sim {
       rating: savedState?.arena1v1Rating ?? savedState?.arenaRating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena1v1Wins ?? savedState?.arenaWins ?? 0,
       losses: savedState?.arena1v1Losses ?? savedState?.arenaLosses ?? 0,
+      // No legacy alias: draws were never counted before this field existed,
+      // so an old save has nothing to fall back to and correctly reads 0.
+      draws: savedState?.arena1v1Draws ?? 0,
     };
     const savedArena2v2: ArenaStanding = {
       rating: savedState?.arena2v2Rating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena2v2Wins ?? 0,
       losses: savedState?.arena2v2Losses ?? 0,
+      draws: savedState?.arena2v2Draws ?? 0,
     };
     const player = createPlayer(this.nextId++, cls, startPos, name);
     this.addEntity(player);
@@ -2769,15 +2832,22 @@ export class Sim {
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
-      totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
+      // Finite-clamped like the bg standings below: Math.max passes NaN
+      // through, and a corrupt non-finite save would otherwise poison every
+      // future fold and ship null on the ptime wire.
+      totalPlayedSeconds: Number.isFinite(savedState?.totalPlayedSeconds)
+        ? Math.max(0, savedState?.totalPlayedSeconds as number)
+        : 0,
       lastActiveTick: this.tickCount,
       pendingUnstuck: null,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
+      arenaDraws: savedArena1v1.draws,
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      arena2v2Draws: savedArena2v2.draws,
       // Finite-clamped like the arena standings above: bgRating feeds Elo
       // math, so a corrupt row must never flow NaN through a match result.
       bgRating: Number.isFinite(savedState?.bgRating)
@@ -2786,6 +2856,9 @@ export class Sim {
       bgWins: Number.isFinite(savedState?.bgWins) ? Math.max(0, savedState?.bgWins as number) : 0,
       bgLosses: Number.isFinite(savedState?.bgLosses)
         ? Math.max(0, savedState?.bgLosses as number)
+        : 0,
+      bgDraws: Number.isFinite(savedState?.bgDraws)
+        ? Math.max(0, savedState?.bgDraws as number)
         : 0,
       bgCaptures: Number.isFinite(savedState?.bgCaptures)
         ? Math.max(0, savedState?.bgCaptures as number)
@@ -3654,6 +3727,10 @@ export class Sim {
     // battleground: drop out of the queue; leaving a live match drops any
     // carried flag and the team fights on a player down (a fully vacated
     // side forfeits). social/battleground.ts owns the rule.
+    // A live queue-pop offer fails with the departing player as the offender:
+    // the nine who are still here must not hold a reserved field open for a
+    // client that is gone, and they keep their place in line.
+    bgProposalMod.bgProposalDisconnect(this.ctx, pid);
     bgMod.bgDequeue(this.ctx, pid);
     bgMod.bgResolveDesertion(this.ctx, pid);
     // Card Duel: leaving the queue is free; a live match is forfeited to the
@@ -3829,9 +3906,9 @@ export class Sim {
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
       // Fold this session's elapsed time into the persisted baseline (see
-      // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
-      // same way without waiting for a save.
-      totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
+      // PlayerMeta.totalPlayedSeconds); /playtime and the playtimeSeconds
+      // facade read the running total the same way without waiting for a save.
+      totalPlayedSeconds: livePlaytimeSeconds(meta, this.time),
       // Legacy dual-write plus the current key, both off the one fold above
       // (separate objects on purpose, so no caller can alias one through the
       // other).
@@ -3903,14 +3980,24 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      // Absent until a draw actually happens, so saves for every character
+      // who has never drawn stay byte-equal (the parity-stable rule the
+      // battleground and Vale Cup blocks below already follow).
+      ...(meta.arenaDraws ? { arena1v1Draws: meta.arenaDraws } : {}),
+      ...(meta.arena2v2Draws ? { arena2v2Draws: meta.arena2v2Draws } : {}),
       // Absent until the first Thornhollow Fields result or capture moves something
       // (back-compat + parity-stable saves).
-      ...(meta.bgWins || meta.bgLosses || meta.bgCaptures || meta.bgRating !== bgMod.BG_BASE_RATING
+      ...(meta.bgWins ||
+      meta.bgLosses ||
+      meta.bgDraws ||
+      meta.bgCaptures ||
+      meta.bgRating !== bgMod.BG_BASE_RATING
         ? {
             bgRating: meta.bgRating,
             bgWins: meta.bgWins,
             bgLosses: meta.bgLosses,
             bgCaptures: meta.bgCaptures,
+            ...(meta.bgDraws ? { bgDraws: meta.bgDraws } : {}),
           }
         : {}),
       // Absent until sheathed (back-compat + parity-stable saves).
@@ -4455,6 +4542,14 @@ export class Sim {
   get restedXp(): number {
     return this.primary.restedXp;
   }
+  // IWorldProgressionXp.playtimeSeconds: the running lifetime played total
+  // (persisted baseline + this session's elapsed sim time), the same figure
+  // /playtime reports and serializeCharacter folds at save. Sim-clock derived,
+  // so it stays deterministic in every host; offline (no save loads a
+  // baseline) it equals this session's time in world.
+  get playtimeSeconds(): number {
+    return livePlaytimeSeconds(this.primary, this.time);
+  }
   get prestigeRank(): number {
     return this.primary.prestigeRank;
   }
@@ -4929,6 +5024,18 @@ export class Sim {
       get bgBusySlots() {
         return sim.bgBusySlots;
       },
+      get bgProposals() {
+        return sim.bgProposals;
+      },
+      get bgProposalLockouts() {
+        return sim.bgProposalLockouts;
+      },
+      get nextBgProposalId() {
+        return sim.nextBgProposalId;
+      },
+      set nextBgProposalId(v) {
+        sim.nextBgProposalId = v;
+      },
       get bgOutcomes() {
         return sim.bgOutcomes;
       },
@@ -4943,6 +5050,9 @@ export class Sim {
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      get resetDay() {
+        return sim.resetDay;
       },
       get utcDay() {
         return sim.utcDay;
@@ -5414,6 +5524,11 @@ export class Sim {
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       mailboxHoldsItem: (meta, itemId) => sim.postOffice.mailboxHoldsItem(meta, itemId),
+      // Commission order board change signal: the module's mutation sites
+      // advance the counter the server's corder gate polls.
+      bumpCommissionOrderBoardRev: () => {
+        sim.commissionOrderBoardRev++;
+      },
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -5581,9 +5696,22 @@ export class Sim {
     name: string,
     bar: (string | null)[],
     pidOrAlloc?: number | TalentAllocation,
-    allocMaybe?: TalentAllocation,
+    allocOrCapture?: TalentAllocation | boolean,
+    captureMaybe = false,
   ): number {
-    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, allocMaybe);
+    // BOTH overloaded positions, because the two caller families disagree on every
+    // slot after `bar`. An IWorld caller passes (alloc?, captureGear?); a
+    // sim/server/RL caller passes (pid, alloc?, captureGear?). So position 3 is
+    // pid-or-alloc and position 4 is alloc-or-captureGear, and all four live call
+    // shapes resolve unambiguously because the types are disjoint.
+    const alloc =
+      typeof pidOrAlloc === 'object'
+        ? pidOrAlloc
+        : typeof allocOrCapture === 'object'
+          ? allocOrCapture
+          : undefined;
+    const captureGear = typeof allocOrCapture === 'boolean' ? allocOrCapture : captureMaybe;
+    const idx = saveTalentLoadout(this.ctx, name, bar, pidOrAlloc, alloc, captureGear);
     // A successful save applies the staged allocation (the UI's Save flow always
     // passes it), so mark the talent deeds like the sibling wrappers; -1 is a
     // rejected save. saveTalentLoadout derives its pid the same way.
@@ -5836,7 +5964,9 @@ export class Sim {
     resurrectionOfferMod.updateResurrectionOffers(this.ctx);
     // Commission order board retention sweep (issue #1298): draws no rng, so
     // appending here is safe (the Vale Cup zero-rng-phase precedent); expires
-    // stale open orders and prunes terminal ones past their retain window.
+    // stale open orders and prunes terminal ones past their retain window
+    // (each mutation advances the board revision through the module's own
+    // bump sites).
     updateCommissionOrders(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
@@ -5918,19 +6048,18 @@ export class Sim {
   }
 
   private shouldSkipIdleMobTick(mob: Entity): boolean {
-    const radius = this.cfg.idleMobTickRadius;
+    const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (mob.dead || mob.ownerId !== null || mob.aiState !== 'idle' || mob.auras.length > 0)
+    if (
+      mob.dead ||
+      mob.ownerId !== null ||
+      mob.aiState !== 'idle' ||
+      mob.inCombat ||
+      mob.auras.length > 0
+    )
       return false;
-    const radiusSq = radius * radius;
-    for (const meta of this.players.values()) {
-      const p = this.entities.get(meta.entityId);
-      if (!p) continue;
-      const dx = p.pos.x - mob.pos.x;
-      const dz = p.pos.z - mob.pos.z;
-      if (dx * dx + dz * dz <= radiusSq) return false;
-    }
-    return true;
+    if (this.players.size === 0) return true;
+    return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
 
   private updateLootRolls(): void {
@@ -6165,7 +6294,9 @@ export class Sim {
       p.chargeTargetId = null;
       p.chargePath = [];
       if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
-      if (arrived) this.startAutoAttack(p.id);
+      // Landing on a FRIENDLY target (Intervene) must not engage auto-attack:
+      // startAutoAttack would refuse an ally and toast "Invalid attack target."
+      if (arrived && target && this.isHostileTo(p, target)) this.startAutoAttack(p.id);
       return true;
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
@@ -6920,7 +7051,12 @@ export class Sim {
     }
     if (category === 'fear') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      return PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)];
+      // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
+      // polymorph and unlike root/stun, fear never reaches full immunity: the
+      // factor clamps at the last rung rather than returning null.
+      return (
+        duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)]
+      );
     }
     if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
     target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
@@ -7074,8 +7210,10 @@ export class Sim {
     petCommands.petWaterJet(this.ctx, pid);
   }
 
-  feedPet(itemId: string, pid?: number): void {
-    petCommands.feedPet(this.ctx, itemId, pid);
+  feedPet(itemId: string, pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    petCommands.feedPet(this.ctx, itemId, pid, named);
   }
 
   healPet(pid?: number): void {
@@ -7725,7 +7863,22 @@ export class Sim {
     }
     e.pos.x = bestX;
     e.pos.z = bestZ;
-    const g = groundHeight(bestX, bestZ, this.cfg.seed);
+    // The floor a body rests on, which for a PLAYER includes the standable prop
+    // top underfoot, not just the terrain. Feared players are moved through here
+    // and return early from the player step, so `stepPlayerMotion` and its whole
+    // vertical pass never run for the duration: snapping to raw terrain dropped
+    // anyone feared off a rampart deck several yards INSIDE the rampart, where
+    // swept collision then refused every direction once the fear ended (from
+    // inside a volume every direction is a surface). Same expression the vertical
+    // pass and climb.ts already land against.
+    //
+    // Scoped to players deliberately: mobs and pets keep the terrain snap they
+    // have always had, so their movement, and the parity draw order with it, is
+    // untouched.
+    const g =
+      e.kind === 'player'
+        ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
+        : groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
       canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
@@ -8501,20 +8654,43 @@ export class Sim {
     return canAddItem(meta.inventory, bagCapacity(meta.bags), itemId, count);
   }
 
-  equipBag(itemId: string, socket?: number, pid?: number): void {
-    bagsMod.equipBag(this.ctx, itemId, socket, pid);
+  equipBag(
+    itemId: string,
+    socket?: number,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    bagsMod.equipBag(this.ctx, itemId, socket, pid, named);
   }
 
   unequipBag(socket: number, pid?: number): void {
     bagsMod.unequipBag(this.ctx, socket, pid);
   }
 
-  discardItem(itemId: string, count = 1, pid?: number): void {
-    items.discardItem(this.ctx, itemId, count, pid);
+  discardItem(
+    itemId: string,
+    count = 1,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.discardItem(this.ctx, itemId, count, pid, named);
   }
 
-  equipItem(itemId: string, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid);
+  equipItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    targetSlot?: EquipSlot,
+    slotIndex?: number,
+  ): void {
+    // The disenchantItem shape (see it for the reasoning): position 2 carries the
+    // target for an IWorld caller and pid for a sim/server caller.
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.equipItem(this.ctx, itemId, pid, targetSlot, named);
   }
 
   // Manual bag order: the player dragged the stack at `from` onto the cell at `to`.
@@ -8522,19 +8698,39 @@ export class Sim {
     items.moveInventoryItem(this.ctx, from, to, pid);
   }
 
+  sortInventory(pid?: number): void {
+    items.sortInventory(this.ctx, pid);
+  }
+
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
   // rather than letting the resolver pick. items.equipItem re-validates the slot
   // against the item, so this is a request, never a bypass.
-  equipItemToSlot(itemId: string, slot: EquipSlot, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid, slot);
+  equipItemToSlot(
+    itemId: string,
+    slot: EquipSlot,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    // The aimed equip arm, and the one the UI actually drives (char_window drag
+    // to a paperdoll slot), so a gear loadout reaches equip through HERE rather
+    // than through the unaimed equipItem.
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.equipItem(this.ctx, itemId, pid, slot, named);
   }
 
   unequipItem(slot: EquipSlot, pid?: number): boolean {
     return items.unequipItem(this.ctx, slot, pid);
   }
 
-  useItem(itemId: string, pid?: number): ItemUseResult | undefined {
-    return items.useItem(this.ctx, itemId, pid);
+  useItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): ItemUseResult | undefined {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return items.useItem(this.ctx, itemId, pid, named);
   }
 
   // ONE explicit shape, no overloads (phase 21): the request rides an options
@@ -8547,8 +8743,15 @@ export class Sim {
     items.buyItem(this.ctx, npcId, itemId, pid, opts);
   }
 
-  sellItem(itemId: string, count = 1, pid?: number): void {
-    items.sellItem(this.ctx, itemId, count, pid);
+  sellItem(
+    itemId: string,
+    count = 1,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.sellItem(this.ctx, itemId, count, pid, named);
   }
 
   sellAllJunk(pid?: number): void {
@@ -8876,8 +9079,12 @@ export class Sim {
   }
 
   /** Per-player form of `commissionOrders`, for the server's `corder`
-   *  self-delta (server/game.ts): a small per-player read, diffed per tick
-   *  like `prof`/`cprof`. */
+   *  self-delta (server/game.ts). NOT a small read: it walks the whole
+   *  realm-global board and every open-scope order lands in EVERY viewer's
+   *  projection, so its cost is O(board) per call and the board grows with
+   *  realm activity (24 h open TTL). The server therefore rebuilds it only
+   *  behind the commissionOrderBoardRev change gate plus a wire cadence,
+   *  never per tick. */
   commissionOrdersFor(pid: number): readonly CommissionOrderRow[] {
     return commissionOrderRowsFor(this.ctx, pid);
   }
@@ -8917,12 +9124,22 @@ export class Sim {
   // src/sim/professions/salvage.ts, resolved on the deterministic tick the
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
-  salvageItem(itemId: string, pid?: number): void {
+  salvageItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    // Overloaded second parameter, the disenchantItem shape: an IWorld caller
+    // passes the target here, a sim/server caller passes pid. Both arities must
+    // stay, because IWorld declares (itemId, target?) while server/game.ts and
+    // the RL host call (itemId, pid, slot).
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
     // On casting:true castStart is the surface; salvageResult lands only from
     // completeSalvageCast.
-    const result = salvageItemImpl(this.ctx, itemId, pid);
+    const result = salvageItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
@@ -8953,16 +9170,36 @@ export class Sim {
     return this.players.get(pid)?.lastSalvageResult ?? null;
   }
 
-  upgradeRiftItem(itemId: string, pid?: number): RiftForgeResult {
-    return upgradeRiftItemImpl(this.ctx, itemId, pid);
+  upgradeRiftItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return upgradeRiftItemImpl(this.ctx, itemId, pid, named);
   }
 
-  enchantRiftItem(itemId: string, stat: string, pid?: number): RiftForgeResult {
-    return enchantRiftItemImpl(this.ctx, itemId, stat, pid);
+  enchantRiftItem(
+    itemId: string,
+    stat: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return enchantRiftItemImpl(this.ctx, itemId, stat, pid, named);
   }
 
-  socketRiftGem(itemId: string, gemId: string, pid?: number): RiftForgeResult {
-    return socketRiftGemImpl(this.ctx, itemId, gemId, pid);
+  socketRiftGem(
+    itemId: string,
+    gemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return socketRiftGemImpl(this.ctx, itemId, gemId, pid, named);
   }
 
   // Enchanting profession commands (IWorldProfessions): same thin-
@@ -10046,6 +10283,10 @@ export class Sim {
     bgMod.bgQueueJoin(this.ctx, pid);
   }
 
+  bgRespond(accept: boolean, pid?: number): void {
+    bgMod.bgRespond(this.ctx, accept, pid);
+  }
+
   bgQueueLeave(pid?: number): void {
     bgMod.bgQueueLeave(this.ctx, pid);
   }
@@ -10328,6 +10569,7 @@ export class Sim {
         rating: standing.rating,
         wins: standing.wins,
         losses: standing.losses,
+        draws: standing.draws,
       });
     }
     rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
@@ -10406,6 +10648,7 @@ export class Sim {
       rating: standing.rating,
       wins: standing.wins,
       losses: standing.losses,
+      draws: standing.draws,
       standings,
       format,
       queued: queuedFmt !== null,
@@ -10705,6 +10948,13 @@ export class Sim {
 
   mailInfoFor(pid: number): import('../world_api').MailInfo | null {
     return this.postOffice.mailInfoFor(pid);
+  }
+
+  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
+  // the cheap change signal server/game.ts polls before paying for a
+  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
+  mailRevFor(pid: number): number | null {
+    return this.postOffice.mailRevFor(pid);
   }
 
   mailUnreadFor(pid: number): number {

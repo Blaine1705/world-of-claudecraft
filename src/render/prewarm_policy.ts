@@ -23,6 +23,7 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.landmarks',
   'views.persistent-portals',
   'views.nearby',
+  'world.settle-state',
   'textures.scene',
   'programs.compile',
   'world.initial-frame',
@@ -43,6 +44,25 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
  */
 export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
+
+/** Whole-scene GPU submits that can synchronously link every visible program
+ * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
+ * once WebGL enters the driver, so omit them to preserve the entry hard limit.
+ * world.settle-state joins them: its lazy world builds (and a woken water
+ * height-field's real submits) have no internal deadline on a profile whose
+ * whole point is bounded main-thread slices. The cost of skipping it is that
+ * textures.scene (which still runs here) collects against pre-settle state,
+ * an accepted residual misalignment: this profile also skips the compile
+ * monolith and the initial frame, the two consumers the alignment mostly
+ * serves. */
+export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
+  'world.settle-state',
+  'world.initial-frame',
+  'programs.compile',
+  'programs.budget-variants',
+  'sky.current-zone',
+  'render.settle-passes',
+];
 
 export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
 export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
@@ -154,6 +174,8 @@ export interface PrewarmPolicy {
   compileBeforeFirstFrame: boolean;
   /** Skip the monolithic programs.compile block entirely. */
   skipMonolithCompile: boolean;
+  /** Omit uninterruptible whole-scene submits when shader linking is synchronous. */
+  skipFullScenePasses: boolean;
   /** Restrict the manifest to CONSTRAINED_PREWARM_KEEP. */
   minimalManifest: boolean;
   /** Textures initialized before yielding the event loop; 0 uses the synchronous desktop path. */
@@ -168,27 +190,114 @@ export interface PrewarmPolicy {
 export function prewarmEntryShouldDefer(
   entryStartedMs: number,
   deadlineMs: number,
+  hardDeadlineMs: number,
   deadlineExempt: boolean,
   finishFullManifestBeforeReveal: boolean,
 ): boolean {
+  if (entryStartedMs >= hardDeadlineMs) return true;
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
 }
 
-/** Build cutoff paired with the entry policy; full Insane prewarm does not trim archetypes. */
+/** The mesh-shape bits three folds into a program's cache key, structurally
+ * typed so this decision layer stays Three-free. */
+export interface ProgramContentMeshShape {
+  isSkinnedMesh?: boolean;
+  isInstancedMesh?: boolean;
+  /** An instanceColor buffer flips USE_INSTANCING_COLOR into the key. */
+  hasInstanceColor?: boolean;
+  isBatchedMesh?: boolean;
+  /** morphAttributes.position PRESENT: three defines USE_MORPHTARGETS on
+   *  presence, even for an empty array, so present-with-zero and absent are
+   *  distinct variants. */
+  hasMorphPositions?: boolean;
+  /** The EXACT morph target count: three keys morphTargetsCount, so a
+   *  boolean here hid variants (a morphs=2 and a morphs=6 mesh relinked at
+   *  draw time against a morphs=4 stand-in). */
+  morphTargetCount?: number;
+  morphNormalCount?: number;
+  morphColorCount?: number;
+  /** geometry.attributes.tangent flips vertexTangents. */
+  hasTangents?: boolean;
+  /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
+  vertexColorItemSize?: number;
+  castShadow?: boolean;
+}
+
+/**
+ * Program-content keys for compile-unit dedupe: one key per material slot,
+ * covering the object and geometry bits of three r165's program cache key
+ * this repo can produce (skinning, instancing and instance colour, batched
+ * meshes, morph position/normal/colour presence and counts, tangents, vertex
+ * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
+ * colour textures (batchingColor) and Points uv presence (pointsUvs), which
+ * the repo does not produce on this path; adopt either and this key must
+ * learn it. A coarser key elects a stand-in
+ * whose program variant differs, and every other geometry shape of that
+ * material is SKIPPED by the dedupe and relinks synchronously at first draw,
+ * which is the stall the compile lane exists to prevent. In-repo fidelity
+ * precedent: occluderGhostVariantKey (occluder_ghost_prewarm.ts).
+ */
+export function prewarmProgramContentKeys(
+  shape: ProgramContentMeshShape,
+  materialIds: readonly string[],
+): string[] {
+  const token =
+    `${shape.isSkinnedMesh ? 's' : 'm'}${shape.isInstancedMesh ? 'i' : ''}` +
+    `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
+    `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
+    `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
+    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
+    `${shape.castShadow ? 'c' : ''}`;
+  return materialIds.map((id) => `${token}:${id}`);
+}
+
+/** Where the programs.compile unit loop must stop so world.initial-frame (the
+ * one uninterruptible whole-scene submit that links whatever compile did not
+ * reach) always has room before the GPU-submit guard. Without the reserve, an
+ * exempt compile that lawfully consumed the whole soft budget left the frame
+ * starting past the deadline, cancelled outright, and the initial scene's
+ * programs linked at first LIVE draw instead (measured: 102-318 ms submit
+ * stalls, 17 programs in one frame). Mirrors prewarmBuildDeadline's reserve,
+ * one pipeline stage later. */
+export function prewarmCompileUnitDeadline(
+  gpuSubmitDeadlineMs: number,
+  frameReserveMs: number,
+): number {
+  return gpuSubmitDeadlineMs - Math.max(0, frameReserveMs);
+}
+
+/** Build cutoff paired with the entry policy. Full Insane prewarm may use the
+ * soft-deadline reserve, but it still stops at the independent hard deadline. */
 export function prewarmBuildDeadline(
   deadlineMs: number,
+  hardDeadlineMs: number,
   reserveMs: number,
   finishFullManifestBeforeReveal: boolean,
 ): number {
-  return finishFullManifestBeforeReveal
-    ? Number.MAX_SAFE_INTEGER
-    : deadlineMs - Math.max(0, reserveMs);
+  return Math.min(
+    hardDeadlineMs,
+    finishFullManifestBeforeReveal ? hardDeadlineMs : deadlineMs - Math.max(0, reserveMs),
+  );
+}
+
+/** Run temporary prewarm state under a guaranteed behavioral restore. */
+export async function withRestoredPrewarmState<T, R>(
+  capture: () => T,
+  restore: (state: T) => void,
+  work: () => R | Promise<R>,
+): Promise<R> {
+  const original = capture();
+  try {
+    return await work();
+  } finally {
+    restore(original);
+  }
 }
 
 /**
  * Resolve every prewarm knob from the device profile. The constrained arms are the
- * watchdog + memory fix; the unconstrained arm reproduces the historical desktop
- * behavior exactly (full manifest, generous budgets, no reordering).
+ * watchdog + memory fix. The unconstrained arm keeps the full desktop manifest and
+ * budgets, while parallel compile is moved ahead of the first whole-scene submit.
  */
 export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
   const { constrainedMemory, asyncCompileSupported, lowGfx } = input;
@@ -200,8 +309,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxViews: baseMaxViews,
       yieldBetweenEntries: false,
       linkPassPerEntry: false,
-      compileBeforeFirstFrame: false,
-      skipMonolithCompile: false,
+      compileBeforeFirstFrame: asyncCompileSupported,
+      skipMonolithCompile: !asyncCompileSupported,
+      skipFullScenePasses: !asyncCompileSupported,
       minimalManifest: false,
       textureBatchSize: 0,
       textureMaxMs: 0,
@@ -217,12 +327,13 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // empty local world. The rest stream in via the per-frame view-create budget.
     maxViews: Math.min(baseMaxViews, input.maxViewsConstrained),
     yieldBetweenEntries: true,
-    // Without parallel compile the monolith is one giant synchronous block, so link
-    // group-by-group per entry instead. With it, the async compile entry links
-    // off-thread and per-entry passes only starve the manifest.
-    linkPassPerEntry: !asyncCompileSupported,
+    // A full-scene render is itself the synchronous shader-link monolith when the
+    // extension is absent. Never enter that uninterruptible driver call inside the
+    // loading gate; first-sight compile gates handle later streamed views instead.
+    linkPassPerEntry: false,
     compileBeforeFirstFrame: asyncCompileSupported,
     skipMonolithCompile: !asyncCompileSupported,
+    skipFullScenePasses: !asyncCompileSupported,
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
     textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
@@ -257,6 +368,12 @@ export function remainingPrewarmViewBudget(maxViews: number, createdViews: numbe
 
 /** True when this manifest entry runs under the given policy. */
 export function prewarmEntryRuns(id: string, policy: PrewarmPolicy): boolean {
+  if (
+    policy.skipFullScenePasses &&
+    BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE.includes(id)
+  ) {
+    return false;
+  }
   if (!policy.minimalManifest) return true;
   return CONSTRAINED_PREWARM_KEEP.includes(id);
 }
