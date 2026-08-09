@@ -75,6 +75,37 @@ function headroomSample(
   };
 }
 
+// Low runs the same tier-parameterized ladder against the retuned numbers
+// (caps 380 / 1.6M / 3.4k, baselines mediums x 0.95, desktop scale floor 0.65),
+// so a low-budget-specific regression cannot hide behind the retune-immune
+// high arm. The maxima literals sit strictly under 1.0, which is what lets the
+// climb-ceiling arm actually REACH its bound (a bound never reached binds
+// nothing: the phase 5 QA probe round stripped the grass phase B ceiling and
+// every suite stayed green).
+const LOW_BASELINE = { grass: 0.74, foliage: 0.7, vfx: 0.76, lighting: 0.68 };
+const LOW_MAXIMA = { grass: 0.86, foliage: 0.82, vfx: 0.86, lighting: 0.78 };
+const LOW_MIN_RENDER_SCALE = 0.65;
+
+function lowGovernor(): RenderBudgetGovernor {
+  const governor = new RenderBudgetGovernor({
+    tier: 'low',
+    budget: GFX_BUDGETS.low,
+    enabled: true,
+  });
+  governor.reset(1, LOW_MIN_RENDER_SCALE, 1);
+  return governor;
+}
+
+function lowSevereSample(): RenderBudgetSample {
+  return { ...severeSample(), minRenderScale: LOW_MIN_RENDER_SCALE };
+}
+
+function lowHeadroomSample(
+  counts: Pick<RenderBudgetSample, 'calls' | 'triangles' | 'grassVisibleTufts'>,
+): RenderBudgetSample {
+  return { ...headroomSample(counts), minRenderScale: LOW_MIN_RENDER_SCALE };
+}
+
 function highGovernor(): RenderBudgetGovernor {
   const governor = new RenderBudgetGovernor({
     tier: 'high',
@@ -236,6 +267,45 @@ describe('render budget recovery ladder', () => {
       );
     }
     expect(state.levels).toEqual(afterDip);
+  });
+
+  it('returns to baseline and restores render scale at low tier in a dense scene', () => {
+    const governor = lowGovernor();
+    let state = governor.state();
+    for (let i = 0; i < 12; i++) state = governor.update(lowSevereSample());
+    // Floors genuinely reached, so the recovery below cannot be vacuous.
+    expect(state.levels.resolution).toBe(LOW_MIN_RENDER_SCALE);
+    expect(state.levels.grass).toBe(0.5);
+
+    // Counters parked in low's 90 to 100% band (targets 380 / 1.6M / 3.4k) from
+    // the first recovery frame: phase A, resolution included, must proceed on
+    // measured headroom alone and the climb above baseline must never start.
+    for (let i = 0; i < 300; i++) {
+      state = governor.update(
+        lowHeadroomSample({ calls: 370, triangles: 1_550_000, grassVisibleTufts: 3_300 }),
+      );
+    }
+
+    expect(state.levels).toEqual({ ...LOW_BASELINE, resolution: 1 });
+  });
+
+  it('climbs to the low band maxima and stops exactly there when the scene stays sparse', () => {
+    const governor = lowGovernor();
+    let state = governor.state();
+    for (let i = 0; i < 12; i++) state = governor.update(lowSevereSample());
+    expect(state.levels.grass).toBe(0.5);
+
+    // Sparse counters stay under every 90% line through the whole climb, so the
+    // ladder walks phase A and then every phase B rung. The equality reaches
+    // each band ceiling for real: a mutant that widens a phase B ceiling
+    // overshoots the maxima and reds here.
+    for (let i = 0; i < 400; i++) {
+      state = governor.update(
+        lowHeadroomSample({ calls: 200, triangles: 800_000, grassVisibleTufts: 1_500 }),
+      );
+    }
+
+    expect(state.levels).toEqual({ ...LOW_MAXIMA, resolution: 1 });
   });
 
   it('holds the climb above baseline while the counters sit inside the gate band', () => {
