@@ -658,8 +658,8 @@ export class CharacterVisual {
       this.current = idle;
     }
 
-    // The atlas for a non-default skin may not be resident at construction: the
-    // packaged iOS shell defers the boot atlas sweep (assets.ts), so a visual
+    // The atlas for a non-default skin may not be resident at construction: every
+    // iOS WebKit host defers the boot atlas sweep (assets.ts), so a visual
     // born with a cosmetic skin applies the embedded default above and heals
     // here once the atlas arrives - the same ensure + re-apply round-trip
     // setSkin() already runs for live swaps. No-op when the atlas is resident
@@ -1580,9 +1580,15 @@ export class CharacterVisual {
     );
     if (offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId)) {
       payloads.push(...offPayloads);
+      this.finishWeaponAttach(payloads);
+      return payloads;
     }
+    // The non-mirrored offhand stays OUT of the skin material/VFX set
+    // (pixel-untouched), but its freshly attached nodes must still reach the
+    // caller's compile gate: dropped from the return, a re-attached shield's
+    // first draw linked its programs synchronously.
     this.finishWeaponAttach(payloads);
-    return payloads;
+    return [...payloads, ...offPayloads];
   }
 
   /** The shared tail of every re-attach (slot swap, skin change, sheathe swap):
