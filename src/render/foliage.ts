@@ -153,7 +153,6 @@ import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 
 const GRASS_CHUNK_SIZE = 48;
 const GRASS_CHUNK_BUILD_BUDGET_MS = 2.2;
-const GRASS_CHUNK_MAX_BUILDS_PER_FRAME = 1;
 const GRASS_DENSITY_LOW = 0.38;
 const GRASS_DENSITY_HIGH = 0.5;
 // Per-biome grass density multipliers over the base above. The Reach is bare
@@ -3192,11 +3191,18 @@ function buildGrassRing(
   };
 
   // The one in-flight sliced build. runSlicedBuild checks the budget BEFORE
-  // resuming each sub-unit (a grid row), so a frame never pays more than the
-  // budget plus one row, where the old check-after-build paid a whole chunk
-  // (18.6ms observed against the 2.2ms budget). An oversized chunk simply
-  // spans more frames; its pop-in when ready is the same pop-in the queue
-  // already implied, just a few frames later.
+  // resuming each sub-unit, so a frame never pays more than the budget plus
+  // the one sub-unit that crossed the deadline, where the old
+  // check-after-build paid a whole chunk (18.6ms observed against the 2.2ms
+  // budget). Stated honestly, that bound is the budget plus FINALIZE: the
+  // grid-row sub-units are small, but the finalize sub-unit (stable-rank
+  // reorder over every instance, trim, bounding spheres, parenting, freeze)
+  // runs unsliced, so it is the largest single step a frame can absorb.
+  // Slicing finalize further is a possible follow-up; any new yield must
+  // land BEFORE the parenting writes, or abandonActiveBuild below would
+  // strand a parented partial mesh. An oversized chunk simply spans more
+  // frames; its pop-in when ready is the same pop-in the queue already
+  // implied, just a few frames later.
   let activeBuild: {
     chunk: GrassChunk;
     job: { step(): boolean };
@@ -3224,12 +3230,21 @@ function buildGrassRing(
     activeBuild = null;
   };
 
+  // Builds run until the frame budget is spent, however many chunks that
+  // completes: the pre-sub-unit deadline check inside runSlicedBuild is the
+  // worst-frame bound, so a cheap chunk finishing early hands its remaining
+  // budget to the next queued chunk instead of discarding it. (An older
+  // one-completion-per-frame cap predated slicing, when the deadline was only
+  // consulted AFTER a whole chunk built; kept after slicing it capped
+  // COMPLETIONS, starving ring fill while a many-frame chunk was in flight
+  // and dropping unspent budget after each finish. Per-frame parenting cost
+  // needs no cap of its own: finalize, the step that parents, is one
+  // sub-unit, so the budget already meters it.)
   const buildQueuedChunks = (): void => {
     if (!activeBuild && buildQueue.length === 0) return;
     const deadline = now() + buildBudgetMs;
-    let completed = 0;
     let sorted = false;
-    while (completed < GRASS_CHUNK_MAX_BUILDS_PER_FRAME) {
+    for (;;) {
       if (activeBuild) {
         const { chunk } = activeBuild;
         // A mid-build chunk that left the streamed window (or was retired)
@@ -3265,7 +3280,6 @@ function buildGrassRing(
       // its slices (inter-frame waiting excluded), same meaning as before.
       lastBuildMs = Math.round(active.activeMs * 100) / 100;
       buildMs = Math.round((buildMs + lastBuildMs) * 100) / 100;
-      completed++;
     }
   };
 
@@ -3391,7 +3405,13 @@ function buildGrassRing(
       uniforms.uPlayerPos.value.set(px, pz);
       uniforms.uFadeFar.value = activeRadius();
       if (px > DUNGEON_X_THRESHOLD) {
-        // dungeon instances live far outside the strip — no meadow indoors
+        // dungeon instances live far outside the strip: no meadow indoors.
+        // This branch returns before buildQueuedChunks, so a build paused
+        // mid-chunk would otherwise hold its two chunkCap instance buffers
+        // for the whole dungeon run; abandon it instead (the chunk rebuilds
+        // byte-identically on return, exactly like leaving the streamed
+        // window).
+        abandonActiveBuild();
         if (parent.visible) {
           parent.visible = false;
           for (const chunk of chunks.values()) {

@@ -1490,6 +1490,17 @@ export class CharacterVisual {
       this.tintedRigClaims,
     );
     releaseTintedMaterials(prevRigClaims);
+    // The per-effect clone maps (ghost/soul-rend/shadowform/moonkin/
+    // metamorph/rune-tint/aura-glow) key by SOURCE material, and this sweep
+    // just swapped every source (a new entity color or skin atlas), so
+    // clones derived from the old sources are unreachable from here on.
+    // Dispose them now, in the same synchronous pass that unmounts them (no
+    // render in between, the rune-chain precedent); the applyVisualMaterials
+    // call below re-derives any active overlay from the new sources, so a
+    // live effect survives the swap. Without this, a pooled visual
+    // accumulated one clone set per rift color worn (the maps only emptied
+    // in dispose()).
+    this.disposeEffectMaterials();
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
     this.model.traverse((o) => {

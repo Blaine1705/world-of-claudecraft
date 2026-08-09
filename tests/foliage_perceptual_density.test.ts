@@ -38,9 +38,10 @@ describe('streamed grass perceptual density', () => {
     // tests/grass_build_slicing.test.ts): the sliced builder checks its frame
     // budget BEFORE every sub-unit on this clock, so on the real clock a slow
     // CI machine can leave the streamed window part-built after any fixed
-    // frame count. Freezing the clock makes every started chunk finish in its
-    // frame, restoring the deterministic one-whole-chunk-per-frame pacing
-    // this suite's full-window assertions were written against.
+    // frame count. Freezing the clock means the budget deadline never
+    // arrives, so the whole queued window builds deterministically in the
+    // first update (builds continue while budget remains), giving this
+    // suite the fully built window its assertions were written against.
     const grass = foliageGrassInternalsForTest.buildGrassRing(parent, 20_061, () => 0);
     const px = 15;
     const pz = 45;

@@ -42,8 +42,9 @@ const FRAME_CAP = 3000;
 
 // A fake clock whose every reading advances by a fixed amount, simulating
 // build sub-units that cost real main-thread time. advancePerReadMs 0 is the
-// unsliced reference: the budget deadline never arrives, so each queued chunk
-// builds whole in one frame, exactly the pre-slicing pacing.
+// unsliced reference: the budget deadline never arrives, so the whole queued
+// window builds in one frame (builds continue while budget remains; there is
+// no per-frame completions cap).
 const makeClock = (advancePerReadMs: number) => {
   let t = 0;
   return () => {
@@ -205,6 +206,77 @@ describe('sliced grass chunk builds', () => {
     // and every reference chunk, including the abandoned-and-rebuilt one,
     // matches the unsliced reference byte for byte. The far detour may cache
     // extra chunks; the reference keys are the ones under test.
+    const geometry = geometryByKey(parent);
+    for (const [key, expected] of reference.geometry) {
+      const actual = geometry.get(key);
+      expect(actual, key).toBeDefined();
+      if (!actual) continue;
+      expectSameBytes(actual.matrix, expected.matrix, `${key} matrix`);
+      expectSameBytes(actual.color, expected.color, `${key} color`);
+    }
+  }, 60_000);
+
+  it('a frame with budget left continues into the next queued chunk (ring fill beats one per frame)', async () => {
+    // Arrange: a cost profile where one whole chunk costs well under the
+    // 2.2ms frame budget, so only a per-frame completions cap could hold the
+    // fill rate down to the pre-slicing one chunk per frame.
+    const reference = await buildReference();
+    const buildGrassRing = await loadRingBuilder();
+    const parent = new THREE.Group();
+    const ring = buildGrassRing(parent, SEED, makeClock(0.005));
+
+    // Act
+    frameAt(ring, PX, PZ);
+    const firstFrameBuilt = ring.perfStats().grassBuiltChunks;
+    const frames = 1 + driveUntilIdle(ring, PX, PZ);
+
+    // Assert: the first frame completed a chunk AND kept building with its
+    // remaining budget (the completions cap that discarded unspent budget
+    // after one finish goes red here), so the whole ring fills in strictly
+    // fewer frames than the pre-slicing one-chunk-per-frame rate. The
+    // geometry stays byte-identical to the unsliced reference.
+    expect(firstFrameBuilt).toBeGreaterThan(1);
+    const stats = ring.perfStats();
+    expect(stats.grassReadyChunks).toBe(reference.readyChunks);
+    expect(frames).toBeLessThan(reference.readyChunks);
+    const geometry = geometryByKey(parent);
+    for (const [key, expected] of reference.geometry) {
+      const actual = geometry.get(key);
+      expect(actual, key).toBeDefined();
+      if (!actual) continue;
+      expectSameBytes(actual.matrix, expected.matrix, `${key} matrix`);
+      expectSameBytes(actual.color, expected.color, `${key} color`);
+    }
+  }, 60_000);
+
+  it('entering a dungeon abandons the in-flight build instead of stranding its buffers', async () => {
+    // Arrange: pause the first chunk mid-build (its two chunkCap instance
+    // buffers are allocated in the setup sub-unit).
+    const reference = await buildReference();
+    const buildGrassRing = await loadRingBuilder();
+    const parent = new THREE.Group();
+    const ring = buildGrassRing(parent, SEED, makeClock(0.35));
+    frameAt(ring, PX, PZ);
+    frameAt(ring, PX, PZ);
+    const statsBefore = ring.perfStats();
+    expect(statsBefore.grassReadyChunks).toBe(0);
+    expect(statsBefore.grassQueuedChunks).toBeGreaterThan(0);
+
+    // Act: cross the dungeon threshold. update() returns before
+    // buildQueuedChunks on that branch, so only the abandon path can release
+    // the paused build; without it the two InstancedMesh buffers stay held
+    // for the whole dungeon run.
+    const disposeSpy = vi.spyOn(THREE.InstancedMesh.prototype, 'dispose');
+    frameAt(ring, 200_000, PZ);
+    expect(disposeSpy).toHaveBeenCalledTimes(2);
+    disposeSpy.mockRestore();
+    // The abandoned build no longer counts as in-flight queued work.
+    expect(ring.perfStats().grassQueuedChunks).toBe(statsBefore.grassQueuedChunks - 1);
+
+    // Assert: back outside, the abandoned chunk rebuilds byte-identically
+    // (the pinned abandon contract) with no duplicate mesh per chunk+family.
+    const frames = driveUntilIdle(ring, PX, PZ);
+    expect(frames).toBeLessThan(FRAME_CAP);
     const geometry = geometryByKey(parent);
     for (const [key, expected] of reference.geometry) {
       const actual = geometry.get(key);
