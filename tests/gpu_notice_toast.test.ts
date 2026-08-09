@@ -30,7 +30,7 @@ describe('the languagechange listener rides the DOM', () => {
   it('binds no listener and builds no node on a session that never shows the notice', async () => {
     const toast = await bootToast();
     const spy = vi.spyOn(document, 'addEventListener');
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
     expect(languageBindings(spy)).toBe(0);
     document.dispatchEvent(new Event(LANGUAGE_EVENT));
     expect(noticeRoot()).toBeNull();
@@ -39,7 +39,7 @@ describe('the languagechange listener rides the DOM', () => {
   it('binds exactly once for a shown notice, and a locale flip cannot resurrect a dismissal', async () => {
     const toast = await bootToast();
     const spy = vi.spyOn(document, 'addEventListener');
-    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true })).toBe(true);
+    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true, desktopPlatform: 'other' })).toBe(true);
     expect(languageBindings(spy)).toBe(1);
 
     (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
@@ -59,11 +59,12 @@ describe('the displayed latch under a persisted dismissal', () => {
     // state.shown early-return in render(); this is that pin.
     const toast = await bootToast();
     localStorage.setItem('woc_gpu_notice_dismissed', 'software');
-    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
     expect(noticeRoot()).toBeNull();
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
   });
 });
@@ -79,7 +80,7 @@ describe('the displayed latch on a both-component verdict', () => {
     // The WARP-flip shape reports both components at once.
     const toast = await bootToast();
     expect(
-      toast.initGpuNotice({ softwareRendering: true, discreteInactive: true, desktopShell: true }),
+      toast.initGpuNotice({ softwareRendering: true, discreteInactive: true, desktopShell: true, desktopPlatform: 'other' }),
     ).toBe(true);
     expect(document.querySelector('#gpu-notice .gpu-notice-message')?.textContent ?? '').toContain(
       'without GPU acceleration',
@@ -87,6 +88,62 @@ describe('the displayed latch on a both-component verdict', () => {
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: true,
       discreteInactive: true,
+      hybridGpuLikely: false,
     });
+  });
+});
+
+describe('the hybrid verdict at the toast level', () => {
+  it('shows the per-OS hybrid body and latches the hybrid component', async () => {
+    const toast = await bootToast();
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: false,
+        hybridGpuLikely: true,
+        desktopShell: false,
+        desktopPlatform: 'win',
+      }),
+    ).toBe(true);
+    expect(document.querySelector('#gpu-notice .gpu-notice-message')?.textContent ?? '').toContain(
+      'Settings > System > Display > Graphics',
+    );
+    expect(toast.gpuNoticeDisplayed()).toEqual({
+      softwareRendering: false,
+      discreteInactive: false,
+      hybridGpuLikely: true,
+    });
+    // Dismissal stores the signature under the ONE key; the v0.36.0 per-variant
+    // hybrid key is read-only compatibility and is never written back.
+    (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
+    expect(localStorage.getItem('woc_gpu_notice_dismissed')).toBe('hybrid');
+    expect(localStorage.getItem('woc_gpu_notice_hybrid_dismissed')).toBeNull();
+  });
+
+  it('honors the v0.36.0 per-variant hybrid dismissal key without widening it', async () => {
+    localStorage.setItem('woc_gpu_notice_hybrid_dismissed', '1');
+    let toast = await bootToast();
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: false,
+        hybridGpuLikely: true,
+        desktopShell: false,
+        desktopPlatform: 'linux',
+      }),
+    ).toBe(false);
+    expect(noticeRoot()).toBeNull();
+    expect(toast.gpuNoticeDisplayed()).toEqual({
+      softwareRendering: false,
+      discreteInactive: false,
+      hybridGpuLikely: false,
+    });
+    // The same stored key must NOT cover a software verdict.
+    toast = await bootToast();
+    expect(
+      toast.initGpuNotice({
+        softwareRendering: true,
+        desktopShell: false,
+        desktopPlatform: 'linux',
+      }),
+    ).toBe(true);
   });
 });

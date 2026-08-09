@@ -113,26 +113,50 @@ describe('normalizeDesktopGpuStatus', () => {
 describe('mergeShellGpuVerdict', () => {
   it('takes software rendering from either source and the discrete verdict only from the shell', async () => {
     const { status } = await boot();
-    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: true, shell: null })).toEqual({
+    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: true, localHybridGpuLikely: false, shell: null })).toEqual({
       softwareRendering: true,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
-    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: false, shell: DISCRETE })).toEqual(
+    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: false, localHybridGpuLikely: false, shell: DISCRETE })).toEqual(
       {
         softwareRendering: false,
         discreteInactive: true,
+        hybridGpuLikely: false,
       },
     );
     expect(
       status.mergeShellGpuVerdict({
-        localSoftwareRendering: false,
+        localSoftwareRendering: false, localHybridGpuLikely: false,
         shell: { softwareRendering: true, discreteInactive: false, adapter: 'SwiftShader' },
       }),
-    ).toEqual({ softwareRendering: true, discreteInactive: false });
-    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: false, shell: null })).toEqual({
+    ).toEqual({ softwareRendering: true, discreteInactive: false, hybridGpuLikely: false });
+    expect(status.mergeShellGpuVerdict({ localSoftwareRendering: false, localHybridGpuLikely: false, shell: null })).toEqual({
       softwareRendering: false,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
+  });
+
+  it('takes the hybrid verdict only from the page, whatever the shell says', async () => {
+    // hybrid_gpu_detect classifies the page's adapter string and is
+    // structurally false inside the shell; the shell payload has no hybrid
+    // field to contribute, so the local flag must pass through unchanged.
+    const { status } = await boot();
+    expect(
+      status.mergeShellGpuVerdict({
+        localSoftwareRendering: false,
+        localHybridGpuLikely: true,
+        shell: null,
+      }),
+    ).toEqual({ softwareRendering: false, discreteInactive: false, hybridGpuLikely: true });
+    expect(
+      status.mergeShellGpuVerdict({
+        localSoftwareRendering: false,
+        localHybridGpuLikely: true,
+        shell: DISCRETE,
+      }),
+    ).toEqual({ softwareRendering: false, discreteInactive: true, hybridGpuLikely: true });
   });
 });
 
@@ -143,7 +167,7 @@ describe('initDesktopGpuStatus', () => {
     expect(() => unsubscribe()).not.toThrow();
     expect(status.latchedDesktopGpuStatus()).toBeNull();
     // Nothing was forwarded, so a hardware session still shows no notice at all.
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: false })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: false, desktopPlatform: 'other' })).toBe(false);
     expect(noticeRoot()).toBeNull();
   });
 
@@ -174,22 +198,24 @@ describe('the shell verdict / notice init race', () => {
     const { toast, push } = await boot();
     push(DISCRETE);
     expect(noticeRoot()).toBeNull();
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(true);
+    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(true);
     expect(noticeRoot()?.hidden).toBe(false);
     expect(noticeText()).toContain('dedicated (gaming) GPU');
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: true,
+      hybridGpuLikely: false,
     });
   });
 
   it('builds the notice lazily when the verdict arrives AFTER the notice inits', async () => {
     const { toast, push } = await boot();
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
     expect(noticeRoot()).toBeNull();
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
 
     push(DISCRETE);
@@ -202,17 +228,19 @@ describe('the shell verdict / notice init race', () => {
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: true,
+      hybridGpuLikely: false,
     });
   });
 
   it('leaves a hardware session alone when the shell reports a healthy GPU', async () => {
     const { toast, push } = await boot();
-    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
     push({ softwareRendering: false, discreteInactive: false, adapter: 'NVIDIA RTX 5090' });
     expect(noticeRoot()).toBeNull();
     expect(toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
   });
 });
@@ -221,7 +249,7 @@ describe('the persisted dismissal across shell verdicts', () => {
   it('stores the verdict signature, never re-nags for it, and re-arms on a new component', async () => {
     const first = await boot();
     first.push(DISCRETE);
-    expect(first.toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(true);
+    expect(first.toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(true);
     (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
     expect(noticeRoot()?.hidden).toBe(true);
     // The storage key and the stored signature are the load-bearing literals.
@@ -230,7 +258,7 @@ describe('the persisted dismissal across shell verdicts', () => {
     // Same machine, next launch: same verdict, still quiet.
     const second = await boot();
     second.push(DISCRETE);
-    expect(second.toast.initGpuNotice({ softwareRendering: false, desktopShell: true })).toBe(
+    expect(second.toast.initGpuNotice({ softwareRendering: false, desktopShell: true, desktopPlatform: 'other' })).toBe(
       false,
     );
     expect(noticeRoot()).toBeNull();
@@ -239,6 +267,7 @@ describe('the persisted dismissal across shell verdicts', () => {
     expect(second.toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: false,
       discreteInactive: false,
+      hybridGpuLikely: false,
     });
 
     // The session degrades further (software rendering too): that component was
@@ -249,13 +278,14 @@ describe('the persisted dismissal across shell verdicts', () => {
     expect(second.toast.gpuNoticeDisplayed()).toEqual({
       softwareRendering: true,
       discreteInactive: true,
+      hybridGpuLikely: false,
     });
   });
 
   it('keeps the legacy dismissal honored for software while showing the new shell verdict', async () => {
     localStorage.setItem(KEY, '1');
     const { toast, push } = await boot();
-    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true })).toBe(false);
+    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true, desktopPlatform: 'other' })).toBe(false);
     expect(noticeRoot()).toBeNull();
     push(DISCRETE);
     expect(noticeRoot()?.hidden).toBe(false);

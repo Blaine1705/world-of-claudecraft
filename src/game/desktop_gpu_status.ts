@@ -43,18 +43,22 @@ export function normalizeDesktopGpuStatus(raw: unknown): DesktopGpuStatus | null
 }
 
 /**
- * Merge the shell verdict with the page's own software-rendering probe: either
- * source claiming software rendering is enough (the shell sees the GPU process
+ * Merge the shell verdict with the page's own boot-time probes: either source
+ * claiming software rendering is enough (the shell sees the GPU process
  * verdict, the page sees the live context), while the inactive-discrete-GPU
- * component only ever comes from the shell.
+ * component only ever comes from the shell and the hybrid component only ever
+ * comes from the page (hybrid_gpu_detect.ts classifies the adapter name and is
+ * structurally false inside the shell, which forces the discrete adapter).
  */
 export function mergeShellGpuVerdict(input: {
   localSoftwareRendering: boolean;
+  localHybridGpuLikely: boolean;
   shell: DesktopGpuStatus | null;
 }): GpuNoticeVerdict {
   return {
     softwareRendering: input.localSoftwareRendering || input.shell?.softwareRendering === true,
     discreteInactive: input.shell?.discreteInactive === true,
+    hybridGpuLikely: input.localHybridGpuLikely,
   };
 }
 

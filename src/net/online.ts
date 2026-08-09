@@ -3212,23 +3212,28 @@ export class ClientWorld implements IWorld {
       if (s.stats !== undefined) {
         e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
       }
-      e.attackPower = s.ap ?? 0;
+      // Static combat-rating scalars (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat):
+      // delta-guarded on selfWireJson like the rest of this record (server/game.ts),
+      // so an omitted key means unchanged, not zero. Fall back to the prior mirrored
+      // value, the same `s.X ?? e.X` shape already used for `weapon` below.
+      e.attackPower = s.ap ?? e.attackPower;
       e.rangedPower = s.rp ?? 0;
-      e.spellPower = s.sp ?? 0;
+      e.spellPower = s.sp ?? e.spellPower;
       // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
       // no wiring (the swing timers already ride the snapshot).
-      e.spellHaste = s.sh ?? 0;
-      e.critChance = s.crit ?? 0.05;
-      e.dodgeChance = s.dodge ?? 0.05;
-      e.blockChance = s.blk ?? 0;
-      e.blockValue = s.bval ?? 0;
+      e.spellHaste = s.sh ?? e.spellHaste;
+      e.critChance = s.crit ?? e.critChance;
+      e.dodgeChance = s.dodge ?? e.dodgeChance;
+      e.blockChance = s.blk ?? e.blockChance;
+      e.blockValue = s.bval ?? e.blockValue;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
-      // crit/sh above, and hit resolves server-side); sent always like the other self
-      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // crit/sh above, and hit resolves server-side); delta-guarded like the rest of
+      // this record so the online character sheet keeps showing the last-known value
+      // between gear/talent changes instead of flashing back to the blankEntity 0.
       // Server-recomputed.
-      e.critRating = s.crat ?? 0;
-      e.hasteRating = s.hrat ?? 0;
-      e.hitRating = s.hirat ?? 0;
+      e.critRating = s.crat ?? e.critRating;
+      e.hasteRating = s.hrat ?? e.hasteRating;
+      e.hitRating = s.hirat ?? e.hitRating;
       e.weapon = s.weapon ?? e.weapon;
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
       // the client never derives a sound decision from this local shadow (the
@@ -3261,26 +3266,25 @@ export class ClientWorld implements IWorld {
       e.craftCastRecipeId = s.ccast?.r ?? '';
       e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
       e.craftCastBatchTotal = s.ccast?.tot ?? 0;
-      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
-      // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
-      // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
+      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk are delta-guarded
+      // like milestones (an omitted key keeps the prior mirror). Terse keys
+      // (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
       // milestones->unlockedMilestones) are unchanged by the re-group.
-      this.xp = s.xp ?? 0;
-      this.lifetimeXp = s.lxp ?? 0;
-      this.restedXp = s.rxp ?? 0;
-      this.prestigeRank = s.prk ?? 0;
+      this.xp = s.xp ?? this.xp;
+      this.lifetimeXp = s.lxp ?? this.lifetimeXp;
+      this.restedXp = s.rxp ?? this.restedXp;
+      this.prestigeRank = s.prk ?? this.prestigeRank;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
-      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
-      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
-      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // IWorldInventory facet (W2) self-decode: copper is delta-guarded like
+      // inv/buyback/equip (a missing field keeps the prior mirror). Terse keys
+      // (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
       // A money-only delta carries no inventory echo at all (a proceeds-only market
       // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
       // so without this the bag money row and vendor affordability sat stale until the
-      // window was reopened (#2373). DIFF against the prior mirror, never a presence
-      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
-      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
-      const copper = s.copper ?? 0;
+      // window was reopened (#2373). Falling back to the prior mirror when the key is
+      // omitted (unchanged) keeps this a true diff: the flag only raises on a real move.
+      const copper = s.copper ?? this.copper;
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
       if (s.inv !== undefined) {
@@ -3880,8 +3884,12 @@ export class ClientWorld implements IWorld {
   // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
   // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
   // the server. The move changes no wire field or command string.
-  equipItem(itemId: string): void {
-    this.cmd({ cmd: 'equip', item: itemId });
+  equipItem(itemId: string, target?: { slotIndex: number }): void {
+    // NOTE the field name. On the `equip` token `slot` already means the EQUIP
+    // slot (see equipItemToSlot below), so the bag index rides as `bagSlot`.
+    // Everywhere else in this family `slot` is free and carries the bag index.
+    if (target === undefined) this.cmd({ cmd: 'equip', item: itemId });
+    else this.cmd({ cmd: 'equip', item: itemId, bagSlot: target.slotIndex });
   }
   moveInventoryItem(from: number, to: number): void {
     this.cmd({ cmd: 'inv_move', from, to });
@@ -3891,35 +3899,45 @@ export class ClientWorld implements IWorld {
   }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
-  equipItemToSlot(itemId: string, slot: EquipSlot): void {
-    this.cmd({ cmd: 'equip', item: itemId, slot });
+  equipItemToSlot(itemId: string, slot: EquipSlot, target?: { slotIndex: number }): void {
+    // `slot` is the equip slot on this token, so the bag index rides as `bagSlot`
+    // (see equipItem above).
+    if (target === undefined) this.cmd({ cmd: 'equip', item: itemId, slot });
+    else this.cmd({ cmd: 'equip', item: itemId, slot, bagSlot: target.slotIndex });
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
-  upgradeRiftItem(itemId: string): void {
-    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+    else this.cmd({ cmd: 'rift_upgrade_item', item: itemId, slot: target.slotIndex });
   }
-  enchantRiftItem(itemId: string, stat: string): void {
-    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+    else this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat, slot: target.slotIndex });
   }
-  socketRiftGem(itemId: string, gemId: string): void {
-    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
+  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
+    else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
   }
-  equipBag(itemId: string, socket?: number): void {
-    this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+  equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
+    // `socket` is the BAG BAR socket, so `slot` stays free for the bag index.
+    if (target === undefined) this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+    else this.cmd({ cmd: 'equip_bag', item: itemId, socket, slot: target.slotIndex });
   }
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
   }
-  useItem(itemId: string): void {
-    this.cmd({ cmd: 'use', item: itemId });
+  useItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
+    else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
   }
-  discardItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'discard', item: itemId, count });
+  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
+    else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
@@ -4051,8 +4069,15 @@ export class ClientWorld implements IWorld {
       this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
     }
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
+  salvageItem(itemId: string, target?: { slotIndex: number }): void {
+    // `slot` is a BAG INDEX here, matching disenchantItem (and NOT apply_enchant,
+    // whose `slot` names an equip slot). Omitted with no selection, so the
+    // message stays byte-identical to the pre-feature form.
+    if (target === undefined) {
+      this.cmd({ cmd: 'salvage_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'salvage_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // Maker's Bond unbind service (Professions 2.0): command only,
   // never predicted. The server re-validates eligibility/bound-ness/station
@@ -4084,8 +4109,9 @@ export class ClientWorld implements IWorld {
   deliverCommissionOrder(orderId: number): void {
     this.cmd({ cmd: 'deliver_commission_order', order: orderId });
   }
-  sellItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'sell', item: itemId, count });
+  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'sell', item: itemId, count });
+    else this.cmd({ cmd: 'sell', item: itemId, count, slot: target.slotIndex });
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
@@ -4404,8 +4430,9 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'pet_auto_water_jet', enabled });
   }
-  feedPet(itemId: string): void {
-    this.cmd({ cmd: 'pet_feed', item: itemId });
+  feedPet(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'pet_feed', item: itemId });
+    else this.cmd({ cmd: 'pet_feed', item: itemId, slot: target.slotIndex });
   }
   healPet(): void {
     this.cmd({ cmd: 'pet_heal' });
@@ -4506,6 +4533,10 @@ export class ClientWorld implements IWorld {
   }
   bgQueueLeave(): void {
     this.cmd({ cmd: 'bg_leave' });
+  }
+
+  bgRespond(accept: boolean): void {
+    this.cmd({ cmd: 'bg_respond', accept });
   }
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
@@ -5384,8 +5415,19 @@ export class ClientWorld implements IWorld {
   selectTalentRow(level: TalentRowLevel, optionId: string | null): void {
     this.cmd({ cmd: 'selectTalentRow', level, optionId });
   }
-  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
-    this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc?: TalentAllocation,
+    captureGear?: boolean,
+  ): void {
+    // `captureGear` rides only when true, the craftItem `commission` idiom: an
+    // ordinary talent-only save sends a byte-identical message to before.
+    if (captureGear === true) {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc, captureGear: true });
+    } else {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+    }
   }
   switchLoadout(index: number): void {
     this.cmd({ cmd: 'switchLoadout', index });

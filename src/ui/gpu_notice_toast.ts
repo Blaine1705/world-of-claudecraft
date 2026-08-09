@@ -1,14 +1,16 @@
 // GPU notice: a one-time, dismissible, shell-level toast shown when the session
-// runs on a software rasterizer (WARP, SwiftShader, llvmpipe) or, inside the
-// desktop shell, when the machine has a dedicated GPU the session is not using.
-// Since Chromium 141 removed the automatic SwiftShader fallback, the Windows
-// no-GPU shape is the D3D11 WARP device: the game still boots and plays (low
-// tier), but at a slideshow frame rate with no explanation; this toast is that
-// explanation. State transitions live in the pure view-core
-// (src/ui/gpu_notice_view.ts); this module is the thin DOM consumer (it owns a
-// fixed-position element on document.body; styles in src/styles/shell.css
-// "software rendering notice" section). It works on both the pre-game shell
-// and in-world, like the desktop update toast it is modeled on.
+// runs on a software rasterizer (WARP, SwiftShader, llvmpipe), when a browser
+// session sits on the integrated GPU of a likely hybrid machine (issue #2119),
+// or, inside the desktop shell, when the machine has a dedicated GPU the
+// session is not using. Since Chromium 141 removed the automatic SwiftShader
+// fallback, the Windows no-GPU shape is the D3D11 WARP device: the game still
+// boots and plays (low tier), but at a slideshow frame rate with no
+// explanation; this toast is that explanation. State transitions live in the
+// pure view-core (src/ui/gpu_notice_view.ts); this module is the thin DOM
+// consumer (it owns a fixed-position element on document.body; styles in
+// src/styles/shell.css "software rendering notice" section, shared by every
+// variant). It works on both the pre-game shell and in-world, like the desktop
+// update toast it is modeled on.
 //
 // The desktop shell publishes its verdict over the bridge, which can land
 // EITHER before this notice inits (the shell integration boots long before the
@@ -17,6 +19,7 @@
 // the resolve and builds the DOM lazily if the notice becomes shown.
 
 import {
+  type DesktopPlatform,
   dismissGpuNotice,
   formatGpuNoticeSignature,
   type GpuNoticeState,
@@ -35,13 +38,34 @@ import { t } from './i18n';
 // hardened private modes.
 const DISMISSED_KEY = 'woc_gpu_notice_dismissed';
 
-const NO_VERDICT: GpuNoticeVerdict = { softwareRendering: false, discreteInactive: false };
+// Read-only compatibility with the separate per-variant key v0.36.0 installs
+// wrote for a dismissed hybrid notice (before the hybrid variant merged into
+// the signature scheme above). Never written here; '1' means the player
+// already closed the hybrid notice once.
+const LEGACY_HYBRID_DISMISSED_KEY = 'woc_gpu_notice_hybrid_dismissed';
+
+const NO_VERDICT: GpuNoticeVerdict = {
+  softwareRendering: false,
+  discreteInactive: false,
+  hybridGpuLikely: false,
+};
 
 function readDismissedSignature(): string {
   try {
     return (typeof localStorage !== 'undefined' && localStorage.getItem(DISMISSED_KEY)) || '';
   } catch {
     return '';
+  }
+}
+
+function readLegacyHybridDismissed(): boolean {
+  try {
+    return (
+      typeof localStorage !== 'undefined' &&
+      localStorage.getItem(LEGACY_HYBRID_DISMISSED_KEY) === '1'
+    );
+  } catch {
+    return false;
   }
 }
 
@@ -56,7 +80,9 @@ function writeDismissedSignature(value: string): void {
 // The shell verdict, OR-accumulated across pushes: a machine-level condition
 // does not un-arm mid-session, and accumulating keeps a later partial payload
 // from dropping a component that already fired. Held at module scope so it
-// survives the init race in either direction.
+// survives the init race in either direction. The hybrid component never comes
+// from the shell (the shell forces the discrete adapter, so there is nothing
+// to detect), which is why pushes carry only the two shell-sourced booleans.
 let shellVerdict: GpuNoticeVerdict = NO_VERDICT;
 
 // The live notice instance's re-resolve hook, or null before initGpuNotice runs.
@@ -65,24 +91,24 @@ let applyShellVerdict: ((verdict: GpuNoticeVerdict) => void) | null = null;
 // Which components the shown notice ACCOUNTED FOR this session, latched true
 // and never cleared by a dismissal: the perf-nudge sibling suppresses its
 // redundant arms on "the boot notice already said this" (packet 0 ruling R16),
-// which stays true after the player closes the notice. When both components
-// are armed, the software body wins the copy yet BOTH count as accounted for
-// (an armed-at-render latch, not a which-body-was-read latch), on purpose: the
-// software copy carries the identical remedy (update drivers, Windows High
-// performance), and surfacing the integrated-GPU nudge instead would assert
-// the shell picked the gaming GPU, exactly false on such a machine (the
-// post-crash WARP-flip shape reports both components at once). Re-litigated
-// and KEPT in phase 3 QA, with one honesty correction: the discrete arm of
-// the suppression this feeds is unreachable in production wiring today
-// (perf_doctor gates 'integrated-gpu' on !desktopShell, and a discrete
-// verdict only exists inside the shell), so these semantics are
+// which stays true after the player closes the notice. When both the software
+// and discrete components are armed, the software body wins the copy yet BOTH
+// count as accounted for (an armed-at-render latch, not a which-body-was-read
+// latch), on purpose: the software copy carries the identical remedy (update
+// drivers, Windows High performance), and surfacing the integrated-GPU nudge
+// instead would assert the shell picked the gaming GPU, exactly false on such
+// a machine (the post-crash WARP-flip shape reports both components at once).
+// Re-litigated and KEPT in phase 3 QA, with one honesty correction: the
+// discrete arm of the suppression this feeds is unreachable in production
+// wiring today (perf_doctor gates 'integrated-gpu' on !desktopShell, and a
+// discrete verdict only exists inside the shell), so these semantics are
 // defense-in-depth for the day that analyzer gate changes, not a load-bearing
 // guard now. Reset by initGpuNotice (a new boot).
 let displayed: GpuNoticeVerdict = NO_VERDICT;
 
 /**
  * The components the rendered body accounted for this session. On a
- * both-component verdict the software copy wins yet both latch true: this is
+ * multi-component verdict the software copy wins yet all latch true: this is
  * "what the notice covered", not "which body text the player read".
  */
 export function gpuNoticeDisplayed(): GpuNoticeVerdict {
@@ -94,8 +120,15 @@ export function gpuNoticeDisplayed(): GpuNoticeVerdict {
  * the notice to fold in; after it, the live notice re-resolves and appears if
  * the new component is not already covered by a persisted dismissal.
  */
-export function updateGpuNoticeShellVerdict(verdict: GpuNoticeVerdict): void {
-  shellVerdict = mergeGpuNoticeVerdicts(shellVerdict, verdict);
+export function updateGpuNoticeShellVerdict(verdict: {
+  softwareRendering: boolean;
+  discreteInactive: boolean;
+}): void {
+  shellVerdict = mergeGpuNoticeVerdicts(shellVerdict, {
+    softwareRendering: verdict.softwareRendering,
+    discreteInactive: verdict.discreteInactive,
+    hybridGpuLikely: false,
+  });
   applyShellVerdict?.(shellVerdict);
 }
 
@@ -104,7 +137,9 @@ export function updateGpuNoticeShellVerdict(verdict: GpuNoticeVerdict): void {
 export function initGpuNotice(input: {
   softwareRendering: boolean;
   discreteInactive?: boolean;
+  hybridGpuLikely?: boolean;
   desktopShell: boolean;
+  desktopPlatform: DesktopPlatform;
 }): boolean {
   // A fresh boot: drop any previous instance and per-session display latch.
   // shellVerdict is deliberately KEPT: it carries a verdict that arrived before
@@ -116,6 +151,7 @@ export function initGpuNotice(input: {
   const localVerdict: GpuNoticeVerdict = {
     softwareRendering: input.softwareRendering,
     discreteInactive: input.discreteInactive === true,
+    hybridGpuLikely: input.hybridGpuLikely === true,
   };
   let verdict = mergeGpuNoticeVerdicts(localVerdict, shellVerdict);
   // Session fallback for the dismissal when storage writes are unavailable.
@@ -125,6 +161,7 @@ export function initGpuNotice(input: {
   let state: GpuNoticeState = resolveGpuNotice({
     ...verdict,
     dismissedSignature: dismissedSignature(),
+    legacyHybridDismissed: readLegacyHybridDismissed(),
   });
 
   let root: HTMLDivElement | null = null;
@@ -166,7 +203,13 @@ export function initGpuNotice(input: {
     ensureDom();
     if (!root || !message || !dismissButton) return;
     root.hidden = false;
-    message.textContent = t(gpuNoticeBodyKey(input.desktopShell, verdict));
+    message.textContent = t(
+      gpuNoticeBodyKey({
+        desktopShell: input.desktopShell,
+        desktopPlatform: input.desktopPlatform,
+        verdict,
+      }),
+    );
     dismissButton.textContent = t('gpuNotice.dismiss');
     displayed = mergeGpuNoticeVerdicts(displayed, verdict);
   };
@@ -175,7 +218,11 @@ export function initGpuNotice(input: {
     const merged = mergeGpuNoticeVerdicts(localVerdict, next);
     if (gpuNoticeVerdictsEqual(merged, verdict)) return;
     verdict = merged;
-    state = resolveGpuNotice({ ...verdict, dismissedSignature: dismissedSignature() });
+    state = resolveGpuNotice({
+      ...verdict,
+      dismissedSignature: dismissedSignature(),
+      legacyHybridDismissed: readLegacyHybridDismissed(),
+    });
     render();
   };
 
