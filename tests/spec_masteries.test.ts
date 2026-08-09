@@ -182,11 +182,11 @@ describe('spec masteries', () => {
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    // v0.36 composition re-pin: needle rank-3 base was cut 60-70 to 45-53 in
-    // the warlock sustain re-tune.
+    // 2026-08-09 120s band round re-pin: needle rank-3 base stepped 45-53 to
+    // 41-49 in the Hexcraft trim (41/49 times the affliction mastery rider).
     expect(effect(known('warlock', 'needle_of_fate', 'affliction'), 'directDamage')).toMatchObject({
-      min: 50,
-      max: 58,
+      min: 45,
+      max: 54,
     });
     expect(effect(known('warlock', 'sentence', 'affliction'), 'afflictionSentence')).toMatchObject({
       damageMult: 1.1,
