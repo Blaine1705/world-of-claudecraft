@@ -80,11 +80,26 @@ describe('opening', () => {
     expect(mainhand).toBe('dagger');
   });
 
-  it('starts with the helm hidden so the face being authored is visible', () => {
+  it('seeds the helm from the character rather than forcing it open', () => {
+    // The toggle is a SAVED preference now, not a turntable preview, so opening
+    // the editor must not decide it. A character wearing its helm opens wearing
+    // it, and Save is a no-op on this field unless the player moves the row.
+    const shown = fakeDeps();
+    editorWith(shown).open({ ...TARGET, helmHidden: false });
+    expect((shown.previewModular.mock.calls[0][1] as { head?: unknown }).head).not.toBeNull();
+
+    const hidden = fakeDeps();
+    editorWith(hidden).open({ ...TARGET, helmHidden: true });
+    expect((hidden.previewModular.mock.calls[0][1] as { head?: unknown }).head).toBeNull();
+  });
+
+  it('saves the helm it was opened with when the player never touches it', async () => {
     const deps = fakeDeps();
-    editorWith(deps).open(TARGET);
-    const [, worn] = deps.previewModular.mock.calls[0];
-    expect((worn as { head?: unknown }).head).toBeNull();
+    const editor = editorWith(deps);
+    editor.open({ ...TARGET, helmHidden: false });
+    await editor.save();
+    // Not `true`: a redesign must not hide a helm the player never hid.
+    expect(deps.saveAppearance.mock.calls[0][2]).toBe(false);
   });
 
   it('opening on a second character discards the first draft', () => {
@@ -116,8 +131,9 @@ describe('saving', () => {
     const [characterId, app, helmHidden] = deps.saveAppearance.mock.calls[0];
     expect(characterId).toBe(42);
     expect(app).toMatchObject({ gender: expect.any(String) });
-    // The helmet toggle IS saved, matching creation. It is not a preview.
-    expect(helmHidden).toBe(true);
+    // The helmet toggle IS saved, matching creation. It is not a preview — and
+    // its value is the character's, not a default this editor invented.
+    expect(helmHidden).toBe(false);
     expect(deps.refreshRoster).toHaveBeenCalledTimes(1);
     expect(editor.isOpen).toBe(false);
     expect(document.getElementById('charselect-reroll')?.hasAttribute('hidden')).toBe(true);

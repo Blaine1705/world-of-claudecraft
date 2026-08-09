@@ -13,7 +13,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { type ArmorSetId, DEFAULT_APPEARANCE } from '../src/render/characters/modular';
-import { charselectLook, composedLook, inWorldLookFor } from '../src/render/characters/player_look';
+import {
+  charselectLook,
+  composedLook,
+  inWorldLookFor,
+} from '../src/render/characters/player_look_core';
 import { createPlayer } from '../src/sim/entity';
 import type { Entity, PlayerClass } from '../src/sim/types';
 

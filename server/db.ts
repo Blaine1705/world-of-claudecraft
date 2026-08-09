@@ -3008,8 +3008,11 @@ export async function setCharacterHotbarLayout(
  *  turntable view. It is sim state, so it patches the one key inside the state
  *  blob rather than rewriting it (a whole-blob write from an HTTP route would
  *  clobber a live session's progress), and follows the sim's zero-default
- *  omission convention: hidden writes the key, shown removes it. A character
- *  that has never been saved (state IS NULL) is left alone; its blob is written
+ *  omission convention: hidden writes the key, shown removes it. A NULL
+ *  helmHidden means the client did not offer the toggle at all and the blob is
+ *  left untouched — defaulting that to false would actively UN-hide a helm the
+ *  player had hidden in world. A character that has never been saved (state IS
+ *  NULL) is likewise left alone; its blob is written
  *  fresh on first entry. A LIVE session still holds the old value in memory and
  *  would autosave over this, which is what the route's setHelmHiddenForCharacter
  *  push exists to prevent. */
@@ -3017,7 +3020,7 @@ export async function consumeAppearanceReroll(
   accountId: number,
   characterId: number,
   appearance: Record<string, unknown>,
-  helmHidden: boolean,
+  helmHidden: boolean | null,
   createdBefore: Date,
 ): Promise<boolean> {
   const res = await pool.query(
@@ -3025,7 +3028,7 @@ export async function consumeAppearanceReroll(
         SET appearance = $3::jsonb,
             appearance_reroll_used = TRUE,
             state = CASE
-                      WHEN state IS NULL THEN state
+                      WHEN state IS NULL OR $5::boolean IS NULL THEN state
                       WHEN $5::boolean THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
                       ELSE state - 'helmHidden'
                     END,

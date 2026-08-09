@@ -22,7 +22,7 @@ import {
   type ModularAppearance,
   normalizeAppearance,
 } from '../render/characters/modular';
-import type { RosterLookRow } from '../render/characters/player_look';
+import type { RosterLookRow } from '../render/characters/player_look_core';
 import type { PlayerClass } from '../sim/types';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './appearance_customizer';
 import { forgetAppearancePanel, noteAppearancePanelMounted } from './appearance_panel_locale';
@@ -73,9 +73,15 @@ export class CharselectRedesignEditor {
   private ui: AppearanceCustomizer | null = null;
   /** The editor's helmet toggle. Unlike the creation turntable's preview flag,
    *  this IS saved: it is the character's standing wardrobe preference, the same
-   *  thing creation posts and the in-world paperdoll eye edits. Starts hidden so
-   *  the face being authored is actually visible while authoring it. */
-  private helmHidden = true;
+   *  thing creation posts and the in-world paperdoll eye edits.
+   *
+   *  Which is exactly why it is SEEDED FROM THE CHARACTER rather than forced
+   *  open. It used to start hidden on every open, on the reasoning that a face
+   *  you are authoring should be visible — fine while the toggle was a preview,
+   *  wrong the moment it became a preference: a player who had never hidden
+   *  anything, redesigned, and never touched the row came out with their helm
+   *  hidden. Save is now a no-op on this field unless they move it. */
+  private helmHidden = false;
 
   constructor(private readonly deps: RedesignEditorDeps) {}
 
@@ -117,7 +123,7 @@ export class CharselectRedesignEditor {
     if (!panel || !host) return;
     this.close(false);
     this.target = c;
-    this.helmHidden = true;
+    this.helmHidden = c.helmHidden === true;
     // Seed from the character's stored look; an eligible character has none by
     // definition, so this is the default body until they touch a control.
     this.draft = normalizeAppearance((c.appearance as Partial<ModularAppearance>) ?? null);

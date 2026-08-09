@@ -1055,13 +1055,16 @@ describe('appearance reroll handler', () => {
     });
     const bounded = { gender: 'female', hair: 'highbun' };
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ ok: true, appearance: bounded, helmHidden: false });
+    expect(res.body).toEqual({ ok: true, appearance: bounded, helmHidden: null });
     const [accountId, characterId, stored, helmHidden, cutoff] = consumeAppearanceReroll.mock
       .calls[0] as [number, number, Record<string, unknown>, boolean, Date];
     expect(accountId).toBe(7);
     expect(characterId).toBe(5);
     expect(stored).toEqual(bounded);
-    expect(helmHidden).toBe(false);
+    // NULL, not false: this body carried no helmHidden, and false would have
+    // made the UPDATE run `state - 'helmHidden'`, un-hiding a helm the player
+    // had hidden in world. Null leaves the blob alone.
+    expect(helmHidden).toBeNull();
     // The free window rides through to the UPDATE, which is what decides
     // eligibility; the handler never compares dates itself.
     expect(cutoff).toBe(APPEARANCE_REROLL_CUTOFF);
@@ -1085,6 +1088,24 @@ describe('appearance reroll handler', () => {
     expect(res.body).toEqual({ ok: true, appearance: { gender: 'female' }, helmHidden: true });
     expect(consumeAppearanceReroll.mock.calls[0][3]).toBe(true);
     expect(setHelmHiddenForCharacter).toHaveBeenCalledWith(5, true);
+  });
+
+  it('leaves the helm alone entirely when the client sends no toggle', async () => {
+    const consumeAppearanceReroll = vi.fn(async (..._args: unknown[]) => true);
+    const setHelmHiddenForCharacter = vi.fn(() => true);
+    setCharactersDbForTests({ consumeAppearanceReroll });
+    resetCharactersRuntimeForTests();
+    configureCharactersRuntime(fakeRuntime({ setHelmHiddenForCharacter }));
+    const res = await callHandler('POST', '/api/characters/:id/appearance-reroll', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 5 })),
+      body: { appearance: { gender: 'female' } },
+    });
+    expect(res.status).toBe(200);
+    // No write, and nothing pushed at a live session either: an omitted field
+    // is "I have no opinion", not "show it".
+    expect(consumeAppearanceReroll.mock.calls[0][3]).toBeNull();
+    expect(setHelmHiddenForCharacter).not.toHaveBeenCalled();
   });
 
   it('400s reroll-unavailable when the atomic update matches no row', async () => {

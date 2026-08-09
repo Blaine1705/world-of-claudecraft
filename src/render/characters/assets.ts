@@ -928,6 +928,9 @@ function optimizedScene(url: string): THREE.Object3D {
  *  is cloned from, a live-clone count, and the far-LOD bake taken off it. */
 interface ModularVariant {
   root: THREE.Object3D;
+  /** The GLB this was pruned from — needed at eviction to tell the geometry
+   *  this variant MINTED from the geometry it merely points at. */
+  url: string;
   /** Live composed clones still drawn from this root's geometry. */
   refs: number;
   /** Baked idle-pose far LOD for this part set, minted on first far-band
@@ -964,6 +967,52 @@ function modularVariantKey(url: string, names: readonly string[]): string {
   return `${url}|${names.join(',')}`;
 }
 
+/** Every BufferGeometry the parsed GLB owns, memoized per url.
+ *
+ *  This is the set a variant must NOT dispose. A variant root is a
+ *  SkeletonUtils clone, which SHARES geometry with its source, and
+ *  mergeSkinnedParts only mints new geometry for the buckets it can prove safe:
+ *  it refuses anything carrying morph targets (head, eyes, ears, lashes, brows,
+ *  mouth) and skips buckets of one. Every one of those meshes is still pointing
+ *  at the parsed scene's buffers, which every other variant and every future
+ *  compose also point at, and nothing re-creates them. Disposing one would be
+ *  the recolorCache bug in a worse place. */
+const sourceGeometryCache = new Map<string, Set<THREE.BufferGeometry>>();
+
+/**
+ * The geometries an evicted variant is allowed to free: the ones it MINTED,
+ * never the ones it merely points at.
+ *
+ * Exported for the test rather than for a caller: this predicate is the whole
+ * safety of eviction, and getting it wrong is silent (a body keeps rendering
+ * until the renderer next needs the buffer). `shared` is the parsed GLB's own
+ * geometry set — see sourceGeometries for why so much of a variant is still in
+ * it.
+ */
+export function variantOwnedGeometries(
+  root: THREE.Object3D,
+  shared: ReadonlySet<THREE.BufferGeometry>,
+): THREE.BufferGeometry[] {
+  const owned: THREE.BufferGeometry[] = [];
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh && mesh.geometry && !shared.has(mesh.geometry)) owned.push(mesh.geometry);
+  });
+  return owned;
+}
+
+function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
+  const hit = sourceGeometryCache.get(url);
+  if (hit) return hit;
+  const owned = new Set<THREE.BufferGeometry>();
+  resolvedGltf(url).scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh && mesh.geometry) owned.add(mesh.geometry);
+  });
+  sourceGeometryCache.set(url, owned);
+  return owned;
+}
+
 /** Drop idle variants, least-recently-used first, until the cache is back under
  *  the cap. Map iteration is insertion order and every hit re-inserts, so the
  *  head is the least recently composed. */
@@ -973,13 +1022,15 @@ function evictModularVariants(): void {
     if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) break;
     if (entry.refs > 0) continue;
     modularVariantCache.delete(key);
-    // Now provably unreferenced, so the GPU buffers can actually go back:
-    // dropping the map entry alone would leak them (three.js frees a
-    // geometry's buffers on dispose(), not on GC).
-    entry.root.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (mesh.isMesh) mesh.geometry.dispose();
-    });
+    // Now provably unreferenced, so the buffers this variant MINTED can go
+    // back: dropping the map entry alone would leak them (three.js frees a
+    // geometry on dispose(), not on GC). Only the minted ones — see
+    // sourceGeometries for what the unmerged parts are still pointing at.
+    for (const geo of variantOwnedGeometries(entry.root, sourceGeometries(entry.url))) {
+      geo.dispose();
+    }
+    // The far bake is always minted here (bakeStaticPose builds it), so it is
+    // unconditionally ours to free.
     entry.far?.geo.dispose();
   }
   if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
@@ -997,7 +1048,12 @@ export function releaseModularVariant(root: THREE.Object3D): void {
   if (!key) return;
   root.userData.modularVariantKey = undefined;
   const entry = modularVariantCache.get(key);
-  if (entry && entry.refs > 0) entry.refs--;
+  if (!entry || entry.refs === 0) return;
+  entry.refs--;
+  // Sweeping only on a miss leaves a cache that went over the cap while every
+  // entry was live sitting there forever if it then only ever hits. Going idle
+  // is the other moment eviction can make progress, so take it.
+  if (entry.refs === 0) evictModularVariants();
 }
 
 /** Composed-body cache occupancy, for the crowd-perf probe on `window.__game`:
@@ -1044,9 +1100,15 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   for (const o of empty) o.removeFromParent();
   mergeSkinnedParts(root);
   primeSkinnedSortSpheres(root);
-  const entry: ModularVariant = { root, refs: 0, far: null };
-  modularVariantCache.set(key, entry);
+  // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
+  // the caller only retains it once this returns, so a sweep run after the
+  // insert reaches the newest entry last, finds it unreferenced, and disposes
+  // the very root it is about to hand back — the caller then clones a disposed
+  // root, the far bake writes to an orphaned entry forever, and the release
+  // finds nothing. Trimming first cannot see it at all.
   evictModularVariants();
+  const entry: ModularVariant = { root, url, refs: 0, far: null };
+  modularVariantCache.set(key, entry);
   return entry;
 }
 
@@ -1357,7 +1419,10 @@ function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
   const decal = buildStubbleDecal(head, sel);
   // Sibling, not child: the head is skinned, so a child would inherit its
   // (bind-pose) transform on top of the skinning it already does.
-  if (decal) (head as THREE.SkinnedMesh).parent?.add(decal);
+  if (decal) {
+    markFaceDecal(decal);
+    (head as THREE.SkinnedMesh).parent?.add(decal);
+  }
 }
 
 /**
@@ -1382,7 +1447,10 @@ function attachMakeupDecal(root: THREE.Object3D, look: ModularLook): void {
   });
   if (!head) return;
   const decal = buildMakeupDecal(head, sel);
-  if (decal) (head as THREE.SkinnedMesh).parent?.add(decal);
+  if (decal) {
+    markFaceDecal(decal);
+    (head as THREE.SkinnedMesh).parent?.add(decal);
+  }
 }
 
 /** Compose a modular character: pick parts, recolour skin/hair, attach weapons. */
@@ -1423,6 +1491,17 @@ export function assembleModular(
       : recolored(mesh.material, look, onMouth, onJewel, onBand);
   });
   applyMorphs(root, look);
+  // The far LOD's material slots, captured HERE and nowhere else. This is the
+  // one moment the tree is exactly the part set wearing THIS look's colours:
+  // the recolour sweep above has run, the face decals are tagged out, and the
+  // held props below have not been attached yet. The far bake walks a clone of
+  // the same variant with the same filter, so slot N here is group N there —
+  // which resolving by material NAME could not promise, because `mod_skin` is
+  // on both the head and the mouth's lip body and a first-wins lookup could
+  // paint an entire distant body in lipstick.
+  root.userData.farMaterials = farBakeMeshes(root).map((mesh) =>
+    Array.isArray(mesh.material) ? mesh.material[0] : mesh.material,
+  );
   attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
   return root;
 }
@@ -2048,6 +2127,11 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
   const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  // The throwaway retained a variant when the def is modular (assembleModular
+  // retains every clone it makes). It exists only to be measured and flattened,
+  // so give it back rather than pinning one part set per modular key forever
+  // and reading the live count one high.
+  releaseModularVariant(temp);
 
   const prep: PreparedVisual = {
     key,
@@ -2065,16 +2149,19 @@ export function prepareVisual(key: string): PreparedVisual {
 }
 
 /** A composed body's baked far LOD: the same single-draw idle-pose mesh
- *  prepareVisual bakes for a fixed rig, but taken off THIS part set. */
+ *  prepareVisual bakes for a fixed rig, but taken off THIS part set.
+ *
+ *  It carries no materials. The geometry is shared by every character with this
+ *  part set while the COLOURS are per character, so group N is resolved against
+ *  the character's own `userData.farMaterials[N]` — captured in assembleModular
+ *  off a clone of the same variant walked by the same filter, which is what
+ *  makes the two orders one list. Resolving by material NAME could not promise
+ *  that: `mod_skin` is on both the head and the mouth's lip body, so a
+ *  first-wins lookup could paint a whole distant body in lipstick. */
 export interface ModularFarBake {
   geo: THREE.BufferGeometry;
-  /** Source material NAME per geometry group. A name rather than the material
-   *  itself because the geometry is shared by every character with this part
-   *  set while the COLOURS are per character: the caller resolves each name
-   *  against its own composed body's materials (see farSourceMaterials). */
-  matNames: string[];
-  /** Parallel to matNames: whether that group is the character's own body,
-   *  the distinction applyMaterials uses to gate the skin/emissive override. */
+  /** One entry per geometry group: whether that group is the character's own
+   *  body, the distinction applyMaterials uses to gate the skin override. */
   isBody: boolean[];
 }
 
@@ -2131,37 +2218,51 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
     .makeTranslation(0, prep.yOffset, 0)
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
-  const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  const { geo, isBody } = bakeStaticPose(temp, norm);
   releaseModularVariant(temp);
   if (!geo) return null;
-  const bake: ModularFarBake = { geo, matNames: mats.map((m) => m.name), isBody };
+  const bake: ModularFarBake = { geo, isBody };
   variant.far = bake;
   return bake;
 }
 
-/** Index a composed body's materials by name. Taken BEFORE applyMaterials
- *  retints the model, so these are the recoloured SOURCE materials — the same
- *  kind of handle prepareVisual hands tintedFarMaterials for a fixed rig. */
-export function materialsByName(root: THREE.Object3D): Map<string, THREE.Material> {
-  const byName = new Map<string, THREE.Material>();
-  root.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-    for (const m of mats) if (m && !byName.has(m.name)) byName.set(m.name, m);
+/** Tag an attached face decal so the far-LOD passes skip it. Decals vary WITHIN
+ *  a part set (buzz and bald pick the same nodes; the decal is the only thing
+ *  that tells them apart), so counting them would break the one guarantee the
+ *  far bake rests on: that the bake's group order and the character's captured
+ *  material order are the same list. They are also face detail nobody can see
+ *  from 35 yards. */
+function markFaceDecal(decal: THREE.Object3D): void {
+  decal.userData.faceDecal = true;
+  decal.traverse((o) => {
+    o.userData.faceDecal = true;
   });
-  return byName;
 }
 
-/** Resolve a bake's material names against a composed body's own materials, so
- *  the shared far geometry is drawn in THIS character's skin, hair and eye
- *  colours. A name with no match (a decal added to the clone after the bake,
- *  say) falls back to a plain material rather than dropping the group. */
-export function farSourceMaterials(
-  byName: Map<string, THREE.Material>,
-  matNames: readonly string[],
-): THREE.Material[] {
-  return matNames.map((name) => byName.get(name) ?? FAR_MATERIAL_FALLBACK);
+/** The meshes the far LOD bakes, in traversal order.
+ *
+ *  ONE function, called from two places on purpose: bakeStaticPose walks it to
+ *  build the geometry groups, and assembleModular walks it to capture the
+ *  matching material slots. Two hand-written traversals that had to agree would
+ *  be a silent mis-colouring the day one of them changed. */
+function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
+  const out: THREE.Mesh[] = [];
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || mesh.userData.faceDecal) return;
+    if (!meshChainVisible(mesh, root)) return;
+    if (!mesh.geometry?.getAttribute('position')) return;
+    out.push(mesh);
+  });
+  return out;
+}
+
+/** This composed body's far-LOD material slots, in bake-group order (captured by
+ *  assembleModular). Padded to `count` so a mismatch can never leave a group
+ *  without a material rather than mis-colouring one. */
+export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
+  const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
+  return Array.from({ length: count }, (_, i) => slots[i] ?? FAR_MATERIAL_FALLBACK);
 }
 
 const FAR_MATERIAL_FALLBACK = new THREE.MeshStandardMaterial();
@@ -2188,12 +2289,11 @@ function bakeStaticPose(
   const v = new THREE.Vector3();
   const full = new THREE.Matrix4();
 
-  root.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || !meshChainVisible(mesh, root)) return;
+  // The SAME list assembleModular captures its far material slots from, so
+  // group N here is slot N there (see farBakeMeshes).
+  for (const mesh of farBakeMeshes(root)) {
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
-    if (!srcPos) return;
     const out = new THREE.BufferGeometry();
     const baked = new Float32Array(srcPos.count * 3);
     const skinned = (mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh
@@ -2225,7 +2325,7 @@ function bakeStaticPose(
     // GLTFLoader emits one Mesh per primitive — materials are never arrays here
     mats.push(Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
     isBody.push(!!mesh.userData.bodyMesh);
-  });
+  }
 
   if (geos.length === 0) return { geo: null, mats: [], isBody: [] };
   // uv presence must agree for merging — drop uvs entirely if any geo lacks them

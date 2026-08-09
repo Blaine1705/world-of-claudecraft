@@ -37,7 +37,6 @@ import {
   assembleModel,
   ensureSkinTexture,
   farSourceMaterials,
-  materialsByName,
   modularFarBake,
   prepareVisual,
   releaseModularVariant,
@@ -429,11 +428,6 @@ export class CharacterVisual {
   private poseWrap = new THREE.Group();
   private farMesh: THREE.Mesh | null = null;
   private farMaterials: THREE.Material | THREE.Material[] | null = null;
-  /** A COMPOSED body's own source materials, by material name, snapshotted
-   *  before applyMaterials retints the model. The far bake shares one geometry
-   *  per part set and resolves its colours through this, so a hundred players
-   *  in one haircut still each keep their own skin, hair and eyes at distance. */
-  private composedSrcMaterials: Map<string, THREE.Material> | null = null;
   /** A composed far LOD is baked on the first crossing into the far band, not
    *  at construction: most of a crowd stands close and never needs one. This
    *  latches so a bake that yields nothing is not retried every crossing. */
@@ -578,9 +572,6 @@ export class CharacterVisual {
     this.look = prep.def.modular ? look : null;
     this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
     configureTightBoneTextures(this.model);
-    // Before applyMaterials: the far bake needs the composed body's own
-    // recoloured materials, and this pass replaces them with tinted clones.
-    if (this.look) this.composedSrcMaterials = materialsByName(this.model);
     applyMaterials(
       this.model,
       this.def,
@@ -1371,7 +1362,7 @@ export class CharacterVisual {
       tintedFarMaterials(
         prep.def,
         this.entityColor,
-        farSourceMaterials(this.composedSrcMaterials ?? new Map(), bake.matNames),
+        farSourceMaterials(this.model, bake.isBody.length),
         bake.isBody,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
@@ -1530,9 +1521,7 @@ export class CharacterVisual {
       this.farMaterials = tintedFarMaterials(
         this.def,
         this.entityColor,
-        composed
-          ? farSourceMaterials(this.composedSrcMaterials ?? new Map(), composed.matNames)
-          : prep.idleSrcMats,
+        composed ? farSourceMaterials(this.model, composed.isBody.length) : prep.idleSrcMats,
         composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),

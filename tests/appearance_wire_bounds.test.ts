@@ -41,6 +41,17 @@ describe('sanitizeAppearance bounds', () => {
     expect(sanitizeAppearance(null)).toBeNull();
   });
 
+  it('rejects a slider map that authors no slider', () => {
+    // An empty or all-junk map used to sanitize to `{}` and still count as a
+    // key the document contributed, so `{"face":{}}` read as a design and spent
+    // the one-shot redesign token on a body nobody chose.
+    expect(sanitizeAppearance({ face: {} })).toBeNull();
+    expect(sanitizeAppearance({ body: { a: 'x' } })).toBeNull();
+    expect(sanitizeAppearance({ face: {}, body: {} })).toBeNull();
+    // ...but a map with one real slider is a design, and survives whole.
+    expect(sanitizeAppearance({ face: { jaw: 0.5, junk: 'x' } })).toEqual({ face: { jaw: 0.5 } });
+  });
+
   it('rejects a document that contributes no known key', () => {
     // An empty look is not a look, and the caller that matters is the one-shot
     // redesign: accepting `{"appearance":{}}` spent a character's single

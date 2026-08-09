@@ -240,7 +240,7 @@ import {
   type ModularLook,
   normalizeAppearance,
 } from './render/characters/modular';
-import { charselectLook, inWorldLookFor } from './render/characters/player_look';
+import { charselectLook, inWorldLookFor } from './render/characters/player_look_core';
 import {
   onPortraitsReady,
   onPortraitUpdate,

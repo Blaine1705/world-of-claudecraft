@@ -118,8 +118,11 @@ describe('authored look on the wire', () => {
     joinServer(server, a, 1, 'Watcher', 'warrior', null);
     const other = joinServer(server, b, 2, 'Designed', 'mage', LOOK);
     const entity = server.sim.entities.get(other.pid)!;
-    // Count stringify passes over the look object itself. A per-tick cost shows
-    // up as one call per broadcast; a memo shows up as exactly one, ever.
+    // TICK, not just broadcast. wireCacheFor gates every identity stringify on
+    // `cache.tick !== sim.tickCount`, so a loop of bare broadcasts enters the
+    // serializing arm exactly once whatever the code underneath does — the
+    // pre-memo version passes that loop too. Advancing the sim is what makes
+    // this measure the memo instead of the per-tick cache.
     let serialized = 0;
     const original = (entity.modularAppearance as any).toJSON;
     Object.defineProperty(entity.modularAppearance, 'toJSON', {
@@ -129,12 +132,39 @@ describe('authored look on the wire', () => {
         return { ...LOOK };
       },
     });
-    for (let i = 0; i < 20; i++) broadcast(server);
+    const startTick = server.sim.tickCount;
+    for (let i = 0; i < 20; i++) {
+      server.sim.tick();
+      broadcast(server);
+    }
     if (original) (entity.modularAppearance as any).toJSON = original;
+    expect(server.sim.tickCount).toBeGreaterThan(startTick + 18); // the loop really ticked
     expect(serialized).toBe(1);
-    // ...and the bytes still land on every tick's full record.
-    const wire = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid);
-    if (wire?.k) expect(wire.app).toEqual(LOOK);
+  });
+
+  it('keeps sending the look on every FULL record, memo or not', () => {
+    // The other half, split out because it needs a full record to look at and
+    // a settled entity emits lite ones: assert on first sight, where identity
+    // always rides.
+    const a = fakeWs();
+    const b = fakeWs();
+    joinServer(server, a, 1, 'Watcher', 'warrior', null);
+    const other = joinServer(server, b, 2, 'Designed', 'mage', LOOK);
+    a.sent.length = 0;
+    broadcast(server);
+    const first = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid);
+    expect(first.k).toBe('player');
+    expect(first.app).toEqual(LOOK);
+
+    // ...and an identity CHANGE re-emits it from the memo rather than dropping
+    // it, since the splice runs inside the change arm.
+    server.sim.entities.get(other.pid)!.level = 42;
+    a.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const changed = lastSnap(a.sent).ents.find((e: any) => e.id === other.pid && e.k);
+    expect(changed.lv).toBe(42);
+    expect(changed.app).toEqual(LOOK);
   });
 
   it('keeps the key off a character with no authored look', () => {

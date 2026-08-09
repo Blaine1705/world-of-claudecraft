@@ -858,9 +858,13 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
   }
   // Same rule as creation (parseCreationCosmetics): the editor's helmet toggle
   // is a standing wardrobe choice, so a redesign sets it exactly as the creator
-  // does rather than being a preview that evaporates on Save. An omitted field
-  // means a client that does not offer the toggle; those keep the helm.
-  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : false;
+  // does rather than being a preview that evaporates on Save.
+  //
+  // An omission is NULL, not false. The real editor always posts the field, so
+  // only a client that does not offer the toggle can omit it — and defaulting
+  // that to false made the UPDATE run `state - 'helmHidden'`, actively UN-hiding
+  // a helm the player had hidden in world. Null leaves the blob alone.
+  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : null;
   const ok = await charactersDb.consumeAppearanceReroll(
     ctxAccountId(ctx),
     character.id,
@@ -876,7 +880,7 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
   // 30 s autosave writes the whole blob, so without this push the helm half of
   // the redesign would be silently reverted (and the look, which rides its own
   // column, would not). No-op when the character is not in world.
-  useRuntime().setHelmHiddenForCharacter(character.id, helmHidden);
+  if (helmHidden !== null) useRuntime().setHelmHiddenForCharacter(character.id, helmHidden);
   // Echo the normalized look so the client can update its roster row without
   // a second list fetch.
   json(ctx.res, 200, { ok: true, appearance, helmHidden });

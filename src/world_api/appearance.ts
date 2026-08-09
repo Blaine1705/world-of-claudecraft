@@ -90,7 +90,12 @@ function sanitizeSliderMap(value: unknown): Record<string, number> | null {
     out[key] = raw;
     kept++;
   }
-  return out;
+  // Null, not {}, when nothing survived. A map that authors no slider is not a
+  // slider map, and returning {} let it count toward the "did this document
+  // author anything" tally below: `{"face":{}}` and `{"body":{"a":"x"}}` both
+  // read as a design and spent the one-shot redesign token on a body nobody
+  // chose. Same rule as the document itself, one level down.
+  return kept > 0 ? out : null;
 }
 
 /**
@@ -101,7 +106,8 @@ function sanitizeSliderMap(value: unknown): Record<string, number> | null {
  *
  * Null covers TWO cases, and the second is load-bearing:
  *  - not an object, so there is nothing to read;
- *  - an object that contributed NO known key ({}, or nothing but junk keys).
+ *  - an object that contributed NO known key ({}, nothing but junk keys, or
+ *    nothing but empty/junk slider maps such as `{"face":{}}`).
  *    An empty document is not a look. Accepting it let `{"appearance":{}}`
  *    spend a character's one-shot redesign token and store a body nobody
  *    authored: the reroll's whole precondition is that the player is choosing
