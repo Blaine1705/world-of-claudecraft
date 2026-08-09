@@ -388,6 +388,7 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',

@@ -1173,6 +1173,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.browserSupport.getDesktopApp': '获取桌面客户端',
   'hudChrome.landing.browserSupport.continueInBrowser': '继续在浏览器中游玩',
   'hudChrome.landing.browserSupport.dismissAria': '关闭不受支持浏览器的提示',
+  'hudChrome.talents.newBuildWithGear': '新建配置（同时保存装备）',
+  'hudChrome.talents.gearNotHeld': '你已不再拥有该配置保存的 {n} 件装备。',
+  'hudChrome.talents.gearCopyGone': '有 {n} 件装备不是该配置锁定的那一件。',
+  'hudChrome.talents.gearTakenByOtherSlot': '有 {n} 件装备需要你没有的另一件副本。',
+  'hudChrome.talents.gearRestored': '已从此配置恢复 {n} 件装备。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：输入 /join world 或 /join lfg，与全服玩家聊天。',
   'meta.builtOn': '构建于 {date}',
@@ -11440,8 +11445,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.warfareHeading': '战争套装',
   'guide.arenaPage.warfareTradeBody':
     '这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。',
-  'guide.classPage.formLine.form_bear':
-    '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
   'guide.classPage.formLine.form_cat': '近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。',
   'guide.classPage.formLine.form_travel':
     '赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。',
@@ -11471,8 +11474,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.combat.fatigueBody':
     '大海没有围墙。世界本就打算让你游过去的那些水域，也就是陆地与陆地之间的海峡与水湾，以及内陆的湖泊，无论花多久横渡都很安全。可若你从岸边一路游进真正的外海，它就会开始榨干你的体力：先是出现一则警告，你有足够的时间掉头，之后大海便会造成不断加重、任何手段都无法阻止的伤害，直到你朝陆地折返为止。在离岸那么远的地方溺死或力竭而亡，都和其他任何死亡一样需要释放灵魂，所以请把地平线当作风景，而不是目的地。',
   'guide.combat.hazardsTitle': '水也能要你的命',
-  'guide.combat.threatBody':
-    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的狼形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
   'guide.combat.threatTitle': '敌人会打谁',
   'guide.combat.unstuckBody':
     '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
@@ -11612,8 +11613,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.zones': '按旅行顺序列出每一个区域及其等级范围，并标出你正身处的那一个。',
   'guide.controls.attackMove': '攻击移动（需先在选项中开启）',
   'guide.controls.bgFlag': '在荆谷原野夺取敌方战旗',
-  'guide.controls.clickMoveNote':
-    '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
   'guide.controls.jumpSwim': '跳跃；身在水中时上浮',
   'guide.controls.meters': '伤害统计（伤害、治疗与威胁）',
   'guide.controls.moveAlt': '移动与转身（同样的四个操作，使用第二套按键）',
@@ -11626,9 +11625,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.bookBody':
     '功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔架，你在那里挑选自己佩戴的那一个。',
   'guide.deedsPage.bookHeading': '走进功绩之书',
-  'guide.deedsPage.platformBody':
-    '如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。',
-  'guide.deedsPage.platformHeading': 'Steam 与 Epic 成就',
   'guide.delvesPage.lockpickAnteBody':
     '在碰到锁之前，你先定下条件。取三根撬锁针，便留有失手的余地，但箱子只付出最朴素的奖赏；取两根，是折中的交易；只取一根，一次干净利落的开锁将付出最丰厚的回报。手上的撬锁针越少，每一步之间可供思考的时间就越短；而若最后一根也折断，锁便彻底卡死：那口箱子就此失去，直到你再通关一次这处探秘为止。',
   'guide.delvesPage.riteBody':
@@ -11706,25 +11702,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '只有在线游玩才需要。离线世界什么都不问：在开始界面选择“离线”，按下“开始游戏”即可。在线账号是免费的，需要一个用户名、一个密码，以及一个用来找回账号的邮箱，你的角色会保存在服务器上。有了账号之后，你还可以在选项中开启双重验证。',
   'guide.faqPage.a16':
     '在线游玩发生在一个个世界上，而每个世界都是这个游戏的一份完整副本，有自己的玩家、自己的世界市场、自己的排名。登录时，世界列表会显示每个世界有多热闹，从“清闲”到“满员”，你可以挑一个安静的图个宽敞，或挑一个热闹的图个人气。你的角色住在创建它的那个世界上，而你也可以在不止一个世界里各留角色。',
-  'guide.faqPage.a17':
-    '同一个账号在每个服务器上最多可以有十个角色，而你也可以在不止一个服务器上拥有角色。想删掉某个角色，就在角色列表里删除它：该角色必须不在世界中，而且你要输入它的名字来确认，所以手一滑绝不会让你失去一位英雄。删除是永久的。那个角色的随身家当会随它而去，它在世界市场上的挂单会被撤下，渡鸦邮驿的信箱也会被清空。',
-  'guide.faqPage.a18':
-    '你自己改不了，所以起名时挑一个中意的。名字为 2 到 16 个字母，以字母开头，允许空格、连字符和撇号；无论大小写怎么写，每个名字在它所在的服务器上都是唯一的。违反行为准则的名字会被拒绝。唯一一次会被要求改名，是管理员要求你改。注销账号可能会把它的名字释放给其他玩家，而单纯一阵子不玩绝不会：闲置的账号照样保留它的名字。',
-  'guide.faqPage.a19':
-    '你的角色会在世界中停留大约五分钟，游戏也会自行尝试重连，所以信号中断、合上笔记本或刷新页面，通常都能让你回到原处、回到同一场对局里。也正因为你的角色确实还站在那儿，掉线并不是逃离战斗的办法。从游戏菜单里选择“退出登录”，则会立即离开，不必等完那段时间。',
-  'guide.faqPage.a20':
-    '在在线游戏中，用 Esc 打开菜单，选择“报告错误”。描述发生了什么，然后发送：你所在的服务器、你的角色，以及你当时站在哪里，都会自动一同附上，还有你的版本与设备信息；你也可以勾选“包含截图”，附上你当时看到的画面。如果你接连发送好几份，可能会被要求稍等片刻再发下一份。',
-  'guide.faqPage.a6Count':
-    '{cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，从最初的山谷，一直到专为满级角色打造的地带。',
   'guide.faqPage.q12': '有内购商店吗？',
   'guide.faqPage.q13': '在哪里可以下载客户端？',
   'guide.faqPage.q14': '运行它需要什么配置？',
   'guide.faqPage.q15': '我需要一个账号吗？',
   'guide.faqPage.q16': '什么是世界？',
-  'guide.faqPage.q17': '我可以拥有多少个角色？可以删除角色吗？',
-  'guide.faqPage.q18': '我可以更改角色的名字吗？',
-  'guide.faqPage.q19': '如果我掉线了会怎么样？',
-  'guide.faqPage.q20': '我发现了一个错误，该怎么报告？',
   'guide.gear.bagsSort':
     '背包乱起来的时候，背包窗口里的“整理”按钮一按就能收拾妥当。同一种东西的零散堆叠会被合并到一起，所有物品也会按一个好读的顺序重新排开：先是武器与护甲，然后是背包、消耗品、工具与坐骑，接着是制作材料，每一种精细品级都紧挨着它的普通版本，再往后是任务物品，灰色废品排在最末，好让你一眼看清哪些该卖。整理绝不会凭空造出或弄丢任何东西，只是重新排列，所以任何时候按下去都是安全的。',
   'guide.gear.bindOnTradeBody':
@@ -11814,8 +11796,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.groups.compete': '玩家对战',
   'guide.groups.endgame': '组队内容',
   'guide.groups.world': '这个世界',
-  'guide.home.faq.a4Count':
-    '等级上限为 {cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，其中最遥远的几处专为满级角色打造。',
   'guide.home.world.farshoreBlurb':
     '沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。',
   'guide.home.world.farshoreName': '远岸',
@@ -11832,17 +11812,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.levelsCap': '{level} 级',
   'guide.home.world.nightBlurb': '一片繁星午夜的国度，花朵照亮小径，月栖镇彻夜守望。',
   'guide.home.world.nightName': '夜绽花野',
-  'guide.home.world.subCount':
-    '一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。',
-  'guide.howToPlay.charactersBody':
-    '一个账号在每个服务器上最多可以保留十个角色，所以你尽可以多试几个职业，不必舍弃什么。删除则是一件需要下决心的事：角色必须不在世界中，游戏还会让你输入它的名字才肯放行。被删除的角色一去不返，它在世界市场上的挂单和渡鸦邮驿里的信件也会随它一并消失。',
-  'guide.howToPlay.charactersTitle': '你的角色',
-  'guide.howToPlay.connectionBody':
-    '信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。',
-  'guide.howToPlay.connectionTitle': '如果你掉线了',
-  'guide.howToPlay.namesBody':
-    '名字长 2 到 16 个字母，以字母开头，可以包含空格、连字符和撇号。同一个服务器上不会有两个角色重名，而大小写并不能让一个名字空出来：如果 Ashwind 已被占用，ashwind 同样被占用。你自己的写法会被原样保留。挑一个你会一直喜欢的名字吧，因为它会一直伴着这个角色。',
-  'guide.howToPlay.namesTitle': '为你的英雄起名',
   'guide.howToPlay.step0Body':
     '离线游玩什么都不需要：在开始界面选择“离线”，再按“开始游戏”。想和大家一起玩，就注册一个免费账号（一个用户名、一个密码，以及一个用于找回账号的邮箱），或登录你已有的账号，然后从服务器列表里挑一个服务器。',
   'guide.howToPlay.worldsBody':
@@ -12029,8 +11998,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.boundBody':
     '你的队伍在裂隙里拿下的第一个击杀，会把这一趟定下来。从那一刻起，你就被绑定在这一份副本上：无论因为什么走出去，再回来时进的都是你离开的那一趟，绝不会进别人的，也绝不会开一趟新的。在第一个击杀之前，什么都还没定，所以还在集结的队伍可以重新会合、一起走进去，不会在身后留下一堆半开的副本。',
   'guide.riftsPage.boundHeading': '一旦见了血',
-  'guide.riftsPage.floorsBody':
-    '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
   'guide.riftsPage.floorsHeading': '层层向下',
   'guide.riftsPage.groupBody':
     '带上一支队伍。裂隙不会因为进去的人少就手下留情：里面没有任何东西会去数你们站着几个人，所以传送门上写的是什么等级，你打的就是什么等级，无论你们是五个人还是一个人。门口确实会放你独自进去，也确实有人这么试过，但裂隙在每一个等级上都是团队内容，而且从第一个房间起它就诚实地告诉你这一点。你的小队会拿到属于自己的一份副本，别的队伍不会闯进你的这一趟。若是倒下了，你可以化作鬼魂走回来，等里面的战斗停下再收拾自己。',
@@ -12352,4 +12319,216 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
+  'guide.controls.clickMoveNote':
+    '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
+  'guide.deedsPage.platformBody':
+    '如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。',
+  'guide.deedsPage.platformHeading': 'Steam 与 Epic 成就',
+  'guide.faqPage.a17':
+    '同一个账号在每个服务器上最多可以有十个角色，而你也可以在不止一个服务器上拥有角色。想删掉某个角色，就在角色列表里删除它：该角色必须不在世界中，而且你要输入它的名字来确认，所以手一滑绝不会让你失去一位英雄。删除是永久的。那个角色的随身家当会随它而去，它在世界市场上的挂单会被撤下，渡鸦邮驿的信箱也会被清空。',
+  'guide.faqPage.a18':
+    '你自己改不了，所以起名时挑一个中意的。名字为 2 到 16 个字母，以字母开头，允许空格、连字符和撇号；无论大小写怎么写，每个名字在它所在的服务器上都是唯一的。违反行为准则的名字会被拒绝。唯一一次会被要求改名，是管理员要求你改。注销账号可能会把它的名字释放给其他玩家，而单纯一阵子不玩绝不会：闲置的账号照样保留它的名字。',
+  'guide.faqPage.a19':
+    '你的角色会在世界中停留大约五分钟，游戏也会自行尝试重连，所以信号中断、合上笔记本或刷新页面，通常都能让你回到原处、回到同一场对局里。也正因为你的角色确实还站在那儿，掉线并不是逃离战斗的办法。从游戏菜单里选择“退出登录”，则会立即离开，不必等完那段时间。',
+  'guide.faqPage.a20':
+    '在在线游戏中，用 Esc 打开菜单，选择“报告错误”。描述发生了什么，然后发送：你所在的服务器、你的角色，以及你当时站在哪里，都会自动一同附上，还有你的版本与设备信息；你也可以勾选“包含截图”，附上你当时看到的画面。如果你接连发送好几份，可能会被要求稍等片刻再发下一份。',
+  'guide.faqPage.q17': '我可以拥有多少个角色？可以删除角色吗？',
+  'guide.faqPage.q18': '我可以更改角色的名字吗？',
+  'guide.faqPage.q19': '如果我掉线了会怎么样？',
+  'guide.faqPage.q20': '我发现了一个错误，该怎么报告？',
+  'guide.howToPlay.charactersBody':
+    '一个账号在每个服务器上最多可以保留十个角色，所以你尽可以多试几个职业，不必舍弃什么。删除则是一件需要下决心的事：角色必须不在世界中，游戏还会让你输入它的名字才肯放行。被删除的角色一去不返，它在世界市场上的挂单和渡鸦邮驿里的信件也会随它一并消失。',
+  'guide.howToPlay.charactersTitle': '你的角色',
+  'guide.howToPlay.connectionBody':
+    '信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。',
+  'guide.howToPlay.connectionTitle': '如果你掉线了',
+  'guide.howToPlay.namesBody':
+    '名字长 2 到 16 个字母，以字母开头，可以包含空格、连字符和撇号。同一个服务器上不会有两个角色重名，而大小写并不能让一个名字空出来：如果 Ashwind 已被占用，ashwind 同样被占用。你自己的写法会被原样保留。挑一个你会一直喜欢的名字吧，因为它会一直伴着这个角色。',
+  'guide.howToPlay.namesTitle': '为你的英雄起名',
+  'guide.faqPage.a6Count':
+    '{cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，从最初的山谷，一直到专为满级角色打造的地带。',
+  'guide.home.faq.a4Count':
+    '等级上限为 {cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，其中最遥远的几处专为满级角色打造。',
+  'guide.home.world.subCount':
+    '一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。',
+  'guide.combat.threatBody':
+    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的狼形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
+  'guide.classPage.formLine.form_bear':
+    '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
+  'guide.riftsPage.floorsBody':
+    '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 性能医生',
+  'hudChrome.perf.diagnostics.subtitle': '针对游戏的扫描，提供证据和代码级修复建议。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '实时性能测量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '诊断扫描进度',
+  'hudChrome.perf.diagnostics.aria.findings': '按优先级排序的诊断结果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展开',
+  'hudChrome.perf.diagnostics.controls.start': '开始 15 秒扫描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '刷新场景统计',
+  'hudChrome.perf.diagnostics.controls.copyReport': '复制清晰报告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下载报告',
+  'hudChrome.perf.diagnostics.controls.scanning': '扫描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '扫描另一个区域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '报告已记录到控制台',
+  'hudChrome.perf.diagnostics.controls.copied': '已复制',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '复制受阻：报告已记录',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低画质重新测试',
+  'hudChrome.perf.diagnostics.instruction':
+    '为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此标签页隐藏时扫描已暂停。返回后扫描将重新开始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已加载。正在等待第一个可操作帧。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此标签页隐藏时扫描已暂停。请返回游戏以继续。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待有代表性的游戏帧：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在采集活跃游戏：现在请穿过问题区域。',
+  'hudChrome.perf.diagnostics.status.ready': '已准备扫描。按开始并重现卡顿。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待游戏世界。请选择离线游戏或进入一个在线角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '渲染器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '场景统计：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡顿归因：进入世界时已启用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 置信度',
+  'hudChrome.perf.diagnostics.sections.evidence': '证据',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即尝试',
+  'hudChrome.perf.diagnostics.sections.codeFix': '代码修复',
+  'hudChrome.perf.diagnostics.sections.source': '相关源文件',
+  'hudChrome.perf.diagnostics.severity.critical': '严重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '信息',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未检测到明显性能问题',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒保持 {fps} FPS，帧 p95 为 {p95}。游戏、浏览器、GPU、内存、资源和网络均未触发阈值。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用软件渲染',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '游戏正在使用集成显卡',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高分辨率渲染开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '强制高画质正在降低性能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '设备可用内存较低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '检测到浏览器或扩展程序停顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '检测到浏览器内存压力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '图形上下文已重置',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要帧瓶颈',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '场景绘制开销超过当前画质预算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '阴影通道占用大量绘制调用',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界渲染器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '实体视图更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌绘制开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模拟工作占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件处理占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '游戏过程中正在编译着色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '纹理上传导致游戏卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '实体视图创建导致卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未归因的长帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '资源处理延迟了游戏启动',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '浏览器长任务正在阻塞帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '网络传输延迟了可见响应',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照处理正在阻塞客户端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '性能规则 {rule} 需要处理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '检测到的浏览器、GPU、内存或设备设置可能在游戏渲染前限制性能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次采集测得的图形工作超过当前帧预算或场景预算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某个 CPU 阶段占用了足以错过帧预算的主线程时间。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '资源准备或首次使用工作发生在可见游戏或启动路径中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '网络传输或客户端快照处理延迟了最新可操作状态。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '环境规则 {rule} 与此设备和浏览器匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 为 {submit}，占渲染器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近窗口测得 {fps} FPS，帧 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '场景使用 {calls} 次绘制调用，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '场景提交 {triangles} 个三角形，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '场景类别 {category} 贡献 {calls} 次调用和 {triangles} 个测量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': '刷新场景统计以识别主要渲染类别。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '阴影通道提交 {calls} 次调用，占基线的 {share}，共 {triangles} 个三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '测得阶段 {phase} 的 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '记录的 {total} 次卡顿中，有 {count} 次与原因 {cause} 匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '预加载门为 {tasks} 个已注册任务等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失败的资源组：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '测得 {count} 个长任务，p95 为 {p95}，最大值为 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照间隔为 {interval}，最新快照年龄为 {age}，输入回显 p95 为 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析和应用 p95 为 {work}；网络间隔 p95 为 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '诊断规则 {rule} 与本次采集匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正检测到的环境设置，重新启动，然后重复相同扫描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低画质重复相同镜头路径，确认图形压力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分别在静止和移动时重复扫描，以隔离 CPU 阶段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重复相同路线或首次使用操作，确认卡顿发生时机。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在离线游戏中使用相同移动和镜头路径进行比较。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '让检测到的备用路径遵守共享图形和内存预算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用现有渲染预算、实例化、材质共享、LOD 和隐藏工作跳过机制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定阶段，移除重复工作和分配，并保持游戏行为。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '通过现有启动和流式预算预加载、池化或分摊已识别的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低传输或快照处理成本，同时不削弱权威服务器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.report.statusLine': '状态：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '采集时间：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要问题：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '画质：{tier}，渲染比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 帧超过 50 毫秒，共测量 {frames} 帧',
+  'hudChrome.perf.diagnostics.report.resultHeading': '结果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次采集未触发可处理阈值。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '严重程度：{severity}。置信度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
+  'hudChrome.perf.diagnostics.report.status.critical': '严重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

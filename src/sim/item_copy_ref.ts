@@ -29,6 +29,24 @@
 //
 // A pure leaf on purpose: no SimContext, no rng, no clock. It takes an `InvSlot[]`
 // and mutates it, so a Vitest drives it directly with a plain array.
+//
+// THE PATTERN A NEW SURFACE SHOULD COPY, since this is the part that took two
+// review rounds to settle:
+//
+//   1. Resolve the selection WITHOUT consuming, before anything mutates, and refuse
+//      there (`selectedInventorySlot(...) === null`). Refusing late is how equipItem
+//      destroyed the displaced piece and how useItem granted its effect for free:
+//      both had already written state by the time the consume could say no.
+//   2. Consume at the point the surface actually takes the item
+//      (`consumeSelectedInventorySlot`), falling back to
+//      `consumeNewestInventoryUnit` only when no selection was given.
+//   3. For a multi-tick action, pin the target with `itemCopyPin` at the start and
+//      re-check it at completion (enchanting and salvage both do this inline).
+//
+// An earlier draft exported a composed `consumeItemCopy` plus an outcome union for
+// step 2. Every converted surface ended up wanting the split above instead, because
+// the refusal has to happen EARLIER than the consume, so the composed helper was
+// removed rather than left as documented-but-unused advice.
 
 import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './types';
 
@@ -145,57 +163,4 @@ export function selectedInventorySlot(
   const slot = inventory[slotIndex];
   if (slot.itemId !== itemId || slot.count < 1) return null;
   return slot;
-}
-
-/** What a resolve did, so a caller can tell a refusal from a fallback. */
-export type ItemCopyOutcome =
-  | { kind: 'selected'; unit: InventoryUnit }
-  | { kind: 'fellBack'; unit: InventoryUnit }
-  | { kind: 'refused' };
-
-/**
- * The composed rule every converted surface calls: honor a valid selection,
- * refuse an invalid one, fall back to the legacy newest-copy walk when none was
- * given.
- *
- * Returning the outcome KIND rather than just the unit is what lets a caller
- * refuse loudly (an invalid selection is a stale or hand-crafted frame, never
- * something to resolve by guessing) while an id-only caller keeps its old
- * behavior untouched.
- */
-export function consumeItemCopy(
-  inventory: InvSlot[],
-  itemId: string,
-  slotIndex: number | undefined,
-): ItemCopyOutcome {
-  const selected = consumeSelectedInventorySlot(inventory, itemId, slotIndex);
-  if (selected === null) return { kind: 'refused' };
-  if (selected !== undefined) return { kind: 'selected', unit: selected };
-  return { kind: 'fellBack', unit: consumeNewestInventoryUnit(inventory, itemId) };
-}
-
-/**
- * Re-check a selection pinned at the START of a multi-tick action against the
- * slot living at that index NOW. False means the bag shifted underneath (a move,
- * a merge, a loot, a sort) and the action must refuse rather than hit whatever
- * moved in.
- *
- * A bag index is stable only within one tick, so any action with a cast time
- * needs this: without it, selecting a copy and then looting during the cast
- * redirects the hit, which is strictly worse than the old guess because the
- * player believes they aimed. Enchanting performs the same re-check inline
- * against its own session; salvage is the second caller, which is what earns
- * this its place here.
- *
- * `undefined` slotIndex passes: an id-only action pinned nothing, so there is
- * nothing to invalidate and it keeps its legacy behavior.
- */
-export function itemCopyStillPinned(
-  inventory: InvSlot[],
-  slotIndex: number | undefined,
-  pin: string,
-): boolean {
-  if (slotIndex === undefined) return true;
-  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return false;
-  return itemCopyPin(inventory[slotIndex]) === pin;
 }

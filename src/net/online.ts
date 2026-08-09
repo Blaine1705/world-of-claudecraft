@@ -5506,8 +5506,19 @@ export class ClientWorld implements IWorld {
   selectTalentRow(level: TalentRowLevel, optionId: string | null): void {
     this.cmd({ cmd: 'selectTalentRow', level, optionId });
   }
-  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
-    this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc?: TalentAllocation,
+    captureGear?: boolean,
+  ): void {
+    // `captureGear` rides only when true, the craftItem `commission` idiom: an
+    // ordinary talent-only save sends a byte-identical message to before.
+    if (captureGear === true) {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc, captureGear: true });
+    } else {
+      this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+    }
   }
   switchLoadout(index: number): void {
     this.cmd({ cmd: 'switchLoadout', index });

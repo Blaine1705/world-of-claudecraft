@@ -1175,6 +1175,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.browserSupport.getDesktopApp': '取得桌面應用程式',
   'hudChrome.landing.browserSupport.continueInBrowser': '繼續在瀏覽器中遊玩',
   'hudChrome.landing.browserSupport.dismissAria': '關閉不受支援瀏覽器的提示',
+  'hudChrome.talents.newBuildWithGear': '新增配置（同時儲存裝備）',
+  'hudChrome.talents.gearNotHeld': '你已不再擁有該配置儲存的 {n} 件裝備。',
+  'hudChrome.talents.gearCopyGone': '有 {n} 件裝備不是該配置鎖定的那一件。',
+  'hudChrome.talents.gearTakenByOtherSlot': '有 {n} 件裝備需要你沒有的另一件副本。',
+  'hudChrome.talents.gearRestored': '已從此配置恢復 {n} 件裝備。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。',
   'meta.builtOn': '建置於 {date}',
@@ -11443,8 +11448,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.warfareHeading': '戰爭套裝',
   'guide.arenaPage.warfareTradeBody':
     '這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。',
-  'guide.classPage.formLine.form_bear':
-    '坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。',
   'guide.classPage.formLine.form_cat':
     '近戰輸出型態：像盜賊那樣使用能量與連擊點，威脅值則低上許多。',
   'guide.classPage.formLine.form_travel':
@@ -11475,8 +11478,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.combat.fatigueBody':
     '大海沒有牆。這個世界原本就要你游過去的水路，也就是陸地與陸地之間的海峽與湖泊，以及內陸的湖泊，無論花多久橫渡都很安全。但若你從岸邊一路闖進真正的外海，它便會開始抽乾你的力氣：先出現一段警告，你有充裕的時間掉頭，在那之後，大海會持續造成愈來愈重、什麼都擋不住的傷害，直到你朝陸地折返為止。在離岸那麼遠的地方溺斃或力竭，你會像其他任何死法一樣釋放靈魂，所以請把地平線當成風景，而不是目的地。',
   'guide.combat.hazardsTitle': '水會要你的命',
-  'guide.combat.threatBody':
-    '每個敵人心裡都默默記著一筆帳，算的是誰最惹惱了牠。傷害會加進去，治療也一樣：一次治療會把威脅值加到那些正在攻擊你所治療對象的敵人身上，並在牠們之間分攤，因此最安全的治療，是治在坦克已經穩住的人身上。坦克會開啟防禦姿態或防護形態，讓自己產生的一切倍增，而德魯伊的狼形態則反過來卸除威脅值；嘲諷則會把施放者直接抬到這筆帳的最上方，並將敵人釘在自己身上數秒。敵人並不會在有人剛超過坦克的那一瞬間就換目標：要拉走一隻敵人得領先得夠明顯，而遠程所需的領先幅度又比近戰更大，因此開場拉怪時稍有耐心，就能讓戰鬥留在它該待的地方。',
   'guide.combat.threatTitle': '敵人會打誰',
   'guide.combat.unstuckBody':
     '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
@@ -11617,8 +11618,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.zones': '依旅程順序列出每一座區域與它的等級範圍，並標出你所在的那一座。',
   'guide.controls.attackMove': '攻擊移動（需先在選項中開啟）',
   'guide.controls.bgFlag': '在荊谷原野奪取敵方戰旗',
-  'guide.controls.clickMoveNote':
-    '點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。',
   'guide.controls.jumpSwim': '跳躍；身在水中時則向上游',
   'guide.controls.meters': '戰鬥統計（傷害、治療與仇恨）',
   'guide.controls.moveAlt': '移動與轉向（同樣的四個動作，使用第二組按鍵）',
@@ -11631,9 +11630,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.bookBody':
     '功績之書會把每個功績分門別類，讓你在類別之間翻閱，並附有搜尋框，以及全部、已獲得、未獲得與即將完成這幾種篩選。靠近頂端的「最近」一列收著你最新解鎖的功績，點擊其中一個就會直接跳到它的卡片；點擊別人貼在聊天中的功績名稱也一樣。在它旁邊，「即將完成」會指出你最接近達成的那幾個。在王國之中，每個功績還帶著它的稀有度，也就是已達成它的冒險者比例，讓你一眼看出哪些稀鬆平常、哪些是真正的攀登；離線世界沒有可供統計的人口，因此不顯示稀有度。側欄的盡頭是頭銜欄，你可以在那裡挑選要佩戴的頭銜。',
   'guide.deedsPage.bookHeading': '功績之書裡面有什麼',
-  'guide.deedsPage.platformBody':
-    '如果你在電腦版應用程式中連結了 Steam 或 Epic Games 帳號，你所贏得的功績便會向外同步，成為該帳號上的成就。遊戲世界始終是權威所在：你在這裡贏得功績，它記在你的角色身上，成就隨後才跟上。並非每個功績都有對應的成就，而某個成就若沒有立刻送達，也會在你下次登入時補上。連結永遠只是連結，絕不是一種登入方式。',
-  'guide.deedsPage.platformHeading': 'Steam 與 Epic 成就',
   'guide.delvesPage.lockpickAnteBody':
     '你在碰到鎖之前就先談好條件。拿三根撬棒，你有失手的餘裕，但寶櫃只會付出最樸素的獎賞；拿兩根是折衷的交易；只拿一根，而且乾淨俐落地解開，回報最為豐厚。你手上的撬棒愈少，每一步之間可供思考的時間也愈短；而如果最後一根折斷，這道鎖就會徹底卡死：在你再次通關這座秘探之前，那只寶櫃就此無緣。',
   'guide.delvesPage.riteBody':
@@ -11710,25 +11706,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '只有線上遊玩才需要。離線世界什麼都不要求：在起始畫面選擇「離線」，然後按下「遊玩」。線上帳號是免費的，需要一個使用者名稱、一組密碼，以及一個用於帳號救援的電子郵件地址，並會把你的角色保存在伺服器上。有了帳號之後，你可以在選項中開啟兩步驟驗證。',
   'guide.faqPage.a16':
     '線上遊玩發生在各個世界上，而每個世界都是一份完整的遊戲副本，有自己的玩家、自己的世界市場與自己的排名。登入時，世界列表會顯示每個世界有多熱鬧，從「低」到「已滿」，讓你挑一個清靜的世界享受空間，或挑一個熱鬧的世界找伴。你的角色住在你創建它的那個世界上，而你可以在不只一個世界上保有角色。',
-  'guide.faqPage.a17':
-    '一個帳號在每個世界上最多可有十個角色，而你也可以在不只一個世界上擁有角色。想移除某個角色，請在角色列表中刪除它：該角色必須不在世界中，而且你得輸入它的名字來確認，正因如此，一次手滑絕不會讓你失去一位英雄。刪除是永久的。那個角色的身家會隨它而去，它在世界市場上的刊登會被撤下，它的渡鴉郵驛信箱也會被清空。',
-  'guide.faqPage.a18':
-    '你自己改不了，所以請挑一個你喜歡的。名字為 2 至 16 個字母，必須以字母開頭，並允許空格、連字號與撇號，而且無論大小寫如何，每個名字在它所屬的世界上都是獨一無二的。違反行為準則的名字會被拒絕。唯一會要求你改名的情況，是管理員要求你這麼做。關閉帳號可能會把它的名字釋出給其他玩家，而單純一陣子沒上線則絕不會：閒置的帳號仍然保有它的名字。',
-  'guide.faqPage.a19':
-    '你的角色會在世界中停留約五分鐘，遊戲也會自行嘗試重新連線，因此訊號中斷、闔上筆電，或是重新整理頁面，通常都能讓你回到原處，回到同一個工作階段。也正因為你的角色真的還站在那裡，斷線並不是一種脫離戰鬥的辦法。若從遊戲選單選擇「登出」，則會立刻離開，而不會等那段時間過完。',
-  'guide.faqPage.a20':
-    '在線上遊戲中，以 Esc 開啟選單並選擇「回報錯誤」。描述發生了什麼事再送出即可：你所在的世界、你的角色，以及你當時站的位置都會自動一併附上，還有你的版本與裝置資訊，而你也可以勾選「包含截圖」，附上一張你當時所見畫面的圖片。如果你連續送出好幾份，系統可能會請你稍候片刻再送下一份。',
-  'guide.faqPage.a6Count':
-    '{cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，從最初的起始山谷，一路延伸到專為已達上限的角色所打造的地帶。',
   'guide.faqPage.q12': '有現金商店嗎？',
   'guide.faqPage.q13': '我可以在哪裡取得應用程式？',
   'guide.faqPage.q14': '我需要什麼才能執行它？',
   'guide.faqPage.q15': '我需要帳號嗎？',
   'guide.faqPage.q16': '什麼是世界？',
-  'guide.faqPage.q17': '我可以有幾個角色？可以刪除嗎？',
-  'guide.faqPage.q18': '我可以更改角色的名字嗎？',
-  'guide.faqPage.q19': '如果我斷線了會怎麼樣？',
-  'guide.faqPage.q20': '我找到一個錯誤，該如何回報？',
   'guide.gear.bagsSort':
     '當背包變亂時，背包視窗中的「整理」按鈕一按就能把它收拾乾淨。同一種物品的零散堆疊會被合併，所有東西也會依好讀的順序重新排列：武器與護甲在前，接著是背包、消耗品、工具與坐騎，然後是製作材料，每一種優質材料都緊挨著它的普通版本，再來是任務物品，最後才是灰色雜物，讓你一眼看出該賣掉什麼。過程中絕不會憑空產生或遺失任何東西，只是重新排列，因此隨時按下都很安全。',
   'guide.gear.bindOnTradeBody':
@@ -11818,8 +11800,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.groups.compete': '玩家對戰',
   'guide.groups.endgame': '組隊內容',
   'guide.groups.world': '這個世界',
-  'guide.home.faq.a4Count':
-    '等級上限為 {cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，其中最遙遠的幾座，正是專為已達上限的角色所打造的。',
   'guide.home.world.farshoreBlurb':
     '沙洲彼端的一座島嶼，天空在裂隙原野之上撕裂而開，而鷗港為每一道裂口敲響它的鐘。',
   'guide.home.world.farshoreName': '遠岸',
@@ -11836,17 +11816,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.levelsCap': '等級 {level}',
   'guide.home.world.nightBlurb': '一片星辰滿天的午夜國度，花朵照亮小徑，月棲鎮則徹夜守望。',
   'guide.home.world.nightName': '夜綻花野',
-  'guide.home.world.subCount':
-    '一片相連的大陸，共 {zones} 座區域，從寧靜的山谷與沉沒的沼澤，到餘燼荒漠、冰封高地與樹籬迷宮花園。',
-  'guide.howToPlay.charactersBody':
-    '一個帳號在每個世界上最多可以保有十個角色，所以你有足夠的空間試玩好幾種職業，不必為此放棄任何東西。刪除角色則是一個慎重的動作：該角色必須不在世界中，而遊戲會要求你輸入它的名字，才肯讓它離去。被刪除的角色永遠回不來了，它在世界市場上的刊登與渡鴉郵驛的信件也會一併消失。',
-  'guide.howToPlay.charactersTitle': '你的角色',
-  'guide.howToPlay.connectionBody':
-    '訊號中斷、闔上筆電，或是重新整理頁面，都不會讓你登出。你的角色會被保留在世界中約五分鐘，遊戲則自行重新連線，而你會回到同一個工作階段的同一個位置。這也表示斷線並不是一種脫離戰鬥的辦法：你的角色仍然站在那裡。從遊戲選單登出則會立刻離開，而不是等待，用同一個帳號登入另一個角色時也是如此。',
-  'guide.howToPlay.connectionTitle': '如果你的連線中斷',
-  'guide.howToPlay.namesBody':
-    '名字長度為 2 至 16 個字母，以字母開頭，並且可以包含空格、連字號與撇號。同一個世界上的兩個角色不能共用同一個名字，而大小寫不會讓一個名字重獲自由：如果 Ashwind 已被使用，ashwind 也一樣被使用了。你自己的拼寫方式會被完整保留，一如你輸入時的模樣。請挑一個你會滿意的名字，因為它將一直伴著這個角色。',
-  'guide.howToPlay.namesTitle': '為你的英雄命名',
   'guide.howToPlay.step0Body':
     '離線遊玩什麼都不用準備：在開始畫面選擇「離線」，按下「遊玩」即可。想和大家一起玩，就免費建立一個帳號（一個使用者名稱、一組密碼，以及一個用來找回帳號的電子郵件地址），或登入你既有的帳號，再從世界列表中挑一個世界。',
   'guide.howToPlay.worldsBody':
@@ -12033,8 +12002,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.boundBody':
     '你的隊伍在裂隙裡取得的第一次擊殺，就此定下這趟旅程。從那一刻起，你便被綁定在那個複本上：無論因為什麼理由離開，回來時進的都是你離開的那一趟，絕不會進入別隊的複本，也不會是一趟全新的。在那第一次擊殺之前，什麼都還沒定下，因此還在集合的隊伍可以重新整隊、一起走進去，不會在身後留下一堆開了頭的半成品複本。',
   'guide.riftsPage.boundHeading': '一旦見血',
-  'guide.riftsPage.floorsBody':
-    '一道裂隙有數層樓，每一層都是現場生成的，而通往下層的路要等這一層放你走才會開啟：清掉層上還活著的東西，解開它橫在你路上的一切封鎖，向下的通道便會撕裂開來。最後一層以一場首領戰作結。每一層都有自己的性格，因此單單一趟旅程就可能帶你從嚴霜走進餘燼，而每當你抵達新的一層，聊天視窗都會念出它的名字。你螢幕上的追蹤條，正是你得知這一道有幾層的地方。有少數裂隙開啟的不是生成出來的下潛之路，而是一座手工打造的場景，它自有一段固定的長度。',
   'guide.riftsPage.floorsHeading': '一層層向下',
   'guide.riftsPage.groupBody':
     '帶上一支隊伍。裂隙不會因為走進去的人少就手下留情：裡頭沒有任何東西會去數站著的有幾個人，所以傳送門上的等級就是你要面對的等級，不管你們是五個人還是一個人。門口確實會讓你獨自進去，也真的有人會試，但裂隙在每一個等級都是團隊內容，而且從第一個房間起就對此毫不掩飾。你的隊伍會拿到專屬於自己的裂隙複本，因此不會有別的隊伍闖進你的旅程。若你倒下，可以化為鬼魂走回去，等裡頭的戰鬥停下之後再把自己收拾起來。',
@@ -12357,4 +12324,217 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命運絲線。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。2 分鐘冷卻。',
+  'guide.controls.clickMoveNote':
+    '點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。',
+  'guide.deedsPage.platformBody':
+    '如果你在電腦版應用程式中連結了 Steam 或 Epic Games 帳號，你所贏得的功績便會向外同步，成為該帳號上的成就。遊戲世界始終是權威所在：你在這裡贏得功績，它記在你的角色身上，成就隨後才跟上。並非每個功績都有對應的成就，而某個成就若沒有立刻送達，也會在你下次登入時補上。連結永遠只是連結，絕不是一種登入方式。',
+  'guide.deedsPage.platformHeading': 'Steam 與 Epic 成就',
+  'guide.faqPage.a17':
+    '一個帳號在每個世界上最多可有十個角色，而你也可以在不只一個世界上擁有角色。想移除某個角色，請在角色列表中刪除它：該角色必須不在世界中，而且你得輸入它的名字來確認，正因如此，一次手滑絕不會讓你失去一位英雄。刪除是永久的。那個角色的身家會隨它而去，它在世界市場上的刊登會被撤下，它的渡鴉郵驛信箱也會被清空。',
+  'guide.faqPage.a18':
+    '你自己改不了，所以請挑一個你喜歡的。名字為 2 至 16 個字母，必須以字母開頭，並允許空格、連字號與撇號，而且無論大小寫如何，每個名字在它所屬的世界上都是獨一無二的。違反行為準則的名字會被拒絕。唯一會要求你改名的情況，是管理員要求你這麼做。關閉帳號可能會把它的名字釋出給其他玩家，而單純一陣子沒上線則絕不會：閒置的帳號仍然保有它的名字。',
+  'guide.faqPage.a19':
+    '你的角色會在世界中停留約五分鐘，遊戲也會自行嘗試重新連線，因此訊號中斷、闔上筆電，或是重新整理頁面，通常都能讓你回到原處，回到同一個工作階段。也正因為你的角色真的還站在那裡，斷線並不是一種脫離戰鬥的辦法。若從遊戲選單選擇「登出」，則會立刻離開，而不會等那段時間過完。',
+  'guide.faqPage.a20':
+    '在線上遊戲中，以 Esc 開啟選單並選擇「回報錯誤」。描述發生了什麼事再送出即可：你所在的世界、你的角色，以及你當時站的位置都會自動一併附上，還有你的版本與裝置資訊，而你也可以勾選「包含截圖」，附上一張你當時所見畫面的圖片。如果你連續送出好幾份，系統可能會請你稍候片刻再送下一份。',
+  'guide.faqPage.q17': '我可以有幾個角色？可以刪除嗎？',
+  'guide.faqPage.q18': '我可以更改角色的名字嗎？',
+  'guide.faqPage.q19': '如果我斷線了會怎麼樣？',
+  'guide.faqPage.q20': '我找到一個錯誤，該如何回報？',
+  'guide.howToPlay.charactersBody':
+    '一個帳號在每個世界上最多可以保有十個角色，所以你有足夠的空間試玩好幾種職業，不必為此放棄任何東西。刪除角色則是一個慎重的動作：該角色必須不在世界中，而遊戲會要求你輸入它的名字，才肯讓它離去。被刪除的角色永遠回不來了，它在世界市場上的刊登與渡鴉郵驛的信件也會一併消失。',
+  'guide.howToPlay.charactersTitle': '你的角色',
+  'guide.howToPlay.connectionBody':
+    '訊號中斷、闔上筆電，或是重新整理頁面，都不會讓你登出。你的角色會被保留在世界中約五分鐘，遊戲則自行重新連線，而你會回到同一個工作階段的同一個位置。這也表示斷線並不是一種脫離戰鬥的辦法：你的角色仍然站在那裡。從遊戲選單登出則會立刻離開，而不是等待，用同一個帳號登入另一個角色時也是如此。',
+  'guide.howToPlay.connectionTitle': '如果你的連線中斷',
+  'guide.howToPlay.namesBody':
+    '名字長度為 2 至 16 個字母，以字母開頭，並且可以包含空格、連字號與撇號。同一個世界上的兩個角色不能共用同一個名字，而大小寫不會讓一個名字重獲自由：如果 Ashwind 已被使用，ashwind 也一樣被使用了。你自己的拼寫方式會被完整保留，一如你輸入時的模樣。請挑一個你會滿意的名字，因為它將一直伴著這個角色。',
+  'guide.howToPlay.namesTitle': '為你的英雄命名',
+  'guide.faqPage.a6Count':
+    '{cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，從最初的起始山谷，一路延伸到專為已達上限的角色所打造的地帶。',
+  'guide.home.faq.a4Count':
+    '等級上限為 {cap} 級，需橫跨各處區域，透過任務、地城與探索達成。全世界共有 {zones} 座區域，其中最遙遠的幾座，正是專為已達上限的角色所打造的。',
+  'guide.home.world.subCount':
+    '一片相連的大陸，共 {zones} 座區域，從寧靜的山谷與沉沒的沼澤，到餘燼荒漠、冰封高地與樹籬迷宮花園。',
+  'guide.combat.threatBody':
+    '每個敵人心裡都默默記著一筆帳，算的是誰最惹惱了牠。傷害會加進去，治療也一樣：一次治療會把威脅值加到那些正在攻擊你所治療對象的敵人身上，並在牠們之間分攤，因此最安全的治療，是治在坦克已經穩住的人身上。坦克會開啟防禦姿態或防護形態，讓自己產生的一切倍增，而德魯伊的狼形態則反過來卸除威脅值；嘲諷則會把施放者直接抬到這筆帳的最上方，並將敵人釘在自己身上數秒。敵人並不會在有人剛超過坦克的那一瞬間就換目標：要拉走一隻敵人得領先得夠明顯，而遠程所需的領先幅度又比近戰更大，因此開場拉怪時稍有耐心，就能讓戰鬥留在它該待的地方。',
+  'guide.classPage.formLine.form_bear':
+    '坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。',
+  'guide.riftsPage.floorsBody':
+    '一道裂隙有數層樓，每一層都是現場生成的，而通往下層的路要等這一層放你走才會開啟：清掉層上還活著的東西，解開它橫在你路上的一切封鎖，向下的通道便會撕裂開來。最後一層以一場首領戰作結。每一層都有自己的性格，因此單單一趟旅程就可能帶你從嚴霜走進餘燼，而每當你抵達新的一層，聊天視窗都會念出它的名字。你螢幕上的追蹤條，正是你得知這一道有幾層的地方。有少數裂隙開啟的不是生成出來的下潛之路，而是一座手工打造的場景，它自有一段固定的長度。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 效能醫生',
+  'hudChrome.perf.diagnostics.subtitle': '針對遊戲的掃描，提供證據與程式碼層級修正建議。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '即時效能測量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '診斷掃描進度',
+  'hudChrome.perf.diagnostics.aria.findings': '依優先順序排列的診斷結果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展開',
+  'hudChrome.perf.diagnostics.controls.start': '開始 15 秒掃描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '重新整理場景統計',
+  'hudChrome.perf.diagnostics.controls.copyReport': '複製清晰報告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下載報告',
+  'hudChrome.perf.diagnostics.controls.scanning': '掃描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '掃描另一個區域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '報告已記錄至主控台',
+  'hudChrome.perf.diagnostics.controls.copied': '已複製',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '複製受阻：報告已記錄',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低畫質重新測試',
+  'hudChrome.perf.diagnostics.instruction':
+    '為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此分頁隱藏時掃描已暫停。返回後掃描將重新開始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已載入。正在等待第一個可操作影格。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此分頁隱藏時掃描已暫停。請返回遊戲以繼續。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在擷取活躍遊戲：剩餘 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待具代表性的遊戲影格：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在擷取活躍遊戲：現在請穿過問題區域。',
+  'hudChrome.perf.diagnostics.status.ready': '已準備掃描。按開始並重現卡頓。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '算繪器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '場景統計：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡頓歸因：進入世界時已啟用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 信心度',
+  'hudChrome.perf.diagnostics.sections.evidence': '證據',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即嘗試',
+  'hudChrome.perf.diagnostics.sections.codeFix': '程式碼修正',
+  'hudChrome.perf.diagnostics.sections.source': '相關來源檔案',
+  'hudChrome.perf.diagnostics.severity.critical': '嚴重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '資訊',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未偵測到明顯效能問題',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒維持 {fps} FPS，影格 p95 為 {p95}。遊戲、瀏覽器、GPU、記憶體、資源與網路均未觸發門檻。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用軟體算繪',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '遊戲正在使用整合式 GPU',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高解析度算繪開銷較大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '強制高畫質正在降低效能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '裝置可用記憶體偏低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '偵測到瀏覽器或擴充功能停頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '偵測到瀏覽器記憶體壓力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '圖形內容已重設',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要影格瓶頸',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '場景繪製成本超過目前畫質預算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '陰影通道占用大量繪製呼叫',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界算繪器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '實體視圖更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌繪製成本偏高',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模擬工作占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件處理占用影格時間',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '遊戲過程中正在編譯著色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '紋理上傳造成遊戲卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '實體視圖建立造成卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未歸因的長影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '資源處理延遲了遊戲啟動',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '瀏覽器長任務正在阻塞影格',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '網路傳輸延遲了可見回應',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照處理正在阻塞客戶端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '效能規則 {rule} 需要處理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '偵測到的瀏覽器、GPU、記憶體或裝置設定可能在遊戲算繪前限制效能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次擷取測得的圖形工作超過目前影格或場景預算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某個 CPU 階段占用足以錯過影格預算的主執行緒時間。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '資源準備或首次使用工作發生在可見遊戲或啟動路徑中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '網路傳輸或客戶端快照處理延遲了最新可操作狀態。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '環境規則 {rule} 與此裝置和瀏覽器相符。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 為 {submit}，占算繪器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近視窗測得 {fps} FPS，影格 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '場景使用 {calls} 次繪製呼叫，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '場景提交 {triangles} 個三角形，目標為 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '場景類別 {category} 貢獻 {calls} 次呼叫和 {triangles} 個測量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded':
+    '重新整理場景統計以識別主要算繪類別。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '陰影通道提交 {calls} 次呼叫，占基準的 {share}，共 {triangles} 個三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '測得階段 {phase} 的 p95 為 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '記錄的 {total} 次卡頓中，有 {count} 次符合原因 {cause}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '預載門檻為 {tasks} 個已登錄任務等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失敗的資源群組：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '測得 {count} 個長任務，p95 為 {p95}，最大值為 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照間隔為 {interval}，最新快照時間為 {age}，輸入回應 p95 為 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析與套用 p95 為 {work}；網路間隔 p95 為 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '診斷規則 {rule} 與本次擷取相符。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正偵測到的環境設定，重新啟動，再重複相同掃描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低畫質重複相同鏡頭路徑，確認圖形壓力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分別在靜止與移動時重複掃描，以隔離 CPU 階段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重複相同路線或首次使用操作，確認卡頓發生時機。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在離線遊戲中使用相同移動與鏡頭路徑進行比較。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '讓偵測到的備援路徑遵守共用圖形與記憶體預算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用現有算繪預算、實例化、材質共用、LOD 與隱藏工作略過機制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定階段，移除重複工作與配置，並維持遊戲行為。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '透過現有啟動與串流預算預載、池化或分攤已識別的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低傳輸或快照處理成本，同時不削弱權威伺服器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 效能診斷',
+  'hudChrome.perf.diagnostics.report.statusLine': '狀態：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '擷取時間：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要問題：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '畫質：{tier}，算繪比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 個影格超過 50 毫秒，共測量 {frames} 個影格',
+  'hudChrome.perf.diagnostics.report.resultHeading': '結果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次擷取未觸發可處理門檻。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '嚴重程度：{severity}。信心度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '無法使用',
+  'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

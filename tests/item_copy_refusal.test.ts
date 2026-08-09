@@ -39,6 +39,22 @@ function makeSim(cls: PlayerClass = 'warrior'): Sim {
   return sim;
 }
 
+/** Stand the player at a real vendor. Without this the sell arms short-circuit on
+ *  "There is no merchant nearby", which made the first sell test VACUOUS: it
+ *  asserted nothing changed, and nothing changed because the command never got
+ *  past its range gate. */
+function standAtVendor(sim: Sim): void {
+  const vendor = [...sim.entities.values()].find(
+    (e) => e.kind === 'npc' && (e.vendorItems?.length ?? 0) > 0,
+  );
+  if (!vendor) throw new Error('no vendor NPC fixture');
+  const p = sim.player;
+  p.pos.x = vendor.pos.x;
+  p.pos.z = vendor.pos.z;
+  p.pos.y = vendor.pos.y;
+  p.prevPos = { ...p.pos };
+}
+
 function metaOf(sim: Sim) {
   const meta = sim.players.get(sim.playerId);
   if (!meta) throw new Error('no meta');
@@ -186,6 +202,80 @@ describe('a refused selection consumes nothing and grants nothing', () => {
 
     expect(metaOf(sim).inventory).toEqual(before.inventory);
     expect(metaOf(sim).bags, 'no socket was filled').toEqual(bagsBefore);
+  });
+
+  it('sellItem: nothing is sold', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim);
+    const id = firstItem((d) => d.kind === 'junk');
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: id, count: 1 });
+    standAtVendor(sim);
+    const before = snapshot(sim);
+    const copperBefore = meta.copper;
+    sim.drainEvents();
+
+    sim.sellItem(id, 1, pid, BAD_INDEX);
+
+    expect(metaOf(sim).inventory).toEqual(before.inventory);
+    expect(metaOf(sim).copper, 'and no coin changed hands').toBe(copperBefore);
+  });
+
+  it('sellItem: naming a slot that holds a DIFFERENT bound item says "don\'t have", not "bound"', () => {
+    // The one behavior change of the review round with no test: the bound check
+    // read the named slot before matching the item id, so naming a slot holding
+    // some other bound item reported it as bound, which is a misleading refusal
+    // about an item the player never asked to sell.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim);
+    const selling = firstItem((d) => d.kind === 'junk');
+    const other = Object.values(ITEMS).find((d) => d.kind === 'junk' && d.id !== selling);
+    if (!other) throw new Error('need two junk items');
+    meta.inventory.length = 0;
+    // index 0 holds a DIFFERENT item, and it is bound.
+    meta.inventory.push({
+      itemId: other.id,
+      count: 1,
+      instance: { boundTo: 'someone' } as never,
+    });
+    meta.inventory.push({ itemId: selling, count: 1 });
+    standAtVendor(sim);
+    sim.drainEvents();
+
+    sim.sellItem(selling, 1, pid, 0);
+
+    const errors = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
+      .map((e) => e.text);
+    expect(errors).toContain("You don't have that item.");
+    expect(errors, 'and NOT the bound refusal').not.toContain(
+      'That item is bound and cannot be sold.',
+    );
+  });
+
+  it('the rift forge: a refused selection upgrades nothing', () => {
+    // The forge MUTATES its target in place rather than consuming it, so a refusal
+    // here would corrupt the wrong copy rather than destroy one. Covered because
+    // the resolve-only helper has its own arm.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim);
+    const id = firstItem((d) => d.slot === 'chest' && d.kind === 'armor');
+    meta.inventory.length = 0;
+    meta.inventory.push({
+      itemId: id,
+      count: 1,
+      instance: { rift: { tier: 1 } } as never,
+    });
+    const before = snapshot(sim);
+    sim.drainEvents();
+
+    sim.upgradeRiftItem(id, pid, BAD_INDEX);
+
+    expect(metaOf(sim).inventory, 'the copy is untouched').toEqual(before.inventory);
   });
 
   it('a VALID selection on the same surfaces still works, so the guards are not blanket refusals', () => {
