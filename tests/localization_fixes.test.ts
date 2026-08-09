@@ -1361,6 +1361,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'battleground_backfill.ts',
       'battleground_outcomes.ts',
       'battleground_party.ts',
+      'battleground_proposal.ts',
       'card_duel.ts',
       'card_duel_queue.ts',
       'chat.ts',
