@@ -4162,9 +4162,9 @@ export class Renderer {
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's
       // per-render auto-reset drops those passes, so add them back at 1 draw call
-      // and 2 triangles each. (Since r185 that live read also includes the
-      // shadow pass, matching the composer tiers' semantics; direct-profile
-      // calls/triangles rose accordingly, an accepted three-train shift.)
+      // and 2 triangles each. (Since r185 that live read would also include
+      // the shadow pass; empty on every shipped direct profile, which never
+      // enables dynamic shadows, pinned in tests/gfx.test.ts.)
       calls: drawStatsFrame
         ? drawStatsFrame.calls
         : info.render.calls + this.lastWaterSimulationPasses,
@@ -4564,10 +4564,11 @@ export class Renderer {
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
     // through untouched, and their water passes are already present in
     // the logical-frame session, so they must not be counted twice. Since
-    // r185 the live read includes the shadow pass too (r165 excluded it),
-    // aligning the direct profiles' draw-pressure signal with the composer
-    // tiers' shadow-inclusive semantics; the shift is accepted deliberately
-    // rather than compensated (three-train record, phase 6).
+    // r185 the live read would include the shadow pass too (r165 excluded
+    // it), but every shipped direct profile also disables dynamic shadows
+    // (low tier and the iOS memory profile; pinned in tests/gfx.test.ts), so
+    // the governor signal did not move; only a dev override pairing
+    // composer:false with shadows on would see the shadow-inclusive read.
     sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
     sample.triangles =
       drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
@@ -5503,9 +5504,9 @@ export class Renderer {
     const focusX = this.cameraLookAt.x;
     const focusZ = this.cameraLookAt.z;
     const input = this.opaqueSortPolicyInput;
-    // The direct arm's live read includes the shadow pass since r185 (r165
-    // excluded it), matching the drawStats arm; the sort threshold may bind
-    // a few calls earlier on direct profiles, accepted with the three train.
+    // The direct arm's live read would include the shadow pass since r185
+    // (r165 excluded it), but shipped direct profiles never render shadows
+    // (pinned in tests/gfx.test.ts), so the sort threshold did not move.
     input.drawCalls = this.drawStats
       ? this.drawStats.currentFrame().calls
       : this.webgl.info.render.calls;

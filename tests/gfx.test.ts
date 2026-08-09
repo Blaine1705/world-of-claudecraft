@@ -30,6 +30,28 @@ const desktop: GfxRuntimeHints = {
 };
 
 describe('graphics tier resolution', () => {
+  it('never renders shadows on a direct (no composer, no gradePass) profile', () => {
+    // r185 moved info.reset() ahead of the shadow pass, so a DIRECT profile's
+    // live info.render reads would include shadow draws in the governor and
+    // opaque-sort signals. That shift is empty today because every shipped
+    // direct profile also disables dynamic shadows; this pin makes that
+    // invariant explicit so a new tier below medium or a gradePass re-gating
+    // cannot silently move the low-end draw-pressure signal.
+    const tiers = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
+    let directProfilesSeen = 0;
+    for (const tier of tiers) {
+      for (const hints of [undefined, { platform: 'ios' as const }]) {
+        const settings = gfxInternalsForTest.settingsFor(tier, hints);
+        if (!settings.composer && !settings.gradePass) {
+          directProfilesSeen++;
+          expect(settings.dynamicShadows, `${tier} ios:${hints !== undefined}`).toBe(false);
+        }
+      }
+    }
+    // Vacuity floor: plain low and every iOS memory-profile tier are direct.
+    expect(directProfilesSeen).toBeGreaterThanOrEqual(6);
+  });
+
   it('resolves an unset preset device-aware, matching the medium data-fx-level fallback', () => {
     // The 3D tier (tierFromHints) and the HUD data-fx-level (graphicsPresetLabel(settings def))
     // must agree on the unset/first-run default so they never diverge. An unrecognized device

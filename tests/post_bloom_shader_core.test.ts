@@ -1,5 +1,8 @@
+import { Vector2 } from 'three';
+import type { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { describe, expect, it } from 'vitest';
+import { PreparedBloomPass } from '../src/render/post_bloom';
 import { restoreClassicBloomComposite } from '../src/render/post_bloom_shader_core';
 
 const NUM_MIPS = 5;
@@ -111,5 +114,44 @@ describe('restoreClassicBloomComposite', () => {
     expect(() => restoreClassicBloomComposite(changedAlpha, NUM_MIPS)).toThrow(
       'Pinned UnrealBloom composite shader shape changed (composite main body)',
     );
+  });
+
+  it('rebuilds main() equal to the r165 shape with its tint terms stripped', () => {
+    // The migration claim is IDENTICAL bloom math across the 0.165 to 0.185
+    // train: the pre-upgrade renderer shipped r165's composite with the
+    // identity tint multipliers removed, so the restored body must equal
+    // exactly that, whitespace aside.
+    const stripWs = (s: string): string => s.replace(/\s+/g, '');
+    const mainOf = (s: string): string => {
+      const start = s.indexOf('void main()');
+      expect(start).toBeGreaterThan(-1);
+      return s.slice(start, s.lastIndexOf('}') + 1);
+    };
+    const preUpgradeShipped = R165_COMPOSITE.replace(
+      /\s*\*\s*vec4\(bloomTintColors\[\d\], 1\.0\)/g,
+      '',
+    );
+    expect(preUpgradeShipped).not.toEqual(R165_COMPOSITE);
+
+    const restored = restoreClassicBloomComposite(INSTALLED_COMPOSITE, NUM_MIPS);
+    expect(stripWs(mainOf(restored))).toBe(stripWs(mainOf(preUpgradeShipped)));
+  });
+});
+
+describe('PreparedBloomPass internals against the installed three', () => {
+  it('resolves the r185 _fsQuad handle and builds the tint-free composite', () => {
+    // The render() override drives every quad draw through the pass's
+    // underscore-private _fsQuad; a future rename would otherwise surface
+    // only as a TypeError on the first bloom frame of high and above.
+    const pass = new PreparedBloomPass(new Vector2(64, 64), 0.4, 0.6, 1.32);
+    const quad = (pass as unknown as { _fsQuad: FullScreenQuad })._fsQuad;
+    expect(quad).toBeDefined();
+    expect(typeof quad.render).toBe('function');
+    expect('material' in quad).toBe(true);
+
+    expect(pass.bloomTexture).toBe(pass.renderTargetsHorizontal[0].texture);
+    expect(pass.compositeMaterial.fragmentShader).not.toContain('bloomTintColors');
+    expect(pass.compositeMaterial.uniforms.bloomTintColors).toBeUndefined();
+    pass.dispose();
   });
 });
