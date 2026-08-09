@@ -84,6 +84,25 @@ describe('hidden present skips', () => {
     perf.reset();
     expect(perf.snapshot(2000).hiddenPresentSkips).toBe(0);
   });
+
+  it('records no bucket sample while frame sampling is off, and resumes when it returns', () => {
+    // Phase 4 QA F10: a hidden desktop frame must reproduce the web
+    // hidden-tab shape, where NO per-frame sample records (rAF pauses there),
+    // or the sim/events rings would grow a hidden-only population and the
+    // first post-refocus report window would carry it. main.ts flips this
+    // switch from the presentation gate every frame.
+    const perf = new PerfMonitor(null);
+    const start = perf.startTime();
+    perf.setFrameSampling(false);
+    perf.finishTime('sim', start);
+    perf.finishTime('events', start);
+    expect(perf.snapshot(1000).mainMs.sim.count).toBe(0);
+    expect(perf.snapshot(1000).mainMs.events.count).toBe(0);
+
+    perf.setFrameSampling(true);
+    perf.finishTime('sim', perf.startTime());
+    expect(perf.snapshot(2000).mainMs.sim.count).toBe(1);
+  });
 });
 
 describe('perf monitor ungated net pipeline', () => {

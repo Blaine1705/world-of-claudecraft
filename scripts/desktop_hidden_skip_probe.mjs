@@ -69,6 +69,15 @@ function sample(page) {
       skips: s.hiddenPresentSkips,
       frames: s.frames,
       draws: s.renderer ? s.renderer.calls : null,
+      // Counted DOWNSTREAM of the sync present argument, so a forced present
+      // moves it deterministically whatever the GPU speed (phase 4 QA F4).
+      presented:
+        g.renderer && typeof g.renderer.presentedFrames === 'function'
+          ? g.renderer.presentedFrames()
+          : null,
+      // The sim bucket ring population: hidden frames must record no per-frame
+      // perf sample at all (web hidden-tab parity, phase 4 QA F10).
+      simSamples: s.mainMs && s.mainMs.sim ? s.mainMs.sim.count : null,
       simTime: g.sim && typeof g.sim.time === 'number' ? g.sim.time : null,
       snapAt: g.online && typeof g.online.lastSnapAt === 'number' ? g.online.lastSnapAt : null,
       entities: g.world && g.world.entities ? g.world.entities.size : null,
@@ -112,6 +121,18 @@ async function offlineLeg() {
     );
     check(
       'offline',
+      'no presents while hidden',
+      s1.presented !== null && s1.presented === s0.presented,
+      `presented ${s0.presented} -> ${s1.presented}`,
+    );
+    check(
+      'offline',
+      'no perf bucket samples while hidden',
+      s0.simSamples !== null && s0.simSamples < 500 && s1.simSamples === s0.simSamples,
+      `sim samples ${s0.simSamples} -> ${s1.simSamples}`,
+    );
+    check(
+      'offline',
       'sim time advances while hidden',
       s1.simTime - s0.simTime >= (HIDDEN_MS / 1000) * 0.8,
       `${s0.simTime} -> ${s1.simTime}`,
@@ -129,6 +150,20 @@ async function offlineLeg() {
       `${s1.frames} -> ${s2.frames}`,
     );
     check('offline', 'draws resume on refocus', s2.draws > 0, `draws ${s2.draws}`);
+    check(
+      'offline',
+      'presents resume on refocus',
+      s2.presented > s1.presented,
+      `presented ${s1.presented} -> ${s2.presented}`,
+    );
+    // Kills a sticky setFrameSampling(false): the frozen-while-hidden check
+    // above would pass a switch that never re-enables, this one cannot.
+    check(
+      'offline',
+      'perf bucket sampling resumes on refocus',
+      s2.simSamples > s1.simSamples,
+      `sim samples ${s1.simSamples} -> ${s2.simSamples}`,
+    );
     check('offline', 'no page errors', pageerrors.length === 0, JSON.stringify(pageerrors));
   } finally {
     await browser.close();
@@ -238,6 +273,18 @@ async function onlineLeg() {
       t1.draws === 0 || t1.draws === t0.draws,
       `draws ${t0.draws} -> ${t1.draws}`,
     );
+    check(
+      'online',
+      'no presents while hidden',
+      t1.presented !== null && t1.presented === t0.presented,
+      `presented ${t0.presented} -> ${t1.presented}`,
+    );
+    check(
+      'online',
+      'no perf bucket samples while hidden',
+      t0.simSamples !== null && t0.simSamples < 500 && t1.simSamples === t0.simSamples,
+      `sim samples ${t0.simSamples} -> ${t1.simSamples}`,
+    );
     check('online', 'world mirror stays live', t2.entities > 0, `entities ${t2.entities}`);
     check(
       'online',
@@ -246,6 +293,12 @@ async function onlineLeg() {
       `${t1.frames} -> ${t2.frames}`,
     );
     check('online', 'draws resume on refocus', t2.draws > 0, `draws ${t2.draws}`);
+    check(
+      'online',
+      'presents resume on refocus',
+      t2.presented > t1.presented,
+      `presented ${t1.presented} -> ${t2.presented}`,
+    );
     check('online', 'no page errors', pageerrors.length === 0, JSON.stringify(pageerrors));
   } finally {
     await browser.close();

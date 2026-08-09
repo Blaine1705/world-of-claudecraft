@@ -4116,7 +4116,13 @@ async function startGame(
     // pauses there, so hidden frames never reach the sampler, and the reporter
     // is gated on this same shell signal via its shellHidden option below): the
     // fleet beacon keeps its meaning, where sampling these would fake a healthy
-    // fps and p95.
+    // fps and p95. The switch extends that shape to EVERY per-frame sample: a
+    // web hidden tab fills no sim/events bucket either, so the hidden desktop
+    // frame must not grow a hidden-only ring population (phase 4 QA F10). The
+    // tick-level fleet trackers stay behind gate.render for the same parity:
+    // their rulings made them independent of the woc_perf opt-in, not of
+    // visibility, and no web hidden tab ever ran them.
+    perf.setFrameSampling(gate.render);
     if (gate.render) perf.frame(frameDt);
     else perf.noteHiddenPresentSkip();
     if (gate.paint) {
@@ -4279,7 +4285,9 @@ async function startGame(
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
-      syncGroundAimReticle();
+      // Cursor-driven renderer state: no cursor reaches a hidden window,
+      // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
+      if (gate.render) syncGroundAimReticle();
       perf.setNetwork(null);
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
@@ -4305,11 +4313,15 @@ async function startGame(
         );
         if (gate.render) perf.finishTime('renderer', rendererStart);
       }
-      traceStart = perf.startTrace();
-      try {
-        updateClickMoveMarker();
-      } finally {
-        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      // Click-driven renderer marker: no clicks reach a hidden window, and the
+      // marker is only consumed by the skipped draw (phase 4 QA F7).
+      if (gate.render) {
+        traceStart = perf.startTrace();
+        try {
+          updateClickMoveMarker();
+        } finally {
+          perf.finishTrace('ui.clickMoveMarker', traceStart);
+        }
       }
       if (gate.render) perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
@@ -4335,7 +4347,9 @@ async function startGame(
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online;
     if (!net) return;
-    spectateBadge.update(net.spectating);
+    // Stateless DOM badge: paint work; the first painted frame after a
+    // restore re-syncs it from the live value (phase 4 QA F7).
+    if (gate.paint) spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
     const resolved = resolveMove(
@@ -4509,7 +4523,9 @@ async function startGame(
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
-    syncGroundAimReticle();
+    // Cursor-driven renderer state: no cursor reaches a hidden window,
+    // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
+    if (gate.render) syncGroundAimReticle();
     const onlineViews = renderer.views.size;
     // A hidden frame skips the draw, so timing it would dilute the renderer
     // bucket with work that never happened.
@@ -4544,13 +4560,22 @@ async function startGame(
       );
       if (gate.render) perf.finishTime('renderer', rendererStart);
     }
-    traceStart = perf.startTrace();
-    try {
-      updateClickMoveMarker();
-    } finally {
-      perf.finishTrace('ui.clickMoveMarker', traceStart);
+    // Click-driven renderer marker: no clicks reach a hidden window, and the
+    // marker is only consumed by the skipped draw (phase 4 QA F7).
+    if (gate.render) {
+      traceStart = perf.startTrace();
+      try {
+        updateClickMoveMarker();
+      } finally {
+        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      }
     }
-    maybeShowImmobileNote(now);
+    // HUD DOM write plus a throttle stamp: paint work, and no movement
+    // input reaches a hidden window anyway (phase 4 QA F7). updateBreathBar
+    // stays UNGATED on purpose: it accumulates the client-side breath
+    // timer, and freezing it while hidden would show a restored player
+    // more breath than they have (the lootRolls timer doctrine).
+    if (gate.paint) maybeShowImmobileNote(now);
     if (gate.render) perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
     if (gate.paint) {

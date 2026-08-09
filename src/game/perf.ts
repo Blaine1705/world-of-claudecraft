@@ -547,7 +547,22 @@ export class PerfMonitor {
     return performance.now();
   }
 
+  // Whether per-frame bucket and trace samples record this frame. The desktop
+  // shell drops it on hidden frames (main.ts sets it from the presentation
+  // gate every frame): a web hidden tab records nothing because rAF pauses
+  // outright, and the hidden desktop frame must reproduce that shape, or the
+  // sim/events rings would grow a hidden-only population no web session has
+  // and the first post-refocus report window would carry it. Counters that
+  // are not per-frame samples (hiddenPresentSkips, the frame counter) are
+  // unaffected.
+  private frameSampling = true;
+
+  setFrameSampling(on: boolean): void {
+    this.frameSampling = on;
+  }
+
   finishTime(bucket: TimedBucket, start: number): void {
+    if (!this.frameSampling) return;
     const ms = performance.now() - start;
     this.lastBucketMs[bucket] = round(ms);
     this.buckets[bucket].push(ms);
@@ -582,7 +597,7 @@ export class PerfMonitor {
   ): void {
     // Callers pass interned keys and primitive values, so the default disabled
     // path reaches this return without allocating a detail object or callback.
-    if (!this.traceEnabled) return;
+    if (!this.traceEnabled || !this.frameSampling) return;
     let detail: Record<string, unknown> | undefined;
     if (detailKey1 !== undefined) {
       detail = { [detailKey1]: detailValue1 };
