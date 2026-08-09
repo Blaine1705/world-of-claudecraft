@@ -45,6 +45,37 @@ describe('static matrix traversal', () => {
     scene.updateMatrixWorld();
     expect(child.matrixWorld.elements[12]).toBe(7);
   });
+
+  it('re-freezing a subtree-frozen root rebakes the root compose (r185 gate)', () => {
+    // r185's force flag does not bypass the matrixWorldAutoUpdate gate, so a
+    // plain updateMatrixWorld(true) bake skips the root's own compose on a
+    // re-freeze; with an ancestor that moved since the first bake, the root
+    // (and everything under it) would stay composed against the stale parent
+    // world. The flag-preserving bake must heal the whole chain.
+    const scene = new THREE.Scene();
+    const parent = new THREE.Group();
+    const root = new THREE.Group();
+    root.position.x = 3;
+    const child = new THREE.Object3D();
+    child.position.x = 4;
+    root.add(child);
+    parent.add(root);
+    scene.add(parent);
+
+    freezeStaticSubtreeMatrices(root);
+    expect(child.matrixWorld.elements[12]).toBe(7);
+
+    parent.position.x = 10;
+    scene.updateMatrixWorld();
+    // The gated root did not follow its parent (the production freeze shape).
+    expect(root.matrixWorld.elements[12]).toBe(3);
+
+    freezeStaticMatrices(root);
+    expect(root.matrixWorld.elements[12]).toBe(13);
+    expect(child.matrixWorld.elements[12]).toBe(17);
+    // The stronger subtree freeze survives the rebake.
+    expect(root.matrixWorldAutoUpdate).toBe(false);
+  });
 });
 
 describe('refreshFrozenWorldMatrix', () => {

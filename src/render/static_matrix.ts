@@ -25,7 +25,15 @@ import type * as THREE from 'three';
 // descendant (campfire flames) must be re-enabled by the caller right after
 // the freeze: `node.matrixAutoUpdate = true`.
 export function freezeStaticMatrices(root: THREE.Object3D): void {
+  // r185: updateMatrixWorld's force bypasses only the dirty check, never the
+  // matrixWorldAutoUpdate gate, so a RE-freeze of a root that was previously
+  // subtree-frozen would silently skip the root's own compose. Bake with the
+  // flag held true and restore it (this deliberately does not heal a NESTED
+  // subtree-frozen descendant; no caller nests subtree freezes today).
+  const worldAuto = root.matrixWorldAutoUpdate;
+  root.matrixWorldAutoUpdate = true;
   root.updateMatrixWorld(true);
+  root.matrixWorldAutoUpdate = worldAuto;
   root.traverse((o) => {
     o.matrixAutoUpdate = false;
   });
