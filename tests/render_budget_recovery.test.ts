@@ -177,6 +177,34 @@ describe('render budget recovery ladder', () => {
     expect(state.levels.lighting).toBe(HIGH_BASELINE.lighting);
   });
 
+  it.each([
+    ['calls', { calls: 600, triangles: 2_000_000, grassVisibleTufts: 2_000 }],
+    ['triangles', { calls: 300, triangles: 4_300_000, grassVisibleTufts: 2_000 }],
+    ['grass tufts', { calls: 300, triangles: 2_000_000, grassVisibleTufts: 5_800 }],
+  ] as const)('holds the climb while %s alone sits over the gate line', (_axis, dense) => {
+    // Each counter clause must close the enrich gate ON ITS OWN. The dense-scene
+    // arm above parks all three counters over the line at once, so deleting any
+    // single clause from canEnrich still passes it (the other two keep binding);
+    // the phase 5 QA probe round proved the triangles clause could be dropped
+    // green. These arms park exactly one counter in the 90 to 100% band of its
+    // target and pin that phase A still completes while the climb never starts.
+    const governor = highGovernor();
+    floorEverything(governor);
+
+    let state = governor.state();
+    for (let i = 0; i < 260; i++) {
+      state = governor.update(headroomSample(dense));
+    }
+
+    expect(state.levels).toEqual({
+      grass: HIGH_BASELINE.grass,
+      foliage: HIGH_BASELINE.foliage,
+      vfx: HIGH_BASELINE.vfx,
+      lighting: HIGH_BASELINE.lighting,
+      resolution: 1,
+    });
+  });
+
   it('permits one enrich step when the counters dip under the line for a single frame', () => {
     const governor = highGovernor();
     floorEverything(governor);
