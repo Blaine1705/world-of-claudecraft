@@ -1665,6 +1665,9 @@ describe('fishing over the live server (pin 8)', () => {
     // exists by design (the player-visible half is the "No fish are biting."
     // log line), but the event still rides the same personal routing, and
     // this is the one arm of the four that had no online pin.
+    // Explicit budget (vite.config.ts's "deliberately long walkers keep their own explicit
+    // budgets"): up to 100 sessions * 200 ticks, 10x the sibling test above, occasionally
+    // brushes the shared 20s default under full-suite parallel load.
     const { server, fcA, fcB, sa, angler } = setupAngler();
     let empty = false;
     for (let session = 0; session < 100 && !empty; session++) {
@@ -1687,7 +1690,7 @@ describe('fishing over the live server (pin 8)', () => {
       server.sim.tick();
     }
     expect(empty).toBe(true);
-  });
+  }, 60_000);
 
   it('a pre-bite re-press over the live server reels in early: personal fishingEarlyReel, no busy error, recast allowed', () => {
     const { server, fcA, fcB, sa, angler } = setupAngler();
