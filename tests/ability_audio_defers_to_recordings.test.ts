@@ -140,6 +140,20 @@ describe('moments a recording already sounds are skipped, not doubled', () => {
   it('stays silent on a crit (combat_crit is recorded)', () => {
     expect(nodesFor(() => sfx.abilityAudio('crit', 'shadow', 1, 0, 0, 0, {}))).toBe(0);
   });
+
+  it('stays silent on the Meteor zone pulse (the meteor recording plays instead)', () => {
+    // The painter's zoneRehit threads ev.ability through to abilityAudio so
+    // PULSE_IMPACT_ABILITIES (ability_sfx_coverage.ts) can silence this one
+    // ground-zone pulse specifically: fx.ts's fx:'tick' handler (hud.ts) plays
+    // the dedicated 'meteor' recording instead. Without abilityId threaded
+    // through, this would fall back to the generic uncovered 'pulse' case
+    // below and double the recording with a synthetic thud.
+    expect(
+      nodesFor(() =>
+        sfx.abilityAudio('pulse', 'fire', 1, 0, 0, 0, { archetype: 'nova', abilityId: 'meteor' }),
+      ),
+    ).toBe(0);
+  });
 });
 
 describe('moments no recording covers keep their procedural voice', () => {

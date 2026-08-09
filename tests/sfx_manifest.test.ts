@@ -423,3 +423,31 @@ describe('mob subfamily scanning', () => {
     expect(spatialForSfx('amb_water')).toBe(false);
   });
 });
+
+// Pins the exact asset-to-ability binding this PR restored, so a future
+// re-swap (Meteor's landing recording and Flamestrike's cast recording were
+// mixed up once already, see the fix commit's history) gets caught by CI
+// instead of shipping silently. Reads the real committed files under
+// public/audio/sfx, not the manifest, since a manifest bug could hide the
+// exact same mistake.
+describe('meteor/flamestrike asset binding', () => {
+  const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const sfxDir = path.join(repoRoot, 'public/audio/sfx');
+
+  it('keeps meteor.mp3 and flamestrike.mp3 as two distinct clips', () => {
+    const meteor = readFileSync(path.join(sfxDir, 'meteor.mp3'));
+    const flamestrike = readFileSync(path.join(sfxDir, 'flamestrike.mp3'));
+    expect(meteor.equals(flamestrike)).toBe(false);
+  });
+
+  it('pins the literal filenames both content keys resolve to in the generated manifest', () => {
+    const manifest = readFileSync(
+      path.join(repoRoot, 'src/game/sfx_manifest.generated.ts'),
+      'utf8',
+    );
+    expect(manifest).toContain('"meteor": {');
+    expect(manifest).toMatch(/"meteor":\s*\{[\s\S]*?\/audio\/sfx\/meteor\.mp3/);
+    expect(manifest).toContain('"flamestrike": {');
+    expect(manifest).toMatch(/"flamestrike":\s*\{[\s\S]*?\/audio\/sfx\/flamestrike\.mp3/);
+  });
+});
