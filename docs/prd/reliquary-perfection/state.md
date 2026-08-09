@@ -1,6 +1,8 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 18 QA COMPLETE, PASS, PUSHED (2026-08-08). The rewards
+Current phase: 19 COMPLETE, GATED, LOCAL (2026-08-09, tip c41d83a896;
+sync merge 76e4abb05d brought release tip 2a10e0f621; Phase 19 QA owns
+the push). Previous: 18 QA COMPLETE, PASS, PUSHED (2026-08-08). The rewards
 ladder is verified: six fresh phase reviewers plus a fix-round reviewer
 and two verification subagents; the one BLOCKING coverage gap (both
 retroFallbackGrants calls were deletable-green at the real join seam)
@@ -93,8 +95,11 @@ Update this line as phases complete.
   deed_chat_line.ts (clickable chat), deed tracker painter + #deed-tracker, deed_i18n.ts
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
 - Guards: tests/architecture.test.ts (UI_PURE_CORES x3 lists), tests/
-  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (309/80/229 since the
-  Phase 16 QA second sync brought the release's playtimeSeconds, facet 33),
+  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (312/82/230 since
+  Phase 19 added activeBorder plus its setter to the deeds facet; 310/81/229
+  was the Phase 17 reliquaryObtainCounts state, 309/80/229 the Phase 16 QA
+  state; the v0.36.0 sync at 76e4abb05d added no members, the release's
+  saveLoadout change is a trailing parameter),
   tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
 
 ## Surfaces added by this packet (append per phase as they land)
@@ -259,10 +264,10 @@ Update this line as phases complete.
   (e8570107ce): the 3 full-suite failures once recorded here
   (loot_window_controller x2, material_profession_affinity sharp_claw) went green
   on the merged tree after PR 3015 shipped the claw/tusk craft consumers; do not
-  budget them as expected reds. The CURRENT inherited red at the v0.36.0 tip is
-  tests/anim_pipeline_hunter_ghost.test.ts (2 tests: its manifestBlock anchors
-  scan for "player_hunter: {", a manifest shape that no longer exists); inputs
-  byte-identical to the release tip, release-owned.
+  budget them as expected reds. RESOLVED at the Phase 15 QA sync (PR 3111):
+  tests/anim_pipeline_hunter_ghost.test.ts is green (its anchor
+  player_hunter: swims({ resolves in src/render/characters/manifest.ts).
+  No inherited red is budgeted at the v0.36.0 tip as of sync 76e4abb05d.
   Release-fill native-pass notes (join the ru retro note): ja colon conventions
   split (deed dungeon-heroics ASCII vs delve-heroics full-width; deedsRetroSummary
   ASCII vs reliquaryRetroSummary full-width); cs/pl plural few leaves carry the
@@ -567,8 +572,11 @@ Update this line as phases complete.
   pending -> Phase 22); twelfth refresh-signature dimension
   (reliquaryObtainCountsDigest) so an open window repaints on a tally
   tick. Measured (pglz, two agreeing methods): production-absolute
-  +1,772 stored bytes (+17 percent) worst-case veteran row at the 30 s
-  autosave cadence; intra-branch counts cost 371 vs 881 saved by
+  +1,772 stored bytes worst-case veteran row at the 30 s autosave
+  cadence (the percentage this row once carried is retired at the
+  v0.36.0 sync: SavedLoadout.gear added a second variable-size surface
+  to the same JSONB, so the denominator is no longer stable; size the
+  Reliquary against its own absolute bound); intra-branch counts cost 371 vs 881 saved by
   dropping pageId + zero-clears. Doctrine: counts are information,
   never a score (nothing consumes them). Rollback: a pre-Phase-17
   binary ignores the count field and its first autosave wipes every
@@ -661,7 +669,73 @@ Update this line as phases complete.
   -> addPlayer round trip keeps the set with zero join illumination events;
   byte-equality and catalog-churn fixed points; the blob-ran-ahead
   divergence tolerance documented on the emit gate.
-- Phase 19: (pending)
+- Phase 19 (2026-08-09): Borders in-world. activeBorder (a DEED ID, never
+  the slug) on PlayerMeta + CharacterState (omit-null; restore routes
+  through the validator so a stale, cross-kind, or content-removed id
+  loads borderless); Entity.border beside title (baseEntity AND ClientWorld
+  blankEntity init null); setActiveBorder in src/sim/deeds.ts, the exact
+  setActiveTitle sibling (earned + reward.kind border + silent no-op;
+  meta and entity written together; both cosmetic validators hasOwn-guarded
+  against prototype keys). Facet: IWorldDeeds.activeBorder +
+  setActiveBorder both worlds (IWORLD_MEMBERS 310 to 312); command
+  deed_set_border (COMMAND_NAMES appended, 193 send / 206 dispatch); wire:
+  entity key `border` on identityFields (emit when non-null, full-record
+  reset semantics), self echo `aborder` per-tick diffed (ALL_DELTA_KEYS 69).
+  server/cosmetic_op_guard.ts: ONE shared per-session token bucket (burst
+  10, refill 1/s) consumed by BOTH deed_set_title and deed_set_border,
+  closing the identity-rewire amplification a toggling client could buy
+  (the full identity record re-broadcasts to everyone in range BEFORE the
+  distance-tier check); the real protection is the throttle, the kick is
+  secondary (a flooder pacing under MSG_ABUSE_SECOND_DROP_FLOOR never
+  kicks, same as the guild-bank sibling). WS_DROP_CAUSES gained 'cosmetic'
+  (ops dashboard series set widened). Render: src/ui/deed_border_view.ts
+  pure core (UI_PURE_CORES; id->slug->palette, one table, all 12 colors
+  unique repo-wide, exact-once scan with NO allowlist: reliquary_gilt's
+  gold is a deliberately imperceptible step off the classic elite gold
+  #f2c84b so the scan stays exact); nameplate cartouche = canvas shapes in
+  drawBase from state.border on the existing tier-cadenced resolveContent
+  pass (no sprite, no cache key, no vertical step: the emote anchor walk
+  is byte-identical, pinned); portrait ring = UnitFrameDescriptor/View
+  borderSlug + UnitFrameElements.portraitBorder, painter writes setAttr
+  data-border + three custom props through the writers facet (HOT_PAINTERS
+  allow:{} intact), ring concentric with the .portrait disc via asymmetric
+  inset (-6px -2px -2px -6px; the 60x60 disc sits at the 64x64 wrap's
+  top-left), z-index 2 UNDER the level chip. Fairness judgment RECORDED
+  and pinned (TS path scan + CSS arm): identity arms (frame, edge, inset)
+  tier-invariant; ONLY the ring's outer bloom rides --fx-shadow (0 at
+  low) like the sibling combat glow; the ring repaints on the sanctioned
+  low-tier 10 Hz target-frame body throttle; fairness doc updated. UI:
+  Titles and Borders shelf (cosmeticsSection rail label; titlesSection
+  keeps its shipped overlay fills), two picker groups with h3 heads +
+  aria-labelledby (bordersAria DELETED as unrendered; titlesAria kept,
+  commented UNRENDERED, removal owed at a release fill), border options
+  labeled by deedName, no optimistic write (the aborder echo repaints via
+  activeBorder in the deeds refresh signature), data-border-pick in
+  refocusSelector; deed cards gain a border reward chip (deed-title-chip
+  family reuse, commented); character sheet worn badge '{name} (worn)'
+  (label carries the state, color is reinforcement); EVERY live border
+  deed unlock logs hudChrome.deeds.unlockedBorderHint (retro back-credits
+  silent, pinned); Reliquary rank 5 summary note + rank-up banner line
+  share ONE key (hudChrome.reliquary.borderWearableNote), the rank derived
+  by curatorBorderReward crossing CURATOR_RANK_DEFS with DEEDS (first
+  border bridge wins by LADDER order, pinned both directions), overview
+  uses >=, banner uses ===. index.html AND play.html carry the two
+  portrait-wrap ids (pinned in both entries; an index-only edit ships a
+  ring online players never see). Nine new hudChrome keys with five
+  non-Latin fills each (M16); guide bookBody/rewardsBody trued up (the 13
+  stale Latin rewardsBody fills DROPPED to pending per the reword rule).
+  Party/tot/pet frames deliberately ring-free (zero-write path pinned);
+  inspect/chat/profile/rosters stay title-only (inspect is Phase 20; text
+  rows have no slug to render). Six domain reviews (zero blocking), two
+  fix rounds each freshly re-reviewed, 45+ mutation checks. Gate PASS all
+  8 steps at c41d83a896 (full suite 33663, browser 111) on the tree with
+  the v0.36.0 sync (2a10e0f621: perf diagnostics, gear-set loadouts,
+  three.js patch, auto-attack fix) merged in; three parity goldens
+  reminted on the merged tree (release recordings predate this branch's
+  reliquary meta surface; diff = the reliquary block returning + the
+  auto-attack state hashes, nothing else); release-merge audit clean.
+  Screenshots: docs/screenshots/reliquary-phase19 (15, before/after,
+  desktop + mobile, lowest preset).
 - Phase 20: (pending)
 - Phase 21: (pending)
 - Phase 22: (pending)
@@ -742,6 +816,47 @@ Update this line as phases complete.
   catalogCharacterCompletion deliberately excludes; the deed copy defuses it
   ("every relic ... that a character can keep"). Both resolve themselves
   when the pended slots land; neither is host drift.
+- NOTE (Phase 19, owes a release-note line): a rollback or mixed-fleet
+  bounce erases border picks: the pre-border serializer drops the
+  activeBorder key on its first autosave (about 30 seconds after login).
+  The loss is one re-pickable cosmetic choice, identical to the
+  activeTitle precedent. Related one-way contract: removing or renaming a
+  border deed (or changing its reward kind) erases every holder's pick at
+  their next load-plus-save via the restore validator; treat a border deed
+  id change as a migration, not an edit.
+- NOTE (Phase 19, ops): WS_DROP_CAUSES gained 'cosmetic' (the shared
+  title/border op guard's drop cause), widening the closed dashboard
+  series vocabulary from seven to eight.
+- NOTE (Phase 19, constraint for future content): the load path re-applies
+  activeBorder AFTER deedsEarned fill and unionLegacyMilestones; a future
+  border-flavored legacy milestone must keep that ordering or veterans
+  load borderless.
+- NOTE (Phase 19 release-merge audit, RELEASE-side observations for the
+  maintainer, not this branch's defects): (1) loadoutGearResult is absent
+  from HEAVY_SELF_EVENTS; safe today only because its one emitter rides
+  switchLoadout which is already in HEAVY_SELF_CMDS (a one-emitter-deep
+  argument; its family siblings are members for exactly this mutation
+  shape). (2) switchLoadout is an unmetered identity-rewire sibling of the
+  cosmetic commands this phase metered: an accepted switch re-broadcasts
+  the full identity record and runs up to one gear swap per equip slot
+  (roughly 16x one equip) at the 30/s command-lane rate; either meter it
+  or record the command-lane ceiling as the accepted answer.
+- NOTE (v0.36.0 sync 76e4abb05d, release-owned): the offline browser Sim
+  now sets idleMobTickRadius = PLAYER_INTEREST_DROP_RADIUS (src/main.ts),
+  and a positive radius moves every passive idle roll to a per-mob rng
+  lane, so the OFFLINE stream no longer matches an unset-radius test Sim.
+  Packet suites are unaffected (none set the radius). A future seed hunt
+  must state which host profile it recorded under; three parity goldens
+  were reminted at 089e2788da with the cause named per the re-pin policy.
+- Follow-ups recorded, do NOT file as issues (Phase 19): the third
+  near-identical per-session token bucket (list_read, guild_bank,
+  cosmetic) has earned a shared helper by the rule of three; the picker's
+  group-plus-aria-pressed markup vs radiogroup/radio is a titles-family
+  decision, not per-surface; a crowd-bench pass for many bordered plates
+  is owed before the border catalog grows; the TITLE suite's server
+  shape-check arm is still vacuous (the border twin has the decisive spy
+  form, mirror it when touched); titlesAria removal belongs to a release
+  locale fill.
 - RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
   the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
   release root-caused it and restored the strict contract (heal-through loop plus a
@@ -972,7 +1087,14 @@ Update this line as phases complete.
   in-change; the deed channel still has no pending tracker, so this row is the
   tracking mechanism). The ru fills deliberately use present tense (the
   deedBroadcast gender-avoidance precedent); include them in the release-fill
-  native-speaker pass already flagged for the ru retro plurals.
+  native-speaker pass already flagged for the ru retro plurals. Phase 19
+  adds: the eight border keys (hudChrome.deeds cosmeticsSection,
+  bordersSection, bordersNone, bordersEmpty, borderChip, charBorderWorn,
+  unlockedBorderHint, plus hudChrome.reliquary.borderWearableNote) pending
+  in the 15 Latin locales (five non-Latin fills in-change per M16), and
+  guide.deedsPage.rewardsBody DROPPED back to pending in its 13 Latin
+  overlays (the border reword staled the shipped fills; the release fill
+  re-authors them; fr_FR/tr_TR rewardsHeading fills verified intact).
 - RESOLVED (Phase 11): the wiki shelf-name glossary conflict. One term per locale
   locked in scripts/i18n_glossary.json (reliquaryShelves row); see the Phase 11
   surfaces entry for the deviation rationale on Professions.

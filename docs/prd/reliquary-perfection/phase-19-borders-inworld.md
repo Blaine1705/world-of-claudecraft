@@ -26,7 +26,7 @@ entity wire (wireEntity), how nameplates render the title text above heads
 will-change trap memory), how the deeds window picker sets it, how inspect and chat
 read it; src/ui/unit_portrait.ts + unit_portrait_painter.ts (the pure-core exemplar
 pair; portraits are the second render target); the four border deeds in
-src/sim/content/deeds.ts (reward {kind:'border', slug}); hud.ts:15788 border badge row;
+src/sim/content/deeds.ts (reward {kind:'border', slug}); the border badge row in hud.ts (grep the ms-deed-border badge builder);
 src/world_api/deeds.ts facet. Return: the activeTitle recipe at every layer, the
 nameplate paint path with its perf constraints, portrait frame hooks.
 

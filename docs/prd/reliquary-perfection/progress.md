@@ -2068,3 +2068,83 @@ owns the push.
 - Verdict: PASS. Pushed to origin/feature/reliquary at QA close (the docs
   commit recording this entry is the pushed tip); CI on PR 2976 babysat
   from there.
+
+## Phase 19 (2026-08-09): Borders in-world (nameplates + portraits)
+
+- Step 0: pre-flight clean at 0a68865b73 (in sync with origin, CI green);
+  origin/release/v0.36.0 (8340aa4a05) already contained via the Phase 18
+  QA merge, no sync owed at start. Memory scan: nameplate will-change
+  raster trap, canvas text-restyle cost, view-model order contract,
+  test-pin trap catalog, screenshot low-preset rule.
+- Step 1: one Explore agent mapped the activeTitle recipe end to end
+  (sim state, setter, wire, facet, parity pin format), the nameplate
+  raster mechanism (one canvas, TextSpriteCache, the devOutline accent
+  precedent), and the unit_frame view-model/painter pair (the named
+  unit_portrait pair turned out to be geometry+blit; the frame pair owns
+  the seam); remaining anchors gathered by hand.
+- Step 2, three implementation agents on a fixed cross-agent contract:
+  A (sim+wire) landed activeBorder end to end with two recipe gaps found
+  and fixed (baseEntity init, the bare_client fixture guard) and 15/15
+  mutation checks; B (render) landed the palette pure core, the canvas
+  cartouche baked into the tier-cadenced resolveContent pass, and the
+  write-elided portrait ring with zero perf-budget grants; C (ui) landed
+  the two-group picker, worn badge, wear hint surfaces, rank-5 copy
+  derived from the ladder, M16 fills, and extended the wiring to
+  play.html (an index-only edit would have hidden the ring online).
+- Step 3: six fresh reviewers in parallel, prompted for coverage, ZERO
+  BLOCKING across all six. Fix round 1 (13 items): the shared cosmetic op
+  guard closing the identity-rewire amplification, the measured ring
+  concentricity fix (2.83px off the disc center), the CSS fairness arm,
+  reach pins, the exact-once palette scan (orchestrator ruling: unique
+  hexes instead of a collision allowlist), the blob-growth ternary+IIFE
+  scrape forms, hasOwn hardening (which turned real at buildDeedUnlockPlan:
+  a prototype-keyed unlock event survived the bare index), hostile-shape
+  load pins, the border unlock hint, guide prose truth-up, picker heading
+  a11y. Fresh fix-round review found 5 should-fix + 10 nits; round 2
+  applied all 15 (h3 heading family, armed-fixture floor for the blob
+  sweep, stale Latin rewardsBody fills dropped to pending, comment
+  truth-ups); its verification found ONE regression (two never-reworded
+  rewardsHeading fills swept away with the stale ones), restored verbatim
+  and verified. 45+ mutation checks across the rounds, all restored by
+  edit.
+- Screenshots: docs/screenshots/reliquary-phase19, 15 PNGs, before/after,
+  desktop + mobile landscape, lowest preset; the two player-frame afters
+  re-captured after the concentricity fix.
+- Step 4: five commits (feat sim/net/render/ui + docs screenshots), then
+  the base moved a THIRD time; sync merge 76e4abb05d brought 2a10e0f621
+  (perf diagnostics, gear-set loadouts, three.js patch via
+  patchedDependencies, auto-attack white-damage fix). Conflicts: two
+  parity goldens (both sides re-recorded) and generated pending.ts
+  (regenerated). The release-side goldens predate this branch's reliquary
+  meta surface, so all three moved goldens were REMINTED on the merged
+  tree (089e2788da); diff verified as exactly the reliquary block
+  returning plus the auto-attack state hashes. pnpm install re-run for
+  the three patch; three release-side files carried format diffs under
+  the pinned biome and were normalized (c41d83a896).
+- Release-merge audit (three legs, all clean on mechanisms): no new
+  routes/commands collide; db-mock trap clean; no legacy-arm divergence;
+  planning-premise legs surfaced six DOC corrections, all applied in this
+  entry's commit (the retired +17 percent row-share figure, the stale
+  hunter-ghost expected-red record, the parity anchor, the offline
+  idleMobTickRadius determinism note, the phase-file line anchor, this
+  status). Two RELEASE-side observations recorded in state.md for the
+  maintainer (loadoutGearResult vs HEAVY_SELF_EVENTS; unmetered
+  switchLoadout as an identity-rewire sibling).
+- Gate on the committed tree at c41d83a896 (TURBO_FORCE=1, bare, log
+  read, exit 0 unmasked): PASS, ALL 8 STEPS GREEN. Full suite fallback
+  (broad change): 33663 passed, 2 expected fail, 108 skipped across 2417
+  files; browser regressions 16 files 111 tests; i18n + wiki + SFX fresh;
+  malware scan clean; changed-files biome green (the earlier local red
+  was origin/main scope noise plus the three normalized release files);
+  tsc + env/server/bot builds + client bundle green.
+- Acceptance criteria: (1) second-client wire visibility + local portrait
+  ring pinned end to end in tests/snapshots.test.ts and the painter
+  suites, screenshots committed; (2) unearned and cross-kind slugs
+  rejected server-side, pinned at both the sim validator and the dispatch
+  spy; (3) no per-frame raster or invalidation cost (no sprite, no cache
+  key, emote-anchor byte-identical, pinned) and the accent identity is
+  tier-invariant (path scan + CSS arm), with the ring's decorative bloom
+  on the repo-wide fx-shadow convention recorded as a judgment in the
+  fairness doc.
+- LOCAL ONLY per the runner prompt: committed, never pushed; Phase 19 QA
+  owns the push after its PASS.
