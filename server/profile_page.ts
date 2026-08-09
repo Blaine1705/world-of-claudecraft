@@ -169,11 +169,13 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
     const relicName = sheetRelicRecentText(entry);
     return relicName === null ? [] : [escapeHtml(relicName)];
   });
-  // Joined with a middle dot, never a comma: one catalogued relic name carries
-  // a comma of its own (kingsbane_last_oath, "Thronebane, Last Oath of
-  // Thornpeak"), so a comma join would render five finds that read as six. No
-  // authored name contains the middot, and the inspect card's meta line
-  // already separates with it for the same reason.
+  // Joined with a middle dot, never a comma: catalogued relic names carry
+  // commas of their own (kingsbane_last_oath "Thronebane, Last Oath of
+  // Thornpeak" and voidsong_dirk "Voidsong, Dirk of the Sundered Veil"), so a
+  // comma join would render five finds that read as more. No authored name
+  // contains the middot (the U+00B7 sweep in tests/profile_page.test.ts pins
+  // that), and the inspect card's meta line separates with it for the same
+  // reason.
   const reliqRecentLine =
     recentRelicNames.length > 0
       ? `<li>Recent finds: <strong>${recentRelicNames.join(' · ')}</strong></li>`

@@ -356,6 +356,24 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(character).toEqual({ owned: 311, total: 311 });
   });
 
+  it('pins the final measured catalog shape: total slots and distinct marks', () => {
+    // Literal: MEASURED through the live page table, update when catalog
+    // content lands. 249 slots shipped before Phase 21 (measured at the
+    // phase base; the phase plan's 245 baseline undercounted the live
+    // catalog by 4, and the measured value wins), and the six Phase 21
+    // pages add 123 slots (19 Rift + 19 slain marks + 31 Spoils + 47
+    // Warfare + 3 fishing + 4 retired vault): 372 total. Slots, not unique
+    // relics: the two Spoils set repeats count again here, and the four
+    // vault slots count here while adding zero to every completion pair
+    // (excludeFromCompletion), which is why this number exceeds the
+    // overview total above by more than the mark count.
+    const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
+    expect(slots).toBe(372);
+    // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
+    // rare-slain proofs of conquerors_rares_of_the_realm.
+    expect(RELIQUARY_MARK_IDS.size).toBe(29);
+  });
+
   it('keeps every page single-kind (the emit path depends on it)', () => {
     // Structural, not cosmetic. emitReliquaryUnlock (src/sim/reliquary.ts)
     // decides Illumination from characterReliquaryOwnership, which deliberately

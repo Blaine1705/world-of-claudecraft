@@ -8,9 +8,10 @@
 // English is correct here BY DESIGN (the page is lang="en" throughout); every
 // localized surface resolves ids client-side.
 import { describe, expect, it, vi } from 'vitest';
-import { SHEET_RECENT_RELICS } from '../server/character_sheet';
+import { RELIQUARY_MARK_ENGLISH, SHEET_RECENT_RELICS } from '../server/character_sheet';
 import { ITEMS } from '../src/sim/data';
 import { catalogCharacterCompletion, RELIQUARY_PAGES } from '../src/sim/reliquary';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 const mockGetCharacterById = vi.fn();
 
@@ -183,9 +184,11 @@ describe('profile page recent-finds strip', () => {
   });
 
   it('separates with a middot so a comma-carrying relic name stays ONE find', async () => {
-    // The one catalogued name with a comma in it, fixture-guarded: if the item
+    // A catalogued name with a comma in it, fixture-guarded: if the item
     // renames, this test must say so rather than silently losing its point. A
-    // comma join would render these two finds as three.
+    // comma join would render these two finds as three. (Two catalogued names
+    // carry commas since the Rift page landed: this one and voidsong_dirk;
+    // the U+00B7 sweep below fixtures both.)
     expect(ITEMS.kingsbane_last_oath.name).toBe('Thronebane, Last Oath of Thornpeak');
     const html = await renderProfile({
       level: 12,
@@ -246,5 +249,79 @@ describe('profile page recent-finds strip', () => {
     const drifted = await renderProfile({ level: 12, reliquary: { recent: ['gone_relic'] } });
     expect(drifted).not.toContain('Recent finds:');
     expect(drifted).not.toContain('gone_relic');
+  });
+});
+
+// The /c/ recent-finds strip and the inspect card's meta line join their
+// entries with ' U+00B7 ' precisely because authored names may carry commas,
+// so the separator character itself must never appear INSIDE an authored
+// English string: a middot in a name would make one find read as two, the
+// inverse of the comma hazard the join exists to solve. Polarity note: a bare
+// not.toContain of a never-present token proves nothing (it stays green when
+// the sweep walks the wrong corpus), so this suite counts occurrences over
+// size-floored corpora of non-empty strings and proves the counter live on a
+// doctored positive.
+describe('U+00B7 stays out of every middot-joined English surface', () => {
+  const MIDDOT = '·';
+  const middotCount = (value: string) => value.split(MIDDOT).length - 1;
+
+  it('the occurrence counter fires on a doctored positive', () => {
+    // The control that keeps the zero-count sweep below falsifiable: the
+    // exact counter used there sees a planted middot.
+    expect(middotCount(`Slain: Old${MIDDOT}Greyjaw`)).toBe(1);
+    expect(middotCount(`a${MIDDOT}b${MIDDOT}c`)).toBe(2);
+    expect(middotCount('Slain: Old Greyjaw')).toBe(0);
+  });
+
+  it('the comma-carrying names that motivate the join sit inside the swept corpus', () => {
+    // Both catalogued comma names, fixture-guarded (a rename must fail loudly
+    // here, not quietly drop the fixture's point), and both proved to be item
+    // relics on live pages, so the sweep below demonstrably walks the strings
+    // the middot join was built for.
+    expect(ITEMS.kingsbane_last_oath.name).toBe('Thronebane, Last Oath of Thornpeak');
+    expect(ITEMS.voidsong_dirk.name).toBe('Voidsong, Dirk of the Sundered Veil');
+    const cataloguedItemIds = new Set(
+      RELIQUARY_PAGES.flatMap((page) =>
+        page.relics.flatMap((relic) => (relic.kind === 'item' ? [relic.itemId] : [])),
+      ),
+    );
+    expect(cataloguedItemIds.has('kingsbane_last_oath')).toBe(true);
+    expect(cataloguedItemIds.has('voidsong_dirk')).toBe(true);
+  });
+
+  it('no relic item name, mark English, markFind value, or page name contains U+00B7', () => {
+    // Collected offenders print the offending string on failure instead of a
+    // bare false. Every swept string must also be non-empty: an empty name
+    // would pass a zero-count check vacuously while breaking the strip.
+    const offenders: string[] = [];
+    const sweep = (label: string, value: string) => {
+      expect(value, `${label} is empty`).not.toBe('');
+      if (middotCount(value) > 0) offenders.push(`${label}: ${value}`);
+    };
+    let itemSlots = 0;
+    for (const page of RELIQUARY_PAGES) {
+      sweep(`page name ${page.id}`, page.name);
+      for (const relic of page.relics) {
+        if (relic.kind !== 'item') continue;
+        itemSlots += 1;
+        sweep(`item ${relic.itemId}`, ITEMS[relic.itemId]?.name ?? '');
+      }
+    }
+    for (const [markId, english] of RELIQUARY_MARK_ENGLISH) {
+      sweep(`mark English ${markId}`, english);
+    }
+    const markFind = hudChromeStrings.reliquary.markFind as Record<string, string>;
+    for (const [key, value] of Object.entries(markFind)) {
+      sweep(`markFind ${key}`, value);
+    }
+    // Non-vacuity floors at today's measured sizes (exact literals live in
+    // the shape pins of tests/reliquary_content.test.ts and the mark
+    // cross-pins of tests/character_sheet.test.ts; these only guard against
+    // an empty or misrouted corpus, so they are floors, not equalities).
+    expect(RELIQUARY_PAGES.length).toBeGreaterThanOrEqual(34);
+    expect(itemSlots).toBeGreaterThanOrEqual(265);
+    expect(RELIQUARY_MARK_ENGLISH.size).toBeGreaterThanOrEqual(29);
+    expect(Object.keys(markFind).length).toBeGreaterThanOrEqual(29);
+    expect(offenders).toEqual([]);
   });
 });
