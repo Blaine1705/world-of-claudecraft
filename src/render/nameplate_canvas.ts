@@ -176,6 +176,13 @@ const EMOTE_STYLE: TextSpriteStyle = {
 // the row's bottom edge, so the drawEmote anchor walk (which mirrors drawBase's
 // y-steps) stays exact and the title line below keeps its clearance.
 const BORDER_ACCENT_PAD_X = 5;
+// The upward pad has a ceiling it is tuned under but is not mechanically tied
+// to: the accent's outer ink reaches topY - (PAD_TOP + EDGE_WIDTH/2), and the
+// quest-marker row anchor sits at topY - (NAMEPLATE_MARKER_ROW_HEIGHT - 21) = 5
+// (marker geometry lives in a different constant block). Raising PAD_TOP toward
+// that ceiling would put the accent under the marker glyph. It cannot bite today
+// because a border is only ever set on the player branch and players carry no
+// quest marker, but keep this pad below the marker row if that ever changes.
 const BORDER_ACCENT_PAD_TOP = 3;
 const BORDER_ACCENT_RADIUS = 6;
 const BORDER_ACCENT_EDGE_WIDTH = 3;

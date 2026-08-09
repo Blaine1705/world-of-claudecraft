@@ -27,6 +27,7 @@ vi.mock('../server/db', () => ({
 import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { gameMetricsCounters } from '../server/http/game_signals';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -45,6 +46,7 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { deedBorderSlug } from '../src/ui/deed_border_view';
 import { playtimeParts } from '../src/ui/playtime_view';
 import {
   bareClient,
@@ -3082,6 +3084,92 @@ describe('active border wire (Book of Deeds)', () => {
     (client as any).applySnapshot(snap);
     expect(client.activeBorder).toBeNull();
   });
+
+  it('cannot redirect the write to another player: pid comes from the session, not the payload', () => {
+    // This is currently safe only because dispatch binds `const pid = session.pid`
+    // once and never rebinds it in the switch. Nothing else in the suite would
+    // notice if a future edit read a pid from the message, so pin it here. BOTH
+    // players earn the deed, so the only thing deciding whose border is written
+    // is the resolved pid, not the validator.
+    const server = new GameServer();
+    const attacker = joinServer(server, fakeWs(), 1, 'Attacker');
+    const victim = joinServer(server, fakeWs(), 2, 'Victim');
+    const sim = server.sim;
+    const attackerMeta = sim.players.get(attacker.pid)!;
+    const victimMeta = sim.players.get(victim.pid)!;
+    attackerMeta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    victimMeta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    for (const field of [
+      'pid',
+      'playerId',
+      'target',
+      'targetPid',
+      'id',
+      'entityId',
+      'characterId',
+      'sessionId',
+    ]) {
+      server.handleMessage(
+        attacker,
+        JSON.stringify({
+          t: 'cmd',
+          cmd: 'deed_set_border',
+          deedId: BORDER_DEED,
+          [field]: victim.pid,
+        }),
+      );
+    }
+    expect(
+      victimMeta.activeBorder,
+      'no message field may redirect the write to the victim',
+    ).toBeNull();
+    expect(sim.entities.get(victim.pid)!.border).toBeNull();
+    // every accepted write landed on the session owner instead
+    expect(attackerMeta.activeBorder).toBe(BORDER_DEED);
+  });
+
+  it('admits only null or a string: object, array, boolean, and an absent key never reach the sim', () => {
+    // The existing dispatch arm pins the number case (deedId: 42); this covers
+    // the other non-string shapes plus an OMITTED key (undefined, not null),
+    // which falls through to a no-op rather than clearing. A real border is
+    // seated first so a shape that slipped through and cleared it would show.
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Shapes');
+    const meta = server.sim.players.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    for (const deedId of [{}, { deedId: BORDER_DEED }, [BORDER_DEED], [], true, false]) {
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId }));
+    }
+    // an omitted key is undefined, which is neither null nor a string
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border' }));
+    expect(setter, 'only null or a string may reach the sim validator').not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBe(BORDER_DEED); // the worn border survived every one
+    setter.mockRestore();
+  });
+
+  it('earns col_reliquary_rank_5 and wears it end to end (the Eternal Spoils acceptance id)', () => {
+    // The acceptance criterion names col_reliquary_rank_5, but the wire arms above
+    // use prog_prestige_10 (its cross-kind sibling makes the kind rejection
+    // decisive). This composes the real rank-5 id through the whole earn -> select
+    // -> wire -> slug chain so the named criterion is demonstrated, not just derived.
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Curator');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    const RANK5 = 'col_reliquary_rank_5';
+    expect(sim.ctx.grantDeed(meta, RANK5)).toBe(true); // the real grant path
+    sim.setActiveBorder(RANK5, pid);
+    expect(meta.activeBorder).toBe(RANK5);
+    expect(wireEntity(e).border).toBe(RANK5);
+    expect(deedBorderSlug(RANK5)).toBe('reliquary_gilt');
+  });
 });
 
 // The two Book of Deeds cosmetic sets share ONE per-session token bucket
@@ -3190,6 +3278,20 @@ describe('cosmetic set rate guard (one bucket for title and border)', () => {
     expect(meta.activeBorder).toBeNull();
     setBorder(server, session, BORDER_DEED);
     expect(meta.activeBorder).toBeNull(); // and nothing beyond that one
+  });
+
+  it('books a cosmetic drop-cause metric when the bucket refuses a set', () => {
+    // The refusal path in consumeCosmeticOp books wsMessageDropped('cosmetic')
+    // and tallies into the abuse window; both could be deleted with every other
+    // arm in this describe still green. Spy on the shared counters singleton
+    // (gameMetricsCounters returns activeCounters) AFTER the burst so it only
+    // sees the post-drain refusal.
+    const { server, session } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) setBorder(server, session, BORDER_DEED);
+    const dropped = vi.spyOn(gameMetricsCounters(), 'wsMessageDropped');
+    setBorder(server, session, null); // bucket empty: refused, so booked
+    expect(dropped).toHaveBeenCalledWith('cosmetic');
+    dropped.mockRestore();
   });
 });
 

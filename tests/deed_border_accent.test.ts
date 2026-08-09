@@ -103,6 +103,16 @@ describe('borderAccent: slug -> palette', () => {
     expect(borderAccent('deepward')).toBe(borderAccent('deepward'));
   });
 
+  it('freezes each palette record so a stray runtime write cannot repaint every plate', () => {
+    // Both surfaces hand the SAME record straight to a canvas strokeStyle and to
+    // CSS custom properties; Readonly is compile-time only, so the runtime freeze
+    // is what makes an accidental `accent.frame = ...` throw in strict mode
+    // instead of silently repainting every plate and ring of that slug.
+    for (const slug of BORDER_ACCENT_SLUGS) {
+      expect(Object.isFrozen(borderAccent(slug)), `${slug} record must be frozen`).toBe(true);
+    }
+  });
+
   it('pins the registered slug set, sorted', () => {
     expect(BORDER_ACCENT_SLUGS).toEqual([
       'curators_gilt',
@@ -158,6 +168,17 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
   it('sits under the level chip and the combat flash (identity never covers a value)', () => {
     expect(rule).toContain('z-index: 2;');
     expect(rule).toContain('pointer-events: none;');
+    // The ring geometrically overlaps the level chip (inset -6px left, -2px
+    // bottom vs the chip at bottom -3px / left -3px), and the chip carries the
+    // unit LEVEL, which IS actionable. Pin the two siblings' z-index so deleting
+    // either would red this test rather than silently letting a cosmetic ring
+    // cover the level number. The bare (unprefixed) rules are the base-frame ones.
+    expect(HUD_CSS, 'the level chip must sit above the ring').toMatch(
+      /\n {2}\.level-chip \{[^}]*z-index: 3;/,
+    );
+    expect(HUD_CSS, 'the combat flash must sit above the ring').toMatch(
+      /\n {2}\.combat-flash \{[^}]*z-index: 4;/,
+    );
   });
 
   it('duplicates no slug and no palette color into CSS (one source of truth)', () => {
@@ -303,5 +324,51 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     const tiered = declarations.filter((decl) => decl.includes('var(--fx-shadow'));
     expect(tiered.length, 'only the outer bloom may scale with --fx-shadow').toBe(1);
     expect(property(tiered[0])).toBe('box-shadow');
+  });
+
+  it('has no tier-scoped selector that could hide the identity ring at a low preset', () => {
+    // RING_RULE captures only the ONE universal rule; the declaration scan above
+    // is blind to a LATER override like
+    // `:root[data-fx-level="low"] .portrait-wrap::after { display: none }`, which
+    // would hide the identity ring on the low preset with every assertion above
+    // still green. Scan the three sheets for any data-fx-level selector that also
+    // names the ring surface. Selectors carry no { } or ; so this survives
+    // @layer / @media nesting.
+    for (const rel of [
+      'src/styles/hud.css',
+      'src/styles/hud.mobile.css',
+      'src/styles/tokens.css',
+    ]) {
+      const css = read(rel);
+      for (const selector of css.match(/[^{};]*data-fx-level[^{}]*\{/g) ?? []) {
+        expect(
+          /portrait-wrap|border-accent|\[data-border/.test(selector),
+          `a data-fx-level selector must not target the identity ring: ${selector.trim()}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('resolves borderSlug at the hud.ts call sites without a tier read', () => {
+    // Both slug reads (self playerFrame, target targetFrame) live in hud.ts,
+    // which the ACCENT_PATH scan cannot include because hud.ts legitimately reads
+    // fxTier everywhere else. Scan a small window around each `borderSlug =`
+    // assignment so a future edit that gated it behind a tier (inline or a
+    // wrapping if) is caught without whole-file false positives.
+    const hud = read('src/ui/hud.ts').split('\n');
+    const sites = hud.reduce<number[]>((acc, line, i) => {
+      if (line.includes('borderSlug = deedBorderSlug')) acc.push(i);
+      return acc;
+    }, []);
+    expect(sites.length, 'expected both borderSlug assignments (self + target)').toBe(2);
+    for (const i of sites) {
+      const window = hud.slice(Math.max(0, i - 3), i + 2).join('\n');
+      for (const token of [...PROFILE_TOKENS, 'fxTier']) {
+        expect(
+          window.includes(token),
+          `the borderSlug assignment near hud.ts line ${i + 1} must not read ${token}`,
+        ).toBe(false);
+      }
+    }
   });
 });

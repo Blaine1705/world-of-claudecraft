@@ -9,7 +9,7 @@ import {
   NAMEPLATE_TEXT_SPRITE_LIMIT,
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
-import { borderAccent } from '../src/ui/deed_border_view';
+import { BORDER_ACCENT_SLUGS, borderAccent } from '../src/ui/deed_border_view';
 
 interface ContextTrace {
   canvas: HTMLCanvasElement;
@@ -506,6 +506,18 @@ describe('nameplate canvas surface', () => {
     // Shapes, not a second text pass: no raster is keyed on the slug, so a player
     // flipping borders can never grow the sprite budget.
     expect(spriteCount(surface)).toBe(spritesWithoutAccent);
+
+    // Flip through EVERY border slug and assert the sprite count stays flat the
+    // whole way. The single flip above sees one border; a scheme that minted a
+    // per-slug border sprite while evicting another under a byte budget could net
+    // zero on one flip and slip past. Cycling all four (twice) makes any per-slug
+    // mint show as growth.
+    for (const slug of [...BORDER_ACCENT_SLUGS, ...BORDER_ACCENT_SLUGS]) {
+      state.border = slug;
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 220);
+      expect(spriteCount(surface), `${slug} must mint no border sprite`).toBe(spritesWithoutAccent);
+    }
   });
 
   it('adds no vertical space, so the emote anchor walk still lands on the name row', () => {
