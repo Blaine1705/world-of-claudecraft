@@ -50,6 +50,24 @@ describe('the languagechange listener rides the DOM', () => {
   });
 });
 
+describe('the displayed latch under a persisted dismissal', () => {
+  it('stays empty when a stored dismissal keeps the boot notice hidden', async () => {
+    // R16 seam: the exposures mean "the player was TOLD this session". A boot
+    // whose notice is hidden by a past install-level dismissal told them
+    // nothing, so the latch must stay empty and leave the perf nudge free.
+    // Phase 3 QA found no pin reds when the displayed merge moves above the
+    // state.shown early-return in render(); this is that pin.
+    const toast = await bootToast();
+    localStorage.setItem('woc_gpu_notice_dismissed', 'software');
+    expect(toast.initGpuNotice({ softwareRendering: true, desktopShell: true })).toBe(false);
+    expect(noticeRoot()).toBeNull();
+    expect(toast.gpuNoticeDisplayed()).toEqual({
+      softwareRendering: false,
+      discreteInactive: false,
+    });
+  });
+});
+
 describe('the displayed latch on a both-component verdict', () => {
   it('counts both components as accounted for while the software body wins the copy', async () => {
     // Deliberate semantics (reviewed and kept): the software copy carries the

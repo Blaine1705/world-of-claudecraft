@@ -64,13 +64,16 @@ describe('the GPU verdict push to the renderer', () => {
   });
 
   it('guards the async send on a live window', () => {
-    // getGPUInfo resolves on a later tick; the window can be gone by then.
+    // getGPUInfo resolves on a later tick; the window can be gone by then. Pin
+    // the whole guarded statement with its polarity (the phase 3 QA audit
+    // showed the old nearby-strings pin passed with the guard inverted or the
+    // send hoisted out), and pin the send count so a second, unguarded send
+    // cannot ride in beside the guarded one.
     const body = gpuFlowBody();
-    const sendAt = body.indexOf("webContents.send('desktop-gpu-status'");
-    expect(sendAt).toBeGreaterThan(-1);
-    const preamble = body.slice(Math.max(0, sendAt - 200), sendAt);
-    expect(preamble).toContain('mainWindow');
-    expect(preamble).toContain('isDestroyed()');
+    expect(body.replace(/\s+/g, ' ')).toContain(
+      "if (mainWindow && !mainWindow.isDestroyed()) { mainWindow.webContents.send('desktop-gpu-status', gpuStatus); }",
+    );
+    expect([...body.matchAll(/webContents\.send\('desktop-gpu-status'/g)].length).toBe(1);
   });
 
   it('the preload subscription shape-checks every payload field and can unsubscribe', () => {

@@ -73,6 +73,31 @@ describe('normalizeDesktopGpuStatus', () => {
     expect(normalized?.adapter.length).toBe(64);
   });
 
+  it('strips any field outside the three-key whitelist, whatever the shell sends', async () => {
+    // The shell is an independently updated binary: a future or compromised
+    // build must not smuggle extra diagnostics through the normalizer.
+    const { status } = await boot();
+    const normalized = status.normalizeDesktopGpuStatus({
+      softwareRendering: true,
+      discreteInactive: false,
+      adapter: 'WARP',
+      glVendor: 'smuggled',
+      devices: [{ vendorId: 32902 }],
+    });
+    expect(normalized).toEqual({
+      softwareRendering: true,
+      discreteInactive: false,
+      adapter: 'WARP',
+    });
+    // The exact key set IS the whitelist: pin it literally so a pass-through
+    // rewrite (returning the raw payload) can never sneak extras across.
+    expect(Object.keys(normalized as object).sort()).toEqual([
+      'adapter',
+      'discreteInactive',
+      'softwareRendering',
+    ]);
+  });
+
   it('drops anything without both booleans rather than coercing a false verdict', async () => {
     const { status } = await boot();
     expect(status.normalizeDesktopGpuStatus(null)).toBeNull();
@@ -209,6 +234,12 @@ describe('the persisted dismissal across shell verdicts', () => {
       false,
     );
     expect(noticeRoot()).toBeNull();
+    // The quiet re-boot told the player nothing: the display latch must stay
+    // empty so an unread notice never suppresses the perf nudge (ruling R16).
+    expect(second.toast.gpuNoticeDisplayed()).toEqual({
+      softwareRendering: false,
+      discreteInactive: false,
+    });
 
     // The session degrades further (software rendering too): that component was
     // never dismissed, so the notice re-arms with the more severe copy.
