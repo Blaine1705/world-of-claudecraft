@@ -2749,6 +2749,75 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 150_000 },
     reward: { kind: 'title', text: 'Warcrowned' },
   },
+  // The Reliquary completion ladder (Phase 18): catalog-wide and shelf-wide
+  // completion plus the three flagship page Illuminations. Zero Renown:
+  // catalog / luck prestige never scores the board (docs/design/reliquary.md +
+  // deeds.md rule 2). Manual: granted by syncReliquaryCompletionDeeds when the
+  // pure completion read holds (and on join retro for veterans who already
+  // hold it). STICKY: later catalog growth lowers the live completion read but
+  // never revokes the earned record (the feat_book_complete precedent: the
+  // requirement is "the catalog as shipped when you finished it", not a moving
+  // target). Titles only. Appended after the WARFARE honor ladder so
+  // DEED_ORDER stays append-only across the release merge. The GRANT-CHECK
+  // order lives in RELIQUARY_COMPLETION_DEED_IDS (src/sim/reliquary.ts) and
+  // deliberately differs from this table's order: illuminations before the
+  // shelf before the catalog, so a title granted earlier in one pass is
+  // visible to the later checks.
+  // feat: true, uniquely off the feat_ prefix (pinned with rationale in
+  // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
+  // growing catalog, the feat_book_complete class, and the flag is what
+  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Three catalog slots are
+  // owner-pended today (masterwork:engineering, reins_drakemaw_raptor,
+  // reins_terrorspark_groundshaker), so a non-feat capstone would dead-end
+  // The Whole Book for every player (the retroFallbackGrants stranded-heal
+  // doctrine names exactly that failure). It stays on the Collection shelf
+  // beside its ladder; grant, marquee, and feed behavior are unaffected.
+  col_reliquary_complete: {
+    id: 'col_reliquary_complete',
+    name: 'The Grand Reliquary',
+    desc: 'Catalogue every relic in The Reliquary that a character can keep. Later catalog growth never takes it back.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Curator of the Vault' },
+    feat: true,
+  },
+  col_reliquary_conquerors: {
+    id: 'col_reliquary_conquerors',
+    name: 'Shelf of Conquerors',
+    desc: 'Catalogue every relic on the Conquerors shelf of The Reliquary. Later catalog growth never takes it back.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Vaultbreaker' },
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    id: 'col_reliquary_illum_nythraxis_heroic',
+    name: 'Nythraxis Illuminated',
+    desc: 'Illuminate the Heroic Nythraxis Raid page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of Nythraxis' },
+  },
+  col_reliquary_illum_thunzharr: {
+    id: 'col_reliquary_illum_thunzharr',
+    name: 'Thunzharr Illuminated',
+    desc: 'Illuminate the Thunzharr, the Waking Peak page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of Thunzharr' },
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    id: 'col_reliquary_illum_gravewyrm_heroic',
+    name: 'Sanctum Illuminated',
+    desc: 'Illuminate the Heroic Gravewyrm Sanctum page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of the Sanctum' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

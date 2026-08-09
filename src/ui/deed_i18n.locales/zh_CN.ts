@@ -66,6 +66,31 @@ export const table: DeedLocaleTable = {
     desc: '生涯累计获得150,000点荣誉。在任何王国都十分罕见，理应如此。',
     title: '战冠者',
   },
+  col_reliquary_complete: {
+    name: '圣物库大全',
+    desc: '将角色能够保有的圣物库中每一件圣物收录在册。此后目录再增添，也不会收回这份记录。',
+    title: '宝库策展人',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者书架',
+    desc: '将圣物库征服者书架上的每一件圣物收录在册。此后目录再增添，也不会收回这份记录。',
+    title: '破库者',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: '点亮尼思拉克西斯',
+    desc: '点亮圣物库的“英雄：尼思拉克西斯团队副本”页面。',
+    title: '尼思拉克西斯之光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: '点亮桑扎尔',
+    desc: '点亮圣物库的“桑扎尔，觉醒之峰”页面。',
+    title: '桑扎尔之光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '点亮圣所',
+    desc: '点亮圣物库的“英雄：墓龙圣所”页面。',
+    title: '圣所之光',
+  },
   chr_drakemaw_broodlord: {
     name: '碎卵者',
     desc: '在满是龙卵的巢穴中击杀一头龙喉巢主，挺过它的怒吼、顺劈与烈焰。',

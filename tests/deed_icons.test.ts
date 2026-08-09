@@ -372,15 +372,16 @@ describe('Book of Deeds webp icons', () => {
     // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
     // third artless deed, a dropped webp, or a silent catalog append all red here. The Rift
     // coverage pair (dgn_rift, dgn_rift_s_rank), the twelve starter-zone chronicle deeds
-    // (frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden), and the four Reliquary
-    // Curator rank bridges all ship artless per docs/design/deeds.md step 6 ("art can trail the
-    // deed"); they join the pending set alongside the Thornhollow Fields battleground quartet,
-    // the Drakelands brood pair, and the seven per-craft rare-tier profession deeds (issue #2055).
+    // (frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden), the four Reliquary
+    // Curator rank bridges, and the five Phase 18 Reliquary completion-ladder deeds all ship
+    // artless per docs/design/deeds.md step 6 ("art can trail the deed"); they join the pending
+    // set alongside the Thornhollow Fields battleground quartet, the Drakelands brood pair, and
+    // the seven per-craft rare-tier profession deeds (issue #2055).
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(266);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(271);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);

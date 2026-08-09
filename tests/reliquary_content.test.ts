@@ -312,8 +312,10 @@ describe('Reliquary Conqueror catalog structure', () => {
       weaponSkins: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands.
-    expect(full).toEqual({ owned: 219, total: 219 });
+    // Literal: update when catalog content lands. Phase 18 adds four title
+    // relics to horizons_titles (the completion-ladder titles minus the
+    // excluded col_reliquary_complete).
+    expect(full).toEqual({ owned: 223, total: 223 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -321,7 +323,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands.
-    expect(character).toEqual({ owned: 190, total: 190 });
+    expect(character).toEqual({ owned: 194, total: 194 });
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -337,6 +339,34 @@ describe('Reliquary Conqueror catalog structure', () => {
     for (const page of RELIQUARY_PAGES) {
       const kinds = new Set(page.relics.map((r) => r.kind));
       expect(kinds.size, `${page.id} mixes relic kinds: ${[...kinds].sort().join(', ')}`).toBe(1);
+    }
+  });
+
+  it('the Conquerors shelf shape the capstone gate depends on: non-empty item pages only', () => {
+    // syncReliquaryCompletionDeeds gates the whole-catalog walk behind the
+    // shelf deed on a necessity argument: owned === total implies the shelf
+    // is complete. That implication holds only while every conquerors page
+    // is non-empty and carries NO weapon_skin relic (skin ownership is
+    // account-scoped, invisible to characterReliquaryOwnership, and
+    // subtracted from the character total, so a conquerors skin page would
+    // keep the shelf deed permanently ungrantable while owned === total
+    // stays reachable: the capstone would dead-end silently). An empty page
+    // can never read complete at all (total > 0 is part of complete). This
+    // arm reds the catalog edit before the gate can strand anyone; a
+    // conquerors-shelf pending slot would be the same hazard one step
+    // removed, so the pending table must never name a conquerors page.
+    expect(CONQUEROR_PAGES.length).toBeGreaterThan(0);
+    for (const page of CONQUEROR_PAGES) {
+      expect(page.relics.length, `${page.id} is empty`).toBeGreaterThan(0);
+      for (const relic of page.relics) {
+        expect(relic.kind, `${page.id} carries a ${relic.kind} relic`).not.toBe('weapon_skin');
+      }
+    }
+    for (const pageId of Object.keys(SOURCE_PENDING_RULING)) {
+      expect(
+        RELIQUARY_PAGES_BY_ID[pageId]?.shelf,
+        `${pageId} is a conquerors page with a pending (unearnable) slot`,
+      ).not.toBe('conquerors');
     }
   });
 
@@ -1186,10 +1216,24 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(ids).toEqual([...RELIQUARY_HORIZON_TITLES]);
     // Bidirectional: the hand list is exactly the live non-hidden title rewards, so a new
     // title deed must be added here and a hidden one can never silently re-enter.
+    // ONE exclusion: col_reliquary_complete rewards a title but must stay OFF
+    // the page, because its trigger is owned === total over the character
+    // catalog; listing its own title would grow total by one the player
+    // cannot own before the grant, deadlocking completion (the
+    // non-terminating self-reference). The explicit arm below pins the
+    // exclusion so a future hand-add reds a test, not just review.
     const liveTitles = DEED_ORDER.filter(
-      (id) => DEEDS[id].reward?.kind === 'title' && !DEEDS[id].hidden,
+      (id) =>
+        DEEDS[id].reward?.kind === 'title' && !DEEDS[id].hidden && id !== 'col_reliquary_complete',
     );
     expect([...ids].sort()).toEqual([...liveTitles].sort());
+    // The exclusion arm, both premise halves: the deed really rewards a title
+    // (so the filter above really is excluding a would-be member, not a
+    // border or rewardless deed) AND the hand list does not carry it.
+    expect(DEEDS.col_reliquary_complete.reward?.kind).toBe('title');
+    expect(DEEDS.col_reliquary_complete.hidden).toBeFalsy();
+    expect(RELIQUARY_HORIZON_TITLES).not.toContain('col_reliquary_complete');
+    expect(ids).not.toContain('col_reliquary_complete');
     for (const id of ids) {
       expect(DEEDS[id], id).toBeDefined();
       expect(DEEDS[id].reward?.kind).toBe('title');
@@ -1714,7 +1758,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 4,
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
-  horizons_titles: 36,
+  // Every title relic's source is its own deed, so the count tracks the page
+  // rows: 36 + the four Phase 18 completion-ladder titles.
+  horizons_titles: 40,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level

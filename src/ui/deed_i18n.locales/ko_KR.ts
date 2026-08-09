@@ -66,6 +66,31 @@ export const table: DeedLocaleTable = {
     desc: '평생 명예 150,000을 획득하십시오. 어느 서버에서든 드물며, 마땅히 그래야 합니다.',
     title: '전쟁왕관',
   },
+  col_reliquary_complete: {
+    name: '위대한 성물고',
+    desc: '캐릭터가 간직할 수 있는 성물고의 모든 성물을 수록하십시오. 이후 목록이 늘어나도 이 기록은 사라지지 않습니다.',
+    title: '보물고의 큐레이터',
+  },
+  col_reliquary_conquerors: {
+    name: '정복자의 서가',
+    desc: '성물고의 정복자 서가에 있는 모든 성물을 수록하십시오. 이후 목록이 늘어나도 이 기록은 사라지지 않습니다.',
+    title: '보물고를 부순 자',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: '조명된 니트락시스',
+    desc: '영웅: 니트락시스 공격대 페이지를 성물고에서 조명하십시오.',
+    title: '니트락시스의 빛',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: '조명된 천자르',
+    desc: '천자르, 깨어나는 봉우리 페이지를 성물고에서 조명하십시오.',
+    title: '천자르의 빛',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '조명된 성소',
+    desc: '영웅: 무덤고룡 성소 페이지를 성물고에서 조명하십시오.',
+    title: '성소의 빛',
+  },
   chr_drakemaw_broodlord: {
     name: '둥지 파괴자',
     desc: '화산구의 둥지군주를 알 무더기 한복판에서, 포효와 가르기와 불길을 뚫고 처치하십시오.',

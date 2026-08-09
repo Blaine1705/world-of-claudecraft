@@ -66,6 +66,31 @@ export const table: DeedLocaleTable = {
     desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
     title: '戦の冠',
   },
+  col_reliquary_complete: {
+    name: '大いなる聖遺物庫',
+    desc: 'キャラクターが所蔵できる聖遺物庫のすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫のキュレーター',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者の棚',
+    desc: '聖遺物庫の征服者の棚にあるすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫破り',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'ナイスラクシスの照耀',
+    desc: '聖遺物庫の「英雄: ナイスラクシスのレイド」のページを照耀する。',
+    title: 'ナイスラクシスの光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'サンザールの照耀',
+    desc: '聖遺物庫の「サンザール、目覚めし峰」のページを照耀する。',
+    title: 'サンザールの光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '聖所の照耀',
+    desc: '聖遺物庫の「英雄: 墓ワームの聖所」のページを照耀する。',
+    title: '聖所の光',
+  },
   chr_drakemaw_broodlord: {
     name: '卵砕き',
     desc: '咆哮と薙ぎ払い、そして業火をくぐり抜け、卵に囲まれた火口の巣主を討ち取れ。',

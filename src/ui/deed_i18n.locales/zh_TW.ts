@@ -66,6 +66,31 @@ export const table: DeedLocaleTable = {
     desc: '生涯累計獲得150,000點榮譽。在任何王國都極為罕見，而它本該如此。',
     title: '戰冠者',
   },
+  col_reliquary_complete: {
+    name: '聖物庫大全',
+    desc: '將角色能夠保有的聖物庫中每一件聖物收錄在冊。此後目錄再增添，也不會收回這份紀錄。',
+    title: '寶庫策展人',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者書架',
+    desc: '將聖物庫征服者書架上的每一件聖物收錄在冊。此後目錄再增添，也不會收回這份紀錄。',
+    title: '破庫者',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: '點亮尼思拉克西斯',
+    desc: '點亮聖物庫的「英雄：尼思拉克西斯團隊副本」頁面。',
+    title: '尼思拉克西斯之光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: '點亮桑扎爾',
+    desc: '點亮聖物庫的「桑扎爾，覺醒之峰」頁面。',
+    title: '桑扎爾之光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '點亮聖所',
+    desc: '點亮聖物庫的「英雄：墓龍聖所」頁面。',
+    title: '聖所之光',
+  },
   chr_drakemaw_broodlord: {
     name: '碎巢者',
     desc: '在龍喉巢主的卵群之間將牠擊殺，撐過牠的怒吼、順劈斬與烈焰。',

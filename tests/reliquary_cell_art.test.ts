@@ -191,10 +191,13 @@ describe('title relics resolve the deed crest', () => {
     // legitimately retires and the floor below should move to the painted arm.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
     expect(pending.length, 'floor: the category-crest tier still has producers').toBeGreaterThan(0);
-    // Today's premise (2026-08-08): the three curator-rank bridges plus four
-    // pvp titles, 7 rows. Count-pinned loosely so ONE painted crest landing
-    // does not red this file, while a mass change still asks for a look.
-    expect(pending.length).toBeLessThanOrEqual(7);
+    // Today's premise (2026-08-08): the three curator-rank bridges, four pvp
+    // titles, and the four Phase 18 completion-ladder titles on the page
+    // (col_reliquary_conquerors and the three flagship Illumination deeds;
+    // col_reliquary_complete is excluded from the page itself), 11 rows.
+    // Count-pinned loosely so ONE painted crest landing does not red this
+    // file, while a mass change still asks for a look.
+    expect(pending.length).toBeLessThanOrEqual(11);
     for (const id of pending) {
       const category = DEEDS[id]?.category;
       expect(category, `${id} premise: a catalogued title deed`).toBeDefined();

@@ -368,6 +368,18 @@ export const RELIQUARY_HORIZON_TITLES = [
   'pvp_honor_sergeant',
   'pvp_honor_knight_lieutenant',
   'pvp_honor_field_marshal',
+  // The Reliquary completion ladder (Phase 18). col_reliquary_complete is
+  // DELIBERATELY absent, the one exception to the locked titles-page rule:
+  // its trigger is owned === total over the character catalog, so putting its
+  // own title on this page grows total by one the player cannot own before
+  // the grant, making completion unreachable (the non-terminating
+  // self-reference). Contrast the rank bridges, which are self-terminating
+  // because maybeSyncCuratorRankDeeds early-outs once every due bridge is
+  // earned. tests/reliquary_content.test.ts pins the exclusion.
+  'col_reliquary_conquerors',
+  'col_reliquary_illum_nythraxis_heroic',
+  'col_reliquary_illum_thunzharr',
+  'col_reliquary_illum_gravewyrm_heroic',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

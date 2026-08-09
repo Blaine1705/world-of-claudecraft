@@ -4593,6 +4593,14 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'pvp_honor_sergeant',
   'pvp_honor_knight_lieutenant',
   'pvp_honor_field_marshal',
+  // The Reliquary completion ladder (Phase 18): all five are 'collection', so they fall
+  // back to the deed_cat_collection crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'col_reliquary_complete',
+  'col_reliquary_conquerors',
+  'col_reliquary_illum_nythraxis_heroic',
+  'col_reliquary_illum_thunzharr',
+  'col_reliquary_illum_gravewyrm_heroic',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

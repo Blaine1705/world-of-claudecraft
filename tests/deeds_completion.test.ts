@@ -127,6 +127,15 @@ describe('the real catalog', () => {
       'col_moonlit_bloom',
       'col_perfect_specimen',
       'col_pristine_vein',
+      // Phase 18 completion ladder: all five zero Renown for the same rule 2
+      // reason as the rank bridges (catalog prestige never scores the board).
+      // col_reliquary_complete is NOT here: it carries feat: true (the
+      // dynamic-meta class), so it sits outside the Book's completion pair
+      // entirely; see the feat-prefix exception pin in deeds_content.
+      'col_reliquary_conquerors',
+      'col_reliquary_illum_gravewyrm_heroic',
+      'col_reliquary_illum_nythraxis_heroic',
+      'col_reliquary_illum_thunzharr',
       'col_reliquary_rank_2',
       'col_reliquary_rank_3',
       'col_reliquary_rank_4',

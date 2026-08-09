@@ -1465,10 +1465,10 @@ describe('reliquaryRefreshSig', () => {
 describe('reliquaryFillPct', () => {
   it('rounds to a whole percent and pins the empty pair at zero', () => {
     expect(reliquaryFillPct(0, 0)).toBe(0);
-    expect(reliquaryFillPct(0, 219)).toBe(0);
+    expect(reliquaryFillPct(0, 223)).toBe(0);
     expect(reliquaryFillPct(1, 3)).toBe(33);
     expect(reliquaryFillPct(2, 3)).toBe(67);
-    expect(reliquaryFillPct(219, 219)).toBe(100);
+    expect(reliquaryFillPct(223, 223)).toBe(100);
     // Round, not floor: 0.5 percent of the way is already 1 on the meter.
     expect(reliquaryFillPct(1, 200)).toBe(1);
   });

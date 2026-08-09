@@ -518,18 +518,18 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // The Drakelands brood merge, the Rift coverage pair, the seven per-craft rare-tier
-    // profession deeds (issue #2055), the remaining starter-zone chronicle pairs, and
-    // the four Reliquary Curator rank bridges, and the three WARFARE honor ranks all
-    // appended deeds after this wave, so the
-    // live catalog is 263 and the wave's own claim is unchanged: every deed that existed
-    // when it landed is painted. The only artless ids are those appended later, which
+    // profession deeds (issue #2055), the remaining starter-zone chronicle pairs,
+    // the four Reliquary Curator rank bridges, the three WARFARE honor ranks, and the
+    // five Phase 18 Reliquary completion-ladder deeds all appended deeds after this
+    // wave, so the wave's own claim is unchanged: every deed that existed when it
+    // landed is painted. The only artless ids are those appended later, which
     // ride the category-crest fallback the Icons authoring rule in docs/design/deeds.md
     // sanctions, until their 512px sources are commissioned (flagged in
     // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one enumeration
     // of that debt (src/ui/icons.ts), so this file cannot end up naming a different
     // pending set than the other two art suites. Exhaustive: a further artless deed
     // still reds here.
-    expect(DEED_ORDER).toHaveLength(266);
+    expect(DEED_ORDER).toHaveLength(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

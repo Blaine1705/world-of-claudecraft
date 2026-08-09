@@ -5187,6 +5187,46 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 50,
     "feat": false,
     "rewardTitle": "Warcrowned"
+  },
+  {
+    "id": "col_reliquary_complete",
+    "name": "The Grand Reliquary",
+    "category": "collection",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Curator of the Vault"
+  },
+  {
+    "id": "col_reliquary_conquerors",
+    "name": "Shelf of Conquerors",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Vaultbreaker"
+  },
+  {
+    "id": "col_reliquary_illum_nythraxis_heroic",
+    "name": "Nythraxis Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of Nythraxis"
+  },
+  {
+    "id": "col_reliquary_illum_thunzharr",
+    "name": "Thunzharr Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of Thunzharr"
+  },
+  {
+    "id": "col_reliquary_illum_gravewyrm_heroic",
+    "name": "Sanctum Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of the Sanctum"
   }
 ];
 
@@ -6364,6 +6404,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Warcrowned"
+      },
+      {
+        "kind": "title",
+        "name": "Vaultbreaker"
+      },
+      {
+        "kind": "title",
+        "name": "Light of Nythraxis"
+      },
+      {
+        "kind": "title",
+        "name": "Light of Thunzharr"
+      },
+      {
+        "kind": "title",
+        "name": "Light of the Sanctum"
       }
     ]
   }
