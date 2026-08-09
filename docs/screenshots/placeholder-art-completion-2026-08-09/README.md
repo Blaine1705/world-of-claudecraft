@@ -1,4 +1,4 @@
-# Placeholder art completion — visual evidence
+# Placeholder art completion - visual evidence
 
 Before images were captured from `release/v0.36.0` at
 `5819c005a7666f161aee8c0b54d9007c865bb494`; after images were captured from this

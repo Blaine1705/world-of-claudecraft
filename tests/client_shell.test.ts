@@ -211,7 +211,7 @@ describe('client HTML shell', () => {
       expect(combat).toContain('src="/ui/crests/status/combat.webp"');
       expect(combat).toContain('data-crest-fallback-id="status_combat"');
       expect(combat).toContain('data-crest-fallback-size="32"');
-      expect(combat).not.toContain('⚔');
+      expect(combat).not.toContain(String.fromCodePoint(0x2694));
       expect(entry).toContain('id="pf-rest" role="status"');
     }
     expect(existsSync(new URL('../public/ui/crests/status/combat.webp', import.meta.url))).toBe(
