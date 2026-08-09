@@ -360,6 +360,29 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     expect(inst.bossDeathZones, 'zones cleared between floors').toHaveLength(0);
   });
 
+  it('boss death cancels pending zones and emits riftDeathZoneClear for online mirrors', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25);
+    const inst = active(sim);
+    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5, total: 5 });
+    const boss = sim.entities.get(inst.bossId!)!;
+    boss.hp = 0;
+    boss.dead = true;
+    // The per-tick boss-death sweep clears the zones and notifies each
+    // instance member; without the event an online mirror runs the phantom
+    // fuse to a detonation that never comes.
+    let events = [] as ReturnType<typeof sim.tick>;
+    for (let i = 0; i < 40 && !events.some((e) => e.type === 'riftDeathZoneClear'); i++) {
+      events = events.concat(sim.tick());
+    }
+    expect(inst.bossDeathZones, 'zones cleared on boss death').toHaveLength(0);
+    const clear = events.find((e) => e.type === 'riftDeathZoneClear');
+    expect(clear, 'online mirrors are told to drop the phantom zone').toBeDefined();
+    expect((clear as { pid?: number }).pid, 'personal event addressed to the instance member').toBe(
+      sim.player.id,
+    );
+  });
+
   it('heroic_s tempo: S death zones cast faster and recycle sooner; A keeps the base tempo', () => {
     const seed = seedWithFinalBoss('rift_boss_frost');
     const def = MOBS.rift_boss_frost.deathZoneCast!;
@@ -412,6 +435,13 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       def.castTime * RIFT_S_ZONE_TEMPO - 1 / 20,
       5,
     );
+    // `total` is the driver's own write (the renderer's sweep divides by it):
+    // the full fuse at spawn, never decremented, so it stays a tick above the
+    // ticked-down remaining.
+    expect(s.inst.bossDeathZones[0].total, 'driver stamps total with the full S fuse').toBeCloseTo(
+      def.castTime * RIFT_S_ZONE_TEMPO,
+      5,
+    );
     expect(s.boss.deathZoneCastTimer, 'S cadence recycles sooner').toBeCloseTo(
       (def.every + def.castTime) * RIFT_S_ZONE_TEMPO,
       5,
@@ -420,6 +450,10 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     expect(a.boss.castTotal, 'A cast bar unchanged').toBeCloseTo(def.castTime, 5);
     expect(a.inst.bossDeathZones[0].remaining, 'A fuse unchanged').toBeCloseTo(
       def.castTime - 1 / 20,
+      5,
+    );
+    expect(a.inst.bossDeathZones[0].total, 'driver stamps total with the full A fuse').toBeCloseTo(
+      def.castTime,
       5,
     );
     expect(a.boss.deathZoneCastTimer, 'A cadence unchanged').toBeCloseTo(
@@ -1418,6 +1452,19 @@ describe('rift ranks: budget escape and citadel exemption', () => {
     // at exactly these numbers). This list covers every boss with a
     // deathZoneCast or deathZoneStrike; missing rows are how the ember, storm,
     // and arcane fuses shipped unescapable (v0.36.0 player feedback).
+    //
+    // Scope: this is a deliberate HAND MODEL over the authored numbers, not a
+    // replay of the shipped runtime, and it is conservative on both counted
+    // axes: the live sim stretches a spawn-time-impaired anchor's fuse by
+    // impairedZoneFuseMult (rift_escape_window.ts) and suppresses the boss's
+    // OWN control procs while the escape window is open, both of which give
+    // the runner MORE room than modeled here. Base-rank fuses only: the S
+    // tempo (RIFT_S_ZONE_TEMPO) shortens every fuse by the same 0.7 for the
+    // rank players choose for its difficulty, and the playtest's "well timed"
+    // anchors (frost, brute, tide) were S fights of exactly these authored
+    // numbers, so the band is calibrated where it was measured. Known residual
+    // outside the model: a third-party trash mob's stun or root is neither
+    // suppressed by the window nor compensated by the spawn-time stretch.
     const cases: Array<{
       id: string;
       ccMult: number;
