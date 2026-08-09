@@ -405,6 +405,7 @@ import {
   buildBgScoreboardView,
   buildBgTimeWarningView,
 } from './hud/battleground';
+import { BgProposalPopup } from './hud/battleground/battleground_proposal_popup';
 import { ChatAnnouncer } from './hud/chat/chat_announcer';
 import { chatChannelColor } from './hud/chat/chat_channels';
 import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
@@ -2153,6 +2154,7 @@ export class Hud {
       itemIcon: (item) => this.itemIcon(item),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      hideTooltip: () => this.hideTooltip(),
       writers: this.writerFacet,
     });
     this.playerCard = new PlayerCardController({
@@ -4383,7 +4385,8 @@ export class Hud {
     applyTalents: (allocation) => this.sim.applyTalents(allocation),
     respec: () => this.sim.respec(),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
-    saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
+    saveLoadout: (name, bar, alloc, captureGear) =>
+      this.sim.saveLoadout(name, bar, alloc, captureGear),
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
     applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
@@ -4652,6 +4655,13 @@ export class Hud {
   // so an answer never requires opening it.
   private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
     root: () => $('#dfinder-proposal-popup'),
+    world: () => this.sim,
+  });
+  // The Thornhollow Fields queue-pop prompt, the same shape one tab over:
+  // opened by the bgProposed SimEvent, self-closing when the offer resolves,
+  // and outside the PvP window so answering never requires opening it.
+  private readonly bgProposalPopup = new BgProposalPopup({
+    root: () => $('#bg-proposal-popup'),
     world: () => this.sim,
   });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
@@ -6140,6 +6150,7 @@ export class Hud {
     this.bgScoreboard.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
+    this.bgProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -9091,6 +9102,7 @@ export class Hud {
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
+      if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       // Auto-open the Card Duel window the instant a queued match starts (a
       // false->true transition on match presence), mirroring updateTradeWindow's
@@ -11723,6 +11735,43 @@ export class Hud {
           } else this.showError(t(toast.key));
           break;
         }
+        case 'loadoutGearResult': {
+          // A loadout with a captured gear set was applied. The sim sends COUNTS
+          // only, so all the copy lives here. Two separate lines rather than one
+          // combined sentence: what came back and what is missing are different
+          // pieces of news, and the missing line is the one a player has to act on.
+          if (ev.equipped > 0) {
+            this.log(
+              t('hudChrome.talents.gearRestored', { n: formatNumber(ev.equipped) }),
+              '#ffd100',
+            );
+          }
+          // Three distinct reasons, three distinct lines. The event schema and the
+          // planner's doc exist to tell them apart, and "you no longer own it" is
+          // different news from "that enchanted copy is gone" or "you only have one
+          // of these". Collapsing them threw the distinction away at the last step.
+          if (ev.notHeld > 0) {
+            this.log(
+              t('hudChrome.talents.gearNotHeld', { n: formatNumber(ev.notHeld) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.copyGone > 0) {
+            this.log(
+              t('hudChrome.talents.gearCopyGone', { n: formatNumber(ev.copyGone) }),
+              '#ff8a5c',
+            );
+          }
+          if (ev.takenByOtherSlot > 0) {
+            this.log(
+              t('hudChrome.talents.gearTakenByOtherSlot', {
+                n: formatNumber(ev.takenByOtherSlot),
+              }),
+              '#ff8a5c',
+            );
+          }
+          break;
+        }
         case 'salvageResult': {
           // Enchanting salvage outcome (Professions 2.0): same shape as
           // disenchantResult above, minus the secondary (salvage yields one
@@ -12482,6 +12531,10 @@ export class Hud {
           // A 30s availability window: the WoW-style prompt pops at the top of
           // the screen (with its cue) without opening the finder window.
           this.dungeonFinderProposalPopup.show();
+          break;
+        case 'bgProposed':
+          // The battleground's own 30s answer window, same prompt one tab over.
+          this.bgProposalPopup.show();
           break;
         case 'arenaFound': {
           const name =
@@ -13644,6 +13697,11 @@ export class Hud {
     const exact: Record<string, TranslationKey> = {
       'You are stunned!': 'hud.errors.stunned',
       'You are silenced!': 'hud.errors.silenced',
+      // The rooted-charge refusal. Reuses the existing combat key rather than
+      // minting an errors.* twin: the string is already carried in every
+      // locale, and a second English spelling of "you cannot move" would be a
+      // translation ask for no player-visible gain.
+      "Can't move!": 'hud.combat.cannotMove',
       'You are busy.': 'hud.errors.busy',
       'That ability is not ready yet.': 'hud.errors.abilityNotReady',
       'Not enough rage!': 'hud.errors.notEnoughRage',
@@ -13658,6 +13716,10 @@ export class Hud {
       'Out of range.': 'hud.errors.outOfRange',
       'You have no target.': 'hud.errors.noTarget',
       'Too close!': 'hud.errors.tooClose',
+      // The friendly-rush refusal. A new key rather than a reuse of noTarget: the
+      // player may well HAVE a target (an enemy one), and telling them they have
+      // none would send them looking for the wrong problem.
+      'You must target an ally.': 'hud.errors.mustTargetAlly',
       'You must be facing your target.': 'hud.errors.facing',
       'You must wield a dagger.': 'hud.errors.dagger',
       'You must be behind your target.': 'hud.errors.behindTarget',
