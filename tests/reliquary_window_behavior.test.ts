@@ -3105,7 +3105,7 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
   });
 
-  it('wears the Personal chip on the riftbound row, never the Retired word', () => {
+  it('wears the Personal chip on the riftbound row AND its page header, never the Retired word', () => {
     expect(pageDef(RIFTBOUND_PAGE_ID).excludeFromCompletion).toBe('personal');
     const rig = makeWindow(baseState(), { nav: 'horizons' });
     const row = must(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
@@ -3117,6 +3117,12 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(row.querySelector('[data-retired]')).toBeNull();
     const vaultRow = must(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
     expect(vaultRow.querySelector('[data-personal]')).toBeNull();
+    // Then the page header, on the same live window (the vault arm's mirror).
+    click(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
+    const headerChips = [...rig.el.querySelectorAll<HTMLElement>('[data-personal]')];
+    expect(headerChips).toHaveLength(1);
+    expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.personalLabel'));
+    expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(0);
   });
 
   it('paints no chip at all on an ordinary page', () => {

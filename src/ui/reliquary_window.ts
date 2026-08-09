@@ -1245,12 +1245,14 @@ export class ReliquaryWindow {
       ? RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion
       : undefined;
     if (reason === undefined) return '';
-    const attr = reason === 'personal' ? 'data-personal' : 'data-retired';
-    const key =
-      reason === 'personal'
-        ? 'hudChrome.reliquary.personalLabel'
-        : 'hudChrome.reliquary.retiredLabel';
-    return `<span class="reliquary-complete-badge" ${attr}="1">${esc(t(key))}</span>`;
+    // Exhaustive over the flag union: a third reason fails to index this
+    // record at tsc time instead of silently wearing the Retired chip.
+    const chips = {
+      retired: { attr: 'data-retired', key: 'hudChrome.reliquary.retiredLabel' },
+      personal: { attr: 'data-personal', key: 'hudChrome.reliquary.personalLabel' },
+    } as const satisfies Record<'retired' | 'personal', { attr: string; key: string }>;
+    const chip = chips[reason];
+    return `<span class="reliquary-complete-badge" ${chip.attr}="1">${esc(t(chip.key))}</span>`;
   }
 
   private pageDetailHtml(

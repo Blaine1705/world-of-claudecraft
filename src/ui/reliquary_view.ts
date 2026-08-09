@@ -731,10 +731,12 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   for (const page of input.pages) {
     // Same scoring rule the headline pair uses (completionScoringPages in
     // src/sim/reliquary.ts): an excludeFromCompletion page contributes to
-    // NEITHER side of a shelf sum. Counting it here while the headline
-    // excluded it made the rail and the Overview cards disagree with the
-    // number at the top of the same window. The flagged page's OWN row keeps
-    // its local owned/total, which is the pair a player can actually move.
+    // NEITHER side of a shelf sum. Counting flagged slots here while the
+    // headline excluded them was one source of rail-vs-headline drift; the
+    // shelf sums still run above the headline because they count a shared id
+    // once per page while the headline de-dupes across pages (pre-existing,
+    // deliberate). The flagged page's OWN row keeps its local owned/total,
+    // which is the pair a player can actually move.
     if (page.excludeFromCompletion !== undefined) continue;
     const c = pageCompletion(page, opts);
     const bucket = shelfTotals.get(page.shelf);

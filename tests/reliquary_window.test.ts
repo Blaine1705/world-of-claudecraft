@@ -153,7 +153,10 @@ describe('painter hygiene', () => {
     // wear each other's word.
     const code = stripComments(painter);
     expect(code).toContain('RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion');
-    expect(code).toMatch(/reason === 'personal'/);
+    // The dispatch is an exhaustive record indexed by the reason, so a third
+    // flag value fails tsc at the index instead of defaulting to either chip.
+    expect(code).toMatch(/satisfies Record<'retired' \| 'personal'/);
+    expect(code).toContain('chips[reason]');
     expect(code).toContain('hudChrome.reliquary.retiredLabel');
     expect(code).toContain('hudChrome.reliquary.personalLabel');
     expect(code).toContain('data-retired');

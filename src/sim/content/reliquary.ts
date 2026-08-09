@@ -1525,7 +1525,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'horizons_riftbound',
     shelf: 'horizons',
     name: 'Riftbound',
-    desc: 'The personal Riftbound bands, minted once for each champion on their first Rift clear. A character can ever hold only their own.',
+    desc: 'The personal Riftbound bands, minted once for each champion on their first Rift clear. A character can only ever hold their own.',
     clearSource: { kind: 'none' },
     excludeFromCompletion: 'personal',
     relics: items(
