@@ -322,8 +322,21 @@ describe('character visual manifest', () => {
         for (const name of donorNames) names.add(name);
       }
       expect(names.size).toBeGreaterThan(0);
+      // animUrls donors (Hit_Stagger, issue #2889 round 2) ship extra clips
+      // in a separate mesh-free GLB alongside the base rig; merge their
+      // names in before checking every clip the ClipMap references actually
+      // resolves somewhere. durationOf and the Death end-vs-start check
+      // below stay on the base-only `names`/`animations`, since none of
+      // those checks touch a donor-only clip.
+      const namesWithDonors = new Set(names);
+      for (const donorUrl of visual.animUrls ?? []) {
+        const donorDoc = await io.read(`public/${donorUrl}`);
+        for (const donorAnimation of donorDoc.getRoot().listAnimations()) {
+          namesWithDonors.add(donorAnimation.getName());
+        }
+      }
       expect(
-        [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !namesWithDonors.has(name)),
         key,
       ).toEqual([]);
 
