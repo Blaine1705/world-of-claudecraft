@@ -143,9 +143,88 @@ it), optional links to deeds (`col_*`, clear milestones).
 | Reliquary window | Primary; DESIGN.md window grammar; mobile full-bleed. |
 | Live toast / combat log | Relic logged; page Illumination; rank up. |
 | Book of Deeds | Unchanged; optional soft links from collection deeds. |
-| Character sheet / public sheet | Optional completion pair and Curator rank (labeled set/scope). |
+| Character sheet / public sheet | Completion pair, Curator rank (labeled set/scope), and the capped recent-finds strip (ids and kinds; privacy note below). |
 | Wiki `/wiki` | Spoiler-safe catalog of pages and relic names; no personal progress. |
 | Discord / marquee | Optional marquee only for full-page Illumination or high Curator ranks; never spam per-relic. |
+
+### Public sheet exposure (privacy note)
+
+The public character sheet (`sheetReliquaryFromState` in
+`server/character_sheet.ts`, rendered by the `/c/` page in
+`server/profile_page.ts`) carries these Reliquary fields and no others: the
+character-scoped completion pair, the Curator rank derived from it, and the
+capped recent-finds strip. The strip is ids plus kinds, newest first, bounded
+by `SHEET_RECENT_RELICS`. It fails closed on any id the live catalog does not
+know, and it carries no first-find provenance, no obtain tally, and no
+timestamp (the recent ring stores none, so there is nothing to coarsen the way
+the deeds strip coarsens `earnedAt`). It rides both visibilities unfiltered
+because the Reliquary has no hidden concept to strip: hidden deeds never enter
+the catalog at all, so the strip cannot name one.
+
+The missing timestamp bounds what the payload STATES, not what a determined
+reader can infer, and the honest version of the claim is worth writing down. A
+poller differencing successive reads of one sheet still sees a new entry appear
+between two fetches, so it can date each find as coarsely as its poll rate
+allows. Two floors bound that rate: the 120 second `Cache-Control: public,
+max-age=120` the `/c/` page serves, and the per-IP public-read budget
+(`PUBLIC_READ_MAX_PER_MINUTE` in `server/ratelimit.ts`, shared by the page and
+the public sheet read). The point is that this is the IDENTICAL property
+`deeds.recent` already has on the same sheet, where the entry additionally
+carries a day-granularity `earnedAt`. The relic strip therefore adds no exposure
+class the sheet did not already carry, and closing it would be a change to both
+strips, not a Reliquary fix.
+
+One consequence is deliberate and stated here rather than left to be
+rediscovered: mount ownership behind that pair reads bags **and** bank, the
+same seam live `ownedMounts` uses, so reins sitting in a character's bank score
+their completion pair and can carry their Curator rank. An unauthenticated
+reader can therefore infer that a character owns reins they have never carried.
+Accepted, with the exposure bounded to the aggregate: the sheet publishes an
+owned count and a rank, never a mount id, never a bank slot, and never anything
+else the bank holds. Narrowing it to bags alone here would also put the public
+pair at odds with the collection the owner sees in game, which counts both
+containers.
+
+Bags-only is a **recorded follow-up and an owner call**, not a defect to fix in
+passing: it would visibly drop the pair for every character with banked reins,
+so it belongs in its own change that moves the sheet, the window, and the
+Curator rank bridges together.
+
+### Inspect and identity-wire exposure (privacy note)
+
+The public sheet is not the only surface a stranger reads a standing from, and
+the inspect card is not gated the way its name suggests. The Curator standing
+(the rank plus the character-scoped owned/total pair behind it) rides the ENTITY
+IDENTITY record, not an inspect response: `refreshCuratorStanding` in
+`server/game.ts` stamps `curatorRank`, `relicsOwned`, and `relicsTotal` on the
+player entity, and `wireEntity` encodes them as `crk`, `cro`, and `crt`. Every
+client holding that player in interest therefore receives them on first sight
+and again on every change. Interest is proximity, not consent: a player enters a
+viewer's set at `INTEREST_RADIUS` and persists out to
+`PLAYER_INTEREST_DROP_RADIUS` (roughly a hundred yards today), so the standing
+reaches everyone nearby whether or not one of them ever clicks inspect. That is
+a wider audience than the card implies, and the gap between the two is the
+reason this note exists.
+
+That is the same audience pattern the `$WOC` holder tier, the developer badge,
+and the linked-Discord flair already have, and for the same reason: the
+nameplate and the card both need them without a round trip. What rides is a
+cosmetic aggregate and nothing else, a rank and a count pair, never a relic id,
+a page, a mark, or any per-relic detail. The recent-finds strip stays on the
+sheet and never touches the wire.
+
+Cadence is join plus the 60 second flair cycle, the two places
+`refreshCuratorStanding` runs, so a third party's view of a rank-up can lag the
+real thing by up to a minute. Self-inspect does not: the card reads the owner's
+LIVE standing off their own ownership surfaces instead of the mirrored record,
+so the owner always sees the true rank at once and only OTHERS ever see the
+stale one.
+
+`relicsTotal` (`crt`) rides the wire despite being player-independent, and that
+is deliberate rather than redundant. The total is catalog size, and a client on
+an older build carries an older catalog; sending the server's total means a
+mixed-version client can never print a pair whose denominator disagrees with the
+server catalog that produced the numerator.
 
 ### Rewards ladder (shipped)
 
@@ -222,6 +301,7 @@ marquees, Discord deed and border cards, and illumination marquees.
 | Illuminated set | `src/sim/reliquary.ts` (`illuminatedPages`, `syncIlluminatedPages`, the emit gate in `emitReliquaryUnlock`); save-only from the client's perspective |
 | Completion ladder | `src/sim/reliquary.ts` `RELIQUARY_COMPLETION_DEED_IDS` + `syncReliquaryCompletionDeeds`; records in `src/sim/content/deeds.ts` |
 | Illumination marquee | `server/game.ts` `fanOutIllumination`, `server/social.ts` `broadcastIllumination`, hud arm `reliquaryIlluminationBroadcast` |
+| Public sheet | `server/character_sheet.ts` (`sheetReliquaryFromState`, `SHEET_RECENT_RELICS`, `sheetRelicRecentText`), `server/profile_page.ts`; narrow reads `restoreReliquaryMarks` / `restoreReliquaryRecent` in `src/sim/reliquary.ts` |
 | Clear counts | `DeedStats.dungeonClears`, `PlayerMeta.delveClears` |
 | Heroic uniques | `src/sim/content/heroic_loot.ts` |
 | Sets | `src/sim/content/item_sets.ts` |

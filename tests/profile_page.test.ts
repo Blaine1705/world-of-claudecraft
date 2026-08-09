@@ -8,7 +8,9 @@
 // English is correct here BY DESIGN (the page is lang="en" throughout); every
 // localized surface resolves ids client-side.
 import { describe, expect, it, vi } from 'vitest';
-import { catalogCharacterCompletion } from '../src/sim/reliquary';
+import { SHEET_RECENT_RELICS } from '../server/character_sheet';
+import { ITEMS } from '../src/sim/data';
+import { catalogCharacterCompletion, RELIQUARY_PAGES } from '../src/sim/reliquary';
 
 const mockGetCharacterById = vi.fn();
 
@@ -22,6 +24,11 @@ vi.mock('../server/db', () => ({
   listCharacterNamesForSitemap: vi.fn(async () => []),
 }));
 
+import {
+  findCharacterReportTargetByName,
+  guildNameForCharacter,
+  lifetimeXpRankForCharacter,
+} from '../server/db';
 import { handleProfilePage } from '../server/profile_page';
 
 function charRow(state: Record<string, unknown>) {
@@ -59,6 +66,26 @@ async function renderProfile(state: Record<string, unknown>): Promise<string> {
   expect(status).toBe(200);
   return body;
 }
+
+describe('profile page db read budget', () => {
+  it('reads each source EXACTLY ONCE per render (the strip added no new read)', async () => {
+    // The recent-finds strip is derived from the state blob the page already
+    // loaded, never from a second lookup. That acceptance criterion held only by
+    // inspection until this pin: four reads, one each, per rendered page.
+    // Counts are cleared first because renderProfile runs in every sibling
+    // describe and the module-level mocks accumulate across a file.
+    vi.clearAllMocks();
+    await renderProfile({
+      level: 12,
+      deedStats: { itemsDiscovered: ['cryptbone_helm'] },
+      reliquary: { marks: ['masterwork:first'], recent: ['cryptbone_helm', 'masterwork:first'] },
+    });
+    expect(findCharacterReportTargetByName).toHaveBeenCalledTimes(1);
+    expect(mockGetCharacterById).toHaveBeenCalledTimes(1);
+    expect(guildNameForCharacter).toHaveBeenCalledTimes(1);
+    expect(lifetimeXpRankForCharacter).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('profile page Book of Deeds title line', () => {
   it('renders the English title under the name for an earned selection', async () => {
@@ -131,5 +158,79 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // Rank 0 renders the explicit fallback line; the <li> never disappears.
     expect(html).toContain('<li>Curator: <strong>Unranked</strong></li>');
     expect(html).not.toContain('Apprentice Curator');
+  });
+});
+
+// The Phase 20 recent-finds strip. The sheet JSON carries ids + kinds; the
+// page resolves ENGLISH names (it is lang="en" throughout, like the Curator
+// rank line above) and a raw relic id must never reach the HTML.
+describe('profile page recent-finds strip', () => {
+  it('renders the ring newest-first as English names, never raw ids', async () => {
+    // Fixture-guard the literals against the live content tables, so a rename
+    // reds here saying what it is instead of drifting silently.
+    expect(ITEMS.cryptbone_helm.name).toBe('Cryptbone Helm');
+    const html = await renderProfile({
+      level: 12,
+      deedStats: { itemsDiscovered: ['cryptbone_helm'] },
+      // Stored oldest-first, so the mark is the newest find.
+      reliquary: { marks: ['masterwork:first'], recent: ['cryptbone_helm', 'masterwork:first'] },
+    });
+    expect(html).toContain(
+      '<li>Recent finds: <strong>First Masterwork, Cryptbone Helm</strong></li>',
+    );
+    expect(html).not.toContain('cryptbone_helm');
+    expect(html).not.toContain('masterwork:first');
+  });
+
+  it('renders at most the sheet bound, dropping the oldest', async () => {
+    // Drives the page with a ring one longer than the bound: the page renders
+    // the SHEET's strip, so the oldest name must be absent from the HTML.
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((page) =>
+          page.relics.flatMap((relic) => (relic.kind === 'item' ? [relic.itemId] : [])),
+        ),
+      ),
+    ].slice(0, SHEET_RECENT_RELICS + 1);
+    // The literal beside the symbolic bounds, so this file stands on its own if
+    // the constant ever drifts: every assertion below is written against
+    // SHEET_RECENT_RELICS, and a bound that silently became 1 or 50 would keep
+    // all of them green while the rendered strip changed shape entirely.
+    expect(SHEET_RECENT_RELICS).toBe(5);
+    expect(ids.length).toBe(SHEET_RECENT_RELICS + 1);
+    const html = await renderProfile({ level: 12, reliquary: { recent: ids } });
+    const strip = /<li>Recent finds: <strong>([^<]*)<\/strong><\/li>/.exec(html);
+    if (!strip) throw new Error('recent-finds line missing from the rendered page');
+    const names = strip[1].split(', ');
+    expect(names.length).toBe(SHEET_RECENT_RELICS);
+    // The last name in the strip is the OLDEST survivor (newest-first), and
+    // the dropped one is absent entirely. This fixture deliberately reads a
+    // name that needs no escaping, so it pins ORDER and not the escaper (the
+    // sibling test below owns that).
+    expect(ITEMS[ids[1]].name).not.toMatch(/['&<>"]/);
+    expect(names.at(-1)).toBe(ITEMS[ids[1]].name);
+    expect(html).not.toContain(ITEMS[ids[0]].name);
+  });
+
+  it('escapes a relic name through the page escaper', async () => {
+    // A real catalogued relic whose English name carries an apostrophe, so the
+    // escaping is load-bearing here rather than a style guard.
+    expect(ITEMS.morthens_cryptforged_hauberk.name).toBe("Morthen's Cryptforged Hauberk");
+    const html = await renderProfile({
+      level: 12,
+      reliquary: { recent: ['morthens_cryptforged_hauberk'] },
+    });
+    expect(html).toContain('Morthen&#39;s Cryptforged Hauberk');
+    expect(html).not.toContain("Morthen's Cryptforged Hauberk");
+  });
+
+  it('renders no strip line for a fresh character or an all-drifted ring', async () => {
+    const fresh = await renderProfile({ level: 12 });
+    expect(fresh).not.toContain('Recent finds:');
+    // An id the live catalog does not know fails closed at the sheet, so the
+    // whole line disappears rather than printing an empty strong tag.
+    const drifted = await renderProfile({ level: 12, reliquary: { recent: ['gone_relic'] } });
+    expect(drifted).not.toContain('Recent finds:');
+    expect(drifted).not.toContain('gone_relic');
   });
 });

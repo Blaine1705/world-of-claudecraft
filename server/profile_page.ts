@@ -14,6 +14,7 @@ import {
   characterSheet,
   type SheetRank,
   sheetCuratorRankText,
+  sheetRelicRecentText,
   sheetTitleText,
 } from './character_sheet';
 import {
@@ -146,8 +147,11 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const guildLine = sheet.guild
     ? `<li>Guild: <strong>&lt;${escapeHtml(sheet.guild)}&gt;</strong></li>`
     : '';
-  // Labeled Reliquary completion pair + Curator rank (character-scoped; no
-  // personal firstFind/recent dump). English-by-design like the rest of /c/.
+  // Labeled Reliquary completion pair + Curator rank (character-scoped), then
+  // the recent-finds strip below. What the page still does NOT publish, now that
+  // the strip does render: no firstFind provenance, no marks set, no per-relic
+  // obtain counts. Only the aggregate pair, the rank, and a capped fail-closed
+  // window on the recent ring. English-by-design like the rest of /c/.
   const reliqOwned = sheet.reliquary.owned;
   const reliqTotal = sheet.reliquary.total;
   const reliqRankEn = sheetCuratorRankText(sheet.reliquary.curatorRank);
@@ -155,6 +159,20 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
     ? `<li>Curator: <strong>${escapeHtml(reliqRankEn)}</strong></li>`
     : `<li>Curator: <strong>Unranked</strong></li>`;
   const reliqLine = `<li>Reliquary: <strong>${reliqOwned}/${reliqTotal}</strong></li>`;
+  // The capped recent-finds strip. The sheet carries ids + kinds; English names
+  // resolve here, like the Curator rank above, because /c/ is English by
+  // design. sheetRelicRecentText answers null for an id with no live name, so a
+  // content-drifted entry drops out instead of printing a raw relic id, and the
+  // whole line disappears when nothing resolves (a fresh character, or a
+  // ring that drifted away entirely).
+  const recentRelicNames = sheet.reliquary.recent.flatMap((entry) => {
+    const relicName = sheetRelicRecentText(entry);
+    return relicName === null ? [] : [escapeHtml(relicName)];
+  });
+  const reliqRecentLine =
+    recentRelicNames.length > 0
+      ? `<li>Recent finds: <strong>${recentRelicNames.join(', ')}</strong></li>`
+      : '';
   // The selected Book of Deeds title, under the name. sheetTitleText returns
   // null for unset/stale/non-title ids, so the line simply disappears (never
   // a raw deed id, never a crash on an old state blob).
@@ -213,6 +231,7 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
       ${rankLine}
       ${reliqLine}
       ${reliqRankLine}
+      ${reliqRecentLine}
       ${arenaLine}
     </ul>
     <nav>
