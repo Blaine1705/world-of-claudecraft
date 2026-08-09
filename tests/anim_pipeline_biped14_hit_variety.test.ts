@@ -88,8 +88,10 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
     // Exactly 6 BIPED14-family consumers touched: a stray extra or missing
     // wiring changes this count. Scoped to this family's own donor
     // basenames rather than every `_hit_variety_anims.glb` in the manifest,
-    // since unrelated families (e.g. the enemy7 hit-variety batch) land
-    // their own donors independently and would otherwise break this pin.
+    // since unrelated families (KayKit's kaykit()/skeletonClips(),
+    // ENEMY_BITE/CRAB_ENEMY_BITE, the enemy7 hit-variety batch, etc, issue
+    // #2889) land their own donors independently and would otherwise break
+    // this pin.
     const occurrences = [
       ...MANIFEST_SRC.matchAll(/(yetialt|frog|orc|demonalt)_hit_variety_anims\.glb/g),
     ].length;
