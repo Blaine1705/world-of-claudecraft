@@ -665,10 +665,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
 // follows the anchor seam, the weapon-skin fade and the census tag. No capture
 // was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (PR 3161) into the three
+// compileAsync patch branch: the release side moved the rendererIntegration
+// and townRuntime leaves while this branch's lockfile patch moved the GLB and
+// source-fingerprint leaves, so all three literals mint to values matching
+// neither parent. No capture was retaken.
+// Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
+// prewarm changes converged with the 3165 reseal. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4b18490d8689cb59b0e9d69c424dc5644f1d62169585afab3de1c0f11e1c5d35';
+  'ec9d9ca628a22172ee8e989c3ac88d563b43929ce6d0ffc2b66881d462ca79f9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'de0f1454a0d7b6599d8a7f536042c577659fb6726d1131125503bf8dc0a27fd7';
+  'a1ee3eaafc63148b46a8af7029cd990f82b4128ee7789e1a1a35e9126926fcca';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1558,10 +1568,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // follows the renderer's anchor seam, weapon-skin fade and census tag,
     // then this second-order seal follows the swept evidence bytes. No capture
     // was retaken.
+    // Re-pinned for the iOS WebKit memory-profile fix: the first-order composite
+    // follows renderer.ts's nativeIosMemoryProfile -> iosMemoryProfile rename,
+    // landing on top of the VFX per-frame cost work already on this release
+    // branch, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
+    // compileAsync patch branch: the first-order composite follows both
+    // parents' inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted after pinning the three specifier exact (PR 3165 review): only
+    // the pnpm-lock.yaml specifier row moved. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('751280aa6d8c9c0ce6b8324245f44e53aba31b6c4bdc19fecf27458592aa1743');
+    ).toBe('cab95c2e4617b24251ccf355ba0519caf9069d0b8a90788bc8148eae276f98ca');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
