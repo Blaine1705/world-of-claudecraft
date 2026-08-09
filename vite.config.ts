@@ -14,9 +14,10 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
-const isOssBrainLinkedWorktree = root.split(path.sep).includes('.wt');
+const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
 
 // Lightning CSS engine targets, derived from .browserslistrc (the single source of
 // the floor) via the zero-dep parser, never a hand-typed object. Drives both the
@@ -547,13 +548,14 @@ export default defineConfig({
     // (Vitest 4.1 experimental.fsModuleCache). Default path is under
     // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
     // OSS Brain linked worktrees symlink node_modules back to the parent checkout,
-    // so concurrent local gates would share one experimental temp-file store and can
-    // fail before reporting parseable tests. Disable it only for those .wt checkouts;
+    // and base-health gates run from that parent checkout under ORCH. Both shapes
+    // can contend on the same experimental temp-file store and fail before
+    // reporting parseable tests. Disable it for OSS Brain-controlled checkouts;
     // normal local checkouts and CI keep the warm-cache path.
     // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
     // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
     experimental: {
-      fsModuleCache: !isOssBrainLinkedWorktree,
+      fsModuleCache: !disableVitestFsModuleCache,
     },
   },
 });
