@@ -66,6 +66,9 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * one-line summary (the tooltip then falls back to name + remaining time only).
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  if (a.id === 'ignivar_shared_pyre') {
+    return { key: `${KEY}.sharedPyre`, nums: { players: 4 } };
+  }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
   }

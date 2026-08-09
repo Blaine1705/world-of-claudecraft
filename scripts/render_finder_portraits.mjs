@@ -42,7 +42,16 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_NATIVE_APP': '"0"',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '"0"',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '"0"',
+  },
   write: false,
   logLevel: 'silent',
 });

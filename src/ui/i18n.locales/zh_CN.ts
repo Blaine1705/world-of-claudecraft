@@ -4288,6 +4288,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '尼思拉克西斯团队竞技场',
   'entities.dungeons.nythraxis_boss_arena.enterText': '你穿过封印的王室之门。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荆峰的寒冷空气中。',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': '伊格尼瓦，末焰使者',
+  'entities.mobs.ignivar_heart_of_the_end.name': '终焉之心',
+  'entities.dungeons.ignivar_raid_arena.name': '最后泉源熔炉',
+  'entities.dungeons.ignivar_raid_arena.enterText': '热浪在熔炉封印的水源上方翻涌。',
+  'entities.dungeons.ignivar_raid_arena.leaveText': '你离开熔炉，终于再次畅快呼吸。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原的异动',
   'entities.quests.q_nythraxis_restless_dead.text':
     '荆峰高地出事了，{playerName}。亡者不再漫无目的地游荡。他们在高望以北的骨原集结并行军，那里是旧战场与峭壁道路交汇之处。去那里调查骨甲亡魂的异动，并带回任何能说明是什么驱使它们的证据。',

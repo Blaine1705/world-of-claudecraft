@@ -35,6 +35,7 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
@@ -495,20 +496,21 @@ export class CharacterVisual {
 
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      // the halo is an unlit additive FX quad: keep it out of the caster list
-      // or this sweep overwrites buildHalo's castShadow = false
-      if (!mesh.isMesh || mesh.name === 'class_halo') return;
-      mesh.castShadow = true;
+      if (!mesh.isMesh) return;
+      const castsShadow = characterMeshCastsShadow(mesh);
+      mesh.castShadow = castsShadow;
       mesh.receiveShadow = false;
+      if (!castsShadow) return;
       // skinned bounds drift outside bind-pose spheres; entity-level culling
       // (80u draw range) already bounds the cost
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
       this.casters.push(mesh);
     });
 
-    // far LOD + shadow proxy share the baked idle-pose geometry per key. Skin
-    // aware from the start (see applySkinMaterials): a character that spawns
-    // already wearing a non-default skin must not LOD out to the embedded one.
+    // The visible far LOD uses the complete baked pose. The shadow proxy uses
+    // its caster-only companion so authored flames/halos cannot become opaque
+    // silhouettes at distance. Skin-aware from the start (see applySkinMaterials):
+    // a character spawning in a non-default skin must not LOD to the embedded one.
     if (prep.idleGeo) {
       this.farMesh = new THREE.Mesh(
         prep.idleGeo,
@@ -524,8 +526,8 @@ export class CharacterVisual {
       this.farMaterials = this.farMesh.material;
       this.farMesh.visible = false;
       this.poseWrap.add(this.farMesh);
-      if (GFX.tier !== 'low') {
-        this.shadowProxy = new THREE.Mesh(prep.idleGeo, shadowOnlyMat());
+      if (GFX.tier !== 'low' && prep.shadowGeo) {
+        this.shadowProxy = new THREE.Mesh(prep.shadowGeo, shadowOnlyMat());
         this.shadowProxy.castShadow = true;
         this.shadowProxy.visible = false;
         this.poseWrap.add(this.shadowProxy);
@@ -1680,11 +1682,12 @@ export class CharacterVisual {
         this.originalMaterials.set(mesh, this.haloBaseMaterial ?? mesh.material);
         return;
       }
-      mesh.castShadow = this.shadowOn;
+      const castsShadow = characterMeshCastsShadow(mesh);
+      mesh.castShadow = this.shadowOn && castsShadow;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
       this.originalMaterials.set(mesh, mesh.material);
-      this.casters.push(mesh);
+      if (castsShadow) this.casters.push(mesh);
     });
   }
 

@@ -1769,6 +1769,7 @@ export const id_ID: EnTranslations = {
       "mail": "Zirah rantai"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
       "absorb": "Menyerap {value} kerusakan",
@@ -10926,6 +10927,12 @@ export const id_ID: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
       },
@@ -14391,6 +14398,11 @@ export const id_ID: EnTranslations = {
         "name": "Arena Raid Nythraxis",
         "enterText": "Kau melewati pintu kerajaan yang tersegel.",
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
       },
       "wildheart_basin": {
         "name": "Cekungan Hati Liar",

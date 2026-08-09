@@ -1769,6 +1769,7 @@ export const fr_CA: EnTranslations = {
       "mail": "Mailles"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Redonne {value} points de vie toutes les {interval} s",
       "absorb": "Bloque {value} points de dégâts",
@@ -10926,6 +10927,12 @@ export const fr_CA: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Spectre du registre"
       },
@@ -14391,6 +14398,11 @@ export const fr_CA: EnTranslations = {
         "name": "Arène de raid de Nythraxis",
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
       },
       "wildheart_basin": {
         "name": "Le Bassin du Cœur Sauvage",

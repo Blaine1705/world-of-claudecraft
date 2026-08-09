@@ -33,9 +33,16 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import {
+  IGNIVAR_FORGE_WAVE_CAST_ID,
+  IGNIVAR_FRONTAL_CAST_ID,
+  IGNIVAR_JUDGMENT_CAST_ID,
+  IGNIVAR_ROTATING_RAYS_CAST_ID,
+  IGNIVAR_SKYFIRE_CAST_ID,
+} from '../sim/encounters/ignivar';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { ALL_CLASSES, type Entity, IGNIVAR_BOSS_ID, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
@@ -208,6 +215,15 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
+import {
+  buildIgnivarWaterConduit,
+  isIgnivarWaterConduitTemplate,
+  isStableIgnivarWaterConduitTransition,
+  syncIgnivarWaterConduitVisibility,
+} from './ignivar_conduit';
+import { disposeIgnivarEncounterVisuals, syncIgnivarEncounterVisuals } from './ignivar_encounter';
+import { ignivarEncounterBypassesCharacterCulling } from './ignivar_encounter_core';
+import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
@@ -5929,12 +5945,14 @@ export class Renderer {
         // the server's real coordinates when the orb latches onto an enemy.
         // The pulse novas below stay the area telegraph, so no actionable
         // information rides on this mesh.
-        if (ev.fx === 'meteorFall') {
+        if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
           this.mageGroundFx.spawnMeteor({
             x: ev.x,
             z: ev.z,
             radius: ev.radius ?? 8,
             duration: ev.duration ?? 2,
+            showTelegraph: ev.fx !== 'ambientMeteorFall',
+            warningLead: ev.warningLead,
           });
           break;
         }
@@ -6476,6 +6494,11 @@ export class Renderer {
                 ? 2.2
                 : 2.4;
       objectMesh = body!;
+    } else if (e.kind === 'object' && isIgnivarWaterConduitTemplate(e.templateId)) {
+      const built = buildIgnivarWaterConduit(e.templateId);
+      body = built.group;
+      height = built.height;
+      objectMesh = built.group;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -6609,6 +6632,7 @@ export class Renderer {
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
       group.add(visual.root);
+      if (e.templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(visual.root);
       height = visual.height;
     }
 
@@ -7912,6 +7936,7 @@ export class Renderer {
   private removeView(id: number): void {
     const v = this.views.get(id);
     if (!v) return;
+    disposeIgnivarEncounterVisuals(v.group);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
@@ -8331,6 +8356,16 @@ export class Renderer {
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
+      if (
+        e.templateId === IGNIVAR_BOSS_ID &&
+        (e.castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
+          e.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID ||
+          e.castingAbility === IGNIVAR_JUDGMENT_CAST_ID ||
+          e.castingAbility === IGNIVAR_ROTATING_RAYS_CAST_ID ||
+          e.castingAbility === IGNIVAR_SKYFIRE_CAST_ID)
+      ) {
+        facing = e.facing;
+      }
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
         // (up to 180deg when engaging after an orbit) under the rate limiter
@@ -8353,6 +8388,7 @@ export class Renderer {
         this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
+      syncIgnivarEncounterVisuals(v.group, e, dt, this.vfx, v.visual?.root);
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
@@ -8362,18 +8398,25 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          this.removeView(id);
-          this.createView(e);
-          continue;
+          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+            v.builtTemplateId = e.templateId;
+          } else {
+            this.removeView(id);
+            this.createView(e);
+            continue;
+          }
         }
         const isPortalObject = isPersistentPortalObject(e);
-        const vis = syncDelveInteractableVisibility(
-          v.group,
-          e.templateId,
-          e.lootable,
-          v.compilePending,
-          !isPortalObject || d2 <= this.entityViewCreateRangeSq,
-        );
+        const withinRange = !isPortalObject || d2 <= this.entityViewCreateRangeSq;
+        const vis = isIgnivarWaterConduitTemplate(e.templateId)
+          ? syncIgnivarWaterConduitVisibility(v.group, e.templateId, v.compilePending, withinRange)
+          : syncDelveInteractableVisibility(
+              v.group,
+              e.templateId,
+              e.lootable,
+              v.compilePending,
+              withinRange,
+            );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)
@@ -8495,7 +8538,7 @@ export class Renderer {
       // Decide visibility now from the real world position; applied at the end so
       // the rest of the per-entity work (animation, footstep audio) is unaffected.
       let charOnScreen = true;
-      if (this.cullCharacters && id !== p.id) {
+      if (this.cullCharacters && id !== p.id && !ignivarEncounterBypassesCharacterCulling(e)) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);

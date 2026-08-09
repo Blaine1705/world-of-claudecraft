@@ -17,6 +17,7 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { createGroundObject, createMob } from '../entity';
 import {
   COMBAT_EXIT_MEMORY_SECONDS,
@@ -48,8 +49,12 @@ import {
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
-const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
-const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
+const RAID_ALLOWED_DUNGEON_IDS = new Set([
+  'nythraxis_crypt',
+  'nythraxis_boss_arena',
+  'ignivar_raid_arena',
+]);
+const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena', 'ignivar_raid_arena']);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
@@ -542,6 +547,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   // Re-entering means earning aggro from scratch.
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
+  if (dungeon.id === 'ignivar_raid_arena') clearIgnivarEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
@@ -666,7 +672,7 @@ function claimInstance(
       obj.templateId = objDef.templateId;
       obj.dungeonId = objDef.dungeonId ?? null;
       obj.objectItemId = null;
-      obj.lootable = true;
+      obj.lootable = objDef.lootable ?? true;
     }
     ctx.addEntity(obj);
     inst.objectIds.push(obj.id);

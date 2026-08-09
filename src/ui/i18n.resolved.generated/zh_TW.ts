@@ -1769,6 +1769,7 @@ export const zh_TW: EnTranslations = {
       "mail": "鎖甲"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "每 {interval} 秒造成 {value} 點{school}傷害",
       "hot": "每 {interval} 秒恢復 {value} 點生命值",
       "absorb": "吸收 {value} 點傷害",
@@ -10926,6 +10927,12 @@ export const zh_TW: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "伊格尼瓦，末焰使者"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "終焉之心"
+      },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"
       },
@@ -14391,6 +14398,11 @@ export const zh_TW: EnTranslations = {
         "name": "尼思拉克西斯團隊競技場",
         "enterText": "你穿過封印的王室之門。",
         "leaveText": "你回到荊峰的寒冷空氣中。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最後泉源熔爐",
+        "enterText": "熱浪在熔爐封印的水源上方翻湧。",
+        "leaveText": "你離開熔爐，終於再次暢快呼吸。"
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

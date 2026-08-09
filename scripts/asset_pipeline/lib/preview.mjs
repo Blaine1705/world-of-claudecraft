@@ -7,7 +7,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findBrowserPath } from '../../browser_path_resolve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,7 +17,8 @@ let pagePromise = null;
 async function launchPage() {
   const esbuild = await import('esbuild');
   const puppeteer = (await import('puppeteer-core')).default;
-  const { BROWSER_PATH } = await import(resolve(__dirname, '../../browser_path.mjs'));
+  const browserModuleUrl = pathToFileURL(resolve(__dirname, '../../browser_path.mjs')).href;
+  const { BROWSER_PATH } = await import(browserModuleUrl);
 
   const bundlePath = join(tmpdir(), `asset_pipeline_preview_${process.pid}.js`);
   await esbuild.build({
@@ -84,7 +85,11 @@ function writeDataUrl(dataUrl, dest) {
 export async function renderPreviews(glbPath, outDir, { size = 512, views, clips } = {}) {
   const b64 = readFileSync(glbPath).toString('base64');
   const shots = await withPage((page) =>
-    page.evaluate((data, opts) => window.renderViews(data, opts), b64, { size, views, clips }),
+    page.evaluate((data, opts) => window.renderViews(data, opts), b64, {
+      size,
+      views,
+      clips,
+    }),
   );
   return shots.map((s) => writeDataUrl(s.dataUrl, join(outDir, `${s.name}.png`)));
 }
@@ -127,7 +132,9 @@ export async function renderScaleCompare(entries, dest, { size = 640 } = {}) {
     label: e.label,
   }));
   const dataUrl = await withPage((page) =>
-    page.evaluate((es, opts) => window.renderScaleCompare(es, opts), payload, { size }),
+    page.evaluate((es, opts) => window.renderScaleCompare(es, opts), payload, {
+      size,
+    }),
   );
   return writeDataUrl(dataUrl, dest);
 }

@@ -1769,6 +1769,7 @@ export const cs_CZ: EnTranslations = {
       "mail": "Kroužková zbroj"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Způsobuje {value} {school} poškození každých {interval} s",
       "hot": "Obnovuje {value} zdraví každých {interval} s",
       "absorb": "Absorbuje {value} poškození",
@@ -10926,6 +10927,12 @@ export const cs_CZ: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"
       },
@@ -14391,6 +14398,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Raidová aréna Nythraxis",
         "enterText": "Procházíš zapečetěnými královskými dveřmi.",
         "leaveText": "Vracíš se do chladného vzduchu Thornpeaku."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
       },
       "wildheart_basin": {
         "name": "Kotlina Divokého srdce",

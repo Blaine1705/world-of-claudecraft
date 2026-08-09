@@ -8,6 +8,44 @@ vi.mock('../src/render/vfx', () => ({
 import { MageGroundFx } from '../src/render/mage_ground_fx';
 
 describe('Mage meteor visual', () => {
+  it('keeps an ambient falling meteor but hides its ground danger telegraph', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 3, showTelegraph: false });
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(true);
+    expect(root.getObjectByName('mage-meteor-telegraph')?.visible).toBe(false);
+  });
+
+  it('shows the danger circle before revealing a delayed falling meteor', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 2.5, warningLead: 0.75 });
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const body = root.getObjectByName('mage-meteor-body') as THREE.Group;
+    const trail = root.getObjectByName('mage-meteor-trail') as THREE.Group;
+    expect(root.getObjectByName('mage-meteor-telegraph')?.visible).toBe(true);
+    expect(body.visible).toBe(false);
+    expect(trail.visible).toBe(false);
+
+    fx.update(0.74);
+    expect(body.visible).toBe(false);
+    expect(landed).not.toHaveBeenCalled();
+
+    fx.update(0.02);
+    expect(body.visible).toBe(true);
+    expect(trail.visible).toBe(true);
+    expect(body.position.y).toBeGreaterThan(44);
+
+    fx.update(1.74);
+    expect(landed).toHaveBeenCalledWith(4, 7);
+  });
+
   it('builds an irregular molten rock with a terrain-draped flame telegraph', () => {
     const scene = new THREE.Scene();
     const heightAt = (x: number, z: number): number =>

@@ -268,6 +268,36 @@ export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
 // the moon-sanctum with Ysolei's great altar dais. Side walls at |x|=23 like
 // the crypt so the KayKit wall modules fit unchanged; wall-side slots carry
 // drowned reliquary altars instead of sarcophagi.
+// Ignivar's Crucible: a flat octagonal raid room centered on the sealed heart.
+// The clipped corners give the four diagonal water conduits their own readable
+// stations while the entire fighting floor stays free of line-of-sight blockers.
+// The polygon is the one source for both rendered walls and collision.
+export const IGNIVAR_LAYOUT: DungeonLayout = {
+  zMin: -33,
+  zMax: 33,
+  sideWallZ: 0,
+  sideWallHd: 33,
+  wallX: 33,
+  endWallHw: 33,
+  floorHalfX: 33,
+  doorZ: -33,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 8 },
+  shellPolygon: [
+    { x: -14, z: -33 },
+    { x: 14, z: -33 },
+    { x: 33, z: -14 },
+    { x: 33, z: 14 },
+    { x: 14, z: 33 },
+    { x: -14, z: 33 },
+    { x: -33, z: 14 },
+    { x: -33, z: -14 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
 export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   const pillars: GridPoint[] = [];
   for (const z of [10, 25, 40, 55, 80, 95, 110]) {

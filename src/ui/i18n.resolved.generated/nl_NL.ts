@@ -1769,6 +1769,7 @@ export const nl_NL: EnTranslations = {
       "mail": "Maliën"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Brengt elke {interval} s {value} {school}schade toe",
       "hot": "Herstelt elke {interval} s {value} gezondheid",
       "absorb": "Absorbeert {value} schade",
@@ -10926,6 +10927,12 @@ export const nl_NL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
       },
@@ -14391,6 +14398,11 @@ export const nl_NL: EnTranslations = {
         "name": "Nythraxis Raid-Arena",
         "enterText": "Je gaat door de verzegelde koninklijke deur.",
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
       },
       "wildheart_basin": {
         "name": "Het Wildhartbekken",

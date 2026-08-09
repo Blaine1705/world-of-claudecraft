@@ -1769,6 +1769,7 @@ export const pl_PL: EnTranslations = {
       "mail": "Kolczuga"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Zadaje {value} obrażeń od {school} co {interval} s",
       "hot": "Przywraca {value} zdrowia co {interval} s",
       "absorb": "Pochłania {value} obrażeń",
@@ -10926,6 +10927,12 @@ export const pl_PL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Plaga Ciernistego Szczytu"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Widmo Ksiąg"
       },
@@ -14391,6 +14398,11 @@ export const pl_PL: EnTranslations = {
         "name": "Rajdowa Arena Nythraxis",
         "enterText": "Przechodzisz przez zapieczętowane królewskie wrota.",
         "leaveText": "Wracasz w zimne powietrze Ciernistego Szczytu."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
       },
       "wildheart_basin": {
         "name": "Kotlina Dzikiego Serca",

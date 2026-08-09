@@ -32,6 +32,8 @@ export interface MeteorFallSpawn {
   z: number;
   radius: number;
   duration: number; // seconds of fall
+  showTelegraph?: boolean;
+  warningLead?: number; // seconds where only the ground warning is visible
 }
 
 export interface RuneCircleSpawn {
@@ -74,6 +76,7 @@ interface MeteorFx {
   z: number;
   groundY: number;
   duration: number;
+  warningLead: number;
   elapsed: number;
   landed: boolean;
 }
@@ -137,6 +140,9 @@ export class MageGroundFx {
 
     const body = new THREE.Group();
     body.name = 'mage-meteor-body';
+    const duration = Math.max(0.3, opts.duration);
+    const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
+    body.visible = warningLead === 0;
     const rockMat = new THREE.MeshStandardMaterial({
       color: 0x111013,
       emissive: 0x210600,
@@ -181,6 +187,7 @@ export class MageGroundFx {
 
     const trail = new THREE.Group();
     trail.name = 'mage-meteor-trail';
+    trail.visible = warningLead === 0;
     const trailOuterMat = new THREE.MeshBasicMaterial({
       color: 0xd63708,
       transparent: true,
@@ -240,6 +247,7 @@ export class MageGroundFx {
     trail.position.copy(body.position);
 
     const warning = this.buildMeteorTelegraph(opts, geometry.flame);
+    warning.group.visible = opts.showTelegraph !== false;
     root.add(warning.group);
     this.scene.add(root);
     this.meteors.push({
@@ -263,7 +271,8 @@ export class MageGroundFx {
       x: opts.x,
       z: opts.z,
       groundY: gy,
-      duration: Math.max(0.3, opts.duration),
+      duration,
+      warningLead,
       elapsed: 0,
       landed: false,
     });
@@ -793,8 +802,13 @@ export class MageGroundFx {
         this.meteors.splice(i, 1);
         continue;
       }
+      const fallDuration = m.duration - m.warningLead;
+      const fallT = Math.min(1, Math.max(0, (m.elapsed - m.warningLead) / fallDuration));
+      const falling = m.elapsed >= m.warningLead;
+      m.body.visible = falling;
+      m.trail.visible = falling;
       // Ease-in fall: slow release, violent finish, like a real drop.
-      const eased = t * t;
+      const eased = fallT * fallT;
       const meteorY = m.groundY + METEOR_DROP_HEIGHT * (1 - eased) + METEOR_RADIUS;
       m.body.position.y = meteorY;
       m.trail.position.y = meteorY;
@@ -802,10 +816,10 @@ export class MageGroundFx {
       m.body.rotation.x += 1.7 * dt;
       const heatPulse = 0.88 + Math.sin(m.elapsed * 10) * 0.12;
       m.magmaMat.opacity = 0.82 + heatPulse * 0.16;
-      m.coronaMat.opacity = (0.12 + t * 0.12) * heatPulse;
-      m.trailOuterMat.opacity = (0.4 + t * 0.12) * heatPulse;
-      m.trailInnerMat.opacity = (0.24 + t * 0.12) * heatPulse;
-      m.emberMat.opacity = 0.72 + t * 0.24;
+      m.coronaMat.opacity = (0.12 + fallT * 0.12) * heatPulse;
+      m.trailOuterMat.opacity = (0.4 + fallT * 0.12) * heatPulse;
+      m.trailInnerMat.opacity = (0.24 + fallT * 0.12) * heatPulse;
+      m.emberMat.opacity = 0.72 + fallT * 0.24;
       m.trail.rotation.y -= dt * 0.45;
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;

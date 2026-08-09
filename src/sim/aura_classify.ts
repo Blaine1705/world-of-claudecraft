@@ -50,9 +50,10 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 // and the cast's direction picks the polarity (an OFFENSIVE dispel strips a
 // benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
-  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl'>,
+  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl' | 'encounterOwned'>,
   offensive: boolean,
 ): boolean {
+  if (aura.encounterOwned) return false;
   if (isUnbreakableControlAura(aura)) return false;
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);

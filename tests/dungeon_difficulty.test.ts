@@ -229,15 +229,16 @@ describe('applyDungeonMobTuning', () => {
 });
 
 describe('boss templates are CC and snare immune on BOTH difficulties', () => {
-  it('every boss-flagged template of the five endgame instances carries both flags', () => {
-    // The complete boss enumeration of the four five-mans plus the raid: these
-    // are the ONLY boss: true templates in dungeons.ts + temple.ts (Korgath,
-    // Velkhar, Sexton Marrow, Olen, Selthe, and the Nythraxis adds are
-    // deliberately NOT boss-flagged). Template-level flags cover normal spawns
-    // too: the applyAura gates read MOBS[templateId] at fire time, so a normal
-    // Korzul can no longer be stunned or kited on a snare (the economy retune
-    // assumes boss swings actually land).
+  it('every boss-flagged dungeon template carries both flags', () => {
+    // The complete boss enumeration of the four five-mans, the public raid,
+    // and the Ignivar development raid. These are the ONLY boss: true templates
+    // in dungeons.ts + temple.ts (Korgath, Velkhar, Sexton Marrow, Olen, Selthe,
+    // and the Nythraxis adds are deliberately NOT boss-flagged). Template-level
+    // flags cover normal spawns too: the applyAura gates read MOBS[templateId]
+    // at fire time, so a normal Korzul can no longer be stunned or kited on a
+    // snare (the economy retune assumes boss swings actually land).
     const bossIds = [
+      'ignivar_herald_of_the_last_flame',
       'morthen',
       'vael_the_mistcaller',
       'ysolei',

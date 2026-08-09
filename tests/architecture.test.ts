@@ -330,6 +330,8 @@ const RENDER_PURE_CORES = [
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/ground_aim_reticle_core.ts',
+  'src/render/ignivar_encounter_core.ts',
+  'src/render/ignivar_judgment_fire_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/env_prefilter_core.ts',

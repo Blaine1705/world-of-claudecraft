@@ -1769,6 +1769,7 @@ export const ko_KR: EnTranslations = {
       "mail": "사슬"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "absorb": "{value}의 피해를 흡수합니다",
@@ -10926,6 +10927,12 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "이그니바르, 마지막 불꽃의 전령"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "종말의 심장"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -14391,6 +14398,11 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "ignivar_raid_arena": {
+        "name": "마지막 샘의 도가니",
+        "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
+        "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
       },
       "wildheart_basin": {
         "name": "야생심장 분지",

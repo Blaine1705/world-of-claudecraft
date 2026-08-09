@@ -33,6 +33,12 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
+import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
+  resetIgnivarEncounter,
+  updateIgnivarApocalypseAdd,
+  updateIgnivarEncounter,
+} from '../encounters/ignivar';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import {
@@ -51,6 +57,7 @@ import {
   DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
+  IGNIVAR_BOSS_ID,
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
@@ -110,6 +117,7 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
+    if (mob.templateId === IGNIVAR_BOSS_ID && mob.ignivar) resetIgnivarEncounter(ctx, mob);
     ctx.onBossDeath(mob);
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
     mob.corpseTimer -= DT;
@@ -179,6 +187,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.inCombat = false;
     mob.aggroTargetId = null;
     clearThreat(mob);
+    return;
+  }
+
+  if (mob.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
+    updateIgnivarApocalypseAdd(mob);
     return;
   }
 
@@ -273,6 +286,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   if (!mob.hostile) mob.hostile = true;
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
+  const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
       isNythraxis &&
@@ -292,6 +306,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
+    } else if (isIgnivar) {
+      updateIgnivarEncounter(ctx, mob);
+      return;
     } else {
       ctx.updateBossMechanics(mob);
     }
@@ -1098,6 +1115,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   }
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every
   // mob other than the one that actually started the channel, so it is safe to

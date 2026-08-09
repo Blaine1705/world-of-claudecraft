@@ -4447,6 +4447,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '니트락시스 공격대 투기장',
   'entities.dungeons.nythraxis_boss_arena.enterText': '봉인된 왕실 문을 지나갑니다.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': '이그니바르, 마지막 불꽃의 전령',
+  'entities.mobs.ignivar_heart_of_the_end.name': '종말의 심장',
+  'entities.dungeons.ignivar_raid_arena.name': '마지막 샘의 도가니',
+  'entities.dungeons.ignivar_raid_arena.enterText': '도가니의 봉인된 물 위로 열기가 아른거립니다.',
+  'entities.dungeons.ignivar_raid_arena.leaveText': '도가니를 벗어나 다시 편히 숨을 쉽니다.',
   'entities.quests.q_nythraxis_restless_dead.title': '뼈 들판의 소요',
   'entities.quests.q_nythraxis_restless_dead.text':
     '쏜피크 고지에 변화가 생겼습니다, {playerName}. 죽은 자들이 더는 정처 없이 떠돌지 않습니다. 그들은 하이워치 너머 북쪽 뼈 들판, 옛 전장과 절벽길이 만나는 곳에서 모여 행군합니다. 그곳으로 가서 뼈갑옷 망령들의 소요를 조사하고, 무엇이 그들을 움직이는지 보여 줄 증거를 가져오십시오.',

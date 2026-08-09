@@ -1,7 +1,7 @@
 // Character asset preparation: preloads manifest glbs, assembles per-key
 // model clones (accessory show/hide + weapon attachments), caches tinted
-// material variants, and bakes a single static idle-pose geometry per key for
-// the far-LOD / shadow-proxy path.
+// material variants, and bakes static idle-pose geometry per key for the far
+// LOD plus a caster-only variant for the shadow proxy.
 //
 // Loading contract: fetches kick off at module import and register with the
 // preload registry; main.ts awaits assetsReady() before the Renderer exists,
@@ -41,6 +41,7 @@ import {
   weaponSkinModelUrls,
 } from './manifest';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -1080,8 +1081,10 @@ export function tintedMaterial(
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
+  selfIllumination = 0,
+  envMapIntensity?: number,
 ): THREE.Material {
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${selfIllumination}|${envMapIntensity ?? 'n'}`;
   const cached = matCache.get(key);
   if (cached) return cached;
 
@@ -1143,6 +1146,13 @@ export function tintedMaterial(
     // in one coherent painted-surface response without touching metalness.
     const std = mat as THREE.MeshStandardMaterial;
     std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    if (selfIllumination > 0 && std.map && !std.emissiveMap) {
+      std.emissiveMap = std.map;
+      std.emissive.set(0xffffff);
+      std.emissiveIntensity = selfIllumination;
+      std.needsUpdate = true;
+    }
+    if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   matCache.set(key, mat);
@@ -1189,9 +1199,29 @@ export function applyMaterials(
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
     if (Array.isArray(source)) {
-      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
+      mesh.material = source.map((m) =>
+        tintedMaterial(
+          m,
+          materialTint,
+          strength,
+          sk,
+          em,
+          role,
+          role === 'body' ? (def.selfIllumination ?? 0) : 0,
+          role === 'body' ? def.envMapIntensity : undefined,
+        ),
+      );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(
+        source,
+        materialTint,
+        strength,
+        sk,
+        em,
+        role,
+        role === 'body' ? (def.selfIllumination ?? 0) : 0,
+        role === 'body' ? def.envMapIntensity : undefined,
+      );
     }
   });
 }
@@ -1213,7 +1243,16 @@ export function tintedFarMaterials(
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
   return srcMats.map((m, i) =>
-    tintedMaterial(m, tint, strength, isBody[i] ? skinTex : null, isBody[i] ? emisTex : null),
+    tintedMaterial(
+      m,
+      tint,
+      strength,
+      isBody[i] ? skinTex : null,
+      isBody[i] ? emisTex : null,
+      'body',
+      isBody[i] ? (def.selfIllumination ?? 0) : 0,
+      isBody[i] ? def.envMapIntensity : undefined,
+    ),
   );
 }
 
@@ -1230,8 +1269,10 @@ export interface PreparedVisual {
   yOffset: number;
   /** clip name -> clip, resolved from the source gltf */
   clips: Map<string, THREE.AnimationClip>;
-  /** static idle-pose geometry in normalized space (far LOD + shadow proxy) */
+  /** static idle-pose geometry in normalized space for the visible far LOD */
   idleGeo: THREE.BufferGeometry | null;
+  /** caster-only idle-pose geometry for the mid-distance shadow proxy */
+  shadowGeo: THREE.BufferGeometry | null;
   /** source materials aligned with idleGeo groups */
   idleSrcMats: THREE.Material[];
   /** parallel to idleSrcMats: whether that material belongs to the
@@ -1331,6 +1372,9 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
   const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  const shadowGeo = hasShadowExclusions(temp)
+    ? bakeStaticPose(temp, norm, characterMeshCastsShadow).geo
+    : geo;
 
   const prep: PreparedVisual = {
     key,
@@ -1339,6 +1383,7 @@ export function prepareVisual(key: string): PreparedVisual {
     yOffset,
     clips,
     idleGeo: geo,
+    shadowGeo,
     idleSrcMats: mats,
     idleSrcIsBody: isBody,
     clickRadius,
@@ -1357,11 +1402,28 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   return true;
 }
 
+function hasShadowExclusions(root: THREE.Object3D): boolean {
+  let excluded = false;
+  root.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (
+      !excluded &&
+      mesh.isMesh &&
+      meshChainVisible(mesh, root) &&
+      !characterMeshCastsShadow(mesh)
+    ) {
+      excluded = true;
+    }
+  });
+  return excluded;
+}
+
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
  *  (skinned verts via applyBoneTransform), normalized into world units. */
 function bakeStaticPose(
   root: THREE.Object3D,
   norm: THREE.Matrix4,
+  includeMesh: (mesh: THREE.Mesh) => boolean = () => true,
 ): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
@@ -1371,7 +1433,7 @@ function bakeStaticPose(
 
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || !meshChainVisible(mesh, root)) return;
+    if (!mesh.isMesh || !meshChainVisible(mesh, root) || !includeMesh(mesh)) return;
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
     if (!srcPos) return;

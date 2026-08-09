@@ -4,6 +4,13 @@ import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effec
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('explains the four-player requirement on Ignivar Shared Pyre', () => {
+    expect(desc({ id: 'ignivar_shared_pyre', kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.sharedPyre',
+      nums: { players: 4 },
+    });
+  });
+
   it('describes the cancelable protective Hourglass aura', () => {
     expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
       key: 'hudChrome.auraEffect.temporalHourglass',

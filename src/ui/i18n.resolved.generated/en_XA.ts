@@ -1769,6 +1769,7 @@ export const en_XA: EnTranslations = {
       "mail": "[Ɱáíļ]"
     },
     "auraEffect": {
+      "sharedPyre": "[Ŕéɋúíŕéš áţ ļéášţ {players} þļáýéŕš íñšíðé ţĥé çíŕçļé]",
       "dot": "[Ðéáļš {value} {school} ðáɱáĝé éʋéŕý {interval} šéç]",
       "hot": "[Ŕéšţóŕéš {value} ĥéáļţĥ éʋéŕý {interval} šéç]",
       "absorb": "[Áƀšóŕƀš {value} ðáɱáĝé]",
@@ -10926,6 +10927,12 @@ export const en_XA: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "[Íĝñíʋáŕ, Ĥéŕáļð óƒ ţĥé Ļášţ Ƒļáɱé]"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "[Ĥéáŕţ óƒ ţĥé Éñð]"
+      },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"
       },
@@ -14391,6 +14398,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ñýţĥŕáẋíš Ŕáíð Áŕéñá]",
         "enterText": "[Ýóú þášš ţĥŕóúĝĥ ţĥé šéáļéð ŕóýáļ ðóóŕ.]",
         "leaveText": "[Ýóú ŕéţúŕñ ţó ţĥé çóļð áíŕ óƒ Ţĥóŕñþéáķ.]"
+      },
+      "ignivar_raid_arena": {
+        "name": "[Çŕúçíƀļé óƒ ţĥé Ļášţ Šþŕíñĝ]",
+        "enterText": "[Ĥéáţ šĥíɱɱéŕš áƀóʋé ţĥé šéáļéð ŵáţéŕš óƒ ţĥé Çŕúçíƀļé.]",
+        "leaveText": "[Ýóú šţéþ áŵáý ƒŕóɱ ţĥé Çŕúçíƀļé áñð ƀŕéáţĥé ƒŕééļý áĝáíñ.]"
       },
       "wildheart_basin": {
         "name": "[Ţĥé Ŵíļðĥéáŕţ Ɓášíñ]",

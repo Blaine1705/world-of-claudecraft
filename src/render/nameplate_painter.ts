@@ -25,6 +25,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
@@ -716,6 +717,6 @@ export class NameplatePainter {
         ? t('abilityUi.cast.gathering')
         : ABILITIES[st.label]
           ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
-          : st.label;
+          : abilityDisplayNameFromSource(st.label);
   }
 }

@@ -1,9 +1,59 @@
 // Dungeon content: mob templates that only spawn inside instances, spawn
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
+import { IGNIVAR_CONDUITS, IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../ignivar_arena';
 import type { DungeonDef, DungeonSpawn, MobTemplate } from '../types';
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
+  // Ignivar's dedicated visual is dispatched by render/characters/manifest.ts.
+  // Encounter behavior lives in encounters/ignivar.ts, not on generic template hooks.
+  ignivar_herald_of_the_last_flame: {
+    id: 'ignivar_herald_of_the_last_flame',
+    name: 'Ignivar, Herald of the Last Flame',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    boss: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 70000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 48,
+    dmgPerLevel: 10,
+    attackSpeed: 2.6,
+    armorPerLevel: 42,
+    moveSpeed: 0,
+    aggroRadius: 30,
+    loot: [],
+    scale: 3.4,
+    color: 0xd64316,
+    enrage: { belowHpPct: 0.25, dmgMult: 1.35 },
+  },
+  // Provisional stationary priority target for Ignivar's Normal intermission.
+  // Its encounter-owned Apocalypse cast lives in encounters/ignivar.ts so the
+  // template cannot accidentally acquire generic movement or attacks.
+  ignivar_heart_of_the_end: {
+    id: 'ignivar_heart_of_the_end',
+    name: 'Heart of the End',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 7000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.6,
+    armorPerLevel: 12,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 2.25,
+    color: 0xff6a1a,
+  },
   // ---- The Hollow Crypt (5-player elite instance) ----
   crypt_shambler: {
     id: 'crypt_shambler',
@@ -138,13 +188,33 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
     loot: [
       { copper: 2500, chance: 1 },
-      { itemId: 'cryptbone_greaves', chance: 0.34, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'quilted_trousers', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'oiled_boots', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'greyjaw_hide_boots', chance: 0.25, rollGroup: 'morthen_bonus' },
+      {
+        itemId: 'cryptbone_greaves',
+        chance: 0.34,
+        rollGroup: 'morthen_guaranteed_uncommon',
+      },
+      {
+        itemId: 'quilted_trousers',
+        chance: 0.33,
+        rollGroup: 'morthen_guaranteed_uncommon',
+      },
+      {
+        itemId: 'oiled_boots',
+        chance: 0.33,
+        rollGroup: 'morthen_guaranteed_uncommon',
+      },
+      {
+        itemId: 'greyjaw_hide_boots',
+        chance: 0.25,
+        rollGroup: 'morthen_bonus',
+      },
       { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus' },
       { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus' },
-      { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus' },
+      {
+        itemId: 'cryptbone_pauldrons',
+        chance: 0.18,
+        rollGroup: 'morthen_bonus',
+      },
     ],
     scale: 1.35,
     color: 0x4a235a,
@@ -181,7 +251,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0x7fa8a0,
-    mortalStrike: { chance: 0.3, healReduction: 0.5, duration: 6, name: 'Maiming Strike' },
+    mortalStrike: {
+      chance: 0.3,
+      healReduction: 0.5,
+      duration: 6,
+      name: 'Maiming Strike',
+    },
   },
   tidebound_acolyte: {
     id: 'tidebound_acolyte',
@@ -261,8 +336,16 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     loot: [
       { copper: 800, chance: 1 },
-      { itemId: 'trollhide_leggings', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
-      { itemId: 'marshstrider_boots', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
+      {
+        itemId: 'trollhide_leggings',
+        chance: 0.5,
+        rollGroup: 'olen_guaranteed_uncommon',
+      },
+      {
+        itemId: 'marshstrider_boots',
+        chance: 0.5,
+        rollGroup: 'olen_guaranteed_uncommon',
+      },
       { itemId: 'fenmist_robe', chance: 0.25, rollGroup: 'olen_bonus' },
       { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus' },
       { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus' },
@@ -295,14 +378,34 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'drowned_thrall', count: 2, atHpPct: [0.6, 0.3] },
     loot: [
       { copper: 5000, chance: 1 },
-      { itemId: 'trollhide_leggings', chance: 0.34, rollGroup: 'vael_guaranteed_uncommon' },
-      { itemId: 'marshstrider_boots', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
-      { itemId: 'fenmist_robe', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
+      {
+        itemId: 'trollhide_leggings',
+        chance: 0.34,
+        rollGroup: 'vael_guaranteed_uncommon',
+      },
+      {
+        itemId: 'marshstrider_boots',
+        chance: 0.33,
+        rollGroup: 'vael_guaranteed_uncommon',
+      },
+      {
+        itemId: 'fenmist_robe',
+        chance: 0.33,
+        rollGroup: 'vael_guaranteed_uncommon',
+      },
       { itemId: 'deepfen_pearl', chance: 1 },
       { itemId: 'eelskin_tunic', chance: 0.2, rollGroup: 'vael_bonus' },
       { itemId: 'tidescale_vest', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'drowned_prayer_leggings', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'drowned_prayer_sandals', chance: 0.1, rollGroup: 'vael_bonus' },
+      {
+        itemId: 'drowned_prayer_leggings',
+        chance: 0.1,
+        rollGroup: 'vael_bonus',
+      },
+      {
+        itemId: 'drowned_prayer_sandals',
+        chance: 0.1,
+        rollGroup: 'vael_bonus',
+      },
       { itemId: 'eelscale_treads', chance: 0.1, rollGroup: 'vael_bonus' },
       { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus' },
       { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus' },
@@ -340,7 +443,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { copper: 300, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
       { itemId: 'boundstone_helm', chance: 0.04, rollGroup: 'boneguard_bonus' },
-      { itemId: 'boundstone_girdle', chance: 0.04, rollGroup: 'boneguard_bonus' },
+      {
+        itemId: 'boundstone_girdle',
+        chance: 0.04,
+        rollGroup: 'boneguard_bonus',
+      },
     ],
     scale: 1.15,
     color: 0xcfc8b0,
@@ -364,7 +471,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { copper: 350, chance: 1 },
       { itemId: 'cracked_wyrm_scale', chance: 0.5 },
       { itemId: 'gravewyrm_mantle', chance: 0.05, rollGroup: 'drakonid_bonus' },
-      { itemId: 'gravewyrm_gauntlets', chance: 0.05, rollGroup: 'drakonid_bonus' },
+      {
+        itemId: 'gravewyrm_gauntlets',
+        chance: 0.05,
+        rollGroup: 'drakonid_bonus',
+      },
       { itemId: 'gravewyrm_thornmaul', chance: 0.05 },
     ],
     scale: 1.45,
@@ -415,17 +526,44 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15,
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
-    stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'Shuddering Stomp' },
+    stomp: {
+      radius: 10,
+      every: 12,
+      duration: 1.5,
+      min: 20,
+      max: 30,
+      name: 'Shuddering Stomp',
+    },
     loot: [
       { copper: 5000, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korgath_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korgath_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korgath_guaranteed_uncommon' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'korgath_guaranteed_uncommon',
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'korgath_guaranteed_uncommon',
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'korgath_guaranteed_uncommon',
+      },
       { itemId: 'zealotsbane_blade', chance: 0.19, rollGroup: 'korgath_bonus' },
-      { itemId: 'korgaths_chainwraps', chance: 0.1, rollGroup: 'korgath_bonus' },
+      {
+        itemId: 'korgaths_chainwraps',
+        chance: 0.1,
+        rollGroup: 'korgath_bonus',
+      },
       { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'korgath_bonus' },
       { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'wyrmcult_grand_robe', chance: 0.1, rollGroup: 'korgath_bonus' },
+      {
+        itemId: 'wyrmcult_grand_robe',
+        chance: 0.1,
+        rollGroup: 'korgath_bonus',
+      },
       { itemId: 'gravewyrm_sabatons', chance: 0.1, rollGroup: 'korgath_bonus' },
       { itemId: 'wyrmcult_soulsteps', chance: 0.1, rollGroup: 'korgath_bonus' },
       { itemId: 'wyrmshadow_treads', chance: 0.05, rollGroup: 'korgath_bonus' },
@@ -456,17 +594,49 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'raised_bonewalker', count: 3, atHpPct: [0.66, 0.33] },
     loot: [
       { copper: 5000, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'velkhar_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'velkhar_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'velkhar_guaranteed_uncommon' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+      },
       { itemId: 'emberwood_staff', chance: 0.2, rollGroup: 'velkhar_bonus' },
-      { itemId: 'boneguard_breastplate', chance: 0.1, rollGroup: 'velkhar_bonus' },
+      {
+        itemId: 'boneguard_breastplate',
+        chance: 0.1,
+        rollGroup: 'velkhar_bonus',
+      },
       { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'velkhar_bonus' },
       { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'gravewyrm_stalkers_treads', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'deathlord_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
-      { itemId: 'necromancers_soulsteps', chance: 0.05, rollGroup: 'velkhar_bonus' },
-      { itemId: 'wyrmshadow_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
+      {
+        itemId: 'gravewyrm_stalkers_treads',
+        chance: 0.1,
+        rollGroup: 'velkhar_bonus',
+      },
+      {
+        itemId: 'deathlord_legguards',
+        chance: 0.05,
+        rollGroup: 'velkhar_bonus',
+      },
+      {
+        itemId: 'necromancers_soulsteps',
+        chance: 0.05,
+        rollGroup: 'velkhar_bonus',
+      },
+      {
+        itemId: 'wyrmshadow_legguards',
+        chance: 0.05,
+        rollGroup: 'velkhar_bonus',
+      },
     ],
     scale: 1.25,
     color: 0x512e5f,
@@ -513,23 +683,71 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korzul_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'korzul_guaranteed_uncommon',
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'korzul_guaranteed_uncommon',
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'korzul_guaranteed_uncommon',
+      },
       { itemId: 'cultist_flayer', chance: 0.1, rollGroup: 'korzul_bonus' },
-      { itemId: 'wyrmfang_greatblade', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'staff_of_the_gravewyrm', chance: 0.05, rollGroup: 'korzul_bonus' },
+      {
+        itemId: 'wyrmfang_greatblade',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'staff_of_the_gravewyrm',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
       { itemId: 'fang_of_korzul', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'deathlord_warplate', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'necromancers_starshroud', chance: 0.05, rollGroup: 'korzul_bonus' },
+      {
+        itemId: 'necromancers_starshroud',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
       { itemId: 'wyrmshadow_harness', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'boundstone_girdle', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'gravewyrm_gauntlets', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'deathlords_dread_visage', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'necromancers_soulspire_mantle', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'wyrmshadow_talongrips', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'nightfangs_greatstaff', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus' },
+      {
+        itemId: 'gravewyrm_gauntlets',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'deathlords_dread_visage',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'necromancers_soulspire_mantle',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'wyrmshadow_talongrips',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'nightfangs_greatstaff',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
+      {
+        itemId: 'wildgrowth_leggings',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+      },
       { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus' },
     ],
@@ -677,40 +895,152 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // existing four groups, one per group, with the set-piece chances rebalanced.
     loot: [
       { copper: 150000, chance: 1 },
-      { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'bonewrought_greatsword', chance: 0.13, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      {
+        itemId: 'deathless_heartwood',
+        chance: 0.03,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'bonewrought_greatsword',
+        chance: 0.13,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'crownforged_dreadhelm',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'nighttalon_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_1',
+      },
       { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'kingsbane_last_oath', chance: 0.03, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'bonewrought_bulwark', chance: 0.13, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      {
+        itemId: 'stormcallers_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'nighttalon_shoulderguards',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'soulflame_mantle',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_1',
+      },
+      {
+        itemId: 'kingsbane_last_oath',
+        chance: 0.03,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'bonewrought_bulwark',
+        chance: 0.13,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'crownforged_warspaulders',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'nighttalon_shoulderguards',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'soulflame_mantle',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'crownforged_dreadhelm',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'nighttalon_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
+      {
+        itemId: 'stormcallers_spaulders',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_2',
+      },
       { itemId: 'wraithfire_orb', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      {
+        itemId: 'crownforged_dreadhelm',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_3',
+      },
+      {
+        itemId: 'nighttalon_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_3',
+      },
       { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'direfang_greatblade', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      {
+        itemId: 'stormcallers_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_3',
+      },
+      {
+        itemId: 'nighttalon_shoulderguards',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_3',
+      },
+      {
+        itemId: 'soulflame_mantle',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_3',
+      },
+      {
+        itemId: 'direfang_greatblade',
+        chance: 0.16,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'soulflame_mantle',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'crownforged_warspaulders',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'nighttalon_shoulderguards',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'stormcallers_spaulders',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'crownforged_dreadhelm',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
+      {
+        itemId: 'nighttalon_crown',
+        chance: 0.14,
+        rollGroup: 'nythraxis_drop_4',
+      },
       // The feral ladder's top rung rides its own bonus group: a fifth,
       // independent draw so the four guaranteed groups above keep their exact
       // 1.00 partitions (a 25% bonus shot, never displacing a set piece).
-      { itemId: 'maul_of_the_scourged_wilds', chance: 0.25, rollGroup: 'nythraxis_drop_5' },
+      {
+        itemId: 'maul_of_the_scourged_wilds',
+        chance: 0.25,
+        rollGroup: 'nythraxis_drop_5',
+      },
     ],
     scale: 3.1,
     color: 0x221b2d,
@@ -782,6 +1112,10 @@ const SANCTUM_SPAWN_LIST: DungeonSpawn[] = [
 
 const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
+];
+
+const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
 ];
 
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
@@ -889,7 +1223,12 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     objects: [
       // the hall's keepsake: a signet dropped by the garrison that never
       // came home, on the entrance hall floor east of the door
-      { itemId: 'last_keep_signet', name: 'Signet of the Last Keep', x: 4, z: 0 },
+      {
+        itemId: 'last_keep_signet',
+        name: 'Signet of the Last Keep',
+        x: 4,
+        z: 0,
+      },
     ],
     interior: 'lastkeep',
     suggestedPlayers: 1,
@@ -912,12 +1251,41 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       // wardstone search radius (see nythraxisWardstones in sim.ts).
       { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -40, z: 79 },
       { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 40, z: 79 },
-      { itemId: 'bastion_ward_stone', name: 'Threshold Wardstone', x: 0, z: 63 },
+      {
+        itemId: 'bastion_ward_stone',
+        name: 'Threshold Wardstone',
+        x: 0,
+        z: 63,
+      },
     ],
     interior: 'nythraxis',
     tombDressing: 'coffins',
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  ignivar_raid_arena: {
+    id: 'ignivar_raid_arena',
+    name: 'Crucible of the Last Spring',
+    index: 9,
+    // Development-only entrance until the raid's progression hook is authored.
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -27 },
+    exitOffset: { x: 0, z: -30 },
+    spawns: IGNIVAR_RAID_SPAWN_LIST,
+    objects: IGNIVAR_CONDUITS.map((conduit) => ({
+      itemId: '',
+      name: `${conduit.id} Water Conduit`,
+      x: conduit.x,
+      z: conduit.z,
+      templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
+      lootable: false,
+    })),
+    interior: 'ignivar',
+    suggestedPlayers: 10,
+    enterText: 'Heat shimmers above the sealed waters of the Crucible.',
+    leaveText: 'You step away from the Crucible and breathe freely again.',
   },
 };

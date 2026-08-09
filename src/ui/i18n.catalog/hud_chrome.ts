@@ -1895,6 +1895,7 @@ export const hudChromeStrings = {
   // localized damage-school name (see schools below). Keys are produced by the pure
   // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
   auraEffect: {
+    sharedPyre: 'Requires at least {players} players inside the circle',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     absorb: 'Absorbs {value} damage',

@@ -4492,6 +4492,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите через запечатанную королевскую дверь.',
   'entities.dungeons.nythraxis_boss_arena.leaveText':
     'Вы возвращаетесь в холодный воздух Терновых высот.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Игнивар, Вестник Последнего Пламени',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Сердце Конца',
+  'entities.dungeons.ignivar_raid_arena.name': 'Горнило Последнего Источника',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'Жар дрожит над запечатанными водами Горнила.',
+  'entities.dungeons.ignivar_raid_arena.leaveText':
+    'Вы покидаете Горнило и снова дышите свободно.',
   'entities.quests.q_nythraxis_restless_dead.title': 'Беспокойство на костяных полях',
   'entities.quests.q_nythraxis_restless_dead.text':
     'Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.',

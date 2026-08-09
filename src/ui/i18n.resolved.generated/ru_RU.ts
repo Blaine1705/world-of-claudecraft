@@ -1769,6 +1769,7 @@ export const ru_RU: EnTranslations = {
       "mail": "Кольчуга"
     },
     "auraEffect": {
+      "sharedPyre": "Requires at least {players} players inside the circle",
       "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
       "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
       "absorb": "Поглощает {value} единиц урона",
@@ -10926,6 +10927,12 @@ export const ru_RU: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Нитраксис, Бич Торнпика"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Игнивар, Вестник Последнего Пламени"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Сердце Конца"
+      },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
       },
@@ -14391,6 +14398,11 @@ export const ru_RU: EnTranslations = {
         "name": "Рейдовая арена Нитраксиса",
         "enterText": "Вы проходите через запечатанную королевскую дверь.",
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
+      },
+      "ignivar_raid_arena": {
+        "name": "Горнило Последнего Источника",
+        "enterText": "Жар дрожит над запечатанными водами Горнила.",
+        "leaveText": "Вы покидаете Горнило и снова дышите свободно."
       },
       "wildheart_basin": {
         "name": "Котловина Дикого Сердца",

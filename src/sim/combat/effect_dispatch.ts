@@ -1081,7 +1081,11 @@ export function runEffects(
         // releases it.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
+          if (
+            isDebuffAura(aura.kind, aura.value) &&
+            !aura.encounterOwned &&
+            !isUnbreakableControlAura(aura)
+          ) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }

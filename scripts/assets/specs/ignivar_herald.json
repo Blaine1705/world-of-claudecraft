@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/ignivar_herald/ignivar_herald_kaykit_custom.glb",
+      "out": "models/creatures/ignivar_herald.glb",
+      "type": "character",
+      "keepClips": [
+        "ForgeIdle",
+        "Walking_A",
+        "Running_A",
+        "ForgeSlam",
+        "ForgeCast",
+        "Hit_A",
+        "Death_A",
+        "Cheer"
+      ],
+      "keepExtras": true
+    }
+  ]
+}

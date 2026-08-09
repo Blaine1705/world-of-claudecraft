@@ -4462,6 +4462,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': 'ナイスラクシスのレイドアリーナ',
   'entities.dungeons.nythraxis_boss_arena.enterText': '封印された王家の扉を通り抜けます。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': 'ソーンピークの冷たい空気へ戻ります。',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'イグニヴァル、最後の炎の先触れ',
+  'entities.mobs.ignivar_heart_of_the_end.name': '終焉の心臓',
+  'entities.dungeons.ignivar_raid_arena.name': '最後の泉のるつぼ',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'るつぼの封じられた水面に熱気が揺らめいています。',
+  'entities.dungeons.ignivar_raid_arena.leaveText': 'るつぼを離れ、再び自由に息をつきます。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原の異変',
   'entities.quests.q_nythraxis_restless_dead.text':
     'ソーンピーク高地で何かが変わりました、{playerName}。死者たちはもはや当てもなくさまよっていません。ハイウォッチの北、古い戦場と崖道が交わる骨原で集まり、行軍しています。そこへ向かい、骨鎧の亡者たちの異変を調べ、彼らを動かしているものの証拠を持ち帰ってください。',

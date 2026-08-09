@@ -29,9 +29,10 @@
 
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { resetIgnivarEncounter } from '../encounters/ignivar';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
-import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
+import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
 import { resetMechanicSpacing } from './mechanic_spacing';
@@ -120,6 +121,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (e && e.targetId === mob.id) e.targetId = null;
