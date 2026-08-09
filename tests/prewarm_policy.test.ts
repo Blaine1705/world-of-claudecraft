@@ -468,6 +468,62 @@ describe('remainingPrewarmViewBudget', () => {
   });
 });
 
+describe('one trim rule for every entry on the shared view budget', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+
+  it('marks the persistent-portal scan trimmed on the cap arm, like the candidate scan', () => {
+    // The reported inconsistency: the two capped scans drew on the same
+    // remainingPrewarmViewBudget yet only createCandidateViews marked the cap
+    // arm trimmed, so a boot that exhausted the shared budget reported one of
+    // them partial and the other completed. The unified rule: either stop
+    // with work remaining is a trim.
+    const portalStart = renderer.indexOf('private createPersistentPortalViews(');
+    const portalEnd = renderer.indexOf('\n  private createCandidateViews(', portalStart);
+    const candidateEnd = renderer.indexOf('\n  private createCharacterVisualWithRetry(', portalEnd);
+    expect(portalStart).toBeGreaterThan(-1);
+    expect(portalEnd).toBeGreaterThan(portalStart);
+    expect(candidateEnd).toBeGreaterThan(portalEnd);
+    const portal = renderer.slice(portalStart, portalEnd);
+    const candidate = renderer.slice(portalEnd, candidateEnd);
+    const trimArm = (guard: string): string =>
+      `${guard} {\n        trimmed = true;\n        break;\n      }`;
+    expect(portal).toContain(trimArm('if (created >= limit)'));
+    // The regression shape: the cap arm silently breaking untrimmed.
+    expect(portal).not.toContain('if (created >= limit) break;');
+    expect(candidate).toContain(trimArm('if (created >= max)'));
+  });
+
+  it('gives all four budget-sharing entries an explicit progress hook', () => {
+    // views.required and views.landmarks bypass the cap by design (required
+    // views must exist for entry), so their hooks honestly report trimmed:
+    // false; the capped portal and nearby scans report their live trim flags.
+    const block = (id: string, nextId: string): string => {
+      const start = renderer.indexOf(`id: '${id}'`);
+      const end = renderer.indexOf(`id: '${nextId}'`, start);
+      expect(start).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(start);
+      return renderer.slice(start, end);
+    };
+    expect(block('views.required', 'views.landmarks')).toContain(
+      'progress: () => ({ done: requiredViewsCreated, trimmed: false })',
+    );
+    const landmarks = block('views.landmarks', 'views.persistent-portals');
+    expect(landmarks).toContain('done: mandatoryLandmarkIds.length');
+    expect(landmarks).toContain('trimmed: false');
+    expect(block('views.persistent-portals', 'views.nearby')).toContain(
+      'progress: () => ({ trimmed: portalViewsTrimmed })',
+    );
+    expect(block('views.nearby', 'props.dungeon-doors')).toContain('trimmed: nearbyViewsTrimmed');
+  });
+
+  it('a cap-trimmed entry without counts is partial, the portal hook shape', () => {
+    expect(resolvePrewarmEntryStatus({ trimmed: true })).toBe('partial');
+  });
+});
+
 describe('resolvePrewarmPolicy: constrained WITHOUT parallel compile', () => {
   const p = resolvePrewarmPolicy({
     ...BASE,
@@ -870,18 +926,48 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
 
   it('defers unfetched biomes to a dedicated lane, never the shared resume queue', () => {
     const source = rendererSource();
-    const deferredLaneAt = source.indexOf('if (skyAssetPrefetch && !skyWarmComplete) {');
+    // The lane gate skips two no-deferral cases: every biome already uploaded
+    // inline (the pending arm marks the warm complete) and a prefetch that
+    // already rejected (the entry, when it ran, reported failed; the lane
+    // would log a deferral for work that can never run).
+    const deferredLaneAt = source.indexOf(
+      'if (skyAssetPrefetch && !skyWarmComplete && skyAssetPrefetch.rejection() === null) {',
+    );
     const sharedResumeAt = source.indexOf('resumeDroppedPrewarmEntries(resume, {');
     expect(deferredLaneAt).toBeGreaterThan(-1);
     expect(sharedResumeAt).toBeGreaterThan(-1);
+    expect(source).toContain('if (split.missing.length === 0) skyWarmComplete = true;');
     // The dedicated lane chains off the prefetch task itself and enters the
     // GPU queue only after the data is resident: a black-holed network can
     // wedge neither the resume lane nor a bounded released-tail slot.
     const lane = source.slice(deferredLaneAt, source.indexOf('const elapsed', deferredLaneAt));
     expect(lane).toContain('void skyAssetPrefetch.task');
-    expect(lane).toContain('GPU_WORK_PRIORITY.BOOT_RESUME');
     expect(lane).toContain('this.prewarmTextureInIdle(');
     expect(lane).not.toContain('droppedEntries.push');
+    // The WHOLE lane runs at its stated lowest priority: both chunked texture
+    // uploads thread BOOT_RESUME through prewarmTextureInIdle alongside the
+    // PMREM unit, so the expensive dome upload never outranks the cheap PMREM.
+    expect(lane.match(/GPU_WORK_PRIORITY\.BOOT_RESUME/g)).toHaveLength(3);
+    expect(source).toContain('priority: number = GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+  });
+
+  it('keeps the sky entry deadline-exempt so the dome upload stays behind the cover', () => {
+    // At priority 64 the entry sits behind every build, texture, and VFX
+    // stage, so without the exemption a long compute tail deadline-skips it
+    // and the 2k RGBA16F dome upload (one indivisible call on pinned r165)
+    // lands in the in-game lane. Exemption adds no network wait:
+    // skyAssetInlineWaitMs returns 0 once the reserve boundary has passed,
+    // and prewarmEntryShouldDefer still bounds the entry by the hard
+    // deadline. Unconditional on purpose: constrained profiles never run the
+    // entry, so the tail entries' conditional form has nothing to gate here.
+    const source = rendererSource();
+    const skyEntryAt = source.indexOf("id: 'sky.nearby-biomes'");
+    const frameEntryAt = source.indexOf("id: 'world.initial-frame'", skyEntryAt);
+    expect(skyEntryAt).toBeGreaterThan(-1);
+    expect(frameEntryAt).toBeGreaterThan(skyEntryAt);
+    expect(source.slice(skyEntryAt, frameEntryAt)).toContain('deadlineExempt: true');
+    const parsed = parsedManifestEntries().find((entry) => entry.id === 'sky.nearby-biomes');
+    expect(parsed?.deadlineExempt).toBe(true);
   });
 
   it('resolves every ran entry through the honest status gate', () => {

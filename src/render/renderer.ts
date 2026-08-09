@@ -4685,9 +4685,16 @@ export class Renderer {
     let created = 0;
     let trimmed = false;
     for (const e of this.sim.entities.values()) {
-      // The view cap is a deliberate policy limit; only the deadline arm marks
-      // the scan trimmed, so the prewarm summary reports the budget cut honestly.
-      if (created >= limit) break;
+      // Either stop with entities unexamined is planned work left undone, so
+      // BOTH arms report trimmed, the same rule createCandidateViews applies:
+      // the deadline is a wall-clock trim and the shared view cap is a policy
+      // trim (a capped scan must never masquerade as completed in the prewarm
+      // summary). A scan that examines every entity exits the loop normally
+      // and stays untrimmed.
+      if (created >= limit) {
+        trimmed = true;
+        break;
+      }
       if (performance.now() >= deadlineMs) {
         trimmed = true;
         break;
@@ -5227,7 +5234,14 @@ export class Renderer {
   private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
   private readonly textureUploadTaskSet = new Set<Promise<void>>();
 
-  private prewarmTextureInIdle(texture: THREE.Texture | null | undefined): Promise<void> {
+  private prewarmTextureInIdle(
+    texture: THREE.Texture | null | undefined,
+    // The caller's queue priority for the chunk uploads: a lane whose stated
+    // intent is lowest-priority (the deferred sky resume at BOOT_RESUME) must
+    // not have its expensive upload steps outrank its cheap ones. An
+    // already-pending upload keeps the priority it entered the queue with.
+    priority: number = GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+  ): Promise<void> {
     if (!texture || this.gpuReadyTextures.has(texture)) return Promise.resolve();
     const pending = this.textureUploadTasks.get(texture);
     if (pending) return pending;
@@ -5236,7 +5250,7 @@ export class Renderer {
       uploadChunk: (chunkTexture) =>
         this.backgroundGpuWork.run(
           () => this.webgl.initTexture(chunkTexture),
-          GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+          priority,
           'texture-chunk-upload',
         ),
     })
@@ -5744,6 +5758,10 @@ export class Renderer {
     let npcPrewarmProgress: PrewarmEntryProgress | null = null;
     let portalViewsTrimmed = false;
     let nearbyViewsTrimmed = false;
+    // views.required's own created count (same per-entry rule as
+    // nearbyViewsCreated below: never report the cumulative counter as one
+    // entry's done).
+    let requiredViewsCreated = 0;
     // views.nearby's own created count: `createdViews` is the CUMULATIVE
     // counter shared with the required/landmark/portal substeps, so reporting
     // it as this entry's done would exceed the entry's planned candidates.
@@ -6083,8 +6101,15 @@ export class Renderer {
         priority: 10,
         required: true,
         run: () => {
-          createdViews += this.createRequiredViews(p, createdViewTypes);
+          requiredViewsCreated = this.createRequiredViews(p, createdViewTypes);
+          createdViews += requiredViewsCreated;
         },
+        // The shared view cap never stops this entry: required player/target
+        // views bypass the budget by design (they only DRAIN it for the capped
+        // substeps). The explicit hook keeps that rule visible beside the
+        // capped entries drawing on the same budget, which mark trimmed when
+        // the cap stops them with work remaining.
+        progress: () => ({ done: requiredViewsCreated, trimmed: false }),
         detail: () => `created=${createdViews}`,
       },
       {
@@ -6098,6 +6123,15 @@ export class Renderer {
           mandatoryLandmarkIds = result.ids;
           createdViews += result.created;
         },
+        // The shared view cap never stops this entry either: mandatory
+        // landmark views bypass the budget (the helper takes no limit), and
+        // run() throws unless every mandatory view became ready, so a
+        // successful entry has done === planned by construction.
+        progress: () => ({
+          done: mandatoryLandmarkIds.length,
+          planned: mandatoryLandmarkIds.length,
+          trimmed: false,
+        }),
         detail: () =>
           `required=${mandatoryLandmarkIds.length};ready=${mandatoryLandmarkViewsReady(
             mandatoryLandmarkIds,
@@ -6564,6 +6598,16 @@ export class Renderer {
         category: 'sky',
         priority: 64,
         required: true,
+        // Exempt unconditionally: uploadDataTextureInChunks falls back to one
+        // full upload on pinned r165, so the 2k RGBA16F dome upload is an
+        // indivisible ~183ms call that must stay behind the loading screen
+        // even when a slow MACHINE spent the soft budget while the network
+        // stayed healthy. The exemption adds no network wait (the inline wait
+        // below is already 0 past the reserve boundary) and the hard deadline
+        // still bounds the entry via prewarmEntryShouldDefer. Constrained
+        // profiles never run this entry, so the conditional exemption form
+        // the tail entries use has nothing to gate here.
+        deadlineExempt: true,
         run: async () => {
           if (!skyAssetPrefetch) return;
           const waitMs = skyAssetInlineWaitMs({
@@ -6602,6 +6646,11 @@ export class Renderer {
           }
           skyWarmedInlineBiomes = split.resident.length;
           skyDeferredBiomes = split.missing;
+          // Every biome resident means every upload already happened inline;
+          // only the promise's settlement is outstanding, and a lane scheduled
+          // for it would log the full set as pending and then no-op through
+          // cache-elided steps.
+          if (split.missing.length === 0) skyWarmComplete = true;
         },
         progress: () => ({
           done: skyWarmedInlineBiomes,
@@ -6916,7 +6965,11 @@ export class Renderer {
     // AFTER the data is resident keeps network waits out of both. Every step
     // is cache-elided, so anything the entry already uploaded inline costs
     // nothing here.
-    if (skyAssetPrefetch && !skyWarmComplete) {
+    // The rejection gate: a prefetch that already failed has nothing for the
+    // lane to upload, and the entry (when it ran) already reported failed;
+    // scheduling the lane anyway would log a deferral for work that can never
+    // run and then warn a second time from the lane's catch.
+    if (skyAssetPrefetch && !skyWarmComplete && skyAssetPrefetch.rejection() === null) {
       const resumeBiomes = initialSkyBiomes.slice();
       // skyDeferredBiomes is the partitioned remainder when the entry ran;
       // when the entry never ran (wholesale-deferred) it is empty and the
@@ -6935,7 +6988,12 @@ export class Renderer {
         .then(async () => {
           if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
           for (const biome of resumeBiomes) {
-            await this.prewarmTextureInIdle(this.skyView.envTexture(biome));
+            // BOOT_RESUME throughout: the dome/env uploads inside the helper
+            // must not outrank the lane's own PMREM unit below.
+            await this.prewarmTextureInIdle(
+              this.skyView.envTexture(biome),
+              GPU_WORK_PRIORITY.BOOT_RESUME,
+            );
             if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
             await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
             if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
@@ -6945,7 +7003,10 @@ export class Renderer {
               `sky-resume-pmrem:${biome}`,
             );
             if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
-            await this.prewarmTextureInIdle(this.skyView.domeTexture(biome));
+            await this.prewarmTextureInIdle(
+              this.skyView.domeTexture(biome),
+              GPU_WORK_PRIORITY.BOOT_RESUME,
+            );
             if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
           }
           console.info(`[entry-guard] sky prewarm resume done: biomes=${resumeBiomes.length}`);

@@ -685,12 +685,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // to values matching neither parent. No capture was retaken.
 // Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
 // sky-unstarve branch: both parents move renderer.ts (this branch also moves
-// prewarm_policy.ts and sky.ts), so all three literals mint to values matching
-// neither parent. No capture was retaken.
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so all
+// three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '868ef37a5162eaea52e691646128a41c70719e866693aadbf01b913e9014756f';
+  'c7e6230a28dc0b0517c9f0acf3b03bd18276d5aa52dff2e11220c35ce3f7d08e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'acb0eb6c9c69c2d1770566027948d7e70397b40074880fed2f64f2635246fa97';
+  '83e7bd859ba5f0dbab3d75eb4bc20a34361c71bec44ed1b363af29a21bc4843d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1601,13 +1605,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-pinned for the merge of release/v0.36.0 (post PR 3222) into the
     // prewarm sky-unstarve branch: the first-order composite follows both
-    // parents' renderer.ts inputs plus this branch's prewarm_policy.ts and
-    // sky.ts, then this second-order performance seal follows the swept
+    // parents' renderer.ts inputs plus this branch's prewarm_policy.ts
+    // (sky.ts moved too but is not a provenance input), then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-pinned for the review fixes on the prewarm sky-unstarve PR: the
+    // first-order composite follows the renderer.ts edits (deadlineExempt sky
+    // entry, unified view-cap trim rule, deferred-lane gate and priority
+    // threading), then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c44ffd45b9b83ca9714805f1e165db2d819ea1755b96eb710fb47e2917e25196');
+    ).toBe('d2a3939e0834282c07281ac665dabaf72e94c6ca820d8cffa04a26614125bc35');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

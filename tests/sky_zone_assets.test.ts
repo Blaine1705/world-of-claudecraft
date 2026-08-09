@@ -45,7 +45,7 @@ describe('zone-scoped sky assets', () => {
     expect(loadTexture).not.toHaveBeenCalled();
   });
 
-  it('classifies a dome-arrived biome as non-resident until its env HDR lands (F2)', async () => {
+  it('classifies a dome-arrived biome as non-resident until its env HDR lands', async () => {
     const sky = await import('../src/render/sky');
     const biomes = sky.skyBiomesAt(0, 0);
     // The dome (2k) and env (1k, maxWidth 512) fetches settle independently:
