@@ -33,7 +33,7 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: outputPath,
           },
           stdio: 'pipe',
-          timeout: 120_000,
+          timeout: 300_000,
         },
       );
 
@@ -118,7 +118,7 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: secondShardPath,
           },
           stdio: 'pipe',
-          timeout: 120_000,
+          timeout: 300_000,
         },
       );
       const secondShard = JSON.parse(readFileSync(secondShardPath, 'utf8')) as {
@@ -134,8 +134,11 @@ describe('Nythraxis matrix DPS rotations', () => {
     } finally {
       rmSync(outputDirectory, { recursive: true, force: true });
     }
-    // Two tsx child runs at ~60s each on the finalized kits.
-  }, 300_000);
+    // Two tsx child runs at ~60s each on the finalized kits solo; the
+    // long-sims lane's slowest observed runner (run 31290316610,
+    // workers=2) killed a child at the old 120s bound mid-shard, so both
+    // child timeouts and this budget carry lane-contention margin.
+  }, 720_000);
 
   it('moves long caster buffs to prepull instead of recurring combat priority', () => {
     expect(source).toContain("prepull: ['arcane_intellect']");

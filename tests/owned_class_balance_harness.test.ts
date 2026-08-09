@@ -96,14 +96,14 @@ describe('owned-class level 20 balance harness', () => {
     expect(packlordBurst?.castsByAbility.Stampede).toBeGreaterThan(0);
     expect(packlordBurst?.damageBySource.Stampede).toBeGreaterThan(0);
     // OWNED_DPS_SPECS grew 6 -> 8 with the druid overhaul (moongrove/wildfang).
-  }, 120_000);
+  }, 480_000);
 
   it('is deterministic at the same fixed seed and fixture', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[3];
     expect(runOwnedClassDpsProbe('fieldcraft', scenario, 29_901)).toEqual(
       runOwnedClassDpsProbe('fieldcraft', scenario, 29_901),
     );
-  }, 30_000);
+  }, 120_000);
 
   it('keeps Fieldcraft sustained damage near the ranged Hunter specs and pays Bloodhook', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
@@ -115,7 +115,7 @@ describe('owned-class level 20 balance harness', () => {
     // combat changes shift this pair a few percent; re-author when it lands.
     expect(fieldcraft.dps).toBeLessThanOrEqual(coldsight.dps * 1.25);
     expect(woundDamage / fieldcraft.totalDamage).toBeGreaterThanOrEqual(0.05);
-  }, 30_000);
+  }, 120_000);
 
   it('keeps Vespers sustained damage in the DPS caster band', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
@@ -126,7 +126,7 @@ describe('owned-class level 20 balance harness', () => {
     // Band widened for the stacked v0.29 rogue redesign (#2328): its shared
     // combat changes shift this pair a few percent; re-author when it lands.
     expect(vespers.dps).toBeLessThanOrEqual(thundercall.dps * 1.2);
-  }, 30_000);
+  }, 120_000);
 
   it('keeps the fixed Shaman and Vespers builds inside their sustained role bands', () => {
     const single = OWNED_CLASS_BALANCE_SCENARIOS[1];
@@ -167,7 +167,7 @@ describe('owned-class level 20 balance harness', () => {
     // The grown owned-class matrix runs ~180s under shard load; in the
     // long-sims lane (workers=2) it shares the runner with the raid harness
     // and roughly doubles (run 31288946173 killed it at 240s).
-  }, 600_000);
+  }, 900_000);
 
   it('keeps the Druid damage arms sane on the fixed low-SP probe', () => {
     // IMPORTANT: this fixed PBE loadout is a level-20 caster PROXY (spell power
@@ -187,7 +187,7 @@ describe('owned-class level 20 balance harness', () => {
     expect(moongrove.dps).toBeLessThanOrEqual(180);
     expect(wildfang.dps).toBeGreaterThanOrEqual(165);
     expect(wildfang.dps).toBeLessThanOrEqual(205);
-  }, 30_000);
+  }, 180_000);
 
   it('keeps Moongrove naked damage within 15% of the naked peer band', () => {
     // The v0.29 Balance rebalance shifted Moongrove's power off flat base
@@ -218,7 +218,7 @@ describe('owned-class level 20 balance harness', () => {
     const peerBand = (nakedAvg('packlord') + nakedAvg('vespers')) / 2;
     expect(moongrove / peerBand).toBeLessThanOrEqual(1.15);
     expect(moongrove / peerBand).toBeGreaterThanOrEqual(0.85);
-  }, 60_000);
+  }, 240_000);
 
   it.each(['spiritmend', 'doctrine', 'benison', 'groveheart'] as const)(
     'records the fixed one-ally and three-ally %s healing profiles',
@@ -264,7 +264,7 @@ describe('owned-class level 20 balance harness', () => {
     expect(spiritmendSingle.hps).toBeGreaterThan(0);
     // Same owned-class matrix growth as the DPS metric test above, same
     // long-sims lane contention doubling.
-  }, 360_000);
+  }, 720_000);
 
   it('runs Priest healer pressure through shields and Seraphic Vigil', () => {
     const doctrine = runOwnedHealerProbe('doctrine', 3, 29_912);
@@ -319,7 +319,7 @@ describe('owned-class level 20 balance harness', () => {
       .find((event) => event.ability === 'Seraphic Vigil');
     expect(vigilHeal?.amount ?? 0).toBeGreaterThan(0);
     expect(priest.auras.some((aura) => aura.id === 'seraphic_vigil')).toBe(false);
-  }, 30_000);
+  }, 120_000);
 
   it('counts Groveheart heal-over-time ticks in the effective-healing profile', () => {
     const groveheart = runOwnedHealerProbe('groveheart', 3, 29_913);
@@ -354,7 +354,7 @@ describe('owned-class level 20 balance harness', () => {
     // agility-loadout regression measured 65.0 and 26.2 here.
     expect(single).toBeGreaterThanOrEqual(80);
     expect(group).toBeGreaterThanOrEqual(40);
-  }, 120_000);
+  }, 300_000);
 
   it('records Warspirit mitigation, threat, forced-target uptime, and exit behavior', () => {
     const result = runWarspiritOfftankProbe(29_920, 'test-head');
@@ -373,5 +373,5 @@ describe('owned-class level 20 balance harness', () => {
       runOwnedHealerProbe('spiritmend', 3, 29_911),
     );
     expect(runWarspiritOfftankProbe(29_921)).toEqual(runWarspiritOfftankProbe(29_921));
-  }, 30_000);
+  }, 120_000);
 });

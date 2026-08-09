@@ -562,9 +562,11 @@ jobs:
     # class-overhaul balance harnesses in after they pushed two 20-minute
     # shards over budget (locally hunter_dps_balance plus
     # owned_class_balance_harness alone exceed 20 minutes), so the bound is
-    # now 40: headroom for the grown lane on a loaded runner while still
-    # cutting a hang off well before the pr-gate run tail it reports beside.
-    timeout-minutes: 40
+    # now 60: run 31290316610 measured the lane's aggregate test time at
+    # ~4400s on a slow-quartile runner, which lands the healthy wall right at
+    # 40 at workers=2, so 40 was a coin flip on runner speed. 60 keeps real
+    # headroom while still cutting a hang off well before GitHub's default.
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
