@@ -54,6 +54,7 @@ import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import {
@@ -2608,6 +2609,14 @@ export class Renderer {
             {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
+            },
+            {
+              // The cost side of the KTX2 mip release: source bytes retained
+              // for the context-loss re-transcode (the released mip chains
+              // truthfully read ~0 in the texture walks above). Pre-counted
+              // here so residencyBudget stays a pure function of its sources.
+              label: 'ktx2 restore sources',
+              bytes: ktx2RetainedSourceBytes(),
             },
           ]),
         ),

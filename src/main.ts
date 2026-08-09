@@ -213,6 +213,11 @@ import {
   resetGraphicsProfileDerivedCaches,
 } from './render/assets/graphics_profile';
 import {
+  enableKtx2MipRelease,
+  ktx2MipsOnContextLost,
+  ktx2MipsRestored,
+} from './render/assets/ktx2_mip_release';
+import {
   assetsReady,
   beginBackgroundPreloads,
   beginDeferredPreloads,
@@ -467,6 +472,18 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
+// World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
+// transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
+// every renderer that can draw those categories is the world renderer, whose
+// context loss and recycle paths route through the re-transcode hook below.
+// The editor and guide entries never call this, so their extra renderers
+// (asset thumbnails, wiki viewer) keep resident mips. Runs at module
+// evaluation so no deferred-preload GLB can classify before the switch is on.
+// The probe reads the LIVE GFX binding (initGfxTier and graphics rebuilds
+// reassign it): constrained-memory profiles (the whole iOS WebKit ladder plus
+// phone-class browsers) keep resident mips, because their semi-routine
+// in-place context loss has no curtain for the restore's re-transcode window.
+enableKtx2MipRelease(() => GFX.constrainedMemory);
 let pendingDeleteCharacter: CharacterSummary | null = null;
 // The desktop roster shows one shared "Enter World" button (in .cs-list-actions)
 // instead of a per-row one; it acts on whichever character is selected. Mobile
@@ -1347,6 +1364,11 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
+    // Start re-transcoding released KTX2 mip chains NOW: the restored (or
+    // recycled) context re-uploads from texture.mipmaps, and the sooner the
+    // worker starts the shorter any stub-black window. Fires for in-place GPU
+    // loss AND the graphics-rebuild recycle (both dispatch on this canvas).
+    ktx2MipsOnContextLost();
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
       contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
@@ -2755,6 +2777,10 @@ async function startGame(
       // eagerly behind this opaque curtain; hold (bounded) so the commit
       // reveals a finished horizon instead of easing the fog out on screen.
       await next.farVistaReady();
+      // Released KTX2 mip chains re-transcode after the recycle's context
+      // loss; hold the curtain until they are back so the reveal never shows
+      // stub-black world textures (settles on failure too, never hangs).
+      await ktx2MipsRestored();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);
