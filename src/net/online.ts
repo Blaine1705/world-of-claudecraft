@@ -2938,8 +2938,10 @@ export class ClientWorld implements IWorld {
         e.maxResource = w.mres;
       }
       e.rangedPower = w.rp ?? 0;
-      if (w.pasc !== undefined && e.kind === 'player' && e.templateId === 'paladin') {
-        const ascensionCharges = Math.max(0, Math.floor(Number(w.pasc) || 0));
+      // Absent means zero (omit-when-default wire convention): without this a
+      // paladin whose charges expired would keep stale orbiting seals forever.
+      if (e.kind === 'player' && e.templateId === 'paladin') {
+        const ascensionCharges = Math.max(0, Math.floor(Number(w.pasc ?? 0) || 0));
         e.paladinDevotion ??= {
           value: 0,
           ascensionCharges: 0,

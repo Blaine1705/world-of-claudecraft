@@ -150,6 +150,31 @@ describe('self stat wire round-trip', () => {
     });
   });
 
+  it('omits idle Ascension charges from the wire and clears them on decode', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const active = wireEntity(sim.player);
+    expect(active.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [active] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(4);
+
+    // Idle charges are omitted entirely (omit-when-default, like the fields
+    // around it), and decoding the ABSENT field must clear the mirrored
+    // charges: a decode gated on presence would leave an expired Ascension's
+    // orbiting seals on the remote paladin forever.
+    sim.player.paladinDevotion!.ascensionCharges = 0;
+    const idle = wireEntity(sim.player);
+    expect('pasc' in idle).toBe(false);
+    (client as any).applySnapshot({ t: 'snap', ents: [idle] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
   it('preserves talent-expanded Ascension charge counts for remote Paladins', () => {
     const sim = new Sim({ seed: 28, playerClass: 'paladin', autoEquip: true });
     sim.player.paladinDevotion!.ascensionCharges = 7;

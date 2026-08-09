@@ -1523,7 +1523,10 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // render Ascension's orbiting seals. Self snapshots additionally carry pdev
   // with the exact Devotion value and remaining duration for the local HUD.
   if (e.kind === 'player' && e.templateId === 'paladin') {
-    out.pasc = e.paladinDevotion?.ascensionCharges ?? 0;
+    // Omit-when-default like the fields above (review 3050): the idle 0 was
+    // serialized into every snapshot for every remote paladin.
+    const ascensionCharges = e.paladinDevotion?.ascensionCharges ?? 0;
+    if (ascensionCharges > 0) out.pasc = ascensionCharges;
   }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
