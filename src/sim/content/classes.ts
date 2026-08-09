@@ -5311,7 +5311,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // The shield is ranked rather than flat so it tracks the health curve at roughly 6-7%
   // of maximum health across the band it is usable in (252 hp at level 5, 822 at 20); a
   // flat value tuned for the cap would be three times as strong at level 5. It is well
-  // under a dedicated healer shield (Mercy's Aegis rank 4 absorbs 210) by design.
+  // under a dedicated healer shield (Psalm of Warding rank 4 absorbs 210) by design.
+  //
+  // Those two claims are the reason for the numbers, so they are PINNED rather than
+  // left as prose: tests/warrior_intervene.test.ts asserts the share of the health
+  // curve at each rank's own unlock level and the ceiling against the healer shield.
+  // An absolutes-only test would have gone green on any re-tune that broke both.
   intervene: {
     id: 'intervene',
     name: 'Intervene',

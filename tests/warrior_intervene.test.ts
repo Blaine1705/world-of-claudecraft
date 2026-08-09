@@ -134,6 +134,49 @@ describe('Intervene (level-5 warrior mobility row)', () => {
     });
   });
 
+  it('holds those numbers to the RATIO they were authored from, not just their values', () => {
+    // Review asked for this one, and it was a fair ask: the pin above is absolutes
+    // only, so a re-tune that broke the reasoning behind the numbers (they are a share
+    // of the health curve, not free-standing figures) would have kept it green as long
+    // as someone edited the expected values to match. This asserts the RULE instead.
+    //
+    // Measured against the WARRIOR's own curve because that is the anchor the def
+    // comment reasons from. Intervene shields an ally whose health the caster does not
+    // control, so the caster's curve is the only stable yardstick at authoring time.
+    const shareAt = (level: number): number => {
+      const { sim, p } = warriorAt(level, 'fury');
+      const meta = sim.players.get(p.id);
+      if (!meta) throw new Error('no meta');
+      const known = abilitiesKnownAt('warrior', level, meta.talentMods);
+      const absorb = known
+        .find((a) => a.def.id === 'intervene')
+        ?.effects.find((e) => e.type === 'absorb');
+      if (!absorb || absorb.type !== 'absorb') throw new Error('no absorb effect');
+      return absorb.amount / p.maxHp;
+    };
+
+    // At each rank's OWN unlock level the share is flat, which is the whole claim.
+    for (const level of [5, 11, 17]) {
+      const share = shareAt(level);
+      expect(share, `level ${level} share ${(share * 100).toFixed(2)}%`).toBeGreaterThan(0.065);
+      expect(share, `level ${level} share ${(share * 100).toFixed(2)}%`).toBeLessThan(0.075);
+    }
+    // Rank 3 is the last rank, so between 17 and the cap the share DECAYS as health
+    // keeps climbing. Pinned in that direction on purpose: a peel that grew relatively
+    // stronger at cap would be the failure this ranking exists to avoid.
+    expect(shareAt(20)).toBeLessThan(shareAt(17));
+
+    // And the ceiling the def comment claims: a warrior peel never rivals a dedicated
+    // healer shield. Read from content rather than restated, so re-tuning either side
+    // moves this test.
+    const psalmRanks = ABILITIES.power_word_shield.ranks ?? [];
+    const psalmAtCap = psalmRanks[psalmRanks.length - 1]?.effects?.find((e) => e.type === 'absorb');
+    if (!psalmAtCap || psalmAtCap.type !== 'absorb') throw new Error('no healer shield fixture');
+    const intervene = ABILITIES.intervene.ranks?.at(-1)?.effects.find((e) => e.type === 'absorb');
+    if (!intervene || intervene.type !== 'absorb') throw new Error('no intervene rank 3');
+    expect(intervene.amount).toBeLessThan(psalmAtCap.amount / 3);
+  });
+
   it('holds the warrior mobility budget: Intervene and Heroic Leap on 30 sec', () => {
     // The point of this row re-cut is the PvP mobility budget, so the two knobs move
     // together and are pinned together. Intervene sits at DOUBLE the hostile Onrush
