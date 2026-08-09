@@ -44,6 +44,8 @@ import {
   weaponIconUrl,
 } from '../src/ui/icons';
 import {
+  RELIQUARY_SLAIN_GLYPH_ID,
+  RELIQUARY_SLAIN_GLYPH_URL,
   RELIQUARY_SPECIMEN_GLYPH_ID,
   RELIQUARY_SPECIMEN_GLYPH_URL,
   type ReliquaryArtSlot,
@@ -296,6 +298,57 @@ describe('the corpse-harvest specimen glyph', () => {
   });
 });
 
+describe('the rare-slain trophy glyph (Phase 21)', () => {
+  // sha256 of the full data URL; re-pin here on a deliberate art edit.
+  const SLAIN_GLYPH_SHA256 = '9c856cb96227af2a87550e356091cbec899fed129e2099f23146232a2ce75035';
+
+  it('routes every catalogued slain mark to the one authored glyph', () => {
+    // The premise the glyph exists for: the slain family has neither
+    // profession art to borrow nor a committed image, and the name carries
+    // which rare fell, so the family shares one trophy.
+    expect(FIELD_NOTE_PROFESSIONS['slain:old_greyjaw']).toBeUndefined();
+    const slainIds = RELIQUARY_PAGES.flatMap((page) =>
+      page.relics.flatMap((relic) =>
+        relic.kind === 'mark' && relic.markId.startsWith('slain:') ? [relic.markId] : [],
+      ),
+    );
+    // Anti-vacuity: the catalog really carries the 19 kill proofs.
+    expect(slainIds.length).toBe(19);
+    for (const id of slainIds) {
+      expect(reliquaryCellArt({ kind: 'mark', id })).toEqual({
+        kind: 'url',
+        url: RELIQUARY_SLAIN_GLYPH_URL,
+      });
+    }
+    // Literal shape pins, so a re-encoding or a swapped glyph reddens.
+    expect(RELIQUARY_SLAIN_GLYPH_URL.startsWith('data:image/svg+xml,')).toBe(true);
+    expect(RELIQUARY_SLAIN_GLYPH_URL).toContain('woc-slain-glyph');
+    expect(RELIQUARY_SLAIN_GLYPH_ID).toBe('woc-slain-glyph');
+    // Byte pin on the authored art itself, the specimen-glyph regime: re-pin
+    // this digest in the same commit as a deliberate art edit.
+    expect(createHash('sha256').update(RELIQUARY_SLAIN_GLYPH_URL).digest('hex')).toBe(
+      SLAIN_GLYPH_SHA256,
+    );
+  });
+
+  it('percent-encodes to a src the window escaper cannot alter', () => {
+    expect(RELIQUARY_SLAIN_GLYPH_URL).not.toMatch(/[&<>"']/);
+    const svg = decodeURIComponent(RELIQUARY_SLAIN_GLYPH_URL.slice('data:image/svg+xml,'.length));
+    expect(svg.startsWith('<svg ')).toBe(true);
+    expect(svg.endsWith('</svg>')).toBe(true);
+    // Multi-color painted style, not a flat monochrome vector.
+    expect([...svg.matchAll(/#[0-9a-f]{6}/g)].length).toBeGreaterThan(4);
+    expect(RELIQUARY_SLAIN_GLYPH_URL).not.toContain('base64');
+  });
+
+  it('is catalog-gated: an uncatalogued slain id answers null, not trophy art', () => {
+    // The same allowlist noteReliquaryMark writes through, so a junk id off
+    // the wire (or a rare retired from the catalog) keeps the caller fallback.
+    expect(reliquaryCellArt({ kind: 'mark', id: 'slain:not_a_rare' })).toBeNull();
+    expect(reliquaryCellArt({ kind: 'mark', id: 'slain:forest_wolf' })).toBeNull();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // 3. Negative arms (the membership guards)
 // ---------------------------------------------------------------------------
@@ -349,6 +402,9 @@ describe('unknown ids fall through to the caller fallback', () => {
       reliquaryCellArtOpaque({ kind: 'url', url: '/ui/professions/masterwork_seal.webp' }),
     ).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
+    // The slain trophy glyph carries a real alpha matte like the specimen
+    // flask, so it stays on the silhouette-darken side of the carve-out.
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SLAIN_GLYPH_URL })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_prog_veteran' })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'item', itemId: 'reins_valorsteed' })).toBe(false);
     // Prefix BOUNDARY on the url arm: a sibling directory must not ride the

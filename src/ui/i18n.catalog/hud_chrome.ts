@@ -4516,6 +4516,28 @@ export const hudChromeStrings = {
       gather_event_ancient_heartwood: 'Ancient Heartwood',
       gather_event_moonlit_bloom: 'Moonlit Bloom',
       gather_event_perfect_specimen: 'Perfect Specimen',
+      // Phase 21: Rares of the Realm kill proofs, 'Slain: <mob display name>'
+      // with names verbatim from MOBS (the server table and the wiki generator
+      // carry the identical strings; tests/character_sheet.test.ts cross-pins).
+      slain_old_greyjaw: 'Slain: Old Greyjaw',
+      slain_mogger: 'Slain: Mogger',
+      slain_grix_the_tunnelking: 'Slain: Grix the Tunnelking',
+      slain_captain_verlan: 'Slain: Captain Verlan',
+      slain_wraithbinder_maldrec: 'Slain: Wraithbinder Maldrec',
+      slain_mirejaw_the_ravenous: 'Slain: Mirejaw the Ravenous',
+      slain_sloomtooth_the_drowned: 'Slain: Sloomtooth the Drowned',
+      slain_sister_nhalia: 'Slain: Sister Nhalia',
+      slain_grubjaw: 'Slain: Grubjaw the Glutton',
+      slain_ironvein_foreman: 'Slain: Ironvein Foreman',
+      slain_brutok_skullsmasher: 'Slain: Brutok Skullsmasher',
+      slain_voskar_emberwing: 'Slain: Voskar the Emberwing',
+      slain_marrowlord_varkas: 'Slain: Marrowlord Varkas',
+      slain_old_cragmaw: 'Slain: Old Cragmaw',
+      slain_shardlord_kazzix: 'Slain: Shardlord Kazzix',
+      slain_gleamstag: 'Slain: The Gleamstag',
+      slain_old_marrowshell: 'Slain: Old Marrowshell',
+      slain_aurelhorn: 'Slain: Aurelhorn, First of the Herd',
+      slain_drakemaw_broodlord: 'Slain: Drakemaw Broodlord',
     },
     // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
     accountScopeBadge: 'Account',

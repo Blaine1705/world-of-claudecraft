@@ -64,6 +64,7 @@ import {
   ZONES,
   zoneContaining,
 } from '../src/sim/data';
+import { RARE_SLAIN_TEMPLATES } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
 import {
   ARMOR_SECONDARY_BY_TYPE,
@@ -284,11 +285,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(23);
+    expect(CONQUEROR_PAGES.length).toBe(25);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(3);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(29);
+    expect(RELIQUARY_PAGES.length).toBe(31);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -319,16 +320,19 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands. Phase 21 adds the 19 Rift
-    // chase items (conquerors_the_rift) on top of the Phase 18 title relics.
-    expect(full).toEqual({ owned: 242, total: 242 });
+    // chase items (conquerors_the_rift), then the 19 rare-slain marks and the
+    // 29 NEW Spoils uniques (31 slots minus the 2 set members already
+    // catalogued; a relic on two pages is one relic): 242 + 19 + 29 = 290.
+    expect(full).toEqual({ owned: 290, total: 290 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
       ownedMounts: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands.
-    expect(character).toEqual({ owned: 213, total: 213 });
+    // Literal: update when catalog content lands (same +19 marks +29 uniques
+    // delta as the overview pair above; marks are character-scoped).
+    expect(character).toEqual({ owned: 261, total: 261 });
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -515,19 +519,25 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     }
     // Exact list, not a count: a new stackable relic has to be looked at
     // (per-copy counting is right for it, but so is the window's phrasing).
+    // gleamstag_charm joined with the Spoils page (Phase 21): a stackable rare
+    // junk trophy off The Gleamstag, obtained and counted per copy like the
+    // specimens.
     expect([...new Set(stackable)].sort()).toEqual([
       'fine_elderwood_log',
       'fine_sunpetal_herb',
       'fine_thorium_ore',
+      'gleamstag_charm',
       'prime_cut',
       'pristine_claw',
       'pristine_hide',
       'pristine_silk',
       'pristine_venom_gland',
     ]);
-    // Every stackable one is a Professions-shelf specimen, never Conqueror
-    // gear: that is what makes the bucket a knowable list rather than a drift.
+    // Every stackable one is a Professions-shelf specimen or the one Spoils
+    // trophy above, never instance gear: that is what makes the bucket a
+    // knowable list rather than a drift.
     for (const id of stackable) {
+      if (id === 'gleamstag_charm') continue;
       expect(
         (RELIQUARY_PROFESSION_SPECIMEN_ITEMS as readonly string[]).includes(id),
         `${id} is not a specimen`,
@@ -712,6 +722,111 @@ describe('Reliquary Rift page pins against live rift content', () => {
     expect(RIFT_GEAR_ITEM_IDS.length).toBeGreaterThanOrEqual(3);
     expect(RIFT_EPIC_ITEM_IDS.length).toBeGreaterThanOrEqual(4);
     expect(RIFT_LEGENDARY_ITEM_IDS.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('Reliquary Rares of the Realm pages pin against the live rare tables', () => {
+  /** Rare+ loot ids of one template, in loot-row order (money rows skipped). */
+  function rarePlusLootIds(templateId: string): string[] {
+    const out: string[] = [];
+    for (const row of MOBS[templateId]?.loot ?? []) {
+      if (typeof row.itemId === 'string' && isRarePlus(row.itemId)) out.push(row.itemId);
+    }
+    return out;
+  }
+
+  it('marks page is a bijection with RARE_SLAIN_TEMPLATES in live set order', () => {
+    const page = RELIQUARY_PAGES_BY_ID.conquerors_rares_of_the_realm;
+    expect(page).toBeDefined();
+    expect(page.shelf).toBe('conquerors');
+    expect(page.clearSource).toEqual({ kind: 'none' });
+    // EQUALITY in ORDER, both directions at once: RARE_SLAIN_TEMPLATES is
+    // authored zone1 to drakelands and Set iteration preserves insertion
+    // order, so the page derives from the live kill-credit set and a new rare
+    // (or a removed one) reds here until the page moves with it.
+    expect(markRelicIds(page)).toEqual([...RARE_SLAIN_TEMPLATES].map((t) => `slain:${t}`));
+    // Snug floor (the bijection above makes the two counts one number).
+    expect(RARE_SLAIN_TEMPLATES.size).toBe(19);
+    // Every slot: exactly one boss hint naming its OWN template plus one zone
+    // hint (the camp zone; the zone truth arm walks the live camp against it,
+    // the boss truth arm's mark branch owns the kill-credit claim).
+    for (const relic of page.relics) {
+      if (relic.kind !== 'mark') continue;
+      const hints = reliquaryRelicSource(page, relic);
+      expect(hints, relic.markId).toHaveLength(2);
+      expect(hints[0].sourceKind, relic.markId).toBe('boss');
+      expect(`slain:${hints[0].sourceId}`, relic.markId).toBe(relic.markId);
+      expect(hints[1].sourceKind, relic.markId).toBe('zone');
+    }
+  });
+
+  it('spoils page EQUALS the live rare+ loot walk of the 19 templates, deduped', () => {
+    const page = RELIQUARY_PAGES_BY_ID.conquerors_spoils_of_the_realm;
+    expect(page).toBeDefined();
+    expect(page.shelf).toBe('conquerors');
+    expect(page.clearSource).toEqual({ kind: 'none' });
+    // The live walk: template order (RARE_SLAIN_TEMPLATES, zone1 to
+    // drakelands), per-template loot-row order, first template keeps a shared
+    // id. A new rare+ row on any rare's table reds here until it is paged.
+    const derived: string[] = [];
+    const carriers = new Map<string, string[]>();
+    for (const templateId of RARE_SLAIN_TEMPLATES) {
+      for (const itemId of rarePlusLootIds(templateId)) {
+        const prior = carriers.get(itemId);
+        if (prior === undefined) {
+          carriers.set(itemId, [templateId]);
+          derived.push(itemId);
+        } else {
+          prior.push(templateId);
+        }
+      }
+    }
+    expect(itemRelicIds(page)).toEqual(derived);
+    // Snug vacuity floor: an emptied loot merge would otherwise shrink the
+    // walk (and the page) silently while the equality stayed green.
+    expect(derived.length).toBeGreaterThanOrEqual(31);
+    // Per-item boss hints EQUAL the carrier set in walk order (the 13a
+    // every-door standard: a shared drop names every rare that carries it),
+    // plus exactly one zone hint. gutripper_shiv also names its quest door,
+    // which the quest truth arm and acknowledgment sweep own.
+    for (const relic of page.relics) {
+      if (relic.kind !== 'item') continue;
+      const hints = reliquaryRelicSource(page, relic);
+      const bosses = hints.filter((h) => h.sourceKind === 'boss').map((h) => h.sourceId);
+      expect(bosses, relic.itemId).toEqual(carriers.get(relic.itemId));
+      expect(
+        hints.filter((h) => h.sourceKind === 'zone'),
+        relic.itemId,
+      ).toHaveLength(1);
+    }
+  });
+
+  it('the five no-drop rares stay marks-only (signatures sub-rare by quality)', () => {
+    // The inverse arm: these templates contribute ZERO rare+ ids, so the
+    // marks page is their whole representation, and their uncommon-or-below
+    // signature drops stay off the museum by QUALITY, never hand-listing
+    // (the thunzharr inert_storm_shard precedent).
+    const noDrop = [...RARE_SLAIN_TEMPLATES].filter((t) => rarePlusLootIds(t).length === 0);
+    expect([...noDrop].sort()).toEqual([
+      'aurelhorn',
+      'drakemaw_broodlord',
+      'grubjaw',
+      'old_greyjaw',
+      'old_marrowshell',
+    ]);
+    const marksPage = RELIQUARY_PAGES_BY_ID.conquerors_rares_of_the_realm;
+    for (const templateId of noDrop) {
+      // Vacuity: each really has a live loot table (the filter judged rows,
+      // not an absent mob), and nothing on it is catalogued anywhere.
+      const loot = (MOBS[templateId].loot ?? [])
+        .map((row) => row.itemId)
+        .filter((id): id is string => typeof id === 'string');
+      expect(loot.length, templateId).toBeGreaterThan(0);
+      for (const itemId of loot) {
+        expect(isCataloguedRelicItem(itemId), `${templateId}:${itemId}`).toBe(false);
+      }
+      expect(markRelicIds(marksPage), templateId).toContain(`slain:${templateId}`);
+    }
   });
 });
 
@@ -1770,11 +1885,29 @@ function bossRouteSatisfies(
 }
 
 /** The zone sweep's shape gate, named so its trip-wire is provable: a zone
- *  hint is checkable only beside EXACTLY one boss hint, mirroring both halves
- *  of the view's compose guard (bosses === 1 && zones === 1). Live data never
- *  trips it, so the synthetic cases below are what keep it honest. */
+ *  hint is checkable only beside at least one boss hint (zero bosses says
+ *  nothing checkable), and only as a SINGLE zone (two zones beside one camp
+ *  walk would leave one of them unverifiable). Phase 21 loosened the boss half
+ *  from EXACTLY one to AT LEAST one: the Spoils page's shared drops name two
+ *  rares plus their one shared zone, a shape the view already renders by
+ *  design (one line per boss plus the zone line; the two-bosses-one-zone pin
+ *  in tests/reliquary_view.test.ts owns that rendering), and the sweep below
+ *  checks EVERY hinted boss's camps against the one zone either way. */
 function zoneHintShapeOk(bossCount: number, zoneCount: number): boolean {
-  return bossCount === 1 && zoneCount === 1;
+  return bossCount >= 1 && zoneCount === 1;
+}
+
+/**
+ * A boss hint on a MARK slot claims the mob's KILL CREDIT writes the mark: no
+ * loot row can carry a mark id, so the loot walk the item arm uses says
+ * nothing here. The one live pairing is the rare-slain family, and its write
+ * site is literal (onMobKillCreditForDeeds writes `slain:<templateId>` for
+ * every RARE_SLAIN_TEMPLATES member), so the claim is true iff the mark id
+ * embeds exactly the hinted template and that template is in the live set.
+ * Any other mark with a boss hint has no derivation and fails.
+ */
+function markBossHintSatisfies(markId: string, mobId: string): boolean {
+  return markId === `slain:${mobId}` && RARE_SLAIN_TEMPLATES.has(mobId);
 }
 
 /** `pageId:slotId` keys, the shape the sweeps below test membership against. */
@@ -1829,6 +1962,13 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // bosses + both citadel bosses + 17 trash carriers), plus the
   // rift_first_clear activity, plus the B and S rank doors.
   conquerors_the_rift: 30,
+  // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
+  // hollow, drakelands).
+  conquerors_rares_of_the_realm: 24,
+  // 19 = the 14 rares that drop a rare+ item (the five no-drop templates
+  // contribute nothing here), their 4 camp zones (no drakelands: the
+  // broodlord is marks-only), plus gutripper_shiv's q_drogmar door.
+  conquerors_spoils_of_the_realm: 19,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level
@@ -1868,6 +2008,10 @@ const KNOWN_MULTI_SOURCE_PAGES = [
   // The Rift page spans every themed environment's mobs, the first-clear
   // activity, and two rank doors: the widest conquerors page there is.
   'conquerors_the_rift',
+  // The realm-rare pair (Phase 21): each spans the named rares of five (marks)
+  // or four (spoils) zones, which is the point of a realm-wide page.
+  'conquerors_rares_of_the_realm',
+  'conquerors_spoils_of_the_realm',
 ];
 
 /** `sourceKind:sourceId`, the stable comparison key for one hint. */
@@ -1984,6 +2128,17 @@ describe('Reliquary source hints resolve against live content', () => {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'boss') continue;
         checked += 1;
+        // MARK slots take the kill-credit derivation (see the helper): loot
+        // rows never carry a mark id, so the loot walk below would call every
+        // honest slain hint a lie and every wrong-rare hint indistinguishable.
+        if (relic.kind === 'mark') {
+          if (!markBossHintSatisfies(slotId, hint.sourceId)) {
+            offenders.push(
+              `${page.id}:${slotId} credits ${hint.sourceId}, whose kill never writes it`,
+            );
+          }
+          continue;
+        }
         const fromLoot = (MOBS[hint.sourceId]?.loot ?? []).some((e) => e.itemId === awardId);
         const heroic = HEROIC_BOSS_LOOT[hint.sourceId as keyof typeof HEROIC_BOSS_LOOT] ?? [];
         const fromHeroic = heroic.some((e) => e.itemId === awardId);
@@ -1997,9 +2152,17 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(offenders).toEqual([]);
     // Vacuity floor: the sweep is worthless if it walked nothing. Literal,
     // matching the authored boss coverage (Phase 21: +28 rift-mob claims on
-    // the ten themed rares); update deliberately with the authoring, same
-    // regime as the totals pins above.
-    expect(checked).toBeGreaterThanOrEqual(187);
+    // the ten themed rares, then +19 slain-mark claims and +33 Spoils claims,
+    // 29 single-rare drops plus the two shared drops' two rares each); update
+    // deliberately with the authoring, same regime as the totals pins above.
+    expect(checked).toBeGreaterThanOrEqual(239);
+    // The mark arm specifically (the slain family), so the kill-credit
+    // derivation cannot rot into a skip that leaves every mark boss hint
+    // unpinned while the total above still clears on item slots alone.
+    const markBossHints = RELIC_SLOTS.filter(({ relic }) => relic.kind === 'mark').flatMap(
+      ({ page, relic }) => reliquaryRelicSource(page, relic).filter((h) => h.sourceKind === 'boss'),
+    );
+    expect(markBossHints.length).toBeGreaterThanOrEqual(19);
     // The mount arm specifically, so the reins translation cannot rot into a
     // no-op that leaves every mount boss hint unpinned while the total above
     // still clears on the item slots alone.
@@ -2021,6 +2184,22 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(bossRouteSatisfies('any', true, false)).toBe(true);
     expect(bossRouteSatisfies(undefined, false, true)).toBe(true);
     expect(bossRouteSatisfies(undefined, false, false)).toBe(false);
+  });
+
+  it('markBossHintSatisfies rejects the wrong rare and a non-rare kill (doctored misses)', () => {
+    // Live data never trips the mark arm (every authored slain hint names its
+    // own template), so these synthetics are what keep the derivation honest:
+    // a shifted hint (real rare, wrong mark) and a template outside
+    // RARE_SLAIN_TEMPLATES (its kill credit writes no mark at all) must both
+    // fail, and the true pairing must pass.
+    expect(markBossHintSatisfies('slain:mogger', 'mogger')).toBe(true);
+    expect(markBossHintSatisfies('slain:mogger', 'grix_the_tunnelking')).toBe(false);
+    // forest_wolf is a live mob whose kill credit writes no slain mark.
+    expect(MOBS.forest_wolf).toBeDefined();
+    expect(RARE_SLAIN_TEMPLATES.has('forest_wolf')).toBe(false);
+    expect(markBossHintSatisfies('slain:forest_wolf', 'forest_wolf')).toBe(false);
+    // A non-slain mark with a boss hint has no derivation and fails closed.
+    expect(markBossHintSatisfies('masterwork:first', 'mogger')).toBe(false);
   });
 
   it('every vendor hint names an NPC whose live stock really sells the relic', () => {
@@ -2307,8 +2486,9 @@ describe('Reliquary source hints resolve against live content', () => {
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: wyrmcult_grand_robe's q_gravewyrm mage reward.
-    expect(checked).toBeGreaterThanOrEqual(1);
+    // Vacuity floor: wyrmcult_grand_robe's q_gravewyrm mage reward plus
+    // gutripper_shiv's q_drogmar rogue reward (Spoils, Phase 21).
+    expect(checked).toBeGreaterThanOrEqual(2);
     // The negative premise this arm is calibrated against: q_riding_lessons is
     // a live quest that awards NO item, so a quest hint there would fail above.
     expect(QUESTS.q_riding_lessons).toBeDefined();
@@ -2404,13 +2584,13 @@ describe('Reliquary source hints resolve against live content', () => {
       const zoneHints = hints.filter((h) => h.sourceKind === 'zone');
       if (zoneHints.length === 0) continue;
       const bossHints = hints.filter((h) => h.sourceKind === 'boss');
-      // EXACTLY one boss AND exactly one zone, matching BOTH halves of the
-      // view's compose guard (bosses === 1 && zones === 1): any other shape
-      // leaves a zone rendering as a lonely "Found in {zone}" line the
-      // composition never intended, and zero bosses says nothing checkable.
+      // AT LEAST one boss AND exactly one zone (see zoneHintShapeOk): zero
+      // bosses says nothing checkable, a second zone would ride unverified,
+      // and EVERY hinted boss's camps are walked against the one zone below,
+      // so the multi-rare Spoils shape is exactly as pinned as the 1+1 pairs.
       if (!zoneHintShapeOk(bossHints.length, zoneHints.length)) {
         offenders.push(
-          `${page.id}:${slotId} pairs ${zoneHints.length} zone hints with ${bossHints.length} boss hints (need exactly 1 of each)`,
+          `${page.id}:${slotId} pairs ${zoneHints.length} zone hints with ${bossHints.length} boss hints (need 1 zone beside 1+ bosses)`,
         );
         continue;
       }
@@ -2436,16 +2616,21 @@ describe('Reliquary source hints resolve against live content', () => {
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: the two open-world set drops.
-    expect(checked).toBeGreaterThanOrEqual(2);
+    // Vacuity floor: the two open-world set drops, the 19 slain marks, and
+    // the 31 Spoils slots (the two set members counted again on their second
+    // page). Update deliberately with the authoring.
+    expect(checked).toBeGreaterThanOrEqual(52);
   });
 
   it('the zone sweep shape gate can actually trip (synthetic shapes)', () => {
-    // Live data is always exactly 1+1, so without these the gate could rot
-    // (invert, or widen to >= 1) with the sweep still green, which is the one
-    // predicate in the truth-pin set that would fail silently.
+    // Live data satisfies the gate everywhere, so without these the gate
+    // could rot (invert, or widen to admit zero bosses or two zones) with the
+    // sweep still green, which is the one predicate in the truth-pin set that
+    // would fail silently. Phase 21: 2+1 is now a LEGAL shape (the Spoils
+    // shared drops; every named boss is still camp-checked), the zero-boss
+    // and two-zone shapes stay refused.
     expect(zoneHintShapeOk(1, 1)).toBe(true);
-    expect(zoneHintShapeOk(2, 1)).toBe(false);
+    expect(zoneHintShapeOk(2, 1)).toBe(true);
     expect(zoneHintShapeOk(1, 2)).toBe(false);
     expect(zoneHintShapeOk(0, 1)).toBe(false);
   });
@@ -2505,10 +2690,10 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 265 = 268 slots minus the
+    // excluded. Literal: tighten as rulings land. 315 = 318 slots minus the
     // two gap mounts minus the pended masterwork:engineering.
     const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
-    expect(hinted).toBeGreaterThanOrEqual(265);
+    expect(hinted).toBeGreaterThanOrEqual(315);
   });
 
   it('no relic authors an EMPTY hint list (a sourceless slot stays keyless)', () => {
@@ -2660,9 +2845,10 @@ describe('Reliquary source hint coverage', () => {
     }
     expect(offenders).toEqual([]);
     // Vacuity floor: the cross-page arm only checks something while shared
-    // relics exist. Every set member except the two open-world drops is one.
+    // relics exist. Every set member is one since Phase 21 (the two
+    // open-world drops joined the Spoils page).
     const shared = [...byId].filter(([id]) => (RELIQUARY_ITEM_TO_PAGES.get(id) ?? []).length > 1);
-    expect(shared.length).toBeGreaterThanOrEqual(26);
+    expect(shared.length).toBeGreaterThanOrEqual(28);
   });
 
   it('every hinted relic acknowledges every comparable live award route', () => {
@@ -2716,6 +2902,11 @@ describe('Reliquary source hint coverage', () => {
     const ACKNOWLEDGED_SECONDARY_ROUTES = new Set<string>([
       'conquerors_set_deathlord:deathlord_sabatons:mob:deeprock_kobold',
       'conquerors_set_necromancers:necromancers_legwraps:mob:boneclad_revenant',
+      // The same two relics on their Phase 21 Spoils page rows: identical
+      // hints (the cross-page agreement pin holds them equal), so the same
+      // dominated trash routes go unacknowledged there too.
+      'conquerors_spoils_of_the_realm:deathlord_sabatons:mob:deeprock_kobold',
+      'conquerors_spoils_of_the_realm:necromancers_legwraps:mob:boneclad_revenant',
     ]);
     const consumed = new Set<string>();
     const offenders: string[] = [];
@@ -2754,17 +2945,20 @@ describe('Reliquary source hint coverage', () => {
     // regime; update deliberately with the authoring). One total would let
     // the small families vanish inside the mob count's margin: the quest arm
     // is the arm that caught wyrmcult_grand_robe.
-    expect(routesByFamily.mob).toBeGreaterThanOrEqual(174);
+    // Phase 21 Spoils growth on the mob family: 29 single-rare drops, the two
+    // shared drops' two rares each, and the two dominated trash routes (35);
+    // the quest family gains gutripper_shiv's q_drogmar door.
+    expect(routesByFamily.mob).toBeGreaterThanOrEqual(209);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(5);
-    expect(routesByFamily.quest).toBeGreaterThanOrEqual(7);
+    expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.recipe).toBeGreaterThanOrEqual(2);
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(288);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(324);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {
@@ -3026,9 +3220,13 @@ describe('Reliquary source hint coverage', () => {
         // Phase 21: the Rift page's clear-time epics (B) and S-only
         // legendaries, walked by the rank truth arm's item side.
         'item x rift',
-        // mark: the gathering professions and the two write sites.
+        // mark: the gathering professions and the two write sites, plus the
+        // Phase 21 rare-slain family (kill-credit boss claims walked by the
+        // boss truth arm's mark branch, camp zones by the zone arm).
         'mark x profession',
         'mark x activity',
+        'mark x boss',
+        'mark x zone',
         // mount: heroic tables, Marla's counter, the rift reins ladder.
         'mount x boss',
         'mount x vendor',

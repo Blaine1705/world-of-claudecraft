@@ -6505,6 +6505,220 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
         "name": "Voidsong, Dirk of the Sundered Veil"
       }
     ]
+  },
+  {
+    "id": "conquerors_rares_of_the_realm",
+    "shelf": "conquerors",
+    "name": "Rares of the Realm",
+    "relics": [
+      {
+        "kind": "mark",
+        "name": "Slain: Old Greyjaw"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Mogger"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Grix the Tunnelking"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Captain Verlan"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Wraithbinder Maldrec"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Mirejaw the Ravenous"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Sloomtooth the Drowned"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Sister Nhalia"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Grubjaw the Glutton"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Ironvein Foreman"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Brutok Skullsmasher"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Voskar the Emberwing"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Marrowlord Varkas"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Old Cragmaw"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Shardlord Kazzix"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: The Gleamstag"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Old Marrowshell"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Aurelhorn, First of the Herd"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Drakemaw Broodlord"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_spoils_of_the_realm",
+    "shelf": "conquerors",
+    "name": "Spoils of the Realm",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Mogger's Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Gravestalker Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Mogger's Copper Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Hollowbone Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Verlan's Oathblade"
+      },
+      {
+        "kind": "item",
+        "name": "Staff of the Hollow Vigil"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewarden's Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Maldrec's Soulbinder"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewoven Raiment"
+      },
+      {
+        "kind": "item",
+        "name": "Fen Reaver Glaive"
+      },
+      {
+        "kind": "item",
+        "name": "Mirejaw Oracle Staff"
+      },
+      {
+        "kind": "item",
+        "name": "Tidereaver Gaff"
+      },
+      {
+        "kind": "item",
+        "name": "Sloomtooth's Tidefang"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Tide Scepter"
+      },
+      {
+        "kind": "item",
+        "name": "Nhalia's Dirgeblade"
+      },
+      {
+        "kind": "item",
+        "name": "Gutripper Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Brutok's Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Crag Warden Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Skullsplitter Dirk"
+      },
+      {
+        "kind": "item",
+        "name": "Stormroot Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Emberwing Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Emberfang Warblade"
+      },
+      {
+        "kind": "item",
+        "name": "Stormvotive Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw's Huntcord"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw Prowlboots"
+      },
+      {
+        "kind": "item",
+        "name": "Cragthorn Greatstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw Huntquiver"
+      },
+      {
+        "kind": "item",
+        "name": "Shardfang Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Gleamstag Charm"
+      }
+    ]
   }
 ];
 

@@ -53,4 +53,9 @@ export const table: ReliquaryLocaleTable = {
   // The Rift page (Phase 21): the shipped rift noun (deed dgn_rift and the
   // sourceRift line both say 균열), used bare as the proper name.
   conquerors_the_rift: { name: '균열' },
+  // Rares of the Realm pages (Phase 21): composed in the chronicle rare
+  // deeds' register (chr_marsh_rares ko reads 안개 속의 이름들); no mob names
+  // inside page names.
+  conquerors_rares_of_the_realm: { name: '온 땅의 이름들' },
+  conquerors_spoils_of_the_realm: { name: '이름난 자들의 전리품' },
 };

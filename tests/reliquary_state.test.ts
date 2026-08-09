@@ -15,9 +15,15 @@ import {
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId } from '../src/sim/content/skins';
-import { DELVES, ITEMS, QUESTS } from '../src/sim/data';
-import { checkDeedTrigger, grantDeed, markItemDiscovered } from '../src/sim/deeds';
+import { DELVES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
+import {
+  checkDeedTrigger,
+  grantDeed,
+  markItemDiscovered,
+  onMobKillCreditForDeeds,
+} from '../src/sim/deeds';
 import { grantDelveClearTo } from '../src/sim/delves/runs';
+import { createMob } from '../src/sim/entity';
 import { grantCopies } from '../src/sim/item_instance_transfer';
 import { mountItemId, ownedMounts } from '../src/sim/mounts';
 import { isCommissionEligible } from '../src/sim/professions/commission';
@@ -816,6 +822,79 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(interactionSrc).toMatch(
       /ctx\.markVisited\(meta, 'gather_event:perfect_specimen'\);[\s\S]*?noteReliquaryMark\(ctx, meta, 'gather_event:perfect_specimen'\);/,
     );
+
+    // The Phase 21 fourth dual-write site: the rare kill-credit arm in
+    // deeds.ts writes the visited mark and the Reliquary mark together for
+    // EVERY eligible member (the per-member loop is inside the match, so a
+    // refactor that moved the note outside the loop, crediting only one
+    // member, reds here). The behavioral kill tests below drive the real
+    // path; this pin holds the visit beside the note on the same arm.
+    const deedsSrc = fs
+      .readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8')
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
+    expect(deedsSrc).toMatch(
+      /if \(RARE_SLAIN_TEMPLATES\.has\(mob\.templateId\)\) \{\s*for \(const meta of eligible\) \{\s*markVisited\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*noteReliquaryMark\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*\}\s*\}/,
+    );
+  });
+});
+
+describe('rare kill credit fills the Reliquary (the Phase 21 dual write)', () => {
+  function spawnRare(sim: Sim, templateId: string) {
+    const mob = createMob(sim.ctx.nextId++, MOBS[templateId], 5, { x: 0, y: 0, z: 0 });
+    sim.addEntity(mob);
+    return mob;
+  }
+
+  it('one real kill credit lands the mark, the visit, and the recent push', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Premise: the mark is catalogued (an uncatalogued id would no-op in
+    // noteReliquaryMark and this test would be checking the visit alone).
+    expect(RELIQUARY_MARK_IDS.has('slain:old_greyjaw')).toBe(true);
+    expect(meta.reliquary.marks.size).toBe(0);
+    const mob = spawnRare(sim, 'old_greyjaw');
+    onMobKillCreditForDeeds(sim.ctx, mob, null, meta, [meta]);
+    expect(meta.reliquary.marks.has('slain:old_greyjaw')).toBe(true);
+    expect(meta.deedStats.visited.has('slain:old_greyjaw')).toBe(true);
+    // The live fill pushes the recent ring (unlike the silent join retro).
+    expect(meta.reliquary.recent).toEqual(['slain:old_greyjaw']);
+  });
+
+  it('a party kill credits EVERY eligible member (the two-member arm)', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const pid2 = sim.addPlayer('warrior', 'Secondwright');
+    const meta2 = sim.players.get(pid2)!;
+    const mob = spawnRare(sim, 'mogger');
+    onMobKillCreditForDeeds(sim.ctx, mob, null, meta, [meta, meta2]);
+    expect(meta.reliquary.marks.has('slain:mogger')).toBe(true);
+    expect(meta2.reliquary.marks.has('slain:mogger')).toBe(true);
+    expect(meta2.deedStats.visited.has('slain:mogger')).toBe(true);
+  });
+
+  it('a non-rare kill writes neither ledger (the RARE_SLAIN_TEMPLATES gate)', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const wolf = spawnRare(sim, 'forest_wolf');
+    onMobKillCreditForDeeds(sim.ctx, wolf, null, meta, [meta]);
+    expect(meta.reliquary.marks.size).toBe(0);
+    expect(meta.deedStats.visited.has('slain:forest_wolf')).toBe(false);
+  });
+
+  it('join retro fills a slain mark from the visited ledger, silently', () => {
+    // A veteran who slew the rare before Phase 21 shipped: the visit exists
+    // (the chr_*_rares deeds wrote it), the Reliquary mark does not. The join
+    // sweep copies it in with no recent push and no toast (nothing is
+    // invented: the visit is proof the kill really happened).
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.visited.add('slain:brutok_skullsmasher');
+    expect(meta.reliquary.marks.size).toBe(0);
+    expect(syncReliquaryMarksFromVisited(meta)).toBe(1);
+    expect(meta.reliquary.marks.has('slain:brutok_skullsmasher')).toBe(true);
+    expect(meta.reliquary.recent).toEqual([]);
   });
 });
 

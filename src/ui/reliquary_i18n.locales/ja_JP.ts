@@ -53,4 +53,9 @@ export const table: ReliquaryLocaleTable = {
   // The Rift page (Phase 21): the shipped rift noun (deed dgn_rift and the
   // sourceRift line both say リフト), used bare as the proper name.
   conquerors_the_rift: { name: 'リフト' },
+  // Rares of the Realm pages (Phase 21): composed in the chronicle rare
+  // deeds' register (chr_marsh_rares ja reads 霧に名だたる者); no mob names
+  // inside page names.
+  conquerors_rares_of_the_realm: { name: '大地に名だたる者' },
+  conquerors_spoils_of_the_realm: { name: '名だたる者の戦利品' },
 };

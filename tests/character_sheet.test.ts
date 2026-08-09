@@ -15,7 +15,7 @@ import {
 import type { CharacterRow } from '../server/db';
 import { DEEDS } from '../src/sim/content/deeds';
 import { talentsFor } from '../src/sim/content/talents';
-import { ITEMS, zoneAt } from '../src/sim/data';
+import { ITEMS, MOBS, zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import {
   CURATOR_RANK_DEFS,
@@ -498,6 +498,10 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       ITEMS.cryptbone_helm.name,
     );
     expect(sheetRelicRecentText({ id: 'masterwork:first', kind: 'mark' })).toBe('First Masterwork');
+    // A Phase 21 rare-slain proof resolves its 'Slain: <mob name>' label.
+    expect(sheetRelicRecentText({ id: 'slain:old_greyjaw', kind: 'mark' })).toBe(
+      'Slain: Old Greyjaw',
+    );
     expect(sheetRelicRecentText({ id: 'gone_relic', kind: 'item' })).toBeNull();
     expect(sheetRelicRecentText({ id: 'gone_mark', kind: 'mark' })).toBeNull();
     // A prototype key must fail closed rather than resolving through
@@ -535,6 +539,25 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     // Forward (above) plus reverse (here) is set equality; the size pin says so
     // once and additionally catches a table that lost a row to a duplicate key.
     expect(RELIQUARY_MARK_ENGLISH.size).toBe(RELIQUARY_MARK_IDS.size);
+  });
+
+  it('every slain mark row reads Slain: <live mob display name> (derived, not restated)', () => {
+    // The Phase 21 rows embed mob display names by hand in three tables (this
+    // server one, the client markFind catalog, and the wiki generator; the
+    // markFind cross-pin above holds server == client). Deriving the expected
+    // string from MOBS here is what reds a renamed rare or a name typo in the
+    // hand rows, which the presence pins alone can never see.
+    let slainRows = 0;
+    for (const [markId, english] of RELIQUARY_MARK_ENGLISH) {
+      if (!markId.startsWith('slain:')) continue;
+      slainRows += 1;
+      const templateId = markId.slice('slain:'.length);
+      const mob = MOBS[templateId];
+      expect(mob, markId).toBeDefined();
+      expect(english, markId).toBe(`Slain: ${mob.name}`);
+    }
+    // Snug floor: the 19 Rares of the Realm proofs.
+    expect(slainRows).toBe(19);
   });
 
   it('scores marks through sheetReliquaryFromState', () => {

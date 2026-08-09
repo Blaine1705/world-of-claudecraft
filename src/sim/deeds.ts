@@ -36,6 +36,7 @@ import {
   characterReliquaryOwnership,
   isHorizonsTitleDeed,
   maybeSyncCuratorRankDeeds,
+  noteReliquaryMark,
   onItemDiscovered as onReliquaryItemDiscovered,
   syncCuratorRankDeeds,
   syncIlluminatedPages,
@@ -1564,8 +1565,15 @@ export function onMobKillCreditForDeeds(
   }
 
   // chr_*_rares: party kills credit every eligible member, like quest credit.
+  // The Reliquary trophy rides the same arm (the crafting / gather_events /
+  // interaction dual-write idiom): the visit is the durable ledger copy the
+  // join-time retro reads, the noteReliquaryMark is the live fill with its
+  // unlock toast and recent-ring push.
   if (RARE_SLAIN_TEMPLATES.has(mob.templateId)) {
-    for (const meta of eligible) markVisited(ctx, meta, `slain:${mob.templateId}`);
+    for (const meta of eligible) {
+      markVisited(ctx, meta, `slain:${mob.templateId}`);
+      noteReliquaryMark(ctx, meta, `slain:${mob.templateId}`);
+    }
   }
 
   // cmb_giantslayer: the killing blow itself (a pet's blow credits its

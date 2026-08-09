@@ -559,11 +559,13 @@ export const RELIQUARY_SET_MEMBERS = {
 // tests/reliquary_content.test.ts holds those two authorings equal so this
 // table cannot drift away from the source page.
 //
-// deathlord_sabatons and necromancers_legwraps are the exceptions in both
-// senses. They are set-page-only, so the cross-page pin does not constrain
-// them at all; their guards are the id-existence check and the loot-truth pin
-// (the item must really sit on the named mob's table). They are also the only
-// relics credited to a rare rather than a boss: each drops from its named
+// deathlord_sabatons and necromancers_legwraps are the exceptions in one
+// sense left: since Phase 21 both ALSO sit on conquerors_spoils_of_the_realm
+// with byte-identical hints, so the cross-page agreement pin now constrains
+// them like every shared member; keep this table and the Spoils rows moving
+// together. They are also no longer the only relics credited to a rare rather
+// than a boss (the whole Spoils page is), but they remain the pattern's
+// origin: each drops from its named
 // rare's dedicated chase roll group at 0.25, versus a 0.001 trickle off common
 // zone trash, so the rare is the source a player actually farms, not a coin
 // flip between two routes. Each pairs its rare with the ZONE that rare camps
@@ -743,6 +745,38 @@ const RIFT_RARE_SOURCES = {
   ],
   pitlords_cleaver: fromBoss('rift_boss_pitlord'),
 } as const satisfies Record<(typeof RIFT_RARE_ITEM_IDS)[number], ReliquarySourceHints>;
+
+// ---------------------------------------------------------------------------
+// Rares of the Realm + Spoils of the Realm (Phase 21)
+// ---------------------------------------------------------------------------
+// The 19 named overworld rares whose kill credit writes a `slain:<templateId>`
+// visited mark (RARE_SLAIN_TEMPLATES in src/sim/deeds.ts; hand-listed here
+// rather than imported because content stays engine-free and deeds.ts sits
+// above this module in the import graph), paired with the zone each one camps
+// in. Order is the RARE_SLAIN_TEMPLATES order, zone1 to drakelands, and the
+// derivation pins in tests/reliquary_content.test.ts hold both the pairing and
+// the order equal to the live set, so a new rare or a moved camp reds there.
+const REALM_RARE_ZONES = [
+  ['old_greyjaw', 'eastbrook_vale'],
+  ['mogger', 'eastbrook_vale'],
+  ['grix_the_tunnelking', 'eastbrook_vale'],
+  ['captain_verlan', 'eastbrook_vale'],
+  ['wraithbinder_maldrec', 'eastbrook_vale'],
+  ['mirejaw_the_ravenous', 'mirefen_marsh'],
+  ['sloomtooth_the_drowned', 'mirefen_marsh'],
+  ['sister_nhalia', 'mirefen_marsh'],
+  ['grubjaw', 'mirefen_marsh'],
+  ['ironvein_foreman', 'thornpeak_heights'],
+  ['brutok_skullsmasher', 'thornpeak_heights'],
+  ['voskar_emberwing', 'thornpeak_heights'],
+  ['marrowlord_varkas', 'thornpeak_heights'],
+  ['old_cragmaw', 'thornpeak_heights'],
+  ['shardlord_kazzix', 'thornpeak_heights'],
+  ['gleamstag', 'veiled_hollow'],
+  ['old_marrowshell', 'veiled_hollow'],
+  ['aurelhorn', 'veiled_hollow'],
+  ['drakemaw_broodlord', 'drakelands'],
+] as const;
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -1254,6 +1288,112 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
       ...RIFT_EPIC_ITEM_IDS.map((id) => [id, fromRift('B')] as const),
       ...RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, fromRift('S')] as const),
+    ),
+  },
+
+  // ---- Rares of the Realm (Phase 21): every named overworld rare, as marks ----
+  // The PRD sketched ONE page holding both the kill proofs and the loot; the
+  // single-kind-per-page pin (the emit path depends on it) forces the split
+  // into this marks page and the Spoils items page below.
+  {
+    id: 'conquerors_rares_of_the_realm',
+    shelf: 'conquerors',
+    name: 'Rares of the Realm',
+    desc: 'Proof of every named rare brought low across the realm.',
+    clearSource: { kind: 'none' },
+    // One mark per rare, written by the kill-credit site in src/sim/deeds.ts
+    // (onMobKillCreditForDeeds dual-writes the visited mark and the Reliquary
+    // mark for every eligible party member). Each slot pairs the rare with the
+    // zone it camps in, the open-world answer the set-page precedent set.
+    relics: marks(
+      ...REALM_RARE_ZONES.map(
+        ([templateId, zoneId]) =>
+          [`slain:${templateId}`, [fromBoss(templateId), fromZone(zoneId)]] as const,
+      ),
+    ),
+  },
+
+  // ---- Spoils of the Realm (Phase 21): the rares' signature loot ----
+  // Exactly the rare+ loot of the 19 REALM_RARE_ZONES templates, in template
+  // order then per-template loot-row order, deduped on later templates
+  // (cryptstalker_jerkin and hollowbone_hauberk keep their first slot; their
+  // fromBoss lists still name every rare that drops them). FIVE templates
+  // contribute no rare+ item at all (old_greyjaw, grubjaw, old_marrowshell,
+  // aurelhorn, drakemaw_broodlord): their signature drops are uncommon or
+  // below, so they stay off this page by quality, the thunzharr
+  // inert_storm_shard precedent, and the marks page above is their whole
+  // representation. deathlord_sabatons and necromancers_legwraps also sit on
+  // their set pages with byte-identical hints (multi-page fill is intentional,
+  // rule 5; the cross-page agreement pin now covers both).
+  {
+    id: 'conquerors_spoils_of_the_realm',
+    shelf: 'conquerors',
+    name: 'Spoils of the Realm',
+    desc: 'Signature treasures carried by the named rares of the realm.',
+    clearSource: { kind: 'none' },
+    relics: items(
+      // Mogger + Wraithbinder Maldrec (Eastbrook Vale)
+      ['moggers_shiv', [fromBoss('mogger'), fromZone('eastbrook_vale')]],
+      [
+        'cryptstalker_jerkin',
+        [fromBoss('mogger'), fromBoss('wraithbinder_maldrec'), fromZone('eastbrook_vale')],
+      ],
+      // Grix the Tunnelking (Eastbrook Vale)
+      ['moggers_copper_cudgel', [fromBoss('grix_the_tunnelking'), fromZone('eastbrook_vale')]],
+      [
+        'hollowbone_hauberk',
+        [
+          fromBoss('grix_the_tunnelking'),
+          fromBoss('wraithbinder_maldrec'),
+          fromZone('eastbrook_vale'),
+        ],
+      ],
+      // Captain Verlan (Eastbrook Vale)
+      ['verlans_oathblade', [fromBoss('captain_verlan'), fromZone('eastbrook_vale')]],
+      ['hollow_vigil_staff', [fromBoss('captain_verlan'), fromZone('eastbrook_vale')]],
+      ['gravewardens_shiv', [fromBoss('captain_verlan'), fromZone('eastbrook_vale')]],
+      // Wraithbinder Maldrec (Eastbrook Vale)
+      ['maldrecs_soulbinder', [fromBoss('wraithbinder_maldrec'), fromZone('eastbrook_vale')]],
+      ['gravewoven_raiment', [fromBoss('wraithbinder_maldrec'), fromZone('eastbrook_vale')]],
+      // Mirejaw the Ravenous (Mirefen Marsh)
+      ['fen_reaver_glaive', [fromBoss('mirejaw_the_ravenous'), fromZone('mirefen_marsh')]],
+      ['mirejaw_oracle_staff', [fromBoss('mirejaw_the_ravenous'), fromZone('mirefen_marsh')]],
+      // Sloomtooth the Drowned (Mirefen Marsh)
+      ['tidereaver_gaff', [fromBoss('sloomtooth_the_drowned'), fromZone('mirefen_marsh')]],
+      ['sloomtooth_tidefang', [fromBoss('sloomtooth_the_drowned'), fromZone('mirefen_marsh')]],
+      ['drowned_tide_scepter', [fromBoss('sloomtooth_the_drowned'), fromZone('mirefen_marsh')]],
+      // Sister Nhalia (Mirefen Marsh)
+      ['nhalias_dirgeblade', [fromBoss('sister_nhalia'), fromZone('mirefen_marsh')]],
+      // Ironvein Foreman (Thornpeak Heights). gutripper_shiv has a SECOND live
+      // door the 13a standard must name: q_drogmar hands it to rogues as a
+      // guaranteed reward, and that quest's kill objective is warlord_drogmar,
+      // a DIFFERENT mob, so the quest is named directly (the wyrmcult_grand_robe
+      // rule) rather than folded into the rare hint.
+      [
+        'gutripper_shiv',
+        [fromBoss('ironvein_foreman'), fromQuest('q_drogmar'), fromZone('thornpeak_heights')],
+      ],
+      ['deathlord_sabatons', [fromBoss('ironvein_foreman'), fromZone('thornpeak_heights')]],
+      // Brutok Skullsmasher (Thornpeak Heights)
+      ['brutoks_maul', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
+      ['crag_warden_cudgel', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
+      ['skullsplitter_dirk', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
+      ['stormroot_cowl', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
+      // Voskar the Emberwing (Thornpeak Heights)
+      ['emberwing_legguards', [fromBoss('voskar_emberwing'), fromZone('thornpeak_heights')]],
+      ['emberfang_warblade', [fromBoss('voskar_emberwing'), fromZone('thornpeak_heights')]],
+      ['stormvotive_hauberk', [fromBoss('voskar_emberwing'), fromZone('thornpeak_heights')]],
+      // Marrowlord Varkas (Thornpeak Heights)
+      ['necromancers_legwraps', [fromBoss('marrowlord_varkas'), fromZone('thornpeak_heights')]],
+      // Old Cragmaw (Thornpeak Heights)
+      ['cragmaw_huntcord', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      ['cragmaw_prowlboots', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      ['cragthorn_greatstaff', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      ['cragmaw_huntquiver', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      // Shardlord Kazzix (Thornpeak Heights)
+      ['shardfang_grips', [fromBoss('shardlord_kazzix'), fromZone('thornpeak_heights')]],
+      // The Gleamstag (Veiled Hollow)
+      ['gleamstag_charm', [fromBoss('gleamstag'), fromZone('veiled_hollow')]],
     ),
   },
 ]);

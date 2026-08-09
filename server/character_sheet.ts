@@ -214,6 +214,27 @@ export const RELIQUARY_MARK_ENGLISH: ReadonlyMap<string, string> = new Map([
   ['gather_event:ancient_heartwood', 'Ancient Heartwood'],
   ['gather_event:moonlit_bloom', 'Moonlit Bloom'],
   ['gather_event:perfect_specimen', 'Perfect Specimen'],
+  // Rares of the Realm kill proofs (Phase 21): 'Slain: <mob display name>',
+  // names verbatim from MOBS (tests/character_sheet.test.ts derives the pin).
+  ['slain:old_greyjaw', 'Slain: Old Greyjaw'],
+  ['slain:mogger', 'Slain: Mogger'],
+  ['slain:grix_the_tunnelking', 'Slain: Grix the Tunnelking'],
+  ['slain:captain_verlan', 'Slain: Captain Verlan'],
+  ['slain:wraithbinder_maldrec', 'Slain: Wraithbinder Maldrec'],
+  ['slain:mirejaw_the_ravenous', 'Slain: Mirejaw the Ravenous'],
+  ['slain:sloomtooth_the_drowned', 'Slain: Sloomtooth the Drowned'],
+  ['slain:sister_nhalia', 'Slain: Sister Nhalia'],
+  ['slain:grubjaw', 'Slain: Grubjaw the Glutton'],
+  ['slain:ironvein_foreman', 'Slain: Ironvein Foreman'],
+  ['slain:brutok_skullsmasher', 'Slain: Brutok Skullsmasher'],
+  ['slain:voskar_emberwing', 'Slain: Voskar the Emberwing'],
+  ['slain:marrowlord_varkas', 'Slain: Marrowlord Varkas'],
+  ['slain:old_cragmaw', 'Slain: Old Cragmaw'],
+  ['slain:shardlord_kazzix', 'Slain: Shardlord Kazzix'],
+  ['slain:gleamstag', 'Slain: The Gleamstag'],
+  ['slain:old_marrowshell', 'Slain: Old Marrowshell'],
+  ['slain:aurelhorn', 'Slain: Aurelhorn, First of the Herd'],
+  ['slain:drakemaw_broodlord', 'Slain: Drakemaw Broodlord'],
 ]);
 
 /**

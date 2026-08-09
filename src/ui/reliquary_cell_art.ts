@@ -30,7 +30,7 @@
 // re-deciding a token, and that file still carries none.
 
 import { DEEDS } from '../sim/content/deeds';
-import { FIELD_NOTE_PROFESSIONS } from '../sim/content/reliquary';
+import { FIELD_NOTE_PROFESSIONS, RELIQUARY_MARK_IDS } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
 import { mountItemId } from '../sim/mounts';
@@ -119,6 +119,56 @@ export const RELIQUARY_SPECIMEN_GLYPH_URL = `data:image/svg+xml,${encodeURICompo
   SPECIMEN_GLYPH_SVG,
 )}`;
 
+/** Marker id carried by the slain-trophy glyph, the RELIQUARY_SPECIMEN_GLYPH_ID
+ *  sibling, so a test can pin the authored art by something stabler than a
+ *  color. */
+export const RELIQUARY_SLAIN_GLYPH_ID = 'woc-slain-glyph';
+
+/** The `slain:` visited namespace prefix the kill-credit site writes
+ *  (src/sim/deeds.ts); the one mark family with neither profession art nor a
+ *  committed image, so it takes the authored trophy glyph below. */
+const SLAIN_MARK_PREFIX = 'slain:';
+
+// The rare-slain trophy: a horned beast skull, same authored-inline regime and
+// DESIGN.md section 6 direction as the specimen flask above (rich color, heavy
+// dark outline, light from the top left; double-quoted attributes, no
+// apostrophes, encoding survives the window's esc()). One glyph for the whole
+// family on purpose: the mark's NAME carries which rare fell, and 19 bespoke
+// portraits are an art-pipeline project, not a catalog obligation.
+const SLAIN_SKULL_PATH =
+  'M20 24c0-8 5-13 12-13s12 5 12 13c0 5-2 8-4 10v9l-4 7h-8l-4-7v-9c-2-2-4-5-4-10z';
+const SLAIN_GLYPH_SVG =
+  `<svg id="${RELIQUARY_SLAIN_GLYPH_ID}" xmlns="http://www.w3.org/2000/svg" ` +
+  'viewBox="0 0 64 64" width="64" height="64">' +
+  '<defs>' +
+  '<linearGradient id="b" x1="16%" y1="6%" x2="86%" y2="96%">' +
+  '<stop offset="0" stop-color="#fdf6dd"/><stop offset="46%" stop-color="#d9c290"/>' +
+  '<stop offset="1" stop-color="#8a6b3c"/></linearGradient>' +
+  '<linearGradient id="h" x1="10%" y1="0%" x2="90%" y2="100%">' +
+  '<stop offset="0" stop-color="#7d5a30"/><stop offset="1" stop-color="#3c2812"/></linearGradient>' +
+  '</defs>' +
+  '<path d="M18 26C10 24 6 17 7 9c6 1 11 6 13 12z" fill="url(#h)" stroke="#0a0603" ' +
+  'stroke-width="3.5" stroke-linejoin="round"/>' +
+  '<path d="M46 26c8-2 12-9 11-17-6 1-11 6-13 12z" fill="url(#h)" stroke="#0a0603" ' +
+  'stroke-width="3.5" stroke-linejoin="round"/>' +
+  `<path d="${SLAIN_SKULL_PATH}" fill="url(#b)" stroke="#0a0603" stroke-width="3.5" ` +
+  'stroke-linejoin="round"/>' +
+  '<circle cx="26.5" cy="27" r="3.6" fill="#171009"/>' +
+  '<circle cx="37.5" cy="27" r="3.6" fill="#171009"/>' +
+  '<circle cx="25.6" cy="26" r="1.1" fill="#f8ecc9" opacity="0.85"/>' +
+  '<path d="M32 33l-2.6 5h5.2z" fill="#171009"/>' +
+  '<path d="M27 43v5M32 44v6M37 43v5" fill="none" stroke="#171009" stroke-width="2.4" ' +
+  'stroke-linecap="round"/>' +
+  '<path d="M23 15c2-2 5-3 8-3" fill="none" stroke="#fffbe9" stroke-width="2.6" ' +
+  'stroke-linecap="round" opacity="0.8"/>' +
+  '</svg>';
+
+/** The slain-trophy glyph as an `<img>`-ready src (percent-encoded for the
+ *  same esc()-survival reason as the specimen glyph). */
+export const RELIQUARY_SLAIN_GLYPH_URL = `data:image/svg+xml,${encodeURIComponent(
+  SLAIN_GLYPH_SVG,
+)}`;
+
 /**
  * Art for one relic slot, or null when this bundle cannot place it (an id from
  * a newer server, a content id that moved, a kind with no art seam). Null is a
@@ -196,6 +246,12 @@ function markArt(markId: string): ReliquaryCellArt | null {
   }
   const profession = ownEntry(FIELD_NOTE_PROFESSIONS, markId);
   if (profession !== undefined) return imageArt(`${GATHER_IMAGE_PREFIX}${profession}`);
+  // Rares of the Realm kill proofs: catalog-gated (RELIQUARY_MARK_IDS is the
+  // same allowlist noteReliquaryMark writes through), so a junk `slain:` id off
+  // the wire still answers null instead of minting trophy art for it.
+  if (markId.startsWith(SLAIN_MARK_PREFIX) && RELIQUARY_MARK_IDS.has(markId)) {
+    return { kind: 'url', url: RELIQUARY_SLAIN_GLYPH_URL };
+  }
   return null;
 }
 
