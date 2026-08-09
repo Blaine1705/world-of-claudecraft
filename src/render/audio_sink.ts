@@ -81,6 +81,10 @@ export interface SpatialAudioSink {
   /** Drop an entity's mountEngine state and silence its loop (dismount,
    *  interest culled, disconnect). */
   mountEngineReset(entityId: number): void;
+  /** Warm a mount's engine clips (windup/loop/winddown) ahead of first use,
+   *  e.g. on the mountKey transition that also calls mountEngineReset. A
+   *  no-op for a mount with no engine take set. */
+  preloadMountEngine(mountKey: string): void;
   /** A discrete movement event (jump / land / water entry / swim stroke). */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
