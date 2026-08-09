@@ -1093,13 +1093,17 @@ describe('CI workflow parity', () => {
       // own comment says the word.
       expect(job).not.toMatch(/\n\s+["']?restore-keys["']?:/);
     }
-    // The store is enabled in the config this cache serves, at the DEFAULT
-    // path the workflow hardcodes. Comment-stripped first (a `//` prefix
-    // must fail the pin, not satisfy it), then anchored to the real config
-    // line shape; and fsModuleCachePath must stay unset or the two would
-    // silently point at different directories.
+    // The store is enabled in the normal-checkout config this cache serves, at
+    // the DEFAULT path the workflow hardcodes. Comment-stripped first (a `//`
+    // prefix must fail the pin, not satisfy it), then anchored to the real
+    // config line shape. OSS Brain linked worktrees disable the experimental
+    // store because their node_modules is symlinked to the parent checkout and
+    // concurrent local gates would share one temp-file cache.
     const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
+    expect(viteConfigCode).toMatch(
+      /\nconst isOssBrainLinkedWorktree = root\.split\(path\.sep\)\.includes\('\.wt'\);/,
+    );
+    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: !isOssBrainLinkedWorktree,/);
     expect(viteConfigCode).not.toContain('fsModuleCachePath');
     // Exactly the two shard matrices plus the long-sims lane carry the step,
     // counted workflow-wide so a copy added to ANY other job fails
