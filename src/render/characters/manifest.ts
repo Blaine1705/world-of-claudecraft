@@ -1213,7 +1213,6 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_shaman: swims({
     url: `${PLAYERS}/barbarian.glb`,
-    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1257,7 +1256,10 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // Ability-specific spellcast clips (scripts/build_shaman_ability_anims.mjs):
     // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
-    animUrls: [`${PLAYERS}/shaman_ability_anims.glb`],
+    // The hit-variety donor (scripts/build_hit_variety_anims.mjs, second
+    // KayKit hit-reaction clip, issue #2889 area B) ships alongside it on the
+    // same rig, so both donors are listed here.
+    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`, `${PLAYERS}/shaman_ability_anims.glb`],
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
