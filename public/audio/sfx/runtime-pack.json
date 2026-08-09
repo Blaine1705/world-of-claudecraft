@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "fb13087105128ddda502d3abb9d211ed1fe06e4c3cfe9c91db29bd3ba799222c",
-  "catalogHash": "e448b626a86e5fda6ba29cdd4c190e21ab2e05d8bc4f8080c8e0aa58379ff037",
+  "bundleId": "5fe25376d38b92474be0da4e54f091bf99c15a168c1e1a7eee2d0d8a802c3a40",
+  "catalogHash": "d1ff2bf974346a391eb8b7062ca21f98d14aaef8042f3990781035185421ccb5",
   "clips": {
     "amb_birds": {
       "variants": [

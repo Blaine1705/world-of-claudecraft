@@ -124,8 +124,13 @@ export const SFX = [
     custom: true,
   },
   {
+    // The sustain take of the windup/loop/winddown set: driven through
+    // Sfx.loop() at runtime (see mountEngine in src/game/sfx.ts), not
+    // playAt, so the manifest's own `loop` flag must say so too, even
+    // though nothing reads it at runtime today.
     key: 'mount_run_terrorspark_groundshaker',
     custom: true,
+    loop: true,
   },
   {
     // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
