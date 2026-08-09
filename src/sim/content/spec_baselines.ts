@@ -38,8 +38,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     survival: {
-      stats: { agi: 3, crit: 0.03, dodge: 0.12 },
-      global: { meleeDmgPct: 0.44 },
+      stats: { agi: 3, crit: 0.03, dodge: 0.12, agiPct: 0.26 },
+      global: { meleeDmgPct: 0.3 },
     },
   },
   // v0.34 rogue base re-band: with the Thronebane hand fix removing the legendary

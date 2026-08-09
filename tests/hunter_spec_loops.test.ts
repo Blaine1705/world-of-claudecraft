@@ -168,9 +168,9 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     sim.player.resource = 0;
     const expectedBloodhookTick = Math.max(
       1,
-      // 1.44 = the survival baseline meleeDmgPct (0.06 to 0.44 in the
-      // 2026-08-09 120s band round).
-      Math.round(((34 + sim.player.rangedPower * 0.26) * 1.44) / 4),
+      // 1.3 = the survival baseline meleeDmgPct (0.06 to 0.3 in the 2026-08-09
+      // 120s band round; the rest of the raise rides the baseline agiPct).
+      Math.round(((34 + sim.player.rangedPower * 0.26) * 1.3) / 4),
     );
 
     sim.castAbility('bloodhook');
