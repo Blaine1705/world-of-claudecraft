@@ -7125,8 +7125,10 @@ export class Sim {
     petCommands.petWaterJet(this.ctx, pid);
   }
 
-  feedPet(itemId: string, pid?: number): void {
-    petCommands.feedPet(this.ctx, itemId, pid);
+  feedPet(itemId: string, pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    petCommands.feedPet(this.ctx, itemId, pid, named);
   }
 
   healPet(pid?: number): void {
@@ -8567,20 +8569,43 @@ export class Sim {
     return canAddItem(meta.inventory, bagCapacity(meta.bags), itemId, count);
   }
 
-  equipBag(itemId: string, socket?: number, pid?: number): void {
-    bagsMod.equipBag(this.ctx, itemId, socket, pid);
+  equipBag(
+    itemId: string,
+    socket?: number,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    bagsMod.equipBag(this.ctx, itemId, socket, pid, named);
   }
 
   unequipBag(socket: number, pid?: number): void {
     bagsMod.unequipBag(this.ctx, socket, pid);
   }
 
-  discardItem(itemId: string, count = 1, pid?: number): void {
-    items.discardItem(this.ctx, itemId, count, pid);
+  discardItem(
+    itemId: string,
+    count = 1,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.discardItem(this.ctx, itemId, count, pid, named);
   }
 
-  equipItem(itemId: string, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid);
+  equipItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    targetSlot?: EquipSlot,
+    slotIndex?: number,
+  ): void {
+    // The disenchantItem shape (see it for the reasoning): position 2 carries the
+    // target for an IWorld caller and pid for a sim/server caller.
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.equipItem(this.ctx, itemId, pid, targetSlot, named);
   }
 
   // Manual bag order: the player dragged the stack at `from` onto the cell at `to`.
@@ -8595,16 +8620,32 @@ export class Sim {
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
   // rather than letting the resolver pick. items.equipItem re-validates the slot
   // against the item, so this is a request, never a bypass.
-  equipItemToSlot(itemId: string, slot: EquipSlot, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid, slot);
+  equipItemToSlot(
+    itemId: string,
+    slot: EquipSlot,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    // The aimed equip arm, and the one the UI actually drives (char_window drag
+    // to a paperdoll slot), so a gear loadout reaches equip through HERE rather
+    // than through the unaimed equipItem.
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.equipItem(this.ctx, itemId, pid, slot, named);
   }
 
   unequipItem(slot: EquipSlot, pid?: number): boolean {
     return items.unequipItem(this.ctx, slot, pid);
   }
 
-  useItem(itemId: string, pid?: number): ItemUseResult | undefined {
-    return items.useItem(this.ctx, itemId, pid);
+  useItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): ItemUseResult | undefined {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return items.useItem(this.ctx, itemId, pid, named);
   }
 
   // ONE explicit shape, no overloads (phase 21): the request rides an options
@@ -8617,8 +8658,15 @@ export class Sim {
     items.buyItem(this.ctx, npcId, itemId, pid, opts);
   }
 
-  sellItem(itemId: string, count = 1, pid?: number): void {
-    items.sellItem(this.ctx, itemId, count, pid);
+  sellItem(
+    itemId: string,
+    count = 1,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    items.sellItem(this.ctx, itemId, count, pid, named);
   }
 
   sellAllJunk(pid?: number): void {
@@ -8991,12 +9039,22 @@ export class Sim {
   // src/sim/professions/salvage.ts, resolved on the deterministic tick the
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
-  salvageItem(itemId: string, pid?: number): void {
+  salvageItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    // Overloaded second parameter, the disenchantItem shape: an IWorld caller
+    // passes the target here, a sim/server caller passes pid. Both arities must
+    // stay, because IWorld declares (itemId, target?) while server/game.ts and
+    // the RL host call (itemId, pid, slot).
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
     // On casting:true castStart is the surface; salvageResult lands only from
     // completeSalvageCast.
-    const result = salvageItemImpl(this.ctx, itemId, pid);
+    const result = salvageItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
@@ -9027,16 +9085,36 @@ export class Sim {
     return this.players.get(pid)?.lastSalvageResult ?? null;
   }
 
-  upgradeRiftItem(itemId: string, pid?: number): RiftForgeResult {
-    return upgradeRiftItemImpl(this.ctx, itemId, pid);
+  upgradeRiftItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return upgradeRiftItemImpl(this.ctx, itemId, pid, named);
   }
 
-  enchantRiftItem(itemId: string, stat: string, pid?: number): RiftForgeResult {
-    return enchantRiftItemImpl(this.ctx, itemId, stat, pid);
+  enchantRiftItem(
+    itemId: string,
+    stat: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return enchantRiftItemImpl(this.ctx, itemId, stat, pid, named);
   }
 
-  socketRiftGem(itemId: string, gemId: string, pid?: number): RiftForgeResult {
-    return socketRiftGemImpl(this.ctx, itemId, gemId, pid);
+  socketRiftGem(
+    itemId: string,
+    gemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): RiftForgeResult {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    return socketRiftGemImpl(this.ctx, itemId, gemId, pid, named);
   }
 
   // Enchanting profession commands (IWorldProfessions): same thin-
