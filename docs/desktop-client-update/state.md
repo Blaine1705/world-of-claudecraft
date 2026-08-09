@@ -30,8 +30,23 @@ gpuNotice.bodyDiscreteInactive with five M16 fills, perf_nudge integratedGpu arm
 suppressed via discreteNoticeShown(). Reviews: security PASS, seam
 PASS-WITH-FOLLOWUPS 0 blocking (one SHOULD-FIX deliberately rejected and pinned:
 both-armed keeps discreteNoticeShown() true, see progress.md phase 3 notes; QA
-should re-litigate). 9/9 mutation probes killed. Next up: phase 3 QA
-(phase-03-qa.md), fresh session, pull+merge first.
+should re-litigate). 9/9 mutation probes killed.
+
+Phase 3 QA done (2026-08-08, PASS-WITH-FOLLOWUPS, 0 blocking; QA-start base merge
+a6e7fb0a22 took release tip 1478f9d2ba, mobile CSS only; fixes 30d8a4ad1e test
+hardening + e1dd4a7798 honesty pass). Five confirmed pin gaps closed (new
+tests/desktop_shell_integration.test.ts composition suite; check-time sampling,
+live-window guard polarity, renderer whitelist key-set, and dismissal-hidden
+display latch all decisively pinned; orchestrator probe round 6/6 killed).
+Re-litigation UPHELD the armed-at-render latch with an honesty correction now in
+the comments: the perf-nudge discrete suppression it feeds is UNREACHABLE in
+production (perf_doctor gates 'integrated-gpu' on !desktopShell while a discrete
+verdict only exists in-shell), defense-in-depth, not load-bearing. Both-toasts
+overlap measured (gpu-notice discrete body 98px en / 114px ru_RU at the 440px cap
+vs a 56px slot offset) but the pair is unreachable today (re-push rides
+did-finish-load reloads only); shell.css comment rewritten with the numbers and
+the supersede-first rule for any future mid-session push. Next up: phase 4
+(phase-04-presentation-lifecycle.md), fresh session, pull+merge first.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -152,7 +167,13 @@ tests/electron_shell_startup.test.ts (phase 2),
 tests/desktop_publish_guard.test.ts (phase 2 QA),
 electron/gpu_status_events.cjs + .d.cts, src/game/desktop_gpu_status.ts,
 tests/electron_gpu_status_events.test.ts, tests/electron_gpu_push.test.ts,
-tests/desktop_gpu_status.test.ts, tests/gpu_notice_toast.test.ts (phase 3)
+tests/desktop_gpu_status.test.ts, tests/gpu_notice_toast.test.ts (phase 3),
+tests/desktop_shell_integration.test.ts (phase 3 QA; also hardened in that QA:
+the electron_gpu_push live-window guard pin is now the whole guarded statement
+with polarity plus a send-count-of-one, the desktop_gpu_status normalizer is
+pinned to the literal three-key whitelist, the display latch is pinned empty
+under a persisted dismissal, and the perf_nudge memo tests flip their predicate
+after init so init-time sampling reds)
 New bridge methods / IPC channels: 'desktop-gpu-status' push channel (main -> renderer,
 no ipcMain.handle) + optional DesktopBridge.onGpuStatus (phase 3); payload
 { softwareRendering, discreteInactive, adapter<=64 } whitelisted in
@@ -161,7 +182,8 @@ New settings keys: (none yet; the gpu notice dismissal localStorage value
 woc_gpu_notice_dismissed grew from '1' to a component signature in phase 3, legacy
 '1' still honored)
 New i18n keys: gpuNotice.bodyDiscreteInactive (en + zh_CN/zh_TW/ja_JP/ko_KR/ru_RU
-fills; 16 locales pending for the release fill pass) (phase 3)
+fills; 15 locales pending for the release fill pass, phase 3 QA corrected the
+original "16" miscount) (phase 3)
 New tests: tests/electron_scheme_privileges.test.ts, the app:// scheme privileges pin
 (app-entry-anchored, block/line/trailing-comment-stripped, per-key explicit-true as
 whole-line values, exact key-set equality with a quoted-key-aware scanner as the

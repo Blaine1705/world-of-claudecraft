@@ -9,7 +9,7 @@
 | 2 | Shell startup and window polish | done | 2026-08-08 | 2026-08-08 |
 | 2 QA | Verify phase 2 | done | 2026-08-08 | 2026-08-08 |
 | 3 | Hybrid-GPU visibility | done | 2026-08-08 | 2026-08-08 |
-| 3 QA | Verify phase 3 | not started | | |
+| 3 QA | Verify phase 3 | done | 2026-08-08 | 2026-08-08 |
 | 4 | Presentation lifecycle | not started | | |
 | 4 QA | Verify phase 4 | not started | | |
 | 5 | Governor and LOW tier | not started | | |
@@ -318,8 +318,10 @@ review hardening):
   dismissal; a verdict shrinking to a subset stays hidden, a new component re-arms.
 - i18n: one new key gpuNotice.bodyDiscreteInactive (English + the five M16 non-Latin
   fills zh_CN/zh_TW/ja_JP/ko_KR/ru_RU, placed with their gpuNotice siblings); no
-  existing key reworded, no placeholders; 16 locales pending for the release-time
-  fill pass. Generated artifacts regenerated via i18n:gen and committed.
+  existing key reworded, no placeholders; 15 locales pending for the release-time
+  fill pass (QA correction: 21 locales minus en minus the five fills; the "16"
+  first recorded here was a miscount). Generated artifacts regenerated via
+  i18n:gen and committed.
 - perf_nudge: the integratedGpu arm is suppressed by the new discreteNoticeShown()
   exposure, sampled (like softwareNoticeShown) inside the 30 s check, so a late shell
   verdict is still seen; softwareNoticeShown() remains software-only (R16 preserved).
@@ -355,3 +357,109 @@ review hardening):
   downgrade-to-older-client re-nags once (signature unknown to the old '1' check,
   accepted, self-healing); initGpuNotice's boolean return is test-facing only;
   screenshots deferred to PR time per the LOCAL-ONLY rule (capture on LOW preset).
+
+Phase 3 QA (2026-08-08, verdict PASS-WITH-FOLLOWUPS, 0 blocking, all fixes landed
+in-session; commits a6e7fb0a22 QA-start base merge of 1478f9d2ba, 30d8a4ad1e test
+hardening, e1dd4a7798 honesty pass; tree clean, LOCAL-ONLY intact):
+- QA-start base merge took release tip 1478f9d2ba (PR 2974 Seeker daily-rewards
+  mobile CSS; no desktop, gpu, or world_api paths); post-merge re-run of the
+  electron/desktop + gpu-notice suites plus world_api parity green (14 files,
+  514 tests). i18n:gen re-run on the committed tree left git status clean
+  (generated artifacts proven fresh) BEFORE any parallel agent shared the tree.
+- Workflow audit in two runs (main run 26 agents, a continuation for the three
+  agents lost to API connection errors, 13 agents; journal-first recovery, no
+  resume-prefix gamble): six parallel auditors (correctness, test-coverage
+  auditor, i18n, fresh privacy-security-review, fresh qa-checklist, fresh
+  frontend-seam re-litigation), findings deduped at a barrier, then two
+  independent adversarial skeptics per actionable finding (confirmed only when
+  neither refutes; splits adjudicated by the orchestrator's own probes).
+- 0 BLOCKING. Five CONFIRMED SHOULD-FIX, all test-decisiveness gaps, fixed in
+  30d8a4ad1e: (1) the desktop_shell_integration composition line had no test at
+  all (new tests/desktop_shell_integration.test.ts pins each piece once with
+  the bridge, the relay-first order, and the no-bridge no-op); (2) the
+  perf_nudge "sampled at check time" claim was satisfiable by an init-time
+  snapshot (both memo tests now flip the predicate AFTER init, before the
+  interval fires); (3) the live-window guard pin was proximity-based and
+  polarity-blind (now pins the whole guarded statement plus a send count of
+  one); (4) the renderer whitelist had no extra-field case (normalize pinned to
+  the literal three-key set against a smuggling payload); (5) nothing pinned
+  the display latch staying empty when a persisted dismissal hides the boot
+  notice (pinned at the toast and in the second-boot round trip; the first
+  round's "lost R16 pin" framing was skeptic-refuted, no such pin ever existed,
+  but the orchestrator's probe confirmed the gap is real, so the pin is new,
+  not restored).
+- Re-litigation of the deliberately rejected displayed-latch finding (fresh
+  frontend-seam-reviewer): verdict CONDITIONAL, rejection OUTCOME UPHELD, the
+  armed-at-render latch stays. New fact both prior sides missed, confirmed by
+  the orchestrator against perf_doctor and by two skeptics: the discrete
+  suppression the latch feeds is UNREACHABLE in production wiring (perf_doctor
+  emits 'integrated-gpu' only when !desktopShell, and a discrete verdict only
+  exists in-shell), so the recorded rationale presented dead code as
+  load-bearing. Honesty conditions landed in e1dd4a7798: the toast, view,
+  analyzer, and pin comments now name the branch defense-in-depth,
+  gpuNoticeDisplayed's contract line says "what the notice covered, not which
+  body text the player read", and the analyzer's disproven "already forces the
+  dGPU" premise is rewritten (the boot notice owns in-shell messaging; test
+  title updated likewise). The re-litigator's two "reachable sibling"
+  SHOULD-FIX filings (identical-body re-show on a component re-arm; the armed
+  dismissal signature covering an unread component) were REFUTED by both
+  skeptics as recorded deliberate design; RULING RECORDED HERE: both stay as
+  designed, pinned by tests/gpu_notice_toast.test.ts and
+  tests/desktop_gpu_status.test.ts.
+- Ledger (a) CLOSED with a real-browser measurement (puppeteer-core over the
+  Playwright Chromium against vite dev, both toasts forced): at the 440px cap
+  the gpu-notice discrete body is 98px tall in English and 114px in ru_RU
+  (162px at a 375px viewport) against a 56px slot offset, so a simultaneous
+  pair overlaps 42 to 106px in every configuration. Reachability: the pair
+  cannot co-occur today (the shell re-pushes only on a did-finish-load reload,
+  which resets the page and the nudge with it; the boot-race revive resolves
+  seconds before the nudge's first 30 s check), so this is a LATENT layout
+  constraint, not a live defect. The stale shell.css "mutually exclusive by
+  construction" comment was replaced with the measured numbers and the rule
+  that any future mid-session verdict push (gpu-info-update or similar) must
+  add a supersede or stacking story first. Neither stopping rule tripped: no
+  trigger redesign and no layout work needed while the pair stays unreachable.
+- Ledger (b) RESOLVED as a sound deferral, one step stronger than recorded: the
+  stale perfNudge.integratedGpu claim is only false on desktop machines, where
+  the arm never fires (the analyzer's web-only gate, pinned in
+  tests/perf_doctor.test.ts); reword waits for the analyzer gate to change and
+  takes the translated-in-the-same-change cost then. Ledger (c) VERIFIED:
+  initDesktopShellIntegration runs at synchronous module scope behind the
+  DESKTOP_APP guard with no async hop before the subscribe (noted for phase 7:
+  the push has no replay, keep it synchronous). Ledger (d) VERIFIED
+  self-healing and bounded to one re-nag per downgrade cycle.
+- i18n auditor PASS: key placement beside its gpuNotice siblings, exactly five
+  M16 fills each adding only the new key, no reword anywhere in the diff, S3
+  guard, completeness, registry, and semantic-regression suites green;
+  pending-locale count corrected 16 to 15 here and in state.md.
+- Fresh privacy-security-review PASS (nothing above nice-to-have; the re-run
+  after the agent loss delivered clean): whitelist and caps verified on both
+  sides, no invoke surface, trustedSender ladder untouched, forged-bridge blast
+  radius bounded to cosmetics. Fresh qa-checklist clean on seams, commits,
+  dashes, and the anchor rule; its unreachable-suppression find became the
+  center of the re-litigation.
+- Orchestrator probe round on the committed tree, six NEW dimensions, 6/6
+  killed with rc=1 and named failing tests: hidden-render latch merge;
+  init-time predicate snapshot; dropped gpu composition call; normalize
+  pass-through spread; guard polarity flip (the exact dodge the old pin
+  allowed); relay-last reorder. Tree proven clean after every restore.
+- Gate at e1dd4a7798 (BROWSER_PATH exported; biome defaultBranch pinned to the
+  release branch for the run and reverted, never committed): i18n + wiki + sfx
+  artifacts, freshness, malware, and biome legs green; vitest full-suite
+  fallback red ONLY on the 8 accepted asset-seal suites (11 tests, phase 11
+  re-mint deferral), 2374 files / 32685 tests otherwise green, and the
+  usually-environmental browser leg PASSED this run with BROWSER_PATH set;
+  post-vitest steps proven via turbo (check:types build:env build:server
+  build:bot 5/5, build:bundle 3/3).
+- New ledger entries (recorded, not fixed): memoDismissed's storage-fallback is
+  currently unobservable through public behavior (verdict merges only grow, so
+  every change re-arms regardless), kept as defense-in-depth with no test on
+  purpose; initGpuNotice re-init leaks the prior instance's DOM node and
+  languagechange listener (single call site today); the adapter string is dead
+  data behind a comment-only do-not-log contract (phase 7 diagnostics-row
+  candidate; note the perf reporter already ships unbucketed glRenderer, a
+  pre-existing practice needing a maintainer decision); preload onGpuStatus
+  allows unbounded re-subscription (renderer-local blast radius); the
+  fleet-beacon integratedGpu dimension inherits the analyzer's !desktopShell
+  gate, so hybrid-GPU desktop sessions are invisible to it (phase 7 follow-up
+  alongside the GPU-force opt-out and the analyzer premise revisit).
