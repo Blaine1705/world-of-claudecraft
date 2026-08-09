@@ -83,7 +83,15 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/audit_conservation_property.test.ts',
   'tests/battleground.test.ts',
   'tests/chronomancy_balance.test.ts',
+  // The five-class-overhauls balance harnesses (review 3050): the owned-class
+  // matrices grew to 8 specs and the raid loop to ~510s, pushing shards 1 and
+  // 4 past the 20-minute job budget; they are exactly what this lane is for.
+  'tests/druid_balance_probe.test.ts',
   'tests/eastbrook_gameplay_integration.test.ts',
+  'tests/hunter_dps_balance.test.ts',
+  'tests/nythraxis_matrix.test.ts',
+  'tests/owned_class_balance_harness.test.ts',
+  'tests/owned_class_raid_balance_harness.test.ts',
 ]);
 
 /**
