@@ -150,6 +150,9 @@ describe('Metamorphosis character integration', () => {
       loadGltf: vi.fn(() => Promise.resolve(stubMetamorphRig())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      // assets.ts resolves skin atlases through the KTX2 path since the
+      // fleet conversion; the mock must provide it (review 3050).
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),
     }));
 
