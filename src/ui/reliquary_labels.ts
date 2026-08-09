@@ -173,7 +173,22 @@ function riftRankLabel(rank: string): string | null {
 const ACTIVITY_SOURCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   corpse_harvest: 'hudChrome.reliquary.sourceActivityCorpseHarvest',
   masterwork_craft: 'hudChrome.reliquary.sourceActivityMasterworkCraft',
+  rift_first_clear: 'hudChrome.reliquary.sourceActivityRiftFirstClear',
 };
+
+/** Label key for a page's display-only SECONDARY clear meter, by the
+ *  secondaryClearSource stat it names. Membership-guarded like every ladder in
+ *  this module: an unknown stat answers null and the window paints no second
+ *  meter (fail closed), never a wrong sentence around a real number. */
+const SECONDARY_CLEARS_LABEL_KEYS: Readonly<Record<string, TranslationKey>> = {
+  riftSRankClears: 'hudChrome.reliquary.srankClearsLabel',
+};
+
+export function reliquarySecondaryClearsLabelKey(stat: string): TranslationKey | null {
+  return Object.hasOwn(SECONDARY_CLEARS_LABEL_KEYS, stat)
+    ? SECONDARY_CLEARS_LABEL_KEYS[stat]
+    : null;
+}
 
 /** Localized profession name for a source hint, or '' for an id on neither the
  *  craft ring nor the gathering table (no honest name means no source line

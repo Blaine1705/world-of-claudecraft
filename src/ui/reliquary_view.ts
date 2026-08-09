@@ -306,6 +306,13 @@ export interface ReliquaryViewInput {
    */
   clearCount?: (pageId: string) => number | undefined;
   /**
+   * Optional SECOND clear-count lookup for pages whose def carries a
+   * secondaryClearSource (display-only meter; the window reads the deed
+   * counter it names). Same fairness rule as clearCount: never gated by
+   * graphics tier. Undefined for a page without a secondary source.
+   */
+  secondaryClearCount?: (pageId: string) => number | undefined;
+  /**
    * Sparse first-find meta for catalogued item relics (live first obtain).
    * Used only for owned-cell tooltips (clear#); never invents ownership.
    */
@@ -413,6 +420,9 @@ export interface ReliquaryShelfPageModel {
   complete: boolean;
   /** Lifetime clears when the page has a clear source; undefined otherwise. */
   clears: number | undefined;
+  /** Lifetime count for the page's display-only secondaryClearSource meter;
+   *  undefined for every page without one (the common case). */
+  secondaryClears: number | undefined;
 }
 
 /** One relic slot on an open page grid. */
@@ -520,6 +530,7 @@ function shelfPageModel(
   page: ReliquaryPageDef,
   opts: ReturnType<typeof ownershipOpts>,
   clearCount?: (pageId: string) => number | undefined,
+  secondaryClearCount?: (pageId: string) => number | undefined,
 ): ReliquaryShelfPageModel {
   const c = pageCompletion(page, opts);
   return {
@@ -530,6 +541,7 @@ function shelfPageModel(
     total: c.total,
     complete: c.complete,
     clears: clearCount?.(page.id),
+    secondaryClears: secondaryClearCount?.(page.id),
   };
 }
 
@@ -720,7 +732,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   if (input.nav !== 'overview') {
     for (const page of input.pages) {
       if (!pageIsShelf(page, input.nav)) continue;
-      allShelfPages.push(shelfPageModel(page, opts, input.clearCount));
+      allShelfPages.push(shelfPageModel(page, opts, input.clearCount, input.secondaryClearCount));
     }
   }
   // Typing a relic name from the shelf shows you which page holds it instead
@@ -738,7 +750,9 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     if (activePage === null) {
       // Page selected but not on this shelf (or unknown): resolve from full catalog.
       const page = pagesById.get(input.pageId);
-      if (page) activePage = shelfPageModel(page, opts, input.clearCount);
+      if (page) {
+        activePage = shelfPageModel(page, opts, input.clearCount, input.secondaryClearCount);
+      }
     }
     if (activePage !== null) {
       const header = activePage;
@@ -1125,6 +1139,31 @@ export function reliquaryRefreshSig(parts: ReliquaryRefreshSigParts): string {
     parts.search ?? '',
     parts.ownedFilter ?? 'all',
   ]);
+}
+
+/**
+ * Compact digest of every page's clear meters, folding the PRIMARY and the
+ * SECONDARY count per page, so a pure clear bump (no ownership change) still
+ * refreshes an open window. Both meters are folded because both paint: a
+ * digest that read only the primary would leave an open header showing a
+ * stale secondary count whenever the two counters moved apart (a mirrored
+ * world replaying counters, or a future secondary stat that bumps alone).
+ * The +1 keeps 0 distinct from undefined (meter absent); the two distinct
+ * multipliers keep "primary 5" from colliding with "secondary 5".
+ */
+export function reliquaryClearsDigest(
+  pages: readonly { id: string }[],
+  clearCount?: (pageId: string) => number | undefined,
+  secondaryClearCount?: (pageId: string) => number | undefined,
+): number {
+  let digest = 0;
+  for (const page of pages) {
+    const n = clearCount?.(page.id);
+    if (n !== undefined) digest = (digest * 31 + (n + 1)) | 0;
+    const s = secondaryClearCount?.(page.id);
+    if (s !== undefined) digest = (digest * 33 + (s + 1)) | 0;
+  }
+  return digest;
 }
 
 /**

@@ -25,9 +25,10 @@
 
 import { audio } from '../game/audio';
 import { mountDef } from '../sim/content/mounts';
-import { RELIQUARY_PAGES } from '../sim/content/reliquary';
+import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
+import { DEED_STAT_KEYS, type DeedStatKey, type DeedStats } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
@@ -47,6 +48,7 @@ import { reliquaryPageDesc, reliquaryPageName } from './reliquary_i18n';
 import {
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
+  reliquarySecondaryClearsLabelKey,
   reliquarySourceAriaText,
   reliquarySourceLines,
 } from './reliquary_labels';
@@ -73,6 +75,7 @@ import {
   type ReliquaryShelfCardModel,
   type ReliquaryViewInput,
   type ReliquaryViewModel,
+  reliquaryClearsDigest,
   reliquaryFillPct,
   reliquaryFlashKey,
   reliquaryFocusFallbackKey,
@@ -761,6 +764,24 @@ export class ReliquaryWindow {
         `${reliquaryPageName(pageId)} ${reliquaryPageDesc(pageId)}`.toLocaleLowerCase(tag),
       relicSearchText: (kind, id) => reliquaryRelicSearchText(kind, id, tag),
       clearCount: (pageId) => world.reliquaryPageClearCount(pageId),
+      // The display-only second meter for pages whose def carries a
+      // secondaryClearSource: read straight off the deeds facet's counter
+      // block (both worlds already mirror it; zero IWorld change). Membership
+      // in DEED_STAT_KEYS is validated and the value floored to finite
+      // positives, exactly the clearCountForSource regime, so a drifted stat
+      // name reads 0 rather than inventing a parallel counter channel.
+      secondaryClearCount: (pageId) => {
+        const src = Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)
+          ? RELIQUARY_PAGES_BY_ID[pageId].secondaryClearSource
+          : undefined;
+        if (src === undefined) return undefined;
+        if (!(DEED_STAT_KEYS as readonly string[]).includes(src.stat)) return 0;
+        // Typed | undefined: a stub world in a test may omit the counter
+        // block, and the meter must degrade to 0 rather than throw mid-paint.
+        const counters: DeedStats['counters'] | undefined = world.deedStats.counters;
+        const n = counters?.[src.stat as DeedStatKey];
+        return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+      },
       firstFind: world.reliquaryFirstFind,
       // Live reference, never a copy: this half of the input is built on every
       // slow-band poll and most of them elide, so the record is read only when
@@ -775,12 +796,14 @@ export class ReliquaryWindow {
     const world = this.deps.world();
     const catalog = world.reliquaryCatalogCompletion();
     // Clear meters paint on shelf/page; digest so a pure clear bump
-    // (no ownership change) still refreshes an open window.
-    let clearsDigest = 0;
-    for (const page of input.pages) {
-      const n = input.clearCount?.(page.id);
-      if (n !== undefined) clearsDigest = (clearsDigest * 31 + (n + 1)) | 0;
-    }
+    // (no ownership change) still refreshes an open window. The pure fold
+    // (reliquary_view.ts) takes BOTH meters, so a secondary-only move
+    // repaints an open header too (the stale-header trap).
+    const clearsDigest = reliquaryClearsDigest(
+      input.pages,
+      input.clearCount,
+      input.secondaryClearCount,
+    );
     // Counted in place: Object.keys would mint a throwaway array of every
     // first-find id on every slow-band poll, including the many that elide.
     // The hasOwn guard keeps the count own-keys-only, matching what
@@ -1230,6 +1253,19 @@ export class ReliquaryWindow {
       page.clears !== undefined
         ? `<p class="reliquary-page-clears">${esc(t('hudChrome.reliquary.clearsLabel', { count: this.fmt(page.clears) }))}</p>`
         : '';
+    // The display-only second meter, after the primary, same markup and class
+    // (no new CSS). The label key resolves from the def's stat through the
+    // membership-guarded ladder in reliquary_labels.ts: an unknown stat
+    // renders nothing (fail closed) rather than a wrong sentence.
+    const secondaryStat = Object.hasOwn(RELIQUARY_PAGES_BY_ID, page.pageId)
+      ? RELIQUARY_PAGES_BY_ID[page.pageId].secondaryClearSource?.stat
+      : undefined;
+    const secondaryKey =
+      secondaryStat !== undefined ? reliquarySecondaryClearsLabelKey(secondaryStat) : null;
+    const secondaryClears =
+      page.secondaryClears !== undefined && secondaryKey !== null
+        ? `<p class="reliquary-page-clears" data-secondary-clears="1">${esc(t(secondaryKey, { count: this.fmt(page.secondaryClears) }))}</p>`
+        : '';
     const accountScope = page.accountScoped
       ? `<p class="reliquary-account-scope" data-account-scope="1">${esc(t('hudChrome.reliquary.accountScopeNote'))}</p>`
       : '';
@@ -1280,7 +1316,7 @@ export class ReliquaryWindow {
       )}">` +
       `<span class="reliquary-page-progress">${esc(progress)}</span>` +
       this.barHtml(pct, 'reliquary-page-bar') +
-      `</div>${clears}${this.filterBarHtml()}${grid}` +
+      `</div>${clears}${secondaryClears}${this.filterBarHtml()}${grid}` +
       `</section>`
     );
   }

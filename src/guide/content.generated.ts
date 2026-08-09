@@ -6422,6 +6422,89 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
         "name": "Light of the Sanctum"
       }
     ]
+  },
+  {
+    "id": "conquerors_the_rift",
+    "shelf": "conquerors",
+    "name": "The Rift",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Hoarfrost Edge"
+      },
+      {
+        "kind": "item",
+        "name": "Emberforge Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Broodmother Carapace"
+      },
+      {
+        "kind": "item",
+        "name": "Bonelord Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Graskbreaker Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Voidscar Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Stormscale Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Abyssal Loop"
+      },
+      {
+        "kind": "item",
+        "name": "Pactbound Vestments"
+      },
+      {
+        "kind": "item",
+        "name": "Pit Lord's Cleaver"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Insight"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Guile"
+      },
+      {
+        "kind": "item",
+        "name": "Emberforged Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Stormsunder Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Voidweave Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Abysswrought Band"
+      },
+      {
+        "kind": "item",
+        "name": "Heart of the Rift"
+      },
+      {
+        "kind": "item",
+        "name": "Voidsong, Dirk of the Sundered Veil"
+      }
+    ]
   }
 ];
 

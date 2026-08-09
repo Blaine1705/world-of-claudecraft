@@ -24,6 +24,7 @@ import { MOUNT_NAME_KEYS } from '../src/ui/mount_labels';
 import {
   reliquaryRelicDisplayName,
   reliquaryRelicSearchText,
+  reliquarySecondaryClearsLabelKey,
   reliquarySourceAriaText,
   reliquarySourceLines,
   reliquarySourceLineText,
@@ -43,6 +44,7 @@ import {
   RELIQUARY_NEARLY_MIN_FRACTION,
   RELIQUARY_SHELF_ORDER,
   type ReliquaryViewInput,
+  reliquaryClearsDigest,
   reliquaryFillPct,
   reliquaryFocusFallbackKey,
   reliquaryMarkFindKey,
@@ -842,6 +844,93 @@ describe('buildReliquaryView shelf and page', () => {
     expect(a.progress).toEqual(b.progress);
     expect(a.recent).toEqual(b.recent);
     expect(a.nearly).toEqual(b.nearly);
+  });
+});
+
+describe('secondary clear meter (the display-only second meter)', () => {
+  it('populates secondaryClears only for pages the injected callback answers', () => {
+    const model = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        clearCount: (id) => (id === 'crypt_n' ? 7 : undefined),
+        secondaryClearCount: (id) => (id === 'crypt_n' ? 2 : undefined),
+      }),
+    );
+    const crypt = model.shelfPages.find((p) => p.pageId === 'crypt_n');
+    expect(crypt?.clears).toBe(7);
+    expect(crypt?.secondaryClears).toBe(2);
+    // Every other page stays undefined (the meter is absent, not zero).
+    const sanctum = model.shelfPages.find((p) => p.pageId === 'sanctum_n');
+    expect(sanctum?.clears).toBeUndefined();
+    expect(sanctum?.secondaryClears).toBeUndefined();
+  });
+
+  it('carries secondaryClears onto the active page header and detail', () => {
+    const model = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        secondaryClearCount: (id) => (id === 'crypt_n' ? 4 : undefined),
+      }),
+    );
+    expect(model.activePage?.secondaryClears).toBe(4);
+    expect(model.pageDetail?.secondaryClears).toBe(4);
+    // The full-catalog resolve path (nav elsewhere) threads it too.
+    const overview = buildReliquaryView(
+      input({
+        nav: 'overview',
+        pageId: 'crypt_n',
+        secondaryClearCount: (id) => (id === 'crypt_n' ? 4 : undefined),
+      }),
+    );
+    expect(overview.activePage?.secondaryClears).toBe(4);
+  });
+
+  it('without the callback the model carries undefined (offline parity shape)', () => {
+    const model = buildReliquaryView(input({ nav: 'conquerors', pageId: 'crypt_n' }));
+    expect(model.pageDetail?.secondaryClears).toBeUndefined();
+  });
+
+  it('the live catalog authors the meter on the Rift page alone today', () => {
+    // Literal pairing pin for the window's def-driven read: the page that
+    // carries a secondaryClearSource is exactly conquerors_the_rift, and its
+    // stat is the S-rank counter the label ladder maps.
+    const withSecondary = RELIQUARY_PAGES.filter((p) => p.secondaryClearSource !== undefined);
+    expect(withSecondary.map((p) => p.id)).toEqual(['conquerors_the_rift']);
+    expect(withSecondary[0]?.secondaryClearSource?.stat).toBe('riftSRankClears');
+  });
+
+  it('reliquaryClearsDigest folds BOTH meters (the stale-header trap)', () => {
+    const pages = [{ id: 'a' }, { id: 'b' }];
+    const primary = (id: string) => (id === 'a' ? 3 : undefined);
+    const secondary = (id: string) => (id === 'a' ? 1 : undefined);
+    const base = reliquaryClearsDigest(pages, primary, secondary);
+    // Stable on identical reads (or every slow-band poll would repaint).
+    expect(reliquaryClearsDigest(pages, primary, secondary)).toBe(base);
+    // Each meter moves the digest ALONE: the secondary arm is the one a
+    // primary-only fold would drop, leaving an open header stale.
+    expect(reliquaryClearsDigest(pages, (id) => (id === 'a' ? 4 : undefined), secondary)).not.toBe(
+      base,
+    );
+    expect(reliquaryClearsDigest(pages, primary, (id) => (id === 'a' ? 2 : undefined))).not.toBe(
+      base,
+    );
+    // Zero is distinct from absent (the +1 fold), on the secondary arm too.
+    expect(reliquaryClearsDigest(pages, undefined, (id) => (id === 'a' ? 0 : undefined))).not.toBe(
+      reliquaryClearsDigest(pages, undefined, () => undefined),
+    );
+  });
+
+  it('resolves the secondary meter label key membership-guarded (fail closed)', () => {
+    expect(reliquarySecondaryClearsLabelKey('riftSRankClears')).toBe(
+      'hudChrome.reliquary.srankClearsLabel',
+    );
+    // A REAL deed stat with no authored meter label still answers null: the
+    // ladder is the meter vocabulary, not the counter space.
+    expect(reliquarySecondaryClearsLabelKey('kills')).toBeNull();
+    expect(reliquarySecondaryClearsLabelKey('not_a_stat')).toBeNull();
+    // Prototype keys index truthy on a bare object; the hasOwn guard holds.
+    expect(reliquarySecondaryClearsLabelKey('constructor')).toBeNull();
   });
 });
 
@@ -2453,6 +2542,9 @@ describe('reliquarySourceLineText', () => {
     );
     expect(reliquarySourceLineText({ kind: 'activity', activityId: 'masterwork_craft' })).toBe(
       'Earned by crafting a masterwork',
+    );
+    expect(reliquarySourceLineText({ kind: 'activity', activityId: 'rift_first_clear' })).toBe(
+      'Awarded to every winner of their first Rift clear',
     );
   });
 

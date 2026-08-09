@@ -18,6 +18,13 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
+  RIFT_RARE_ITEM_IDS,
+} from './rift/items';
+
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
 
@@ -94,8 +101,18 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   and grants the HARVEST_COMPONENT_SPECIMENS items on a signed jackpot roll.
  * - masterwork_craft: src/sim/professions/crafting.ts writes masterwork:first on
  *   the first lifetime masterwork proc, from ANY of the gear crafts.
+ * - rift_first_clear: src/sim/rift/progression.ts addRiftProgressionLoot mints
+ *   one class-matched Riftbound band per participant for the party that wins a
+ *   ranked rift's first-clear race (src/sim/rift/runs.ts completeRiftClear
+ *   gates the call on claim.won AND claim.event, so a dev portal never mints).
+ *   The hint is rank-agnostic on purpose: every ranked tier, C included, mints
+ *   the rings on its event's first clear.
  */
-export const RELIQUARY_ACTIVITY_SOURCE_IDS = ['corpse_harvest', 'masterwork_craft'] as const;
+export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
+  'corpse_harvest',
+  'masterwork_craft',
+  'rift_first_clear',
+] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
 /** Rift ranks that award mount reins (RIFT_GREEN / BLUE / EPIC_MOUNT_REINS,
@@ -122,6 +139,12 @@ export interface ReliquaryPageDef {
   desc?: string;
   /** Clear-count source; omit or `none` when the page has no clear meter. */
   clearSource?: ReliquaryClearSource;
+  /** Display-only SECOND clear meter, rendered by the window after the primary
+   *  when present. Never read by completion, rank, or deed math. Must name a
+   *  DEED_STAT_KEYS member (the same stat space the deed_stat clearSource arm
+   *  draws from); the window validates membership and floors finite positives
+   *  before painting, so a drifted stat renders nothing rather than a lie. */
+  secondaryClearSource?: { kind: 'deed_stat'; stat: string };
   /** Source every un-hinted relic on this page inherits. Authored only where
    *  EVERY relic on the page really shares ONE source, which is why it stays a
    *  single hint rather than a list: a page whose relics need several routes
@@ -662,6 +685,65 @@ export const RELIQUARY_HEROIC_GEAR = {
 // Order: append-only. Phase 1 stub id `conquerors_hollow_crypt` is kept and
 // expanded with real Hollow Crypt uniques (boundstone_helm moved to Sanctum).
 
+// ---------------------------------------------------------------------------
+// The Rift page (Phase 21)
+// ---------------------------------------------------------------------------
+// Per-rare hint table keyed by the LIVE RIFT_RARE_ITEM_IDS array (`satisfies`
+// asserts exhaustiveness both ways), so a new themed rare fails tsc here until
+// its doors are authored. Each row follows the 13a every-door standard: it
+// names EVERY mob whose static loot really carries the item (theme wiring
+// src/sim/content/rift/themes.ts, loot rows src/sim/content/rift/mobs.ts):
+// the theme boss's fat roll first, then its trash's slim ones in mobs.ts
+// table order. graskbreaker_girdle has one trash carrier (the Warcamp theme
+// shares rift_marrow_troll with Boneyard, whose loot stays bonelord_mantle),
+// pactbound_vestments spans both citadel bosses plus both citadel trash, and
+// pitlords_cleaver is the pit lord's alone.
+const RIFT_RARE_SOURCES = {
+  hoarfrost_edge: [
+    fromBoss('rift_boss_frost'),
+    fromBoss('rift_frost_revenant'),
+    fromBoss('rift_rime_elemental'),
+  ],
+  emberforge_gauntlets: [
+    fromBoss('rift_boss_ember'),
+    fromBoss('rift_ember_fiend'),
+    fromBoss('rift_magma_brute'),
+  ],
+  broodmother_carapace: [
+    fromBoss('rift_boss_venom'),
+    fromBoss('rift_venom_weaver'),
+    fromBoss('rift_thornback'),
+  ],
+  bonelord_mantle: [
+    fromBoss('rift_boss_necro'),
+    fromBoss('rift_boneclad'),
+    fromBoss('rift_marrow_troll'),
+  ],
+  graskbreaker_girdle: [fromBoss('rift_boss_brute'), fromBoss('rift_stone_ogre')],
+  voidscar_handwraps: [
+    fromBoss('rift_boss_arcane'),
+    fromBoss('rift_void_acolyte'),
+    fromBoss('rift_dread_stalker'),
+  ],
+  stormscale_treads: [
+    fromBoss('rift_boss_storm'),
+    fromBoss('rift_storm_caller'),
+    fromBoss('rift_stormscale'),
+  ],
+  abyssal_loop: [
+    fromBoss('rift_boss_tide'),
+    fromBoss('rift_tide_thrall'),
+    fromBoss('rift_deep_lurker'),
+  ],
+  pactbound_vestments: [
+    fromBoss('rift_boss_ritualist'),
+    fromBoss('rift_boss_pitlord'),
+    fromBoss('rift_hellguard'),
+    fromBoss('rift_pact_acolyte'),
+  ],
+  pitlords_cleaver: fromBoss('rift_boss_pitlord'),
+} as const satisfies Record<(typeof RIFT_RARE_ITEM_IDS)[number], ReliquarySourceHints>;
+
 /**
  * Freeze the whole page table at its one construction site: the top-level
  * array, every page object, and every page's relics list. `readonly` is a
@@ -1149,6 +1231,30 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     desc: 'Titles earned from the Book of Deeds. Cosmetic only: never power, drop rate, or pity.',
     clearSource: { kind: 'none' },
     relics: titles(...RELIQUARY_HORIZON_TITLES),
+  },
+
+  // ---- The Rift (Phase 21): the procedural dungeon's whole chase ladder ----
+  {
+    id: 'conquerors_the_rift',
+    shelf: 'conquerors',
+    name: 'The Rift',
+    desc: 'Signature spoils of the shifting Rift, from its roaming horrors to the twin treasures of the S-rank chase.',
+    clearSource: { kind: 'deed_stat', stat: 'riftClears' },
+    secondaryClearSource: { kind: 'deed_stat', stat: 'riftSRankClears' },
+    // Ascending chase order, each group SPREAD from its live rift/items.ts
+    // array so membership and order can never trail the content: the ten
+    // themed world-drop rares (RIFT_RARE_SOURCES above), the three first-clear
+    // Riftbound bands (minted by addRiftProgressionLoot for every winner of a
+    // ranked rift's first-clear race, the rift_first_clear activity), the four
+    // clear-time epics (riftHeroicClearPool seeds them; B is the minimum rank
+    // whose clear pays from that pool), and the two S-only legendary rolls
+    // (addRiftClearGearLoot rolls each independently on an S clear alone).
+    relics: items(
+      ...RIFT_RARE_ITEM_IDS.map((id) => [id, RIFT_RARE_SOURCES[id]] as const),
+      ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
+      ...RIFT_EPIC_ITEM_IDS.map((id) => [id, fromRift('B')] as const),
+      ...RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, fromRift('S')] as const),
+    ),
   },
 ]);
 

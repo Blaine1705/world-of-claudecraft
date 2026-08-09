@@ -48,4 +48,7 @@ export const table: ReliquaryLocaleTable = {
   horizons_mounts: { name: 'Транспорт' },
   horizons_weapon_skins: { name: 'Облики оружия' },
   horizons_titles: { name: 'Звания' },
+  // The Rift page (Phase 21): the shipped rift noun (deed dgn_rift and the
+  // sourceRift line both say Разлом), used bare as the proper name.
+  conquerors_the_rift: { name: 'Разлом' },
 };

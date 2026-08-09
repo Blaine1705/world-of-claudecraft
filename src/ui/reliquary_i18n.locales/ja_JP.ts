@@ -50,4 +50,7 @@ export const table: ReliquaryLocaleTable = {
   horizons_mounts: { name: 'マウント' },
   horizons_weapon_skins: { name: '武器スキン' },
   horizons_titles: { name: '称号' },
+  // The Rift page (Phase 21): the shipped rift noun (deed dgn_rift and the
+  // sourceRift line both say リフト), used bare as the proper name.
+  conquerors_the_rift: { name: 'リフト' },
 };

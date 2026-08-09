@@ -44,7 +44,13 @@ import {
   type ReliquarySourceHint,
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
-import { RIFT_ITEMS } from '../src/sim/content/rift/items';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_ITEMS,
+  RIFT_LEGENDARY_ITEM_IDS,
+  RIFT_RARE_ITEM_IDS,
+} from '../src/sim/content/rift/items';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -278,11 +284,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(22);
+    expect(CONQUEROR_PAGES.length).toBe(23);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(3);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(28);
+    expect(RELIQUARY_PAGES.length).toBe(29);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -312,10 +318,9 @@ describe('Reliquary Conqueror catalog structure', () => {
       weaponSkins: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands. Phase 18 adds four title
-    // relics to horizons_titles (the completion-ladder titles minus the
-    // excluded col_reliquary_complete).
-    expect(full).toEqual({ owned: 223, total: 223 });
+    // Literal: update when catalog content lands. Phase 21 adds the 19 Rift
+    // chase items (conquerors_the_rift) on top of the Phase 18 title relics.
+    expect(full).toEqual({ owned: 242, total: 242 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -323,7 +328,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands.
-    expect(character).toEqual({ owned: 194, total: 194 });
+    expect(character).toEqual({ owned: 213, total: 213 });
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -566,6 +571,31 @@ describe('Reliquary clear sources map to live content', () => {
     }
   });
 
+  it('secondaryClearSource stats reference real DEED_STAT_KEYS (the display-only second meter)', () => {
+    // Mirror of the clearSource pin above for the Phase 21 second meter: the
+    // window reads the named counter straight off the deeds facet, so a stat
+    // outside DEED_STAT_KEYS would render 0 forever with no failing gate.
+    let checked = 0;
+    for (const page of RELIQUARY_PAGES) {
+      const src = page.secondaryClearSource;
+      if (!src) continue;
+      checked += 1;
+      expect(src.kind, page.id).toBe('deed_stat');
+      expect(DEED_STAT_KEYS, page.id).toContain(src.stat);
+    }
+    // The Rift page carries the one authored secondary meter today; the pin
+    // keeps the pairing literal so a swap to another counter is a decision.
+    expect(checked).toBeGreaterThanOrEqual(1);
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_the_rift.secondaryClearSource).toEqual({
+      kind: 'deed_stat',
+      stat: 'riftSRankClears',
+    });
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_the_rift.clearSource).toEqual({
+      kind: 'deed_stat',
+      stat: 'riftClears',
+    });
+  });
+
   it('covers every live five-man / raid final boss dungeon with N+H pages', () => {
     // Hand copy of the module-private FINAL_BOSS_DUNGEONS list in
     // src/sim/deeds.ts (documented there as PINNED as of v1: it never grows).
@@ -658,6 +688,30 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     for (const bossId of Object.keys(HEROIC_BOSS_LOOT)) {
       expect(HEROIC_PAGE_BY_BOSS[bossId], `page map for ${bossId}`).toBeDefined();
     }
+  });
+});
+
+describe('Reliquary Rift page pins against live rift content', () => {
+  it('derives its slots from the four live rift item arrays in ascending chase order', () => {
+    const page = RELIQUARY_PAGES_BY_ID.conquerors_the_rift;
+    expect(page).toBeDefined();
+    expect(page.shelf).toBe('conquerors');
+    // EQUALITY against the live arrays in append-only group order (rares,
+    // first-clear bands, clear-time epics, S legendaries), so the page can
+    // never trail rift/items.ts: a new array member reds here (and the hint
+    // table in content/reliquary.ts reds tsc) until the curator authors it.
+    expect(itemRelicIds(page)).toEqual([
+      ...RIFT_RARE_ITEM_IDS,
+      ...RIFT_GEAR_ITEM_IDS,
+      ...RIFT_EPIC_ITEM_IDS,
+      ...RIFT_LEGENDARY_ITEM_IDS,
+    ]);
+    // Snug per-group vacuity floors: an emptied source array would otherwise
+    // shrink the page silently while the equality above stayed green.
+    expect(RIFT_RARE_ITEM_IDS.length).toBeGreaterThanOrEqual(10);
+    expect(RIFT_GEAR_ITEM_IDS.length).toBeGreaterThanOrEqual(3);
+    expect(RIFT_EPIC_ITEM_IDS.length).toBeGreaterThanOrEqual(4);
+    expect(RIFT_LEGENDARY_ITEM_IDS.length).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -1461,6 +1515,11 @@ const DELVE_AWARDABLE_IDS = new Map<string, Set<string>>(
 const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   corpse_harvest: ['gather_event:perfect_specimen', ...Object.values(HARVEST_COMPONENT_SPECIMENS)],
   masterwork_craft: ['masterwork:first'],
+  // Derived from the live array: addRiftProgressionLoot mints one
+  // class-matched band per winner of a ranked rift's first-clear race
+  // (createRiftGearInstance picks from RIFT_GEAR_ITEM_IDS), so the activity's
+  // award set IS that array.
+  rift_first_clear: RIFT_GEAR_ITEM_IDS,
 };
 
 /**
@@ -1766,6 +1825,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
   horizons_titles: 40,
+  // 30 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
+  // bosses + both citadel bosses + 17 trash carriers), plus the
+  // rift_first_clear activity, plus the B and S rank doors.
+  conquerors_the_rift: 30,
 };
 
 /** Pages whose relics provably come from more than one source, so a page-level
@@ -1802,6 +1865,9 @@ const KNOWN_MULTI_SOURCE_PAGES = [
   // and pinned at 1 in EXPECTED_DISTINCT_SOURCES instead.
   'horizons_titles',
   'horizons_mounts',
+  // The Rift page spans every themed environment's mobs, the first-clear
+  // activity, and two rank doors: the widest conquerors page there is.
+  'conquerors_the_rift',
 ];
 
 /** `sourceKind:sourceId`, the stable comparison key for one hint. */
@@ -1930,9 +1996,10 @@ describe('Reliquary source hints resolve against live content', () => {
     }
     expect(offenders).toEqual([]);
     // Vacuity floor: the sweep is worthless if it walked nothing. Literal,
-    // matching the authored boss coverage; update deliberately with the
-    // authoring, same regime as the totals pins above.
-    expect(checked).toBeGreaterThanOrEqual(159);
+    // matching the authored boss coverage (Phase 21: +28 rift-mob claims on
+    // the ten themed rares); update deliberately with the authoring, same
+    // regime as the totals pins above.
+    expect(checked).toBeGreaterThanOrEqual(187);
     // The mount arm specifically, so the reins translation cannot rot into a
     // no-op that leaves every mount boss hint unpinned while the total above
     // still clears on the item slots alone.
@@ -2132,33 +2199,68 @@ describe('Reliquary source hints resolve against live content', () => {
     }
   });
 
-  it('every rift hint names the rank whose reins table really carries the mount', () => {
+  it('every rift hint names the rank that really pays the relic (reins, pool epics, S rolls)', () => {
     // Rank is the claim, so rank is what gets checked: a B hint on a blue-tier
     // mount is a real rank and a real mount and still the wrong door, because
     // ranks do not inherit each other's tiers (one mount roll per clear, for
-    // that rank's table only). Resolved through the mount's ownership reins,
-    // which is the id the ladder actually pushes onto the corpse.
+    // that rank's table only). Mount slots resolve through their ownership
+    // reins, which is the id the ladder actually pushes onto the corpse.
+    //
+    // ITEM slots landed with the Rift page (Phase 21) and make two different
+    // rank claims: a B hint says the item sits in the rift-signature seed of
+    // riftHeroicClearPool (B is the MINIMUM rank whose clear pays from that
+    // pool; addRiftClearGearLoot's guaranteed epic draw), and an S hint says
+    // the item is one of the S-only independent legendary rolls
+    // (RIFT_LEGENDARY_ITEM_IDS, rolled per id on an S clear alone). Any other
+    // rank letter on an item names a tier that pays no aimable item.
     const offenders: string[] = [];
-    let checked = 0;
+    let mountChecked = 0;
+    let itemChecked = 0;
     for (const { page, relic, slotId } of RELIC_SLOTS) {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'rift') continue;
-        checked += 1;
-        if (relic.kind !== 'mount') {
-          offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a rift hint`);
+        if (relic.kind === 'mount') {
+          mountChecked += 1;
+          const rank = hint.sourceId as keyof typeof RIFT_REINS_BY_RANK;
+          const table = RIFT_REINS_BY_RANK[rank];
+          expect(table, `rift rank ${hint.sourceId}`).toBeDefined();
+          if (!table?.includes(reinsItemIdForMount(slotId))) {
+            offenders.push(`${page.id}:${slotId} credits rift rank ${rank}, whose reins lack it`);
+          }
           continue;
         }
-        const rank = hint.sourceId as keyof typeof RIFT_REINS_BY_RANK;
-        const table = RIFT_REINS_BY_RANK[rank];
-        expect(table, `rift rank ${hint.sourceId}`).toBeDefined();
-        if (!table?.includes(reinsItemIdForMount(slotId))) {
-          offenders.push(`${page.id}:${slotId} credits rift rank ${rank}, whose reins lack it`);
+        if (relic.kind === 'item') {
+          itemChecked += 1;
+          if (hint.sourceId === 'B') {
+            // Seed membership is the authored claim; pool membership is the
+            // behavioral half (the derived pool really pays the id).
+            if (!(RIFT_EPIC_ITEM_IDS as readonly string[]).includes(slotId)) {
+              offenders.push(`${page.id}:${slotId} credits rift rank B outside the epic seed`);
+            }
+            if (!riftHeroicClearPool().includes(slotId)) {
+              offenders.push(`${page.id}:${slotId} credits rift rank B, whose pool lacks it`);
+            }
+          } else if (hint.sourceId === 'S') {
+            if (!(RIFT_LEGENDARY_ITEM_IDS as readonly string[]).includes(slotId)) {
+              offenders.push(
+                `${page.id}:${slotId} credits rift rank S outside the legendary rolls`,
+              );
+            }
+          } else {
+            offenders.push(
+              `${page.id}:${slotId} credits rift rank ${hint.sourceId}, which pays no aimable item`,
+            );
+          }
+          continue;
         }
+        offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a rift hint`);
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: two green reins, two blue, two epic.
-    expect(checked).toBeGreaterThanOrEqual(6);
+    // Vacuity floors per arm: two green reins, two blue, two epic on the
+    // mount side; four pool epics plus two legendaries on the Rift page.
+    expect(mountChecked).toBeGreaterThanOrEqual(6);
+    expect(itemChecked).toBeGreaterThanOrEqual(6);
     // Premise guard: the three tables are distinct and non-empty, so a
     // collapsed ladder cannot make every rank answer true for every mount.
     const tables = Object.values(RIFT_REINS_BY_RANK);
@@ -2166,11 +2268,25 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(new Set(tables.flatMap((t) => [...t])).size).toBe(
       tables.reduce((sum, t) => sum + t.length, 0),
     );
+    // The tier split behind the two item claims, in both directions so the
+    // negative cannot rot vacuous: the S-only legendaries are NEVER in the
+    // B/A/S guaranteed pool (an S clear rolls them separately), while the
+    // whole epic seed IS (the positive control on the same accessor).
+    for (const epicId of RIFT_EPIC_ITEM_IDS) {
+      expect(riftHeroicClearPool(), epicId).toContain(epicId);
+    }
+    for (const legendaryId of RIFT_LEGENDARY_ITEM_IDS) {
+      expect(riftHeroicClearPool(), legendaryId).not.toContain(legendaryId);
+    }
     // Literal, for the same reason as the storefront id: the rank letters are
     // both the authored sourceIds and the keys this pin indexes by, so only a
     // literal catches a wholesale rename of the rank space.
     expect([...RELIQUARY_RIFT_RANK_SOURCE_IDS]).toEqual(['B', 'A', 'S']);
-    expect([...RELIQUARY_ACTIVITY_SOURCE_IDS]).toEqual(['corpse_harvest', 'masterwork_craft']);
+    expect([...RELIQUARY_ACTIVITY_SOURCE_IDS]).toEqual([
+      'corpse_harvest',
+      'masterwork_craft',
+      'rift_first_clear',
+    ]);
   });
 
   it('every quest hint names a quest whose live itemRewards include the relic', () => {
@@ -2233,9 +2349,11 @@ describe('Reliquary source hints resolve against live content', () => {
   it('every activity hint names the write site that really awards the relic', () => {
     // Activities have no engine table to index, so the pin is the write site
     // itself: src/sim/interaction.ts awards gather_event:perfect_specimen plus
-    // the HARVEST_COMPONENT_SPECIMENS jackpots on a corpse harvest, and
+    // the HARVEST_COMPONENT_SPECIMENS jackpots on a corpse harvest,
     // src/sim/professions/crafting.ts writes masterwork:first on the first
-    // lifetime masterwork proc. Both directions are pinned, so an activity that
+    // lifetime masterwork proc, and src/sim/rift/progression.ts
+    // addRiftProgressionLoot mints the Riftbound bands for a ranked rift's
+    // first-clear winners. Both directions are pinned, so an activity that
     // stopped awarding a slot (or a slot that quietly joined one) reds.
     const bySlotKind = new Map<string, string[]>();
     let checked = 0;
@@ -2263,8 +2381,14 @@ describe('Reliquary source hints resolve against live content', () => {
     // literally (interaction.ts and professions/crafting.ts respectively).
     expect(bySlotKind.get('corpse_harvest:mark')).toEqual(['gather_event:perfect_specimen']);
     expect(bySlotKind.get('masterwork_craft:mark')).toEqual(['masterwork:first']);
-    // Vacuity floor: five specimens plus the two marks.
-    expect(checked).toBeGreaterThanOrEqual(7);
+    // The rift first-clear ITEM slots are EXACTLY the live Riftbound band
+    // array (createRiftGearInstance picks from it per winner class), the same
+    // bidirectional regime as the corpse-harvest specimens above.
+    expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
+      [...RIFT_GEAR_ITEM_IDS].sort(),
+    );
+    // Vacuity floor: five specimens, the two marks, and the three bands.
+    expect(checked).toBeGreaterThanOrEqual(10);
   });
 
   it('every zone hint names the zone where its credited rare really camps', () => {
@@ -2381,10 +2505,10 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 239 = 242 slots minus the
+    // excluded. Literal: tighten as rulings land. 265 = 268 slots minus the
     // two gap mounts minus the pended masterwork:engineering.
     const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
-    expect(hinted).toBeGreaterThanOrEqual(239);
+    expect(hinted).toBeGreaterThanOrEqual(265);
   });
 
   it('no relic authors an EMPTY hint list (a sourceless slot stays keyless)', () => {
@@ -2630,7 +2754,7 @@ describe('Reliquary source hint coverage', () => {
     // regime; update deliberately with the authoring). One total would let
     // the small families vanish inside the mob count's margin: the quest arm
     // is the arm that caught wyrmcult_grand_robe.
-    expect(routesByFamily.mob).toBeGreaterThanOrEqual(146);
+    expect(routesByFamily.mob).toBeGreaterThanOrEqual(174);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(5);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(7);
@@ -2638,9 +2762,9 @@ describe('Reliquary source hint coverage', () => {
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
-    expect(routesByFamily.activity).toBeGreaterThanOrEqual(7);
+    expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(257);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(288);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {
@@ -2832,12 +2956,24 @@ describe('Reliquary source hint coverage', () => {
     );
     expect(groundObjectIds.length).toBeGreaterThanOrEqual(7);
     expect(groundObjectIds.filter((id) => watchedAwardIds.has(id))).toEqual([]);
-    // The Rift's own item family (progression gear, essence, gems, rare and
-    // epic rift items, the two legendaries). Phase 21 owns any inclusion
-    // decision; until then no hinted relic may sit in it.
+    // The Rift's own item family. Phase 21 EXECUTED the inclusion decision:
+    // the whole chase ladder (rares, first-clear bands, clear-time epics, the
+    // two legendaries) is catalogued on conquerors_the_rift, so the watched
+    // set inside RIFT_ITEMS is EXACTLY those four arrays, and the currency
+    // ids (essence + the three gems) stay outside the catalog. Equality in
+    // both directions: a new RIFT_ITEMS id cannot quietly join a page, nor
+    // sit unwatched, without a decision landing here.
     const riftItemIds = Object.keys(RIFT_ITEMS);
     expect(riftItemIds.length).toBeGreaterThanOrEqual(23);
-    expect(riftItemIds.filter((id) => watchedAwardIds.has(id))).toEqual([]);
+    const cataloguedRift = riftItemIds.filter((id) => watchedAwardIds.has(id)).sort();
+    expect(cataloguedRift).toEqual(
+      [
+        ...RIFT_RARE_ITEM_IDS,
+        ...RIFT_GEAR_ITEM_IDS,
+        ...RIFT_EPIC_ITEM_IDS,
+        ...RIFT_LEGENDARY_ITEM_IDS,
+      ].sort(),
+    );
   });
 
   it('the excluded Rift GEAR pools still overlap the catalog they are excluded from', () => {
@@ -2857,8 +2993,10 @@ describe('Reliquary source hint coverage', () => {
       hintedItemIds.add(slotId);
     }
     const overlap = [...hintedItemIds].filter((id) => pooled.has(id));
-    // Exact regime like every other floor in this file: 69 measured today.
-    expect(overlap.length).toBeGreaterThanOrEqual(69);
+    // Exact regime like every other floor in this file: 73 measured today
+    // (Phase 21 adds the four pool-seeded rift epics as hinted slots; their
+    // POOL payout stays excluded, the fromRift('B') hint names the rank).
+    expect(overlap.length).toBeGreaterThanOrEqual(73);
   });
 
   it('every (relic kind, source kind) pairing in the catalog is one this file sweeps', () => {
@@ -2885,6 +3023,9 @@ describe('Reliquary source hint coverage', () => {
         'item x quest',
         'item x zone',
         'item x activity',
+        // Phase 21: the Rift page's clear-time epics (B) and S-only
+        // legendaries, walked by the rank truth arm's item side.
+        'item x rift',
         // mark: the gathering professions and the two write sites.
         'mark x profession',
         'mark x activity',

@@ -4476,6 +4476,9 @@ export const hudChromeStrings = {
     shelfEmpty: 'No pages on this shelf yet.',
     pageComplete: 'Illuminated',
     clearsLabel: '{count} clears',
+    // Phase 21: the Rift page's display-only SECOND meter, rendered beside
+    // clearsLabel on the page header (secondaryClearSource, riftSRankClears).
+    srankClearsLabel: '{count} S-rank clears',
     backToShelf: 'Back to shelf',
     // Phase 5: page grid, live unlock toast, Illumination celebration.
     gridAria: 'Relics on {name}',
@@ -4541,6 +4544,9 @@ export const hudChromeStrings = {
     // vendor, or quest in between.
     sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
     sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
+    // The Riftbound bands: minted per participant for the party that wins a
+    // ranked rift's first-clear race (addRiftProgressionLoot), any rank.
+    sourceActivityRiftFirstClear: 'Awarded to every winner of their first Rift clear',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

@@ -10740,6 +10740,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.shelfEmpty': 'На этой полке пока нет страниц.',
   'hudChrome.reliquary.pageComplete': 'Озарено',
   'hudChrome.reliquary.clearsLabel': 'Прохождений: {count}',
+  'hudChrome.reliquary.srankClearsLabel': 'Прохождений ранга S: {count}',
   'hudChrome.reliquary.backToShelf': 'Назад к полке',
   'hudChrome.reliquary.gridAria': 'Реликвии на странице {name}',
   'hudChrome.reliquary.pageProgressAria': 'Прогресс страницы: {owned} из {total} реликвий',
@@ -10849,6 +10850,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': 'Покупается в магазине WOC',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': 'Находится при сборе с трупов существ',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': 'Даётся за создание шедевра',
+  'hudChrome.reliquary.sourceActivityRiftFirstClear':
+    'Вручается каждому победителю первого прохождения разлома',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}, ещё не найдено, {source}',
   'hudChrome.reliquary.cellOwnedClearsAria':
     '{name}, каталогизировано, впервые найдено на прохождении {count}',
