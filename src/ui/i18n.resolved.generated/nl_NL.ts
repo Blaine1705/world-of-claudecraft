@@ -7735,6 +7735,7 @@ export const nl_NL: EnTranslations = {
       "outOfRange": "Buiten bereik.",
       "noTarget": "Je hebt geen doelwit.",
       "tooClose": "Te dichtbij!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Je moet naar je doelwit gekeerd staan.",
       "targetHealthBelow": "Die vaardigheid vereist dat het doelwit onder {percent}% gezondheid is.",
       "dagger": "Je moet een dolk hanteren.",

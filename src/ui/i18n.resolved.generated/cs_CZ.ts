@@ -7735,6 +7735,7 @@ export const cs_CZ: EnTranslations = {
       "outOfRange": "Mimo dosah.",
       "noTarget": "Nemáš cíl.",
       "tooClose": "Příliš blízko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musíš čelit svému cíli.",
       "targetHealthBelow": "Tato schopnost vyžaduje cíl pod {percent} % zdraví.",
       "dagger": "Musíš mít dýku.",

@@ -2197,6 +2197,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': 'Вне дальности.',
   'hud.errors.noTarget': 'У вас нет цели.',
   'hud.errors.tooClose': 'Слишком близко!',
+  'hud.errors.mustTargetAlly': 'Нужно выбрать целью союзника.',
   'hud.errors.facing': 'Вы должны смотреть на цель.',
   'hud.errors.targetHealthBelow':
     'Эта способность требует, чтобы здоровье цели было ниже {percent}%.',

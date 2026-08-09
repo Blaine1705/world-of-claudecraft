@@ -7735,6 +7735,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Fuori portata.",
       "noTarget": "Non hai un bersaglio.",
       "tooClose": "Troppo vicino!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",

@@ -7735,6 +7735,7 @@ export const sv_SE: EnTranslations = {
       "outOfRange": "Utom räckhåll.",
       "noTarget": "Du har inget mål.",
       "tooClose": "För nära!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Du måste vara vänd mot ditt mål.",
       "targetHealthBelow": "Den förmågan kräver att målet har under {percent}% hälsa.",
       "dagger": "Du måste bära en dolk.",

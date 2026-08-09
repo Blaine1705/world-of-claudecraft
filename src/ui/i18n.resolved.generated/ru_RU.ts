@@ -7735,6 +7735,7 @@ export const ru_RU: EnTranslations = {
       "outOfRange": "Вне дальности.",
       "noTarget": "У вас нет цели.",
       "tooClose": "Слишком близко!",
+      "mustTargetAlly": "Нужно выбрать целью союзника.",
       "facing": "Вы должны смотреть на цель.",
       "targetHealthBelow": "Эта способность требует, чтобы здоровье цели было ниже {percent}%.",
       "dagger": "Вы должны держать кинжал.",

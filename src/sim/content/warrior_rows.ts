@@ -29,7 +29,7 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_double_charge',
         name: 'Intervene',
         description:
-          'Grants Intervene: rush to a friendly player, shielding them for a small amount of damage for 6 sec.',
+          'Grants Intervene: rush to a friendly player, shielding them from a small amount of damage for 6 sec.',
         // LIVE: grants the friendly-target charge (targetType 'friendly' + absorb);
         // the charge dispatch skips rage and combat entry for a friendly rush.
         effect: { grant: { ability: 'intervene' } },

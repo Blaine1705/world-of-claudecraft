@@ -818,7 +818,11 @@ export function castAbility(
   // covered (warrior Onrush, the druid Bruin-Form charge, Intervene) and a
   // fourth added later inherits it. isRooted folds in stun, which the ladder
   // above has already refused, so what reaches here is a genuine root.
-  if (ability.effects?.some((effect) => effect.type === 'charge') && isRooted(p)) {
+  //
+  // Reads the RANK-RESOLVED effects, not the base def's: those are what actually
+  // run, and an ability that only gains the charge at a later rank would slip a
+  // base-def check. Same list the two friendly-branch gates below read.
+  if (res.effects.some((effect) => effect.type === 'charge') && isRooted(p)) {
     ctx.error(p.id, "Can't move!");
     return;
   }
@@ -893,9 +897,32 @@ export function castAbility(
     // heals/buffs: the mouseover override when given, else the current
     // friendly target, else yourself
     target = resolveFriendlyTarget(ctx, p, castTargetId);
+    // A RUSH has no meaning against yourself, and the self fallback above is
+    // reached by an ordinary miss: no target at all, or an ENEMY targeted. Without
+    // this gate Intervene resolved onto the caster and became an off-GCD personal
+    // absorb on its own cooldown, which is the opposite of what a friendly-only
+    // reposition is for. Refuse HERE, above the billing, the same shape as the
+    // partyOnlyTarget gate below.
+    //
+    // Gated on the effect and never on an ability id, so a future friendly rush
+    // inherits it; every other friendly ability keeps its self-cast, which is the
+    // whole point of the fallback for a heal or a buff.
+    if (target.id === p.id && res.effects.some((effect) => effect.type === 'charge')) {
+      ctx.error(p.id, 'You must target an ally.');
+      return;
+    }
     const d = dist2d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5)) {
       ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    // An authored minRange means the same thing on a friendly target as on a hostile
+    // one, and only the hostile branch was enforcing it: an ally standing on top of
+    // the warrior took the cast while the tooltip advertised an 8 yd floor. Intervene
+    // is the only friendly ability that authors minRange today, so this changes
+    // nothing else, and a second one gets the floor it declares for free.
+    if (ability.minRange && d < ability.minRange) {
+      ctx.error(p.id, 'Too close!');
       return;
     }
     if (ctx.lineOfSightBlocked(p, target, ability)) {
@@ -1837,8 +1864,24 @@ function applyAbility(
     // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
     // override wins while valid, else current-friendly-target-else-self.
     target = resolveFriendlyTarget(ctx, p, castTarget);
-    if (dist2d(p.pos, target.pos) > Math.max(ability.range, 5) + 2) {
+    const d = dist2d(p.pos, target.pos);
+    if (d > Math.max(ability.range, 5) + 2) {
       ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    // The finish-side twins of the two gates in castAbility's friendly branch. No
+    // shipped ability reaches them (Intervene is the only friendly rush and the only
+    // friendly minRange, and it is instant), but the two branches resolve through the
+    // same resolveFriendlyTarget fallback and check the same authored fields, so
+    // leaving one arm short is how the next timed friendly ability inherits the bug
+    // rather than the fix. The +2 slack matches the range check just above: a target
+    // may drift during a cast.
+    if (target.id === p.id && res.effects.some((effect) => effect.type === 'charge')) {
+      ctx.error(p.id, 'You must target an ally.');
+      return;
+    }
+    if (ability.minRange && d < ability.minRange - 2) {
+      ctx.error(p.id, 'Too close!');
       return;
     }
     if (ctx.lineOfSightBlocked(p, target, ability)) {

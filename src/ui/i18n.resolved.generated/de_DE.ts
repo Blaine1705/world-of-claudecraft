@@ -7735,6 +7735,7 @@ export const de_DE: EnTranslations = {
       "outOfRange": "Außer Reichweite.",
       "noTarget": "Ihr habt kein Ziel.",
       "tooClose": "Zu nah!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Ihr müsst Eurem Ziel zugewandt sein.",
       "targetHealthBelow": "Diese Fähigkeit erfordert, dass das Ziel unter {percent}% Gesundheit hat.",
       "dagger": "Ihr müsst einen Dolch führen.",

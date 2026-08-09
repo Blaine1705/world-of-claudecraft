@@ -2078,6 +2078,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出范围。',
   'hud.errors.noTarget': '你没有目标。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必须选定一名友方目标。',
   'hud.errors.facing': '你必须面向目标。',
   'hud.errors.targetHealthBelow': '该技能要求目标生命值低于 {percent}%。',
   'hud.errors.dagger': '你必须装备匕首。',

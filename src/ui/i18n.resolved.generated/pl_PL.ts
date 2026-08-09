@@ -7735,6 +7735,7 @@ export const pl_PL: EnTranslations = {
       "outOfRange": "Poza zasięgiem.",
       "noTarget": "Nie masz celu.",
       "tooClose": "Zbyt blisko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musisz być zwrócony przodem do celu.",
       "targetHealthBelow": "Ta umiejętność wymaga, by cel miał poniżej {percent}% zdrowia.",
       "dagger": "Musisz dzierżyć sztylet.",

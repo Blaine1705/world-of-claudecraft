@@ -7735,6 +7735,7 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "射程外です。",
       "noTarget": "対象がいません。",
       "tooClose": "近すぎます！",
+      "mustTargetAlly": "味方を対象にしてください。",
       "facing": "対象の方を向いている必要があります。",
       "targetHealthBelow": "その能力は対象の体力が{percent}%未満でなければ使えません。",
       "dagger": "短剣を装備する必要があります。",

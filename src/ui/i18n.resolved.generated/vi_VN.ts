@@ -7735,6 +7735,7 @@ export const vi_VN: EnTranslations = {
       "outOfRange": "Ngoài tầm.",
       "noTarget": "Bạn không có mục tiêu.",
       "tooClose": "Quá gần!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Bạn phải đối mặt với mục tiêu.",
       "targetHealthBelow": "Kỹ năng đó cần mục tiêu có sinh lực dưới {percent}%.",
       "dagger": "Bạn phải trang bị một con dao găm.",

@@ -7735,6 +7735,7 @@ export const tr_TR: EnTranslations = {
       "outOfRange": "Menzil dışında.",
       "noTarget": "Hiçbir hedefin yok.",
       "tooClose": "Çok yakın!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Hedefine dönük olmalısın.",
       "targetHealthBelow": "O yetenek, hedefin canının %{percent} altında olmasını gerektirir.",
       "dagger": "Bir hançer kuşanmalısın.",

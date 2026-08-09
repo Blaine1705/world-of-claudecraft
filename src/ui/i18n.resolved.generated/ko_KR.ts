@@ -7735,6 +7735,7 @@ export const ko_KR: EnTranslations = {
       "outOfRange": "사정거리 밖입니다.",
       "noTarget": "대상이 없습니다.",
       "tooClose": "너무 가깝습니다!",
+      "mustTargetAlly": "아군을 대상으로 지정해야 합니다.",
       "facing": "대상을 바라봐야 합니다.",
       "targetHealthBelow": "그 능력은 대상 생명력이 {percent}% 미만이어야 합니다.",
       "dagger": "단검을 착용해야 합니다.",

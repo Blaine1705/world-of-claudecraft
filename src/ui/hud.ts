@@ -13663,6 +13663,10 @@ export class Hud {
       'Out of range.': 'hud.errors.outOfRange',
       'You have no target.': 'hud.errors.noTarget',
       'Too close!': 'hud.errors.tooClose',
+      // The friendly-rush refusal. A new key rather than a reuse of noTarget: the
+      // player may well HAVE a target (an enemy one), and telling them they have
+      // none would send them looking for the wrong problem.
+      'You must target an ally.': 'hud.errors.mustTargetAlly',
       'You must be facing your target.': 'hud.errors.facing',
       'You must wield a dagger.': 'hud.errors.dagger',
       'You must be behind your target.': 'hud.errors.behindTarget',

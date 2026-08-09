@@ -7735,6 +7735,7 @@ export const id_ID: EnTranslations = {
       "outOfRange": "Di luar jangkauan.",
       "noTarget": "Kamu tidak memiliki sasaran.",
       "tooClose": "Terlalu dekat!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Kamu harus menghadap sasaranmu.",
       "targetHealthBelow": "Kemampuan itu membutuhkan nyawa sasaran di bawah {percent}%.",
       "dagger": "Kamu harus menggunakan belati.",

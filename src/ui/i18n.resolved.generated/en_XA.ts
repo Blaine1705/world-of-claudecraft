@@ -7735,6 +7735,7 @@ export const en_XA: EnTranslations = {
       "outOfRange": "[Óúţ óƒ ŕáñĝé.]",
       "noTarget": "[Ýóú ĥáʋé ñó ţáŕĝéţ.]",
       "tooClose": "[Ţóó çļóšé!]",
+      "mustTargetAlly": "[Ýóú ɱúšţ ţáŕĝéţ áñ áļļý.]",
       "facing": "[Ýóú ɱúšţ ƀé ƒáçíñĝ ýóúŕ ţáŕĝéţ.]",
       "targetHealthBelow": "[Ţĥáţ áƀíļíţý ŕéɋúíŕéš ţĥé ţáŕĝéţ ƀéļóŵ {percent}% ĥéáļţĥ.]",
       "dagger": "[Ýóú ɱúšţ ŵíéļð á ðáĝĝéŕ.]",

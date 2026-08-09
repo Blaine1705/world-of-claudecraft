@@ -2178,6 +2178,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '射程外です。',
   'hud.errors.noTarget': '対象がいません。',
   'hud.errors.tooClose': '近すぎます！',
+  'hud.errors.mustTargetAlly': '味方を対象にしてください。',
   'hud.errors.facing': '対象の方を向いている必要があります。',
   'hud.errors.targetHealthBelow': 'その能力は対象の体力が{percent}%未満でなければ使えません。',
   'hud.errors.dagger': '短剣を装備する必要があります。',

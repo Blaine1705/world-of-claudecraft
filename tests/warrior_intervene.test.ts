@@ -145,6 +145,83 @@ describe('Intervene (level-5 warrior mobility row)', () => {
     expect(ABILITIES.charge.cooldown).toBe(15);
   });
 
+  it('refuses to rush the caster: no target and an enemy target both mean no ally', () => {
+    // resolveFriendlyTarget falls back to the CASTER when the current target is
+    // missing, dead, or hostile, which is right for a heal and wrong for a rush.
+    // Without a gate that fallback turned Intervene into an off-GCD personal absorb
+    // every 30 sec for every warrior who takes the row: exactly the quiet extra
+    // budget this row swap exists to remove, and the opposite of "rush to a friendly
+    // player". Both entry paths are covered because they resolve through the same
+    // fallback and a gate on one alone would leave the other open.
+    for (const withEnemyTarget of [false, true]) {
+      const { sim, p } = warriorAt(20, 'fury');
+      if (withEnemyTarget) {
+        const mob = createMob(9101, MOBS.training_dummy, 20, {
+          x: p.pos.x,
+          y: p.pos.y,
+          z: p.pos.z + 15,
+        });
+        mob.hostile = true;
+        sim.addEntity(mob);
+        sim.targetEntity(mob.id);
+      }
+      const errors = captureErrors(sim);
+      sim.castAbility('intervene');
+      for (let i = 0; i < 20; i++) sim.tick();
+
+      expect(
+        p.auras.some((a) => a.kind === 'absorb'),
+        `withEnemyTarget=${withEnemyTarget}: no self-shield`,
+      ).toBe(false);
+      // Refused ABOVE the billing, so nothing is spent either. A refusal that still
+      // charged the 30 sec would be its own bug.
+      expect(
+        p.cooldowns.has('intervene'),
+        `withEnemyTarget=${withEnemyTarget}: no cooldown billed`,
+      ).toBe(false);
+      expect(errors).toContain('You must target an ally.');
+    }
+  });
+
+  it('enforces its authored 8 yd minimum against a friendly target', () => {
+    // The def authors minRange: 8 and the tooltip header advertises "8-25 yd range",
+    // but the minRange gate lived only in the HOSTILE branch, so an ally standing on
+    // top of the warrior took the cast and the floor was a promise the sim ignored.
+    const { sim, p } = warriorAt(20, 'fury');
+    const ally = allyAt(sim, 2);
+    sim.tick();
+    sim.targetEntity(ally.id);
+    const errors = captureErrors(sim);
+
+    sim.castAbility('intervene');
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    expect(ally.auras.some((a) => a.kind === 'absorb'), 'no shield inside the floor').toBe(false);
+    expect(p.cooldowns.has('intervene'), 'and no cooldown billed').toBe(false);
+    expect(errors).toContain('Too close!');
+  });
+
+  it('still lands at the edges of its authored band, so the two gates are not blanket refusals', () => {
+    // Guards the two guards above. Both would also pass if Intervene simply stopped
+    // working, so pin that the band it advertises is the band it accepts.
+    for (const dist of [8, 25]) {
+      const { sim, p } = warriorAt(20, 'fury');
+      const ally = allyAt(sim, dist);
+      sim.tick();
+      sim.targetEntity(ally.id);
+      const errors = captureErrors(sim);
+
+      sim.castAbility('intervene');
+      for (let i = 0; i < 80; i++) sim.tick();
+
+      expect(ally.auras.some((a) => a.kind === 'absorb'), `${dist} yd is inside the band`).toBe(
+        true,
+      );
+      expect(p.cooldowns.has('intervene'), `${dist} yd bills the cooldown`).toBe(true);
+      expect(errors).toEqual([]);
+    }
+  });
+
   it('leaves the hostile Onrush completely unchanged', () => {
     // The friendly branch is gated on target hostility, not on the ability id, so this
     // is the regression guard for every warrior who never picks the row.

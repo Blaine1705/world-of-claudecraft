@@ -7735,6 +7735,7 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "超出範圍。",
       "noTarget": "你沒有目標。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必須選定一名友方目標。",
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
