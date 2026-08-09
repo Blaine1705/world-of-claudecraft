@@ -394,6 +394,20 @@ const MURLOC_BIPED14: ClipMap = {
   attack: ['Murloc_Attack'],
 };
 
+// The warlock demon pet family's own attack (scripts/build_demon_anims.mjs,
+// issue #2889 round 2): BIPED14's Punch/Weapon attack is shared by
+// reference across 6 unrelated families (mob_bear, mob_yeti, mob_murloc,
+// mob_troll, mob_demon, mob_demonalt). This "nod-and-slash" clip is baked
+// off demonalt.glb's own donor poses (Weapon's swing blended through the
+// currently unused Yes clip's downward nod), so only mob_demon and
+// mob_demonalt get it: they already share the same base rig and
+// tint-only differentiation, so sharing the new attack too is consistent
+// with how the rest of that pairing works.
+const DEMON_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Demon_Attack'],
+};
+
 // The bear family's own attack (scripts/build_bear_anims.mjs, issue #2889
 // round 2): BIPED14's Punch/Weapon attack is shared by reference across 6
 // unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon,
@@ -2109,9 +2123,14 @@ export const VISUALS: Record<string, VisualDef> = {
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
-    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 1.8,
-    clips: BIPED14,
+    clips: DEMON_BIPED14,
+    // Demon_Attack clip donor (scripts/build_demon_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Shared with mob_demonalt below.
+    animUrls: [
+      `${CREATURES}/demonalt_hit_variety_anims.glb`,
+      `${CREATURES}/demon_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.5,
   },
@@ -2242,9 +2261,14 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
-    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 2.1,
-    clips: BIPED14,
+    clips: DEMON_BIPED14,
+    // Demon_Attack clip donor (scripts/build_demon_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Shared with mob_demon above.
+    animUrls: [
+      `${CREATURES}/demonalt_hit_variety_anims.glb`,
+      `${CREATURES}/demon_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.35,
   },

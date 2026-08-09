@@ -1054,7 +1054,7 @@ export const da_DK: EnTranslations = {
       "blurb": "To ruinerede borge står over for hinanden på tværs af en ommuret hulning i skyggen af Tornetop: Karmoisin mod syd, Azurblå mod nord, og den ældre Ruingård imellem dem, som ingen af dem nogensinde har holdt. Fem på hver side, ét banner hver, og den første til at bringe tre af deres egne hjem tager marken.",
       "modeTag": "5v5 fang flaget",
       "offlineNote": "Tornehulemarkerne synkroniserer. Køen åbner, så snart riget svarer.",
-      "ratingSummary": "Rating. {wins} sejre / {losses} nederlag",
+      "ratingSummary": "Rating. {wins} sejre / {losses} nederlag / {draws} uafgjorte",
       "careerCaptures": "Erobringer i karrieren: {count}",
       "enterQueue": "Gå i kø",
       "enterQueueParty": "Gå i kø (gruppe på {count})",
@@ -7418,6 +7418,9 @@ export const da_DK: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
     "bodyWeb": "Spillet kører uden GPU-acceleration og vil være langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Afvis"
   },
   "perfNudge": {
@@ -7879,6 +7882,7 @@ export const da_DK: EnTranslations = {
       "deathRecapAbility": "Du er død. Dræbt af {ability}.",
       "deathRecapFalling": "Du er død. Du faldt i døden.",
       "deathRecapDrowned": "Du er død. Du druknede.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Du føler dig udhvilet og hel igen.",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
@@ -7922,6 +7926,7 @@ export const da_DK: EnTranslations = {
       "outOfRange": "Uden for rækkevidde.",
       "noTarget": "Du har intet mål.",
       "tooClose": "For tæt på!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Du skal vende ansigtet mod dit mål.",
       "targetHealthBelow": "Den evne kræver, at målet er under {percent}% helbred.",
       "dagger": "Du skal føre en daggert.",
@@ -8164,7 +8169,7 @@ export const da_DK: EnTranslations = {
       "queueNote": "Du bliver matchet med den nærmeste rangerede udfordrer online og derefter teleporteret til sandet. Vind for at kravle op; den første, der overgiver sig (1 helbred), taber. Du vender tilbage præcis hvor du stillede dig i kø.",
       "ladderAllTime": "Rangliste - Gennem Tiden",
       "ladderOnline": "Rangliste - Online",
-      "ratingSummary": "Rating - {wins} sejre / {losses} nederlag",
+      "ratingSummary": "Rating - {wins} sejre / {losses} nederlag / {draws} uafgjorte",
       "statusCountdown": "Tag dig sammen...",
       "statusReturning": "Vender tilbage til verden... {seconds}",
       "statusFight": "Kæmp til overgivelse!",
@@ -9538,6 +9543,10 @@ export const da_DK: EnTranslations = {
       "die_by_sword": {
         "name": "Dø ved Sværdet",
         "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Dumdristighed",

@@ -1054,7 +1054,7 @@ export const de_DE: EnTranslations = {
       "blurb": "Zwei zerstörte Festungen stehen sich in einer ummauerten Senke im Schatten des Thornpeak gegenüber: Karmesin im Süden, Azur im Norden, und der ältere Ruinenhof dazwischen, den keine von beiden je gehalten hat. Fünf gegen fünf, je ein Banner, und wer zuerst drei der gegnerischen heimbringt, gewinnt das Feld.",
       "modeTag": "5v5 Flaggenraub",
       "offlineNote": "Thornhollow-Felder synchronisiert sich. Die Warteschlange öffnet, sobald das Reich antwortet.",
-      "ratingSummary": "Wertung. {wins} Siege / {losses} Niederlagen",
+      "ratingSummary": "Wertung. {wins} Siege / {losses} Niederlagen / {draws} Unentschieden",
       "careerCaptures": "Eroberungen der Karriere: {count}",
       "enterQueue": "In Warteschlange",
       "enterQueueParty": "In Warteschlange (Gruppe von {count})",
@@ -7418,6 +7418,9 @@ export const de_DE: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.",
     "bodyWeb": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktiviere die Hardwarebeschleunigung in deinen Browsereinstellungen, aktualisiere deine Grafiktreiber und starte deinen Browser neu.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Schließen"
   },
   "perfNudge": {
@@ -7879,6 +7882,7 @@ export const de_DE: EnTranslations = {
       "deathRecapAbility": "Ihr seid gestorben. Erschlagen durch {ability}.",
       "deathRecapFalling": "Ihr seid gestorben. Ihr seid in den Tod gestürzt.",
       "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
@@ -7922,6 +7926,7 @@ export const de_DE: EnTranslations = {
       "outOfRange": "Außer Reichweite.",
       "noTarget": "Ihr habt kein Ziel.",
       "tooClose": "Zu nah!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Ihr müsst Eurem Ziel zugewandt sein.",
       "targetHealthBelow": "Diese Fähigkeit erfordert, dass das Ziel unter {percent}% Gesundheit hat.",
       "dagger": "Ihr müsst einen Dolch führen.",
@@ -8164,7 +8169,7 @@ export const de_DE: EnTranslations = {
       "queueNote": "Ihr werdet mit dem online nächstbewerteten Herausforderer gepaart und in den Sand teleportiert. Gewinnt, um aufzusteigen; wer zuerst aufgibt (1 Gesundheit), verliert. Ihr kehrt genau an den Ort zurück, an dem Ihr Euch eingereiht habt.",
       "ladderAllTime": "Rangliste - gesamt",
       "ladderOnline": "Rangliste - online",
-      "ratingSummary": "Wertung - {wins} Siege / {losses} Niederlagen",
+      "ratingSummary": "Wertung - {wins} Siege / {losses} Niederlagen / {draws} Unentschieden",
       "statusCountdown": "Macht Euch bereit...",
       "statusReturning": "Rückkehr in die Welt... {seconds}",
       "statusFight": "Kämpft bis zur Aufgabe!",
@@ -9538,6 +9543,10 @@ export const de_DE: EnTranslations = {
       "die_by_sword": {
         "name": "Tod durch das Schwert",
         "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Tollkühnheit",

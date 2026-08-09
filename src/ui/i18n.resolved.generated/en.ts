@@ -1054,7 +1054,7 @@ export const en: EnTranslations = {
       "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
       "modeTag": "5v5 Capture the Flag",
       "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
-      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses / {draws} draws",
       "careerCaptures": "Career captures: {count}",
       "enterQueue": "Enter the Queue",
       "enterQueueParty": "Enter the Queue (party of {count})",
@@ -7418,6 +7418,9 @@ export const en: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Dismiss"
   },
   "perfNudge": {
@@ -7879,6 +7882,7 @@ export const en: EnTranslations = {
       "deathRecapAbility": "You have died. Slain by {ability}.",
       "deathRecapFalling": "You have died. You fell to your death.",
       "deathRecapDrowned": "You have died. You drowned.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "You feel rested and whole again.",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
@@ -7922,6 +7926,7 @@ export const en: EnTranslations = {
       "outOfRange": "Out of range.",
       "noTarget": "You have no target.",
       "tooClose": "Too close!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "You must be facing your target.",
       "targetHealthBelow": "That ability requires the target below {percent}% health.",
       "dagger": "You must wield a dagger.",
@@ -8164,7 +8169,7 @@ export const en: EnTranslations = {
       "queueNote": "You will be matched with the nearest-rated challenger online, then teleported to the sands. Win to climb; first to yield (1 health) loses. You return exactly where you queued.",
       "ladderAllTime": "Ladder - All-Time",
       "ladderOnline": "Ladder - Online",
-      "ratingSummary": "Rating - {wins} wins / {losses} losses",
+      "ratingSummary": "Rating - {wins} wins / {losses} losses / {draws} draws",
       "statusCountdown": "Steel yourself...",
       "statusReturning": "Returning to the world... {seconds}",
       "statusFight": "Fight to the yield!",
@@ -9539,6 +9544,10 @@ export const en: EnTranslations = {
         "name": "Die by the Sword",
         "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
+      },
       "recklessness": {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
@@ -9553,7 +9562,7 @@ export const en: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect."
       },
       "revenge": {
         "name": "Revenge",

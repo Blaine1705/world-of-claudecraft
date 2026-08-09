@@ -1054,7 +1054,7 @@ export const cs_CZ: EnTranslations = {
       "blurb": "Dvě zbořené tvrze si hledí přes ohrazenou kotlinu ve stínu Thornpeaku: Karmínová na jihu, Blankytná na severu, a mezi nimi starší Zpustlé nádvoří, které nikdy žádná z nich neovládla. Pět na každé straně, jedna vlajka na tým, a kdo první donese domů tři z těch svých, ovládne bojiště.",
       "modeTag": "5v5, Zajetí vlajky",
       "offlineNote": "Thornhollowská pole se synchronizují. Fronta se otevře, jakmile realm odpoví.",
-      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher / {draws} remíz",
       "careerCaptures": "Zajetí za kariéru: {count}",
       "enterQueue": "Vstoupit do fronty",
       "enterQueueParty": "Vstoupit do fronty (skupina: {count})",
@@ -7418,6 +7418,9 @@ export const cs_CZ: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
     "bodyWeb": "Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Zavřít"
   },
   "perfNudge": {
@@ -7879,6 +7882,7 @@ export const cs_CZ: EnTranslations = {
       "deathRecapAbility": "Tvá postava zemřela. Příčina: {ability}.",
       "deathRecapFalling": "Tvá postava zemřela. Spadla k smrti.",
       "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
@@ -7922,6 +7926,7 @@ export const cs_CZ: EnTranslations = {
       "outOfRange": "Mimo dosah.",
       "noTarget": "Nemáš cíl.",
       "tooClose": "Příliš blízko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musíš čelit svému cíli.",
       "targetHealthBelow": "Tato schopnost vyžaduje cíl pod {percent} % zdraví.",
       "dagger": "Musíš mít dýku.",
@@ -8164,7 +8169,7 @@ export const cs_CZ: EnTranslations = {
       "queueNote": "Budeš spárován(a) s online vyzyvatelem s nejbližším hodnocením a teleportován(a) do písku. Vyhraj a stoupni; kdo první povolí (1 zdraví), prohrává. Vrátíš se přesně tam, kde ses zařadil(a) do fronty.",
       "ladderAllTime": "Žebříček - celkový",
       "ladderOnline": "Žebříček - online",
-      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher / {draws} remíz",
       "statusCountdown": "Zocel se...",
       "statusReturning": "Návrat do světa... {seconds}",
       "statusFight": "Bojuj až do povolení!",
@@ -9538,6 +9543,10 @@ export const cs_CZ: EnTranslations = {
       "die_by_sword": {
         "name": "Smrt s mečem v ruce",
         "description": "Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Bezhlavost",

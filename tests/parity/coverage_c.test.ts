@@ -10,6 +10,9 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../../src/sim/data';
+import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
+import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
 import { SCENARIOS } from './scenarios';
@@ -292,20 +295,28 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   }, 90_000);
 
-  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+  it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
     const rec = run('warrior_row_capstones');
     const sim = rec.sim as any;
     const pid = sim.playerId;
     const ev = rec.allEvents as Ev[];
-    expect(rec.notes.chargeSpent).toBe(2);
-    expect(rec.notes.chargeRecharging).toBe(true);
-    const feared = entities(rec).find((e) =>
-      e.auras?.some((a: any) => a.id === 'fear_incap'),
-    ) as any;
-    expect(feared).toBeTruthy();
-    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
-    expect(fear.breaksOnDamage).toBe(true);
-    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // The hostile Onrush keeps both side effects...
+    expect(rec.notes.onrushRage).toBe(true);
+    expect(rec.notes.onrushInCombat).toBe(true);
+    // ...and the friendly Intervene takes neither, while shielding the ally.
+    expect(rec.notes.interveneShield).toBe(50);
+    expect(rec.notes.interveneClosed).toBe(true);
+    expect(rec.notes.interveneRage).toBe(0);
+    expect(rec.notes.interveneInCombat).toBe(false);
+    expect(rec.notes.interveneAutoAttack).toBe(false);
+    // Read at APPLY, not from end-of-run state: the legs after the shout run over
+    // five seconds, so anything shorter than the old 8 sec fear has expired by the
+    // end and an end-state lookup quietly finds nothing to assert.
+    expect(rec.notes.fearApplied).toBe(true);
+    expect(rec.notes.fearDuration).toBe(4);
+    expect(rec.notes.fearBreaksOnDamage).toBe(true);
+    // Lingering Dread's soak, 10% of the wolf's max health.
+    expect(rec.notes.fearBreakThreshold).toBeGreaterThan(0);
     expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
       true,
     );
@@ -538,6 +549,33 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.maxDurability).toBe(30);
     expect(slot.durability).toBeLessThan(slot.maxDurability);
     expect(slot.durability).toBe(29);
+  });
+
+  it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {
+    const rec = run('rift_boss_floor');
+    const ev = rec.allEvents as Ev[];
+    const n = rec.notes as Record<string, unknown>;
+    // The driver fired twice: the driven fuse plus the pre-death zone.
+    const spawns = ev.filter((e) => e.type === 'riftDeathZoneSpawn');
+    expect(spawns.length).toBeGreaterThanOrEqual(2);
+    // The first fuse carries the S tempo (0.7) times the capped 50%-slow
+    // stretch (2x) over Venom Pool's authored castTime: both arms really ran.
+    expect((spawns[0] as { durationSecs?: number }).durationSecs).toBeCloseTo(
+      MOBS.rift_boss_venom.deathZoneCast!.castTime * RIFT_S_ZONE_TEMPO * RIFT_IMPAIRED_FUSE_CAP,
+      5,
+    );
+    // The fuse ran out: the detonation telegraph line fired.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Venom Pool'),
+      ),
+    ).toBe(true);
+    // Boss death cancelled the pending zone and told online mirrors.
+    expect(ev.some((e) => e.type === 'riftDeathZoneClear')).toBe(true);
+    // The escape window was genuinely open while the guard fought, and the
+    // guard's web never landed inside it (riftControlSuppressed fired).
+    expect(n.windowOpenDuringGuardFight).toBe(true);
+    expect(n.playerRootedInWindow).toBe(false);
   });
 
   it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {

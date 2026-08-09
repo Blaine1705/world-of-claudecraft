@@ -339,7 +339,7 @@ function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): voi
 
 // Legacy incremental API retained for old scripts. The node system is gone, so
 // this no longer changes state.
-export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
+export function spendTalentPoint(ctx: SimContext, _nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   ctx.error(r.e.id, 'Invalid talent build.');
