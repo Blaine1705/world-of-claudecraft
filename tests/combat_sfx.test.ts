@@ -253,7 +253,7 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
-  it('gives the two AoE fear shouts still on the shared fear_shout cue', () => {
+  it('keeps the two AoE fear shouts on the shared fear_shout cue', () => {
     for (const ability of ['psychic_scream', 'howl_of_terror']) {
       expect(
         spellFxCue({
@@ -325,7 +325,10 @@ describe('combat SFX policy', () => {
         ability: 'intimidating_shout',
       }),
     ).toBeNull();
-    // An unmapped shout id stays silent too.
+    // A real ability id that is not one of the five recorded shouts (Charge,
+    // a warrior ability with no cast-time fx of its own) stays silent too:
+    // a fx:'shout' event carrying it must not accidentally resolve through
+    // some other lookup keyed off the same id.
     expect(
       spellFxCue({
         type: 'spellfx',
@@ -333,7 +336,7 @@ describe('combat SFX policy', () => {
         targetId: 10,
         school: 'physical',
         fx: 'shout',
-        ability: 'commanding_shout',
+        ability: 'charge',
       }),
     ).toBeNull();
   });
