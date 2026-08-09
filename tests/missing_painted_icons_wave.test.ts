@@ -517,16 +517,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // The Drakelands brood merge, the Rift coverage pair, the seven per-craft rare-tier
-    // profession deeds (issue #2055), and the remaining starter-zone chronicle pairs all
-    // appended deeds after this wave, so the live catalog is 259 and the wave's own claim
-    // is unchanged: every deed that existed when it landed is painted. The only
-    // artless ids are those appended later, which ride the category-crest fallback the
-    // Icons authoring rule in docs/design/deeds.md sanctions, until their 512px sources
-    // are commissioned (flagged in docs/achievements/icon-brief.md). Read from
-    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts), so this file
-    // cannot end up naming a different pending set than the other two art suites.
-    // Exhaustive: a further artless deed still reds here.
+    // Later releases appended more deeds after this historical wave. The completion wave now
+    // paints those too, so the shared pending set is empty; a future unenumerated artless deed
+    // still fails this exhaustive comparison.
     expect(DEED_ORDER).toHaveLength(262);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
@@ -541,7 +534,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     const generatedRow = creditRows.find((line) =>
       line.startsWith('| Generated Book of Deeds additions'),
     );
-    expect(commissionedRow).toContain('excluding the fourteen generated additions listed next');
+    expect(commissionedRow).toContain('excluding the project-generated additions credited below');
     expect(generatedRow).toContain('World of ClaudeCraft');
     expect(generatedRow).toContain('OpenAI built-in image generation');
     for (const id of accepted.targetSets.deeds) {
@@ -582,7 +575,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     }
   });
 
-  it('pins every live Heroic weapon to its base GLB-rendered portrait with no duplicate mapping', () => {
+  it('keeps the historical Heroic resolver record while serving its base painting today', () => {
     const accepted = manifest();
     const live = Object.values(ITEMS)
       .filter((item) => item.kind === 'weapon' && item.heroicOf)
@@ -603,8 +596,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
       expect(target.heldModelPath).toBe(`public/models/weapons/${target.variant}.glb`);
       expect(existsSync(path.join(repoRoot, target.portraitPath))).toBe(true);
       expect(existsSync(path.join(repoRoot, target.heldModelPath))).toBe(true);
-      expect(weaponIconUrl(target.id)).toBe(target.bagIconUrl);
-      expect(iconDataUrl('item', target.id)).toBe(target.bagIconUrl);
+      // The accepted-art manifest is immutable historical evidence of the old JPG lane. The
+      // current runtime intentionally supersedes only its bag/portrait URL with base-id art;
+      // the held model and legacy preview remain available to rendering/tooling.
+      expect(weaponIconUrl(target.id)).toBe(`/ui/items/${target.baseId}.webp`);
+      expect(iconDataUrl('item', target.id)).toBe(`/ui/items/${target.baseId}.webp`);
       expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${target.variant}.glb`);
       expect(iconDataUrl('item', target.id)).toBe(iconDataUrl('item', target.baseId));
     }

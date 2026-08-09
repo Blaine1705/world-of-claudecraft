@@ -489,14 +489,21 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   `ABILITY_IMAGE_IDS`. Nothing converts at BUILD time (the script is a pre-commit step, not
   wired into `npm run build`); each art tree has its own converter and its own gate:
   `tests/skill_icons.test.ts` fails if a wired id lacks its webp or any non-webp image is
-  committed there (the existing weapon JPGs and cursor/emote PNGs are grandfathered). Prefer
-  WebP for any new ability/skill art.
+  committed there (the legacy weapon-preview JPGs and cursor/emote PNGs are grandfathered).
+  Prefer WebP for any new ability/skill art.
   The Book of Deeds crest art mirrors this: the generated `DEED_IMAGE_IDS` set
   (`deed_image_ids.ts`) maps a `deed_<deedId>` crest id to `/ui/deeds/<deedId>.webp` via
-  `deedImageUrl`, served for `kind:'crest'` (the deeds window; any other crest id still
-  composites its procedural recipe). Convert with `npm run assets:deeds`
+  `deedImageUrl`, served for `kind:'crest'` in the deeds window. Class, mob-family, and status
+  crest ids resolve through `crest_icon_art.ts`; unit portraits paint their procedural recipe
+  immediately and replace it after the static WebP decodes. Convert deed sources with
+  `npm run assets:deeds`
   (`scripts/convert_deed_icons_webp.mjs`); `tests/deed_icons.test.ts` gates the id list
   against the committed webp files in both directions.
+- **Specialization emblems:** every live talent specialization has dedicated 128px opaque WebP
+  art at `public/ui/specs/<class>/<spec>.webp`. `spec_icon_art.ts` owns the closed class-qualified
+  registry and `talent_icons.ts` retains signature-ability/text fallbacks only for synthetic or
+  development-time specs. `tests/spec_icons.test.ts` gates catalog, files, dimensions, weight,
+  opacity, and uniqueness in both directions.
 - **The same exception for HUD CHROME, scoped to primary destinations:** `ui_icons.ts` stays
   the monochrome `currentColor` registry, but the names in `CHROME_ART_IDS`
   (`chrome_icon_art.ts`) also ship painted art under `public/ui/chrome/<name>.webp`, and
@@ -511,14 +518,17 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   `public/ui/chrome/mapping.json`. `tests/chrome_icons.test.ts` gates the bijection, the alpha,
   the 128px square, launcher reachability from BOTH entry documents, and the role split
   (secondary controls and brand marks may never gain art).
-- **The same exception for ITEMS:** `ITEM_IMAGE_IDS` ships painted art for items, and
+- **The same exception for ITEMS:** `ITEM_IMAGE_IDS` ships painted art for non-weapon items, and
   `itemImageUrl(id)` returns `/ui/items/<id>.webp`, served for `kind:'item'` (bags, tooltips,
-  loot, vendor, the `/wiki` guide). Weapons are the one carve-out: they keep their rendered-model
-  thumbnails under `WEAPON_ICON_DIR`. Add art the same way: drop it into `public/ui/items/` named
-  after the item id, run `npm run assets:items` (`scripts/convert_item_icons_webp.mjs`, the
-  sibling of the skills converter, which ALSO downscales to the served 128px square and deletes
-  the original), then list the id in `ITEM_IMAGE_IDS` and record its provenance/license in
-  `public/ui/items/mapping.json`. An icon id with NO `ITEMS` record (today: the implicit
+  loot, vendor, the `/wiki` guide). `WEAPON_IMAGE_IDS` uses that same directory for one bespoke
+  painting per authored weapon id; generated Heroic copies inherit their base painting while
+  `ITEM_WEAPON_VARIANTS` independently chooses the held GLB. Add art the same way: drop it into
+  `public/ui/items/` named after the item id, run `npm run assets:items`
+  (`scripts/convert_item_icons_webp.mjs`, the sibling of the skills converter, which ALSO
+  downscales to the served 128px square and deletes the original), then record its
+  provenance/license in `public/ui/items/mapping.json`. Non-weapons enter `ITEM_IMAGE_IDS`
+  automatically from `ITEMS`; authored weapons enter `WEAPON_IMAGE_IDS` from
+  `ITEM_WEAPON_VARIANTS`. An icon id with NO `ITEMS` record (today: the implicit
   `backpack` the bag bar shows) goes in `UI_ITEM_IMAGE_IDS` instead, which keeps the guard's
   "every wired ITEM id is a real, non-weapon item" assertion intact. `tests/item_icons.test.ts`
   is the gate: WebP-only tree, art and wiring in bijection, every icon the declared square, every

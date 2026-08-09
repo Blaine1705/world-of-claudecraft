@@ -13,18 +13,19 @@ import {
   itemIconRecipe,
   itemImageUrl,
   UI_ITEM_IMAGE_IDS,
+  WEAPON_IMAGE_IDS,
 } from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
-// public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl for
-// kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). The guard is a bijection plus
-// a scope check (wired ids are real, non-equipment items):
+// public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl or
+// weaponIconUrl for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). The guard is
+// a bijection plus a scope check:
 //   A) every id in ITEM_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/items;
-//   C) every committed .webp is a WIRED id (an item id, or a UI pseudo-item id);
-//   D) every wired ITEM id is a real ITEMS entry that is not a weapon (weapons ship rendered
-//      model thumbnails via WEAPON_ICON_DIR; everything else, armor included, lives here),
+//   C) every committed .webp is a WIRED item, weapon, or UI pseudo-item id;
+//   D) every wired ITEM id is a real ITEMS entry that is not a weapon, every weapon-art id is
+//      a directly authored weapon,
 //      and every UI pseudo-item id is deliberately NOT an item (the two sets stay disjoint);
 //   E) the whole bag family (the 5 equippable bags + the implicit backpack) is image-backed,
 //      so the bag bar never mixes painted art with a procedural fallback.
@@ -230,13 +231,14 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
+    expect(WEAPON_IMAGE_IDS.size).toBe(119);
   });
 
-  it('A) every image-backed item id resolves to a committed, decodable .webp', async () => {
+  it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
     const broken: string[] = [];
-    for (const id of [...ITEM_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
+    for (const id of [...ITEM_IMAGE_IDS, ...WEAPON_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
       if (ITEM_ART_PENDING.has(id)) continue; // covered by A2/A3 below
-      const url = itemImageUrl(id);
+      const url = WEAPON_IMAGE_IDS.has(id) ? iconDataUrl('item', id) : itemImageUrl(id);
       expect(url, `${id} must resolve to a webp url`).toMatch(/^\/ui\/items\/.+\.webp$/);
       const file = path.join(publicDir, (url as string).replace(/^\//, ''));
       if (!existsSync(file)) broken.push(`${id} -> ${url} (missing file)`);
@@ -297,22 +299,25 @@ describe('item webp icons', () => {
     const orphans: string[] = [];
     for (const file of webpFiles()) {
       const id = path.basename(file, '.webp');
-      if (!ITEM_IMAGE_IDS.has(id) && !UI_ITEM_IMAGE_IDS.has(id))
-        orphans.push(`${path.relative(repoRoot, file)} (not in ITEM_IMAGE_IDS/UI_ITEM_IMAGE_IDS)`);
+      if (!ITEM_IMAGE_IDS.has(id) && !WEAPON_IMAGE_IDS.has(id) && !UI_ITEM_IMAGE_IDS.has(id)) {
+        orphans.push(
+          `${path.relative(repoRoot, file)} (not in an item, weapon, or UI image registry)`,
+        );
+      }
     }
     expect(orphans, 'remove dead-weight art or wire the id into ITEM_IMAGE_IDS').toEqual([]);
   });
 
-  it('D) every wired id is a real, non-weapon item', () => {
+  it('D) every general item-art id is a real, non-weapon item', () => {
     const bad: string[] = [];
     for (const id of ITEM_IMAGE_IDS) {
       const def = (ITEMS as Record<string, { kind?: string }>)[id];
       if (!def) bad.push(`${id} (no such item)`);
-      else if (def.kind === 'weapon') bad.push(`${id} (weapon: has its own rendered-JPG pipeline)`);
+      else if (def.kind === 'weapon') bad.push(`${id} (weapon: belongs in WEAPON_IMAGE_IDS)`);
     }
     expect(
       bad,
-      'ITEM_IMAGE_IDS covers real items only; weapons use WEAPON_ICON_DIR thumbnails instead',
+      'ITEM_IMAGE_IDS covers non-weapon items; painted weapons belong in WEAPON_IMAGE_IDS',
     ).toEqual([]);
   });
 
@@ -330,6 +335,15 @@ describe('item webp icons', () => {
       'UI_ITEM_IMAGE_IDS is only for icon ids with no ITEMS record (the implicit backpack); ' +
         'a real item belongs in ITEM_IMAGE_IDS, where guard D checks it',
     ).toEqual([]);
+  });
+
+  it('D3) every authored weapon has one per-item painted path', () => {
+    expect([...WEAPON_IMAGE_IDS].sort()).toEqual(Object.keys(ITEM_WEAPON_VARIANTS).sort());
+    for (const id of WEAPON_IMAGE_IDS) {
+      expect(ITEMS[id]?.kind, id).toBe('weapon');
+      expect(ITEMS[id]?.heroicOf, `${id} should be an authored base weapon`).toBeUndefined();
+      expect(iconDataUrl('item', id), id).toBe(`/ui/items/${id}.webp`);
+    }
   });
 
   it('E) every bag, and the implicit backpack, renders painted art (not a procedural icon)', () => {
@@ -563,7 +577,7 @@ describe('item webp icons', () => {
     ).toEqual([]);
   });
 
-  it('J) mapped weapons keep their rendered model thumbnails', () => {
+  it('J) mapped weapons serve per-item paintings independently of their held model', () => {
     const weaponIds = new Set(
       Object.values(ITEMS)
         .filter((item) => item.kind === 'weapon')
@@ -572,8 +586,8 @@ describe('item webp icons', () => {
     const strayMappings = Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !weaponIds.has(id));
     expect(strayMappings, 'thumbnail mappings must only target real weapons').toEqual([]);
     for (const id of Object.keys(ITEM_WEAPON_VARIANTS)) {
-      expect(iconDataUrl('item', id), `${id} must keep its rendered weapon thumbnail`).toBe(
-        `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
+      expect(iconDataUrl('item', id), `${id} must serve bespoke painted inventory art`).toBe(
+        `/ui/items/${id}.webp`,
       );
     }
   });
@@ -595,11 +609,11 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
       expect(isUnknownIconRecipe(itemIconRecipe(hostile)), hostile).toBe(true);
     }
     // The weapon-art arm shares the gate: without it, a prototype key
-    // stringifies a prototype member into a garbage /ui/weapons/ URL before
+    // stringifies a prototype member into a garbage /ui/items/ URL before
     // the recipe layer is ever consulted (canvas-bound at runtime, so pinned
     // at the source).
     const iconsSource = readFileSync(new URL('../src/ui/icons.ts', import.meta.url), 'utf8');
-    expect(iconsSource).toContain('Object.hasOwn(ITEM_ICON_IMAGES, id)');
+    expect(iconsSource).toContain('Object.hasOwn(ITEM_WEAPON_VARIANTS, id)');
     // A real def without committed art takes its DERIVED recipe, not the
     // fallback, so this pin cannot pass by everything falling through.
     const derived = Object.values(ITEMS).find(

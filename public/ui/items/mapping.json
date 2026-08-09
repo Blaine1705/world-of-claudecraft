@@ -1,7 +1,7 @@
 {
   "license": "CraftPix premium (royalty-free commercial). Icons purchased by Levy Street account - callum@levystreet.com",
   "iconSize": 128,
-  "note": "Item icons (resources, consumables, quest items, armor equipment, and bags), curated + verified from CraftPix packs unless the entry carries its own \"license\" field, which overrides the pack license above. WebP only; add art with `npm run assets:items`.",
+  "note": "Item icons (resources, consumables, quest items, armor equipment, bags, and per-item weapon paintings). Ordinary entries are curated + verified from CraftPix packs unless the entry carries its own \"license\" field, which overrides the pack license above. Generated batches carry separate provenance and do not inherit the CraftPix license. WebP only; add art with `npm run assets:items`.",
   "entries": [
     {
       "itemId": "acolytes_circlet",
@@ -613,13 +613,6 @@
       "sourcePack": "equipment",
       "sourceFile": "2.png",
       "confidence": "medium"
-    },
-    {
-      "itemId": "firebottle",
-      "name": "Firebottle",
-      "sourcePack": "alchemist",
-      "sourceFile": "1.png",
-      "confidence": "high"
     },
     {
       "itemId": "footpad_jerkin",
@@ -2178,30 +2171,6 @@
       "sourcePack": "greaves",
       "sourceFile": "22.png",
       "confidence": "medium"
-    },
-    {
-      "itemId": "sharp_claw",
-      "name": "Sharp Claw",
-      "sourcePack": "woc_original_svg",
-      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
-    },
-    {
-      "itemId": "curved_tusk",
-      "name": "Curved Tusk",
-      "sourcePack": "woc_original_svg",
-      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
-    },
-    {
-      "itemId": "pristine_claw",
-      "name": "Pristine Claw",
-      "sourcePack": "woc_original_svg",
-      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
     }
   ],
   "generatedBatches": [
@@ -7575,6 +7544,257 @@
           "intendedVisualSubject": "A matched pair of empty umber and deep green leather boots standing side by side in three-quarter view, wrapped with woody root and vine straps, thorn studs at the ankle and pale moss caught around the soles. Feet slot, leather."
         }
       }
+    },
+    {
+      "batchId": "placeholder-art-completion-item-cleanup-2026-08-09",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "Exact per-item ordered repository references, their limited visual roles, and the superseded placeholder anti-references are recorded in docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json. Each referenced file retains its existing recorded provenance and license; its repository path does not establish or reclassify authorship.",
+      "styleReferencesByItem": {
+        "curved_tusk": [
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "overall painted item lighting and finish reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/cracked_ogre_tusk.webp",
+            "role": "tusk, ivory, wear, and harvest-material reference",
+            "provenance": "CraftPix Premium hunting/19.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/grubjaw_tusk.webp",
+            "role": "tusk, ivory, wear, and harvest-material reference",
+            "provenance": "CraftPix Premium generic100b/91.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/curved_tusk.webp",
+            "role": "superseded thin crescent placeholder and semantic anti-reference",
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ],
+        "firebottle": [
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "overall painted item lighting and finish reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/glass_vial.webp",
+            "role": "glass, cork, and material-rendering reference",
+            "provenance": "World of ClaudeCraft original professions art created for this game",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/venomfire_elixir.webp",
+            "role": "glass, flame-color, and material-rendering reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/firebottle.webp",
+            "role": "superseded red potion placeholder and semantic anti-reference",
+            "provenance": "CraftPix Premium alchemist/1.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          }
+        ],
+        "pristine_claw": [
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "overall painted item lighting and finish reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/wolf_fang.webp",
+            "role": "harvested keratin material reference",
+            "provenance": "CraftPix Premium generic100b/31.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/greyjaw_fang.webp",
+            "role": "creature-material reference",
+            "provenance": "CraftPix Premium hunting/37.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/pristine_claw.webp",
+            "role": "superseded gold crescent placeholder and semantic anti-reference",
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ],
+        "sharp_claw": [
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "overall painted item lighting and finish reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/wolf_fang.webp",
+            "role": "harvested keratin and bone reference",
+            "provenance": "CraftPix Premium generic100b/31.png art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/rough_hide.webp",
+            "role": "sinew and hide material reference",
+            "provenance": "World of ClaudeCraft original professions art created for this game",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/sharp_claw.webp",
+            "role": "superseded clean crescent placeholder and semantic anti-reference",
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ]
+      },
+      "commonPrompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory icon of one centered tangible item on an opaque dark atmospheric vignette, with top-left key light, a clear silhouette, safe margins, small-size readability, and no UI border, text, watermark, character, or crop. Exact per-item subjects and constraints are recorded in the provenance record.",
+      "provenanceRecord": "docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json",
+      "itemIds": [
+        "curved_tusk",
+        "firebottle",
+        "pristine_claw",
+        "sharp_claw"
+      ]
+    },
+    {
+      "batchId": "placeholder-art-completion-weapons-2026-08-09",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "Exact per-weapon prompts, ordered repository reference paths, and the visual role of each reference are recorded in docs/achievements/placeholder-art-completion-2026-08-09/. Every referenced file retains its existing recorded provenance and license; its repository path does not establish or reclassify authorship.",
+      "commonPrompt": "Fresh premium hand-painted classic-fantasy MMORPG weapon inventory icon of one complete centered weapon on an opaque dark atmospheric vignette. Give every canonical item a distinct silhouette and material construction, with top-left light, safe margins, readability at 28 pixels, and no UI border, text, watermark, hand, character, or crop. Exact per-weapon subjects and constraints are recorded in the provenance reports.",
+      "provenanceRecord": "docs/achievements/placeholder-art-completion-2026-08-09/",
+      "itemIds": [
+        "apprentice_staff",
+        "arcanite_war_axe",
+        "bogiron_mace",
+        "bonewrought_greatsword",
+        "briarroot_staff",
+        "bristleback_maul",
+        "bronzework_mace",
+        "brutoks_maul",
+        "caravan_warden_dirk",
+        "copper_bearded_axe",
+        "copper_flanged_mace",
+        "corpse_candle_focus",
+        "crag_warden_cudgel",
+        "craghorn_staff",
+        "cragthorn_greatstaff",
+        "crossroads_saber",
+        "cultist_flayer",
+        "deacons_cleaver",
+        "deathless_greatblade",
+        "deathless_heartwood",
+        "direfang_greatblade",
+        "drogmars_skullcleaver",
+        "drovers_staff",
+        "drowned_choir_fang",
+        "drowned_tide_scepter",
+        "drownedmoon_kris",
+        "drownedmoon_maul",
+        "drownedmoon_scepter",
+        "duskfang_dirk",
+        "eastbrook_arming_sword",
+        "eastbrook_greatsword",
+        "elderwood_battle_staff",
+        "emberfang_warblade",
+        "emberglass_warstaff",
+        "emberwood_staff",
+        "fang_of_korzul",
+        "fanglords_beastspear",
+        "fen_reaver_glaive",
+        "fenreed_staff",
+        "fenshadow_maul",
+        "final_argument_greatblade",
+        "first_blood_razor",
+        "gleamwood_stave",
+        "gnarled_staff",
+        "gorraks_cleaver",
+        "gorraks_cruel_chopper",
+        "gravecaller_blade",
+        "gravecaller_staff",
+        "gravewardens_shiv",
+        "gravewyrm_cleaver",
+        "gravewyrm_thornmaul",
+        "greatfang_of_the_basin",
+        "gutripper_shiv",
+        "hickory_shortstaff",
+        "highwatch_greatsword",
+        "highwatch_warblade",
+        "hoarfrost_edge",
+        "hollow_vigil_staff",
+        "icevein_dirk",
+        "ironbark_boar_spear",
+        "ironedge_longsword",
+        "ironshod_maul",
+        "ironvein_lantern_staff",
+        "ironvein_pickblade",
+        "keen_dirk",
+        "kingsbane_last_oath",
+        "lunar_tide_greatstaff",
+        "maldrecs_soulbinder",
+        "maul_of_the_scourged_wilds",
+        "mirefen_skinner",
+        "mirejaw_biteblade",
+        "mirejaw_fang_knife",
+        "mirejaw_oracle_staff",
+        "mistbinder_kris",
+        "mistcallers_edge",
+        "mistcallers_fang",
+        "moggers_copper_cudgel",
+        "moggers_shiv",
+        "moonscale_saber",
+        "nhalias_bell_maul",
+        "nhalias_dirgeblade",
+        "nhalias_litany_rod",
+        "nightfangs_greatstaff",
+        "ogre_bonecharm_staff",
+        "palecoil_rod",
+        "pitlords_cleaver",
+        "redbrook_blade",
+        "riptide_dirk",
+        "rusty_dagger",
+        "rusty_hatchet",
+        "scepter_of_the_deathless_court",
+        "skullsplitter_dirk",
+        "sloomtooth_tidefang",
+        "staff_of_drowned_prayers",
+        "staff_of_the_gravewyrm",
+        "staff_of_velkhar",
+        "stormcallers_focus",
+        "thorium_warblade",
+        "tideglass_dirk",
+        "tidereaver_gaff",
+        "tradesman_hatchet",
+        "training_mace",
+        "tunnelkings_spade",
+        "vaels_mist_staff",
+        "vale_carving_knife",
+        "valeborn_spellblade",
+        "veilsteel_blade",
+        "verlans_oathblade",
+        "voidsong_dirk",
+        "voss_sanctified_mace",
+        "whetted_iron_dirk",
+        "widowfang_dirk",
+        "wildheart_fangknife",
+        "wildheart_hexwood_staff",
+        "wildheart_tuskblade",
+        "wildsoul_maul",
+        "worn_sword",
+        "wyrmfang_greatblade",
+        "zealotsbane_blade"
+      ]
     }
   ]
 }
