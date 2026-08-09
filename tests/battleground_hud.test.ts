@@ -1158,3 +1158,61 @@ describe('the scoreboard opens itself over the frozen result screen', () => {
     expect(writes(), 'an unchanged state touches nothing').toBe(atMount + 1);
   });
 });
+
+describe('an old server that has never heard of draws (battleground half)', () => {
+  // The rolling-deploy property, pinned on the side that had no pin. Every
+  // other fixture in this file supplies `draws: 0` explicitly, so none of them
+  // is the pre-upgrade shape and all three `?? 0` guards in
+  // battleground_window_view.ts could be deleted with the suite still green.
+  // These build the shape a server predating the field actually sends.
+  const noDraws = <T extends object>(o: T): T => {
+    const { draws: _drop, ...rest } = o as T & { draws?: number };
+    return rest as T;
+  };
+
+  it('reads a missing standing, ladder and all-time draws as zero, never NaN', () => {
+    const info = noDraws(
+      baseInfo({
+        rating: 1620,
+        wins: 4,
+        losses: 2,
+        ladder: [
+          noDraws({
+            pid: 1,
+            name: 'Me',
+            cls: 'warrior',
+            rating: 1620,
+            wins: 4,
+            losses: 2,
+            draws: 0,
+          }),
+        ],
+      }),
+    );
+    const view = buildBgWindowView({
+      info,
+      playerName: 'Me',
+      playerLevel: 20,
+      party: null,
+      playerId: 1,
+      allTime: [
+        noDraws({
+          name: 'Old',
+          class: 'mage',
+          level: 20,
+          rating: 1700,
+          wins: 9,
+          losses: 1,
+          draws: 0,
+        }),
+      ],
+    });
+    if (view.kind !== 'live') throw new Error('expected a live view');
+
+    expect('draws' in info, 'the fixture really is the old shape').toBe(false);
+    expect(view.draws, 'the standing defaults').toBe(0);
+    for (const row of view.ladder) expect(row.draws, `ladder row ${row.name}`).toBe(0);
+    for (const row of view.allTime ?? []) expect(row.draws, `all-time row ${row.name}`).toBe(0);
+    expect(Number.isNaN(view.draws)).toBe(false);
+  });
+});
