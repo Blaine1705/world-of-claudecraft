@@ -69,7 +69,7 @@ const CHECK_RUN_STEPS = [
   'run: npm run build:env',
   'run: npm run build:server',
   'run: npm run build:bot',
-  'run: npm run build\n',
+  'run: npm run wiki:content && npm run build:bundle\n',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a

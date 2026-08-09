@@ -707,7 +707,7 @@ jobs:
         run: npm run build:bot
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle
 
   # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
   # suite at PR tier, release-i18n runs the release TIER over the suites that read
@@ -903,4 +903,4 @@ jobs:
         run: npm run build:bot
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle
