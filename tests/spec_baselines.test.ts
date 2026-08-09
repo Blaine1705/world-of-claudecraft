@@ -100,7 +100,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'shaman/enhancement': {
-    stats: { int: 2, ap: 76 },
+    stats: { int: 2, ap: 24, apPct: 0.22 },
     abilities: {
       lightning_bolt: { costPct: -0.2 },
       earth_shock: { costPct: -0.2 },
