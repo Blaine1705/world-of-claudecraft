@@ -196,7 +196,10 @@ describe('Intervene (level-5 warrior mobility row)', () => {
     sim.castAbility('intervene');
     for (let i = 0; i < 20; i++) sim.tick();
 
-    expect(ally.auras.some((a) => a.kind === 'absorb'), 'no shield inside the floor').toBe(false);
+    expect(
+      ally.auras.some((a) => a.kind === 'absorb'),
+      'no shield inside the floor',
+    ).toBe(false);
     expect(p.cooldowns.has('intervene'), 'and no cooldown billed').toBe(false);
     expect(errors).toContain('Too close!');
   });
@@ -214,9 +217,10 @@ describe('Intervene (level-5 warrior mobility row)', () => {
       sim.castAbility('intervene');
       for (let i = 0; i < 80; i++) sim.tick();
 
-      expect(ally.auras.some((a) => a.kind === 'absorb'), `${dist} yd is inside the band`).toBe(
-        true,
-      );
+      expect(
+        ally.auras.some((a) => a.kind === 'absorb'),
+        `${dist} yd is inside the band`,
+      ).toBe(true);
       expect(p.cooldowns.has('intervene'), `${dist} yd bills the cooldown`).toBe(true);
       expect(errors).toEqual([]);
     }
