@@ -141,10 +141,7 @@ describe('reversed-depth premises behind the dropped surgery arm', () => {
   // n8ao 2.0.0 removed computeNormal's REVERSEDEPTH arm; that stays sound on
   // exactly two premises, each pinned so a silent return goes red here.
   it('the n8ao dist carries no reversed-depth c0 spelling', () => {
-    const dist = readFileSync(
-      path.resolve(__dirname, '../node_modules/n8ao/dist/N8AO.js'),
-      'utf8',
-    );
+    const dist = readFileSync(path.resolve(__dirname, '../node_modules/n8ao/dist/N8AO.js'), 'utf8');
     expect(dist.includes('1.0 - texelFetch(sceneDepth, p, 0).x')).toBe(false);
   });
 

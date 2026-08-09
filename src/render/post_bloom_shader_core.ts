@@ -25,9 +25,7 @@ function shippedMipTerm(mip: number): string {
 /** The whole r182+ composite main(), pinned: 3.0-scaled rgb sum plus the
  *  max-component alpha derivation. Anything else fails closed. */
 function shippedCompositeMain(nMips: number): RegExp {
-  const terms = Array.from({ length: nMips }, (_, mip) => shippedMipTerm(mip)).join(
-    '\\s*\\+\\s*',
-  );
+  const terms = Array.from({ length: nMips }, (_, mip) => shippedMipTerm(mip)).join('\\s*\\+\\s*');
   return new RegExp(
     'void main\\(\\)\\s*\\{\\s*' +
       '(?:\\/\\/[^\\n]*\\s*)?' +
