@@ -55,6 +55,7 @@ import {
   bgProposalRemaining,
   bgProposalRespond,
   bgRequeueLockedUntil,
+  openBgBackfillProposal,
   openBgProposal,
   sweepBgProposals,
 } from './battleground_proposal';
@@ -629,6 +630,11 @@ function backfillBgMatches(ctx: SimContext): void {
       capsToWin: BG_CAPS_TO_WIN,
     });
     if (team === null) continue;
+    // One offer per match at a time. The seat stays OPEN while a candidate is
+    // deciding, so without this the next tick would read the same short side
+    // and offer it to somebody else, and the tick after that to a third, until
+    // the queue was drained into a pile of competing invitations for one chair.
+    if (ctx.bgProposals.some((p) => p.backfill?.match === match)) continue;
     // Liveness is folded into SELECTION, not applied after it. Picking the
     // oldest solo first and only then testing them meant a single temporarily
     // ineligible candidate blocked every backfill behind them: the loop moved
@@ -644,14 +650,23 @@ function backfillBgMatches(ctx: SimContext): void {
     ctx.bgQueue.forEach((g, i) => {
       const cand = g.pids[0];
       if (!ctx.entities.get(cand) || ctx.bgMatches.has(cand) || ctx.arenaMatches.has(cand)) return;
+      // ...and never double-offer: a solo already holding a queue-pop offer, or
+      // sitting out the lockout from one they just failed, is not available.
+      if (bgProposalFor(ctx, cand) || bgRequeueLockedUntil(ctx, cand) > 0) return;
       eligible.push({ index: i, size: g.pids.length, waited: g.waited });
     });
     const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
     if (pickedAt < 0) return; // no eligible solo waiting: no later match can do better
     const index = eligible[pickedAt].index;
-    const pid = ctx.bgQueue[index].pids[0];
-    ctx.bgQueue.splice(index, 1);
-    seatBackfill(ctx, match, team, pid);
+    const [group] = ctx.bgQueue.splice(index, 1);
+    // ASK, never seat. The seat is a teleport into a live rated 5v5 that also
+    // detaches the player from any dungeon they are standing in, scrubbing
+    // their threat off the whole claim; doing that to someone who is not at the
+    // keyboard is the exact failure the queue-pop prompt was built to stop, and
+    // it lands harder here: a filled side is never offered a backfill again,
+    // and a body that never disconnects never deserts, so the seat it consumed
+    // cannot reopen. Declining or lapsing frees it for the next candidate.
+    openBgBackfillProposal(ctx, match, team, group);
   }
 }
 
@@ -775,7 +790,20 @@ function seatBgProposal(ctx: SimContext, proposal: BgProposal): void {
 /** Answer a live queue-pop proposal; a full house seats the match immediately. */
 export function bgRespond(ctx: SimContext, accept: boolean, pid?: number): void {
   const ready = bgProposalRespond(ctx, accept, pid);
-  if (ready) seatBgProposal(ctx, ready);
+  if (!ready) return;
+  if (ready.backfill) {
+    // A backfill offer holds no slot of its own, so it is simply dropped and
+    // the one accepted fighter takes the seat that was held open for them.
+    ctx.bgProposals.splice(ctx.bgProposals.indexOf(ready), 1);
+    seatBackfill(
+      ctx,
+      ready.backfill.match,
+      ready.backfill.team,
+      ready.teams[ready.backfill.team][0],
+    );
+    return;
+  }
+  seatBgProposal(ctx, ready);
 }
 
 /** One candidate pairing, plus the numbers the fairness rules read off it. */

@@ -52,6 +52,7 @@ import {
   drainBgOutcomes,
   recordBgOutcome,
 } from '../src/sim/social/battleground_outcomes';
+import { BG_PROPOSAL_SECONDS, bgProposalFor } from '../src/sim/social/battleground_proposal';
 import { addThreat } from '../src/sim/threat';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -75,6 +76,13 @@ function tp(sim: Sim, pid: number, x: number, z: number) {
 }
 
 /** Answer a live queue-pop offer for every listed fighter. */
+/** Answer a backfill offer and drain the tick it seats on, so a caller can
+ *  assert on the events the seat emits. */
+function acceptBackfillOffer(sim: Sim, pid: number): SimEvent[] {
+  bgRespond(sim.ctx, true, pid);
+  return sim.drainEvents();
+}
+
 function acceptBgOffer(sim: Sim, pids: number[]): void {
   for (const pid of pids) bgRespond(sim.ctx, true, pid);
 }
@@ -537,17 +545,76 @@ describe('Thornhollow Fields: team parties for the match', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
     const team = match.teams[0];
-    // The base is whoever the formation did NOT record as auto-added.
-    const base = team.find((p) => !match.autoPartyPids[0].includes(p));
-    expect(base, 'a sim-formed team really does have a base outside the auto list').toBeTruthy();
+    // An all-solo side's party is entirely this system's invention, so EVERY
+    // member is recorded as auto-added, base included. That is the arrangement
+    // the fix rests on: the base is unwound by id rather than by inferring
+    // "system-built" from who else sits in the party.
+    expect(
+      [...match.autoPartyPids[0]].sort((a, b) => a - b),
+      'an all-solo side records its whole roster, base included',
+    ).toEqual([...team].sort((a, b) => a - b));
+    const base = team[0];
 
-    bgResolveDesertion(sim.ctx, base!);
+    bgResolveDesertion(sim.ctx, base);
 
     const stayer = team.find((p) => p !== base)!;
     const party = sim.partyOf(stayer);
     expect(party, 'the rest of the team keeps its party').toBeTruthy();
     expect(party!.members, 'the deserting base is out of it').not.toContain(base);
-    expect(sim.partyOf(base!), 'and holds no match party of their own').toBeNull();
+    expect(sim.partyOf(base), 'and holds no match party of their own').toBeNull();
+  });
+
+  it('leaves a PARTIAL premade deserter with their own friends', () => {
+    // Review catch, and the reason the base rule is spelled by id rather than
+    // inferred: formBgTeamParty picks the premade's own party as the base and
+    // MERGES the solos into it. So on a partial premade the match party IS the
+    // players' group and merely contains auto-added solos, and any rule that
+    // read "shares a party with an auto-added member" as "system built" would
+    // throw a deserting friend out of their own group.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    const friends = [leader];
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Friend${i}`);
+      tp(sim, m, 0, -40);
+      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      friends.push(m);
+    }
+    for (let i = 0; i < 7; i++) {
+      const s = sim.addPlayer('rogue', `Solo${i}`);
+      tp(sim, s, 0, -40);
+      sim.entities.get(s)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(s);
+    }
+    sim.bgQueueJoin(leader);
+    sim.tick();
+    acceptAllBgOffers(sim);
+    const match = sim.bgMatchFor(leader)!;
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+
+    // The arrangement that makes this the partial case: the friends are the
+    // base, so none of them is recorded as auto-added, and the party they kept
+    // really does hold a solo.
+    for (const f of friends) expect(match.autoPartyPids[team]).not.toContain(f);
+    const merged = sim.partyOf(leader)!;
+    expect(
+      match.autoPartyPids[team].some((p) => merged.members.includes(p)),
+      'the premade party really did absorb a solo',
+    ).toBe(true);
+
+    const deserter = friends[1];
+    bgResolveDesertion(sim.ctx, deserter);
+
+    const stillTogether = sim.partyOf(leader);
+    expect(stillTogether, 'the friends keep their group').toBeTruthy();
+    expect(
+      stillTogether!.members,
+      'a deserting friend stays with the friends they queued with',
+    ).toContain(deserter);
   });
 
   it('welds each all-solo team into one party at start and disbands both at the end', () => {
@@ -3141,6 +3208,7 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
 
     sim.tick();
+    bgRespond(sim.ctx, true, fresh); // the seat is an OFFER now
 
     expect(match.teams[0], 'the younger eligible solo filled the seat').toContain(fresh);
     expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
@@ -3172,7 +3240,8 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     bgResolveDesertion(sim.ctx, deserter);
     expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
 
-    const events = sim.tick();
+    sim.tick(); // opens the OFFER
+    const events = acceptBackfillOffer(sim, spare);
     expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
     expect(match.teams[0]).toContain(spare);
     expect(sim.ctx.bgMatches.get(spare)).toBe(match);
@@ -3222,6 +3291,7 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
 
     bgResolveDesertion(sim.ctx, deserter);
     sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
     expect(match.teams[0], 'the arrangement needs the seat actually filled').toContain(spare);
 
     expect(mob.threat.has(spare), 'the seat must scrub instance threat').toBe(false);
@@ -3242,6 +3312,7 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     const spare = queueSpare(sim);
     bgResolveDesertion(sim.ctx, deserter);
     sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
     expect(match.backfilled.has(spare)).toBe(true);
 
     const stayer = match.teams[0].find((p) => p !== spare)!;
@@ -3258,11 +3329,94 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(stayerMeta.bgLosses).toBe(1);
   });
 
+  it('ASKS before seating, and an away player never consumes the seat', () => {
+    // The reason the seat is an offer rather than a teleport. An away-but-
+    // connected player is exactly who the queue-pop prompt exists to catch, and
+    // a backfill is worse for them than a fresh pop: a filled side is never
+    // offered a backfill again, and a body that never disconnects never
+    // deserts, so a seat burned on someone at their desk-but-away could never
+    // reopen. There is no idle desertion in a live match to recover it.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+
+    // Offered, NOT seated.
+    expect(bgProposalFor(sim.ctx, away), 'the candidate is holding an offer').toBeTruthy();
+    expect(match.teams[0], 'and is not on the field yet').not.toContain(away);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    // Silence for the whole window is a decline, exactly as for a queue pop.
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(match.teams[0], 'silence never seats them').not.toContain(away);
+    expect(sim.ctx.players.get(away), 'they are still a real player').toBeTruthy();
+  });
+
+  it('holds ONE offer per match while a candidate is deciding', () => {
+    // The seat stays open for the whole answer window, so the pass that reads
+    // "this side is short" reads it again on every tick. Without a guard it
+    // offers the chair to a second candidate, then a third, draining the queue
+    // into competing invitations for one seat (and, found the hard way, slowing
+    // the tick to a crawl as the proposals piled up).
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const first = queueSpare(sim);
+    const second = queueSpare(sim);
+    sim.tick();
+
+    const offered = [first, second].filter((p) => bgProposalFor(sim.ctx, p));
+    expect(offered, 'exactly one candidate is asked').toHaveLength(1);
+
+    // Ticking through most of the window must not recruit the other one.
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS - 2); i++) sim.tick();
+    expect(
+      [first, second].filter((p) => bgProposalFor(sim.ctx, p)),
+      'and still only one while they decide',
+    ).toHaveLength(1);
+    expect(sim.ctx.bgProposals.filter((p) => p.backfill?.match === match)).toHaveLength(1);
+  });
+
+  it('offers the seat to the NEXT candidate after one declines', () => {
+    // The seat must survive a refusal, or declining would cost the four
+    // remaining fighters their backfill entirely.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const first = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, first)).toBeTruthy();
+
+    bgRespond(sim.ctx, false, first); // decline
+    expect(match.teams[0], 'declining seats nobody').not.toContain(first);
+
+    const second = queueSpare(sim);
+    sim.tick();
+    bgRespond(sim.ctx, true, second);
+    expect(match.teams[0], 'the seat went to the next candidate').toContain(second);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+  });
+
+  it('never frees the live match slot when a backfill offer lapses', () => {
+    // A backfill offer reserves no slot: the match it fills is already standing
+    // on one. Releasing it on teardown would hand a LIVE field to the matchmaker.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+    expect(sim.ctx.bgBusySlots.has(match.slot), 'the match holds its slot').toBe(true);
+
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(sim.ctx.bgBusySlots.has(match.slot), 'and still holds it after the offer lapses').toBe(
+      true,
+    );
+    expect(away).toBeTruthy();
+  });
+
   it('charges a backfilled fighter nothing if they leave too', () => {
     const { sim, match } = staged();
     bgResolveDesertion(sim.ctx, match.teams[0][0]);
     const spare = queueSpare(sim);
     sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
     expect(match.backfilled.has(spare)).toBe(true);
 
     const before = sim.ctx.players.get(spare)!.bgRating;

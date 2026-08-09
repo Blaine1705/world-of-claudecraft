@@ -48,8 +48,17 @@ export function formBgTeamParty(ctx: SimContext, teamPids: number[]): number[] {
   const formed = ctx.formDungeonFinderGroup(units, { raid: false });
   if (!formed) return [];
   // The same base-unit rule the formation applied: that unit kept its party.
-  const base = units.find((u) => u.partyId !== null) ?? units[0];
-  return units.filter((u) => u !== base).flatMap((u) => u.members);
+  const premadeBase = units.find((u) => u.partyId !== null);
+  const base = premadeBase ?? units[0];
+  const added = units.filter((u) => u !== base).flatMap((u) => u.members);
+  // When NO unit brought a party of its own, the group is entirely this
+  // system's invention, so its base is an auto-added member like every other
+  // and belongs in the list. That is what lets a deserting base be unwound by
+  // id. When a premade IS the base, the party is the players' own group and
+  // its members stay out, so deserting never breaks up friends: a partial
+  // premade's party CONTAINS the auto-added solos, so any rule that inferred
+  // system-built from party contents would evict a friend by mistake.
+  return premadeBase ? added : [...base.members, ...added];
 }
 
 /**
@@ -125,18 +134,6 @@ export function unwindBgAutoPartyFor(
     if (auto[team].includes(pid)) {
       ctx.removeFromParty(pid, LEAVE_VERB);
       auto[team] = auto[team].filter((p) => p !== pid);
-      continue;
-    }
-    // The BASE unit is deliberately absent from `auto`: formBgTeamParty returns
-    // everyone the formation ADDED, and the base kept its own party object. So a
-    // deserter who happened to be the base was left sitting in the match party,
-    // still reading its chat and holding a party frame for a fight they walked
-    // out of. Evict them too, identified by sharing the party with an
-    // auto-added member: that is what marks it a party THIS system built rather
-    // than a whole premade's own group, which deserting must never break up.
-    const party = ctx.partyOf(pid);
-    if (party && auto[team].some((m) => party.members.includes(m))) {
-      ctx.removeFromParty(pid, LEAVE_VERB);
     }
   }
 }
