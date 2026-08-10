@@ -23,8 +23,8 @@ describe('tab target server dispatch', () => {
     expect(dispatchArm('tab')).toContain('sim.tabTarget(pid);');
   });
 
-  it('does not retain the dropped reverse-target wire command', () => {
-    expect(COMMAND_NAMES).not.toContain('tabPrev');
-    expect(serverSource).not.toContain("case 'tabPrev':");
+  it('keeps the reverse tab command wired to Sim.tabTargetPrev', () => {
+    expect(COMMAND_NAMES).toContain('tabPrev');
+    expect(dispatchArm('tabPrev')).toContain('sim.tabTargetPrev(pid);');
   });
 });

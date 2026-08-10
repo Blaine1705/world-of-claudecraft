@@ -41,7 +41,7 @@ export class Targeting {
 
   // Optional QoL preference (issue #1358): mirrors the client's
   // `stopAutoAttackOnTargetSwitch` setting onto the authoritative PlayerMeta so
-  // every selector below (targetEntity, tabTarget, targetNearestEnemy,
+  // every selector below (targetEntity, tabTarget, tabTargetPrev, targetNearestEnemy,
   // targetNearestFriendly, friendlyTabTarget) can gate on it consistently.
   setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
     const r = this.ctx.resolve(pid);
@@ -88,20 +88,9 @@ export class Targeting {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const p = r.e;
-    const candidates = this.enemyCandidates(p);
-    if (candidates.length === 0) return;
-    // Cycle the enemies the player can see / is fighting first; off-screen ones
-    // stay reachable but never steal the selection (see tab_target.ts).
-    const { ids, primaryCount } = orderTabTargets(
-      candidates.map((c) => ({
-        id: c.e.id,
-        dx: c.e.pos.x - p.pos.x,
-        dz: c.e.pos.z - p.pos.z,
-        d: c.d,
-        engaged: this.isEnemyEngagedWith(c.e, p),
-      })),
-      p.facing,
-    );
+    const ordered = this.orderedEnemyTabTargets(p);
+    if (!ordered) return;
+    const { ids, primaryCount } = ordered;
     const curIdx = ids.indexOf(p.targetId ?? -1);
     let nextId: number;
     if (curIdx === -1) {
@@ -119,6 +108,43 @@ export class Targeting {
     }
     if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
     p.targetId = nextId;
+  }
+
+  tabTargetPrev(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const p = r.e;
+    const ordered = this.orderedEnemyTabTargets(p);
+    if (!ordered) return;
+    const { ids, primaryCount } = ordered;
+    const curIdx = ids.indexOf(p.targetId ?? -1);
+    let nextId: number;
+    if (curIdx === -1) {
+      nextId = ids[0];
+    } else if (curIdx < primaryCount) {
+      nextId = ids[(curIdx + primaryCount - 1) % primaryCount];
+    } else {
+      nextId = curIdx > primaryCount ? ids[curIdx - 1] : ids[primaryCount - 1];
+    }
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
+    p.targetId = nextId;
+  }
+
+  private orderedEnemyTabTargets(p: Entity): { ids: number[]; primaryCount: number } | null {
+    const candidates = this.enemyCandidates(p);
+    if (candidates.length === 0) return null;
+    // Cycle the enemies the player can see / is fighting first; off-screen ones
+    // stay reachable but never steal the selection (see tab_target.ts).
+    return orderTabTargets(
+      candidates.map((c) => ({
+        id: c.e.id,
+        dx: c.e.pos.x - p.pos.x,
+        dz: c.e.pos.z - p.pos.z,
+        d: c.d,
+        engaged: this.isEnemyEngagedWith(c.e, p),
+      })),
+      p.facing,
+    );
   }
 
   targetNearestEnemy(pid?: number): void {

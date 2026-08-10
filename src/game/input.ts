@@ -58,6 +58,7 @@ type ContextMenuTarget = {
 
 export interface InputCallbacks {
   onTab(): void;
+  onTabPrev(): void;
   onTargetFriendly(): void;
   onCycleFriendly(): void;
   // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
@@ -978,6 +979,10 @@ export class Input {
     if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
     if (e.code === 'Tab') e.preventDefault();
     if (e.code === 'Space') e.preventDefault?.();
+    if (e.code === 'Tab' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      this.cb.onTabPrev();
+      return;
+    }
     // The full modifier chord for this press (null if it is itself a bare
     // modifier key, which never triggers an action on its own).
     const combo = isModifierCode(e.code)
