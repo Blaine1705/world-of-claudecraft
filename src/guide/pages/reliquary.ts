@@ -17,12 +17,35 @@ const SHELF_LABEL_KEYS: Record<(typeof SHELF_ORDER)[number], TranslationKey> = {
   horizons: 'guide.reliquaryPage.shelf.horizons',
 };
 
+/** Tag word + explanatory line for an outside-completion page, keyed by the
+ *  flag's reason so the two kinds never wear each other's word (the in-game
+ *  chip's exhaustive-record rule, mirrored here for the wiki reader). */
+const OUTSIDE_COMPLETION_KEYS: Record<
+  'retired' | 'personal',
+  { tag: TranslationKey; note: TranslationKey }
+> = {
+  retired: {
+    tag: 'guide.reliquaryPage.retiredTag',
+    note: 'guide.reliquaryPage.retiredNote',
+  },
+  personal: {
+    tag: 'guide.reliquaryPage.personalTag',
+    note: 'guide.reliquaryPage.personalNote',
+  },
+};
+
 function pageSection(page: GuideReliquaryPage): string {
   const names = page.relics.map((r) => esc(r.name)).join(', ');
   const count = formatNumber(page.relics.length);
+  const outside =
+    page.excludeFromCompletion !== undefined
+      ? OUTSIDE_COMPLETION_KEYS[page.excludeFromCompletion]
+      : undefined;
+  const tag = outside ? ` <span class="guide-reliquary-flag">(${esc(t(outside.tag))})</span>` : '';
+  const note = outside ? `<p class="guide-reliquary-note">${esc(t(outside.note))}</p>` : '';
   return `<section class="guide-block guide-reliquary-page" id="reliquary-${esc(page.id)}">
-        <h3 class="guide-reliquary-page-h">${esc(page.name)} <span class="guide-reliquary-count">(${esc(count)})</span></h3>
-        <p class="guide-reliquary-relics">${names}</p>
+        <h3 class="guide-reliquary-page-h">${esc(page.name)} <span class="guide-reliquary-count">(${esc(count)})</span>${tag}</h3>
+        ${note}<p class="guide-reliquary-relics">${names}</p>
       </section>`;
 }
 

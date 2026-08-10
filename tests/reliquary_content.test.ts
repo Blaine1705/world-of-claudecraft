@@ -87,7 +87,11 @@ import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
-import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
+import {
+  catalogCharacterCompletion,
+  catalogRankOwned,
+  catalogRelicCompletion,
+} from '../src/sim/reliquary';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import {
   createRiftGearInstance,
@@ -587,7 +591,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // first find whose chat line renders inert. (A direct
     // isCataloguedRelicItem-vs-index agreement pin would be vacuous: the
     // predicate IS the index membership test.)
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBeGreaterThan(100);
+    // The Phase 21 measured final, hand-carried: 237 unique catalogued item
+    // ids (the sixth figure of the ledger row's "all pinned" claim; the other
+    // five are the page/overview/character/slot/mark literals nearby).
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(237);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -819,7 +826,10 @@ describe('Reliquary Rift page pins against live rift content', () => {
     ]);
     expect(page.relics.length).toBe(16);
     // Band absence stated directly, so a re-added band reds on the claim it
-    // breaks rather than only on the ordered equality above.
+    // breaks rather than only on the ordered equality above. The floor keeps
+    // the loop from running zero times on an emptied source array (the
+    // dead-alternate-negative shape).
+    expect(RIFT_GEAR_ITEM_IDS.length).toBeGreaterThanOrEqual(3);
     for (const bandId of RIFT_GEAR_ITEM_IDS) {
       expect(itemRelicIds(page), bandId).not.toContain(bandId);
     }
@@ -940,6 +950,9 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
     const oneBand = new Set([RIFT_GEAR_ITEM_IDS[0]]);
     expect(catalogRelicCompletion({ itemsDiscovered: oneBand }).owned).toBe(0);
     expect(catalogCharacterCompletion({ itemsDiscovered: oneBand }).owned).toBe(0);
+    // The rank surface pinned for this reason too, not only the vault's: the
+    // fill is real membership but Curator rank must not move on it.
+    expect(catalogRankOwned({ itemsDiscovered: oneBand })).toBe(0);
   });
 });
 
@@ -3883,6 +3896,17 @@ describe('the page table freeze (the catalog-index memo contract)', () => {
       expect(Object.isFrozen(page.relics), `relics of ${page.id} must be frozen`).toBe(true);
       for (const relic of page.relics) {
         expect(Object.isFrozen(relic), `a relic on ${page.id} must be frozen`).toBe(true);
+      }
+      // The nested source objects too (closed at Phase 21 QA: these were the
+      // one unfrozen depth left in the table).
+      if (page.clearSource !== undefined) {
+        expect(Object.isFrozen(page.clearSource), `clearSource of ${page.id}`).toBe(true);
+      }
+      if (page.secondaryClearSource !== undefined) {
+        expect(
+          Object.isFrozen(page.secondaryClearSource),
+          `secondaryClearSource of ${page.id}`,
+        ).toBe(true);
       }
     }
   });

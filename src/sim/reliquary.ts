@@ -344,7 +344,10 @@ export function clearCountForSource(
     // hand-edited catalog cannot invent a parallel counter channel.
     if (!(DEED_STAT_KEYS as readonly string[]).includes(source.stat)) return 0;
     const n = meta.deedStats.counters[source.stat as DeedStatKey];
-    return typeof n === 'number' && n > 0 ? Math.floor(n) : 0;
+    // isFinite matches the display-only secondary arm (reliquarySecondaryClears
+    // in src/ui/reliquary_view.ts): a poisoned Infinity counter reads 0 on both
+    // meters instead of an infinity glyph on one and 0 on the other.
+    return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
   }
   // dungeon
   return dungeonClearCount(meta.deedStats, source.dungeonId, source.difficulty);
@@ -419,10 +422,16 @@ export function onItemDiscovered(
   // change inside a fill chain at all, since nothing here moves a reins item.
   const ownership = characterReliquaryOwnership(meta);
   // Rank is character-durable catalogued fills (items + marks + mounts + titles;
-  // never account skins). Prior count is owned - 1 because this discover is the
-  // first time the id entered itemsDiscovered (markItemDiscovered only calls on first add).
+  // never account skins). Prior count is owned - 1 only when this discover
+  // actually SCORED: the ledger add already happened (markItemDiscovered only
+  // calls on first add), so a scoring id moved the count and an
+  // excludeFromCompletion-only id left it unmoved. Assuming - 1 for a
+  // non-scoring fill understates the prior count, and at an exact threshold
+  // that fires a rank-up banner for a rank the player already held (the
+  // riftbound bands are the live-mintable case).
   const owned = catalogRankOwned(ownership);
-  const previousRank = curatorRankFromOwned(Math.max(0, owned - 1));
+  const scored = relicFillScoresForRank('item', itemId);
+  const previousRank = curatorRankFromOwned(scored ? Math.max(0, owned - 1) : owned);
   const newRank = curatorRankFromOwned(owned);
   const rankedUp = newRank > previousRank ? newRank : undefined;
   // The unlock event is the first-find MOMENT, so it fires only when a new
@@ -610,11 +619,16 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
   // add to those later reads, because `marks` on it is the live Set itself.
   const ownership = characterReliquaryOwnership(meta);
   // Rank uses pre-add owned so this mark is the +1 that may cross a threshold.
+  // The +1 applies only when the mark SCORES (sits on a completion-scoring
+  // page): every authored mark does today, so the other arm is the documented
+  // dead guard compensated by the catalog-wide pin, but a future mark on an
+  // excludeFromCompletion page must not fake a threshold crossing (the item
+  // path's riftbound-band defect, fixed in the same change as this guard).
   const previousOwned = catalogRankOwned(ownership);
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
   bumpReliquaryWireRev(meta.reliquary);
-  const newOwned = previousOwned + 1;
+  const newOwned = relicFillScoresForRank('mark', markId) ? previousOwned + 1 : previousOwned;
   const previousRank = curatorRankFromOwned(previousOwned);
   const newRank = curatorRankFromOwned(newOwned);
   const rankedUp = newRank > previousRank ? newRank : undefined;
@@ -1031,6 +1045,24 @@ function completionScoringPages(pages: readonly ReliquaryPageDef[]): readonly Re
     : pages;
   completionScoringPagesByPages.set(pages, scoring);
   return scoring;
+}
+
+/**
+ * True when a catalogued relic id contributes to the character-durable rank
+ * count: it sits on at least one completion-scoring page. An id that lives
+ * ONLY on excludeFromCompletion pages (the riftbound bands; the vault items)
+ * fills its silhouette without moving catalogRankOwned, so the rank-crossing
+ * math in both fill paths must treat such a fill as +0, never +1: at an exact
+ * Curator threshold the +1 assumption re-announces a rank the player already
+ * held (the false-banner defect the Phase 21 QA parity leg reproduced).
+ * Exported for the direct pin in tests/reliquary_state.test.ts; the mark arm
+ * is otherwise unreachable today because every authored mark scores (the
+ * catalog-wide pin in tests/reliquary_content.test.ts is the compensating
+ * guard, the M4 pattern).
+ */
+export function relicFillScoresForRank(kind: 'item' | 'mark', id: string): boolean {
+  const index = catalogIndexFor(completionScoringPages(RELIQUARY_PAGES));
+  return (kind === 'item' ? index.items : index.marks).includes(id);
 }
 
 /** Test-only probe: the memoized index for a page table, or undefined when no
@@ -1493,19 +1525,6 @@ export function syncReliquaryCompletionDeeds(
     }
     ctx.grantDeed(meta, deedId, grantOpts);
   }
-}
-
-/** Convenience: live pages in append order (skip missing defs). */
-export function orderedReliquaryPages(
-  order: readonly string[] = RELIQUARY_PAGE_ORDER,
-  byId: Readonly<Record<string, ReliquaryPageDef>> = RELIQUARY_PAGES_BY_ID,
-): ReliquaryPageDef[] {
-  const out: ReliquaryPageDef[] = [];
-  for (const id of order) {
-    const page = byId[id];
-    if (page) out.push(page);
-  }
-  return out;
 }
 
 // Re-export catalog lookup helpers so callers can import from one runtime module.

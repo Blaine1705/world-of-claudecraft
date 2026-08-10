@@ -4576,8 +4576,13 @@ export const hudChromeStrings = {
     sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
     sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
     // The Riftbound bands: minted per participant for the party that wins a
-    // ranked rift's first-clear race (addRiftProgressionLoot), any rank.
-    sourceActivityRiftFirstClear: 'Awarded to every winner of their first Rift clear',
+    // ranked rift's first-clear race (addRiftProgressionLoot), any rank. The
+    // English names the RACE, not a personal milestone: a party that clears a
+    // ranked event after its first clear mints nothing (claimRiftFirstClear
+    // returns won: false), and the five non-Latin fills already carry the
+    // race reading (the Phase 21 QA copy fix aligned the English to them).
+    sourceActivityRiftFirstClear:
+      "Awarded to every member of the party that wins a ranked Rift's first clear",
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

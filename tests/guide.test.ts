@@ -814,7 +814,9 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
   });
 
   it('bakes only allowlisted fields (no progress, clears, firstFind, or sources)', () => {
-    const pageFields = new Set(['id', 'shelf', 'name', 'relics']);
+    // excludeFromCompletion joined at Phase 21 QA: catalog data, not player
+    // state, and rule 7 requires the wiki to LABEL an outside-completion page.
+    const pageFields = new Set(['id', 'shelf', 'name', 'relics', 'excludeFromCompletion']);
     const relicFields = new Set(['kind', 'name']);
     for (const page of GUIDE_RELIQUARY) {
       for (const k of Object.keys(page)) {
@@ -841,6 +843,38 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     ]) {
       expect(blob.includes(`"${leak}"`), `leaked field token ${leak}`).toBe(false);
     }
+  });
+
+  it('labels exactly the two outside-completion pages, and renders tag plus note for each', () => {
+    // The generated blob carries the flag for exactly the live flagged set
+    // (a third flagged page must surface here the moment it is authored)...
+    expect(
+      GUIDE_RELIQUARY.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
+        p.id,
+        p.excludeFromCompletion,
+      ]),
+    ).toEqual([
+      ['horizons_vault_of_ages', 'retired'],
+      ['horizons_riftbound', 'personal'],
+    ]);
+    // ...and the rendered catalog SHOWS the label: the tag beside the page
+    // heading and the explanatory note, one pair per flagged page, resolved
+    // through t() (never hardcoded English), with none on ordinary pages.
+    const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(2);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(2);
+    expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
+    expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
+    expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
+    expect(html).toContain(t('guide.reliquaryPage.personalNote'));
+    // The note sits inside the flagged page's own section (reach, not mere
+    // presence): the vault section carries the retired pair.
+    const vault = html.match(
+      /<section[^>]*id="reliquary-horizons_vault_of_ages"[\s\S]*?<\/section>/,
+    )?.[0];
+    expect(vault, 'vault section').toBeTruthy();
+    expect(vault).toContain(t('guide.reliquaryPage.retiredTag'));
+    expect(vault).toContain(t('guide.reliquaryPage.retiredNote'));
   });
 
   it('every generated mark name equals the shipped English the sheet resolves', () => {

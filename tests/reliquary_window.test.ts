@@ -162,7 +162,7 @@ describe('painter hygiene', () => {
     expect(code).toContain('data-retired');
     expect(code).toContain('data-personal');
     // Both call sites (header and shelf row) go through the one helper.
-    expect(code.match(/this\.retiredChipHtml\(/g)?.length).toBe(2);
+    expect(code.match(/this\.outsideCompletionChipHtml\(/g)?.length).toBe(2);
   });
 
   it('labels account-scoped weapon skins', () => {
@@ -1413,5 +1413,31 @@ describe('styles and architecture registration', () => {
 
   it('registers the pure core in UI_PURE_CORES', () => {
     expect(architecture).toContain("'src/ui/reliquary_view.ts'");
+  });
+
+  it('binds the outside-completion chip rules to the markup they must reach', () => {
+    // The selector-reach direction of the css-class-presence trap: both chip
+    // rules are COMPOUND (.reliquary-complete-badge[data-retired]), so the
+    // painter must emit the class and the reason hook on one element and the
+    // declarations must live in this section. Dropping either half leaves the
+    // chip wearing the celebratory gold these rules exist to prevent, with
+    // every attribute-only query still green.
+    const reliquaryCss = sectionCss('reliquary');
+    const mutedRule = reliquaryCss.match(
+      /\.reliquary-complete-badge\[data-retired\],\s*\.reliquary-complete-badge\[data-personal\] \{[^}]*\}/,
+    )?.[0];
+    expect(mutedRule, 'the muted chip rule (both reasons, one selector list)').toBeTruthy();
+    expect(mutedRule).toContain('var(--color-text-muted)');
+    const optOut = reliquaryCss.match(
+      /\.reliquary-page-detail\.is-illuminated \.reliquary-complete-badge\[data-retired\],\s*\.reliquary-page-detail\.is-illuminated \.reliquary-complete-badge\[data-personal\] \{[^}]*\}/,
+    )?.[0];
+    expect(optOut, 'the illuminated-page gold-frame opt-out rule').toBeTruthy();
+    expect(optOut).toContain('border-color: var(--color-border-default)');
+    expect(optOut).toContain('background: none');
+    // The painter's side of the join: class + hook on the SAME span, one arm
+    // per reason through the exhaustive record.
+    expect(painter).toContain('class="reliquary-complete-badge" ${chip.attr}="1"');
+    expect(painter).toContain("attr: 'data-retired'");
+    expect(painter).toContain("attr: 'data-personal'");
   });
 });

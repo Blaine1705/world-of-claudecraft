@@ -117,6 +117,8 @@ export interface GuideReliquaryPage {
   id: string;
   shelf: 'conquerors' | 'professions' | 'horizons';
   name: string;
+  /** Outside-completion reason (rule 7): present only on labeled pages. */
+  excludeFromCompletion?: 'retired' | 'personal';
   relics: GuideReliquaryRelic[];
 }
 
@@ -6926,6 +6928,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     "id": "horizons_vault_of_ages",
     "shelf": "horizons",
     "name": "Vault of Ages",
+    "excludeFromCompletion": "retired",
     "relics": [
       {
         "kind": "item",
@@ -6949,6 +6952,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     "id": "horizons_riftbound",
     "shelf": "horizons",
     "name": "Riftbound",
+    "excludeFromCompletion": "personal",
     "relics": [
       {
         "kind": "item",

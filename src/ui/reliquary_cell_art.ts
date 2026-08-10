@@ -19,10 +19,11 @@
 // A slot with no answer returns null and the window keeps its previous
 // behavior, so an id this bundle does not know still renders something.
 //
-// The one relic with no committed art anywhere is
-// gather_event:perfect_specimen: it fires on corpse harvest, which belongs to
-// no gathering profession, so there is no profession image to borrow. It gets
-// the authored specimen-flask glyph below instead of the ghost.
+// Two mark families have no committed art anywhere and take an authored
+// inline glyph instead of the ghost: gather_event:perfect_specimen (fires on
+// corpse harvest, which belongs to no gathering profession, so there is no
+// profession image to borrow) gets the specimen flask, and the 19 slain:*
+// rare kill proofs (Phase 21) share the trophy-skull glyph below.
 //
 // This module is an ART SOURCE (the icons.ts family), not a painter, which is
 // why the authored glyph's palette lives here as literal colors: the painter

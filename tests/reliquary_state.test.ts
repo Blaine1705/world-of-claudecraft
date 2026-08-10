@@ -56,6 +56,7 @@ import {
   RELIQUARY_OBTAIN_COUNT_CAP,
   RELIQUARY_PAGES_BY_ID,
   RELIQUARY_RECENT_CAP,
+  relicFillScoresForRank,
   reliquaryCatalogIndexProbe,
   reliquaryOwnershipOpts,
   reliquaryScoringPagesProbe,
@@ -882,6 +883,10 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // path; this pin holds the visit beside the note on the same arm.
     const deedsSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8')
+      // Strip BOTH comment forms before matching, so neither a line comment
+      // nor a /* */ block holding the old code can satisfy the pin (the
+      // source-text-pin-comment-gameable trap).
+      .replace(/\/\*[\s\S]*?\*\//g, '')
       .split('\n')
       .filter((line) => !/^\s*\/\//.test(line))
       .join('\n');
@@ -1326,6 +1331,77 @@ describe('Reliquary pure completion + curator rank', () => {
     const sizeBefore = meta.deedsEarned.size;
     syncCuratorRankDeeds(sim.ctx, meta);
     expect(meta.deedsEarned.size).toBe(sizeBefore);
+  });
+
+  it('a fill that scores nowhere never fires a rank-up, even at an exact threshold', () => {
+    // The Phase 21 QA parity leg's catch: onItemDiscovered assumed every
+    // catalogued fill moved the rank count by one, so a riftbound band
+    // (catalogued, but on an excludeFromCompletion page) landing while the
+    // scoring count sits EXACTLY on a Curator threshold derived a
+    // previousRank one tier low and re-announced the rank the player already
+    // held. The band is the live-mintable case (first-clear race loot).
+    const band = RELIQUARY_PAGES_BY_ID.horizons_riftbound.relics.flatMap((r) =>
+      r.kind === 'item' ? [r.itemId] : [],
+    )[0]!;
+    expect(relicFillScoresForRank('item', band)).toBe(false);
+    // Premise pins: 25 is a threshold (rank 3 starts there, 24 is still 2).
+    expect(curatorRankFromOwned(25)).toBe(3);
+    expect(curatorRankFromOwned(24)).toBe(2);
+    const scoringIds = [...RELIQUARY_ITEM_TO_PAGES.keys()]
+      .filter((id) => relicFillScoresForRank('item', id))
+      .slice(0, 25);
+    expect(scoringIds.length).toBe(25);
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Seed the ledger DIRECTLY rather than through the fill chain: a chain
+    // crossing rank 2 and 3 lands the bridge TITLES, which are catalogued
+    // fills themselves and push owned past the threshold. The stable
+    // at-threshold state is real regardless (rank 5's bridge is a border,
+    // which never scores, so a veteran parks at exactly 100), and
+    // onItemDiscovered reads the live ledger the same way however it got
+    // there; 25 keeps the rig small.
+    for (const id of scoringIds) meta.deedStats.itemsDiscovered.add(id);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(25);
+    markItemDiscovered(sim.ctx, meta, band);
+    const unlock = sim
+      .drainEvents()
+      .find((e) => e.type === 'reliquaryUnlock' && 'itemId' in e && e.itemId === band);
+    // The fill itself still toasts (it is a real first find)...
+    expect(unlock).toBeDefined();
+    // ...but carries NO rank-up, and the true rank never moved.
+    expect(unlock && 'curatorRank' in unlock ? unlock.curatorRank : undefined).toBeUndefined();
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(25);
+
+    // Positive control on the same boundary: a character at 24 scoring fills
+    // whose 25th fill SCORES still gets the rank-3 announcement (the fix must
+    // not mute real crossings).
+    const sim2 = makeSim();
+    const { meta: meta2 } = primary(sim2);
+    for (const id of scoringIds.slice(0, 24)) meta2.deedStats.itemsDiscovered.add(id);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta2))).toBe(24);
+    markItemDiscovered(sim2.ctx, meta2, scoringIds[24]!);
+    const crossing = sim2
+      .drainEvents()
+      .find((e) => e.type === 'reliquaryUnlock' && 'itemId' in e && e.itemId === scoringIds[24]);
+    expect(crossing && 'curatorRank' in crossing ? crossing.curatorRank : undefined).toBe(3);
+  });
+
+  it('relicFillScoresForRank: flagged-page ids score nothing, every authored mark scores', () => {
+    // Direct pins on the helper both fill paths consult. The mark loop is the
+    // compensating guard for the dead arm in noteReliquaryMark (no authored
+    // mark sits on a flagged page today, the M4 pattern): if a mark ever
+    // lands on an excludeFromCompletion page, this loop reds and the arm
+    // becomes live and testable.
+    for (const page of ['horizons_riftbound', 'horizons_vault_of_ages'] as const) {
+      for (const relic of RELIQUARY_PAGES_BY_ID[page].relics) {
+        if (relic.kind !== 'item') continue;
+        expect(relicFillScoresForRank('item', relic.itemId), relic.itemId).toBe(false);
+      }
+    }
+    expect(relicFillScoresForRank('item', CATALOGUE_RELIC)).toBe(true);
+    for (const markId of RELIQUARY_MARK_IDS) {
+      expect(relicFillScoresForRank('mark', markId), markId).toBe(true);
+    }
   });
 
   it('first catalogued fill ranks up to 1 without a deed bridge', () => {
@@ -2620,9 +2696,9 @@ describe('Reliquary catalog index memo', () => {
     // it is frozen (every reader gets this exact array).
     expect(first).not.toBe(RELIQUARY_PAGES);
     expect(Object.isFrozen(first)).toBe(true);
-    expect(first?.length).toBe(
-      RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion === undefined).length,
-    );
+    // A hand-carried literal, not the production filter restated (which would
+    // prove nothing): 35 pages minus the vault and riftbound flags.
+    expect(first?.length).toBe(33);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:
@@ -2650,6 +2726,37 @@ describe('Reliquary catalog index memo', () => {
     expect(flaggedAnswer).not.toBe(first);
     expect(Object.isFrozen(flaggedAnswer)).toBe(true);
     expect(flaggedAnswer?.map((p) => p.id)).toEqual(['probe_page']);
+  });
+
+  it('the outer scoring filter keeps a flagged skin slot out of the character subtraction', () => {
+    // catalogCharacterCompletion subtracts the SCORING index's skin slots
+    // from the full pair; the inner catalogRelicCompletion filters again, so
+    // the only observable work of the OUTER filter is that subtraction. A
+    // flagged page carrying a weapon_skin separates the two: its skin slot
+    // was never counted, so subtracting it would deflate total below owned
+    // (here 1 owned over a phantom total of 0). No live flagged page carries
+    // a skin today, so this synthetic arm is what keeps the outer filter
+    // live and pinned (the testable sibling of the M4 dead guard).
+    const pages: ReliquaryPageDef[] = [
+      {
+        id: 'probe_scored',
+        shelf: 'conquerors',
+        name: 'Probe Scored',
+        relics: [{ kind: 'item', itemId: 'probe_relic_alpha' }],
+      },
+      {
+        id: 'probe_flagged_skin',
+        shelf: 'horizons',
+        name: 'Probe Flagged Skin',
+        excludeFromCompletion: 'retired',
+        relics: [
+          { kind: 'weapon_skin', skinId: 'probe_skin' },
+          { kind: 'item', itemId: 'probe_relic_beta' },
+        ],
+      },
+    ];
+    const pair = catalogCharacterCompletion({ itemsDiscovered: { has: () => true } }, pages);
+    expect(pair).toEqual({ owned: 1, total: 1 });
   });
 });
 
@@ -3472,22 +3579,30 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
     expect(ev).toBeDefined();
   });
 
-  it('the capstone ignores the retired vault: everything EXCEPT vault items still completes', () => {
+  it('the capstone ignores BOTH flagged pages: a reachable holding still completes', () => {
     // The Vault of Ages slots are excludeFromCompletion, so a character who
     // owns every countable slot but NONE of the four retired ids must earn
     // col_reliquary_complete: the retired page can never dead-end the
-    // capstone (rule 7, the reason the flag exists). The whole-catalog check
-    // routes through catalogCharacterCompletion, whose scoring set skips the
-    // vault on both sides.
+    // capstone (rule 7, the reason the flag exists). The riftbound bands are
+    // skipped too, ALL BUT ONE: a real character holds exactly their own
+    // class's band, so granting all three would prove the deed on an
+    // ownership state no character can reach and hide a personal-page
+    // dead-end (the Phase 21 QA coverage catch). The whole-catalog check
+    // routes through catalogCharacterCompletion, whose scoring set skips
+    // both flagged pages on both sides.
     const vault = RELIQUARY_PAGES_BY_ID.horizons_vault_of_ages;
     const vaultIds = vault.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
     expect(vaultIds.length).toBe(4);
+    const riftbound = RELIQUARY_PAGES_BY_ID.horizons_riftbound;
+    const bandIds = riftbound.relics.flatMap((r) => (r.kind === 'item' ? [r.itemId] : []));
+    expect(bandIds.length).toBe(3);
     const sim = makeSim();
     const { meta } = primary(sim);
-    grantWholeCharacterCatalog(sim, new Set(vaultIds));
-    for (const id of vaultIds) {
+    grantWholeCharacterCatalog(sim, new Set([...vaultIds, ...bandIds.slice(1)]));
+    for (const id of [...vaultIds, ...bandIds.slice(1)]) {
       expect(meta.deedStats.itemsDiscovered.has(id), id).toBe(false);
     }
+    expect(meta.deedStats.itemsDiscovered.has(bandIds[0]!)).toBe(true);
     expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(true);
     expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
     const pair = catalogCharacterCompletion(characterReliquaryOwnership(meta));

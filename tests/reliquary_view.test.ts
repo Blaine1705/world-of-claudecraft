@@ -2740,7 +2740,7 @@ describe('reliquarySourceLineText', () => {
       'Earned by crafting a masterwork',
     );
     expect(reliquarySourceLineText({ kind: 'activity', activityId: 'rift_first_clear' })).toBe(
-      'Awarded to every winner of their first Rift clear',
+      "Awarded to every member of the party that wins a ranked Rift's first clear",
     );
   });
 

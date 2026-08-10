@@ -1188,7 +1188,7 @@ export class ReliquaryWindow {
           `<span class="reliquary-page-name">${esc(reliquaryPageName(page.pageId))}</span>${sub}` +
           `</span>` +
           `<span class="reliquary-page-meta">` +
-          `<span class="reliquary-progress-text">${esc(progress)}</span>${clears}${this.retiredChipHtml(page.pageId)}${done}` +
+          `<span class="reliquary-progress-text">${esc(progress)}</span>${clears}${this.outsideCompletionChipHtml(page.pageId)}${done}` +
           `</span></button>${this.pinButtonHtml(page.pageId, page.complete)}</li>`
         );
       })
@@ -1240,7 +1240,7 @@ export class ReliquaryWindow {
    * row/header, which is exactly what a screen reader announces, so no extra
    * aria is minted for it. Empty for every live page.
    */
-  private retiredChipHtml(pageId: string): string {
+  private outsideCompletionChipHtml(pageId: string): string {
     const reason = Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)
       ? RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion
       : undefined;
@@ -1319,7 +1319,7 @@ export class ReliquaryWindow {
       `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       `<header class="reliquary-page-header">` +
-      `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${this.retiredChipHtml(page.pageId)}${done}` +
+      `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${this.outsideCompletionChipHtml(page.pageId)}${done}` +
       // Same control, same focus key as the shelf row's: the shelf list and a
       // page detail are mutually exclusive surfaces (contentHtml), so one page
       // never renders two pin buttons and the key stays unique per paint.

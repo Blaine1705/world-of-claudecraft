@@ -565,13 +565,15 @@ function shelfPageModel(
  * synthetic test page reusing a live id must resolve its own source, never the
  * catalog row that shares the id.
  */
+const DEED_STAT_KEY_SET: ReadonlySet<string> = new Set(DEED_STAT_KEYS);
+
 export function reliquarySecondaryClears(
   page: ReliquaryPageDef | undefined,
   counters: DeedStats['counters'] | undefined,
 ): number | undefined {
   const src = page?.secondaryClearSource;
   if (src === undefined) return undefined;
-  if (!(DEED_STAT_KEYS as readonly string[]).includes(src.stat)) return 0;
+  if (!DEED_STAT_KEY_SET.has(src.stat)) return 0;
   const n = counters?.[src.stat as DeedStatKey];
   return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }

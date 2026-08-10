@@ -330,7 +330,11 @@ function refreshDefaultRows(out: ReliquaryTrackerView, input: ReliquaryTrackerIn
     // skip as buildNearlyComplete in reliquary_view.ts; resolved off the
     // authored def because this core only receives ids. A deliberate PIN on
     // such a page still tracks (player choice, pass 1).
-    if (RELIQUARY_PAGES_BY_ID[pageId]?.excludeFromCompletion !== undefined) continue;
+    if (
+      Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId) &&
+      RELIQUARY_PAGES_BY_ID[pageId].excludeFromCompletion !== undefined
+    )
+      continue;
     const c = input.completion(pageId);
     if (c === null || !isReliquaryNearlyComplete(c.owned, c.total)) continue;
     candidates.push({ pageId, owned: c.owned, total: c.total });

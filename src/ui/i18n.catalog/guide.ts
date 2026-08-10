@@ -2174,10 +2174,19 @@ export const guideStrings = {
       'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',
     howHeading: 'How the collection works',
     howBody:
-      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
+      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
     ranksHeading: 'Curator ranks',
     ranksBody:
-      'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable.',
+      'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.',
+    // The outside-completion tags and notes (rule 7 on the wiki): a retired or
+    // class-personal page must be labeled here too, or a reader chases relics
+    // that can no longer be won or can never all be held by one character.
+    retiredTag: 'Retired',
+    personalTag: 'Personal',
+    retiredNote:
+      'These relics can no longer be won. The page honors the veterans who keep them and does not count toward completion or Curator rank.',
+    personalNote:
+      'Each character can only ever hold their own. The page does not count toward completion or Curator rank.',
     catalogHeading: 'Catalog of pages',
     catalogBody:
       'Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.',

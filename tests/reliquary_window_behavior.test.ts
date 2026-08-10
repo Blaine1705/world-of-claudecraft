@@ -3095,12 +3095,16 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(pageDef(VAULT_PAGE_ID).excludeFromCompletion).toBe('retired');
     const rig = makeWindow(baseState(), { nav: 'horizons' });
     // Shelf row first, before any navigation.
-    const rowChips = [...rig.el.querySelectorAll<HTMLElement>('[data-retired]')];
+    const rowChips = [
+      ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-retired]'),
+    ];
     expect(rowChips).toHaveLength(1);
     expect(rowChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
     // Then the page header, on the same live window.
     click(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
-    const headerChips = [...rig.el.querySelectorAll<HTMLElement>('[data-retired]')];
+    const headerChips = [
+      ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-retired]'),
+    ];
     expect(headerChips).toHaveLength(1);
     expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
   });
@@ -3109,7 +3113,7 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(pageDef(RIFTBOUND_PAGE_ID).excludeFromCompletion).toBe('personal');
     const rig = makeWindow(baseState(), { nav: 'horizons' });
     const row = must(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
-    const chip = row.querySelector<HTMLElement>('[data-personal]');
+    const chip = row.querySelector<HTMLElement>('.reliquary-complete-badge[data-personal]');
     expect(chip, 'the riftbound shelf row carries the personal chip').toBeTruthy();
     expect(chip?.textContent).toBe(t('hudChrome.reliquary.personalLabel'));
     // The two reasons never wear each other's word: this row carries no
@@ -3119,7 +3123,9 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(vaultRow.querySelector('[data-personal]')).toBeNull();
     // Then the page header, on the same live window (the vault arm's mirror).
     click(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
-    const headerChips = [...rig.el.querySelectorAll<HTMLElement>('[data-personal]')];
+    const headerChips = [
+      ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-personal]'),
+    ];
     expect(headerChips).toHaveLength(1);
     expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.personalLabel'));
     expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(0);
@@ -3130,5 +3136,25 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(pageDef(PAGE_ID).excludeFromCompletion).toBeUndefined();
     expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(0);
     expect(rig.el.querySelectorAll('[data-personal]')).toHaveLength(0);
+  });
+
+  it('a full-holding veteran illuminates the vault WITH the Retired chip still on the header', () => {
+    // The one paint where .reliquary-page-detail.is-illuminated and the
+    // Retired chip coexist (the vault deliberately still illuminates,
+    // pinned sim-side): the gold-frame opt-out rules in components.css key
+    // on exactly this DOM state, and no other test produces it. The chip
+    // must carry BOTH the badge class and the reason hook here, or the
+    // opt-out selector cannot reach it and the chip inherits the
+    // celebratory frame this page must never wear.
+    const state = baseState();
+    for (const relic of pageDef(VAULT_PAGE_ID).relics) {
+      if (relic.kind === 'item') state.itemsDiscovered.add(relic.itemId);
+    }
+    const rig = openPage(state, VAULT_PAGE_ID, 'horizons');
+    const detail = must(rig.el, '.reliquary-page-detail');
+    expect(detail.classList.contains('is-illuminated')).toBe(true);
+    const chip = detail.querySelector<HTMLElement>('.reliquary-complete-badge[data-retired]');
+    expect(chip, 'the illuminated vault header keeps its Retired chip').toBeTruthy();
+    expect(chip?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
   });
 });

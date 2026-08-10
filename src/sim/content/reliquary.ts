@@ -850,6 +850,8 @@ function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[]
   for (const page of pages) {
     for (const relic of page.relics) Object.freeze(relic);
     Object.freeze(page.relics);
+    if (page.clearSource !== undefined) Object.freeze(page.clearSource);
+    if (page.secondaryClearSource !== undefined) Object.freeze(page.secondaryClearSource);
     Object.freeze(page);
   }
   return Object.freeze(pages);
@@ -1525,7 +1527,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'horizons_riftbound',
     shelf: 'horizons',
     name: 'Riftbound',
-    desc: 'The personal Riftbound bands, minted once for each champion on their first Rift clear. A character can only ever hold their own.',
+    desc: "The personal Riftbound bands, minted for every champion in the party that wins a ranked Rift's first clear. A character can only ever hold their own.",
     clearSource: { kind: 'none' },
     excludeFromCompletion: 'personal',
     relics: items(

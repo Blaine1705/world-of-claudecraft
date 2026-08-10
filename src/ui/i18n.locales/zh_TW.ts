@@ -5781,10 +5781,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '聖物庫是你已收錄的獨特戰利品博物館：地城追逐裝備、專業獎盃、坐騎、武器外觀與頭銜。它與功績之書的關係，就像獎盃廳與成就簿的關係。',
   'guide.reliquaryPage.howHeading': '收藏如何運作',
   'guide.reliquaryPage.howBody':
-    '在遊戲中開啟聖物庫（預設 Shift+X）。每個架上有多頁獨特聖物。角色首次獲得該件時填滿剪影；一頁上的聖物全部填滿時點亮該頁。即時發現會跳出提示並重新整理已開啟的視窗；進度按角色計算，武器外觀除外（帳號外觀）。',
+    '在遊戲中開啟聖物庫（預設 Shift+X）。每個架上有多頁獨特聖物。角色首次獲得該件時填滿剪影；一頁上的聖物全部填滿時點亮該頁。少數頁面標註「絕版」或「專屬」：它們不計入達成，不會阻礙書架或全庫的完成。即時發現會跳出提示並重新整理已開啟的視窗；進度按角色計算，武器外觀除外（帳號外觀）。',
   'guide.reliquaryPage.ranksHeading': '策展人等級',
   'guide.reliquaryPage.ranksBody':
-    '策展人等級隨已收錄的獨特聖物上升，僅授予裝飾性頭銜與邊框。不會提供戰鬥強度、掉落率或保底。帳號武器外觀不計策展人等級，因此聲望保持角色持久。',
+    '策展人等級隨已收錄的獨特聖物上升，僅授予裝飾性頭銜與邊框。不會提供戰鬥強度、掉落率或保底。帳號武器外觀不計策展人等級，因此聲望保持角色持久。絕版與專屬頁面上的聖物同樣不計入等級。',
+  'guide.reliquaryPage.retiredTag': '絕版',
+  'guide.reliquaryPage.personalTag': '專屬',
+  'guide.reliquaryPage.retiredNote':
+    '這些聖物已無法再取得。此頁致敬仍持有它們的老兵，不計入達成或策展人等級。',
+  'guide.reliquaryPage.personalNote': '每個角色只能持有自己的一件。此頁不計入達成或策展人等級。',
   'guide.reliquaryPage.catalogHeading': '頁面目錄',
   'guide.reliquaryPage.catalogBody':
     '每一頁已編寫的聖物庫頁面及其聖物名稱。此列表僅含防劇透名稱：請在遊戲中開啟聖物庫查看你的進度、通關次數與剪影。',
@@ -8965,7 +8970,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accepted': '{accepted}/{size} 已確認',
   'hudChrome.bgOffer.title': '荊谷原野已準備就緒',
   'hudChrome.bgOffer.backfillTitle': '荊谷原野需要一名戰士',
-  'hudChrome.bgOffer.backfillBody': '這場戰鬥已經開始。你將加入人數不足的一方，本場對戰不會改變你的評分。',
+  'hudChrome.bgOffer.backfillBody':
+    '這場戰鬥已經開始。你將加入人數不足的一方，本場對戰不會改變你的評分。',
   'hudChrome.bgOffer.accepted': '已確認 {accepted}/{size}',
   'hudChrome.bgOffer.remaining': '剩餘 {seconds} 秒確認',
   'hudChrome.bgOffer.accept': '接受',

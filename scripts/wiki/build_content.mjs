@@ -560,7 +560,12 @@ function reliquaryRelicName(relic) {
     return def.name;
   }
   if (relic.kind === 'mark') {
-    const name = RELIQUARY_MARK_GUIDE_NAMES[relic.markId];
+    // hasOwn, not a bare index: the sibling server table is a Map for the
+    // same reason (an Object.prototype key like 'constructor' must fail the
+    // build loudly, never emit a garbage name).
+    const name = Object.hasOwn(RELIQUARY_MARK_GUIDE_NAMES, relic.markId)
+      ? RELIQUARY_MARK_GUIDE_NAMES[relic.markId]
+      : undefined;
     if (!name) throw new Error(`reliquary wiki emit: unknown mark ${relic.markId}`);
     return name;
   }
@@ -607,6 +612,13 @@ const reliquary = RELIQUARY_PAGES.map((page) => ({
   id: page.id,
   shelf: page.shelf,
   name: RELIQUARY_WIKI_PAGE_NAME[page.id] ?? page.name,
+  // Rule 7 (docs/design/reliquary.md) reaches the wiki too: a page outside
+  // completion must be LABELED, not indistinguishable from a winnable page,
+  // or a reader chases retired items and mutually exclusive bands. Emitted
+  // only when set so the common page shape stays lean.
+  ...(page.excludeFromCompletion !== undefined
+    ? { excludeFromCompletion: page.excludeFromCompletion }
+    : {}),
   relics: page.relics.map((r) => ({
     kind: r.kind,
     name: reliquaryRelicName(r),
@@ -1157,6 +1169,8 @@ export interface GuideReliquaryPage {
   id: string;
   shelf: 'conquerors' | 'professions' | 'horizons';
   name: string;
+  /** Outside-completion reason (rule 7): present only on labeled pages. */
+  excludeFromCompletion?: 'retired' | 'personal';
   relics: GuideReliquaryRelic[];
 }
 
