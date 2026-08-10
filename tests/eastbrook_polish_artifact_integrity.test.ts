@@ -694,10 +694,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+// budget-governed shadow cadence; renderer.ts edits only). No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '457ff6205fd56073b46231c4f97ffa73a3c6ff3f3e22aeb03b57707aa5603e02';
+  '8578e83cabb7e42427f9c1da8ee05b623f68a562475def699f2aa92b87bb5458';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  '48a49c89f210637e8d03562af616b8717b4ff954dad7dd84e7778ee5ca9800a8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1624,10 +1627,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+    // budget-governed shadow cadence; renderer.ts edits only). No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('a7218e4f637be5545f0a844f2b0986b720962358fa3604d294a99925bbbe160c');
+    ).toBe('1ebbe647577ab9b52648ab88f3e15a3d966c86bea72eae0e6450fb66d862ec8d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
