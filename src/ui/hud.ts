@@ -15712,14 +15712,16 @@ export class Hud {
 
   /** The ordered post-entry preview prewarm plan; the plan itself is the pure
    *  buildPostEntryPreviewPrewarmUnits (preview_prewarm_core.ts), composed
-   *  here with the real preview thunks. */
-  private postEntryPreviewPrewarmUnits(): PreviewPrewarmUnit[] {
+   *  here with the real preview thunks. `includeCharFamily` is forwarded
+   *  verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
+  private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {
     return buildPostEntryPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
       playerClass: this.sim.cfg.playerClass,
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
       armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
+      includeCharFamily,
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
       },
@@ -15743,16 +15745,41 @@ export class Hud {
   private previewPrewarmHandle: PreviewPrewarmHandle | null = null;
   private restartPreviewPrewarmAfterGraphicsRebuild = false;
 
+  /** Every surface that displays the single shared CharacterPreview instance
+   *  (this.charPreview): the character sheet (charWindow.isOpen) and the inspect
+   *  ("Profile") window, which mounts the SAME preview via mountInspectPreview. The
+   *  inspect window painter carries no isOpen of its own, so this reads its DOM
+   *  display exactly the way mountInspectPreview itself already does (its late-mech-
+   *  resolve guard a few lines below). The char skin picker mounts through
+   *  mountCharPreview too, but only while the char sheet is showing (its click
+   *  handler re-checks `#char-window` display before mounting), so it needs no
+   *  signal of its own. A char prewarm unit must pause while either surface is on
+   *  screen: otherwise it draws warmup frames on the visible canvas and warms
+   *  whatever rig that surface has mounted (the INSPECTED player's, not the local
+   *  paperdoll skin the unit was warming). */
+  private isCharPreviewSurfaceVisible(): boolean {
+    return (
+      this.charWindow.isOpen ||
+      ($('#inspect-window') as HTMLElement | null)?.style.display === 'block'
+    );
+  }
+
   /** Start (or restart) the post-entry preview prewarm behind the live frame:
    *  one unit per idle slot through the renderer's background GPU queue, paused
    *  while the owning window is open (its own lazy path is warming what the
-   *  player is looking at). Replaces the old blocking pre-reveal prewarms. */
-  startPostEntryPreviewPrewarm(): PreviewPrewarmHandle {
+   *  player is looking at). Replaces the old blocking pre-reveal prewarms.
+   *  `includeCharFamily` defaults to true, the boot path: the curtain-side
+   *  `prewarmCharPreviewShell` already built the paperdoll shell there, so the
+   *  paced shell/skin/pose units are real work. The graphics-rebuild restart
+   *  (`restoreGraphicsPreviewContexts`) passes false: its own cover is already
+   *  down by the time it runs, so building the shell there would be the exact
+   *  live-frame hitch the curtain exists to avoid. */
+  startPostEntryPreviewPrewarm(includeCharFamily: boolean = true): PreviewPrewarmHandle {
     this.previewPrewarmHandle?.cancel();
-    const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(), {
+    const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(includeCharFamily), {
       enqueue: (label, run) => this.renderer.queueSecondaryPreviewPrewarm(label, run),
       isFamilyBusy: (family) =>
-        family === 'char' ? this.charWindow.isOpen : this.dailyRewardsWindow.isOpen,
+        family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen,
       // Pause while the FPS governor reports a struggling frame; the core's
       // poll cap keeps ambient pressure from starving the warmup forever.
       hasHeadroom: () => this.renderer.perfStats().renderBudget.mode !== 'degrading',
@@ -15790,11 +15817,19 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    // Fresh contexts start cold; re-run the paced schedule so first-open
-    // stays covered after a rebuild exactly like it is after boot.
+    // Fresh contexts start cold; re-run the paced schedule so armory and
+    // portrait first-open stay covered after a rebuild exactly like they are
+    // after boot. The char family (the shell plus its dependent skin/pose
+    // units) is excluded here: unlike boot, this restart runs with no curtain
+    // up (resetGraphicsPreviewContexts already dropped it before this point),
+    // so building the ~700 ms paperdoll shell + its secondary WebGL context as
+    // a schedule unit would hitch a live frame, the exact stall class the
+    // curtain exists to avoid. First open after a rebuild pays that cost
+    // lazily instead (charWindow.render / renderIfOpen above already covers
+    // the case where the char window was open across the rebuild).
     if (this.restartPreviewPrewarmAfterGraphicsRebuild) {
       this.restartPreviewPrewarmAfterGraphicsRebuild = false;
-      this.startPostEntryPreviewPrewarm();
+      this.startPostEntryPreviewPrewarm(false);
     }
   }
 

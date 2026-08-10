@@ -61,7 +61,9 @@ describe('Armory preview lifecycle', () => {
     const plan = core.slice(start);
     expect(plan).toContain("['headshot', 'body'] as const");
     expect(plan).toContain('deps.renderPortrait(portraitClass, skin, framing)');
-    const hudStart = hud.indexOf('private postEntryPreviewPrewarmUnits()');
+    const hudStart = hud.indexOf(
+      'private postEntryPreviewPrewarmUnits(includeCharFamily: boolean)',
+    );
     expect(hudStart).toBeGreaterThan(-1);
     const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
     expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
@@ -76,5 +78,53 @@ describe('Armory preview lifecycle', () => {
     expect(capture).toContain('readRenderTargetPixelsAsync');
     expect(capture).not.toContain('this.renderer.setSize(');
     expect(hud).toContain('prewarmCloseupPoses([pose])');
+  });
+
+  it('carries a mid-prewarm setContainer/syncSize request past the CharacterPreview finally instead of a stale wasActive', () => {
+    // syncSize (setContainer's own tail, and the resize observer that fires
+    // when the char window's display flips) must not resize the buffer that
+    // prewarm() has repurposed for warmup while it owns it; it should only
+    // record the request.
+    const syncSizeStart = characterPreview.indexOf('syncSize(): void {');
+    const syncSizeEnd = characterPreview.indexOf('/** Compile and upload', syncSizeStart);
+    const syncSize = characterPreview.slice(syncSizeStart, syncSizeEnd);
+    expect(syncSize).toContain('if (this.prewarming) {');
+    expect(syncSize).toContain(
+      'this.pendingActive = this.container.clientWidth > 0 && this.container.clientHeight > 0;',
+    );
+
+    const prewarmStart = characterPreview.indexOf('async prewarm(skinIndices');
+    const prewarmEnd = characterPreview.indexOf('async prewarmCloseupPoses(', prewarmStart);
+    const prewarm = characterPreview.slice(prewarmStart, prewarmEnd);
+    expect(prewarm).toContain('this.prewarming = true;');
+    // The finally applies the latest mid-prewarm request over the stale
+    // wasActive it captured at entry, then resyncs to the real size only
+    // when a request actually arrived (no mid-flight calls means the
+    // pre-warmup snapshot restored just above is already correct).
+    expect(prewarm).toContain('const requestedActive = this.pendingActive;');
+    expect(prewarm).toContain('this.renderActive = requestedActive ?? wasActive;');
+    expect(prewarm).toContain('if (requestedActive !== null) this.syncSize();');
+    expect(prewarm).not.toContain('this.renderActive = wasActive;');
+  });
+
+  it('carries a mid-prewarm setActive request past the ArmoryPreview finally instead of a stale wasActive', () => {
+    // setActive must not touch the shared active/rAF state while prewarm()
+    // owns the render buffer and loop; it should only record the request.
+    const setActiveStart = preview.indexOf('setActive(next: boolean): void {');
+    const setActiveEnd = preview.indexOf(
+      'setAppearance(next: PreviewAppearance): void {',
+      setActiveStart,
+    );
+    const setActive = preview.slice(setActiveStart, setActiveEnd);
+    expect(setActive).toContain('if (prewarming) {');
+    expect(setActive).toContain('pendingActive = next;');
+
+    const prewarmStart = preview.indexOf('async prewarm(');
+    const finallyStart = preview.indexOf('} finally {', prewarmStart);
+    const finallyEnd = preview.indexOf('dispose(): void {', finallyStart);
+    const finallyBody = preview.slice(finallyStart, finallyEnd);
+    expect(finallyBody).toContain('const requestedActive = pendingActive;');
+    expect(finallyBody).toContain('active = requestedActive ?? wasActive;');
+    expect(finallyBody).not.toContain('active = wasActive;');
   });
 });

@@ -73,6 +73,22 @@ describe('tight-memory residency diet', () => {
     expect(revealAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(revealAt);
   });
+
+  it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
+    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell();');
+    expect(callAt).toBeGreaterThan(-1);
+    // Anchor on the NEAREST preceding gate, not the first one in the file: a
+    // plain indexOf-ordering check (gate index before call index) would still
+    // pass if some unrelated earlier "!GFX.tightMemory" text existed anywhere
+    // above the call.
+    const gateAt = mainSource.lastIndexOf('if (!GFX.tightMemory) {', callAt);
+    expect(gateAt).toBeGreaterThan(-1);
+    // The gate's own closing brace must not appear between the gate and the
+    // call: that would mean the block already ended and the call runs
+    // unconditionally, even though the ordering check above would still hold.
+    const between = mainSource.slice(gateAt, callAt);
+    expect(between).not.toMatch(/\n {2}\}/);
+  });
 });
 
 describe('deferred skin atlases on every iOS WebKit host', () => {

@@ -196,6 +196,11 @@ export function createArmoryPreview(
   let skinId: string | null = null;
   let active = false;
   let prewarming = false;
+  // The latest setActive request that arrived while prewarm() owned the
+  // renderer/composer buffer and the rAF loop; applied by prewarm's finally
+  // instead of the wasActive snapshot it captured at entry, so a window
+  // opened or closed mid-warmup is never clobbered back to a stale value.
+  let pendingActive: boolean | null = null;
   let disposed = false;
   let renderWidth = Math.max(1, container.clientWidth);
   let renderHeight = Math.max(1, container.clientHeight);
@@ -377,7 +382,14 @@ export function createArmoryPreview(
 
   return {
     setActive(next: boolean): void {
-      if (disposed || next === active) return;
+      if (disposed) return;
+      if (prewarming) {
+        // prewarm() owns the rAF loop and the render buffer until it
+        // finishes; record the request and let its finally apply it.
+        pendingActive = next;
+        return;
+      }
+      if (next === active) return;
       active = next;
       if (!active) {
         if (raf !== null) cancelAnimationFrame(raf);
@@ -439,6 +451,7 @@ export function createArmoryPreview(
       active = false;
       clock.stop();
       prewarming = true;
+      pendingActive = null;
       try {
         renderer.setPixelRatio(1);
         renderer.setSize(480, 380, false);
@@ -494,7 +507,12 @@ export function createArmoryPreview(
         // had already been warmed above.
         composer.render();
         prewarming = false;
-        active = wasActive;
+        // setActive may have arrived mid-prewarm (the store window opened or
+        // closed while this buffer was repurposed for warmup); apply that
+        // request instead of the wasActive snapshot captured at entry.
+        const requestedActive = pendingActive;
+        pendingActive = null;
+        active = requestedActive ?? wasActive;
         if (active && !disposed) {
           resize();
           clock.start();

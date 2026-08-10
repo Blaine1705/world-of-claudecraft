@@ -55,6 +55,17 @@ export interface PreviewPrewarmPlanDeps<Pose> {
   cardPoses: readonly Pose[];
   /** Armory catalog skin ids to warm, in catalog order. */
   armorySkinIds: readonly string[];
+  /** True on the boot path, false on a graphics-rebuild restart. Excludes the
+   *  char-window shell unit plus the per-skin and per-pose units that depend on
+   *  it (they no-op via `this.charPreview?.` once built): at boot the shell
+   *  already exists behind the loading curtain (`Hud.prewarmCharPreviewShell`),
+   *  so those units are real work there; on a rebuild restart the destroying
+   *  reset already dropped its own cover, so building the shell as a schedule
+   *  unit would hitch a live frame, the exact class of stall the curtain
+   *  exists to avoid. Portrait units stay in every plan (canvas-2D only, no
+   *  dependence on the shell); so do armory units (its own prewarm path
+   *  lazily rebuilds its stage). */
+  includeCharFamily: boolean;
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
@@ -69,26 +80,30 @@ export interface PreviewPrewarmPlanDeps<Pose> {
  *  encode on the first inspected player), then every Armory catalog skin,
  *  one MODE per unit (a whole-skin warmup measured 170 to 225 ms of
  *  main-thread block during live play; per-mode units roughly halve it).
- *  Each entry is one bounded GPU unit the renderer's background lane paces. */
+ *  Each entry is one bounded GPU unit the renderer's background lane paces.
+ *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
+ *  on `PreviewPrewarmPlanDeps`. */
 export function buildPostEntryPreviewPrewarmUnits<Pose>(
   deps: PreviewPrewarmPlanDeps<Pose>,
 ): PreviewPrewarmUnit[] {
   const units: PreviewPrewarmUnit[] = [];
-  units.push({ family: 'char', label: 'preview:char-window', run: deps.renderCharShell });
-  const skins = deps.skinCount(`player_${deps.playerClass}`);
-  for (let skin = 0; skin < skins; skin++) {
-    units.push({
-      family: 'char',
-      label: `preview:char-skin:${skin}`,
-      run: () => deps.prewarmCharSkin(skin),
-    });
-  }
-  for (const [index, pose] of deps.cardPoses.entries()) {
-    units.push({
-      family: 'char',
-      label: `preview:card-pose:${index}`,
-      run: () => deps.prewarmCardPose(pose),
-    });
+  if (deps.includeCharFamily) {
+    units.push({ family: 'char', label: 'preview:char-window', run: deps.renderCharShell });
+    const skins = deps.skinCount(`player_${deps.playerClass}`);
+    for (let skin = 0; skin < skins; skin++) {
+      units.push({
+        family: 'char',
+        label: `preview:char-skin:${skin}`,
+        run: () => deps.prewarmCharSkin(skin),
+      });
+    }
+    for (const [index, pose] of deps.cardPoses.entries()) {
+      units.push({
+        family: 'char',
+        label: `preview:card-pose:${index}`,
+        run: () => deps.prewarmCardPose(pose),
+      });
+    }
   }
   for (const portraitClass of deps.allClasses) {
     const portraitSkins = deps.skinCount(`player_${portraitClass}`);
@@ -123,20 +138,29 @@ export function runPreviewPrewarmSchedule(
   let cancelled = false;
   const done = (async () => {
     for (const unit of units) {
-      while (!cancelled && deps.isFamilyBusy(unit.family)) {
-        await deps.delay(PREVIEW_PREWARM_BUSY_POLL_MS);
+      // The busy pause and the headroom pause bound two different waits (an
+      // open window vs. frame pressure), and the headroom pause can itself
+      // run long enough for the player to open the window this unit is about
+      // to warm. Recheck busy after every headroom wait and loop back to the
+      // busy pause instead of firing at a window the player just opened.
+      for (;;) {
+        while (!cancelled && deps.isFamilyBusy(unit.family)) {
+          await deps.delay(PREVIEW_PREWARM_BUSY_POLL_MS);
+        }
+        if (cancelled) return;
+        let headroomPolls = 0;
+        while (
+          !cancelled &&
+          deps.hasHeadroom &&
+          !deps.hasHeadroom() &&
+          headroomPolls < PREVIEW_PREWARM_HEADROOM_POLL_CAP
+        ) {
+          headroomPolls++;
+          await deps.delay(PREVIEW_PREWARM_BUSY_POLL_MS);
+        }
+        if (cancelled) return;
+        if (!deps.isFamilyBusy(unit.family)) break;
       }
-      let headroomPolls = 0;
-      while (
-        !cancelled &&
-        deps.hasHeadroom &&
-        !deps.hasHeadroom() &&
-        headroomPolls < PREVIEW_PREWARM_HEADROOM_POLL_CAP
-      ) {
-        headroomPolls++;
-        await deps.delay(PREVIEW_PREWARM_BUSY_POLL_MS);
-      }
-      if (cancelled) return;
       try {
         await deps.enqueue(unit.label, unit.run);
       } catch (err) {
