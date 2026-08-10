@@ -1,8 +1,12 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 22 COMPLETE (implementation + records close-out,
-2026-08-09), awaiting Phase 22 QA, the FINAL phase (phase-22-qa.md:
-whole-feature matrix, full gate, PR-body application, teardown offer).
+Current phase: 22 QA COMPLETE (2026-08-10). PACKET CLOSED. The whole-feature
+matrix ran as a 16-verifier fan-out, all ten items of the maintainer's
+2026-08-05 review verify as DELIVERED, the full gate is green except the
+release-owned portrait-manifest red, the PR body is applied, and every
+surviving rider was migrated into docs/design/reliquary.md before this
+directory was deleted. This file and its siblings exist only in git history
+from the teardown commit onward.
 Phase 22 landed the realm population-rarity read (per-relic "Found by"
 tooltip lines and per-page "Illuminated by" header lines, online only,
 riding the deeds rarity refresh), recaptured the whole stale evidence

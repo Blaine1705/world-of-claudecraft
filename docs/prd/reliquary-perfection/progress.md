@@ -2804,3 +2804,67 @@ reliquary wiring; tsc clean; the 717-test core battery green. The portrait
 manifest acceptance remains stale on the merged tree exactly as on the pure
 release tip (the b2 rider stands: the release's own acceptance process owes
 the re-accept).
+
+## Phase 22 QA (2026-08-10, the final phase)
+
+Whole-feature verification, then ship. Executed the qa-checklist matrix as a
+16-verifier fan-out (one per matrix line, five closing-table legs over the
+maintainer's 2026-08-05 review, three adversarial legs). All ten review items
+verify as DELIVERED with file:line evidence; item 10 (performance) verifies as
+MET with all four claimed wins real.
+
+STEP 0 sync: the release moved twice during this phase. Merged
+origin/release/v0.36.0 at 2e51971339 (sim world-geometry extraction, net
+snapshot-timer cleanup, i18n identical-write skip, CI turbo collapse). Clean
+merge, no conflicts; the only overlap with branch-owned files was
+.github/workflows/ci.yml, which merged without a conflict.
+
+Gate on the final tip: one red file, tests/mob_portrait_source_manifest.test.ts
+(2 tests). Everything else green: 2,467 test files passed, 34,734 tests passed,
+2 expected-fail, 108 skipped. i18n gen + freshness, malware scan, and
+ci:changed all clean. The gate stops at the first failure, so the post-vitest
+steps were run by hand: turbo check:types build:env build:server build:bot and
+turbo build:bundle, both exit 0.
+
+RIDER b2 CORRECTED, not merely re-asserted. The recorded attribution said the
+branch computes rendererFingerprint 5788f245 identically to the release and
+adds ZERO renderer drift. Both halves of that wording are wrong, and the
+correction matters because the old wording would have been migrated forward:
+  - 5788f245 is the sha256 of the committed manifest FILE (the "found" side of
+    the diff hint), not a rendererFingerprint. The manifest's actual
+    rendererFingerprint field is 54caabc3 as committed.
+  - The branch does NOT compute a fingerprint identical to the release. It
+    changes five files that are genuinely inside the portrait bundle's import
+    graph (src/sim/rng.ts, src/sim/types.ts, src/sim/content/zone3.ts,
+    src/sim/content/rift/items.ts, src/game/settings.ts), so its esbuild bundle
+    hash moves.
+The CONCLUSION nevertheless holds, and was proved directly rather than
+inferred: a detached worktree at the pure release tip computes rendererFingerprint
+51217a81 against its own committed 54caabc3, so the release tip fails this test
+with no branch code present at all. The drift is confined to the browser-bundle
+hash of a wiki stills entry; all 230 portraits are byte-identical, trackedFiles
+and bootstrapReview match, so no portrait rerender is warranted and the branch
+cannot legitimately re-accept. Release-owned; the release's own receipt process
+owes the repair.
+
+Fixes applied this phase (e0146f0f2e, 38045f54c1):
+  - The weapon-skin account-scope fact was hover-only: the tooltip stated it,
+    cellAriaBase had no weapon_skin arm, so keyboard and screen-reader players
+    never heard it. That violated the painter's own stated agreement contract.
+    Folded in through a new punctuation-owning composition key mirroring the
+    rarity arm, with the five non-Latin fills carrying each locale's own comma.
+    The new pin is mutation-checked (red when the arm is removed) and carries a
+    different-kind negative control.
+  - Three comment literals that catalog growth had rotted now name the pinned
+    test instead, per the anchor rule.
+  - docs/design/reliquary.md absorbed everything in this packet that binds
+    future work, because this directory is deleted at teardown.
+
+Surfaced rather than fixed, because each is a product call and not a defect:
+the unfillable-slot nudge (the two pages holding the three owner-pended slots
+permanently satisfy the nearly-complete rule, so they sit at the top of the
+Overview strip and the HUD tracker forever), the Overview shared-uniques note
+now being factually wrong about shelf sums after the Phase 21 exclusion, the 19
+rare-kill trophies painting at common while sibling mark families carry a rung,
+and the inert .reliquary-cell:hover keyline. All four are recorded in
+docs/design/reliquary.md under the open owner calls and deliberate oddities.

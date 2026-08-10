@@ -594,6 +594,25 @@ None of these is a defect. Each is a product decision with no ruling yet.
 - **Compact-tier mobile collision.** On the compact mobile tier the minimap
   coordinate readout and clock overprint the tracker chip. Raised during the
   packet and never ruled on; it ships as-is.
+- **The Overview shared-uniques note is now imprecise.** It tells the player
+  that shelf and page counts list every slot, so a relic on two pages is
+  counted by each. Since the outside-completion pages landed, shelf totals skip
+  those pages entirely while the shelf still lists their rows, so a player
+  summing the visible rows gets a number above the shelf card and the one line
+  meant to explain the gap asserts the opposite rule. Rewording it is a copy
+  change that stales the shipped non-Latin fills, which is why it was recorded
+  rather than done at the merge gate.
+- **Rare-kill trophies paint at the common rung.** The cell-quality resolver
+  knows the masterwork and gathering-event mark families but not the rare-kill
+  family, so every cell on the realm-rares page frames grey while sibling mark
+  families carry a colour. Which rung those trophies deserve is a product call,
+  which is the only reason it is not simply fixed.
+- **The cell hover keyline never renders.** The quality classes set
+  `border-color` with `!important` in the same cascade layer, so the
+  `.reliquary-cell:hover` keyline (and the resting showcase border) never wins,
+  despite a comment stating the opposite intent. The guard is a source-text
+  presence check, blind to selector reach. Restoring the intended hover
+  treatment is a visual change and wants a before/after capture.
 
 ## Anchors (stable paths)
 
