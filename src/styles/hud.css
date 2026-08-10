@@ -885,7 +885,7 @@
     text-shadow: 1px 1px 1px #000;
     z-index: 3;
   }
-  /* crossed-swords combat indicator on the player portrait (classic style) */
+  /* painted combat-status crest on the player portrait (classic style) */
   .combat-flash {
     position: absolute;
     top: -4px;
@@ -895,14 +895,17 @@
     display: none;
     align-items: center;
     justify-content: center;
-    color: #ff5040;
-    font-size: 15px;
-    line-height: 1;
     z-index: 4;
     pointer-events: none;
-    text-shadow:
-      0 0 4px #000,
-      0 0 6px #ff5040;
+  }
+  .combat-flash img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-hostile);
+    border-radius: 5px;
+    object-fit: cover;
+    box-shadow: var(--art-shadow-sm);
   }
   #player-frame.combat .combat-flash {
     display: flex;
@@ -2094,9 +2097,10 @@
      split already keeps each column well under budget at 1366x768, but the
      rescue stays as a floor for shorter viewports still. Pinned by the
      rail-height budget test in tests/crafting_launcher.test.ts. Threshold is
-     600px, not 720px: uncompacted col-b (128 + 10 * (30 + 4) = 468) already
-     fits the 660px maximized-1366x768 budget, so the rescue only needs to
-     fire below that. */
+     600px, not 720px: uncompacted col-b already fits the 660px
+     maximized-1366x768 budget (that same rail-height budget test derives the
+     arithmetic from the live markup), so the rescue only needs to fire below
+     that. */
   @media (max-height: 600px) {
     .side-buttons-col {
       gap: 1px;

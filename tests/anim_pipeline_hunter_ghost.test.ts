@@ -57,7 +57,7 @@ describe('hunter ability-specific attacks (issue #2889 follow-up batch)', () => 
   });
 
   it('wires both donor GLBs (the pre-existing bow_anims.glb and the new one) and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_hunter: {', 'player_rogue: {');
+    const block = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
     expect(block).toContain('bow_anims.glb');
     expect(block).toContain('hunter_ability_anims.glb');
     expect(block).toContain('attackByAbility');
@@ -65,7 +65,7 @@ describe('hunter ability-specific attacks (issue #2889 follow-up batch)', () => 
   });
 
   it('every mapped ability id is a real hunter ability, and every referenced clip is shipped or an existing rig clip', () => {
-    const hunterBlock = manifestBlock('player_hunter: {', 'player_rogue: {');
+    const hunterBlock = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
     const abilityStart = hunterBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = hunterBlock.indexOf('\n      },', abilityStart);
@@ -133,8 +133,13 @@ describe('ghost family bespoke attack (issue #2889 follow-up batch)', () => {
     // originally (batch 1's own pin); this batch migrates one more
     // (mob_ghost), and the nightkin family's own follow-up migration to
     // NIGHTKIN_FLOATING (tests/anim_pipeline_warlock_nightkin.test.ts) takes
-    // one more still, leaving 6 remaining direct `clips: FLOATING,` usages.
+    // one more, and the round-2 glub migration (tests/anim_pipeline_glub.test.ts)
+    // takes one more still, and the dragonkin family's own follow-up migration
+    // to DRAGONKIN_FLOATING (tests/anim_pipeline_druid_dragonkin.test.ts) takes
+    // one more, and the flying demon's own migration to DEMON_FLYING_FLOATING
+    // (tests/anim_pipeline_shaman_demonflying.test.ts) takes one more still,
+    // leaving 3 remaining direct `clips: FLOATING,` usages.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(6);
+    expect(remaining).toBe(3);
   });
 });

@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "f644114bf4632f7aa8b01cd685c2d4c90e3078a0a8b58cf2cdc56eaa16a5d8c7",
-  "catalogHash": "be508f1f6b39d215f7babd153319da0c1d8b502a1862813fb811d21068d0c61f",
+  "bundleId": "4e0366fc71920afb2f882f6f1e4d65a3a332cbff20756c801e007e35c10a86f8",
+  "catalogHash": "538389235484af903830dc6c34b394636be2c0a27510954f5dee8afaf06286a5",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -536,9 +536,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/flamestrike.mp3?v=d57a0627c1bf",
-          "bytes": 60229,
-          "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
+          "url": "/audio/sfx/flamestrike.mp3?v=bd4257d3567b",
+          "bytes": 49571,
+          "sha256": "bd4257d3567b43f5228066cba5f1dff5c31b205c9314bfb4c7f0d6cbfebcdf15"
         }
       ],
       "gain": 2.041738,
@@ -1442,6 +1442,18 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "meteor": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/meteor.mp3?v=d57a0627c1bf",
+          "bytes": 60229,
+          "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "mob_beast_aggro": {

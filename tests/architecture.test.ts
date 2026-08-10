@@ -202,6 +202,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
@@ -235,7 +236,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
+  'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_lockout_view.ts',
+  'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
@@ -250,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/bags_view.ts',
   'src/ui/bag_item_context_menu.ts',
   'src/ui/enchant_apply_view.ts',
@@ -317,6 +321,7 @@ const UI_PURE_CORES = [
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
@@ -382,6 +387,7 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
@@ -432,7 +438,11 @@ const RENDER_PURE_CORES = [
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
+  'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
+  'src/render/drape_lod_core.ts',
+  'src/render/weapon_vfx_emissive_cache_core.ts',
+  'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
@@ -448,6 +458,7 @@ const RENDER_PURE_CORES = [
   'src/render/env_prefilter_core.ts',
   'src/render/environment_transition_core.ts',
   'src/render/ground_tilt_core.ts',
+  'src/render/grass_build_slicer_core.ts',
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
@@ -468,6 +479,7 @@ const RENDER_PURE_CORES = [
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
+  'src/render/rift_death_zone_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
@@ -500,6 +512,7 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -541,6 +554,7 @@ const BARE_NAMED = [
   'src/ui/coords.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/quest_marker_tags.ts',
@@ -1087,7 +1101,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
     ...new Set(
       [...uiCores, ...renderCores]
         .filter((f) => !viewOrCoreRe.test(f))
-        .map((f) => relative(repoRoot, f)),
+        .map((f) => relative(repoRoot, f).replaceAll('\\', '/')),
     ),
   ].sort();
 }
@@ -1115,6 +1129,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/absorb_bar.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/clock.ts',
@@ -1184,7 +1199,9 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
     const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
-    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
+    const bareNamedRel = [
+      ...new Set(BARE_NAMED.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
+    ].sort();
     expect(
       derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
@@ -1215,7 +1232,7 @@ describe('curated bare-named pure cores (cross-check)', () => {
 
     const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
     const mutatedBareNamedRel = [
-      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f).replaceAll('\\', '/'))),
     ].sort();
     // The OLD derived check: still green after the synchronized delete (the gap).
     expect(derivedBare).toEqual(mutatedBareNamedRel);
@@ -1591,6 +1608,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_briefing.ts',
   'src/ui/vale_cup_charge.ts',
   'src/ui/vale_cup_hud.ts',
+  'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));
