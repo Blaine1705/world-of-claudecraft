@@ -3668,7 +3668,9 @@ export const ja_JP: EnTranslations = {
       "delete_confirm": "削除を確認するにはキャラクター名を入力してください。",
       "already_in_world": "キャラクターは既に世界にいます。",
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
-      "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。"
+      "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
+      "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
+      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。"
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -7605,7 +7607,12 @@ export const ja_JP: EnTranslations = {
     "sortLevel": "レベル",
     "sortName": "名前",
     "sortRecent": "最近プレイ",
-    "sortPlaytime": "プレイ時間"
+    "sortPlaytime": "プレイ時間",
+    "redesign": "再デザイン",
+    "redesignHint": "このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。",
+    "redesignTitle": "{name}を再デザイン",
+    "redesignSave": "新しい外見を保存",
+    "redesignCancel": "現在の外見を保持"
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",

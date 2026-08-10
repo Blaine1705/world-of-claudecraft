@@ -3668,7 +3668,9 @@ export const pl_PL: EnTranslations = {
       "delete_confirm": "Wpisz imię postaci, aby potwierdzić usunięcie.",
       "already_in_world": "Postać jest już w świecie.",
       "taken_over": "Twoją postać przejęła inna sesja.",
-      "rename_required": "Tę postać trzeba przemianować przed wejściem do świata."
+      "rename_required": "Tę postać trzeba przemianować przed wejściem do świata.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "To konto jest zawieszone do {date}.",
@@ -6495,7 +6497,7 @@ export const pl_PL: EnTranslations = {
     "browSoft": "Delikatne",
     "browThick": "Gęste",
     "browAngled": "Skośne",
-    "earrings": "Kolczyki",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiał biżuterii",
     "jewelDefault": "Jak wykute",
     "jewelGold": "Złoto",
@@ -7605,7 +7607,12 @@ export const pl_PL: EnTranslations = {
     "sortLevel": "Poziom",
     "sortName": "Imię",
     "sortRecent": "Ostatnio grane",
-    "sortPlaytime": "Czas gry"
+    "sortPlaytime": "Czas gry",
+    "redesign": "Przeprojektuj",
+    "redesignHint": "Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
+    "redesignTitle": "Przeprojektuj postać {name}",
+    "redesignSave": "Zapisz nowy wygląd",
+    "redesignCancel": "Zachowaj obecny wygląd"
   },
   "deleteCharacter": {
     "title": "Usuń postać",

@@ -1032,6 +1032,80 @@ describe('createWsAuth: bank bonus stamp', () => {
   });
 });
 
+describe('createWsAuth: authored look on the join meta', () => {
+  // The `appearance` column is JSONB the server re-broadcasts to every player in
+  // view, so it is bounded on the way IN (the redesign route) and re-validated
+  // on the way OUT here, the same belt-and-braces the hotbar layout gets. A row
+  // can predate the current rules, or come from an older build, a migration, or
+  // a direct database edit, and the read path is the last gate before the wire.
+
+  it('re-validates the stored look on the way to the world', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.getCharacter = vi.fn(
+      async () =>
+        baseChar({
+          // a row that today's bounds would never have written: unknown keys, an
+          // attacker-chosen slider name, and free text where a style id goes
+          appearance: {
+            gender: 'female',
+            hair: 'BUY GOLD AT EXAMPLE COM',
+            evil: '<script>alert(1)</script>',
+            face: { jaw: 0.5, 'ATTACKER TEXT': 1 },
+          },
+        }) as CharacterRow | null,
+    );
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual({ gender: 'female', face: { jaw: 0.5 } });
+  });
+
+  it('passes a clean look through untouched', async () => {
+    const look = { gender: 'male', hair: 'mohawk', skinLight: 0.42, lashes: false };
+    const { ws, game, deps, req } = setup();
+    deps.getCharacter = vi.fn(async () => baseChar({ appearance: look }) as CharacterRow | null);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual(look);
+  });
+
+  it('sends null for a character with no look, never undefined', async () => {
+    // `undefined` means "absent" on the resume arm (keep what the session has),
+    // so a look-less character must be an explicit null rather than a hole.
+    const { ws, game, deps, req } = setup();
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    const meta = joinedMeta(game);
+    expect('appearance' in meta).toBe(true);
+    expect(meta.appearance).toBeNull();
+    // ...and a row whose column holds junk is the same thing: no usable look.
+    const junk = setup();
+    junk.deps.getCharacter = vi.fn(
+      async () => baseChar({ appearance: { evil: 'x' } as never }) as CharacterRow | null,
+    );
+    await createWsAuth(junk.deps).authenticateWebSocket(asWs(junk.ws), authRaw(), junk.req);
+    expect(joinedMeta(junk.game).appearance).toBeNull();
+  });
+
+  it('re-validates on the RESUME arm too, where a redesign may have landed', async () => {
+    // The linkdead window is exactly when a redesign can be saved against a row
+    // the live entity does not know about, so the resume arm carries a freshly
+    // read look and it goes through the same gate.
+    const { ws, game, deps, req } = setup();
+    game.hasSessionForCharacter = vi.fn(() => true);
+    deps.getCharacter = vi.fn(
+      async () =>
+        baseChar({ appearance: { hair: 'mohawk', junk: 'x'.repeat(200) } }) as CharacterRow | null,
+    );
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).appearance).toEqual({ hair: 'mohawk' });
+  });
+});
+
 describe('createWsAuth: onConnection', () => {
   beforeEach(() => {
     vi.useFakeTimers();

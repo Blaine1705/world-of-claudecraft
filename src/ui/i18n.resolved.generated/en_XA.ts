@@ -3668,7 +3668,9 @@ export const en_XA: EnTranslations = {
       "delete_confirm": "[Ţýþé ţĥé çĥáŕáçţéŕ ñáɱé ţó çóñƒíŕɱ ðéļéţíóñ.]",
       "already_in_world": "[Çĥáŕáçţéŕ íš áļŕéáðý íñ ŵóŕļð.]",
       "taken_over": "[Ýóúŕ çĥáŕáçţéŕ ŵáš ţáķéñ óʋéŕ ƀý áñóţĥéŕ šéššíóñ.]",
-      "rename_required": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]"
+      "rename_required": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]",
+      "invalid_appearance": "[Ţĥáţ áþþéáŕáñçé çóúļð ñóţ ƀé šáʋéð. Áðĵúšţ ţĥé ðéšíĝñ áñð ţŕý áĝáíñ.]",
+      "reroll_unavailable": "[Ţĥíš çĥáŕáçţéŕ ðóéš ñóţ ĥáʋé á ƒŕéé ŕéðéšíĝñ áʋáíļáƀļé.]"
     },
     "moderation": {
       "suspended_until": "[Ţĥíš áççóúñţ íš šúšþéñðéð úñţíļ {date}.]",
@@ -6495,7 +6497,7 @@ export const en_XA: EnTranslations = {
     "browSoft": "[Šóƒţ]",
     "browThick": "[Ţĥíçķ]",
     "browAngled": "[Áñĝļéð]",
-    "earrings": "[Éáŕŕíñĝš]",
+    "earrings": "[Þíéŕçíñĝš]",
     "jewelMaterial": "[Ĵéŵéļļéŕý Ɱáţéŕíáļ]",
     "jewelDefault": "[Áš Ƒóŕĝéð]",
     "jewelGold": "[Ĝóļð]",
@@ -7605,7 +7607,12 @@ export const en_XA: EnTranslations = {
     "sortLevel": "[Ļéʋéļ]",
     "sortName": "[Ñáɱé]",
     "sortRecent": "[Ŕéçéñţļý Þļáýéð]",
-    "sortPlaytime": "[Þļáýţíɱé]"
+    "sortPlaytime": "[Þļáýţíɱé]",
+    "redesign": "[Ŕéðéšíĝñ]",
+    "redesignHint": "[Ţĥíš çĥáŕáçţéŕ þŕéðáţéš ţĥé ñéŵ çĥáŕáçţéŕ çŕéáţóŕ. Ýóú ĝéţ óñé ƒŕéé ŕéðéšíĝñ; íţ íš úšéð ŵĥéñ ýóú šáʋé.]",
+    "redesignTitle": "[Ŕéðéšíĝñ {name}]",
+    "redesignSave": "[Šáʋé Ñéŵ Ļóóķ]",
+    "redesignCancel": "[Ķééþ Çúŕŕéñţ Ļóóķ]"
   },
   "deleteCharacter": {
     "title": "[Ðéļéţé Çĥáŕáçţéŕ]",

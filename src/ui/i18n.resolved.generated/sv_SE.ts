@@ -3668,7 +3668,9 @@ export const sv_SE: EnTranslations = {
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
-      "rename_required": "Denna karaktär måste byta namn innan den går in i världen."
+      "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",
@@ -6495,7 +6497,7 @@ export const sv_SE: EnTranslations = {
     "browSoft": "Mjuka",
     "browThick": "Tjocka",
     "browAngled": "Vinklade",
-    "earrings": "Örhängen",
+    "earrings": "Piercingar",
     "jewelMaterial": "Smyckesmaterial",
     "jewelDefault": "Som smidd",
     "jewelGold": "Guld",
@@ -7605,7 +7607,12 @@ export const sv_SE: EnTranslations = {
     "sortLevel": "Nivå",
     "sortName": "Namn",
     "sortRecent": "Senast spelad",
-    "sortPlaytime": "Speltid"
+    "sortPlaytime": "Speltid",
+    "redesign": "Omforma",
+    "redesignHint": "Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.",
+    "redesignTitle": "Omforma {name}",
+    "redesignSave": "Spara nytt utseende",
+    "redesignCancel": "Behåll nuvarande utseende"
   },
   "deleteCharacter": {
     "title": "Radera karaktär",

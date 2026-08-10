@@ -563,7 +563,9 @@ export const en = {
     browSoft: 'Soft',
     browThick: 'Thick',
     browAngled: 'Angled',
-    earrings: 'Earrings',
+    // "Piercings", not "Earrings": the set includes a nose ring, and the
+    // fantasy sets carry face piercings too (see the note below).
+    earrings: 'Piercings',
     jewelMaterial: 'Jewellery Material',
     jewelDefault: 'As Forged',
     jewelGold: 'Gold',
