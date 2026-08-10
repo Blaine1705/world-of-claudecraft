@@ -146,7 +146,10 @@ describe('Discord bot build and typecheck surface', () => {
     expect(tsconfigBot.compilerOptions.lib).not.toContain('DOM');
     expect(tsconfigBot.compilerOptions.types).toEqual(['node']);
     expect(tsconfigBot.include).toEqual(['bot']);
-    expect(packageJson.scripts['check:ts:bot']).toBe('tsc -p tsconfig.bot.json');
+    // The incremental/buildinfo flags are a caching detail (like the sibling
+    // check:ts script above), never the project read, so this pin only
+    // requires the `-p tsconfig.bot.json` project flag to lead the command.
+    expect(packageJson.scripts['check:ts:bot']).toMatch(/^tsc -p tsconfig\.bot\.json(\s|$)/);
     expect(packageJson.scripts['check:types']).toContain('check:ts:bot');
     // The bot project is ADDED to the gate, never substituted for the root include.
     // Dropping 'bot' from tsconfig.json in exchange would look like a tidy-up and
