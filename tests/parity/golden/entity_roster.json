@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "e836976c",
+      "nextId": 983,
+      "state": "b70303ac",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,13 +54,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -90,7 +91,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -103,7 +104,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -147,9 +148,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 966,
-      "state": "9b608d3f",
-      "events": "a5e3fe0a",
+      "nextId": 985,
+      "state": "8940f05b",
+      "events": "bd4281a8",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -158,8 +159,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 966,
-      "state": "58b9082c",
+      "nextId": 985,
+      "state": "0cee7450",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -169,8 +170,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 966,
-      "state": "54b69a88",
+      "nextId": 985,
+      "state": "4232a294",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -222,13 +223,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -260,7 +262,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -273,7 +275,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -317,8 +319,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 966,
-      "state": "e6dc5414",
+      "nextId": 985,
+      "state": "9a74ac61",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -370,13 +372,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -417,7 +420,7 @@
           "fiveSecondRule": 99.25,
           "ghost": true,
           "hp": 442,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -461,9 +464,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 966,
-      "state": "d41a3000",
-      "events": "c453183d",
+      "nextId": 985,
+      "state": "b574a8ae",
+      "events": "929e319c",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -514,13 +517,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -552,7 +556,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 959,
+              "sourceId": 978,
               "undispellable": true,
               "value": -0.75
             }
@@ -567,7 +571,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 44,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -611,9 +615,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 966,
-      "state": "702398d8",
-      "events": "5f5b7b5b",
+      "nextId": 985,
+      "state": "7b6d30d9",
+      "events": "c41a7759",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -622,8 +626,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 966,
-      "state": "bdd69a5f",
+      "nextId": 985,
+      "state": "dc66a15c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -675,13 +679,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -713,7 +718,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 959,
+              "sourceId": 978,
               "undispellable": true,
               "value": -0.75
             },
@@ -724,7 +729,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -737,7 +742,7 @@
           "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
           "hp": 44,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

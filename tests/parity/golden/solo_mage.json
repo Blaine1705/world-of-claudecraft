@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "7e4e40e7",
+      "nextId": 983,
+      "state": "412c5b02",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,12 +53,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -92,7 +93,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -136,9 +137,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 965,
-      "state": "fa1b4228",
-      "events": "12e26ae9",
+      "nextId": 984,
+      "state": "2c2e7fab",
+      "events": "2070aa80",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -147,9 +148,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 965,
-      "state": "abd49f8b",
-      "events": "17f6bb90",
+      "nextId": 984,
+      "state": "d13e52c5",
+      "events": "d1077897",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -158,9 +159,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 965,
-      "state": "71aa0aa7",
-      "events": "0290caaf",
+      "nextId": 984,
+      "state": "4a6dc236",
+      "events": "f589a0a4",
       "rng": {
         "draws": 136,
         "digest": "e230e6f0"
@@ -169,9 +170,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 965,
-      "state": "36279137",
-      "events": "491a2d01",
+      "nextId": 984,
+      "state": "0d36b662",
+      "events": "4261a301",
       "rng": {
         "draws": 304,
         "digest": "1b76d31b"
@@ -180,9 +181,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 965,
-      "state": "68359600",
-      "events": "88a206d4",
+      "nextId": 984,
+      "state": "278365ca",
+      "events": "aed18107",
       "rng": {
         "draws": 507,
         "digest": "7cc40d26"
@@ -191,9 +192,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 965,
-      "state": "c2a63dd8",
-      "events": "65911be9",
+      "nextId": 984,
+      "state": "a41c0b56",
+      "events": "8f2e0dde",
       "rng": {
         "draws": 714,
         "digest": "ff11f95b"
@@ -202,8 +203,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 965,
-      "state": "967994ab",
+      "nextId": 984,
+      "state": "b74c3be5",
       "events": "741638a5",
       "rng": {
         "draws": 798,
@@ -260,12 +261,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -286,7 +288,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -294,7 +297,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 1.7,
-          "castTargetId": 964,
+          "castTargetId": 983,
           "castTotal": 2.5,
           "castingAbility": "frostbolt",
           "combatTimer": 0.55,
@@ -307,7 +310,7 @@
           "fiveSecondRule": 1.55,
           "gcdRemaining": 0.7,
           "hp": 49984,
-          "id": 959,
+          "id": 978,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -339,7 +342,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 964,
+          "targetId": 983,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -348,7 +351,7 @@
           }
         },
         {
-          "aggroTargetId": 959,
+          "aggroTargetId": 978,
           "aiState": "attack",
           "auras": [
             {
@@ -358,7 +361,7 @@
               "name": "Cinderbolt",
               "remaining": 2.2,
               "school": "fire",
-              "sourceId": 959,
+              "sourceId": 978,
               "tickInterval": 2,
               "tickTimer": 0.2,
               "value": 1
@@ -370,7 +373,7 @@
               "name": "Rimelance",
               "remaining": 4.6,
               "school": "frost",
-              "sourceId": 959,
+              "sourceId": 978,
               "value": 0.6
             }
           ],
@@ -384,7 +387,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8912,
-          "id": 964,
+          "id": 983,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -413,11 +416,11 @@
             "armor": 40
           },
           "swingTimer": 1.45,
-          "tappedById": 959,
+          "tappedById": 978,
           "templateId": "forest_wolf",
           "threat": [
             [
-              959,
+              978,
               89
             ]
           ],

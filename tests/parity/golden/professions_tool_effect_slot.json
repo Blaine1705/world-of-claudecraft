@@ -22,8 +22,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "e836976c",
+      "nextId": 983,
+      "state": "b70303ac",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,13 +61,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -97,7 +98,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -110,7 +111,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -154,9 +155,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "f7b3a426",
-      "events": "df133d2d",
+      "nextId": 983,
+      "state": "6d0e17ca",
+      "events": "bbe55e6a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -198,13 +199,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 70
           },
@@ -249,7 +251,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -262,7 +264,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -306,9 +308,9 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 964,
-      "state": "79171eeb",
-      "events": "a10631da",
+      "nextId": 983,
+      "state": "7103328c",
+      "events": "7874c60c",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -368,13 +370,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -413,6 +416,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -428,7 +432,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -442,7 +446,7 @@
           "fallStartY": -2.134597,
           "fiveSecondRule": 101.55,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -486,9 +490,9 @@
     {
       "tick": 53,
       "time": 2.65,
-      "nextId": 964,
-      "state": "db92da10",
-      "events": "414479fe",
+      "nextId": 983,
+      "state": "07121f9f",
+      "events": "47166ba3",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -548,13 +552,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -593,6 +598,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -608,7 +614,7 @@
               "name": "Battle Stance",
               "remaining": 3597.35,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -622,7 +628,7 @@
           "fallStartY": -2.134597,
           "fiveSecondRule": 101.65,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -666,9 +672,9 @@
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 964,
-      "state": "2ab38680",
-      "events": "1796b529",
+      "nextId": 983,
+      "state": "97f0e94b",
+      "events": "7f543657",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -728,13 +734,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -773,6 +780,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -788,7 +796,7 @@
               "name": "Battle Stance",
               "remaining": 3597.25,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -802,7 +810,7 @@
           "fallStartY": -2.134597,
           "fiveSecondRule": 101.75,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -846,9 +854,9 @@
     {
       "tick": 106,
       "time": 5.3,
-      "nextId": 964,
-      "state": "824e44a9",
-      "events": "4be0fb68",
+      "nextId": 983,
+      "state": "c79c0706",
+      "events": "df08f411",
       "rng": {
         "draws": 4,
         "digest": "49d036fe"
@@ -909,13 +917,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 70.75
           },
@@ -962,6 +971,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 72
         }
       ],
@@ -977,7 +987,7 @@
               "name": "Battle Stance",
               "remaining": 3594.7,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -991,7 +1001,7 @@
           "fallStartY": -2.314273,
           "fiveSecondRule": 104.3,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1035,9 +1045,9 @@
     {
       "tick": 157,
       "time": 7.85,
-      "nextId": 964,
-      "state": "947a4856",
-      "events": "7f087928",
+      "nextId": 983,
+      "state": "65103661",
+      "events": "538187a3",
       "rng": {
         "draws": 6,
         "digest": "1272a77a"
@@ -1098,13 +1108,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 71.25
           },
@@ -1159,6 +1170,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 108
         }
       ],
@@ -1174,7 +1186,7 @@
               "name": "Battle Stance",
               "remaining": 3592.15,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -1188,7 +1200,7 @@
           "fallStartY": 1.743181,
           "fiveSecondRule": 106.85,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1232,8 +1244,8 @@
     {
       "tick": 159,
       "time": 7.95,
-      "nextId": 964,
-      "state": "0b65a053",
+      "nextId": 983,
+      "state": "4646dc88",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1295,13 +1307,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 71.25
           },
@@ -1356,6 +1369,7 @@
             }
           },
           "townFocus": {},
+          "tutorialGreetingSent": true,
           "xp": 108
         }
       ],
@@ -1371,7 +1385,7 @@
               "name": "Battle Stance",
               "remaining": 3592.05,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -1385,7 +1399,7 @@
           "fallStartY": 1.743181,
           "fiveSecondRule": 106.95,
           "hp": 100,
-          "id": 959,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

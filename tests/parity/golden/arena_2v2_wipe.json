@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 963,
+      "nextId": 982,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 967,
-      "state": "f150c8f9",
-      "events": "375f7547",
+      "nextId": 986,
+      "state": "c539a6bc",
+      "events": "b6355d4d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 967,
-      "state": "de883a74",
-      "events": "224cbfd9",
+      "nextId": 986,
+      "state": "aa3a0189",
+      "events": "5b0cf65d",
       "rng": {
         "draws": 94,
         "digest": "f94836fc"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 967,
-      "state": "009a5220",
-      "events": "969ec561",
+      "nextId": 986,
+      "state": "1a8a6b11",
+      "events": "8724ea8d",
       "rng": {
         "draws": 290,
         "digest": "d5038b1d"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 967,
-      "state": "a81b2205",
-      "events": "507341c9",
+      "nextId": 986,
+      "state": "0f9fa1b0",
+      "events": "66f46845",
       "rng": {
         "draws": 513,
         "digest": "fbd3b6a8"
@@ -72,9 +72,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 967,
-      "state": "e530fdf4",
-      "events": "74c0894d",
+      "nextId": 986,
+      "state": "e3415c0d",
+      "events": "c957acf5",
       "rng": {
         "draws": 525,
         "digest": "3a6dc8d7"
@@ -128,13 +128,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -151,7 +152,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -200,12 +202,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -226,7 +229,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -274,13 +278,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 984,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -297,7 +302,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -346,12 +352,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 966,
+          "entityId": 985,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -372,7 +379,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -387,7 +395,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -399,7 +407,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.05,
           "hp": 632,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -447,7 +455,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 308,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -497,7 +505,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 385,
-          "id": 965,
+          "id": 984,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -554,7 +562,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 282,
-          "id": 966,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -597,9 +605,9 @@
     {
       "tick": 102,
       "time": 5.1,
-      "nextId": 967,
-      "state": "4cacbe42",
-      "events": "22ada79d",
+      "nextId": 986,
+      "state": "d1563a67",
+      "events": "c5a57778",
       "rng": {
         "draws": 531,
         "digest": "bc30bbc0"
@@ -655,13 +663,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -678,7 +687,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -727,12 +737,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -753,7 +764,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -809,13 +821,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 984,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -832,7 +845,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -881,12 +895,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 966,
+          "entityId": 985,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -907,7 +922,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -922,7 +938,7 @@
               "name": "Battle Stance",
               "remaining": 3594.95,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -934,7 +950,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.1,
           "hp": 632,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -982,7 +998,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.1,
           "hp": 308,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1032,7 +1048,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
-          "id": 965,
+          "id": 984,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1089,7 +1105,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
           "hp": 282,
-          "id": 966,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1132,9 +1148,9 @@
     {
       "tick": 103,
       "time": 5.15,
-      "nextId": 967,
-      "state": "71a8c9b4",
-      "events": "d16bc573",
+      "nextId": 986,
+      "state": "26216b2d",
+      "events": "91b49c5e",
       "rng": {
         "draws": 538,
         "digest": "989640f4"
@@ -1199,13 +1215,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -1231,7 +1248,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -1289,12 +1307,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -1324,7 +1343,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -1385,13 +1405,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 984,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1408,7 +1429,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -1470,12 +1492,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 966,
+          "entityId": 985,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1496,7 +1519,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -1511,7 +1535,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -1523,7 +1547,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.15,
           "hp": 632,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1571,7 +1595,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.15,
           "hp": 308,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1621,7 +1645,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 965,
+          "id": 984,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1678,7 +1702,7 @@
           "dodgeChance": 0.0555,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 966,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1721,8 +1745,8 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 967,
-      "state": "a37b413e",
+      "nextId": 986,
+      "state": "1145ac4f",
       "events": "741638a5",
       "rng": {
         "draws": 754,
@@ -1732,8 +1756,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 967,
-      "state": "3b1426f8",
+      "nextId": 986,
+      "state": "51a2324d",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -1743,8 +1767,8 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 967,
-      "state": "6a8381b3",
+      "nextId": 986,
+      "state": "1bb79882",
       "events": "741638a5",
       "rng": {
         "draws": 1349,
@@ -1754,8 +1778,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 967,
-      "state": "6fb0e2df",
+      "nextId": 986,
+      "state": "53583cee",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -1765,9 +1789,9 @@
     {
       "tick": 225,
       "time": 11.25,
-      "nextId": 967,
-      "state": "93f03ec0",
-      "events": "de7d14f9",
+      "nextId": 986,
+      "state": "d479f5df",
+      "events": "56cadc27",
       "rng": {
         "draws": 1860,
         "digest": "f802c41d"
@@ -1776,8 +1800,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 967,
-      "state": "00a6c665",
+      "nextId": 986,
+      "state": "053eec7e",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -1846,13 +1870,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -1878,7 +1903,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -1939,12 +1965,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -1974,7 +2001,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2038,13 +2066,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 984,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2061,7 +2090,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2126,12 +2156,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 966,
+          "entityId": 985,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2152,7 +2183,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -2167,7 +2199,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -2180,7 +2212,7 @@
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 632,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2229,7 +2261,7 @@
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 308,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2280,7 +2312,7 @@
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 385,
-          "id": 965,
+          "id": 984,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2338,7 +2370,7 @@
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 282,
-          "id": 966,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2382,8 +2414,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 967,
-      "state": "00a6c665",
+      "nextId": 986,
+      "state": "053eec7e",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -2452,13 +2484,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -2484,7 +2517,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2545,12 +2579,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 50,
@@ -2580,7 +2615,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2644,13 +2680,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 984,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2667,7 +2704,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2732,12 +2770,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 966,
+          "entityId": 985,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2758,7 +2797,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -2773,7 +2813,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -2786,7 +2826,7 @@
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 632,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2835,7 +2875,7 @@
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 308,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2886,7 +2926,7 @@
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 385,
-          "id": 965,
+          "id": 984,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2944,7 +2984,7 @@
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 282,
-          "id": 966,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",

@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 963,
+      "nextId": 982,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 979,
-      "state": "5d821d8b",
-      "events": "ac8d5016",
+      "nextId": 998,
+      "state": "d39c4ebd",
+      "events": "0c5c086a",
       "rng": {
         "draws": 39,
         "digest": "fc384baa"
@@ -76,13 +76,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -137,12 +138,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -177,7 +179,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -189,7 +191,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -238,7 +240,7 @@
           "fallStartY": -1.693743,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -287,7 +289,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 965,
+          "id": 984,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -331,7 +333,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 966,
+          "id": 985,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -375,7 +377,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 967,
+          "id": 986,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -419,7 +421,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 968,
+          "id": 987,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -463,7 +465,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 969,
+          "id": 988,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -507,7 +509,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 970,
+          "id": 989,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -551,7 +553,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 971,
+          "id": 990,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -595,7 +597,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 972,
+          "id": 991,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -639,7 +641,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 973,
+          "id": 992,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -683,7 +685,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 974,
+          "id": 993,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -729,7 +731,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 975,
+          "id": 994,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -777,7 +779,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 976,
+          "id": 995,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -825,7 +827,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 977,
+          "id": 996,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -871,7 +873,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 978,
+          "id": 997,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -903,9 +905,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 979,
-      "state": "264d347b",
-      "events": "2a1d73b5",
+      "nextId": 998,
+      "state": "e0c39134",
+      "events": "7a5bbb58",
       "rng": {
         "draws": 42,
         "digest": "7a78e97c"
@@ -961,13 +963,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1022,12 +1025,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1064,7 +1068,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 99.2,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1114,7 +1118,7 @@
           "fallStartY": 35.827155,
           "fiveSecondRule": 99.2,
           "hp": 50000,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1163,7 +1167,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 965,
+          "id": 984,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1207,7 +1211,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 966,
+          "id": 985,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1251,7 +1255,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 967,
+          "id": 986,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1295,7 +1299,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 968,
+          "id": 987,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1339,7 +1343,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 969,
+          "id": 988,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1383,7 +1387,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 970,
+          "id": 989,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1427,7 +1431,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 971,
+          "id": 990,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1471,7 +1475,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 972,
+          "id": 991,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1515,7 +1519,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 973,
+          "id": 992,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1559,7 +1563,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 974,
+          "id": 993,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1605,7 +1609,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 975,
+          "id": 994,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -1653,7 +1657,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 976,
+          "id": 995,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1701,7 +1705,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 977,
+          "id": 996,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1747,7 +1751,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 978,
+          "id": 997,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1779,9 +1783,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 979,
-      "state": "6a648c2c",
-      "events": "38e7094b",
+      "nextId": 998,
+      "state": "b040c003",
+      "events": "a2d5fac4",
       "rng": {
         "draws": 42,
         "digest": "7a78e97c"
@@ -1790,8 +1794,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 979,
-      "state": "a4002d3e",
+      "nextId": 998,
+      "state": "df10eb2d",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1801,8 +1805,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 979,
-      "state": "8a2bdd4c",
+      "nextId": 998,
+      "state": "8478442b",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1812,9 +1816,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 979,
-      "state": "c42a496f",
-      "events": "15c901ba",
+      "nextId": 998,
+      "state": "67e3687f",
+      "events": "2cad6bb9",
       "rng": {
         "draws": 44,
         "digest": "8329963e"
@@ -1823,8 +1827,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 979,
-      "state": "5423a987",
+      "nextId": 998,
+      "state": "2d8f2d9f",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -1881,13 +1885,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1903,7 +1908,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -1954,12 +1960,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1979,7 +1986,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -1996,7 +2004,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2046,7 +2054,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2090,8 +2098,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 979,
-      "state": "5423a987",
+      "nextId": 998,
+      "state": "2d8f2d9f",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2148,13 +2156,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2170,7 +2179,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         },
         {
           "activeLoadout": -1,
@@ -2221,12 +2231,13 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2246,7 +2257,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "tutorialGreetingSent": true
         }
       ],
       "entities": [
@@ -2263,7 +2275,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
-          "id": 963,
+          "id": 982,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2313,7 +2325,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
-          "id": 964,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
