@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '3e62defc310b6eb120ad66cd5ea629713c58d33ba9c87b4e02f0e5b066f83ea4';
+  '7ac1ba4152bd7093b34c8f48d24e1746597913076437e24c5f836a66dd772373';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3455c52bb8541eeba4541c006b51f35fe833dd13574518c674d825590e76dd2f';
+  'c022a8446cc9f4c9bb2bead342582cd99ba86732d8dcd7ec0b7ceb803540714a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -983,7 +983,7 @@ describe('Eastbrook polish committed capture artifacts', () => {
     }
     expect(acceptedFiles).toHaveLength(18);
     expect(fingerprint.digest('hex')).toBe(
-      '031d3a72fe04c1b4b084ca6608ce137d4078f9ddff42c488efe6ca8624fcc1b4',
+      'a8d3eae853d16e4546b475a672584dbaf5e276756fadbde6c7075b776b763f5a',
     );
   });
 

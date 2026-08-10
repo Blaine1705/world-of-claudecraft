@@ -123,6 +123,15 @@ describe('Renderer lifecycle wiring', () => {
     expect(mountKeyEdge).toContain('this.audioSink?.preloadMountEngine(e.mountKey)');
   });
 
+  it("preloads an already-mounted entity's engine clips at view creation", () => {
+    // The edge above only fires on a CHANGE, and lastMountKey is seeded from
+    // the entity's current mountKey when the view is born, so a remote rider
+    // entering interest range mid-ride and an already-mounted login both have
+    // no edge to detect and would otherwise always hit the cold path.
+    const createView = slice('private createView(e: Entity): void {', '\n  }\n\n  // Shared core');
+    expect(createView).toContain("if (e.mountKey !== '') this.audioSink?.preloadMountEngine(");
+  });
+
   it("holds an engine mount's audio phase while airborne instead of polling a stop", () => {
     const audioBlock = slice(
       '// --- spatial movement audio (self + others) --------------------------',
