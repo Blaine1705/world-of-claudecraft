@@ -235,6 +235,40 @@ describe('ktx2 transcoder support', () => {
     vi.unstubAllGlobals();
   });
 
+  it('the Mesa filter needs every one of its four format conjuncts, one arm each', () => {
+    // three's guard is astc AND etc2 AND bptc AND dxt; the all-formats arm
+    // above cannot tell a four-conjunct guard from any subset of it, so each
+    // conjunct gets its own missing-format fixture asserting the filter does
+    // NOT fire (the capability answer keeps the formats the host really has).
+    vi.stubGlobal('navigator', {
+      platform: 'Linux x86_64',
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) Chrome/126.0',
+    });
+    const MISSING = [
+      'WEBGL_compressed_texture_astc',
+      'WEBGL_compressed_texture_etc',
+      'EXT_texture_compression_bptc',
+      'WEBGL_compressed_texture_s3tc',
+    ] as const;
+    for (const missing of MISSING) {
+      const gl = {
+        getExtension: (name: string) =>
+          name === missing || name === 'WEBKIT_WEBGL_compressed_texture_pvrtc' ? null : {},
+      };
+      const config = ktx2WorkerConfigFromRawContext(gl);
+      // The filter must not fire: every still-present emulation-suspect
+      // format keeps its true answer.
+      expect(config.etc1Supported, `filter fired with ${missing} absent`).toBe(true);
+      if (missing !== 'WEBGL_compressed_texture_astc') {
+        expect(config.astcSupported, `filter fired with ${missing} absent`).toBe(true);
+      }
+      if (missing !== 'WEBGL_compressed_texture_etc') {
+        expect(config.etc2Supported, `filter fired with ${missing} absent`).toBe(true);
+      }
+    }
+    vi.unstubAllGlobals();
+  });
+
   it('honors the WebKit-prefixed pvrtc alias, exactly like three detectSupport', () => {
     // three r185's WebGL arm ORs WEBKIT_WEBGL_compressed_texture_pvrtc into
     // pvrtcSupported; an old WebKit host exposing only the prefixed name must

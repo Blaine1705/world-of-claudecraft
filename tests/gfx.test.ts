@@ -37,19 +37,37 @@ describe('graphics tier resolution', () => {
     // direct profile also disables dynamic shadows; this pin makes that
     // invariant explicit so a new tier below medium or a gradePass re-gating
     // cannot silently move the low-end draw-pressure signal.
+    // Every settingsFor tier ('advanced' is not one: it resolves through the
+    // override path over a base tier's bands, so it cannot mint a direct
+    // profile of its own).
     const tiers = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
+    // The full hint grid the resolver differentiates on: every platform value
+    // plus the ios tightMemory arm (QA hardening: the original two-hint sample
+    // could not red on an android- or tightMemory-only rewiring).
+    const hintGrid = [
+      undefined,
+      { platform: 'android' as const },
+      { platform: 'other' as const },
+      { platform: 'ios' as const },
+      { platform: 'ios' as const, tightMemory: true },
+    ];
     let directProfilesSeen = 0;
     for (const tier of tiers) {
-      for (const hints of [undefined, { platform: 'ios' as const }]) {
+      for (const hints of hintGrid) {
         const settings = gfxInternalsForTest.settingsFor(tier, hints);
         if (!settings.composer && !settings.gradePass) {
           directProfilesSeen++;
-          expect(settings.dynamicShadows, `${tier} ios:${hints !== undefined}`).toBe(false);
+          expect(
+            settings.dynamicShadows,
+            `${tier} hints:${JSON.stringify(hints ?? null)}`,
+          ).toBe(false);
         }
       }
     }
-    // Vacuity floor: plain low and every iOS memory-profile tier are direct.
-    expect(directProfilesSeen).toBeGreaterThanOrEqual(6);
+    // Vacuity floor: plain low is direct on every one of the five hint arms,
+    // and the iOS arms add direct profiles on the higher tiers; the widened
+    // grid sees 13 today and must never quietly drop below that.
+    expect(directProfilesSeen).toBeGreaterThanOrEqual(13);
   });
 
   it('resolves an unset preset device-aware, matching the medium data-fx-level fallback', () => {

@@ -44,6 +44,38 @@ describe('chunked DataTexture upload', () => {
     ]);
   });
 
+  it('clears stale pre-existing update ranges before the first batch', async () => {
+    // QA mutation gap: every other rig starts with an empty updateRanges
+    // array, so the module's initial clearUpdateRanges() was unobservable. A
+    // texture carrying a range from an aborted earlier upload must not leak
+    // it into the first batch (the consumer would re-upload a stale region
+    // and the first chunk would overshoot its byte budget).
+    const updateRanges: { start: number; count: number }[] = [
+      { start: 512, count: 7 },
+    ];
+    const texture = Object.assign(new THREE.DataTexture(new Uint16Array(8 * 2 * 4), 8, 2), {
+      updateRanges,
+      clearUpdateRanges: () => {
+        updateRanges.length = 0;
+      },
+      addUpdateRange: (start: number, count: number) => {
+        updateRanges.push({ start, count });
+      },
+    });
+    const calls: { start: number; count: number }[][] = [];
+    const target = {
+      initTexture: () => {
+        calls.push(texture.updateRanges.map((range) => ({ ...range })));
+        texture.clearUpdateRanges();
+      },
+    };
+    await uploadDataTextureInChunks(target, texture, { maxChunkBytes: 64 });
+    expect(calls[0]).toEqual([{ start: 0, count: 32 }]);
+    for (const batch of calls) {
+      expect(batch).not.toContainEqual({ start: 512, count: 7 });
+    }
+  });
+
   it('takes the bounded path on a plain DataTexture (native ranges since 0.185)', async () => {
     // Premise pin: the installed three ships the update-range API on every
     // texture, so the module's production consumers, the sky env/dome HDR
