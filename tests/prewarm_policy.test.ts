@@ -1124,8 +1124,19 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
     expect(prefetchAt).toBeGreaterThan(-1);
     expect(manifestAt).toBeGreaterThan(-1);
     expect(prefetchAt).toBeLessThan(manifestAt);
-    // The starvation shape: a raw inline await of the fetch inside an entry.
-    expect(source).not.toContain('await ensureSkyBiomeAssets(');
+    // The starvation shape: a raw inline await of the fetch inside a prewarm
+    // entry. Exactly one await exists in the whole renderer and it lives in
+    // the post-boot sky residency lane (ensureSkyResidency), which re-fetches
+    // an evicted biome at idle pace long after boot; the prewarm manifest
+    // region itself stays await-free.
+    expect(source.match(/await ensureSkyBiomeAssets\(/g) ?? []).toHaveLength(1);
+    const residencyAt = source.indexOf('private ensureSkyResidency(');
+    expect(residencyAt).toBeGreaterThan(-1);
+    const residency = source.slice(residencyAt, source.indexOf('\n  private ', residencyAt + 1));
+    expect(residency).toContain('await ensureSkyBiomeAssets(');
+    expect(source.slice(manifestAt, source.indexOf('\n  private ', manifestAt))).not.toContain(
+      'await ensureSkyBiomeAssets(',
+    );
     // The entry waits only through the budget-bounded prefetch race.
     expect(source).toContain('await waitForPrefetch(skyAssetPrefetch, waitMs, sleep)');
     expect(source).toContain('reserveMs: PREWARM_BUILD_RESERVE_MS');

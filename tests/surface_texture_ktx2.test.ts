@@ -48,12 +48,29 @@ const SS_ZSTD = 2;
 
 const readSource = (rel: string): string => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
-/** Splat layers terrain.ts asks for, read off its prepareTerrainTex calls. */
-function terrainReferences(): string[] {
+/** Splat layers terrain.ts asks for, read off its prepareTerrainTex calls,
+ *  with the srgb flag: the srgb=true COLOUR layers are pack sources for
+ *  buildSplatAlbedoArray's drawImage and must stay raw (see below). */
+function terrainReferencesWithFlags(): { logical: string; srgb: boolean }[] {
   const src = readSource('src/render/terrain.ts');
-  const files = [...src.matchAll(/prepareTerrainTex\(\s*'[^']+',\s*'([^']+)'/g)].map((m) => m[1]);
-  if (files.length === 0) throw new Error('no prepareTerrainTex calls found in terrain.ts');
-  return files.map((f) => `${TERRAIN_DIR}/${f}`);
+  const calls = [
+    ...src.matchAll(/prepareTerrainTex\(\s*'[^']+',\s*'([^']+)',\s*(true|false)\s*\)/g),
+  ].map((m) => ({ logical: `${TERRAIN_DIR}/${m[1]}`, srgb: m[2] === 'true' }));
+  if (calls.length === 0) throw new Error('no prepareTerrainTex calls found in terrain.ts');
+  return calls;
+}
+
+function terrainReferences(): string[] {
+  return terrainReferencesWithFlags()
+    .filter((c) => !c.srgb)
+    .map((c) => c.logical);
+}
+
+/** The srgb=true colour layers: referenced, deliberately NOT converted. */
+function terrainColourReferences(): string[] {
+  return terrainReferencesWithFlags()
+    .filter((c) => c.srgb)
+    .map((c) => c.logical);
 }
 
 /** The one shared stone detail normal, read off its literal url. */
@@ -105,7 +122,7 @@ const u32 = (buf: Buffer, off: number): number => buf.readUInt32LE(off);
 // Tight vacuity floor (tests/CLAUDE.md): the exact number of distinct source
 // images the three render modules reference and the conversion run produced.
 // A dropped splat layer or family channel cannot hide under it.
-const SHIPPED_SURFACE_TEXTURES = 38;
+const SHIPPED_SURFACE_TEXTURES = 32;
 /** The one referenced source that stays a raw image, pinned below. */
 const PACKED_DATA_TEXTURE = `${TERRAIN_DIR}/GroundAO_Packed.png`;
 
@@ -161,6 +178,31 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
       const ktx2Url = ktx2SiblingUrl(logical);
       expect(MEDIA_ASSETS[ktx2Url], `${ktx2Url} missing from the media manifest`).toBeTruthy();
     }
+  });
+
+  it('leaves the six colour layers raw: they are drawImage pack sources for the splat albedo array', () => {
+    // buildSplatAlbedoArray drawImages each colour layer into the packed
+    // DataArrayTexture; a CompressedTexture's image is a plain descriptor
+    // that passes a width check and then throws inside drawImage, which took
+    // the renderer down at world build on every splat tier. The packed array
+    // is the resident form wherever the colours load, so compressing the
+    // pack source bought nothing anyway.
+    const colours = terrainColourReferences();
+    expect(colours.length).toBe(6);
+    for (const logical of colours) {
+      expect(fs.existsSync(onDisk(logical)), `${logical} source missing`).toBe(true);
+      expect(
+        fs.existsSync(ktx2SiblingPath(onDisk(logical))),
+        `${logical} must not grow a .ktx2 sibling`,
+      ).toBe(false);
+      expect(MEDIA_ASSETS[ktx2SiblingUrl(logical)]).toBeUndefined();
+    }
+    // The route split in prepareTerrainTex: srgb (colour) stays loadTexture,
+    // linear jpg goes compressed; and the pack guards drawability instead of
+    // width-truthiness.
+    const terrain = readSource('src/render/terrain.ts');
+    expect(terrain).toContain(".endsWith('.jpg') && !srgb");
+    expect(terrain).toContain('isCanvasDrawableImage(raw) ? raw : undefined');
   });
 
   it('leaves GroundAO_Packed.png raw: a packed DATA texture whose measured stats are shader constants', () => {
