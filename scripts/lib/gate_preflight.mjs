@@ -81,10 +81,16 @@ function probeToolByExecution(toolPath, shell) {
  *
  * Runs the two probes concurrently rather than serially.
  *
- * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined> }} opts
+ * The failure message's re-run hint uses `command` when given (the actual
+ * shell invocation for this caller); otherwise it falls back to
+ * `pnpm run <label>`, which is only correct when `label` is a real npm
+ * script name (true for `gate`, false for callers like `gate_profile` that
+ * only run via `node scripts/<file>.mjs`).
+ *
+ * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined>, command?: string }} opts
  * @returns {Promise<string | null>} error text, or null when both tools run
  */
-export async function checkAudioTooling({ label, shell }) {
+export async function checkAudioTooling({ label, shell, command }) {
   const tools = [
     ['ffmpeg', FFMPEG_PATH],
     ['ffprobe', FFPROBE_PATH],
@@ -92,28 +98,29 @@ export async function checkAudioTooling({ label, shell }) {
   const ok = await Promise.all(tools.map(([, toolPath]) => probeToolByExecution(toolPath, shell)));
   const missing = tools.filter((_, i) => !ok[i]);
   if (missing.length === 0) return null;
+  const rerun = command ?? `pnpm run ${label}`;
   return (
     `[${label}] missing required SFX audio tooling: ${missing.map(([name]) => name).join(', ')}\n` +
     `[${label}] the bundled ffmpeg-static/ffprobe-static binaries are absent or broken (a\n` +
     `[${label}] scripts-skipped install leaves them missing): reinstall with\n` +
     `[${label}] pnpm install --frozen-lockfile (ensure onlyBuiltDependencies allows\n` +
     `[${label}] ffmpeg-static/ffprobe-static), or install FFmpeg (including ffprobe) on PATH,\n` +
-    `[${label}] then re-run pnpm run ${label === 'gate' ? 'gate' : label}`
+    `[${label}] then re-run ${rerun}`
   );
 }
 
 /**
  * Run both preflights, printing and exiting on the first failure.
  *
- * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined> }} opts
+ * @param {{ label: string, shell: boolean, env?: Record<string, string | undefined>, command?: string }} opts
  */
-export async function runGatePreflights({ label, shell, env = process.env }) {
+export async function runGatePreflights({ label, shell, env = process.env, command }) {
   const depError = checkDependencySync({ label, shell, env });
   if (depError) {
     console.error(depError);
     process.exit(1);
   }
-  const audioError = await checkAudioTooling({ label, shell, env });
+  const audioError = await checkAudioTooling({ label, shell, env, command });
   if (audioError) {
     console.error(audioError);
     process.exit(1);

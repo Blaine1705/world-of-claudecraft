@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -72,5 +73,54 @@ describe('checkAudioTooling', () => {
       expect(missingLine).toContain('missing required SFX audio tooling: ffmpeg');
       expect(missingLine).not.toContain('ffprobe');
     });
+  });
+});
+
+// This suite proves the two probes actually run CONCURRENTLY, not merely that
+// both "eventually run": the pre-change serial implementation also passes
+// every scenario above (both tools were still exercised, just one after the
+// other), which is exactly what a swap-in of the old serial gate_preflight.mjs
+// showed. Mocking node:child_process lets us hold both children open and
+// assert spawn was called twice BEFORE either child's exit event fires,
+// which a serial await-then-await implementation cannot do (its second spawn
+// call only happens once the first child has already settled).
+describe('checkAudioTooling concurrency', () => {
+  afterEach(() => {
+    vi.doUnmock('node:child_process');
+    vi.resetModules();
+  });
+
+  it('issues both spawn calls before either child settles', async () => {
+    vi.resetModules();
+    vi.doMock('node:child_process', () => ({ spawn: vi.fn() }));
+    const { spawn } = await import('node:child_process');
+    const emitters: EventEmitter[] = [];
+    (spawn as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      const emitter = new EventEmitter();
+      emitters.push(emitter);
+      return emitter;
+    });
+    const { checkAudioTooling } = await import('../scripts/lib/gate_preflight.mjs');
+
+    const resultPromise = checkAudioTooling({ label: 'gate', shell: false });
+
+    // Flush the microtask queue so both spawn() calls (issued synchronously
+    // inside the Promise.all map callback) have run, but do this BEFORE
+    // firing either child's exit event, so a serial implementation would
+    // still be stuck waiting on the first child at this point.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(spawn).toHaveBeenCalledTimes(2);
+    expect(emitters).toHaveLength(2);
+
+    // Settle the SECOND child first: a serial implementation awaiting the
+    // first child before even spawning the second would have no second
+    // emitter to settle yet, so this ordering only makes sense concurrently.
+    emitters[1].emit('exit', 0);
+    emitters[0].emit('exit', 0);
+
+    const result = await resultPromise;
+    expect(result).toBeNull();
   });
 });

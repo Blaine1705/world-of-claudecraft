@@ -344,7 +344,11 @@ function runDependencySync() {
 // own serial copy of the two version probes, which drifted the moment the
 // real preflight started running them concurrently instead.
 async function runAudioToolProbe() {
-  const error = await checkAudioTooling({ label: 'gate_profile', shell });
+  const error = await checkAudioTooling({
+    label: 'gate_profile',
+    shell,
+    command: 'node scripts/gate_profile.mjs',
+  });
   if (error) {
     console.error(error);
     return { ok: false, exitCode: 1 };

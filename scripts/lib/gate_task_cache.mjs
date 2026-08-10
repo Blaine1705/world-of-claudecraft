@@ -15,6 +15,7 @@
 //   cannot hide drift from committed artifacts.
 // - Standalone `npm test` / `npm run build` still regenerate via pretest/build
 //   (Phase 2 generate-once only applies inside gate.mjs).
+
 /** Tasks the full gate runs through turbo for local disk cache. */
 export const GATE_CACHEABLE_TASKS = Object.freeze([
   'i18n:gen',
