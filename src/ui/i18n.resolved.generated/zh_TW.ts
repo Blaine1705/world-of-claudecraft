@@ -3590,7 +3590,8 @@ export const zh_TW: EnTranslations = {
       "unpinAria": "取消釘選{name}",
       "rarityLine": "{percent} 的收藏家已發現",
       "pageRarityLine": "{percent} 的收藏家已點亮",
-      "cellAriaWithRarity": "{base}，{rarity}"
+      "cellAriaWithRarity": "{base}，{rarity}",
+      "cellAriaWithAccountScope": "{base}，{scope}"
     },
     "deeds": {
       "title": "功績之書",

@@ -10694,6 +10694,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rarityLine': '収集家の{percent}が発見',
   'hudChrome.reliquary.pageRarityLine': '収集家の{percent}が照耀',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}、{rarity}',
+  'hudChrome.reliquary.cellAriaWithAccountScope': '{base}、{scope}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '記録のない聖遺物',

@@ -3590,7 +3590,8 @@ export const ja_JP: EnTranslations = {
       "unpinAria": "{name}のピン留めを解除",
       "rarityLine": "収集家の{percent}が発見",
       "pageRarityLine": "収集家の{percent}が照耀",
-      "cellAriaWithRarity": "{base}、{rarity}"
+      "cellAriaWithRarity": "{base}、{rarity}",
+      "cellAriaWithAccountScope": "{base}、{scope}"
     },
     "deeds": {
       "title": "功績の書",

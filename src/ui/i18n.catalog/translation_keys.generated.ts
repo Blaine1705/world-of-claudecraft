@@ -8992,6 +8992,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.accountScopeNote'
   | 'hudChrome.reliquary.backToShelf'
   | 'hudChrome.reliquary.borderWearableNote'
+  | 'hudChrome.reliquary.cellAriaWithAccountScope'
   | 'hudChrome.reliquary.cellAriaWithRarity'
   | 'hudChrome.reliquary.cellMissingAria'
   | 'hudChrome.reliquary.cellMissingSourceAria'

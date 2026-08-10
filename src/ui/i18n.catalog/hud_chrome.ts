@@ -4655,6 +4655,9 @@ export const hudChromeStrings = {
     // Joins a cell's base aria sentence and the rarity sentence; the key owns
     // the punctuation so locales can reorder or repunctuate the pair.
     cellAriaWithRarity: '{base}, {rarity}',
+    // Joins a cell's base aria sentence and the account-scope badge, so the
+    // weapon-skin scope fact is not hover-only; the key owns the punctuation.
+    cellAriaWithAccountScope: '{base}, {scope}',
   },
   deeds: {
     title: 'Book of Deeds',

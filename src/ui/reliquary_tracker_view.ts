@@ -17,7 +17,7 @@
 //
 // WHY THE DEFAULT SCAN IS MEMOIZED: reliquaryPageCompletion mints a fresh
 // ownership bag (two Sets plus the live mount list) per CALL in both hosts, so
-// the 28-page default scan would mint dozens of throwaway Sets every slow tick
+// the whole-catalog default scan would mint dozens of throwaway Sets every slow tick
 // for an always-on strip. The scan therefore re-runs only when the cheap
 // ownership signature moves (reliquaryTrackerOwnershipSig), which is exactly
 // when a page's progress can have changed; pinned pages, capped at

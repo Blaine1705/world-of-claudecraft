@@ -10204,6 +10204,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已發現',
   'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已點亮',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
+  'hudChrome.reliquary.cellAriaWithAccountScope': '{base}，{scope}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '未記錄的聖物',

@@ -3590,7 +3590,8 @@ export const en_XA: EnTranslations = {
       "unpinAria": "[Úñþíñ {name}]",
       "rarityLine": "[Ƒóúñð ƀý {percent} óƒ çóļļéçţóŕš]",
       "pageRarityLine": "[Íļļúɱíñáţéð ƀý {percent} óƒ çóļļéçţóŕš]",
-      "cellAriaWithRarity": "[{base}, {rarity}]"
+      "cellAriaWithRarity": "[{base}, {rarity}]",
+      "cellAriaWithAccountScope": "[{base}, {scope}]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

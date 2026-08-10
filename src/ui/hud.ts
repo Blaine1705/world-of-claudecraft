@@ -15933,7 +15933,7 @@ export class Hud {
       completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
       // The deliberate asymmetry, recorded here because the two halves read as
       // an inconsistency otherwise: pinned pages (at most RELIQUARY_TRACK_CAP,
-      // five) are read LIVE on every slow build, while the 28-page default scan
+      // five) are read LIVE on every slow build, while the whole-catalog default scan
       // memoizes on this signature. The signature is cheap but has a documented
       // same-band blind spot (an add and a remove on ONE surface inside a single
       // 500ms band cancel out), and five live reads sit comfortably inside the

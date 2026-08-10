@@ -3590,7 +3590,8 @@ export const pl_PL: EnTranslations = {
       "unpinAria": "Unpin {name}",
       "rarityLine": "Found by {percent} of collectors",
       "pageRarityLine": "Illuminated by {percent} of collectors",
-      "cellAriaWithRarity": "{base}, {rarity}"
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
     },
     "deeds": {
       "title": "Księga Czynów",

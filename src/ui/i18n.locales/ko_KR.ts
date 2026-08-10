@@ -10677,6 +10677,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.rarityLine': '수집가 중 {percent} 발견',
   'hudChrome.reliquary.pageRarityLine': '수집가 중 {percent} 조명',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}, {rarity}',
+  'hudChrome.reliquary.cellAriaWithAccountScope': '{base}, {scope}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '기록되지 않은 성물',

@@ -3590,7 +3590,8 @@ export const ko_KR: EnTranslations = {
       "unpinAria": "{name} 고정 해제",
       "rarityLine": "수집가 중 {percent} 발견",
       "pageRarityLine": "수집가 중 {percent} 조명",
-      "cellAriaWithRarity": "{base}, {rarity}"
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
     },
     "deeds": {
       "title": "업적의 서",

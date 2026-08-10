@@ -3590,7 +3590,8 @@ export const ru_RU: EnTranslations = {
       "unpinAria": "Открепить страницу {name}",
       "rarityLine": "Нашли {percent} коллекционеров",
       "pageRarityLine": "Озарили {percent} коллекционеров",
-      "cellAriaWithRarity": "{base}, {rarity}"
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
     },
     "deeds": {
       "title": "Книга деяний",

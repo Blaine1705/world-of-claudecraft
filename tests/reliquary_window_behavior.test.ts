@@ -3292,6 +3292,60 @@ describe('population rarity', () => {
     expect(tooltipFor(rig2, skinNode)?.() ?? '').not.toContain('of collectors');
   });
 
+  // The tooltip/label agreement contract in reliquary_window.ts says every
+  // fact the tooltip gains, the aria gains in the same change. The
+  // account-scope badge is the one non-source, non-count tooltip line, so a
+  // keyboard or screen-reader player must hear it too.
+  it('a weapon-skin cell carries the account-scope fact in its aria, not hover-only', () => {
+    let skinPage: string | null = null;
+    let skinId: string | null = null;
+    for (const page of RELIQUARY_PAGES_BY_ID ? Object.values(RELIQUARY_PAGES_BY_ID) : []) {
+      const skin = page.relics.find((r) => r.kind === 'weapon_skin');
+      if (skin && skin.kind === 'weapon_skin') {
+        skinPage = page.id;
+        skinId = skin.skinId;
+        break;
+      }
+    }
+    if (skinPage === null || skinId === null) {
+      throw new Error('content premise: the catalog keeps at least one weapon-skin slot');
+    }
+    const badge = t('hudChrome.reliquary.accountScopeBadge');
+    const rig = makeWindow(baseState(), { open: false });
+    rig.w.openWithPage(skinPage);
+    const skinNode = must(rig.el, `[data-cell-id="${skinId}"]`);
+    const skinAria = skinNode.getAttribute('aria-label') ?? '';
+    // The tooltip carries it (the premise this test guards parity against).
+    expect(tooltipFor(rig, skinNode)?.() ?? '').toContain(badge);
+    expect(skinAria).toContain(badge);
+    // Composed through the key, which owns the punctuation: the whole base
+    // sentence (name plus its store source hint) leads, the scope follows.
+    const skinLines = sourceLinesFor(skinPage, relicIndex(skinPage, skinId));
+    expect(
+      skinLines.length,
+      'content premise: a weapon skin lists its store route',
+    ).toBeGreaterThan(0);
+    expect(skinAria).toBe(
+      t('hudChrome.reliquary.cellAriaWithAccountScope', {
+        base: t('hudChrome.reliquary.cellMissingSourceAria', {
+          name: reliquaryRelicDisplayName('weapon_skin', skinId),
+          source: joinSourceLines(skinLines),
+        }),
+        scope: badge,
+      }),
+    );
+    // Negative control on a DIFFERENT kind, so the assertion above
+    // discriminates the weapon-skin arm rather than a badge glued to every
+    // cell: an item relic's label must not carry the account-scope fact.
+    const itemRig = openPage(baseState(), PAGE_ID);
+    const itemRelic = pageDef(PAGE_ID).relics[0];
+    if (!itemRelic || itemRelic.kind !== 'item') {
+      throw new Error(`content premise: ${PAGE_ID} keeps a first ITEM relic slot`);
+    }
+    const itemNode = must(itemRig.el, `[data-cell-id="${itemRelic.itemId}"]`);
+    expect(itemNode.getAttribute('aria-label') ?? '').not.toContain(badge);
+  });
+
   it('an OWNED item relic keeps the rarity line on the full-item-tooltip branch', async () => {
     const { state, relicId } = seededState();
     state.itemsDiscovered.add(relicId);

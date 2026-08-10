@@ -1002,8 +1002,10 @@ export class ReliquaryWindow {
     // Why a page can be full while the catalog total is smaller than the slot
     // sum: a relic shown on two pages is ONE relic. Said once, quietly, where
     // the two numbers sit side by side. Unconditional: the shelf denominators
-    // disagree with the catalog total from the very first open (245 slots over
-    // 219 relics), so the player at 0 owned needs the explanation too.
+    // disagree with the catalog total from the very first open (the slot sum
+    // runs above the de-duplicated relic total; both are pinned in
+    // tests/reliquary_content.test.ts rather than quoted here, because catalog
+    // growth moves them), so the player at 0 owned needs the explanation too.
     html += `<p class="reliquary-uniques-note">${esc(t('hudChrome.reliquary.sharedUniquesNote'))}</p>`;
     // The rank whose deed bridge rewards a nameplate border says so once the
     // rank is held: the summary strip names the rank but never tells the
@@ -1495,7 +1497,18 @@ export class ReliquaryWindow {
     // the SAME cellRarityText resolver, so whichever surface a player reads,
     // the population fact is there or absent on both. The composition key owns
     // the joining punctuation ('{base}, {rarity}'), never this painter.
-    const base = this.cellAriaBase(cell, name, sourceLines);
+    // The account-scope fact is the tooltip's one non-source, non-count line,
+    // so it owes the same parity: a weapon skin is account-scoped whether the
+    // player hovers it or hears it. Folded before rarity so the scope reads as
+    // part of what the relic IS, and the population fact stays last on both
+    // surfaces. Composition keys own the punctuation, never this painter.
+    let base = this.cellAriaBase(cell, name, sourceLines);
+    if (cell.kind === 'weapon_skin') {
+      base = t('hudChrome.reliquary.cellAriaWithAccountScope', {
+        base,
+        scope: t('hudChrome.reliquary.accountScopeBadge'),
+      });
+    }
     const rarity = this.cellRarityText(cell);
     if (rarity === null) return base;
     return t('hudChrome.reliquary.cellAriaWithRarity', { base, rarity });
