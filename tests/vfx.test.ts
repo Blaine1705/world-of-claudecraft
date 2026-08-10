@@ -345,6 +345,11 @@ describe('pooled VFX cloud', () => {
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);`);
-    expect(source).toMatch(/this\.captureGlIdentity\(\);\s+this\.vfx\?\.onContextRestored\(\);/);
+    // The restore handler re-captures identity, rebinds the draw-stats
+    // session (three replaces webgl.info on restore; see
+    // tests/draw_stats_core.test.ts), then notifies vfx, in that order.
+    expect(source).toMatch(
+      /this\.captureGlIdentity\(\);[\s\S]{0,700}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);\s+this\.vfx\?\.onContextRestored\(\);/,
+    );
   });
 });

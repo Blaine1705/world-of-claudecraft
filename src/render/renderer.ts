@@ -1953,6 +1953,15 @@ export class Renderer {
   private readonly onWebGLContextRestored = (): void => {
     this.contextRestoredCount++;
     this.captureGlIdentity();
+    // three's onContextRestore re-runs initGLContext, which REPLACES
+    // webgl.info with a fresh WebGLInfo; the composer-tier draw-stats session
+    // captured the old object at construction and would read a dead
+    // accumulator (governor draw signal and opaque-sort input pinned at zero)
+    // for the rest of the session. Re-create it against the live info; the
+    // fresh session's first beginFrame re-baselines safely. Pre-existing on
+    // the release branch (not a phase 6 regression); r185 even preserves
+    // autoReset onto the new object, so only this rebind is needed.
+    if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
   };
   private readonly onViewportResize = (): void => {
