@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assetId": "gate_arch",
-  "sourceFingerprint": "c324e1b90cee686db677fb4715746a43abb2a4cc381f2467574d320379d855bb",
+  "sourceFingerprint": "4a23c350029b74174cd01338ead8472932c7872f42c57df20aea243e32b59ef7",
   "reference": "docs/design/fenbridge-rebuild/references/gate-arch-turnaround.png",
   "minimumOverallScore": 0.7,
   "requiredViews": [

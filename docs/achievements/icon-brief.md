@@ -1,5 +1,10 @@
 # Icon brief: new deeds (2026-07-09)
 
+> Completed 2026-08-09: every live deed now has committed painted art. The final 30-crested
+> completion wave, including the later battleground, Rift, profession, zone-chronicle, and honor
+> additions, is recorded in `placeholder-art-completion-2026-08-09/README.md` and
+> `placeholder-art-completion-2026-08-09/accepted-art.json`.
+
 Ready to send. One line per new deed, same format as the v1 brief; icon files
 are named exactly by deed id at 512x512 RGBA like the existing set. All six
 transcribed ids ship with the procedural category crest as fallback until art
@@ -28,12 +33,9 @@ Deferred (authored, not yet shipped; commission whenever convenient):
 Two new ids from the dragonkin brood rework (`feature/dragonkin-drakelands`),
 same delivery contract as above: one 512x512 RGBA PNG per deed, named exactly by
 deed id, ingested with `npm run assets:deeds <source-dir>`. Both ship with the
-procedural chronicle category crest as fallback until art arrives (the Icons
-authoring rule in `docs/design/deeds.md`), and both are enumerated once as
-`DEED_ART_PENDING` in `src/ui/icons.ts`, which
-`tests/deed_icons.test.ts`, `tests/missing_painted_icons_wave.test.ts` and
-`tests/release_v034_additional_art.test.ts` all read, so removing an id there is
-the single edit that lands with the ingested crest.
+procedural chronicle category crest as an authoring-time fallback (the Icons
+authoring rule in `docs/design/deeds.md`). Their painted crests landed in the
+2026-08-09 completion wave and `DEED_ART_PENDING` is now empty.
 
 Chronicle:
 - [v1] `chr_drakemaw_broodlord`, Clutch Breaker: a cracked dragon egg in a scorched nest, a broken broodlord horn laid across the shell, ember orange on slate.
@@ -44,18 +46,19 @@ Chronicle:
 Three new ids from phase 3 of the WARFARE tier refactor
 (`feature/warfare-tier-refactor`), same delivery contract as above: one 512x512
 RGBA PNG per deed, named exactly by deed id, ingested with
-`npm run assets:deeds <source-dir>`. All three ship with the procedural pvp
-category crest as fallback until art arrives (the Icons authoring rule in
-`docs/design/deeds.md`), and all three are enumerated once as `DEED_ART_PENDING`
-in `src/ui/icons.ts`, which `tests/deed_icons.test.ts` reads, so removing an id
-there is the single edit that lands with the ingested crest.
+`npm run assets:deeds <source-dir>`. All three retain the procedural pvp category
+crest as an authoring-time fallback (the Icons authoring rule in
+`docs/design/deeds.md`), but their painted crests landed in the 2026-08-09
+completion wave and `DEED_ART_PENDING` is now empty.
 
 These are a LADDER, so the three should read as one ascending set: the same
 insignia language and the same field palette, gaining metal and rank as they
 climb (weathered iron, then steel and gold, then full gilt). Each carries a
 title, so the crest is what a player displays their rank with.
 
-PvP:
-- [v1] `pvp_honor_sergeant`, Sergeant: a plain iron rank chevron over crossed campaign spears, worn leather strap behind it, muddied field browns.
-- [v1] `pvp_honor_knight_lieutenant`, Knight-Lieutenant: a steel gorget with a single gold rank star at the throat, a lieutenant's pennant furled behind, steel blue and gold.
-- [v1] `pvp_honor_field_marshal`, Field Marshal: a gilded marshal's baton crossed with a battle standard over a laurel half-wreath, deep crimson field, high gold gleam.
+PvP: the three deed IDS below are FROZEN (an earned title is stored as its deed id,
+so a rename is display-only); their display names were re-cut off the classic-era
+ranks they originally copied, hence id and name no longer match.
+- [v1] `pvp_honor_sergeant`, Linebreaker: a splintered shield wall breached at its centre, one iron-shod boot planted through the gap, worn leather and muddied field browns.
+- [v1] `pvp_honor_knight_lieutenant`, Fieldreaver: a reaping blade dragged low over trampled banners and broken shafts, a season of campaign behind it, steel blue and tarnished gold.
+- [v1] `pvp_honor_field_marshal`, Warcrowned: a battered circlet forged from broken weapons, seated on a bare war standard, deep crimson field, high gold gleam.

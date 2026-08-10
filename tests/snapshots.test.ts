@@ -35,6 +35,7 @@ import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/dat
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -42,6 +43,7 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { playtimeParts } from '../src/ui/playtime_view';
 import {
   bareClient,
   broadcast,
@@ -699,6 +701,89 @@ describe('combat ratings over the wire', () => {
   });
 });
 
+// The static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) used to ride the unconditional
+// base self object every tick for every player, unlike every other heavy field
+// on the same record. They now go through the same `maybe(...)` delta gate
+// (server/game.ts), so an unchanged value elides from the wire entirely; the
+// decoder (src/net/online.ts) falls back to the prior mirrored value instead
+// of a hardcoded default when the key is absent.
+describe('static combat-rating/progression scalars ride the delta gate', () => {
+  const SCALAR_KEYS = [
+    'ap',
+    'sp',
+    'sh',
+    'crit',
+    'dodge',
+    'blk',
+    'bval',
+    'crat',
+    'hrat',
+    'hirat',
+    'xp',
+    'lxp',
+    'rxp',
+    'prk',
+    'copper',
+    'ddiff',
+  ] as const;
+
+  it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Ratings');
+    const meta = server.sim.meta(session.pid)!;
+    const p = server.sim.entities.get(session.pid)!;
+
+    // A fresh session has an empty lastSent, so every one of these rides the
+    // very first snapshot, same as every other maybe() delta key.
+    broadcast(server);
+    const first = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(first.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+    }
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(first);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // The mechanism this PR adds: a second, no-op broadcast with nothing about
+    // combat ratings or progression changed must OMIT every one of these keys
+    // (fewer bytes built and shipped per player per tick), and applying that
+    // delta-less snapshot must NOT reset the mirrored values to a default.
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(quiet.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(quiet);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // A real gear change bumps attackPower: only `ap` rides on the next
+    // snapshot, proving the gate detects a genuine change precisely (not just
+    // that it stays quiet), while every other scalar in the cohort keeps eliding.
+    p.attackPower += 25;
+    fc.sent.length = 0;
+    broadcast(server);
+    const changed = lastSnap(fc.sent);
+    expect(changed.self.ap).toBe(p.attackPower);
+    for (const key of SCALAR_KEYS) {
+      if (key === 'ap') continue;
+      expect(changed.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(changed);
+    expect(client.player.attackPower).toBe(p.attackPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -724,6 +809,53 @@ describe('delta snapshots', () => {
     expect(snap.self.trade).toBeNull();
     expect(Array.isArray(snap.self.inv)).toBe(true);
     expect(Array.isArray(snap.ents)).toBe(true);
+  });
+
+  it('round-trips lifetime played time minute-quantized on ptime', () => {
+    // The encoder floors to whole minutes (still in seconds on the wire) so
+    // the serialized form only changes about once a minute and the delta gate
+    // drops the key from every other tick; the decoder mirrors it verbatim.
+    const meta = server.sim.players.get(session.pid)!;
+    meta.totalPlayedSeconds = 3725; // 1h 2m 5s baseline, sim.time still ~0
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ptime).toBe(3720);
+
+    const client = bareClient(session.pid);
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // Unchanged within the same minute: the next snapshot omits the key, and
+    // the delta-guarded decode keeps the prior mirror instead of wiping it.
+    broadcast(server);
+    const snap2 = lastSnap(fc.sent);
+    expect(snap2.self).not.toHaveProperty('ptime');
+    (client as unknown as SnapshotApplier).applySnapshot(snap2);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // The elapsed-session arm: once the sim clock crosses the next whole
+    // minute the quantized value re-ships and tracks the live total.
+    (server.sim as { time: number }).time += 61;
+    broadcast(server);
+    const snap3 = lastSnap(fc.sent);
+    expect(snap3.self.ptime).toBe(3780);
+    (client as unknown as SnapshotApplier).applySnapshot(snap3);
+    expect(client.playtimeSeconds).toBe(3780);
+
+    // Cross-host display agreement, pinned ABSOLUTELY on both sides (3725s
+    // baseline + 61s session = 1h 3m): the offline formula serves unfloored
+    // seconds while the online mirror is minute-quantized, and the sheet's
+    // minute-flooring parts split must render both identically. The offline
+    // arm anchors on the session's own meta (not Sim.primary, which is only
+    // coincidentally the same character in this harness), and the literal
+    // expectation keeps the pin decisive inside this file even if
+    // playtimeParts itself regresses.
+    expect(playtimeParts(client.playtimeSeconds)).toEqual({ days: 0, hours: 1, minutes: 3 });
+    expect(playtimeParts(livePlaytimeSeconds(meta, server.sim.time))).toEqual({
+      days: 0,
+      hours: 1,
+      minutes: 3,
+    });
   });
 
   it('round-trips the Hunter reactive window as remaining seconds', () => {
@@ -823,21 +955,15 @@ describe('delta snapshots', () => {
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
-    // the always-on fields are still present every snapshot
-    for (const key of [
-      'x',
-      'z',
-      'hp',
-      'mhp',
-      'res',
-      'gcd',
-      'pcd',
-      'swing',
-      'xp',
-      'copper',
-      'target',
-    ]) {
+    // the always-on fields are still present every snapshot. xp/copper moved
+    // behind the delta gate alongside the rest of the static combat-rating/
+    // progression cohort (server/game.ts), so they are no longer in this list.
+    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'target']) {
       expect(snap.self).toHaveProperty(key);
+    }
+    // xp/copper are unchanged since the first broadcast, so they delta-elide here.
+    for (const key of ['xp', 'copper']) {
+      expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
   });
 
@@ -3352,31 +3478,44 @@ describe('online mount command and race-event transport', () => {
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
 // shared across viewers), not plain `maybe(...)`. The count is the union of the
-// release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
+// release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
+// and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
+// record and behind this same delta gate, since they change far less often than
+// the reconciliation-critical fields (resource, gcd, swing, combo, target...)
+// that stay unconditional.
 const ALL_DELTA_KEYS = [
   'achg',
   'achr',
+  'ap',
   'arena',
   'atitle',
   'bags',
   'bank',
   'bg',
+  'blk',
   'buyback',
+  'bval',
   'cardDuel',
   'cds',
+  'copper',
   'corder',
   'corpse',
   'cosmetics',
   'cprof',
+  'crat',
+  'crit',
   'dclears',
   'dcomp',
   'dcompanion',
+  'ddiff',
   'deeds',
   'delveDaily',
   'denc',
   'df',
   'dfb',
   'dmarks',
+  'dodge',
   'drun',
   'dstats',
   'duel',
@@ -3386,12 +3525,15 @@ const ALL_DELTA_KEYS = [
   'gprof',
   'guildBank',
   'hbl',
+  'hirat',
   'honor',
+  'hrat',
   'inv',
   'lhonor',
   'lockouts',
   'lroll',
   'lrollg',
+  'lxp',
   'mail',
   'mailU',
   'market',
@@ -3406,11 +3548,16 @@ const ALL_DELTA_KEYS = [
   'mst',
   'ncd',
   'party',
+  'prk',
   'prof',
+  'ptime',
   'qdone',
   'qlog',
   'renown',
+  'rxp',
   'salv',
+  'sh',
+  'sp',
   'sport',
   'stats',
   'tal',
@@ -3420,6 +3567,7 @@ const ALL_DELTA_KEYS = [
   'vcup',
   'vcupb',
   'weapon',
+  'xp',
 ] as const;
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
@@ -3434,6 +3582,7 @@ const ALL_DELTA_KEYS = [
 // on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
   achg: 'abilityCharges',
+  ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
   bags: 'bags',
@@ -3445,14 +3594,18 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
+  crat: 'critRating',
+  crit: 'critChance',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
+  ddiff: 'dungeonDifficulty',
   deeds: 'deedsEarned',
   denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
+  dodge: 'dodgeChance',
   drun: 'delveRun',
   dstats: 'deedStats',
   duel: 'duelInfo',
@@ -3461,6 +3614,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
+  hirat: 'hitRating',
+  hrat: 'hasteRating',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3483,12 +3638,15 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   party: 'partyInfo',
   prk: 'prestigeRank',
   prof: 'professionsState',
+  ptime: 'playtimeSeconds',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  sh: 'spellHaste',
+  sp: 'spellPower',
   sport: 'sportRole',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
@@ -4290,11 +4448,15 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 83 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
-    // commission order board's corder key (issue #1298).
-    expect(ALL_DELTA_KEYS).toHaveLength(66);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
+    // commission order board's corder key (issue #1298), +1: the character
+    // sheet's lifetime played-time key ptime, for 67, then +16: the static
+    // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
+    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
+    // self record and behind this same delta gate, for 83.
+    expect(ALL_DELTA_KEYS).toHaveLength(83);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(83);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4318,9 +4480,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
     // plus the packet's slotted-tool-effects key tslot for 63, the
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
-    // for 65, and this branch's commission order board key corder
-    // (issue #1298) for 66.
-    expect(scraped.size).toBe(66);
+    // for 65, this branch's commission order board key corder
+    // (issue #1298) for 66, and the character sheet's lifetime played-time
+    // key ptime for 67, then the 16 static combat-rating/progression scalars
+    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
+    // for 83.
+    expect(scraped.size).toBe(83);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4407,8 +4572,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // sorted-membership pin: adding or renaming an entry must be a deliberate,
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
-    // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    // every entry is either a delta key or one of the always-present self scalars.
+    // blk/bval/lxp/rxp/prk moved into ALL_DELTA_KEYS alongside the rest of the
+    // static combat-rating/progression cohort, so only res/mres/rtype are left
+    // always-present here.
+    const SELF_SCALARS = new Set(['res', 'mres', 'rtype']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),

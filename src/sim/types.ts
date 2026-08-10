@@ -28,6 +28,11 @@ export const INTERACT_RANGE = 5;
 // code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
+// Shared host interest boundary: the renderer destroys ordinary entity views at
+// 96 yards, and the network keeps known entities through this slightly wider
+// hysteresis edge. Offline and server Sims may therefore skip only idle,
+// ownerless mob AI beyond this radius without freezing anything a player sees.
+export const PLAYER_INTEREST_DROP_RADIUS = 100;
 export const OBJECT_RESPAWN = 30;
 // How many of a party member's auras ride the party wire (PartyMemberInfo.auras,
 // the mini icon strip under each party frame row). A cap, not a filter: the first
@@ -233,6 +238,9 @@ export interface ArenaStanding {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level. Counted since the W-L-D record change; a
+   *  character who drew before it always reads 0, never a wrong number. */
+  draws: number;
 }
 
 export interface ArenaCombatant {
@@ -739,7 +747,10 @@ export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
 
-type ItemKind =
+// Exported so inventory_sort.ts can type its clean-up ladder as
+// Record<ItemKind, number>: a new kind then FAILS to compile until it is
+// given a rank, instead of silently sorting after gray trash.
+export type ItemKind =
   | 'weapon'
   | 'armor'
   | 'held_offhand'
@@ -997,13 +1008,21 @@ export interface WeaponProc {
   effects: WeaponProcEffect[];
 }
 
-// Held-in-offhand caster stat stick (orb/tome): no armor class, no weapon damage,
-// equips in the offhand slot by literal requiredClass (equipment_rules).
+// Offhand-slot stat stick with no armor class and no weapon damage (a caster
+// orb/tome, a hunter's quiver): equips in the offhand slot by literal
+// requiredClass (equipment_rules).
 export interface HeldOffhandItemDef extends BaseItemDef {
   kind: 'held_offhand';
   slot: 'offhand';
   armorType?: never;
   weapon?: never;
+  // Whether the item takes up a HAND, not just the offhand slot. Defaults to
+  // true (an orb or tome is held). A quiver is WORN, slung on the back, so it
+  // sets false and the two-hand exclusion never applies to it: see
+  // occupiesHand + displacedSlotForEquip in equipment_rules.ts. Anything false
+  // here also budgets on the lighter worn line (item_budget.ts), because a slot
+  // you keep alongside a two-hander is worth more than one you trade it for.
+  occupiesHand?: false;
 }
 
 export interface OtherItemDef extends BaseItemDef {
@@ -4655,6 +4674,12 @@ export type SimEvent = { pid?: number } & (
   // position: the group's 1-based place in the queue line
   | { type: 'bgQueued'; position: number }
   | { type: 'bgUnqueued' }
+  // The queue-pop offer opened for this player: `seconds` is the answer
+  // window. The client opens its Accept/Decline prompt on this event and
+  // polls bgInfo.proposal for the countdown thereafter.
+  | { type: 'bgProposed'; seconds: number }
+  // One more fighter accepted the offer this player is looking at.
+  | { type: 'bgProposalUpdate'; accepted: number }
   | { type: 'bgFound'; team: number }
   | { type: 'bgCountdown'; seconds: number }
   | { type: 'bgStart' }
@@ -5122,6 +5147,22 @@ export type SimEvent = { pid?: number } & (
         | 'already_enchanted'
         | 'same_enchant'
         | 'busy';
+    }
+  // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim
+  // stays language-agnostic and the client renders the copy from a t() key, which
+  // avoids adding a twentieth-locale in-file dictionary entry for one sentence.
+  // Personal (carries pid). Only emitted when a loadout actually captured gear.
+  | {
+      type: 'loadoutGearResult';
+      /** Pieces equipped from the saved set. */
+      equipped: number;
+      /** Slots already wearing the exact saved copy. */
+      alreadyWorn: number;
+      /** Saved pieces that could not be found, by reason, so the client can word
+       *  "you no longer own it" differently from "that enchanted copy is gone". */
+      notHeld: number;
+      copyGone: number;
+      takenByOtherSlot: number;
     }
   | {
       type: 'salvageResult';
@@ -5600,6 +5641,12 @@ export type SimEvent = { pid?: number } & (
       radius: number;
       durationSecs: number;
     }
+  // The sim cancelled every pending death zone before its fuse ran out (boss
+  // death, boss evade, or floor teardown). Online mirrors count zones down
+  // locally from riftDeathZoneSpawn, so without this they would keep drawing a
+  // phantom "about to detonate" telegraph for the rest of the fuse. Personal
+  // (pid = each instance member) so delivery never depends on interest radius.
+  | { type: 'riftDeathZoneClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
   // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and
@@ -5936,11 +5983,11 @@ export interface SimConfig {
   // host reads it, the sim never does), so the parity/determinism gates are untouched.
   perfLap?: (phase: string, entity?: Entity) => void;
   // Distance-cull throttle: when positive, idle ownerless mobs farther than this many
-  // world units from every player skip their per-tick idle AI. Per host: the offline
-  // browser Sim and every deterministic golden/test Sim leave it unset (0, fully live,
-  // draw-order stable); the live GameServer sets it to INTEREST_DROP_RADIUS (the same
-  // distance a mob stays known/rendered to a viewer, see server/game.ts, #2703); the
-  // headless RL env sets its own throttle (headless/env_server.ts).
+  // world units from every player skip their per-tick idle AI. The offline browser and
+  // live GameServer set it to PLAYER_INTEREST_DROP_RADIUS; deterministic tests leave it
+  // unset unless they are explicitly pinning the culling contract. The headless RL env
+  // keeps its own intentional 80-unit throttle (headless/env_server.ts). Positive values
+  // also move every passive idle roll to the per-mob lane; see mob/idle_rng.ts.
   idleMobTickRadius?: number;
   // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
   // of no queue activity, so a walk-up spectator always has a game to watch (and

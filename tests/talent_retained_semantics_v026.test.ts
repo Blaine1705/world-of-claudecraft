@@ -14,6 +14,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { AbilityEffect, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -185,9 +186,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     const twinstrike = resolved('warrior', 'raging_gale', {}, 'fury');
     expect(twinstrike).toMatchObject({ charges: 2, bonusCharges: 1 });
 
-    const doubleCharge = resolved('warrior', 'charge', { 5: 'war_row_double_charge' }, 'arms');
-    expect(doubleCharge).toMatchObject({ charges: 2, bonusCharges: 1 });
-
+    // The warrior arm was Double Charge, which this branch replaced with Intervene,
+    // so `charge` no longer takes talent bonusCharges. The talent-added half of the
+    // claim is still covered by Double Blink below; only the warrior INSTANCE is
+    // gone, not the mechanism.
     const doubleBlink = resolved('mage', 'blink', { 5: 'mag_r5_double_blink' });
     expect(doubleBlink).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
@@ -195,7 +197,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   it('Fieldhardy (was Calloused Hide) is a flat max-health passive', () => {
     // Balance pass: the on-hit instant Long Draw is gone; the option is the
     // classic Survivalist shape and no bigHitTaken response remains on it.
-    const sim = harness(new Sim({ seed: 2608, playerClass: 'hunter', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2608, playerClass: 'hunter', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const before = sim.player.maxHp;
     expect(sim.selectTalentRow(17, 'hun_r17_thick_hide')).toBe(true);
@@ -208,7 +212,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('consumes a scoped cheap-cast aura at the authoritative cost boundary', () => {
-    const sim = harness(new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.resource = player.maxResource;
@@ -235,7 +241,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('snapshots Viperfletch from the preceding resolved Fell Shot hit', () => {
-    const sim = harness(new Sim({ seed: 2610, playerClass: 'hunter', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2610, playerClass: 'hunter', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(14, 'hun_r14_serpents_venom')).toBe(true);
     const player = sim.player;
@@ -259,7 +267,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
   it("applies conditional bolt damage only for the caster's DoT", () => {
     const damage = (withOwnDot: boolean): number => {
-      const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
+      const sim = harness(
+        new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false, world: EMPTY_TEST_WORLD }),
+      );
       sim.setPlayerLevel(20);
       expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
       const player = sim.player;
@@ -292,7 +302,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
   it('Steady Rain prevents damage pushback without changing baseline channels', () => {
     const castRemainingAfterHit = (selected: boolean): number => {
-      const sim = harness(new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false }));
+      const sim = harness(
+        new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false, world: EMPTY_TEST_WORLD }),
+      );
       sim.setPlayerLevel(20);
       if (selected) expect(sim.selectTalentRow(20, 'hun_r20_improved_volley')).toBe(true);
       const player = sim.player;
@@ -309,7 +321,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('fires and consumes Mercy Deferred when real damage crosses its health threshold', () => {
-    const sim = harness(new Sim({ seed: 2613, playerClass: 'priest', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2613, playerClass: 'priest', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(14, 'pri_r14_greater_heal')).toBe(true);
     const player = sim.player;
@@ -333,8 +347,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     );
   });
 
-  it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {
-    const sim = harness(new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false }));
+  it('makes winning Lingering Dread absorb 10% max-health damage before fear breaks', () => {
+    const sim = harness(
+      new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(11, 'war_row_lingering_dread')).toBe(true);
     const player = sim.player;
@@ -344,17 +360,17 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     runEffects(sim.ctx, player, metaOf(sim), target, shout);
     const fear = target.auras.find((aura) => aura.id === 'fear_incap');
-    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.2));
+    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.1));
 
     dealDamage(sim.ctx, player, target, 100, false, 'physical', 'Test Hit', 'hit');
     expect(target.auras.find((aura) => aura.id === 'fear_incap')?.breakThreshold).toBe(
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
     );
     dealDamage(
       sim.ctx,
       player,
       target,
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
       false,
       'physical',
       'Test Hit',
@@ -370,7 +386,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {
-        const sim = harness(new Sim({ seed: 2615, playerClass: cls, autoEquip: false }));
+        const sim = harness(
+          new Sim({ seed: 2615, playerClass: cls, autoEquip: false, world: EMPTY_TEST_WORLD }),
+        );
         sim.setPlayerLevel(20);
         expect(sim.selectTalentRow(level, optionId)).toBe(true);
         return sim;
@@ -401,7 +419,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   );
 
   it('does not grant cheat death without the selected row', () => {
-    const sim = harness(new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.hp = 100;
@@ -413,7 +433,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it('Dawnward Ricochet damages and silences its primary before deterministic falloff bounces', () => {
-    const sim = harness(new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(20, 'pal_r20_aura_mastery')).toBe(true);
     const player = sim.player;
