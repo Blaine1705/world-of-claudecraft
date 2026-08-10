@@ -243,7 +243,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Kelelahan',
   'guide.glossary.finderDef': 'Jendela yang mengatalogkan ruang bawah tanah dan raid, mengantrekanmu untuk Pencocokan Cepat, dan mencantumkan grup-grup Premade yang sedang mencari orang. Shift+I membukanya secara bawaan.',
   'guide.glossary.finderTerm': 'Pencari Dungeon',
-  'guide.glossary.fiveSecondDef': 'Manamu baru mulai terisi kembali dengan sendirinya begitu lima detik telah berlalu sejak terakhir kali kamu menghabiskannya. Itulah sebabnya para pemantra mengatur ritme mereka alih-alih merapal habis-habisan.',
+  'guide.glossary.fiveSecondDef': 'Manamu terisi dengan kecepatan penuh hanya setelah lima detik berlalu sejak terakhir kali kamu menghabiskannya. Sampai saat itu ia tetap mengalir dengan laju yang dikurangi, bukan berhenti sama sekali. Itulah sebabnya para pemantra mengatur ritme mereka alih-alih merapal tanpa henti.',
   'guide.glossary.fiveSecondTerm': 'Aturan lima detik',
   'guide.glossary.honorDef': 'Apa yang dibayar oleh pertarungan melawan pemain lain: kemenangan arena, kemenangan Medan Thornhollow, dan bunuhan terhormat semuanya menambahnya. Kamu membelanjakannya pada Set Perang.',
   'guide.glossary.honorTerm': 'Kehormatan',

@@ -4595,7 +4595,7 @@ export const it_IT: EnTranslations = {
       "worldBossTerm": "Boss del mondo",
       "worldBossDef": "Un boss della potenza di un'incursione che si erge nel mondo aperto con un ritmo costante, affrontato da chiunque si raduni a rispondere anziché da un gruppo fisso.",
       "fiveSecondTerm": "La regola dei cinque secondi",
-      "fiveSecondDef": "Il tuo mana comincia a rigenerarsi da solo soltanto dopo che sono trascorsi cinque secondi dall'ultima volta che ne hai speso. È il motivo per cui gli incantatori dosano il ritmo invece di lanciare a raffica continua.",
+      "fiveSecondDef": "Il tuo mana si rigenera a pieno ritmo soltanto dopo che sono trascorsi cinque secondi dall'ultima volta che ne hai speso. Fino ad allora continua a rientrare a ritmo ridotto invece di fermarsi del tutto. È il motivo per cui gli incantatori dosano il ritmo invece di lanciare senza sosta.",
       "talentRowTerm": "Fila di talenti",
       "talentRowDef": "I talenti arrivano in sei file, una a ciascuno dei livelli 5, 8, 11, 14, 17 e 20. Ogni fila offre tre opzioni e ne scegli una, quindi non ci sono punti da risparmiare o da spendere.",
       "riftTerm": "Squarcio",

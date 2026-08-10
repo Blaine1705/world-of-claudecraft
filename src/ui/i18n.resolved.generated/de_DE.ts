@@ -4595,7 +4595,7 @@ export const de_DE: EnTranslations = {
       "worldBossTerm": "Weltboss",
       "worldBossDef": "Ein Boss von Schlachtzugsstärke, der sich in stetigem Rhythmus in der offenen Welt erhebt und von allen bekämpft wird, die sich zusammenfinden, statt von einer festen Gruppe.",
       "fiveSecondTerm": "Die Fünf-Sekunden-Regel",
-      "fiveSecondDef": "Dein Mana beginnt erst dann von selbst wieder aufzufüllen, wenn seit deinem letzten Manaverbrauch fünf Sekunden vergangen sind. Deshalb teilen sich Zauberwirker ihre Kräfte ein, statt ununterbrochen zu wirken.",
+      "fiveSecondDef": "Dein Mana füllt sich erst dann mit voller Geschwindigkeit wieder auf, wenn seit deinem letzten Manaverbrauch fünf Sekunden vergangen sind. Bis dahin fließt es weiterhin in verringertem Maße nach, statt ganz auszusetzen. Deshalb teilen sich Zauberwirker ihre Kräfte ein, statt ununterbrochen zu zaubern.",
       "talentRowTerm": "Talentreihe",
       "talentRowDef": "Talente kommen als sechs Reihen, jeweils eine auf den Stufen 5, 8, 11, 14, 17 und 20. Jede Reihe bietet drei Optionen, von denen du eine wählst, es gibt also keine Punkte zum Ansparen oder Ausgeben.",
       "riftTerm": "Riss",

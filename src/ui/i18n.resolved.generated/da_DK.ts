@@ -4595,7 +4595,7 @@ export const da_DK: EnTranslations = {
       "worldBossTerm": "Verdensboss",
       "worldBossDef": "En boss af raidstyrke, der rejser sig i den åbne verden i en fast rytme, bekæmpet af hvem end der samles for at svare frem for en fast gruppe.",
       "fiveSecondTerm": "Femsekundersreglen",
-      "fiveSecondDef": "Din mana begynder først at genopfyldes af sig selv, når der er gået fem sekunder, siden du sidst brugte noget. Det er derfor, kastere holder tempoet i stedet for at kaste for fuld kraft hele tiden.",
+      "fiveSecondDef": "Din mana genopfyldes først med fuld hastighed, når der er gået fem sekunder, siden du sidst brugte noget. Indtil da siver den stadig ind i nedsat tempo i stedet for at stoppe helt. Det er derfor, kastere holder tempoet i stedet for at kaste for fuld kraft.",
       "talentRowTerm": "Talentrække",
       "talentRowDef": "Talenter kommer som seks rækker, én ved hvert af niveauerne 5, 8, 11, 14, 17 og 20. Hver række tilbyder tre muligheder, og du vælger én af dem, så der er ingen point at spare op eller bruge.",
       "riftTerm": "Rift",

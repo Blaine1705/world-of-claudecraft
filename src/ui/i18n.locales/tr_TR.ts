@@ -243,7 +243,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Yorgunluk',
   'guide.glossary.finderDef': 'Zindanları ve akınları kataloglayan, seni hızlı bir eşleşme için sıraya sokan ve insan arayan hazır grupları listeleyen pencere. Varsayılan olarak Shift+I ile açılır.',
   'guide.glossary.finderTerm': 'Zindan Bulucu',
-  'guide.glossary.fiveSecondDef': 'Manan, en son harcamandan bu yana beş saniye geçmeden kendiliğinden dolmaya başlamaz. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.',
+  'guide.glossary.fiveSecondDef': 'Manan, en son harcamandan bu yana beş saniye geçmeden tam hızıyla dolmaya başlamaz. O ana kadar da büsbütün durmaz, düşük bir hızla dolmayı sürdürür. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.',
   'guide.glossary.fiveSecondTerm': 'Beş saniye kuralı',
   'guide.glossary.honorDef': 'Diğer oyuncularla dövüşmenin karşılığı: arena zaferleri, Dikenvadi Ovası galibiyetleri ve onurlu öldürmelerin hepsi buna eklenir. Onu Harp takımlarına harcarsın.',
   'guide.glossary.honorTerm': 'Onur',

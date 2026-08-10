@@ -12414,7 +12414,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': '疲労',
   'guide.glossary.finderDef': 'ダンジョンとレイドを一覧にまとめ、クイックマッチの待機列に並ばせ、人を募っている事前編成を表示するウィンドウです。初期設定ではShift+Iで開きます。',
   'guide.glossary.finderTerm': 'ダンジョンファインダー',
-  'guide.glossary.fiveSecondDef': 'マナが自然に回復し始めるのは、最後にマナを使ってから5秒が過ぎてからです。キャスターが撃ちっぱなしにせず、配分を考えて詠唱するのはこのためです。',
+  'guide.glossary.fiveSecondDef': 'マナが本来の速さで回復するのは、最後にマナを使ってから5秒が過ぎてからです。それまでも完全に止まるわけではなく、落ちた速さで回復し続けます。キャスターが撃ちっぱなしにせず、配分を考えて詠唱するのはこのためです。',
   'guide.glossary.fiveSecondTerm': '5秒ルール',
   'guide.glossary.honorDef': 'ほかのプレイヤーと戦って得られるものです。アリーナの勝利、ソーンホロウ平原の勝利、名誉ある撃破のいずれもここに加算されます。使い道はウォーフェアのセットです。',
   'guide.glossary.honorTerm': '名誉',

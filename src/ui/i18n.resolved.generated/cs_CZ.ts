@@ -4595,7 +4595,7 @@ export const cs_CZ: EnTranslations = {
       "worldBossTerm": "Světový boss",
       "worldBossDef": "Boss o síle raidu, který v otevřeném světě povstává v pravidelném rytmu a bojuje s ním kdokoli se sejde, aby odpověděl, ne pevně daná parta.",
       "fiveSecondTerm": "Pravidlo pěti sekund",
-      "fiveSecondDef": "Tvá mana se sama doplňovat začne, teprve když od poslední doby, co jsi nějakou utratil, uplyne pět sekund. Proto sesilatelé hospodaří s tempem místo aby sesílali naplno.",
+      "fiveSecondDef": "Tvá mana se plnou rychlostí doplňuje, teprve když od poslední doby, co jsi nějakou utratil, uplyne pět sekund. Do té doby se stále doplňuje sníženým tempem, místo aby se zastavila úplně. Proto sesilatelé hospodaří s tempem, místo aby sesílali naplno.",
       "talentRowTerm": "Řada talentů",
       "talentRowDef": "Talenty přicházejí v šesti řadách, po jedné na úrovních 5, 8, 11, 14, 17 a 20. Každá řada nabízí tři možnosti a jednu z nich si vybereš, takže tu nejsou žádné body, které by se šetřily nebo utrácely.",
       "riftTerm": "Trhlina",

@@ -243,7 +243,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Únava',
   'guide.glossary.finderDef': 'Okno, které katalogizuje dungeony a raidy, zařadí tě do fronty na rychlý zápas a vypisuje předem sestavené skupiny hledající lidi. Ve výchozím nastavení ho otevírá Shift+I.',
   'guide.glossary.finderTerm': 'Hledač dungeonů',
-  'guide.glossary.fiveSecondDef': 'Tvá mana se sama doplňovat začne, teprve když od poslední doby, co jsi nějakou utratil, uplyne pět sekund. Proto sesilatelé hospodaří s tempem místo aby sesílali naplno.',
+  'guide.glossary.fiveSecondDef': 'Tvá mana se plnou rychlostí doplňuje, teprve když od poslední doby, co jsi nějakou utratil, uplyne pět sekund. Do té doby se stále doplňuje sníženým tempem, místo aby se zastavila úplně. Proto sesilatelé hospodaří s tempem, místo aby sesílali naplno.',
   'guide.glossary.fiveSecondTerm': 'Pravidlo pěti sekund',
   'guide.glossary.honorDef': 'To, co vyplácí boj s ostatními hráči: přidávají se k tomu vítězství v aréně, výhry na Thornhollowských polích i čestná zabití. Utrácíš ji za sady Válečnictví.',
   'guide.glossary.honorTerm': 'Čest',

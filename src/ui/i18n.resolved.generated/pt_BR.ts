@@ -4595,7 +4595,7 @@ export const pt_BR: EnTranslations = {
       "worldBossTerm": "Chefe mundial",
       "worldBossDef": "Um chefe com força de raide que surge no mundo aberto em um ritmo constante, enfrentado por quem quer que se reúna para respondê-lo, e não por um grupo fixo.",
       "fiveSecondTerm": "A regra dos cinco segundos",
-      "fiveSecondDef": "Sua mana só começa a se recompor sozinha depois que cinco segundos se passam desde a última vez que você gastou alguma. É por isso que conjuradores dosam o ritmo em vez de conjurar sem parar.",
+      "fiveSecondDef": "Sua mana se recompõe em ritmo pleno só depois que cinco segundos se passam desde a última vez que você gastou alguma. Até lá ela continua vindo em ritmo reduzido, em vez de parar de vez. É por isso que conjuradores dosam o ritmo em vez de conjurar sem parar.",
       "talentRowTerm": "Fileira de talentos",
       "talentRowDef": "Os talentos chegam em seis fileiras, uma em cada um dos níveis 5, 8, 11, 14, 17 e 20. Cada fileira oferece três opções e você escolhe uma delas, então não há pontos para guardar ou gastar.",
       "riftTerm": "Fenda",

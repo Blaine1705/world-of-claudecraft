@@ -4595,7 +4595,7 @@ export const sv_SE: EnTranslations = {
       "worldBossTerm": "Världsboss",
       "worldBossDef": "En boss av raidstyrka som reser sig i den öppna världen i en jämn rytm, bekämpad av vem som än samlas för att svara snarare än av en fast grupp.",
       "fiveSecondTerm": "Femsekundersregeln",
-      "fiveSecondDef": "Din mana börjar bara fyllas på av sig själv när fem sekunder har gått sedan du senast spenderade något. Det är därför besvärjare håller tempot i stället för att kasta för fullt.",
+      "fiveSecondDef": "Din mana fylls på i full takt först när fem sekunder har gått sedan du senast spenderade något. Fram till dess fortsätter den att sippra in i nedsatt takt i stället för att stanna helt. Det är därför besvärjare håller tempot i stället för att kasta för fullt.",
       "talentRowTerm": "Talangrad",
       "talentRowDef": "Talanger kommer i sex rader, en vid vardera nivå 5, 8, 11, 14, 17 och 20. Varje rad erbjuder tre alternativ och du väljer ett av dem, så det finns inga poäng att spara ihop eller spendera.",
       "riftTerm": "Reva",

@@ -254,7 +254,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Fadiga',
   'guide.glossary.finderDef': 'A janela que cataloga as masmorras e raides, coloca você na fila para uma partida rápida e lista os grupos formados em busca de gente. Shift+I a abre por padrão.',
   'guide.glossary.finderTerm': 'Localizador de Masmorras',
-  'guide.glossary.fiveSecondDef': 'Sua mana só começa a se recompor sozinha depois que cinco segundos se passam desde a última vez que você gastou alguma. É por isso que conjuradores dosam o ritmo em vez de conjurar sem parar.',
+  'guide.glossary.fiveSecondDef': 'Sua mana se recompõe em ritmo pleno só depois que cinco segundos se passam desde a última vez que você gastou alguma. Até lá ela continua vindo em ritmo reduzido, em vez de parar de vez. É por isso que conjuradores dosam o ritmo em vez de conjurar sem parar.',
   'guide.glossary.fiveSecondTerm': 'A regra dos cinco segundos',
   'guide.glossary.honorDef': 'O que lutar contra outros jogadores paga: vitórias na arena, vitórias em Campos de Thornhollow e abates honrosos somam a ela. Você a gasta nos conjuntos de Guerra.',
   'guide.glossary.honorTerm': 'Honra',

@@ -254,7 +254,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Fatigue',
   'guide.glossary.finderDef': "La fenêtre qui catalogue les donjons et les raids, vous met en file pour une partie rapide, et liste les groupes formés en quête de joueurs. Shift+I l'ouvre par défaut.",
   'guide.glossary.finderTerm': 'Chercheur de donjons',
-  'guide.glossary.fiveSecondDef': "Votre mana ne recommence à se régénérer tout seul qu'une fois cinq secondes écoulées depuis la dernière fois que vous en avez dépensé. C'est pourquoi les lanceurs de sorts dosent leur rythme au lieu d'enchaîner les sorts sans interruption.",
+  'guide.glossary.fiveSecondDef': "Votre mana ne se régénère à pleine vitesse qu'une fois cinq secondes écoulées depuis la dernière fois que vous en avez dépensé. Jusque-là, il continue de revenir à un rythme réduit plutôt que de s'arrêter net. C'est pourquoi les lanceurs de sorts dosent leur rythme au lieu d'incanter sans relâche.",
   'guide.glossary.fiveSecondTerm': 'La règle des cinq secondes',
   'guide.glossary.honorDef': "Ce que rapporte le combat contre d'autres joueurs : les victoires en arène, les victoires aux Champs de Thornhollow et les éliminations honorables s'y ajoutent toutes. Vous le dépensez sur les tenues de Guerre.",
   'guide.glossary.honorTerm': 'Honneur',

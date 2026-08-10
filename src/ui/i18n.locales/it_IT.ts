@@ -254,7 +254,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Affaticamento',
   'guide.glossary.finderDef': 'La finestra che cataloga i dungeon e le incursioni, ti mette in coda per una partita rapida ed elenca i gruppi prefissati in cerca di persone. Si apre con Maiusc+I per impostazione predefinita.',
   'guide.glossary.finderTerm': 'Cercatore di Dungeon',
-  'guide.glossary.fiveSecondDef': "Il tuo mana comincia a rigenerarsi da solo soltanto dopo che sono trascorsi cinque secondi dall'ultima volta che ne hai speso. È il motivo per cui gli incantatori dosano il ritmo invece di lanciare a raffica continua.",
+  'guide.glossary.fiveSecondDef': "Il tuo mana si rigenera a pieno ritmo soltanto dopo che sono trascorsi cinque secondi dall'ultima volta che ne hai speso. Fino ad allora continua a rientrare a ritmo ridotto invece di fermarsi del tutto. È il motivo per cui gli incantatori dosano il ritmo invece di lanciare senza sosta.",
   'guide.glossary.fiveSecondTerm': 'La regola dei cinque secondi',
   'guide.glossary.honorDef': 'Ciò che paga il combattere altri giocatori: le vittorie in arena, le vittorie ai Campi di Thornhollow e le uccisioni onorevoli vi contribuiscono tutte. Lo spendi sui set da Guerra.',
   'guide.glossary.honorTerm': 'Onore',

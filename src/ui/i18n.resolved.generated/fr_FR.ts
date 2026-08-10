@@ -4595,7 +4595,7 @@ export const fr_FR: EnTranslations = {
       "worldBossTerm": "Boss de monde",
       "worldBossDef": "Un boss de la puissance d'un raid qui surgit dans le monde ouvert à un rythme régulier, affronté par quiconque se rassemble pour répondre à l'appel plutôt que par un groupe fixe.",
       "fiveSecondTerm": "La règle des cinq secondes",
-      "fiveSecondDef": "Votre mana ne recommence à se régénérer tout seul qu'une fois cinq secondes écoulées depuis la dernière fois que vous en avez dépensé. C'est pourquoi les lanceurs de sorts dosent leur rythme au lieu d'enchaîner les sorts sans interruption.",
+      "fiveSecondDef": "Votre mana ne se régénère à pleine vitesse qu'une fois cinq secondes écoulées depuis la dernière fois que vous en avez dépensé. Jusque-là, il continue de revenir à un rythme réduit plutôt que de s'arrêter net. C'est pourquoi les lanceurs de sorts dosent leur rythme au lieu d'incanter sans relâche.",
       "talentRowTerm": "Rangée de talents",
       "talentRowDef": "Les talents se présentent en six rangées, une à chacun des niveaux 5, 8, 11, 14, 17 et 20. Chaque rangée propose trois options dont vous choisissez une seule, si bien qu'il n'y a aucun point à économiser ou à dépenser.",
       "riftTerm": "Faille",

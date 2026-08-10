@@ -243,7 +243,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Kiệt Sức',
   'guide.glossary.finderDef': 'Cửa sổ liệt kê các hầm ngục và raid, ghép bạn vào hàng chờ cho một trận nhanh, và hiển thị danh sách các nhóm thành lập sẵn đang tìm người. Shift+I mở nó theo mặc định.',
   'guide.glossary.finderTerm': 'Tìm Hầm Ngục',
-  'guide.glossary.fiveSecondDef': 'Mana của bạn chỉ bắt đầu tự hồi phục một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục hết công suất.',
+  'guide.glossary.fiveSecondDef': 'Mana của bạn chỉ hồi phục với tốc độ đầy đủ một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Trước đó nó vẫn hồi với tốc độ giảm bớt chứ không dừng hẳn. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục.',
   'guide.glossary.fiveSecondTerm': 'Quy tắc năm giây',
   'guide.glossary.honorDef': 'Thứ mà chiến đấu với người chơi khác trả cho bạn: chiến thắng đấu trường, chiến thắng trên Cánh Đồng Trũng Gai, và những đòn hạ gục vinh dự đều cộng thêm vào đó. Bạn tiêu nó vào các bộ trang bị Chiến Tranh.',
   'guide.glossary.honorTerm': 'Danh dự',

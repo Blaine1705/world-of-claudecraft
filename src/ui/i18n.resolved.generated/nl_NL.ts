@@ -4595,7 +4595,7 @@ export const nl_NL: EnTranslations = {
       "worldBossTerm": "Wereldbaas",
       "worldBossDef": "Een baas met de kracht van een raid die in de open wereld verrijst met een vast ritme, bevochten door wie zich verzamelt om de roep te beantwoorden, niet door een vaste groep.",
       "fiveSecondTerm": "De vijfsecondenregel",
-      "fiveSecondDef": "Je mana begint pas vanzelf weer aan te vullen zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Daarom doseren casters zichzelf in plaats van non-stop te casten.",
+      "fiveSecondDef": "Je mana vult zich pas op volle snelheid weer aan zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Tot die tijd blijft het in een lager tempo binnendruppelen in plaats van helemaal te stoppen. Daarom doseren casters zichzelf in plaats van onafgebroken te spreuken.",
       "talentRowTerm": "Talentrij",
       "talentRowDef": "Talenten komen in zes rijen, een op elk van de niveaus 5, 8, 11, 14, 17 en 20. Elke rij biedt drie opties en je kiest er een van, dus er zijn geen punten om op te sparen of uit te geven.",
       "riftTerm": "Rift",

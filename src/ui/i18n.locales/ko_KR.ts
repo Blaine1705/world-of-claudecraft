@@ -12409,7 +12409,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': '피로',
   'guide.glossary.finderDef': '던전과 공격대를 목록으로 정리하고, 빠른 매칭 대기열에 넣어 주며, 사람을 찾는 사전 모집 파티를 보여 주는 창입니다. 기본 단축키는 Shift+I입니다.',
   'guide.glossary.finderTerm': '던전 찾기',
-  'guide.glossary.fiveSecondDef': '마나는 마지막으로 마나를 쓴 뒤 5초가 지나야 비로소 저절로 차오르기 시작합니다. 시전자들이 주문을 쉼 없이 쏟아붓는 대신 호흡을 조절하는 이유가 바로 이것입니다.',
+  'guide.glossary.fiveSecondDef': '마나가 제 속도로 차오르는 것은 마지막으로 마나를 쓴 뒤 5초가 지나야 비로소 시작됩니다. 그때까지도 완전히 멈추는 것은 아니며 줄어든 속도로 계속 차오릅니다. 시전자들이 주문을 쉼 없이 쏟아붓는 대신 호흡을 조절하는 이유가 바로 이것입니다.',
   'guide.glossary.fiveSecondTerm': '5초 규칙',
   'guide.glossary.honorDef': '다른 플레이어와 싸워서 받는 것입니다. 투기장 승리와 쏜할로우 평원 승리, 명예로운 처치가 모두 여기에 더해집니다. 워페어 세트를 사는 데 씁니다.',
   'guide.glossary.honorTerm': '명예',

@@ -4595,7 +4595,7 @@ export const pl_PL: EnTranslations = {
       "worldBossTerm": "Boss świata",
       "worldBossDef": "Boss o sile rajdowej, który powstaje w otwartym świecie w stałym rytmie, zwalczany przez każdego, kto się zbierze, by odpowiedzieć na wezwanie, a nie przez ustaloną drużynę.",
       "fiveSecondTerm": "Reguła pięciu sekund",
-      "fiveSecondDef": "Twoja mana zaczyna się sama odnawiać dopiero, gdy minie pięć sekund od ostatniego jej wydania. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.",
+      "fiveSecondDef": "Twoja mana odnawia się z pełną prędkością dopiero, gdy minie pięć sekund od ostatniego jej wydania. Do tego czasu wciąż napływa w zmniejszonym tempie, zamiast zatrzymać się zupełnie. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.",
       "talentRowTerm": "Rząd talentów",
       "talentRowDef": "Talenty pojawiają się w sześciu rzędach, po jednym na poziomach 5, 8, 11, 14, 17 i 20. Każdy rząd oferuje trzy opcje, z których wybierasz jedną, więc nie ma punktów do odkładania ani wydawania.",
       "riftTerm": "Szczelina",

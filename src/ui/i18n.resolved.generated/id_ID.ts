@@ -4595,7 +4595,7 @@ export const id_ID: EnTranslations = {
       "worldBossTerm": "Bos dunia",
       "worldBossDef": "Bos sekuat raid yang bangkit di dunia terbuka dengan irama tetap, dilawan oleh siapa pun yang berkumpul untuk menjawab alih-alih party tetap.",
       "fiveSecondTerm": "Aturan lima detik",
-      "fiveSecondDef": "Manamu baru mulai terisi kembali dengan sendirinya begitu lima detik telah berlalu sejak terakhir kali kamu menghabiskannya. Itulah sebabnya para pemantra mengatur ritme mereka alih-alih merapal habis-habisan.",
+      "fiveSecondDef": "Manamu terisi dengan kecepatan penuh hanya setelah lima detik berlalu sejak terakhir kali kamu menghabiskannya. Sampai saat itu ia tetap mengalir dengan laju yang dikurangi, bukan berhenti sama sekali. Itulah sebabnya para pemantra mengatur ritme mereka alih-alih merapal tanpa henti.",
       "talentRowTerm": "Baris talenta",
       "talentRowDef": "Talenta datang sebagai enam baris, satu pada tiap level 5, 8, 11, 14, 17, dan 20. Setiap baris menawarkan tiga pilihan dan kamu mengambil salah satunya, jadi tidak ada poin yang perlu ditabung atau dibelanjakan.",
       "riftTerm": "Rift",

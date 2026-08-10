@@ -4595,7 +4595,7 @@ export const tr_TR: EnTranslations = {
       "worldBossTerm": "Dünya şefi",
       "worldBossDef": "Açık dünyada düzenli bir ritimle yükselen, akın gücünde bir şef; sabit bir grup yerine, çağrıya toplanan herkesçe dövüşülür.",
       "fiveSecondTerm": "Beş saniye kuralı",
-      "fiveSecondDef": "Manan, en son harcamandan bu yana beş saniye geçmeden kendiliğinden dolmaya başlamaz. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.",
+      "fiveSecondDef": "Manan, en son harcamandan bu yana beş saniye geçmeden tam hızıyla dolmaya başlamaz. O ana kadar da büsbütün durmaz, düşük bir hızla dolmayı sürdürür. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.",
       "talentRowTerm": "Yetenek sırası",
       "talentRowDef": "Yetenekler altı sıra halinde gelir, biri 5, 8, 11, 14, 17 ve 20. seviyelerin her birinde. Her sıra üç seçenek sunar ve sen bunlardan birini alırsın, yani biriktirilecek ya da harcanacak puan yoktur.",
       "riftTerm": "Yarık",

@@ -11986,7 +11986,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '這個視窗收錄了各座地城與團隊副本，讓你排入快速配對，並列出正在找人的預組隊伍。預設按 Shift+I 開啟。',
   'guide.glossary.finderTerm': '地城搜尋器',
   'guide.glossary.fiveSecondDef':
-    '你的法力要等到上次花用法力後過了五秒，才會開始自行回復。這正是施法者懂得掌握節奏，而不是一路傾瀉法術的原因。',
+    '你的法力要等到上次花用法力後過了五秒，才會以完整速度回復。在那之前它並不會完全停下，而是以較慢的速度持續回復。這正是施法者懂得掌握節奏，而不是一路傾瀉法術的原因。',
   'guide.glossary.fiveSecondTerm': '五秒規則',
   'guide.glossary.honorDef':
     '與其他玩家作戰所得的報酬：競技場勝利、荊谷原野的勝場與光榮擊殺，都會為它添上一筆。你可以用它換取戰爭套裝。',

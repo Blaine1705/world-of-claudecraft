@@ -1045,11 +1045,12 @@ export const guideStrings = {
     worldBossTerm: 'World boss',
     worldBossDef:
       'A raid-strength boss that rises in the open world on a steady rhythm, fought by whoever gathers to answer rather than a fixed party.',
-    // Mana regen only resumes five seconds after the last mana spend
-    // (src/sim/combat/auras.ts `fiveSecondRule >= 5`).
+    // FULL Spirit regen resumes five seconds after the last mana spend; while the rule
+    // is active a share still flows (src/sim/mana_regen.ts, FIVE_SECOND_RULE_SECONDS
+    // and COMBAT_SPIRIT_REGEN_FRACTION). No percentages here, per the page's policy.
     fiveSecondTerm: 'The five-second rule',
     fiveSecondDef:
-      'Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.',
+      'Your mana comes back at full speed only once five seconds have passed since you last spent any. Until then it still trickles in at a reduced rate rather than stopping outright, which is why casters pace themselves instead of casting flat out.',
     // Talents are six choice rows at levels 5, 8, 11, 14, 17 and 20, one of
     // three options each (src/sim/content/talent_rows.ts ROW_LEVELS,
     // OPTIONS_PER_ROW). There is no point pool to spend.
@@ -3301,7 +3302,7 @@ export const guideStrings = {
       "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
     spiTitle: 'Spirit',
     spiBody:
-      "Spirit governs how quickly a caster's mana returns, but only once they have gone a few seconds without spending any, so a caster who never stops casting never regenerates. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
+      "Spirit governs how quickly a caster's mana returns. It pays in full only once they have gone a few seconds without spending any, and a share of it keeps flowing even mid-cast, so Spirit is never dead weight in a fight, though a caster nuking flat out will still run dry. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
 
     // Secondary / derived stats.
     armorTitle: 'Armor',

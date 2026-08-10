@@ -254,7 +254,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Erschöpfung',
   'guide.glossary.finderDef': 'Das Fenster, das die Dungeons und Schlachtzüge katalogisiert, dich für eine Schnellsuche einreiht und die vorgefertigten Gruppen auflistet, die nach Leuten suchen. Standardmäßig öffnet es sich mit Shift+I.',
   'guide.glossary.finderTerm': 'Instanzfinder',
-  'guide.glossary.fiveSecondDef': 'Dein Mana beginnt erst dann von selbst wieder aufzufüllen, wenn seit deinem letzten Manaverbrauch fünf Sekunden vergangen sind. Deshalb teilen sich Zauberwirker ihre Kräfte ein, statt ununterbrochen zu wirken.',
+  'guide.glossary.fiveSecondDef': 'Dein Mana füllt sich erst dann mit voller Geschwindigkeit wieder auf, wenn seit deinem letzten Manaverbrauch fünf Sekunden vergangen sind. Bis dahin fließt es weiterhin in verringertem Maße nach, statt ganz auszusetzen. Deshalb teilen sich Zauberwirker ihre Kräfte ein, statt ununterbrochen zu zaubern.',
   'guide.glossary.fiveSecondTerm': 'Die Fünf-Sekunden-Regel',
   'guide.glossary.honorDef': 'Was das Kämpfen gegen andere Spieler auszahlt: Arenasiege, Siege in den Thornhollow-Feldern und ehrenhafte Tötungen zahlen alle darauf ein. Du gibst sie für die Kriegsführungs-Sets aus.',
   'guide.glossary.honorTerm': 'Ehre',

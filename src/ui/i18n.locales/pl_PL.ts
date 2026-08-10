@@ -243,7 +243,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Zmęczenie',
   'guide.glossary.finderDef': 'Okno katalogujące lochy i rajdy, które kolejkuje cię do szybkiego meczu i wyświetla listę gotowych grup szukających chętnych. Domyślnie otwiera je Shift+I.',
   'guide.glossary.finderTerm': 'Wyszukiwarka lochów',
-  'guide.glossary.fiveSecondDef': 'Twoja mana zaczyna się sama odnawiać dopiero, gdy minie pięć sekund od ostatniego jej wydania. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.',
+  'guide.glossary.fiveSecondDef': 'Twoja mana odnawia się z pełną prędkością dopiero, gdy minie pięć sekund od ostatniego jej wydania. Do tego czasu wciąż napływa w zmniejszonym tempie, zamiast zatrzymać się zupełnie. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.',
   'guide.glossary.fiveSecondTerm': 'Reguła pięciu sekund',
   'guide.glossary.honorDef': 'To, co wypłaca walka z innymi graczami: zwycięstwa na arenie, wygrane na Polach Ciernistej Kotliny i honorowe zabójstwa, wszystkie się na niego składają. Wydajesz go na zestawy Działań Wojennych.',
   'guide.glossary.honorTerm': 'Honor',

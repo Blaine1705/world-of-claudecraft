@@ -243,7 +243,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Vermoeidheid',
   'guide.glossary.finderDef': 'Het venster dat de kerkers en raids catalogiseert, je in een wachtrij zet voor een snelle koppeling, en de voorgemaakte groepen toont die mensen zoeken. Shift+I opent het standaard.',
   'guide.glossary.finderTerm': 'Kerkerzoeker',
-  'guide.glossary.fiveSecondDef': 'Je mana begint pas vanzelf weer aan te vullen zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Daarom doseren casters zichzelf in plaats van non-stop te casten.',
+  'guide.glossary.fiveSecondDef': 'Je mana vult zich pas op volle snelheid weer aan zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Tot die tijd blijft het in een lager tempo binnendruppelen in plaats van helemaal te stoppen. Daarom doseren casters zichzelf in plaats van onafgebroken te spreuken.',
   'guide.glossary.fiveSecondTerm': 'De vijfsecondenregel',
   'guide.glossary.honorDef': 'Wat vechten tegen andere spelers uitbetaalt: arena-overwinningen, overwinningen op de Doornholte-Velden en eervolle kills tellen er allemaal aan mee. Je geeft het uit aan de Oorlogvoering-sets.',
   'guide.glossary.honorTerm': 'Eer',

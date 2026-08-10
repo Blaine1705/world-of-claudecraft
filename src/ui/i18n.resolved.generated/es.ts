@@ -4595,7 +4595,7 @@ export const es: EnTranslations = {
       "worldBossTerm": "Jefe del mundo",
       "worldBossDef": "Un jefe con fuerza de banda que se alza en el mundo abierto con un ritmo constante, al que combate quienquiera que se reúna para responder en lugar de un grupo fijo.",
       "fiveSecondTerm": "La regla de los cinco segundos",
-      "fiveSecondDef": "Tu maná solo empieza a regenerarse por sí solo cuando han pasado cinco segundos desde la última vez que gastaste algo. Por eso los lanzadores dosifican su ritmo en vez de lanzar sin parar.",
+      "fiveSecondDef": "Tu maná se regenera a pleno ritmo solo cuando han pasado cinco segundos desde la última vez que gastaste algo. Hasta entonces sigue goteando a un ritmo reducido en vez de detenerse del todo. Por eso los lanzadores dosifican su ritmo en vez de lanzar sin parar.",
       "talentRowTerm": "Fila de talentos",
       "talentRowDef": "Los talentos llegan en seis filas, una en cada uno de los niveles 5, 8, 11, 14, 17 y 20. Cada fila ofrece tres opciones y eliges una de ellas, así que no hay puntos que ahorrar ni gastar.",
       "riftTerm": "Brecha",

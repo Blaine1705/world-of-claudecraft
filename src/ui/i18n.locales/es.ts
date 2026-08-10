@@ -254,7 +254,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Fatiga',
   'guide.glossary.finderDef': 'La ventana que cataloga las mazmorras y las bandas, te pone en cola para una partida rápida y muestra los grupos preformados que buscan gente. Shift+I la abre de forma predeterminada.',
   'guide.glossary.finderTerm': 'Buscador de Mazmorras',
-  'guide.glossary.fiveSecondDef': 'Tu maná solo empieza a regenerarse por sí solo cuando han pasado cinco segundos desde la última vez que gastaste algo. Por eso los lanzadores dosifican su ritmo en vez de lanzar sin parar.',
+  'guide.glossary.fiveSecondDef': 'Tu maná se regenera a pleno ritmo solo cuando han pasado cinco segundos desde la última vez que gastaste algo. Hasta entonces sigue goteando a un ritmo reducido en vez de detenerse del todo. Por eso los lanzadores dosifican su ritmo en vez de lanzar sin parar.',
   'guide.glossary.fiveSecondTerm': 'La regla de los cinco segundos',
   'guide.glossary.honorDef': 'Lo que paga luchar contra otros jugadores: las victorias de arena, las victorias en Campos Espinosos y las muertes honorables suman a él. Lo gastas en los conjuntos de guerra.',
   'guide.glossary.honorTerm': 'Honor',

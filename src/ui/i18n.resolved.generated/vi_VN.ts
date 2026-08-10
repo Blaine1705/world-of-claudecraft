@@ -4595,7 +4595,7 @@ export const vi_VN: EnTranslations = {
       "worldBossTerm": "Trùm Thế Giới",
       "worldBossDef": "Một con trùm mạnh cỡ raid trỗi dậy giữa thế giới mở theo một nhịp đều đặn, được chiến đấu bởi bất kỳ ai tụ lại đáp lời chứ không phải một tổ đội cố định.",
       "fiveSecondTerm": "Quy tắc năm giây",
-      "fiveSecondDef": "Mana của bạn chỉ bắt đầu tự hồi phục một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục hết công suất.",
+      "fiveSecondDef": "Mana của bạn chỉ hồi phục với tốc độ đầy đủ một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Trước đó nó vẫn hồi với tốc độ giảm bớt chứ không dừng hẳn. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục.",
       "talentRowTerm": "Hàng tài năng",
       "talentRowDef": "Tài năng đến dưới dạng sáu hàng, mỗi hàng ở các cấp 5, 8, 11, 14, 17 và 20. Mỗi hàng đưa ra ba lựa chọn và bạn chọn lấy một trong số đó, nên không có điểm nào để dành dụm hay tiêu.",
       "riftTerm": "Rạn Nứt",

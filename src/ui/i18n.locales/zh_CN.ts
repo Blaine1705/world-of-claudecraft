@@ -11982,7 +11982,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '这个窗口收录了各座地下城与团队副本，为你排队快速匹配，并列出正在招人的预组队伍。默认按 Shift+I 打开。',
   'guide.glossary.finderTerm': '地下城查找器',
   'guide.glossary.fiveSecondDef':
-    '自你上一次消耗法力算起满五秒，法力才会开始自行回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。',
+    '自你上一次消耗法力算起满五秒，法力才会以完整速度回复。在那之前它并不会完全停下，而是以较慢的速度继续回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。',
   'guide.glossary.fiveSecondTerm': '五秒规则',
   'guide.glossary.honorDef':
     '与其他玩家作战换来的报酬：竞技场的胜利、荆谷原野的胜场以及荣誉击杀都会往上累加。你可以用它换取战争套装。',

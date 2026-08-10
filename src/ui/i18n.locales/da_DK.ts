@@ -243,7 +243,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Udmattelse',
   'guide.glossary.finderDef': 'Vinduet, der katalogiserer fangehullerne og raidene, stiller dig i kø til en hurtig kamp og viser de forhåndssammensatte grupper, der søger folk. Shift+I åbner det som standard.',
   'guide.glossary.finderTerm': 'Fangekældersfinder',
-  'guide.glossary.fiveSecondDef': 'Din mana begynder først at genopfyldes af sig selv, når der er gået fem sekunder, siden du sidst brugte noget. Det er derfor, kastere holder tempoet i stedet for at kaste for fuld kraft hele tiden.',
+  'guide.glossary.fiveSecondDef': 'Din mana genopfyldes først med fuld hastighed, når der er gået fem sekunder, siden du sidst brugte noget. Indtil da siver den stadig ind i nedsat tempo i stedet for at stoppe helt. Det er derfor, kastere holder tempoet i stedet for at kaste for fuld kraft.',
   'guide.glossary.fiveSecondTerm': 'Femsekundersreglen',
   'guide.glossary.honorDef': 'Det, kamp mod andre spillere udbetaler: arenasejre, sejre på Tornehulemarkerne og hæderlige drab lægger alle til den. Du bruger den på Krigsførelsessættene.',
   'guide.glossary.honorTerm': 'Ære',

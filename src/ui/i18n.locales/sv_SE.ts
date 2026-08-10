@@ -243,7 +243,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.fatigueTerm': 'Utmattning',
   'guide.glossary.finderDef': 'Fönstret som katalogiserar fängelsehålorna och raiderna, ställer dig i kö för en snabbmatch, och listar de förberedda grupperna som letar efter folk. Shift+I öppnar det som standard.',
   'guide.glossary.finderTerm': 'Fängelsehålsletaren',
-  'guide.glossary.fiveSecondDef': 'Din mana börjar bara fyllas på av sig själv när fem sekunder har gått sedan du senast spenderade något. Det är därför besvärjare håller tempot i stället för att kasta för fullt.',
+  'guide.glossary.fiveSecondDef': 'Din mana fylls på i full takt först när fem sekunder har gått sedan du senast spenderade något. Fram till dess fortsätter den att sippra in i nedsatt takt i stället för att stanna helt. Det är därför besvärjare håller tempot i stället för att kasta för fullt.',
   'guide.glossary.fiveSecondTerm': 'Femsekundersregeln',
   'guide.glossary.honorDef': 'Vad striden mot andra spelare betalar ut: arenasegrar, vinster på Törnhålefälten och hederliga dråp lägger alla till den. Du spenderar den på Krigföringssetten.',
   'guide.glossary.honorTerm': 'Heder',
