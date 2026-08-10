@@ -7,8 +7,14 @@
 // its exit code and stderr, and that runPregen genuinely overlaps the steps
 // in wall time rather than just fanning out the spawn calls and awaiting
 // them one at a time.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { PREGEN_STEPS, runPregen, runPregenStep } from '../scripts/build_bundle_pregen.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PACKAGE_JSON = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
 describe('PREGEN_STEPS', () => {
   it('runs exactly the sitemap, SFX manifest, and media manifest generate steps', () => {
@@ -17,6 +23,20 @@ describe('PREGEN_STEPS', () => {
       ['scripts/build_sfx_manifest.mjs'],
       ['scripts/build_media_manifest.mjs', 'generate'],
     ]);
+  });
+});
+
+describe('package.json wiring', () => {
+  // Pinning PREGEN_STEPS alone does not prove build:bundle actually calls the
+  // orchestrator: a revert to the old serial `&&` chain in package.json would
+  // leave that pin green. Cross-check the real script bodies instead.
+  it('build:bundle invokes the pregen orchestrator, not an inline serial chain', () => {
+    expect(PACKAGE_JSON.scripts['build:bundle']).toContain('node scripts/build_bundle_pregen.mjs');
+  });
+
+  it('the sitemap and SFX manifest steps stay in sync with their standalone npm scripts', () => {
+    expect(PACKAGE_JSON.scripts['sitemap:build']).toBe(`node ${PREGEN_STEPS[0].join(' ')}`);
+    expect(PACKAGE_JSON.scripts['sfx:manifest']).toBe(`node ${PREGEN_STEPS[1].join(' ')}`);
   });
 });
 
