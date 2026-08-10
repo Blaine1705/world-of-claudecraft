@@ -20,47 +20,6 @@ function spawnMob(sim: Sim, id: number, dx: number, dz: number) {
 }
 
 describe('Sim.tabTarget on-screen / in-combat cycling', () => {
-  it('Shift+Tab cycles backward through the same hostile fight cluster', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.player;
-    p.facing = 0;
-    sim.rebucket(p);
-    const near1 = spawnMob(sim, 900071, 0, 8);
-    const near2 = spawnMob(sim, 900072, 0, 14);
-    const near3 = spawnMob(sim, 900073, 0, 20);
-    const farIdle = spawnMob(sim, 900074, 0, 38);
-
-    sim.tabTarget();
-    expect(p.targetId).toBe(near1.id);
-    sim.tabTargetPrev();
-    expect(p.targetId).toBe(near3.id);
-    sim.tabTargetPrev();
-    expect(p.targetId).toBe(near2.id);
-    sim.tabTargetPrev();
-    expect(p.targetId).toBe(near1.id);
-    expect(p.targetId).not.toBe(farIdle.id);
-  });
-
-  it('Shift+Tab walks backward from a clicked fallback target into the cluster', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.player;
-    p.facing = 0;
-    sim.rebucket(p);
-    const internals = sim as unknown as { dropEntity(id: number): void };
-    for (const id of [...sim.entities.keys()]) {
-      if (id !== sim.playerId) internals.dropEntity(id);
-    }
-    const near = spawnMob(sim, 900081, 0, 10);
-    const behindA = spawnMob(sim, 900082, 0, -8);
-    const behindB = spawnMob(sim, 900083, 0, -15);
-
-    p.targetId = behindB.id;
-    sim.tabTargetPrev();
-    expect(p.targetId).toBe(behindA.id);
-    sim.tabTargetPrev();
-    expect(p.targetId).toBe(near.id);
-  });
-
   it('targets the on-screen enemy and does not cycle to an unseen one behind', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
     const p = sim.player;

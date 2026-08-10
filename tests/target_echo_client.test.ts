@@ -198,12 +198,7 @@ describe('ClientWorld pending-target echo protection', () => {
     expect(selfTarget(world)).toBeNull();
   });
 
-  for (const retarget of [
-    'tabTarget',
-    'tabTargetPrev',
-    'targetNearestFriendly',
-    'friendlyTabTarget',
-  ] as const) {
+  for (const retarget of ['tabTarget', 'targetNearestFriendly', 'friendlyTabTarget'] as const) {
     it(`server-resolved retarget (${retarget}) clears the hold: its result applies from the next snapshot`, () => {
       const { world, wire } = seededWorld();
       world.targetEntity(77);

@@ -1,7 +1,6 @@
 export interface IWorldTargeting {
   targetEntity(id: number | null): void;
   tabTarget(): void;
-  tabTargetPrev(): void;
   targetNearestFriendly(): void;
   friendlyTabTarget(): void;
   // Mirrors the client's "Stop Auto-Attack on Target Switch" setting (issue

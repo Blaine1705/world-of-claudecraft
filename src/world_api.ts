@@ -315,7 +315,6 @@ export const COMMAND_NAMES = [
   'cancel_aura',
   'target',
   'tab',
-  'tabPrev',
   'targetNearest',
   'tabFriendly',
   'targetNearestFriendly',
@@ -678,7 +677,6 @@ export const COMMAND_FACETS = {
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
-  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   stopAutoAttackOnTargetSwitch: 'IWorldTargeting',

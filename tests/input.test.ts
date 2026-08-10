@@ -73,7 +73,6 @@ function makeInput(userAgent?: string) {
   };
   const cb = {
     onTab: vi.fn(),
-    onTabPrev: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
@@ -304,21 +303,6 @@ describe('Input autorun', () => {
       surface: false,
     });
     expect(cb.onAbilityUp).toHaveBeenCalledWith(0);
-  });
-});
-
-describe('Input target cycling', () => {
-  it('dispatches Shift+Tab to the reverse hostile target callback', () => {
-    const { windowListeners, cb } = makeInput();
-    const preventDefault = vi.fn();
-    const keydown = windowListeners.get('keydown');
-    expect(keydown).toBeDefined();
-
-    keydown?.({ code: 'Tab', shiftKey: true, repeat: false, preventDefault });
-
-    expect(preventDefault).toHaveBeenCalled();
-    expect(cb.onTabPrev).toHaveBeenCalledTimes(1);
-    expect(cb.onTab).not.toHaveBeenCalled();
   });
 });
 
