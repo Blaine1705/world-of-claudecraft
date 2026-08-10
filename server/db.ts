@@ -15,6 +15,10 @@ import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
+import {
+  configureLifetimeXpRankCache,
+  readLifetimeXpRankForCharacter,
+} from './character_rank_cache';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import {
@@ -2709,7 +2713,11 @@ export async function lifetimeXpStanding(
 // still sees their own rank. Returns null when no such character exists on this
 // realm OR when the viewed account is delisted (the callers render name/level
 // with no rank line on null, so this is not a 404).
-export async function lifetimeXpRankForCharacter(
+//
+// The raw two-COUNT(*) read; exported uncached so its SQL shape and eligibility
+// branching stay directly testable. Every production caller goes through
+// lifetimeXpRankForCharacter below (the cached wrapper) instead.
+export async function lifetimeXpRankForCharacterUncached(
   characterId: number,
 ): Promise<{ rank: number; total: number } | null> {
   const res = await pool.query(
@@ -2733,6 +2741,21 @@ export async function lifetimeXpRankForCharacter(
   // rank for a delisted account (its bearer-authenticated self-view still does).
   if (!res.rows[0]?.eligible) return null;
   return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
+}
+
+configureLifetimeXpRankCache(lifetimeXpRankForCharacterUncached);
+
+// Called by all 4 sites that need a character's public rank (the owner and
+// public character-sheet handlers in characters.ts/leaderboard.ts/main.ts, and
+// the unauthenticated crawlable profile_page.ts SEO route): a keyed, bounded
+// TTL cache (server/character_rank_cache.ts) in front of the two-COUNT(*) read
+// above, so a repeat view or crawl of the same character within the TTL costs
+// no query. See that module's header for the cache shape and the moderation
+// bust wiring (server/main.ts bustBoardCaches).
+export async function lifetimeXpRankForCharacter(
+  characterId: number,
+): Promise<{ rank: number; total: number } | null> {
+  return readLifetimeXpRankForCharacter(characterId);
 }
 
 export async function moderationStatusForAccount(
@@ -3578,6 +3601,7 @@ export interface ArenaLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 export async function topArenaRatings(
@@ -3597,16 +3621,23 @@ export async function topArenaRatings(
     fmt === '2v2'
       ? "COALESCE((state->>'arena2v2Losses')::int, 0)"
       : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
+  // No legacy alias: draws were never persisted before the W-L-D change, so an
+  // untouched row correctly reads 0 rather than borrowing another field.
+  const drawsExpr =
+    fmt === '2v2'
+      ? "COALESCE((state->>'arena2v2Draws')::int, 0)"
+      : "COALESCE((state->>'arena1v1Draws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3621,6 +3652,7 @@ export async function topArenaRatings(
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 
@@ -3638,6 +3670,7 @@ export interface BgLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 // ACCEPTED COST (the arena twin's trade, doubled): predicating and ordering on
@@ -3654,16 +3687,18 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
   const ratingExpr = "COALESCE((state->>'bgRating')::int, 1500)";
   const winsExpr = "COALESCE((state->>'bgWins')::int, 0)";
   const lossesExpr = "COALESCE((state->>'bgLosses')::int, 0)";
+  const drawsExpr = "COALESCE((state->>'bgDraws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3678,6 +3713,7 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 

@@ -675,10 +675,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // neither parent. No capture was retaken.
 // Re-minted on PR 3150's v0.36.0 base merge, where the branch's renderer.ts
 // prewarm changes converged with the 3165 reseal. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into the render caches branch:
+// both sides moved the rendererIntegration leaf (the release's prewarm compile
+// and point-light reseals; this branch's bounded character-visual pool wiring),
+// so all three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so all three literals mint
+// to values matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '5ec5cc4b8d573a2978c616a7e3dcd92d5d693dd564f7dc319660026732c1599c';
+  'dd92bbcdb2471283e51e58c1a9f089373d033b3918d652edae843383c3c80ea8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '960dbd51c0ebc6ad2908ea8d17658cacd298a7ac33f1be4403eac2d26a11570c';
+  '6c851bbbf26498d01aed94ceca47e5e9eff2f5d72817f83cff64d6825a085357';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1583,10 +1591,18 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-minted after pinning the three specifier exact (PR 3165 review): only
     // the pnpm-lock.yaml specifier row moved. No capture was retaken.
+    // Re-minted for the merge of release/v0.36.0 into the render caches branch:
+    // the first-order composite follows both parents' renderer.ts and
+    // prewarm_policy.ts inputs, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3220/3221) into the
+    // KTX2 mip-release branch: the first-order composite follows both parents'
+    // renderer.ts inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('76bb933c70d50d85daf0ad1795fa42f423012c11b27e5409d1fa03d7d71c27a4');
+    ).toBe('b72983e4b4d3e05150b76f24418edec3b5f80c487b1714f84e341219a7d03d9c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

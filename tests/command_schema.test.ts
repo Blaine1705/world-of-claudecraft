@@ -48,9 +48,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
 // persists per character like weaponStowed), and inv_sort as a send +
 // dispatch pair (the one-shot bag clean-up; no payload, the sim re-derives
-// the whole arrangement deterministically).
-const EXPECTED_SEND_COUNT = 194;
-const EXPECTED_DISPATCH_COUNT = 207;
+// the whole arrangement
+// deterministically), and bg_respond as a send + dispatch pair (the
+// release's battleground queue-pop confirmation).
+const EXPECTED_SEND_COUNT = 195;
+const EXPECTED_DISPATCH_COUNT = 208;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

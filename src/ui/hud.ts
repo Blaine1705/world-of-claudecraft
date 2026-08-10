@@ -164,6 +164,7 @@ import {
   auraEffectMaximumFractionDigits,
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
+import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
@@ -242,6 +243,8 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
+import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
@@ -415,6 +418,7 @@ import {
   buildBgScoreboardView,
   buildBgTimeWarningView,
 } from './hud/battleground';
+import { BgProposalPopup } from './hud/battleground/battleground_proposal_popup';
 import { ChatAnnouncer } from './hud/chat/chat_announcer';
 import { chatChannelColor } from './hud/chat/chat_channels';
 import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
@@ -477,7 +481,16 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import { hasAuraRecipe, iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import {
+  abilityImageUrl,
+  cachedProceduralIconDataUrl,
+  hasAbilityIconIdentity,
+  hasAuraRecipe,
+  iconDataUrl,
+  proceduralIconDataUrl,
+  QUALITY_COLOR,
+  raidMarkerDataUrl,
+} from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -563,7 +576,12 @@ import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
-import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
+import {
+  makeWriterFacet,
+  type PainterHostPresentation,
+  type SingleSlotCache,
+  shouldWriteSingleSlot,
+} from './painter_host';
 import { PaladinDevotionPainter } from './paladin_devotion_painter';
 import { createPaladinDevotionView } from './paladin_devotion_view';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
@@ -842,6 +860,17 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
+const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
+const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
+if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
+const resolveHudAuraIconUrl = (iconId: string): string =>
+  auraIconCssBackground(
+    iconId,
+    abilityImageUrl,
+    (id) => cachedProceduralIconDataUrl('aura', id),
+    HUD_AURA_STATIC_FALLBACK_URL,
+    (id) => proceduralIconDataUrl('aura', id),
+  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
@@ -1523,7 +1552,7 @@ export class Hud {
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
-  private hotWriteCache = new Map<HTMLElement, string>();
+  private hotWriteCache: SingleSlotCache = new Map();
   // Multi-slot caches for the per-frame writers: one element holds many
   // custom properties / toggled classes, so these key per (element, prop) and
   // (element, class) instead of the single slot per element hotWriteCache uses.
@@ -1955,6 +1984,7 @@ export class Hud {
     private keybinds: Keybinds,
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
+    hydrateCrestImageFallbacks(document);
     this.auraOverlayController = new AuraOverlayController({
       writers: this.writerFacet,
       playerClass: this.sim.cfg.playerClass,
@@ -1990,7 +2020,7 @@ export class Hud {
       storage: localStorage,
       isMobileLayout: () => this.isMobileLayout(),
       uiScale: getUiScale,
-      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      resolveIconUrl: resolveHudAuraIconUrl,
       renderTooltip: (name, remaining, effectHtml) =>
         `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
       attachTooltip: (el, html) => this.attachTooltip(el, html),
@@ -2084,7 +2114,7 @@ export class Hud {
         scorePing: (mineScored) => audio.fiestaScorePing(mineScored),
         revive: () => audio.fiestaRevive(),
       },
-      crestIconUrl: (playerClass) => iconDataUrl('crest', playerClass),
+      crestIconUrl: (playerClass) => iconDataUrl('crest', classCrestId(playerClass)),
       random: Math.random,
       schedule: (callback, delayMs) => {
         window.setTimeout(callback, delayMs);
@@ -2181,6 +2211,7 @@ export class Hud {
       itemIcon: (item) => this.itemIcon(item),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      hideTooltip: () => this.hideTooltip(),
       writers: this.writerFacet,
     });
     this.playerCard = new PlayerCardController({
@@ -2925,23 +2956,26 @@ export class Hud {
     this.log(t('hudChrome.tips.joinChannels'), '#7fd4ff');
   }
 
+  // The two Hud-direct single-slot writers. The elision DECISION is
+  // shouldWriteSingleSlot (painter_host.ts), shared verbatim with the painter
+  // facet over the SAME hotWriteCache: it compares (kind, value) components so
+  // an elided call composes no key string and allocates nothing (the old shape
+  // built a `display:` + value key BEFORE the skip check, allocating a discarded
+  // string on every elided write).
   private setText(el: HTMLElement, text: string): void {
-    if (this.hotWriteCache.get(el) === text) {
+    if (!shouldWriteSingleSlot(this.hotWriteCache, el, 'text', text)) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, text);
     this.hotDomWrites++;
     el.textContent = text;
   }
 
   private setDisplay(el: HTMLElement, display: string): void {
-    const key = `display:${display}`;
-    if (this.hotWriteCache.get(el) === key) {
+    if (!shouldWriteSingleSlot(this.hotWriteCache, el, 'display', display)) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, key);
     this.hotDomWrites++;
     el.style.display = display;
   }
@@ -2950,8 +2984,8 @@ export class Hud {
   // (makeWriterFacet's setTransform/setWidth, painter_host.ts). The target hp bar was
   // the last Hud-direct setTransform caller and the cast bars were the last
   // setWidth caller; with both on their painters, every transform/width write
-  // routes through the facet over the SAME hotWriteCache + `transform:`/`width:` keys,
-  // so the Hud no longer mirrors a private setTransform or setWidth.
+  // routes through the facet over the SAME hotWriteCache + the shared (kind, value)
+  // single-slot entries, so the Hud no longer mirrors a private setTransform or setWidth.
 
   // Write-elision extension. setStyleProp drives a custom
   // property (or any standard property) and toggleClass drives a class, each
@@ -4237,7 +4271,7 @@ export class Hud {
   // is why the tooltip here is NAME-ONLY: no seconds line, no effect summary.
   private readonly partyAurasDeps: PartyRowAuraDeps = {
     view: {
-      iconId: (a) => (ABILITIES[a.id] || hasAuraRecipe(a.id) ? a.id : `aura_${a.kind}`),
+      iconId: resolveHudAuraIconId,
       auraName: (a) =>
         auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
       formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
@@ -4250,7 +4284,7 @@ export class Hud {
       isOwn: () => false,
     },
     painter: {
-      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      resolveIconUrl: resolveHudAuraIconUrl,
       renderTooltip: (name) => `<div class="tt-title">${esc(name)}</div>`,
       attachTooltip: (el, html) => this.attachTooltip(el, html),
     },
@@ -4330,7 +4364,7 @@ export class Hud {
   // switch lands next tick, but the object itself is never reallocated.
   private readonly auraDurationUnits = { s: 's', m: 'm', h: 'h', d: 'd' };
   private readonly aurasViewDeps: AurasDeps = {
-    iconId: (a) => (ABILITIES[a.id] || hasAuraRecipe(a.id) ? a.id : `aura_${a.kind}`),
+    iconId: resolveHudAuraIconId,
     auraName: (a) =>
       auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
@@ -4349,7 +4383,7 @@ export class Hud {
     isOwn: (a) => a.sourceId !== undefined && a.sourceId !== 0 && a.sourceId === this.sim.playerId,
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
-    resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+    resolveIconUrl: resolveHudAuraIconUrl,
     // A MODE aura (form, stance, stealth, Ghost Wolf, the carried flag) prints NO
     // seconds-remaining line. The sim backs each with a long finite duration
     // (3600s, or a whole match) purely so nothing can expire it; surfacing that
@@ -4743,6 +4777,13 @@ export class Hud {
   // so an answer never requires opening it.
   private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
     root: () => $('#dfinder-proposal-popup'),
+    world: () => this.sim,
+  });
+  // The Thornhollow Fields queue-pop prompt, the same shape one tab over:
+  // opened by the bgProposed SimEvent, self-closing when the offer resolves,
+  // and outside the PvP window so answering never requires opening it.
+  private readonly bgProposalPopup = new BgProposalPopup({
+    root: () => $('#bg-proposal-popup'),
     world: () => this.sim,
   });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
@@ -6275,6 +6316,7 @@ export class Hud {
     this.bgScoreboard.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
+    this.bgProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -9406,6 +9448,7 @@ export class Hud {
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
+      if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       // Auto-open the Card Duel window the instant a queued match starts (a
       // false->true transition on match presence), mirroring updateTradeWindow's
@@ -12889,6 +12932,10 @@ export class Hud {
           // the screen (with its cue) without opening the finder window.
           this.dungeonFinderProposalPopup.show();
           break;
+        case 'bgProposed':
+          // The battleground's own 30s answer window, same prompt one tab over.
+          this.bgProposalPopup.show();
+          break;
         case 'arenaFound': {
           const name =
             ev.enemies.length > 1 ? ev.enemies.map((e) => e.name).join(' & ') : ev.oppName;
@@ -14066,6 +14113,11 @@ export class Hud {
     const exact: Record<string, TranslationKey> = {
       'You are stunned!': 'hud.errors.stunned',
       'You are silenced!': 'hud.errors.silenced',
+      // The rooted-charge refusal. Reuses the existing combat key rather than
+      // minting an errors.* twin: the string is already carried in every
+      // locale, and a second English spelling of "you cannot move" would be a
+      // translation ask for no player-visible gain.
+      "Can't move!": 'hud.combat.cannotMove',
       'You are busy.': 'hud.errors.busy',
       'That ability is not ready yet.': 'hud.errors.abilityNotReady',
       'Not enough rage!': 'hud.errors.notEnoughRage',
@@ -14081,6 +14133,10 @@ export class Hud {
       'Out of range.': 'hud.errors.outOfRange',
       'You have no target.': 'hud.errors.noTarget',
       'Too close!': 'hud.errors.tooClose',
+      // The friendly-rush refusal. A new key rather than a reuse of noTarget: the
+      // player may well HAVE a target (an enemy one), and telling them they have
+      // none would send them looking for the wrong problem.
+      'You must target an ally.': 'hud.errors.mustTargetAlly',
       'You must be facing your target.': 'hud.errors.facing',
       'You must wield a dagger.': 'hud.errors.dagger',
       'You must be behind your target.': 'hud.errors.behindTarget',

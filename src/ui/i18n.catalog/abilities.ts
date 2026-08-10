@@ -2156,6 +2156,11 @@ const classAbilityNamesEn = {
         'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
       ],
       [
+        'intervene',
+        'Intervene',
+        'Rush to a friendly player, shielding them from {damage} damage for 6 sec.',
+      ],
+      [
         'recklessness',
         'Recklessness',
         'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
@@ -2173,7 +2178,7 @@ const classAbilityNamesEn = {
       [
         'intimidating_shout',
         'Intimidating Shout',
-        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect.',
       ],
       [
         'revenge',

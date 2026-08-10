@@ -91,8 +91,22 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted on PR 3150's v0.36.0 base merge: the branch's renderer.ts prewarm
 // changes and the PR 3165 reseal converged here. No capture was retaken.
+// Re-minted for the bounded-prewarm point-light pin (renderer.ts edit only).
+// No capture was retaken.
+// Re-minted for the entry-prewarm compile dedupe/batch + initial-frame reserve
+// (renderer.ts + prewarm_policy.ts edits). No capture was retaken.
+// Re-minted for the prewarm coverage completion (settle-state entry, program
+// content keys, widened depth arm). No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into the render caches branch:
+// the release-side prewarm compile and point-light reseals converge with this
+// branch's bounded character-visual pool wiring on the rendererIntegration
+// leaf, so the merged tree mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so the rendererIntegration
+// leaf mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '960dbd51c0ebc6ad2908ea8d17658cacd298a7ac33f1be4403eac2d26a11570c';
+  '6c851bbbf26498d01aed94ceca47e5e9eff2f5d72817f83cff64d6825a085357';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -1083,7 +1083,7 @@ export const sv_SE: EnTranslations = {
       "blurb": "Två förfallna fästningar möter varandra över en murad sänka i skuggan av Törntoppen: Karmosinröd i söder, Azurblå i norr, och den äldre Ruingården mitt emellan som ingen av dem någonsin har hållit. Fem mot fem, ett banér var, och den som först för hem tre av deras vinner slaget.",
       "modeTag": "5 mot 5, erövra flaggan",
       "offlineNote": "Törnhålefälten synkroniseras. Kön öppnas när riket svarar.",
-      "ratingSummary": "Rankning. {wins} vinster / {losses} förluster",
+      "ratingSummary": "Rankning. {wins} vinster / {losses} förluster / {draws} oavgjorda",
       "careerCaptures": "Erövringar totalt: {count}",
       "enterQueue": "Ställ dig i kön",
       "enterQueueParty": "Ställ dig i kön (grupp om {count})",
@@ -3114,6 +3114,11 @@ export const sv_SE: EnTranslations = {
       "toolEffectRechargeFull": "{effect} är redan fulladdad.",
       "toolEffectRechargeToolCapped": "Bär ett bättre verktyg för {profession} för att ladda {effect} vidare.",
       "toolEffectRechargeMaterials": "Att ladda om {effect} kräver {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Nivå {tier}",
       "nextUnlockTier": "{points} poäng till nästa nivå: mästerverksodds förbättras",
       "nextUnlockSpecialized": "{points} poäng till Specialiserad: materialkostnaderna sjunker",
@@ -3408,6 +3413,16 @@ export const sv_SE: EnTranslations = {
       "denyNotCrafted": "Tillverka den beställda pjäsen först (med beställningsväxeln på).",
       "denyOutOfRange": "Du måste vara nära beställaren för att leverera en beställning.",
       "denyNoSpace": "Beställaren har ingen plats i sina väskor."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Fängelsehålsletaren",
@@ -7529,6 +7544,9 @@ export const sv_SE: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Stäng"
   },
   "perfNudge": {
@@ -7991,6 +8009,7 @@ export const sv_SE: EnTranslations = {
       "deathRecapAbility": "Du har dött. Dräpt av {ability}.",
       "deathRecapFalling": "Du har dött. Du föll till din död.",
       "deathRecapDrowned": "Du har dött. Du drunknade.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Du känner dig utvilad och hel igen.",
       "ignoringChat": "Ignorerar chatt från {name}.",
       "noLongerIgnoring": "Ignorerar inte längre {name}.",
@@ -8035,6 +8054,7 @@ export const sv_SE: EnTranslations = {
       "outOfRange": "Utom räckhåll.",
       "noTarget": "Du har inget mål.",
       "tooClose": "För nära!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Du måste vara vänd mot ditt mål.",
       "targetHealthBelow": "Den förmågan kräver att målet har under {percent}% hälsa.",
       "dagger": "Du måste bära en dolk.",
@@ -8285,7 +8305,7 @@ export const sv_SE: EnTranslations = {
       "queueNote": "Du matchas med den närmast rankade utmanaren som är uppkopplad och teleporteras sedan till sanden. Vinn för att klättra; först att ge upp (1 hälsa) förlorar. Du återvänder exakt dit du ställde dig i kö.",
       "ladderAllTime": "Stege - Genom tiderna",
       "ladderOnline": "Stege - Uppkopplade",
-      "ratingSummary": "Rankning - {wins} vinster / {losses} förluster",
+      "ratingSummary": "Rankning - {wins} vinster / {losses} förluster / {draws} oavgjorda",
       "statusCountdown": "Stålsätt dig...",
       "statusReturning": "Återvänder till världen... {seconds}",
       "statusFight": "Strid till underkastelse!",
@@ -10051,6 +10071,10 @@ export const sv_SE: EnTranslations = {
       "die_by_sword": {
         "name": "Dö för svärdet",
         "description": "Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Hänsynslöshet",
