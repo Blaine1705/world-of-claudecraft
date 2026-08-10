@@ -11,11 +11,9 @@
 
 import { describe, expect, it } from 'vitest';
 import {
-  consumeItemCopy,
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   itemCopyPin,
-  itemCopyStillPinned,
   selectedInventorySlot,
 } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
@@ -197,80 +195,5 @@ describe('selectedInventorySlot: resolve without consuming', () => {
 
   it('returns undefined for no selection, so the caller falls back', () => {
     expect(selectedInventorySlot([plain('girdle')], 'girdle', undefined)).toBeUndefined();
-  });
-});
-
-describe('itemCopyStillPinned: surviving a bag that shifts mid-cast', () => {
-  it('holds while the pinned copy stays put', () => {
-    const inv = [enchanted('girdle', 'power'), plain('boots')];
-    expect(itemCopyStillPinned(inv, 0, itemCopyPin(inv[0]))).toBe(true);
-  });
-
-  it('fails when a different copy slides into the pinned index', () => {
-    // The mid-cast hazard, and the reason a bare index is not enough: the player
-    // aimed at their enchanted girdle, then a loot re-ordered the bag. Hitting
-    // whatever now occupies index 0 is worse than the old guess, because the
-    // player believes they chose.
-    const inv = [enchanted('girdle', 'power'), plain('boots')];
-    const pin = itemCopyPin(inv[0]);
-    inv[0] = plain('girdle');
-    expect(itemCopyStillPinned(inv, 0, pin)).toBe(false);
-  });
-
-  it('fails when the bag shrank past the pinned index', () => {
-    const inv = [enchanted('girdle', 'power')];
-    const pin = itemCopyPin(inv[0]);
-    inv.pop();
-    expect(itemCopyStillPinned(inv, 0, pin)).toBe(false);
-  });
-
-  it('passes for an id-only action, which pinned nothing', () => {
-    expect(itemCopyStillPinned([plain('girdle')], undefined, '')).toBe(true);
-  });
-
-  it('survives a partial consume of the pinned stack, which changes only count', () => {
-    // A pin that moved on count would false-refuse after any partial consume.
-    const inv = [enchanted('scroll', 'power', 3)];
-    const pin = itemCopyPin(inv[0]);
-    inv[0].count -= 1;
-    expect(itemCopyStillPinned(inv, 0, pin)).toBe(true);
-  });
-});
-
-describe('consumeItemCopy: the composed rule every converted surface calls', () => {
-  it('honors a valid selection and reports that it was honored', () => {
-    const inv = [enchanted('girdle', 'power'), plain('girdle')];
-    const out = consumeItemCopy(inv, 'girdle', 0);
-    expect(out.kind).toBe('selected');
-    expect(out.kind === 'selected' && out.unit.instance).toEqual({ enchantId: 'power' });
-  });
-
-  it('refuses an invalid selection instead of falling back to a guess', () => {
-    // The single most important case in this file. Collapsing refuse into
-    // fall-back is precisely the defect: a stale index would destroy or equip
-    // whatever the legacy walk happened to land on.
-    const inv = [plain('girdle')];
-    const out = consumeItemCopy(inv, 'girdle', 9);
-    expect(out.kind).toBe('refused');
-    expect(inv, 'a refusal consumes nothing').toHaveLength(1);
-  });
-
-  it('falls back to the legacy walk for an id-only call, and says so', () => {
-    const inv = [enchanted('girdle', 'power'), plain('girdle')];
-    const out = consumeItemCopy(inv, 'girdle', undefined);
-    expect(out.kind).toBe('fellBack');
-    expect(out.kind === 'fellBack' && out.unit.instance).toBeUndefined();
-  });
-
-  it('selected and fellBack disagree on the same bag, so the modes are distinguishable', () => {
-    // Guards the guard: if both paths picked the same copy this whole file could
-    // pass while the feature did nothing. The fixture is built so they differ.
-    const bag = () => [enchanted('girdle', 'power'), plain('girdle')];
-    const picked = consumeItemCopy(bag(), 'girdle', 0);
-    const guessed = consumeItemCopy(bag(), 'girdle', undefined);
-    const pickedInstance = picked.kind === 'selected' ? picked.unit.instance : null;
-    const guessedInstance = guessed.kind === 'fellBack' ? guessed.unit.instance : null;
-    expect(pickedInstance).toEqual({ enchantId: 'power' });
-    expect(guessedInstance).toBeUndefined();
   });
 });

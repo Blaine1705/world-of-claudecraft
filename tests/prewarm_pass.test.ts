@@ -342,14 +342,11 @@ describe('runBackgroundPrewarm', () => {
     const boundedEnd = source.indexOf('\n  private renderPrewarmPass(', boundedStart);
     const boundedMethod = source.slice(boundedStart, boundedEnd);
     const compileStart = source.indexOf('private async compilePrewarmColorPrograms(');
-    const compileEnd = source.indexOf(
-      '\n  private async compileSkinnedShadowPrograms(',
-      compileStart,
-    );
+    const compileEnd = source.indexOf('\n  private async compileShadowPrograms(', compileStart);
     const compileMethod = source.slice(compileStart, compileEnd);
 
     expect(zoneMethod).toContain('() => this.compilePrewarmColorPrograms(childRoot, true)');
-    expect(zoneMethod).toContain('() => this.compileSkinnedShadowPrograms(childRoot)');
+    expect(zoneMethod).toContain('() => this.compileShadowPrograms(childRoot)');
     expect(zoneMethod).toContain('runUpload: (work, label) =>');
     // The decomposed upload: texture batches first, then the bounded render.
     expect(zoneMethod).toContain('warmChildUnits: (groupLike, child) =>');
@@ -397,11 +394,18 @@ describe('runBackgroundPrewarm', () => {
   });
 
   it('awaits shader compiles instead of letting timed-out work overlap later lanes', () => {
+    // The bug class this guards: racing an UNCANCELLABLE compileAsync call
+    // against a timer so a "timed out" branch moves on to the NEXT unit or
+    // lane while that call is still linking, unmanaged, off in the
+    // background (measured: it overlapped the next child's compile and even
+    // live gameplay). prepareZoneSky and compileShadowPrograms never bound
+    // an individual compile call at all, so they stay a plain, unbounded
+    // await with no race of any kind.
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const zoneStart = source.indexOf('private async prepareZoneSky(');
     const zoneEnd = source.indexOf('\n  /** Blocking-path neighborhood prepare', zoneStart);
     const zoneSlice = source.slice(zoneStart, zoneEnd);
-    const shadowStart = source.indexOf('private async compileSkinnedShadowPrograms(');
+    const shadowStart = source.indexOf('private async compileShadowPrograms(');
     const shadowEnd = source.indexOf('\n  // A tiny throwaway target', shadowStart);
     const shadowSlice = source.slice(shadowStart, shadowEnd);
     const bootStart = source.indexOf("id: 'programs.compile'");
@@ -410,6 +414,27 @@ describe('runBackgroundPrewarm', () => {
 
     expect(zoneSlice).not.toContain('Promise.race');
     expect(shadowSlice).not.toContain('Promise.race');
-    expect(bootSlice).not.toContain('Promise.race');
+    // The boot compile entry's resumeUnits selection (which groups the
+    // background resume lane may take) must stay the same plain, unbounded
+    // selection too: racing it away would double-submit an already in-flight
+    // compileAsync (its units are never resubmitted, only ever selected).
+    const resumeAt = bootSlice.indexOf('resumeUnits: () => {');
+    const runAt = bootSlice.indexOf('run: async () => {', resumeAt);
+    const progressAt = bootSlice.indexOf('progress: () =>', runAt);
+    expect(resumeAt).toBeGreaterThan(-1);
+    expect(runAt).toBeGreaterThan(resumeAt);
+    expect(progressAt).toBeGreaterThan(runAt);
+    expect(bootSlice.slice(resumeAt, runAt)).not.toContain('Promise.race');
+    // run() DOES race now, but not the old harmful shape: every unit it races
+    // was already SUBMITTED (compileAsync already called) before the race
+    // starts, so a lost race launches nothing new and double-submits
+    // nothing. It bounds how long the entry WAITS for already-in-flight work,
+    // against its own reserved deadline (prewarmCompileAwaitDeadline), never
+    // a raw compileAsync call racing a timer.
+    const runSlice = bootSlice.slice(runAt, progressAt);
+    expect(runSlice).not.toContain('Promise.race([this.webgl.compileAsync');
+    expect(runSlice).not.toContain('compileAsync(this.scene');
+    expect(runSlice).toContain('const awaitAll = Promise.all(');
+    expect(runSlice).toContain('const outcome = await Promise.race([');
   });
 });

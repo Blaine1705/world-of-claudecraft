@@ -48,7 +48,7 @@ import {
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
-import { instancePlayerIds } from '../rift/runs';
+import { clearRiftBossDeathZones, instancePlayerIds } from '../rift/runs';
 // Type only: the idle sub-stream is threaded through the wander step as a local.
 // The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
 import type { Rng } from '../rng';
@@ -137,7 +137,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
   if (mob.dead) {
     ctx.onBossDeath(mob);
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
+    if (
+      mob.ownerId !== null &&
+      MOBS[mob.templateId]?.family !== 'demon' &&
+      MOBS[mob.templateId]?.family !== 'undead'
+    )
+      return;
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
@@ -150,7 +155,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       }
     }
     // a slain summoned demon unravels rather than respawning into the wild
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family === 'demon') {
+    if (
+      mob.ownerId !== null &&
+      (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
+    ) {
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
@@ -1071,6 +1079,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
             z: anchorE.pos.z,
             radius: def.radius,
             remaining: anchorFuse,
+            total: anchorFuse,
           });
           // Notify online clients so they can mirror the zone countdown locally.
           // Interest-scoped by world position, so only instance players receive it.
@@ -1427,17 +1436,19 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   }
   mob.yelledEngage = false;
   // A boss evade ends the pull: clear any pending lethal death zones so stale
-  // zones from the previous pull do not linger into the next.
+  // zones from the previous pull do not linger into the next (and notify
+  // online mirrors, which otherwise run the phantom fuse to detonation).
   if (deathZoneCastDef || deathZoneStrikeDef) {
     for (const inst of ctx.riftInstances) {
       if (inst.partyKey !== null && inst.bossId === mob.id) {
-        inst.bossDeathZones = [];
+        clearRiftBossDeathZones(ctx, inst);
         break;
       }
     }
   }
-  // The reset re-seeds the idle timer, so an off-stream mob rolls it off-stream too
-  // (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  // The reset re-seeds the idle timer through the same passive lane. An explicit
+  // off-stream mob leaves the shared lane untouched; a distance-culling config routes
+  // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
