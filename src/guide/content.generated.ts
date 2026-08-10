@@ -5928,6 +5928,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
+        "name": "Duskwhisper"
+      },
+      {
+        "kind": "item",
         "name": "Wildheart Tuskblade"
       },
       {
@@ -7031,6 +7035,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Cragthorn Greatstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Boneglass Shiv"
       },
       {
         "kind": "item",

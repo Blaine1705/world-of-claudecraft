@@ -1037,6 +1037,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'normal' },
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
+      ['duskwhisper', fromBoss('wildheart_beastmaster')],
       ['wildheart_tuskblade', fromBoss('wildheart_high_priest')],
       ['wildheart_hexwood_staff', fromBoss('wildheart_high_priest')],
       ['wildheart_fangknife', fromBoss('wildheart_high_priest')],
@@ -1462,6 +1463,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['cragmaw_huntcord', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       ['cragmaw_prowlboots', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       ['cragthorn_greatstaff', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      ['boneglass_shiv', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       ['cragmaw_huntquiver', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       // Shardlord Kazzix (Thornpeak Heights)
       ['shardfang_grips', [fromBoss('shardlord_kazzix'), fromZone('thornpeak_heights')]],

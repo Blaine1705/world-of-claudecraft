@@ -119,6 +119,14 @@ function isMountReinsId(itemId: string): boolean {
   return itemId.startsWith('reins_');
 }
 
+/** `heroic_<base>` ids are auto-generated stat copies (heroic_variants.ts), not the heroic
+ *  UNIQUES the Reliquary catalogs (docs/design/reliquary.md, "Adding a page"): the base id
+ *  already holds the slot, so listing the variant would double-count one weapon. The catalog
+ *  has never contained one. Same shape of deliberate carve-out as mount reins. */
+function isHeroicVariantId(itemId: string): boolean {
+  return itemId.startsWith('heroic_');
+}
+
 // Classifies EVERY live quality (`satisfies` pins the union): a new ItemDef
 // quality tier fails tsc here until the curator sorts it museum-in or out.
 const RARE_PLUS_BY_QUALITY = {
@@ -344,23 +352,28 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the 29 NEW Spoils uniques (31 slots minus the 2 set members already
     // catalogued; a relic on two pages is one relic), then the 47 Warfare
     // honor pieces and the 3 fishing additions (the koi and both rods):
-    // 242 + 16 + 29 + 47 + 3 = 337. The two excludeFromCompletion pages add
+    // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
+    // merge added to live content (rimefang on the Rift page, duskwhisper on
+    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // page completion for finished players, per docs/design/reliquary.md.
+    // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
     // slots and horizons_riftbound the three class-personal Riftbound bands,
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 337, total: 337 });
+    expect(full).toEqual({ owned: 340, total: 340 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
       ownedMounts: allOwned,
       deedsEarned: allOwned,
     });
-    // Literal: update when catalog content lands (same +16 Rift +19 marks
-    // +29 uniques +47 Warfare +3 fishing deltas as the overview pair above;
-    // marks are character-scoped).
-    expect(character).toEqual({ owned: 308, total: 308 });
+    // Literal: update when catalog content lands (same deltas as the overview
+    // pair above, including the three release-merged daggers; marks are
+    // character-scoped, so this trails the overview by the 29 account-scoped
+    // weapon skins).
+    expect(character).toEqual({ owned: 311, total: 311 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -369,7 +382,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // phase base; the phase plan's 245 baseline undercounted the live
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
-    // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372 total.
+    // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
+    // three daggers the v0.36.0 release merge added to live content: 375 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -380,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(372);
+    ).toBe(375);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -592,9 +606,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // isCataloguedRelicItem-vs-index agreement pin would be vacuous: the
     // predicate IS the index membership test.)
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
-    // ids (the sixth figure of the ledger row's "all pinned" claim; the other
-    // five are the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(237);
+    // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
+    // sixth figure of the ledger row's "all pinned" claim; the other five are
+    // the page/overview/character/slot/mark literals nearby).
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -770,17 +785,55 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
   };
 
-  it('RELIQUARY_HEROIC_GEAR lists every non-mount HEROIC_BOSS_LOOT id', () => {
+  /** The live ids a heroic page is expected to catalog, both carve-outs applied. */
+  function catalogueableHeroicIds(entries: (typeof HEROIC_BOSS_LOOT)[string]): string[] {
+    const liveIds: string[] = [];
+    for (const e of entries) {
+      if (typeof e.itemId !== 'string') continue;
+      if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
+      liveIds.push(e.itemId);
+    }
+    return [...new Set(liveIds)].sort();
+  }
+
+  /** Bosses whose heroic table holds at least one catalogue-able unique. A boss drops out
+   *  of this list ONLY when every one of its live ids is a carve-out, which the sweep below
+   *  asserts item by item, so a boss can never fall out of the pins by accident. */
+  const GEAR_BOSSES = Object.keys(HEROIC_BOSS_LOOT)
+    .filter((bossId) => catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).length > 0)
+    .sort();
+
+  it('carves out only auto-generated heroic variants, never a bespoke heroic unique', () => {
+    // Positive control: the carve-out predicate really fires on the live variant id.
+    expect(isHeroicVariantId('heroic_duskwhisper')).toBe(true);
+    // Negative control: a bespoke heroic unique the catalog DOES list stays catalogue-able.
+    expect(isHeroicVariantId('morthens_cryptforged_hauberk')).toBe(false);
+    // The catalog itself has never listed a variant id, on any page.
+    for (const page of CONQUEROR_PAGES) {
+      for (const id of itemRelicIds(page)) expect(isHeroicVariantId(id)).toBe(false);
+    }
+    // Anti-vacuity: something is actually excluded, and every id of every excluded boss is
+    // a carve-out, so GEAR_BOSSES cannot silently shed a boss that still owes the catalog.
+    const droppedBosses = Object.keys(HEROIC_BOSS_LOOT).filter((b) => !GEAR_BOSSES.includes(b));
+    expect(droppedBosses.length).toBeGreaterThan(0);
+    for (const bossId of droppedBosses) {
+      for (const entry of HEROIC_BOSS_LOOT[bossId]) {
+        expect(
+          typeof entry.itemId === 'string' &&
+            (isMountReinsId(entry.itemId) || isHeroicVariantId(entry.itemId)),
+          `${bossId} drops ${String(entry.itemId)}, which is not a carve-out`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('RELIQUARY_HEROIC_GEAR lists every catalogue-able HEROIC_BOSS_LOOT id', () => {
     // Bidirectional first: the loop below walks live bosses, so a stale
     // RELIQUARY_HEROIC_GEAR key for a removed boss would sit unnoticed as
     // dead data without this pin.
-    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(Object.keys(HEROIC_BOSS_LOOT).sort());
-    for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
-      const liveIds: string[] = [];
-      for (const e of entries) {
-        if (typeof e.itemId === 'string' && !isMountReinsId(e.itemId)) liveIds.push(e.itemId);
-      }
-      const liveGear = [...new Set(liveIds)].sort();
+    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(GEAR_BOSSES);
+    for (const bossId of GEAR_BOSSES) {
+      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
       ]
@@ -801,8 +854,9 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
   });
 
-  it('every HEROIC_BOSS_LOOT boss has a mapped Reliquary heroic page', () => {
-    for (const bossId of Object.keys(HEROIC_BOSS_LOOT)) {
+  it('every HEROIC_BOSS_LOOT boss with catalogue-able gear has a mapped heroic page', () => {
+    expect(GEAR_BOSSES.length).toBeGreaterThan(0);
+    for (const bossId of GEAR_BOSSES) {
       expect(HEROIC_PAGE_BY_BOSS[bossId], `page map for ${bossId}`).toBeDefined();
     }
   });
@@ -824,7 +878,7 @@ describe('Reliquary Rift page pins against live rift content', () => {
       ...RIFT_EPIC_ITEM_IDS,
       ...RIFT_LEGENDARY_ITEM_IDS,
     ]);
-    expect(page.relics.length).toBe(16);
+    expect(page.relics.length).toBe(17);
     // Band absence stated directly, so a re-added band reds on the claim it
     // breaks rather than only on the ordered equality above. The floor keeps
     // the loop from running zero times on an emptied source array (the
@@ -3207,11 +3261,12 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 365 = 372 slots minus the
+    // excluded. Literal: tighten as rulings land. 368 = 375 slots minus the
     // four retired vault slots minus the two gap mounts minus the pended
-    // masterwork:engineering.
+    // masterwork:engineering. It tracks the slot total, so it moved with the
+    // three daggers the v0.36.0 release merge added, keeping the original slack.
     const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
-    expect(hinted).toBeGreaterThanOrEqual(365);
+    expect(hinted).toBeGreaterThanOrEqual(368);
     // The retired arm stays snug too: exactly the vault's four slots today.
     expect(retiredSlots).toBe(4);
   });
