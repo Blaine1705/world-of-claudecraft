@@ -7170,6 +7170,11 @@ export class Sim {
   // / diminishedCrowdControlDuration, see their doc comments there); kept as a
   // thin delegate here because SimContext-bound callers (`ctx.diminishedCrowdControlDuration`)
   // and the in-class applyRootAura caller both resolve it on the Sim facade.
+  // Pre-bound once (not re-allocated per call): this delegate sits on the
+  // per-cast crowd-control path, including the AoE fan-outs in
+  // effect_dispatch.ts that can invoke it once per target in a single tick.
+  private readonly isHostileToBound = (a: Entity, b: Entity) => this.isHostileTo(a, b);
+
   private diminishedCrowdControlDuration(
     source: Entity,
     target: Entity,
@@ -7178,7 +7183,7 @@ export class Sim {
   ): number | null {
     return diminishedCrowdControlDurationImpl(
       this.time,
-      (a, b) => this.isHostileTo(a, b),
+      this.isHostileToBound,
       source,
       target,
       category,
