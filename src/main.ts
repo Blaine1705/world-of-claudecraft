@@ -6529,7 +6529,15 @@ async function refreshCharacters(): Promise<void> {
       if (charselectLook(c) && !portraitsReady()) {
         onPortraitsReady(() => {
           const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
-          if (chip?.isConnected) chip.outerHTML = chipHtml();
+          if (!chip?.isConnected) return;
+          chip.outerHTML = chipHtml();
+          // The module-scope onPortraitsReady listener in portrait_chip.ts
+          // (which arms crest-image fallbacks document-wide) is registered
+          // at import time, before this per-row callback, so it already ran
+          // by the time the swap above lands new elements in the DOM. Re-arm
+          // this row's fresh badge/portrait img explicitly, or a blocked or
+          // missing crest asset on it never falls back.
+          hydratePortraits(row);
         });
       }
       row.innerHTML = `${chipHtml()}
@@ -6610,10 +6618,16 @@ async function refreshCharacters(): Promise<void> {
       });
       row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
+        // Captured before selectRow(), whose own close(false) call (on
+        // whatever editor is already open) would otherwise leave
+        // document.activeElement pointing at the OLD row's button by the
+        // time open() ran. Passing this button explicitly is the fix (see
+        // charselect_redesign.ts open()).
+        const opener = e.currentTarget as HTMLButtonElement;
         // Select the row first so the stage, name, and Enter World button all
         // agree on which character is being redesigned.
         selectRow();
-        redesignEditor.open(c);
+        redesignEditor.open(c, opener);
       });
       // Double-click a row to jump straight into the world (classic-select
       // muscle memory). It routes through the shared desktop Enter World button

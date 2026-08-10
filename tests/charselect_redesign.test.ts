@@ -2,8 +2,8 @@
 //
 // The one-shot redesign editor. The token is the point: a character gets ONE
 // free appearance change, so every path that could spend it without the player
-// getting the design they chose — or that could leave it unspent while the
-// player believes it landed — is a bug worth a test rather than a click.
+// getting the design they chose (or that could leave it unspent while the
+// player believes it landed) is a bug worth a test rather than a click.
 //
 // Pinned here: the stage always shows the DRAFT while the editor is open, a
 // rejected save keeps both the token and the draft, Cancel writes nothing at
@@ -132,6 +132,34 @@ describe('opening', () => {
     expect(document.activeElement).toBe(rowB);
   });
 
+  it('returns focus to the button that opened it on the REAL shipped path', () => {
+    // The direct-open test above proves the returnFocus handoff in isolation,
+    // but the actual char-select click handler is main.ts:6611-6621: it calls
+    // selectRow() BEFORE open(c, opener), and selectRow's own first statement
+    // is redesignEditor.close(false) on whatever editor is already open. That
+    // close(false) hands focus to WHATEVER ROW OPENED THAT ONE before this
+    // open() ever runs, so a fallback to document.activeElement inside open()
+    // would read the wrong row. Reproduce that exact sequence: row A's editor
+    // is open, then an external close(false) (standing in for selectRow) runs
+    // BEFORE row B's open(), and open() is given B's button directly rather
+    // than relying on activeElement (deliberately never focused here, so a
+    // regression to the activeElement fallback would leave focus on A).
+    const rowA = document.createElement('button');
+    const rowB = document.createElement('button');
+    rowA.id = 'row-a';
+    rowB.id = 'row-b';
+    document.body.append(rowA, rowB);
+
+    const editor = editorWith(fakeDeps());
+    rowA.focus();
+    editor.open(TARGET, rowA);
+    editor.close(false); // selectRow()'s close(false), external to open()
+    editor.open({ ...TARGET, id: 43, name: 'Another' }, rowB);
+    editor.close(true);
+
+    expect(document.activeElement).toBe(rowB);
+  });
+
   it('does nothing at all when the panel is not in the document', () => {
     document.body.innerHTML = '';
     const deps = fakeDeps();
@@ -139,6 +167,100 @@ describe('opening', () => {
     editor.open(TARGET);
     expect(editor.isOpen).toBe(false);
     expect(deps.previewModular).not.toHaveBeenCalled();
+  });
+});
+
+describe('mobile and keyboard focus into the panel', () => {
+  it('moves focus into the panel, not just to whatever opened it', () => {
+    // On mobile the reroll dock flows below the roster, so a tap on a long
+    // roster can leave the freshly shown panel offscreen with nothing
+    // telling the player anything happened. This is the fix, on ALL form
+    // factors: land focus on the panel's first control, not just the row.
+    const editor = editorWith(fakeDeps());
+    editor.open(TARGET);
+    const panel = document.getElementById('charselect-reroll');
+    expect(panel?.contains(document.activeElement)).toBe(true);
+  });
+
+  it('scrolls the panel into view when it is not fully visible', () => {
+    const panel = document.getElementById('charselect-reroll') as HTMLElement;
+    vi.spyOn(panel, 'getBoundingClientRect').mockReturnValue({
+      top: -80,
+      left: 0,
+      bottom: 200,
+      right: 320,
+      width: 320,
+      height: 280,
+      x: 0,
+      y: -80,
+      toJSON: () => ({}),
+    } as DOMRect);
+    // jsdom ships no scrollIntoView; stub one so the call is observable.
+    const scrollIntoView = vi.fn();
+    (panel as unknown as { scrollIntoView: typeof scrollIntoView }).scrollIntoView = scrollIntoView;
+
+    editorWith(fakeDeps()).open(TARGET);
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' });
+  });
+
+  it('does not scroll when the panel is already fully visible', () => {
+    const panel = document.getElementById('charselect-reroll') as HTMLElement;
+    vi.spyOn(panel, 'getBoundingClientRect').mockReturnValue({
+      top: 10,
+      left: 10,
+      bottom: 200,
+      right: 320,
+      width: 310,
+      height: 190,
+      x: 10,
+      y: 10,
+      toJSON: () => ({}),
+    } as DOMRect);
+    const scrollIntoView = vi.fn();
+    (panel as unknown as { scrollIntoView: typeof scrollIntoView }).scrollIntoView = scrollIntoView;
+
+    editorWith(fakeDeps()).open(TARGET);
+
+    expect(scrollIntoView).not.toHaveBeenCalled();
+  });
+});
+
+describe('escape', () => {
+  it('closes and discards the draft, exactly like Cancel', () => {
+    const deps = fakeDeps();
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(editor.isOpen).toBe(false);
+    expect(deps.saveAppearance).not.toHaveBeenCalled();
+    expect(deps.restoreStage).toHaveBeenCalledTimes(1);
+    expect(document.getElementById('charselect-reroll')?.hasAttribute('hidden')).toBe(true);
+    expect(document.getElementById('charselect-news')?.hasAttribute('hidden')).toBe(false);
+  });
+
+  it('is a no-op when nothing is open', () => {
+    const deps = fakeDeps();
+    editorWith(deps); // never opened
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(deps.restoreStage).not.toHaveBeenCalled();
+    expect(deps.saveAppearance).not.toHaveBeenCalled();
+  });
+
+  it('does not double-fire after two open/close cycles (listener leak guard)', () => {
+    const deps = fakeDeps();
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    editor.close(true);
+    editor.open({ ...TARGET, id: 43, name: 'Another' });
+    editor.close(true);
+    deps.restoreStage.mockClear();
+
+    // If close() failed to remove its listener, both cycles would still have
+    // one attached to document, and one Escape would fire close(true) twice.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(deps.restoreStage).not.toHaveBeenCalled();
   });
 });
 
@@ -152,7 +274,7 @@ describe('saving', () => {
     const [characterId, app, helmHidden] = deps.saveAppearance.mock.calls[0];
     expect(characterId).toBe(42);
     expect(app).toMatchObject({ gender: expect.any(String) });
-    // The helmet toggle IS saved, matching creation. It is not a preview — and
+    // The helmet toggle IS saved, matching creation. It is not a preview, and
     // its value is the character's, not a default this editor invented.
     expect(helmHidden).toBe(false);
     expect(deps.refreshRoster).toHaveBeenCalledTimes(1);
