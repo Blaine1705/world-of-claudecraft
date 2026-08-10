@@ -715,20 +715,14 @@ jobs:
           restore-keys: |
             tsc-buildinfo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json') }}-
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), so CI and
+      # the local gate share one cache-aware idiom instead of drifting apart.
       # The Discord bot bundles from the same tree and ships in the same image
       # (Dockerfile runs build:bot), so a broken bot bundle must fail here rather
       # than on the production host during docker compose up --build.
-      - name: Build Discord bot
-        run: npm run build:bot
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
@@ -919,19 +913,13 @@ jobs:
           restore-keys: |
             tsc-buildinfo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json') }}-
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), so CI and
+      # the local gate share one cache-aware idiom instead of drifting apart.
       # Same reason as the PR-tier job: the bot bundles from this tree and ships
       # in the same image, so a broken bot bundle fails here, not on the host.
-      - name: Build Discord bot
-        run: npm run build:bot
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
