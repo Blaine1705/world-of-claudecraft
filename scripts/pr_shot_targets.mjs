@@ -62,6 +62,42 @@ async function openMarketBrowse(page) {
   return pollForSize(page, '#market-window');
 }
 
+// Open Esc options -> Interface -> Combat by CLICKING the rendered controls rather
+// than reaching past them, so the shot proves the row is reachable the way a player
+// reaches it. Interface is the 4th main-menu row (buildOptionsMenu; the optional Bug
+// Report row is appended AFTER it, so the index is stable) and Combat the 4th tab of
+// the Interface panel (INTERFACE_TAB_ORDER). The window is force-hidden first so the
+// toggle is deterministic regardless of prior state, the same trick the bags target uses.
+async function openInterfaceCombatTab(page) {
+  await page.evaluate(() => {
+    const el = document.querySelector('#options-menu');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.toggleOptionsMenu?.();
+  });
+  await wait(400);
+  await page.evaluate(() => {
+    document.querySelectorAll('#options-menu .opt-btn')[3]?.click();
+  });
+  await wait(400);
+  await page.evaluate(() => {
+    document.querySelectorAll('#options-menu .opt-tab')[3]?.click();
+  });
+  return pollForSize(page, '#options-menu');
+}
+
+// Press the real "Unlock interface" button (the first row of the Combat tabpanel,
+// which interfaceUnlockRow appends ahead of the declarative list), then close the
+// menu so the loosened HUD is what the camera sees.
+async function unlockInterfaceThroughTheOption(page) {
+  await openInterfaceCombatTab(page);
+  await page.evaluate(() => {
+    document.querySelector('#interface-tabpanel .set-row button')?.click();
+  });
+  await wait(300);
+  await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+  await wait(500);
+}
+
 // The home page's global board is a REST read (`/api/leaderboard?scope=global...`),
 // and a screenshot host has no populated realm behind it, so answer that one request
 // with a representative cross-realm page before the document loads. Everything after
@@ -1327,6 +1363,58 @@ export const TARGETS = [
         throw new Error(`missing ability surfaces: ${JSON.stringify(surfaces)}`);
       }
       return {};
+    },
+  },
+  {
+    key: 'interface-unlock-option',
+    label: 'Interface options, Combat tab: the Unlock interface row',
+    when: ['ui/interface_unlock', 'ui/options_window', 'ui/options_view'],
+    // Desktop and mobile: the row is an ordinary options control on both, and the
+    // template asks for the mobile arm of any options-panel change.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await openInterfaceCombatTab(page);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'interface-unlock-hud',
+    label: 'HUD with the interface unlocked: move buttons and resize grips on every live frame',
+    when: ['ui/interface_unlock', 'ui/movable_frame'],
+    // Desktop only, and that is the feature rather than a gap: MovableFrame refuses
+    // every gesture on the mobile layout and the stylesheet hides the chrome there,
+    // so the mobile shot would be identical to the locked one.
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await unlockInterfaceThroughTheOption(page);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'interface-unlock-moved',
+    label: 'HUD after frames have been dragged and scaled (the persisted boxes replayed)',
+    when: ['ui/interface_unlock', 'ui/target_frame_pos'],
+    variants: [
+      {
+        key: 'desktop',
+        // Seed the SAME localStorage keys a real drag persists, before the document
+        // loads, so the shot exercises the real parse-and-apply path a returning
+        // player hits rather than a synthetic pointer script. String form because
+        // this script runs under tsx (keepNames breaks nested evaluate functions).
+        beforeLoad: async (page) => {
+          await page.evaluateOnNewDocument(
+            `try {
+               localStorage.setItem('woc_hud_frame_castbar', JSON.stringify({ left: 240, top: 300, scale: 1.4 }));
+               localStorage.setItem('woc_hud_frame_minimap', JSON.stringify({ left: 40, top: 60, scale: 0.8 }));
+               localStorage.setItem('woc_hud_frame_side_buttons', JSON.stringify({ left: 1180, top: 120, scale: 1 }));
+             } catch {}`,
+          );
+        },
+      },
+    ],
+    async capture(page) {
+      await unlockInterfaceThroughTheOption(page);
+      return { clip: '#ui' };
     },
   },
   {

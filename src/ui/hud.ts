@@ -3689,10 +3689,11 @@ export class Hud {
 
   // Public: snap all movable unit frames back to their stock CSS spots and
   // forget the saved drags. Wired to the "Reset Frame Positions" interface option.
+  // resetAll() locks the interface first and then resets every registered frame,
+  // which covers the three unit frames as well as the action bars, cast bar,
+  // menu, minimap and pet frame. The doom meter runs its own MovableFrame outside
+  // the registry, so it keeps its own line here.
   resetUnitFrames(): void {
-    // resetAll() locks the interface first and then resets every registered
-    // frame, which covers the three unit frames as well as the action bars, cast
-    // bar, menu, minimap and pet frame.
     this.interfaceUnlock.resetAll();
     this.doomMeter.resetPosition();
   }
