@@ -137,6 +137,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/woc-market/listings/:id/bids',
   '/api/woc-market/bids/:id/bond-quote',
   '/api/woc-market/bids/:id/bond',
+  '/api/woc-market/bids/:id/abandon',
   '/api/woc-market/listings/:id/buy-now',
   '/api/woc-market/settlements/:id/quote',
   '/api/woc-market/settlements/:id/confirm',
@@ -395,6 +396,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/woc-market/listings/:id/bids' },
     { method: 'POST', path: '/api/woc-market/bids/:id/bond-quote' },
     { method: 'POST', path: '/api/woc-market/bids/:id/bond' },
+    { method: 'POST', path: '/api/woc-market/bids/:id/abandon' },
     { method: 'POST', path: '/api/woc-market/listings/:id/buy-now' },
     { method: 'POST', path: '/api/woc-market/settlements/:id/quote' },
     { method: 'POST', path: '/api/woc-market/settlements/:id/confirm' },
@@ -634,13 +636,14 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 18 = the handleInternalApi nine (restart-countdown + the 8 Discord-bot
+    // 20 = the handleInternalApi nine (restart-countdown + the 8 Discord-bot
     // routes, flaired-ids included; the retired relay/activity/winners GETs
     // have no rows since #2791) plus the seven-route payout and moderation ops
-    // family below, plus the two registry-only rows (POST
-    // /internal/discord/flex-batch and GET /internal/discord/outbox), which have
-    // no legacy ladder arm by design and so are the internal rows with no twin.
-    expect(internalLadder.length).toBe(18);
+    // family below, plus the FOUR registry-only rows (POST
+    // /internal/discord/flex-batch, GET /internal/discord/outbox, and the ops
+    // dashboard's two Exchange reads), which have no legacy ladder arm by design
+    // and so are the internal rows with no twin.
+    expect(internalLadder.length).toBe(20);
     expect(opsFamilyRows.length).toBe(7);
   });
 

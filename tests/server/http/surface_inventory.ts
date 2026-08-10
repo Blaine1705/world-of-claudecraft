@@ -65,6 +65,11 @@ export type HttpMethod = (typeof HTTP_METHODS)[number];
 //                 AND a wrong header both answer 401 'not authenticated'
 //                 (daily_rewards.ts internalAuthorized), and it never falls back
 //                 to RESTART_COUNTDOWN_SECRET.
+//   secret-dashboard  x-woc-dashboard-secret / DASHBOARD_INTERNAL_SECRET, the
+//                 internal ops dashboard's own gate. Deliberately NOT the deploy
+//                 or discord secret: the dashboard reads player trade history, so
+//                 its credential must be revocable without taking down deploys or
+//                 the bot.
 //   dev-gated     guarded by ALLOW_DEV_COMMANDS=1
 export const AUTH_SCOPE = {
   public: 'public',
@@ -74,6 +79,7 @@ export const AUTH_SCOPE = {
   secretDeploy: 'secret-deploy',
   secretDiscord: 'secret-discord',
   secretDailyReward: 'secret-daily-reward',
+  secretDashboard: 'secret-dashboard',
   devGated: 'dev-gated',
 } as const;
 export type AuthScope = (typeof AUTH_SCOPE)[keyof typeof AUTH_SCOPE];
@@ -1375,6 +1381,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',
+    path: '/api/woc-market/bids/:id/abandon',
+    handler: 'server/woc_market_routes.ts abandonBidHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'wocMarketMutationRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.bola404,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
     path: '/api/woc-market/listings/:id/buy-now',
     handler: 'server/woc_market_routes.ts buyNowHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
@@ -2519,6 +2535,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleInternalApi arm: /internal/restart-countdown',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDeploy,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The ops dashboard's two Exchange reads. Registry-only (no legacy ladder
+  // twin): they postdate the frozen ladders, so there is nothing to reproduce.
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/woc-market/listings',
+    handler: 'internal.ts RouteDef: /internal/woc-market/listings',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDashboard,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/woc-market/p2p-trades',
+    handler: 'internal.ts RouteDef: /internal/woc-market/p2p-trades',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDashboard,
     limiter: null,
     requireOwnedExpected: null,
   },

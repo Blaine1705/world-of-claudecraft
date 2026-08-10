@@ -162,6 +162,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/woc-market/listings/:id/bids': PROBLEM_JSON,
   '/api/woc-market/bids/:id/bond-quote': PROBLEM_JSON,
   '/api/woc-market/bids/:id/bond': PROBLEM_JSON,
+  '/api/woc-market/bids/:id/abandon': PROBLEM_JSON,
   '/api/woc-market/listings/:id/buy-now': PROBLEM_JSON,
   '/api/woc-market/settlements/:id/quote': PROBLEM_JSON,
   '/api/woc-market/settlements/:id/confirm': PROBLEM_JSON,
