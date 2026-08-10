@@ -783,6 +783,12 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(bodyOf(read('server/deeds_db.ts'), 'export async function deedRarityCounts')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
     );
+    // The reliquary aggregate is the heavier half of the same refresh (it
+    // detoasts every eligible character's state blob, which the deeds COUNT
+    // arms never do), so it needs the raised allowance at least as much.
+    expect(
+      bodyOf(read('server/reliquary_rarity_db.ts'), 'export async function reliquaryRarityCounts'),
+    ).toContain('runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS');
     // The on-demand admin reads carry the wrapper in the body that owns their
     // heaviest scan: sessionsByDay and accountDetail wrap directly; clientPerfSummary
     // runs its whole roll-up as ONE GROUPING SETS statement inside its own wrapper
