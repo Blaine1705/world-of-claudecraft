@@ -5638,6 +5638,8 @@ export const zh_CN: EnTranslations = {
       "chanWhisperBody": "按名字发给某一位玩家的私人消息，无论他们身在何处。用它来说几句悄悄话。",
       "chanParty": "小队。",
       "chanPartyBody": "与你队伍中的每一个人交谈，无论你们相隔多远。",
+      "chanBattleground": "战场。",
+      "chanBattlegroundBody": "与战场中的所有战士交谈，双方阵营都能看到。仅在比赛进行时可用。",
       "chanGeneral": "综合。",
       "chanGeneralBody": "一个始终开启、覆盖全位面的频道，能触及所有在线玩家，适合提问或闲聊。与世界频道和寻求组队频道不同，你无需手动加入便能使用。",
       "chanWorld": "世界。",
@@ -7744,6 +7746,7 @@ export const zh_CN: EnTranslations = {
           "say": "说话",
           "yell": "大喊",
           "party": "小队",
+          "battleground": "战场",
           "general": "综合",
           "world": "世界",
           "lfg": "组队",
@@ -7905,6 +7908,7 @@ export const zh_CN: EnTranslations = {
     "chat": {
       "rightClickName": "右键点击 {name}",
       "templates": {
+        "battleground": "[战场] {name}：{message}",
         "party": "[队伍] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄说：{message}",

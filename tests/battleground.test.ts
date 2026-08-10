@@ -8,6 +8,7 @@ import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
+import { restorePet, summonPet } from '../src/sim/pet/pet_commands';
 import {
   awardBattlegroundHonor,
   BATTLEGROUND_ASSIST_HONOR,
@@ -58,7 +59,7 @@ import {
   bgRequeueLockedUntil,
 } from '../src/sim/social/battleground_proposal';
 import { addThreat } from '../src/sim/threat';
-import { DT, type SimEvent } from '../src/sim/types';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -3821,5 +3822,269 @@ describe('Thornhollow Fields: talents are the fighter own to change', () => {
     expect(sim.setSpec('arms', a)).toBe(false);
     expect(sim.respec(a)).toBe(false);
     expect(sim.ctx.players.get(a)!.talents.spec).toBe('fury');
+  });
+});
+
+describe('Thornhollow Fields: a pet that walks in alive walks back out alive', () => {
+  // The arena has kept this parenthesis since issue #1600 (ArenaMatch.preMatchPets),
+  // but the battleground never had it, and a wave respawn raises only the fighter.
+  // So a hunter, warlock or mage who lost their companion mid-match left the field
+  // still without it: most of their kit gone for one death, in rated content.
+  const petOwnerInMatch = (
+    cls: 'hunter' | 'warlock',
+  ): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? cls : 'warrior', `P${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      sim.entities.get(pid)!.level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    const pet =
+      cls === 'hunter'
+        ? (restorePet(sim.ctx, sim.entities.get(owner)!, {
+            templateId: 'wild_boar',
+            name: 'Rip',
+            level: 20,
+            hp: 40,
+            dead: false,
+            mode: 'defensive',
+          }),
+          sim.petOf(owner, true)!)
+        : (summonPet(sim.ctx, sim.entities.get(owner)!, 'emberkin'), sim.petOf(owner)!);
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
+    sim.tick();
+    acceptBgOffer(sim, pids);
+    const match = sim.ctx.bgMatches.get(owner)!;
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands a beast back up beside its owner when the match ends', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    kill(sim, pet.id);
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+    // Beside the owner at their return spot, never left out on the field.
+    const ownerEntity = sim.entities.get(owner)!;
+    expect(
+      Math.hypot(back!.pos.x - ownerEntity.pos.x, back!.pos.z - ownerEntity.pos.z),
+    ).toBeLessThan(12);
+  });
+
+  it('rebuilds a warlock demon, whose corpse does not survive its death', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('warlock');
+    const originalId = pet.id;
+    kill(sim, pet.id);
+    // Let the demon's corpse unravel: this is the arm that cannot revive in place.
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+    expect(back!.id).not.toBe(originalId); // a rebuild, not a revive in place
+  });
+
+  it('hands the pet back to a deserter too, since leaving is also an exit', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    kill(sim, pet.id);
+    bgResolveDesertion(sim.ctx, owner);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
+
+  it('never hands back a pet that was already a corpse on the way in', () => {
+    // Only what the match took is owed back, the same rule the arena applies.
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    const other = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    expect(match.preMatchPets.has(other)).toBe(false);
+    expect(pet.dead).toBe(false);
+  });
+
+  it('snapshots a BACKFILLED hunter too, so their pet also walks back out', () => {
+    // seatBackfill copies the same per-fighter state startBgMatch takes
+    // (returns, pools, stats); the pet snapshot is part of that promise, or a
+    // backfiller whose pet dies leaves the field without it while a
+    // start-of-match fighter gets theirs back.
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+
+    const spare = sim.addPlayer('hunter', 'Spare');
+    tp(sim, spare, 6, -40);
+    sim.entities.get(spare)!.level = 20;
+    restorePet(sim.ctx, sim.entities.get(spare)!, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = sim.petOf(spare, true)!;
+    sim.bgQueueJoin(spare);
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    sim.tick(); // opens the OFFER
+    acceptBackfillOffer(sim, spare);
+    expect(match.teams[0]).toContain(spare);
+    expect(match.preMatchPets.has(spare)).toBe(true);
+
+    kill(sim, pet.id);
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(spare, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
+});
+
+describe('Thornhollow Fields: the wave brings your pet back too', () => {
+  // The wave raises fighters directly and never calls reviveAt, so the pet
+  // hand-back had to be asked for at that site as well. Without it a hunter,
+  // warlock or mage played the rest of the match without a companion after one
+  // death, while every other class came back whole.
+  const hunterInMatch = (): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? 'hunter' : 'warrior', `W${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      sim.entities.get(pid)!.level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    restorePet(sim.ctx, sim.entities.get(owner)!, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = sim.petOf(owner, true)!;
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
+    sim.tick();
+    acceptBgOffer(sim, pids);
+    const match = sim.ctx.bgMatches.get(owner)!;
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands the pet back up when the wave raises its owner', () => {
+    const { sim, owner, pet } = hunterInMatch();
+    kill(sim, owner); // the owner arm kills the pet with them
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+    sim.releaseSpirit(owner); // become a ghost so the wave is eligible to raise you
+
+    // Run past a full wave period so the raise definitely lands.
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+
+    expect(sim.entities.get(owner)!.dead).toBe(false);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
+
+  it('hands nothing back to an owner who had no pet', () => {
+    // The negative that keeps the case above honest: the wave must not conjure a
+    // companion for the nine warriors it raises alongside the hunter.
+    const { sim, match, owner } = hunterInMatch();
+    const warrior = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    kill(sim, warrior);
+    sim.releaseSpirit(warrior);
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+    expect(sim.entities.get(warrior)!.dead).toBe(false);
+    expect(sim.petOf(warrior, true)).toBeFalsy();
+  });
+});
+
+describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
+  // Players were falling back to General to say anything to the opposing side,
+  // which broadcasts it realm-wide. /bg is deliberately CROSS-TEAM for exactly
+  // that reason; the team already has /p, since the match welds each side into
+  // one party.
+  const chatPidsFor = (events: SimEvent[], text: string): number[] =>
+    events
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'chat' }> =>
+          e.type === 'chat' && e.channel === 'battleground' && e.text === text,
+      )
+      .map((e) => e.pid ?? -1)
+      .sort((a, b) => a - b);
+
+  it('delivers to every fighter in the match, including the enemy team', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+
+    const sent = sim.chat('/bg incoming mid', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'incoming mid' });
+    const heard = chatPidsFor(sim.tick(), 'incoming mid');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    // Decisive on the cross-team claim: the OTHER side really is in that list.
+    for (const enemy of match.teams[1]) expect(heard).toContain(enemy);
+  });
+
+  it('refuses outside a match, and says so', () => {
+    const sim = makeWorld();
+    const lone = sim.addPlayer('warrior', 'Lone');
+    sim.entities.get(lone)!.level = 20;
+
+    expect(sim.chat('/bg anyone there', lone)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
+  });
+
+  it('reaches a backfilled or mid-match roster, not a snapshot taken at start', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[1][0];
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+
+    sim.chat('/bg they are a man down', speaker);
+    const heard = chatPidsFor(sim.tick(), 'they are a man down');
+    // The deserter is gone from the roster, so they are gone from the channel.
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(heard).toHaveLength(BG_TEAM_SIZE * 2 - 1);
+  });
+
+  it('accepts a live fighter even if their per-player match index is stale', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    sim.ctx.bgMatches.delete(speaker);
+
+    const sent = sim.chat('/bg still in the fight', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'still in the fight' });
+    const heard = chatPidsFor(sim.tick(), 'still in the fight');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(errorTexts(sim.tick())).not.toContain('You are not in a battleground.');
+  });
+
+  it('refuses after the match leaves the active phase', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    match.state = 'ended';
+
+    expect(sim.chat('/bg postgame leak check', speaker)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
   });
 });
