@@ -7,15 +7,32 @@
 // here.
 
 import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { resolveChangedBaseRef } from './lib/ci_changed_base.mjs';
+import { buildBiomeArgs } from './lib/ci_changed_biome_args.mjs';
 
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a
 // shell (same pattern as scripts/gate.mjs and scripts/gate_fast.mjs).
 const shell = process.platform === 'win32';
 
-/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string }} */
+// The npm script always runs from repo root, but pin cwd explicitly anyway
+// so `run()` never silently scans the wrong subtree if that ever changes
+// (e.g. invoked directly from a subdirectory).
+const REPO_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string }} */
 function run(cmd, args) {
-  const res = spawnSync(cmd, args, { encoding: 'utf8', shell });
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: REPO_ROOT });
+  if (res.error !== undefined) {
+    // Surface the real spawn failure (e.g. git not on PATH) instead of
+    // letting a generic "status: null" reach resolveChangedBaseRef's caller.
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+    };
+  }
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };
 }
 
@@ -29,23 +46,7 @@ try {
 
 console.log(`[ci:changed] --since=${since}`);
 
-// Pin the biome invocation to the version this repo depends on
-// (package.json "@biomejs/biome") with --no-install, same as the guard-test
-// invocation in scripts/gate_fast.mjs: a bare `npx @biomejs/biome` can
-// silently resolve a different cached/global version than the one the repo
-// pins, which would drift from every other biome check in the gate.
-const result = spawnSync(
-  'npx',
-  [
-    '--no-install',
-    '@biomejs/biome@2.5.4',
-    'ci',
-    '--changed',
-    `--since=${since}`,
-    '--no-errors-on-unmatched',
-  ],
-  { stdio: 'inherit', shell },
-);
+const result = spawnSync('npx', buildBiomeArgs(since), { stdio: 'inherit', shell });
 
 if (result.error !== undefined) {
   console.error(`[ci:changed] failed to spawn biome: ${result.error.message}`);

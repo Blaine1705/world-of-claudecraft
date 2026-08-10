@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveChangedBaseRef } from '../scripts/lib/ci_changed_base.mjs';
+import { buildBiomeArgs } from '../scripts/lib/ci_changed_biome_args.mjs';
 
 type Run = (cmd: string, args: string[]) => { status: number | null; stdout?: string };
 
@@ -78,5 +79,22 @@ describe('resolveChangedBaseRef', () => {
     expect(() => resolveChangedBaseRef({ env: {}, run })).toThrow(
       /could not resolve a --since base ref/,
     );
+  });
+});
+
+describe('buildBiomeArgs', () => {
+  it('pins --no-install and --changed with the resolved base, and never a version suffix', () => {
+    const args = buildBiomeArgs('origin/release/v0.36.0');
+    expect(args).toEqual([
+      '--no-install',
+      '@biomejs/biome',
+      'ci',
+      '--changed',
+      '--since=origin/release/v0.36.0',
+      '--no-errors-on-unmatched',
+    ]);
+    // Regression guard: a hardcoded `@x.y.z` suffix here is a second, unguarded
+    // copy of package.json's pinned biome version that goes stale silently.
+    expect(args.some((a) => /^@biomejs\/biome@/.test(a))).toBe(false);
   });
 });
