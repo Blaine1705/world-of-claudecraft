@@ -3094,11 +3094,15 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
   it('wears the Retired chip on the vault shelf row AND its page header', () => {
     expect(pageDef(VAULT_PAGE_ID).excludeFromCompletion).toBe('retired');
     const rig = makeWindow(baseState(), { nav: 'horizons' });
-    // Shelf row first, before any navigation.
+    // Shelf row first, before any navigation. The compound query pins the
+    // selector reach (class + hook on one element); the bare-attribute count
+    // beside it keeps a STRAY hook without the badge class from hiding on
+    // the flagged page (the two counts must always agree).
     const rowChips = [
       ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-retired]'),
     ];
     expect(rowChips).toHaveLength(1);
+    expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(1);
     expect(rowChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
     // Then the page header, on the same live window.
     click(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);

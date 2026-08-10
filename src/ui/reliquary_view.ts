@@ -548,6 +548,8 @@ function shelfPageModel(
   };
 }
 
+const DEED_STAT_KEY_SET: ReadonlySet<string> = new Set(DEED_STAT_KEYS);
+
 /**
  * The display-only SECOND clear meter's value for one page: undefined for
  * every page without a secondaryClearSource (the common case), else the named
@@ -565,8 +567,6 @@ function shelfPageModel(
  * synthetic test page reusing a live id must resolve its own source, never the
  * catalog row that shares the id.
  */
-const DEED_STAT_KEY_SET: ReadonlySet<string> = new Set(DEED_STAT_KEYS);
-
 export function reliquarySecondaryClears(
   page: ReliquaryPageDef | undefined,
   counters: DeedStats['counters'] | undefined,

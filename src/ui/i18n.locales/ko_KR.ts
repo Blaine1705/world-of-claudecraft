@@ -10690,7 +10690,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': 'WOC 상점에서 구매',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '시체 채집으로 획득',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '걸작 제작으로 획득',
-  'hudChrome.reliquary.sourceActivityRiftFirstClear': '균열 최초 클리어의 승자 전원에게 수여',
+  'hudChrome.reliquary.sourceActivityRiftFirstClear':
+    '등급 균열의 최초 클리어를 차지한 파티 전원에게 수여',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}, 아직 없음, {source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}, 수록됨, 첫 획득은 클리어 {count}회차',
   'hudChrome.reliquary.searchPlaceholder': '성물 검색',

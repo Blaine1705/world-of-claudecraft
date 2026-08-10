@@ -3555,7 +3555,7 @@ export const zh_TW: EnTranslations = {
       "sourceStore": "在 WOC 商店購買",
       "sourceActivityCorpseHarvest": "採集生物屍體時獲得",
       "sourceActivityMasterworkCraft": "製作傑作時獲得",
-      "sourceActivityRiftFirstClear": "授予裂隙首次通關的每位勝利者",
+      "sourceActivityRiftFirstClear": "授予率先通關分級裂隙的隊伍全體成員",
       "cellMissingSourceAria": "{name}，尚未獲得，{source}",
       "cellOwnedClearsAria": "{name}，已收錄，首次獲得於第 {count} 次通關",
       "searchPlaceholder": "搜尋聖物",

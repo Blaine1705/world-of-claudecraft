@@ -885,11 +885,12 @@ describe('Reliquary profession marks (Phase 7)', () => {
       .readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8')
       // Strip BOTH comment forms before matching, so neither a line comment
       // nor a /* */ block holding the old code can satisfy the pin (the
-      // source-text-pin-comment-gameable trap).
-      .replace(/\/\*[\s\S]*?\*\//g, '')
+      // source-text-pin-comment-gameable trap). Line comments FIRST: a /*
+      // inside a // line must not open a block match that swallows code.
       .split('\n')
       .filter((line) => !/^\s*\/\//.test(line))
-      .join('\n');
+      .join('\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
     expect(deedsSrc).toMatch(
       /if \(RARE_SLAIN_TEMPLATES\.has\(mob\.templateId\)\) \{\s*for \(const meta of eligible\) \{\s*markVisited\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*noteReliquaryMark\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*\}\s*\}/,
     );
@@ -1394,6 +1395,10 @@ describe('Reliquary pure completion + curator rank', () => {
     // becomes live and testable.
     for (const page of ['horizons_riftbound', 'horizons_vault_of_ages'] as const) {
       for (const relic of RELIQUARY_PAGES_BY_ID[page].relics) {
+        // Item-only asserted, not skipped: a mount/title/skin relic on a
+        // flagged page would have NO helper arm at all, so the loop must red
+        // on it rather than pass vacuously.
+        expect(relic.kind, `${page} carries a non-item relic`).toBe('item');
         if (relic.kind !== 'item') continue;
         expect(relicFillScoresForRank('item', relic.itemId), relic.itemId).toBe(false);
       }

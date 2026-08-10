@@ -10880,7 +10880,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityCorpseHarvest': 'Находится при сборе с трупов существ',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': 'Даётся за создание шедевра',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
-    'Вручается каждому победителю первого прохождения разлома',
+    'Вручается каждому участнику группы, первой прошедшей ранговый разлом',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}, ещё не найдено, {source}',
   'hudChrome.reliquary.cellOwnedClearsAria':
     '{name}, каталогизировано, впервые найдено на прохождении {count}',

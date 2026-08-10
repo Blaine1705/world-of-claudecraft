@@ -927,12 +927,52 @@ Update this line as phases complete.
 - Phase 22: (pending)
 
 ## OPEN items / known gotchas
-- Phase 21 QA owes (implementation local and unpushed): gate_select then the
-  deeper gate; the Phase 21 screenshot set under docs/screenshots (desktop and
-  mobile, lowest preset per the capture rule): the Rift page header with both
-  meters, the Rares of the Realm grid with the slain trophy glyph, the Vault of
-  Ages shelf row and header with the Retired chip, the Riftbound page with the
-  Personal chip; then the push to feature/reliquary (PR #2976).
+- Phase 21 QA COMPLETE (2026-08-09, record in progress.md): release re-sync
+  (81dcf54d80) with one both-appended test conflict kept whole, the release
+  merge audited clean, the release-added rift_boss_floor parity golden
+  re-minted shape-only for this branch's reliquary state member; eight QA
+  legs plus a live-rig proof of the slain dual write and the silent join
+  retro; ONE real defect found and fixed (the false Curator rank-up banner
+  below); the wiki labeling gap closed; the screenshot set committed under
+  docs/screenshots/reliquary-phase21 (lowest preset, desktop and mobile).
+- FIXED AT PHASE 21 QA (the round's one real defect, parity leg, reproduced
+  then pinned): onItemDiscovered assumed every catalogued fill moved the rank
+  count by one, so a riftbound band landing while the scoring count sat
+  exactly on a Curator threshold re-announced a rank the player already held
+  (stable at-threshold states are real: rank 5's bridge is a border, which
+  never scores). Both fill paths now consult relicFillScoresForRank; the
+  noteReliquaryMark arm is a compensated dead guard (every authored mark
+  scores, pinned catalog-wide) beside M4.
+- RECORDED at Phase 21 QA, deliberate, no change: (a) the parity golden gate
+  is structurally BLIND to the slain kill path (no scenario kills a
+  RARE_SLAIN_TEMPLATES mob; old_greyjaw appears beefed-alive only); the
+  behavioral suites in tests/reliquary_state.test.ts and the QA live-rig
+  proof are the coverage, and a rare-kill coverage scenario plus one golden
+  re-mint is the optional hardening. (b) shelfLatest still surfaces a flagged
+  page's find as the shelf card's newest-find thumbnail: the find really is
+  the newest, only the sums exclude the page. (c) catalogItemCompletion stays
+  exported and unfiltered; its doc comment is the guard, and the synthetic
+  skin-subtraction pin keeps the OUTER filter live. (d) a veteran with all 19
+  rare kills now silently auto-illuminates conquerors_rares_of_the_realm on
+  join (the correct retro posture: no toast, no marquee; near-universal for
+  veterans rather than theoretical). (e) markFind growth has no reverse
+  orphan-leaf pin (forward pin plus a >= 29 floor only; the server table has
+  both directions), pre-existing, optional hardening. (f) the reliquary
+  window remains outside the mobile overlap audit's WINDOW_MATRIX (the same
+  pre-existing family as the Phase 20 inspect deferral); its mobile posture
+  at the 35-page shelf is evidenced by the committed 844x390 capture set,
+  and joining the matrix is the recipe-backed hardening.
+- OWNER-VISIBLE note from Phase 21 QA (recorded, not decided): the Conquerors
+  shelf deed col_reliquary_conquerors, and feat_book_complete behind it, grew
+  a long tail this phase: the 47-piece honor stock, the 31 rare drops, and
+  the two S-only Rift legendaries at a 0.003 roll per S clear. Everything is
+  reachable (verified: the heroic pool draws class-agnostically, honor stock
+  has no class gate), so this is a difficulty escalation record in the Phase
+  18 "Whole Book" tradition, not a defect.
+- OWNER CALL candidate from Phase 21 QA (not decided, low-medium): a per-page
+  Illumination deed for The Rift, peer to the three flagship pages that carry
+  one (nythraxis_heroic, thunzharr, gravewyrm_heroic). The flagship list is a
+  curated product list, so this is the maintainer's call.
 - OWNER-VISIBLE consequence of the Phase 21 band remedy (deliberate, pinned, not
   a defect): a player's own Riftbound band scores ZERO toward Curator rank and
   both completion pairs (the both-sides exclusion); an earned chase item that
@@ -949,19 +989,39 @@ Update this line as phases complete.
   guard. Shelf-card sums still run above the headline pair because they count a
   shared id once per page while the headline de-dupes across pages
   (pre-existing, deliberate, now stated in the view comment).
-- Perf notes from Phase 21 (context for a future scale pass, no action owed): a
-  rare kill now runs the completion ladder once per eligible party member at the
-  kill tick (allowlist and already-has early-outs bound it; the first kill of
-  each rare per character pays the ownership scan); the secondary S-rank meter
-  rides the dstats safety refresh (under 2 s) like the primary and is folded
-  into the repaint digest.
+- Perf notes from Phase 21, REFRESHED at Phase 21 QA with measured figures
+  (context for a future scale pass, no action owed): a rare kill runs the
+  completion ladder once per eligible party member at the kill tick; the
+  O(1) repeat-kill bound comes from the marks.has early-out ALONE (the
+  allowlist check is inert on this path: RARE_SLAIN_TEMPLATES is exactly the
+  catalogued slain set). Measured per-member first-kill ladder: 3.5 us
+  typical, 13.7 us worst case; at the RAID_MAX of 10 (the brief's 40-player
+  premise does not exist) that is 137 us on one tick, 0.27 percent of the
+  budget. A first kill also pulls each member's heavy-self re-diff forward
+  by under 2 s (reliquaryUnlock is a HEAVY_SELF_EVENTS member), at most 19
+  times per character lifetime. The 60s curator sweep body measured 2.24 to
+  4.51 us per session at the new totals (about +25 percent over Phase 20;
+  the ledger's 13.7 ms at the 5000 cap reads nearer 17 to 19 ms now), and
+  the cheaper first lever for a future scale pass is memoizing ownedMounts
+  on an inventory revision (the ownership scan is 2.02 us of the veteran
+  sweep, nearly the catalog walk's equal), with client-list slicing second.
+  The secondary S-rank meter rides the dstats safety refresh (under 2 s)
+  like the primary and is folded into the repaint digest. The 4.2 KB
+  autosave bound was independently re-measured on a real Postgres at QA:
+  3,784 stored bytes worst case, so the bound holds with about 10 percent
+  headroom (pglz compresses the larger blob better than the extrapolation
+  assumed).
 - Phase 22 i18n worklist additions from Phase 21: four hudChrome.reliquary keys
   (srankClearsLabel, retiredLabel, personalLabel, sourceActivityRiftFirstClear)
   and the 19 markFind.slain_* leaves pending in the 15 Latin locales (five
   non-Latin fills landed in-change per M16); the seven new page names are filled
   in all five non-Latin reliquary_i18n chunks, their descs English-only by the
   Phase 11 channel design; the Latin page-name chunks and all desc fills remain
-  the standing Phase 22 worklist.
+  the standing Phase 22 worklist. Phase 21 QA added four guide.reliquaryPage
+  keys (retiredTag, personalTag, retiredNote, personalNote), non-Latin filled
+  in-change, Latin pending. Fill-session note: the v0.36.0 release carries its
+  OWN pending rows (battleground backfill, draws keys, a ratingSummary reword),
+  so the release-tier worklist will list rows beyond the reliquary set.
 - OWNER CALLS from Phase 20 QA (no ruling exists; raised by three
   independent QA legs, recorded here for the maintainer, NOT decided and
   NOT filed as issues):
@@ -972,6 +1032,11 @@ Update this line as phases complete.
   means "recently first acquired, however acquired"; order-plus-polling reconstructs sub-minute acquisition
   timing on an unauthenticated crawlable page whose deeds sibling coarsens
   earnedAt to the UTC day (the floor is PUBLIC_READ_MAX_PER_MINUTE per IP);
+  since Phase 21 the payload is also location-bearing: a slain:* entry names
+  a rare whose camp zone is published, so the ring can place a character at
+  camp granularity within the polling window (noted at Phase 21 QA; /c/
+  already publishes the live zone uncoarsened, so the increment is
+  camp-within-zone, not a new exposure class);
   a relic sold or traded away still prints; /c/ has no character-level
   suppression (pre-existing); and the strip renders as one bold block at
   narrow widths. Candidate mitigations if wanted: owner-only arm, window

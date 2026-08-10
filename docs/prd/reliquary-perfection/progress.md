@@ -2564,3 +2564,78 @@ overlaps correctly resolved to the release side, both suites green, tsc clean).
   28/4-kits figure); five rares contribute marks only (no rare+ drop, the
   off-by-quality precedent); growth ran ~+123 slots vs the brief's ~+80, linear
   budget holds per the re-measure.
+
+## Phase 21 QA (2026-08-09): Verify catalog growth
+
+Fresh-session QA over the ten Phase 21 commits; owns the sync, the push, and
+the screenshot set. Outcome: PASS WITH ONE DEFECT FIXED.
+
+- STEP 0 sync: merged origin/release/v0.36.0 at 81dcf54d80 (58 commits:
+  render-perf caches, hitch referee, PvP W-L-D draws, battleground backfill,
+  the Evergarden edge fix) as 0052c3c5b9. One conflict
+  (tests/profile_page.test.ts, both sides appended a describe at one point;
+  kept both, suite green). Release-merge audit (5 parallel auditors over the
+  overlap set): CLEAN, every both-sided file's hunks accounted for on both
+  parents, zero release-added server-db mocks, i18n regen zero-churn. One
+  real drift found and fixed: the release-added rift_boss_floor parity golden
+  was recorded without this branch's reliquary state member; UPDATE_PARITY on
+  shard g moved only that file (38 state hashes + five empty reliquary
+  blocks, zero rng or event lines), committed as ce8d3d4993.
+- QA legs (eight fresh reviewers, independent of the in-session rounds):
+  privacy/authority CLEAN (two nits, applied); parity/wire CLEAN on all nine
+  IWorld members and five wire fields with ONE real defect (below);
+  sim/architecture CLEAN (draw order, member iteration, tick phases,
+  SimContext seam, purity, memo discipline all verified with evidence);
+  frontend seams CLEAN (two chip-CSS coverage should-fixes, applied);
+  pins/test-coverage strong (three should-fixes, applied; no unmitigated
+  self-comparison); qa-checklist READY (the wiki labeling gap and the
+  Riftbound copy defect, both applied).
+- THE DEFECT (parity leg, reproduced with a probe, confirmed first-hand, then
+  fixed): onItemDiscovered derived the prior rank count as owned - 1 for
+  EVERY catalogued fill, but a fill on an excludeFromCompletion page moves no
+  count, so a riftbound band landing while the scoring count sat exactly on a
+  Curator threshold re-announced the rank the player already held (stable
+  at-threshold states are real; rank 5's bridge is a border and never
+  scores). Fixed via relicFillScoresForRank consulted by both fill paths;
+  threshold repro red-then-green (mutation-checked by reverting the fix), a
+  positive control on the same boundary, direct helper pins, and the
+  every-mark-scores compensating pin for the mark arm's dead guard.
+- LIVE RIG PROOF (the acceptance criterion, real authoritative server on
+  :8787 + a WS bot + Postgres): a fresh character killed old_greyjaw (dev
+  spawn); the reliquaryUnlock event carried markId slain:old_greyjaw,
+  pageIds [conquerors_rares_of_the_realm], curatorRank 1, retro unset; the
+  wire self.reliq.marks and dstats.visited both gained the id; the persisted
+  row carried both after logout. Retro arm: marks stripped in the DB with
+  visited kept; on rejoin the wire marks refilled with ZERO slain unlock
+  events (silent), and the mark persisted again after logout. All twelve
+  assertions green.
+- Fix round 6b01b8d30e (all findings applied; none refuted): the rank fix;
+  the wiki now labels the two outside-completion pages (generator emits the
+  flag, guide renders a muted tag + note per reason, four new
+  guide.reliquaryPage keys with five non-Latin fills, howBody/ranksBody
+  corrected in English AND all five fills in-change); the Riftbound English
+  source line and page desc now name the first-clear RACE (the five fills
+  already did); freezePageTable freezes the nested clear-source objects
+  (pinned); the dead orderedReliquaryPages export deleted;
+  clearCountForSource gains isFinite; chip CSS reach pinned end to end
+  (compound selectors, declaration-bound rules, the illuminated-vault
+  coexistence paint); the capstone rig stops granting an unreachable
+  all-three-bands holding; the outer scoring filter's skin subtraction, the
+  237 catalogued-id literal, and the band rank-zero surface pinned; the
+  deeds source pin strips block comments; wiki mark lookup through hasOwn.
+- Screenshots 68ce1e57be: five new change-aware pr_shot_targets entries
+  (each seeding the LOW preset via seedLowGraphicsPreset), ten after shots
+  desktop + mobile under docs/screenshots/reliquary-phase21: the Rift dual
+  meters, the Rares trophy glyphs (3/19 filled), the Horizons shelf with
+  both chips, the Vault page Retired header, the Riftbound page Personal
+  header at 1/3.
+- Gates: gate_select ran i18n gen + freshness, wiki freshness, malware scan
+  (PASS, 0 high), and SFX conformance green, then stopped on ONE INHERITED
+  biome red: docs/perf/hitch/gate.json (release-authored, byte-identical to
+  origin/release/v0.36.0 on this branch) fails the format check only because
+  the local changed-set baselines against origin/main (the recorded
+  ci-changed-stale-main scope noise); the PR's own CI diffs against the
+  release base where the file is unchanged. Carried as inherited, not fixed
+  here (the release owns its artifact). The masked later steps ran by hand:
+  full vitest with bounded workers, tsc, and the five-entry build (results
+  recorded below at push time).

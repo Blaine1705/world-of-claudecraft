@@ -1062,6 +1062,10 @@ function completionScoringPages(pages: readonly ReliquaryPageDef[]): readonly Re
  */
 export function relicFillScoresForRank(kind: 'item' | 'mark', id: string): boolean {
   const index = catalogIndexFor(completionScoringPages(RELIQUARY_PAGES));
+  // A linear includes, deliberately: this runs once per FIRST fill of an id
+  // (beside a whole inventory + bank scan), and the arrays are the memoized
+  // index's own frozen lists, so there is no cheap place to hang a Set
+  // without a second per-table memo.
   return (kind === 'item' ? index.items : index.marks).includes(id);
 }
 

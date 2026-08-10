@@ -10215,7 +10215,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': '在 WOC 商店购买',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '采集生物尸体时获得',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '制作杰作时获得',
-  'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予裂隙首次通关的每位胜利者',
+  'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予率先通关分级裂隙的队伍全体成员',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}，尚未获得，{source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}，已收录，首次获得于第 {count} 次通关',
   'hudChrome.reliquary.searchPlaceholder': '搜索圣物',

@@ -151,7 +151,7 @@ it), optional links to deeds (`col_*`, clear milestones).
 | Live toast / combat log | Relic logged; page Illumination; rank up. |
 | Book of Deeds | Unchanged; optional soft links from collection deeds. |
 | Character sheet / public sheet | Completion pair, Curator rank (labeled set/scope), and the capped recent-finds strip (ids and kinds; privacy note below). |
-| Wiki `/wiki` | Spoiler-safe catalog of pages and relic names; no personal progress. |
+| Wiki `/wiki` | Spoiler-safe catalog of pages and relic names, with the rule-7 outside-completion label (Retired / Personal tag plus note) on flagged pages; no personal progress. |
 | Discord / marquee | Optional marquee only for full-page Illumination or high Curator ranks; never spam per-relic. |
 
 ### Public sheet exposure (privacy note)

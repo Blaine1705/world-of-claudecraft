@@ -3555,7 +3555,7 @@ export const ru_RU: EnTranslations = {
       "sourceStore": "Покупается в магазине WOC",
       "sourceActivityCorpseHarvest": "Находится при сборе с трупов существ",
       "sourceActivityMasterworkCraft": "Даётся за создание шедевра",
-      "sourceActivityRiftFirstClear": "Вручается каждому победителю первого прохождения разлома",
+      "sourceActivityRiftFirstClear": "Вручается каждому участнику группы, первой прошедшей ранговый разлом",
       "cellMissingSourceAria": "{name}, ещё не найдено, {source}",
       "cellOwnedClearsAria": "{name}, каталогизировано, впервые найдено на прохождении {count}",
       "searchPlaceholder": "Поиск реликвий",
