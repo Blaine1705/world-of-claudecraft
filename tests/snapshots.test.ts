@@ -3707,8 +3707,8 @@ function dirtyEveryDeltaField(): {
   sim.enterDelve('collapsed_reliquary', 'normal', lp);
   const p = sim.entities.get(lp)!;
 
-  // An authored modular look (app). Sparse on the wire — a character created
-  // before the creator has none — so the fixture stamps one, exactly as the
+  // An authored modular look (app). Sparse on the wire (a character created
+  // before the creator has none), so the fixture stamps one, exactly as the
   // join path does from the character's own column.
   p.modularAppearance = { gender: 'female', hair: 'highbun' };
 
@@ -4468,7 +4468,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
     // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
-    // self record and behind this same delta gate, for 83 — and +1: `app`, the
+    // self record and behind this same delta gate, for 83, and +1: `app`, the
     // authored modular look, for 84. The viewer's own copy cannot come from the
     // entity list (the broadcast loop skips their own entity), and it is heavy
     // and immutable, so it rides this channel rather than being re-serialized

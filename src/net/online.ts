@@ -2835,7 +2835,7 @@ export class ClientWorld implements IWorld {
         );
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         // The authored modular look (identity-only: set at join, immutable for
-        // the session). Untrusted wire JSON on purpose — every consumer runs
+        // the session). Untrusted wire JSON on purpose: every consumer runs
         // it through normalizeAppearance before composing, so a hostile peer
         // payload can only ever produce a clamped, valid body.
         //

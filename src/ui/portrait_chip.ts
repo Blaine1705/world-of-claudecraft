@@ -104,7 +104,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   // A composed chip built before assets were ready holds the crest, and
   // hydratePortraits must NOT upgrade it (it would re-derive the LEGACY
-  // portrait from the data attributes — a look does not fit in one). The
+  // portrait from the data attributes: a look does not fit in one). The
   // builder re-renders such chips itself via onPortraitsReady.
   const composed = !mech && look && !portrait ? ' data-portrait-composed="1"' : '';
   const alt = esc(t('character.portraitAlt', { name }));

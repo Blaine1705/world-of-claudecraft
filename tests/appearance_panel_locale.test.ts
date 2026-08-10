@@ -1,5 +1,5 @@
 // The locale probe that keeps mounted appearance customizers in the player's
-// language — and specifically its SUBTLE half: the probe compares RESOLVED
+// language, and specifically its SUBTLE half: the probe compares RESOLVED
 // TEXT, never the language id. The language id is already the player's choice
 // at boot; what arrives late is the table behind it, so an id-based probe reads
 // "nothing changed" while every label on screen is still English. That is the

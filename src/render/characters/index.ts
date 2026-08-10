@@ -23,7 +23,7 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 // provider answers for peers from server truth. A character authored before the
 // creator carries no look and keeps its class rig, which is what the provider
 // returning null still means. The seam stays a seam because the RULE for what a
-// given entity wears is app-level (see src/render/characters/player_look.ts),
+// given entity wears is app-level (see src/render/characters/player_look_core.ts),
 // while this module only needs the answer.
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
