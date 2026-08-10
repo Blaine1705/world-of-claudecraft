@@ -143,6 +143,16 @@ export const SFX = [
     custom: true,
   },
   {
+    // Real recording (not ElevenLabs): the cart's rolling/creaking bed, held
+    // as a continuous loop while the mount moves rather than a per-stride
+    // one-shot like mount_run_* above. A wheeled cart has no stride to hang
+    // a one-shot on -- the sound is continuous by nature, so it runs through
+    // sfx.ts's loop()/unloop() the way the campfire and forge ambiences do.
+    key: 'mount_loop_rickshaw_mount',
+    custom: true,
+    loop: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,

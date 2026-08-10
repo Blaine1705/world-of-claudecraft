@@ -1047,6 +1047,7 @@ export const en_CA: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_rickshaw_mount": "Bonebound Rickshaw",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
@@ -1055,7 +1056,8 @@ export const en_CA: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
       "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
+      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -12166,6 +12168,9 @@ export const en_CA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Bound Reins: Bonebound Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"

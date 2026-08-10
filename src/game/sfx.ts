@@ -42,6 +42,19 @@ export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/
 const POINT_AMBIENCE_GAIN = 0.18;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
+// The ceiling the SFX system itself allows for this key. loop() multiplies this
+// by the clip's own manifest gain (1 for this key, i.e. 0dB), and
+// sfx_runtime_pack.ts's maxGainForKey caps it at SFX_GAIN_LIMITS, which is 1
+// here -- so 1 IS the maximum, not an arbitrary choice. Still peak-safe: the
+// conform pass put the file at -6dBFS, so 0dB of gain leaves 6dB of headroom.
+// Nothing about the mix is protecting us above this, so if it ends up too loud
+// against footsteps and ambience, this comes DOWN rather than the ceiling
+// going up.
+const MOUNT_LOOP_GAIN = 1;
+// Short enough that letting go of the key reads as the cart stopping, long
+// enough not to click. Deliberately far below the 0.7 the ambiences use, whose
+// job is to disguise a zone boundary rather than track player input.
+const MOUNT_LOOP_FADE = 0.18;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
 // full sanctioned +5dB, the maximum true-peak headroom under the shared
@@ -896,6 +909,14 @@ class Sfx {
   /** One custom stride for a running mount. This is part of the world SFX mix,
    *  independent of the optional on-foot footstep toggle. */
   mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+    // A mount with a continuous loop does not also get per-stride one-shots.
+    // The rickshaw shipped both for a while and they stacked: a 0.6s stride cue
+    // retriggering every 5.8 units of travel is one hit every ~0.46s at mounted
+    // run speed, which layered over the rolling bed and read as the loop itself
+    // stuttering. Gated on the loop clip EXISTING rather than on a mount-key
+    // allowlist, so any mount that later gains a loop drops its strides for
+    // free, and every mount without one is untouched.
+    if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
     const key = `mount_run_${mountKey}`;
     if (!(key in SFX_CLIPS)) return;
     this.playAt(key, x, y, z, {
@@ -998,6 +1019,38 @@ class Sfx {
     this.preload(keys.startKey);
     this.preload(keys.loopKey);
     this.preload(keys.stopKey);
+  }
+
+  /** Continuous rolling loop for a mount that ships one. Every other mount has
+   *  only a stride one-shot and no `mount_loop_*` clip, so this is a no-op for
+   *  them and needs no per-mount allowlist.
+   *
+   *  Runs through the same loop()/unloop() path as the campfire and forge point
+   *  ambiences rather than mountRun()'s distance-accumulator strides, because a
+   *  cart wheel makes a CONTINUOUS sound: faking that with repeated one-shots
+   *  beats against its own tail at every speed except the one the stride
+   *  interval was tuned for. The id is per ENTITY, not per mount key, so two
+   *  players on carts get two independently positioned voices rather than
+   *  fighting over one slot. */
+  mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void {
+    const key = `mount_loop_${mountKey}`;
+    if (!(key in SFX_CLIPS)) {
+      this.stopMountLoop(id);
+      return;
+    }
+    // GAIN-only, never stop/start on movement. Stopping the loop when `moving`
+    // goes false and restarting it when it comes back means any single-frame
+    // flicker in that flag re-creates the BufferSource, which restarts a 7.8s
+    // recording from zero -- audibly a fast stutter rather than a loop. Holding
+    // one source for as long as the rider is mounted and ramping its gain makes
+    // that failure impossible instead of merely unlikely, and it is the only
+    // way the recording is guaranteed to play through and loop at its own seam.
+    // Cost is one voice per mounted rider, alive only while actually mounted.
+    this.loop(`mountloop_${id}`, key, moving ? MOUNT_LOOP_GAIN : 0, x, y, z);
+  }
+
+  stopMountLoop(id: number): void {
+    this.unloop(`mountloop_${id}`, MOUNT_LOOP_FADE);
   }
 
   /** Jump / land / water-entry / swim-stroke. */

@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "a2f69d7f1e3e7248b2f506c0f31f87e9b92c48ea0fe1974ee423caa33e7413d1",
+  "catalogHash": "b322b7901a9164ef11c914e7d76ad9095ac5d67f5452d7a792d3963861b228c9",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2849,6 +2849,18 @@
           "url": "/audio/sfx/mob_undead_skeleton_idle_2.mp3?v=832ad6e9f349",
           "bytes": 15045,
           "sha256": "832ad6e9f349dd100b92908f059cfb3971e4a653ad8405239fb35530cfb78ac8"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_loop_rickshaw_mount": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_loop_rickshaw_mount.mp3?v=90fafb2c1bb7",
+          "bytes": 187497,
+          "sha256": "90fafb2c1bb702068d31a596b5e2758605c089f4c2c0b95547eb5e520f824f00"
         }
       ],
       "gain": 1,

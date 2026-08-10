@@ -195,6 +195,35 @@ const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing')
   flourish,
 });
 
+// The Bonebound Rickshaw's puller ONLY (skel_rickshaw_puller). Not shared
+// with any other skeleton key on purpose.
+//
+// skeleton_minion.glb is one of the rigs corrupted by build_assets.mjs's
+// meshopt() step (it breaks this exact multi-primitive-skinned KayKit shape),
+// which the mount cannot ship around: its puller renders as a scattered pile of
+// bones. It is rebuilt by scripts/assets/rebuild_kaykit_skeletons_free.mjs from
+// the KayKit_Skeletons_1.1_FREE pack and shipped as a SEPARATE file
+// (skeleton_minion_free.glb) rather than overwriting the original, because the
+// FREE pack bundles only 2 of the 7 Rig_Medium animation sources: no combat
+// swing, no emotes. Overwriting the shared file would have handed that
+// regression to delve_skel_wraith, a real Reliquary delve mob that currently
+// has real attack clips and nothing to do with this mount. A cart puller never
+// swings at anything, so the reduced set costs the mount nothing.
+//
+// Fixing the other rigs on that shared file, and deciding whether losing their
+// attack swings is worth the geometry fix, is a separate change with its own
+// argument to make.
+const RICKSHAW_PULLER_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walking_A',
+  run: 'Running_A',
+  // Empty rather than naming a clip this GLB does not contain, which
+  // tests/character_clipmaps.test.ts correctly refuses to let through.
+  attack: [],
+  hit: ['Hit_A'],
+  death: 'Death_A',
+};
+
 const skeletonLargeClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
   walk: 'Walking_A',
@@ -1669,6 +1698,34 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12.6,
     lazyPreload: true,
   },
+  // Developer-only Halloween cart (image-to-glb static prop, no clips of its
+  // own): height is the measured shipped bbox (npx gltf-transform inspect).
+  // The puller is a SEPARATE visual (skel_rickshaw_puller) composed at
+  // runtime by src/render/rickshaw_mount.ts, not baked into this GLB.
+  mount_rickshaw_mount: {
+    url: `${MOUNTS_DIR}/rickshaw_mount.glb`,
+    // MUST match the shipped GLB's measured bbox height exactly (npx
+    // gltf-transform inspect): prepareVisual's normScale = height /
+    // measuredHeight, so a stale value here silently RESCALES the whole
+    // model to compensate. A canopy-raise once landed with almost no visible
+    // effect in-game because this field was left stale through two geometry
+    // changes, quietly shrinking the whole mount to compensate; the canopy
+    // was later cut entirely (floating/unmounted, unconnected wheel spokes),
+    // dropping the real height back down. Re-measure after any geometry
+    // change to this GLB.
+    // Re-measured off the shipped GLB after this pass's geometry work (arched
+    // seat back, trimmed throne wings, harness collar, lantern rebuild): 2.8 was
+    // stale and was silently rescaling the whole cart.
+    height: 4.779,
+    // This GLB ships NO clips: the wheels are spun procedurally by renderer.ts's
+    // spinMountWheels, because crossfading a spin clip out drags the wheel back
+    // toward its bind rotation and reads as backwards spin on every stop (full
+    // history in scripts/assets/rickshaw_mount/model.js, above WHEEL_NODES).
+    // MOUNT_RIGGED's names therefore resolve to nothing, which is already a
+    // no-op: visual.ts registers actions only for clips that exist.
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
 
   // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
   // the Valorsteed GLB + its authored gait clips so it renders and ambles as a real
@@ -2433,6 +2490,19 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  // The Bonebound Rickshaw's puller ONLY: a separate key on its own rebuilt
+  // rig (see RICKSHAW_PULLER_CLIPS above for why it is a separate GLB from
+  // skeleton_minion.glb, which skel_minion above still uses unchanged, no
+  // regression to any of its own consumers). Height is MEASURED off the
+  // rebuilt GLB, not the old blanket 2.5: prepareVisual derives normScale
+  // from it, so a stale value silently rescales the whole puller.
+  skel_rickshaw_puller: {
+    url: `${ENEMIES}/skeleton_minion_free.glb`,
+    height: 2.166,
+    clips: RICKSHAW_PULLER_CLIPS,
     tint: 'entity',
     tintStrength: 0.25,
   },

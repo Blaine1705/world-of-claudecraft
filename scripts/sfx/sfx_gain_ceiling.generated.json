@@ -2348,6 +2348,17 @@
       }
     ]
   },
+  "mount_loop_rickshaw_mount": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "mount_loop_rickshaw_mount.mp3",
+        "sha256": "90fafb2c1bb702068d31a596b5e2758605c089f4c2c0b95547eb5e520f824f00",
+        "size": 187497,
+        "peakDb": -6
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [

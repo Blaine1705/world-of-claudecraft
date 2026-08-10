@@ -463,6 +463,14 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import {
+  attachRickshawPuller,
+  createRickshawPullerVisual,
+  preloadRickshawPullerAssets,
+  RICKSHAW_MOUNT_VISUAL_KEY,
+  rickshawPullerAssetsReady,
+  spinMountWheels,
+} from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -1125,6 +1133,22 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  /** Wheel nodes of a mount that rolls (the rickshaw's Wheel_L/Wheel_R), looked
+   *  up once per mount build. `null` = looked up and this mount has none, which
+   *  is every mount but one; `undefined` = not looked up yet. */
+  mountWheels?: THREE.Object3D[] | null;
+  /** Radius of those wheels in world units, measured off the built model rather
+   *  than hardcoded, so a geometry change cannot desync the roll rate. */
+  mountWheelRadius?: number;
+  /** Whether this view has ever called sink.mountLoop (a continuous rolling
+   *  mount). Gates the per-frame stopMountLoop call so it costs nothing for
+   *  the common case (an entity that never had a loop): NOT the same as
+   *  checking mountVisualKey, which the dismount branch above already resets
+   *  to '' in the SAME frame the loop still needs one final stop call. */
+  mountLoopActive?: boolean;
+  // The Bonebound Rickshaw's puller: a second character visual parented at
+  // the cart's Socket_Puller node. Null for every other mount.
+  mountPullerVisual: CharacterVisual | null;
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -8759,6 +8783,7 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountPullerVisual: null,
       mountLift: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
@@ -10343,6 +10368,11 @@ export class Renderer {
       v.travelVisual?.dispose();
       v.mountVisual?.dispose();
       v.metamorphVisual?.dispose();
+      v.mountPullerVisual?.dispose();
+      // Wheel lookup is cached per built model (see spinMountWheels); leaving
+      // it here would hold references into the just-disposed mountVisual.
+      v.mountWheels = undefined;
+      v.mountWheelRadius = undefined;
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -10372,6 +10402,10 @@ export class Renderer {
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
     this.audioSink?.mountEngineReset(id);
+    // A mount loop is keyed by entity id and driven from the per-frame sync
+    // pass; once the view is gone nothing calls it again, so it would keep
+    // playing at the spot the entity vanished from. Stop it here.
+    this.audioSink?.stopMountLoop(id);
     this.views.delete(id);
   }
 
@@ -11239,11 +11273,26 @@ export class Renderer {
           v.mountVisual.dispose();
           v.mountVisual = null;
         }
+        v.mountPullerVisual?.dispose();
+        v.mountPullerVisual = null;
         v.mountVisualKey = '';
-        if (mountAssetsReady(mountSpec.visualKey)) {
+        // Wheel lookup is cached per built model, so it has to be invalidated
+        // with the model. Leaving it would keep nodes from a disposed visual.
+        v.mountWheels = undefined;
+        v.mountWheelRadius = undefined;
+        // The rickshaw composes a second character visual (the puller): both
+        // assets must be ready before either is built, or the cart pops in
+        // gripless for a frame.
+        const isRickshaw = mountSpec.visualKey === RICKSHAW_MOUNT_VISUAL_KEY;
+        const pullerReady = !isRickshaw || rickshawPullerAssetsReady();
+        if (mountAssetsReady(mountSpec.visualKey) && pullerReady) {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          if (isRickshaw) {
+            v.mountPullerVisual = createRickshawPullerVisual();
+            attachRickshawPuller(v.mountVisual.root, v.mountPullerVisual);
+          }
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -11255,11 +11304,18 @@ export class Renderer {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
           );
+          if (isRickshaw) {
+            void preloadRickshawPullerAssets().catch((err) =>
+              console.error('Failed to preload rickshaw puller model:', err),
+            );
+          }
         }
       } else if (!mountSpec && v.mountVisual) {
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
+        v.mountPullerVisual?.dispose();
+        v.mountPullerVisual = null;
         v.mountVisualKey = '';
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -11653,6 +11709,25 @@ export class Renderer {
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
       }
+      // A rolling mount (the rickshaw's cart bed) is CONTINUOUS, so it is driven
+      // by movement state every frame rather than by the stride accumulator
+      // above. No-op for every mount without a mount_loop_* clip, which is all
+      // of them but this one. Stopped explicitly rather than by omission: a loop
+      // nobody calls again just keeps playing.
+      if (sink) {
+        if (logicallyMounted && !visuallyDead) {
+          sink.mountLoop(e.id, ax, ay, az, e.mountKey, moving && !airborne);
+          v.mountLoopActive = true;
+        } else if (v.mountLoopActive) {
+          // Gated on "this view actually started a loop", not just "not
+          // mounted": that makes the call free for the common case (an
+          // entity that never had a loop) instead of three Map operations a
+          // frame for everyone in view, while still firing exactly once on
+          // the dismount frame that needs it.
+          sink.stopMountLoop(e.id);
+          v.mountLoopActive = false;
+        }
+      }
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
       const entryFallSpeed = v.fallSpeed;
@@ -11861,6 +11936,14 @@ export class Renderer {
         mst.swimming = st.swimming;
         if (runCharacterPresentation) {
           v.mountVisual.update(dt, mst, animate);
+          // RAW per-frame travel, not st.speed. loco.speed is exponentially
+          // smoothed for footstep cadence and additionally latches its last
+          // value while "stalled", so it keeps reporting motion for a beat
+          // after the player actually stops -- which the wheels rode as a
+          // visible coast. The displayed position delta is the ground truth
+          // the wheels should agree with anyway: if the cart did not move this
+          // frame, the wheels must not turn this frame.
+          spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
           // the rider floats WITH the procedural bob (the hover cycle's idle
           // float), not just the mount body
           const bob = mountBobY(mountSpec, this.time, moving);
@@ -11875,6 +11958,18 @@ export class Renderer {
           }
         } else {
           v.mountVisual.advanceOffscreen(dt);
+        }
+        if (v.mountPullerVisual) {
+          if (runCharacterPresentation) {
+            // Same locomotion state the cart's own mountVisual just got (mst,
+            // built above from the rider's real speed/moving/running/
+            // backwards/swimming): the puller walks/runs with the rider instead
+            // of always idling in place, which is what a fixed idle constant
+            // here used to make it do.
+            v.mountPullerVisual.update(dt, mst, animate);
+          } else {
+            v.mountPullerVisual.advanceOffscreen(dt);
+          }
         }
       }
 

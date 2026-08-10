@@ -414,6 +414,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only, same treatment as the tank above: no acquisition path, so
+  // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
+  // while the leg rig and canopy toggle remain unbuilt.
+  reins_rickshaw_mount: {
+    id: 'reins_rickshaw_mount',
+    name: 'Bound Reins: Bonebound Rickshaw',
+    kind: 'mount',
+    mount: 'rickshaw_mount',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

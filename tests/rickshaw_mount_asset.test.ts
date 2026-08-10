@@ -1,0 +1,119 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
+import { describe, expect, it } from 'vitest';
+import { RICKSHAW_MATERIAL_CONTRACT } from '../scripts/assets/rickshaw_mount/model.js';
+import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
+
+// Structural contract for the shipped rickshaw_mount.glb, mirroring the tank
+// mount's own asset test (tests/terrorspark_groundshaker_asset.test.ts) minus
+// the source-fingerprint-in-extras half: this GLB was never exported with
+// that stamp (the rickshaw's exporter predates adopting the eastbrook-style
+// fingerprint convention), and re-exporting to add it now would risk
+// reintroducing bugs into geometry that has already been measured, tuned,
+// and live-verified across several passes. What this DOES pin: the exact
+// shipped bytes (so any future re-export is a deliberate, reviewed change,
+// not a silent drift) and the real structural shape (materials, UVs,
+// COLOR_0, wheel nodes, no skin/animation) a change to model.js or the
+// exporter could otherwise break without any test noticing.
+const REPO_ROOT = path.join(__dirname, '..');
+const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/rickshaw_mount.glb');
+const EXPECTED_ASSET_SHA256 = '66164215368708fdecb1ee971a162a3cb8d38da97e064fa3984c075b587d1885';
+// The four procedural PBR material families this mount ships, plus the
+// untextured emissive lantern-glow material (not in RICKSHAW_MATERIAL_CONTRACT:
+// it has no surface maps, see model.js's makeMaterials).
+const EXPECTED_MATERIAL_NAMES = ['wood', 'bronze', 'leather', 'fabric', 'LanternGlow'];
+
+describe('rickshaw mount asset pipeline', () => {
+  it('pins the material contract that drives the surface-map export', () => {
+    expect(RICKSHAW_MATERIAL_CONTRACT.map((entry) => entry.name)).toEqual([
+      'wood',
+      'bronze',
+      'leather',
+      'fabric',
+    ]);
+    for (const entry of RICKSHAW_MATERIAL_CONTRACT) {
+      expect(entry.roughness).toBeGreaterThan(0);
+      expect(entry.roughness).toBeLessThanOrEqual(1);
+      expect(entry.metalness).toBeGreaterThanOrEqual(0);
+      expect(entry.metalness).toBeLessThanOrEqual(1);
+      expect(entry.uvScale).toBeGreaterThan(0);
+    }
+  });
+
+  it('ships the exact bytes this test pins, changed only by a deliberate re-export', async () => {
+    await MeshoptDecoder.ready;
+    const bytes = readFileSync(ASSET_PATH);
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    expect(sha256).toBe(EXPECTED_ASSET_SHA256);
+    expect(MEDIA_ASSETS['models/mounts/rickshaw_mount.glb']).toBe(
+      `/media/models/mounts/rickshaw_mount.${sha256.slice(0, 12)}.glb`,
+    );
+  });
+
+  it('carries the real material/UV/COLOR_0/wheel-node shape the renderer and shading pipeline depend on', async () => {
+    await MeshoptDecoder.ready;
+    const bytes = readFileSync(ASSET_PATH);
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.readBinary(bytes);
+    const root = document.getRoot();
+
+    // No skin or animation: wheel spin and puller gait are both driven
+    // procedurally by the renderer (spinMountWheels, the puller's own
+    // CharacterVisual), never a baked clip on this GLB itself.
+    expect(root.listSkins()).toHaveLength(0);
+    expect(root.listAnimations()).toHaveLength(0);
+    expect(root.listCameras()).toHaveLength(0);
+    expect(root.listScenes()).toHaveLength(1);
+
+    expect(root.listMaterials().map((m) => m.getName())).toEqual(EXPECTED_MATERIAL_NAMES);
+
+    // Every material but the lantern glow ships a full PBR trio (albedo,
+    // normal, ORM), matching RICKSHAW_MATERIAL_CONTRACT's four families.
+    const textureNames = root
+      .listTextures()
+      .map((t) => t.getName())
+      .sort();
+    for (const family of ['wood', 'bronze', 'leather', 'fabric']) {
+      expect(textureNames).toContain(`rickshaw_${family}_albedo`);
+      expect(textureNames).toContain(`rickshaw_${family}_normal`);
+      expect(textureNames).toContain(`rickshaw_${family}_orm`);
+    }
+    expect(textureNames.filter((n) => n.startsWith('rickshaw_'))).toHaveLength(12);
+
+    // Every mesh primitive carries a vertex-baked COLOR_0 (shadeSurfaceInto's
+    // output), the load-bearing convention for every procedural asset in this
+    // pipeline: no bespoke photo textures, macro shading rides vertex color.
+    let primitiveCount = 0;
+    for (const mesh of root.listMeshes()) {
+      for (const primitive of mesh.listPrimitives()) {
+        primitiveCount++;
+        expect(primitive.getAttribute('COLOR_0'), `${mesh.getName()} COLOR_0`).not.toBeNull();
+        const material = primitive.getMaterial();
+        // The lantern glow primitive has no UVs (untextured emissive); every
+        // textured material primitive needs real TEXCOORD_0 for its albedo/
+        // normal/ORM maps to land correctly.
+        if (material && material.getName() !== 'LanternGlow') {
+          expect(
+            primitive.getAttribute('TEXCOORD_0'),
+            `${mesh.getName()} TEXCOORD_0`,
+          ).not.toBeNull();
+        }
+      }
+    }
+    expect(primitiveCount).toBeGreaterThan(0);
+
+    // The two wheel nodes spinMountWheels looks up by name at runtime
+    // (src/render/rickshaw_mount.ts ROLLING_WHEEL_NODES): if either is
+    // renamed or dropped by a model.js change, the wheels silently stop
+    // rolling with no test failing anywhere else.
+    const nodeNames = root.listNodes().map((n) => n.getName());
+    expect(nodeNames).toContain('Wheel_L');
+    expect(nodeNames).toContain('Wheel_R');
+  });
+});
