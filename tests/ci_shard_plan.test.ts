@@ -379,7 +379,7 @@ describe('the long-sims lane (Phase 4)', () => {
     // alwaysRun above); the one lane member then moves to the lane, so the
     // leg is back at the base figure.
     expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
-    expect(relatedLeg.args).not.toContain('--exclude=' + LANE_BLIND);
+    expect(relatedLeg.args).not.toContain(`--exclude=${LANE_BLIND}`);
     expect(relatedLeg.args.join(' ')).not.toContain('--exclude');
   });
 

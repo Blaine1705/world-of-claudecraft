@@ -108,10 +108,10 @@ function nonPlayerAuraHp(aura: Aura): number {
 }
 
 export function applyNonPlayerStatAura(
-  ctx: SimContext,
+  _ctx: SimContext,
   target: Entity,
   aura: Aura,
-  direction: 1 | -1,
+  _direction: 1 | -1,
 ): void {
   if (target.kind === 'player') return;
   let hpDelta = nonPlayerAuraHp(aura) * direction;
