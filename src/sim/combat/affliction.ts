@@ -675,11 +675,16 @@ export function applyCoven(
   }
 }
 
+// 2026-08-09 120s band round: the 80 and 100 anchors step down (750 to 620,
+// 1100 to 910) to land the BiS bench inside the 150-200 band. The 20 and 50
+// anchors stay at 138/400: the bench spends in the 80-100 segment, and the
+// doom-50 base keeps the judgment (1.2x) and possession (1.25x) ratios exact
+// integers in the mechanics tests.
 export function sentenceBaseDamage(doom: number): number {
   if (doom <= 20) return 138;
   if (doom <= 50) return Math.round(138 + ((doom - 20) / 30) * 262);
-  if (doom <= 80) return Math.round(400 + ((doom - 50) / 30) * 350);
-  return Math.round(750 + ((doom - 80) / 20) * 350);
+  if (doom <= 80) return Math.round(400 + ((doom - 50) / 30) * 220);
+  return Math.round(620 + ((doom - 80) / 20) * 290);
 }
 
 function endgameCompressionProgress(level: number): number {

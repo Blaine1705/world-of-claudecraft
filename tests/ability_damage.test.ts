@@ -122,8 +122,11 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
       bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
     );
     expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
-    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(55);
-    expect(abilityEffectText(bloodhook, SC)).toBe('36 (+55)');
+    // 2026-08-09 120s band round: the survival baseline meleeDmgPct stepped
+    // 0.06 to 0.3 (the rest of the raise rides the baseline agiPct), so the 34
+    // base and 200*0.26 rider re-derive at 1.3x.
+    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(68);
+    expect(abilityEffectText(bloodhook, SC)).toBe('44.2 (+68)');
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {

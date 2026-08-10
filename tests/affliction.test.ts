@@ -204,7 +204,7 @@ describe('Affliction Warlock', () => {
   it('pins the level-20 Needle and Maledict Gaze damage floor', () => {
     expect(ABILITIES.needle_of_fate.ranks?.find((rank) => rank.rank === 3)).toMatchObject({
       level: 20,
-      effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 45, max: 53 }],
+      effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
     });
     expect(maledictGazeDamage(19)).toBe(9);
     expect(maledictGazeDamage(20)).toBe(10);
@@ -1335,7 +1335,7 @@ describe('Affliction Warlock', () => {
   });
 
   it('spends the full pool with Sentence and scales its damage at 20, 50, 80, and 100', () => {
-    expect([20, 50, 80, 100].map(sentenceBaseDamage)).toEqual([138, 400, 750, 1100]);
+    expect([20, 50, 80, 100].map(sentenceBaseDamage)).toEqual([138, 400, 620, 910]);
     const losses: number[] = [];
     for (const amount of [20, 50, 80, 100]) {
       const sim = makeAffliction(amount);
@@ -1367,7 +1367,7 @@ describe('Affliction Warlock', () => {
       expect(doomValue(sim.player)).toBe(0);
     }
 
-    expect(losses).toEqual([83, 242, 454, 666]);
+    expect(losses).toEqual([83, 242, 375, 551]);
   });
 
   it('compresses Sentence and its demonic echo only across levels 17 to 20', () => {
@@ -1524,7 +1524,7 @@ describe('Affliction Warlock', () => {
     const nearHp = nearby.hp;
     const farHp = distant.hp;
     finishCast(splashSim, 'sentence', splashTarget);
-    expect(nearHp - nearby.hp).toBe(159);
+    expect(nearHp - nearby.hp).toBe(131);
     expect(distant.hp).toBe(farHp);
 
     const bossSim = makeAffliction(503);
@@ -1549,9 +1549,9 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(699);
+    ).toBe(579);
     expect(boss.hp).toBeLessThan(bossHp);
-    expect(bossNearbyHp - bossNearby.hp).toBe(233);
+    expect(bossNearbyHp - bossNearby.hp).toBe(193);
 
     const executeSim = makeAffliction(504);
     const executeTarget = addTarget(executeSim);
@@ -1742,7 +1742,7 @@ describe('Affliction Warlock', () => {
     // Coven echoes 35% of the shared mastery-adjusted verdict, not 35% of the
     // boss-only 20% amplified primary hit. Moving it out of the splash radius
     // isolates the Coven component.
-    expect(secondaryHp - secondary.hp).toBe(233);
+    expect(secondaryHp - secondary.hp).toBe(193);
   });
 
   it('requires the primary Evil Eye for Sentence and preserves resources on a secondary Eye', () => {

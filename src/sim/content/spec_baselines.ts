@@ -33,13 +33,20 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'arcane_shot', dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
         { ability: 'serpent_sting', costPct: -0.16 },
-        { ability: 'aimed_shot', dmgPct: 0.16, castPct: -0.2 },
+        { ability: 'aimed_shot', dmgPct: 0.5, castPct: -0.2 },
         { ability: 'concussive_shot', cooldownPct: -0.1 },
       ],
     },
     survival: {
-      stats: { agi: 3, crit: 0.03, dodge: 0.12 },
-      global: { meleeDmgPct: 0.06 },
+      // 2026-08 120s band round: the raise rides apPct, not agiPct, on
+      // purpose. apPct feeds only the two Attack Power lines (melee and
+      // hunter ranged); agiPct would also lift the Agility-derived armor,
+      // dodge, and crit on the spec that already dodges the most. The
+      // deep-equal pin in spec_baselines.test.ts guards the damage-only
+      // shape. Both arms are relatively level-invariant, an accepted
+      // remainder for the hunter kit-item pass alongside Marksmanship.
+      stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
+      global: { meleeDmgPct: 0.3 },
     },
   },
   // v0.34 rogue base re-band: with the Thronebane hand fix removing the legendary
@@ -53,8 +60,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   // and finisher share. The legendary itself is not touched here (separate PR).
   rogue: {
     assassination: {
-      stats: { crit: 0.12, apPct: 0.5 },
-      global: { meleeDmgPct: 0.34 },
+      stats: { crit: 0.12, apPct: 0.36 },
+      global: { meleeDmgPct: 0.22 },
       ability: [
         { ability: 'sinister_strike', costPct: -0.16 },
         { ability: 'eviscerate', dmgPct: 0.32 },
@@ -66,8 +73,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
     subtlety: {
-      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.35 },
-      global: { meleeDmgPct: 0.24 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
+      global: { meleeDmgPct: 0.08 },
       ability: [
         { ability: 'stealth', cooldownPct: -0.7 },
         { ability: 'backstab', dmgPct: 0.16 },
@@ -99,16 +106,15 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     shadow: {
       // v0.28.x stat-identity pass: shadow is a DPS caster, so its flat stat is
       // Int (spell power), not the combat-dead Spirit it inherited.
-      // 2026-08-07 re-band: these percents were sized against the pre-#2757
-      // under-delivery (talent percents missing the SP rider); now that they
-      // apply to the whole hit, the rows shrink so delivered BiS damage lands
-      // near the 215 anchor instead of 233.
+      // 2026-08-09 120s band round: the three ability rows step down again
+      // (0.3/0.34/0.4 to 0.2/0.2/0.15, with the vespers.ts multipliers) so the
+      // 120s BiS Monte Carlo lands inside the 150-200 band instead of 215.
       stats: { int: 6 },
       global: { spellDmgPct: 0.15 },
       ability: [
-        { ability: 'shadow_word_pain', dmgPct: 0.3, costPct: -0.1 },
-        { ability: 'mind_blast', dmgPct: 0.34, costPct: -0.1 },
-        { ability: 'mind_flay', dmgPct: 0.4 },
+        { ability: 'shadow_word_pain', dmgPct: 0.2, costPct: -0.1 },
+        { ability: 'mind_blast', dmgPct: 0.2, costPct: -0.1 },
+        { ability: 'mind_flay', dmgPct: 0.15 },
       ],
     },
   },
@@ -126,13 +132,13 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     enhancement: {
       // v0.28.x stat-identity pass: Enhancement primary is Strength, so its Int
       // stays below Elemental's; melee AP is retained.
-      stats: { int: 2, ap: 24 },
+      stats: { int: 2, ap: 24, apPct: 0.22 },
       ability: [
         { ability: 'lightning_bolt', costPct: -0.2 },
         { ability: 'earth_shock', costPct: -0.2 },
         { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
-        { ability: 'stormstrike', dmgPct: 0.25 },
+        { ability: 'stormstrike', dmgPct: 0.8 },
       ],
     },
     restoration: {

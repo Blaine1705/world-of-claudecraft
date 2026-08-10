@@ -155,14 +155,14 @@ describe('owned-class level 20 balance harness', () => {
     expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(1.1);
     expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(1.2);
     expect(vespersArea.dps / vespersSingle.dps).toBeGreaterThanOrEqual(1.25);
-    // Re-authored on the owned-class stack integration this file predicted:
-    // measured 0.9376 on the integrated tree (margin below).
+    // 2026-08-09 120s band round: the Warspirit raise (stormstrike row plus
+    // the baseline AP arm, ridden on apPct after review) and the Vespers trim
+    // moved this pair to a measured 1.1539 (warspirit 204.5 / vespers 177.2),
+    // so the 0.93 floor is green again with real margin.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeGreaterThanOrEqual(0.93);
-    // Band widened for the stacked v0.29 rogue redesign (#2328), then again
-    // after rebasing onto the in-combat Spirit mp5 merge: the spirit-stacking
-    // Warspirit build gains more sustained mana than Vespers, compounding the
-    // rogue-layer drift (measured 1.18 on the combined tree). Re-author both
-    // sides of this pair when the owned-class stack integrates.
+    // Ceiling kept at 1.2 (measured 1.1539 this round, was 1.18 on the
+    // combined tree pre-round). Re-author both sides of this pair when the
+    // owned-class stack integrates.
     expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(1.2);
     // The grown owned-class matrix runs ~180s under shard load; in the
     // long-sims lane (workers=2) it shares the runner with the raid harness

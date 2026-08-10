@@ -3696,7 +3696,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 0,
-        effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 0.1 }],
+        effects: [{ type: 'weaponStrike', bonus: 16, weaponMult: 0.1 }],
       },
     ],
     description:
@@ -3792,7 +3792,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 26, max: 33 },
+      { type: 'directDamage', min: 38, max: 48 },
       { type: 'gainResource', amount: 20 },
     ],
     description:
@@ -3920,7 +3920,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 2,
         level: 16,
         cost: 30,
-        effects: [{ type: 'weaponStrike', bonus: 48, weaponMult: 0.45 }],
+        effects: [{ type: 'weaponStrike', bonus: 54, weaponMult: 0.45 }],
       },
     ],
     description:
@@ -4042,7 +4042,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 61, max: 75 }],
+    effects: [{ type: 'directDamage', min: 89, max: 109 }],
     description:
       'Shoot the target for $d Physical damage. Damage increases with Ranged Attack Power.',
   },
@@ -4063,7 +4063,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true,
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 13, max: 18 }],
+    effects: [{ type: 'directDamage', min: 19, max: 26 }],
     description:
       'Fire 6 shots over 2.4 sec while moving. Each shot deals $d Physical damage and increases with Ranged Attack Power.',
   },
@@ -4301,7 +4301,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 25% more damage, and each tick on your Effigy grants 1 Gloomtithe.',
+      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 10% more damage, and each tick on your Effigy grants 1 Gloomtithe.',
   },
   power_word_shield: {
     id: 'power_word_shield',
@@ -4988,13 +4988,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 2,
         level: 12,
         cost: 30,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 40, max: 48 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 36, max: 43 }],
       },
       {
         rank: 3,
         level: 20,
         cost: 35,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 45, max: 53 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
       },
     ],
     description:
@@ -7524,7 +7524,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // and must never eat the form itself.
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
-    effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 0.81 }],
+    effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 0.32 }],
     description:
       'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
   },
@@ -7545,7 +7545,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
     effects: [
-      { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 0.81 },
+      { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 0.32 },
       { type: 'dot', total: 45, duration: 9, interval: 3 },
       { type: 'gainResource', amount: 35 },
     ],

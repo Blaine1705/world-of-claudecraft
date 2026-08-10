@@ -76,7 +76,7 @@ function prepareEffigy(sim: Sim, priest: Entity, primary: Entity, secondary?: En
 }
 
 describe('Vespers baseline loop', () => {
-  it('raises Vespers Dirge damage by 25% and gives Mindfracture stronger Spell Power scaling', () => {
+  it('raises Vespers Dirge damage by 10% and gives Mindfracture stronger Spell Power scaling', () => {
     const { sim, priest } = vespersPriest();
     const ctx = (sim as unknown as { ctx: SimContext }).ctx;
     const meta = ctx.players.get(priest.id);
@@ -97,11 +97,11 @@ describe('Vespers baseline loop', () => {
       (effect) => effect.type === 'directDamage',
     );
 
-    expect(VESPERS_DOT_DAMAGE_MULT).toBe(1.25);
-    expect(dirgeDot?.type === 'dot' ? dirgeDot.total : 0).toBe(105);
+    expect(VESPERS_DOT_DAMAGE_MULT).toBe(1.1);
+    expect(dirgeDot?.type === 'dot' ? dirgeDot.total : 0).toBe(92);
     expect(
       mindfractureHit?.type === 'directDamage' ? mindfractureHit.spellPowerCoeff : undefined,
-    ).toBe(0.6);
+    ).toBe(0.5);
   });
 
   it('binds Effigy only through Mindfracture on the priest own Dirge', () => {
