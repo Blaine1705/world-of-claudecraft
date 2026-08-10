@@ -117,10 +117,11 @@ describe('restoreClassicBloomComposite', () => {
   });
 
   it('rebuilds main() equal to the r165 shape with its tint terms stripped', () => {
-    // The migration claim is IDENTICAL bloom math across the 0.165 to 0.185
-    // train: the pre-upgrade renderer shipped r165's composite with the
-    // identity tint multipliers removed, so the restored body must equal
-    // exactly that, whitespace aside.
+    // The migration claim is an IDENTICAL COMPOSITE STAGE across the 0.165 to
+    // 0.185 train (the blur mips and bright-pass weights feeding it moved
+    // upstream, an accepted r181-bucket visual delta): the pre-upgrade
+    // renderer shipped r165's composite with the identity tint multipliers
+    // removed, so the restored body must equal exactly that, whitespace aside.
     const stripWs = (s: string): string => s.replace(/\s+/g, '');
     const mainOf = (s: string): string => {
       const start = s.indexOf('void main()');

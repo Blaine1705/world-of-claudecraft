@@ -46,8 +46,12 @@ describe('chunked DataTexture upload', () => {
 
   it('takes the bounded path on a plain DataTexture (native ranges since 0.185)', async () => {
     // Premise pin: the installed three ships the update-range API on every
-    // texture, so the real bone/skin DataTextures upload bounded with no
-    // polyfill (the forward-compatible arm this module always carried).
+    // texture, so the module's production consumers, the sky env/dome HDR
+    // DataTextures behind prewarmTextureInIdle (renderer.ts prepareZoneSky
+    // and the deferred sky resume), upload bounded with no polyfill (the
+    // forward-compatible arm this module always carried). Bone palettes never
+    // route through here; Skeleton.update pays whole-texture uploads on every
+    // three in the train.
     const texture = new THREE.DataTexture(new Uint16Array(8 * 5 * 4), 8, 5);
     expect(Array.isArray(texture.updateRanges)).toBe(true);
     expect(typeof texture.addUpdateRange).toBe('function');

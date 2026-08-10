@@ -69,8 +69,11 @@ export class PreparedBloomPass extends UnrealBloomPass {
     // vec3(1), and no caller changes them. r182 rewrote the composite for its
     // own One-factor blend draw (rgb-only sum scaled 3.0, max-component
     // alpha), a draw this pass skips; rebuild the r165-shaped tint-free
-    // accumulation so OutputGradePass's bloom.rgb * bloom.a add keeps grading
-    // the exact pre-upgrade bloom.
+    // accumulation so OutputGradePass's bloom.rgb * bloom.a add keeps the
+    // pre-upgrade composite contract. The blur mips feeding it still carry
+    // upstream's r182+ kernel rework and Rec.709 bright-pass weights (small,
+    // accepted visual deltas in the r181 bucket), so this restore pins the
+    // composite stage, not bloom output bytes.
     this.compositeMaterial.fragmentShader = restoreClassicBloomComposite(
       this.compositeMaterial.fragmentShader,
       this.nMips,

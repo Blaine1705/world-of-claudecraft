@@ -583,7 +583,8 @@ const PREWARM_BUILD_RESERVE_MS = 3000;
 // before the GPU-submit guard; see prewarmCompileUnitDeadline.
 const PREWARM_FRAME_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
-// calls and awaits them together, so r165's 10 ms poll floors overlap instead
+// calls and awaits them together, so three's 10 ms poll floors (r165 through
+// the installed 0.185, see patches/three@0.185.1.patch) overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
 // enough that a batch's synchronous prologues stay a bounded slice. Coupled
 // to PREWARM_FRAME_RESERVE_MS: the deadline is checked BETWEEN units, so the
@@ -2028,8 +2029,9 @@ export class Renderer {
     // The scene root sits at identity forever, but with the default
     // matrixAutoUpdate the root recomposes each frame, which flags
     // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
-    // every node in the graph (three r165 updateMatrixWorld), defeating both
-    // the static-subtree freeze and the hidden-rig gate below. Freeze the root:
+    // the graph (three updateMatrixWorld; r185's force still bypasses the
+    // dirty check for every auto-update descendant), defeating both the
+    // static-subtree freeze and the hidden-rig gate below. Freeze the root:
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
@@ -3385,14 +3387,15 @@ export class Renderer {
       this.prewarmTexture(domeSource);
       return;
     }
-    // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-    // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-    // ranges and pays one full upload. Either way each atomic WebGL call enters
-    // the shared queue so it cannot overlap a live shader compile.
+    // A DataTexture upload is synchronous even from requestIdleCallback. The
+    // installed 0.185 ships native update ranges, so the idle arm row-batches
+    // the HDRI instead of paying one full upload. Either way each atomic
+    // WebGL call enters the shared queue so it cannot overlap a live shader
+    // compile.
     await this.prewarmTextureInIdle(envSource);
-    // PMREM generation is indivisible in Three r165. Defer two timed-out
-    // callbacks before deliberately paying that single unit under sustained
-    // load, rather than running it on the first forced callback.
+    // PMREM generation is indivisible in three (0.185 included). Defer two
+    // timed-out callbacks before deliberately paying that single unit under
+    // sustained load, rather than running it on the first forced callback.
     await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
     await this.backgroundGpuWork.run(
       () => this.ensureEnvironmentBiome(zone.biome),
@@ -5431,8 +5434,9 @@ export class Renderer {
 
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
-   * Three r165 chooses output colour space from the current render target in
-   * compileAsync's synchronous prologue. Restore that global before awaiting
+   * Three chooses output colour space from the current render target in
+   * compileAsync's synchronous prologue (authored on r165; the r185 prewarm
+   * re-audit kept this restore). Restore that global before awaiting
    * the parallel linker so live frames never inherit the prewarm target.
    */
   private async compilePrewarmColorPrograms(
@@ -6704,11 +6708,12 @@ export class Renderer {
         category: 'sky',
         priority: 64,
         required: true,
-        // Exempt unconditionally: uploadDataTextureInChunks falls back to one
-        // full upload on pinned r165, so the 2k RGBA16F dome upload is an
-        // indivisible ~183ms call that must stay behind the loading screen
-        // even when a slow MACHINE spent the soft budget while the network
-        // stayed healthy. The exemption adds no network wait (the inline wait
+        // Exempt unconditionally: the exemption was sized when pinned r165
+        // paid the 2k RGBA16F dome upload as one indivisible ~183ms call; the
+        // installed 0.185 row-batches it via native update ranges, but the
+        // batches still total the same GPU work, which must stay behind the
+        // loading screen even when a slow MACHINE spent the soft budget while
+        // the network stayed healthy. The exemption adds no network wait (the inline wait
         // below is already 0 past the reserve boundary) and the hard deadline
         // still bounds the entry via prewarmEntryShouldDefer. Constrained
         // profiles never run this entry, so the conditional exemption form

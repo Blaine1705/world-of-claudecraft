@@ -7,9 +7,15 @@ const SHAPE_ERROR = 'Pinned UnrealBloom composite shader shape changed';
 // bloom.rgb * bloom.a, the r165 SrcAlpha additive contribution, so the r182+
 // body is not a drop-in. This rewrite rebuilds the r165-shaped accumulation
 // (full vec4 samples, no 3.0 scale, no tint terms; alpha stays the accumulated
-// blurred bright-pass alpha) so the shipped bloom math is identical across the
-// three 0.165 to 0.185 train. Fails closed on every unexpected shape so a
-// future three bump cannot silently change how bloom grades.
+// blurred bright-pass alpha) so the COMPOSITE STAGE's math is identical across
+// the three 0.165 to 0.185 train. The stages feeding it are upstream's and
+// did move: r182+ reworked the separable Gaussian mip blur coefficients
+// (three PR 31528, same strength, removes blockiness) and the bright-pass
+// luminance weights went Rec.601 to Rec.709, so shipped bloom PIXELS are
+// near-identical, not byte-identical; both feeder deltas are part of the
+// phase 6 r181-bucket visual acceptance. Fails closed on every unexpected
+// composite shape so a future three bump cannot silently change how bloom
+// grades.
 
 const TINT_UNIFORM = /uniform\s+vec3\s+bloomTintColors\s*\[\s*NUM_MIPS\s*\]\s*;/;
 
