@@ -1184,14 +1184,31 @@
     outline-offset: 2px;
     touch-action: none;
   }
-  /* The corner button and grip need a positioned host to hang off. The action
-     bars, minimap wrap and pet frame are already positioned or in-flow blocks;
-     stating it here means the chrome never lands in the wrong corner. */
+  /* The corner button and grip need a positioned host to hang off. Only the
+     action bars lack one: the cast bar, the menu rail and the minimap wrap are
+     already absolute and the pet frame already relative. Re-stating the menu rail
+     here would ALSO shadow its real rule from the crafting-launcher rail budget,
+     which reads the FIRST wrapper block it finds by regex (and that regex scans
+     comments too, so do not spell the selector-plus-brace pattern in prose). */
   #actionbar,
   #actionbar2,
-  #actionbar3,
-  #side-buttons {
+  #actionbar3 {
     position: relative;
+  }
+  /* A frame re-homed onto #ui (interface_unlock.ts makeUiRootDetacher: the action
+     bars and the pet frame, which otherwise resolve their left/top against
+     #bottom-bar's centering transform) must position off its own left/top. The
+     selectors are id-qualified because #pet-frame's own `position: relative` and
+     the action bars' rule above would otherwise win on specificity, leaving a
+     dragged frame stuck at its docked spot with the coordinates silently ignored.
+     Mirrors what pf-detached does for the player frame. */
+  #actionbar.hud-frame-detached,
+  #actionbar2.hud-frame-detached,
+  #actionbar3.hud-frame-detached,
+  #pet-frame.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,

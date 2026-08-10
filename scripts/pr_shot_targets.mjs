@@ -1407,6 +1407,12 @@ export const TARGETS = [
                localStorage.setItem('woc_hud_frame_castbar', JSON.stringify({ left: 240, top: 300, scale: 1.4 }));
                localStorage.setItem('woc_hud_frame_minimap', JSON.stringify({ left: 40, top: 60, scale: 0.8 }));
                localStorage.setItem('woc_hud_frame_side_buttons', JSON.stringify({ left: 1180, top: 120, scale: 1 }));
+               // The primary action bar covers the OTHER half of the feature: it
+               // lives under #bottom-bar's centering transform, so it only lands
+               // here if the re-home onto #ui and the .hud-frame-detached
+               // positioning both work. A frame that is already absolute would
+               // move without either of them and prove nothing.
+               localStorage.setItem('woc_hud_frame_actionbar', JSON.stringify({ left: 620, top: 470, scale: 1 }));
              } catch {}`,
           );
         },
