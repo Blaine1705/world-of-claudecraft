@@ -122,6 +122,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'editor.html',
       'vite.config.ts',
       'tsconfig.json',
+      'scripts/build_bundle_pregen.mjs',
       'scripts/build_sitemap.mjs',
       'scripts/build_sfx_manifest.mjs',
       'scripts/build_media_manifest.mjs',

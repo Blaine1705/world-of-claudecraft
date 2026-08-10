@@ -28,40 +28,67 @@ export const PREGEN_STEPS = [
 
 /**
  * Spawn one pregen step and resolve with its captured stdout/stderr, or
- * reject with a descriptive error if it fails to spawn or exits non-zero.
+ * reject with a descriptive error (carrying both streams) if it fails to
+ * spawn or exits non-zero. The returned promise stays a plain promise (so a
+ * bare `await runPregenStep(...)` keeps working), but the live ChildProcess
+ * is also stashed on it so a caller running several steps concurrently can
+ * still reach every child to await its exit.
  */
 export function runPregenStep(args, execPath = process.execPath) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-    let stdout = '';
-    let stderr = '';
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk;
-    });
+  const child = spawn(execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+  let stdout = '';
+  let stderr = '';
+  child.stdout.on('data', (chunk) => {
+    stdout += chunk;
+  });
+  child.stderr.on('data', (chunk) => {
+    stderr += chunk;
+  });
+  const promise = new Promise((resolve, reject) => {
     child.on('error', (error) => {
       reject(new Error(`${args.join(' ')} failed to spawn: ${error.message}`));
     });
     child.on('close', (code) => {
       if (code === 0) resolve({ stdout, stderr });
-      else reject(new Error(`${args.join(' ')} exited with code ${code}\n${stderr}`));
+      else {
+        const error = new Error(
+          `${args.join(' ')} exited with code ${code}\nstderr:\n${stderr}\nstdout:\n${stdout}`,
+        );
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+      }
     });
   });
+  promise.child = child;
+  return promise;
 }
 
 /**
- * Run every step concurrently via Promise.all, then replay each step's
- * captured output in step order (deterministic regardless of finish order).
- * Any step failing to spawn or exiting non-zero rejects the whole call.
+ * Run every step concurrently, then replay each step's captured output in
+ * step order (deterministic regardless of finish order). Uses
+ * Promise.allSettled rather than Promise.all so that on any one step's
+ * failure, EVERY step has still fully finished (successfully or not) before
+ * this function returns or throws: nothing keeps writing files in the
+ * background after control returns to the caller (a re-run, a git checkout).
+ * Whatever output the other steps produced is still replayed, and the
+ * rejection includes the failing step's own stdout alongside its stderr, so
+ * a failing concurrent run reports at least as much as the old serial chain
+ * did.
  */
 export async function runPregen(steps = PREGEN_STEPS) {
-  const results = await Promise.all(steps.map((args) => runPregenStep(args)));
-  for (const { stdout, stderr } of results) {
-    if (stdout) process.stdout.write(stdout);
-    if (stderr) process.stderr.write(stderr);
+  const settled = await Promise.allSettled(steps.map((args) => runPregenStep(args)));
+  const failures = [];
+  for (const result of settled) {
+    if (result.status === 'fulfilled') {
+      const { stdout, stderr } = result.value;
+      if (stdout) process.stdout.write(stdout);
+      if (stderr) process.stderr.write(stderr);
+    } else {
+      failures.push(result.reason);
+    }
   }
+  if (failures.length > 0) throw failures[0];
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
