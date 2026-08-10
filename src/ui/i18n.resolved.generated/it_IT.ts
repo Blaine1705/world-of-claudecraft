@@ -1054,7 +1054,7 @@ export const it_IT: EnTranslations = {
       "blurb": "Due rocche in rovina si fronteggiano in una valletta murata all'ombra di Thornpeak: i Cremisi a sud, gli Azzurri a nord, e tra loro il più antico Cortile in Rovina che nessuno dei due ha mai conquistato. Cinque contro cinque, una bandiera a testa, e la prima squadra che ne riporta a casa tre si aggiudica il campo.",
       "modeTag": "5c5 Cattura la Bandiera",
       "offlineNote": "I Campi di Thornhollow si stanno sincronizzando. La coda si apre non appena il reame risponde.",
-      "ratingSummary": "Indice. {wins} vittorie / {losses} sconfitte",
+      "ratingSummary": "Indice. {wins} vittorie / {losses} sconfitte / {draws} pareggi",
       "careerCaptures": "Catture in carriera: {count}",
       "enterQueue": "Entra in coda",
       "enterQueueParty": "Entra in coda (gruppo di {count})",
@@ -3009,6 +3009,11 @@ export const it_IT: EnTranslations = {
       "toolEffectRechargeFull": "{effect} è già a piena carica.",
       "toolEffectRechargeToolCapped": "Porta uno strumento da {profession} migliore per caricare ancora {effect}.",
       "toolEffectRechargeMaterials": "Per ricaricare {effect} servono {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Livello {tier}",
       "nextUnlockTier": "{points} punta al livello successivo: le probabilità di capolavori migliorano",
       "nextUnlockSpecialized": "{points} punti alla specializzazione: i costi dei materiali diminuiscono",
@@ -3303,6 +3308,16 @@ export const it_IT: EnTranslations = {
       "denyNotCrafted": "Realizza prima il pezzo commissionato (con l'opzione commissione attiva).",
       "denyOutOfRange": "Devi essere vicino al richiedente per consegnare una commissione.",
       "denyNoSpace": "Il richiedente non ha spazio nelle borse."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Cercatore di Dungeon",
@@ -7403,6 +7418,9 @@ export const it_IT: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Il gioco sta girando senza accelerazione GPU e sarà lento. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.",
     "bodyWeb": "Il gioco sta girando senza accelerazione GPU e sarà lento. Abilita l'accelerazione hardware nelle impostazioni del browser, aggiorna i driver grafici, poi riavvia il browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Ignora"
   },
   "perfNudge": {
@@ -7864,6 +7882,7 @@ export const it_IT: EnTranslations = {
       "deathRecapAbility": "Sei morto. Ucciso da {ability}.",
       "deathRecapFalling": "Sei morto. Sei caduto nel vuoto.",
       "deathRecapDrowned": "Sei morto. Sei annegato.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Ti senti di nuovo riposato e integro.",
       "ignoringChat": "Chat di {name} ignorata.",
       "noLongerIgnoring": "Non ignori più {name}.",
@@ -7907,6 +7926,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Fuori portata.",
       "noTarget": "Non hai un bersaglio.",
       "tooClose": "Troppo vicino!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",
@@ -8149,7 +8169,7 @@ export const it_IT: EnTranslations = {
       "queueNote": "Verrai abbinato al contendente online con indice più vicino e teletrasportato nell'arena. Vinci per salire; il primo a cedere (1 salute) perde. Torni esattamente dove ti sei messo in coda.",
       "ladderAllTime": "Classifica - storica",
       "ladderOnline": "Classifica - online",
-      "ratingSummary": "Indice - {wins} vittorie / {losses} sconfitte",
+      "ratingSummary": "Indice - {wins} vittorie / {losses} sconfitte / {draws} pareggi",
       "statusCountdown": "Preparati...",
       "statusReturning": "Ritorno al mondo... {seconds}",
       "statusFight": "Combatti fino alla resa!",
@@ -9523,6 +9543,10 @@ export const it_IT: EnTranslations = {
       "die_by_sword": {
         "name": "Morte per la Spada",
         "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temerarietà",
