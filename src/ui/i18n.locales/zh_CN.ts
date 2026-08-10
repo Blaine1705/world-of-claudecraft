@@ -78,6 +78,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。',
   'entities.abilities.die_by_sword.name': '剑在人在',
+  'entities.abilities.intervene.name': '援护',
+  'entities.abilities.intervene.description':
+    '冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
   'entities.abilities.emboldening_roar.name': '鼓舞怒吼',
@@ -867,7 +870,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。',
   'hudChrome.bg.modeTag': '5v5夺旗战',
   'hudChrome.bg.offlineNote': '荆谷原野正在同步。待王国响应后即可排队。',
-  'hudChrome.bg.ratingSummary': '评分。{wins}胜 / {losses}负',
+  'hudChrome.bg.ratingSummary': '评分。{wins}胜 / {losses}负 / {draws} 平',
   'hudChrome.bg.careerCaptures': '生涯夺旗:{count}',
   'hudChrome.bg.enterQueue': '加入队列',
   'hudChrome.bg.enterQueueParty': '加入队列({count}人小队)',
@@ -2081,6 +2084,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出范围。',
   'hud.errors.noTarget': '你没有目标。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必须选定一名友方目标。',
   'hud.errors.facing': '你必须面向目标。',
   'hud.errors.targetHealthBelow': '该技能要求目标生命值低于 {percent}%。',
   'hud.errors.dagger': '你必须装备匕首。',
@@ -2270,7 +2274,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你会与在线且评级最接近的挑战者匹配，然后传送到沙场。获胜即可攀升；先认输者（1 点生命值）落败。结束后会回到你排队的位置。',
   'hud.arena.ladderAllTime': '排名 - 历史',
   'hud.arena.ladderOnline': '排名 - 在线',
-  'hud.arena.ratingSummary': '评级 - {wins} 胜 / {losses} 负',
+  'hud.arena.ratingSummary': '评级 - {wins} 胜 / {losses} 负 / {draws} 平',
   'hud.arena.statusCountdown': '做好准备...',
   'hud.arena.statusReturning': '正在返回世界... {seconds}',
   'hud.arena.statusFight': '战斗到认输！',
@@ -8941,6 +8945,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalRole': '你的职责：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 已确认',
   'hudChrome.bgOffer.title': '荆谷原野已准备就绪',
+  'hudChrome.bgOffer.backfillTitle': '荆谷原野需要一名战士',
+  'hudChrome.bgOffer.backfillBody':
+    '这场战斗已经开始。你将加入人数不足的一方，本场对战不会改变你的评分。',
   'hudChrome.bgOffer.accepted': '已确认 {accepted}/{size}',
   'hudChrome.bgOffer.remaining': '剩余 {seconds} 秒确认',
   'hudChrome.bgOffer.accept': '接受',
