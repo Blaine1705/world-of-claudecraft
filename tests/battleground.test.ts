@@ -3855,7 +3855,10 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
           sim.petOf(owner, true)!)
         : (summonPet(sim.ctx, sim.entities.get(owner)!, 'emberkin'), sim.petOf(owner)!);
     for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
     sim.tick();
+    acceptBgOffer(sim, pids);
     const match = sim.ctx.bgMatches.get(owner)!;
     toActive(sim, match);
     return { sim, match, owner, pet };
@@ -3936,7 +3939,10 @@ describe('Thornhollow Fields: the wave brings your pet back too', () => {
     });
     const pet = sim.petOf(owner, true)!;
     for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
     sim.tick();
+    acceptBgOffer(sim, pids);
     const match = sim.ctx.bgMatches.get(owner)!;
     toActive(sim, match);
     return { sim, match, owner, pet };
