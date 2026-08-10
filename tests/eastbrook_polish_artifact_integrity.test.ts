@@ -680,13 +680,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // and point-light reseals; this branch's bounded character-visual pool wiring),
 // so all three literals mint to values matching neither parent. No capture was
 // retaken.
-// Re-minted for the merge of release/v0.36.0 into feature/rift-mechanics-sfx-clean:
-// both parents move renderer.ts, so all three literals mint to values matching
-// neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so all three literals mint
+// to values matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so all
+// three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b21493eed913ee82fa74b5d8f13f28d98aea9dced8b11af4588280edc99bc774';
+  '3e62defc310b6eb120ad66cd5ea629713c58d33ba9c87b4e02f0e5b066f83ea4';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '35758d0c214b8b2f3203b3a25c11b2f2f5f57df362ec14b3d504bdbeb5bbc1e0';
+  '3455c52bb8541eeba4541c006b51f35fe833dd13574518c674d825590e76dd2f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1595,14 +1606,24 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // KTX2 mip-release branch: the first-order composite follows both parents'
     // renderer.ts inputs, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
-    // Re-pinned for the merge of release/v0.36.0 into feature/rift-mechanics-sfx-clean:
-    // the first-order composite follows both parents' renderer.ts inputs, then
-    // this second-order performance seal follows the swept evidence bytes. No
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3222) into the
+    // prewarm sky-unstarve branch: the first-order composite follows both
+    // parents' renderer.ts inputs plus this branch's prewarm_policy.ts
+    // (sky.ts moved too but is not a provenance input), then this
+    // second-order performance seal follows the swept evidence bytes. No
     // capture was retaken.
+    // Re-pinned for the review fixes on the prewarm sky-unstarve PR: the
+    // first-order composite follows the renderer.ts edits (deadlineExempt sky
+    // entry, unified view-cap trim rule, deferred-lane gate and priority
+    // threading), then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+    // archetype and scene-texture counts; renderer.ts edits only). No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('089428e241367d34efaa8d443871a6076d35c2c3f048ae330e73b1a33b437312');
+    ).toBe('3da13ffce9226150c58fed288b8dacc0ab1c52c163bd9c6eaff4401a284bbb8e');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

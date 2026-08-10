@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SFX_FIXED_CATALOG_KEYS } from '../src/game/sfx_manifest.generated';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // src/sim/ cannot import the generated SfxId type (it lives in a client module
 // the sim must never depend on, see src/sim/types.ts's `sfxKey?: string`
@@ -14,6 +15,7 @@ import { SFX_FIXED_CATALOG_KEYS } from '../src/game/sfx_manifest.generated';
 // fails a test instead of silently playing nothing.
 
 const RIFT_DIR = path.join(__dirname, '../src/sim/rift');
+const SIM_DIR = path.join(__dirname, '../src/sim');
 const EXTRA_SCAN_FILES = [path.join(__dirname, '../src/sim/dev_commands.ts')];
 
 // riftFx(ctx, x, z, school, fx, sfxKey?, pid?): school and fx are drawn from
@@ -53,13 +55,25 @@ function extractRiftFxCallArgs(src: string): string[] {
   return calls;
 }
 
-function extractRiftSfxKeyLiterals(): string[] {
-  const files = readdirSync(RIFT_DIR)
-    .filter((f) => f.endsWith('.ts'))
-    .map((f) => path.join(RIFT_DIR, f))
+function scannedFiles(): string[] {
+  return tsFilesUnder(RIFT_DIR)
+    .map((entry) => entry.full)
     .concat(EXTRA_SCAN_FILES);
+}
+
+// Every file under src/sim/ that actually calls riftFx. The scanned set above
+// is hand-maintained (one directory plus a literal list), which is exactly how
+// dev_commands.ts escaped it twice; this is the reverse sweep that fails when
+// a call site lands somewhere the scan does not reach.
+function filesCallingRiftFx(): string[] {
+  return tsFilesUnder(SIM_DIR)
+    .filter((entry) => /\briftFx\(/.test(readFileSync(entry.full, 'utf8')))
+    .map((entry) => entry.full);
+}
+
+function extractRiftSfxKeyLiterals(): string[] {
   const keys = new Set<string>();
-  for (const file of files) {
+  for (const file of scannedFiles()) {
     const src = readFileSync(file, 'utf8');
     for (const args of extractRiftFxCallArgs(src)) {
       for (const str of args.matchAll(/'([^']*)'/g)) {
@@ -81,5 +95,39 @@ describe('src/sim/rift riftFx sfxKey literals stay in sync with the real SFX man
     for (const key of extractRiftSfxKeyLiterals()) {
       expect(catalog.has(key), `sfxKey '${key}' is not in SFX_FIXED_CATALOG_KEYS`).toBe(true);
     }
+  });
+
+  it('scans every src/sim file that calls riftFx, not just the rift directory', () => {
+    // Without this the scanned set can silently stop covering a call site and
+    // the guard above stays green over a smaller surface, which is how
+    // dev_commands.ts escaped it twice.
+    const scanned = new Set(scannedFiles());
+    const missed = filesCallingRiftFx().filter((file) => !scanned.has(file));
+    expect(missed, `riftFx call sites outside the scanned set: ${missed.join(', ')}`).toEqual([]);
+  });
+
+  it('picks up the dev_commands.ts call sites specifically', () => {
+    // Pins the EXTRA_SCAN_FILES arm itself: dropping it leaves the union above
+    // non-empty (the rift directory still yields keys), so only a per-file
+    // assertion turns that revert red.
+    const src = readFileSync(EXTRA_SCAN_FILES[0], 'utf8');
+    const keys = new Set<string>();
+    for (const args of extractRiftFxCallArgs(src)) {
+      for (const str of args.matchAll(/'([^']*)'/g)) {
+        if (!SCHOOL_AND_FX_LITERALS.has(str[1])) keys.add(str[1]);
+      }
+    }
+    expect([...keys]).toEqual(['rift_portal_spawn']);
+  });
+
+  it('keeps a nested call in the arguments inside one extracted call', () => {
+    // Pins the depth-counting matcher: the old /riftFx\(([^)]*)\)/ truncated at
+    // the inner call's closing paren, dropping the sfxKey from the scan. No
+    // live call site nests today, so only a synthetic source exercises it.
+    const args = extractRiftFxCallArgs(
+      "riftFx(ctx, at(p).x, at(p).z, 'frost', 'burst', 'rift_ice_stop');",
+    );
+    expect(args).toHaveLength(1);
+    expect(args[0]).toContain("'rift_ice_stop'");
   });
 });
