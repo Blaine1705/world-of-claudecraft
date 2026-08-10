@@ -68,6 +68,26 @@ export interface SpatialAudioSink {
   ): void;
   /** One custom running stride for a mounted entity. */
   mountRun(x: number, y: number, z: number, mountKey: string, self: boolean): void;
+  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
+   *  (see src/game/mount_engine_state.ts); call every frame a rider is
+   *  mounted and grounded. Returns true when `mountKey` actually has an
+   *  engine take set, so the caller can skip mountRun's gait beat for it;
+   *  false means fall back to the ordinary per-stride mountRun cue instead. */
+  mountEngine(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    moving: boolean,
+    entityId: number,
+  ): boolean;
+  /** Drop an entity's mountEngine state and silence its loop (dismount,
+   *  interest culled, disconnect). */
+  mountEngineReset(entityId: number): void;
+  /** Warm a mount's engine clips (windup/loop/winddown) ahead of first use,
+   *  e.g. on the mountKey transition that also calls mountEngineReset. A
+   *  no-op for a mount with no engine take set. */
+  preloadMountEngine(mountKey: string): void;
   /** A discrete movement event (jump / land / water entry / swim stroke). */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
