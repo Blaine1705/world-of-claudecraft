@@ -480,6 +480,11 @@ import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import {
+  type ShadowAnchor,
+  shadowTexelWorldSize,
+  snapShadowAnchor,
+} from './shadow_texel_snap_core';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import {
   buildSky,
@@ -1761,6 +1766,12 @@ export class Renderer {
   private moonDir = new THREE.Vector3(0, -1, 0);
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
   private shadowLightDirection = new THREE.Vector3();
+  // World units per shadow-map texel (ortho box width / GFX.shadowMap), set
+  // once beside the shadow camera; 0 disables snapping. shadowSnappedAnchor
+  // is the per-frame scratch shadow_texel_snap_core.ts fills so the frustum
+  // follows the player in whole-texel steps (anti shadow-swimming).
+  private shadowTexelWorld = 0;
+  private readonly shadowSnappedAnchor: ShadowAnchor = { x: 0, y: 0, z: 0 };
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -2431,6 +2442,7 @@ export class Renderer {
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
+    this.shadowTexelWorld = shadowTexelWorldSize(2 * S, GFX.shadowMap);
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -10215,8 +10227,32 @@ export class Renderer {
   // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
   private updateKeyLight(pp: THREE.Vector3): void {
     if (this.lowGfx && !this.sun.castShadow) return;
+    // Follow the player in whole shadow-map texel steps, not raw sub-texel
+    // ones: position and target translate together, so the light DIRECTION
+    // is untouched and only the shadow rasterization grid stops sliding
+    // under static geometry (shadow_texel_snap_core.ts). A shadowless key
+    // light has no grid to align to and keeps the raw position.
+    const anchor = this.shadowSnappedAnchor;
+    anchor.x = pp.x;
+    anchor.y = pp.y;
+    anchor.z = pp.z;
     if (this.lowGfx) {
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          SUN_ANCHOR.x,
+          SUN_ANCHOR.y,
+          SUN_ANCHOR.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
+      this.sun.position.set(
+        anchor.x + SUN_ANCHOR.x,
+        anchor.y + SUN_ANCHOR.y,
+        anchor.z + SUN_ANCHOR.z,
+      );
     } else {
       // the key light hands off from the sun to the moon across the terminator.
       // Blend the two directions smoothly (rather than a hard switch) as the sun
@@ -10226,10 +10262,21 @@ export class Renderer {
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const blend = t * t * (3 - 2 * t);
       this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          this.lightDir.x,
+          this.lightDir.y,
+          this.lightDir.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
       this.sun.position.set(
-        pp.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
-        pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
-        pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
+        anchor.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
+        anchor.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
+        anchor.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
       );
       // the unlit water shader follows the same key light and grade: glints
       // track the sun by day and the moon by night, and the surface dims with
@@ -10244,12 +10291,12 @@ export class Renderer {
       // texel (foliage_shadow_core.ts). Push it here, where the light's own
       // direction and target are decided, so the two can never disagree.
       if (this.sun.castShadow) {
-        setFoliageShadowVolume(this.lightDir, pp, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
+        setFoliageShadowVolume(this.lightDir, anchor, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
       } else {
         clearFoliageShadowVolume();
       }
     }
-    this.sun.target.position.set(pp.x, pp.y, pp.z);
+    this.sun.target.position.set(anchor.x, anchor.y, anchor.z);
   }
 
   // Aim the sun and moon disc sprites along their directions and fade them by how
