@@ -582,6 +582,12 @@ None of these is a defect. Each is a product decision with no ruling yet.
   by-name flair cache.
 - **A per-page Illumination deed for The Rift**, peer to the three flagship
   pages that carry one. The flagship list is a curated product list.
+- **The Conquerors capstone grew a long tail**, and the Book completion feat
+  behind it with it: the honor stock, the realm-rare drops, and the two
+  S-rank-only Rift legendaries at a very low roll per clear. Everything is
+  verified reachable (the heroic pool draws class-agnostically and the honor
+  stock has no class gate), so this is a difficulty escalation to accept or
+  soften deliberately, not a defect.
 - **The unfillable-slot nudge.** Because the two pages holding the three
   unfillable slots are not `excludeFromCompletion`, they permanently satisfy the
   "nearly complete" rule (remaining at or under the threshold) and therefore sit
