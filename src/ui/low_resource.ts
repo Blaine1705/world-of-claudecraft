@@ -7,6 +7,7 @@
 // tested directly, mirroring xp_bar.ts. All display strings route through t().
 
 import type { ResourceType } from '../sim/types';
+import { clamp01 } from './clamp';
 import { t } from './i18n';
 
 export interface LowResourceInput {
@@ -70,8 +71,4 @@ export function lowResourceViewInto(
   out.pulseSeconds = pulseSeconds;
   out.label = label;
   return out;
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }
