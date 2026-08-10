@@ -3587,7 +3587,10 @@ export const ja_JP: EnTranslations = {
       "unpin": "ピン留め解除",
       "pinFull": "トラッカーが満杯です（最大 {cap} ページ）",
       "pinAria": "{name}をHUDトラッカーにピン留め",
-      "unpinAria": "{name}のピン留めを解除"
+      "unpinAria": "{name}のピン留めを解除",
+      "rarityLine": "収集家の{percent}が発見",
+      "pageRarityLine": "収集家の{percent}が照耀",
+      "cellAriaWithRarity": "{base}、{rarity}"
     },
     "deeds": {
       "title": "功績の書",

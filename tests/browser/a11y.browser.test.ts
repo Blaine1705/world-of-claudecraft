@@ -1127,6 +1127,7 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
       reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),
       reliquaryCuratorRank: () => 0,
       reliquaryPageCompletion: () => null,
+      reliquaryRarity: () => Promise.resolve(null),
     };
   }
 

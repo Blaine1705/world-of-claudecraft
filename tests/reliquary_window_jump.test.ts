@@ -89,6 +89,7 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),
         reliquaryCuratorRank: () => 0,
         reliquaryPageCompletion: () => null,
+        reliquaryRarity: () => Promise.resolve(null),
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},

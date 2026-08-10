@@ -3587,7 +3587,10 @@ export const fr_CA: EnTranslations = {
       "unpin": "Unpin",
       "pinFull": "The tracker is full (up to {cap} pages)",
       "pinAria": "Pin {name} to the HUD tracker",
-      "unpinAria": "Unpin {name}"
+      "unpinAria": "Unpin {name}",
+      "rarityLine": "Found by {percent} of collectors",
+      "pageRarityLine": "Illuminated by {percent} of collectors",
+      "cellAriaWithRarity": "{base}, {rarity}"
     },
     "deeds": {
       "title": "Livre des hauts faits",

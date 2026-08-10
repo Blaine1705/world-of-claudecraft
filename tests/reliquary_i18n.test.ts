@@ -330,6 +330,7 @@ describe('the window paints the RESOLVED page name, never the model English', ()
       reliquaryCatalogCompletion: () => ({ owned: 0, total: 1 }),
       reliquaryCuratorRank: () => 0,
       reliquaryPageCompletion: () => undefined,
+      reliquaryRarity: () => Promise.resolve(null),
     };
   }
 

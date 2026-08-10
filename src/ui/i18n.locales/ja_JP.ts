@@ -10691,6 +10691,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': 'トラッカーが満杯です（最大 {cap} ページ）',
   'hudChrome.reliquary.pinAria': '{name}をHUDトラッカーにピン留め',
   'hudChrome.reliquary.unpinAria': '{name}のピン留めを解除',
+  'hudChrome.reliquary.rarityLine': '収集家の{percent}が発見',
+  'hudChrome.reliquary.pageRarityLine': '収集家の{percent}が照耀',
+  'hudChrome.reliquary.cellAriaWithRarity': '{base}、{rarity}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '記録のない聖遺物',

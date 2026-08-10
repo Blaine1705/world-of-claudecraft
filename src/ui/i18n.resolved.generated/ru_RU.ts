@@ -3587,7 +3587,10 @@ export const ru_RU: EnTranslations = {
       "unpin": "Открепить",
       "pinFull": "Список отслеживания полон (не более {cap} страниц)",
       "pinAria": "Закрепить страницу {name} на экране",
-      "unpinAria": "Открепить страницу {name}"
+      "unpinAria": "Открепить страницу {name}",
+      "rarityLine": "Нашли {percent} коллекционеров",
+      "pageRarityLine": "Озарили {percent} коллекционеров",
+      "cellAriaWithRarity": "{base}, {rarity}"
     },
     "deeds": {
       "title": "Книга деяний",

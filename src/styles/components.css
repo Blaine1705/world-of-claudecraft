@@ -8506,6 +8506,13 @@
     line-height: 1.4;
     color: var(--color-text-muted);
   }
+  /* The population line under the blurb (the .deed-rarity sibling): a muted
+     one-liner, absent entirely when there is no aggregate to report. */
+  .reliquary-page-rarity {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
   /* flex: none matches the .deeds-filterbar twin: inside the page-detail flex
      column the chip row would otherwise shrink under pressure. */
   .reliquary-filterbar {

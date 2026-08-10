@@ -3587,7 +3587,10 @@ export const en_XA: EnTranslations = {
       "unpin": "[Úñþíñ]",
       "pinFull": "[Ţĥé ţŕáçķéŕ íš ƒúļļ (úþ ţó {cap} þáĝéš)]",
       "pinAria": "[Þíñ {name} ţó ţĥé ĤÚÐ ţŕáçķéŕ]",
-      "unpinAria": "[Úñþíñ {name}]"
+      "unpinAria": "[Úñþíñ {name}]",
+      "rarityLine": "[Ƒóúñð ƀý {percent} óƒ çóļļéçţóŕš]",
+      "pageRarityLine": "[Íļļúɱíñáţéð ƀý {percent} óƒ çóļļéçţóŕš]",
+      "cellAriaWithRarity": "[{base}, {rarity}]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

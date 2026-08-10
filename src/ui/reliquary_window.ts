@@ -28,7 +28,7 @@ import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
-import type { IWorld } from '../world_api';
+import type { IWorld, ReliquaryRarity } from '../world_api';
 import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -80,6 +80,8 @@ import {
   reliquaryFocusFallbackKey,
   reliquaryObtainCountsDigest,
   reliquaryOwnershipDigest,
+  reliquaryPageRarityFraction,
+  reliquaryRarityFraction,
   reliquaryRecentSig,
   reliquaryRefreshSig,
   reliquarySecondaryClears,
@@ -148,6 +150,11 @@ export class ReliquaryWindow {
   private opened = false;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  /** The realm population-rarity aggregate, one fetch per fresh open (the
+   *  DeedsWindow rarity pattern): null offline, on failure, and until the
+   *  async read lands, and null renders NO rarity nodes at all. */
+  private rarity: ReliquaryRarity | null = null;
+  private rarityFetchSeq = 0;
   private nav: ReliquaryNavId = 'overview';
   private pageId: string | null = null;
   private search = '';
@@ -276,6 +283,7 @@ export class ReliquaryWindow {
     this.opened = true;
     this.lastSig = '';
     this.suppressAnnounceOnce = true;
+    this.fetchRarity();
     this.render();
     this.deps.root().style.display = 'flex';
     // The page jump outranks the shelf jump. Today at most ONE of the two is
@@ -426,6 +434,28 @@ export class ReliquaryWindow {
     } else {
       this.open();
     }
+  }
+
+  /** One rarity fetch per fresh open (the DeedsWindow rarity pattern). The
+   *  async result repaints in place when it lands (the signature diff cannot
+   *  see it, so that render is explicit); the sequence guard drops a stale
+   *  response after a close/reopen race, and the opened check drops one that
+   *  lands after close. Null-on-failure is the facet contract: a rejection or
+   *  null keeps this.rarity null and nothing renders. */
+  private fetchRarity(): void {
+    const seq = ++this.rarityFetchSeq;
+    this.rarity = null;
+    void this.deps
+      .world()
+      .reliquaryRarity()
+      .then((rarity) => {
+        if (seq !== this.rarityFetchSeq || !this.opened || rarity === null) return;
+        this.rarity = rarity;
+        this.render();
+      })
+      .catch(() => {
+        /* null-on-failure is the facet contract; a rejection renders nothing */
+      });
   }
 
   /**
@@ -1295,6 +1325,24 @@ export class ReliquaryWindow {
     // reliquary_i18n channel (English fallback until the release locale fill).
     const desc = reliquaryPageDesc(page.pageId);
     const blurb = desc === '' ? '' : `<p class="reliquary-page-desc">${esc(desc)}</p>`;
+    // The population line: how much of the realm has illuminated this page.
+    // Null (offline, fetch failure, empty population, or a page nobody has
+    // illuminated, which permanently covers the personal Riftbound page)
+    // renders NO node at all, the deed-rarity omission contract, so offline
+    // and pre-fetch paints are byte-identical to the pre-rarity ones. Plain
+    // rendered text, so screen readers get it without an aria mirror.
+    const pageRarityFraction = reliquaryPageRarityFraction(this.rarity, page.pageId);
+    const pageRarity =
+      pageRarityFraction === null
+        ? ''
+        : `<p class="reliquary-page-rarity">${esc(
+            t('hudChrome.reliquary.pageRarityLine', {
+              percent: formatNumber(pageRarityFraction, {
+                style: 'percent',
+                maximumFractionDigits: 1,
+              }),
+            }),
+          )}</p>`;
     const activeCell = Math.min(Math.max(this.gridIndex, 0), Math.max(page.cells.length - 1, 0));
     // Roving tabindex on role="list" is not a composite-widget role, so nothing
     // announces the arrow-key model on its own and a sighted keyboard-only
@@ -1326,6 +1374,7 @@ export class ReliquaryWindow {
       this.pinButtonHtml(page.pageId, page.illuminated) +
       `</header>` +
       blurb +
+      pageRarity +
       accountScope +
       `<div class="reliquary-page-progress-row" role="img" aria-label="${esc(
         t('hudChrome.reliquary.pageProgressAria', {
@@ -1424,6 +1473,17 @@ export class ReliquaryWindow {
    * spelled here.
    */
   private cellAria(cell: ReliquaryGridCellModel, name: string, sourceLines: string[]): string {
+    // The tooltip/label agreement contract: the tooltip's rarity line rides
+    // the SAME cellRarityText resolver, so whichever surface a player reads,
+    // the population fact is there or absent on both. The composition key owns
+    // the joining punctuation ('{base}, {rarity}'), never this painter.
+    const base = this.cellAriaBase(cell, name, sourceLines);
+    const rarity = this.cellRarityText(cell);
+    if (rarity === null) return base;
+    return t('hudChrome.reliquary.cellAriaWithRarity', { base, rarity });
+  }
+
+  private cellAriaBase(cell: ReliquaryGridCellModel, name: string, sourceLines: string[]): string {
     if (cell.owned) {
       // Four owned shapes, one whole authored sentence each rather than a
       // stitched-together label: the clause order and the punctuation between
@@ -1567,6 +1627,30 @@ export class ReliquaryWindow {
     )}</div>`;
   }
 
+  /** The population-rarity sentence for one cell, or null when there is
+   *  nothing to say (offline, fetch failure, empty population, or a relic
+   *  nobody has found; weapon-skin and title relics are always absent from
+   *  the aggregate). ONE resolver feeds the tooltip line AND the aria fold so
+   *  the two surfaces cannot disagree (the sourceLines agreement contract). */
+  private cellRarityText(cell: ReliquaryGridCellModel): string | null {
+    const fraction = reliquaryRarityFraction(this.rarity, cell.id);
+    if (fraction === null) return null;
+    return t('hudChrome.reliquary.rarityLine', {
+      percent: formatNumber(fraction, { style: 'percent', maximumFractionDigits: 1 }),
+    });
+  }
+
+  /** The rarity tooltip line, the ONE implementation every tooltip exit path
+   *  appends (the obtainedLineHtml discipline): the missing-cell body, the
+   *  owned plain body, and the owned full-item-tooltip branch. Absent data
+   *  renders nothing at all, never a zero, so offline and fetch-failure
+   *  tooltips are byte-identical to the pre-rarity ones. */
+  private rarityLineHtml(cell: ReliquaryGridCellModel): string {
+    const text = this.cellRarityText(cell);
+    if (text === null) return '';
+    return `<div class="tt-line">${esc(text)}</div>`;
+  }
+
   private cellTooltipHtml(cell: ReliquaryGridCellModel): string {
     const name = this.cellDisplayName(cell);
     const status = cell.owned
@@ -1619,9 +1703,11 @@ export class ReliquaryWindow {
           )}</div>`;
         }
         html += this.obtainedLineHtml(cell);
+        html += this.rarityLineHtml(cell);
         return html;
       }
     }
+    body += this.rarityLineHtml(cell);
     return body;
   }
 

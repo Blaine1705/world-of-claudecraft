@@ -55,6 +55,8 @@ import {
   reliquaryMarkFindKey,
   reliquaryObtainCountsDigest,
   reliquaryOwnershipDigest,
+  reliquaryPageRarityFraction,
+  reliquaryRarityFraction,
   reliquaryRecentSig,
   reliquaryRefreshSig,
   reliquarySecondaryClears,
@@ -2928,5 +2930,47 @@ describe('fairness: completion never depends on graphics tier', () => {
     expect(withItems.progress).toEqual(again.progress);
     expect(withItems.progress.owned).toBe(2);
     expect(Object.keys(input())).not.toContain('graphicsTier');
+  });
+});
+
+describe('reliquaryRarityFraction / reliquaryPageRarityFraction (the render gates)', () => {
+  const aggregate = {
+    totalEligible: 200,
+    found: { cryptbone_helm: 3, 'slain:old_greyjaw': 260 },
+    illuminated: { conquerors_hollow_crypt: 5 },
+  };
+
+  it('null aggregate, empty population, and an absent id all gate to null', () => {
+    // Null is the single no-render value: offline (Sim always answers null),
+    // a failed fetch, a dead population, and a relic nobody has found must all
+    // land on the SAME arm, because the painter renders no node for null and
+    // anything else would paint a fabricated zero.
+    expect(reliquaryRarityFraction(null, 'cryptbone_helm')).toBeNull();
+    expect(
+      reliquaryRarityFraction({ totalEligible: 0, found: {}, illuminated: {} }, 'x'),
+    ).toBeNull();
+    expect(reliquaryRarityFraction(aggregate, 'never_found_relic')).toBeNull();
+    expect(reliquaryPageRarityFraction(null, 'conquerors_hollow_crypt')).toBeNull();
+    expect(
+      reliquaryPageRarityFraction({ totalEligible: 0, found: {}, illuminated: {} }, 'x'),
+    ).toBeNull();
+    // The personal Riftbound page can never illuminate, so it is permanently
+    // absent from the map: the gate answers null, never a zero line.
+    expect(reliquaryPageRarityFraction(aggregate, 'horizons_riftbound')).toBeNull();
+  });
+
+  it('a present id yields the exact fraction, mark ids included', () => {
+    expect(reliquaryRarityFraction(aggregate, 'cryptbone_helm')).toBe(3 / 200);
+    expect(reliquaryPageRarityFraction(aggregate, 'conquerors_hollow_crypt')).toBe(5 / 200);
+  });
+
+  it('clamps a count that outran the denominator to exactly 1', () => {
+    // The aggregate's scans are not one snapshot (READ COMMITTED), so a fill
+    // committing between statements can push a count past totalEligible for
+    // one cycle; a rarity line must never read over 100 percent.
+    expect(reliquaryRarityFraction(aggregate, 'slain:old_greyjaw')).toBe(1);
+    expect(
+      reliquaryPageRarityFraction({ totalEligible: 10, found: {}, illuminated: { p: 11 } }, 'p'),
+    ).toBe(1);
   });
 });

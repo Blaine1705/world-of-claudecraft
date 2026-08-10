@@ -1314,3 +1314,35 @@ export function reliquaryFocusFallbackKey(focusKey: string | null): string | nul
   }
   return null;
 }
+
+/** The population-rarity fraction for one relic id, or null when there is
+ *  nothing to render: no aggregate (offline, or the fetch failed), an empty
+ *  eligible population, or a relic nobody has found (absent from the map by
+ *  the endpoint contract; weapon-skin and title relics are always absent).
+ *  The painter renders a rarity line only for a non-null value, so absent
+ *  data means no node at all (the deedRarityFraction contract). */
+export function reliquaryRarityFraction(
+  rarity: import('../world_api').ReliquaryRarity | null,
+  relicId: string,
+): number | null {
+  if (rarity === null || rarity.totalEligible <= 0) return null;
+  const found = rarity.found[relicId];
+  if (found === undefined) return null;
+  // The aggregate's scans are not one snapshot, so a count can outrun the
+  // denominator by a hair; a rarity line must never read over 100 percent.
+  return Math.min(1, found / rarity.totalEligible);
+}
+
+/** The illumination-rarity fraction for one page id, on exactly the
+ *  reliquaryRarityFraction contract (null means the header omits the line;
+ *  a page nobody has illuminated is absent from the map, which also covers
+ *  the personal Riftbound page that can never illuminate). */
+export function reliquaryPageRarityFraction(
+  rarity: import('../world_api').ReliquaryRarity | null,
+  pageId: string,
+): number | null {
+  if (rarity === null || rarity.totalEligible <= 0) return null;
+  const illuminated = rarity.illuminated[pageId];
+  if (illuminated === undefined) return null;
+  return Math.min(1, illuminated / rarity.totalEligible);
+}

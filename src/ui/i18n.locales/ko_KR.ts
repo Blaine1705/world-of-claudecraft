@@ -10674,6 +10674,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': '추적기가 가득 찼습니다 (최대 {cap}개 페이지)',
   'hudChrome.reliquary.pinAria': 'HUD 추적기에 {name} 고정',
   'hudChrome.reliquary.unpinAria': '{name} 고정 해제',
+  'hudChrome.reliquary.rarityLine': '수집가 중 {percent} 발견',
+  'hudChrome.reliquary.pageRarityLine': '수집가 중 {percent} 조명',
+  'hudChrome.reliquary.cellAriaWithRarity': '{base}, {rarity}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '기록되지 않은 성물',

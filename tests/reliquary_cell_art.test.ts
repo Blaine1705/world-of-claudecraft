@@ -629,6 +629,7 @@ function makeRig(seed: { recent?: string[]; marks?: string[] } = {}): ArtRig {
           if (!page) return null;
           return { owned: 0, total: page.relics.length, complete: false };
         },
+        reliquaryRarity: () => Promise.resolve(null),
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},

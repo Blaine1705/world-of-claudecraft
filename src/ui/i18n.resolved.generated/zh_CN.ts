@@ -3587,7 +3587,10 @@ export const zh_CN: EnTranslations = {
       "unpin": "取消固定",
       "pinFull": "追踪器已满（最多 {cap} 个页面）",
       "pinAria": "将{name}固定到界面追踪器",
-      "unpinAria": "取消固定{name}"
+      "unpinAria": "取消固定{name}",
+      "rarityLine": "{percent} 的收藏家已发现",
+      "pageRarityLine": "{percent} 的收藏家已点亮",
+      "cellAriaWithRarity": "{base}，{rarity}"
     },
     "deeds": {
       "title": "功绩之书",

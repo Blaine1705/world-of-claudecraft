@@ -10199,6 +10199,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': '追踪器已满（最多 {cap} 个页面）',
   'hudChrome.reliquary.pinAria': '将{name}固定到界面追踪器',
   'hudChrome.reliquary.unpinAria': '取消固定{name}',
+  'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已发现',
+  'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已点亮',
+  'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': '未记录的圣物',

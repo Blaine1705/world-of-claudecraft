@@ -10863,6 +10863,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': 'Список отслеживания полон (не более {cap} страниц)',
   'hudChrome.reliquary.pinAria': 'Закрепить страницу {name} на экране',
   'hudChrome.reliquary.unpinAria': 'Открепить страницу {name}',
+  'hudChrome.reliquary.rarityLine': 'Нашли {percent} коллекционеров',
+  'hudChrome.reliquary.pageRarityLine': 'Озарили {percent} коллекционеров',
+  'hudChrome.reliquary.cellAriaWithRarity': '{base}, {rarity}',
   // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
   // the search / found-status filter chrome.
   'hudChrome.reliquary.unknownRelic': 'Незарегистрированная реликвия',

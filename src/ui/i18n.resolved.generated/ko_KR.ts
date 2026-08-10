@@ -3587,7 +3587,10 @@ export const ko_KR: EnTranslations = {
       "unpin": "고정 해제",
       "pinFull": "추적기가 가득 찼습니다 (최대 {cap}개 페이지)",
       "pinAria": "HUD 추적기에 {name} 고정",
-      "unpinAria": "{name} 고정 해제"
+      "unpinAria": "{name} 고정 해제",
+      "rarityLine": "수집가 중 {percent} 발견",
+      "pageRarityLine": "수집가 중 {percent} 조명",
+      "cellAriaWithRarity": "{base}, {rarity}"
     },
     "deeds": {
       "title": "업적의 서",

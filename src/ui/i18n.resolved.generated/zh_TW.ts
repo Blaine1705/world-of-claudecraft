@@ -3587,7 +3587,10 @@ export const zh_TW: EnTranslations = {
       "unpin": "取消釘選",
       "pinFull": "追蹤器已滿（最多 {cap} 個頁面）",
       "pinAria": "將{name}釘選到介面追蹤器",
-      "unpinAria": "取消釘選{name}"
+      "unpinAria": "取消釘選{name}",
+      "rarityLine": "{percent} 的收藏家已發現",
+      "pageRarityLine": "{percent} 的收藏家已點亮",
+      "cellAriaWithRarity": "{base}，{rarity}"
     },
     "deeds": {
       "title": "功績之書",

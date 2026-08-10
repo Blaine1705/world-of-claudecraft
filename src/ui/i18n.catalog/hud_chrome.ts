@@ -4645,6 +4645,16 @@ export const hudChromeStrings = {
     pinFull: 'The tracker is full (up to {cap} pages)',
     pinAria: 'Pin {name} to the HUD tracker',
     unpinAria: 'Unpin {name}',
+    // Phase 22: realm population rarity (the hudChrome.deeds.rarityLine
+    // sibling). {percent} arrives pre-formatted through formatNumber's percent
+    // style. "Found" is deliberate over "Owned": the aggregate counts sticky
+    // first discovery (items) and kill proofs (marks), so it stays true for a
+    // mount whose reins were later sold or traded away.
+    rarityLine: 'Found by {percent} of collectors',
+    pageRarityLine: 'Illuminated by {percent} of collectors',
+    // Joins a cell's base aria sentence and the rarity sentence; the key owns
+    // the punctuation so locales can reorder or repunctuate the pair.
+    cellAriaWithRarity: '{base}, {rarity}',
   },
   deeds: {
     title: 'Book of Deeds',
