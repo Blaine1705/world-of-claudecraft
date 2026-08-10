@@ -41,12 +41,13 @@ import {
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import { DT, dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SPACING = RIFT_MECHANIC_SPACING_SEC;
 const WINDUP = RIFT_MECHANIC_WINDUP_SEC;
 
 function makeSim(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
 }
 
 const stunAura = (e: Entity) => e.auras.find((a) => a.id === 'stomp_stun');
@@ -95,7 +96,13 @@ function captureEvents(sim: Sim): SimEvent[] {
 // and hand-place a stamped boss of the given template on the player inside the
 // instance (its id joined to inst.mobIds so the death-zone driver finds it).
 function enterRiftWithBoss(templateId: string): { sim: Sim; mob: Entity } {
-  const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed: 3,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.enterRift(3, 20, sim.player.id);
   const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
   for (const id of inst.mobIds) {
@@ -456,7 +463,12 @@ describe('rift boss cleave is a frontal arc', () => {
   });
 
   function cleaveSplashAt(offX: number, offZ: number, stamped: boolean): boolean {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const mainId = sim.addPlayer('warrior', 'Tank');
     const offId = sim.addPlayer('warrior', 'Bystander');
     const mob = createMob((sim as any).nextId++, MOBS.rift_boss_brute, 22, { x: 0, y: 0, z: 0 });

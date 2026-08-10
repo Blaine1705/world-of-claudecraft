@@ -41,6 +41,7 @@ import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
+import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -136,7 +137,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
   if (mob.dead) {
     ctx.onBossDeath(mob);
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
+    if (
+      mob.ownerId !== null &&
+      MOBS[mob.templateId]?.family !== 'demon' &&
+      MOBS[mob.templateId]?.family !== 'undead'
+    )
+      return;
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
@@ -149,13 +155,20 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       }
     }
     // a slain summoned demon unravels rather than respawning into the wild
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family === 'demon') {
+    if (
+      mob.ownerId !== null &&
+      (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
+    ) {
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
         // owner (pet/pet_match_return.ts). Recorded before the entity goes, since
         // afterwards it is unknowable. Pure state, no rng.
         noteMatchPetUnravelled(ctx, mob);
+        // The same fact for the owner's own death: a demon that leaves no corpse
+        // has to be REBUILT when its owner is resurrected, not revived in place
+        // (pet/pet_owner_revive.ts). Also pure state, no rng.
+        notePetUnravelledOnOwnerDeath(ctx, mob);
         ctx.despawnPet(mob);
       }
       return;

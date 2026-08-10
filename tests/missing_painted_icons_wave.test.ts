@@ -237,6 +237,9 @@ const ALLOWED_REFERENCE_ROLES = [
   'subject reference',
 ] as const;
 
+// The warlock overhaul's choice-row talent icons and the retired summon art
+// (WARLOCK_TALENT_IMAGE_IDS) are image ids without live ability records by
+// design: choice rows use their own images instead of borrowing spell art.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'anger_management',
   'attack',
@@ -254,9 +257,31 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'pursuit',
   'second_wind',
   'snap_polymorph',
+  'summon_doomguard',
+  'summon_felguard',
+  'summon_felhunter',
+  'summon_succubus',
   'temporal_rift',
   'twin_frost_nova',
   'warded',
+  'wlk_r11_demon_armor',
+  'wlk_r11_fel_concentration',
+  'wlk_r11_improved_life_tap',
+  'wlk_r14_amplify_curse',
+  'wlk_r14_ruin',
+  'wlk_r14_shadow_mastery',
+  'wlk_r17_death_coil',
+  'wlk_r17_demonic_resilience',
+  'wlk_r17_improved_fear',
+  'wlk_r20_chaos_bolt',
+  'wlk_r20_curse_mastery',
+  'wlk_r20_grimoire_of_haste',
+  'wlk_r5_bane',
+  'wlk_r5_improved_corruption',
+  'wlk_r5_improved_immolate',
+  'wlk_r8_curse_of_exhaustion',
+  'wlk_r8_howl_of_terror',
+  'wlk_r8_voidfeast',
 ] as const;
 
 describe('missing painted icon accepted-art manifest', () => {
@@ -266,18 +291,24 @@ describe('missing painted icon accepted-art manifest', () => {
     );
     const accepted = manifest();
     expect(accepted.schemaVersion).toBe(1);
+    // The paladin overhaul retired aura_surge/cleansing_verdict/divine_shield/
+    // holy_wrath (4 ability rows) and buildHeroicVariants added the
+    // heroic_duskwhisper resolver, so 209/194/90/15 became 206/190/86/16.
+    // The 2026-08-09 wave adds the 13 missing overhaul ability icons plus the
+    // bespoke Elemental Trance replacing its interim duplicate: 206/190/86
+    // become 220/204/100.
     expect(accepted.scope).toEqual({
-      targetRows: 209,
-      rasterPaintings: 194,
-      abilities: 90,
+      targetRows: 220,
+      rasterPaintings: 204,
+      abilities: 100,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 15,
+      heroicWeaponResolvers: 16,
       originalInventoryRows: 197,
       supplementalCurrentHeadRows: 12,
     });
-    expect(accepted.assets).toHaveLength(194);
-    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
+    expect(accepted.assets).toHaveLength(204);
+    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(100);
     expect(accepted.assets.filter((asset) => asset.kind === 'item')).toHaveLength(101);
     expect(accepted.assets.filter((asset) => asset.kind === 'deed')).toHaveLength(3);
 
@@ -291,7 +322,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(15);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(16);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
@@ -422,9 +453,9 @@ describe('missing painted icon accepted-art manifest', () => {
         ).toBe(true);
       }
     }
-    expect(shippingHashes.size).toBe(194);
-    expect(sourceHashes.size).toBe(194);
-    expect(masterHashes.size).toBe(194);
+    expect(shippingHashes.size).toBe(204);
+    expect(sourceHashes.size).toBe(204);
+    expect(masterHashes.size).toBe(204);
     expect(sorted(referenceRoles)).toEqual([...ALLOWED_REFERENCE_ROLES]);
   });
 });
@@ -432,7 +463,7 @@ describe('missing painted icon accepted-art manifest', () => {
 describe('missing painted ability integration', () => {
   it('makes every live ability image-backed while preserving all 19 modifier/talent ids', () => {
     const accepted = manifest();
-    expect(accepted.targetSets.abilities).toHaveLength(90);
+    expect(accepted.targetSets.abilities).toHaveLength(100);
     expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
     expect(sorted([...ABILITY_IMAGE_IDS].filter((id) => !Object.hasOwn(ABILITIES, id)))).toEqual([
       ...PRESERVED_IMAGE_BACKED_MODIFIER_IDS,

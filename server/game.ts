@@ -61,6 +61,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
@@ -117,12 +118,15 @@ import {
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  PET_SPECIAL_WIRE_VERSION,
+  type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
+import { sameAppearance } from '../src/world_api/appearance';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -1031,6 +1035,7 @@ export interface ClientSession {
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
+  petSpecialWireVersion: 0 | PetSpecialWireVersion;
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
@@ -1203,6 +1208,7 @@ export interface AdminLiveAura {
   value: number;
   remaining: number;
   duration: number;
+  permanent?: boolean;
 }
 
 export interface AdminLiveLocation {
@@ -1251,6 +1257,7 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  perm?: 1;
   // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
   // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
   // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
@@ -1305,7 +1312,18 @@ interface WhoRosterRow {
 }
 
 type RememberedChat =
-  | { channel: 'say' | 'yell' | 'general' | 'party' | 'guild' | 'officer' | 'world' | 'lfg' }
+  | {
+      channel:
+        | 'say'
+        | 'yell'
+        | 'general'
+        | 'party'
+        | 'battleground'
+        | 'guild'
+        | 'officer'
+        | 'world'
+        | 'lfg';
+    }
   | { channel: 'whisper'; target: string };
 
 // Identity fields rarely change, so they ride only in "full" records: on an
@@ -1326,6 +1344,16 @@ function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
+    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
+    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // and changes at most once a session, and everything in this record is
+    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
+    // into the object would re-serialize half a kilobyte 20 times a second per
+    // online player to produce the same bytes. It is serialized once per entity
+    // instead (EntityWireCache.appJson) and spliced into the cached identity
+    // JSON; the self record picks it up through the `maybeRaw` delta channel in
+    // bcastSelf, which already exists for heavy, rarely-changing fields.
+    // appearanceWireJson() is the one place that string is minted.
     const eq = e.equippedItems;
     for (const _ in eq) {
       out.eq = eq;
@@ -1425,14 +1453,21 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
 // result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
 // measurable source of short-lived garbage. Output is byte-identical to the
 // prior spread chain; only the allocation shape changed.
+// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
+// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
+// aura visible instead of decoding the v3 sentinel as already expired.
+const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
+
 function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
   const w: WireAura = {
     id: a.id,
     name: a.name,
     kind: a.kind,
-    rem: round2(a.remaining),
-    dur: a.duration,
+    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
+    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
   };
+  if (permanent) w.perm = 1;
   // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
   // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
@@ -1448,7 +1483,12 @@ function wireAura(a: Aura): WireAura {
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
   if (a.school !== 'physical') w.school = a.school;
-  if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+  // teach the live stage including 0 and 1, and the decode side cannot tell
+  // "absent because 1" from "absent because 0", so the count is always sent.
+  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
+  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
   // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
   // buff icon can badge the count online exactly as offline; undefined for every other aura.
   if (a.charges !== undefined) w.charges = a.charges;
@@ -1494,6 +1534,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
     out.castTot = round2(e.castTotal);
+    if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
   // Mount summon/dismount transition, so every client can time the summon FX / call
@@ -1544,8 +1585,19 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
     if (e.petAutoWaterJet) out.pw = 1;
+    if ((e.petSkillTimer ?? 0) > 0) out.ps = round2(e.petSkillTimer ?? 0);
+    if (e.petAutoSkill) out.px = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
+  // Remote Paladins need the compact active-charge count so every client can
+  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
+  // with the exact Devotion value and remaining duration for the local HUD.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    // Omit-when-default like the fields above (review 3050): the idle 0 was
+    // serialized into every snapshot for every remote paladin.
+    const ascensionCharges = e.paladinDevotion?.ascensionCharges ?? 0;
+    if (ascensionCharges > 0) out.pasc = ascensionCharges;
+  }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (includeAuras && e.auras.length > 0) {
@@ -1644,7 +1696,15 @@ interface EntityWireVariantCache {
 
 interface EntityWireCache {
   tick: number;
+  /** identityFields() as JSON, WITHOUT the authored look: the string actually
+   *  diffed for identity changes. Kept beside idJson so the appearance splice
+   *  below only re-runs when the rest of the identity moves. */
+  baseIdJson: string;
   idJson: string;
+  /** The authored modular look, serialized ONCE for this entity (null when it
+   *  has none). Immutable for the session, so it is minted on first use and
+   *  spliced, never re-stringified. */
+  appJson: string | null;
   baseDynJson: string;
   idVer: number;
   baseDynVer: number;
@@ -3650,6 +3710,7 @@ export class GameServer {
         sourceUrl?: string | null;
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
+        petSpecialWireVersion?: 0 | PetSpecialWireVersion;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -3658,6 +3719,10 @@ export class GameServer {
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
         hotbarLayout?: ActionBarLayout | null;
+        // The character's authored modular look (characters.appearance),
+        // normalized at write. Stamped onto the world entity so it rides the
+        // identity wire (`app`) to every client in view.
+        appearance?: Record<string, unknown> | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -3695,7 +3760,17 @@ export class GameServer {
       state: state ?? undefined,
       characterId,
       bankBonus: meta.bankBonus,
+      appearance: meta.appearance ?? null,
     });
+    const player = this.sim.entities.get(pid);
+    if (player) {
+      player.petSpecialCommandsSupported = meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (meta.petSpecialWireVersion !== PET_SPECIAL_WIRE_VERSION) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === pid) entity.petAutoSkill = false;
+      }
+    }
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -3790,6 +3865,8 @@ export class GameServer {
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
+      petSpecialWireVersion:
+        meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0,
       timerWireCache: new StableSelfTimerWireCache(),
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
@@ -3895,6 +3972,9 @@ export class GameServer {
       name,
       cls,
       realm: REALM,
+      // Staff advert for admin-gated client surfaces (the /dev Spawns tab).
+      // Every gated command is re-checked server-side, so a forged true is inert.
+      admin: session.isAdmin,
       // Soft (cosmetic) words the client masks locally when its profanity
       // filter is on. Hard words are never sent — they're enforced server-side.
       softWords: this.chatFilter.softWords(),
@@ -3985,6 +4065,25 @@ export class GameServer {
     if (meta.hotbarLayout !== undefined) {
       session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
     }
+    // The freshly-read look, same "absent means keep" contract as the layout
+    // above. ws_auth always supplies it on a real reconnect, so a redesign
+    // saved during the linkdead grace window lands here: the join-time value
+    // on the entity would otherwise outlive the row for the whole session,
+    // with the appearance memo happily serving the stale string (the wipe of
+    // lastSent below re-SENDS, but what it re-sends is the memo).
+    if (meta.appearance !== undefined) {
+      const e = this.sim.entities.get(session.pid);
+      // Compared by VALUE, not identity. meta.appearance is a fresh parse of a
+      // fresh row read, so it is never the same object as the one already on
+      // the entity and an identity check elided nothing: every reconnect busted
+      // the memo and re-shipped the look. Serializing two ~0.6 KB documents once
+      // per resume is nothing against re-minting the wire string and forcing a
+      // full identity record on every player in view.
+      if (e && !sameAppearance(e.modularAppearance, meta.appearance ?? null)) {
+        e.modularAppearance = meta.appearance ?? null;
+        this.bustAppearanceWireMemo(e.id);
+      }
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     // Load-bearing for every rev + cadence gate (market, mail, corder):
@@ -3999,6 +4098,18 @@ export class GameServer {
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    session.petSpecialWireVersion =
+      meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const player = this.sim.entities.get(session.pid);
+    if (player) {
+      player.petSpecialCommandsSupported =
+        session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (session.petSpecialWireVersion === 0) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
+      }
+    }
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
@@ -4011,6 +4122,7 @@ export class GameServer {
       name: session.name,
       cls,
       realm: REALM,
+      admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
     });
@@ -5484,6 +5596,67 @@ export class GameServer {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
   }
 
+  /**
+   * Push a helm-visibility preference onto a LIVE session, if the character has
+   * one. Returns whether anything was in world to push to.
+   *
+   * The appearance redesign writes helm visibility straight into the stored
+   * state blob (consumeAppearanceReroll), and a character who is IN WORLD while
+   * that lands still holds the old value in memory: its 30 s autosave would
+   * write it straight back. So the route mirrors the write onto the session
+   * through the same Sim entry the paperdoll's `set_helm` command uses; the
+   * value then rides the entity wire to every viewer at once, and the autosave
+   * agrees with the row instead of fighting it.
+   */
+  setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      this.sim.setHelmHidden(hidden, s.pid);
+      pushed = true;
+    }
+    return pushed;
+  }
+
+  /**
+   * Push a freshly saved look onto a LIVE session, if the character has one.
+   *
+   * The redesign route is allowed while the character is in world, and it used
+   * to apply only its helm half live: the look stayed the old body for the
+   * player and every peer until relog, while the roster row it was saved from
+   * showed the new one. Setting the entity field is NOT enough on its own:
+   * `EntityWireCache.appJson` is minted once per entity and the identity only
+   * re-splices when the rest of the identity moves, so the memo would serve
+   * the old string for the rest of the session. Busting both (appJson and the
+   * diffed base identity string) makes the next tick re-serialize, bump idVer,
+   * and re-send the full record to every viewer; the self record follows
+   * through the `maybeRaw('app')` diff for the same reason.
+   */
+  applyAppearanceForCharacter(
+    characterId: number,
+    appearance: Record<string, unknown> | null,
+  ): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      const e = this.sim.entities.get(s.pid);
+      if (!e) continue;
+      e.modularAppearance = appearance;
+      this.bustAppearanceWireMemo(e.id);
+      pushed = true;
+    }
+    return pushed;
+  }
+
+  /** Invalidate the per-entity appearance memo + identity diff so the next
+   *  tick re-serializes and re-ships the full record (see above). */
+  private bustAppearanceWireMemo(entityId: number): void {
+    const cache = this.wireCache.get(entityId);
+    if (!cache) return; // never broadcast yet; the first serialize is fresh
+    cache.appJson = null;
+    cache.baseIdJson = '';
+  }
+
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMailOwner(characterId, oldName, newName);
   }
@@ -5828,8 +6001,9 @@ export class GameServer {
           name: a.name,
           kind: a.kind,
           value: a.value,
-          remaining: round2(a.remaining),
-          duration: a.duration,
+          remaining: a.permanent ? 0 : round2(a.remaining),
+          duration: a.permanent ? 0 : a.duration,
+          permanent: a.permanent,
         })),
       });
     }
@@ -7218,6 +7392,17 @@ export class GameServer {
       case 'pet_auto_water_jet':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
+      case 'pet_special':
+        if (session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION) sim.petSpecial(pid);
+        break;
+      case 'pet_auto_special':
+        if (
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION &&
+          typeof msg.enabled === 'boolean'
+        ) {
+          sim.setPetAutoSpecial(msg.enabled, pid);
+        }
+        break;
       case 'pet_feed':
         if (typeof msg.item === 'string') {
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
@@ -8178,6 +8363,7 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
+    const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8384,10 +8570,27 @@ export class GameServer {
           );
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        const consecrations = activeConsecrations
+          .filter((consecration) => {
+            const dx = consecration.x - anchorEntity.pos.x;
+            const dz = consecration.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (consecration) =>
+              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
+          );
+        const consecrationsJson =
+          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
+        const petSpecialWireJson =
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
+            ? `,"psw":${PET_SPECIAL_WIRE_VERSION}`
+            : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>
@@ -8430,7 +8633,9 @@ export class GameServer {
     if (!cache) {
       cache = {
         tick: -1,
+        baseIdJson: '',
         idJson: '',
+        appJson: null,
         baseDynJson: '',
         idVer: 0,
         baseDynVer: 0,
@@ -8443,6 +8648,28 @@ export class GameServer {
     return cache;
   }
 
+  /**
+   * The authored modular look as JSON, minted at most ONCE per entity.
+   *
+   * `app` is by far the heaviest identity field (~0.6 KB for a default look,
+   * 1489 bytes at the ceiling the sanitizer's allowlists imply, measured by
+   * tests/appearance_wire_bounds.test.ts rather than compared at runtime) and the only one
+   * that a session normally never changes: it is stamped at join from the
+   * character's own column, and the sole thing that moves it is a redesign the
+   * player just paid a token for (applyAppearanceForCharacter, which busts this
+   * memo explicitly). Both wire paths therefore serialize
+   * it here and reuse the string: the peer path splices it into the cached
+   * identity JSON (wireCacheFor), the self path ships it through bcastSelf's
+   * `maybeRaw` delta channel. Returns null when the entity has no authored
+   * look, which is also what keeps the key sparse for pre-creator characters.
+   */
+  private appearanceWireJson(e: Entity): string | null {
+    if (!e.modularAppearance) return null;
+    const cache = this.entityWireCacheFor(e);
+    if (cache.appJson === null) cache.appJson = JSON.stringify(e.modularAppearance);
+    return cache.appJson;
+  }
+
   // Identity and non-aura dynamics are serialized once per entity/tick. The
   // negotiated legacy and stable aura variants are then built lazily, at most
   // once each, and shared by every compatible recipient.
@@ -8451,10 +8678,16 @@ export class GameServer {
     const t0 = this.perfDetailActive ? process.hrtime.bigint() : 0n;
     if (cache.tick !== this.sim.tickCount) {
       cache.tick = this.sim.tickCount;
-      const idJson = JSON.stringify(identityFields(e));
+      const baseIdJson = JSON.stringify(identityFields(e));
       const baseDynJson = JSON.stringify(dynamicFields(e, false));
-      if (idJson !== cache.idJson) {
-        cache.idJson = idJson;
+      if (baseIdJson !== cache.baseIdJson) {
+        cache.baseIdJson = baseIdJson;
+        // The look is spliced rather than composed into identityFields so the
+        // per-tick stringify above never walks it (see appearanceWireJson).
+        // Splicing here, inside the change arm, means even the concat only runs
+        // when the rest of the identity actually moved.
+        const appJson = this.appearanceWireJson(e);
+        cache.idJson = appJson === null ? baseIdJson : jsonWithField(baseIdJson, 'app', appJson);
         cache.idVer++;
       }
       if (baseDynJson !== cache.baseDynJson) {
@@ -8557,6 +8790,13 @@ export class GameServer {
       fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
+      pdev: p.paladinDevotion
+        ? {
+            value: p.paladinDevotion.value,
+            charges: p.paladinDevotion.ascensionCharges,
+            remaining: round2(p.paladinDevotion.ascensionRemaining),
+          }
+        : null,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
@@ -8626,6 +8866,20 @@ export class GameServer {
     maybe('hrat', p.hasteRating);
     maybe('hirat', p.hitRating);
     maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
+    // The viewer's OWN authored look. It cannot come from the entity list (the
+    // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
+    // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
+    // and near-immutable, so it ships on the first self record and then only if
+    // a redesign moves it.
+    //
+    // A missing look ships an explicit `"app":null` rather than nothing at all,
+    // which costs one 11-byte field once per session for a pre-creator
+    // character and makes clearing symmetric: a peer clears on ABSENCE, but
+    // absence on this record means "unchanged" (see the decode in
+    // src/net/online.ts), so a look pushed to null with nothing sent would clear
+    // for everyone in view and leave the owner looking at their old body for the
+    // rest of the session.
+    maybeRaw('app', this.appearanceWireJson(p) ?? 'null');
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,
@@ -9795,6 +10049,15 @@ export class GameServer {
               // match lifecycle, and flag plays refresh `bg` next snapshot.
               if (BG_WIRE_RESET_EVENTS.has(ev.type))
                 session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+              // A sticky /bg must not outlive the match it belongs to. The
+              // party precedent this channel copies is not equivalent: a party
+              // disband is occasional, a battleground ending is CERTAIN, so
+              // leaving the stickiness set would route the next plain line of
+              // every fighter after every match into "You are not in a
+              // battleground." Drop back to say, and only from bg.
+              if (ev.type === 'bgEnd' && session.rememberedChat.channel === 'battleground') {
+                session.rememberedChat = { channel: 'say' };
+              }
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (
@@ -9961,6 +10224,18 @@ export class GameServer {
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
       return null;
     }
+    // The spawn-control dev commands (spawn/despawn/killtarget) are staff-only
+    // even where ALLOW_DEV_COMMANDS is on: on a shared PBE realm any tester may
+    // self-serve gear and travel, but conjuring or deleting mobs reshapes the
+    // world every other tester is standing in. The client hides the Spawns tab
+    // for non-staff; this is the authoritative check behind that advert.
+    if (
+      /^\/(?:dev\s+(?:spawn|despawn|killtarget)|devspawn|devdespawn|devkilltarget)\b/i.test(text) &&
+      !session.isAdmin
+    ) {
+      this.sendChatNotice(session, '[dev] Spawn controls require an administrator account.');
+      return null;
+    }
     if (!text.startsWith('/')) {
       const body = text;
       if (!body.trim()) return null;
@@ -9992,6 +10267,11 @@ export class GameServer {
           return this.sim.chat(`/w ${session.rememberedChat.target} ${body}`, pid);
         case 'party':
           return this.sim.chat(`/p ${body}`, pid);
+        // Sticky like every other channel. Out of a match the sim answers with
+        // its own "not in a battleground" refusal, the same way a plain line
+        // sticky to party does once the party is gone.
+        case 'battleground':
+          return this.sim.chat(`/bg ${body}`, pid);
         case 'general':
           return this.sim.chat(`/general ${body}`, pid);
         case 'world':

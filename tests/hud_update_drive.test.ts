@@ -193,6 +193,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'reads the STATIC graphics-preset stamp that tiers several cadences below it; no DOM write',
   },
   {
+    call: 'this.resolvePendingLoadoutBar',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'applies a server-acked loadout bar swap the moment activeLoadout confirms (v0.29 class stack); early-returns to bookkeeping only on ordinary frames, no DOM write',
+  },
+  {
     call: 'this.reconcileSfx',
     band: 'fast',
     gate: '',
@@ -291,6 +298,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'one-shot latch that reloads the saved action-bar layout once',
   },
   {
+    call: 'this.paladinDevotionPainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
+  },
+  {
     call: 'this.syncActiveHotbarForm',
     band: 'frame',
     gate: '',
@@ -385,6 +399,63 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "p.resourceType === 'energy'",
     surface: 'chrome',
     why: 'shows the combo-point row for energy users, through the elided writer',
+  },
+  {
+    call: 'this.writerFacet.setAttr',
+    band: 'frame',
+    gate: "p.resourceType === 'energy'",
+    sites: 4,
+    surface: 'chrome',
+    why: 'combo-row a11y state (aria hidden/valuenow/valuetext/label), elided writer',
+  },
+  {
+    call: 'this.writerFacet.setAttr',
+    band: 'frame',
+    gate: "!(p.resourceType === 'energy')",
+    surface: 'chrome',
+    why: 'hides the combo row for non-energy classes, through the elided writer',
+  },
+  {
+    call: 'this.doomMeter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Warlock Doom meter driven by its own view core',
+  },
+  {
+    call: 'this.procOverlayPainter.paintNecromancyCharges',
+    band: 'frame',
+    gate: "this.sim.talentSpec === 'demonology'",
+    surface: 'chrome',
+    why: 'Demonology necromancy charge pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintDestructionMarks',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && this.sim.talentSpec === 'destruction'",
+    surface: 'chrome',
+    why: 'Destruction burn marks on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintChronoCharges',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && this.sim.talentSpec === 'arcane'",
+    surface: 'chrome',
+    why: 'Chronomancy charge pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintFrostCharges',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && !(this.sim.talentSpec === 'arcane') && this.sim.talentSpec === 'frost'",
+    surface: 'chrome',
+    why: 'Frost icicle pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paint',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && !(this.sim.talentSpec === 'arcane') && !(this.sim.talentSpec === 'frost')",
+    surface: 'chrome',
+    why: 'the generic proc overlay for every spec without its own charge readout',
   },
   {
     call: 'this.comboRowEl.appendChild',
@@ -581,27 +652,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!this.procOverlayPreviewed && this.sim.talentSpec === 'fire'",
     surface: 'chrome',
     why: 'clears that preview after 8 s; a one-shot behind the same latch, not a repeating driver',
-  },
-  {
-    call: 'this.procOverlayPainter.paintChronoCharges',
-    band: 'frame',
-    gate: "this.sim.talentSpec === 'arcane'",
-    surface: 'chrome',
-    why: 'the proc overlay driven by Aether Surge charges',
-  },
-  {
-    call: 'this.procOverlayPainter.paintFrostCharges',
-    band: 'frame',
-    gate: "!(this.sim.talentSpec === 'arcane') && this.sim.talentSpec === 'frost'",
-    surface: 'chrome',
-    why: 'the frost arm of the same overlay',
-  },
-  {
-    call: 'this.procOverlayPainter.paint',
-    band: 'frame',
-    gate: "!(this.sim.talentSpec === 'arcane') && !(this.sim.talentSpec === 'frost')",
-    surface: 'chrome',
-    why: 'the Heating Up / Hot Streak arm, the default for every other spec',
   },
   {
     call: 'this.auraOverlayController.paint',
@@ -1520,16 +1570,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-      // 46 = the same merge trap a second time: both sides of the v0.36.0
-      // sync counted 45 alone (the branch's reliquary window row vs the
-      // release's new window row on top of the shared 44 base); the merged
-      // tree carries both, decided surface: window.
-      // 47 = Phase 20 adds refreshCharSheetIfChanged, the progression-block
-      // latch that converges the open character SHEET (a window, not chrome: it
-      // repaints char_window, never always-on HUD furniture). It stays ONE row
-      // after the latch widened from worn cosmetics to the whole block: same
-      // single drive, more signature parts.
-    ).toEqual({ window: 47, chrome: 76, none: 16 });
+      // Both sides of every v0.36.0 sync move this bucket split independently
+      // (the branch's reliquary window row and the char-sheet latch against the
+      // release's own window/chrome churn), so it cannot be reconciled by
+      // arithmetic across a merge. The numbers below were set from a suite run
+      // on the merged tree, not from either side's narrative.
+    ).toEqual({ window: 47, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -42,6 +42,8 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
+import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
@@ -93,6 +95,7 @@ import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 import { WORLD_SEED } from '../sim/world_seed';
 import {
   type AccountCosmetics,
+  type ActiveConsecration,
   type ActiveFrostRing,
   type ActiveTemporalHourglass,
   type ArenaInfo,
@@ -133,6 +136,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
+  PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
@@ -161,6 +165,7 @@ import type {
   MasterworkView,
   SalvageResultView,
 } from '../world_api/professions';
+import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -189,6 +194,7 @@ interface ClientWireAura {
   rem?: number;
   exp?: number;
   dur: number;
+  perm?: 1;
   value?: number;
   value2?: number;
   value3?: number;
@@ -226,21 +232,20 @@ export interface CharacterSummary {
   /** The account's active Armory weapon skin for this character (server-resolved
    *  per class + mainhand). Optional for back-compat like the fields above. */
   weaponSkinId?: string | null;
-}
-
-function stringList(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function stringRecord(value: unknown): Record<string, string> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  const out: Record<string, string> = {};
-  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof entry === 'string' && entry.length > 0) out[key] = entry;
-  }
-  return out;
+  /** THIS character's authored modular look (characters.appearance). Untrusted
+   *  wire JSON: consumers normalize (normalizeAppearance) before composing.
+   *  Null/absent = pre-creator character; the legacy class rig renders. */
+  appearance?: Record<string, unknown> | null;
+  /** Mirror of the character's saved helm-visibility preference, so the roster
+   *  preview wears (or bares) the kit helm exactly as the world last saw them. */
+  helmHidden?: boolean;
+  /** ISO creation timestamp (server clock), for display; eligibility for the
+   *  redesign token is decided server-side (appearanceRerollAvailable). */
+  createdAt?: string | null;
+  /** Server-decided: this character still holds its one-shot appearance
+   *  redesign (created before the modular creator shipped, token unspent).
+   *  Drives the roster's reroll button; flips false after a successful spend. */
+  appearanceRerollAvailable?: boolean;
 }
 
 /** Bounded positive-integer wire read for cosmetic counts. NEVER trust the
@@ -256,16 +261,6 @@ function wireCount(value: unknown): number | undefined {
   if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
   const n = Math.floor(value);
   return n > 0 ? Math.min(n, RELIQUARY_OBTAIN_COUNT_CAP) : undefined;
-}
-
-function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: stringList(src.completedQuestIds),
-    mechChromaIds: stringList(src.mechChromaIds),
-    weaponSkinIds: stringList(src.weaponSkinIds),
-    weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
-  };
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
@@ -290,6 +285,7 @@ export function buildWebSocketAuthMessage(
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
+  petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
 } {
   return {
     t: ONLINE_WORLD_AUTH_TYPE,
@@ -297,6 +293,7 @@ export function buildWebSocketAuthMessage(
     character: characterId,
     clientSeed,
     timerWire: STABLE_TIMER_WIRE_VERSION,
+    petSpecialWire: PET_SPECIAL_WIRE_VERSION,
   };
 }
 
@@ -799,8 +796,44 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+    // The authored modular look, fixed to THIS character at create (its own
+    // server column). Optional: absent creates a legacy-rig character. Typed
+    // `object` so the render layer's ModularAppearance interface passes
+    // without a cast (this module stays out of src/render imports).
+    appearance: object | null = null,
+    // The creator's helmet toggle, becoming this character's standing helm
+    // preference. Defaults to hidden so an authored face is what the player
+    // meets in the world.
+    helmHidden = true,
+  ): Promise<void> {
+    await this.post('/api/characters', {
+      name,
+      class: cls,
+      skin,
+      helmHidden,
+      ...(appearance ? { appearance } : {}),
+    });
+  }
+
+  // Spend the character's one-shot appearance redesign (characters with no
+  // authored look; the server is the eligibility authority and burns the token
+  // atomically). `helmHidden` is the editor's helmet toggle, which is the same
+  // standing wardrobe choice creation posts, not a preview. Resolves with the
+  // normalized stored look.
+  async rerollAppearance(
+    characterId: number,
+    appearance: object,
+    helmHidden: boolean,
+  ): Promise<Record<string, unknown>> {
+    const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
+      appearance,
+      helmHidden,
+    });
+    return (data.appearance ?? appearance) as Record<string, unknown>;
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -1370,6 +1403,7 @@ function blankEntity(id: number): Entity {
     afk: false,
     weaponStowed: false,
     helmHidden: false,
+    modularAppearance: null,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1402,8 +1436,10 @@ function blankEntity(id: number): Entity {
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
+    petSkillTimer: 0,
     petAutoTaunt: false,
     petAutoWaterJet: false,
+    petAutoSkill: false,
     petManualTauntPending: false,
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
@@ -1466,6 +1502,9 @@ export class ClientWorld implements IWorld {
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
   realm = '';
+  // Whether this session's account holds a staff/admin role, from the hello
+  // frame. Advert only: every admin-gated command is re-checked server-side.
+  accountAdmin = false;
   inventory: InvSlot[] = [];
   // Equipped bag sockets, mirrored from snapshot self ('bags'); capacity is
   // derived locally from the shared item data (same math as the sim's bags.ts).
@@ -1790,6 +1829,9 @@ export class ClientWorld implements IWorld {
   // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
   // null until the server's meter warms up (perf overlay hides the row)
   serverTickHz: number | null = null;
+  // False until a negotiated server snapshot advertises support. This keeps a
+  // new client from showing inert buttons while connected to an older server.
+  petSpecialCommandsSupported = false;
   // Stable timer-wire decode state. These stay separate from the public
   // remaining-time mirrors so an omitted v2 field can be re-derived from the
   // server simulation clock without accumulating client-frame drift.
@@ -1853,6 +1895,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
@@ -2039,6 +2082,9 @@ export class ClientWorld implements IWorld {
   // 'error' frame, handled in onMessage, which sets sessionEnded).
   private socketClosed(): void {
     this.connected = false;
+    // A reconnect may land on an older binary. Drop optional behavior before
+    // any new transport can accept input; the next capable snapshot re-arms it.
+    this.petSpecialCommandsSupported = false;
     this.failPendingCommandOutcomes();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
@@ -2340,6 +2386,7 @@ export class ClientWorld implements IWorld {
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
+      this.accountAdmin = msg.admin === true;
       if (Array.isArray(msg.softWords)) {
         this.profanityWords = msg.softWords.filter(
           (w: unknown): w is string => typeof w === 'string',
@@ -2626,7 +2673,7 @@ export class ClientWorld implements IWorld {
           if (entity.dead || entity.auras.length === 0) continue;
           let retained = 0;
           for (const aura of entity.auras) {
-            if (Number.isFinite(aura.remaining))
+            if (!isPersistentEngineAura(aura.id) && Number.isFinite(aura.remaining))
               aura.remaining = Math.max(0, aura.remaining - elapsed);
             if (aura.remaining > 0) entity.auras[retained++] = aura;
           }
@@ -2690,6 +2737,7 @@ export class ClientWorld implements IWorld {
 
   private applySnapshot(snap: LooseJson): void {
     const now = performance.now();
+    this.petSpecialCommandsSupported = snap.psw === PET_SPECIAL_WIRE_VERSION;
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
     }
@@ -2766,6 +2814,36 @@ export class ClientWorld implements IWorld {
           ];
         })
       : [];
+    this.activeConsecrations = Array.isArray(snap.consecrations)
+      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
+          if (!value || typeof value !== 'object') return [];
+          const consecration = value as Record<string, unknown>;
+          if (
+            typeof consecration.id !== 'string' ||
+            ![
+              consecration.x,
+              consecration.z,
+              consecration.r,
+              consecration.dur,
+              consecration.rem,
+            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
+            (consecration.r as number) <= 0 ||
+            (consecration.dur as number) <= 0 ||
+            (consecration.rem as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: consecration.id,
+              x: consecration.x as number,
+              z: consecration.z as number,
+              radius: consecration.r as number,
+              duration: consecration.dur as number,
+              remaining: Math.min(consecration.rem as number, consecration.dur as number),
+            },
+          ];
+        })
+      : [];
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -2777,13 +2855,18 @@ export class ClientWorld implements IWorld {
     const prevSelfDead = prevSelf?.dead ?? false;
 
     const auraRemaining = (aura: ClientWireAura): number => {
+      if (aura.perm === 1) return Number.POSITIVE_INFINITY;
       if (timerWire.mode !== 'stable' || timerWire.time === null) return Number(aura.rem);
       const deadlineRemaining = stableDeadlineRemaining(aura.exp, timerWire.time);
       if (deadlineRemaining !== null) return deadlineRemaining;
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: LooseJson): Entity | null => {
+    // `selfDelta` marks the one record that is not a peer broadcast: the
+    // viewer's own extended state. Fields the server delta-gates per session
+    // (bcastSelf's maybe/maybeRaw channel) are absent when unchanged there,
+    // so an absent key must not be read as "cleared".
+    const applyWire = (w: LooseJson, selfDelta = false): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -2820,6 +2903,22 @@ export class ClientWorld implements IWorld {
           ),
         );
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        // The authored modular look (identity-only: set at join, immutable for
+        // the session). Untrusted wire JSON on purpose: every consumer runs
+        // it through normalizeAppearance before composing, so a hostile peer
+        // payload can only ever produce a clamped, valid body.
+        //
+        // For a PEER, absence on a full record is meaningful: no authored look,
+        // so clear it and let the class rig render. The SELF record is not a
+        // peer record: the viewer's own entity never rides the entity list (the
+        // broadcast loop skips it), so its look comes through bcastSelf's
+        // heavy-field delta channel, which ships a value once and then omits it.
+        // Clearing on absence there would erase the local player's body one tick
+        // after they entered the world.
+        if (!selfDelta || w.app !== undefined) {
+          e.modularAppearance =
+            w.app && typeof w.app === 'object' && !Array.isArray(w.app) ? w.app : null;
+        }
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
@@ -2940,6 +3039,26 @@ export class ClientWorld implements IWorld {
         e.maxResource = w.mres;
       }
       e.rangedPower = w.rp ?? 0;
+      // Absent means zero (omit-when-default wire convention): without this a
+      // paladin whose charges expired would keep stale orbiting seals forever.
+      if (e.kind === 'player' && e.templateId === 'paladin') {
+        const ascensionCharges = Math.max(0, Math.floor(Number(w.pasc ?? 0) || 0));
+        e.paladinDevotion ??= {
+          value: 0,
+          ascensionCharges: 0,
+          ascensionRemaining: 0,
+          outOfCombatTime: 0,
+          decayProgress: 0,
+          blockIcdRemaining: 0,
+        };
+        e.paladinDevotion.ascensionCharges = ascensionCharges;
+        // Synthetic presence flag, not a real duration: `pasc` carries only the
+        // charge count, never a remaining-seconds value. Every current reader
+        // (paladin_devotion_view, action_bar_view, paladin_ascension_core) only
+        // tests > 0, so 0/1 is enough; a future consumer that reads this as an
+        // actual countdown must not trust it.
+        e.paladinDevotion.ascensionRemaining = ascensionCharges > 0 ? 1 : 0;
+      }
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
@@ -2950,6 +3069,7 @@ export class ClientWorld implements IWorld {
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
+      e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
       // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
       // the summon FX / call pose and (for the local player) the self-extrapolator's
@@ -2988,8 +3108,10 @@ export class ClientWorld implements IWorld {
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
+      e.petSkillTimer = w.ps ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petAutoWaterJet = !!w.pw;
+      e.petAutoSkill = !!w.px;
       e.petManualTauntPending = false;
       // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
@@ -3028,7 +3150,8 @@ export class ClientWorld implements IWorld {
             rec.name = a.name;
             rec.kind = a.kind;
             rec.remaining = auraRemaining(a);
-            rec.duration = a.dur;
+            rec.duration = a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur;
+            rec.permanent = a.perm === 1;
             rec.value = a.value ?? 0;
             rec.value2 = a.value2;
             rec.value3 = a.value3;
@@ -3061,7 +3184,8 @@ export class ClientWorld implements IWorld {
             name: a.name,
             kind: a.kind,
             remaining: auraRemaining(a),
-            duration: a.dur,
+            duration: a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur,
+            permanent: a.perm === 1,
             value: a.value ?? 0,
             value2: a.value2,
             value3: a.value3,
@@ -3092,7 +3216,7 @@ export class ClientWorld implements IWorld {
 
     // self with extended state (always a full record)
     const s = snap.self;
-    const e = s ? applyWire(s) : null;
+    const e = s ? applyWire(s, true) : null;
     if (s && e) {
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
@@ -3252,6 +3376,18 @@ export class ClientWorld implements IWorld {
         e.firebottleCdRemaining = fcd;
       }
       e.comboPoints = s.combo ?? 0;
+      if (s.pdev !== undefined) {
+        e.paladinDevotion = s.pdev
+          ? {
+              value: Number(s.pdev.value) || 0,
+              ascensionCharges: Number(s.pdev.charges) || 0,
+              ascensionRemaining: Number(s.pdev.remaining) || 0,
+              outOfCombatTime: 0,
+              decayProgress: 0,
+              blockIcdRemaining: 0,
+            }
+          : undefined;
+      }
       // Routed through the pending-target echo guard: a stale in-flight
       // snapshot must not clobber an optimistic targetEntity write (the target
       // frame + party-frames select flicker). This is the counting site: one
@@ -3432,7 +3568,7 @@ export class ClientWorld implements IWorld {
       if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
       this.known = this.sportRole
         ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods);
+        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3682,6 +3818,7 @@ export class ClientWorld implements IWorld {
           }
         : undefined,
       cadenceBlocked,
+      this.cfg?.playerClass,
     );
   }
 
@@ -4484,9 +4621,13 @@ export class ClientWorld implements IWorld {
   petWaterJet(): void {
     this.cmd({ cmd: 'pet_water_jet' });
   }
+  petSpecial(): void {
+    if (!this.petSpecialCommandsSupported) return;
+    this.cmd({ cmd: 'pet_special' });
+  }
   setPetAutoTaunt(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoTaunt = enabled;
         break;
       }
@@ -4496,12 +4637,22 @@ export class ClientWorld implements IWorld {
 
   setPetAutoWaterJet(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoWaterJet = enabled;
         break;
       }
     }
     this.cmd({ cmd: 'pet_auto_water_jet', enabled });
+  }
+  setPetAutoSpecial(enabled: boolean): void {
+    if (!this.petSpecialCommandsSupported) return;
+    for (const e of this.entities.values()) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
+        e.petAutoSkill = enabled;
+        break;
+      }
+    }
+    this.cmd({ cmd: 'pet_auto_special', enabled });
   }
   feedPet(itemId: string, target?: { slotIndex: number }): void {
     if (target === undefined) this.cmd({ cmd: 'pet_feed', item: itemId });

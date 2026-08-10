@@ -551,8 +551,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
@@ -2556,7 +2558,12 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           queued: false,
           procGlow: false,
           empowered: false,
+          ascensionSpender: false,
+          ascensionCostLabel: '',
+          fateConsumeReady: false,
+          fateSentenceReady: false,
           ariaLabel: 'A',
+          ariaDescription: '',
           keybindLabel: 'K',
         },
       ],
@@ -2628,6 +2635,7 @@ function actionBarDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -2641,6 +2649,7 @@ function idleWorld(): ActionBarWorldInput {
     target: null,
     inventory: [],
     stealthed: false,
+    entities: [],
   };
 }
 
