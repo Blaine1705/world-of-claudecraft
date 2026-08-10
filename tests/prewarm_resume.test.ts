@@ -143,6 +143,64 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['player', 'mob']);
   });
 
+  it('skips a root whose every dedupe key was already covered', async () => {
+    // Hundreds of material-bearing leaves share programs (surfaceMat dedupes
+    // materials): a root contributing no unseen key links nothing new, so it
+    // must not cost a unit (each awaited compileAsync has a 10 ms poll floor).
+    const first = { id: 'a', mats: ['stone'] };
+    const duplicate = { id: 'b', mats: ['stone'] };
+    const fresh = { id: 'c', mats: ['stone', 'moss'] };
+    const compiled: string[] = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [first, duplicate, fresh] }],
+      async (root) => {
+        compiled.push(root.id);
+      },
+      { dedupeKeys: (root) => root.mats },
+    );
+    expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
+    for (const unit of units) await unit.run();
+    expect(compiled).toEqual(['a', 'c']);
+  });
+
+  it('batches roots into one unit that awaits its compiles together', async () => {
+    // r165 compileAsync resolves after N x 10 ms of setTimeout polling: awaited
+    // one by one, the floors stack; awaited together, they overlap. The batch
+    // still resolves only when every compile settles.
+    const roots = ['a', 'b', 'c'].map((id) => ({ id }));
+    const started: string[] = [];
+    const release: Array<() => void> = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots }],
+      (root) =>
+        new Promise<void>((resolve) => {
+          started.push(root.id);
+          release.push(resolve);
+        }),
+      { batchSize: 2 },
+    );
+    expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
+
+    let firstDone = false;
+    const firstRun = units[0].run();
+    void Promise.resolve(firstRun).then(() => {
+      firstDone = true;
+    });
+    await Promise.resolve();
+    // Both compiles of the batch started before either resolved.
+    expect(started).toEqual(['a', 'b']);
+    release.shift()?.();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(firstDone).toBe(false);
+    release.shift()?.();
+    await firstRun;
+    expect(firstDone).toBe(true);
+
+    await Promise.all([units[1].run(), Promise.resolve().then(() => release.shift()?.())]);
+    expect(started).toEqual(['a', 'b', 'c']);
+  });
+
   it('never overlaps a compile that outlives its idle slot', async () => {
     let active = 0;
     let maxActive = 0;
@@ -210,6 +268,9 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('wires the production compile resume lane to bounded units', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const unitsStart = source.indexOf('const compileEntryUnits =');
+    const unitsEnd = source.indexOf('const runEntry =', unitsStart);
+    const unitsSlice = source.slice(unitsStart, unitsEnd);
     const compileEntryStart = source.indexOf("id: 'programs.compile'");
     const compileEntryEnd = source.indexOf("id: 'sky.current-zone'", compileEntryStart);
     const compileEntry = source.slice(compileEntryStart, compileEntryEnd);
@@ -221,15 +282,22 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compileEntryEnd).toBeGreaterThan(compileEntryStart);
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
-    expect(resumeSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('roots: group.children');
-    expect(resumeSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(resumeSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
-    expect(resumeSlice).not.toContain('compileAsync(this.scene');
-    expect(resumeSlice).not.toContain('Promise.race');
+    expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    expect(resumeSlice).toContain('return compileEntryUnits()');
+    expect(unitsStart).toBeGreaterThan(-1);
+    expect(unitsEnd).toBeGreaterThan(unitsStart);
+    expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    expect(unitsSlice).toContain('else root.traverse(collect)');
+    expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
+    expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
+    expect(compileEntry).not.toContain('compileAsync(this.scene');
+    expect(compileEntry).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
-    expect(source).toContain('this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME)');
+    expect(source).toContain(
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+    );
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');

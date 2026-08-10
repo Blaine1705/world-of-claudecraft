@@ -1,15 +1,24 @@
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
-// mid-distance band. All geometry/materials are shared caches, dispose()
-// only releases mixer bindings.
+// mid-distance band. All geometry/materials are shared caches; dispose()
+// releases mixer bindings, this clone's Skeletons, and the visual's claims
+// on the shared tinted-material cache (which disposes a clone only once no
+// visual mounts it).
 import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
-import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
+import {
+  createWeaponVfx,
+  DEFAULT_TUNING,
+  WEAPON_VFX,
+  type WeaponVfxHandle,
+  type WeaponVfxTuning,
+} from '../weapon_vfx';
+import { scaleWeaponVfxTuning } from '../weapon_vfx_shed_core';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimActionWeight,
@@ -30,11 +39,13 @@ import {
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
+  releaseTintedMaterials,
   setHeldOffhand,
   setHeldWeapon,
   setWeaponsStowed,
   skinEmissiveTexture,
   skinTexture,
+  type TintedMaterialClaims,
   tintedFarMaterials,
 } from './assets';
 import { HairSwayDriver } from './hair_sway';
@@ -380,6 +391,12 @@ export class CharacterVisual {
   }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  // The skin's authored tuning row (the rig's 1.0 look) plus the shed
+  // multiplier last applied over it, and one scratch the scaled row is written
+  // into so a shed step allocates nothing.
+  private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
+  private weaponVfxShed = 1;
+  private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
    *  free on every other rig). */
   private hairSway = new HairSwayDriver();
@@ -430,8 +447,19 @@ export class CharacterVisual {
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
   // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
   // (weakest treatment: every form/death tint above wins). Keyed per source
-  // material AND color, since the wearer can chain different runes.
-  private runeTintMaterials = new Map<string, THREE.Material>();
+  // material, one clone each (the live rune color rides the clone's userData);
+  // chaining to a different rune replaces and disposes the old clone inside
+  // the same applyVisualMaterials sweep that unmounts it, and dispose()
+  // releases whatever remains, so rune wear can never strand materials.
+  private runeTintMaterials = new Map<THREE.Material, THREE.Material>();
+  // Leases over the shared tinted-material cache (assets.ts): every cache
+  // clone mounted on the rig (and, separately, on the far LOD) stays claimed
+  // through these sets so the cache can never dispose a mounted material. A
+  // full re-apply sweep claims into a fresh lease first and releases the old
+  // one after (shared keys never dip to zero claims mid-swap); dispose()
+  // releases both.
+  private tintedRigClaims: TintedMaterialClaims = new Set();
+  private tintedFarClaims: TintedMaterialClaims = new Set();
   // Ability VFX body glow (the gallery rim read): per-visual material clones
   // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
   // once per original because base materials are SHARED per-asset caches;
@@ -558,6 +586,7 @@ export class CharacterVisual {
       entityColor,
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),
+      this.tintedRigClaims,
     );
     // Class halo (the priest's Light): a glowing ring behind the head bone.
     // Added AFTER applyMaterials (its additive material must not be re-mapped)
@@ -609,6 +638,7 @@ export class CharacterVisual {
           prep.idleSrcIsBody,
           skinTexture(key, skinIndex),
           skinEmissiveTexture(key, skinIndex),
+          this.tintedFarClaims,
         ),
       );
       this.farMaterials = this.farMesh.material;
@@ -645,8 +675,8 @@ export class CharacterVisual {
       this.current = idle;
     }
 
-    // The atlas for a non-default skin may not be resident at construction: the
-    // packaged iOS shell defers the boot atlas sweep (assets.ts), so a visual
+    // The atlas for a non-default skin may not be resident at construction: every
+    // iOS WebKit host defers the boot atlas sweep (assets.ts), so a visual
     // born with a cosmetic skin applies the embedded default above and heals
     // here once the atlas arrives - the same ensure + re-apply round-trip
     // setSkin() already runs for live swaps. No-op when the atlas is resident
@@ -1403,6 +1433,22 @@ export class CharacterVisual {
     }
   }
 
+  /** Re-tint this visual for a new owner entity (pooled reuse across per-instance
+   *  colors: rift spawns jitter mob.color per instance, so the reuse-pool key is
+   *  per-template and color is applied at acquire time; see
+   *  characters/visual_pool.ts). Runs the same shared-material sweep setSkin
+   *  does, so the reused visual picks the exact tinted-material clones a fresh
+   *  construction with this color would, re-snapshots the ghost/restore map, and
+   *  re-applies any active overlay. No-op when the color already matches; a def
+   *  that ignores entity color (fixed or absent tint) only records the new
+   *  color, because no material reads it. */
+  setEntityColor(color: number): void {
+    if (color === this.entityColor) return;
+    this.entityColor = color;
+    if (this.def.tint !== 'entity') return;
+    this.applySkinMaterials(this.skinIndex);
+  }
+
   /** Swap the body skin (alternate texture atlas) at runtime; no-op if unchanged.
    *  Reuses the shared skin-keyed material cache, so this is a cheap reassign. */
   setSkin(skinIndex: number): void {
@@ -1428,13 +1474,33 @@ export class CharacterVisual {
   }
 
   private applySkinMaterials(skinIndex: number): void {
+    // Full-rig sweep: claim the new material set into a fresh lease BEFORE
+    // releasing the old one, so a key kept across the swap (same source, same
+    // tint) never dips to zero claims and can never be evicted mid-swap. Old
+    // keys nothing re-claimed (a previous entity color's tints, a previous
+    // skin's atlas variants) go idle and age out of the shared cache.
+    const prevRigClaims = this.tintedRigClaims;
+    this.tintedRigClaims = new Set();
     applyMaterials(
       this.model,
       this.def,
       this.entityColor,
       skinTexture(this.key, skinIndex),
       skinEmissiveTexture(this.key, skinIndex),
+      this.tintedRigClaims,
     );
+    releaseTintedMaterials(prevRigClaims);
+    // The per-effect clone maps (ghost/soul-rend/shadowform/moonkin/
+    // metamorph/rune-tint/aura-glow) key by SOURCE material, and this sweep
+    // just swapped every source (a new entity color or skin atlas), so
+    // clones derived from the old sources are unreachable from here on.
+    // Dispose them now, in the same synchronous pass that unmounts them (no
+    // render in between, the rune-chain precedent); the applyVisualMaterials
+    // call below re-derives any active overlay from the new sources, so a
+    // live effect survives the swap. Without this, a pooled visual
+    // accumulated one clone set per rift color worn (the maps only emptied
+    // in dispose()).
+    this.disposeEffectMaterials();
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
     this.model.traverse((o) => {
@@ -1453,6 +1519,8 @@ export class CharacterVisual {
     // pop reverts to the model's embedded default skin.
     if (this.farMesh) {
       const prep = prepareVisual(this.key);
+      const prevFarClaims = this.tintedFarClaims;
+      this.tintedFarClaims = new Set();
       this.farMaterials = tintedFarMaterials(
         this.def,
         this.entityColor,
@@ -1460,7 +1528,9 @@ export class CharacterVisual {
         prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
+        this.tintedFarClaims,
       );
+      releaseTintedMaterials(prevFarClaims);
     }
     this.applyVisualMaterials();
   }
@@ -1506,12 +1576,17 @@ export class CharacterVisual {
     );
     for (const payload of payloads) {
       configureTightBoneTextures(payload);
+      // Payload-subtree sweep: claim ADDITIVELY into the live rig lease (the
+      // rest of the rig keeps its mounts). Keys of the removed offhand's
+      // materials overstay in the lease until the next full sweep or dispose;
+      // an overstay only pins, it can never dispose a mounted material.
       applyMaterials(
         payload,
         this.def,
         this.entityColor,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
+        this.tintedRigClaims,
       );
     }
     this.originalMaterials.clear();
@@ -1567,9 +1642,15 @@ export class CharacterVisual {
     );
     if (offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId)) {
       payloads.push(...offPayloads);
+      this.finishWeaponAttach(payloads);
+      return payloads;
     }
+    // The non-mirrored offhand stays OUT of the skin material/VFX set
+    // (pixel-untouched), but its freshly attached nodes must still reach the
+    // caller's compile gate: dropped from the return, a re-attached shield's
+    // first draw linked its programs synchronously.
     this.finishWeaponAttach(payloads);
-    return payloads;
+    return [...payloads, ...offPayloads];
   }
 
   /** The shared tail of every re-attach (slot swap, skin change, sheathe swap):
@@ -1595,13 +1676,20 @@ export class CharacterVisual {
           }))
         : [];
     }
+    // Full-rig sweep (the whole model graph, weapon meshes included): swap
+    // the rig lease like applySkinMaterials does, so the removed weapon's
+    // material claims release and can age out of the shared cache.
+    const prevRigClaims = this.tintedRigClaims;
+    this.tintedRigClaims = new Set();
     applyMaterials(
       this.model,
       this.def,
       this.entityColor,
       skinTexture(this.key, this.skinIndex),
       skinEmissiveTexture(this.key, this.skinIndex),
+      this.tintedRigClaims,
     );
+    releaseTintedMaterials(prevRigClaims);
     // A VFX-tier skin's emissive derive mutates its payload materials in place,
     // so give each payload exclusive clones BEFORE the caster snapshot: the
     // shared tinted-material cache must never carry derived state (two players
@@ -1707,10 +1795,14 @@ export class CharacterVisual {
     const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
     const spec = skin ? (WEAPON_VFX[skin.model] ?? null) : null;
     if (!skin || !spec) return;
+    // The authored row is the rig's 1.0 look; the shed lever below re-derives
+    // from it, so it must be kept rather than only pushed once.
+    this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
+    this.weaponVfxShed = 1;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, { grounded: false });
       handle.setBackdropVisible(false);
-      handle.setTuning(weaponVfxTuningFor(skin.model, spec.tier));
+      handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
       // Tag the rig's own scene nodes: applyMaterials must never tint its
       // ShaderMaterials and the shadow pass has no business with sprite shells.
@@ -1733,10 +1825,43 @@ export class CharacterVisual {
 
   /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
    *  without an active skin; the renderer calls it once per entity per frame.
-   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
-  updateWeaponVfx(dt: number): void {
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon).
+   *
+   *  `shed` is the rig-strength multiplier from `weaponVfxShedScale` (viewer
+   *  distance plus the frame-budget governor's vfx lever); 1 is the authored
+   *  look. It only ever DIMS; what removes a rig is the far-LOD swap below.
+   *
+   *  The rig's point light deliberately keeps its `visible` flag at every
+   *  scale: three counts visible point lights into every lit material's program
+   *  cache key, so clearing one mid-flight is the open-world recompile freeze.
+   *  Dimming drives its intensity down instead, which is the look without the
+   *  hazard. */
+  updateWeaponVfx(dt: number, shed = 1): void {
     this.applySkinOrientation(dt);
+    if (this.weaponVfx.length === 0) return;
+    // A rig that the far-LOD swap has taken off screen still cost a full tick
+    // of uniform writes, emissive pulse and light flicker every frame, for
+    // something no pixel can show: `setFar` hides `modelWrap`, and a held
+    // weapon (with its rig) hangs off a bone INSIDE it.
+    //
+    // Gated on farMesh as well as `far`, and that is the load-bearing half:
+    // `setFar` leaves `modelWrap` VISIBLE when there is no baked mesh to stand
+    // in for it, while `isFar` reads true either way. Skipping on `far` alone
+    // would freeze a rig that is still drawing, leaving its motes hanging in
+    // the air and its light stuck at whatever the last flicker wrote.
+    if (this.far && this.farMesh) return;
+    this.applyWeaponVfxShed(shed);
     for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  // Write-elided: setTuning walks every part and rewrites its materials, so the
+  // quantized scale is compared first and an unchanged frame costs nothing.
+  private applyWeaponVfxShed(shed: number): void {
+    const next = Number.isFinite(shed) ? Math.min(1, Math.max(0, shed)) : 1;
+    if (next === this.weaponVfxShed) return;
+    this.weaponVfxShed = next;
+    scaleWeaponVfxTuning(this.weaponVfxAuthored, next, this.weaponVfxTuningScratch);
+    for (const handle of this.weaponVfx) handle.setTuning(this.weaponVfxTuningScratch);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their
@@ -1803,6 +1928,7 @@ export class CharacterVisual {
       this.shadowformMaterials,
       this.moonkinMaterials,
       this.metamorphMaterials,
+      this.runeTintMaterials,
       this.auraGlowMaterials,
     ]);
   }
@@ -1814,6 +1940,7 @@ export class CharacterVisual {
       ...this.shadowformMaterials.values(),
       ...this.moonkinMaterials.values(),
       ...this.metamorphMaterials.values(),
+      ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
@@ -1822,6 +1949,7 @@ export class CharacterVisual {
     this.shadowformMaterials.clear();
     this.moonkinMaterials.clear();
     this.metamorphMaterials.clear();
+    this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
   }
 
@@ -1913,14 +2041,24 @@ export class CharacterVisual {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     this.disposeEffectMaterials();
+    // Release the shared tinted-material leases (never disposing directly:
+    // another visual may still mount the same clones; the shared cache
+    // disposes an entry only once nothing claims it). Cleared so a double
+    // dispose cannot release another visual's claims.
+    releaseTintedMaterials(this.tintedRigClaims);
+    this.tintedRigClaims.clear();
+    releaseTintedMaterials(this.tintedFarClaims);
+    this.tintedFarClaims.clear();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();
     this.root.removeFromParent();
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
     // bone textures the renderer allocates lazily, release them here or
-    // online interest churn strands one per despawned entity. Geometries and
-    // materials remain shared per-asset caches and are never disposed.
+    // online interest churn strands one per despawned entity. Geometries
+    // remain shared per-asset caches and are never disposed; shared tinted
+    // materials were claim-released above and dispose through the bounded
+    // cache once no visual mounts them.
     const skeletons = new Set<THREE.Skeleton>();
     this.model.traverse((o) => {
       const sm = o as THREE.SkinnedMesh;
@@ -2006,10 +2144,18 @@ export class CharacterVisual {
   }
 
   private runeTintMaterial(material: THREE.Material, tint: number): THREE.Material {
-    const key = `${tint}:${material.uuid}`;
-    const cached = this.runeTintMaterials.get(key);
-    if (cached) return cached;
+    const cached = this.runeTintMaterials.get(material);
+    if (cached && cached.userData.runeTintHex === tint) return cached;
+    // Chained to a different rune color: replace the clone and dispose the
+    // old one. Safe because every runeTintMaterial call happens inside an
+    // applyVisualMaterials sweep, and a tint change reaches here only while
+    // that sweep is rewriting every mount of the old clone (same synchronous
+    // pass, no render in between), so disposal lands exactly as the material
+    // is unmounted, and the map stays at one clone per source instead of one
+    // per (source, color) forever.
+    cached?.dispose();
     const marked = material.clone();
+    marked.userData.runeTintHex = tint;
     const withColor = marked as THREE.Material & {
       color?: THREE.Color;
       emissive?: THREE.Color;
@@ -2022,7 +2168,7 @@ export class CharacterVisual {
       withColor.emissive.setHex(tint);
       withColor.emissiveIntensity = 0.18;
     }
-    this.runeTintMaterials.set(key, marked);
+    this.runeTintMaterials.set(material, marked);
     return marked;
   }
 
