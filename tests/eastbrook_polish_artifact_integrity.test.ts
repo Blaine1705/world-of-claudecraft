@@ -1624,6 +1624,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
