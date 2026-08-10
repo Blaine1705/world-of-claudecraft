@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '53b20be4700d8dbc51af7ea4f67516c392b8037b6db582459f45b80ddfe035c7';
+  '99afe7b2d1560065e519134818a90dea92be98403d2d8a356b12a65ffbc2421d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '26a94b158138db4a393a562ae397afa95669e39ed686bbde565a4bbd3ff8a573';
+  '9db933efa90fecc3de79268b1027d7a2630e948bc250b74324da4230cf059352';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1592,10 +1592,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // landing on top of the VFX per-frame cost work already on this release
     // branch, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
-    // Re-pinned for the review 3050 Sentence-impact extraction: the first-order
-    // composite follows renderer.ts's sentenceImpactFeedback thinning onto the
-    // sentence_vfx_core plan, then this second-order performance seal follows
-    // the swept evidence bytes. No capture was retaken.
     // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
     // compileAsync patch branch: the first-order composite follows both
     // parents' inputs, then this second-order performance seal follows the
@@ -1624,15 +1620,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
     // archetype and scene-texture counts; renderer.ts edits only). No capture
     // was retaken.
-    // Re-pinned for the merge of release/v0.36.0 into the shortestAngle/wrapAngle
-    // dedupe branch: the first-order composite follows both parents' renderer.ts
-    // inputs (the wrapAngle dedupe plus release's EvilEyeMarkers addition), then
-    // this second-order performance seal follows the swept evidence bytes. No
-    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('7f2fa96cf28c2f309f736918f342d4b3f5ca2bd89bb50ebcb0430069202c357f');
+    ).toBe('af9f8a1421705f57c23d55ac66f50d07584662dc11a261b67269ed3a70eb40a5');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
