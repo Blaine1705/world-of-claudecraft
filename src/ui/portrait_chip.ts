@@ -18,6 +18,11 @@ import {
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
 import type { PlayerClass, SkinCatalog } from '../sim/types';
+import {
+  clearCrestImageFallback,
+  crestImageFallbackAttributes,
+  hydrateCrestImageFallbacks,
+} from './crest_image_fallback';
 import { esc } from './esc';
 import { t } from './i18n';
 import { iconDataUrl } from './icons';
@@ -92,6 +97,9 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
         : playerPortraitDataUrl(cls, skin, framing);
   const src = deferSource ? null : (portrait ?? crestUrl(cls));
   const source = src ? ` src="${src}"` : '';
+  const crestId = `class_${cls}`;
+  const fallbackAttrs = crestImageFallbackAttributes(crestId, 96);
+  const portraitFallbackAttrs = !portrait && !deferSource ? ` ${fallbackAttrs}` : '';
   const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   // A composed chip built before assets were ready holds the crest, and
@@ -101,11 +109,11 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const composed = !mech && look && !portrait ? ' data-portrait-composed="1"' : '';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
-    ? `<img class="portrait-badge" src="${crestUrl(cls)}" alt="" aria-hidden="true" draggable="false">`
+    ? `<img class="portrait-badge" src="${crestUrl(cls)}" ${fallbackAttrs} alt="" aria-hidden="true" draggable="false">`
     : '';
   return (
     `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-catalog="${catalog}" data-framing="${framing}"${pending}${composed}>` +
-    `<span class="portrait-ring"><img class="portrait-img"${source} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
+    `<span class="portrait-ring"><img class="portrait-img"${source}${portraitFallbackAttrs} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
     badgeHtml +
     `</span>`
   );
@@ -118,6 +126,7 @@ export function hydratePortraits(
   onlyClass?: PlayerClass,
   onlySkin?: number,
 ): void {
+  hydrateCrestImageFallbacks(root);
   if (!portraitsReady()) return;
   root.querySelectorAll<HTMLElement>('.portrait-chip[data-portrait-pending]').forEach((chip) => {
     // Composed chips re-render through their builder (see portraitChipHtml);
@@ -135,6 +144,7 @@ export function hydratePortraits(
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
     if (img) {
+      clearCrestImageFallback(img);
       img.loading = 'lazy';
       img.decoding = 'async';
       img.src = url;
