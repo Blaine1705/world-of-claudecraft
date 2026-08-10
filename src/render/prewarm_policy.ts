@@ -620,7 +620,11 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxMs: input.defaultMaxMs,
       compileMaxMs: input.defaultCompileMaxMs,
       maxViews: baseMaxViews,
-      yieldBetweenEntries: false,
+      // A macOS Chromium cold entry reproduced the same "page is not
+      // responding" symptom as WebKit while synchronous manifest steps ran.
+      // A zero-delay event-loop handoff between steps keeps the browser alive
+      // without changing which work the deadline admits.
+      yieldBetweenEntries: true,
       linkPassPerEntry: false,
       compileBeforeFirstFrame: asyncCompileSupported,
       skipMonolithCompile: !asyncCompileSupported,

@@ -39,12 +39,12 @@ const BASE: PrewarmPolicyInput = {
   asyncCompileSupported: true,
   lowGfx: false,
   finishFullManifestBeforeReveal: false,
-  defaultMaxMs: 12000,
-  constrainedMaxMs: 5000,
-  defaultCompileMaxMs: 10000,
-  constrainedCompileMaxMs: 2500,
-  maxViewsLow: 48,
-  maxViewsHigh: 72,
+  defaultMaxMs: 3000,
+  constrainedMaxMs: 3000,
+  defaultCompileMaxMs: 1500,
+  constrainedCompileMaxMs: 1500,
+  maxViewsLow: 12,
+  maxViewsHigh: 16,
   maxViewsConstrained: 2,
 };
 
@@ -55,6 +55,39 @@ const BASE: PrewarmPolicyInput = {
 const MAIN_SOURCE = codeWithoutLineComments(
   readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
+
+it('pins the production soft, compile, hard, and view budgets plus their policy wiring', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  for (const literal of [
+    'const VIEW_PREWARM_MAX_MS = 3000;',
+    'const VIEW_PREWARM_MAX_MS_CONSTRAINED = 3000;',
+    'const PREWARM_COMPILE_MAX_MS = 1500;',
+    'const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 1500;',
+    'const VIEW_PREWARM_HARD_MAX_MS = 5000;',
+    'const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 5000;',
+    'const PREWARM_BUILD_RESERVE_MS = 1000;',
+    'const VIEW_PREWARM_MAX_VIEWS_LOW = 12;',
+    'const VIEW_PREWARM_MAX_VIEWS_HIGH = 16;',
+  ]) {
+    expect(renderer).toContain(literal);
+  }
+  for (const wiring of [
+    'defaultMaxMs: VIEW_PREWARM_MAX_MS,',
+    'constrainedMaxMs: VIEW_PREWARM_MAX_MS_CONSTRAINED,',
+    'defaultCompileMaxMs: PREWARM_COMPILE_MAX_MS,',
+    'constrainedCompileMaxMs: PREWARM_COMPILE_MAX_MS_CONSTRAINED,',
+    'maxViewsLow: VIEW_PREWARM_MAX_VIEWS_LOW,',
+    'maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,',
+    '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : VIEW_PREWARM_HARD_MAX_MS;',
+    'const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);',
+    'const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
+  ]) {
+    expect(renderer).toContain(wiring);
+  }
+});
 
 // The full manifest id order the renderer builds, for the reorder tests.
 // Kept in lockstep with the renderer by the "matches the renderer's real
@@ -150,13 +183,13 @@ function parsedManifestEntries(): { id: string; required: boolean; deadlineExemp
 }
 
 describe('resolvePrewarmPolicy: unconstrained desktop', () => {
-  it('runs the full manifest with generous budgets and no reordering', () => {
+  it('runs the full manifest inside a short responsive budget', () => {
     const p = resolvePrewarmPolicy(BASE);
     expect(p.minimalManifest).toBe(false);
-    expect(p.maxMs).toBe(12000);
-    expect(p.compileMaxMs).toBe(10000);
-    expect(p.maxViews).toBe(72);
-    expect(p.yieldBetweenEntries).toBe(false);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
+    expect(p.maxViews).toBe(16);
+    expect(p.yieldBetweenEntries).toBe(true);
     expect(p.linkPassPerEntry).toBe(false);
     expect(p.compileBeforeFirstFrame).toBe(true);
     expect(p.skipMonolithCompile).toBe(false);
@@ -202,6 +235,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, true, false)).toBe(false);
     expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, true, false)).toBe(true);
     expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
+    // The production 3 s soft budget must leave a real build slice before the
+    // 1 s reserve; otherwise nearby/persistent views all spill into gameplay.
+    expect(prewarmBuildDeadline(3_000, 5_000, 1_000, false)).toBe(2_000);
   });
 
   it('stops the compile-submit loop at the GPU submit deadline, except on the Insane arm', () => {
@@ -424,7 +460,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   });
 
   it('uses the low view cap on the low tier', () => {
-    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(12);
   });
 
   it('keeps the full manifest and compiles before the first full-scene frame', () => {
@@ -898,8 +934,8 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   });
 
   it('caps budget, compile budget, and nearby views hard', () => {
-    expect(p.maxMs).toBe(5000);
-    expect(p.compileMaxMs).toBe(2500);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
     // The production-hub fix: only self plus one required/nearby view may build
     // synchronously at entry, never a crowd that reveals on the first live submit.
     expect(p.maxViews).toBe(2);
@@ -958,7 +994,7 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       constrainedMemory: true,
       maxViewsConstrained: 999,
     });
-    expect(highCap.maxViews).toBe(72); // tier cap still wins when it is lower
+    expect(highCap.maxViews).toBe(16); // tier cap still wins when it is lower
   });
 });
 

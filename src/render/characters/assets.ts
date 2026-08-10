@@ -518,9 +518,8 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged
-// native app: see GFX.iosMemoryProfile in gfx.ts) carves the mob bodies out of
-// the boot gate and STREAMS them after first frame instead. They are the
+// Every iOS WebKit host carves the mob bodies out of the boot gate and STREAMS
+// them after first frame instead. They are the
 // heaviest character content (creature + skeleton-family GLBs with embedded
 // 1024-class atlases; 47 files, and by far the largest share of the decoded
 // character residency) and nothing on the launcher, the character-select
@@ -529,27 +528,53 @@ const allPreloadUrls = characterPreloadUrls(false);
 // the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
 // is still arriving pops in a beat later instead of crashing anything.
 // Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
-// WebContent at 1.54 GB before the renderer ever existed; streaming defers that
-// mass to after the entry spike has cleared, and that WebContent ceiling is
-// identical whether the process hosts Safari or the packaged app. Weapons and
-// NPC bodies stay in the gate: the char-select preview builds CharacterVisual
-// DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
-// there would throw.
+// WebContent at 1.54 GB before the renderer ever existed. Desktop keeps these
+// actionable bodies critical: until a creature GLB arrives, its view, nameplate,
+// and click target do not exist. Weapons and NPC bodies also stay in the gate:
+// the char-select preview builds CharacterVisual DIRECTLY (not through the
+// fail-soft factory), so a missing held-weapon GLB there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
-// Armory weapon-SKIN models stream too (64 of the 78 weapon files): they are
-// cosmetic replacements for base weapons that always stay in the gate, so a
-// wearer whose skin GLB has not arrived yet degrades to their base weapon (the
-// swapAttachDef guard below) instead of throwing. Base item weapons stay
-// resident so the player's own hands are never empty at spawn.
+// Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
+// files), but remain on demand instead of joining the bulk post-entry stream.
+// They are cosmetic replacements for base weapons that always stay in the
+// gate, so a wearer whose skin GLB has not arrived yet degrades to their base
+// weapon (the swapAttachDef guard below) instead of throwing. Base item weapons
+// stay resident so the player's own hands are never empty at spawn.
 const streamedSkinUrls = new Set(weaponSkinModelUrls());
-const streamableUrls = allPreloadUrls.filter(
-  (url) =>
-    STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
-);
-let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
+function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
+  return allPreloadUrls.filter(
+    (url) =>
+      streamedSkinUrls.has(url) ||
+      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))),
+  );
+}
+function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
+  return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));
+}
+let streamedUrls = streamedCharacterUrlsFor(GFX);
 let streamedUrlSet = new Set(streamedUrls);
+let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
+type CharacterAssetReadyListener = (url: string) => void;
+const characterAssetReadyListeners = new Set<CharacterAssetReadyListener>();
+
+/** Observe a character GLB becoming resident. Consumers use this to replace a
+ *  fail-soft fallback that was built while an on-demand cosmetic was cold. */
+export function onCharacterAssetReady(listener: CharacterAssetReadyListener): () => void {
+  characterAssetReadyListeners.add(listener);
+  return () => characterAssetReadyListeners.delete(listener);
+}
+
+function notifyCharacterAssetReady(url: string): void {
+  for (const listener of characterAssetReadyListeners) {
+    try {
+      listener(url);
+    } catch (error) {
+      console.warn('Character asset-ready listener failed', error);
+    }
+  }
+}
 
 function prepareCharacterUrl(url: string): Promise<void> {
   if (gltfByUrl.has(url)) return Promise.resolve();
@@ -558,6 +583,7 @@ function prepareCharacterUrl(url: string): Promise<void> {
   const task = loadGltf(url)
     .then((gltf) => {
       gltfByUrl.set(url, gltf);
+      notifyCharacterAssetReady(url);
     })
     .catch((err) => {
       characterLoadTasks.delete(url);
@@ -575,22 +601,12 @@ function characterAssetResident(url: string): boolean {
 /** Kick a streamed character GLB (memoized by loadGltf) and index it on arrival. */
 export function ensureCharacterUrl(url: string | null | undefined): void {
   if (!url || characterAssetResident(url)) return;
-  void loadGltf(url)
-    .then((g) => {
-      // Keyed on the RAW url like the eager boot loop; readers resolve through
-      // assetUrl(url). Consistent today because no streamed url is aliased
-      // (LOW_URL_ALIAS only rewrites the rogue body, never streamed); an alias
-      // added inside models/creatures/ or the skin set would make this asset
-      // look permanently non-resident, so key any such future entry resolved.
-      gltfByUrl.set(url, g);
-    })
-    .catch(() => undefined);
+  void prepareCharacterUrl(url).catch(() => undefined);
 }
 
 /** A streamed url that has not arrived yet must degrade, never throw: return
  *  null so the caller falls back (base weapon / no ranged override) and kick
- *  the fetch so the cosmetic appears on the next swap or view rebuild. Eager
- *  platforms never take the branch: their streamed set is empty. */
+ *  the fetch so the cosmetic appears on the next swap or view rebuild. */
 function residentOrEnsure(url: string | null): string | null {
   if (!url) return null;
   if (!streamedUrlSet.has(url) || characterAssetResident(url)) return url;
@@ -605,10 +621,8 @@ for (const url of preloadUrls) {
 let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
- * this call started). main.ts calls it once the entry is past its allocation
- * spike (prewarm complete). Empty everywhere but iOS WebKit hosts (Safari,
- * other iOS browsers, and the packaged app), where the boot gate above
- * deliberately excluded these urls. A failed fetch re-arms
+ * this call started). main.ts calls it after the first painted world frame,
+ * once the entry allocation spike has cleared. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -616,15 +630,10 @@ let streamedStarted = false;
 export function startStreamedCharacterPreloads(): number {
   if (streamedStarted) return 0;
   streamedStarted = true;
-  for (const url of streamedUrls) {
-    void loadGltf(url)
-      .then((g) => {
-        // Raw-url key on purpose: see the keying note in ensureCharacterUrl.
-        gltfByUrl.set(url, g);
-      })
-      .catch(() => undefined);
+  for (const url of postEntryStreamUrls) {
+    void prepareCharacterUrl(url).catch(() => undefined);
   }
-  return streamedUrls.length;
+  return postEntryStreamUrls.length;
 }
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
@@ -661,40 +670,34 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) defers
-// the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
+// Every host defers the whole alternate-atlas sweep out of the boot gate: about
+// 34 1024x1024 atlases
 // decode to well over 100 MB of RGBA inside the same WebContent process whose
 // jetsam ceiling the entry spike already presses against (the iPhone 13 report),
 // and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
 // to the embedded default and every apply site heals through ensureSkinTexture()
 // (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
 // so a deferred atlas costs a brief fallback, never a crash or a stall. Both
-// profile hints derive from static boot signals (never the tier), so this
-// import-time read cannot drift from the live profile the way an import-time
-// TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);
+// The on-demand recovery seam is platform-neutral, so retaining those atlases
+// before first paint on desktop only lengthens the gate and raises its peak.
+const eagerSkinAtlases = false;
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = target.iosMemoryProfile ? streamableUrls : [];
+  const nextStreamedUrls = streamedCharacterUrlsFor(target);
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
-  const skinTasks =
-    target.iosMemoryProfile || target.tightMemory
-      ? []
-      : [...bootSkinUrls].map((url) =>
-          skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),
-        );
-  await Promise.all([...requiredGltf.map(prepareCharacterUrl), ...skinTasks]);
+  await Promise.all(requiredGltf.map(prepareCharacterUrl));
   const nextSignature = nextStreamedUrls.join('|');
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
+  postEntryStreamUrls = postEntryStreamUrlsFor(nextStreamedUrls);
 }
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
