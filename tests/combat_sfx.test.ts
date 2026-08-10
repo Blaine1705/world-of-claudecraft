@@ -255,6 +255,36 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
+  it('gives each empowered Ascension impact a distinct sampled cue', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'holy',
+        fx: 'paladinAscensionStart',
+      }),
+    ).toBeNull();
+    for (const [impact, key, anchorId] of [
+      ['offensive', 'wand_holy', 20],
+      ['area', 'proj_holy', 10],
+      ['defensive', 'combat_block', 20],
+      ['healing', 'cast_chain_heal', 20],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'holy',
+          fx: 'paladinAscensionImpact',
+          impact,
+        }),
+      ).toEqual({ key, anchorId });
+      expect(key in SFX_CLIPS).toBe(true);
+    }
+  });
+
   it('keeps the two AoE fear shouts on the shared fear_shout cue', () => {
     for (const ability of ['psychic_scream', 'howl_of_terror']) {
       expect(
@@ -786,6 +816,9 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
     expect(auraApplyCue(gained, aura('dot'))).toBe('debuff_apply');
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
+    for (const id of ['divine_ascension', 'dawns_path_speed', 'aegis_of_devotion_dr']) {
+      expect(auraApplyCue(gained, { ...aura('buff_ap', 5), id })).toBeNull();
+    }
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
   });

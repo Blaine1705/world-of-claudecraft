@@ -572,18 +572,20 @@ jobs:
     name: PR gate (long sims)
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
-    # The lane concentrates the four slowest suites in one required job with
-    # no sibling shard to report around it, so a hang would otherwise hold a
-    # required check for GitHub's 6 hour default. 20 matches the shard
-    # matrices (rationale and the checkout-stall evidence on the pr-gate
-    # bound): the lane's healthy worst cases are 8.1 minutes GREEN and 10.7
-    # minutes RED (run 31118669058), the sample is thin (the job is days
-    # old), the chronomancy sweep inside it is the suite whose budget was
-    # raised for loaded runners, and a bound below 20 cannot lower the run
-    # tail anyway while pr-gate holds 20 in the same run. Its one stalled
-    # run sat 15.6 minutes in checkout inside a 23.3 minute wall
-    # (run 31105262161).
-    timeout-minutes: 20
+    # The lane concentrates the nine slowest suites (CI_LONG_SUITES) in one
+    # required job with no sibling shard to report around it, so a hang would
+    # otherwise hold a required check for GitHub's 6 hour default. The bound
+    # was 20 when the lane held four suites (healthy worst cases 8.1 minutes
+    # GREEN / 10.7 RED, run 31118669058; one checkout stall sat 15.6 minutes
+    # inside a 23.3 minute wall, run 31105262161). Review 3050 moved the five
+    # class-overhaul balance harnesses in after they pushed two 20-minute
+    # shards over budget (locally hunter_dps_balance plus
+    # owned_class_balance_harness alone exceed 20 minutes), so the bound is
+    # now 60: run 31290316610 measured the lane's aggregate test time at
+    # ~4400s on a slow-quartile runner, which lands the healthy wall right at
+    # 40 at workers=2, so 40 was a coin flip on runner speed. 60 keeps real
+    # headroom while still cutting a hang off well before GitHub's default.
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:

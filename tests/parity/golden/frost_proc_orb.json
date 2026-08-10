@@ -171,7 +171,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "676ce292",
+      "state": "a3194559",
       "events": "c2f7f197",
       "rng": {
         "draws": 316,
@@ -182,7 +182,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "e0c48c20",
       "events": "7b765a8e",
       "rng": {
         "draws": 356,
@@ -335,7 +335,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1436,
+          "resource": 1444,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -436,7 +436,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "e0c48c20",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -589,7 +589,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1436,
+          "resource": 1444,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

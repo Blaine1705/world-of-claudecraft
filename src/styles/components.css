@@ -14945,14 +14945,22 @@
   .dev-item-suggest {
     position: absolute;
     left: 0;
-    right: 0;
     top: calc(100% + 3px);
     display: none;
     z-index: 30;
     background: #14110d;
     border: 1px solid #6f5a2a;
     border-radius: 5px;
-    max-height: 210px;
+    /* Wide enough that name + tags + id fit on one line (the input is narrow, so
+       an input-width list truncated every row and grew a horizontal scrollbar),
+       and tall enough that the full DEV_ITEM_PICKER_LIMIT of rows fits WITHOUT a
+       vertical scrollbar: a scrollbar here is a trap, since grabbing it blurs
+       the input and the blur teardown drops the list mid-drag. max-height stays
+       as the safety net that keeps the old taller-than-the-viewport bug dead. */
+    min-width: 100%;
+    width: max-content;
+    max-width: min(560px, 72vw);
+    max-height: 480px;
     overflow-y: auto;
     box-shadow: 0 6px 18px #000a;
   }
