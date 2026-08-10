@@ -30,6 +30,8 @@ import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibil
 import { BG_SLOT_COUNT, battlegroundOrigin } from '../data';
 import { createGroundObject } from '../entity';
 import { detachFromDungeon } from '../instances/dungeons';
+import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
+import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import {
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
@@ -206,6 +208,12 @@ export interface BgMatch {
   waveIn: [number, number]; // seconds until each team's next respawn wave
   returns: Map<number, { x: number; z: number; facing: number }>;
   preMatchPools: Map<number, ArenaReturnPools>;
+  // The same parenthesis rule applied to the fighter's PET: one that walks
+  // in alive walks back out alive. Without it a hunter, warlock or mage who
+  // lost their companion mid-match left the field still without it, since a
+  // wave respawn raises only the fighter. The arena has carried this since
+  // issue #1600 (ArenaMatch.preMatchPets); the battleground never got it.
+  preMatchPets: Map<number, MatchPetSnapshot>;
   pendingFlagPress: Set<number>; // deliberate presses, resolved next update
   honorTeamKeys: [string, string]; // snapshotted at start (rename-proof DR keys)
   // false for /dev bg force-starts (jgyy review): a dev-forced, possibly
@@ -309,6 +317,19 @@ export function bgAllPids(match: BgMatch): number[] {
 
 export function bgMatchFor(ctx: SimContext, pid: number): BgMatch | null {
   return ctx.bgMatches.get(pid) ?? null;
+}
+
+export function bgActiveMatchForFighter(ctx: SimContext, pid: number): BgMatch | null {
+  const indexed = ctx.bgMatches.get(pid);
+  if (indexed?.state === 'active' && bgAllPids(indexed).includes(pid)) return indexed;
+  for (const match of new Set(ctx.bgMatches.values())) {
+    if (match.state === 'active' && bgAllPids(match).includes(pid)) return match;
+  }
+  return null;
+}
+
+export function bgActiveFighterPids(ctx: SimContext, match: BgMatch): number[] {
+  return match.state === 'active' ? bgAllPids(match).filter((pid) => ctx.entities.has(pid)) : [];
 }
 
 function bgEmitAll(ctx: SimContext, match: BgMatch, ev: (pid: number) => void): void {
@@ -691,6 +712,10 @@ function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number
   const door = detachFromDungeon(ctx, e);
   match.returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
   match.preMatchPools.set(pid, snapshotArenaReturnPools(e));
+  // The pet parenthesis is part of the same promise: a pet that walks in alive
+  // walks back out alive, for a backfill seat exactly as for a start-of-match one.
+  const pet = snapshotMatchPet(ctx, pid);
+  if (pet) match.preMatchPets.set(pid, pet);
   match.stats.set(pid, { kills: 0, deaths: 0, captures: 0, assists: 0 });
   match.backfilled.add(pid);
   const index = match.teams[team].length;
@@ -982,6 +1007,7 @@ export function startBgMatch(
   const origin = battlegroundOrigin(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (const pid of [...teamA, ...teamB]) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
@@ -993,6 +1019,8 @@ export function startBgMatch(
     const door = detachFromDungeon(ctx, e);
     returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
     preMatchPools.set(pid, snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, pid);
+    if (pet) preMatchPets.set(pid, pet);
   }
   const flags = ([0, 1] as BgTeam[]).map((team) => {
     const home = ctx.groundPos(origin.x + BG_BASES[team].flag.x, origin.z + BG_BASES[team].flag.z);
@@ -1045,6 +1073,7 @@ export function startBgMatch(
     waveIn: [BG_WAVE_PERIOD, BG_WAVE_OFFSET],
     returns,
     preMatchPools,
+    preMatchPets,
     pendingFlagPress: new Set(),
     honorTeamKeys: [honorTeamIdentity(ctx, teamA), honorTeamIdentity(ctx, teamB)],
     rated: opts?.rated !== false,
@@ -1179,6 +1208,12 @@ function tickWaveRespawns(ctx: SimContext, match: BgMatch): void {
       e.prevPos = { ...e.pos };
       e.facing = team === 0 ? 0 : Math.PI;
       e.prevFacing = e.facing;
+      // The wave raises the FIGHTER directly and never goes through spirit.ts's
+      // shared reviveAt, so the pet hand-back has to be asked for here too.
+      // Without it a hunter, warlock or mage fights the whole rest of the match
+      // without a companion after one death, which is most of their kit, while
+      // every other class comes back whole.
+      restorePetOnOwnerRevive(ctx, e);
       ctx.emit({ type: 'respawn', pid });
     });
   }
@@ -1790,10 +1825,14 @@ export function bgResolveDesertion(ctx: SimContext, pid: number): void {
       leaver.facing = ret.facing;
     }
     ctx.rebucket(leaver);
+    // A deserter is leaving the match, so the same exit rule applies: whatever
+    // pet they walked in with comes back with them at their return spot.
+    restoreMatchPet(ctx, leaver, match.preMatchPets.get(pid));
   }
   match.teams[team] = match.teams[team].filter((p) => p !== pid);
   match.returns.delete(pid);
   match.preMatchPools.delete(pid);
+  match.preMatchPets.delete(pid);
   match.stats.delete(pid);
   match.pendingFlagPress.delete(pid);
   ctx.bgMatches.delete(pid);
@@ -1997,6 +2036,9 @@ function releaseBgFighters(ctx: SimContext, match: BgMatch): void {
       e.corpsePos = null;
       e.corpseInstanceId = null;
       ctx.rebucket(e);
+      // The fighter is home now, so a pet the match killed is stood back up
+      // HERE beside them, never back on the field (the arena's rule verbatim).
+      restoreMatchPet(ctx, e, match.preMatchPets.get(pid));
       ctx.emit({ type: 'respawn', pid });
     }
   }

@@ -362,6 +362,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import type { PetReturnSnapshot } from './pet/pet_return';
 import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
@@ -1208,7 +1209,7 @@ export interface RewardCounters {
 }
 
 export interface SentChat {
-  channel: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'world' | 'lfg';
+  channel: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'battleground' | 'world' | 'lfg';
   message: string;
   target?: string;
 }
@@ -1247,6 +1248,14 @@ export interface PlayerMeta {
   // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
   // torch is ready. Session-only, never serialized.
   firebottleReadyAt?: number;
+  // The LIVING pet this player's own death took from them (absent when they had
+  // none), so every resurrection path can stand it back up beside them instead of
+  // leaving them owing a Revive Pet cast, or a fresh summon, for a death that was
+  // just undone. Written on every death and consumed by the shared revive;
+  // src/sim/pet/pet_owner_revive.ts owns the rules. Session-only and never
+  // serialized, exactly like the match-side snapshot it shares its shape with: a
+  // relog is a fresh session, and a warlock re-summons their demon on login.
+  deathPet?: PetReturnSnapshot;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
@@ -2795,6 +2804,11 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // The character's authored modular look (characters.appearance column,
+      // normalized at write; NOT part of CharacterState, so serializeCharacter
+      // never re-emits it). Stamped onto the entity so it rides the identity
+      // wire (`app`) to every client in view. Opaque to the sim.
+      appearance?: Record<string, unknown> | null;
     },
   ): number {
     const savedState = opts?.state
@@ -2859,6 +2873,7 @@ export class Sim {
       draws: savedState?.arena2v2Draws ?? 0,
     };
     const player = createPlayer(this.nextId++, cls, startPos, name);
+    if (opts?.appearance) player.modularAppearance = opts.appearance;
     this.addEntity(player);
     const classDef = CLASSES[cls];
     const meta: PlayerMeta = {

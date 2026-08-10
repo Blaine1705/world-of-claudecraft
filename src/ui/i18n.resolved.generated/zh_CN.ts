@@ -3668,7 +3668,9 @@ export const zh_CN: EnTranslations = {
       "delete_confirm": "输入角色名称以确认删除。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
-      "rename_required": "此角色必须先改名才能进入世界。"
+      "rename_required": "此角色必须先改名才能进入世界。",
+      "invalid_appearance": "无法保存该外观。请调整设计后重试。",
+      "reroll_unavailable": "此角色没有可用的免费重新设计。"
     },
     "moderation": {
       "suspended_until": "此账号被停用至 {date}。",
@@ -5636,6 +5638,8 @@ export const zh_CN: EnTranslations = {
       "chanWhisperBody": "按名字发给某一位玩家的私人消息，无论他们身在何处。用它来说几句悄悄话。",
       "chanParty": "小队。",
       "chanPartyBody": "与你队伍中的每一个人交谈，无论你们相隔多远。",
+      "chanBattleground": "战场。",
+      "chanBattlegroundBody": "与战场中的所有战士交谈，双方阵营都能看到。仅在比赛进行时可用。",
       "chanGeneral": "综合。",
       "chanGeneralBody": "一个始终开启、覆盖全位面的频道，能触及所有在线玩家，适合提问或闲聊。与世界频道和寻求组队频道不同，你无需手动加入便能使用。",
       "chanWorld": "世界。",
@@ -6495,7 +6499,7 @@ export const zh_CN: EnTranslations = {
     "browSoft": "柔和",
     "browThick": "浓密",
     "browAngled": "上扬",
-    "earrings": "耳环",
+    "earrings": "穿孔饰品",
     "jewelMaterial": "首饰材质",
     "jewelDefault": "原样",
     "jewelGold": "黄金",
@@ -7605,7 +7609,12 @@ export const zh_CN: EnTranslations = {
     "sortLevel": "等级",
     "sortName": "名称",
     "sortRecent": "最近游玩",
-    "sortPlaytime": "游戏时长"
+    "sortPlaytime": "游戏时长",
+    "redesign": "重新设计",
+    "redesignHint": "该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。",
+    "redesignTitle": "重新设计{name}",
+    "redesignSave": "保存新外观",
+    "redesignCancel": "保留当前外观"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -7737,6 +7746,7 @@ export const zh_CN: EnTranslations = {
           "say": "说话",
           "yell": "大喊",
           "party": "小队",
+          "battleground": "战场",
           "general": "综合",
           "world": "世界",
           "lfg": "组队",
@@ -7898,6 +7908,7 @@ export const zh_CN: EnTranslations = {
     "chat": {
       "rightClickName": "右键点击 {name}",
       "templates": {
+        "battleground": "[战场] {name}：{message}",
         "party": "[队伍] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄说：{message}",

@@ -3668,7 +3668,9 @@ export const en_XA: EnTranslations = {
       "delete_confirm": "[Ţýþé ţĥé çĥáŕáçţéŕ ñáɱé ţó çóñƒíŕɱ ðéļéţíóñ.]",
       "already_in_world": "[Çĥáŕáçţéŕ íš áļŕéáðý íñ ŵóŕļð.]",
       "taken_over": "[Ýóúŕ çĥáŕáçţéŕ ŵáš ţáķéñ óʋéŕ ƀý áñóţĥéŕ šéššíóñ.]",
-      "rename_required": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]"
+      "rename_required": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]",
+      "invalid_appearance": "[Ţĥáţ áþþéáŕáñçé çóúļð ñóţ ƀé šáʋéð. Áðĵúšţ ţĥé ðéšíĝñ áñð ţŕý áĝáíñ.]",
+      "reroll_unavailable": "[Ţĥíš çĥáŕáçţéŕ ðóéš ñóţ ĥáʋé á ƒŕéé ŕéðéšíĝñ áʋáíļáƀļé.]"
     },
     "moderation": {
       "suspended_until": "[Ţĥíš áççóúñţ íš šúšþéñðéð úñţíļ {date}.]",
@@ -5636,6 +5638,8 @@ export const en_XA: EnTranslations = {
       "chanWhisperBody": "[Á þŕíʋáţé ɱéššáĝé ţó óñé þļáýéŕ ƀý ñáɱé, ŵĥéŕéʋéŕ ţĥéý áŕé. Úšé íţ ƒóŕ á ɋúíéţ ŵóŕð.]",
       "chanParty": "[Þáŕţý.]",
       "chanPartyBody": "[Ţáļķ ţó éʋéŕýóñé íñ ýóúŕ ĝŕóúþ, ñó ɱáţţéŕ ĥóŵ šþŕéáð óúţ ýóú áŕé.]",
+      "chanBattleground": "[Ɓáţţļéĝŕóúñð.]",
+      "chanBattlegroundBody": "[Ţáļķ ţó éʋéŕý ƒíĝĥţéŕ íñ ýóúŕ ƀáţţļéĝŕóúñð, ƀóţĥ šíðéš. Óñļý ŵĥíļé á ɱáţçĥ íš ŕúññíñĝ.]",
       "chanGeneral": "[Ĝéñéŕáļ.]",
       "chanGeneralBody": "[Áñ áļŵáýš-óñ ŕéáļɱ-ŵíðé çĥáññéļ ţĥáţ ŕéáçĥéš éʋéŕýóñé óñļíñé, ĝóóð ƒóŕ ášķíñĝ á ɋúéšţíóñ óŕ ĝéñéŕáļ çĥáţţéŕ. Úñļíķé Ŵóŕļð áñð Ļóóķíñĝ ƒóŕ Ĝŕóúþ, ýóú ñéʋéŕ ĥáʋé ţó óþţ íñ.]",
       "chanWorld": "[Ŵóŕļð.]",
@@ -6495,7 +6499,7 @@ export const en_XA: EnTranslations = {
     "browSoft": "[Šóƒţ]",
     "browThick": "[Ţĥíçķ]",
     "browAngled": "[Áñĝļéð]",
-    "earrings": "[Éáŕŕíñĝš]",
+    "earrings": "[Þíéŕçíñĝš]",
     "jewelMaterial": "[Ĵéŵéļļéŕý Ɱáţéŕíáļ]",
     "jewelDefault": "[Áš Ƒóŕĝéð]",
     "jewelGold": "[Ĝóļð]",
@@ -7605,7 +7609,12 @@ export const en_XA: EnTranslations = {
     "sortLevel": "[Ļéʋéļ]",
     "sortName": "[Ñáɱé]",
     "sortRecent": "[Ŕéçéñţļý Þļáýéð]",
-    "sortPlaytime": "[Þļáýţíɱé]"
+    "sortPlaytime": "[Þļáýţíɱé]",
+    "redesign": "[Ŕéðéšíĝñ]",
+    "redesignHint": "[Ţĥíš çĥáŕáçţéŕ þŕéðáţéš ţĥé ñéŵ çĥáŕáçţéŕ çŕéáţóŕ. Ýóú ĝéţ óñé ƒŕéé ŕéðéšíĝñ; íţ íš úšéð ŵĥéñ ýóú šáʋé.]",
+    "redesignTitle": "[Ŕéðéšíĝñ {name}]",
+    "redesignSave": "[Šáʋé Ñéŵ Ļóóķ]",
+    "redesignCancel": "[Ķééþ Çúŕŕéñţ Ļóóķ]"
   },
   "deleteCharacter": {
     "title": "[Ðéļéţé Çĥáŕáçţéŕ]",
@@ -7737,6 +7746,7 @@ export const en_XA: EnTranslations = {
           "say": "[Šáý]",
           "yell": "[Ýéļļ]",
           "party": "[Þáŕţý]",
+          "battleground": "[Ɓáţţļéĝŕóúñð]",
           "general": "[Ĝéñéŕáļ]",
           "world": "[Ŵóŕļð]",
           "lfg": "[ĻƑĜ]",
@@ -7898,6 +7908,7 @@ export const en_XA: EnTranslations = {
     "chat": {
       "rightClickName": "[Ŕíĝĥţ-çļíçķ {name}]",
       "templates": {
+        "battleground": "[[Ɓáţţļéĝŕóúñð] {name}: {message}]",
         "party": "[[Þáŕţý] {name}: {message}]",
         "yell": "[{name} ýéļļš: {message}]",
         "whisper": "[{name} ŵĥíšþéŕš: {message}]",

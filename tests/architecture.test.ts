@@ -252,6 +252,7 @@ const UI_PURE_CORES = [
   'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
+  'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
@@ -425,6 +426,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/ability_vfx_core.ts',
+  'src/render/characters/player_look_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
@@ -1518,6 +1520,7 @@ const UI_DOM_MODULES = [
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
+  'src/ui/charselect_redesign.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',

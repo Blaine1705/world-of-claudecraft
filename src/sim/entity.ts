@@ -153,6 +153,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     drinking: null,
     weaponStowed: false,
     helmHidden: false,
+    modularAppearance: null,
     afk: false,
     aiState: 'idle',
     tappedById: null,

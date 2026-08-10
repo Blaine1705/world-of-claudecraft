@@ -436,6 +436,7 @@ export default defineConfig({
         '**/.codex/**',
         '**/.agents/**',
         '**/.worktrees/**',
+        '**/.wt/**',
         '**/.venv/**',
         '**/tmp/**',
       ],
@@ -506,9 +507,10 @@ export default defineConfig({
     //   config or instruction files are not product test sources. Excluding them keeps a
     //   stale local worktree from duplicating tests. .venv is local Python tooling.
     //   .worktrees/ is the repo's own gitignored convention for local linked worktrees
-    //   (see .gitignore); leaving it out of this list meant a worktree left checked out
-    //   there re-ran its whole frozen test tree on every `vitest run`, so a stale branch
-    //   snapshot inside it could fail tests/architecture.test.ts or
+    //   (see .gitignore), while .wt/ is the OSS Brain linked-worktree cache used by
+    //   release automation. Leaving either out of this list means a parked worktree can
+    //   re-run its whole frozen test tree on every `vitest run`, so a stale branch
+    //   snapshot inside it can fail tests/architecture.test.ts or
     //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to the
     //   current branch.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
@@ -525,6 +527,7 @@ export default defineConfig({
       '**/.codex/**',
       '**/.agents/**',
       '**/.worktrees/**',
+      '**/.wt/**',
       '**/.venv/**',
       'tmp/**',
       'tests/browser/**',

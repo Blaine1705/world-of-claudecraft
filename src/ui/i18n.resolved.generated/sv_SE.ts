@@ -3668,7 +3668,9 @@ export const sv_SE: EnTranslations = {
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
-      "rename_required": "Denna karaktär måste byta namn innan den går in i världen."
+      "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",
@@ -5636,6 +5638,8 @@ export const sv_SE: EnTranslations = {
       "chanWhisperBody": "Ett privat meddelande till en spelare vid namn, var de än är. Använd det för ett tyst ord.",
       "chanParty": "Grupp.",
       "chanPartyBody": "Prata med alla i din grupp, oavsett hur utspridda ni är.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Allmänt.",
       "chanGeneralBody": "En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.",
       "chanWorld": "Värld.",
@@ -6495,7 +6499,7 @@ export const sv_SE: EnTranslations = {
     "browSoft": "Mjuka",
     "browThick": "Tjocka",
     "browAngled": "Vinklade",
-    "earrings": "Örhängen",
+    "earrings": "Piercingar",
     "jewelMaterial": "Smyckesmaterial",
     "jewelDefault": "Som smidd",
     "jewelGold": "Guld",
@@ -7605,7 +7609,12 @@ export const sv_SE: EnTranslations = {
     "sortLevel": "Nivå",
     "sortName": "Namn",
     "sortRecent": "Senast spelad",
-    "sortPlaytime": "Speltid"
+    "sortPlaytime": "Speltid",
+    "redesign": "Omforma",
+    "redesignHint": "Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.",
+    "redesignTitle": "Omforma {name}",
+    "redesignSave": "Spara nytt utseende",
+    "redesignCancel": "Behåll nuvarande utseende"
   },
   "deleteCharacter": {
     "title": "Radera karaktär",
@@ -7737,6 +7746,7 @@ export const sv_SE: EnTranslations = {
           "say": "Säg",
           "yell": "Ropa",
           "party": "Grupp",
+          "battleground": "Battleground",
           "general": "Allmänt",
           "world": "Världen",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const sv_SE: EnTranslations = {
     "chat": {
       "rightClickName": "Högerklicka på {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",

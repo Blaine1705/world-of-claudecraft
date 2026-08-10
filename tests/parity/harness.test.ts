@@ -141,6 +141,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'holderBalance',
       'holderTier',
       'mainhandItemId',
+      'modularAppearance',
       'name',
       'netInterval',
       'netUpdatedAt',

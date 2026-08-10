@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
+import { CI_LONG_SUITE_HALVES } from '../scripts/lib/ci_shard_plan.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
@@ -397,15 +398,17 @@ describe('CI workflow parity', () => {
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
     const prGate = jobSource('pr-gate');
-    const prLongSims = jobSource('pr-long-sims');
+    const prLongSimsA = jobSource('pr-long-sims-a');
+    const prLongSimsB = jobSource('pr-long-sims-b');
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
-    for (const job of [prLongSims, prChecks]) {
+    for (const job of [prLongSimsA, prLongSimsB, prChecks]) {
       // Exact composed if: event routing AND code path filter (D10). Dropping
       // either arm breaks release-to-main exclusion or docs-only skip. These
-      // two are non-matrix jobs, so a job-level skip keeps the exact required
-      // name and satisfies protection; only pr-gate needs the split below.
+      // three are non-matrix jobs, so a job-level skip keeps the exact
+      // required name and satisfies protection; only pr-gate needs the split
+      // below.
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
       expect(ifLines).toEqual([PR_TIER_IF_LINE]);
       expect(job).toContain(PR_TIER_EVENT_FRAGMENT);
@@ -460,16 +463,19 @@ describe('CI workflow parity', () => {
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
     const prGate = jobSource('pr-gate');
-    const prLongSims = jobSource('pr-long-sims');
+    const prLongSimsA = jobSource('pr-long-sims-a');
+    const prLongSimsB = jobSource('pr-long-sims-b');
     const prChecks = jobSource('pr-checks');
-    // Parallel means no needs edge between the trio. Each may need `changes`
+    // Parallel means no needs edge between the four. Each may need `changes`
     // for the path filter; none may wait on another (would re-serialize).
     expect(prGate).toMatch(/^\s{4}needs: changes\s*$/m);
-    expect(prLongSims).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prLongSimsA).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prLongSimsB).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prChecks).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-checks/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-gate/);
-    expect(prLongSims).not.toMatch(/needs:\s*\[?[^\n]*pr-(gate|checks)/);
+    expect(prLongSimsA).not.toMatch(/needs:\s*\[?[^\n]*pr-(gate|checks|long-sims)/);
+    expect(prLongSimsB).not.toMatch(/needs:\s*\[?[^\n]*pr-(gate|checks|long-sims)/);
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     // Phase 2: pr-gate's test step runs through the selection-aware shard
@@ -484,13 +490,16 @@ describe('CI workflow parity', () => {
       // survives the comment, the anchored form does not.
       expect(prChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(prGate).not.toContain(step);
-      expect(prLongSims).not.toContain(step);
+      expect(prLongSimsA).not.toContain(step);
+      expect(prLongSimsB).not.toContain(step);
     }
-    // The lane job is tests-only through the shard runner, like pr-gate: a
-    // raw `npm test` or a check step substituted into it would run the whole
+    // The lane jobs are tests-only through the shard runner, like pr-gate: a
+    // raw `npm test` or a check step substituted into one would run the whole
     // suite (or a check) on every PR under the lane's name.
-    expect(prLongSims).not.toContain('run: npm test');
-    expect(prLongSims).not.toContain('Cache tsc incremental buildinfo');
+    for (const laneJob of [prLongSimsA, prLongSimsB]) {
+      expect(laneJob).not.toContain('run: npm test');
+      expect(laneJob).not.toContain('Cache tsc incremental buildinfo');
+    }
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
@@ -757,7 +766,8 @@ describe('CI workflow parity', () => {
     const requiredCheckNames = [
       'Detect code path changes',
       'PR gate (English-only legal)',
-      'PR gate (long sims)',
+      'PR gate (long sims A)',
+      'PR gate (long sims B)',
       'PR checks (freshness, typecheck, builds)',
       'Format + lint (Biome, changed files)',
       'Browser regressions (Chromium)',
@@ -784,7 +794,8 @@ describe('CI workflow parity', () => {
     const docRequiredNameForms = [
       '`Detect code path changes`',
       `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
-      '`PR gate (long sims)`',
+      '`PR gate (long sims A)`',
+      '`PR gate (long sims B)`',
       '`PR checks (freshness, typecheck, builds)`',
       '`Format + lint (Biome, changed files)`',
       '`Browser regressions (Chromium)`',
@@ -822,11 +833,14 @@ describe('CI workflow parity', () => {
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
-      // Resized 20 to 40 with the nine-suite lane (review 3050), then 40 to
-      // 60 after run 31290316610 measured the lane's healthy wall landing
-      // right at 40 on a slow-quartile runner (the sizing evidence sits on
-      // the ci.yml bound).
-      ['pr-long-sims', 60],
+      // The single-job lane's bound reached 60 after run 31290316610 measured
+      // ~4400s aggregate suite time on a slow-quartile runner. The lane-diet
+      // PR cut the aggregate several-fold and split the lane in two, so each
+      // half projects under 10 minutes healthy on a standard runner; 20
+      // matches the pr-gate shard bound (sizing evidence on the ci.yml
+      // bounds and in the lane-diet PR body).
+      ['pr-long-sims-a', 20],
+      ['pr-long-sims-b', 20],
       ['browser-gate', 10],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
@@ -948,29 +962,62 @@ describe('CI workflow parity', () => {
           String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
       ),
     );
-    // Exactly two entry invocations: the shard matrix and the long-sims lane.
-    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(2);
-    // The lane job mirrors the shard step's hardened relay (env block, never
-    // run-line interpolation) and runs the entry in lane mode: unsharded, no
-    // matrix, one job that owns the CI_LONG_SUITES files every shard leg
-    // excludes. Same anchored name-to-env-to-run shape as the shard pin.
-    const prLongSims = jobSource('pr-long-sims');
-    expect(prLongSims).toMatch(
-      new RegExp(
-        String.raw`- name: Run tests \(PR tier, long-sims lane\)\n` +
-          String.raw` {8}env:\n` +
-          String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
-          String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
-          String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
-          String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=long-sims\n`,
-      ),
+    // Exactly three entry invocations: the shard matrix and the two long-sims
+    // lane halves.
+    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(3);
+    // Each lane job mirrors the shard step's hardened relay (env block, never
+    // run-line interpolation) and runs the entry in its lane-half mode:
+    // unsharded, no matrix, two jobs that between them own the
+    // CI_LONG_SUITES files every shard leg excludes. Same anchored
+    // name-to-env-to-run shape as the shard pin.
+    for (const [jobName, laneLabel, laneFlag] of [
+      ['pr-long-sims-a', 'A', 'long-sims-a'],
+      ['pr-long-sims-b', 'B', 'long-sims-b'],
+    ] as const) {
+      const laneJob = jobSource(jobName);
+      expect(laneJob).toMatch(
+        new RegExp(
+          String.raw`- name: Run tests \(PR tier, long-sims lane ${laneLabel}\)\n` +
+            String.raw` {8}env:\n` +
+            String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
+            String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
+            String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+            String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=${laneFlag}\n`,
+        ),
+      );
+      expect(laneJob).not.toContain('strategy:');
+      expect(laneJob).not.toContain('matrix:');
+      expect(laneJob).not.toContain('--shard=');
+      // Checkout, setup-pnpm, setup-node, pnpm install, the vitest transform
+      // cache (the Phase 4 rider), and the lane run.
+      expect(laneJob.match(/\n {6}- name: /g)).toHaveLength(6);
+      // The lane jobs skip at JOB level, so NO step in them may carry a
+      // condition: an appended step-level `if:` (never true, or `if: false`)
+      // would disable that step outright while the run-line shape pin above
+      // and the job-level if sweep both stay green (the same mutation class
+      // the cache-step pin below closes with its blank-line terminator).
+      expect(laneJob).not.toMatch(/\n {8}if: /);
+    }
+    // The half constants and the ci.yml run lines must cover each other: a
+    // CI_LONG_SUITE_HALVES key with no lane job would leave that half's
+    // files excluded from every shard but run by no lane (a silent coverage
+    // hole the partition pin alone cannot see).
+    expect(Object.keys(CI_LONG_SUITE_HALVES).sort()).toEqual(['a', 'b']);
+    expect((workflow.match(/--lane=long-sims-([a-z])\b/g) ?? []).sort()).toEqual(
+      Object.keys(CI_LONG_SUITE_HALVES)
+        .sort()
+        .map((half) => `--lane=long-sims-${half}`),
     );
-    expect(prLongSims).not.toContain('strategy:');
-    expect(prLongSims).not.toContain('matrix:');
-    expect(prLongSims).not.toContain('--shard=');
-    // Checkout, setup-pnpm, setup-node, pnpm install, the vitest transform
-    // cache (the Phase 4 rider), and the lane run.
-    expect(prLongSims.match(/\n {6}- name: /g)).toHaveLength(6);
+    // The pre-split flag must not linger anywhere in the workflow (any token
+    // shape, not just end-of-line): the entry rejects it, so a stale run
+    // line would fail every PR loudly.
+    expect(workflow).not.toMatch(/--lane=long-sims(?![-a-z])/);
+    // The balance harnesses' full-sweep env flag is nightly-depth-only
+    // (docs/qa-gate.md, "The balance-harness diet"): setting it on any ci.yml
+    // job would silently put the five-seed cost back on the PR (or release)
+    // critical path. tests/nightly_workflow.test.ts pins the one sanctioned
+    // copy on the nightly tests job.
+    expect(workflow).not.toContain('WOC_FULL_BALANCE_SWEEP');
     for (const job of [releaseGate, releaseChecks, jobSource('release-i18n')]) {
       expect(job).not.toContain('ci_shard_test.mjs');
       expect(job).not.toContain('TEST_MODE');
@@ -1064,7 +1111,7 @@ describe('CI workflow parity', () => {
     // and the lane still admit no if at all.
     // One shared name line, body, and hashFiles tail for every copy of the
     // step, so the shard and lane regexes cannot drift apart: an edit to the
-    // key's input list either moves all three ci.yml key lines or goes red
+    // key's input list either moves all four ci.yml key lines or goes red
     // here.
     const cacheStepName = String.raw`- name: Cache vitest transform cache\n`;
     const cacheStepBody = String.raw`(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
@@ -1076,17 +1123,22 @@ describe('CI workflow parity', () => {
     const releaseCacheStepRe = new RegExp(
       `${cacheStepName}${cacheStepBody}${shardKeySegment}${cacheKeyTail}`,
     );
-    // The lane job (Phase 4 rider) carries the same step with a lane key
-    // segment where the matrices carry shard${{ matrix.shard }}: the lane has
-    // no matrix, so the shard expression would render empty there, and the
-    // lane's store earns its own entry rather than borrowing a shard's.
-    const laneCacheStepRe = new RegExp(
-      `${cacheStepName}${cacheStepBody}lane-long-sims${cacheKeyTail}`,
+    // The lane jobs (Phase 4 rider) carry the same step with per-half lane
+    // key segments where the matrices carry shard${{ matrix.shard }}: the
+    // lanes have no matrix, so the shard expression would render empty there,
+    // and each half's store earns its own entry rather than borrowing a
+    // shard's or the other half's.
+    const laneCacheStepReA = new RegExp(
+      `${cacheStepName}${cacheStepBody}lane-long-sims-a${cacheKeyTail}`,
+    );
+    const laneCacheStepReB = new RegExp(
+      `${cacheStepName}${cacheStepBody}lane-long-sims-b${cacheKeyTail}`,
     );
     for (const [name, stepRe] of [
       ['pr-gate', prGateCacheStepRe],
       ['release-gate', releaseCacheStepRe],
-      ['pr-long-sims', laneCacheStepRe],
+      ['pr-long-sims-a', laneCacheStepReA],
+      ['pr-long-sims-b', laneCacheStepReB],
     ] as const) {
       const job = jobSource(name);
       expect(job).toMatch(stepRe);
@@ -1120,16 +1172,16 @@ describe('CI workflow parity', () => {
     const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
     expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
     expect(viteConfigCode).not.toContain('fsModuleCachePath');
-    // Exactly the two shard matrices plus the long-sims lane carry the step,
-    // counted workflow-wide so a copy added to ANY other job fails
-    // (browser-gate has no matrix, so ${{ matrix.shard }} would render empty
-    // there and every run would collide on one key; the lane carries its own
-    // lane-long-sims key segment for the same reason). The path line is
-    // counted rather than the bare string because the pr-gate rationale
-    // comment mentions the directory.
-    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(3);
+    // Exactly the two shard matrices plus the two long-sims lane halves
+    // carry the step, counted workflow-wide so a copy added to ANY other job
+    // fails (browser-gate has no matrix, so ${{ matrix.shard }} would render
+    // empty there and every run would collide on one key; each lane carries
+    // its own lane-long-sims-a/-b key segment for the same reason). The path
+    // line is counted rather than the bare string because the pr-gate
+    // rationale comment mentions the directory.
+    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(4);
     expect(workflow.match(/ {10}path: node_modules\/\.experimental-vitest-cache\n/g)).toHaveLength(
-      3,
+      4,
     );
     for (const name of [
       'pr-checks',

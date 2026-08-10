@@ -3668,7 +3668,9 @@ export const vi_VN: EnTranslations = {
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
-      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới."
+      "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tài khoản này bị đình chỉ đến {date}.",
@@ -5636,6 +5638,8 @@ export const vi_VN: EnTranslations = {
       "chanWhisperBody": "Một tin nhắn riêng đến một người chơi theo tên, dù họ ở đâu. Dùng nó cho một lời nhỏ nhẹ.",
       "chanParty": "Tổ Đội.",
       "chanPartyBody": "Trò chuyện với mọi người trong nhóm của bạn, dù các bạn ở cách xa nhau đến đâu.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Chung.",
       "chanGeneralBody": "Một kênh phủ toàn vương quốc luôn bật, đến với mọi người đang trực tuyến, tiện để hỏi một câu hoặc trò chuyện chung. Khác với World và Looking for Group, bạn không bao giờ phải tự đăng ký tham gia.",
       "chanWorld": "Thế Giới.",
@@ -6495,7 +6499,7 @@ export const vi_VN: EnTranslations = {
     "browSoft": "Mềm",
     "browThick": "Dày",
     "browAngled": "Xếch",
-    "earrings": "Khuyên Tai",
+    "earrings": "Khuyên",
     "jewelMaterial": "Chất Liệu Trang Sức",
     "jewelDefault": "Nguyên Bản",
     "jewelGold": "Vàng",
@@ -7605,7 +7609,12 @@ export const vi_VN: EnTranslations = {
     "sortLevel": "Cấp",
     "sortName": "Tên",
     "sortRecent": "Chơi Gần Đây",
-    "sortPlaytime": "Thời Gian Chơi"
+    "sortPlaytime": "Thời Gian Chơi",
+    "redesign": "Thiết Kế Lại",
+    "redesignHint": "Nhân vật này có trước trình tạo nhân vật mới. Bạn có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.",
+    "redesignTitle": "Thiết Kế Lại {name}",
+    "redesignSave": "Lưu Diện Mạo Mới",
+    "redesignCancel": "Giữ Diện Mạo Hiện Tại"
   },
   "deleteCharacter": {
     "title": "Xóa Nhân Vật",
@@ -7737,6 +7746,7 @@ export const vi_VN: EnTranslations = {
           "say": "Nói",
           "yell": "Hét",
           "party": "Tổ Đội",
+          "battleground": "Battleground",
           "general": "Chung",
           "world": "Thế Giới",
           "lfg": "Tìm Đội",
@@ -7898,6 +7908,7 @@ export const vi_VN: EnTranslations = {
     "chat": {
       "rightClickName": "Nhấp chuột phải {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",

@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '557c7b28d60232fd18a6343276ad93383ae56ca6b47d8ed86b0645936a2d0c0e';
+  '457ff6205fd56073b46231c4f97ffa73a3c6ff3f3e22aeb03b57707aa5603e02';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a5a84fb2bd4a35b844d7ad47a95304388cd77f485299c670f6997c3a3bc2cf0b';
+  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1592,10 +1592,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // landing on top of the VFX per-frame cost work already on this release
     // branch, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
-    // Re-pinned for the review 3050 Sentence-impact extraction: the first-order
-    // composite follows renderer.ts's sentenceImpactFeedback thinning onto the
-    // sentence_vfx_core plan, then this second-order performance seal follows
-    // the swept evidence bytes. No capture was retaken.
     // Re-pinned for the merge of release/v0.36.0 (PR 3161) into the three
     // compileAsync patch branch: the first-order composite follows both
     // parents' inputs, then this second-order performance seal follows the
@@ -1624,10 +1620,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
     // archetype and scene-texture counts; renderer.ts edits only). No capture
     // was retaken.
+    // Re-minted for the merge of release/v0.36.0 (post the renderer refactor,
+    // PR 3204) into the creator-appearance branch: both parents move the
+    // rendererIntegration leaf, so the merged tree mints a value matching
+    // neither parent. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('ad2b01d1ef2ef83d41ac427152709596b55cca9c4ba5cd2abcf337f0dc72eecd');
+    ).toBe('a7218e4f637be5545f0a844f2b0986b720962358fa3604d294a99925bbbe160c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

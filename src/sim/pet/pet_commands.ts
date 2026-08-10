@@ -68,6 +68,11 @@ const DEMON_HEAL_MANA_COST = 55;
 const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
+// Share of its pool a revived pet stands up with. The Revive Pet command's number,
+// named here because the owner's own resurrection now performs the same work for
+// free and must hand the pet back at exactly what the command would have given
+// (pet/pet_owner_revive.ts).
+export const PET_REVIVE_HP_FRACTION = 0.35;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
 
 function templateHasPetSpecial(templateId: string): boolean {
@@ -606,7 +611,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   pet.pos = ctx.groundPos(r.e.pos.x + 2, r.e.pos.z + 1);
   pet.prevPos = { ...pet.pos };
   ctx.rebucket(pet);
-  pet.hp = Math.max(1, Math.round(pet.maxHp * 0.35));
+  pet.hp = Math.max(1, Math.round(pet.maxHp * PET_REVIVE_HP_FRACTION));
   ctx.emit({
     type: 'log',
     text: `${pet.name} returns to your side.`,

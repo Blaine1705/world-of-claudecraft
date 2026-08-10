@@ -149,6 +149,7 @@ import type {
   MasterworkView,
   SalvageResultView,
 } from '../world_api/professions';
+import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -215,31 +216,20 @@ export interface CharacterSummary {
   /** The account's active Armory weapon skin for this character (server-resolved
    *  per class + mainhand). Optional for back-compat like the fields above. */
   weaponSkinId?: string | null;
-}
-
-function stringList(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function stringRecord(value: unknown): Record<string, string> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  const out: Record<string, string> = {};
-  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof entry === 'string' && entry.length > 0) out[key] = entry;
-  }
-  return out;
-}
-
-function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: stringList(src.completedQuestIds),
-    mechChromaIds: stringList(src.mechChromaIds),
-    weaponSkinIds: stringList(src.weaponSkinIds),
-    weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
-  };
+  /** THIS character's authored modular look (characters.appearance). Untrusted
+   *  wire JSON: consumers normalize (normalizeAppearance) before composing.
+   *  Null/absent = pre-creator character; the legacy class rig renders. */
+  appearance?: Record<string, unknown> | null;
+  /** Mirror of the character's saved helm-visibility preference, so the roster
+   *  preview wears (or bares) the kit helm exactly as the world last saw them. */
+  helmHidden?: boolean;
+  /** ISO creation timestamp (server clock), for display; eligibility for the
+   *  redesign token is decided server-side (appearanceRerollAvailable). */
+  createdAt?: string | null;
+  /** Server-decided: this character still holds its one-shot appearance
+   *  redesign (created before the modular creator shipped, token unspent).
+   *  Drives the roster's reroll button; flips false after a successful spend. */
+  appearanceRerollAvailable?: boolean;
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
@@ -775,8 +765,44 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+    // The authored modular look, fixed to THIS character at create (its own
+    // server column). Optional: absent creates a legacy-rig character. Typed
+    // `object` so the render layer's ModularAppearance interface passes
+    // without a cast (this module stays out of src/render imports).
+    appearance: object | null = null,
+    // The creator's helmet toggle, becoming this character's standing helm
+    // preference. Defaults to hidden so an authored face is what the player
+    // meets in the world.
+    helmHidden = true,
+  ): Promise<void> {
+    await this.post('/api/characters', {
+      name,
+      class: cls,
+      skin,
+      helmHidden,
+      ...(appearance ? { appearance } : {}),
+    });
+  }
+
+  // Spend the character's one-shot appearance redesign (characters with no
+  // authored look; the server is the eligibility authority and burns the token
+  // atomically). `helmHidden` is the editor's helmet toggle, which is the same
+  // standing wardrobe choice creation posts, not a preview. Resolves with the
+  // normalized stored look.
+  async rerollAppearance(
+    characterId: number,
+    appearance: object,
+    helmHidden: boolean,
+  ): Promise<Record<string, unknown>> {
+    const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
+      appearance,
+      helmHidden,
+    });
+    return (data.appearance ?? appearance) as Record<string, unknown>;
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -1346,6 +1372,7 @@ function blankEntity(id: number): Entity {
     afk: false,
     weaponStowed: false,
     helmHidden: false,
+    modularAppearance: null,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -2794,7 +2821,11 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: LooseJson): Entity | null => {
+    // `selfDelta` marks the one record that is not a peer broadcast: the
+    // viewer's own extended state. Fields the server delta-gates per session
+    // (bcastSelf's maybe/maybeRaw channel) are absent when unchanged there,
+    // so an absent key must not be read as "cleared".
+    const applyWire = (w: LooseJson, selfDelta = false): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -2831,6 +2862,22 @@ export class ClientWorld implements IWorld {
           ),
         );
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        // The authored modular look (identity-only: set at join, immutable for
+        // the session). Untrusted wire JSON on purpose: every consumer runs
+        // it through normalizeAppearance before composing, so a hostile peer
+        // payload can only ever produce a clamped, valid body.
+        //
+        // For a PEER, absence on a full record is meaningful: no authored look,
+        // so clear it and let the class rig render. The SELF record is not a
+        // peer record: the viewer's own entity never rides the entity list (the
+        // broadcast loop skips it), so its look comes through bcastSelf's
+        // heavy-field delta channel, which ships a value once and then omits it.
+        // Clearing on absence there would erase the local player's body one tick
+        // after they entered the world.
+        if (!selfDelta || w.app !== undefined) {
+          e.modularAppearance =
+            w.app && typeof w.app === 'object' && !Array.isArray(w.app) ? w.app : null;
+        }
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
@@ -3117,7 +3164,7 @@ export class ClientWorld implements IWorld {
 
     // self with extended state (always a full record)
     const s = snap.self;
-    const e = s ? applyWire(s) : null;
+    const e = s ? applyWire(s, true) : null;
     if (s && e) {
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
