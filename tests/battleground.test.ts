@@ -3912,6 +3912,42 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
     expect(match.preMatchPets.has(other)).toBe(false);
     expect(pet.dead).toBe(false);
   });
+
+  it('snapshots a BACKFILLED hunter too, so their pet also walks back out', () => {
+    // seatBackfill copies the same per-fighter state startBgMatch takes
+    // (returns, pools, stats); the pet snapshot is part of that promise, or a
+    // backfiller whose pet dies leaves the field without it while a
+    // start-of-match fighter gets theirs back.
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+
+    const spare = sim.addPlayer('hunter', 'Spare');
+    tp(sim, spare, 6, -40);
+    sim.entities.get(spare)!.level = 20;
+    restorePet(sim.ctx, sim.entities.get(spare)!, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = sim.petOf(spare, true)!;
+    sim.bgQueueJoin(spare);
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    sim.tick(); // opens the OFFER
+    acceptBackfillOffer(sim, spare);
+    expect(match.teams[0]).toContain(spare);
+    expect(match.preMatchPets.has(spare)).toBe(true);
+
+    kill(sim, pet.id);
+    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(spare, true);
+    expect(back).toBeTruthy();
+    expect(back!.dead).toBe(false);
+  });
 });
 
 describe('Thornhollow Fields: the wave brings your pet back too', () => {
