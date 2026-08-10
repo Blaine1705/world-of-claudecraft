@@ -6820,6 +6820,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
+        "name": "Rimefang"
+      },
+      {
+        "kind": "item",
         "name": "Heart of the Rift"
       },
       {
