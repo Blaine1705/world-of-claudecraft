@@ -4704,6 +4704,21 @@
   .cs-reroll-actions .btn {
     flex: 1 1 0;
   }
+  /* The shared .auth-error rule below (written for the char-create input
+     tooltips) positions errors absolutely below their anchor. That anchor
+     assumption breaks here: the reroll panel docks as position:absolute on
+     desktop, so an absolute error paints over the 3D stage instead of
+     flowing under the Save/Keep actions. Reset it to a normal flow child.
+     Double-id selector so it wins over the shared rule regardless of the
+     two rules' relative source order (equal id+class specificity otherwise). */
+  #charselect-reroll #charselect-reroll-error {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    margin-top: var(--spacing-sm);
+  }
 
   .class-details-content {
     transition:
@@ -5273,7 +5288,9 @@
   }
   body.mobile-touch .char-row .char-actions {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: auto;
     gap: 7px;
     width: 100%;
   }
@@ -6372,7 +6389,9 @@
   body.mobile-touch #char-list .char-row .char-actions {
     grid-area: actions;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: auto;
     gap: 7px;
     width: 100%;
   }
@@ -6607,7 +6626,9 @@
     }
     body.mobile-touch #char-list .char-row .char-actions {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr;
+      grid-auto-flow: column;
+      grid-auto-columns: auto;
       gap: 6px;
       width: 100%;
     }
