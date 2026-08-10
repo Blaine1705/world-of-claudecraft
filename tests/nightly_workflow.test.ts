@@ -166,6 +166,13 @@ describe('nightly gate workflow', () => {
     expect(browser).toMatch(stepLine('run: npm run test:browser'));
     expect(browser).toContain('path: ~/.cache/ms-playwright');
     expect(browser).toContain("require('playwright/package.json').version");
+    // The toContain above only pins the resolve step that feeds the cache
+    // key, not the key: line itself: a mutation that loosens key: back to a
+    // bare version prefix (reintroducing the stale-restore fallback) would
+    // leave that assertion green. Pin the key: line exactly.
+    expect(browser).toMatch(
+      /\n {10}key: playwright-chromium-\$\{\{ runner\.os \}\}-\$\{\{ steps\.playwright-version\.outputs\.version \}\}\n/,
+    );
     // No restore-keys on the Playwright cache: a version-prefix fallback can
     // only ever restore a stale Chromium build, so the exact-version key is
     // the only key worth having. Anchored to the YAML key shape (bare,
