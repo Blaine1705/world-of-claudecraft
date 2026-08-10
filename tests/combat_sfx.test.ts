@@ -6,6 +6,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  groundTickAbilityCue,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -369,6 +370,15 @@ describe('combat SFX policy', () => {
         ability: 'flamestrike',
       }),
     ).toEqual({ key: 'flamestrike', anchorId: 10 });
+  });
+
+  it('gives Meteor its own ground-tick cue instead of staying silent', () => {
+    expect(groundTickAbilityCue('meteor')).toBe('meteor');
+    // Every other groundAoE zone (Consecration, Blizzard's damage pulse, ...)
+    // has no dedicated recording and stays silent here (procedural VFX synth
+    // carries it, see ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES).
+    expect(groundTickAbilityCue('consecration')).toBeNull();
+    expect(groundTickAbilityCue(undefined)).toBeNull();
   });
 
   it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {

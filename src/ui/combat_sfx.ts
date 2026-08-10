@@ -35,7 +35,10 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 // instead, keyed off the casting ability id the event already carries: the
 // three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
 // warrior Intimidating Shout, all archetype aoeFear), Frost Nova, and
-// Flamestrike (also archetype 'nova': a ground-targeted fire burst).
+// Flamestrike (also archetype 'nova': a ground-targeted fire burst). Not to
+// be confused with Meteor (GROUND_TICK_ABILITY_CUES below): the two are
+// separate abilities, each with its own recording, once mixed up during
+// authoring and since corrected.
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
@@ -46,13 +49,27 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 // Shared by both nova-shaped events: the caster-anchored fx:'spellfx' nova
 // (self-centered/entity-anchored bursts) AND the world-anchored
-// fx:'spellfxAt' nova (ground-targeted bursts like Flamestrike, which always
-// takes the castAim branch and never the entity-anchored one). Exported so
-// hud.ts's spellfxAt handler can resolve the same override instead of
-// hardcoding 'spell_nova' regardless of ability (review finding, PR #2861:
-// the Flamestrike entry above could never fire on a real cast without this).
+// fx:'spellfxAt' nova (ground-targeted bursts). Exported so hud.ts's
+// spellfxAt handler can resolve the same override instead of hardcoding
+// 'spell_nova' regardless of ability (review finding, PR #2861).
 export function novaAbilityCue(ability: string | undefined): SfxId {
   return (ability && NOVA_ABILITY_CUES[ability]) || 'spell_nova';
+}
+
+// A ground-zone 'tick' fx event (pulseGroundAoE, effect_dispatch.ts's
+// groundAoE case) normally has no dedicated recording (see 'pulse' in
+// ability_sfx_coverage.ts's isAbilityMomentRecorded, which defaults to
+// false): the procedural VFX-synth layer carries every zone pulse. Meteor's
+// single delayed pulse now has a real recording instead, keyed off the
+// abilityId the tick event carries (effect.abilityId, pulseGroundAoE,
+// sim.ts). ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES set must list
+// the same id or the synth layer doubles it.
+const GROUND_TICK_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  meteor: 'meteor',
+};
+
+export function groundTickAbilityCue(ability: string | undefined): SfxId | null {
+  return (ability && GROUND_TICK_ABILITY_CUES[ability]) || null;
 }
 
 // A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
