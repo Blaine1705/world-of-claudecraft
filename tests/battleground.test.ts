@@ -1137,6 +1137,8 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     e.vz = 0;
     e.onGround = true;
     e.jumping = false;
+    e.facing = Math.PI / 2;
+    e.prevFacing = -Math.PI / 2;
     sim.ctx.rebucket(e);
 
     expect(sim.unstuck(pid)).toBe(true);
@@ -1149,7 +1151,51 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(inGraveyard(sim, match, pid, 0)).toBe(true);
     expectClearPlayerPosition(sim, e);
     expect(e.prevPos).toEqual(e.pos);
+    expect(e.facing).toBe(0);
+    expect(e.prevFacing).toBe(e.facing);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('Unstuck falls back to a clear team spawn when the graveyard plot is obstructed', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = sim.entities.get(pid)!;
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x + 50, origin.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+
+    const originalPlot = { ...BG_GRAVEYARDS[0] };
+    Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    try {
+      expect(sim.unstuck(pid)).toBe(true);
+      sim.drainEvents();
+      for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+      expect(sim.bgMatchFor(pid)).toBe(match);
+      expect(e.dead).toBe(false);
+      expect(e.ghost).toBe(false);
+      expect(isBgPos(e.pos.x)).toBe(true);
+      expectClearPlayerPosition(sim, e);
+      expect(
+        BG_BASES[0].spawns.some(
+          (spawn) =>
+            Math.abs(e.pos.x - (origin.x + spawn.x)) < 1e-6 &&
+            Math.abs(e.pos.z - (origin.z + spawn.z)) < 1e-6,
+        ),
+      ).toBe(true);
+      expect(e.prevPos).toEqual(e.pos);
+      expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+    } finally {
+      Object.assign(BG_GRAVEYARDS[0], originalPlot);
+    }
   });
 
   it('Unstuck relocates a fighter trapped on their indexed spawn point', () => {

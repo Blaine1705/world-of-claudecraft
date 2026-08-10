@@ -1173,15 +1173,19 @@ export function bgUnstuckDestination(ctx: SimContext, pid: number): Vec3 | null 
     { x: plot.x + plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
     { x: plot.x - plot.hw * 0.5, z: plot.z + plot.hd * 0.5 },
     { x: plot.x + plot.hw * 0.5, z: plot.z - plot.hd * 0.5 },
+    ...BG_BASES[team].spawns,
   ];
   for (const candidate of candidates) {
     const x = origin.x + candidate.x;
     const z = origin.z + candidate.z;
     const resolved = resolvePosition(ctx.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+    const insideGraveyard =
+      Math.abs(resolved.x - (origin.x + plot.x)) <= plot.hw &&
+      Math.abs(resolved.z - (origin.z + plot.z)) <= plot.hd;
+    const insideKeep = BG_BASES[team].spawns.includes(candidate);
     if (
       Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6 &&
-      Math.abs(resolved.x - (origin.x + plot.x)) <= plot.hw &&
-      Math.abs(resolved.z - (origin.z + plot.z)) <= plot.hd
+      (insideGraveyard || insideKeep)
     ) {
       return ctx.groundPos(x, z);
     }

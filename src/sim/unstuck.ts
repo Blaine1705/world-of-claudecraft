@@ -28,7 +28,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { bgCarryingFlag, bgUnstuckDestination } from './social/battleground';
+import { bgCarryingFlag, bgTeamOf, bgUnstuckDestination } from './social/battleground';
 import {
   applyUnstuckSickness,
   moveToGraveyardForUnstuck,
@@ -365,8 +365,12 @@ function completeBattlegroundUnstuck(
 ): UnstuckPosition | null {
   const destination = bgUnstuckDestination(ctx, p.id);
   if (!destination) return null;
+  const match = ctx.bgMatches.get(p.id);
+  const team = match ? bgTeamOf(match, p.id) : 0;
   p.pos = destination;
   p.prevPos = { ...p.pos };
+  p.facing = team === 0 ? 0 : Math.PI;
+  p.prevFacing = p.facing;
   ctx.rebucket(p);
   Object.assign(meta.moveInput, emptyMoveInput());
   p.vx = 0;
