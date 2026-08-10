@@ -80,9 +80,10 @@ describe('generated chunk geometry is stable', () => {
     await task;
 
     const meshes = terrain.group.children.filter((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh[];
-    // 36 in-rect chunks plus the 12 merged super-chunk meshes over the 21 gap
-    // cells nearest-rect ownership hands the Vale (the rects do not tile).
-    expect(meshes.length).toBe(48);
+    // 36 in-rect chunks and no gap super-chunks any more: the Proving Shore
+    // tutorial island claimed the west cell, so nearest-rect ownership no
+    // longer hands the Vale any gap cells (was 48 with 12 merged gap meshes).
+    expect(meshes.length).toBe(36);
 
     // Order the chunks by their own geometry bounds, so the pin does not depend
     // on build ORDER (which the worker move is expressly going to change).
@@ -117,7 +118,10 @@ describe('generated chunk geometry is stable', () => {
     const inRect = keyed.filter(({ box }) => box.min.x >= -181);
     const gapFill = keyed.filter(({ box }) => box.min.x < -181);
     expect(inRect.length).toBe(36);
-    expect(gapFill.length).toBe(12);
+    // The Proving Shore tutorial island owns every former Vale gap cell, so a
+    // Vale build produces zero gap-fill super-chunks now; the island's own
+    // chunks arrive only with its zone build.
+    expect(gapFill.length).toBe(0);
 
     // Re-minted for the natural-relief heightfield plus the shared height
     // lattice in terrain_chunk_build.ts (vertex normals now difference the
@@ -130,10 +134,12 @@ describe('generated chunk geometry is stable', () => {
     // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
     // in the same commit): the whole ten-node placement fix moves 146 of
     // its 140639 points, 0.1 percent, all inside the moved nodes' pad
-    // footprints.
-    expect(digestOf(inRect)).toBe('5a5e1a89378552ec5e52321c657d923b');
-    // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('0a6da9382c9bc0a9d6c7adcc752fb27b');
+    // footprints. Re-minted again for the Proving Shore tutorial island:
+    // its provingCoast/provingMoat terrain appliers reshape the Vale's west
+    // strand, an intended visual change (digest stable across two runs).
+    expect(digestOf(inRect)).toBe('fa5474c3d8dd0f27a4c4e5220391cda5');
+    // The gap super-chunk digest pin is gone with the gap chunks themselves;
+    // gapFill.length above pins their absence.
 
     terrain.cancelStreaming();
   });

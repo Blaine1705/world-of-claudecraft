@@ -5,8 +5,10 @@
 // yards at the vista tiers. Interpolating depth / seabed slope / alpha across a
 // 48 yard triangle draws hard straight-edged wedges and diagonal colour steps,
 // which is what was reported along the southwest shore: x -540..-180 by
-// z -180..180 is the ONE un-zoned cell carrying a real coastline (the vale's
-// west headland stands ~15 yards over its own beach inside it).
+// z -180..180 was the ONE un-zoned cell carrying a real coastline (the vale's
+// west headland stands ~15 yards over its own beach inside it). The Proving
+// Shore tutorial island now owns that cell, so its coastline is covered by a
+// zone sheet rather than a gap sheet.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -59,22 +61,30 @@ describe('water sheet coverage', () => {
   });
 
   it('covers the southwest coastline cell, the one that drew the wedges', () => {
+    // The Proving Shore tutorial island claimed the cell, so it is no longer a
+    // gap: its coastline is covered by the island's own zone sheet instead.
     const sw = gaps().find((g) => g.xMin === -540 && g.zMin === -180);
     expect(
       sw,
       `gaps: ${gaps()
         .map((g) => g.id)
         .join(' ')}`,
-    ).toBeDefined();
-    expect(sw?.xMax).toBe(-180);
-    expect(sw?.zMax).toBe(180);
+    ).toBeUndefined();
+    const island = zoneRects().find((r) => r.id === 'proving_shore');
+    expect(island).toBeDefined();
+    expect(island?.xMin).toBe(-540);
+    expect(island?.xMax).toBe(-180);
+    expect(island?.zMin).toBe(-180);
+    expect(island?.zMax).toBe(180);
   });
 
   it('pins that every gap holding a coastline is a real gap, against live terrain', () => {
     // A gap with BOTH wet and dry ground is one the apron cannot represent:
-    // those are exactly the sheets buildSheet(requireShore) builds. Assert the
-    // set is non-empty and that the southwest cell is in it, so a future grid
-    // change that strands a new coast on the apron fails here.
+    // those are exactly the sheets buildSheet(requireShore) builds. The one
+    // coastline gap (gap:-540,-180) became the Proving Shore tutorial island,
+    // a zone in its own right, so the set is now empty: every remaining gap is
+    // open sea. A future grid change that strands a new coast on the apron
+    // still fails here.
     const withShore = gaps().filter((gap) => {
       let wet = false;
       let dry = false;
@@ -86,17 +96,18 @@ describe('water sheet coverage', () => {
       }
       return wet && dry;
     });
-    expect(withShore.map((g) => g.id)).toEqual(['gap:-540,-180']);
+    expect(withShore.map((g) => g.id)).toEqual([]);
   });
 
   it('treats a gap as an abutting sheet, so no calm chop stripe forms at the seam', () => {
     // The chop feather fires only where the APRON is across an edge. The vale's
-    // west edge (x -180) now has the southwest gap sheet across it, so the
-    // feather must NOT fire there.
+    // west edge (x -180) now has the Proving Shore tutorial island's zone
+    // sheet across it, so the feather must NOT fire there.
     const sheets = [...zoneRects(), ...gaps()];
     expect(coveredByOtherSheet(sheets, 'eastbrook_vale', -180.5, 0)).toBe(true);
-    // ...while the true outer edge of the world still has only the apron.
-    expect(coveredByOtherSheet(sheets, 'gap:-540,-180', -540.5, 0)).toBe(false);
+    // ...while the true outer edge of the world (now the island's west edge)
+    // still has only the apron.
+    expect(coveredByOtherSheet(sheets, 'proving_shore', -540.5, 0)).toBe(false);
   });
 
   it('attaches each gap to a zone that actually touches it', () => {

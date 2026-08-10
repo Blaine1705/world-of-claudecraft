@@ -73,7 +73,8 @@ export function isFreshCharacter(world: IWorld): boolean {
   // the whole column west of the vale at x < -180) is being taught by the
   // island's own on-rails chain; this Eastbrook coachmark stays quiet there
   // and still engages normally if they ferry back with no quest history.
-  if (p.pos.x < -180) return false;
+  // (pos is optional-chained for the online pre-snapshot placeholder.)
+  if ((p.pos?.x ?? 0) < -180) return false;
   return p.level === 1 && world.questsDone.size === 0 && world.questLog.size === 0;
 }
 

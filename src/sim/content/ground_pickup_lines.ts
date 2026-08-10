@@ -37,6 +37,11 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'You have no reason to torch that.',
     enough: 'These huts are already smouldering.',
   },
+  // The Proving Shore (tutorial island): the wreck line's salvage crates.
+  ps_castaway_crate: {
+    deny: 'Barnacles seal the crate shut.',
+    enough: 'You already have enough castaway crates.',
+  },
   lost_caravan_goods: {
     deny: "You aren't authorized to salvage these goods yet.",
     enough: 'You already have enough caravan goods.',

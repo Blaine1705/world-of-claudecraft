@@ -6058,26 +6058,34 @@
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
      group), and the JS floors its z-index above the mobile sheet (the
      scoped-popup 96 rule). Sized from existing tokens, no new ones. */
-  #profession-tutorial {
+  /* #tutorial-greeting (the tutorial island spawn greeting,
+     tutorial_greeting_window.ts) shares every rule: the same once-ever modal
+     shape, reusing the same confirm-dialog family chrome. */
+  #profession-tutorial,
+  #tutorial-greeting {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     width: 380px;
     --window-pad: 14px;
   }
-  #profession-tutorial .cd-body {
+  #profession-tutorial .cd-body,
+  #tutorial-greeting .cd-body {
     padding: 10px 0;
   }
-  #profession-tutorial .cd-para {
+  #profession-tutorial .cd-para,
+  #tutorial-greeting .cd-para {
     margin: 0 0 8px;
     color: var(--color-text-light);
     font-size: 12.5px;
     line-height: 1.55;
   }
-  #profession-tutorial .cd-para:last-child {
+  #profession-tutorial .cd-para:last-child,
+  #tutorial-greeting .cd-para:last-child {
     margin-bottom: 0;
   }
-  #profession-tutorial .cd-actions {
+  #profession-tutorial .cd-actions,
+  #tutorial-greeting .cd-actions {
     display: flex;
     justify-content: flex-end;
     margin-top: 4px;

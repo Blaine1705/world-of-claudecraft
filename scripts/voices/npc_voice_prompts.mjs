@@ -1054,6 +1054,24 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
+  // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
+  // than the same character recurring under a suffixed id: each borrows the
+  // designed voice whose role and register its own dialogue carries. Promote
+  // each to its own VOICE_PROMPTS entry once an ElevenLabs key is available to
+  // design and render it.
+  // Harbor guide greeting newcomers and pointing them to the crossing: the
+  // waycamp keeper's warm, unhurried, hospitable-without-fuss register.
+  wayfarer_bryn: 'waykeeper_pell',
+  // Proving Master running drills for the unsteady: the riding-trial
+  // stablemaster's drill-instructor bark with real fondness under it.
+  instructor_maren: 'stablemaster_marla',
+  // Camp outfitter rattling off bread, water, and a draught: the Highwatch
+  // quartermaster's brisk, no-nonsense inventory cadence.
+  quartermaster_finch: 'quartermaster_bree',
+  // Keeper of the Crossing waiting at his pier: the fogbound-lake
+  // ferrymaster's low, careful, water-wise calm.
+  ferryman_odo: 'ferrymaster_caddow',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

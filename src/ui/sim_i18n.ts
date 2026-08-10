@@ -237,6 +237,7 @@ const baseEnTable = {
   'groundPickup.graveSealedDeny':
     'The grave is sealed against the living until the dead call you to it.',
   'groundPickup.cryptRitualCircleDeny': 'The ritual circle lies cold and dormant.',
+  'groundPickup.castawayCrateDeny': 'Barnacles seal the crate shut.',
   'groundPickup.supplyCrateEnough': 'You already have enough supply crates.',
   'groundPickup.gravecallerSigilEnough': "You already carry a Gravecaller's Sigil.",
   'groundPickup.ledgerPageEnough': 'You already have enough ledger pages.',
@@ -257,6 +258,7 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  'groundPickup.castawayCrateEnough': 'You already have enough castaway crates.',
   // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
   // route to the firebottle handler first), but the lines exist per the
   // every-object-has-lines rule and localize like the rest.

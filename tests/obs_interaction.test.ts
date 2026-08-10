@@ -236,6 +236,10 @@ describe('RL interactable observation parity', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
     const board = entityByTemplate(sim, 'noticeboard_eastbrook');
     const tinker = entityByTemplate(sim, 'tinker_gizzel');
+    // Park everything else, the file-wide fixture idiom: the tutorial island's
+    // harbor guide (wayfarer_bryn) now stands 2.2 yards from this spot, and the
+    // claim under test is board-vs-Tinker priority, not who is nearest overall.
+    parkOtherInteractables(sim, board, tinker);
     const player = standAt(sim, {
       x: 5.667054662450036,
       z: -9.214736474221478,

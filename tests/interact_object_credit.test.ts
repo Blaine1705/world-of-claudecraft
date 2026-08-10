@@ -181,8 +181,9 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // (q_deepfen_purge, count 5 over 5 authored huts). The huts route to the
     // firebottle handler before the generic interact path, so their re-credit
     // pacing is the timed burnedObjects cooldown, not this ledger; the
-    // distinct-objects floor above still holds for them.
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(21);
+    // distinct-objects floor above still holds for them. Plus the tutorial
+    // island's castaway crates (q_ps_the_wreck_line, count 3 over 3 spots).
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(22);
   });
 
   it.each(interactObjectives.filter((o) => o.count > 1))(

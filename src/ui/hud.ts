@@ -3330,6 +3330,11 @@ export class Hud {
         // never left hidden with a live trap (the confirm-dialog precedent).
         this.closeProfessionTutorial();
         break;
+      case 'tutorial-greeting':
+        // Route through closeTutorialGreeting so the focus trap is released
+        // and the modal is removed (the profession-tutorial precedent).
+        this.closeTutorialGreeting();
+        break;
       case 'options-menu':
         this.closeOptions();
         break;

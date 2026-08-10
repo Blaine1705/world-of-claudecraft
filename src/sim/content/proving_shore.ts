@@ -134,6 +134,9 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 4, chance: 1 }],
     scale: 0.8,
     color: 0x7a5a3a,
+    // Every beast carries a harvestable component (the economy_yield rule);
+    // crab meat, the tide_scuttler precedent.
+    componentTags: ['meat'],
   },
 };
 
