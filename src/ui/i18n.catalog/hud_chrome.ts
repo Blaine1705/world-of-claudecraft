@@ -544,6 +544,18 @@ export const hudChromeStrings = {
   // the Use / More action buttons. These touch variants are swapped in when the
   // mobile-touch interface is active (see tutorial_copy.ts). English-only add, so
   // they live here in the hud_chrome domain rather than the constrained `hud` one.
+  // The spawn greeting dialog (tutorial island): the harbor guide's one-time
+  // offer of passage to the Proving Shore, first-character welcome vs
+  // returning-player refresher, and the two choice buttons
+  // (tutorial_greeting_view.ts / tutorial_greeting_window.ts).
+  tutorialGreeting: {
+    bodyFirst:
+      'I have not seen you around before, friend. If this is your first time on these roads, there is a place you can go to hone your skills and get used to the world before you take on its challenges: the Proving Shore, a quiet island across the strait. The ferry runs both ways, and no one will think less of you either way.',
+    bodyRefresher:
+      'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
+    play: 'Take the tutorial',
+    skip: 'Skip the tutorial',
+  },
   tutorial: {
     // "movement stick", not "left stick": left-handed mode swaps the two thumb
     // sticks (and the stick can float to wherever you touch), so a fixed side is

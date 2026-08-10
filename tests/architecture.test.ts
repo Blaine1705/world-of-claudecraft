@@ -303,6 +303,7 @@ const UI_PURE_CORES = [
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
   'src/ui/market_view.ts',
   'src/ui/market_buy_confirm_core.ts',
   'src/ui/mailbox_view.ts',
@@ -1580,6 +1581,7 @@ const UI_DOM_MODULES = [
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it

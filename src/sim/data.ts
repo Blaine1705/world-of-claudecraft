@@ -95,6 +95,19 @@ import {
   FARSHORE_ZONE,
 } from './content/farshore';
 import {
+  PROVING_SHORE_CAMPS,
+  PROVING_SHORE_ITEMS,
+  PROVING_SHORE_MOBS,
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
+  PROVING_SHORE_PORTALS,
+  PROVING_SHORE_PROPS,
+  PROVING_SHORE_QUEST_ORDER,
+  PROVING_SHORE_QUESTS,
+  PROVING_SHORE_ROADS,
+  PROVING_SHORE_ZONE,
+} from './content/proving_shore';
+import {
   FROSTVEIL_CAMPS,
   FROSTVEIL_ESCORTS,
   FROSTVEIL_ITEMS,
@@ -348,6 +361,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  PROVING_SHORE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -377,6 +391,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  ...PROVING_SHORE_MOBS,
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
@@ -408,6 +423,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...EVERGARDEN_NPCS,
   ...GALECREST_NPCS,
   ...FARSHORE_NPCS,
+  // The Proving Shore cast (tutorial island) appends after every shipped NPC
+  // for the same insertion-order stability reason as the realms above.
+  ...PROVING_SHORE_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -434,6 +452,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
+  ...PROVING_SHORE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -452,6 +471,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...PROVING_SHORE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -501,6 +521,10 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
+  // The Proving Shore's camps are all offStream (private rng sub-streams), so
+  // their position in this array cannot shift any earlier camp's draws; they
+  // still append LAST by the standing rule.
+  ...PROVING_SHORE_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -528,6 +552,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...EVERGARDEN_OBJECTS,
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
+  ...PROVING_SHORE_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
@@ -554,6 +579,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...EVERGARDEN_ROADS,
   ...GALECREST_ROADS,
   ...FARSHORE_ROADS,
+  ...PROVING_SHORE_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -568,6 +594,7 @@ export const PORTALS: PortalDef[] = [
   ...EVERGARDEN_PORTALS,
   ...GALECREST_PORTALS,
   ...FARSHORE_PORTALS,
+  ...PROVING_SHORE_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -586,6 +613,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   EVERGARDEN_PROPS,
   GALECREST_PROPS,
   FARSHORE_PROPS,
+  PROVING_SHORE_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -667,6 +695,7 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
   FARSHORE_ZONE,
+  PROVING_SHORE_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)

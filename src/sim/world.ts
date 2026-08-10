@@ -1844,6 +1844,83 @@ function applyIsleCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
+// ---------------------------------------------------------------------------
+// The Proving Shore: the tutorial island in the starter sea east of Eastbrook
+// Vale (negative x; the Farshore recipe mirrored into the opposite column).
+// No land border and no causeway: the only ways over are the tutorial
+// greeting's ferry and the crossing-circle portal pair, and swim fatigue
+// guards the strait. Beaches all around, rising gently toward the heart.
+// ---------------------------------------------------------------------------
+const PS_LAND_LOBES = [
+  { x: -330, z: 20, r: 70 }, // the island's heart
+  { x: -292, z: 58, r: 45 }, // Dawnrest Camp's shelf
+  { x: -272, z: 66, r: 34 }, // the Old Pier's point, facing the vale
+  { x: -352, z: -28, r: 50 }, // the practice downs
+  { x: -286, z: -6, r: 40 }, // the wreck line's strand
+] as const;
+const PS_BAYS = [
+  { x: -258, z: 34, r: 26 }, // the ferry cove, between pier and strand
+  { x: -380, z: 60, r: 34 }, // the far bight
+] as const;
+
+const PS_LAND_FIELD = boundedBlobs(PS_LAND_LOBES);
+const PS_BAY_FIELD = boundedBlobs(PS_BAYS);
+export function provingLandness(x: number, z: number): number {
+  return metaballLandness(PS_LAND_FIELD, PS_BAY_FIELD, x, z);
+}
+
+// The tutorial island's coast: the applyIsleCoast recipe with the vale-facing
+// seam mirrored to the cell's east edge (x = -180). Every window edge fades.
+function applyProvingCoast(x: number, z: number, h: number): number {
+  if (x < -566 || x > -166) return h;
+  const zSeam = smoothstep(-188, -172, z) * (1 - smoothstep(172, 188, z));
+  if (zSeam <= 0) return h;
+  const seam = smoothstep(172, 188, -x);
+  if (seam <= 0) return h;
+  const land = provingLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.8 - (WATER_LEVEL - 3.2)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the beach apron: low shores pressed flat, the Palmreach recipe
+  const beachT = 1 - smoothstep(0.05, 0.28, land);
+  if (beachT > 0 && out > 1.4) out = out + (1.4 + (out - 1.4) * 0.2 - out) * beachT;
+  // a gentle rise toward the heart, kept small so the camp stays near-flat
+  const dHeart = Math.hypot(x + 340, z);
+  out += 8 * (1 - smoothstep(15, 90, dHeart)) * smoothstep(0.02, 0.2, land);
+  return h + (out - h) * seam * zSeam;
+}
+
+// Clean open water framing the Proving Shore: applyStarterMoat mirrored to
+// the east column (x -> -x, no causeway exemption). The vale/island border
+// strait keeps the x = -180 line honest sea, the north channel sinks the
+// Willowfen border ridge over water, and the south band opens the sea below
+// the island out to the map edge. Every window edge is a fade, never a cut.
+function applyProvingMoat(x: number, z: number, h: number): number {
+  if (x >= -196 && x <= -177 && z < 158 && z > -184) {
+    const wb =
+      smoothstep(177, 182, -x) *
+      (1 - smoothstep(188, 196, -x)) *
+      (1 - smoothstep(148, 158, z)) *
+      smoothstep(-184, -172, z);
+    if (wb > 0) {
+      const sea2 = Math.min(h, WATER_LEVEL - 5);
+      h = h + (sea2 - h) * wb;
+    }
+  }
+  if (x > -172 || x < -548) return h;
+  const xw = smoothstep(172, 184, -x);
+  // the north channel: the border band with the Willowfen (z 164..186),
+  // fading back to the fen's own south shore north of z 200
+  const north = smoothstep(150, 164, z) * (1 - smoothstep(186, 200, z));
+  // the south: open sea below the island's strand, out to the map edge
+  const south = smoothstep(-150, -166, z);
+  const w = Math.max(north, south) * xw;
+  if (w <= 0) return h;
+  const sea = Math.min(h, WATER_LEVEL - 5);
+  return h + (sea - h) * w;
+}
+
 // The border meres between columns: the seam blend of two adjacent coasts
 // leaves each border line hovering at the waterline (a mushy mudflat neither
 // walkable nor swimmable); these carve every column border into honest
@@ -2938,7 +3015,9 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     // walk, never open sea.
     if (Math.abs(x) > 620 || z < -215) return false; // the far void keeps legacy rules
     if (onCauseway(x, z)) return false;
-    return valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02;
+    return (
+      valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02 && provingLandness(x, z) < 0.02
+    );
   }
   if (z <= 960) {
     // the columns' southern outer coasts: open ocean to the world edge
@@ -4404,6 +4483,12 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.starterMoat)) {
     h = applyStarterMoat(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.provingCoast)) {
+    h = applyProvingCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.provingMoat)) {
+    h = applyProvingMoat(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.columnStraits)) {
     h = applyColumnStraits(x, z, h);

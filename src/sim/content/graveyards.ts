@@ -42,6 +42,7 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldergleam Rest', x: -60, z: 1004 },
   { id: 'gy_farshore', name: 'Gullhaven Rest', x: 290, z: 86 },
+  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -324, z: 58 },
   // At the zone's own graveyard field (willowfen.ts): the old (-346, 338) spot
   // sits inside Bridgemere's moat ring, below WATER_LEVEL, and the Pale Keeper
   // spawned underwater there.

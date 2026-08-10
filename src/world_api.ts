@@ -575,6 +575,11 @@ export const COMMAND_NAMES = [
   // sim consolidates and restamps cell hints deterministically. Appended
   // because wire tokens are never reordered.
   'inv_sort',
+  // The tutorial greeting's accept: the ferry ride to the Proving Shore
+  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
+  // life, and band server-side). Appended because wire tokens are never
+  // reordered.
+  'tutorial_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

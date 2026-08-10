@@ -58,6 +58,8 @@ export const TERRAIN_APPLIER = {
   sowfieldFlatten: 32,
   stableFlatten: 33,
   fenSouthShore: 34,
+  provingCoast: 35,
+  provingMoat: 36,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -109,6 +111,11 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   // tail fade (FEN_SHORE_TAIL_Z) north to FEN_ZMIN + FEN_SHORE_SUPPORT, the
   // widest the wandered waterline plus its bank shave can reach inland.
   [bounds(-566, -232, 132, 336)],
+  // provingCoast: the tutorial island's full window (fades included)
+  [bounds(-566, -166, -188, 188)],
+  // provingMoat: like starterMoat, its south open-sea band has unbounded z
+  // support, so it stays in the always-run mask
+  null,
 ];
 
 interface MutableCell {

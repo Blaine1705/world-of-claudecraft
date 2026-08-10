@@ -142,6 +142,7 @@ export const IWORLD_MEMBERS = [
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
+  { name: 'startTutorial', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
@@ -560,7 +561,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // sortInventory (IWorldInventory, a method), leaving 301. The character
     // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
     // data), leaving 302. This branch's battleground queue-pop confirmation
-    // adds bgRespond (IWorldBattleground, a method), leaving 303.
+    // adds bgRespond (IWorldBattleground, a method), leaving 303; the
+    // tutorial greeting adds startTutorial (IWorldQuests, a method), 304.
     //
     // NOTE for the next merge, twice over now: BOTH sides of this pin bumped it
     // to the same number independently, so git merged the count with no
@@ -568,9 +570,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // increment is a silent off-by-one at merge time, and the data/method split
     // can disagree even when the total agrees. Only running the suite says what
     // these numbers really are; never reconcile them by arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(303);
+    expect(IWORLD_MEMBERS.length).toBe(304);
     expect(DATA_MEMBERS.length).toBe(77);
-    expect(METHOD_MEMBERS.length).toBe(226);
+    expect(METHOD_MEMBERS.length).toBe(227);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -844,6 +846,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
@@ -1167,6 +1170,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
@@ -1370,6 +1374,7 @@ const FACET_QUESTS = [
   'turnInQuest',
   'abandonQuest',
   'acceptLinkedQuest',
+  'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -1778,8 +1783,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(303);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(303);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

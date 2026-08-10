@@ -834,6 +834,12 @@ export const pl_PL: EnTranslations = {
       "hideKeyboard": "Ukryj klawiaturę",
       "chatPlaceholder": "Powiedz coś..."
     },
+    "tutorialGreeting": {
+      "bodyFirst": "I have not seen you around before, friend. If this is your first time on these roads, there is a place you can go to hone your skills and get used to the world before you take on its challenges: the Proving Shore, a quiet island across the strait. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
+      "play": "Take the tutorial",
+      "skip": "Skip the tutorial"
+    },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
       "talkBodyTouch": "Stań blisko marszałka Redbrooka i dotknij przycisku Użyj, aby z nim porozmawiać, a następnie przyjmij jego zadanie.",
@@ -3770,6 +3776,8 @@ export const pl_PL: EnTranslations = {
         "fenBlurb": "Za jesienną koroną leży jasne mokradło pełne wierzb i spokojnej wody, a za fosą kryje się miasteczko.",
         "farshoreName": "The Farshore",
         "farshoreBlurb": "An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.",
+        "provingName": "The Proving Shore",
+        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
         "nightName": "The Nightbloom",
         "nightBlurb": "A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.",
         "hauntName": "The Wraithwood",
@@ -4707,6 +4715,10 @@ export const pl_PL: EnTranslations = {
       "farshoreGreeting": "You came over the Ferrywalk? Then you are the first in a week, and the Warden will want to look you over.",
       "farshoreGreeter": "Bellkeeper Tam, the Landing",
       "farshorePlaceNotes": "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
+      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
+      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
+      "provingGreeter": "Instructor Maren, Dawnrest Camp",
+      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
       "travelTitle": "Getting around",
       "travelBody": "Every road in the realm is walked or ridden. There are no flight paths, no taxis, and no teleport network: the map is one connected landmass, and every connection is something you can stand on. Ridges divide one realm from the next, and where two realms share a ridge the road climbs through a pass. Not every border works that way, though. In the north a long causeway carries the road out over the water from the Veiled Hollow into the snow country beyond, and back south a thin natural sandbar called the Ferrywalk runs east from the Vale's coast to the Landing on the island of the Farshore, which has no land border at all. And there is exactly one true doorway in the whole overworld: a veil of dusk high on Thornpeak that opens into the Veiled Hollow. The Hollow's southern ridge is sealed with no pass through it, so that veil is how you first get in, and it closes behind you on the way back.\n\nWherever you fall, the walk back is a short one. Every zone keeps at least one graveyard with a Pale Keeper hovering over the stones, and a released spirit rises at the nearest of them.\n\nThe map does not end in an invisible wall. The land runs out into beaches and headlands, and then into open water. The crossings the world means you to swim, the straits and meres between one realm and the next, are calm and safe to cross. Strike out for the open sea instead and the distance itself turns you back: you are warned, and warned again, and if you keep swimming the sea wears you down until it kills you. Diving has its own limit, since your breath runs out under the surface, so come up for air and turn around when the water tells you to.",
       "mountsTitle": "Mounts",
@@ -11384,6 +11396,9 @@ export const pl_PL: EnTranslations = {
       "pristine_claw": {
         "name": "Nieskazitelny Pazur"
       },
+      "ps_castaway_crate": {
+        "name": "Castaway Crate"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -12712,6 +12727,12 @@ export const pl_PL: EnTranslations = {
       "fisher_bram": {
         "name": "Rybak Bram"
       },
+      "training_effigy": {
+        "name": "Training Effigy"
+      },
+      "shore_scuttler": {
+        "name": "Shore Scuttler"
+      },
       "rift_hellguard": {
         "name": "Piekłostrażnik"
       },
@@ -13301,6 +13322,26 @@ export const pl_PL: EnTranslations = {
         "name": "Alchemik Verane",
         "title": "Mistrz Aptekarstwa",
         "greeting": "Odmierz dwa razy i wlej raz, {className}. Aptekarz nie ma cierpliwości do rozlanych odczynników."
+      },
+      "wayfarer_bryn": {
+        "name": "Wayfarer Bryn",
+        "title": "Harbor Guide",
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the east strand runs both ways, every day of the year."
+      },
+      "instructor_maren": {
+        "name": "Instructor Maren",
+        "title": "Proving Master",
+        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+      },
+      "quartermaster_finch": {
+        "name": "Quartermaster Finch",
+        "title": "Camp Outfitter",
+        "greeting": "Bread, water, and a draught for when practice gets ahead of you. Coin buys them, and work earns the coin. That is the whole economy, {playerName}, and it never gets more complicated. Only bigger."
+      },
+      "ferryman_odo": {
+        "name": "Ferryman Odo",
+        "title": "Keeper of the Crossing",
+        "greeting": "The strait is calm and the boat is sound, {playerName}. Whenever you are ready for the vale, the crossing circle at the end of my pier will carry you over."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -15248,6 +15289,59 @@ export const pl_PL: EnTranslations = {
           }
         }
       },
+      "q_ps_find_your_feet": {
+        "title": "Find Your Feet",
+        "text": "Welcome to the Proving Shore, {playerName}. Nothing on this island bites unless you ask it to, so use the quiet: walk the camp and learn its faces. Quartermaster Finch keeps the stores, and Ferryman Odo keeps the way home. Pay each of them a visit, then come back to me.",
+        "completion": "Fast on your feet and back before the kettle boiled. You know the camp now, {playerName}, which means you know where to run when something does bite.",
+        "objectives": {
+          "0": {
+            "label": "Visit Quartermaster Finch"
+          },
+          "1": {
+            "label": "Visit Ferryman Odo"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Strike True",
+        "text": "A blade you have never swung is just a heavy stick, {playerName}. The effigies on the practice yard south of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
+        "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.",
+        "objectives": {
+          "0": {
+            "label": "Training Effigy felled"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "The Wreck Line",
+        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand that faces the vale. The scuttlers that pick over them pinch harder than they look, so mind your step. Crack open three crates and bring me whatever the sea left us.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, {playerName}. Keep the habit: look, open, take.",
+        "objectives": {
+          "0": {
+            "label": "Castaway Crate opened"
+          }
+        }
+      },
+      "q_ps_tools_of_the_trade": {
+        "title": "Tools of the Trade",
+        "text": "Coin is for spending, {playerName}, and mine is an honest stall. Buy a healing draught off me, and I will refund you more than the price for the lesson: find a vendor, weigh a cost, count your change. When you reach the vale, spend what is left on gathering tools at the traders there. Every fortune ever minted started exactly this small.",
+        "completion": "One draught, bought and paid for, and your refund as promised: a bargain you will not often see repeated. Keep it corked for a bad day, {playerName}, and remember that the vale traders sell picks, axes, and sickles to anyone carrying honest coin.",
+        "objectives": {
+          "0": {
+            "label": "Minor Healing Potion bought"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Set Sail",
+        "text": "There is nothing left on this shore you have not already beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk down to the Old Pier and tell Ferryman Odo I said you have earned your crossing.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. The circle at the end of my pier will carry you to the vale whenever you walk into it, {playerName}. Mind the wolves.",
+        "objectives": {
+          "0": {
+            "label": "Report to Ferryman Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "W Dół Wietrznego Szlaku",
         "text": "Dokonałeś wspinaczki, {playerName}, więc wiatr postanowił cię zatrzymać. Wickharbor leży na wschód wzdłuż drogi przez wzgórza, schowane w zaciszu swojej zatoczki. Kapitan Portu Odile liczy każdą duszę, która przechodzi przez przełęcz, i będzie chciała policzyć ciebie. Powiedz jej, że Wietrzny Szlak jest wciąż otwarty.",
@@ -15805,6 +15899,24 @@ export const pl_PL: EnTranslations = {
           },
           "4": {
             "label": "Pola Szczelin"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "The Proving Shore",
+        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "pois": {
+          "0": {
+            "label": "Dawnrest Camp"
+          },
+          "1": {
+            "label": "The Old Pier"
+          },
+          "2": {
+            "label": "The Practice Yard"
+          },
+          "3": {
+            "label": "The Wreck Line"
           }
         }
       }

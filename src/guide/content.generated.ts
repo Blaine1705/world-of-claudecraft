@@ -2031,6 +2031,25 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "burrower",
       "demon"
     ]
+  },
+  {
+    "id": "proving_shore",
+    "name": "The Proving Shore",
+    "min": 1,
+    "max": 2,
+    "biome": "vale",
+    "hub": "Dawnrest Camp",
+    "pois": [
+      "Dawnrest Camp",
+      "The Old Pier",
+      "The Practice Yard",
+      "The Wreck Line"
+    ],
+    "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+    "families": [
+      "beast",
+      "humanoid"
+    ]
   }
 ];
 
@@ -2177,6 +2196,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#7f8c8d",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_wolf__7f8c8d__s35.webp"
+      },
+      {
+        "name": "Shore Scuttler",
+        "min": 1,
+        "max": 2,
+        "rare": false,
+        "templateId": "shore_scuttler",
+        "model": "mob_wolf",
+        "tint": "#7a5a3a",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__7a5a3a__s35.webp"
       },
       {
         "name": "Wild Boar",
@@ -2641,6 +2671,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
   {
     "family": "humanoid",
     "creatures": [
+      {
+        "name": "Training Effigy",
+        "min": 1,
+        "max": 1,
+        "rare": false,
+        "templateId": "training_effigy",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+      },
       {
         "name": "Vale Bandit",
         "min": 3,

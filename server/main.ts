@@ -123,6 +123,7 @@ import {
   type BgLeaderRow,
   bankBonusFactsForAccount,
   type CharacterRow,
+  characterCountForAccount,
   characterCountsByRealm,
   charactersForDeedsBoard,
   chatMuteStatusForAccount,
@@ -3143,6 +3144,7 @@ export async function startServer(): Promise<http.Server> {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
+    characterCountForAccount,
   });
   wsAuth.attachUpgrade(server, wss);
 

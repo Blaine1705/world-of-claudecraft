@@ -12233,5 +12233,79 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '利用不可',
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '見かけない顔だね、旅の人。この道を歩くのが初めてなら、世界の試練に挑む前に腕を磨き、この土地に慣れられる場所がある。修練の浜、海峡の向こうの静かな島だ。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
+  'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
+  'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
+  'entities.items.ps_castaway_crate.name': '漂着した木箱',
+  'entities.mobs.training_effigy.name': '訓練用のかかし',
+  'entities.mobs.shore_scuttler.name': '浜辺ガニ',
+  'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
+  'entities.npcs.wayfarer_bryn.title': '港の案内人',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。東の浜の渡しの円環は、年中どちら向きにも通じているからね。',
+  'entities.npcs.instructor_maren.name': '教官マレン',
+  'entities.npcs.instructor_maren.title': '修練の師',
+  'entities.npcs.instructor_maren.greeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた、{className}。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。この浜はそのためにある。問い、鍛え、失敗しても構わない場所で存分に失敗するといい。',
+  'entities.npcs.quartermaster_finch.name': '補給係フィンチ',
+  'entities.npcs.quartermaster_finch.title': '野営地の商人',
+  'entities.npcs.quartermaster_finch.greeting':
+    'パンに水、それに稽古が過ぎたときのための薬。銅貨があれば買えるし、銅貨は働いて稼ぐもの。それが経済のすべてだよ、{playerName}。これ以上難しくはならない。大きくなるだけさ。',
+  'entities.npcs.ferryman_odo.name': '渡し守オド',
+  'entities.npcs.ferryman_odo.title': '渡し場の番人',
+  'entities.npcs.ferryman_odo.greeting':
+    '海峡は穏やかで、船も頑丈だ、{playerName}。渓谷へ行く支度ができたら、桟橋の先の渡しの円環がいつでも運んでくれる。',
+  'entities.quests.q_ps_find_your_feet.title': '第一歩',
+  'entities.quests.q_ps_find_your_feet.text':
+    'ようこそ修練の浜へ、{playerName}。この島では、こちらから手を出さない限り噛みついてくるものはいない。だから静かな今のうちに、野営地を歩いて顔ぶれを覚えておくといい。補給係フィンチが物資を、渡し守オドが帰り道を預かっている。二人を訪ねたら、私のところへ戻っておいで。',
+  'entities.quests.q_ps_find_your_feet.completion':
+    '足も速いし、湯が沸く前に戻ってきたね。これで野営地は頭に入った、{playerName}。つまり、本当に噛みつかれたときにどこへ走ればいいかも分かったということだ。',
+  'entities.quests.q_ps_find_your_feet.objectives.0.label': '補給係フィンチを訪ねる',
+  'entities.quests.q_ps_find_your_feet.objectives.1.label': '渡し守オドを訪ねる',
+  'entities.quests.q_ps_strike_true.title': '確かな一撃',
+  'entities.quests.q_ps_strike_true.text':
+    '振ったことのない剣は、ただの重い棒だよ、{playerName}。野営地の南の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
+  'entities.quests.q_ps_strike_true.completion':
+    '三体倒して、握りももう確かになってきた。その感覚を忘れないで、{playerName}。足を据え、目を上げ、全身で振り抜く。渓谷の狼は藁より速いが、同じ算術で倒れるものだよ。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
+  'entities.quests.q_ps_the_wreck_line.title': '難破の浜',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '潮はこの島に漂着物で払いをする。古い難破船の木箱が、渓谷に面した浜に打ち上げられるんだ。それを漁る蟹どもは見た目より強く挟むから、足元には気をつけて。木箱を三つこじ開けて、海が残していったものを持っておいで。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'ロープに、タールに、海がなぜか見逃したチーズが半玉。世の中は身をかがめる価値のあるもので満ちているよ、{playerName}。この習慣を続けなさい。見つけて、開けて、頂く。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',
+  'entities.quests.q_ps_tools_of_the_trade.title': '商いの道具',
+  'entities.quests.q_ps_tools_of_the_trade.text':
+    '銅貨は使うためにある、{playerName}。そしてうちは正直な店だ。私から治療薬をひと瓶買ってごらん。授業料としてお代より多く払い戻そう。店を見つけ、値段を量り、釣り銭を数える。渓谷に着いたら、残りはあちらの商人の採集道具に使うといい。鋳られた財産というものは、みんなこれくらい小さく始まったのさ。',
+  'entities.quests.q_ps_tools_of_the_trade.completion':
+    'ひと瓶、きちんと買って、約束どおりの払い戻し。こんな良い取引にはそうそう出会えないよ。まさかの日のために栓をしたまま取っておきなさい、{playerName}。それから、渓谷の商人はまっとうな銅貨を持つ者になら誰にでも、つるはしも斧も鎌も売ってくれることを覚えておいで。',
+  'entities.quests.q_ps_tools_of_the_trade.objectives.0.label': '治療薬を購入する',
+  'entities.quests.q_ps_set_sail.title': '出航',
+  'entities.quests.q_ps_set_sail.text':
+    'この浜には、君がまだ倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルック渓谷には本物の仕事が待っている。古い桟橋へ下りて、渡し守オドに伝えなさい。マレンが、君は渡りを勝ち取ったと言っていた、とね。',
+  'entities.quests.q_ps_set_sail.completion':
+    'マレンがそう言ったのかい？私に一週間も舫い結びの稽古をさせた人からの、これは大した誉め言葉だ。桟橋の先の円環に足を踏み入れれば、いつでも渓谷へ運んでくれるよ、{playerName}。狼には気をつけて。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '渡し守オドに報告する',
+  'entities.zones.proving_shore.name': '修練の浜',
+  'entities.zones.proving_shore.welcome':
+    '修練の浜が君に求めるのは時間だけ。野営地を覚え、かかしを打ち、難破の浜を歩き、支度ができたら渡し守オドが渓谷まで送り届けてくれる。',
+  'entities.zones.proving_shore.pois.0.label': '暁の野営地',
+  'entities.zones.proving_shore.pois.1.label': '古い桟橋',
+  'entities.zones.proving_shore.pois.2.label': '練習場',
+  'entities.zones.proving_shore.pois.3.label': '難破の浜',
+  'guide.home.world.provingName': '修練の浜',
+  'guide.home.world.provingBlurb':
+    '海峡の向こうの静かな訓練の島。渓谷が何かを求めてくる前に、新米冒険者はここで足場を固める。',
+  'guide.worldPage.provingBlurb':
+    '渓谷から海峡を隔てた静かな島で、訓練場として保たれている。野営地がひとつ、練習場がひとつ、残骸の散らばる浜、そして行きも帰りも通う渡し船。',
+  'guide.worldPage.provingGreeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。',
+  'guide.worldPage.provingGreeter': '教官マレン、暁の野営地',
+  'guide.worldPage.provingPlaceNotes':
+    '暁の野営地が島の集落のすべてで、テントが数張り、売店がひとつ、集いの焚き火がひとつ。古い桟橋は渓谷に面し、渡しの円環が卒業生を海峡の向こうへ運ぶ。野営地の南の練習場には、必要とする者のために藁のかかしが立ち続け、難破の浜は潮が漂着した木箱で島に払いをする、残骸の散らばる海岸だ。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

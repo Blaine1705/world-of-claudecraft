@@ -12031,5 +12031,77 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '無法使用',
   'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '這張面孔我可沒見過，朋友。如果這是你第一次踏上這些路，有一個地方可以讓你先磨練身手、熟悉這個世界，再去迎接它的挑戰：試煉之濱，海峽對面的一座安靜小島。渡船來回都通，去或不去都沒人會小看你。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '又換了一副新面孔回來了？那你知道該怎麼做。不過，出發前若想溫習一遍，試煉之濱從不拒絕回爐的學生，渡船隨時候著你。',
+  'hudChrome.tutorialGreeting.play': '進行新手教學',
+  'hudChrome.tutorialGreeting.skip': '跳過新手教學',
+  'entities.items.ps_castaway_crate.name': '漂流貨箱',
+  'entities.mobs.training_effigy.name': '訓練草人',
+  'entities.mobs.shore_scuttler.name': '灘塗掠蟹',
+  'entities.npcs.wayfarer_bryn.name': '旅人布琳',
+  'entities.npcs.wayfarer_bryn.title': '港口嚮導',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：東岸的渡送法陣一年到頭雙向通行。',
+  'entities.npcs.instructor_maren.name': '教官瑪倫',
+  'entities.npcs.instructor_maren.title': '試煉導師',
+  'entities.npcs.instructor_maren.greeting':
+    '谷地感激過的每一位英雄，都曾站在你現在站的地方，{className}，而且當時沒有一個人分得清劍該握哪頭。這片海濱就是為此而設。儘管問，儘管練，在失敗不要緊的地方儘管失敗。',
+  'entities.npcs.quartermaster_finch.name': '軍需官芬奇',
+  'entities.npcs.quartermaster_finch.title': '營地補給商',
+  'entities.npcs.quartermaster_finch.greeting':
+    '麵包、清水，還有一瓶練過頭時救急的藥劑。銅板能買下它們，而銅板要靠幹活掙來。這就是全部的經濟學，{playerName}，它永遠不會變得更複雜。只會變得更大。',
+  'entities.npcs.ferryman_odo.name': '渡船人奧多',
+  'entities.npcs.ferryman_odo.title': '渡口看守',
+  'entities.npcs.ferryman_odo.greeting':
+    '海峽風平浪靜，船也結實，{playerName}。等你準備好去谷地了，碼頭盡頭的渡送法陣隨時送你過去。',
+  'entities.quests.q_ps_find_your_feet.title': '站穩腳跟',
+  'entities.quests.q_ps_find_your_feet.text':
+    '歡迎來到試煉之濱，{playerName}。這座島上沒有什麼東西會主動咬人，所以趁著安靜：在營地裡走走，認認這裡的面孔。軍需官芬奇管著補給，渡船人奧多守著回家的路。去拜訪他們倆，然後回來找我。',
+  'entities.quests.q_ps_find_your_feet.completion':
+    '腳步俐落，水壺還沒燒開你就回來了。現在你熟悉了營地，{playerName}，也就知道真有東西咬人的時候該往哪兒跑了。',
+  'entities.quests.q_ps_find_your_feet.objectives.0.label': '拜訪軍需官芬奇',
+  'entities.quests.q_ps_find_your_feet.objectives.1.label': '拜訪渡船人奧多',
+  'entities.quests.q_ps_strike_true.title': '擊中要害',
+  'entities.quests.q_ps_strike_true.text':
+    '從沒揮過的劍不過是根沉棍子，{playerName}。營地以南練武場上的草人生來就是挨打的：挑一個，站穩，砍到三個散架為止。它們不會還手。這片海濱之外的東西可會。',
+  'entities.quests.q_ps_strike_true.completion':
+    '三個倒下，你的手也穩多了。記住這種感覺，{playerName}：站穩腳，抬起眼，全力揮出。谷地的狼比稻草快，但同樣的算術也能放倒牠們。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',
+  'entities.quests.q_ps_the_wreck_line.title': '沉船灘',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '潮水用海貨支付這座島：舊沉船上的漂流貨箱，被沖上面向谷地的那片海灘。翻揀它們的掠蟹夾起人來比看上去疼，所以腳下留神。撬開三只貨箱，把大海留給我們的東西帶回來。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '繩子、焦油，還有半輪大海竟然放過的乳酪。世上到處都是值得彎腰去撿的東西，{playerName}。保持這個習慣：看見，打開，拿走。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '開啟漂流貨箱',
+  'entities.quests.q_ps_tools_of_the_trade.title': '謀生之道',
+  'entities.quests.q_ps_tools_of_the_trade.text':
+    '銅板就是拿來花的，{playerName}，而我這攤子童叟無欺。從我這兒買一瓶治療藥劑，我會退給你比價錢更多的錢，就當學費：找到商販，掂量價錢，數清找零。等你到了谷地，把剩下的錢花在那裡商人的採集工具上。古往今來鑄出的每一筆財富，都是從這麼小的一步開始的。',
+  'entities.quests.q_ps_tools_of_the_trade.completion':
+    '一瓶藥劑，錢貨兩訖，退款如約奉上：這樣的好買賣你以後可不常見。留著它以備不時之需，{playerName}，也記住谷地的商人向任何拿著正當銅板的人出售礦鎬、斧子和鐮刀。',
+  'entities.quests.q_ps_tools_of_the_trade.objectives.0.label': '購買初級治療藥水',
+  'entities.quests.q_ps_set_sail.title': '揚帆起航',
+  'entities.quests.q_ps_set_sail.text':
+    '這片海濱上已經沒有你沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。走到舊碼頭去，告訴渡船人奧多，就說是我說的，你掙到了這趟航程。',
+  'entities.quests.q_ps_set_sail.completion':
+    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。碼頭盡頭的法陣隨時送你去谷地，{playerName}，走進去就行。當心狼群。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奧多報到',
+  'entities.zones.proving_shore.name': '試煉之濱',
+  'entities.zones.proving_shore.welcome':
+    '試煉之濱對你別無所求，只求時間。熟悉營地，砍倒草人，走一趟沉船灘，等你準備好了，渡船人奧多會送你過海去谷地。',
+  'entities.zones.proving_shore.pois.0.label': '晨憩營地',
+  'entities.zones.proving_shore.pois.1.label': '舊碼頭',
+  'entities.zones.proving_shore.pois.2.label': '練武場',
+  'entities.zones.proving_shore.pois.3.label': '沉船灘',
+  'guide.home.world.provingName': '試煉之濱',
+  'guide.home.world.provingBlurb': '海峽對面一座安靜的訓練之島，新冒險者在谷地對他們提出任何要求之前，先在這裡站穩腳跟。',
+  'guide.worldPage.provingBlurb':
+    '谷地海峽對面的一座安靜小島，被闢為訓練場：一處營地、一片練武場、一段佈滿殘骸的海灘，還有一班雙向通行的渡船。',
+  'guide.worldPage.provingGreeting': '谷地感激過的每一位英雄，都曾站在你現在站的地方，而且當時沒有一個人分得清劍該握哪頭。',
+  'guide.worldPage.provingGreeter': '教官瑪倫，晨憩營地',
+  'guide.worldPage.provingPlaceNotes':
+    '晨憩營地是島上唯一的聚居點：幾頂帳篷、一個貨攤和一堆集合篝火。舊碼頭面向谷地，渡送法陣從那裡送畢業生跨過海峽；營地以南的練武場為任何需要的人立著稻草人；沉船灘則是潮水用漂流貨箱付賬的那段滿是殘骸的海岸。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

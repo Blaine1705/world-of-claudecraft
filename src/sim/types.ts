@@ -5661,6 +5661,13 @@ export type SimEvent = { pid?: number } & (
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
+  // Spawn greeting (tutorial island): fired exactly once per character, on a
+  // genuinely fresh character's first swept tick (sim/tutorial/greeting.ts).
+  // Personal (pid = the newcomer) and text-free: the client renders the
+  // greeter dialog itself, choosing first-character vs refresher copy off
+  // `firstCharacter` (a server-recomputed account fact, never persisted).
+  // The persisted one-shot flag guarantees it never re-fires.
+  | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and

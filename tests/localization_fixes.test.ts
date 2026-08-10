@@ -956,6 +956,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // The tutorial greeting (spawn greeting event + the startTutorial ferry):
+    // the ferry log line and the two gate denials are matched by the sim_i18n
+    // EXACT map (log.provingFerry, error.tutorialFromHere,
+    // error.tutorialOutleveled); scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.

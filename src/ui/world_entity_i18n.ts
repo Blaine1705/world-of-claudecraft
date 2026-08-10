@@ -218,6 +218,9 @@ const MOB_IDS = [
   'void_stalker',
   'sundered_horror',
   'fisher_bram',
+  // The Proving Shore (tutorial island, src/sim/content/proving_shore.ts).
+  'training_effigy',
+  'shore_scuttler',
   // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
   'rift_hellguard',
   'rift_pact_acolyte',
@@ -333,6 +336,11 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  // the Proving Shore (tutorial island) + its Eastbrook-spawn greeter
+  'wayfarer_bryn',
+  'instructor_maren',
+  'quartermaster_finch',
+  'ferryman_odo',
 ] as const;
 
 const QUEST_IDS = [
@@ -533,6 +541,12 @@ const QUEST_IDS = [
   'q_fs_bram_come_home',
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
+  // the Proving Shore (tutorial island)
+  'q_ps_find_your_feet',
+  'q_ps_strike_true',
+  'q_ps_the_wreck_line',
+  'q_ps_tools_of_the_trade',
+  'q_ps_set_sail',
   // the Galecrest
   'q_gc_down_the_windway',
   'q_gc_wool_off_the_downs',
@@ -560,6 +574,7 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  'proving_shore',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

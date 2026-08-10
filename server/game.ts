@@ -3537,6 +3537,10 @@ export class GameServer {
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+        // Server-recomputed account fact (ws_auth.ts, fresh-join arm): whether
+        // this is the account's first character. Absent (-> sim default true)
+        // for callers that pass no meta (tests, the bot-detector overlay).
+        firstCharacter?: boolean;
         // The character's stored action-bar layout (characters.hotbar_layout),
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
@@ -3578,6 +3582,7 @@ export class GameServer {
       state: state ?? undefined,
       characterId,
       bankBonus: meta.bankBonus,
+      firstCharacter: meta.firstCharacter,
     });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
@@ -6424,6 +6429,11 @@ export class GameServer {
           );
           this.resyncQuests(session);
         }
+        break;
+      case 'tutorial_start':
+        // No payload to validate: the sim re-runs every gate (alive, level 1,
+        // overworld) on its authoritative copy before the teleport.
+        sim.startTutorial(pid);
         break;
       case 'turnin':
         if (typeof msg.quest === 'string') {

@@ -411,6 +411,7 @@ import {
   serializeNodeReadiness,
 } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
+import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import {
   completeSalvageCast as completeSalvageCastImpl,
@@ -1515,6 +1516,16 @@ export interface PlayerMeta {
   // Persisted in CharacterState so no later load can re-fire it (the
   // guildLetterSent idiom).
   profTierTutorialSent: boolean;
+  // One-time spawn greeting sent (tutorial island; sim/tutorial/greeting.ts):
+  // flipped on a character's first swept tick, silently for established
+  // characters. Persisted in CharacterState so no later load can re-fire it
+  // (the guildLetterSent idiom).
+  tutorialGreetingSent: boolean;
+  // Whether this is the account's FIRST character. TRANSIENT: never
+  // serialized; the server recomputes it from the character table at every
+  // join (the bankBonus idiom) and the offline Sim, which is stateless by
+  // design, is always a first character. Read only by the tutorial greeting.
+  firstCharacter: boolean;
   // In-memory trend-nudge cadence (Professions 2.0). TRANSIENT: never
   // serialized (a restart reopens the window, deliberately: the nudge is a hint,
   // not an award), and empty at construction and on load, so the parity sampler
@@ -1769,6 +1780,10 @@ export interface CharacterState {
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
   profTierTutorialSent?: boolean;
+  // Spawn greeting already sent (tutorial island; JSONB, optional so older
+  // saves load cleanly and latch silently on their next swept tick).
+  // Written only when true (zero-default omission).
+  tutorialGreetingSent?: boolean;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
   // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
@@ -2719,6 +2734,11 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // Server-stamped account fact, recomputed at every join like bankBonus:
+      // whether this is the account's first character. Never persisted; the
+      // offline Sim omits it and defaults to true (offline is stateless).
+      // Read only by the tutorial greeting (sim/tutorial/greeting.ts).
+      firstCharacter?: boolean;
     },
   ): number {
     const savedState = opts?.state
@@ -2907,6 +2927,8 @@ export class Sim {
       tierMailSent: new Map(),
       questedHobbies: new Map(),
       profTierTutorialSent: false,
+      tutorialGreetingSent: false,
+      firstCharacter: opts?.firstCharacter ?? true,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
       delveMarks: 0,
@@ -3304,6 +3326,7 @@ export class Sim {
       // character left the pair is the entire point (professions/hobby_memory.ts).
       meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
+      meta.tutorialGreetingSent = s.tutorialGreetingSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -4105,6 +4128,7 @@ export class Sim {
           }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
+      ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -6020,6 +6044,11 @@ export class Sim {
     // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
     // which draw nothing), so its mail-phase position cannot fork the draw order.
     updateProfNudges(this.ctx);
+    // The spawn greeting sweep (tutorial island): the one-shot personal
+    // greeting event for fresh characters. Draws ZERO rng (it only emits
+    // events, which draw nothing), so its mail-phase position cannot fork
+    // the draw order.
+    updateTutorialGreeting(this.ctx);
     // The one-time mastery reset notice (Professions 2.0): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
@@ -8932,6 +8961,16 @@ export class Sim {
   // train_already_known and never re-charges. Denials surface ONLY through
   // the event plus the lastTrainResult probe (the craftItem single-surface
   // doctrine: no ctx.error toast, or the deny would print twice).
+  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
+  // ferry ride to the Proving Shore. All gates (alive, level 1, overworld)
+  // re-run here on the authoritative copy; the client never predicts it.
+  startTutorial(pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    resolveStartTutorial(this.ctx, r.e, r.meta);
+  }
+
   trainRecipe(recipeId: string, pid?: number): void {
     if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);

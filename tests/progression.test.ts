@@ -50,7 +50,11 @@ function collectItemAcquirable(itemId: string): boolean {
     Object.values(byZone).some((row) => row.itemId === itemId),
   );
   const fromHarvest = Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId);
-  return fromLoot || fromGround || fromScript || fromNode || fromHarvest;
+  // A vendor's stock is an acquisition source too: the tutorial island's
+  // buy-a-pick lesson (q_ps_tools_of_the_trade) is deliberately fulfilled at
+  // a vendor stall, teaching the purchase flow itself.
+  const fromVendor = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId) === true);
+  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromVendor;
 }
 
 describe('content referential integrity', () => {

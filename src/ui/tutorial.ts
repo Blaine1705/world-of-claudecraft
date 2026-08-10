@@ -406,6 +406,13 @@ export class TutorialOverlay {
   }
 }
 
+/** Latch the overlay done from outside (the tutorial-island greeting's
+ *  accept path): the island's on-rails chain replaces this coachmark, so a
+ *  player who sails never sees the Eastbrook five-step. */
+export function markNewAdventurerTutorialSeen(): void {
+  writeDone();
+}
+
 function readDone(): boolean {
   try {
     return localStorage.getItem(STORAGE_KEY) === 'done';

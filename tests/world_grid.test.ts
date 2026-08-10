@@ -50,18 +50,22 @@ describe('the continent derives the right border set', () => {
   });
 
   it('keeps the production terrain path sparse at town coordinates', () => {
+    // 10 appliers: the Proving Shore's moat carve joined starterMoat in the
+    // always-run mask (its south open-sea band has unbounded z support).
     expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
-      appliers: 9,
+      appliers: 10,
       camps: 17,
       hubs: 1,
     });
   });
 
-  it('has eleven horizontal borders and fifteen column edges', () => {
+  it('has twelve horizontal borders and sixteen column edges', () => {
     // the Farshore adds a v-edge against the vale and an h-line under the
-    // Galecrest: both are open-sea borders with no isthmus (ferry only)
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(11);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(15);
+    // Galecrest: both are open-sea borders with no isthmus (ferry only); the
+    // Proving Shore mirrors both on the east column (v-edge against the
+    // vale, h-line under the Willowfen), open sea with the ferry portal only
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(12);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(16);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -100,8 +104,8 @@ describe('the continent derives the right border set', () => {
 
   it('row bounds widen exactly where columns live', () => {
     for (const z of [-100, 100]) {
-      // the Farshore widens the starter row east
-      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 540 });
+      // the Farshore and the Proving Shore widen the starter row both ways
+      expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
     for (const z of [300, 800, 1100, 1700, 1900]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });

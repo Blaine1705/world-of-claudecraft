@@ -613,6 +613,9 @@ import {
 } from './profession_identity_view';
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
+import { markNewAdventurerTutorialSeen } from './tutorial';
+import { buildTutorialGreetingModel } from './tutorial_greeting_view';
+import { renderTutorialGreeting } from './tutorial_greeting_window';
 import { ProfessionsWindow } from './professions_window';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
@@ -1929,6 +1932,7 @@ export class Hud {
   private confirmOnCancel: (() => void) | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
+  private tutorialGreetingTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
@@ -11641,6 +11645,12 @@ export class Hud {
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
+        case 'tutorialGreeting':
+          // The spawn greeting (tutorial island): the sim guarantees
+          // once-ever; this arm only opens the choice dialog with the
+          // first-character vs refresher copy the event decided.
+          this.openTutorialGreeting(ev.firstCharacter);
+          break;
         case 'profTrendNudge':
         case 'profTierTutorial':
         case 'attuned':
@@ -13438,6 +13448,38 @@ export class Hud {
     this.professionTutorialTrap?.release();
     this.professionTutorialTrap = null;
     document.getElementById('profession-tutorial')?.remove();
+  }
+
+  // The one-time spawn greeting dialog (tutorial island): fired by
+  // tutorialGreeting (the sim guarantees once-ever). Reuses the confirm-dialog
+  // modal family via the tutorial_greeting_window painter; the Hud owns the
+  // focus trap and the z-index floor, the openProfessionTutorial precedent.
+  private openTutorialGreeting(firstCharacter: boolean): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
+      onPlay: () => {
+        // The island's on-rails chain replaces the Eastbrook coachmark
+        // overlay, so latch it done before the ferry ride; the server
+        // re-validates the command itself.
+        markNewAdventurerTutorialSeen();
+        this.sim.startTutorial();
+        this.closeTutorialGreeting();
+      },
+      onSkip: () => this.closeTutorialGreeting(),
+    });
+    this.bringWindowToFront(el);
+    // Above the mobile sheet (z-95) and the armory inspect overlay (z-90):
+    // the scoped-popup floor, so the one-shot never opens buried.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeTutorialGreeting(): void {
+    this.tutorialGreetingTrap?.release();
+    this.tutorialGreetingTrap = null;
+    document.getElementById('tutorial-greeting')?.remove();
   }
 
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the

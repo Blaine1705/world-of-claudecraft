@@ -12238,5 +12238,79 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '사용할 수 없음',
   'hudChrome.perf.diagnostics.report.status.critical': '심각',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '주의 필요',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '처음 보는 얼굴이군요, 친구. 이 길이 처음이라면, 세상의 시련에 맞서기 전에 실력을 갈고닦고 이곳에 익숙해질 수 있는 곳이 있어요. 해협 건너의 조용한 섬, 수련의 해안이죠. 나룻배는 양방향으로 다니고, 가든 안 가든 누구도 당신을 얕보지 않을 거예요.',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.',
+  'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
+  'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
+  'entities.items.ps_castaway_crate.name': '표류 상자',
+  'entities.mobs.training_effigy.name': '훈련용 허수아비',
+  'entities.mobs.shore_scuttler.name': '해변 종종게',
+  'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
+  'entities.npcs.wayfarer_bryn.title': '항구 안내인',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 동쪽 바닷가의 나룻배 마법진은 일 년 내내 양방향으로 통한답니다.',
+  'entities.npcs.instructor_maren.name': '교관 마렌',
+  'entities.npcs.instructor_maren.title': '수련 사범',
+  'entities.npcs.instructor_maren.greeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요, {className}. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠. 이 해안은 그러라고 있는 곳이에요. 묻고, 연습하고, 실패해도 되는 곳에서 마음껏 실패하세요.',
+  'entities.npcs.quartermaster_finch.name': '보급관 핀치',
+  'entities.npcs.quartermaster_finch.title': '야영지 물자상',
+  'entities.npcs.quartermaster_finch.greeting':
+    '빵과 물, 그리고 연습이 과했을 때를 위한 물약이죠. 동전이면 살 수 있고, 동전은 일해서 버는 것. 그게 경제의 전부예요, {playerName}. 더 복잡해지는 일은 없어요. 더 커질 뿐이지.',
+  'entities.npcs.ferryman_odo.name': '뱃사공 오도',
+  'entities.npcs.ferryman_odo.title': '나루터지기',
+  'entities.npcs.ferryman_odo.greeting':
+    '해협은 잔잔하고 배는 튼튼해요, {playerName}. 골짜기로 갈 준비가 되면, 부두 끝의 건너기 마법진이 언제든 데려다줄 겁니다.',
+  'entities.quests.q_ps_find_your_feet.title': '첫걸음 떼기',
+  'entities.quests.q_ps_find_your_feet.text':
+    '수련의 해안에 온 걸 환영해요, {playerName}. 이 섬에서는 먼저 건드리지 않는 한 무는 것이 없으니, 이 고요함을 활용하세요. 야영지를 둘러보고 얼굴들을 익혀 두세요. 보급관 핀치가 물자를 맡고, 뱃사공 오도가 돌아가는 길을 지킵니다. 두 사람을 찾아뵌 뒤 내게 돌아오세요.',
+  'entities.quests.q_ps_find_your_feet.completion':
+    '발도 빠르고, 주전자가 끓기도 전에 돌아왔군요. 이제 야영지를 알게 됐으니, {playerName}, 정말로 무언가 물어올 때 어디로 달려가야 할지도 아는 셈이죠.',
+  'entities.quests.q_ps_find_your_feet.objectives.0.label': '보급관 핀치 방문',
+  'entities.quests.q_ps_find_your_feet.objectives.1.label': '뱃사공 오도 방문',
+  'entities.quests.q_ps_strike_true.title': '정확한 일격',
+  'entities.quests.q_ps_strike_true.text':
+    '한 번도 휘둘러 본 적 없는 칼은 그저 무거운 막대기일 뿐이에요, {playerName}. 야영지 남쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 하나를 골라 자세를 잡고, 셋이 쓰러질 때까지 내리치세요. 허수아비는 반격하지 않아요. 이 해안 너머의 것들은 반격하죠.',
+  'entities.quests.q_ps_strike_true.completion':
+    '셋을 쓰러뜨렸고, 손아귀도 벌써 단단해졌네요. 그 감각을 기억하세요, {playerName}. 발을 딛고, 시선을 들고, 온몸으로 휘두르기. 골짜기의 늑대는 짚보다 빠르지만, 같은 산수에 쓰러진답니다.',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',
+  'entities.quests.q_ps_the_wreck_line.title': '난파선 해안',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '조수는 이 섬에 표류물로 값을 치릅니다. 옛 난파선의 표류 상자들이 골짜기를 마주한 바닷가로 밀려오죠. 상자를 뒤지는 게들은 보기보다 세게 꼬집으니 발밑을 조심하세요. 상자 셋을 열어 바다가 남긴 것을 가져와요.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 세상은 허리를 굽힐 가치가 있는 것들로 가득해요, {playerName}. 이 습관을 지키세요. 보고, 열고, 갖기.',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '표류 상자 열기',
+  'entities.quests.q_ps_tools_of_the_trade.title': '장사의 도구',
+  'entities.quests.q_ps_tools_of_the_trade.text':
+    '동전은 쓰라고 있는 거예요, {playerName}. 그리고 내 좌판은 정직하죠. 내게서 치유 물약 한 병을 사면 수업료로 값보다 더 많이 돌려드릴게요. 상인을 찾고, 값을 재고, 거스름돈을 세는 것. 골짜기에 도착하면 남은 돈은 그곳 상인들의 채집 도구에 쓰세요. 지금껏 주조된 모든 재산은 딱 이만큼 작게 시작했답니다.',
+  'entities.quests.q_ps_tools_of_the_trade.completion':
+    '물약 한 병, 값을 치르고 샀고, 약속한 환불도 드렸어요. 이런 거래는 앞으로 자주 못 볼 겁니다. 궂은 날을 위해 마개를 닫아 두세요, {playerName}. 그리고 골짜기 상인들은 정직한 동전을 든 사람이라면 누구에게나 곡괭이와 도끼와 낫을 판다는 걸 기억하세요.',
+  'entities.quests.q_ps_tools_of_the_trade.objectives.0.label': '치유 물약 구입하기',
+  'entities.quests.q_ps_set_sail.title': '출항',
+  'entities.quests.q_ps_set_sail.text':
+    '이 해안에는 당신이 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 낡은 부두로 내려가 뱃사공 오도에게 전하세요. 내가 당신이 건너갈 자격을 얻었다 했다고요.',
+  'entities.quests.q_ps_set_sail.completion':
+    '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 부두 끝의 마법진에 걸어 들어가면 언제든 골짜기로 데려다줍니다, {playerName}. 늑대를 조심하세요.',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '뱃사공 오도에게 보고',
+  'entities.zones.proving_shore.name': '수련의 해안',
+  'entities.zones.proving_shore.welcome':
+    '수련의 해안이 당신에게 바라는 것은 시간뿐입니다. 야영지를 익히고, 허수아비를 치고, 난파선 해안을 걸어 보세요. 준비가 되면 뱃사공 오도가 골짜기까지 건네줄 겁니다.',
+  'entities.zones.proving_shore.pois.0.label': '새벽쉼터 야영지',
+  'entities.zones.proving_shore.pois.1.label': '낡은 부두',
+  'entities.zones.proving_shore.pois.2.label': '수련장',
+  'entities.zones.proving_shore.pois.3.label': '난파선 해안',
+  'guide.home.world.provingName': '수련의 해안',
+  'guide.home.world.provingBlurb':
+    '해협 건너의 조용한 훈련 섬. 골짜기가 무언가를 요구하기 전에, 새내기 모험가들이 이곳에서 첫걸음을 다집니다.',
+  'guide.worldPage.provingBlurb':
+    '골짜기에서 해협을 건넌 곳에 있는 조용한 섬으로, 훈련장으로 쓰입니다. 야영지 하나, 수련장 하나, 잔해가 널린 바닷가, 그리고 양방향으로 다니는 나룻배가 있습니다.',
+  'guide.worldPage.provingGreeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠.',
+  'guide.worldPage.provingGreeter': '교관 마렌, 새벽쉼터 야영지',
+  'guide.worldPage.provingPlaceNotes':
+    '새벽쉼터 야영지가 섬의 유일한 정착지로, 천막 몇 동과 좌판 하나, 모임 모닥불이 전부입니다. 낡은 부두는 골짜기를 마주하며 건너기 마법진이 졸업생을 해협 너머로 실어 나르고, 야영지 남쪽 수련장에는 필요한 이를 위해 짚 허수아비가 서 있으며, 난파선 해안은 조수가 표류 상자로 섬에 값을 치르는 잔해투성이 바닷가입니다.',
   'hudChrome.perf.diagnostics.report.status.healthy': '정상',
 };

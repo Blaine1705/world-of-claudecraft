@@ -145,6 +145,11 @@ export interface WsAuthDeps {
   bankBonusForAccount: (
     accountId: number,
   ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
+  // Account-wide character count (db.ts characterCountForAccount), read on the
+  // FRESH-JOIN arm to stamp the tutorial greeting's firstCharacter fact
+  // (count <= 1 means the joining character is the account's first). Same
+  // recompute-at-join, never-persisted policy as bankBonusForAccount.
+  characterCountForAccount: (accountId: number) => Promise<number>;
 }
 
 export interface WsAuthHandlers {
@@ -173,6 +178,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount,
+    characterCountForAccount,
   } = deps;
 
   // Character ids whose lease-acquire-through-join section is in flight in THIS
@@ -403,6 +409,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
           // await means a DB error fails the handshake exactly like a getCharacter failure.
           const bankBonus = await bankBonusForAccount(accountId);
+          // The tutorial greeting's account fact: this join's character is the
+          // account's first when the account-wide count is at most 1 (the row
+          // being joined is already counted). Fresh-join arm only, like
+          // bankBonus; a resume keeps the session's stamped value.
+          const firstCharacter = (await characterCountForAccount(accountId)) <= 1;
           leaseNonce = randomUUID();
           const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
           if (!leased) {
@@ -417,7 +428,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.class,
             character.state,
             character.is_gm,
-            { ...joinMeta, leaseNonce, bankBonus },
+            { ...joinMeta, leaseNonce, bankBonus, firstCharacter },
           );
         } finally {
           // Decrement on every fresh-arm exit path (join completed, lease refused,

@@ -196,6 +196,11 @@ export const guideStrings = {
       farshoreName: 'The Farshore',
       farshoreBlurb:
         'An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.',
+      // The Proving Shore shares the Vale's biome too, so it carries its own
+      // slug and copy (the tutorial island).
+      provingName: 'The Proving Shore',
+      provingBlurb:
+        'A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.',
       nightName: 'The Nightbloom',
       nightBlurb:
         'A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.',
@@ -1638,6 +1643,16 @@ export const guideStrings = {
     farshoreGreeter: 'Bellkeeper Tam, the Landing',
     farshorePlaceNotes:
       "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
+    // The Proving Shore (proving_shore). It renders in the vale biome, so it
+    // carries its own stem for the same anchor-collision reason as the
+    // Farshore above.
+    provingBlurb:
+      'A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.',
+    provingGreeting:
+      'Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.',
+    provingGreeter: 'Instructor Maren, Dawnrest Camp',
+    provingPlaceNotes:
+      "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
     // Getting around: the on-foot rule, the passes and causeways, the one overworld
     // doorway, the graveyards, and the sea at the map's edge. Paragraphs are split on
     // blank lines by paras().
