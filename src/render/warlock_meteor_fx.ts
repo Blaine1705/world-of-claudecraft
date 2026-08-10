@@ -61,15 +61,21 @@ interface ActiveMeteor {
   geometries: THREE.BufferGeometry[];
 }
 
+interface ActiveImpactRing {
+  mesh: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
+  material: THREE.MeshBasicMaterial;
+}
+
 interface ActiveImpact {
   root: THREE.Group;
   kind: WarlockMeteorImpact['kind'];
   age: number;
   duration: number;
-  rings: THREE.MeshBasicMaterial[];
+  rings: ActiveImpactRing[];
   smoke: THREE.MeshBasicMaterial;
   sparks: THREE.Group;
   light?: THREE.PointLight;
+  powerfulBurst: THREE.Sprite | null;
   materials: THREE.Material[];
   geometries: THREE.BufferGeometry[];
 }
@@ -373,7 +379,8 @@ export class WarlockMeteorFx {
     this.scene.add(root);
 
     const materials: THREE.Material[] = [];
-    const rings: THREE.MeshBasicMaterial[] = [];
+    const rings: ActiveImpactRing[] = [];
+    let powerfulBurst: THREE.Sprite | null = null;
     if (this.powerfulImpactTexture) {
       const powerfulMaterial = new THREE.SpriteMaterial({
         map: this.powerfulImpactTexture,
@@ -383,7 +390,7 @@ export class WarlockMeteorFx {
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
-      const powerfulBurst = new THREE.Sprite(powerfulMaterial);
+      powerfulBurst = new THREE.Sprite(powerfulMaterial);
       powerfulBurst.name = 'warlock-powerful-fel-impact';
       powerfulBurst.position.y = impact.kind === 'infernal' ? 0.58 : 0.34;
       powerfulBurst.scale.setScalar(impact.kind === 'infernal' ? 1.8 : 1.25);
@@ -406,7 +413,7 @@ export class WarlockMeteorFx {
       ring.scale.setScalar(0.12 + index * 0.08);
       root.add(ring);
       materials.push(material);
-      rings.push(material);
+      rings.push({ mesh: ring, material });
     }
 
     const fissureMaterial = new THREE.LineBasicMaterial({
@@ -491,6 +498,7 @@ export class WarlockMeteorFx {
       smoke: smokeMaterial,
       sparks,
       light,
+      powerfulBurst,
       materials,
       geometries: [fissureGeometry],
     });
@@ -502,9 +510,7 @@ export class WarlockMeteorFx {
       const impact = this.impacts[index];
       impact.age += dt;
       const progress = Math.min(1, impact.age / impact.duration);
-      const powerfulBurst = impact.root.getObjectByName(
-        'warlock-powerful-fel-impact',
-      ) as THREE.Sprite | null;
+      const powerfulBurst = impact.powerfulBurst;
       if (powerfulBurst) {
         const baseScale = impact.kind === 'infernal' ? 1.8 : 1.25;
         powerfulBurst.scale.setScalar(
@@ -514,11 +520,11 @@ export class WarlockMeteorFx {
         if (!reducedMotion) powerfulBurst.material.rotation += dt * 0.7;
       }
       for (let ringIndex = 0; ringIndex < impact.rings.length; ringIndex++) {
-        const ring = impact.root.getObjectByName(`warlock-fel-impact-ring-${ringIndex}`);
-        ring?.scale.setScalar(
+        const ring = impact.rings[ringIndex];
+        ring.mesh.scale.setScalar(
           reducedMotion ? 0.72 + ringIndex * 0.13 : 0.12 + progress * (0.72 + ringIndex * 0.13),
         );
-        impact.rings[ringIndex].opacity = (0.72 - ringIndex * 0.12) * (1 - progress);
+        ring.material.opacity = (0.72 - ringIndex * 0.12) * (1 - progress);
       }
       impact.smoke.opacity = 0.58 * (1 - progress);
       if (impact.light) impact.light.intensity *= Math.max(0, 1 - dt * 5);

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PaladinConsecrationVisuals } from '../src/render/paladin_consecration_visual';
 
 function radialBounds(root: THREE.Object3D, centerX: number, centerZ: number, name: string) {
@@ -124,5 +124,32 @@ describe('Paladin Consecration ground visual', () => {
     expect(visual.getObjectByName('paladin-consecration-shimmer')?.visible).toBe(false);
     expect(visual.getObjectByName('paladin-consecration-motes')?.visible).toBe(false);
     expect(visual.getObjectByName('paladin-consecration-edge-wisps')?.visible).toBe(false);
+  });
+
+  it('disposes both instanced meshes (motes and edge wisps) when a seal expires', () => {
+    const scene = new THREE.Scene();
+    const groundFx = new PaladinConsecrationVisuals(scene, () => 0);
+    groundFx.sync([
+      {
+        id: 'consecration:dispose',
+        x: 0,
+        z: 0,
+        radius: 6,
+        duration: 9,
+        remaining: 9,
+      },
+    ]);
+
+    const visual = scene.getObjectByName('paladin-consecration');
+    if (!visual) throw new Error('missing Consecration visual');
+    const motes = visual.getObjectByName('paladin-consecration-motes') as THREE.InstancedMesh;
+    const wisps = visual.getObjectByName('paladin-consecration-edge-wisps') as THREE.InstancedMesh;
+    const moteDisposeSpy = vi.spyOn(motes, 'dispose');
+    const wispDisposeSpy = vi.spyOn(wisps, 'dispose');
+
+    groundFx.update(10, false);
+
+    expect(moteDisposeSpy).toHaveBeenCalledTimes(1);
+    expect(wispDisposeSpy).toHaveBeenCalledTimes(1);
   });
 });

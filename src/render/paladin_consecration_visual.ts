@@ -364,6 +364,8 @@ export class PaladinConsecrationVisuals {
     this.scene.remove(visual.root);
     for (const material of visual.materials) material.dispose();
     for (const geometry of visual.geometries) geometry.dispose();
+    visual.motes.dispose();
+    visual.edgeWisps.dispose();
   }
 
   private createTerrainRing(

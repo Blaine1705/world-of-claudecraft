@@ -41,6 +41,15 @@ export class BurningPactMarkers {
   private readonly shardGeometry = new THREE.OctahedronGeometry(0.16, 0);
   private readonly haloGeometry = new THREE.TorusGeometry(0.72, 0.025, 6, 48);
 
+  private removeMarker(id: number): void {
+    const marker = this.markers.get(id);
+    if (!marker) return;
+    marker.group.removeFromParent();
+    marker.halo.material.dispose();
+    for (const shard of marker.shards) shard.material.dispose();
+    this.markers.delete(id);
+  }
+
   update(world: IWorld, views: ReadonlyMap<number, HostView>, reducedMotion = false): void {
     for (const [id, marker] of this.markers) {
       const entity = world.entities.get(id);
@@ -51,8 +60,7 @@ export class BurningPactMarkers {
         view.group !== marker.host ||
         burningPactStages(entity, world.playerId) === 0
       ) {
-        marker.group.removeFromParent();
-        this.markers.delete(id);
+        this.removeMarker(id);
       }
     }
 
@@ -105,8 +113,7 @@ export class BurningPactMarkers {
   }
 
   clear(): void {
-    for (const marker of this.markers.values()) marker.group.removeFromParent();
-    this.markers.clear();
+    for (const id of [...this.markers.keys()]) this.removeMarker(id);
   }
 
   private createMarker(host: THREE.Group, id: number): PactMarker {

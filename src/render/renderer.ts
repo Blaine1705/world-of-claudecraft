@@ -10037,9 +10037,8 @@ export class Renderer {
         v.group.visible = false;
         continue;
       }
-      // form swaps (polymorph sheep, druid forms), computed up front because
       this.syncDrainChannelVisual(id, e);
-      // form swaps (polymorph sheep, druid forms) — computed up front because
+      // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of repeated .some() scans per entity per
       // frame; the flag combination below preserves the original precedence.
@@ -10180,7 +10179,6 @@ export class Renderer {
               !metamorphForm,
           );
           // sheep/forms keep articulated shadows through the whole proxy band:
-          // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
           v.sheepVisual?.setShadow(wantFormShadow);
@@ -11331,16 +11329,6 @@ export class Renderer {
           if (spawnRecklessnessSkulls) {
             this.recklessSkulls.spawn(v.group, active.height * e.scale);
           }
-        }
-        if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
-          this.vfx.castSparkle(
-            e.id,
-            'fire',
-            dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
-          );
-        }
-        if (tithefiendEmpoweredActive(e)) {
-          this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
         }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,
         // moonkin star motes, shadowform gloom wisps. Suppressed for the dead

@@ -40,12 +40,18 @@ export function buildSoulwell(entityId: number): {
   const root = new THREE.Group();
   root.name = `soulwell_${entityId}`;
 
+  // baseMat/stoneMat/edgeMat/runeMat/soulMat all come from surfaceMat, a global
+  // dedupe cache (see gfx.ts) that returns the SAME instance for equal opts.
+  // They are shared across every prop that asks for that color/roughness
+  // combination, so they must never be disposed here: only the per-instance
+  // MeshBasicMaterials built below (basinMaterial, the energy ring materials)
+  // belong to this one soulwell.
   const baseMat = stoneMaterial(0x171624, 0.96);
   const stoneMat = stoneMaterial(0x29263a);
   const edgeMat = stoneMaterial(0x443d59, 0.76);
   const runeMat = emissiveMaterial(0x62d72d, 0x47ff20, 2.1);
   const soulMat = emissiveMaterial(0x6b2a91, 0xb34cff, 2.5);
-  const ownedMaterials: THREE.Material[] = [baseMat, stoneMat, edgeMat, runeMat, soulMat];
+  const ownedMaterials: THREE.Material[] = [];
 
   const base = new THREE.Mesh(new THREE.CylinderGeometry(1.32, 1.45, 0.24, 12), baseMat);
   base.position.y = 0.12;
