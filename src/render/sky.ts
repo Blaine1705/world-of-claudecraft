@@ -1,8 +1,15 @@
 import * as THREE from 'three';
-import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
-import type { BiomeId } from '../sim/types';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  STRIP_ZONES,
+  ZONES,
+} from '../sim/data';
+import type { BiomeId, ZoneDef } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
-import { loadHdr, loadTexture } from './assets/loader';
+import { loadHdr, loadTexture, releaseHdr, releaseTexture } from './assets/loader';
 import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms, hasBiomeHazeField } from './biome_haze_field';
 import { HAZE_SKY_SAMPLE_DIST, HAZE_SKY_TINT_MAX } from './biome_haze_field_core';
 import {
@@ -11,6 +18,7 @@ import {
   stepEnvironmentBlend,
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
+import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
 // HDRI sky dome. Cloud cover comes from the sky HDRIs themselves; there is
@@ -388,6 +396,21 @@ const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 const skyAssetTasks = new Map<string, Promise<void>>();
+// Fetches that have not settled yet. skyAssetTasks alone cannot answer this
+// (it stays populated as the memo), and releaseSkyBiomeAssets must refuse a
+// biome whose fetch is still in flight: its `then` would otherwise publish a
+// texture into a store the release just cleared, or (through an aliased url)
+// publish one this release disposed.
+const skyAssetsInFlight = new Set<SkyKey>();
+
+/** Every sky key the tables above declare. */
+export const SKY_KEYS = Object.keys(HDRI_TUNE) as SkyKey[];
+
+/** The memo key for one biome's fetch: biome plus both urls, so a retuned
+ *  table invalidates the memo instead of serving the old pair. */
+function skyAssetTaskKey(biome: SkyKey): string {
+  return `${biome}|${BIOME_HDRI[biome]}|${BIOME_BACKDROP[biome]}`;
+}
 
 export function ensureSkyBiomeAssets(
   biomes: readonly SkyKey[],
@@ -397,9 +420,10 @@ export function ensureSkyBiomeAssets(
   const hdriUrls = BIOME_HDRI;
   const backdropUrls = BIOME_BACKDROP;
   const tasks = [...new Set(biomes)].map((biome) => {
-    const taskKey = `${biome}|${hdriUrls[biome]}|${backdropUrls[biome]}`;
+    const taskKey = skyAssetTaskKey(biome);
     const existing = skyAssetTasks.get(taskKey);
     if (existing) return existing;
+    skyAssetsInFlight.add(biome);
     // Every shipped biome currently uses its HDRI as the sole sky source.
     // Loading an 8k painted backdrop at strength 0 still made Three upload it
     // on the first biome blend; marsh_backdrop.webp alone blocked the driver
@@ -436,11 +460,155 @@ export function ensureSkyBiomeAssets(
       .catch((err) => {
         skyAssetTasks.delete(taskKey);
         throw err;
+      })
+      .finally(() => {
+        skyAssetsInFlight.delete(biome);
       });
     skyAssetTasks.set(taskKey, task);
     return task;
   });
   return Promise.all(tasks).then(() => undefined);
+}
+
+// Live dome bindings, one per HDRI SkyView: the biomes whose decoded textures
+// are assigned into that dome's uSkyA/uSkyB (and backdrop) uniforms right now.
+// This is the second line of defense behind the renderer's pinned set, so a
+// release can never blank the sky that is on screen.
+const domeBindings = new Set<() => readonly SkyKey[]>();
+
+/** Every biome currently bound into a live sky dome's uniforms. */
+export function currentDomeBiomes(): SkyKey[] {
+  const bound = new Set<SkyKey>();
+  for (const read of domeBindings) {
+    for (const biome of read()) bound.add(biome);
+  }
+  return [...bound];
+}
+
+/** Biomes holding ANY decoded sky asset (dome HDR, PMREM source or backdrop):
+ *  the memory-accurate residency set the eviction plan reasons over, unlike
+ *  skyBiomeAssetsResident, which answers the stricter "safe to prewarm" question. */
+export function residentSkyBiomes(): SkyKey[] {
+  return SKY_KEYS.filter(
+    (biome) =>
+      hdriStore[biome] !== undefined ||
+      envHdriStore[biome] !== undefined ||
+      backdropStore[biome] !== undefined,
+  );
+}
+
+/** Whether any biome OTHER than the ones being dropped still owns `url` in
+ *  `store` (or is still fetching it). The sky tables alias urls across keys
+ *  (beach reuses the vale day sky, cave the marsh overcast), and loadHdr hands
+ *  every consumer of one url the SAME DataTexture, so disposing it for one key
+ *  would blank the other key's dome. */
+function hdrUrlStillClaimed(
+  store: Partial<Record<SkyKey, THREE.DataTexture>>,
+  urls: Record<SkyKey, string>,
+  url: string,
+  dropping: ReadonlySet<SkyKey>,
+): boolean {
+  return SKY_KEYS.some(
+    (biome) =>
+      !dropping.has(biome) &&
+      urls[biome] === url &&
+      (store[biome] !== undefined || skyAssetTasks.has(skyAssetTaskKey(biome))),
+  );
+}
+
+function releaseHdrSlot(
+  store: Partial<Record<SkyKey, THREE.DataTexture>>,
+  urls: Record<SkyKey, string>,
+  biome: SkyKey,
+  dropping: ReadonlySet<SkyKey>,
+  options?: { maxWidth?: number },
+): void {
+  const texture = store[biome];
+  delete store[biome];
+  const url = urls[biome];
+  if (hdrUrlStillClaimed(store, urls, url, dropping)) return;
+  texture?.dispose();
+  // Dispose and cache release are ONE step: the loader would otherwise keep
+  // handing the disposed texture to the next ensure for this url.
+  releaseHdr(url, options);
+}
+
+/**
+ * Give one or more biomes' decoded sky assets back: dispose the dome HDR, the
+ * PMREM source and the backdrop, drop the fetch memo, and drop the loader's
+ * cache entries so a later ensureSkyBiomeAssets re-fetches from scratch.
+ *
+ * Refuses (silently skips) any biome bound into a live dome's uniforms, and any
+ * biome whose fetch is still in flight. Returns the biomes actually released,
+ * so the caller can evict whatever it derived from them (the renderer's
+ * prefiltered environment render targets).
+ */
+export function releaseSkyBiomeAssets(biomes: readonly SkyKey[]): SkyKey[] {
+  const bound = new Set(currentDomeBiomes());
+  const dropping = new Set<SkyKey>();
+  for (const biome of biomes) {
+    if (bound.has(biome) || skyAssetsInFlight.has(biome)) continue;
+    dropping.add(biome);
+  }
+  if (dropping.size === 0) return [];
+  // Drop every memo first: hdrUrlStillClaimed reads it as a claim, and a memo
+  // left behind for a dropped biome would both retain its aliases' urls and
+  // make the next ensure resolve instantly against empty stores.
+  for (const biome of dropping) skyAssetTasks.delete(skyAssetTaskKey(biome));
+  for (const biome of dropping) {
+    releaseHdrSlot(hdriStore, BIOME_HDRI, biome, dropping);
+    releaseHdrSlot(envHdriStore, BIOME_HDRI_1K, biome, dropping, { maxWidth: 512 });
+    const backdrop = backdropStore[biome];
+    delete backdropStore[biome];
+    if (backdrop) {
+      const url = BIOME_BACKDROP[biome];
+      const claimed = SKY_KEYS.some(
+        (other) =>
+          !dropping.has(other) &&
+          BIOME_BACKDROP[other] === url &&
+          backdropStore[other] !== undefined,
+      );
+      if (!claimed) {
+        backdrop.dispose();
+        releaseTexture(url, { srgb: true });
+      }
+    }
+  }
+  return [...dropping];
+}
+
+// The camera windows the two PLACE-keyed skies own, mirroring the override
+// windows biomeBlendAt applies below: the Farshore isle's own day sky
+// (x 172..560, z -182..182) and the Vale Cup practice sky over the Sowfield
+// bowl (the rect around its 120 yd disc; over-covering the disc by a corner
+// only makes residency marginally more generous). tests/sky_zone_assets.test.ts
+// pins both against biomeBlendAt itself, so a moved window cannot drift.
+const VALE_CUP_SKY_RADIUS = 120;
+const PLACE_SKY_REGIONS: readonly SkyResidencyRegion<SkyKey>[] = [
+  { key: 'farshore', minX: 172, maxX: 560, minZ: -182, maxZ: 182 },
+  {
+    key: 'vale_cup',
+    minX: SOWFIELD_CENTER.x - VALE_CUP_SKY_RADIUS,
+    maxX: SOWFIELD_CENTER.x + VALE_CUP_SKY_RADIUS,
+    minZ: SOWFIELD_CENTER.z - VALE_CUP_SKY_RADIUS,
+    maxZ: SOWFIELD_CENTER.z + VALE_CUP_SKY_RADIUS,
+  },
+];
+
+/** Where each sky key is drawn, for the residency plan: one rectangle per zone
+ *  (several zones can share a biome sky) plus the two place-keyed windows. */
+export function skyResidencyRegions(
+  zones: readonly ZoneDef[] = ZONES,
+): SkyResidencyRegion<SkyKey>[] {
+  const regions: SkyResidencyRegion<SkyKey>[] = zones.map((zone) => ({
+    key: zone.biome,
+    minX: zone.xMin ?? STRIP_MIN_X,
+    maxX: zone.xMax ?? STRIP_MAX_X,
+    minZ: zone.zMin,
+    maxZ: zone.zMax,
+  }));
+  regions.push(...PLACE_SKY_REGIONS);
+  return regions;
 }
 
 export function hasSkyHdriAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 'peaks']): boolean {
@@ -491,6 +659,9 @@ export interface SkyView {
   biomeAt(x: number, z: number): BiomeBlend;
   /** temporally eased blend currently painted by the dome */
   currentBiomeBlend(): Readonly<BiomeBlend>;
+  /** Drop this dome's uniform binding from the module's live-binding set, so a
+   *  replaced renderer's dome stops pinning biomes against eviction. */
+  dispose(): void;
 }
 
 export interface BiomeBlend {
@@ -850,6 +1021,9 @@ export function buildSky(
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
       currentBiomeBlend: () => current,
+      // The canvas dome samples skyTexture(), never the HDR stores, so it binds
+      // nothing and has nothing to unbind.
+      dispose: () => {},
     };
   }
 
@@ -906,6 +1080,11 @@ export function buildSky(
   const current = createEnvironmentBlend(start);
   let boundFrom = start.from;
   let boundTo = start.to;
+  // The uniforms hold the BOUND pair; the eased blend's own from/to can differ
+  // for the rest of a frame (setCameraPos steps the blend, then rebinds), so
+  // the binding reports both and nothing in flight can be released underneath.
+  const readBinding = (): readonly SkyKey[] => [boundFrom, boundTo, current.from, current.to];
+  domeBindings.add(readBinding);
   return {
     dome,
     setCameraPos(x: number, z: number, dt: number): void {
@@ -966,6 +1145,9 @@ export function buildSky(
     },
     biomeAt: biomeBlendAt,
     currentBiomeBlend: () => current,
+    dispose(): void {
+      domeBindings.delete(readBinding);
+    },
   };
 }
 

@@ -5,18 +5,24 @@ const loadHdr = vi.fn(
   async (_url: string, _opts?: { maxWidth?: number }) => new THREE.DataTexture(),
 );
 const loadTexture = vi.fn(async () => new THREE.Texture());
+const releaseHdr = vi.fn((_url: string, _opts?: { maxWidth?: number }) => undefined);
+const releaseTexture = vi.fn();
 
 describe('zone-scoped sky assets', () => {
   beforeEach(() => {
     vi.resetModules();
     loadHdr.mockClear();
     loadTexture.mockClear();
+    releaseHdr.mockClear();
+    releaseTexture.mockClear();
     vi.doMock('../src/render/gfx', () => ({ GFX: { standardMaterials: true } }));
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(),
       loadHdr,
       loadTexture,
       releaseGltf: vi.fn(),
+      releaseHdr,
+      releaseTexture,
     }));
     vi.doMock('../src/render/textures', () => ({
       cloudTexture: vi.fn(() => new THREE.Texture()),
@@ -81,6 +87,150 @@ describe('zone-scoped sky assets', () => {
     } finally {
       loadHdr.mockImplementation(async () => new THREE.DataTexture());
     }
+  });
+
+  // Residency: the stores used to grow for a whole session (one 2k dome HDR is
+  // ~16.8 MB of CPU pixels plus the same on the GPU, times the shipped keys).
+  it('releases exactly the asked biomes and lets a later ensure re-fetch', async () => {
+    const sky = await import('../src/render/sky');
+    await sky.ensureSkyBiomeAssets(['vale', 'marsh']);
+    // North of the Sowfield bowl, so the dome's start pair is the vale alone
+    // (the Vale Cup practice sky overlaps the world origin).
+    const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+    const marshDome = view.domeTexture('marsh');
+    const marshEnv = view.envTexture('marsh');
+    if (!marshDome || !marshEnv) throw new Error('expected the marsh sky to be resident');
+    const domeDisposed = vi.spyOn(marshDome, 'dispose');
+    const envDisposed = vi.spyOn(marshEnv, 'dispose');
+
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual(['marsh']);
+
+    expect(domeDisposed).toHaveBeenCalled();
+    expect(envDisposed).toHaveBeenCalled();
+    expect(sky.hasSkyHdriAssets(['marsh'])).toBe(false);
+    expect(sky.residentSkyBiomes()).not.toContain('marsh');
+    // The unrelated biome keeps everything.
+    expect(sky.hasSkyHdriAssets(['vale'])).toBe(true);
+    expect(sky.residentSkyBiomes()).toContain('vale');
+    // Dispose and loader-cache release are one step, or the next ensure would
+    // be handed the disposed texture straight back out of the promise cache.
+    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_2k.hdr', undefined);
+    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_1k.hdr', { maxWidth: 512 });
+    expect(releaseHdr).not.toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+
+    // The per-biome fetch memo is gone too, so the re-ensure really re-fetches.
+    loadHdr.mockClear();
+    await sky.ensureSkyBiomeAssets(['marsh']);
+    expect(loadHdr).toHaveBeenCalledTimes(2);
+    expect(loadHdr).toHaveBeenNthCalledWith(1, '/env/marsh_overcast_2k.hdr');
+    expect(sky.hasSkyHdriAssets(['marsh'])).toBe(true);
+  });
+
+  it('refuses to release a biome bound into a live dome until that dome is gone', async () => {
+    const sky = await import('../src/render/sky');
+    const startBiomes = sky.skyBiomesAt(0, 0);
+    await sky.ensureSkyBiomeAssets(startBiomes);
+    const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 0);
+    for (const biome of startBiomes) expect(sky.currentDomeBiomes()).toContain(biome);
+
+    // The second line of defense behind the renderer's pinned set.
+    expect(sky.releaseSkyBiomeAssets([...startBiomes])).toEqual([]);
+    expect(sky.hasSkyHdriAssets(startBiomes)).toBe(true);
+    expect(releaseHdr).not.toHaveBeenCalled();
+
+    view.dispose();
+    expect(sky.currentDomeBiomes()).toEqual([]);
+    expect(sky.releaseSkyBiomeAssets([...startBiomes])).toEqual([...startBiomes]);
+    expect(sky.hasSkyHdriAssets(startBiomes)).toBe(false);
+  });
+
+  it('never disposes an HDR two biome keys share through an aliased url', async () => {
+    // beach reuses the vale day sky, cave/volcano the marsh overcast: loadHdr
+    // hands both keys the SAME decoded texture, so a per-key dispose would
+    // blank the other key's dome.
+    const decoded = new Map<string, THREE.DataTexture>();
+    loadHdr.mockImplementation(async (url: string, opts?: { maxWidth?: number }) => {
+      const key = `${url}|${opts?.maxWidth ?? ''}`;
+      const existing = decoded.get(key);
+      if (existing) return existing;
+      const tex = new THREE.DataTexture();
+      decoded.set(key, tex);
+      return tex;
+    });
+    try {
+      const sky = await import('../src/render/sky');
+      await sky.ensureSkyBiomeAssets(['vale', 'beach']);
+      const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+      const shared = view.domeTexture('vale');
+      if (!shared) throw new Error('expected the vale sky to be resident');
+      expect(view.domeTexture('beach')).toBe(shared);
+      const disposed = vi.spyOn(shared, 'dispose');
+
+      expect(sky.releaseSkyBiomeAssets(['beach'])).toEqual(['beach']);
+      expect(disposed).not.toHaveBeenCalled();
+      expect(releaseHdr).not.toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+      expect(sky.hasSkyHdriAssets(['vale'])).toBe(true);
+      expect(sky.hasSkyHdriAssets(['beach'])).toBe(false);
+
+      // Once the last claimant goes, the texture and its cache entry go too.
+      view.dispose();
+      expect(sky.releaseSkyBiomeAssets(['vale'])).toEqual(['vale']);
+      expect(disposed).toHaveBeenCalled();
+      expect(releaseHdr).toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+    } finally {
+      loadHdr.mockImplementation(async () => new THREE.DataTexture());
+    }
+  });
+
+  it('holds the dome on its last bound pair when a target biome is not resident', async () => {
+    // The fail-soft that makes eviction safe: setCameraPos refuses to step the
+    // blend onto a missing HDR, so the sky freezes on the pair it has instead
+    // of sampling an undefined uniform (a black dome).
+    const sky = await import('../src/render/sky');
+    await sky.ensureSkyBiomeAssets(['vale', 'marsh']);
+    const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+    const uniforms = (view.dome.material as THREE.ShaderMaterial).uniforms;
+    const boundA = uniforms.uSkyA.value;
+    const boundB = uniforms.uSkyB.value;
+    expect(boundA).toBeTruthy();
+
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual(['marsh']);
+    // Deep inside the marsh band, whose sky is now gone.
+    expect(() => view.setCameraPos(0, 400, 1 / 20)).not.toThrow();
+    expect(uniforms.uSkyA.value).toBe(boundA);
+    expect(uniforms.uSkyB.value).toBe(boundB);
+  });
+
+  it('maps every sky key to the rectangles it is drawn over', async () => {
+    const sky = await import('../src/render/sky');
+    const { SOWFIELD_CENTER } = await import('../src/sim/vale_cup_layout');
+    const regions = sky.skyResidencyRegions();
+    // One region per zone (several zones share the vale sky) plus the two
+    // place-keyed windows.
+    expect(regions.filter((region) => region.key === 'vale').length).toBeGreaterThan(1);
+
+    const isle = regions.find((region) => region.key === 'farshore');
+    if (!isle) throw new Error('expected a Farshore sky region');
+    // Pinned against biomeBlendAt itself: the window must cover exactly where
+    // the isle sky enters the blend, or residency and the dome would drift.
+    expect(sky.skyBiomesAt(isle.minX + 5, 0)).toContain('farshore');
+    expect(sky.skyBiomesAt(isle.minX - 5, 0)).not.toContain('farshore');
+    expect(sky.skyBiomesAt(isle.maxX - 5, 0)).toContain('farshore');
+    expect(sky.skyBiomesAt(isle.maxX + 5, 0)).not.toContain('farshore');
+    expect(sky.skyBiomesAt(300, isle.minZ + 5)).toContain('farshore');
+    expect(sky.skyBiomesAt(300, isle.minZ - 5)).not.toContain('farshore');
+    expect(sky.skyBiomesAt(300, isle.maxZ - 5)).toContain('farshore');
+    expect(sky.skyBiomesAt(300, isle.maxZ + 5)).not.toContain('farshore');
+
+    const cup = regions.find((region) => region.key === 'vale_cup');
+    if (!cup) throw new Error('expected a Vale Cup sky region');
+    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z)).toContain('vale_cup');
+    // The rect covers the whole 120 yd disc (over-covering at the corners).
+    expect(cup.minX).toBeLessThanOrEqual(SOWFIELD_CENTER.x - 119);
+    expect(cup.maxX).toBeGreaterThanOrEqual(SOWFIELD_CENTER.x + 119);
+    expect(cup.minZ).toBeLessThanOrEqual(SOWFIELD_CENTER.z - 119);
+    expect(cup.maxZ).toBeGreaterThanOrEqual(SOWFIELD_CENTER.z + 119);
+    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x + 125, SOWFIELD_CENTER.z)).not.toContain('vale_cup');
   });
 
   it('renders the shipping HDRI dome after opaques at far depth', async () => {

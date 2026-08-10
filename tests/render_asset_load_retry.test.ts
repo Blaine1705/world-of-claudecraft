@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from '../src/render/assets/load_retry';
 
@@ -77,5 +78,56 @@ describe('loadGltf retries a transient failure before rejecting', () => {
     calls = 0;
     await expect(loadGltf(url)).rejects.toThrow('missing file or bad GLB');
     expect(calls).toBe(MAX_LOAD_ATTEMPTS);
+  });
+});
+
+// releaseHdr is the HDR twin of releaseGltf/releaseTexture: the sky residency
+// lane disposes a far realm's decoded HDR, and unless the loader's promise
+// cache is dropped in the same step the next ensure is handed that disposed
+// texture straight back out of the cache.
+describe('loadHdr cache release', () => {
+  const url = '/env/vale_day_2k.hdr';
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('re-fetches after a release, and discriminates on maxWidth', async () => {
+    const calls: string[] = [];
+    vi.doMock('three/addons/loaders/RGBELoader.js', () => ({
+      RGBELoader: class {
+        load(loaded: string, onLoad: (tex: unknown) => void): void {
+          calls.push(loaded);
+          const tex = new THREE.DataTexture(new Uint16Array(4 * 2 * 1), 2, 1);
+          tex.type = THREE.HalfFloatType;
+          onLoad(tex);
+        }
+      },
+    }));
+
+    const { loadHdr, releaseHdr } = await import('../src/render/assets/loader');
+    const first = await loadHdr(url);
+    expect(calls).toHaveLength(1);
+    expect(await loadHdr(url)).toBe(first);
+    expect(calls).toHaveLength(1);
+
+    // A release under the WRONG key must not drop the entry: the maxWidth
+    // variant is a separate decode on its own cache line.
+    releaseHdr(url, { maxWidth: 512 });
+    expect(await loadHdr(url)).toBe(first);
+    expect(calls).toHaveLength(1);
+
+    releaseHdr(url);
+    const second = await loadHdr(url);
+    expect(calls).toHaveLength(2);
+    expect(second).not.toBe(first);
+
+    // ...and the same for the PMREM-source variant the sky module loads.
+    const small = await loadHdr(url, { maxWidth: 512 });
+    expect(calls).toHaveLength(3);
+    expect(await loadHdr(url, { maxWidth: 512 })).toBe(small);
+    releaseHdr(url, { maxWidth: 512 });
+    expect(await loadHdr(url, { maxWidth: 512 })).not.toBe(small);
+    expect(calls).toHaveLength(4);
   });
 });

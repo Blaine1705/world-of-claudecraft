@@ -324,11 +324,19 @@ export interface HdrLoadOptions {
   maxWidth?: number;
 }
 
+/** The resolved cache key for one (url, options) pair. loadHdr and releaseHdr
+ *  share it so a release can never miss the entry a load created. */
+function hdrCacheKey(url: string, options: HdrLoadOptions): string {
+  const resolved = assetUrl(url);
+  const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
+  return maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved;
+}
+
 /** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
 export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
   const resolved = assetUrl(url);
   const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
-  const cacheKey = maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved;
+  const cacheKey = hdrCacheKey(url, options);
   let p = hdrCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
@@ -382,6 +390,18 @@ export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THRE
     hdrCache.set(cacheKey, p);
   }
   return p;
+}
+
+/** The HDR twin of releaseGltf/releaseTexture: drop a loadHdr entry once its
+ *  decoded texture has been disposed by its owner, so a later loadHdr for the
+ *  same url re-fetches instead of handing out a disposed DataTexture. Pass the
+ *  SAME options the load used - maxWidth discriminates the cache key. The
+ *  sky-residency lane pairs this with the dispose (src/render/sky.ts
+ *  releaseSkyBiomeAssets): releasing the cache entry WITHOUT disposing merely
+ *  costs a re-decode, but disposing without releasing hands the next consumer a
+ *  dead texture. */
+export function releaseHdr(url: string, options: HdrLoadOptions = {}): void {
+  hdrCache.delete(hdrCacheKey(url, options));
 }
 
 /** Plain image texture (terrain splats, water normals, VFX sprites). */

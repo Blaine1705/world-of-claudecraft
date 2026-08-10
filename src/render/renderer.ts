@@ -483,11 +483,17 @@ import { sentenceImpactPlan } from './sentence_vfx_core';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import {
   buildSky,
+  currentDomeBiomes,
   ensureSkyAssetsAt,
   ensureSkyBiomeAssets,
+  releaseSkyBiomeAssets,
+  residentSkyBiomes,
   type SkyKey,
   type SkyView,
+  skyBiomesAt,
+  skyResidencyRegions,
 } from './sky';
+import { computeSkyResidencyPlan } from './sky_residency_core';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
@@ -1866,6 +1872,12 @@ export class Renderer {
   // at every biome boundary. Lives as long as the renderer, like the env RTs.
   private pmremGenerator: THREE.PMREMGenerator | null = null;
   private envBiome: SkyKey = 'vale';
+  // Sky keys that are a ZONE's biome, so the residency lane re-creates exactly
+  // what the zone prepare lane would have: prepareZoneSky PMREMs zone.biome, and
+  // the two place-keyed skies (farshore, vale_cup) have never had an env RT.
+  private readonly zoneSkyBiomes: ReadonlySet<SkyKey> = new Set(ZONES.map((zone) => zone.biome));
+  private readonly skyResidencyRegionList = skyResidencyRegions();
+  private readonly skyResidencyEnsuring = new Set<SkyKey>();
   private envOutdoorIntensity = ENV_INTENSITY;
   private envTransition: EnvironmentMapTransition<SkyKey> = createEnvironmentMapTransition(
     'vale',
@@ -3276,6 +3288,9 @@ export class Renderer {
     this.prewarmRenderTarget = null;
     bestEffort(() => this.pmremGenerator?.dispose());
     this.pmremGenerator = null;
+    // Unbind this dome from the sky module's live-binding set, or a replaced
+    // renderer's dome would pin its last biome pair against eviction forever.
+    bestEffort(() => this.skyView?.dispose());
     for (const target of this.envRTs.values()) {
       bestEffort(() => target.dispose());
     }
@@ -3523,7 +3538,10 @@ export class Renderer {
     };
   }
 
-  private ensureEnvironmentBiome(biome: BiomeId): THREE.WebGLRenderTarget | null {
+  // SkyKey, not BiomeId: envRTs, envBiome and skyView.envTexture are all keyed
+  // by the wider sky key. The live callers still pass a zone biome (the two
+  // place-keyed skies have never had a prefiltered environment of their own).
+  private ensureEnvironmentBiome(biome: SkyKey): THREE.WebGLRenderTarget | null {
     if (this.lowGfx) return null;
     const existing = this.envRTs.get(biome);
     if (existing) return existing;
@@ -3541,6 +3559,102 @@ export class Renderer {
     }
     this.envRTs.set(biome, target);
     return target;
+  }
+
+  /** Drop one biome's prefiltered environment render target once its sky assets
+   *  have been released. Never touches the bound IBL (the pinned set already
+   *  keeps its biome out of the plan; this is the same second line of defense
+   *  releaseSkyBiomeAssets keeps for the dome), and never disposes a target the
+   *  aliased sky urls still share with a biome that stayed resident. */
+  private evictEnvironmentBiome(biome: SkyKey): void {
+    const target = this.envRTs.get(biome);
+    if (!target) return;
+    if (biome === this.envBiome || biome === this.envTransition.current) return;
+    if (this.scene.environment === target.texture) return;
+    this.envRTs.delete(biome);
+    for (const remaining of this.envRTs.values()) {
+      if (remaining === target) return;
+    }
+    target.dispose();
+  }
+
+  /** Re-fetch and re-warm one biome's sky assets after an eviction (or for a
+   *  biome whose zone was never prepared), on prepareZoneSky's idle discipline
+   *  and WITHOUT touching preparedZones: this lane owns the sky half only, and
+   *  a prepared zone must never re-run a whole-zone prepare. */
+  private ensureSkyResidency(biome: SkyKey): void {
+    if (this.shutdownStarted || this.skyResidencyEnsuring.has(biome)) return;
+    this.skyResidencyEnsuring.add(biome);
+    // Every step below yields, and the fetch can settle long after a graphics
+    // rebuild replaced this renderer: guard the lifecycle like the boot resume
+    // lane, or ensureEnvironmentBiome would re-mint GPU state on a dead one.
+    const generation = this.lifecycleGeneration;
+    const live = (): boolean => !this.shutdownStarted && generation === this.lifecycleGeneration;
+    void (async () => {
+      await ensureSkyBiomeAssets([biome]);
+      if (!live()) return;
+      // Nothing arrived: a tier that fetches no HDRIs at all, or a fetch that
+      // failed. Warming from here would PMREM the dome fallback (see the sky
+      // module's residency predicate) and burn an idle slot per recheck.
+      if (!this.skyView.skyBiomeAssetsResident(biome)) return;
+      // Uploads are cache-elided per texture, so a biome the streaming lane
+      // warmed in the meantime costs nothing here.
+      await this.prewarmTextureInIdle(this.skyView.envTexture(biome));
+      if (!live()) return;
+      if (this.zoneSkyBiomes.has(biome)) {
+        await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+        if (!live()) return;
+        await this.backgroundGpuWork.run(
+          () => this.ensureEnvironmentBiome(biome),
+          GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+          `sky-residency-pmrem:${biome}`,
+        );
+        if (!live()) return;
+      }
+      await this.prewarmTextureInIdle(this.skyView.domeTexture(biome));
+    })()
+      .catch((err) => {
+        console.warn(`Sky residency ensure failed: ${biome}`, err);
+      })
+      .finally(() => {
+        this.skyResidencyEnsuring.delete(biome);
+      });
+  }
+
+  /**
+   * Bound the per-biome sky stores: release the decoded HDRs (plus their
+   * prefiltered environments) of biomes the camera has left far behind, and
+   * bring back any biome inside the streaming horizon that is missing. Runs on
+   * the zone-streaming recheck cadence, never per frame; the hysteresis band
+   * between the two radii lives in sky_residency_core.ts.
+   */
+  private updateSkyResidency(cameraX: number, cameraZ: number): void {
+    if (this.shutdownStarted) return;
+    // Only a PREPARED zone's sky is this lane's to restore: an unprepared one
+    // still belongs to the streaming lane, which fetches it inside its own
+    // prepare. A region's centre always resolves to the zone that owns it, for
+    // the place-keyed windows (the Farshore isle, the Sowfield bowl) too.
+    const ensurable = new Set<SkyKey>();
+    for (const region of this.skyResidencyRegionList) {
+      if (ensurable.has(region.key)) continue;
+      const zoneId = this.zoneIdAt(
+        (region.minX + region.maxX) / 2,
+        (region.minZ + region.maxZ) / 2,
+      );
+      if (zoneId !== null && this.preparedZones.has(zoneId)) ensurable.add(region.key);
+    }
+    const plan = computeSkyResidencyPlan<SkyKey>({
+      regions: this.skyResidencyRegionList,
+      cameraX,
+      cameraZ,
+      ensurable,
+      resident: residentSkyBiomes(),
+      // The dome's live pair plus whatever the IBL is bound to (or easing
+      // toward): releasing either would blank a surface currently on screen.
+      pinned: [...currentDomeBiomes(), this.envBiome, this.envTransition.current],
+    });
+    for (const biome of releaseSkyBiomeAssets(plan.evict)) this.evictEnvironmentBiome(biome);
+    for (const biome of plan.ensure) this.ensureSkyResidency(biome);
   }
 
   /**
@@ -3604,6 +3718,17 @@ export class Renderer {
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
       onProgress?.(1, 1);
+      // The zone build stays skipped, but its SKY may have been released while
+      // the player was away (see updateSkyResidency): re-run the sky half only,
+      // and return it so a blocking arrival (a teleport landing back in a realm
+      // it visited hours ago) waits behind the loading screen for its dome
+      // instead of arriving under the previous realm's frozen sky.
+      if (
+        zoneId !== null &&
+        !skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))
+      ) {
+        return this.prepareZoneSky(zoneAt(x, z), x, z, opts?.pace === 'idle');
+      }
       return Promise.resolve();
     }
     const pending = this.pendingZonePrepares.get(zoneId);
@@ -3901,6 +4026,10 @@ export class Renderer {
     this.visibleZoneCheckX = cameraX;
     this.visibleZoneCheckZ = cameraZ;
     this.visibleZoneCheckFar = horizon;
+    // Same cadence, opposite direction: the per-biome sky stores are unbounded
+    // without an eviction pass, and this is the one place that already knows
+    // the camera moved far enough to reconsider zone residency.
+    this.updateSkyResidency(cameraX, cameraZ);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(

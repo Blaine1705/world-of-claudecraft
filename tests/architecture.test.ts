@@ -528,6 +528,7 @@ const RENDER_PURE_CORES = [
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
   'src/render/resident_scenery_core.ts',
+  'src/render/sky_residency_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
