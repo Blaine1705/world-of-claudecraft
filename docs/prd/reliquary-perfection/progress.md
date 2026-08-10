@@ -2789,3 +2789,18 @@ red is the release's stale acceptance (reported upstream in the state.md
 rider, deliberately NOT re-accepted here: the guard demands a reviewed
 portrait rerender receipt, which is the release's own acceptance process).
 The final Phase 22 QA sync will inherit the release's next acceptance.
+
+### Phase 22 second sync (post-push, at the maintainer's conflict report)
+
+GitHub held all 13 expected checks behind a base conflict: the release had
+moved 33 commits past the morning sync (game-music refactor, tank-mount and
+rift-mechanics SFX waves) and re-recorded tests/parity/golden/
+rift_boss_floor.json. Merged as 79bb52be74 taking the golden from the
+RELEASE side, then the recorded shape-only shard re-mint (8decb2b835: 58/38
+lines, state hashes plus empty reliquary blocks, zero rng or event lines,
+the THIRD occurrence of this class). Parity 199 green; the two auto-merged
+branch-owned files (src/sim/types.ts, src/ui/hud.ts) verified keeping the
+reliquary wiring; tsc clean; the 717-test core battery green. The portrait
+manifest acceptance remains stale on the merged tree exactly as on the pure
+release tip (the b2 rider stands: the release's own acceptance process owes
+the re-accept).
