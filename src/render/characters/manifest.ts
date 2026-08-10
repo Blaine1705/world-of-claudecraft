@@ -24,6 +24,8 @@ export interface ClipMap {
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
   attackByAbility?: Record<string, string>;
+  /** Playback rate for authored per-ability clips that must keep exact timing. */
+  attackTimeScaleByAbility?: Record<string, number>;
   /** Optional weapon-style override for plain auto attacks. */
   attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
@@ -691,6 +693,7 @@ const PLAYERS = 'models/chars/players';
 /** Modular part library (one GLB, every part), see modular.ts. */
 const MODULAR = 'models/chars/modular';
 const ENEMIES = 'models/chars/enemies';
+const FORMS = 'models/chars/forms';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 const MOUNTS_DIR = 'models/mounts';
@@ -1067,18 +1070,17 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
-      // Ability-specific clips (scripts/build_paladin_ability_anims.mjs,
-      // issue #2889 follow-up batch): the paladin had zero attackByAbility
-      // overrides across its kit, so every ability played the same melee
-      // chop. Almost the whole kit shares school: 'holy' (classes.ts), so
-      // school cannot differentiate anything the way it did for the mage:
-      // mapped instead by the ability's EFFECT TYPE (judgement, groundAoE,
+      // Ability-specific clips: the composed union of the overhaul's
+      // Dawnreaver entries (final_edict/sunward_disc/bastion_sweep) and the
+      // #2889 follow-up batch mapped by the ability's EFFECT TYPE (groundAoE,
       // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
-      // Not every ability in the kit is listed: this is a representative
-      // slice, not exhaustive coverage (seal_of_righteousness, exorcism,
-      // holy_taunt, and rebuke keep the default chop until a later batch).
+      // The batch's judgement row is dropped: the overhaul retired that id
+      // (final_edict is its successor and carries the Verdict clip). Not
+      // every ability is listed; unlisted ids keep the default chop.
       attackByAbility: {
-        judgement: 'Cast_Verdict',
+        final_edict: 'Paladin_Templars_Verdict_1H',
+        sunward_disc: 'Spellcast_Raise',
+        bastion_sweep: 'Paladin_Bastion_Sweep',
         consecration: 'Cast_Consecrate',
         hammer_of_justice: 'Cast_HammerBash',
         divine_protection: 'Cast_Ward',
@@ -1091,6 +1093,7 @@ export const VISUALS: Record<string, VisualDef> = {
         flash_of_light: 'Cast_HolyMend',
         lay_on_hands: 'Cast_HolyMend',
       },
+      attackTimeScaleByAbility: { final_edict: 1, sunward_disc: 1.8, bastion_sweep: 1 },
     },
     // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
     // mesh-free clip donor GLB baked off this rig's own poses.
@@ -1523,6 +1526,26 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 1.6,
     runRef: 5.4,
     attackTimeScale: 1,
+  },
+  form_metamorph: {
+    url: `${FORMS}/metamorphosis.glb`,
+    height: 2.55,
+    // Generated Lich rig. Tripo bipeds face +X, while character visuals face
+    // +Z at world facing 0. Jump is intentionally absent: the generic biped
+    // jump distorted this winged silhouette, so airborne frames use Idle plus
+    // the controlled procedural wing pose in CharacterVisual.
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
   },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
   // the ghost material on top). Same custom baked wolf as the world wolves;
@@ -2006,6 +2029,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: WATER_ELEMENTAL,
     attackTimeScale: 1.1,
   },
+  mob_gravewing: {
+    url: `${CREATURES}/gravewing.glb`,
+    height: 2.4,
+    // Tripo's rig faces +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    // The source Attack clip is 6.625s. Gravewing swings every 1.8s, or about
+    // 1.29s with both Necromancy haste buffs, so play it in 1.10s and return
+    // to locomotion before another swing can restart the full-body one-shot.
+    attackTimeScale: 6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      jump: 'Jump',
+    },
+  },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
     height: 2.4,
@@ -2119,8 +2161,65 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.15,
   },
-  // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
-  // the mob template's scale tell the little orange emberkin from the bulky gloomshade
+  // Dedicated Destruction summons generated through the creature pipeline.
+  // Their authored fel textures stay untinted. The manifest height combines
+  // with each MobTemplate scale to render Emberkin at 1.15 units, Gloomshade
+  // at 3.0 units, and the Pyre Colossus at 4.25 units.
+  mob_emberkin: {
+    url: `${CREATURES}/emberkin.glb`,
+    height: 2.1,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+      attackByAbility: { emberkin_felbolt: 'Cast' },
+    },
+  },
+  mob_gloomshade: {
+    url: `${CREATURES}/gloomshade_abyssal_guardian.glb`,
+    height: 2.6,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+      attackByAbility: { gloomshade_abyssal_chain: 'Cast' },
+    },
+  },
+  mob_pyre_colossus: {
+    url: `${CREATURES}/pyre_colossus.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
+  // Shared fallback rig for the remaining warlock demons. The entity colour
+  // and the mob template's scale distinguish their silhouettes.
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
     height: 1.8,
@@ -2690,12 +2789,13 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   training_dummy: 'mob_training_dummy',
-  emberkin: 'mob_demon',
+  emberkin: 'mob_emberkin',
+  gloomshade: 'mob_gloomshade',
+  pyre_colossus: 'mob_pyre_colossus',
   water_elemental: 'mob_water_elemental',
-  gloomshade: 'mob_demon',
-  duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
+  guardian_tithefiend: 'mob_demonalt',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
@@ -2743,6 +2843,10 @@ const MOB_KEYS: Record<string, string> = {
   nythraxis_heroic_warrior_add: 'skel_warrior',
   nythraxis_heroic_priest_add: 'skel_necromancer',
   nythraxis_heroic_rogue_add: 'skel_rogue',
+  graveguard: 'skel_warrior',
+  necromancy_skeletal_warrior: 'skel_minion',
+  necromancy_bone_mage: 'skel_mage',
+  necromancy_gravewing: 'mob_gravewing',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
