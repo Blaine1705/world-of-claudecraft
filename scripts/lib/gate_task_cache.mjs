@@ -158,10 +158,5 @@ export function turboRunArgs(tasks) {
  * @param {ReadonlyArray<string>} args
  */
 export function isTurboGateStep(cmd, args) {
-  return (
-    cmd === 'npx' &&
-    Array.isArray(args) &&
-    args[0] === 'turbo' &&
-    args[1] === 'run'
-  );
+  return cmd === 'npx' && Array.isArray(args) && args[0] === 'turbo' && args[1] === 'run';
 }
