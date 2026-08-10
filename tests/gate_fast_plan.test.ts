@@ -159,6 +159,16 @@ describe('gate:fast wiring contracts', () => {
     expect(gateFastSrc).toMatch(/npm run gate/);
   });
 
+  it('spawns the resolved vitest bin for the vitest legs instead of shelling out to npx', () => {
+    expect(gateFastSrc).toMatch(/resolveLocalBin\(repoRoot, 'vitest'\)/);
+    // The vitest legs spawn the resolved bin path directly; nothing spawns 'npx' as a command.
+    expect(gateFastSrc).not.toMatch(/['"]npx['"]/);
+    expect(gateFastSrc).toMatch(/\['guard tests \(architecture \+ localization\)', vitestBin,/);
+    expect(gateFastSrc).toMatch(
+      /\['vitest \(related \/ changed tests\)', vitestBin, \[\.\.\.vitestPlan\.args\]\]/,
+    );
+  });
+
   it('docs keep full gate as the merge contract and name gate:fast as day-loop only', () => {
     expect(qaGate).toMatch(/npm run gate/);
     expect(qaGate).toMatch(/gate:fast/);
