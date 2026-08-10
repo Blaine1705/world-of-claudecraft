@@ -333,9 +333,10 @@ export function prewarmProgramContentKeys(
  * already carry: material type, hook identity (customProgramCacheKey, whose
  * three default is onBeforeCompile source), the texture-channel presence
  * bits, blending/alpha-test, vertex colors, flat shading, fog opt-out and
- * side. An imperfect signature is fail-soft: world.initial-frame still runs
- * guaranteed and links any residue behind the cover, never at first live
- * draw. */
+ * side. An imperfect signature is fail-soft: world.initial-frame's own
+ * guaranteed submit (its start is bounded ahead of the hard deadline by
+ * prewarmCompileAwaitDeadline) links any residue behind the loading cover
+ * there, instead of at first live draw. */
 export function materialProgramSignature(material: {
   type?: string;
   customProgramCacheKey?: () => string;
@@ -417,6 +418,23 @@ export function planCompileSubmission(input: {
     if (!input.recollect.has(id)) mark.push(id);
   }
   return { collect, mark };
+}
+
+/** Where the programs.compile entry's await-all must give up waiting so
+ * world.initial-frame (which compileBeforeFirstFrame reorders to run
+ * immediately after this entry) always STARTS before the hard deadline.
+ * prewarmEntryShouldDefer defers ANY entry, even a deadlineExempt one, the
+ * instant its start time reaches hardDeadlineMs, so an unbounded await here
+ * risked pushing world.initial-frame's own start past that wall: the entry
+ * would then be skipped outright (it has no resumeUnits) and the initial
+ * scene's programs would link at first LIVE draw instead, the exact stall
+ * class this lane exists to prevent. reserveMs is the room the initial
+ * frame's own submit needs to start and run before the wall; it does not
+ * bound the compile itself, which keeps linking off-thread after a timeout
+ * (resubmitting in-flight compileAsync calls would double-submit them).
+ * Mirrors prewarmBuildDeadline's reserve, one pipeline stage later. */
+export function prewarmCompileAwaitDeadline(hardDeadlineMs: number, reserveMs: number): number {
+  return hardDeadlineMs - Math.max(0, reserveMs);
 }
 
 /** Build cutoff paired with the entry policy. Full Insane prewarm may use the

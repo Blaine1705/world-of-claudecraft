@@ -327,7 +327,22 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
     expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
     expect(compileEntry).not.toContain('compileAsync(this.scene');
-    expect(compileEntry).not.toContain('Promise.race');
+    // The resume lane specifically must never race a scene-wide compileAsync
+    // call away (the old bug this pin guards): resuming already-submitted
+    // units would double-submit their in-flight compileAsync, so resumeUnits
+    // stays a plain bounded-unit selection, never a race.
+    expect(resumeSlice).not.toContain('Promise.race');
+    // run() DOES race now: a bounded await-all against its own reserved
+    // deadline (prewarmCompileAwaitDeadline, see prewarm_policy.test.ts), so
+    // an unbounded await can never push world.initial-frame's start past the
+    // hard deadline. It races only its own reserved cap, never the separate
+    // gpuSubmitDeadline the trailing exempt entries (programs.budget-variants
+    // etc, outside this slice) bound themselves against.
+    const runEnd = compileEntry.indexOf('progress: () =>', runStart);
+    expect(runEnd).toBeGreaterThan(runStart);
+    const runSlice = compileEntry.slice(runStart, runEnd);
+    expect(runSlice).toContain('Promise.race([');
+    expect(runSlice).not.toContain('performance.now() >= gpuSubmitDeadline');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
     // releaseTail: a resume unit's wall time is its off-thread links; without
@@ -344,6 +359,46 @@ describe('resumeDroppedPrewarmEntries', () => {
       'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication })',
     );
     expect(source).toContain('cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true })');
+  });
+
+  it('publishes the retained pools even when the compile resume remainder is empty', () => {
+    // Regression for the stranded-pool review finding: the compile entry's
+    // resumeUnits callback can set deferPoolPublication while its OWN
+    // remainder is empty (the shared compile dedupe store already covered
+    // every root through the early 'programs.compile-submit' entry). Gating
+    // the settle-then-publish scheduling on droppedEntries.length alone then
+    // never runs it when nothing else was dropped either, so the withheld
+    // entity/npc pools are silently discarded and the early-submitted units
+    // are never awaited. The gate must also fire on deferPoolPublication alone.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const finallyMarker =
+      'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });';
+    const blockStart = source.indexOf(finallyMarker);
+    const blockEnd = source.indexOf('// Sky uploads deferred behind a slow prefetch', blockStart);
+    expect(blockStart).toBeGreaterThan(-1);
+    expect(blockEnd).toBeGreaterThan(blockStart);
+    const block = source.slice(blockStart, blockEnd);
+
+    // The settle-then-publish scheduling must run whenever EITHER a real
+    // entry was dropped OR pool publication was withheld, never
+    // droppedEntries.length alone.
+    expect(block).toContain('if (droppedEntries.length > 0 || deferPoolPublication) {');
+    // resumeDroppedPrewarmEntries stays unconditional on `resume` (it is
+    // itself a no-op over an empty array, per resumeDroppedPrewarmEntries'
+    // own 'does nothing for empty entries' contract): gating THIS call on
+    // resume.length instead of widening the outer guard would skip the
+    // Promise.allSettled await of submittedCompileUnits whenever the resume
+    // list is empty, so the in-flight early-submitted units would still
+    // never be awaited for the empty-remainder case.
+    expect(block).toContain('return resumeDroppedPrewarmEntries(resume, {');
+    expect(block).toContain(
+      'await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));',
+    );
+    // Exactly one publish call backs this whole block: no duplicate
+    // publication path was added alongside the widened guard.
+    expect(
+      block.match(/cleanupPrewarmArtifacts\(\{ clearVfx: false, publishPools: true \}\)/g),
+    ).toHaveLength(1);
   });
 
   it('retains dropped texture uploads as one explicit idle unit per unique texture', () => {

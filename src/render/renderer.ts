@@ -360,6 +360,7 @@ import {
   partitionResidentSkyBiomes,
   planCompileSubmission,
   prewarmBuildDeadline,
+  prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
@@ -574,6 +575,12 @@ const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
+// Reserve at the tail of the compile entry's await-all so world.initial-frame,
+// which compileBeforeFirstFrame reorders to run immediately after this entry,
+// always starts before the hard deadline: prewarmEntryShouldDefer defers ANY
+// entry, even a deadlineExempt one, once its start time reaches hardDeadline.
+// See prewarmCompileAwaitDeadline.
+const PREWARM_COMPILE_AWAIT_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
 // calls and awaits them together, so r165's 10 ms poll floors overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
@@ -5748,6 +5755,16 @@ export class Renderer {
       PREWARM_BUILD_RESERVE_MS,
       policy.finishFullManifestBeforeReveal,
     );
+    // Stop the compile entry's await-all early so world.initial-frame (the
+    // next entry; compileBeforeFirstFrame reorders it to run immediately
+    // after this one) always starts before the hard deadline. Derived from
+    // the SAME hardDeadline value prewarmEntryShouldDefer checks every entry
+    // start against, never a separately-computed clock. See
+    // prewarmCompileAwaitDeadline and the compile entry's run() below.
+    const compileAwaitDeadline = prewarmCompileAwaitDeadline(
+      hardDeadline,
+      PREWARM_COMPILE_AWAIT_RESERVE_MS,
+    );
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
     const startCounts = this.prewarmCounts();
     const createdViewTypes: string[] = [];
@@ -6889,23 +6906,41 @@ export class Renderer {
           // and the live-scene re-collection.
           await submitCompileUnits(true);
           compileUnitsPlanned = submittedCompileUnits.length;
-          // Await EVERY submitted unit, deliberately unbounded by the unit
-          // deadline: this entry exists so every submitted program is READY
+          // Await every submitted unit so all of their programs are READY
           // before world.initial-frame renders (a program still linking by
           // then links synchronously inside that frame, the measured
-          // first-draw stall class). This is the same accepted
-          // behind-the-cover overrun class as the exempt initial frame
-          // itself, and the links have been progressing off-thread since
-          // submission (most since the early entry), so the residual wait is
-          // the driver's tail, not the whole link cost the old serialized
-          // batches paid here.
-          await Promise.all(
+          // first-draw stall class), bounded by compileAwaitDeadline:
+          // prewarmEntryShouldDefer defers ANY entry, even the
+          // deadlineExempt world.initial-frame that compileBeforeFirstFrame
+          // reorders to run right after this one, the instant its start
+          // time reaches the hard deadline. An unbounded await risked
+          // pushing that start past the wall on a pathological driver link
+          // tail (no shader disk cache, a serialized linker); world.initial-
+          // frame has no resumeUnits, so a deferred start SKIPPED it
+          // outright and left the whole scene to link synchronously at
+          // first LIVE draw instead, the exact stall this lane exists to
+          // prevent. On a lost race we stop AWAITING, never resubmit: every
+          // unit's compileAsync is already in flight off-thread, and
+          // resubmitting would double-submit it. Each unit's done handler
+          // below keeps running and counting after the race is lost, so the
+          // honesty gate's done/planned count stays accurate, and whatever
+          // is still linking when world.initial-frame draws links
+          // synchronously inside that guaranteed, still-covered frame
+          // instead: the same accepted behind-the-cover overrun class as
+          // the frame itself.
+          const awaitAll = Promise.all(
             submittedCompileUnits.map((unit) =>
               unit.done.then(() => {
                 compileUnitsDone++;
               }),
             ),
           );
+          const budgetMs = Math.max(0, compileAwaitDeadline - performance.now());
+          const outcome = await Promise.race([
+            awaitAll.then(() => 'settled' as const),
+            sleep(budgetMs).then(() => 'timeout' as const),
+          ]);
+          if (outcome === 'timeout') compileTimedOut = true;
           compileMs = roundMs(performance.now() - compileStart);
           compileTimedOut ||= compileMs > policy.compileMaxMs;
         },
@@ -7077,20 +7112,32 @@ export class Renderer {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
 
-    if (droppedEntries.length > 0) {
+    // Either arm needs the settle-then-publish scheduling below: real dropped
+    // work (droppedEntries), or the compile entry's resumeUnits callback
+    // withholding pool publication (deferPoolPublication) even though its OWN
+    // remainder came back empty, because the shared compile dedupe store can
+    // leave nothing left to resume while the early-submitted units are still
+    // settling off-thread. droppedEntries.length alone stranded the withheld
+    // pools in that case: the finally block above never publishes them when
+    // deferPoolPublication is set, so this is the only remaining place that can.
+    if (droppedEntries.length > 0 || deferPoolPublication) {
       // Fire-and-forget: world-entry timing does not depend on this. Every
       // retained item is an explicit small unit, never a whole entry rerun.
       const resume = droppedEntries.slice();
       const failedResumeUnits: string[] = [];
-      console.info(
-        `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
-      );
+      if (resume.length > 0) {
+        console.info(
+          `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
+        );
+      }
       void settlePrewarmBeforePublish(
         async () => {
           // If 'programs.compile' itself was deferred past the hard deadline,
           // its early-submitted units may still be settling off-thread; wait
           // them out before the resume lane (and pool publication) proceeds,
-          // so the resume lane never overlaps the in-flight submissions.
+          // so the resume lane never overlaps the in-flight submissions. This
+          // await also covers the deferPoolPublication-only case (an empty
+          // `resume`): pool publication still waits for the same settlement.
           await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));
           return resumeDroppedPrewarmEntries(resume, {
             idleSlot: () =>
@@ -7117,6 +7164,7 @@ export class Renderer {
         () => cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true }),
       )
         .then(() => {
+          if (resume.length === 0) return;
           const unitCount = resume.reduce((sum, entry) => sum + entry.units.length, 0);
           console.info(
             `[entry-guard] prewarm resume done: units=${unitCount};failed=[${failedResumeUnits.join(',')}]`,

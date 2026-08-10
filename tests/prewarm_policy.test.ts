@@ -15,6 +15,7 @@ import {
   partitionResidentSkyBiomes,
   planCompileSubmission,
   prewarmBuildDeadline,
+  prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
@@ -211,7 +212,10 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(submitEntryAt).toBeGreaterThan(-1);
     expect(submitEntryAt).toBeLessThan(renderer.indexOf("id: 'surface-detail.textures'"));
     expect(compileEntry).toContain('await submitCompileUnits(true)');
-    expect(compileEntry).toContain('await Promise.all(\n');
+    // The await-all is bounded (see the dedicated reserve test below), so the
+    // literal Promise.all is no longer the awaited expression directly; it is
+    // captured and raced against the reserved deadline.
+    expect(compileEntry).toContain('const awaitAll = Promise.all(\n');
     expect(compileEntry).toContain('submittedCompileUnits.map((unit) =>');
     expect(compileEntry).toContain('unit.done.then(() => {');
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
@@ -225,6 +229,49 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     );
     expect(renderer).toContain('sharedDedupe: compileDedupe,');
     expect(renderer).toContain('await submitCompileUnits(false)');
+  });
+
+  it('reserves await-all room so the initial frame always starts before the hard deadline', () => {
+    // The regression (PR 3233 review): programs.compile deleted the old
+    // per-unit deadline check and awaited every submitted unit completely
+    // unbounded. A pathological driver link tail (no shader disk cache, a
+    // serialized linker) that pushed the await past the hard deadline meant
+    // prewarmEntryShouldDefer then deferred world.initial-frame itself (it
+    // defers ANY entry, even a deadlineExempt one, once entryStartedMs
+    // reaches hardDeadlineMs), so the guaranteed behind-the-cover first
+    // frame never rendered and the whole scene linked synchronously at
+    // first LIVE draw instead.
+    expect(prewarmCompileAwaitDeadline(14_000, 2_000)).toBe(12_000);
+    // A nonsensical negative reserve never extends the wait past the hard deadline.
+    expect(prewarmCompileAwaitDeadline(14_000, -500)).toBe(14_000);
+
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    // The cap is derived from the SAME hardDeadline value prewarmEntryShouldDefer
+    // sees, not a fresh or looser value.
+    expect(renderer).toContain(
+      'const compileAwaitDeadline = prewarmCompileAwaitDeadline(\n' +
+        '      hardDeadline,\n' +
+        '      PREWARM_COMPILE_AWAIT_RESERVE_MS,\n' +
+        '    );',
+    );
+    const compileEntryAt = renderer.indexOf("id: 'programs.compile',");
+    const nextEntryAt = renderer.indexOf("id: 'programs.budget-variants'", compileEntryAt);
+    const compileEntry = renderer.slice(compileEntryAt, nextEntryAt);
+    expect(compileEntryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(compileEntryAt);
+    // The await-all races against the reserved cap; on a lost race the code
+    // stops awaiting but never resubmits (compileAsync is already in flight,
+    // and every submitted unit's own .then keeps counting as it settles).
+    expect(compileEntry).toContain(
+      'const budgetMs = Math.max(0, compileAwaitDeadline - performance.now());',
+    );
+    expect(compileEntry).toContain('const outcome = await Promise.race([');
+    expect(compileEntry).toContain("awaitAll.then(() => 'settled' as const)");
+    expect(compileEntry).toContain("sleep(budgetMs).then(() => 'timeout' as const)");
+    expect(compileEntry).toContain("if (outcome === 'timeout') compileTimedOut = true;");
   });
 
   it('plans compile submissions so a not-yet-staged group is never lost', () => {
