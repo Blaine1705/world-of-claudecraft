@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { DEED_BESPOKE_CRESTS, deedCrestId } from '../src/ui/deeds_view';
-import { DEED_ART_PENDING, deedImageUrl, iconDataUrl } from '../src/ui/icons';
+import { DEED_ART_PENDING, deedImageUrl, hasCrestRecipe, iconDataUrl } from '../src/ui/icons';
 
 // Gate for the committed Book of Deeds WebP icons (mirror of tests/skill_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/deeds/<deed_id>.webp is the source of truth
