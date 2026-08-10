@@ -1054,7 +1054,7 @@ export const ko_KR: EnTranslations = {
       "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 세 번 가져오는 쪽이 전장을 차지한다.",
       "modeTag": "5v5 깃발 뺏기",
       "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
-      "ratingSummary": "레이팅. {wins}승 / {losses}패",
+      "ratingSummary": "레이팅. {wins}승 / {losses}패 / {draws}무",
       "careerCaptures": "통산 탈취: {count}",
       "enterQueue": "대기열 참가",
       "enterQueueParty": "대기열 참가({count}인 파티)",
@@ -3311,6 +3311,8 @@ export const ko_KR: EnTranslations = {
     },
     "bgOffer": {
       "title": "쏜할로우 평원이 준비되었습니다",
+      "backfillTitle": "쏜할로우 평원에 전사가 필요합니다",
+      "backfillBody": "이 전투는 이미 진행 중입니다. 인원이 부족한 쪽에 합류하며, 이 전투는 평점에 영향을 주지 않습니다.",
       "accepted": "{size}명 중 {accepted}명 수락",
       "remaining": "응답까지 {seconds}초",
       "accept": "수락",
@@ -7924,6 +7926,7 @@ export const ko_KR: EnTranslations = {
       "outOfRange": "사정거리 밖입니다.",
       "noTarget": "대상이 없습니다.",
       "tooClose": "너무 가깝습니다!",
+      "mustTargetAlly": "아군을 대상으로 지정해야 합니다.",
       "facing": "대상을 바라봐야 합니다.",
       "targetHealthBelow": "그 능력은 대상 생명력이 {percent}% 미만이어야 합니다.",
       "dagger": "단검을 착용해야 합니다.",
@@ -8166,7 +8169,7 @@ export const ko_KR: EnTranslations = {
       "queueNote": "온라인 중인 가장 가까운 평점의 도전자와 매칭된 뒤 모래장으로 순간이동합니다. 승리하면 순위가 오르고, 먼저 항복한 쪽(생명력 1)이 패배합니다. 대기열에 들어간 바로 그 자리로 돌아옵니다.",
       "ladderAllTime": "순위표 - 전체",
       "ladderOnline": "순위표 - 온라인",
-      "ratingSummary": "평점 - {wins}승 / {losses}패",
+      "ratingSummary": "평점 - {wins}승 / {losses}패 / {draws}무",
       "statusCountdown": "마음을 다잡으세요...",
       "statusReturning": "세계로 돌아가는 중... {seconds}",
       "statusFight": "항복할 때까지 싸우세요!",
@@ -9540,6 +9543,10 @@ export const ko_KR: EnTranslations = {
       "die_by_sword": {
         "name": "검의 승부",
         "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
+      },
+      "intervene": {
+        "name": "엄호",
+        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다."
       },
       "recklessness": {
         "name": "무모함",

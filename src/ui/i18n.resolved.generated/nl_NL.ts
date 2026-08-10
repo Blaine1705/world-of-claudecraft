@@ -1054,7 +1054,7 @@ export const nl_NL: EnTranslations = {
       "blurb": "Twee vervallen burchten staan tegenover elkaar in een ommuurde holte in de schaduw van Doorntop: Karmozijn in het zuiden, Azuur in het noorden, en daartussen het oudere Ruïnehof dat geen van beide ooit heeft gehouden. Vijf tegen vijf, elk een eigen vaandel, en wie als eerste drie van de hunne naar huis draagt, wint het veld.",
       "modeTag": "5v5 Vlagverovering",
       "offlineNote": "Doornholte-Velden synchroniseert. De wachtrij gaat open zodra het rijk antwoordt.",
-      "ratingSummary": "Rating. {wins} overwinningen / {losses} nederlagen",
+      "ratingSummary": "Rating. {wins} overwinningen / {losses} nederlagen / {draws} gelijk",
       "careerCaptures": "Veroveringen in je carrière: {count}",
       "enterQueue": "Sluit je aan bij de wachtrij",
       "enterQueueParty": "Sluit je aan bij de wachtrij (groep van {count})",
@@ -3311,6 +3311,8 @@ export const nl_NL: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const nl_NL: EnTranslations = {
       "outOfRange": "Buiten bereik.",
       "noTarget": "Je hebt geen doelwit.",
       "tooClose": "Te dichtbij!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Je moet naar je doelwit gekeerd staan.",
       "targetHealthBelow": "Die vaardigheid vereist dat het doelwit onder {percent}% gezondheid is.",
       "dagger": "Je moet een dolk hanteren.",
@@ -8166,7 +8169,7 @@ export const nl_NL: EnTranslations = {
       "queueNote": "Je wordt gekoppeld aan de dichtstbijzijnde uitdager met vergelijkbare rang die online is en vervolgens naar het zand geteleporteerd. Win om te stijgen; wie als eerste opgeeft (1 levenspunt) verliest. Je keert exact terug waar je je in de wachtrij aansloot.",
       "ladderAllTime": "Ranglijst - Aller Tijden",
       "ladderOnline": "Ranglijst - Online",
-      "ratingSummary": "Waardering - {wins} winsten / {losses} verliezen",
+      "ratingSummary": "Waardering - {wins} winsten / {losses} verliezen / {draws} gelijk",
       "statusCountdown": "Maak je klaar...",
       "statusReturning": "Terugkeren naar de wereld... {seconds}",
       "statusFight": "Vecht tot de overgave!",
@@ -9540,6 +9543,10 @@ export const nl_NL: EnTranslations = {
       "die_by_sword": {
         "name": "Door het Zwaard",
         "description": "Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Roekeloosheid",

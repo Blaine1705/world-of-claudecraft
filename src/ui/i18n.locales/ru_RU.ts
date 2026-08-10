@@ -75,6 +75,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
   'entities.abilities.die_by_sword.name': 'Погибель от меча',
+  'entities.abilities.intervene.name': 'Вмешательство',
+  'entities.abilities.intervene.description':
+    'Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек.',
   'entities.abilities.emboldening_roar.description':
     'Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)',
   'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
@@ -897,7 +900,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.modeTag': 'Захват флага 5 на 5',
   'hudChrome.bg.offlineNote':
     'Терновая Лощина синхронизируется. Очередь откроется после ответа мира.',
-  'hudChrome.bg.ratingSummary': 'Рейтинг. Побед: {wins} / поражений: {losses}',
+  'hudChrome.bg.ratingSummary': 'Рейтинг. Побед: {wins} / поражений: {losses} / {draws} ничьих',
   'hudChrome.bg.careerCaptures': 'Захватов за карьеру: {count}',
   'hudChrome.bg.enterQueue': 'Встать в очередь',
   'hudChrome.bg.enterQueueParty': 'Встать в очередь (группа из {count})',
@@ -2200,6 +2203,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': 'Вне дальности.',
   'hud.errors.noTarget': 'У вас нет цели.',
   'hud.errors.tooClose': 'Слишком близко!',
+  'hud.errors.mustTargetAlly': 'Нужно выбрать целью союзника.',
   'hud.errors.facing': 'Вы должны смотреть на цель.',
   'hud.errors.targetHealthBelow':
     'Эта способность требует, чтобы здоровье цели было ниже {percent}%.',
@@ -2397,7 +2401,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вас подберут с ближайшим по рейтингу онлайн-претендентом и перенесут на пески. Побеждайте, чтобы подняться; первый уступивший (1 здоровье) проигрывает. Вы вернетесь точно туда, где встали в очередь.',
   'hud.arena.ladderAllTime': 'Таблица - за все время',
   'hud.arena.ladderOnline': 'Таблица - онлайн',
-  'hud.arena.ratingSummary': 'Рейтинг - {wins} побед / {losses} поражений',
+  'hud.arena.ratingSummary': 'Рейтинг - {wins} побед / {losses} поражений / {draws} ничьих',
   'hud.arena.statusCountdown': 'Приготовьтесь...',
   'hud.arena.statusReturning': 'Возвращение в мир... {seconds}',
   'hud.arena.statusFight': 'Сражайтесь до уступки!',
@@ -9502,6 +9506,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalRole': 'Ваша роль: {role}',
   'hudChrome.finder.accepted': 'Подтвердили: {accepted} из {size}',
   'hudChrome.bgOffer.title': 'Терновая Лощина готова',
+  'hudChrome.bgOffer.backfillTitle': 'Терновой Лощине нужен боец',
+  'hudChrome.bgOffer.backfillBody': 'Этот бой уже идёт. Вы присоединитесь к стороне, которой не хватает бойца, и этот бой не изменит ваш рейтинг.',
   'hudChrome.bgOffer.accepted': 'Готовы: {accepted} из {size}',
   'hudChrome.bgOffer.remaining': 'На ответ: {seconds} с',
   'hudChrome.bgOffer.accept': 'Принять',

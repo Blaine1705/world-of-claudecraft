@@ -1054,7 +1054,7 @@ export const fr_FR: EnTranslations = {
       "blurb": "Deux donjons en ruine se font face de part et d'autre d'un creux fortifié à l'ombre de Thornpeak : Carmin au sud, Azur au nord, et entre eux, la plus ancienne Cour en ruine, qu'aucun des deux camps n'a jamais tenue. Cinq contre cinq, une bannière chacun, et le premier à en ramener trois chez lui remporte le combat.",
       "modeTag": "5v5 Capture du drapeau",
       "offlineNote": "Les Champs de Thornhollow se synchronisent. La file s'ouvre dès que le royaume répond.",
-      "ratingSummary": "Cote. {wins} victoires / {losses} défaites",
+      "ratingSummary": "Cote. {wins} victoires / {losses} défaites / {draws} nuls",
       "careerCaptures": "Captures en carrière : {count}",
       "enterQueue": "Rejoindre la file",
       "enterQueueParty": "Rejoindre la file (groupe de {count})",
@@ -3311,6 +3311,8 @@ export const fr_FR: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const fr_FR: EnTranslations = {
       "outOfRange": "Hors de portée.",
       "noTarget": "Vous n'avez pas de cible.",
       "tooClose": "Trop près !",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Vous devez faire face à votre cible.",
       "targetHealthBelow": "Cette technique requiert une cible sous {percent} % de points de vie.",
       "dagger": "Vous devez porter une dague.",
@@ -8166,7 +8169,7 @@ export const fr_FR: EnTranslations = {
       "queueNote": "Vous serez opposé au prétendant en ligne au classement le plus proche, puis téléporté dans l'arène. Gagnez pour monter; le premier à céder (1 point de vie) perd. Vous revenez exactement où vous étiez en file.",
       "ladderAllTime": "Classement - historique",
       "ladderOnline": "Classement - en ligne",
-      "ratingSummary": "Cote - {wins} victoires / {losses} défaites",
+      "ratingSummary": "Cote - {wins} victoires / {losses} défaites / {draws} nuls",
       "statusCountdown": "Préparez-vous...",
       "statusReturning": "Retour au monde... {seconds}",
       "statusFight": "Combattez jusqu'à la reddition !",
@@ -9540,6 +9543,10 @@ export const fr_FR: EnTranslations = {
       "die_by_sword": {
         "name": "Périr par l'épée",
         "description": "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Témérité",

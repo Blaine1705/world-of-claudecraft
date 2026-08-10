@@ -1054,7 +1054,7 @@ export const zh_TW: EnTranslations = {
       "blurb": "兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方三次者贏得戰場。",
       "modeTag": "5v5奪旗戰",
       "offlineNote": "荊谷原野正在同步。待王國回應後即可排隊。",
-      "ratingSummary": "評分。{wins}勝 / {losses}敗",
+      "ratingSummary": "評分。{wins}勝 / {losses}敗 / {draws} 平",
       "careerCaptures": "生涯奪旗:{count}",
       "enterQueue": "加入佇列",
       "enterQueueParty": "加入佇列({count}人隊伍)",
@@ -3311,6 +3311,8 @@ export const zh_TW: EnTranslations = {
     },
     "bgOffer": {
       "title": "荊谷原野已準備就緒",
+      "backfillTitle": "荊谷原野需要一名戰士",
+      "backfillBody": "這場戰鬥已經開始。你將加入人數不足的一方，本場對戰不會改變你的評分。",
       "accepted": "已確認 {accepted}/{size}",
       "remaining": "剩餘 {seconds} 秒確認",
       "accept": "接受",
@@ -7924,6 +7926,7 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "超出範圍。",
       "noTarget": "你沒有目標。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必須選定一名友方目標。",
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
@@ -8166,7 +8169,7 @@ export const zh_TW: EnTranslations = {
       "queueNote": "你會與線上且評級最接近的挑戰者配對，然後傳送到沙場。獲勝即可攀升；先認輸者（1 點生命值）落敗。結束後會回到你排隊的位置。",
       "ladderAllTime": "排名 - 歷史",
       "ladderOnline": "排名 - 線上",
-      "ratingSummary": "評級 - {wins} 勝 / {losses} 敗",
+      "ratingSummary": "評級 - {wins} 勝 / {losses} 敗 / {draws} 平",
       "statusCountdown": "做好準備...",
       "statusReturning": "正在返回世界... {seconds}",
       "statusFight": "戰鬥到認輸！",
@@ -9540,6 +9543,10 @@ export const zh_TW: EnTranslations = {
       "die_by_sword": {
         "name": "劍在人在",
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。"
       },
       "recklessness": {
         "name": "魯莽",
