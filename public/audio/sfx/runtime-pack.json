@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "4e0366fc71920afb2f882f6f1e4d65a3a332cbff20756c801e007e35c10a86f8",
-  "catalogHash": "538389235484af903830dc6c34b394636be2c0a27510954f5dee8afaf06286a5",
+  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
+  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2930,12 +2930,36 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=7508c4a5ad92",
-          "bytes": 15716,
-          "sha256": "7508c4a5ad925cbf152c3143b23215c1e1a653ea0f30b9b9d7a89044d9849b06"
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=0a736f1befdb",
+          "bytes": 167435,
+          "sha256": "0a736f1befdb490135fd93ffff0bb9593c59b96308bc4e974a0e1e3e5668ed09"
         }
       ],
-      "gain": 1,
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "mount_run_terrorspark_groundshaker_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker_start.mp3?v=475c5288cbe9",
+          "bytes": 21985,
+          "sha256": "475c5288cbe9b2968876bd88102b358288bfb75bf74609bec2cee3a37d698db4"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "mount_run_terrorspark_groundshaker_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker_stop.mp3?v=35c7dc124cf4",
+          "bytes": 18224,
+          "sha256": "35c7dc124cf494ae69f19f65cd2a9e5019a6e8251d0ca18d27f25767f9eb04c5"
+        }
+      ],
+      "gain": 1.840772,
       "playbackRate": 1
     },
     "mount_run_thunderstrut_gobbler": {
@@ -3314,6 +3338,126 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "rift_boulder_impact": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_boulder_impact.mp3?v=64b1dd3e337b",
+          "bytes": 16343,
+          "sha256": "64b1dd3e337b62387ad7e5b023307bf0b91941cf8d96f5cb0be369b57b64d374"
+        }
+      ],
+      "gain": 1.778279,
+      "playbackRate": 1
+    },
+    "rift_boulder_roll": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_boulder_roll.mp3?v=a7b2d2fc337e",
+          "bytes": 241414,
+          "sha256": "a7b2d2fc337e666468ca4d225e2abf5cafa342d37ea3e0808eb8a6e4f9a2c765"
+        }
+      ],
+      "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "rift_gate_grind": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_gate_grind.mp3?v=6a36868e3eca",
+          "bytes": 43301,
+          "sha256": "6a36868e3eca24d39ba708d254d45edd27139e49e160a11198038e0ef4f3a22c"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "rift_ice_glide": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_ice_glide.mp3?v=4a4c99640deb",
+          "bytes": 145492,
+          "sha256": "4a4c99640deb2447054e870691ca11b0d2bb7999a08f1b78180d1272c079d42b"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "rift_ice_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_ice_start.mp3?v=3e5fce7f7458",
+          "bytes": 19478,
+          "sha256": "3e5fce7f74589e555492853c4024342495687fef65412908d3447d4891e6c5e1"
+        }
+      ],
+      "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "rift_ice_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_ice_stop.mp3?v=04ae7317e561",
+          "bytes": 23866,
+          "sha256": "04ae7317e561d24f80e0b6b54d3a3ddff4a209354ff63db263229692466e1e5c"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "rift_lava_tick": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_lava_tick.mp3?v=4ce302e4ad0c",
+          "bytes": 29509,
+          "sha256": "4ce302e4ad0c6e6cbd2935697e699beb177554541c9f1c4895cd7749ae715ca5"
+        }
+      ],
+      "gain": 2.42661,
+      "playbackRate": 1
+    },
+    "rift_portal_drone": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_portal_drone.mp3?v=6dd24da97ebf",
+          "bytes": 151762,
+          "sha256": "6dd24da97ebffde407638f54c00fe1085e24fe715a81eb6b00ca7e85c96d18e9"
+        }
+      ],
+      "gain": 8.317638,
+      "playbackRate": 1
+    },
+    "rift_portal_enter": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_portal_enter.mp3?v=12ba8db620a7",
+          "bytes": 28882,
+          "sha256": "12ba8db620a70f16ecc702f20efee1c9ad9e5e2459140faa55632dfe6bd3e7eb"
+        }
+      ],
+      "gain": 2.660725,
+      "playbackRate": 1
+    },
+    "rift_portal_spawn": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rift_portal_spawn.mp3?v=4d8687575c96",
+          "bytes": 85306,
+          "sha256": "4d8687575c9654794ea017dfcc421f217bb19b215f488a37db338cb64cca4ac7"
+        }
+      ],
+      "gain": 3.935501,
       "playbackRate": 1
     },
     "sap": {
