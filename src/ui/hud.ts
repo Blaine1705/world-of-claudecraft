@@ -205,6 +205,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  groundTickAbilityCue,
   impactCueForDamage,
   type MobVoiceAction,
   mobVoiceActionForDamage,
@@ -11065,16 +11066,43 @@ export class Hud {
         return;
       }
       case 'spellfxAt': {
+        // Meteor's landing recording is preloaded lazily (SFX_CLIPS entries
+        // preload: 'lazy' by default), so a first-cast-of-session player can
+        // hit the fx:'tick' below before the fetch+decode finishes and
+        // playAt's 0.12s unbuffered-oneshot race drops it silently. The
+        // meteorFall telegraph fires here about 2s before the ground tick
+        // lands (effect_dispatch.ts), which is exactly enough lead time to
+        // warm the buffer if we kick the preload off now.
+        if (ev.fx === 'meteorFall') {
+          sfx.preload('meteor');
+          return;
+        }
+        // A ground-zone pulse (Consecration, Blizzard's damage tick, Meteor's
+        // one delayed hit): a dedicated recording (Meteor) is the whole read;
+        // every other zone stays silent here and keeps its procedural
+        // VFX-synth voice (ability_sfx_coverage.ts).
+        if (ev.fx === 'tick') {
+          const tickKey = groundTickAbilityCue(ev.ability);
+          if (tickKey) this.combat(tickKey, ev.x, sim.player.pos.y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
         // Ground-anchored bursts (ground-target detonations, the citadel's Blood
         // Orb flare, the portcullis release nova) were silent: give novas the
         // shared burst layered with a school-flavored impact, so the orb's fire
         // flare reads differently from the gate's holy release. The listener is
         // on the same floor, so the player's own y is the right height anchor.
-        if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
-        // A per-ability nova recording (Flamestrike) is the whole read on the
-        // aimed path too, at the same 1.0 the entity-anchored spellfx path
-        // plays it; the generic burst keeps its school-flavored layer.
+        // A fixed custom recording (rift mechanics: riftFx in src/sim/rift/fx.ts)
+        // replaces the generic nova/burst sound entirely, for both fx variants,
+        // not just nova.
+        if (ev.sfxKey) {
+          this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
+        if (ev.fx !== 'nova') return;
+        // A per-ability nova recording is the whole read on the aimed path
+        // too, at the same 1.0 the entity-anchored spellfx path plays it;
+        // the generic burst keeps its school-flavored layer.
         const novaKey = novaAbilityCue(ev.ability);
         if (novaKey !== 'spell_nova') {
           this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });

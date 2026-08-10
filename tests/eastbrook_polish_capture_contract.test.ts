@@ -105,8 +105,19 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
 // mip-release branch: both parents move renderer.ts, so the rendererIntegration
 // leaf mints a value matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '6c851bbbf26498d01aed94ceca47e5e9eff2f5d72817f83cff64d6825a085357';
+  'a5a84fb2bd4a35b844d7ad47a95304388cd77f485299c670f6997c3a3bc2cf0b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

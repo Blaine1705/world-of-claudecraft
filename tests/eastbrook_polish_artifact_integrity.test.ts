@@ -683,10 +683,21 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
 // mip-release branch: both parents move renderer.ts, so all three literals mint
 // to values matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so all
+// three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dd92bbcdb2471283e51e58c1a9f089373d033b3918d652edae843383c3c80ea8';
+  '557c7b28d60232fd18a6343276ad93383ae56ca6b47d8ed86b0645936a2d0c0e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '6c851bbbf26498d01aed94ceca47e5e9eff2f5d72817f83cff64d6825a085357';
+  'a5a84fb2bd4a35b844d7ad47a95304388cd77f485299c670f6997c3a3bc2cf0b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1599,10 +1610,24 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // KTX2 mip-release branch: the first-order composite follows both parents'
     // renderer.ts inputs, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3222) into the
+    // prewarm sky-unstarve branch: the first-order composite follows both
+    // parents' renderer.ts inputs plus this branch's prewarm_policy.ts
+    // (sky.ts moved too but is not a provenance input), then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-pinned for the review fixes on the prewarm sky-unstarve PR: the
+    // first-order composite follows the renderer.ts edits (deadlineExempt sky
+    // entry, unified view-cap trim rule, deferred-lane gate and priority
+    // threading), then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+    // archetype and scene-texture counts; renderer.ts edits only). No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('b72983e4b4d3e05150b76f24418edec3b5f80c487b1714f84e341219a7d03d9c');
+    ).toBe('ad2b01d1ef2ef83d41ac427152709596b55cca9c4ba5cd2abcf337f0dc72eecd');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

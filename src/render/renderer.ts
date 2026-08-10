@@ -417,8 +417,10 @@ import {
   interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
   orderedPrewarmIds,
+  type PrewarmEntryProgress,
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
+  partitionResidentSkyBiomes,
   prewarmBuildDeadline,
   prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -426,7 +428,9 @@ import {
   prewarmEntryShouldDefer,
   prewarmProgramContentKeys,
   remainingPrewarmViewBudget,
+  resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
+  skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from './prewarm_policy';
 import {
@@ -435,6 +439,8 @@ import {
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
   settlePrewarmBeforePublish,
+  trackPrefetch,
+  waitForPrefetch,
 } from './prewarm_resume';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
@@ -453,6 +459,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
@@ -621,6 +628,15 @@ const PREWARM_GPU_SUBMIT_GUARD_MS = 1000;
 // A background prewarm waits for a browser idle slot between its per-group
 // compile chunks; the timeout forces progress under sustained frame load.
 const IDLE_PREWARM_TIMEOUT_MS = 250;
+
+// The four pooled-particle burst points the vfx.atlas prewarm spawns around
+// the player (behind them, outside the entry camera).
+const VFX_PREWARM_BURST_OFFSETS: readonly (readonly [number, number])[] = [
+  [0, -4],
+  [-3, -5],
+  [3, -5],
+  [0, -7],
+];
 // Diagnostic threshold for a live async-compile gate. The compile cannot be
 // cancelled, so the target remains hidden and the serial gate remains occupied
 // until the driver settles instead of overlapping first-draw or later links.
@@ -1013,7 +1029,10 @@ interface RendererPrewarmManifestEntryStats {
   category: RendererPrewarmCategory;
   priority: number;
   required: boolean;
-  status: 'completed' | 'skipped' | 'timed-out' | 'failed';
+  /** 'partial': ran, but a deadline (or a pending asset prefetch) trimmed the
+   *  planned work; the counts below say how much actually happened. An entry
+   *  that did zero or partial work must never read 'completed'. */
+  status: 'completed' | 'partial' | 'skipped' | 'timed-out' | 'failed';
   elapsedMs: number;
   remainingMsAfter: number;
   passes: number;
@@ -1023,6 +1042,9 @@ interface RendererPrewarmManifestEntryStats {
   texturesBefore: number;
   texturesAfter: number;
   textureDelta: number;
+  /** Work units actually done / planned, for entries that track progress. */
+  workDone?: number;
+  workPlanned?: number;
   detail?: string;
 }
 
@@ -1056,9 +1078,12 @@ export interface RendererPrewarmStats {
   manifestPlanned: number;
   manifestEntries: RendererPrewarmManifestEntryStats[];
   manifestCompleted: number;
+  /** Entries that ran but were trimmed by a deadline or a pending prefetch. */
+  manifestPartial: number;
   manifestSkipped: number;
   manifestTimedOut: number;
   manifestFailed: number;
+  partialEntryIds: string[];
   timedOutEntryIds: string[];
   failedEntryIds: string[];
   diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
@@ -1972,6 +1997,11 @@ export class Renderer {
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
   private readonly ambientPointSources: readonly AmbientPointSource[];
+  // Reused scratch buffers for the per-frame rift ambience merge in
+  // updateCamera: avoids allocating two arrays plus an object per match every
+  // frame regardless of whether a rift is nearby (review finding, PR #2687).
+  private readonly riftAmbienceScratch: AmbientPointSource[] = [];
+  private readonly ambientPointsMergedScratch: AmbientPointSource[] = [];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -4867,28 +4897,55 @@ export class Renderer {
     createdViewTypes: string[],
     deadlineMs: number,
     maxViews: number,
-  ): number {
+  ): { created: number; trimmed: boolean } {
     const limit = Math.min(PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT, Math.max(0, Math.floor(maxViews)));
     let created = 0;
+    let trimmed = false;
     for (const e of this.sim.entities.values()) {
-      if (created >= limit || performance.now() >= deadlineMs) break;
+      // Either stop with entities unexamined is planned work left undone, so
+      // BOTH arms report trimmed, the same rule createCandidateViews applies:
+      // the deadline is a wall-clock trim and the shared view cap is a policy
+      // trim (a capped scan must never masquerade as completed in the prewarm
+      // summary). A scan that examines every entity exits the loop normally
+      // and stays untrimmed.
+      if (created >= limit) {
+        trimmed = true;
+        break;
+      }
+      if (performance.now() >= deadlineMs) {
+        trimmed = true;
+        break;
+      }
       if (!isPersistentPortalObject(e) || this.views.has(e.id)) continue;
       this.createView(e);
       this.sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
-    return created;
+    return { created, trimmed };
   }
 
   private createCandidateViews(
     limit: number,
     createdViewTypes: string[],
     deadlineMs = Infinity,
-  ): number {
+  ): { created: number; trimmed: boolean } {
     const max = Math.max(0, Math.floor(limit));
     let created = 0;
+    let trimmed = false;
     for (const candidate of this.viewCandidates) {
-      if (created >= max || performance.now() >= deadlineMs) break;
+      // Either stop with candidates unexamined is planned work left undone,
+      // so BOTH report trimmed: the deadline is a wall-clock trim, and the
+      // view cap is a policy trim (a capped scan must never masquerade as
+      // completed in the prewarm summary). A scan that examines every
+      // candidate exits the loop normally and stays untrimmed.
+      if (created >= max) {
+        trimmed = true;
+        break;
+      }
+      if (performance.now() >= deadlineMs) {
+        trimmed = true;
+        break;
+      }
       const e = this.sim.entities.get(candidate.id);
       if (!e || this.views.has(e.id)) continue;
       // a recent failed build (assets unavailable) sits out its cooldown so it
@@ -4898,7 +4955,7 @@ export class Renderer {
       this.sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
-    return created;
+    return { created, trimmed };
   }
 
   private createCharacterVisualWithRetry(
@@ -5241,24 +5298,50 @@ export class Renderer {
   private buildNpcPrewarmGroup(
     zone: ZoneDef,
     deadline: number,
-  ): { group: THREE.Group; pooled: { key: string; visual: CharacterVisual }[] } {
+  ): {
+    group: THREE.Group;
+    pooled: { key: string; visual: CharacterVisual }[];
+    /** Ids whose model ended the loop warm: freshly built here, already warm
+     *  from an earlier id or session pass, or with no static record to build.
+     *  An asset-unavailable skip stays uncounted so warmed < planned reports
+     *  the unwarmed remainder instead of masquerading as complete work. */
+    warmed: number;
+    planned: number;
+    trimmed: boolean;
+  } {
     const group = new THREE.Group();
     const pooled: { key: string; visual: CharacterVisual }[] = [];
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 24);
     setRenderCategory(group, 'prewarm');
     let idx = 0;
-    for (const npcId of this.templateIdsInZone(zone, 'npc')) {
-      if (performance.now() >= deadline) break;
+    const npcIds = this.templateIdsInZone(zone, 'npc');
+    let warmed = 0;
+    let trimmed = false;
+    for (const npcId of npcIds) {
+      if (performance.now() >= deadline) {
+        trimmed = true;
+        break;
+      }
       const npc = NPCS[npcId];
-      if (!npc) continue;
+      // Dynamic-entity template with no static NPC record: nothing to build.
+      if (!npc) {
+        warmed++;
+        continue;
+      }
       const entity = this.prewarmEntity('npc', npc.id, npc.color, 1);
       const modelKey = visualKeyFor(entity);
-      if (this.prewarmedNpcModels.has(modelKey)) continue;
+      // Shared model already warm: this id's planned work exists already.
+      if (this.prewarmedNpcModels.has(modelKey)) {
+        warmed++;
+        continue;
+      }
       const visual = createCharacterVisual(entity);
-      // assets unavailable: skip the seed, leave the model unmarked
+      // assets unavailable: skip the seed, leave the model unmarked and the
+      // id uncounted, so a later zone preparation can retry it
       if (!visual) continue;
       this.prewarmedNpcModels.add(modelKey);
+      warmed++;
       const poolKey = this.visualPoolKeyFor(entity);
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
@@ -5266,18 +5349,22 @@ export class Renderer {
       group.add(visual.root);
       idx++;
     }
-    return { group, pooled };
+    return { group, pooled, warmed, planned: npcIds.length, trimmed };
   }
 
   private buildPlayerPrewarmGroup(deadline: number): {
     group: THREE.Group;
     visualCount: number;
     visuals: CharacterVisual[];
+    plannedVisuals: number;
+    trimmed: boolean;
   } {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
     setRenderCategory(group, 'prewarm');
+    // Skin variants plus one aura-glow rig per class (the second loop below).
+    const plannedVisuals = prewarmPlayerSkinVariantCount() + ALL_CLASSES.length;
     let idx = 0;
     const visuals: CharacterVisual[] = [];
     const place = (obj: THREE.Object3D): void => {
@@ -5305,7 +5392,9 @@ export class Renderer {
     for (const cls of ALL_CLASSES) {
       const variants = skinCount(`player_${cls}`);
       for (let skin = 0; skin < variants; skin++) {
-        if (performance.now() >= deadline) return { group, visualCount: idx, visuals };
+        if (performance.now() >= deadline) {
+          return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
+        }
         const color = CLASSES[cls]?.color ?? 0xffffff;
         const entity = this.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
         const visual = createCharacterVisual(entity);
@@ -5328,7 +5417,9 @@ export class Renderer {
     // group is removed in the prewarm finally, but linked programs stay cached
     // for the session.
     for (const cls of ALL_CLASSES) {
-      if (performance.now() >= deadline) return { group, visualCount: idx, visuals };
+      if (performance.now() >= deadline) {
+        return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
+      }
       const color = CLASSES[cls]?.color ?? 0xffffff;
       const entity = this.prewarmEntity('player', cls, color, 1, 0, -11_500 - idx);
       const visual = createCharacterVisual(entity);
@@ -5338,7 +5429,7 @@ export class Renderer {
       place(visual.root);
       visuals.push(visual);
     }
-    return { group, visualCount: idx, visuals };
+    return { group, visualCount: idx, visuals, plannedVisuals, trimmed: false };
   }
 
   private buildObjectPrewarmGroup(): THREE.Group {
@@ -5402,7 +5493,14 @@ export class Renderer {
   private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
   private readonly textureUploadTaskSet = new Set<Promise<void>>();
 
-  private prewarmTextureInIdle(texture: THREE.Texture | null | undefined): Promise<void> {
+  private prewarmTextureInIdle(
+    texture: THREE.Texture | null | undefined,
+    // The caller's queue priority for the chunk uploads: a lane whose stated
+    // intent is lowest-priority (the deferred sky resume at BOOT_RESUME) must
+    // not have its expensive upload steps outrank its cheap ones. An
+    // already-pending upload keeps the priority it entered the queue with.
+    priority: number = GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+  ): Promise<void> {
     if (!texture || this.gpuReadyTextures.has(texture)) return Promise.resolve();
     const pending = this.textureUploadTasks.get(texture);
     if (pending) return pending;
@@ -5411,7 +5509,7 @@ export class Renderer {
       uploadChunk: (chunkTexture) =>
         this.backgroundGpuWork.run(
           () => this.webgl.initTexture(chunkTexture),
-          GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+          priority,
           'texture-chunk-upload',
         ),
     })
@@ -5661,17 +5759,27 @@ export class Renderer {
   private async prewarmInitialSceneTexturesBatched(
     batchSize: number,
     maxMs: number,
-  ): Promise<number> {
+  ): Promise<{ uploaded: number; initialized: number; planned: number; trimmed: boolean }> {
     const before = this.webgl.info.memory.textures;
     const deadline = performance.now() + Math.max(0, maxMs);
     const textures = this.collectInitialSceneTextures();
     const batch = Math.max(1, Math.floor(batchSize));
+    let initialized = 0;
     for (let i = 0; i < textures.length && performance.now() < deadline; i += batch) {
       const end = Math.min(textures.length, i + batch);
       for (let j = i; j < end; j++) this.prewarmTexture(textures[j]);
+      initialized = end;
       if (end < textures.length && performance.now() < deadline) await sleep(0);
     }
-    return Math.max(0, this.webgl.info.memory.textures - before);
+    // `initialized` is the progress unit matching `planned` (textures examined);
+    // `uploaded` is a GPU-residency delta an already-resident texture never
+    // moves, kept for the upload diagnostics only.
+    return {
+      uploaded: Math.max(0, this.webgl.info.memory.textures - before),
+      initialized,
+      planned: textures.length,
+      trimmed: initialized < textures.length,
+    };
   }
 
   // Drop an out-of-band render burst (prewarm pass, screenshot, scene census)
@@ -5873,6 +5981,17 @@ export class Renderer {
         ),
       ),
     ];
+    // Decouple the sky HDRI fetch + worker decode from the budgeted manifest:
+    // start it NOW so the network wait overlaps the compute stages below. The
+    // old shape awaited this fetch inside the FIRST manifest entry, and a slow
+    // network was measured consuming 11.5s of the 12s boot budget before a
+    // single archetype/program/vfx stage had run (the boot starvation), after
+    // which those stages were dropped at 0ms. Constrained profiles skip the
+    // sky entry entirely (CONSTRAINED_PREWARM_KEEP), so they must not fetch
+    // or decode-hold these HDRIs either: the prefetch is gated the same way.
+    const skyAssetPrefetch = prewarmEntryRuns('sky.nearby-biomes', policy)
+      ? trackPrefetch(ensureSkyBiomeAssets(initialSkyBiomes))
+      : null;
     const zoneMobTemplateIds = this.templateIdsInZone(activeZone, 'mob');
     const zoneNpcTemplateIds = this.templateIdsInZone(activeZone, 'npc');
     let createdViews = 0;
@@ -5899,6 +6018,36 @@ export class Renderer {
 
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
+    let playerPrewarmProgress: PrewarmEntryProgress | null = null;
+    let npcPrewarmProgress: PrewarmEntryProgress | null = null;
+    let portalViewsTrimmed = false;
+    // views.persistent-portals' own created count (same per-entry rule as
+    // nearbyViewsCreated below).
+    let portalViewsCreated = 0;
+    let nearbyViewsTrimmed = false;
+    // views.required's own created count (same per-entry rule as
+    // nearbyViewsCreated below: never report the cumulative counter as one
+    // entry's done).
+    let requiredViewsCreated = 0;
+    // views.nearby's own created count: `createdViews` is the CUMULATIVE
+    // counter shared with the required/landmark/portal substeps, so reporting
+    // it as this entry's done would exceed the entry's planned candidates.
+    let nearbyViewsCreated = 0;
+    let sceneTextureProgress: PrewarmEntryProgress | null = null;
+    // Batched-arm-only count of scene textures actually initialized; null on
+    // the synchronous desktop path, which tracks only the upload delta.
+    let sceneTexturesInitialized: number | null = null;
+    let skyWarmedInlineBiomes = 0;
+    let skyDeferredBiomes: (typeof initialSkyBiomes)[number][] = [];
+    let skyWarmComplete = false;
+    // sky.current-zone's camera points, hoisted so the entry's run() loop and
+    // its progress() planned count share one source of truth (live references,
+    // read at run time exactly as before).
+    const skyZonePoints = [p.pos, activeZone.hub];
+    let skyZonePasses = 0;
+    let compileUnitsPlanned = 0;
+    let compileUnitsDone = 0;
+    let compileUnitsDropped = 0;
     let vfxPrewarmBursts = 0;
     let compileMode: RendererPrewarmStats['compileMode'] = 'none';
     let compileMs = 0;
@@ -5923,6 +6072,10 @@ export class Renderer {
        * this hook is intentional: a whole manifest entry is never rerun live. */
       resumeUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
+      /** Read after run(): how much of the planned work actually happened. A
+       * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
+       * so a deadline return can never masquerade as completed again. */
+      progress?: () => PrewarmEntryProgress | null;
       detail?: () => string;
     };
 
@@ -6088,6 +6241,11 @@ export class Renderer {
         status = 'failed';
         console.warn(`Renderer prewarm entry failed: ${entry.id}`, err);
       }
+      // Honesty gate: an entry that hit its deadline (or deferred to the
+      // background lane) with planned work remaining reports 'partial' with
+      // its counts, never 'completed'.
+      const progress = entry.progress?.() ?? null;
+      if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
       const after = this.prewarmCounts();
       const entryEnded = performance.now();
       target.push({
@@ -6105,6 +6263,8 @@ export class Renderer {
         texturesBefore: before.textures,
         texturesAfter: after.textures,
         textureDelta: after.textures - before.textures,
+        workDone: progress?.done,
+        workPlanned: progress?.planned,
         detail: entry.detail?.(),
       });
     };
@@ -6197,6 +6357,8 @@ export class Renderer {
       weatherPrewarmActive = false;
     };
 
+    const settleMinPasses = this.lowGfx ? 8 : 10;
+
     const textureResumeUnits = (
       idPrefix: string,
       textures: readonly THREE.Texture[],
@@ -6208,33 +6370,20 @@ export class Renderer {
 
     const manifest: PrewarmManifestEntry[] = [
       {
-        // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
-        // WebGL exposes no non-blocking Three.js DataTexture upload, so pay the
-        // immediate-neighbour cost while the loading screen still owns the
-        // frame. PMREM uses the 1k source but is generated here too, keeping
-        // both the dome swap and IBL transition out of gameplay.
-        id: 'sky.nearby-biomes',
-        category: 'sky',
-        priority: 5,
-        required: true,
-        run: async () => {
-          await ensureSkyBiomeAssets(initialSkyBiomes);
-          for (const biome of initialSkyBiomes) {
-            this.prewarmTexture(this.skyView.envTexture(biome));
-            this.ensureEnvironmentBiome(biome);
-            this.prewarmTexture(this.skyView.domeTexture(biome));
-          }
-        },
-        detail: () => `biomes=${initialSkyBiomes.join(',')}`,
-      },
-      {
         id: 'views.required',
         category: 'views',
         priority: 10,
         required: true,
         run: () => {
-          createdViews += this.createRequiredViews(p, createdViewTypes);
+          requiredViewsCreated = this.createRequiredViews(p, createdViewTypes);
+          createdViews += requiredViewsCreated;
         },
+        // The shared view cap never stops this entry: required player/target
+        // views bypass the budget by design (they only DRAIN it for the capped
+        // substeps). The explicit hook keeps that rule visible beside the
+        // capped entries drawing on the same budget, which mark trimmed when
+        // the cap stops them with work remaining.
+        progress: () => ({ done: requiredViewsCreated, trimmed: false }),
         detail: () => `created=${createdViews}`,
       },
       {
@@ -6248,6 +6397,15 @@ export class Renderer {
           mandatoryLandmarkIds = result.ids;
           createdViews += result.created;
         },
+        // The shared view cap never stops this entry either: mandatory
+        // landmark views bypass the budget (the helper takes no limit), and
+        // run() throws unless every mandatory view became ready, so a
+        // successful entry has done === planned by construction.
+        progress: () => ({
+          done: mandatoryLandmarkIds.length,
+          planned: mandatoryLandmarkIds.length,
+          trimmed: false,
+        }),
         detail: () =>
           `required=${mandatoryLandmarkIds.length};ready=${mandatoryLandmarkViewsReady(
             mandatoryLandmarkIds,
@@ -6260,13 +6418,20 @@ export class Renderer {
         priority: 14,
         required: true,
         run: () => {
-          createdViews += this.createPersistentPortalViews(
+          const result = this.createPersistentPortalViews(
             createdViewTypes,
             buildDeadline,
             remainingPrewarmViewBudget(policy.maxViews, createdViews),
           );
+          portalViewsCreated = result.created;
+          createdViews += result.created;
+          portalViewsTrimmed = result.trimmed;
         },
-        detail: () => `created=${createdViews}`,
+        progress: () => ({ trimmed: portalViewsTrimmed }),
+        // Per-entry count first: `createdViews` is the cumulative counter
+        // shared with the required/landmark/nearby substeps (same rule as
+        // views.nearby below).
+        detail: () => `created=${portalViewsCreated};cumulativeViews=${createdViews}`,
       },
       {
         id: 'views.nearby',
@@ -6276,13 +6441,22 @@ export class Renderer {
         run: () => {
           this.collectMissingViewCandidates(p, VIEW_PREWARM_RANGE_SQ, false);
           candidateViews = this.viewCandidates.length;
-          createdViews += this.createCandidateViews(
+          const result = this.createCandidateViews(
             remainingPrewarmViewBudget(policy.maxViews, createdViews),
             createdViewTypes,
             buildDeadline,
           );
+          nearbyViewsCreated = result.created;
+          createdViews += result.created;
+          nearbyViewsTrimmed = result.trimmed;
         },
-        detail: () => `created=${createdViews};candidates=${candidateViews}`,
+        progress: () => ({
+          done: nearbyViewsCreated,
+          planned: candidateViews,
+          trimmed: nearbyViewsTrimmed,
+        }),
+        detail: () =>
+          `created=${nearbyViewsCreated};cumulativeViews=${createdViews};candidates=${candidateViews}`,
       },
       {
         id: 'props.dungeon-doors',
@@ -6321,8 +6495,17 @@ export class Renderer {
           playerPrewarmGroup = built.group;
           playerPrewarmVisuals = built.visualCount;
           playerPrewarmInstances = built.visuals;
+          // Planned is exact here, so any shortfall trims: an asset-skipped
+          // rig (createCharacterVisual returning null) leaves planned work
+          // unwarmed, and completed must mean the work actually happened.
+          playerPrewarmProgress = {
+            done: built.visualCount,
+            planned: built.plannedVisuals,
+            trimmed: built.trimmed || built.visualCount < built.plannedVisuals,
+          };
           this.scene.add(playerPrewarmGroup);
         },
+        progress: () => playerPrewarmProgress,
         detail: () =>
           `classes=${ALL_CLASSES.length};skins=${prewarmPlayerSkinVariantCount()};visuals=${playerPrewarmVisuals}`,
       },
@@ -6349,8 +6532,17 @@ export class Renderer {
           const built = this.buildNpcPrewarmGroup(activeZone, buildDeadline);
           npcPrewarmGroup = built.group;
           npcPrewarmPool = built.pooled;
+          // Same derived rule as entities.player-archetypes above: done counts
+          // ids whose model ended warm, so an asset-skipped id leaves
+          // done < planned and the entry reports partial, never completed.
+          npcPrewarmProgress = {
+            done: built.warmed,
+            planned: built.planned,
+            trimmed: built.trimmed || built.warmed < built.planned,
+          };
           this.scene.add(npcPrewarmGroup);
         },
+        progress: () => npcPrewarmProgress,
         detail: () => `zone=${activeZone.id};npcs=${zoneNpcTemplateIds.length}`,
       },
       {
@@ -6534,14 +6726,30 @@ export class Renderer {
         required: true,
         resumeUnits: () => textureResumeUnits('scene', this.collectInitialSceneTextures()),
         run: async () => {
-          textureUploads = constrainedPrewarm
-            ? await this.prewarmInitialSceneTexturesBatched(
-                policy.textureBatchSize,
-                policy.textureMaxMs,
-              )
-            : this.prewarmObjectTextures(this.scene);
+          if (constrainedPrewarm) {
+            const batched = await this.prewarmInitialSceneTexturesBatched(
+              policy.textureBatchSize,
+              policy.textureMaxMs,
+            );
+            textureUploads = batched.uploaded;
+            sceneTexturesInitialized = batched.initialized;
+            // done matches planned's unit (textures examined): the uploaded
+            // GPU-residency delta never moves for an already-resident texture,
+            // so it would misreport a shortfall on a fully successful run.
+            sceneTextureProgress = {
+              done: batched.initialized,
+              planned: batched.planned,
+              trimmed: batched.trimmed,
+            };
+            return;
+          }
+          textureUploads = this.prewarmObjectTextures(this.scene);
         },
-        detail: () => `uploaded=${textureUploads}`,
+        progress: () => sceneTextureProgress,
+        detail: () =>
+          sceneTexturesInitialized === null
+            ? `uploadedDelta=${textureUploads}`
+            : `initialized=${sceneTexturesInitialized};uploadedDelta=${textureUploads}`,
       },
       {
         id: 'vfx.atlas',
@@ -6551,18 +6759,17 @@ export class Renderer {
         // No resumeUnits: this spawns real particles into the shared pooled VFX
         // system, so rerunning it live would create an unexplained burst.
         run: () => {
-          const offsets = [
-            [0, -4],
-            [-3, -5],
-            [3, -5],
-            [0, -7],
-          ] as const;
-          for (const [dx, dz] of offsets) {
+          for (const [dx, dz] of VFX_PREWARM_BURST_OFFSETS) {
             if (performance.now() >= deadline) break;
             this.vfx.prewarm(new THREE.Vector3(p.pos.x + dx, p.pos.y + 1, p.pos.z + dz));
             vfxPrewarmBursts++;
           }
         },
+        progress: () => ({
+          done: vfxPrewarmBursts,
+          planned: VFX_PREWARM_BURST_OFFSETS.length,
+          trimmed: vfxPrewarmBursts < VFX_PREWARM_BURST_OFFSETS.length,
+        }),
         detail: () => `bursts=${vfxPrewarmBursts}`,
       },
       {
@@ -6660,6 +6867,93 @@ export class Renderer {
         },
       },
       {
+        // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
+        // WebGL exposes no non-blocking Three.js DataTexture upload, so pay the
+        // immediate-neighbour cost while the loading screen still owns the
+        // frame. PMREM uses the 1k source but is generated here too, keeping
+        // both the dome swap and IBL transition out of gameplay.
+        //
+        // The fetch + worker decode were kicked off at prewarm start (see
+        // skyAssetPrefetch above), so they overlap every compute stage above
+        // instead of serializing ahead of them. This entry only waits for the
+        // prefetch within the budget the tail entries can spare; biomes whose
+        // assets have not arrived defer their uploads to the background lane
+        // scheduled after the manifest, and the entry reports partial. The
+        // first rendered frame is unaffected either way: the dome/IBL sources
+        // the first frame draws were resolved before buildSky ran, and this
+        // entry still precedes world.initial-frame so any inline uploads land
+        // behind the loading screen. On the async-compile arm orderedPrewarmIds
+        // moves programs.compile between this entry and that frame, so the
+        // bounded inline wait's reserve is what protects compile RUN time
+        // before the compile-unit deadline.
+        id: 'sky.nearby-biomes',
+        category: 'sky',
+        priority: 64,
+        required: true,
+        // Exempt unconditionally: uploadDataTextureInChunks falls back to one
+        // full upload on pinned r165, so the 2k RGBA16F dome upload is an
+        // indivisible ~183ms call that must stay behind the loading screen
+        // even when a slow MACHINE spent the soft budget while the network
+        // stayed healthy. The exemption adds no network wait (the inline wait
+        // below is already 0 past the reserve boundary) and the hard deadline
+        // still bounds the entry via prewarmEntryShouldDefer. Constrained
+        // profiles never run this entry, so the conditional exemption form
+        // the tail entries use has nothing to gate here.
+        deadlineExempt: true,
+        run: async () => {
+          if (!skyAssetPrefetch) return;
+          const waitMs = skyAssetInlineWaitMs({
+            nowMs: performance.now(),
+            deadlineMs: deadline,
+            reserveMs: PREWARM_BUILD_RESERVE_MS,
+            finishFullManifestBeforeReveal: policy.finishFullManifestBeforeReveal,
+          });
+          const outcome = await waitForPrefetch(skyAssetPrefetch, waitMs, sleep);
+          if (outcome === 'ready') {
+            // Settled: rethrow a fetch failure so the entry reports failed,
+            // exactly as the old inline await did.
+            await skyAssetPrefetch.task;
+            for (const biome of initialSkyBiomes) {
+              this.prewarmTexture(this.skyView.envTexture(biome));
+              this.ensureEnvironmentBiome(biome);
+              this.prewarmTexture(this.skyView.domeTexture(biome));
+            }
+            skyWarmedInlineBiomes = initialSkyBiomes.length;
+            skyWarmComplete = true;
+            return;
+          }
+          // Slow network: upload what already arrived, defer the rest. The
+          // compute budget stays with the manifest tail instead of this wait.
+          // Residency is the sky module's two-store predicate: envTexture's
+          // dome fallback means neither it nor domeTexture can probe env
+          // residency, and a dome-only biome inline here would PMREM (and
+          // cache for the session) the full-size dome fallback.
+          const split = partitionResidentSkyBiomes(initialSkyBiomes, (biome) =>
+            this.skyView.skyBiomeAssetsResident(biome),
+          );
+          for (const biome of split.resident) {
+            this.prewarmTexture(this.skyView.envTexture(biome));
+            this.ensureEnvironmentBiome(biome);
+            this.prewarmTexture(this.skyView.domeTexture(biome));
+          }
+          skyWarmedInlineBiomes = split.resident.length;
+          skyDeferredBiomes = split.missing;
+          // Every biome resident means every upload already happened inline;
+          // only the promise's settlement is outstanding, and a lane scheduled
+          // for it would log the full set as pending and then no-op through
+          // cache-elided steps.
+          if (split.missing.length === 0) skyWarmComplete = true;
+        },
+        progress: () => ({
+          done: skyWarmedInlineBiomes,
+          planned: initialSkyBiomes.length,
+          trimmed: skyDeferredBiomes.length > 0,
+        }),
+        detail: () =>
+          `biomes=${initialSkyBiomes.join(',')}` +
+          (skyDeferredBiomes.length > 0 ? `;deferred=${skyDeferredBiomes.join(',')}` : ''),
+      },
+      {
         id: 'world.initial-frame',
         category: 'world',
         priority: 70,
@@ -6719,9 +7013,11 @@ export class Renderer {
           }
           compileMode = 'async';
           const units = compileEntryUnits();
+          compileUnitsPlanned = units.length;
           for (let index = 0; index < units.length; index++) {
             if (performance.now() >= compileUnitDeadline) {
               const remaining = units.slice(index);
+              compileUnitsDropped = remaining.length;
               if (remaining.length > 0) {
                 droppedEntries.push({ id: 'programs.compile', units: remaining });
                 // Same rule as the whole-entry resumeUnits path above: the
@@ -6741,10 +7037,23 @@ export class Renderer {
             await Promise.resolve(units[index].run()).catch((err: unknown) => {
               console.warn(`Renderer async prewarm compile failed: ${units[index].id}`, err);
             });
+            compileUnitsDone++;
           }
           compileMs = roundMs(performance.now() - compileStart);
           compileTimedOut ||= compileMs > policy.compileMaxMs;
         },
+        // The compile-unit deadline (3219) drops the remaining units to the
+        // resume lane mid-entry; the summary must say so instead of counting a
+        // half-run compile as completed. The skipped-monolith arm plans no
+        // units and keeps the historical completed status.
+        progress: () =>
+          compileUnitsPlanned > 0
+            ? {
+                done: compileUnitsDone,
+                planned: compileUnitsPlanned,
+                trimmed: compileUnitsDropped > 0,
+              }
+            : null,
         detail: () =>
           `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}`,
       },
@@ -6790,14 +7099,19 @@ export class Renderer {
         required: false,
         // No resumeUnits: this would present real frames in a synchronous loop.
         run: () => {
-          const points = [p.pos, activeZone.hub];
-          for (const point of points) {
+          for (const point of skyZonePoints) {
             if (performance.now() >= gpuSubmitDeadline) break;
             this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
+            skyZonePasses++;
           }
         },
+        progress: () => ({
+          done: skyZonePasses,
+          planned: skyZonePoints.length,
+          trimmed: skyZonePasses < skyZonePoints.length,
+        }),
       },
       {
         id: 'render.settle-passes',
@@ -6807,12 +7121,16 @@ export class Renderer {
         required: false,
         // No resumeUnits: this is a tight loop of real presented renders.
         run: () => {
-          const minPasses = this.lowGfx ? 8 : 10;
-          while (renderPasses < minPasses && performance.now() < gpuSubmitDeadline) {
+          while (renderPasses < settleMinPasses && performance.now() < gpuSubmitDeadline) {
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
         },
+        progress: () => ({
+          done: renderPasses,
+          planned: settleMinPasses,
+          trimmed: renderPasses < settleMinPasses,
+        }),
         detail: () => `passes=${renderPasses}`,
       },
       {
@@ -6926,10 +7244,75 @@ export class Renderer {
         });
     }
 
+    // Sky uploads deferred behind a slow prefetch (or a deadline-dropped sky
+    // entry) join the world once their data arrives, on the same off-critical
+    // path treatment the live zone-crossing lane uses (prepareZoneSky's idle
+    // arm): chunked idle texture uploads plus the arbiter for the indivisible
+    // PMREM unit. Its own lane, deliberately NOT the droppedEntries resume
+    // above: that lane serially awaits each unit's settlement, so a unit
+    // holding the network wait would park dropped compile units behind a
+    // black-holed fetch (3217's releaseTail frees only the queue, never the
+    // resume lane's own await, and a never-settling tail would pin one of the
+    // queue's bounded tail slots for the session). Entering the queue only
+    // AFTER the data is resident keeps network waits out of both. Every step
+    // is cache-elided, so anything the entry already uploaded inline costs
+    // nothing here.
+    // The rejection gate: a prefetch that already failed has nothing for the
+    // lane to upload, and the entry (when it ran) already reported failed;
+    // scheduling the lane anyway would log a deferral for work that can never
+    // run and then warn a second time from the lane's catch.
+    if (skyAssetPrefetch && !skyWarmComplete && skyAssetPrefetch.rejection() === null) {
+      const resumeBiomes = initialSkyBiomes.slice();
+      // skyDeferredBiomes is the partitioned remainder when the entry ran;
+      // when the entry never ran (wholesale-deferred) it is empty and the
+      // pending work is the whole resume set.
+      const pendingBiomes = skyDeferredBiomes.length > 0 ? skyDeferredBiomes : resumeBiomes;
+      console.info(
+        `[entry-guard] sky prewarm deferred: pending=[${pendingBiomes.join(',')}] resume=${resumeBiomes.length}`,
+      );
+      // The trigger is a network promise that can settle minutes after this
+      // renderer is gone, and every await below yields: guard on the captured
+      // lifecycle generation like every other post-boot async path, or a stale
+      // completion would recreate GPU state (ensureEnvironmentBiome re-mints
+      // the pmremGenerator disposeRendererResources nulled) on a dead renderer.
+      const generation = this.lifecycleGeneration;
+      void skyAssetPrefetch.task
+        .then(async () => {
+          if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+          for (const biome of resumeBiomes) {
+            // BOOT_RESUME throughout: the dome/env uploads inside the helper
+            // must not outrank the lane's own PMREM unit below.
+            await this.prewarmTextureInIdle(
+              this.skyView.envTexture(biome),
+              GPU_WORK_PRIORITY.BOOT_RESUME,
+            );
+            if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+            await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+            if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+            await this.backgroundGpuWork.run(
+              () => this.ensureEnvironmentBiome(biome),
+              GPU_WORK_PRIORITY.BOOT_RESUME,
+              `sky-resume-pmrem:${biome}`,
+            );
+            if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+            await this.prewarmTextureInIdle(
+              this.skyView.domeTexture(biome),
+              GPU_WORK_PRIORITY.BOOT_RESUME,
+            );
+            if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+          }
+          console.info(`[entry-guard] sky prewarm resume done: biomes=${resumeBiomes.length}`);
+        })
+        .catch((err) => {
+          console.warn('Renderer deferred sky prewarm failed', err);
+        });
+    }
+
     const elapsed = performance.now() - started;
     const finalCounts = this.prewarmCounts();
     const manifestTimedOut = manifestEntries.filter((entry) => entry.status === 'timed-out');
     const manifestFailed = manifestEntries.filter((entry) => entry.status === 'failed');
+    const manifestPartial = manifestEntries.filter((entry) => entry.status === 'partial');
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),
@@ -6951,9 +7334,11 @@ export class Renderer {
       manifestPlanned: manifest.length,
       manifestEntries,
       manifestCompleted: manifestEntries.filter((entry) => entry.status === 'completed').length,
+      manifestPartial: manifestPartial.length,
       manifestSkipped: manifestEntries.filter((entry) => entry.status === 'skipped').length,
       manifestTimedOut: manifestTimedOut.length,
       manifestFailed: manifestFailed.length,
+      partialEntryIds: manifestPartial.map((entry) => entry.id),
       timedOutEntryIds: manifestTimedOut.map((entry) => entry.id),
       failedEntryIds: manifestFailed.map((entry) => entry.id),
       diagnosticsBaseline,
@@ -6969,7 +7354,8 @@ export class Renderer {
         `programs=${stats.programsBefore}->${stats.programsAfter} ` +
         `textures=${stats.texturesBefore}->${stats.texturesAfter} uploads=${stats.textureUploads} ` +
         `compile=${stats.compileMode}/${stats.compileMs}ms parallelCompile=${this.asyncCompileSupported} ` +
-        `skipped=${stats.manifestSkipped} timedOut=[${stats.timedOutEntryIds.join(',')}] ` +
+        `skipped=${stats.manifestSkipped} partial=[${stats.partialEntryIds.join(',')}] ` +
+        `timedOut=[${stats.timedOutEntryIds.join(',')}] ` +
         `failed=[${stats.failedEntryIds.join(',')}]`,
     );
     return stats;
@@ -8267,6 +8653,12 @@ export class Renderer {
     if (view && e.id !== this.sim.player.id) {
       view.compileReady = this.gateViewOnCompile(view, group);
     }
+    // Warm an already-mounted entity's engine clips at view creation too: the
+    // mountKey-edge preload below only fires on a CHANGE, but a remote rider
+    // entering interest range, or an already-mounted player logging in, is
+    // born with a mountKey and no edge to detect, so without this it always
+    // hits the cold path (see the edge-site comment near preloadMountEngine).
+    if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
   }
 
   // Shared core for every compile gate below: link `target`'s programs off the
@@ -9787,6 +10179,7 @@ export class Renderer {
     v.paladinOathChainVisual?.dispose();
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
+    this.audioSink?.mountEngineReset(id);
     this.views.delete(id);
   }
 
@@ -9966,7 +10359,7 @@ export class Renderer {
       this.runtimeViewCreateBudget(dt),
       createdViewTypes,
       Infinity,
-    );
+    ).created;
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
@@ -10986,7 +11379,13 @@ export class Renderer {
             sink.movement('swim', ax, ay, az, isSelf);
           }
         } else if (logicallyMounted && moving && !airborne) {
-          if (loco.speed >= FOOT_RUN_SPEED) {
+          // An engine mount (windup/loop/winddown take set, e.g. the tank
+          // mount) drives its own state machine every frame instead of the
+          // per-stride gait beat below; mountEngine reports whether this
+          // mountKey actually has one, so ordinary mounts fall through.
+          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
+            // handled entirely by mountEngine
+          } else if (loco.speed >= FOOT_RUN_SPEED) {
             v.stepAccum += loco.speed * dt;
             if (v.stepAccum >= MOUNT_STRIDE_RUN) {
               v.stepAccum = 0;
@@ -10995,6 +11394,19 @@ export class Renderer {
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
+        } else if (logicallyMounted && airborne) {
+          // Airborne while mounted (a jump, or hopping over a ledge): HOLD
+          // whatever engine-audio phase was already playing rather than
+          // polling mountEngine with moving=false, which would read the hop
+          // as a stop and run a full winddown-then-windup cycle for every
+          // little bump in the road. Skipping the poll entirely leaves the
+          // state machine (and any active loop) exactly where it was; the
+          // next grounded frame picks the state back up on its own branch.
+        } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
+          // Not moving while mounted (grounded and stopped): still poll an
+          // engine mount every frame so the winddown fires on the stop edge;
+          // a non-engine mount has nothing to do here (mountEngine no-ops).
+          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
         } else if (moving && !airborne) {
           v.stepAccum += loco.speed * dt;
           const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
@@ -11014,6 +11426,16 @@ export class Renderer {
           // lands promptly rather than after a full stride of travel.
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
+      } else if (sink && logicallyMounted) {
+        // Every other cue in the block above is a one-shot; an engine
+        // mount's loop is not, and this gate (SFX_MOVE_RANGE_SQ, 42yd) sits
+        // inside the panner's own audible falloff (MAX_DISTANCE, 46yd in
+        // sfx.ts). Without this, a rider who moves out of the 42yd gate
+        // while still moving leaves a frozen, never-advancing loop node
+        // playing at its last polled position until dismount or view
+        // removal. mountEngineReset is a safe no-op with no active engine
+        // state (an ordinary mount, or the loop already stopped).
+        sink.mountEngineReset(e.id);
       }
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
@@ -11281,6 +11703,21 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // A mountKey change (dismount, a live mount swap, or a fresh summon
+          // reusing this entity id) must drop any engine mount's windup/loop
+          // state; otherwise the old loop node stays connected forever once
+          // logicallyMounted goes false (the entity/view-removal reset at
+          // removeView() never fires for a live swap or dismount), and a swap
+          // would carry the old moving state into the new mount, skipping its
+          // windup.
+          this.audioSink?.mountEngineReset(e.id);
+          // Warm the new mount's engine clips right away (not e.g. lazily on
+          // the first movement frame): a cold first ride otherwise plays the
+          // windup through playAt's cold path (silently dropped past a 0.12s
+          // fetch/decode window) and the loop's cold path (a fallback fade-in
+          // instead of the immediate splice), reading as ~0.9s of silence
+          // then a swell. A no-op for an ordinary (non-engine) mount.
+          if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
         }
       }
 
@@ -12604,7 +13041,17 @@ export class Renderer {
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
+      collectRiftAmbientSources(this.sim.entities, this.riftAmbienceScratch);
+      // Early-out: no live rift ambience this frame, so skip building the
+      // merged array entirely and hand the static set straight through.
+      let points: readonly AmbientPointSource[] = this.ambientPointSources;
+      if (this.riftAmbienceScratch.length > 0) {
+        this.ambientPointsMergedScratch.length = 0;
+        for (const p of this.ambientPointSources) this.ambientPointsMergedScratch.push(p);
+        for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
+        points = this.ambientPointsMergedScratch;
+      }
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, points);
     }
   }
 
