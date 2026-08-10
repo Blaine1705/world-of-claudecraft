@@ -13031,4 +13031,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '심각',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '주의 필요',
   'hudChrome.perf.diagnostics.report.status.healthy': '정상',
+  'hudChrome.reliquary.progressText': '{owned}/{total}',
 };

@@ -13193,4 +13193,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
   'hudChrome.perf.diagnostics.report.status.healthy': 'норма',
+  'hudChrome.reliquary.progressText': '{owned}/{total}',
 };
