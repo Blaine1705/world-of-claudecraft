@@ -104,6 +104,12 @@ export interface PrewarmCompileUnitOptions<T> {
    *  scene walk, so redundant roots are pure wall-clock. A root with no keys
    *  is always kept (fail-open). */
   dedupeKeys?: (root: T) => Iterable<unknown>;
+  /** Caller-owned dedupe store shared ACROSS calls, so one logical compile
+   *  pass split over several submissions (an early manifest entry, the
+   *  compile entry's tail, a live-scene re-collection, the resume lane)
+   *  never resubmits a root or program signature an earlier call already
+   *  covered. Omitted, each call dedupes only against itself. */
+  sharedDedupe?: { seen: Set<T>; seenKeys: Set<unknown> };
   /** Roots per unit. One unit launches its batch's compiles and awaits them
    *  TOGETHER, so the 10 ms poll floors overlap instead of stacking. Each
    *  compile call keeps its own bounded synchronous prologue, so a batch
@@ -123,8 +129,8 @@ export function buildPrewarmCompileUnits<T extends object>(
   compile: (root: T) => unknown | Promise<unknown>,
   options?: PrewarmCompileUnitOptions<T>,
 ): PrewarmResumeUnit[] {
-  const seen = new Set<T>();
-  const seenKeys = new Set<unknown>();
+  const seen = options?.sharedDedupe?.seen ?? new Set<T>();
+  const seenKeys = options?.sharedDedupe?.seenKeys ?? new Set<unknown>();
   const batchSize = Math.max(1, options?.batchSize ?? 1);
   const units: PrewarmResumeUnit[] = [];
   for (const group of groups) {
