@@ -136,7 +136,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
   if (mob.dead) {
     ctx.onBossDeath(mob);
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
+    if (
+      mob.ownerId !== null &&
+      MOBS[mob.templateId]?.family !== 'demon' &&
+      MOBS[mob.templateId]?.family !== 'undead'
+    )
+      return;
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
@@ -149,7 +154,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       }
     }
     // a slain summoned demon unravels rather than respawning into the wild
-    if (mob.ownerId !== null && MOBS[mob.templateId]?.family === 'demon') {
+    if (
+      mob.ownerId !== null &&
+      (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
+    ) {
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
