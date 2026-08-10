@@ -2680,3 +2680,90 @@ the screenshot set. Outcome: PASS WITH ONE DEFECT FIXED.
   files, 1208 green; tsc clean. The screenshot set re-captured on the merged
   tree because the artwork overhaul changes the item art inside the shots;
   CI babysitting skipped at the owner's direction.
+
+## Phase 22 (2026-08-09): Population rarity + records close-out
+
+Fresh session per the phase file, with the starter prompt's live-state
+corrections in force. Outcome: COMPLETE; seven commits on the branch tip
+(CI repair 0338f59a87, sync merge f30db7dc5f, rarity server c9f03ad3dc,
+rarity UI ddd1330c8a, server pins 143c4a4c1f, review round 82f2008263,
+evidence set 4b9cd579cc) plus this docs commit.
+
+- FIRST ACTION (the handoff mandate): PR #2976's "PR checks (freshness,
+  typecheck, builds)" job was red because the Phase 21 polish commit used
+  hasCrestRecipe in tests/deed_icons.test.ts while its import hunk sat
+  uncommitted in the worktree; the one-line import was committed and pushed.
+  The follow-up full-suite shard red (tests/mob_portrait_source_manifest) was
+  INHERITED from the pre-sync base and is repaired by the release's own
+  portrait-manifest commits, which the STEP 0 sync brings.
+- STEP 0 sync: origin/release/v0.36.0 at a71841224d (19 commits: the warrior
+  shout SFX wave, the ci:changed --since hardening, fenbridge/portrait
+  fingerprint re-mints) merged clean as f30db7dc5f. Release-merge audit:
+  ZERO branch-owned overlap (441-file branch set vs the 56-file delta), no
+  new server-db mocks, no route additions, package.json delta is script
+  wiring only. tests/parity fully green with NO golden re-mint (the sync
+  carried no sim-state change), so the twice-recorded post-sync expectation
+  did not fire this time. PREMISE CORRECTION recorded: PR #2937 makes
+  ci:changed resolve its base via gate_discovery (a real --since), so the
+  recorded pre-push-floor rider about the inherited gate.json format red and
+  pushing with --no-verify is SUPERSEDED; both pushes this session ran the
+  floor green with no bypass.
+- STEP 1 recon (three parallel agents + first-hand reads): the deeds
+  population recipe end to end (deedRarityCounts, the 5-minute TTL
+  single-flight cache in main.ts, GET /api/deeds/rarity, fetch-per-open,
+  deedRarityFraction, the Sim null stub), the reliquary surface map (the
+  tooltip's owned-item EARLY RETURN, the tt-line count pin, the six parity
+  edit sites, five as-never world stubs), and the shot rig (the marker-token
+  selection trick, the two low-preset helpers). The phase file's stopping
+  rule did not fire: the deeds walk exists and the aggregation rides its
+  refresh; the phase premise that the blobs were "already loaded by the
+  existing aggregation pass" was FALSE (the deeds scan never detoasts state)
+  and is recorded as the cost the db reviewer measured.
+- Agent A (rarity) landed as designed; the review round then applied every
+  finding from FIVE fresh reviewers: privacy (the deeds-slice-first install
+  with one-TTL negative caching), cross-platform (the dead-alternate
+  negative pin replaced), frontend (the landing render moved onto the slow
+  band via a sig generation, the page-header focus key, the mount/skin kind
+  pins, the announce/focus/late-landing arms), qa-checklist (the mount
+  tri-kind doc correction, the duplicate denominator removed via handoff,
+  the serializer-layout cross-pin), and db-performance PRIMARY (measured:
+  the folding idea REFUTED, the single-detoast jsonpath guard is the real
+  2x lever and landed, the dedicated 10 s statement allowance replaced the
+  60 s heavy tier, the staleness bound, the observability line, the
+  per-process scope note, the observer-table lever recorded with its
+  trigger).
+- Measured figures (real Postgres 16, throwaway DB, dropped after): with
+  the final shape, reliquaryRarityCounts 62.1 ms median at 1000 eligible
+  characters and 268.7 ms at the 5000 cap (was 79.5/361.9 with the CASE
+  guard), deeds baseline 6.6/17.7 ms; one refresh per 5-minute TTL per
+  process worst case; a seeded malformed blob row (scalar and object where
+  arrays belong) proved the strict-jsonpath silent guard end to end. The
+  live dev DB served the endpoint at totalEligible 3,861 with 139 real
+  found counts.
+- Evidence: all four docs/screenshots/reliquary shots verified stale by
+  opening them (the char-sheet desktop was the marketing homepage; the
+  window pair was the 3/213 era; the char-sheet mobile framed equipment)
+  and recaptured at the low preset through change-aware targets, plus
+  tracker (strip, HUD placement, mobile chip), the current inspect card,
+  the rank-5 border on the own nameplate in world, and
+  rarity-online-desktop.png: a REAL registration on the live server, /dev
+  level+give through the real grant path, and the tooltip reading "Not yet
+  found / Drops from Morthen the Gravecaller in The Hollow Crypt / Found by
+  0.1% of collectors" against the real 3,861-character population. The
+  reliquary-phase21 set stays as committed (re-captured at QA on the
+  artwork tree); the reliquary-phase20 inspect pair stays as that phase's
+  era evidence.
+- Validation: tsc clean throughout; the targeted battery
+  (parity/wire/architecture/perf-budget/i18n/styles + all reliquary and
+  server suites) green after every round; the serializer-layout cross-pin,
+  the tunables allowance pin, and the staleness-bound arm added; biome on
+  every touched file; the bounded full vitest run before handoff (result in
+  the phase's final response).
+- The Phase 12 committed-comment corrections were re-verified post-merges:
+  zero occurrences of the banned world-gen attribution anywhere in the tree
+  (the one "world-gen" hit is the release-authored generic comment in
+  tests/duel.test.ts, not the false attribution).
+- CI note: the merge push at f30db7dc5f never received a check run (GitHub
+  race with the cancelled run), so the phase tip was pushed to give the
+  repaired, merged state a real run; the Phase 22 QA still owns the final
+  green.

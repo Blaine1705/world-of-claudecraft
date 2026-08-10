@@ -1,30 +1,20 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 20 COMPLETE (implementation, 2026-08-09), LOCAL and
-unpushed, awaiting Phase 20 QA per the phase-file cadence (QA owns the
-push and the deeper gate). Step 0 found the tree clean at 0d9fa3ecd0 with
-origin/release/v0.36.0 (5819c005a7) already an ancestor through the Phase
-19 QA sync, so no sync merge was owed and the base did not move during
-the phase. Landed: curator standing on the identity wire (Entity
-curatorRank/relicsOwned/relicsTotal, sparse keys crk/cro/crt, server-
-computed only, no facet member so the parity pin is unchanged), the
-inspect card's Reliquary standing line + border accent + rank-5 Curator
-sigil (the fourth flair badge), a live self-inspect overlay through
-selfCuratorStanding that fixes offline self-inspect and the up-to-60s
-online staleness at once, and SHEET_RECENT_RELICS on the public sheet and
-/c/ derived from the persisted blob with NO new DB read. The Phase 19
-deferred should-fix is CLOSED: the char-sheet signature latch
-(src/ui/char_sheet_sig_core.ts + refreshCharSheetIfChanged on the slow
-band) self-corrects the worn title AND border rows plus the earned-badge
-row and the completion pair. The portrait-ring forced-colors follow-up
-landed with it. Six fresh reviewers ZERO blocking (the db reviewer
-re-confirmed the no-new-read criterion by measurement), then three fresh
-fix-round reviewers found two blocking items (a stale inspect_instances
-pin, the unpinned accent placement), both applied and mutation-verified;
-differential harnesses proved the catalog memo hoist and the restore
-extraction byte-identical. Full record in progress.md "Phase 20".
-Next: Phase 20 QA (fresh session, phase-20-qa.md; re-check
-origin/release/v0.36.0 at Step 0, it moves often).
+Current phase: 22 COMPLETE (implementation + records close-out,
+2026-08-09), awaiting Phase 22 QA, the FINAL phase (phase-22-qa.md:
+whole-feature matrix, full gate, PR-body application, teardown offer).
+Phase 22 landed the realm population-rarity read (per-relic "Found by"
+tooltip lines and per-page "Illuminated by" header lines, online only,
+riding the deeds rarity refresh), recaptured the whole stale evidence
+set including a live-server rarity shot, and recorded the close-out
+riders. The session also repaired the PR's red CI (a dropped import
+hunk from the Phase 21 polish commit) and synced origin/release/v0.36.0
+(a71841224d, warrior shouts + ci:changed hardening + fenbridge
+re-mints; merge audited clean, zero branch-owned overlap, parity green
+with no golden re-mint). The PR-body draft awaits the maintainer in
+docs/prd/reliquary-perfection/phase-22-pr-body-draft.md; the Phase 22
+QA applies it via gh pr edit after the maintainer has seen it. See the
+"Phase 22" surfaces entry and the "Phase 22 riders" OPEN entry.
 Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
@@ -924,9 +914,114 @@ Update this line as phases complete.
   warfare landed as TWO pages at 47 epics; relic growth ran ~+123 slots vs the
   brief's ~+80 (warfare 47 vs 28 and spoils 31 account for it; the linear budget
   holds per the re-measure).
-- Phase 22: (pending)
+- Phase 22 (2026-08-09): Population rarity + records close-out. COMPLETE, LOCAL
+  until the CI-repair push (see the record). Rarity: reliquaryRarityCounts in
+  the NEW server/reliquary_rarity_db.ts (three strict-jsonpath lateral unnests
+  over the characters blobs: deedStats.itemsDiscovered, reliquary.marks,
+  reliquary.illuminatedPages, each filtered to catalog binds; weapon skins,
+  titles, AND mounts deliberately uncounted, the tri-kind exclusion is in the
+  facet doc), riding the deeds rarity refresh in main.ts: ONE single-flight
+  and 5-minute TTL for both aggregates per process, the deeds slice installed
+  BEFORE the heavier arm (a reliquary-only failure cannot blank deeds rarity
+  and is negative-cached one TTL), the deeds denominator handed over (no
+  second eligible COUNT in the shared refresh), the carried slice dropping to
+  empty past three TTLs, one observability log line per refresh, and the
+  module's own RELIQUARY_RARITY_STATEMENT_TIMEOUT_MS = 10s allowance (the
+  60s heavy tier across three statements could hold a pooled client for
+  minutes; the GUILD_BANK_LOG_TIMEOUT_MS lowering precedent). Served by the
+  RouteDef GET /api/reliquary/rarity (anonymous, publicReadRateLimited,
+  registry-only, surface corpus rows added). Facet: reliquaryRarity() on
+  IWorldReliquary (ninth member; parity pins 314/82/232 across all six edit
+  sites), Sim always null (the deedsRarity stub doctrine), ClientWorld lazy
+  shape-checked fetch. UI: fetch-per-open stores the aggregate and bumps a
+  painter-side sig generation; the SLOW BAND paints it world-driven (no
+  direct render: the IME hold, announce suppression, and focus restore all
+  stay intact), the page header carries tabindex -1 plus
+  data-focus-key="page-header" so a rebuild restores a deep-linked reading
+  position, the tooltip rarity line rides every exit path including the
+  owned full-item-tooltip early return via one cellRarityText resolver, the
+  aria composes through hudChrome.reliquary.cellAriaWithRarity
+  ('{base}, {rarity}', punctuation owned by the key), and the page header
+  shows pageRarityLine only for a counted page. Pure gates
+  reliquaryRarityFraction / reliquaryPageRarityFraction (hasOwn-gated,
+  clamped) in the reliquary_view core. Three new hudChrome.reliquary keys
+  (rarityLine 'Found by {percent} of collectors', pageRarityLine, the aria
+  composition key) with five non-Latin fills per M16; the 15 Latin locales
+  join the release fill worklist. Measured on real Postgres 16 (throwaway
+  DB, 4-8 KB raw blobs): 62.1 ms median at 1000 eligible characters, 268.7
+  ms at the 5000 cap (was 361.9 before the single-detoast jsonpath guard),
+  vs the 6.6/17.7 ms deeds baseline; live dev-DB proof at 3,861 eligible
+  characters in the committed rarity-online-desktop.png. Review shape: five
+  fresh reviewers (db-performance PRIMARY with measured refutations,
+  privacy, cross-platform, frontend, qa-checklist), every finding applied or
+  recorded with rationale in the record; the serializer-layout cross-pin
+  (tests/server/reliquary_rarity_db.test.ts) turns a save-shape rename into
+  a red test instead of silently zeroed counts. Records: all four stale
+  docs/screenshots/reliquary shots verified against live captures and
+  recaptured (low preset, change-aware targets, two NEW targets
+  char-sheet-reliquary and nameplate-border on the reliquary_phase22_closeout
+  marker), tracker/inspect/nameplate evidence added, and the online rarity
+  shot captured against the live server. The optional Overview
+  rarest-owned-relic card was DELIBERATELY skipped (a close-out phase does
+  not grow a new sig dimension and painter surface for a "may" item; the
+  recipe is reliquaryRarityFraction over ownershipOpts if the maintainer
+  wants it). PR-body draft: docs/prd/reliquary-perfection/
+  phase-22-pr-body-draft.md, shown to the maintainer in the phase's final
+  response; gh pr edit deliberately NOT run this session (the maintainer
+  sees the draft first; the final QA applies it).
 
 ## OPEN items / known gotchas
+- Phase 22 riders (2026-08-09, the close-out record; the release-side re-pin
+  chore rider the phase file named is OBSOLETE per the Phase 10 sync ruling
+  below and was NOT re-raised):
+  (a) RELEASE FILL WORKLIST addition: hudChrome.reliquary.rarityLine,
+  pageRarityLine, and cellAriaWithRarity pending in the 15 Latin locales
+  (five non-Latin fills landed in-change per M16; the aria composition key
+  needs only punctuation-true fills). The consolidated worklist otherwise
+  stands in the "i18n release fill" entry below plus the Phase 21/21-QA
+  additions entry; the v0.36.0 release carries its OWN pending rows, so the
+  release-tier worklist lists rows beyond the reliquary set.
+  (b) UPSTREAM FLAG for the maintainer: the v0.36.0 PvP W-L-D draws counters
+  were missing from the professions blob-growth census (the census red only
+  on the merged tree's full run at Phase 21 QA; the classification is
+  mirrored on this branch). The release should classify its own draws fields
+  in tests/professions blob-growth census so the next branch does not
+  inherit the same red; the sibling scrape blind spot is recorded at (g) of
+  the Phase 21 QA entries.
+  (c) Steam/Epic portal registration: cross-reference, the standing Phase 18
+  OPEN entry below is the record (nine achievement ids, the deploy-order
+  constraint, HOLD on ACH_RELIQUARY_COMPLETE); nothing new, not duplicated.
+  (d) The v0.35.0 usedBy locale-fill rider stands (PR #2935's material
+  used-by keys), cross-referenced, not duplicated here.
+  (e) DB scaling lever, recorded with its trigger per the db review: if the
+  rarity refresh exceeds 1 s at production scale or eligible characters
+  exceed 50k, build a character_relics observer table on the
+  character_deeds exemplar (idempotent ON CONFLICT insert at first find,
+  login reconcile) and convert the three blob unnests into indexed GROUP
+  BYs. Folding the three numerator statements into one pass is REFUTED by
+  measurement (Postgres detoasts per expression reference: folded ran 11 to
+  17 percent slower at identical buffer counts). Also recorded: the
+  "one walk per TTL" bound is PER REALM PROCESS (stated in the main.ts
+  comment); a deeds-ARM failure still installs nothing (pre-existing
+  no-backoff shape, now cheap because the reliquary arm never runs then);
+  production TOAST-vs-page-cache fit at large scale is the regime change to
+  watch (the db review's runtime-proof note).
+  (f) Recorded-not-changed from the review round, each with rationale: the
+  deedsRarityCache/refreshDeedsRarityShared NAMES now also govern the
+  reliquary slice (kept: the seam names are test-pinned and the comment
+  block states the double duty; renaming is churn without behavior); a
+  rarity response landing inside a page-celebration animation can strip the
+  celebration class one band tick after open (narrowed by the band-path
+  design to one extra repaint shortly after open; the deeds reattachFlash
+  recipe is the fix if it ever bites); the page header rarity line pops in
+  on the landing paint and shifts the grid about 15 px once per online open
+  (the deeds precedent has the same shape; reserving space would leave a
+  permanent gap offline); the online aria fold reads
+  "..., Found by 1.5% of collectors" with a mid-sentence capital (one
+  English value serves the tooltip and the fold; locales can fix their own
+  casing through the composition key); formatNumber renders "0%" below
+  roughly 1 in 2000 (the deeds precedent, unreachable at current
+  population).
 - Phase 21 QA COMPLETE (2026-08-09, record in progress.md): release re-sync
   (81dcf54d80) with one both-appended test conflict kept whole, the release
   merge audited clean, the release-added rift_boss_floor parity golden
