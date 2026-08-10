@@ -21,17 +21,17 @@ const CORRECTED_PORTRAITS = {
   drowsy_croaker: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    '68511815fd2b5928ec93cc5ab05242f712d5cc6a906633eff9050a82abb40b33',
+    'c1152c0280759863294bb97ed616485ccc2560db94edb9e3075446fdae0b5b3c',
   ],
   mere_lurker: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    '359500697d15641e72e2dc2906a8be1dfbbaacc6022467be15aa439d88285f93',
+    '80abf56c9439c500d500aab72370cfddcc5a22671dc6fa131a936526e1d4420f',
   ],
   the_meredark: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    'da6cd5c847381aa2f0ef37c3e17c84f01cde8ab00463e36be02a6c44516d03ac',
+    'cc833563eb0b8d23fd293100bb0744b149004136d01b37d722a61e91fa24c220',
   ],
   breach_wretch: [
     'mob_kobold',
@@ -112,14 +112,14 @@ const CORRECTED_TINTED_PORTRAITS = {
     'models/creatures/grubjaw.glb',
     0x145a32,
     0.04,
-    '5cb52fe0d4367c8f78939dd062df5d1132e0dc90e663dda16826aef5a0cbea90',
+    'dcb6b87b10521124dd2418981cd9d572c6281927202662bc922fe652b87bd496',
   ],
   the_wreck_warden: [
     'mob_bruiser',
     'models/chars/players/barbarian.glb',
     0x7a8a86,
     0.3,
-    '35c85cc65cc18a14f528c60d7c0a07f94b2331cf0b1c85137063d87ab82f5708',
+    '77179c62bad651d805473d92901f455d15dcfafcb0ca0e9c6c8345968e8c1cc1',
   ],
 } as const;
 

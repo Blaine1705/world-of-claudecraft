@@ -121,7 +121,7 @@ describe('G5: damage-scaled fear break', () => {
   it('Terror Canticle (aoeFear) applies chance-scaled fears', () => {
     const sim = new Sim({ seed: 7, playerClass: 'priest', autoEquip: true });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'pri_r8_psychic_scream' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 11: 'pri_r8_psychic_scream' } })).toBe(true);
     const mob = addTarget(sim, 3);
     sim.player.resource = sim.player.maxResource;
     sim.castAbility('psychic_scream');

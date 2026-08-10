@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "669364a4d583a3cbd52afc13f8feb120a46d81c80e88489e4f2b050d48d1d470",
-      "acceptedBytes": 264231
+      "acceptedSha256": "5f8956fe1a942171cf453830e6f0080b5b06b006bcba37d659072c6eadff8a64",
+      "acceptedBytes": 264930
     }
   ],
   "assets": [
@@ -2155,7 +2155,7 @@
       "kind": "mobPortrait",
       "id": "drowsy_croaker",
       "runtimeUrl": "/ui/mobs/drowsy_croaker.webp",
-      "acceptedSha256": "68511815fd2b5928ec93cc5ab05242f712d5cc6a906633eff9050a82abb40b33",
+      "acceptedSha256": "c1152c0280759863294bb97ed616485ccc2560db94edb9e3075446fdae0b5b3c",
       "acceptedBytes": 1862,
       "origin": "deterministic-rerender"
     },
@@ -2187,7 +2187,7 @@
       "kind": "mobPortrait",
       "id": "grubjaw",
       "runtimeUrl": "/ui/mobs/grubjaw.webp",
-      "acceptedSha256": "5cb52fe0d4367c8f78939dd062df5d1132e0dc90e663dda16826aef5a0cbea90",
+      "acceptedSha256": "dcb6b87b10521124dd2418981cd9d572c6281927202662bc922fe652b87bd496",
       "acceptedBytes": 2160,
       "origin": "deterministic-rerender"
     },
@@ -2211,23 +2211,23 @@
       "kind": "mobPortrait",
       "id": "mere_lurker",
       "runtimeUrl": "/ui/mobs/mere_lurker.webp",
-      "acceptedSha256": "359500697d15641e72e2dc2906a8be1dfbbaacc6022467be15aa439d88285f93",
-      "acceptedBytes": 1912,
+      "acceptedSha256": "80abf56c9439c500d500aab72370cfddcc5a22671dc6fa131a936526e1d4420f",
+      "acceptedBytes": 1910,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "the_meredark",
       "runtimeUrl": "/ui/mobs/the_meredark.webp",
-      "acceptedSha256": "da6cd5c847381aa2f0ef37c3e17c84f01cde8ab00463e36be02a6c44516d03ac",
-      "acceptedBytes": 1814,
+      "acceptedSha256": "cc833563eb0b8d23fd293100bb0744b149004136d01b37d722a61e91fa24c220",
+      "acceptedBytes": 1812,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "the_wreck_warden",
       "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
-      "acceptedSha256": "35c85cc65cc18a14f528c60d7c0a07f94b2331cf0b1c85137063d87ab82f5708",
+      "acceptedSha256": "77179c62bad651d805473d92901f455d15dcfafcb0ca0e9c6c8345968e8c1cc1",
       "acceptedBytes": 2612,
       "origin": "deterministic-rerender"
     },
