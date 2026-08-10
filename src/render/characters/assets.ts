@@ -32,6 +32,7 @@ import {
   itemOffhandModelUrl,
   itemWeaponModelUrl,
   manifestUrlsForGraphics,
+  modularVisualKey,
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
@@ -70,6 +71,14 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
+import {
+  createPaladinBastionSweepClip,
+  PALADIN_BASTION_SWEEP_CLIP,
+} from './paladin_bastion_sweep_clip';
+import {
+  createPaladinTemplarsVerdictClip,
+  PALADIN_TEMPLARS_VERDICT_CLIP,
+} from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
@@ -163,7 +172,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   emberwish_mote_of_the_dying_sun: 'VAR_WAND',
   meteorlatch_the_sky_s_last_judgment: 'VAR_CROSSBOW',
   starfall_judgment_of_the_heavens: 'VAR_MACE',
-  ice_fang: 'VAR_SWORD',
+  ice_fang: 'VAR_DAGGER', // Rimefang (rogue dagger): dagger grip, not sword
   glaciersplit: 'VAR_AXE',
   rimecrusher: 'VAR_MACE',
   frostbite: 'VAR_DAGGER',
@@ -1947,11 +1956,22 @@ export function resetCharacterProfileCaches(): void {
   prepared.clear();
 }
 
+// The two paladin attack clips synthesized at prepare time rather than baked
+// into a GLB, keyed to the source clip each derives from. Both the classic and
+// the modular paladin play them (the modular def mirrors the class clip map),
+// so prepareVisual synthesizes for both keys, and the modular clip-resolution
+// test resolves these names through their sources.
+export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> = {
+  [PALADIN_TEMPLARS_VERDICT_CLIP]: '2H_Melee_Attack_Chop',
+  [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
+};
+
 /** Test-only observation window into the shared tinted-material cache. */
 export const tintedMaterialInternalsForTest = {
   cacheSize: (): number => matCache.size,
   cacheIdleSize: (): number => matCache.idleSize,
 };
+
 
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);
@@ -1964,6 +1984,19 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const clip of gltf.animations) clips.set(clip.name, clip);
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
+  }
+  // The modular paladin mirrors the classic clip map (attackByAbility includes
+  // the synthesized Verdict and Sweep names), so it needs the same synthesis:
+  // its animUrls lead with the class GLB, which supplies both source clips.
+  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+    const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
+    if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
+    clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
+    const sweepBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_BASTION_SWEEP_CLIP]);
+    if (!sweepBase) {
+      throw new Error('Paladin Bastion Sweep requires 1H_Melee_Attack_Slice_Diagonal');
+    }
+    clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.

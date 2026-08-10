@@ -127,6 +127,10 @@ export const pt_BR: EnTranslations = {
         "label": "Equipar kit de nível 20",
         "description": "Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento."
       },
+      "biskit": {
+        "label": "Equipar kit BIS de nível 20",
+        "description": "Veste o conjunto épico ideal de uma especialização em todas as posições. Somente equipamento."
+      },
       "gold": {
         "label": "Adicionar ouro",
         "description": "Adiciona ouro à bolsa atual."
@@ -240,7 +244,8 @@ export const pt_BR: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana Baixa",
-      "lowEnergy": "Energia Baixa"
+      "lowEnergy": "Energia Baixa",
+      "lowFocus": "Foco baixo"
     },
     "talents": {
       "title": "Talentos",
@@ -316,6 +321,25 @@ export const pt_BR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condenação",
+      "fateThreadsLabel": "Fios do Destino",
+      "doomMeterUnlock": "Mover barra de recurso de Aflição",
+      "doomMeterLock": "Travar barra de recurso de Aflição",
+      "doomEmptyStatus": "Condenação {value} de {max}.",
+      "doomStatus": "Condenação {value} de {max}; {remaining}.",
+      "fateThreadsStatus": "Fios do Destino {value} de {max}.",
+      "fateThreadsConsumeReady": "Três Fios do Destino: Consumir pode tecê-los em Condenação adicional.",
+      "fateThreadsSentenceReady": "Três Fios do Destino: Sentence pode consumi-los para 18% de dano aumentado."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Fragmentos de Alma",
+      "ruinMeter": "Ruína",
+      "ruinStatus": "Ruína {value} de {max}"
+    },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Assistindo {name}"
     },
@@ -787,6 +811,14 @@ export const pt_BR: EnTranslations = {
     },
     "rest": {
       "resting": "Descansando"
+    },
+    "paladin": {
+      "devotion": "Devoção",
+      "devotionValue": "Devoção {value} de {max}",
+      "devotionAscensionCharges": "Devoção {value} de {max}. Ascensão: {charges} cargas.",
+      "devotionAscensionLast": "Devoção {value} de {max}. Ascensão: última carga.",
+      "ascensionLastAnnouncement": "Ascensão: última carga",
+      "ascensionSpenderAria": "Espaço de ação {slot}: {ability}. Consome uma carga de Ascensão."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1767,6 +1799,7 @@ export const pt_BR: EnTranslations = {
         "spellCritPct": "+{value}% de Acerto crítico com magias",
         "healthRegen": "Cerca de {value} de vida a cada 5 seg ao descansar",
         "manaRegen": "Cerca de {value} de mana a cada 5 seg ao descansar",
+        "manaRegenCombat": "Cerca de {value} de mana a cada 5 s em combate",
         "damageReduction": "Redução de dano contra um atacante de nível {level}: {value}%",
         "dpsFromAp": "Adiciona {value} de dano por segundo aos seus ataques"
       },
@@ -2151,18 +2184,36 @@ export const pt_BR: EnTranslations = {
     "auraEffect": {
       "dot": "Causa {value} de dano de {school} a cada {interval} s",
       "hot": "Restaura {value} de vida a cada {interval} s",
+      "mendingCurrent": "Armazena {value} de cura, liberada com o tempo ou consumida por Remendo em Cascata",
+      "mendingCurrentPercent": "Armazena cura equivalente a {pct}% da vida máxima para Remendo em Cascata",
       "absorb": "Absorve {value} de dano",
       "healAbsorb": "Absorve {value} de cura recebida",
       "thorns": "Causa {value} de dano de {school} aos atacantes",
+      "stasis": "Imune e incapaz de agir",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "imbueRange": "Arma imbuída: {min} a {max} de dano adicional no Verdict",
+      "petDamage": "Aumenta o dano do mascote em {pct}%",
+      "petHaste": "Aumenta a velocidade de ação do mascote em {pct}%",
+      "spellDamage": "Aumenta o dano de feitiço em {pct}%",
+      "spellHaste": "Aumenta a velocidade de conjuração em {pct}%",
+      "sated": "Não pode se beneficiar de outro efeito de aceleração em grupo",
+      "cauterizeFatigue": "Cauterizar não pode evitar outro acerto letal",
+      "castShield": "A conjuração não pode ser interrompida ou atrasada por dano",
       "dmgDone": "Aumenta o dano causado em {pct}%",
       "dmgDoneReduce": "Reduz o dano causado em {pct}%",
       "heatingUp": "Seu próximo acerto crítico consecutivo de construção de Fogo concede Embalo Ardente; um acerto não crítico remove o Aquecendo",
       "elementalConvergencePrimed": "Seu próximo feitiço da outra escola elemental concede Convergência Elemental",
+      "hunterFerocity": "{stacks} de Ferocidade da Matilha: seu companheiro causa {pct}% mais dano",
+      "cooldownCap": "{used} de {cap} s de redução de recarga usados nesta janela",
+      "funeralHarvestLock": "Funeral Harvest ainda não pode criar outro Fragmento de Alma",
+      "leadenHexLock": "Maldição Chúmbea ainda não pode enraizar este alvo novamente",
+      "forbiddenReflectionReady": "Sua próxima recarga elegível de Bruxo pode ser conjurada novamente",
+      "forbiddenReflectionLock": "Reflexo Proibido ainda não pode ser preparado novamente",
+      "internalCooldown": "Este efeito não pode ser acionado novamente até o temporizador expirar",
       "carriedFlag": "Você está carregando a bandeira inimiga. Cancele este benefício para soltá-la.",
       "battleStance": "Postura de Batalha: 10% mais geração de raiva",
       "berserkerStance": "Postura de Berserker: críticos 3% mais frequentes e 3% mais fortes",
@@ -2177,6 +2228,13 @@ export const pt_BR: EnTranslations = {
       "revengeFree": "Sua próxima Vingança não custa raiva",
       "victoryRush": "Ímpeto da Vitória está pronto",
       "maxHpPct": "Aumenta a vida máxima em {pct}%",
+      "enrage": "Dano causado aumentado em {damagePct}%, velocidade de ataque em {hastePct}% e velocidade de movimento em {movePct}%",
+      "suddenDeath": "Sua próxima Cova Prematura não custa Raiva e ignora seu requisito de vida",
+      "aoeEcho": "Restam {charges} ecos: habilidades de alvo único causam {pct}% de dano a até {targets} inimigos próximos",
+      "sureCrit": "{charges} lançamentos de habilidades que causam dano são acertos críticos garantidos",
+      "temporalEcho": "O dano Arcano do conjurador cura você em {singlePct}% do dano de alvo único ou {areaPct}% do dano em área",
+      "arcaneCharge": "{stacks} Cargas Arcanas: Onda de Éter causa {damagePct}% mais dano, conjura {castPct}% mais rápido e custa {costMult}x de mana",
+      "physicalReduction": "Reduz o dano Físico sofrido em {pct}%",
       "temporalHourglass": "Imune e incapaz de agir; restaura vida e acelera a recuperação de recarga. Clique com o botão direito para cancelar.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Seus feitiços de Fogo sempre causam acerto crítico",
@@ -2186,6 +2244,22 @@ export const pt_BR: EnTranslations = {
       "freeCast": "Seu próximo lançamento não tem custo",
       "instantCast": "Seu próximo feitiço com tempo de lançamento é instantâneo",
       "cheapCast": "Seu próximo feitiço custa {pct}% menos",
+      "radiantResonance": "Sua próxima Luz Restauradora é instantânea, ou seu próximo Abraço da Alvorada custa {pct}% menos mana e é conjurado em {castTime} s",
+      "solarReprisal": "Seu próximo Disco Solar não custa mana, ignora a recarga e causa {pct}% mais dano; o Martelo da Graça ignora a recarga e cura você em 100% do dano causado; ou a Luz Restauradora é instantânea",
+      "dawnsWrath": "MdI: qualquer vida · +1 uso · Recarga 0 · +{pct}% de dano",
+      "venomRitual": "Ritual de Veneno: estágio {stacks} de {max}. Golpes geradores adicionam estágios; em {max}, Sono Eterno vira Dilacerveneno",
+      "gloam": "Penumbra: estágio {stacks} de {max}. Em {max}, suas aberturas do Véu Crepuscular se liberam a céu aberto, e a próxima lançada é GRATUITA e detona a reserva no véu de sombras",
+      "redline": "Linha Vermelha: marca {stacks} de {max}. Golpes no Corpo adicionam marcas; o Golpe de Misericórdia atinge {pct}% mais forte por marca e encerra a janela. Se expirar antes, ela é perdida",
+      "veilstrikeWindow": "Véu de Sombras: suas aberturas do Véu Crepuscular podem ser usadas a céu aberto de qualquer ângulo, e o dano causado aumenta {pct}%",
+      "veiledEdge": "Seu próximo Golpe do Espreitador atinge em dobro",
+      "duskEconomy": "As habilidades custam {pct}% menos energia",
+      "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
+      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Lobo e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
+      "verdance": "Verdor: estágio {stacks} de {max}. Lançamentos completados de Florescer Selvagem e Segundo Florescer o enchem; com {max}, Recuperação Rápida vira Superflorescência",
+      "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
+      "resourceSap": "Restaura {value} do seu recurso atual a cada {interval} s",
+      "nextAttackCrit": "Seu próximo ataque é garantidamente um acerto crítico",
+      "healEcho": "Cair abaixo de {threshold}% de vida restaura {value} de vida",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Aumenta o poder de feitiço em {value}",
@@ -2224,6 +2298,8 @@ export const pt_BR: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "bleedVuln": "Aumenta o dano de sangramento sofrido em {pct}%",
+      "sourceVuln": "Sofre {pct}% mais dano do conjurador que aplicou este efeito",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2237,14 +2313,46 @@ export const pt_BR: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "imbueRange": "Arma imbuída: {min} a {max} de dano adicional no Verdict",
+      "galeheartWeapon": "Completar a cadência de {steps} golpes do Espírito Guerreiro faz o golpe ecoar {count} vezes por {pct}% do seu dano como dano de Natureza",
+      "elementalTrance": "Dano sofrido reduzido em {pct}%. {mana}% de todo o dano que você causa é convertido em mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Forma de Bruin: vida e armadura aumentadas",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
       "formFireball": "Forma de Brasa: velocidade de movimento aumentada em {pct}%; ataques e feitiços desativados",
+      "formMoonkin": "Forma de Luniscante: dano de feitiço aumentado em {pct}% e armadura aumentada em {armorPct}%",
+      "formShadow": "Forma de Sombra: dano das Sombras aumentado em {pct}%",
+      "resourceCount": "{value} de {max}",
+      "formLich": "Soul Lance também atinge até {targets} inimigos próximos por {pct}% de dano",
+      "afflictionEye": "Maledict Gaze ataca a cada {interval} s; efeitos neste Eye geram {pct}% de Condenação",
+      "afflictionEyeSecondary": "Efeitos neste Eye geram {doomPct}% de Condenação; Sentence ecoa aqui por {echoPct}% de dano",
+      "afflictionAccomplice": "Dano qualificado concede {value} de Condenação, no máximo uma vez a cada {interval} s",
+      "afflictionViolence": "Restam {charges} represálias; um ataque inimigo concede {doom} de Condenação e causa {damage} de dano das Sombras de volta",
+      "afflictionVicarious": "Redireciona ou reduz {pct}% do dano recebido e pode gerar até {max} de Condenação",
+      "afflictionPossession": "Fortalece Needle of Fate, Consumir, Maledict Gaze e Sentence",
+      "afflictionJudgment": "O Eye primário gera {eyePct}% mais Condenação; Sentence causa {sentencePct}% mais dano e a primeira reembolsa {refund} de Condenação",
+      "afflictionLitany": "Ganhos de Condenação causam {damage} de dano das Sombras a até {targets} inimigos num raio de {radius} m, uma vez por segundo",
+      "afflictionFateThreads": "{stacks} Fios do Destino: Sentence causa {sentencePct}% mais dano, ou Consumir ganha {doom} de Condenação extra por tique",
+      "afflictionConsumeThreads": "Consumir está consumindo {stacks} Fios do Destino para {doom} de Condenação extra por tique",
+      "necromancyHarvestMark": "A morte pode criar 1 Fragmento de Alma",
+      "necromancyOssuaryMark": "Armazena {storedPct}% do dano seu e dos seus mortos-vivos, mais {lancePct}% do dano de Soul Lance; lance novamente para detonar. A morte explode num raio de {radius} m e cria 1 Fragmento de Alma",
+      "necromancyDeathEcho": "Eco da Morte legado; nenhuma habilidade atual o consome",
+      "warlockAnchor": "Lance novamente num raio de {range} m para retornar aqui e consumir a âncora",
+      "formMetamorph": "Forma demoníaca: tamanho do corpo aumentado em {pct}%; outros bônus vêm em buffs separados",
+      "energyRegen": "Aumenta a regeneração de Energia em {pct}%",
       "defensiveStance": "Postura de Guarda: dano recebido reduzido, mais ameaça",
       "righteousFury": "Juramento Ardente: ameaça de dano Sagrado muito aumentada",
+      "overpowerCharge": "{stacks} cargas: seu próximo Golpe Mutilador causa {pct}% mais dano",
+      "sweepingStrikes": "Golpes de alvo único também atingem {targets} inimigo próximo por {pct}% de dano",
+      "fingersOfFrost": "{charges} cargas: Lança de Gelo trata o alvo como congelado e causa {pct}% de dano de congelado",
+      "brainFreeze": "Seu próximo Açoite Invernal é instantâneo e ignora a recarga",
+      "wintersChill": "{charges} cargas: feitiços compatíveis tratam este alvo como congelado",
+      "icicles": "Pingentes de Gelo {value} de {max}; em {max}, Estaca Glacial pode ser conjurada",
+      "desolation": "{charges} cargas: sua próxima Seta da Ruína conjura {castPct}% mais rápido ou sua próxima Chuva de Fogo cai imediatamente",
+      "ruinousBrand": "Restam {charges} cópias: feitiços diretos copiam {otherPct}% de dano para cá, ou {selfPct}% quando este for o alvo deles",
+      "duskfireClaim": "A morte concede {value} de Ruína",
+      "pyreGuardian": "Gera {ruin} de Ruína a cada {ruinInterval} s e causa {damage} de dano de Fogo num raio de {radius} m a cada {damageInterval} s",
+      "perfectMoment": "Dardos Etéreos não consomem Cargas Arcanas",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -4407,7 +4515,8 @@ export const pt_BR: EnTranslations = {
     "resourceName": {
       "rage": "Fúria",
       "mana": "Mana",
-      "energy": "Energia"
+      "energy": "Energia",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Todas as classes",
@@ -4476,6 +4585,7 @@ export const pt_BR: EnTranslations = {
       "none": "Nenhuma classe atende a todos os filtros. Limpe um para ver mais."
     },
     "abilityHook": {
+      "evil_eye": "Nomeia o inimigo cujas ações e sofrimento alimentarão sua Condenação.",
       "heroic_strike": "Prepara um golpe mais pesado que gasta fúria no seu próximo ataque.",
       "revenge": "Atinge os inimigos à sua frente e pode ficar gratuita após uma esquiva ou aparada.",
       "hamstring": "Prejudica o movimento de um inimigo para impedir que ele escape.",
@@ -4486,9 +4596,21 @@ export const pt_BR: EnTranslations = {
       "holy_light": "Uma cura firme e considerável para recuperar um aliado ou você mesmo.",
       "devotion_aura": "Um aprimoramento próprio duradouro que aumenta a armadura para os golpes doerem menos.",
       "judgement": "Gasta seu Selo ativo para atingir um inimigo a curta distância.",
+      "hammer_of_wrath": "Executa um inimigo ferido à distância, ou qualquer inimigo enquanto suas asas estiverem ativas.",
+      "avenging_wrath": "Concede 10 de Devoção e então dobra a Devoção gerada por habilidades por quinze segundos.",
+      "bastion_sweep": "Varre um grupo com seu escudo para tomar a ameaça e acumular Devoção.",
+      "oath_chain": "Arrasta um inimigo distante para dentro da sua matilha e freia sua fuga.",
+      "veilbound_march": "Atravesse um grupo para marcá-lo, abrandar seu dano contra você e firmar a ameaça.",
+      "holy_shield": "Gasta Devoção em uma janela de bloqueio ativo, absorção e um pulso de ameaça.",
+      "consecration": "Reivindica o terreno ao seu redor com dano Sagrado e ameaça contínuos.",
+      "hammer_of_justice": "Detém um inimigo com um atordoamento curto e confiável.",
+      "lay_on_hands": "Restaura uma grande quantidade de vida quando um aliado está prestes a cair.",
       "blessing_of_might": "Aumenta o poder de ataque de um alvo amigo; bom para lançar antes da puxada.",
       "divine_protection": "Uma salvaguarda protetora rápida para absorver dano quando as coisas ficam difíceis.",
       "raptor_strike": "Um golpe corpo a corpo pesado para quando algo encurta a distância até você.",
+      "pack_command": "Ordena que seu companheiro golpeie e acumule Ferocidade da Matilha. Cada acúmulo faz seu companheiro causar 10% mais dano, até 30%, antes que Desencadear Fera gaste os acúmulos.",
+      "stampede": "Chama três feras para atacar por 12 segundos. Use-a com a Ferocidade da Matilha no máximo para que mantenham o bônus de dano completo durante toda a invocação.",
+      "measured_shot": "Um tiro à distância deliberado que restaura foco para seus ataques mais pesados.",
       "aspect_of_the_hawk": "Uma postura que você mantém ativa para aumentar seu poder de ataque à distância.",
       "serpent_sting": "Aplica uma peçonha que causa dano de natureza ao longo do tempo.",
       "arcane_shot": "Um tiro instantâneo à distância para um dano extra rápido.",
@@ -4507,11 +4629,21 @@ export const pt_BR: EnTranslations = {
       "power_word_shield": "Envolve um aliado num escudo que absorve os golpes antes que eles acertem.",
       "renew": "Uma cura que age ao longo do tempo, boa para lançar e seguir em movimento.",
       "lightning_bolt": "Uma conjuração de dano de Natureza à distância, sua opção preferida de longe.",
+      "chain_lightning": "Atinge um alvo e salta para dois inimigos próximos, acumulando um Trovão para toda a conjuração.",
+      "thunder_reservoir": "Acumula relâmpagos até que o Abalo Terreno ou o Terremoto possam liberar uma recompensa em plena potência.",
       "rockbiter_weapon": "Imbui sua arma para que cada golpe corpo a corpo acerte com mais força.",
       "healing_wave": "Sua cura principal, um restauro direto para você ou um aliado.",
       "earth_shock": "Um choque instantâneo para dano de Natureza rápido quando você precisa dele na hora.",
       "lightning_shield": "Carrega você de modo que os atacantes sofram dano de Natureza ao acertá-lo.",
       "flame_shock": "Uma queimadura instantânea que acerta de cara e continua escaldando ao longo do tempo.",
+      "galeheart_weapon": "Imbui as duas armas com ventos de tempestade e recompensa um ritmo constante de ataques.",
+      "warspirit_cadence": "Transforma um ritmo de arma constante em Ecos do Coração de Vendaval e em uma oportunidade de magia instantânea.",
+      "stormsurge": "Às vezes traz o Golpe Ancestral de volta mais cedo depois que você gasta uma oportunidade de Presságio de Tempestade.",
+      "lifespring_weapon": "Imbui sua arma com água restauradora e fortalece o fluxo contínuo de cura.",
+      "tidecall": "Invoca a maré e fortalece a próxima sequência de feitiços de cura.",
+      "ancestor_return": "Traz de volta à vida todos os membros caídos do grupo ou raide após uma longa conjuração fora de combate.",
+      "stoneward": "Ergue um escudo de pedra carregado que transforma dano recebido em cura.",
+      "primal_exaltation": "Libera brevemente o poder elemental da sua especialização.",
       "fireball": "Sua principal magia de fogo, acerta um golpe e deixa o alvo em chamas.",
       "fireball_form": "Torne-se uma brasa viva para cruzar terreno aberto em alta velocidade.",
       "frost_armor": "Um aprimoramento próprio duradouro que endurece sua armadura antes da luta.",
@@ -4537,17 +4669,14 @@ export const pt_BR: EnTranslations = {
       "healing_touch": "Uma cura potente de alvo único com conjuração longa, para recuperar alguém por completo.",
       "mark_of_the_wild": "Uma bênção duradoura que você coloca em si mesmo ou num aliado antes da luta.",
       "moonfire": "Acerta na hora e deixa o alvo em chamas, bom para usar em movimento.",
+      "moonseed": "Adiciona um estágio de Maré Lunar e estende Tempestade Lunar enquanto você está na Forma de Luniscante.",
       "rejuvenation": "Lança na hora e cura um aliado ao longo do tempo, para você continuar agindo.",
       "thorns": "Protege um aliado para que atacantes corpo a corpo se firam ao golpeá-lo."
     },
     "petHook": {
       "emberkin": "Um demônio de setas de fogo à distância que desgasta os inimigos de um ponto seguro.",
       "gloomshade": "Um demônio robusto que provoca e absorve golpes para você conjurar em paz.",
-      "duskborn": "Um demônio corpo a corpo rápido que acerta forte, mas cede sob pressão.",
-      "spellhound": "Um combatente sombrio que persegue conjuradores inimigos.",
-      "warfiend": "Um brigão corpo a corpo resistente, o faz-tudo assim que você consegue invocá-lo.",
-      "pyre_colossus": "Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta.",
-      "wraithborn": "Um conjurador de elite que despeja sombra pesada à distância."
+      "pyre_colossus": "Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta."
     },
     "bestiary": {
       "heading": "Bestiário",
@@ -7504,7 +7633,8 @@ export const pt_BR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energia",
-      "rage": "Raiva"
+      "rage": "Raiva",
+      "focus": "Foco"
     },
     "roles": {
       "warrior": "Tanque / DPS corpo a corpo",
@@ -7911,6 +8041,7 @@ export const pt_BR: EnTranslations = {
       "notEnoughRage": "Raiva insuficiente!",
       "notEnoughEnergy": "Energia insuficiente!",
       "notEnoughMana": "Mana insuficiente!",
+      "notEnoughDevotion": "Devoção insuficiente!",
       "notEnoughResource": "{resource} insuficiente!",
       "notEnoughHealth": "Saúde insuficiente.",
       "targetMustDodge": "Seu alvo precisa esquivar primeiro.",
@@ -8039,6 +8170,10 @@ export const pt_BR: EnTranslations = {
     "pet": {
       "attack": "Atacar",
       "waterJet": "Jato de Água",
+      "felbolt": "Descarga Vil",
+      "abyssalChain": "Corrente Abissal",
+      "autocastOn": "Autolançamento ativado. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para desativá-lo.",
+      "autocastOff": "Autolançamento desativado. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para ativá-lo.",
       "taunt": "Provocar",
       "healDemon": "Curar demônio",
       "healPet": "Curar mascote",
@@ -8049,6 +8184,10 @@ export const pt_BR: EnTranslations = {
       "petAttackDesc": "Comande seu mascote a atacar seu alvo hostil atual.",
       "waterJetTitle": "Jato de Água",
       "waterJetDesc": "Comanda seu Elemental de Água a canalizar um fluxo desacelerador por 3 segundos. Recarga de 8 segundos. Clique com o botão direito para lançar automaticamente sempre que estiver disponível.",
+      "felboltTitle": "Descarga Vil",
+      "felboltDesc": "Comande Emberkin para lançar um projétil vil extra no seu alvo. Recarga de 8 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.",
+      "abyssalChainTitle": "Corrente Abissal",
+      "abyssalChainDesc": "Comande Gloomshade para puxar de volta a si um inimigo normal a mais de 8 e até 20 m de distância. Chefes não podem ser puxados. Recarga de 15 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.",
       "petTauntTitle": "Provocação do mascote",
       "petTauntDesc": "Comande seu mascote a entrar em combate e usar Rosnar quando estiver ao alcance. Recarga de 10 segundos.",
       "healDemonDesc": "Gaste mana para canalizar cura no seu demônio por 5 segundos.",
@@ -8204,6 +8343,7 @@ export const pt_BR: EnTranslations = {
     "tooltip": {
       "rank": "Grau {rank}",
       "cost": "{cost} de {resource}",
+      "ruinCost": "{cost} de Ruína",
       "range": "{range} m de alcance",
       "rangeWithMin": "{min}-{max} m de alcance",
       "instant": "Instantâneo",
@@ -8215,6 +8355,7 @@ export const pt_BR: EnTranslations = {
       "requiresLevel": "Requer nível {level}",
       "requiresForm": "Requer Forma de {form}",
       "requiresStealth": "Requer furtividade",
+      "requiresStealthSkulduggery": "Requer furtividade (não necessária em 3 Gloam ou durante o Shadow Veil)",
       "requiresCombo": "Consome pontos de combo",
       "requiresTargetHealthBelow": "Requer alvo abaixo de {percent}% de saúde",
       "requiresDodge": "Só pode ser usado depois que o alvo esquiva",
@@ -8230,7 +8371,9 @@ export const pt_BR: EnTranslations = {
     "resources": {
       "mana": "mana",
       "rage": "raiva",
-      "energy": "energia"
+      "energy": "energia",
+      "focus": "foco",
+      "devotion": "Devoção"
     },
     "forms": {
       "bear": "urso",
@@ -8431,6 +8574,7 @@ export const pt_BR: EnTranslations = {
       "clickDestroy": "Clique para destruir",
       "useFishing": "Uso: pesca em águas próximas.",
       "useHealingPotion": "Uso: restaura instantaneamente {amount} de vida. Pode ser usada em combate. Recarga de 1 min.",
+      "useHealingPotionPct": "Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.",
       "useManaPotion": "Uso: restaura instantaneamente {amount} de mana. Pode ser usada em combate. Recarga de 1 min.",
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",
@@ -8668,6 +8812,58 @@ export const pt_BR: EnTranslations = {
         "name": "Saraivada",
         "description": "Dispara uma chuva de flechas na área-alvo por 3 s, causando {damage} de dano a cada 0,5 s aos inimigos atingidos."
       },
+      "pack_command": {
+        "name": "Comando da Matilha",
+        "description": "Ordena que seu companheiro vivo golpeie causando de 36 a 48 de dano Físico. O dano aumenta com o poder de ataque do companheiro. Um acerto restaura 20 de foco e concede 1 de Ferocidade da Matilha por 30 s, até 3. Cada acúmulo aumenta em 10% todo o dano causado pelo seu companheiro. Este golpe usa os acúmulos que você tinha antes do acerto."
+      },
+      "stampede": {
+        "name": "Debandada",
+        "description": "Invoca 3 feras por 12 s. Cada uma ataca a cada 2 s causando {damage} de dano Físico. O dano exibido inclui 8% do seu poder de ataque à distância antes dos bônus de dano de companheiro. As feras fixam a Ferocidade da Matilha ao serem invocadas, ganhando 10% de dano por acúmulo. Enquanto a Debandada está em recarga, Comandos da Matilha bem-sucedidos têm 20% de chance de reiniciá-la, garantido após 5 chances falhas. Ela não pode reiniciar enquanto as feras estiverem ativas. (Senhor da Matilha)"
+      },
+      "unleash_beast": {
+        "name": "Desencadear Fera",
+        "description": "Consome 3 de Ferocidade da Matilha depois que seu companheiro golpeia causando de 83 a 105 de dano Físico e sacode todos os inimigos a até 6 metros causando de 26 a 34. O golpe e a sacudida usam o bônus completo de 30% de dano de companheiro da Ferocidade da Matilha e aumentam com o poder de ataque do companheiro. Pelos 8 s seguintes, o companheiro causa 25% mais dano, ataca 35% mais rápido e faz o Tiro Vil atingir até 2 inimigos próximos."
+      },
+      "measured_shot": {
+        "name": "Tiro Medido",
+        "description": "Atira no alvo causando {damage} de dano Físico. Um acerto restaura 20 de foco. O dano aumenta com o poder de ataque à distância."
+      },
+      "cold_focus": {
+        "name": "Foco Gélido",
+        "description": "Por 12 s, o Tiro Medido restaura 50% mais foco, e o Puxo Longo custa 25% menos e é conjurado 30% mais rápido. (Distintivo de Visão Gélida)"
+      },
+      "bloodhook": {
+        "name": "Gancho Sangrento",
+        "description": "Avança contra um inimigo e aplica Ferida de Gancho Sangrento, causando 34 de dano Físico base mais 26% do seu poder de ataque à distância ao longo de 12 s em 4 pulsos. (Distintivo de Perícia de Campo)"
+      },
+      "shrapnel_charge": {
+        "name": "Carga de Estilhaços",
+        "description": "Atinge o alvo causando de 24 a 30 de dano Físico e até 4 outros inimigos a até 6 metros causando de 13 a 17. Os demais alvos também sangram por 12 de dano ao longo de 6 s. Se o alvo principal tiver sua Ferida de Gancho Sangrento, causa 1 pulso de ferida imediatamente. O dano direto aumenta com o poder de ataque à distância."
+      },
+      "bloodtrail_assault": {
+        "name": "Assalto da Trilha de Sangue",
+        "description": "Por 12 s, o Gancho Sangrento espalha uma ferida com 60% de força para até 2 inimigos próximos, o Rasga-Feridas comanda um ataque do companheiro de 18 de dano, e a Carga de Estilhaços ganha 2 metros, causa 25% mais dano base ao alvo principal e aciona 50% mais dano de ferida."
+      },
+      "trailbreak": {
+        "name": "Quebra-Trilha",
+        "description": "Salta 12 metros para trás. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s."
+      },
+      "wildheart": {
+        "name": "Coração Selvagem",
+        "description": "Restaura instantaneamente 30% da sua vida máxima."
+      },
+      "shellskin": {
+        "name": "Pele de Casco",
+        "description": "Reduz o dano sofrido em 60% por 8 s, mas impede ataques enquanto está ativa."
+      },
+      "frostjaw_trap": {
+        "name": "Armadilha Presa Gélida",
+        "description": "Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
+      },
+      "pack_rally": {
+        "name": "Reunião da Matilha",
+        "description": "Assume a Forma do Corcel e reúne aliados próximos com 30% de velocidade de movimento e 10% de velocidade de ataque e conjuração por 10 s."
+      },
       "hurricane": {
         "name": "Furacão",
         "description": "Desencadeia um furacão na área-alvo por 6 s, atingindo os inimigos e causando {damage} de dano de Natureza a cada segundo."
@@ -8882,15 +9078,20 @@ export const pt_BR: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Talho Perverso",
-        "description": "Golpe instantâneo com dano de arma mais {damage}. Concede 1 ponto de combo."
+        "description": "Um golpe instantâneo por dano da arma mais {damage}. Concede 1 ponto de combo.",
+        "specNote_assassination": "Adiciona 1 de Ritual de Veneno (máx. 6).",
+        "specNote_combat": "Enquanto a Redline está ativa, este botão se torna Golpe no Corpo: 130% do dano da arma mais 10, concede 2 pontos de combo e adiciona 1 nível de Redline (máx. 4)."
       },
       "eviscerate": {
         "name": "Sono Eterno",
-        "description": "Golpe final que causa {damage}."
+        "description": "Movimento finalizador que causa {damage}.",
+        "specNote_assassination": "Em 6 de Ritual de Veneno, este botão se torna Rasgaveneno: um golpe que causa instantaneamente todo o dano que seus sangramentos ainda causariam, planta uma nova ferida envenenada e restaura 20 de energia.",
+        "specNote_combat": "Acertar isso com 4 ou mais pontos de combo inicia a Redline por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (45 mais 35 por ponto de combo, 25% mais forte por nível de Redline, restaura 25 de energia). Gaste-o antes que a Redline termine."
       },
       "backstab": {
         "name": "Estocada Covarde",
-        "description": "Apunhala o alvo pelas costas, causando 150% do dano de arma mais {damage}. Você precisa estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo."
+        "description": "Crave sua adaga nas costas do alvo por 150% do dano da arma mais {damage}. Deve estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
+        "specNote_assassination": "Cada acerto adiciona 1 de Ritual de Veneno (máx. 6) e reembolsa 15 de energia. Em 6 de Ritual de Veneno, Sono Eterno se torna Rasgaveneno (causa instantaneamente todo o dano restante dos seus sangramentos de uma vez)."
       },
       "gouge": {
         "name": "Golpe no Olho",
@@ -8902,7 +9103,7 @@ export const pt_BR: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ritmo Degolador",
-        "description": "Golpe final que aumenta a velocidade de ataque corpo a corpo em 30%. Dura mais por ponto de combo."
+        "description": "Movimento finalizador que aumenta a velocidade de ataque corpo a corpo em 30% por 12 s mais 4 s por ponto de combo (5 pontos de combo: 32 s)."
       },
       "sprint": {
         "name": "Pés Ligeiros",
@@ -8910,15 +9111,17 @@ export const pt_BR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Golpe Baixo",
-        "description": "Golpe final que atordoa o alvo. Dura 1 s a mais por ponto de combo."
+        "description": "Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s)."
       },
       "ambush": {
         "name": "Golpe do Espreitador",
-        "description": "Embosca o alvo com 250% do dano de arma mais {damage}. Você precisa estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo."
+        "description": "Golpeia a partir das sombras por 250% do dano da arma mais {damage}. Deve estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
+        "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade e de qualquer ângulo: esse uso não custa nada, gasta todos os 3 Gloam, inicia o Shadow Veil de 6 s e causa o dobro de dano."
       },
       "stealth": {
         "name": "Véu Crepuscular",
-        "description": "Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Duskveil. Lance de novo para sair."
+        "description": "Oculta você nas sombras: os inimigos mal percebem sua presença, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.",
+        "specNote_subtlety": "Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3)."
       },
       "adrenaline_rush": {
         "name": "Sangue Acelerado",
@@ -8926,11 +9129,13 @@ export const pt_BR: EnTranslations = {
       },
       "garrote": {
         "name": "Fio na Garganta",
-        "description": "Garroteia o inimigo, causando {damage} de dano imediato e fazendo-o sangrar por {overTime} ao longo de 18 s. Requer modo furtivo. Concede 1 ponto de combo."
+        "description": "Enlaça um fio ao redor da garganta do inimigo, causando {damage} de dano agora e sangramento de {overTime} ao longo de 18 s. Deve estar furtivo. Concede 1 ponto de combo.",
+        "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade: esse uso não custa nada, gasta todos os 3 Gloam e inicia o Shadow Veil de 6 s."
       },
       "cheap_shot": {
         "name": "Soco no Estômago",
-        "description": "Atinge o alvo com {damage} de dano, atordoando-o por 4 s. Requer modo furtivo. Concede 2 pontos de combo."
+        "description": "Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Deve estar furtivo. Concede 2 pontos de combo.",
+        "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade: esse uso não custa nada, gasta todos os 3 Gloam e inicia o Shadow Veil de 6 s."
       },
       "sap": {
         "name": "Nocaute",
@@ -8942,11 +9147,11 @@ export const pt_BR: EnTranslations = {
       },
       "expose_armor": {
         "name": "Brecha na Armadura",
-        "description": "Golpe final que expõe o alvo, reduzindo sua armadura em {damage} por 30 s."
+        "description": "Movimento finalizador que expõe o alvo por 30 s: cada ponto de combo gasto reduz sua armadura em 2% (5 pontos de combo: {damage}%)."
       },
       "rupture": {
         "name": "Hemorragia",
-        "description": "Golpe final que fere o alvo, fazendo-o sangrar por {damage} ao longo de 16 s."
+        "description": "Movimento finalizador que fere o alvo: ele sangra a cada 2 s, por 6 s mais 2 s por ponto de combo (5 pontos de combo: 16 s e {damage} de dano total)."
       },
       "vanish": {
         "name": "Passo de Fumaça",
@@ -8968,17 +9173,129 @@ export const pt_BR: EnTranslations = {
         "name": "Marca do Juramento",
         "description": "Enche você de poder Sagrado por 30 s, fazendo cada golpe corpo a corpo causar {damage} de dano Sagrado adicional. Libere com Verdict."
       },
+      "judgement": {
+        "name": "Veredito",
+        "description": "Libera seu Selo ativo sobre o inimigo, consumindo-o para causar seu dano Sagrado armazenado."
+      },
       "holy_light": {
         "name": "Luz Restauradora",
         "description": "Cura um alvo aliado em {damage}."
       },
+      "divine_ascension": {
+        "name": "Ascensão Divina",
+        "description": "Consome 20 de Devoção para obter 5 cargas de Ascensão por até 45 s. Habilidades marcadas consomem uma carga e ganham um efeito adicional."
+      },
+      "aura_mastery": {
+        "name": "Concórdia Sagrada",
+        "description": "Por 8 s, fortalece todas as Devoções e Auras de Represália ativas do seu grupo. A Devoção do Bastião reduz o dano em 15%; a Represália causa 15 de dano Sagrado. Usos múltiplos renovam em vez de acumular."
+      },
+      "devotion_ward": {
+        "name": "Devoção do Bastião",
+        "description": "Reduz em 5% o dano sofrido por você e pelos membros do grupo até a morte ou substituição. Apenas esta aura e a Aura de Represália se substituem; as Devoções Radiante, da Alvorada e da Graça coexistem."
+      },
+      "hammer_of_grace": {
+        "name": "Martelo da Graça",
+        "description": "Arremessa instantaneamente um martelo sagrado em um inimigo a até 20 m causando {damage}, restaura 70 de mana, cura você em 50% do dano causado e gera 1 de Devoção quando causa dano. A Represália Solar permite que o Martelo da Graça ignore a recarga e cure você em 100% do dano causado."
+      },
+      "hushbrand": {
+        "name": "Marca do Silêncio",
+        "description": "Interrompe a conjuração e impede magias daquela escola por 4 s."
+      },
+      "guardian_covenant": {
+        "name": "Pacto do Guardião",
+        "description": "Protege um alvo aliado e você mesmo, reduzindo o dano sofrido em 20% por 8 s. Seleciona você por padrão quando nenhum alvo aliado está escolhido."
+      },
+      "solar_step": {
+        "name": "Passo Solar",
+        "description": "Aumenta sua velocidade de movimento em 150% por 2 s."
+      },
+      "solar_invocation": {
+        "name": "Invocação Solar",
+        "description": "Cura instantaneamente um aliado em {damage} ou causa dano Sagrado moderado a um inimigo. Qualquer um dos usos gera 1 de Devoção. Durante a Ascensão, uma conjuração de cura também cura pela metade os jogadores aliados a até 10 m do alvo."
+      },
+      "radiant_devotion": {
+        "name": "Devoção Radiante",
+        "description": "Aumenta o poder mágico seu e dos membros do grupo em 20 por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos."
+      },
+      "dawn_devotion": {
+        "name": "Devoção da Alvorada",
+        "description": "Aumenta o poder de ataque seu e dos membros do grupo em 40 por 30 min. Substitui sua própria Devoção Radiante ou da Graça, mas coexiste com as Devoções de outros paladinos e com os gritos de guerreiro."
+      },
+      "grace_devotion": {
+        "name": "Devoção da Graça",
+        "description": "Você e os membros do grupo recuperam 15 de mana a cada 5 s e pagam 3% menos mana por 30 min. Substitui sua própria Devoção Radiante ou da Alvorada, mas coexiste com as Devoções de outros paladinos."
+      },
+      "recall_the_fallen": {
+        "name": "Chamar os Caídos",
+        "description": "Traz de volta à vida um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo."
+      },
+      "beacon_of_light": {
+        "name": "Farol de Luz",
+        "description": "Marca um membro do grupo como seu Farol de Luz. 50% da sua cura direta efetiva em outro membro do grupo a até 60 m também cura o Farol. Curas em área e periódicas não são transferidas. Dura até que um de vocês morra."
+      },
+      "final_edict": {
+        "name": "Édito Final",
+        "description": "Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão Sagrada ao seu redor."
+      },
+      "dawnfall": {
+        "name": "Queda da Alvorada",
+        "description": "Causa {damage} de dano Sagrado aos inimigos próximos e gera 1 de Devoção. Atingir pelo menos um inimigo reduz em 2 s a recarga restante do Édito Final. A Ascensão aumenta seu dano e raio."
+      },
+      "sun_gods_verdict": {
+        "name": "Veredito do Deus Sol",
+        "description": "Julga um inimigo sob o Veredito do Deus Sol por 30 s. O Édito Final e a Queda da Alvorada inscrevem uma carga a cada acerto bem-sucedido. A habilidade que aplicar a terceira carga dita a sentença: o Édito Final desencadeia dano devastador sobre o condenado; a Queda da Alvorada detona o veredito, danificando e atordoando inimigos próximos por 1,5 s."
+      },
+      "valkyrs_calling": {
+        "name": "Chamado da Valquíria",
+        "description": "Ascende aos ares, tornando-se imune a dano enquanto voa em direção ao inimigo. Após 2 s, desce sobre a área alvo causando {damage} de dano Sagrado e gera 1 de Devoção. A Ascensão aumenta o dano de impacto em 50% e consome 1 carga."
+      },
+      "faithforged_guard": {
+        "name": "Dívida de Luz",
+        "description": "Por 8 s, o próximo golpe inimigo contra você recebe resposta: até {buff} de dano é negado e devolvido ao atacante como dano Sagrado, e você ganha 1 de Devoção. Apenas um golpe recebe resposta. A Ascensão aumenta em 50% a quantidade que ela pode responder."
+      },
+      "mercy_lance": {
+        "name": "Lança da Misericórdia",
+        "description": "Causa {damage} de dano Sagrado a um inimigo e gera 1 de Devoção quando causa dano. Durante a Ascensão, consome 1 carga para garantir um acerto crítico."
+      },
+      "sacred_form": {
+        "name": "Forma Sagrada",
+        "description": "Entra em um estado sagrado até a morte, aumentando a cura em 10% e a chance de crítico mágico em 5%, e reduzindo a ameaça gerada em 50%. Apenas para Curassóis."
+      },
+      "dawns_embrace": {
+        "name": "Abraço da Alvorada",
+        "description": "Libera uma cura poderosa e gera 1 de Devoção. A Ressonância Radiante reduz seu custo de mana em 50% e o tempo de conjuração para 1,5 s. A Ascensão a torna instantânea e aumenta sua cura em 35%."
+      },
+      "radiant_chorus": {
+        "name": "Coro Radiante",
+        "description": "Cura aliados próximos em {damage} e gera 1 de Devoção. Curar efetivamente ao menos 2 aliados concede Ressonância Radiante: sua próxima Luz Restauradora é instantânea, ou seu próximo Abraço da Alvorada custa 50% menos mana e é conjurado em 1,5 s. A Ascensão aumenta a cura e o raio do Coro Radiante."
+      },
+      "life_covenant": {
+        "name": "Pacto da Vida",
+        "description": "Reduz em 40% o dano sofrido por um aliado por 6 s. Durante a Ascensão também concede um escudo de 120 pontos sem consumir carga."
+      },
+      "aegis_first_dawn": {
+        "name": "Égide da Primeira Alvorada",
+        "description": "Canalize por 5 s, criando uma cúpula sagrada de 10 metros. Aliados dentro dela são curados a cada segundo e sofrem 50% menos dano. Concluir a canalização libera uma cura final e concede 30% de velocidade de movimento por 4 s."
+      },
+      "vowkeeper_strike": {
+        "name": "Golpe do Guardião dos Votos",
+        "description": "Golpeia com ameaça elevada e gera 1 de Devoção. Um golpe bem-sucedido tem 20% de chance de conceder Represália Solar por 8 s; cada bloqueio bem-sucedido tem 25%. A Represália Solar potencializa seu próximo Disco Solar, Martelo da Graça ou Luz Restauradora. A Ascensão também concede um pequeno escudo de absorção."
+      },
+      "bastion_rite": {
+        "name": "Rito do Bastião",
+        "description": "Reduz o dano físico sofrido em 20% e aumenta a chance de bloqueio em 20% por 6 s. A Ascensão estende a duração para 10 s."
+      },
+      "sunward_disc": {
+        "name": "Disco Solar",
+        "description": "Requer um escudo. Arremessa um disco radiante que atinge e depois ricocheteia entre inimigos próximos. Cada impacto danoso gera 1 de Devoção. A Represália Solar faz o Disco Solar não custar mana, ignorar a recarga e causar 20% mais dano. A Ascensão potencializa 5 ricochetes."
+      },
+      "sacred_challenge": {
+        "name": "Aguilhão Sagrado",
+        "description": "Obriga um inimigo a atacar você. Durante a Ascensão também reduz em 15% todo o dano recebido por 4 s sem consumir carga."
+      },
       "devotion_aura": {
         "name": "Aura Inabalável",
         "description": "Aumenta sua armadura em {buff} por 30 min."
-      },
-      "judgement": {
-        "name": "Veredito",
-        "description": "Libera seu Selo ativo sobre o inimigo, consumindo-o para causar seu dano Sagrado armazenado."
       },
       "blessing_of_might": {
         "name": "Juramento de Ferro",
@@ -8986,7 +9303,7 @@ export const pt_BR: EnTranslations = {
       },
       "divine_protection": {
         "name": "Salvaguarda da Fé",
-        "description": "Uma salvaguarda protetora absorve {damage} de dano por 10 s."
+        "description": "Um escudo sagrado absorve {damage}% da sua vida máxima por {duration} s."
       },
       "hammer_of_justice": {
         "name": "Malho Dilacerante",
@@ -8994,7 +9311,7 @@ export const pt_BR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Extrema-Unção",
-        "description": "Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min."
+        "description": "Uma onda massiva de cura restaura {damage}% da sua vida máxima. Recarga de 10 min."
       },
       "holy_taunt": {
         "name": "Aguilhão Sagrado",
@@ -9010,7 +9327,23 @@ export const pt_BR: EnTranslations = {
       },
       "consecration": {
         "name": "Solo Sagrado",
-        "description": "Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado a cada 2 s por 10 s."
+        "description": "Consagra o chão por 9 s e causa {damage} de dano Sagrado a cada segundo. Guardiões da Fé sofrem 10% menos dano enquanto estiverem dentro."
+      },
+      "bastion_sweep": {
+        "name": "Varredura do Bastião",
+        "description": "Varre os inimigos em um arco frontal de 180 graus com seu escudo equipado causando {damage} de dano Sagrado com ameaça elevada e gera 1 de Devoção. A Ascensão aumenta o dano em 30% e o raio para 8 m."
+      },
+      "oath_chain": {
+        "name": "Corrente do Juramento",
+        "description": "Prende instantaneamente um inimigo distante com uma corrente sagrada. O inimigo avança até você a 18 m por segundo até alcançar 3 m, e então é lentificado em 50% por 4 s. Durante a Ascensão, prende um segundo inimigo próximo."
+      },
+      "veilbound_march": {
+        "name": "Marcha do Véu",
+        "description": "Torne-se etéreo por 4 s, ganhando 40% de velocidade de movimento e 30% de armadura e ficando imune a raízes, lentidões e deslocamentos. Inimigos que você atravessa recebem a Marca do Véu por 6 s: sofrem dano Sagrado a cada segundo, causam 20% menos dano em você e geram ameaça adicional. A primeira marca concede 1 de Devoção. Quando a marcha termina, inimigos marcados próximos sofrem uma explosão final. A Ascensão aumenta a explosão em 50% e os puxa levemente em sua direção."
+      },
+      "veilbound_mark": {
+        "name": "Marca do Véu",
+        "description": "Sofre dano Sagrado a cada segundo, causa 20% menos dano ao paladino que aplicou a marca e gera ameaça adicional em relação a esse paladino."
       },
       "righteous_fury": {
         "name": "Juramento Ardente",
@@ -9018,7 +9351,7 @@ export const pt_BR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura de Represália",
-        "description": "Envolve você em energia sagrada por 30 min, causando 5 de dano Sagrado a qualquer inimigo que o atinja corpo a corpo."
+        "description": "Envolve você e seu grupo em energia sagrada até a morte ou substituição. Inimigos que atingirem um aliado afetado corpo a corpo sofrem {buff} de dano Sagrado, e aliados afetados causam {buff} de dano Sagrado adicional com ataques automáticos."
       },
       "tame_beast": {
         "name": "Elo Selvagem",
@@ -9052,6 +9385,14 @@ export const pt_BR: EnTranslations = {
         "name": "Contra-Presa",
         "description": "Contra-ataca depois que o alvo esquiva, causando dano de arma mais {damage}. Não pode ser esquivado."
       },
+      "hunting_momentum": {
+        "name": "Ímpeto de Caça",
+        "description": "Passiva: o Golpe Estripador concede 1 de Ímpeto de Caça por 8 s, até 3. Com 3 acúmulos, o Rasga-Feridas causa 45% mais dano de golpe e consome os acúmulos. (Perícia de Campo)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Reentrada Armada",
+        "description": "Passiva: Quebra-Trilha renova o Ímpeto de Caça e prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. O Golpe Estripador causa 15% mais dano por acúmulo. O Gancho Sangrento causa de 18 a 24 de dano Físico adicional, aumentado em 15% por acúmulo e pelo seu poder de ataque à distância. Com 3 acúmulos, qualquer um dos ataques consome o Ímpeto de Caça. (Perícia de Campo)"
+      },
       "wing_clip": {
         "name": "Talho Aprisionador",
         "description": "Inflige um ferimento com {damage} de dano que reduz a velocidade do inimigo em 40% por 10 s."
@@ -9070,7 +9411,7 @@ export const pt_BR: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Disparo Febril",
-        "description": "Aumenta sua velocidade de ataque em 40% por 15 s."
+        "description": "Canaliza seis disparos rápidos ao longo de 2,4 s enquanto você se move. Cada disparo causa {damage} de dano físico."
       },
       "smite": {
         "name": "Punição",
@@ -9115,6 +9456,10 @@ export const pt_BR: EnTranslations = {
       "lightning_bolt": {
         "name": "Raio em Arco",
         "description": "Arremessa um raio que causa {damage} de dano de Natureza."
+      },
+      "thunder_reservoir": {
+        "name": "Reservatório de Trovão",
+        "description": "Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)"
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
@@ -9172,9 +9517,29 @@ export const pt_BR: EnTranslations = {
         "name": "Podridão Negra",
         "description": "Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Marca um inimigo como o foco das suas maldições. Mover o Evil Eye preserva a Condenação, mas não renova seu prazo de expiração de 20 s."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Seu Maledict Eye ataca seu Evil Eye primário selecionado a cada 2,5 s causando dano das Sombras. Possess the Evil Eye dobra sua velocidade de ataque."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Perfura o inimigo causando {damage} de dano das Sombras e gera 5 de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16."
+      },
       "life_tap": {
         "name": "Barganha Amarga",
         "description": "Converte {damage} de vida em {damage} de mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Vincula seu Maledict Eye quando nenhum aliado está selecionado, fazendo sua Maledict Gaze gerar 2 de Condenação. Vincular um membro de grupo selecionado faz apenas o dano dele ao seu Evil Eye gerar 3 em vez disso. Um novo vínculo substitui o anterior e pode ser acionado uma vez a cada 2 s."
       },
       "curse_of_agony": {
         "name": "Praga da Angústia",
@@ -9183,6 +9548,46 @@ export const pt_BR: EnTranslations = {
       "drain_life": {
         "name": "Consumir",
         "description": "Drena a vida do alvo, transferindo {damage} de vida para você a cada segundo por 5 s."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Amaldiçoa seu Evil Eye primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 m, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Endurece sua pele em escória resfriada por 10 s, reduzindo todo o dano sofrido em 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Invoca um Soulwell por 3 min. Fora de combate, os membros do grupo podem reabastecer suas Pedras de Alma até 3. Uma Pedra de Alma restaura 25% da vida máxima e compartilha a recarga de poções."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Amaldiçoa o inimigo por 8 s. Suas próximas 3 ações de dano geram 7 de Condenação cada uma e o açoitam com 16 de dano das Sombras."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Sacrifica 12% da sua vida máxima para restaurar 1,5% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Vincula seu sofrimento por 8 s e gera até 15 de Condenação a partir de acertos hostis. Em você mesmo, reduz o dano sofrido em 20%. Em um aliado, redireciona até 20% para você sem levá-lo abaixo de 15% de vida."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "O Maledictor possui seu Evil Eye primário por 15 s e gera 35 de Condenação. Needle of Fate é conjurada em 1 s e gera 2 de Condenação extra, Consumir pode ser canalizado em movimento, e Sentence causa 25% mais dano e libera um eco retardado por 60% de dano, diminuindo para 30% entre os níveis 17 e 20."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Invoca o julgamento sobre seu Evil Eye primário por 15 s, concedendo 40 de Condenação e 3 Fios do Destino, ativando a Possessão, dobrando a Condenação gerada pelo Eye primário e aumentando o dano de Sentence em 20%. A primeira Sentence reembolsa 50 de Condenação."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Cria Evil Eyes secundários em até 4 inimigos próximos por 15 s. Eles alimentam a reserva compartilhada de Condenação a 50%, e Sentence ecoa até eles por 35% de dano."
       },
       "fear": {
         "name": "Atormentar",
@@ -9196,9 +9601,14 @@ export const pt_BR: EnTranslations = {
         "name": "Fogo Crepuscular",
         "description": "Atinge instantaneamente o alvo com sombra abrasadora, causando {damage} de dano de Sombra."
       },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo."
+      },
       "wrath": {
         "name": "Raio Selvagem",
-        "description": "Arremessa um projétil de energia natural, causando {damage} de dano de Natureza."
+        "description": "Arremessa um raio de energia da natureza causando {damage} de dano de Natureza.",
+        "specNote_balance": "Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, Semente Lunar se torna Onda Lunar e Raio Selvagem se torna Despertar Solar."
       },
       "healing_touch": {
         "name": "Cura Selvagem",
@@ -9210,11 +9620,17 @@ export const pt_BR: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempestade Lunar",
-        "description": "Queima o inimigo com fogo lunar, causando {damage} de dano Arcano e dano ao longo do tempo."
+        "description": "Queima o inimigo com fogo lunar causando {damage} de dano Arcano mais dano ao longo do tempo.",
+        "specNote_balance": "Mantenha-o queimando: Semente Lunar o estende em 6 s."
+      },
+      "moonseed": {
+        "name": "Semente Lunar",
+        "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até 6 s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar."
       },
       "rejuvenation": {
         "name": "Florescer Selvagem",
-        "description": "Cura o alvo em {damage} ao longo de 12 s."
+        "description": "Cura o alvo em {damage} ao longo de 12 s.",
+        "specNote_restoration": "Plantar uma NOVA floração adiciona 1 Verdance (máx. 5). Em 5 Verdance, Recuperação Rápida se torna Superflorescência."
       },
       "thorns": {
         "name": "Guarda de Espinhos",
@@ -9230,7 +9646,8 @@ export const pt_BR: EnTranslations = {
       },
       "maul": {
         "name": "Esmaga-Ossos",
-        "description": "Ataque brutal que aumenta o dano corpo a corpo em {damage} e causa muita ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin."
+        "description": "Um ataque brutal que aumenta o dano corpo a corpo em {damage} e causa uma grande quantidade de ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.",
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso escuda você em 18% da sua vida máxima e reembolsa 15 de raiva."
       },
       "growl": {
         "name": "Ameaçar",
@@ -9242,19 +9659,23 @@ export const pt_BR: EnTranslations = {
       },
       "claw": {
         "name": "Garra",
-        "description": "Arranha o inimigo com dano de arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Lobo."
+        "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Lobo.",
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
-        "description": "Golpe final que causa {damage}. Apenas Forma de Lobo."
+        "description": "Movimento finalizador que causa {damage}. Apenas Forma de Lobo.",
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha: uma mordida por 70 mais 43 por ponto de combo que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura 30 de energia."
       },
       "swipe": {
         "name": "Garras Varredoras",
-        "description": "Atinge inimigos próximos com {damage} de dano. Gera ameaça extra. Apenas Forma de Bruin."
+        "description": "Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.",
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "regrowth": {
         "name": "Segundo Florescer",
-        "description": "Cura um alvo aliado em {damage} e em uma quantidade adicional ao longo de 21 s."
+        "description": "Cura um alvo aliado em {damage} e uma quantidade adicional ao longo de 21 s.",
+        "specNote_restoration": "Plantar uma NOVA floração adiciona 1 Verdance (máx. 5)."
       },
       "barkskin": {
         "name": "Pele de Carvalho",
@@ -9270,7 +9691,8 @@ export const pt_BR: EnTranslations = {
       },
       "starfire": {
         "name": "Queda Celeste",
-        "description": "Invoca um raio de fogo estelar, causando {damage} de dano Arcano."
+        "description": "Invoca um raio de fogo estelar, causando {damage} de dano Arcano.",
+        "specNote_balance": "Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de 80 a 100 de dano de Natureza mais uma queimadura de 45 ao longo de 9 s, restaurando 35 de mana e gastando todos os 3."
       },
       "travel_form": {
         "name": "Forma de Fleet",
@@ -9286,7 +9708,7 @@ export const pt_BR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luz Bruxa",
-        "description": "Reduz a armadura do alvo em {damage}% por 40 s. Não acumula com Retalhar Armadura."
+        "description": "Reduz a armadura do alvo em {damage}% por 40 s."
       },
       "hibernate": {
         "name": "Sono Profundo",
@@ -9310,7 +9732,8 @@ export const pt_BR: EnTranslations = {
       },
       "rip": {
         "name": "Rasgar",
-        "description": "Golpe final que causa {damage} de dano de Sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo."
+        "description": "Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Lobo.",
+        "specNote_feral": "O acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -9338,7 +9761,99 @@ export const pt_BR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Cura em Cadeia",
-        "description": "Cura bastante um alvo aliado e depois salta para até 2 outros aliados próximos, curando 50% menos a cada salto. (Habilidade característica de Restauração)"
+        "description": "Cura um alvo aliado em {damage} e então salta para até 2 aliados num raio de 12 metros. Cada salto cura 50% do alvo anterior. Cada aliado alcançado consome sua Corrente Restauradora restante e cura imediatamente 125% da quantidade consumida. A cura inicial aumenta com o poder mágico. (assinatura Restauração)"
+      },
+      "galeheart_weapon": {
+        "name": "Arma Coração de Vendaval",
+        "description": "Encanta ambas as armas por 30 min, habilitando a Cadência do Espírito Guerreiro."
+      },
+      "warspirit_cadence": {
+        "name": "Cadência do Espírito Guerreiro",
+        "description": "Passiva: a cada 3.º ataque de arma acertado, aciona 2 Ecos do Coração de Vendaval causando 50% de dano de Natureza e concede Presságio de Tempestade por 12 s. O Presságio de Tempestade torna instantâneo seu próximo Raio em Arco, Abalo ou Águas Restauradoras e reduz o custo de mana em 50%. O Golpe Ancestral conta como 2 ataques. (Espírito Guerreiro)"
+      },
+      "stormsurge": {
+        "name": "Ressaca de Tempestade",
+        "description": "Passiva: enquanto o Golpe Ancestral está em recarga, consumir um Presságio de Tempestade tem 25% de chance de reiniciá-lo. Se as 3 primeiras chances falharem, a 4.ª sempre o reinicia. (Espírito Guerreiro)"
+      },
+      "lifespring_weapon": {
+        "name": "Arma Fonte da Vida",
+        "description": "Encanta sua arma por 30 min. Águas Restauradoras e o Chamado da Maré adicionam 20% mais cura à Corrente Restauradora."
+      },
+      "unleash_weapon": {
+        "name": "Desencadear Arma",
+        "description": "Desencadeia o encantamento ativo da sua arma. A Marca Pírica causa de 54 a 64 de dano de Fogo, ganha 30% do poder mágico e concede 2 de Trovão. O Coração de Vendaval golpeia com sua arma, avança a Cadência do Espírito Guerreiro e concede 20% de velocidade de ataque por 6 s. O Vínculo de Pedra golpeia por 75% do dano de arma, obriga o alvo a atacar você e reduz o dano sofrido em 20% por 4 s. A Fonte da Vida consome sua Corrente Restauradora, cura por 125% da cura restante e reduz o próximo golpe em 8 s em 50% da vida restaurada."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Entra em transe elemental por 15 s, reduzindo o dano sofrido em 30% e convertendo 20% de todo o dano que você causa em mana. (assinatura de Espírito Guerreiro)"
+      },
+      "primal_exaltation": {
+        "name": "Exaltação Primordial",
+        "description": "Por 12 s, o Raio em Arco e o Relâmpago Bifurcado do Chamado do Trovão são conjurados 50% mais rápido, e o Raio em Arco concede 2 de Trovão; o Espírito Guerreiro aciona sua cadência a cada 2 acertos de arma; o Remendo Espiritual adiciona 50% mais cura à Corrente Restauradora. (Talento de xamã)"
+      },
+      "stoneward": {
+        "name": "Guarda de Pedra",
+        "description": "Protege um aliado por 60 s com 6 cargas. O dano consome uma carga para curar 5% da vida máxima, uma vez a cada 3 s. (Talento de xamã)"
+      },
+      "tidecall": {
+        "name": "Chamado da Maré",
+        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo."
+      },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Rasga a alma do inimigo causando {damage} de dano das Sombras e cria 1 Fragmento de Alma, até 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Arremessa uma lança espectral causando {damage} de dano das Sombras. Contra seu Ossuary Mark, 50% do dano é adicionado à marca."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Ergue um companheiro defensivo permanente. O Guarda Tumular provoca automaticamente, intercepta 20% do seu dano através do Domínio Tumular, e Reaping Command o faz provocar e sofrer 30% menos dano por 4 s."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Gasta 1 Fragmento de Alma para adicionar um Guerreiro Esquelético permanente ao seu Domínio de 2 vagas. Apenas um pode servi-lo. Ele atinge em área os inimigos próximos por 45% de dano a cada 6 s, e Reaping Command imobiliza seu alvo com uma lentidão de 40% por 4 s."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Gasta 2 Fragmentos de Alma para adicionar um Mago de Ossos permanente à distância ao seu Domínio de 2 vagas. Apenas um pode servi-lo. Seus ataques expõem o alvo a 5% mais dano mágico por 6 s, e Reaping Command eleva essa fraqueza para 8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Envolve você em ossos, absorvendo dano igual a 20% da sua vida máxima."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Sacrifica primeiro um Mago de Ossos, depois um Guerreiro Esquelético, e uma Asa Tumular apenas como último recurso. Entre duplicatas, escolhe a que tem menos duração restante e, em seguida, a mais fraca, para causar {damage} de dano das Sombras no local escolhido."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "Quando um inimigo recentemente ferido por você ou por seus mortos-vivos morre, você ganha 1 Fragmento de Alma. Isso pode ocorrer uma vez a cada 3 s."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marca um inimigo por 12 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 m e cria 1 Fragmento de Alma."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Gasta 3 Fragmentos de Alma para comandar todos os seus mortos-vivos a causar 25% mais dano e agir 20% mais rápido por 12 s."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Destrói um servo do Domínio para restaurar 25% da sua vida máxima."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Gasta 2 Fragmentos de Alma para adicionar uma Asa Tumular permanente ao seu Domínio de 2 vagas. Apenas uma pode servi-lo. Ela atinge em área os inimigos próximos por 65% de dano a cada 5 s, e Reaping Command faz cada inimigo atingido sofrer 8% mais dano por 5 s."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Abre um portal tumular para erguer temporariamente um Guerreiro Esquelético, um Mago de Ossos e uma Asa Tumular por 20 s, preenchendo as vagas que os servos fixos do seu Domínio deixarem livres."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -9348,13 +9863,9 @@ export const pt_BR: EnTranslations = {
         "name": "Choque Sagrado",
         "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"
       },
-      "aura_surge": {
-        "name": "Ricochete da Alvorada",
-        "description": "Arremessa um escudo forjado ao alvorecer que causa {damage} de dano Sagrado, silencia o alvo principal por 2 s e ricocheteia em até 2 inimigos adicionais num raio de 10 m, causando 75% de dano por ricochete. (talento de Paladino)"
-      },
       "holy_shield": {
         "name": "Escudo Sagrado",
-        "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
+        "description": "Aumenta o bloqueio em 30% e concede por {duration} s um escudo de {damage}% da sua vida máxima. Ascensão fortalece a defesa."
       },
       "bestial_wrath": {
         "name": "Ira Bestial",
@@ -9382,15 +9893,15 @@ export const pt_BR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Frio",
-        "description": "Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)"
+        "description": "Concentra sua intenção mortal para que seu próximo ataque seja um acerto crítico. (assinatura de Knifework)"
       },
       "blade_flurry": {
         "name": "Torrente de Lâminas",
-        "description": "Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)"
+        "description": "Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura de Thuggery)"
       },
       "hemorrhage": {
         "name": "Hemorragia",
-        "description": "Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)"
+        "description": "Golpeia o inimigo com dano da arma mais {damage}, causa dano de sangramento ao longo de 12 s e aumenta o dano de sangramento sofrido em 40%. Concede 1 ponto de combo. A cada 2 usos, adiciona 1 Gloam (máx. 3). (assinatura de Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusão de Poder",
@@ -9426,7 +9937,27 @@ export const pt_BR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Recuperação Rápida",
-        "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)"
+        "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Plantios de Florescer Selvagem e Segundo Florescer adicionam Verdance; em 5 Verdance, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)"
+      },
+      "moonlash": {
+        "name": "Onda Lunar",
+        "description": "Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um."
+      },
+      "sunlance": {
+        "name": "Esteira Solar",
+        "description": "Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um."
+      },
+      "redharvest": {
+        "name": "Colheita Vermelha",
+        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura 30 de energia. Funciona sem pontos de combo."
+      },
+      "marrowbreak": {
+        "name": "Quebra-Medula",
+        "description": "Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria."
+      },
+      "overbloom": {
+        "name": "Superflorescência",
+        "description": "Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -9450,7 +9981,7 @@ export const pt_BR: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Invocar Pyre Colossus",
-        "description": "Vincula um Pyre Colossus à sua vontade, um colosso imponente com um corpo a corpo esmagador e a maior vida e armadura entre todos os demônios. Uma longa recarga limita seu poder bruto. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
+        "description": "Faz um Pyre Colossus cair na área-alvo, causando 58-72 de dano de Fogo no impacto. Ele luta por 30 s sem substituir seu demônio, queima inimigos próximos a cada 2 s e gera 1 de Ruína por segundo."
       },
       "summon_doomguard": {
         "name": "Invocar Wraithborn",
@@ -9608,13 +10139,17 @@ export const pt_BR: EnTranslations = {
         "name": "Relâmpago Bifurcado",
         "description": "Arremessa um raio na área-alvo, causando {damage} de dano aos inimigos próximos. (talento de Xamã)"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Abre uma fenda no local selecionado, puxando os inimigos num raio de 8 m para o centro dela, causando {damage} de dano das Sombras e atordoando-os por 2 s. Chefes sofrem o dano, mas resistem ao puxão e ao atordoamento."
+      },
       "chaos_bolt": {
         "name": "Seta da Ruína",
         "description": "Arremessa um raio de fogo caótico que causa {damage} de dano de Fogo. (talento de Bruxo)"
       },
-      "cleansing_verdict": {
-        "name": "Veredito Purificador",
-        "description": "Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada."
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifica 10% da sua vida atual para absorver dano igual a 30% da sua vida máxima por 8 s."
       },
       "cloak_of_shadows": {
         "name": "Manto Sombrio",
@@ -9642,15 +10177,11 @@ export const pt_BR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Última Prece",
-        "description": "Cura você instantaneamente em {damage}. (talento de Sacerdote)"
+        "description": "Cura você instantaneamente em 30% da vida máxima."
       },
       "deterrence": {
         "name": "Guarda Espinhosa",
         "description": "Aumenta sua chance de esquiva em 50 pontos percentuais por 10 s. (talento de Caçador)"
-      },
-      "divine_shield": {
-        "name": "Guarda de Luz",
-        "description": "Protege você com poder sagrado, absorvendo 900 de dano por 8 s. (talento de Paladino)"
       },
       "earthbind": {
         "name": "Terra Agarradora",
@@ -9659,6 +10190,10 @@ export const pt_BR: EnTranslations = {
       "evocation": {
         "name": "Poço Etéreo",
         "description": "Restaura mana rápidamente. (talento de mago)"
+      },
+      "flurry_of_knives": {
+        "name": "Rajada de Facas",
+        "description": "Açoita todos os inimigos num raio de 6 m com facas de arremesso, causando {damage} de dano físico e concedendo 2 pontos de combo. (talento de Ladino)"
       },
       "frenzied_regeneration": {
         "name": "Remendo Selvagem",
@@ -9670,7 +10205,7 @@ export const pt_BR: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Golpe Espectral",
-        "description": "Atinge o inimigo, causando o dano da arma mais {damage}, aumenta brevemente a esquiva e concede 1 ponto de combo. (talento de Ladino)"
+        "description": "Golpeia o inimigo com dano da arma mais {damage} e aumenta sua chance de esquiva em 15% por 7 s. Concede 1 ponto de combo. (talento de Ladino)"
       },
       "hammer_of_wrath": {
         "name": "Martelo Badalante",
@@ -9679,10 +10214,6 @@ export const pt_BR: EnTranslations = {
       "healing_stream": {
         "name": "Fonte Viva",
         "description": "Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)"
-      },
-      "holy_wrath": {
-        "name": "Ira do Santo",
-        "description": "Libera poder sagrado, causando {damage} de dano aos inimigos próximos. (talento de Paladino)"
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
@@ -9739,6 +10270,10 @@ export const pt_BR: EnTranslations = {
       "collective_reversal": {
         "name": "Reversão coletiva",
         "description": "Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)"
+      },
+      "ancestor_return": {
+        "name": "Retorno dos Ancestrais",
+        "description": "Chama de volta à vida, junto ao próprio corpo, todos os membros caídos do seu grupo ou raide com 30% de vida e mana. Não pode ser conjurada em combate. (Remendo Espiritual)"
       },
       "temporal_rewind": {
         "name": "Rebobinar",
@@ -9804,6 +10339,10 @@ export const pt_BR: EnTranslations = {
         "name": "Cortina de Fumaça",
         "description": "Você desaparece numa nuvem de fumaça, aumentando em 30% sua chance de esquiva por 8 s."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Aumenta a velocidade de movimento em 35%, mas sacrifica 2% da sua vida máxima a cada segundo. Lance de novo para cancelar. Desativa-se automaticamente com 20% de vida."
+      },
       "spellsteal": {
         "name": "Roubar Feitiço",
         "description": "Rouba um efeito mágico benéfico de um inimigo e o transfere para você."
@@ -9820,9 +10359,34 @@ export const pt_BR: EnTranslations = {
         "name": "Ordem de Silêncio",
         "description": "Silencia o alvo durante a conjuração e impede lançar feitiços dessa escola por 5 s."
       },
+      "thieves_chorus": {
+        "name": "Coro dos Ladrões",
+        "description": "Um assobio de sinal incita seu grupo: velocidade de ataque, lançamento e canalização aumentada em 10% por 10 s. Aliados afetados há pouco por um surto de aceleração de grupo estão exaustos demais para se beneficiar. (talento de Ladino)"
+      },
       "tranquility": {
         "name": "Canto do Bosque",
         "description": "Canaliza energia restauradora por 4 s, curando os aliados num raio de 30 m em 42 a 52 a cada segundo. (talento de Druida)"
+      },
+      "venom_dart": {
+        "name": "Dardo Venenoso",
+        "description": "Arremessa um dardo envenenado que causa {damage} de dano de Natureza. Concede 1 ponto de combo. Knifework: prolonga sua ferida de Dilaceração Venenosa em 6 s, até 20 s.",
+        "specNote_assassination": "Adiciona 1 de Ritual de Veneno e estende sua ferida envenenada em 6 s (a ferida nunca ultrapassa 20 s)."
+      },
+      "body_blow": {
+        "name": "Golpe no Corpo",
+        "description": "Um golpe pesado por 130% do dano da arma mais 10 que concede 2 pontos de combo e aprofunda a Redline em um nível. (motor de Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Golpe de Nocaute",
+        "description": "Encerre a Redline com um nocaute: golpeia por 45 mais 35 por ponto de combo, 25% mais forte por nível da Redline, e recupera 25 de energia. (motor de Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Golpe do Véu",
+        "description": "Consome a reserva de Lusco para envolver-se em sombras por 6 s: suas aberturas furtivas funcionam a descoberto e você causa 25% mais dano. (motor de Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Dilaceração Venenosa",
+        "description": "Consome o Ritual de Veneno: golpeia por 22 mais 26 por ponto de combo, detona o dano restante dos seus sangramentos e restaura 25 de energia. (motor de Knifework)"
       },
       "typhoon": {
         "name": "Tufão",
@@ -9831,6 +10395,30 @@ export const pt_BR: EnTranslations = {
       "voidfeast": {
         "name": "Banquete do Vazio",
         "description": "Devora um efeito mágico (um benéfico de um inimigo ou um nocivo de um aliado) e cura você em 6% da vida máxima."
+      },
+      "veilstep": {
+        "name": "Passo do Véu",
+        "description": "Atravessa o véu na direção para a qual você está olhando."
+      },
+      "scouring_mercy": {
+        "name": "Misericórdia Purificadora",
+        "description": "Causa de 72 a 84 de dano Sagrado a um inimigo ou cura um alvo aliado de 130 a 155. Ambos os valores aumentam com o poder mágico. O dano também cura em 30% cada aliado vinculado pela Doutrina, ou em 15% o membro do grupo com menos vida se nenhum aliado estiver vinculado. (Distintivo de Doutrina)"
+      },
+      "seraphic_vigil": {
+        "name": "Vigília Seráfica",
+        "description": "Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em 180. (Distintivo de Bênção)"
+      },
+      "summon_tithefiend": {
+        "name": "Invocar Demônio do Dízimo",
+        "description": "Consome todo o Dízimo Sombrio para invocar um Demônio do Dízimo por 6, 8, 10, 12 ou 15 s com 1 a 5 acúmulos. Ele ataca a cada 2 s causando de 20 a 24 de dano Sombrio, mais 8 por acúmulo extra. Com cinco acúmulos ele fica maior e seu dano aumenta 25%. Seu dano aumenta com o seu poder mágico. Ele prefere sua Efígie. Cada acerto restaura 1% do mana máximo e ecoa 15% do dano para até 3 outros inimigos com seu Canto de Decadência. (Distintivo de Vésperas)"
+      },
+      "martyrs_aegis": {
+        "name": "Égide do Mártir",
+        "description": "Reduz em 40% o dano sofrido por um aliado por 8 s."
+      },
+      "choir_of_deliverance": {
+        "name": "Coro da Libertação",
+        "description": "Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico."
       },
       "bear_charge": {
         "name": "Investida de Bruin",
@@ -9846,7 +10434,8 @@ export const pt_BR: EnTranslations = {
       },
       "rake": {
         "name": "Esfolar",
-        "description": "Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 s. Concede 1 ponto de combo. Apenas Forma de Lobo."
+        "description": "Esfola o inimigo por dano da arma mais {damage} e causa dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Lobo.",
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "revive_pet": {
         "name": "Remendar",
@@ -11363,6 +11952,18 @@ export const pt_BR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
       },
+      "rimefang": {
+        "name": "Presa de Geada"
+      },
+      "marrowpoint": {
+        "name": "Ponta de Medula"
+      },
+      "duskwhisper": {
+        "name": "Sussurro do Crepúsculo"
+      },
+      "boneglass_shiv": {
+        "name": "Faca de Vidro Ósseo"
+      },
       "moggers_hide_quiver": {
         "name": "Aljava de couro de Mogger"
       },
@@ -11389,6 +11990,9 @@ export const pt_BR: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Pão de Banquete Conjurado"
+      },
+      "soul_stone": {
+        "name": "Pedra de Alma"
       },
       "bristleback_maul": {
         "name": "Martelo Gallowglass"
@@ -12775,9 +13379,6 @@ export const pt_BR: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix o Rei dos Túneis"
       },
@@ -12799,17 +13400,8 @@ export const pt_BR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Maldrec o Atador-de-espectros"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Pyre Colossus"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Mãe-do-Coro Selthe"
@@ -12849,6 +13441,18 @@ export const pt_BR: EnTranslations = {
       },
       "water_elemental": {
         "name": "Elemental da Água"
+      },
+      "graveguard": {
+        "name": "Guarda Tumular"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Guerreiro Esquelético"
+      },
+      "necromancy_bone_mage": {
+        "name": "Mago de Ossos"
+      },
+      "necromancy_gravewing": {
+        "name": "Asa Tumular"
       }
     },
     "npcs": {
@@ -13475,6 +14079,16 @@ export const pt_BR: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "O Tomo da Alvorada",
+        "text": "A Luz não repousa em você em silêncio, {playerName}. Eu o vi dar paz aos mortos, e creio que está pronto para o que poucos paladinos chegam a aprender: o Rito do Chamado, pelo qual uma alma caída é chamada de volta aos vivos. Suas palavras estão guardadas no Tomo da Alvorada, aqui sob minha custódia, mas um livro não é bênção alguma enquanto os mortos inquietos ainda caminharem por este solo. Devolva mais 6 Ossos Inquietos à terra e começarei a ensiná-lo.",
+        "completion": "O pátio da capela fica em silêncio. Você está pronto para as palavras, {playerName}, mas o Rito do Chamado não pode ser pronunciado em uma capela morna. Ele precisa ser cantado onde o véu entre a vida e a morte se afina. Pretendo levar o Tomo ao norte, ao Pântano de Mirefen. Siga-me até lá e terminaremos isto.",
+        "objectives": {
+          "0": {
+            "label": "Ossos Inquietos postos em descanso"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Bandidos do Vale",
         "text": "Um bando de degoladores acampou nas colinas sudoeste. Três carroças foram roubadas esta semana. Mate 10 bandidos do Vale.",
@@ -13628,6 +14242,16 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Morto afogado devolvido ao descanso"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "O Rito do Chamado",
+        "text": "Então você me seguiu até o lodo, {playerName}. Bom. Tenho aqui o Tomo da Alvorada, e este solo afogado é onde suas palavras pertencem: em nenhum lugar o véu entre a vida e a morte é mais fino do que onde os mortos não permanecem enterrados. Mas os afogados arrastariam sua voz no meio do verso. Abra um espaço digno do rito: ponha 8 dos Afogados em descanso e o consagraremos juntos.",
+        "completion": "Ajoelhe-se, {playerName}, e leia as palavras em voz alta. Pronto. Sente isso? A Luz já não apenas restaura os vivos em suas mãos, ela pode convocar de volta aqueles que atravessaram. Use-a com sabedoria. Uma alma chamada de volta a uma luta sem esperança é uma crueldade, não uma misericórdia. Levante-se, Redentor.",
+        "objectives": {
+          "0": {
+            "label": "Afogados postos em descanso"
           }
         }
       },
