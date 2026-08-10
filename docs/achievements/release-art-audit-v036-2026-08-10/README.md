@@ -12,7 +12,14 @@ profession, chrome, mob portrait, and Guide image routes.
 - Added painted Emberkin Felbolt and Gloomshade Abyssal Chain pet-action icons.
 - Added a dedicated Vale Cup ball target portrait instead of the unrelated wolf fallback.
 - Normalized 36 oversized Mage and Warrior skill paintings to the 128px shipping contract,
-  reducing their combined size from 10,852,710 bytes to 271,244 bytes.
+  reducing their combined size from 10,852,710 bytes to 271,244 bytes. Three of the 36 are the
+  hand-authored ("custom-user") Warrior icons double_charge, crushing_charge, and
+  combat_mastery, which were serving full desktop resolution at 20x to 24x the converter's
+  15 KiB cap. Their bytes are pinned by `tests/warrior_authored_assets.test.ts`, so that pin
+  was updated deliberately in the same change, and the 128px contract was added beside it: the
+  paintings are untouched, the guard still fails on any substitution, and it now also fails on
+  a return to full resolution. Provenance is unchanged in
+  `public/ui/skills/warrior/mapping.json`.
 - Restored painted identity for 110 exact runtime aura states and 11 closed generated families
   while retaining generic art for ambiguous mob, control, sickness, and shared resource states.
 - Removed four same-row talent art collisions by selecting distinct existing painted sources.
