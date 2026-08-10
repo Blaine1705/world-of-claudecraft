@@ -56,9 +56,9 @@ export function createMountVisual(visualKey: string): CharacterVisual {
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
+  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
 ): CharacterVisual | null {
-  // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
+  // Forms are their own models. Skins and held weapons
   // only apply to the base body
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic

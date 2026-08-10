@@ -41,6 +41,10 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
+import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
+import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -153,11 +157,16 @@ import {
 } from './ability_damage';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
-import { auraDisplayNameFromSource } from './aura_display_name';
-import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
+import {
+  type AuraEffectInput,
+  auraEffectDescriptor,
+  auraEffectMaximumFractionDigits,
+} from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
 import { AuraOverlayController } from './aura_overlay_controller';
+import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, auraCancelNeedsConfirm, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -274,6 +283,7 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
+  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -290,6 +300,7 @@ import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
   PARTY_FRAME_POS_KEY,
   PLAYER_FRAME_POS_KEY,
@@ -322,7 +333,7 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -459,6 +470,7 @@ import {
 import { renderVendorWindow } from './hud/vendor/vendor_window';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
+import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
@@ -572,13 +584,16 @@ import {
   type SingleSlotCache,
   shouldWriteSingleSlot,
 } from './painter_host';
+import { PaladinDevotionPainter } from './paladin_devotion_painter';
+import { createPaladinDevotionView } from './paladin_devotion_view';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
-import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
+import { PET_ACTION_ICONS, petFeedButtonState, petSpecialButtonState } from './pet_action_icons';
+import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
 import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
@@ -602,6 +617,7 @@ import {
   chronoOverlayCharges,
   combustionOverlayActive,
   frostOverlayCharges,
+  necromancyOverlayCharges,
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
@@ -627,7 +643,7 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimText } from './sim_i18n';
+import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -638,7 +654,11 @@ import {
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
+import {
+  activeStanceBarAbilityId,
+  isStanceBarAbilityGroup,
+  stanceBarView,
+} from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -977,6 +997,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
+  focus: 'abilityUi.resources.focus',
 };
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
@@ -1494,6 +1515,12 @@ export class Hud {
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
+  private paladinDevotionFrameEl = $('#paladin-devotion-frame');
+  private paladinDevotionEl = $('#paladin-devotion');
+  private paladinDevotionFillEl = $('#paladin-devotion-fill');
+  private paladinDevotionLabelEl = $('#paladin-devotion-label');
+  private paladinAscensionCharges = $<HTMLElement>('.paladin-ascension-charges').children;
+  private paladinAscensionStatusEl = $('#paladin-ascension-status');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
@@ -2019,6 +2046,8 @@ export class Hud {
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
+      playerLevel: () => this.sim.player.level,
+      talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
       isInSportMatch: () => {
@@ -2275,6 +2304,10 @@ export class Hud {
     this.chatWindow.init();
     this.chatGeometry.init();
     this.initFrameMovers();
+    attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor', {
+      fx: 0.5,
+      fy: 0.72,
+    });
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.actionBarController.init();
@@ -2685,7 +2718,10 @@ export class Hud {
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
       if (mapPinch.isPinching() || !this.mapView || this.mapZoom <= 1) return;
-      const base = this.mapCenter ?? { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
+      const base = this.mapCenter ?? {
+        x: this.sim.player.pos.x,
+        z: this.sim.player.pos.z,
+      };
       this.mapCenter = { ...base };
       this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
       mapCanvas.setPointerCapture(ev.pointerId);
@@ -2991,7 +3027,11 @@ export class Hud {
     el.classList.toggle(cls, on);
   }
 
-  perfStats(): { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } {
+  perfStats(): {
+    hotDomWrites: number;
+    hotDomSkippedWrites: number;
+    hotDomSkipRate: number;
+  } {
     const total = this.hotDomWrites + this.hotDomSkippedWrites;
     return {
       hotDomWrites: this.hotDomWrites,
@@ -3029,7 +3069,10 @@ export class Hud {
       for (const win of windowsToSync) this.syncWindowOpenState(win);
     });
     document.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
-    this.windowObserver.observe(document.body, { childList: true, subtree: true });
+    this.windowObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
     this.syncAnyWindowOpenState();
 
     this.windowDragController = installWindowDrag({
@@ -3580,6 +3623,7 @@ export class Hud {
     this.targetFrameMover?.reset();
     this.playerFrameMover?.reset();
     this.partyFrameMover?.reset();
+    this.doomMeter.resetPosition();
   }
 
   /** Repaint persisted visual-space geometry after a live UI Scale change. */
@@ -3588,6 +3632,7 @@ export class Hud {
     this.targetFrameMover?.reapplyPosition();
     this.playerFrameMover?.reapplyPosition();
     this.partyFrameMover?.reapplyPosition();
+    this.doomMeter.reapplyPosition();
   }
 
   // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
@@ -3953,6 +3998,49 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private readonly paladinDevotionView = createPaladinDevotionView(
+    (value) => formatNumber(value, { maximumFractionDigits: 0 }),
+    (value, max, charges, lastCharge) =>
+      lastCharge
+        ? t('hudChrome.paladin.devotionAscensionLast', { value, max })
+        : charges !== '0'
+          ? t('hudChrome.paladin.devotionAscensionCharges', { value, max, charges })
+          : t('hudChrome.paladin.devotionValue', { value, max }),
+    t('hudChrome.paladin.ascensionLastAnnouncement'),
+  );
+  private readonly paladinDevotionPainter = new PaladinDevotionPainter(
+    this.writerFacet,
+    this.paladinDevotionFrameEl,
+    this.paladinDevotionEl,
+    this.paladinDevotionFillEl,
+    this.paladinDevotionLabelEl,
+    this.paladinAscensionCharges,
+    this.paladinAscensionStatusEl,
+  );
+  private readonly doomMeter = createDoomMeter(
+    document,
+    this.playerFrameEl.parentElement as HTMLElement,
+    this.playerFrameEl,
+    this.writerFacet,
+    {
+      label: () => t('hudChrome.warlock.doomLabel'),
+      formatCount: (value) => formatNumber(value, { maximumFractionDigits: 0 }),
+      formatEmptyStatus: (value, max) => t('hudChrome.warlock.doomEmptyStatus', { value, max }),
+      formatStatus: (value, max, seconds) =>
+        t('hudChrome.warlock.doomStatus', {
+          value,
+          max,
+          remaining: tPlural('hudChrome.plurals.secondsRemaining', seconds),
+        }),
+      fateThreadsLabel: () => t('hudChrome.warlock.fateThreadsLabel'),
+      formatFateThreadsStatus: (value, max) =>
+        t('hudChrome.warlock.fateThreadsStatus', { value, max }),
+    },
+    {
+      detachedParent: $('#ui'),
+      isMobileLayout: () => this.isMobileLayout(),
+    },
+  );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
@@ -3983,7 +4071,7 @@ export class Hud {
   // (proc_overlay_drag), class-toggled per frame via the elided writers
   // (proc_overlay_painter + the pure proc_overlay_view rule).
   private readonly procOverlayEl = (() => {
-    const el = buildProcOverlay();
+    const el = buildProcOverlay(t('hudChrome.procOverlay.soulFragmentsMeter'));
     document.body.appendChild(el);
     // Owner request: grab the phoenix while it burns and park it anywhere;
     // the spot persists (viewport fractions, so a resize keeps it sensible).
@@ -4066,7 +4154,11 @@ export class Hud {
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
-    resource: { container: this.pfResourceEl, fill: this.pfResEl, text: this.pfResTextEl },
+    resource: {
+      container: this.pfResourceEl,
+      fill: this.pfResEl,
+      text: this.pfResTextEl,
+    },
   });
   // The two cast bars are ONE instance-parameterized painter, over the
   // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
@@ -4183,7 +4275,7 @@ export class Hud {
     view: {
       iconId: resolveHudAuraIconId,
       auraName: (a) =>
-        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+        auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
       formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
       // Units are never rendered here (Infinity remaining -> blank label), so the
       // shared container is returned unrefreshed.
@@ -4276,7 +4368,7 @@ export class Hud {
   private readonly aurasViewDeps: AurasDeps = {
     iconId: resolveHudAuraIconId,
     auraName: (a) =>
-      ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+      auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
     durationUnits: () => {
       const u = this.auraDurationUnits;
@@ -4286,7 +4378,7 @@ export class Hud {
       u.d = t('hudChrome.unitFrame.durationUnitDays');
       return u;
     },
-    auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
+    auraEffectHtml: (a) => this.auraTooltipBodyHtml(a),
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
@@ -4420,9 +4512,8 @@ export class Hud {
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     saveLoadout: (name, bar, alloc, captureGear) =>
       this.sim.saveLoadout(name, bar, alloc, captureGear),
-    switchLoadout: (i) => this.sim.switchLoadout(i),
+    switchLoadout: (i, bar, alloc) => this.requestLoadoutSwitch(i, bar, alloc),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
-    applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
     inputDialog: (opts) => this.inputDialog(opts),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
@@ -5250,16 +5341,43 @@ export class Hud {
     return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
   }
 
+  // Complete aura tooltip body. A buff created by a known ability first shows that
+  // ability's localized, rank/talent-resolved description; the mechanical one-line
+  // descriptor follows when the aura kind has one. Proc-only auras without an ability
+  // definition still retain their descriptor. This keeps new ability buffs from
+  // silently degrading to name + timer just because their AuraKind is new.
+  private auraTooltipBodyHtml(a: AuraEffectInput & { id?: string }): string {
+    if (!a.id) return this.auraEffectTooltipHtml(a);
+    return renderAuraTooltipBodyHtml(a as AuraEffectInput & { id: string }, {
+      abilityDescription: (id) => {
+        const res = this.previewResolvedAbility(id);
+        if (!res) return null;
+        const p = this.sim.player;
+        const scaling: AbilityScaling = {
+          spellPower: p.spellPower,
+          rangedPower: p.rangedPower,
+          attackPower: p.attackPower,
+        };
+        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling);
+      },
+      effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
+      escapeHtml: esc,
+    });
+  }
+
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
-  // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
-  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  // (aura_effect.ts) resolved to localized, esc'd text. The descriptor is exhaustive
+  // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
+  // the view never calls t().
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
     const values: Record<string, string> = {};
     if (effect.nums) {
       for (const [k, n] of Object.entries(effect.nums)) {
-        values[k] = formatNumber(n, { maximumFractionDigits: 0 });
+        values[k] = formatNumber(n, {
+          maximumFractionDigits: auraEffectMaximumFractionDigits(n),
+        });
       }
     }
     // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
@@ -5314,6 +5432,10 @@ export class Hud {
       pointerFocusPending = true;
     });
     el.addEventListener('focusin', () => {
+      if (el.dataset.suppressFocusTooltip === 'true') {
+        delete el.dataset.suppressFocusTooltip;
+        return;
+      }
       if (pointerFocusPending) {
         pointerFocusPending = false;
         return;
@@ -5673,7 +5795,9 @@ export class Hud {
           t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
         )}</div>`;
         html += `<div class="tt-sub">${esc(
-          t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
+          t('hudChrome.options.itemScoreLine', {
+            score: itemNumber(itemScore(item), 1),
+          }),
         )}</div>`;
       }
     }
@@ -5794,6 +5918,8 @@ export class Hud {
     }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
+    if (item.potionHpPctMax)
+      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotionPct', { percent: formatNumber(item.potionHpPctMax * 100) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
     // Battle elixirs: the temporary stat-buff quaffing grants (sim/items.ts
@@ -5891,7 +6017,10 @@ export class Hud {
           jumps: n(e.jumps),
         });
       case 'attackSlow':
-        return t('hudChrome.itemProc.attackSlow', { pct: n(e.slowPct), duration: n(e.duration) });
+        return t('hudChrome.itemProc.attackSlow', {
+          pct: n(e.slowPct),
+          duration: n(e.duration),
+        });
       case 'dot':
         return t('hudChrome.itemProc.dot', {
           name: e.name ?? '',
@@ -5999,14 +6128,19 @@ export class Hud {
     for (const id of Object.values(sim.equipment)) {
       const item = id ? ITEMS[id] : null;
       if (!item || (!item.stats && !item.spellPower)) continue;
-      gear.push({ name: itemDisplayName(item), stats: item.stats, spellPower: item.spellPower });
+      gear.push({
+        name: itemDisplayName(item),
+        stats: item.stats,
+        spellPower: item.spellPower,
+      });
     }
     const buffs: BuffStatSource[] = p.auras.map((a) => ({
       kind: a.kind,
       value: a.value,
-      name: ABILITIES[a.id]
-        ? abilityDisplayName(ABILITIES[a.id])
-        : auraDisplayNameFromSource(a.name),
+      name: auraDisplayNameForHud(
+        a.name,
+        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null,
+      ),
     }));
     return buildStatTooltip(stat, {
       cls: sim.cfg.playerClass,
@@ -6107,6 +6241,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.doomMeter.relocalize();
     // The player unit frame's hp/resource text is memoized on the raw value,
     // which does not change on a locale switch, so clear the memo to force
     // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
@@ -6232,7 +6367,16 @@ export class Hud {
         if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
       }
     }
-    return { def, rank, cost, castTime, cooldown: def.cooldown, effects, threatFlat, threatMult };
+    return {
+      def,
+      rank,
+      cost,
+      castTime,
+      cooldown: def.cooldown,
+      effects,
+      threatFlat,
+      threatMult,
+    };
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
@@ -6255,6 +6399,21 @@ export class Hud {
         }),
       );
     }
+    if (a.devotionCost) {
+      costLine.push(
+        t('abilityUi.tooltip.cost', {
+          cost: formatAbilityNumber(a.devotionCost),
+          resource: t('abilityUi.resources.devotion'),
+        }),
+      );
+    }
+    if ((a.ruinCost ?? 0) > 0) {
+      costLine.push(
+        t('abilityUi.tooltip.ruinCost', {
+          cost: formatAbilityNumber(a.ruinCost ?? 0),
+        }),
+      );
+    }
     const rangeLine = abilityRangeLine(a);
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
@@ -6264,18 +6423,25 @@ export class Hud {
     // their effect in the tooltip.
     if (res.cooldown > 0)
       castLine.push(
-        t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
+        t('abilityUi.tooltip.cooldownSeconds', {
+          seconds: formatAbilityNumber(res.cooldown),
+        }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, this.sim.talents.spec))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
+      if (res.def.tooltipOmitEffectLines) break;
       if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
         // Pass the ability id so the effect line can resolve its damage school
         // (the {school} placeholder in the thorns/dot/absorb summaries).
-        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value, id: a.id });
+        html += this.auraEffectTooltipHtml({
+          kind: eff.kind,
+          value: eff.value,
+          id: a.id,
+        });
       } else if (eff.type === 'partyMeleeBuff') {
         // Sanguine Aura: surface the same composite line the buff icon shows.
         html += this.auraEffectTooltipHtml({
@@ -6285,7 +6451,7 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a);
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -6391,9 +6557,21 @@ export class Hud {
   abilityForSlot(barSlot: number): ResolvedAbility | null {
     // barSlot 1..33 (three desktop rows of eleven configurable slots)
     const action = this.actionForSlot(barSlot);
-    return action?.type === 'ability'
-      ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
-      : null;
+    if (action?.type !== 'ability') return null;
+    const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
+    if (!known) return null;
+    // Action-slot replacement: the saved binding keeps the base id while the
+    // painted button follows the aura state, the same pure resolution the sim
+    // cast path uses (rogue engine transforms for every class, plus the
+    // hunter-specific resolvers below).
+    const resolved = resolveActionReplacement(known, this.sim.player);
+    if (this.sim.cfg.playerClass !== 'hunter') return resolved;
+    const coldsight = resolveColdsightAbilityForSpec(
+      resolved,
+      this.sim.player,
+      this.sim.talents.spec,
+    );
+    return resolveHunterSharedAbilityForTalents(coldsight, this.sim.player, this.sim.talents);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {
@@ -7091,7 +7269,11 @@ export class Hud {
             e.preventDefault();
             return;
           }
-          this.dragAction = { action, sourceIndex: null, sourceAttackSlot: true };
+          this.dragAction = {
+            action,
+            sourceIndex: null,
+            sourceAttackSlot: true,
+          };
           this.writeDraggedAction(e.dataTransfer, action);
           if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
@@ -7238,7 +7420,15 @@ export class Hud {
       const rechargeOverlay = document.createElement('div');
       rechargeOverlay.className = 'recharge-overlay';
       btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
-      return { btn, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
+      return {
+        btn,
+        label,
+        countEl,
+        keybindEl,
+        cdOverlay,
+        cdText,
+        rechargeOverlay,
+      };
     });
 
     // Wire clicks: attack -> the classic fixed control while the
@@ -7390,7 +7580,15 @@ export class Hud {
       const rechargeOverlay = document.createElement('div');
       rechargeOverlay.className = 'recharge-overlay';
       btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
-      return { btn, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
+      return {
+        btn,
+        label,
+        countEl,
+        keybindEl,
+        cdOverlay,
+        cdText,
+        rechargeOverlay,
+      };
     });
 
     // bindTouchTap, not 'click', for the same reason as the ring: the browser
@@ -7896,24 +8094,26 @@ export class Hud {
   }
 
   private ownPet(): Entity | null {
+    // The exclusion rule (Pyre Colossus, temporary Necromancy undead, guardian_*
+    // templates; the PERMANENT graveguard stays) lives inside findOwnPet
+    // (pet_frame_view.ts) so the frame, the pet bar, and the target-pet keybind
+    // all resolve the same entity. tests/pet_bar_core.test.ts pins the rule.
     return findOwnPet(this.sim.entities.values(), this.sim.playerId);
   }
 
-  // The warrior stance bar: a small row of stance toggles stacked above the
-  // action bars, shown only for warriors and only for the stances valid for the
-  // current spec (Battle + Guarded for Arms/Prot, Berserker for Fury, Battle only
-  // for no spec). Rebuilds only when the known-stance set or the active stance
-  // changes (sig elision, like the pet bar).
+  // The stance-style choice bar: one shared row above the action bars for
+  // warrior stances and paladin auras. Rebuilds only when the known choice set
+  // or active choice changes (sig elision, like the pet bar).
   private renderStanceBar(): void {
     const bar = $('#stancebar') as HTMLElement;
-    const isWarrior = this.sim.cfg.playerClass === 'warrior';
-    const knownStances = isWarrior
-      ? this.sim.known.filter((k) => k.def.exclusiveGroup === WARRIOR_STANCE_GROUP)
+    const playerClass = this.sim.cfg.playerClass;
+    const usesChoiceBar = playerClass === 'warrior' || playerClass === 'paladin';
+    const knownStances = usesChoiceBar
+      ? this.sim.known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
       : [];
     const knownIds = knownStances.map((k) => k.def.id);
-    const knownSet = new Set(knownIds);
-    const activeAura = this.sim.player.auras.find((a) => knownSet.has(a.id));
-    const model = stanceBarView(isWarrior, knownIds, activeAura ? activeAura.id : null);
+    const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
+    const model = stanceBarView(playerClass, knownIds, activeId);
     if (!model.visible) {
       bar.style.display = 'none';
       if (this.lastStanceBarSig !== '') {
@@ -7983,10 +8183,14 @@ export class Hud {
       return;
     }
     const mode = pet.petMode ?? 'defensive';
+    const petTemplate = MOBS[pet.templateId];
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
     const autoTaunt = pet.petAutoTaunt === true;
     const autoWaterJet = pet.petAutoWaterJet === true;
     const canTaunt = petCanForceTaunt(pet.templateId);
+    const special = this.sim.petSpecialCommandsSupported
+      ? petSpecialButtonState(petTemplate, pet.petSkillTimer, pet.petAutoSkill)
+      : null;
     const ownerClass = this.sim.cfg.playerClass;
     const actionCooldownSig =
       pet.templateId === 'water_elemental'
@@ -7994,16 +8198,24 @@ export class Hud {
         : canTaunt
           ? `${cd}:${autoTaunt ? 'auto' : 'manual'}`
           : 'no-taunt';
+    const specialCooldownSig = special
+      ? `${special.iconId}:${special.cooldown}:${special.autocast ? 'auto' : 'manual'}`
+      : 'no-special';
     // Feed-button reason (full HP / no food) folds in so the pet bar redraws
     // when either flips, even while the pet stays otherwise unchanged.
     const feedSig =
       ownerClass === 'warlock'
         ? ''
         : (petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood()).reasonKey ?? 'ok');
-    const sig = `${pet.id}:${ownerClass}:${mode}:${actionCooldownSig}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
+    const sig = `${pet.id}:${ownerClass}:${mode}:${actionCooldownSig}:${specialCooldownSig}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
+    // Focus carry-across through the shared helper (focus_restore.ts, #2528):
+    // captureFocusKey owns the activeElement narrowing and the containment
+    // check, so this rebuild never steals focus from another open window that
+    // happens to reuse the same data-focus-key value.
+    const focusedPetActionKey = captureFocusKey(bar);
     bar.innerHTML = '';
     const commands = document.createElement('div');
     commands.className = 'petbar-group';
@@ -8025,6 +8237,7 @@ export class Hud {
         cooldownText?: string;
         onContextMenu?: () => void;
         onTouchHold?: () => void;
+        focusKey?: string;
         // Kept visible (never hidden) but greyed and inert while set. The
         // accessible name (`title`, which also feeds aria-label) STAYS the
         // action name; the WHY is carried by the rich hover tooltip
@@ -8035,14 +8248,30 @@ export class Hud {
     ) => {
       const btn = document.createElement('button');
       btn.className = 'pet-btn';
+      btn.dataset.focusKey = opts.focusKey ?? iconId;
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       if (opts.disabled) btn.classList.add('disabled');
       btn.title = title;
-      btn.setAttribute('aria-label', title);
+      btn.setAttribute(
+        'aria-label',
+        opts.cooldownText
+          ? `${title}, ${tPlural('hudChrome.plurals.secondsRemaining', Number(opts.cooldownText))}`
+          : title,
+      );
       if (opts.disabled) btn.setAttribute('aria-disabled', 'true');
-      if (opts.active || opts.autocast) btn.setAttribute('aria-pressed', 'true');
+      if (opts.active) btn.setAttribute('aria-pressed', 'true');
+      if (opts.onContextMenu) {
+        // Primary activation casts the skill; it does not toggle autocast. Do
+        // not expose this as aria-pressed (which promises the opposite button
+        // contract). Announce the secondary mode as descriptive state instead.
+        btn.setAttribute(
+          'aria-description',
+          t(opts.autocast ? 'hud.pet.autocastOn' : 'hud.pet.autocastOff'),
+        );
+        btn.setAttribute('aria-keyshortcuts', 'Shift+Enter');
+      }
       const icon = document.createElement('span');
       icon.className = 'icon-label';
       icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
@@ -8085,6 +8314,13 @@ export class Hud {
         runClickAction();
       });
       if (opts.onContextMenu) {
+        btn.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' || !event.shiftKey || event.repeat || opts.disabled) return;
+          event.preventDefault();
+          event.stopPropagation();
+          audio.click();
+          opts.onContextMenu?.();
+        });
         btn.addEventListener('contextmenu', (event) => {
           event.preventDefault();
           if (document.body.classList.contains('mobile-touch')) return;
@@ -8162,6 +8398,23 @@ export class Hud {
       this.attachTooltip(btn, () => tooltip);
       parent.appendChild(btn);
     };
+    const restorePetBarFocus = () => {
+      if (!focusedPetActionKey) return;
+      // Finding the rebuilt equivalent stays the caller's own ladder (the
+      // shared helper only owns the walk + disabled skip); the pet bar has no
+      // degradation rungs, just the one exact action the player was on.
+      const replacement = [...bar.querySelectorAll<HTMLButtonElement>('.pet-btn')].find(
+        (button) => button.dataset.focusKey === focusedPetActionKey,
+      );
+      // suppressFocusTooltip is attachTooltip's own side channel (below), kept
+      // as a direct write on the resolved button. Dropping the prior
+      // `{ preventScroll: true }` is safe: restoreFirstEnabled's bare focus()
+      // is the seam's policy, and #petbar is fixed HUD chrome outside any
+      // scrollable ancestor, so a re-focused button never needs a scroll
+      // correction.
+      if (replacement) replacement.dataset.suppressFocusTooltip = 'true';
+      restoreFirstEnabled([replacement]);
+    };
     addButton(
       commands,
       PET_ACTION_ICONS.attack,
@@ -8187,6 +8440,27 @@ export class Hud {
           },
           onTouchHold: () => {
             this.sim.setPetAutoWaterJet(!autoWaterJet);
+            this.lastPetBarSig = '';
+          },
+        },
+      );
+    }
+    if (special) {
+      addButton(
+        commands,
+        special.iconId,
+        t(special.labelKey),
+        petTooltip(t(special.titleKey), t(special.descKey)),
+        () => this.sim.petSpecial(),
+        {
+          autocast: special.autocast,
+          cooldownText: special.cooldown > 0 ? `${special.cooldown}` : undefined,
+          onContextMenu: () => {
+            this.sim.setPetAutoSpecial(!special.autocast);
+            this.lastPetBarSig = '';
+          },
+          onTouchHold: () => {
+            this.sim.setPetAutoSpecial(!special.autocast);
             this.lastPetBarSig = '';
           },
         },
@@ -8255,10 +8529,17 @@ export class Hud {
         // A pending feed stays clickable so the toggle can CANCEL it, even once
         // the pet has regenerated back to full HP (which would otherwise flip
         // feedState.disabled true and trap the player in food-selection mode).
-        { active: this.pendingPetFeed, disabled: feedState.disabled && !this.pendingPetFeed },
+        {
+          active: this.pendingPetFeed,
+          disabled: feedState.disabled && !this.pendingPetFeed,
+        },
       );
     }
-    const modes: { mode: PetMode; labelKey: TranslationKey; descKey: TranslationKey }[] = [
+    const modes: {
+      mode: PetMode;
+      labelKey: TranslationKey;
+      descKey: TranslationKey;
+    }[] = [
       {
         mode: 'passive',
         labelKey: PET_MODE_LABEL_KEYS.passive,
@@ -8289,9 +8570,12 @@ export class Hud {
         this.petModeMenuOpen = !this.petModeMenuOpen;
         this.lastPetBarSig = '';
       },
-      { active: true },
+      { active: true, focusKey: 'stance-menu' },
     );
-    if (!this.petModeMenuOpen) return;
+    if (!this.petModeMenuOpen) {
+      restorePetBarFocus();
+      return;
+    }
     for (const entry of modes) {
       addButton(
         stances,
@@ -8303,9 +8587,10 @@ export class Hud {
           this.petModeMenuOpen = false;
           this.lastPetBarSig = '';
         },
-        { active: mode === entry.mode },
+        { active: mode === entry.mode, focusKey: `stance-${entry.mode}` },
       );
     }
+    restorePetBarFocus();
   }
 
   // -------------------------------------------------------------------------
@@ -8475,6 +8760,7 @@ export class Hud {
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
+    this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
 
@@ -8548,13 +8834,36 @@ export class Hud {
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
+    // Hoisted behind the spec check (review 3050): the thread count walks the
+    // whole entity map times each entity's auras, and for the eight other
+    // classes it produced a discarded 0 every frame.
+    const isAffliction = this.sim.talentSpec === 'affliction';
+    const fateThreads = isAffliction ? afflictionFateThreadCount(sim.entities.values(), p.id) : 0;
+    this.doomMeter.paint({
+      affliction: isAffliction,
+      auras: p.auras,
+      fateThreads,
+    });
 
-    // combo points: character-bound (retail-style), so the row of pips rides the
-    // PLAYER frame (over the hp bar) and stays lit across target swaps until the
-    // points are spent or fade. The row is lazy-built ONCE (then only the `on`
-    // class is toggled per frame, through the elided writer), never rebuilt.
+    // Energy users keep combo points on the character frame. Class resources
+    // with their own identity are rendered by dedicated HUD overlays below.
     if (p.resourceType === 'energy') {
       this.setDisplay(this.comboRowEl, 'flex');
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'false');
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-valuenow', String(p.comboPoints));
+      // aria-valuetext is the LIVE "N of max" status (the count a screen reader
+      // needs); aria-label is the stable meter name. The two used to be the
+      // same static tooltip-cost sentence ("Consumes combo points"), which
+      // masked aria-valuenow entirely and misnamed the meter.
+      this.writerFacet.setAttr(
+        this.comboRowEl,
+        'aria-valuetext',
+        t('hudChrome.auraEffect.resourceCount', {
+          value: p.comboPoints,
+          max: COMBO_PIP_COUNT,
+        }),
+      );
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-label', t('hudChrome.comboMeter.label'));
       if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
         this.comboRowEl.innerHTML = '';
         for (let i = 0; i < COMBO_PIP_COUNT; i++) {
@@ -8570,7 +8879,9 @@ export class Hud {
       }
     } else {
       this.setDisplay(this.comboRowEl, 'none');
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'true');
     }
+    this.paladinDevotionPainter.paint(this.paladinDevotionView.tick(p));
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
@@ -8615,7 +8926,9 @@ export class Hud {
       // change gate means this is an event write, not a per-frame write.
       if (target.id !== this.lastAnnouncedTargetId) {
         this.targetLiveEl.textContent = this.targetReannounce.mark(
-          t('hudChrome.unitFrame.targetAnnounce', { name: entityDisplayName(target) }),
+          t('hudChrome.unitFrame.targetAnnounce', {
+            name: entityDisplayName(target),
+          }),
         );
         this.lastAnnouncedTargetId = target.id;
       }
@@ -8888,7 +9201,21 @@ export class Hud {
     // charges (one quarter per charge); every other spec/class keeps the fire
     // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
     // spec swap never strands a half-lit bird.
-    if (this.sim.talentSpec === 'arcane') {
+    if (this.sim.talentSpec === 'demonology') {
+      const soulFragments = necromancyOverlayCharges(p.auras);
+      this.procOverlayPainter.paintNecromancyCharges(
+        soulFragments,
+        t('hudChrome.procOverlay.soulFragmentsMeter'),
+        t('hudChrome.auraEffect.resourceCount', { value: soulFragments, max: 5 }),
+      );
+    } else if (this.sim.talentSpec === 'destruction') {
+      const ruinPips = destructionRuinPips(this.sim.talentSpec, p.auras);
+      this.procOverlayPainter.paintDestructionMarks(
+        ruinPips,
+        t('hudChrome.procOverlay.ruinMeter'),
+        t('hudChrome.procOverlay.ruinStatus', { value: ruinPips, max: 5 }),
+      );
+    } else if (this.sim.talentSpec === 'arcane') {
       this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
     } else if (this.sim.talentSpec === 'frost') {
       this.procOverlayPainter.paintFrostCharges(frostOverlayCharges(p.auras));
@@ -8918,12 +9245,18 @@ export class Hud {
       actionBarWorld.target = target ?? null;
       actionBarWorld.inventory = sim.inventory;
       actionBarWorld.stealthed = stealthed;
+      actionBarWorld.paladinSpec = sim.talentSpec;
+      actionBarWorld.fateThreads = fateThreads;
+      actionBarWorld.entities = sim.entities.values();
     } else {
       actionBarWorld = {
         player: p,
         target: target ?? null,
         inventory: sim.inventory,
         stealthed,
+        paladinSpec: sim.talentSpec,
+        fateThreads,
+        entities: sim.entities.values(),
       };
       this.actionBarWorldInput = actionBarWorld;
     }
@@ -9101,7 +9434,11 @@ export class Hud {
       this.toggleClass(this.playerFrameEl, 'combat', inCombat);
       // classic "resting" zZz on the player portrait while seated / recovering.
       // Reads the seated booleans IWorld exposes; works offline + online alike.
-      const rest = restView({ sitting: !!p.sitting, eating: !!p.eating, drinking: !!p.drinking });
+      const rest = restView({
+        sitting: !!p.sitting,
+        eating: !!p.eating,
+        drinking: !!p.drinking,
+      });
       if (rest.resting !== this.lastResting) {
         this.lastResting = rest.resting;
         const restEl = $('#pf-rest');
@@ -9436,9 +9773,15 @@ export class Hud {
     const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0, useGrouping: false });
     switch (lockoutShape(ms)) {
       case 'daysHours':
-        return t('hudChrome.raidLockout.daysHours', { d: n(days), h: n(hours) });
+        return t('hudChrome.raidLockout.daysHours', {
+          d: n(days),
+          h: n(hours),
+        });
       case 'hoursMinutes':
-        return t('hudChrome.raidLockout.hoursMinutes', { h: n(hours), m: n(minutes) });
+        return t('hudChrome.raidLockout.hoursMinutes', {
+          h: n(hours),
+          m: n(minutes),
+        });
       case 'minutes':
         return t('hudChrome.raidLockout.minutes', { m: n(minutes) });
       default:
@@ -9829,7 +10172,9 @@ export class Hud {
       ) => number;
     };
     if (w.requestIdleCallback) {
-      this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 2000 });
+      this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, {
+        timeout: 2000,
+      });
       this.mapPrewarmVia = 'idle';
     } else {
       this.mapPrewarmHandle = window.setTimeout(() => this.pumpMapPrewarm(), 16);
@@ -10197,7 +10542,9 @@ export class Hud {
         ? t('hud.arena.statusCountdown')
         : m.state === 'over'
           ? t('hud.arena.statusReturning', {
-              seconds: formatNumber(m.returnIn ?? 0, { maximumFractionDigits: 0 }),
+              seconds: formatNumber(m.returnIn ?? 0, {
+                maximumFractionDigits: 0,
+              }),
             })
           : t('hud.arena.statusFight');
     let vsBlock: string;
@@ -10492,7 +10839,9 @@ export class Hud {
       html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tagHtml}</div>`;
       if (quest.minLevel) {
         html += `<div class="tt-quest-req">${esc(
-          t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }),
+          t('questUi.detail.requiresLevel', {
+            level: this.questNumber(quest.minLevel),
+          }),
         )}</div>`;
       }
     }
@@ -10569,7 +10918,13 @@ export class Hud {
     const candidates: IdleBarkCandidate[] = [];
     for (const e of sim.entities.values()) {
       if (isIdleBarkCandidate(e, p.pos)) {
-        candidates.push({ id: e.id, templateId: e.templateId, x: e.pos.x, y: e.pos.y, z: e.pos.z });
+        candidates.push({
+          id: e.id,
+          templateId: e.templateId,
+          x: e.pos.x,
+          y: e.pos.y,
+          z: e.pos.z,
+        });
       }
     }
     if (!candidates.length) return;
@@ -10617,7 +10972,9 @@ export class Hud {
         const src = sim.entities.get(ev.sourceId) ?? null;
         const swing = playerSwingCueForDamage(ev, src);
         if (swing && src) {
-          this.combat(swing, src.pos.x, src.pos.y, src.pos.z, 1.0, { cooldown: 0.08 });
+          this.combat(swing, src.pos.x, src.pos.y, src.pos.z, 1.0, {
+            cooldown: 0.08,
+          });
         }
         if ((ev.absorbed ?? 0) > 0 || ev.kind === 'block')
           this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
@@ -10837,7 +11194,9 @@ export class Hud {
       if (this.ensureMobEngaged(src)) return; // just fired the aggro alert
       const voice = availableMobVoiceCue(src.templateId, 'attack');
       if (voice && shouldPlayMobVoiceSfxForEntity(src)) {
-        this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 1.0, { cooldown: 0.25 });
+        this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 1.0, {
+          cooldown: 0.25,
+        });
         // Warm the crit-only hurt cue alongside the frequently-played attack
         // bark, so it is resident well before a crit could ever need it. Gated
         // the same as the play above (a muted Nythraxis mob never plays it)
@@ -10925,8 +11284,11 @@ export class Hud {
           const tgt = sim.entities.get(ev.targetId);
           if (!tgt) break;
           const isPlayerSource = ev.sourceId === sim.playerId;
+          const isPlayerOwnedSource = ownedCombatSourceOwnerId(src) === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
-          if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
+          if (isPlayerSource || isPlayerOwnedSource || isPlayerTarget) {
+            this.lastCombatEventAt = performance.now();
+          }
           // An absorbed hit floats "Absorbed N" for BOTH sides of the swing: over your
           // own character when a shield of yours soaked it, and over the TARGET when you
           // were the attacker (without it, hitting a shielded mob looks like your attacks
@@ -10940,7 +11302,9 @@ export class Hud {
                 {
                   ...absorbShape,
                   text: t('hudChrome.fct.absorbed', {
-                    amount: formatNumber(ev.absorbed ?? 0, { maximumFractionDigits: 0 }),
+                    amount: formatNumber(ev.absorbed ?? 0, {
+                      maximumFractionDigits: 0,
+                    }),
                   }),
                   target: tgt,
                 },
@@ -10964,6 +11328,7 @@ export class Hud {
               ability: false,
               crit: false,
               isPlayerSource,
+              isPlayerOwnedSource,
               isPlayerTarget,
             });
             if (shape)
@@ -10989,7 +11354,7 @@ export class Hud {
               this.fiestaWordPop(t('fiesta.word.dodge'), '#7fd4ff', 1);
               this.renderer.addShake(0.15);
             }
-            if (isPlayerSource) {
+            if (isPlayerSource || isPlayerOwnedSource) {
               const logKey =
                 ev.kind === 'miss'
                   ? 'hud.combat.miss'
@@ -11023,6 +11388,7 @@ export class Hud {
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
+            isPlayerOwnedSource,
             isPlayerTarget,
             // Nothing got through and the absorb floater above already said so,
             // so the number is suppressed rather than shown as a bare 0.
@@ -11033,7 +11399,11 @@ export class Hud {
             (hitShape.kind === 'damage-done-ability' || hitShape.kind === 'damage-done-auto')
           ) {
             this.fctPainter.spawn(
-              { ...hitShape, text: `${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+              {
+                ...hitShape,
+                text: `${ev.amount}${ev.crit ? '!' : ''}`,
+                target: tgt,
+              },
               now,
             );
             this.combatLog(
@@ -11161,7 +11531,10 @@ export class Hud {
                 now,
               );
             this.log(
-              t('hud.core.xpGainRested', { amount: ev.amount, rested: ev.rested }),
+              t('hud.core.xpGainRested', {
+                amount: ev.amount,
+                rested: ev.rested,
+              }),
               '#a980d8',
             );
           } else {
@@ -11884,7 +12257,9 @@ export class Hud {
           // completeFishing), which is what stopped a catch printing three
           // lines and playing two cues (#2430).
           this.log(
-            t('hudChrome.gathering.catchLine', { name: grantItemToken(ev.itemId) }),
+            t('hudChrome.gathering.catchLine', {
+              name: grantItemToken(ev.itemId),
+            }),
             QUALITY_COLOR[ev.quality],
           );
           audio.fishReel();
@@ -12332,7 +12707,9 @@ export class Hud {
         case 'partyInvite':
           audio.partyInvite();
           this.showPrompt(
-            t('hud.prompts.partyInvite', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hud.prompts.partyInvite', {
+              name: `<b>${esc(ev.fromName)}</b>`,
+            }),
             t('hud.prompts.joinParty'),
             () => this.sim.partyAccept(),
             () => this.sim.partyDecline(),
@@ -12341,7 +12718,9 @@ export class Hud {
         case 'readyCheckStart':
           audio.readyCheck();
           this.showPrompt(
-            t('hudChrome.readyCheck.prompt', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hudChrome.readyCheck.prompt', {
+              name: `<b>${esc(ev.fromName)}</b>`,
+            }),
             t('hudChrome.readyCheck.ready'),
             () => this.sim.readyCheckRespond(true),
             () => this.sim.readyCheckRespond(false),
@@ -12369,7 +12748,9 @@ export class Hud {
           // Chronomancer's offer.
           this.closeResurrectionPrompt();
           this.resurrectionPromptEl = this.showPrompt(
-            t('hud.prompts.resurrectionOffer', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hud.prompts.resurrectionOffer', {
+              name: `<b>${esc(ev.fromName)}</b>`,
+            }),
             t('hud.prompts.acceptResurrection'),
             () => {
               this.resurrectionPromptEl = null;
@@ -12428,7 +12809,9 @@ export class Hud {
         case 'tradeRequest':
           audio.click();
           this.showPrompt(
-            t('hud.prompts.tradeRequest', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hud.prompts.tradeRequest', {
+              name: `<b>${esc(ev.fromName)}</b>`,
+            }),
             t('hud.prompts.openTrade'),
             () => this.sim.tradeAccept(),
             () => {
@@ -12439,7 +12822,9 @@ export class Hud {
         case 'duelRequest':
           audio.duelChallenge();
           this.showPrompt(
-            t('hud.prompts.duelRequest', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hud.prompts.duelRequest', {
+              name: `<b>${esc(ev.fromName)}</b>`,
+            }),
             t('hud.prompts.acceptDuel'),
             () => this.sim.duelAccept(),
             () => this.sim.duelDecline(),
@@ -12465,10 +12850,16 @@ export class Hud {
           break;
         case 'duelEnd':
           this.showBanner(
-            t('hud.system.duelEndBanner', { winner: ev.winnerName, loser: ev.loserName }),
+            t('hud.system.duelEndBanner', {
+              winner: ev.winnerName,
+              loser: ev.loserName,
+            }),
           );
           this.combatLog(
-            t('hud.system.duelEndLog', { winner: ev.winnerName, loser: ev.loserName }),
+            t('hud.system.duelEndLog', {
+              winner: ev.winnerName,
+              loser: ev.loserName,
+            }),
             '#fa6',
           );
           audio.duelEnd();
@@ -12661,12 +13052,17 @@ export class Hud {
           const delta = ev.ratingAfter - ev.ratingBefore;
           const sign = delta >= 0 ? '+' : '';
           const ratingDelta = `${sign}${formatNumber(delta, { maximumFractionDigits: 0 })}`;
-          const ratingAfter = formatNumber(ev.ratingAfter, { maximumFractionDigits: 0 });
+          const ratingAfter = formatNumber(ev.ratingAfter, {
+            maximumFractionDigits: 0,
+          });
           let arenaResultLine: string;
           let arenaResultColor: string;
           if (ev.draw) {
             this.showBanner(
-              t('hud.system.arenaDrawBanner', { name: ev.oppName, delta: ratingDelta }),
+              t('hud.system.arenaDrawBanner', {
+                name: ev.oppName,
+                delta: ratingDelta,
+              }),
             );
             arenaResultLine = t('hud.system.arenaDrawLog', {
               name: ev.oppName,
@@ -12819,7 +13215,9 @@ export class Hud {
             this.combatLog(t('hudChrome.vcup.bet.refundLog', { amount }), '#7fd4ff');
           } else {
             this.combatLog(
-              t('hudChrome.vcup.bet.lostLog', { amount: formatLocalizedMoney(ev.stake) }),
+              t('hudChrome.vcup.bet.lostLog', {
+                amount: formatLocalizedMoney(ev.stake),
+              }),
               '#fa6',
             );
           }
@@ -13187,7 +13585,9 @@ export class Hud {
             if (ev.gained) this.noteProcAuraGain(ev.name);
             else this.noteProcAuraConsume(ev.auraKind);
             this.combatLog(
-              t(ev.gained ? 'hud.combat.auraGain' : 'hud.combat.auraFade', { name: auraName }),
+              t(ev.gained ? 'hud.combat.auraGain' : 'hud.combat.auraFade', {
+                name: auraName,
+              }),
               '#d8a0d8',
             );
           } else if (tgt && ev.gained) {
@@ -13374,7 +13774,11 @@ export class Hud {
           plan.masterNpcId !== null
             ? t('hudChrome.crafting.trendNudge', {
                 archetype,
-                master: tEntity({ kind: 'npc', id: plan.masterNpcId, field: 'name' }),
+                master: tEntity({
+                  kind: 'npc',
+                  id: plan.masterNpcId,
+                  field: 'name',
+                }),
               })
             : t('hudChrome.crafting.trendNudgeNoMaster', { archetype }),
           '#c8b888',
@@ -13616,7 +14020,10 @@ export class Hud {
     // second tiny (12x12) tap target here would have no keyboard path, unlike the
     // name's Enter/Space handler above.
     const streamerBadge = chatStreamerBadgeEl(document, flair?.links);
-    const rendered = t(templateKey, { name: CHAT_NAME_TOKEN, message: CHAT_MESSAGE_TOKEN });
+    const rendered = t(templateKey, {
+      name: CHAT_NAME_TOKEN,
+      message: CHAT_MESSAGE_TOKEN,
+    });
     appendChatLineParts(div, rendered, {
       // The staff/special-role disclosure tag, resolved only from the
       // server-stamped flair (never from a local entity), so it cannot be
@@ -13767,6 +14174,7 @@ export class Hud {
       'Not enough rage!': 'hud.errors.notEnoughRage',
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
       'Not enough mana!': 'hud.errors.notEnoughMana',
+      'Not enough Devotion!': 'hud.errors.notEnoughDevotion',
       'Not enough health.': 'hud.errors.notEnoughHealth',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
       'That ability requires combo points.': 'hud.errors.requiresCombo',
@@ -13907,7 +14315,10 @@ export class Hud {
       // The same line is emitted for dungeons and delves; resolve the name in the
       // matching table so a delve name does not fall through as raw English.
       const delve = Object.values(DELVES).find((d) => d.name === busyName);
-      if (delve) return t('sim.delve.instancesBusy', { name: delveDisplayName(delve.id) });
+      if (delve)
+        return t('sim.delve.instancesBusy', {
+          name: delveDisplayName(delve.id),
+        });
       return t('worldContent.dungeonInstanceBusy', {
         name: dungeonDisplayNameFromSource(busyName),
       });
@@ -13991,11 +14402,20 @@ export class Hud {
     match = /^(.+) has gone offline\.$/.exec(text);
     if (match) return t('hud.logs.friendOffline', { name: match[1] });
     match = /^Quest accepted: (.+)$/.exec(text);
-    if (match) return t('questUi.logs.accepted', { name: questTitleFromSource(match[1]) });
+    if (match)
+      return t('questUi.logs.accepted', {
+        name: questTitleFromSource(match[1]),
+      });
     match = /^Quest abandoned: (.+)$/.exec(text);
-    if (match) return t('questUi.logs.abandoned', { name: questTitleFromSource(match[1]) });
+    if (match)
+      return t('questUi.logs.abandoned', {
+        name: questTitleFromSource(match[1]),
+      });
     match = /^Quest completed: (.+)$/.exec(text);
-    if (match) return t('questUi.logs.completed', { name: questTitleFromSource(match[1]) });
+    if (match)
+      return t('questUi.logs.completed', {
+        name: questTitleFromSource(match[1]),
+      });
     match = /^(.+) accepted your shared quest\.$/.exec(text);
     if (match) return t('hudChrome.questShare.accepted', { name: match[1] });
     match = /^(.+) \(Complete\)$/.exec(text);
@@ -14006,7 +14426,9 @@ export class Hud {
       });
     match = /^Your market listing of (.+) expired and waits at the Merchant\.$/.exec(text);
     if (match)
-      return t('itemUi.logs.expiredListing', { item: itemDisplayNameFromSource(match[1]) });
+      return t('itemUi.logs.expiredListing', {
+        item: itemDisplayNameFromSource(match[1]),
+      });
     // The dungeon party-size warning is emitted as a 'log' event (sim.ts), so it must be
     // matched on this path, not in localizeLootText.
     match = /^(.+) is meant for a full party of (\d+)\. Tread carefully\.$/.exec(text);
@@ -14040,11 +14462,19 @@ export class Hud {
     // lookup and silently degrade to raw English.
     let match = /^You receive: (.+?)( x\d+)?\.$/.exec(text);
     if (match)
-      return t('hud.logs.lootReceiveItem', { item: itemStackDisplayName(match[1], match[2]) });
+      return t('hud.logs.lootReceiveItem', {
+        item: itemStackDisplayName(match[1], match[2]),
+      });
     match = /^You receive (.+)\.$/.exec(text);
-    if (match) return t('hud.logs.lootReceiveMoney', { money: this.localizeSimMoney(match[1]) });
+    if (match)
+      return t('hud.logs.lootReceiveMoney', {
+        money: this.localizeSimMoney(match[1]),
+      });
     match = /^You loot (.+)\.$/.exec(text);
-    if (match) return t('hud.logs.lootMoney', { money: this.localizeSimMoney(match[1]) });
+    if (match)
+      return t('hud.logs.lootMoney', {
+        money: this.localizeSimMoney(match[1]),
+      });
     match = /^Rolling for (\[\[i:[A-Za-z0-9_]+\]\])\.$/.exec(text);
     if (match) return t('hudChrome.masterLoot.rollingFor', { item: match[1] });
     match = /^Everyone passed on (.+)\.$/.exec(text);
@@ -14073,7 +14503,9 @@ export class Hud {
       });
     match = /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (match)
-      return t('hudChrome.masterLoot.unassigned', { item: itemDisplayNameFromSource(match[1]) });
+      return t('hudChrome.masterLoot.unassigned', {
+        item: itemDisplayNameFromSource(match[1]),
+      });
     // The optional xN suffix (vendor-selling a stack) routes through
     // itemStackDisplayName so the item NAME still localizes, the same
     // treatment as the receive/listed/bought/reclaimed arms above and below:
@@ -14115,9 +14547,14 @@ export class Hud {
       });
     match = /^Reclaimed (.+?)( x\d+)? from the market\.$/.exec(text);
     if (match)
-      return t('itemUi.logs.reclaimedItem', { item: itemStackDisplayName(match[1], match[2]) });
+      return t('itemUi.logs.reclaimedItem', {
+        item: itemStackDisplayName(match[1], match[2]),
+      });
     match = /^You collect (.+) from the Merchant\.$/.exec(text);
-    if (match) return t('itemUi.logs.collectedMoney', { money: this.localizeSimMoney(match[1]) });
+    if (match)
+      return t('itemUi.logs.collectedMoney', {
+        money: this.localizeSimMoney(match[1]),
+      });
     const server = localizeServerText(text);
     if (server !== null) return server;
     // Sim-emitted log/error/loot text (src/sim) is English at the source; localize it
@@ -16633,6 +17070,46 @@ export class Hud {
     this.saveSlotMap();
   }
 
+  private pendingLoadoutBar: {
+    index: number;
+    bar: (string | null)[];
+    alloc: TalentAllocation;
+    requestedAt: number;
+  } | null = null;
+
+  /** Apply a saved bar only after the authoritative world confirms the loadout.
+   *  Offline Sim confirms synchronously; ClientWorld waits for its snapshot. */
+  private requestLoadoutSwitch(
+    index: number,
+    bar: (string | null)[],
+    alloc: TalentAllocation,
+  ): void {
+    this.sim.switchLoadout(index);
+    if (this.sim.activeLoadout === index) {
+      this.pendingLoadoutBar = null;
+      this.applyLoadoutBar(bar, alloc);
+      return;
+    }
+    this.pendingLoadoutBar = {
+      index,
+      bar: [...bar],
+      alloc: { spec: alloc.spec, rows: { ...alloc.rows } },
+      requestedAt: performance.now(),
+    };
+  }
+
+  private resolvePendingLoadoutBar(): void {
+    const pending = this.pendingLoadoutBar;
+    if (!pending) return;
+    if (this.sim.activeLoadout === pending.index) {
+      this.pendingLoadoutBar = null;
+      this.applyLoadoutBar(pending.bar, pending.alloc);
+      return;
+    }
+    // A rejected command must never mutate the bar or wait forever.
+    if (performance.now() - pending.requestedAt > 5000) this.pendingLoadoutBar = null;
+  }
+
   // -------------------------------------------------------------------------
   // Quest log window
   // -------------------------------------------------------------------------
@@ -16847,7 +17324,7 @@ export class Hud {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);
-    } else if (t && t.kind === 'mob' && t.ownerId === this.sim.playerId) {
+    } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
       this.openPetMenu(t.id, t.name, t.dead, x, y);
     } else if (
       t &&
@@ -17136,7 +17613,9 @@ export class Hud {
     this.positionLootSettingsPanel();
     if (explicit) {
       if (wasHidden)
-        this.lootSettingsTrap = this.focusManager.open({ root: () => $('#loot-settings-window') });
+        this.lootSettingsTrap = this.focusManager.open({
+          root: () => $('#loot-settings-window'),
+        });
       this.lootSettingsTrap?.focusFirst();
     }
   }
@@ -17402,7 +17881,10 @@ export class Hud {
         { value: 'harassment', label: t('hud.report.reasons.harassment') },
         { value: 'spam', label: t('hud.report.reasons.spam') },
         { value: 'cheating', label: t('hud.report.reasons.cheating') },
-        { value: 'offensive_name_or_chat', label: t('hud.report.reasons.offensiveNameOrChat') },
+        {
+          value: 'offensive_name_or_chat',
+          label: t('hud.report.reasons.offensiveNameOrChat'),
+        },
         { value: 'other', label: t('hud.report.reasons.other') },
       ],
       'harassment',
@@ -17955,11 +18437,20 @@ function describeAbilitySummary(
       }),
     );
   }
+  if ((known.def.ruinCost ?? 0) > 0) {
+    parts.push(
+      t('abilityUi.tooltip.ruinCost', {
+        cost: formatAbilityNumber(known.def.ruinCost ?? 0),
+      }),
+    );
+  }
   parts.push(abilityCastLine(known, spellHaste));
   // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
   if (known.cooldown > 0) {
     parts.push(
-      t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(known.cooldown) }),
+      t('abilityUi.tooltip.cooldownSeconds', {
+        seconds: formatAbilityNumber(known.cooldown),
+      }),
     );
   }
   return parts.join(' · ');
@@ -17973,6 +18464,7 @@ function abilityDisplayDescription(
   res: ResolvedAbility,
   damageText: string,
   scaling?: AbilityScaling,
+  spec?: string | null,
 ): string {
   const buff = abilityBuffValue(res);
   const duration = abilityDurationValue(res);
@@ -17984,7 +18476,7 @@ function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  return tEntity({
+  const text = tEntity({
     kind: 'ability',
     id: res.def.id,
     field: 'description',
@@ -18006,6 +18498,16 @@ function abilityDisplayDescription(
       rage: rageText,
     },
   });
+  // Spec-aware teaching line: a shared button explains its interaction ONLY
+  // for the player's current spec, so a new player never reads another
+  // spec's rules on their own tooltip.
+  const note = spec ? res.def.specNotes?.[spec] : undefined;
+  if (!note) return text;
+  return `${text} ${tEntity({
+    kind: 'ability',
+    id: res.def.id,
+    field: `specNote_${spec}` as AbilitySpecNoteField,
+  })}`;
 }
 
 function itemDisplayNameFromSource(name: string): string {
@@ -18038,7 +18540,11 @@ function npcGreeting(npcId: string, playerClass: PlayerClass, playerName: string
     kind: 'npc',
     id: npcId,
     field: 'greeting',
-    values: { className, classNameLower: className.toLocaleLowerCase(), playerName },
+    values: {
+      className,
+      classNameLower: className.toLocaleLowerCase(),
+      playerName,
+    },
   });
 }
 
@@ -18051,7 +18557,12 @@ function questNarrative(questId: string, field: 'text' | 'completion', playerNam
 }
 
 function questObjectiveLabel(questId: string, objectiveIndex: number): string {
-  return tEntity({ kind: 'questObjective', questId, objectiveIndex, field: 'label' });
+  return tEntity({
+    kind: 'questObjective',
+    questId,
+    objectiveIndex,
+    field: 'label',
+  });
 }
 
 function questTitleFromSource(name: string): string {
@@ -18078,7 +18589,9 @@ function dungeonDisplayNameFromSource(name: string): string {
 
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
-    return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    return entity.ownerId !== null && !isNecromancyUndead(entity)
+      ? (localizeSimAuraName(entity.name) ?? entity.name)
+      : mobDisplayName(entity.templateId);
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }
@@ -18125,7 +18638,9 @@ function abilityRangeLine(def: AbilityDef): string | null {
       max: formatAbilityNumber(def.range),
     });
   }
-  return t('abilityUi.tooltip.range', { range: formatAbilityNumber(def.range) });
+  return t('abilityUi.tooltip.range', {
+    range: formatAbilityNumber(def.range),
+  });
 }
 
 // The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
@@ -18152,32 +18667,47 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
     });
   }
   if (known.castTime > 0) {
-    return t('abilityUi.tooltip.castSeconds', { seconds: formatAbilityNumber(known.castTime / h) });
+    return t('abilityUi.tooltip.castSeconds', {
+      seconds: formatAbilityNumber(known.castTime / h),
+    });
   }
   return t('abilityUi.tooltip.instant');
 }
 
-export function abilityRequirementLines(def: AbilityDef): string[] {
-  const lines: string[] = [];
-  if (def.requiresForm)
-    lines.push(t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[def.requiresForm]) }));
-  if (def.requiresStealth) lines.push(t('abilityUi.tooltip.requiresStealth'));
-  if (def.spendsCombo) lines.push(t('abilityUi.tooltip.requiresCombo'));
-  if (def.requiresDodgeProc) lines.push(t('abilityUi.tooltip.requiresDodge'));
-  if (def.requiresOutOfCombat) lines.push(t('abilityUi.tooltip.requiresOutOfCombat'));
-  if (def.requiresTargetHpBelow !== undefined) {
-    lines.push(
-      t('abilityUi.tooltip.requiresTargetHealthBelow', {
-        percent: formatAbilityNumber(def.requiresTargetHpBelow * 100),
-      }),
-    );
-  }
-  if (def.onNextSwing) lines.push(t('abilityUi.tooltip.onNextSwing'));
-  if (def.offGcd) lines.push(t('abilityUi.tooltip.offGlobalCooldown'));
-  if (def.targetType === 'friendly') lines.push(t('abilityUi.tooltip.friendlyTarget'));
-  else if (def.requiresTarget) lines.push(t('abilityUi.tooltip.enemyTarget'));
-  else if (isSelfOnlyAbility(def)) lines.push(t('abilityUi.tooltip.selfOnly'));
-  return lines;
+// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
+// owns the truth table incl. the Skulduggery-only stealth-bypass line.
+export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
+  return abilityRequirementKeys(def, spec).map((req) => {
+    switch (req.key) {
+      case 'requiresForm':
+        return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form!]) });
+      case 'requiresStealth':
+        return t('abilityUi.tooltip.requiresStealth');
+      case 'requiresStealthSkulduggery':
+        return t('abilityUi.tooltip.requiresStealthSkulduggery');
+      case 'requiresCombo':
+        return t('abilityUi.tooltip.requiresCombo');
+      case 'requiresDodge':
+        return t('abilityUi.tooltip.requiresDodge');
+      case 'requiresOutOfCombat':
+        return t('abilityUi.tooltip.requiresOutOfCombat');
+      case 'requiresTargetHealthBelow':
+        return t('abilityUi.tooltip.requiresTargetHealthBelow', {
+          percent: formatAbilityNumber(req.percent!),
+        });
+      case 'onNextSwing':
+        return t('abilityUi.tooltip.onNextSwing');
+      case 'offGlobalCooldown':
+        return t('abilityUi.tooltip.offGlobalCooldown');
+      case 'friendlyTarget':
+        return t('abilityUi.tooltip.friendlyTarget');
+      case 'enemyTarget':
+        return t('abilityUi.tooltip.enemyTarget');
+      case 'selfOnly':
+      default:
+        return t('abilityUi.tooltip.selfOnly');
+    }
+  });
 }
 
 // Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
@@ -18200,13 +18730,21 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (primary) {
     switch (primary.type) {
       case 'directDamage':
-      case 'heal':
       case 'aoeDamage':
       case 'aoeHeal':
+      case 'chainHeal':
       case 'aoeRoot':
+      case 'chainDamage':
       case 'groundAoE':
       case 'drainTick':
+      case 'valkyrsCalling':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'hunterStampede':
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'heal':
+        return primary.casterMaxHpPct === undefined
+          ? abilityAmountRange(primary.min, primary.max) + suffix(primary)
+          : formatAbilityNumber(primary.casterMaxHpPct * 100);
       case 'repositionToAim':
         return primary.landingAoe
           ? abilityAmountRange(primary.landingAoe.min, primary.landingAoe.max)
@@ -18224,7 +18762,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         return formatAbilityNumber(primary.bonus);
       case 'sunder':
         return formatAbilityNumber(
-          SUNDER_ARMOR_PCT_PER_STACK * (primary.full ? primary.maxStacks : 1) * 100,
+          SUNDER_ARMOR_PCT_PER_STACK *
+            (primary.full || primary.perCombo ? primary.maxStacks : 1) *
+            100,
         );
       case 'faerieFire':
         return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);
@@ -18236,6 +18776,10 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
             base: formatAbilityNumber(primary.base),
             perCombo: formatAbilityNumber(primary.perCombo),
           }) + suffix(primary)
+        );
+      case 'hunterBloodhook':
+        return (
+          formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)
         );
     }
   }
@@ -18256,7 +18800,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     case 'hot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'absorb':
-      return formatAbilityNumber(secondary.amount) + suffix(secondary);
+      return secondary.casterMaxHpPct === undefined
+        ? formatAbilityNumber(secondary.amount) + suffix(secondary)
+        : formatAbilityNumber(secondary.casterMaxHpPct * 100);
     case 'imbue':
       return formatAbilityNumber(secondary.bonus);
     default:

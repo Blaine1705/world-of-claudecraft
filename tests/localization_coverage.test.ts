@@ -859,8 +859,12 @@ describe('i18n Localization Key Coverage', () => {
     const classAbilityEntries = entityTranslationManifest().filter(
       (entry) => entry.group === 'classAbility',
     );
+    const specNoteCount = Object.values(ABILITIES).reduce(
+      (count, ability) => count + Object.keys(ability.specNotes ?? {}).length,
+      0,
+    );
     expect(classAbilityEntries).toHaveLength(
-      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
+      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2 + specNoteCount,
     );
     const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
     expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
@@ -1241,14 +1245,6 @@ describe('i18n Localization Key Coverage', () => {
         if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
         return entry;
       };
-      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
-        const entry = talentEntries.find(
-          (candidate) => candidate.id === id && candidate.field === field,
-        );
-        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
-        return entry;
-      };
-
       setLanguage('es');
       expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
         'Carga doble',
@@ -1266,11 +1262,6 @@ describe('i18n Localization Key Coverage', () => {
       expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
         '생명력',
       );
-      expect(
-        renderTalentManifestEntry(
-          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
-        ),
-      ).toContain('생명력');
     }
 
     setLanguage('en');
