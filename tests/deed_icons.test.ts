@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { DEED_BESPOKE_CRESTS, deedCrestId } from '../src/ui/deeds_view';
-import { DEED_ART_PENDING, deedImageUrl, hasCrestRecipe, iconDataUrl } from '../src/ui/icons';
+import { DEED_ART_PENDING, deedImageUrl, iconDataUrl } from '../src/ui/icons';
 
 // Gate for the committed Book of Deeds WebP icons (mirror of tests/skill_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/deeds/<deed_id>.webp is the source of truth
@@ -366,32 +366,38 @@ describe('Book of Deeds webp icons', () => {
     }
   });
 
-  it('an artless deed card resolves to a procedural crest (no committed image)', () => {
-    // Any live deed awaiting art must land on its category base crest, which carries no
-    // image URL and falls through to the procedural canvas path. The pending set is pinned
-    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
-    // third artless deed, a dropped webp, or a silent catalog append all red here. The Rift
-    // coverage pair (dgn_rift, dgn_rift_s_rank), the twelve starter-zone chronicle deeds
-    // (frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden), the four Reliquary
-    // Curator rank bridges, and the five Phase 18 Reliquary completion-ladder deeds all ship
-    // artless per docs/design/deeds.md step 6 ("art can trail the deed"); they join the pending
-    // set alongside the Thornhollow Fields battleground quartet, the Drakelands brood pair, and
-    // the seven per-craft rare-tier profession deeds (issue #2055).
+  it('painted deeds resolve to their WebP; the pending Reliquary deeds fall back procedurally', () => {
+    // The 2026-08-09 completion wave painted every release-live deed, so the
+    // only artless deeds left are this branch's nine Reliquary deeds (four
+    // Curator rank bridges, five Phase 18 completion-ladder deeds), trailing
+    // their art per docs/design/deeds.md step 6 and pinned exhaustively in
+    // DEED_ART_PENDING. Literal counts make a new artless deed, a dropped
+    // WebP, or a stale pending entry fail loudly; each pending deed must land
+    // on a REAL category base recipe, never the generic fallback.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
+    const pending = new Set(DEED_ART_PENDING_IDS);
     expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(271);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(232);
-    for (const id of artless) {
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(262);
+    for (const id of DEED_ORDER) {
       const crestId = deedCrestId(id, DEEDS[id].category);
-      expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
-      expect(
-        hasCrestRecipe(crestId),
-        `${id} -> ${crestId} must be a real procedural recipe, not the generic fallback`,
-      ).toBe(true);
-      expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();
-      expect(deedImageUrl(`deed_${id}`), `${id} itself must have no committed image`).toBeNull();
+      if (pending.has(id)) {
+        expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
+        expect(
+          hasCrestRecipe(crestId),
+          `${id} -> ${crestId} must be a real procedural recipe, not the generic fallback`,
+        ).toBe(true);
+        expect(
+          deedImageUrl(crestId),
+          `${id} -> ${crestId} must have no committed image`,
+        ).toBeNull();
+        expect(deedImageUrl(`deed_${id}`), `${id} itself must have no committed image`).toBeNull();
+      } else {
+        expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);
+        expect(deedImageUrl(crestId), id).toBe(`/ui/deeds/${id}.webp`);
+      }
     }
     expect(DEED_IMAGE_IDS.has('synthetic_artless')).toBe(false);
     expect(deedImageUrl('deed_synthetic_artless')).toBeNull();
@@ -399,8 +405,7 @@ describe('Book of Deeds webp icons', () => {
     expect(deedImageUrl('deed_cat_progression')).toBeNull();
     expect(deedImageUrl('deed_cat_dungeon')).toBeNull();
     expect(deedImageUrl('deed_cat_chronicle')).toBeNull();
-    // A non-deed_ crest id (a class or family unit-portrait crest) misses the prefix guard and
-    // returns null, so those crests keep their procedural canvas path untouched.
+    // A non-deed_ crest id misses this helper's prefix guard; crestIconUrl owns those paintings.
     expect(deedImageUrl('status_npc')).toBeNull();
     expect(deedImageUrl('family_wolf')).toBeNull();
   });
