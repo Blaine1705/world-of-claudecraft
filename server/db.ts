@@ -3075,9 +3075,12 @@ export async function listCharacterNamesForSitemap(limit = 50000): Promise<strin
 // Realm-scoped character read by id WITHOUT an ownership check, for the public
 // character sheet / profile page, which serve any character on the realm. Returns
 // the same shape as getCharacter so the sheet normalizer treats both alike.
+// `appearance` is deliberately NOT selected here: no public-path consumer reads
+// it, and every surface that does (roster, ws join, reroll) has its own
+// account-scoped query that re-sanitizes the column on the way out.
 export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, appearance FROM characters WHERE id = $1 AND realm = $2',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
     [characterId, REALM],
   );
   return res.rows[0] ?? null;

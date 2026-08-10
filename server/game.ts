@@ -8391,7 +8391,8 @@ export class GameServer {
    * The authored modular look as JSON, minted at most ONCE per entity.
    *
    * `app` is by far the heaviest identity field (~0.6 KB for a default look,
-   * 1489 bytes at the bound the shared sanitizer enforces) and the only one
+   * 1489 bytes at the ceiling the sanitizer's allowlists imply, measured by
+   * tests/appearance_wire_bounds.test.ts rather than compared at runtime) and the only one
    * that a session normally never changes: it is stamped at join from the
    * character's own column, and the sole thing that moves it is a redesign the
    * player just paid a token for (applyAppearanceForCharacter, which busts this
