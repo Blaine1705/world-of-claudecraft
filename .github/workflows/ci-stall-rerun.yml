@@ -13,9 +13,10 @@ name: CI stall auto-rerun
 # the one job-scoped issues: write). This one departs, and each scope is
 # load-bearing:
 #   - actions: write is the rerun-failed-jobs call, the workflow's whole
-#     point. Proven against cancelled jobs live: the 2026-08-10 incident
-#     rerun of run 31398462129 restarted two bound-killed (cancelled)
-#     shards through this exact endpoint.
+#     point. Proven against cancelled jobs live: the 2026-08-10 rerun of
+#     run 31398462129 (that day's second stall incident, distinct from the
+#     triple-kill run 31392590628 in the ci.yml notes) restarted two
+#     bound-killed (cancelled) shards through this exact endpoint.
 #   - checks: read fetches the killed job's annotations; the runner's
 #     "exceeded the maximum execution time" annotation is what separates a
 #     bound kill from a user or concurrency cancellation (a superseded PR
@@ -28,17 +29,21 @@ name: CI stall auto-rerun
 #     API, as data.
 # No repository secrets are used, only the ephemeral github.token.
 #
-# Loop and masking safety (both re-verified inside the decision core, the
-# job-level if below is only a cheap gate that keeps green runs and rerun
-# attempts from spinning a runner):
+# Safety properties. The first two are re-verified inside the decision
+# core, so for them the job-level if below is only a cheap gate that keeps
+# green runs and rerun attempts from spinning a runner; the merge_group
+# exclusion is enforced by that if ALONE (the core never sees the
+# triggering event), which is sound while workflow_run is this file's only
+# trigger:
 #   - only attempt 1 ever reruns, so the rerun's own completion event can
 #     never rerun again; a second stall of the same job is the merge-queue
 #     doc's "real slowdown, investigate" case and stays with a human.
-#   - a rerun is only requested when nothing that ran had failed and
-#     nothing after the dead setup step ran (in particular no test step),
-#     so a rerun can never mask a real failure. A late setup step (a cache
-#     restore after the freshness checks) can die with earlier PASSED work
-#     steps behind it; that reruns green work, never a red.
+#   - a rerun is only requested when nothing else that ran had failed (the
+#     dead step is the one allowed failure) and nothing after the dead
+#     setup step ran (in particular no test step), so a rerun can never
+#     mask a real failure. A late setup step (a cache restore after the
+#     freshness checks) can die with earlier PASSED work steps behind it;
+#     that reruns green work, never a red.
 #   - merge_group runs are excluded: a rejected PR is already out of the
 #     queue and its gh-readonly-queue ref is deleted when the group
 #     dissolves, so a rerun cannot re-queue anything; queue rejections

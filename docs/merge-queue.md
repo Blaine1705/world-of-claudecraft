@@ -81,7 +81,8 @@ the Checks tab (filter by event: merge_group).
    actions/checkout retries it in-step, and the CI stall auto-rerun
    workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
    reruns a run's failed jobs once, on attempt 1 only, when the dead step
-   was a setup step, nothing that ran had failed, and nothing after the
+   was a bound-killed setup step or a failed checkout (the two recognized
+   stall shapes), nothing else that ran had failed, and nothing after the
    dead step ran. The auto-rerun deliberately skips merge_group runs (the
    queue has already ejected the PR and dissolved the group's ref, so only
    the manual rerun-and-re-queue above applies there); on pull_request and

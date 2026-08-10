@@ -203,10 +203,11 @@ describe('ci stall rerun decision core', () => {
     expect(decision.reason).toContain('no job matches');
   });
 
-  it('reruns the fast-abort shape: setup step failed, everything after it skipped', () => {
+  it('reruns the fast-abort shape: checkout failed, everything after it skipped', () => {
     // The second arm: ci.yml's git low-speed abort exhausted the in-step
-    // checkout retries and FAILED the setup step early. No annotation
-    // needed: no test step ran, so a rerun can mask nothing.
+    // checkout retries and FAILED the checkout early (the only step name
+    // the arm accepts). No annotation needed: nothing after the dead
+    // checkout ran, so a rerun can mask nothing.
     const run = incidentRun();
     run.runConclusion = 'failure';
     run.jobs[run.jobs.length - 1] = {
@@ -356,6 +357,24 @@ describe('ci-stall-rerun.yml shape', () => {
     // A rejected merge group is already dissolved (ref deleted, PR ejected);
     // rerunning it cannot re-queue anything, so queue runs stay manual.
     expect(workflowCode).toContain("github.event.workflow_run.event != 'merge_group'");
+    // The substring pins above cannot catch a broken fold (every fragment
+    // present but the expression malformed), so re-fold the block scalar
+    // and pin the whole expression. The merge_group arm is enforced by
+    // this if ALONE (the core never sees the event), so the exact folded
+    // expression is load-bearing, not cosmetic.
+    const ifBlock = workflowCode.match(/\n {4}if: >-\n((?: {6}\S[^\n]*\n)+)/);
+    expect(ifBlock).not.toBeNull();
+    const folded = (ifBlock?.[1] ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .join(' ');
+    expect(folded).toBe(
+      'github.event.workflow_run.run_attempt == 1 && ' +
+        "github.event.workflow_run.event != 'merge_group' && " +
+        "(github.event.workflow_run.conclusion == 'cancelled' || " +
+        "github.event.workflow_run.conclusion == 'failure')",
+    );
   });
 
   it('serializes duplicate deliveries per triggering run', () => {

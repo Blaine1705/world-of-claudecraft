@@ -9,9 +9,10 @@
 // to "re-run the failed jobs and re-queue". This module is that triage rule
 // as code, so attempt 1 of the rerun no longer needs a human.
 //
-// The crux is the SAFE PREDICATE: a rerun is only allowed when nothing that
-// ran had failed and nothing after the dead setup step ran (in particular
-// no test step after it), so a rerun can never mask a real failure, and
+// The crux is the SAFE PREDICATE: a rerun is only allowed when nothing else
+// that ran had failed (the dead step itself is the one allowed failure) and
+// nothing after the dead setup step ran (in particular no test step after
+// it), so a rerun can never mask a real failure, and
 // only on attempt 1, so the rerun's own completion can never rerun anything
 // (a second stall of the same job is the doc's "real slowdown, investigate"
 // case and stays with a human). A late setup step can legitimately die with
@@ -203,7 +204,7 @@ export function decide(run) {
   }
   return {
     rerun: true,
-    reason: `every non-benign job is a recognized checkout-stall shape (${stalledJobs.join(', ')}); no test step ran, rerunning failed jobs once`,
+    reason: `every non-benign job is a recognized checkout-stall shape (${stalledJobs.join(', ')}); nothing else that ran had failed and nothing after the dead step ran, rerunning failed jobs once`,
     stalledJobs,
   };
 }

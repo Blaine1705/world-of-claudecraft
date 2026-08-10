@@ -926,8 +926,9 @@ describe('CI workflow parity', () => {
     // WORKFLOW-level block: every job's checkout and every run-step git fetch
     // must inherit the same floor, and a job- or step-level redeclaration
     // could shadow it with a value nobody measured. The second net (the
-    // once-only auto-rerun of a run whose setup step died with no test step
-    // run) is ci-stall-rerun.yml, pinned by tests/ci_stall_rerun.test.ts.
+    // once-only auto-rerun of a run whose bound-killed setup step or failed
+    // checkout left nothing running after it) is ci-stall-rerun.yml, pinned
+    // by tests/ci_stall_rerun.test.ts.
     expect(workflow).toMatch(
       /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
     );
