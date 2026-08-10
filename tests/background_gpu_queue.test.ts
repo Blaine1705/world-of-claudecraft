@@ -701,7 +701,7 @@ describe('createBackgroundGpuQueue', () => {
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
     expect(texture).toContain('this.backgroundGpuWork.run(');
     expect(initial).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
     );
   });
 });
