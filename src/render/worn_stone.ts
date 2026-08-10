@@ -675,6 +675,11 @@ export function applySurfaceDetail(
   const metalMix = (fam.metalMix ?? 0) * scalarK;
   const prev = mat.onBeforeCompile;
   const prevSrc = typeof prev === 'function' ? prev.toString() : '';
+  // Captured BEFORE the override below, like addRimGlow: called later it
+  // yields whatever key the previous layer composed (the armor dye pins a
+  // distinct key per dyed material while its wrapper SOURCE is identical),
+  // which prevSrc alone cannot see.
+  const prevProgramKey = mat.customProgramCacheKey.bind(mat);
   mat.onBeforeCompile = (shader, renderer) => {
     prev?.call(mat, shader, renderer);
     // Fail soft before the preload gate resolves: the material simply ships
@@ -944,7 +949,11 @@ export function applySurfaceDetail(
   // The default program cache key stringifies onBeforeCompile, and every worn
   // wrapper stringifies identically even when the chained PREVIOUS hook (which
   // edits different source) differs, so re-include its source text (the
-  // foliage_collapse precedent). The family's texture-ready state keys too
+  // foliage_collapse precedent) AND the previous live key: source text alone
+  // collided a dyed and an undyed rig material of the same name into one
+  // program (the rim wrapper's source is the same closure whatever it wraps;
+  // only the dye layer's own customProgramCacheKey tells them apart).
+  // The family's texture-ready state keys too
   // (before the preload resolves the hook compiles to a plain pass-through),
   // as do the projection mode and the tier's parallax tap count.
   mat.customProgramCacheKey = () => {
@@ -960,7 +969,7 @@ export function applySurfaceDetail(
     // with the effective tile scale (and the dev ?wornfade override).
     const fadeBands = scaledFadeBands(fam.parallaxDepth, tileScale);
     const fadeKey = `f${fadeBands.parStart.toFixed(1)},${fadeBands.parEnd.toFixed(1)},${fadeBands.detStart.toFixed(1)},${fadeBands.detEnd.toFixed(1)}`;
-    return `surface-detail|${family}|${ready}|${par}|${mask}|${met}|${objectSpace ? 'o' : 'w'}|${fadeKey}|${prevSrc}`;
+    return `surface-detail|${family}|${ready}|${par}|${mask}|${met}|${objectSpace ? 'o' : 'w'}|${fadeKey}|${prevSrc}|${prevProgramKey()}`;
   };
 }
 

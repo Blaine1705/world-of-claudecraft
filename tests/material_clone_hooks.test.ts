@@ -301,20 +301,41 @@ describe('armour-dye layer survival across the program-preserving clone', () => 
     const source = dyedRigMaterial();
     const clone = cloneMaterialWithHooks(source);
     expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
-    // The outermost two layers are visible in the composed key. The dye is not
-    // spelled in it: worn_stone's key folds the PREVIOUS HOOK'S SOURCE rather
-    // than its key, and the rim wrapper's source text is the same closure
-    // whatever it wraps. That narrowing is worn_stone's, and it predates the
-    // dye; what this suite owns is that the clone lands on the SAME key as its
-    // source (asserted above) and keeps the dye patch (asserted below).
+    // All three layers are visible in the composed key: worn_stone folds the
+    // previous layer's LIVE key alongside its source text (the addRimGlow
+    // pattern), so the dye marker rides through the rim wrapper into the
+    // outermost key instead of collapsing into it.
     expect(clone.customProgramCacheKey()).toContain('surface-detail|fabric');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
+    expect(clone.customProgramCacheKey()).toContain('woc_armor_dye|');
     // And the patches themselves all still land on the clone.
     const shader = dyeShaderStub();
     clone.onBeforeCompile(shader as never, null as never);
     expect(shader.uniforms.uDyeCount).toBeDefined();
     expect(shader.uniforms.uRimBoost).toBeDefined();
     expect(shader.fragmentShader).toContain('uniform float uRimBoost;');
+  });
+
+  it('distinguishes a dyed from an undyed rig material of the same family', () => {
+    // The collision this pins: the rim wrapper's SOURCE TEXT is the same
+    // closure whatever it wraps, so a detail key composed from source text
+    // alone was byte-identical for a dyed and an undyed material of the same
+    // name, and three's program cache served one program for two different
+    // fragment shaders. The detail layer now folds the previous LIVE key.
+    const dyed = dyedRigMaterial();
+    const undyed = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    undyed.name = 'knight_cloth';
+    addRimGlow(undyed);
+    applySurfaceDetail(undyed, 'fabric', { strength: 0.2, objectSpace: true });
+    expect(dyed.customProgramCacheKey()).not.toBe(undyed.customProgramCacheKey());
+
+    // And the sharing that must survive the fix: two undyed materials of the
+    // same family still land on one key, so their program stays shared.
+    const twin = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    twin.name = 'knight_cloth';
+    addRimGlow(twin);
+    applySurfaceDetail(twin, 'fabric', { strength: 0.2, objectSpace: true });
+    expect(twin.customProgramCacheKey()).toBe(undyed.customProgramCacheKey());
   });
 
   it('never grants a dye to a clone of an undyed source', () => {
