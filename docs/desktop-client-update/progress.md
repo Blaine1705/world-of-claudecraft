@@ -1195,6 +1195,19 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
 - SHADER SMOKE on the merged tree: clean at low AND ultra with
   checkShaderErrors ON; only the pre-existing training-dummy lazy-preload
   race, identical at both tiers.
+- GATE (gate_select, BROWSER_PATH exported, biome defaultBranch pinned to the
+  release branch for the run and reverted, proven in no commit): i18n
+  freshness, malware scan, and changed-files biome green (after a scoped
+  format commit over exactly the QA-touched files); full-suite fallback red
+  on 9 files / 13 tests: the 8 accepted asset-seal suites (11 tests) PLUS
+  tests/mob_portrait_source_manifest.test.ts (2 tests), a NEW seal-family
+  suite that arrived with the merge's artwork overhaul: it byte-seals the
+  portrait RENDERER fingerprint, which the r185 train legitimately moved, and
+  healing it requires the re-render + review + receipt flow, so it JOINS the
+  phase 11 re-mint batch as the ninth accepted seal suite (the r181-bucket
+  decision in baked-asset form). Everything else green: 2448 files / 33750
+  tests. Post-abort turbo proofs green: check:types build:env build:server
+  build:bot, then build:bundle.
 - Process notes: the phase-06-qa.md test-quality and perf:crowd steps ran
   (workflow area + orchestrator); the heap-sawtooth ungated-tick interplay
   with the hidden-window skip is a phase 7 diagnostics candidate; the

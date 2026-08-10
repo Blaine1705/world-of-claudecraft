@@ -592,7 +592,11 @@ invalidates cross-era comparisons.
   re-mint at phase 11 over the final lockfile; until then these 8 suites are the
   accepted per-phase full-gate exception (everything else must stay green, and the
   lockfile-triggered vitest full-suite fallback means every per-phase gate WILL run
-  them).
+  them). Phase 6 QA expansion: tests/mob_portrait_source_manifest.test.ts (arrived
+  with the artwork-overhaul merge) seals the portrait RENDERER fingerprint, which
+  the three train moved; it needs the re-render + review + receipt flow, so it is
+  the NINTH accepted seal suite (9 files / 13 tests total) batched with the phase
+  11 re-mint.
 - tests/profile_mode.test.mjs (in the normal vitest suite) and the browser
   regressions leg need a browser binary this machine lacks by default: export
   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
