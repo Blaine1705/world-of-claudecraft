@@ -130,6 +130,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests (full suite, PR tier)
+        # The one place the balance harnesses' FULL sweep runs (docs/qa-gate.md,
+        # "The balance-harness diet"): the PR-tier long-sims lanes run the diet
+        # configuration (fewer seeds, band scenarios only, shorter windows), and
+        # this flag restores the full five-seed, all-scenario, 120-second
+        # depth nightly. Set nowhere else by design.
+        env:
+          WOC_FULL_BALANCE_SWEEP: '1'
         run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # The serialized checks, mirroring the release-checks job in ci.yml (same

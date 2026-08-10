@@ -187,6 +187,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // gameplay coverage (like wireRev above).
   'damageHistory',
   'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
+  'modularAppearance', // authored cosmetic look; the sim never reads it
   // Derived crit core (recalcPlayerStats): a pure function of sampled inputs
   // (gear ratings, talents, auras), like the derived meta fields below.
   'sharedCritBonus',

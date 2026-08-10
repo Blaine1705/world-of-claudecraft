@@ -2792,6 +2792,11 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // The character's authored modular look (characters.appearance column,
+      // normalized at write; NOT part of CharacterState, so serializeCharacter
+      // never re-emits it). Stamped onto the entity so it rides the identity
+      // wire (`app`) to every client in view. Opaque to the sim.
+      appearance?: Record<string, unknown> | null;
     },
   ): number {
     const savedState = opts?.state
@@ -2856,6 +2861,7 @@ export class Sim {
       draws: savedState?.arena2v2Draws ?? 0,
     };
     const player = createPlayer(this.nextId++, cls, startPos, name);
+    if (opts?.appearance) player.modularAppearance = opts.appearance;
     this.addEntity(player);
     const classDef = CLASSES[cls];
     const meta: PlayerMeta = {

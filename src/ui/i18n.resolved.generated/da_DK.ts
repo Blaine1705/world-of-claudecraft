@@ -3668,7 +3668,9 @@ export const da_DK: EnTranslations = {
       "delete_confirm": "Skriv karakterens navn for at bekræfte sletning.",
       "already_in_world": "Karakteren er allerede i verdenen.",
       "taken_over": "Din karakter blev overtaget af en anden session.",
-      "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen."
+      "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Denne konto er suspenderet indtil {date}.",
@@ -6497,7 +6499,7 @@ export const da_DK: EnTranslations = {
     "browSoft": "Bløde",
     "browThick": "Tykke",
     "browAngled": "Vinklede",
-    "earrings": "Øreringe",
+    "earrings": "Piercinger",
     "jewelMaterial": "Smykkemateriale",
     "jewelDefault": "Som Smedet",
     "jewelGold": "Guld",
@@ -7607,7 +7609,12 @@ export const da_DK: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Navn",
     "sortRecent": "Senest spillet",
-    "sortPlaytime": "Spilletid"
+    "sortPlaytime": "Spilletid",
+    "redesign": "Omdesign",
+    "redesignHint": "Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.",
+    "redesignTitle": "Omdesign {name}",
+    "redesignSave": "Gem nyt udseende",
+    "redesignCancel": "Behold nuværende udseende"
   },
   "deleteCharacter": {
     "title": "Slet Karakter",

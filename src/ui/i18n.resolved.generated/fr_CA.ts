@@ -3668,7 +3668,9 @@ export const fr_CA: EnTranslations = {
       "delete_confirm": "Saisissez le nom du personnage pour confirmer la suppression.",
       "already_in_world": "Le personnage est déjà dans le monde.",
       "taken_over": "Votre personnage a été pris en main par une autre session.",
-      "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde."
+      "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Ce compte est suspendu jusqu'au {date}.",
@@ -6497,7 +6499,7 @@ export const fr_CA: EnTranslations = {
     "browSoft": "Doux",
     "browThick": "Épais",
     "browAngled": "Inclinés",
-    "earrings": "Boucles d'oreilles",
+    "earrings": "Piercings",
     "jewelMaterial": "Matériau des bijoux",
     "jewelDefault": "Tel que forgé",
     "jewelGold": "Or",
@@ -7607,7 +7609,12 @@ export const fr_CA: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Nom",
     "sortRecent": "Joués récemment",
-    "sortPlaytime": "Temps de jeu"
+    "sortPlaytime": "Temps de jeu",
+    "redesign": "Remodeler",
+    "redesignHint": "Ce personnage est antérieur au nouveau créateur de personnage. Vous disposez d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.",
+    "redesignTitle": "Remodeler {name}",
+    "redesignSave": "Enregistrer la nouvelle apparence",
+    "redesignCancel": "Conserver l’apparence actuelle"
   },
   "deleteCharacter": {
     "title": "Supprimer le personnage",

@@ -3668,7 +3668,9 @@ export const cs_CZ: EnTranslations = {
       "delete_confirm": "Pro potvrzení smazání napiš jméno postavy.",
       "already_in_world": "Postava už je ve světě.",
       "taken_over": "Tvoje postava byla převzata jinou relací.",
-      "rename_required": "Tato postava musí být před vstupem do světa přejmenována."
+      "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tento účet je pozastavený do {date}.",
@@ -6497,7 +6499,7 @@ export const cs_CZ: EnTranslations = {
     "browSoft": "Jemné",
     "browThick": "Husté",
     "browAngled": "Šikmé",
-    "earrings": "Náušnice",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiál šperků",
     "jewelDefault": "Původní",
     "jewelGold": "Zlato",
@@ -7607,7 +7609,12 @@ export const cs_CZ: EnTranslations = {
     "sortLevel": "Úroveň",
     "sortName": "Jméno",
     "sortRecent": "Nedávno hrané",
-    "sortPlaytime": "Čas hraní"
+    "sortPlaytime": "Čas hraní",
+    "redesign": "Přetvořit",
+    "redesignHint": "Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.",
+    "redesignTitle": "Přetvořit postavu {name}",
+    "redesignSave": "Uložit nový vzhled",
+    "redesignCancel": "Ponechat současný vzhled"
   },
   "deleteCharacter": {
     "title": "Smazat postavu",

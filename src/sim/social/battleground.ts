@@ -714,6 +714,10 @@ function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number
   const door = detachFromDungeon(ctx, e);
   match.returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
   match.preMatchPools.set(pid, snapshotArenaReturnPools(e));
+  // The pet parenthesis is part of the same promise: a pet that walks in alive
+  // walks back out alive, for a backfill seat exactly as for a start-of-match one.
+  const pet = snapshotMatchPet(ctx, pid);
+  if (pet) match.preMatchPets.set(pid, pet);
   match.stats.set(pid, { kills: 0, deaths: 0, captures: 0, assists: 0 });
   match.backfilled.add(pid);
   const index = match.teams[team].length;

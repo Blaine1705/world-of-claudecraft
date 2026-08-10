@@ -952,7 +952,7 @@ describe('delta snapshots', () => {
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
     // first snapshot (even the null-valued ones like party/trade/bank); every
     // key in ALL_DELTA_KEYS
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
     expect(snap.self.party).toBeNull();
@@ -1530,7 +1530,7 @@ describe('delta snapshots', () => {
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
     // a fresh session always receives the full self state: every registered delta key
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
     // the veteran session still gets deltas only
@@ -3683,6 +3683,7 @@ const ALL_DELTA_KEYS = [
   'achg',
   'achr',
   'ap',
+  'app',
   'arena',
   'atitle',
   'bags',
@@ -3764,6 +3765,14 @@ const ALL_DELTA_KEYS = [
   'weapon',
   'xp',
 ] as const;
+
+/** The delta keys a FRESH session is guaranteed to receive on its first
+ *  snapshot. Every registered key but one: `app` is the authored modular look,
+ *  and a character created before the creator (or by a client that posts no
+ *  appearance) has none, so it stays sparse on the wire the way `eq`/`eqi` do
+ *  on the entity record. Its own round trip is pinned in
+ *  tests/appearance_broadcast.test.ts, including that it ships exactly once. */
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -3892,6 +3901,11 @@ function dirtyEveryDeltaField(): {
   pDoor.prevPos = { ...pDoor.pos };
   sim.enterDelve('collapsed_reliquary', 'normal', lp);
   const p = sim.entities.get(lp)!;
+
+  // An authored modular look (app). Sparse on the wire (a character created
+  // before the creator has none), so the fixture stamps one, exactly as the
+  // join path does from the character's own column.
+  p.modularAppearance = { gender: 'female', hair: 'highbun' };
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -4643,15 +4657,19 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 83 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 84 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
     // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
-    // self record and behind this same delta gate, for 83.
-    expect(ALL_DELTA_KEYS).toHaveLength(83);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(83);
+    // self record and behind this same delta gate, for 83, and +1: `app`, the
+    // authored modular look, for 84. The viewer's own copy cannot come from the
+    // entity list (the broadcast loop skips their own entity), and it is heavy
+    // and immutable, so it rides this channel rather than being re-serialized
+    // every tick.
+    expect(ALL_DELTA_KEYS).toHaveLength(84);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(84);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4679,8 +4697,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (issue #1298) for 66, and the character sheet's lifetime played-time
     // key ptime for 67, then the 16 static combat-rating/progression scalars
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
-    // for 83.
-    expect(scraped.size).toBe(83);
+    // for 83, and the authored modular look `app` for 84.
+    expect(scraped.size).toBe(84);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

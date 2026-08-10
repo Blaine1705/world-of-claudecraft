@@ -6,7 +6,6 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
-import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -96,8 +95,10 @@ import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_
 import {
   buildCharacterList,
   configureCharactersRuntime,
+  parseCreationCosmetics,
   purgeDeletedCharacterWorldState,
   rekeyReclaimedCharacterWorldState,
+  withCreationHelm,
 } from './characters';
 import { pruneChatViolationsBatch } from './chat_filter_db';
 import {
@@ -1610,13 +1611,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
+        // Same cosmetic rules as the migrated arm, through the SAME parser, so
+        // a dispatch rollback cannot create characters without their authored
+        // look or wearing a helmet they never chose.
+        const cosmetics = parseCreationCosmetics(body);
+        if (cosmetics === 'invalid')
+          return json(res, 400, {
+            error: 'invalid appearance',
+            code: 'character.invalid_appearance',
+          });
         const create = () =>
           createCharacterCapped(
             accountId,
             name,
             body.class,
             10,
-            initialCharacterState(body.class, name, skin),
+            withCreationHelm(initialCharacterState(body.class, name, skin), cosmetics.helmHidden),
+            cosmetics.appearance,
           );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
           json(res, 200, {
@@ -2666,6 +2677,10 @@ configureCharactersRuntime({
     liveGame().takeOverCharacter(accountId, characterId),
   rekeyMarketSeller: (characterId, oldName, newName) =>
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
+  setHelmHiddenForCharacter: (characterId, hidden) =>
+    liveGame().setHelmHiddenForCharacter(characterId, hidden),
+  applyAppearanceForCharacter: (characterId, appearance) =>
+    liveGame().applyAppearanceForCharacter(characterId, appearance),
   saveMarket: () => liveGame().saveMarket(),
   purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>
