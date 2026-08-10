@@ -10734,8 +10734,15 @@ export class Hud {
         // shared burst layered with a school-flavored impact, so the orb's fire
         // flare reads differently from the gate's holy release. The listener is
         // on the same floor, so the player's own y is the right height anchor.
-        if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
+        // A fixed custom recording (rift mechanics: riftFx in src/sim/rift/fx.ts)
+        // replaces the generic nova/burst sound entirely, for both fx variants,
+        // not just nova.
+        if (ev.sfxKey) {
+          this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
+        if (ev.fx !== 'nova') return;
         // A per-ability nova recording is the whole read on the aimed path
         // too, at the same 1.0 the entity-anchored spellfx path plays it;
         // the generic burst keeps its school-flavored layer.

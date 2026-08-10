@@ -9,7 +9,10 @@ export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
 export interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
+  // despawn during play, or track a gliding player), unlike the static
+  // world-built campfire/forge set; see src/render/rift_ambience.ts.
+  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;
