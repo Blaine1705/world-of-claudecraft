@@ -2629,6 +2629,25 @@ the screenshot set. Outcome: PASS WITH ONE DEFECT FIXED.
   meters, the Rares trophy glyphs (3/19 filled), the Horizons shelf with
   both chips, the Vault page Retired header, the Riftbound page Personal
   header at 1/3.
+- Server perf leg (leg 6, measured with esbuild-bundled probes and a real
+  Postgres TEMP-table check): PASS. Per-member first-kill ladder 3.5 to 13.7
+  us at RAID_MAX 10 (0.27 percent of a tick); repeat kills walk zero pages
+  (the marks.has early-out is the whole O(1) bound; the allowlist arm is
+  inert on this path); the 60s sweep is +25 percent at the new totals; a
+  first kill pulls the heavy-self re-diff forward under 2 s at most 19 times
+  per lifetime; the 4.2 KB autosave bound independently re-measured at 3,784
+  stored worst case (holds with ~10 percent headroom). The two ledger
+  corrections landed in state.md's refreshed perf note.
+- Fix-round fresh review (of 6b01b8d30e): COMPLETE, no blockers; reproduced
+  the rank defect and confirmed the repair at runtime; nine smaller items
+  applied as round two 68034d96e8 (JSDoc re-attachment, the five non-Latin
+  rift-first-clear fills gaining the ranked and party qualifiers the
+  sharpened English carries, item-only assertion on the flagged-page pin,
+  the bare-attribute stray check beside the compound chip query, the
+  stripper comment order, the includes rationale, the design doc's wiki
+  surface row) with two recorded-not-changed items: the zh overlays' biome
+  line-wrap churn on an unrelated key, and the intentional
+  noTemplateCurlyInString warning on the source-text pin.
 - Gates: gate_select ran i18n gen + freshness, wiki freshness, malware scan
   (PASS, 0 high), and SFX conformance green, then stopped on ONE INHERITED
   biome red: docs/perf/hitch/gate.json (release-authored, byte-identical to
@@ -2637,5 +2656,12 @@ the screenshot set. Outcome: PASS WITH ONE DEFECT FIXED.
   ci-changed-stale-main scope noise); the PR's own CI diffs against the
   release base where the file is unchanged. Carried as inherited, not fixed
   here (the release owns its artifact). The masked later steps ran by hand:
-  full vitest with bounded workers, tsc, and the five-entry build (results
-  recorded below at push time).
+  tsc clean, the five-entry build green with a clean tree after its regen
+  chain, and the FULL vitest suite with bounded workers: 34,459 passed, 2
+  failed, both real full-sweep catches fixed as 0bf1436f3b: the delve-shop
+  catalogued-stock equality had to grow to six for the two catalogued chase
+  rods (phase-caused; the facet doc sentence moved with it), and the
+  professions blob-growth census never classified the v0.36.0 draws
+  counters (release-caused, red only on the merged tree's full run; the
+  classification is mirrored here and worth flagging upstream). Both files
+  re-run green after the fix.
