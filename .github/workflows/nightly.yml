@@ -178,17 +178,12 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
-      - name: Typecheck
-        run: npm run check:types
-
-      - name: Build headless environment
-        run: npm run build:env
-
-      - name: Build server
-        run: npm run build:server
-
-      - name: Build Discord bot
-        run: npm run build:bot
+      # Same turbo multi-task run gate.mjs uses for wall-clock overlap across
+      # these four independent pure steps (scripts/lib/gate_steps.mjs), mirrored
+      # from ci.yml's release-checks job (tests/nightly_workflow.test.ts pins
+      # the two run-line sequences equal).
+      - name: Typecheck + env/server/bot builds
+        run: npx turbo run check:types build:env build:server build:bot --ui=stream
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
