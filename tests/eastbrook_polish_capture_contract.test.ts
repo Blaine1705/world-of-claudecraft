@@ -116,8 +116,10 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the shortestAngle -> facing_smooth.wrapAngle dedupe on
+// refactor/render-renderer (renderer.ts edits only). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e966d377837e834850319887fe93cba18b953aba4bed1e9147c4ea7187a43155';
+  '3e0dfbc94beb56fa7f2918c0d6d1cc7b6ddff97f0578d1ac111de85bab5e91a6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
