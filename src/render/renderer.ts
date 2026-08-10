@@ -7789,6 +7789,12 @@ export class Renderer {
     if (view && e.id !== this.sim.player.id) {
       view.compileReady = this.gateViewOnCompile(view, group);
     }
+    // Warm an already-mounted entity's engine clips at view creation too: the
+    // mountKey-edge preload below only fires on a CHANGE, but a remote rider
+    // entering interest range, or an already-mounted player logging in, is
+    // born with a mountKey and no edge to detect, so without this it always
+    // hits the cold path (see the edge-site comment near preloadMountEngine).
+    if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
   }
 
   // Shared core for every compile gate below: link `target`'s programs off the
