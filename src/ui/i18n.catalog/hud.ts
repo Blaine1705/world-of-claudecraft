@@ -375,6 +375,7 @@ const hudStringsEn = {
       outOfRange: 'Out of range.',
       noTarget: 'You have no target.',
       tooClose: 'Too close!',
+      mustTargetAlly: 'You must target an ally.',
       facing: 'You must be facing your target.',
       targetHealthBelow: 'That ability requires the target below {percent}% health.',
       dagger: 'You must wield a dagger.',

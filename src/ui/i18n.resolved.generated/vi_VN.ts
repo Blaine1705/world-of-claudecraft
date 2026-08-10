@@ -1054,7 +1054,7 @@ export const vi_VN: EnTranslations = {
       "blurb": "Hai pháo đài đổ nát đối mặt nhau qua một thung lũng có tường bao dưới bóng Đỉnh Gai: Đỏ Thẫm ở phía nam, Xanh Lam ở phía bắc, và Sân Phế Tích cổ xưa hơn nằm giữa chúng mà chưa bên nào từng chiếm được. Năm người mỗi bên, mỗi bên một lá cờ, và bên đầu tiên mang được ba lá cờ của đối phương về nhà sẽ giành lấy chiến trường.",
       "modeTag": "5 đấu 5 Cướp Cờ",
       "offlineNote": "Cánh Đồng Trũng Gai đang đồng bộ. Hàng chờ sẽ mở khi thế giới phản hồi.",
-      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng. {wins} thắng / {losses} thua / {draws} hòa",
       "careerCaptures": "Số lần chiếm cờ trong sự nghiệp: {count}",
       "enterQueue": "Vào Hàng Chờ",
       "enterQueueParty": "Vào Hàng Chờ (nhóm {count} người)",
@@ -3311,6 +3311,8 @@ export const vi_VN: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const vi_VN: EnTranslations = {
       "outOfRange": "Ngoài tầm.",
       "noTarget": "Bạn không có mục tiêu.",
       "tooClose": "Quá gần!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Bạn phải đối mặt với mục tiêu.",
       "targetHealthBelow": "Kỹ năng đó cần mục tiêu có sinh lực dưới {percent}%.",
       "dagger": "Bạn phải trang bị một con dao găm.",
@@ -8166,7 +8169,7 @@ export const vi_VN: EnTranslations = {
       "queueNote": "Bạn sẽ được ghép cặp với đối thủ trực tuyến có thứ hạng gần nhất, rồi được dịch chuyển đến đấu trường. Thắng để leo hạng; ai chịu thua trước (còn 1 máu) sẽ bại. Bạn sẽ trở về đúng nơi đã vào hàng chờ.",
       "ladderAllTime": "Bảng Xếp Hạng - Mọi Thời Đại",
       "ladderOnline": "Bảng Xếp Hạng - Trực Tuyến",
-      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua",
+      "ratingSummary": "Thứ hạng - {wins} thắng / {losses} thua / {draws} hòa",
       "statusCountdown": "Sẵn sàng nào...",
       "statusReturning": "Đang trở về thế giới... {seconds}",
       "statusFight": "Chiến đến khi có kẻ chịu thua!",
@@ -9540,6 +9543,10 @@ export const vi_VN: EnTranslations = {
       "die_by_sword": {
         "name": "Sống Chết Cùng Kiếm",
         "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Liều Lĩnh",

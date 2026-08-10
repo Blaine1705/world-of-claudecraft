@@ -1054,7 +1054,7 @@ export const cs_CZ: EnTranslations = {
       "blurb": "Dvě zbořené tvrze si hledí přes ohrazenou kotlinu ve stínu Thornpeaku: Karmínová na jihu, Blankytná na severu, a mezi nimi starší Zpustlé nádvoří, které nikdy žádná z nich neovládla. Pět na každé straně, jedna vlajka na tým, a kdo první donese domů tři z těch svých, ovládne bojiště.",
       "modeTag": "5v5, Zajetí vlajky",
       "offlineNote": "Thornhollowská pole se synchronizují. Fronta se otevře, jakmile realm odpoví.",
-      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení. {wins} výher / {losses} proher / {draws} remíz",
       "careerCaptures": "Zajetí za kariéru: {count}",
       "enterQueue": "Vstoupit do fronty",
       "enterQueueParty": "Vstoupit do fronty (skupina: {count})",
@@ -3311,6 +3311,8 @@ export const cs_CZ: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const cs_CZ: EnTranslations = {
       "outOfRange": "Mimo dosah.",
       "noTarget": "Nemáš cíl.",
       "tooClose": "Příliš blízko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musíš čelit svému cíli.",
       "targetHealthBelow": "Tato schopnost vyžaduje cíl pod {percent} % zdraví.",
       "dagger": "Musíš mít dýku.",
@@ -8166,7 +8169,7 @@ export const cs_CZ: EnTranslations = {
       "queueNote": "Budeš spárován(a) s online vyzyvatelem s nejbližším hodnocením a teleportován(a) do písku. Vyhraj a stoupni; kdo první povolí (1 zdraví), prohrává. Vrátíš se přesně tam, kde ses zařadil(a) do fronty.",
       "ladderAllTime": "Žebříček - celkový",
       "ladderOnline": "Žebříček - online",
-      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher",
+      "ratingSummary": "Hodnocení - {wins} výher / {losses} proher / {draws} remíz",
       "statusCountdown": "Zocel se...",
       "statusReturning": "Návrat do světa... {seconds}",
       "statusFight": "Bojuj až do povolení!",
@@ -9540,6 +9543,10 @@ export const cs_CZ: EnTranslations = {
       "die_by_sword": {
         "name": "Smrt s mečem v ruce",
         "description": "Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Bezhlavost",
