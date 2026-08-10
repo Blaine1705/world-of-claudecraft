@@ -37,6 +37,9 @@ RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
 FROM node:26-slim
 WORKDIR /app
 ENV NODE_ENV=production
+# server/parse/build_version.ts reads the version from package.json in the
+# working directory; without it every telemetry batch reports build unknown.
+COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/media-build ./media-build
 COPY --from=build /app/dist-server ./dist-server
