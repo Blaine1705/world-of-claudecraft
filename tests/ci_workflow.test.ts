@@ -58,6 +58,12 @@ const PNPM_VERSION = (() => {
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
+// Typecheck plus the three independent pure builds (env/server/bot), collapsed
+// into one turbo call so CI shares the exact idiom gate.mjs already uses for
+// intra-task cache/parallelism (scripts/lib/gate_task_cache.mjs turboRunArgs).
+const TYPECHECK_BUILDS_TURBO_RUN =
+  'run: npx turbo run check:types build:env build:server build:bot --ui=stream';
+
 // Shared serialized check-run lines for both pr-checks and release-checks (D8).
 // One list so a step added on one arm only fails the other arm's pin.
 const CHECK_RUN_STEPS = [
@@ -65,10 +71,7 @@ const CHECK_RUN_STEPS = [
   'run: node scripts/i18n_coverage_summary.mjs',
   'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
   'run: npm run security:gate',
-  'run: npm run check:types',
-  'run: npm run build:env',
-  'run: npm run build:server',
-  'run: npm run build:bot',
+  TYPECHECK_BUILDS_TURBO_RUN,
   'run: npm run wiki:content && npm run build:bundle\n',
 ] as const;
 
@@ -231,21 +234,25 @@ describe('CI workflow parity', () => {
 
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     // One occurrence in pr-checks and one in release-checks (the parallel
-    // check jobs). Neither test job typechecks.
-    expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
-    expect(jobSource('pr-checks')).toContain('run: npm run check:types');
-    expect(jobSource('release-checks')).toContain('run: npm run check:types');
-    expect(jobSource('pr-gate')).not.toContain('run: npm run check:types');
-    expect(jobSource('release-gate')).not.toContain('run: npm run check:types');
+    // check jobs), collapsed with the env/server/bot builds into one turbo
+    // call. Neither test job typechecks.
+    expect(workflow.match(new RegExp(escapeRe(TYPECHECK_BUILDS_TURBO_RUN), 'g'))).toHaveLength(2);
+    expect(jobSource('pr-checks')).toContain(TYPECHECK_BUILDS_TURBO_RUN);
+    expect(jobSource('release-checks')).toContain(TYPECHECK_BUILDS_TURBO_RUN);
+    expect(jobSource('pr-gate')).not.toContain('check:types');
+    expect(jobSource('release-gate')).not.toContain('check:types');
     expect(workflow).not.toContain('run: npx tsc --noEmit');
-    // Local gate runs typecheck through turbo (Phase 8); CI still uses npm run check:types.
-    // The combined step carries the Discord bot build too (R7: every consumer
-    // of the shared list builds the bot beside the server).
+    // Local gate runs typecheck through turbo (Phase 8); CI now shares that
+    // exact idiom instead of four separate serial npm steps. The combined step
+    // carries the Discord bot build too (R7: every consumer of the shared list
+    // builds the bot beside the server).
     expect(gate).toContain('buildFullGateSteps');
     expect(gateSteps.some((s) => s.name === 'typecheck + env/server/bot builds')).toBe(true);
-    expect(gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds')?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'check:types', 'build:bot']),
-    );
+    const typesBuilds = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
+    // The local gate resolves turbo's own binary directly (no npx dispatch);
+    // cmd carries the "turbo" identity, args starts at "run" (gate_task_cache.mjs).
+    expect(typesBuilds?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
+    expect(typesBuilds?.args).toEqual(expect.arrayContaining(['run', 'check:types', 'build:bot']));
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -473,7 +480,7 @@ describe('CI workflow parity', () => {
     expect(prChecks).not.toContain('run: npm test');
     for (const step of CHECK_RUN_STEPS) {
       // Anchored to the start of a step line, so a YAML-commented-out step
-      // (`#        run: npm run build:server`) cannot satisfy it: the substring
+      // (`#        run: npm run build`) cannot satisfy it: the substring
       // survives the comment, the anchored form does not.
       expect(prChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(prGate).not.toContain(step);
@@ -487,7 +494,7 @@ describe('CI workflow parity', () => {
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
-    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(14);
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(11);
     // pr-checks is unsharded, so NO step in it may carry a condition: an
     // `if: matrix.shard == 1` copy-pasted here is never true and would disable
     // that step outright.
@@ -515,12 +522,12 @@ describe('CI workflow parity', () => {
       expect(releaseChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(releaseGate).not.toContain(step);
     }
-    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus ten
-    // check steps (i18n gen/summary/freshness, malware, tsc cache, typecheck,
-    // four builds including the Discord bot). An accidental extra step on the
-    // checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(14);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(14);
+    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus
+    // seven check steps (i18n gen/summary/freshness, malware, tsc cache, the
+    // combined typecheck + env/server/bot builds turbo call, client build).
+    // An accidental extra step on the checks job would otherwise stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
@@ -815,7 +822,11 @@ describe('CI workflow parity', () => {
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
-      ['pr-long-sims', 20],
+      // Resized 20 to 40 with the nine-suite lane (review 3050), then 40 to
+      // 60 after run 31290316610 measured the lane's healthy wall landing
+      // right at 40 on a slow-quartile runner (the sizing evidence sits on
+      // the ci.yml bound).
+      ['pr-long-sims', 60],
       ['browser-gate', 10],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
@@ -1002,7 +1013,7 @@ describe('CI workflow parity', () => {
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     // gate.mjs still binds workers into the shared step builder.
-    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier })');
+    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier, repoRoot })');
     expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
@@ -1140,32 +1151,36 @@ describe('CI workflow parity', () => {
     // bundles still run before the slow client build.
     const combined = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
     expect(combined?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:env', 'build:server', 'build:bot']),
+      expect.arrayContaining(['run', 'build:env', 'build:server', 'build:bot']),
     );
     const combinedIdx = gateSteps.findIndex((s) => s.name === 'typecheck + env/server/bot builds');
     const clientIdx = gateSteps.findIndex((s) => s.name === 'client build');
     expect(combinedIdx).toBeGreaterThanOrEqual(0);
     expect(clientIdx).toBeGreaterThan(combinedIdx);
-    expect(gateSteps[clientIdx]?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:bundle']),
-    );
+    expect(gateSteps[clientIdx]?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
     // The profile fallback arm (types-only or builds-only runs) must carry the
     // bot build as its own step too, or --skip-types would silently drop it.
     const fallback = buildFullGateSteps(8, { skipTypes: true });
     expect(fallback.some((s) => s.name === 'bot build')).toBe(true);
     expect(fallback.find((s) => s.name === 'bot build')?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:bot']),
+      expect.arrayContaining(['run', 'build:bot']),
     );
   });
 
   it('keeps the bot build a real, ungated failure in both CI check jobs', () => {
-    // Name-to-run adjacency, because `toContain('run: npm run build:bot')` is
-    // also satisfied by `run: npm run build:bot || true` (which can never fail)
-    // and by a copy-pasted `if: matrix.shard == 1` slipped between the two
-    // lines, which in these unsharded jobs is never true and would disable the
-    // build outright. Either would put a broken bundle back on the host.
+    // Name-to-run adjacency, because `toContain(TYPECHECK_BUILDS_TURBO_RUN)` is
+    // also satisfied by an appended `|| true` (which can never fail) and by a
+    // copy-pasted `if: matrix.shard == 1` slipped between the two lines, which
+    // in these unsharded jobs is never true and would disable the build
+    // outright. Either would put a broken bundle back on the host. turbo run
+    // itself fails the step on any task's non-zero exit, so build:bot riding
+    // inside the combined call still fails the whole step, not just its task.
     for (const name of ['pr-checks', 'release-checks'] as const) {
-      expect(jobSource(name)).toMatch(/- name: Build Discord bot\n {8}run: npm run build:bot\n/);
+      expect(jobSource(name)).toMatch(
+        new RegExp(
+          `- name: Typecheck \\+ env/server/bot builds\\n {8}${escapeRe(TYPECHECK_BUILDS_TURBO_RUN)}\\n`,
+        ),
+      );
     }
     // A step that is allowed to fail is not a gate.
     expect(workflow).not.toContain('continue-on-error');
