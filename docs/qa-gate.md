@@ -419,6 +419,7 @@ before reporting readiness.
 | Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
 | Persistence and migrations | `migration-safety` | `woc_persistence` |
 | Database performance | `database-performance-reviewer` | `woc_database_performance` |
+| Server hot-path performance | `server-hot-path-reviewer` | (not yet mirrored) |
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
@@ -436,7 +437,9 @@ is silently skipped tests. Persistence review owns
 compatibility, save/load shape, and rollback safety. Database-performance review owns query cadence, cardinality, plans,
 indexes, pool pressure, locks, timeout scope, write amplification, driver/dependency upgrades,
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
-Dispatch both when both sets of risk apply.
+Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
+serialization, cache seams, and retention for anything that grows (the seams in
+`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

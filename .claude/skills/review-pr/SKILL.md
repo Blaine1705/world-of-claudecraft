@@ -195,6 +195,7 @@ review in your own voice. Do not let a subagent author the final review prose or
 the voice and the verify-before-accuse bar are yours to hold. Prefer the purpose-built
 agents (`architecture-reviewer` for `src/sim/` determinism + the `SimContext` seam,
 `cross-platform-sync`, `migration-safety`, `database-performance-reviewer`,
+`server-hot-path-reviewer` for server tick/broadcast/cache/retention work,
 `privacy-security-review`, `content-obligations-reviewer` for content-record diffs,
 `gate-integrity-reviewer` for gate/CI pipeline diffs, `qa-checklist`) for
 their domains.

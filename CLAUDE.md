@@ -253,7 +253,8 @@ Use the seams this repo already has, do not invent new ones:
   single-flight and moderation busts, the retention sweep for every table that grows
   without bound, build-once realm readouts and serialize-once events. An uncached
   viewer-identical read or a new unbounded table without a retention story is a defect,
-  not a style choice.
+  not a style choice. The `server-hot-path-reviewer` agent audits exactly these seams;
+  dispatch it on any server hot-path diff.
 - New multi-file subsystem: a directory with an `index.ts` barrel exposing only its
   public surface, plus a local `CLAUDE.md` (template: `src/render/characters/`).
 
