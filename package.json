@@ -41,7 +41,7 @@
     "lint:fix": "biome lint --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "ci:changed": "biome ci --changed --no-errors-on-unmatched",
+    "ci:changed": "node scripts/ci_changed.mjs",
     "check:admin": "svelte-check --tsconfig ./tsconfig.admin.json",
     "check:ts": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc/buildinfo.json",
     "check:ts:bot": "tsc -p tsconfig.bot.json",

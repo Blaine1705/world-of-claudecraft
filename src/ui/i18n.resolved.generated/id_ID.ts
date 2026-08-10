@@ -1054,7 +1054,7 @@ export const id_ID: EnTranslations = {
       "blurb": "Dua benteng reruntuhan saling berhadapan di seberang ceruk berdinding dalam bayangan Thornpeak: Merah di selatan, Biru di utara, dan Halaman Reruntuhan yang lebih tua terletak di antara keduanya, yang tak pernah dikuasai salah satu pun. Lima lawan lima, satu bendera untuk tiap tim, dan tim pertama yang membawa pulang tiga bendera musuh menguasai medan.",
       "modeTag": "5v5 Rebut Bendera",
       "offlineNote": "Medan Thornhollow sedang menyinkronkan. Antrean akan terbuka setelah realm merespons.",
-      "ratingSummary": "Rating. {wins} menang / {losses} kalah",
+      "ratingSummary": "Rating. {wins} menang / {losses} kalah / {draws} seri",
       "careerCaptures": "Rebutan karier: {count}",
       "enterQueue": "Masuk Antrean",
       "enterQueueParty": "Masuk Antrean (party beranggota {count})",
@@ -3311,6 +3311,8 @@ export const id_ID: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const id_ID: EnTranslations = {
       "outOfRange": "Di luar jangkauan.",
       "noTarget": "Kamu tidak memiliki sasaran.",
       "tooClose": "Terlalu dekat!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Kamu harus menghadap sasaranmu.",
       "targetHealthBelow": "Kemampuan itu membutuhkan nyawa sasaran di bawah {percent}%.",
       "dagger": "Kamu harus menggunakan belati.",
@@ -8166,7 +8169,7 @@ export const id_ID: EnTranslations = {
       "queueNote": "Kamu akan dipasangkan dengan penantang daring berperingkat terdekat, lalu diteleportasi ke pasir arena. Menang untuk naik; yang pertama menyerah (1 nyawa) kalah. Kamu kembali persis ke tempat kamu mengantre.",
       "ladderAllTime": "Tangga Peringkat - Sepanjang Masa",
       "ladderOnline": "Tangga Peringkat - Daring",
-      "ratingSummary": "Peringkat - {wins} menang / {losses} kalah",
+      "ratingSummary": "Peringkat - {wins} menang / {losses} kalah / {draws} seri",
       "statusCountdown": "Bersiaplah...",
       "statusReturning": "Kembali ke dunia... {seconds}",
       "statusFight": "Bertarung sampai menyerah!",
@@ -9540,6 +9543,10 @@ export const id_ID: EnTranslations = {
       "die_by_sword": {
         "name": "Mati oleh Pedang",
         "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Kenekatan",

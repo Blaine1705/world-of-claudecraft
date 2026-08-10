@@ -1054,7 +1054,7 @@ export const tr_TR: EnTranslations = {
       "blurb": "İki yıkık kale, Dikenzirve'nin gölgesindeki surlu bir vadide karşı karşıyadır: güneyde Kızıl, kuzeyde Gök Mavisi, ikisinin arasında ise hiçbirinin hiç ele geçiremediği daha eski Yıkık Avlu bulunur. Her tarafta beş kişi, birer sancak; kendi sancaklarından üçünü eve ilk taşıyan sahayı kazanır.",
       "modeTag": "5v5 Sancağı Kap",
       "offlineNote": "Dikenvadi Ovası senkronize ediliyor. Diyar yanıt verdiğinde sıra açılır.",
-      "ratingSummary": "Puan. {wins} galibiyet / {losses} mağlubiyet",
+      "ratingSummary": "Puan. {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik",
       "careerCaptures": "Kariyer boyunca ele geçirme: {count}",
       "enterQueue": "Sıraya Gir",
       "enterQueueParty": "Sıraya Gir ({count} kişilik grup)",
@@ -3311,6 +3311,8 @@ export const tr_TR: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const tr_TR: EnTranslations = {
       "outOfRange": "Menzil dışında.",
       "noTarget": "Hiçbir hedefin yok.",
       "tooClose": "Çok yakın!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Hedefine dönük olmalısın.",
       "targetHealthBelow": "O yetenek, hedefin canının %{percent} altında olmasını gerektirir.",
       "dagger": "Bir hançer kuşanmalısın.",
@@ -8166,7 +8169,7 @@ export const tr_TR: EnTranslations = {
       "queueNote": "Çevrimiçi olan en yakın puanlı meydan okuyanla eşleştirilip kumlara ışınlanacaksın. Yükselmek için kazan; ilk teslim olan (1 can) kaybeder. Tam olarak sıraya girdiğin yere dönersin.",
       "ladderAllTime": "Sıralama - Tüm Zamanlar",
       "ladderOnline": "Sıralama - Çevrimiçi",
-      "ratingSummary": "Puan - {wins} galibiyet / {losses} mağlubiyet",
+      "ratingSummary": "Puan - {wins} galibiyet / {losses} mağlubiyet / {draws} beraberlik",
       "statusCountdown": "Kendini hazırla...",
       "statusReturning": "Dünyaya dönülüyor... {seconds}",
       "statusFight": "Teslimiyete kadar savaş!",
@@ -9540,6 +9543,10 @@ export const tr_TR: EnTranslations = {
       "die_by_sword": {
         "name": "Kılıçla Ölüm",
         "description": "Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Pervasızlık",
