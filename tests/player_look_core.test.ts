@@ -1,6 +1,6 @@
 // What a player WEARS, as a decision rather than as a thing you have to log in
-// to see. Every surface that draws an authored character — the world, the
-// char-select stage, the roster chip, the redesign turntable — goes through
+// to see. Every surface that draws an authored character (the world, the
+// char-select stage, the roster chip, the redesign turntable) goes through
 // these three functions, and each of the rules below is one that broke a real
 // screen before it was pinned here:
 //
@@ -18,6 +18,7 @@ import {
   charselectLook,
   composedLook,
   inWorldLookFor,
+  modularLookChanged,
 } from '../src/render/characters/player_look_core';
 import { createPlayer } from '../src/sim/entity';
 import type { Entity, PlayerClass } from '../src/sim/types';
@@ -155,5 +156,43 @@ describe('DEFAULT_APPEARANCE round trip', () => {
   it('survives the compose path unchanged', () => {
     const look = composedLook({ ...DEFAULT_APPEARANCE }, 'knight', false);
     expect(look?.app).toEqual(DEFAULT_APPEARANCE);
+  });
+});
+
+describe('modularLookChanged', () => {
+  it('returns false for the same reference (the fast path the per-frame diff relies on)', () => {
+    const look = { gender: 'female' };
+    expect(modularLookChanged(look, look)).toBe(false);
+  });
+
+  it('returns false from null to null', () => {
+    expect(modularLookChanged(null, null)).toBe(false);
+  });
+
+  it('returns false from undefined to undefined, and across null/undefined', () => {
+    expect(modularLookChanged(undefined, undefined)).toBe(false);
+    expect(modularLookChanged(null, undefined)).toBe(false);
+    expect(modularLookChanged(undefined, null)).toBe(false);
+  });
+
+  it('returns true from null to a look', () => {
+    expect(modularLookChanged(null, { gender: 'female' })).toBe(true);
+  });
+
+  it('returns true from a look to null', () => {
+    expect(modularLookChanged({ gender: 'female' }, null)).toBe(true);
+  });
+
+  it('returns false for two different references carrying identical content (the full identity-record reassignment case)', () => {
+    const prev = { gender: 'female', hair: 'highbun' };
+    const next = { gender: 'female', hair: 'highbun' };
+    expect(prev).not.toBe(next);
+    expect(modularLookChanged(prev, next)).toBe(false);
+  });
+
+  it('returns true for two different references carrying different content', () => {
+    const prev = { gender: 'female', hair: 'highbun' };
+    const next = { gender: 'female', hair: 'shortcrop' };
+    expect(modularLookChanged(prev, next)).toBe(true);
   });
 });

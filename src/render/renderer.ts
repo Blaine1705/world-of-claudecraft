@@ -138,6 +138,7 @@ import {
   trainingDummyAssetsReady,
 } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
+import { modularLookChanged } from './characters/player_look_core';
 import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
@@ -1060,6 +1061,11 @@ export interface EntityView {
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
   helmHidden: boolean; // last-rendered paperdoll eye toggle, diffed to recompose the kit helm
+  // last-composed authored look, diffed by VALUE (see modularLookChanged) to
+  // recompose a live redesign; a plain reference copy of e.modularAppearance,
+  // never normalized, so an unchanged reference short-circuits without a
+  // stringify next frame
+  modularAppearance: Record<string, unknown> | null | undefined;
   /** unscaled height, nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -8139,6 +8145,9 @@ export class Renderer {
       // Born with the CURRENT bit: unlike the stow pose there is no transition
       // to replay, createCharacterVisual composed with it just now.
       helmHidden: e.helmHidden,
+      // Born with the CURRENT look, for the same reason: createCharacterVisual
+      // composed with it just now, so there is nothing to reconcile yet.
+      modularAppearance: e.modularAppearance,
       liveScale: e.scale,
       loco: newLocoTrack(),
       locoState: newLocoState(),
@@ -10258,6 +10267,30 @@ export class Renderer {
         // helm toggle must not force a pointless dispose/rebuild of it. Asked
         // through isMechWearer, the one definition of the rule.
         if (!isMechWearer(e) && modularLookFor(e)) v.visualKey = null;
+      }
+
+      // live redesign: the server pushed a changed authored look onto this
+      // live entity (server/game.ts) and the client mirror reassigned
+      // e.modularAppearance from a fresh wire read (src/net/online.ts). Cheap
+      // reference check first, exactly like every other diff in this pass;
+      // the reference alone is not a verdict here because the SAME mirror
+      // also reassigns it on every unrelated identity record (an equip, a
+      // level-up), so modularLookChanged does the real by-value comparison
+      // before anything is nulled. Same recompose path as the helm toggle
+      // above: nulling visualKey makes updateBaseVisual's next-key diff read
+      // as a base-visual swap and reuse its whole replace path. The guard
+      // differs from the helm arm in one spot: modularLookFor reads the NEW
+      // state, which is null exactly when a cleared look needs the body to
+      // fall back to the class rig, so a previously composed body (a non-null
+      // prev reference) recomposes too. The reference is copied every time
+      // this fires, changed or not, so the cheap check above stays quiet
+      // until the next real reassignment.
+      if (e.modularAppearance !== v.modularAppearance) {
+        if (modularLookChanged(v.modularAppearance, e.modularAppearance)) {
+          const composedBefore = v.modularAppearance != null;
+          if (!isMechWearer(e) && (modularLookFor(e) || composedBefore)) v.visualKey = null;
+        }
+        v.modularAppearance = e.modularAppearance;
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;

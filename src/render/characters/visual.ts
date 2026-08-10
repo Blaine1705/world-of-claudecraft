@@ -440,7 +440,7 @@ export class CharacterVisual {
   private farBakeTried = false;
   /** Waiting on the per-frame bake budget (takeFarBakeBudget): the band
    *  crossed but this part set's slot was taken, so update() retries. The
-   *  visual stays articulated meanwhile — correct, just not yet cheap. */
+   *  visual stays articulated meanwhile (correct, just not yet cheap). */
   private farBakePending = false;
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
@@ -1377,7 +1377,7 @@ export class CharacterVisual {
     if (far === this.far) return;
     this.far = far;
     // First crossing of a composed body: mint its far LOD, BUDGETED. Cached
-    // per part set, so a crowd in one haircut pays for one bake between them —
+    // per part set, so a crowd in one haircut pays for one bake between them,
     // but a camera leaving a capital crosses every peer in one frame, so only
     // one genuinely new part set bakes per window and the rest go pending and
     // retry from update(). A part set someone already baked is free (the peek)
@@ -1419,7 +1419,7 @@ export class CharacterVisual {
 
   /** Bake (or reuse) this composed body's far LOD. Leaves farMesh null if the
    *  look bakes to nothing, in which case the character simply keeps its
-   *  articulated model at distance — correct, just not as cheap. */
+   *  articulated model at distance (correct, just not as cheap). */
   private buildComposedFar(): void {
     this.farBakeTried = true;
     if (!this.look) return;
@@ -1446,6 +1446,13 @@ export class CharacterVisual {
     // which already ran for this frame against a null proxy; sync it to the
     // state the mesh was just built into.
     if (this.shadowProxy) this.shadowProxy.visible = false;
+    // This mesh is minted lazily, on the first crossing into the far band, so
+    // any effect state (ghost, soul rend, shadowform, moonkin, metamorph, rune
+    // tint) that edged on before that crossing never touched it: every setter
+    // that writes an overlay onto farMesh early-returns on no state change, and
+    // this is the only place a fresh farMesh comes from outside the constructor.
+    // Catch it up now, on the same material set the rig itself is already wearing.
+    this.applyVisualMaterials();
   }
 
   get isFar(): boolean {
