@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '99afe7b2d1560065e519134818a90dea92be98403d2d8a356b12a65ffbc2421d';
+  'c86120ce697b52ad0b4673185c86c8f41db3506075cd13a6f839f3eb71b3959d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9db933efa90fecc3de79268b1027d7a2630e948bc250b74324da4230cf059352';
+  'b16db9885fdaa22054f7338275b418da5ec2e3ca47f5f8dc560a160e4902b05d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1620,10 +1620,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
     // archetype and scene-texture counts; renderer.ts edits only). No capture
     // was retaken.
+    // Re-minted for the merge of release/v0.36.0 (post PR 3231/3233) into the
+    // creator-appearance branch: both parents move the rendererIntegration
+    // leaf (this branch's composed far overlay, live recompose and eviction
+    // seam; the release's loading-time and water-seam work), so the merged
+    // tree mints a value matching neither parent. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('af9f8a1421705f57c23d55ac66f50d07584662dc11a261b67269ed3a70eb40a5');
+    ).toBe('03127017106710473ee02532975d60166281be3dc837eccf677fdc65e6289194');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
