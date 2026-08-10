@@ -525,6 +525,49 @@ describe('mount engine audio (windup/loop/winddown)', () => {
       .pendingLoops;
     expect(pendingLoops.get('cold-loop-immediate')?.immediate).toBe(true);
   });
+
+  it('actually passes the immediate flag through to the resumed loop() call, snapping gain via setValueAtTime rather than ramping via setTargetAtTime', async () => {
+    // Storing `immediate` on the pending entry (the test above) is necessary
+    // but not sufficient: a mutant that stores it and then drops
+    // `pending.immediate` from the resumed `loop(...)` call below (line 738)
+    // would still pass that test. This test forces the cold path all the way
+    // through to a resolved buffer and inspects the actual gain automation
+    // call the resumed loop() makes, which is the only observable difference
+    // `immediate` produces (see the `justCreated && immediate` branch).
+    const coldKey = 'mount_run_never_cached_test_key_resumed';
+    const buffers = (sfx as unknown as { buffers: Map<string, unknown> }).buffers;
+    const failedLoads = (sfx as unknown as { failedLoads: Set<string> }).failedLoads;
+    buffers.delete(coldKey);
+    failedLoads.delete(coldKey);
+    // Real fetch/decode isn't available in this test's WebAudio stub, so stub
+    // loadBuffer directly to resolve with a fake decoded buffer, simulating
+    // the fetch finishing successfully while the loop is still pending.
+    const fakeBuffer = { duration: 1 };
+    // Populate the buffer cache as a side effect of the mocked resolution, so
+    // the resumed loop() call (which re-checks `buffers` itself) finds it
+    // cached instead of falling back to ANOTHER cold path and recursing.
+    const loadBufferSpy = vi
+      .spyOn(
+        sfx as unknown as { loadBuffer: (key: string, variantIndex?: number) => Promise<unknown> },
+        'loadBuffer',
+      )
+      .mockImplementation(async (key: string, variantIndex = 0) => {
+        buffers.set(variantIndex === 0 ? key : `${key}:${variantIndex}`, fakeBuffer);
+        return fakeBuffer;
+      });
+    const id = 'cold-loop-immediate-resumed';
+    sfx.loop(id, coldKey, 0.85, 0, 0, 0, undefined, true);
+    // Let the mocked loadBuffer promise (and its .then() resume callback) settle.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    loadBufferSpy.mockRestore();
+    const loops = (sfx as unknown as { loops: Map<string, { gain: { gain: { value: number } } }> })
+      .loops;
+    const slot = loops.get(id);
+    expect(slot).toBeDefined();
+    expect(slot?.gain.gain.value).toBeCloseTo(0.85);
+    expect(gainAutomationCalls).toContain('setValueAtTime');
+    expect(gainAutomationCalls).not.toContain('setTargetAtTime');
+  });
 });
 
 describe('amb_forge: its own narrower audible distance', () => {
