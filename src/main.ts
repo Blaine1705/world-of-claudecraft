@@ -538,6 +538,7 @@ const RESOURCE_KEYS = {
   mana: 'classDetails.resources.mana',
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
+  focus: 'classDetails.resources.focus',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {
@@ -1467,7 +1468,11 @@ async function startGame(
       // Spellbook paints the whole class kit, including not-yet-learned rows.
       classAbilityIds: CLASSES[world.cfg.playerClass].abilities,
       talentIconRefs: (rowTreeFor(world.cfg.playerClass) ?? []).flatMap((row) =>
-        row.options.map(talentRowOptionIconRef),
+        row.options
+          .map(talentRowOptionIconRef)
+          // Paladin talent art is a real .webp the browser fetches directly;
+          // only procedural icon-cache refs participate in the prewarm plan.
+          .filter((ref) => ref.kind !== 'image'),
       ),
       recipeResultItemIds: world.recipeList.map((recipe) => recipe.resultItemId),
       finderLootItemIds: finderLootItemIds(),

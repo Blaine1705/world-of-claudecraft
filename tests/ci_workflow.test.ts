@@ -820,7 +820,11 @@ describe('CI workflow parity', () => {
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
-      ['pr-long-sims', 20],
+      // Resized 20 to 40 with the nine-suite lane (review 3050), then 40 to
+      // 60 after run 31290316610 measured the lane's healthy wall landing
+      // right at 40 on a slow-quartile runner (the sizing evidence sits on
+      // the ci.yml bound).
+      ['pr-long-sims', 60],
       ['browser-gate', 10],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
