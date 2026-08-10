@@ -99,16 +99,20 @@ describe('delve shop, buying', () => {
     expect(countOf(sim, RELIC)).toBe(2);
     expect(meta.reliquary.counts[RELIC]).toBe(2);
 
-    // The facet doc's four-id premise, pinned as an EXACT set equality: the
-    // catalogued relics stocked across all delve shops are precisely the four
-    // ids the doc names, so a fifth catalogued relic landing in any delve
-    // shop reds here and forces the doc sentence to be revisited (the ids'
-    // properties are what this pins; the prose itself cannot be pinned).
+    // The facet doc's six-id premise, pinned as an EXACT set equality: the
+    // catalogued relics stocked across all delve shops are precisely the six
+    // ids the doc names (four Phase 12 originals plus the two chase rods the
+    // Phase 21 specimens growth catalogued off the Litany board), so a
+    // seventh catalogued relic landing in any delve shop reds here and
+    // forces the doc sentence to be revisited (the ids' properties are what
+    // this pins; the prose itself cannot be pinned).
     const DOC_RELICS = [
       'deacon_reliquary_helm',
       'varric_shadow_cowl',
       'sister_nhalia_choir_plate',
       'drowned_choir_fang',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
     ];
     const stocked = new Set(
       Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),

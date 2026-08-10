@@ -59,11 +59,13 @@ export interface IWorldReliquary {
    * purchase, vendor buyback, or re-mint never bumps one. A heroic-difficulty
    * drop credits the BASE relic, the same slot its discovery fills, so the
    * count agrees with the page. A CURRENCY vendor does count, and is meant to:
-   * the delve Marks shop sells four catalogued relics (deacon_reliquary_helm,
-   * varric_shadow_cowl, sister_nhalia_choir_plate, drowned_choir_fang), Marks
-   * are earned in the world, and buying a second copy really is a second thing
-   * the world handed you. Information, never a score: it feeds no completion,
-   * rank, drop rate, or reward. Empty object when none.
+   * the delve Marks shops sell six catalogued relics (deacon_reliquary_helm,
+   * varric_shadow_cowl, sister_nhalia_choir_plate, drowned_choir_fang, and
+   * since the Phase 21 specimens growth the two chase rods
+   * stormreel_fishing_rod and tidewrought_fishing_rod on the Litany board),
+   * Marks are earned in the world, and buying a second copy really is a
+   * second thing the world handed you. Information, never a score: it feeds
+   * no completion, rank, drop rate, or reward. Empty object when none.
    */
   reliquaryObtainCounts: Readonly<Record<string, number>>;
   /**

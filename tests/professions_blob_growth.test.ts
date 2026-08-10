@@ -111,13 +111,19 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'arena1v1Rating',
   'arena1v1Wins',
   'arena1v1Losses',
+  // The W-L-D draws counters (v0.36.0): persisted beside their bracket's
+  // wins/losses; classified here at the Phase 21 QA release sync because
+  // the release change landed without this guard's row.
+  'arena1v1Draws',
   'arena2v2Rating',
   'arena2v2Wins',
   'arena2v2Losses',
+  'arena2v2Draws',
   // The battleground group, written together behind one conditional spread.
   'bgRating',
   'bgWins',
   'bgLosses',
+  'bgDraws',
   'bgCaptures',
   'weaponStowed',
   'helmHidden',
