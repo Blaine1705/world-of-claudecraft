@@ -306,7 +306,6 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
-  type Entity,
   MELEE_RANGE,
   PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,

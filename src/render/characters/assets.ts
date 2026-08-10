@@ -2170,7 +2170,6 @@ export const tintedMaterialInternalsForTest = {
   cacheIdleSize: (): number => matCache.idleSize,
 };
 
-
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);
   if (hit) return hit;

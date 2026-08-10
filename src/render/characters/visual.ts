@@ -57,6 +57,7 @@ import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
+import type { ModularAppearance, ModularLook } from './modular';
 import {
   PALADIN_BASTION_SWEEP_CLIP,
   PALADIN_BASTION_SWEEP_DURATION,
@@ -67,7 +68,6 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
-import type { ModularAppearance, ModularLook } from './modular';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
