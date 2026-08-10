@@ -66,7 +66,7 @@ export function bestEpicGearFor(
       if (oneHanders.length > 0) candidates = oneHanders;
     }
     if (candidates.length === 0) continue;
-    candidates.sort((a, b) => score(b) - score(a) || a.id.localeCompare(b.id));
+    candidates.sort((a, b) => score(b) - score(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     picks[slot] = candidates[0].id;
     used.add(candidates[0].id);
   }

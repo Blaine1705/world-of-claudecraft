@@ -139,7 +139,9 @@ export function createDeathEcho(
 
   let aura: Entity['auras'][number] | undefined;
   if (slot < 0) {
-    aura = [...active].sort((a, b) => a.remaining - b.remaining || a.id.localeCompare(b.id))[0];
+    aura = [...active].sort(
+      (a, b) => a.remaining - b.remaining || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    )[0];
     slot = Number.parseInt(aura.id.slice(DEATH_ECHO_ID_PREFIX.length), 10);
   }
 

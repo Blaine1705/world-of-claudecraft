@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { anchorProbeInOpenField } from '../scripts/probe_anchor';
 import { lineOfSightClear } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
+import type { ResolvedAbilityMod } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -357,5 +358,40 @@ describe('Hunter v0.29 choice-row mechanics', () => {
       true,
     );
     expect(sim.resolvedAbility('aspect_of_the_cheetah')?.def.id).toBe('aspect_of_the_cheetah');
+  });
+
+  it('keeps a per-ability talent mod on the Pack Rally transform (no real hunter talent keys pack_rally today, so this pins the ordering directly)', () => {
+    // No shipped hunter talent currently keys a mod to 'pack_rally' (it is a
+    // shadow def, only ever reached through the aspect_of_the_cheetah swap,
+    // never a member of the hunter's known-ability list). Injecting a mod
+    // straight onto the resolved talentMods exercises the exact same
+    // applyTalentMods(found, mods) call resolvedAbility makes for every real
+    // per-ability mod, without inventing new talent content.
+    const sim = hunter('beast_mastery', { 17: 'hun_r17_pack_rally' }, 2926);
+    sim.player.inCombat = true;
+    const packRallyMod: ResolvedAbilityMod = {
+      dmgPct: 0,
+      dmgPctVsDotted: 0,
+      flatDmg: 0,
+      costPct: -0.5,
+      cooldownPct: -0.5,
+      cooldownFlat: 0,
+      castPct: 0,
+      buffPct: 0,
+      critPct: 0,
+      castWhileMoving: false,
+      damagePushbackImmune: false,
+      ignoreStealthRequirement: false,
+      bonusCharges: 0,
+      addEffects: [],
+    };
+    sim.players.get(sim.playerId)!.talentMods.abilities.pack_rally = packRallyMod;
+
+    const resolved = sim.resolvedAbility('aspect_of_the_cheetah');
+    expect(resolved?.def.id).toBe('pack_rally');
+    // Raw pack_rally is cost 20 / cooldown 90 (classes.ts); a -50% mod on
+    // the swapped-in def must land exactly once.
+    expect(resolved?.cost).toBe(10);
+    expect(resolved?.cooldown).toBe(45);
   });
 });

@@ -91,6 +91,32 @@ describe('Knifework: Venom Ritual', () => {
     expect(sim.resolvedAbility('eviscerate')?.def.id).toBe('eviscerate');
   });
 
+  it('still carries the assassination baseline damage mod through the Venomrend transform', () => {
+    // Assassination's spec baseline (spec_baselines.ts) bakes a real, shipped
+    // global.meleeDmgPct: 0.22 into every physical-school ability. Venomrend
+    // (school: physical) is a wholesale def swap via resolveActionReplacement,
+    // never a member of the rogue's known-ability list, so it only ever gets
+    // this multiplier if resolvedAbility re-applies talent mods to the
+    // swapped-in def. This pins that the ordering refactor in resolvedAbility
+    // did not regress the one real per-ability-swap mod path that already
+    // shipped: dropping it would leave Venomrend at its raw 100/55 base/perCombo.
+    const { sim, p } = rig('assassination');
+    const mob = addTargetMob(sim);
+    for (let i = 0; i < 6; i++) completeCast(sim, 'backstab', mob);
+    expect(stacksOf(p, 'venom_ritual')).toBe(6);
+
+    const resolved = sim.resolvedAbility('eviscerate');
+    expect(resolved?.def.id).toBe('venomrend');
+    const finisher = resolved?.effects.find((effect) => effect.type === 'finisherDamage');
+    if (!finisher || finisher.type !== 'finisherDamage') {
+      throw new Error('expected a finisherDamage effect on the resolved Venomrend');
+    }
+    // Raw Venomrend is base 100 / perCombo 55 (talent_abilities_v2_a.ts); at
+    // 1.22x that is 122 / 67.
+    expect(finisher.base).toBe(122);
+    expect(finisher.perCombo).toBe(67);
+  });
+
   it('the two-beat rhythm: a five-thrust cycle ends in Dirt Nap, the next in Venomrend', () => {
     const { sim, p } = rig('assassination');
     const mob = addTargetMob(sim, 1_000_000, 2, 9403);

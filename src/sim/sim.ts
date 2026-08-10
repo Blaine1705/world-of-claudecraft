@@ -5862,10 +5862,21 @@ export class Sim {
     // hunter resolvers land here, the one choke point the cast path, cost
     // checks, and the server all read).
     let found = resolveActionReplacement(known, r.e);
-    if (found !== known) applyTalentMods(found, this.playerMods(r.meta));
     found = resolveColdsightAbility(found, r.e, r.meta);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
     found = resolveVespersAbility(found, r.meta);
+    // `known` already carries its own talent mods, baked in once when
+    // r.meta.known was built (abilitiesKnownAt -> applyTalentMods). A
+    // wholesale def swap (resolveActionReplacement's rogue engine transforms,
+    // or the hunter Pack Rally swap inside resolveHunterSharedAbility) lands
+    // on a raw ABILITIES def instead, which never went through that bake, so
+    // give it its own (possibly empty) mods pass here, exactly once, keyed by
+    // its FINAL id, after every resolver above has had a chance to swap it.
+    // Compare ids, not object identity: Coldsight/Vespers return a
+    // `{...resolved}` spread copy even when they leave the def untouched, and
+    // keying on `found !== known` would re-run the bake on that copy and
+    // double-apply the mods `known` already carries.
+    if (found.def.id !== known.def.id) applyTalentMods(found, this.playerMods(r.meta));
     // A "draining curse" (cost_tax aura) inflates the resource cost of every
     // ability the victim uses. Resolve it here, the single choke point all cost
     // checks/spends read, so the affordability check and the spend stay in
