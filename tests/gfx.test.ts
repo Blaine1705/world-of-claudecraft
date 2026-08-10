@@ -57,10 +57,9 @@ describe('graphics tier resolution', () => {
         const settings = gfxInternalsForTest.settingsFor(tier, hints);
         if (!settings.composer && !settings.gradePass) {
           directProfilesSeen++;
-          expect(
-            settings.dynamicShadows,
-            `${tier} hints:${JSON.stringify(hints ?? null)}`,
-          ).toBe(false);
+          expect(settings.dynamicShadows, `${tier} hints:${JSON.stringify(hints ?? null)}`).toBe(
+            false,
+          );
         }
       }
     }

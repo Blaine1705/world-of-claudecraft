@@ -206,11 +206,7 @@ describe('PreparedBloomPass internals against the installed three', () => {
       },
     };
     const readBuffer = { texture: { isTexture: true } };
-    pass.render(
-      stub as never,
-      undefined as never,
-      readBuffer as never,
-    );
+    pass.render(stub as never, undefined as never, readBuffer as never);
     // 1 high-pass + 2 blur draws per mip + 1 composite.
     expect(draws).toHaveLength(2 + 2 * pass.nMips);
     expect(draws[0]?.material).toBe(pass.materialHighPassFilter);

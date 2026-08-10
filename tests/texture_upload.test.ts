@@ -50,9 +50,7 @@ describe('chunked DataTexture upload', () => {
     // texture carrying a range from an aborted earlier upload must not leak
     // it into the first batch (the consumer would re-upload a stale region
     // and the first chunk would overshoot its byte budget).
-    const updateRanges: { start: number; count: number }[] = [
-      { start: 512, count: 7 },
-    ];
+    const updateRanges: { start: number; count: number }[] = [{ start: 512, count: 7 }];
     const texture = Object.assign(new THREE.DataTexture(new Uint16Array(8 * 2 * 4), 8, 2), {
       updateRanges,
       clearUpdateRanges: () => {

@@ -74,8 +74,7 @@ export function ktx2WorkerConfigFromRawContext(gl: RawGlContext): Ktx2WorkerConf
   //    degrades to false here instead of throwing.
   const astc = astcExtension as { getSupportedProfiles?: () => string[] } | null;
   config.astcHDRSupported =
-    typeof astc?.getSupportedProfiles === 'function' &&
-    astc.getSupportedProfiles().includes('hdr');
+    typeof astc?.getSupportedProfiles === 'function' && astc.getSupportedProfiles().includes('hdr');
   // 2) The Linux Mesa emulated-format filter: Chrome/Firefox on Linux expose
   //    ASTC/ETC for AMD/Intel GPUs whose hardware lacks them (the driver
   //    software-decompresses on sample), so when every non-emulated format is
