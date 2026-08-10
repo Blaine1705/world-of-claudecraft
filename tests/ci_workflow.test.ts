@@ -248,9 +248,11 @@ describe('CI workflow parity', () => {
     // builds the bot beside the server).
     expect(gate).toContain('buildFullGateSteps');
     expect(gateSteps.some((s) => s.name === 'typecheck + env/server/bot builds')).toBe(true);
-    expect(gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds')?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'check:types', 'build:bot']),
-    );
+    const typesBuilds = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
+    // The local gate resolves turbo's own binary directly (no npx dispatch);
+    // cmd carries the "turbo" identity, args starts at "run" (gate_task_cache.mjs).
+    expect(typesBuilds?.cmd).toMatch(/(?:^|[\\/])turbo(?:\.cmd)?$/);
+    expect(typesBuilds?.args).toEqual(expect.arrayContaining(['run', 'check:types', 'build:bot']));
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -820,7 +822,11 @@ describe('CI workflow parity', () => {
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
-      ['pr-long-sims', 20],
+      // Resized 20 to 40 with the nine-suite lane (review 3050), then 40 to
+      // 60 after run 31290316610 measured the lane's healthy wall landing
+      // right at 40 on a slow-quartile runner (the sizing evidence sits on
+      // the ci.yml bound).
+      ['pr-long-sims', 60],
       ['browser-gate', 10],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
@@ -1007,7 +1013,7 @@ describe('CI workflow parity', () => {
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     // gate.mjs still binds workers into the shared step builder.
-    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier })');
+    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier, repoRoot })');
     expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
@@ -1145,21 +1151,19 @@ describe('CI workflow parity', () => {
     // bundles still run before the slow client build.
     const combined = gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds');
     expect(combined?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:env', 'build:server', 'build:bot']),
+      expect.arrayContaining(['run', 'build:env', 'build:server', 'build:bot']),
     );
     const combinedIdx = gateSteps.findIndex((s) => s.name === 'typecheck + env/server/bot builds');
     const clientIdx = gateSteps.findIndex((s) => s.name === 'client build');
     expect(combinedIdx).toBeGreaterThanOrEqual(0);
     expect(clientIdx).toBeGreaterThan(combinedIdx);
-    expect(gateSteps[clientIdx]?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:bundle']),
-    );
+    expect(gateSteps[clientIdx]?.args).toEqual(expect.arrayContaining(['run', 'build:bundle']));
     // The profile fallback arm (types-only or builds-only runs) must carry the
     // bot build as its own step too, or --skip-types would silently drop it.
     const fallback = buildFullGateSteps(8, { skipTypes: true });
     expect(fallback.some((s) => s.name === 'bot build')).toBe(true);
     expect(fallback.find((s) => s.name === 'bot build')?.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'build:bot']),
+      expect.arrayContaining(['run', 'build:bot']),
     );
   });
 

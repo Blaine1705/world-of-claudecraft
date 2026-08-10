@@ -42,6 +42,7 @@
 // set 8 ways. The two legs may overlap on partial tests; that re-runs a few
 // files and is wasted time, never a correctness gap.
 
+import path from 'node:path';
 import { isRelayablePath } from './ci_test_select.mjs';
 import { classifySelectPaths } from './gate_select_plan.mjs';
 
@@ -83,7 +84,15 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/audit_conservation_property.test.ts',
   'tests/battleground.test.ts',
   'tests/chronomancy_balance.test.ts',
+  // The five-class-overhauls balance harnesses (review 3050): the owned-class
+  // matrices grew to 8 specs and the raid loop to ~510s, pushing shards 1 and
+  // 4 past the 20-minute job budget; they are exactly what this lane is for.
+  'tests/druid_balance_probe.test.ts',
   'tests/eastbrook_gameplay_integration.test.ts',
+  'tests/hunter_dps_balance.test.ts',
+  'tests/nythraxis_matrix.test.ts',
+  'tests/owned_class_balance_harness.test.ts',
+  'tests/owned_class_raid_balance_harness.test.ts',
 ]);
 
 /**
@@ -154,6 +163,25 @@ export function buildFloor({ alwaysRun, testFiles, changedTestFiles }) {
   }
   for (const t of changedTestFiles ?? []) floor.add(t);
   return { floor: [...floor].sort(), missingGuards };
+}
+
+/**
+ * Resolve a locally installed CLI binary from node_modules/.bin so the
+ * `vitest related` leg spawns the exact vitest binary `npm test` already
+ * resolves, instead of paying npx's extra registry-aware resolution path for
+ * a binary this monorepo always has installed. This planner always runs from
+ * the repo root (CI invokes it there, and so does the local gate), so the
+ * binary is resolved against process.cwd() rather than adding a repoRoot
+ * input every caller would have to start threading through. win32-aware:
+ * pnpm links a .cmd shim there; every other platform ships the bare POSIX
+ * script npm/pnpm links.
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+export function resolveLocalBin(name) {
+  const bin = process.platform === 'win32' ? `${name}.cmd` : name;
+  return path.join(process.cwd(), 'node_modules', '.bin', bin);
 }
 
 /**
@@ -320,17 +348,8 @@ export function buildShardPlan({
       // changed sources and fed-through generated i18n artifacts; the mode
       // reason carries the split counts.
       name: `vitest related (${liveSources.length} path(s), shard ${shard.index}/${shard.total})`,
-      cmd: 'npx',
-      args: [
-        '--no-install',
-        'vitest',
-        'related',
-        ...liveSources,
-        '--run',
-        '--passWithNoTests',
-        shardArg,
-        workersArg,
-      ],
+      cmd: resolveLocalBin('vitest'),
+      args: ['related', ...liveSources, '--run', '--passWithNoTests', shardArg, workersArg],
     });
   }
   return {
