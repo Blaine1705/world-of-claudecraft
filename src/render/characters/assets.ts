@@ -929,7 +929,7 @@ function optimizedScene(url: string): THREE.Object3D {
  *  is cloned from, a live-clone count, and the far-LOD bake taken off it. */
 interface ModularVariant {
   root: THREE.Object3D;
-  /** The GLB this was pruned from — needed at eviction to tell the geometry
+  /** The GLB this was pruned from: needed at eviction to tell the geometry
    *  this variant MINTED from the geometry it merely points at. */
   url: string;
   /** Live composed clones still drawn from this root's geometry. */
@@ -944,7 +944,7 @@ interface ModularVariant {
 // The cache is keyed by PART SET, and the original reasoning ("creation only
 // walks a few dozen") held while a single character composed: the local player.
 // Now every peer composes, so what mints entries is no longer one player at a
-// turntable but the population of a zone — a distinct set per distinct look —
+// turntable but the population of a zone (a distinct set per distinct look),
 // and it grows for as long as the session lasts as players come and go. At
 // ~6.7k merged vertices a set, an evening in a capital would run to hundreds of
 // megabytes of geometry nothing on screen is using.
@@ -955,11 +955,11 @@ interface ModularVariant {
 // is therefore retained in assembleModular and released in
 // CharacterVisual.dispose, and only entries with NO live clone are eligible.
 // When every entry is live the cache is allowed past the cap rather than
-// breaking a body on screen — the bound is on garbage, not on the crowd.
+// breaking a body on screen: the bound is on garbage, not on the crowd.
 const modularVariantCache = new Map<string, ModularVariant>();
 /** Retained clones over the cap keep their variant; only idle ones are dropped. */
 const MODULAR_VARIANT_CACHE_MAX = 96;
-/** Dev-only tripwire on live (unevictable) variants — the one growth the cap
+/** Dev-only tripwire on live (unevictable) variants: the one growth the cap
  *  cannot bound, and the signal that a release site was missed. */
 const MODULAR_VARIANT_WARN_AT = 128;
 
@@ -997,7 +997,7 @@ const sourceGeometryCache = new WeakMap<THREE.Object3D, Set<THREE.BufferGeometry
  * Exported for the test rather than for a caller: this predicate is the whole
  * safety of eviction, and getting it wrong is silent (a body keeps rendering
  * until the renderer next needs the buffer). `shared` is the parsed GLB's own
- * geometry set — see sourceGeometries for why so much of a variant is still in
+ * geometry set: see sourceGeometries for why so much of a variant is still in
  * it.
  */
 export function variantOwnedGeometries(
@@ -1012,7 +1012,9 @@ export function variantOwnedGeometries(
   return owned;
 }
 
-function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
+// Exported for the test rather than for a caller (test seam, no behavior change):
+// evictModularVariants diffs against this set to know what a variant may free.
+export function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
   const scene = resolvedGltf(url).scene;
   const hit = sourceGeometryCache.get(scene);
   if (hit) return hit;
@@ -1036,7 +1038,7 @@ function evictModularVariants(): void {
     modularVariantCache.delete(key);
     // Now provably unreferenced, so the buffers this variant MINTED can go
     // back: dropping the map entry alone would leak them (three.js frees a
-    // geometry on dispose(), not on GC). Only the minted ones — see
+    // geometry on dispose(), not on GC). Only the minted ones: see
     // sourceGeometries for what the unmerged parts are still pointing at.
     for (const geo of variantOwnedGeometries(entry.root, sourceGeometries(entry.url))) {
       geo.dispose();
@@ -1115,7 +1117,7 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
   // insert reaches the newest entry last, finds it unreferenced, and disposes
-  // the very root it is about to hand back — the caller then clones a disposed
+  // the very root it is about to hand back: the caller then clones a disposed
   // root, the far bake writes to an orphaned entry forever, and the release
   // finds nothing. Trimming first cannot see it at all.
   evictModularVariants();
@@ -1395,7 +1397,7 @@ function recolored(
     // NOT disposed, and the old dispose() here was a live-object bug the moment
     // peers started composing. assembleModular assigns these instances straight
     // onto the clone's meshes, so a cached material is SHARED by every character
-    // wearing that colour — evicting one while ten peers are drawn with it
+    // wearing that colour: evicting one while ten peers are drawn with it
     // dropped the renderer's state for a material still in the scene, and it had
     // to be re-initialized on the next frame.
     //
@@ -1523,7 +1525,7 @@ export function assembleModular(
   // streamed weapon GLB that has not landed yet, and that throw is a designed
   // path: the fail-soft visual build catches it and the retry gate re-attempts
   // on a cooldown. A retain taken before it leaked one ref per attempt with no
-  // dispose ever running, which made the entry permanently unevictable — the
+  // dispose ever running, which made the entry permanently unevictable: the
   // precise failure the cap exists to prevent. Down here, a throw anywhere in
   // assembly means no ref was ever taken, so there is nothing to leak.
   root.userData.modularVariantKey = modularVariantKey(def.url, names);
@@ -2261,7 +2263,7 @@ export function prepareVisual(key: string): PreparedVisual {
  *
  *  It carries no materials. The geometry is shared by every character with this
  *  part set while the COLOURS are per character, so group N is resolved against
- *  the character's own `userData.farMaterials[N]` — captured in assembleModular
+ *  the character's own `userData.farMaterials[N]`: captured in assembleModular
  *  off a clone of the same variant walked by the same filter, which is what
  *  makes the two orders one list. Resolving by material NAME could not promise
  *  that: `mod_skin` is on both the head and the mouth's lip body, so a
@@ -2273,7 +2275,7 @@ export interface ModularFarBake {
   isBody: boolean[];
 }
 
-/** An already-minted far bake for this key + look, or null — WITHOUT baking.
+/** An already-minted far bake for this key + look, or null (WITHOUT baking).
  *  The cheap arm of the budgeted far path: a character whose part set was
  *  already baked (by anyone sharing the look) assembles its far mesh for the
  *  cost of the material tint alone, so only genuinely new part sets compete
@@ -2289,7 +2291,7 @@ export function peekModularFarBake(key: string, look: ModularLook): ModularFarBa
 }
 
 // The composed far bake is real synchronous work (a full compose, a mixer
-// step, a static rebake), and setFar drives it on the crossing EDGE — so a
+// step, a static rebake), and setFar drives it on the crossing EDGE, so a
 // camera riding away from a capital used to flip every composed peer to far in
 // one frame and pay for every distinct unbaked part set in that frame. The
 // budget spreads the mint: at most one bake per window, everyone else stays
@@ -2313,7 +2315,7 @@ export function takeFarBakeBudget(): boolean {
  * The far-LOD bake for a COMPOSED body, minted once per part set.
  *
  * WHY THIS EXISTS. prepareVisual bakes one idle-pose mesh per visual KEY, from
- * `assembleModel(def)` with no look — which falls through to DEFAULT_LOOK. That
+ * `assembleModel(def)` with no look, which falls through to DEFAULT_LOOK. That
  * was harmless while only the local player composed, because the local player
  * never crosses into the far band. Peers do, constantly: the band starts around
  * 58yd and pulls IN toward ~35yd exactly when a crowd makes it matter. Without
@@ -2322,7 +2324,7 @@ export function takeFarBakeBudget(): boolean {
  * WHAT IT SHARES AND WHAT IT DOES NOT. The geometry is keyed by part set, so a
  * hundred players in a hundred colourways with the same haircut share one baked
  * mesh; the materials are resolved per character from their own composed body.
- * Face and body SLIDERS are therefore not in the silhouette — two characters
+ * Face and body SLIDERS are therefore not in the silhouette: two characters
  * with the same parts and different cheekbones bake to one mesh. That is a
  * millimetre of jaw at 35+ yards, against a per-slider mesh being a cache keyed
  * on a continuous input (the reason the face is morphs at all; see applyMorphs).

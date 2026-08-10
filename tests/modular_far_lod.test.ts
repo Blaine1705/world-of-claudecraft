@@ -29,11 +29,16 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as assets from '../src/render/characters/assets';
 import {
   composedFarMeshes,
   farSourceMaterials,
   takeFarBakeBudget,
 } from '../src/render/characters/assets';
+import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { CharacterVisual } from '../src/render/characters/visual';
+
+type AssetsModule = typeof import('../src/render/characters/assets');
 
 function src(file: string): string {
   return readFileSync(resolve(process.cwd(), file), 'utf8');
@@ -298,4 +303,284 @@ describe('far-LOD wiring (source pins)', () => {
     expect(body).toContain('releaseTintedMaterials(this.tintedRigClaims)');
     expect(body).toContain('releaseTintedMaterials(this.tintedFarClaims)');
   });
+});
+
+describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
+  // The far mesh is minted lazily, on the first crossing into the far band,
+  // not in the constructor. Every state edge that overlays it (ghost, soul
+  // rend, shadowform, moonkin, metamorph, rune tint) runs through
+  // applyVisualMaterials, and every one of those setters early-returns when
+  // the state has not moved, so a setter that fired BEFORE this mesh existed
+  // never re-fires once it does. The only place left to catch it up is the
+  // mint itself.
+  //
+  // `buildComposedFar` is private and the class is heavy to construct for
+  // real (a GLTF-backed modular def), so these drive the real prototype
+  // method against a minimal object whose prototype IS CharacterVisual's, via
+  // Object.create: the private helpers it calls (buildFarMeshes,
+  // applyVisualMaterials, and the effect-material chain beneath it) resolve
+  // through the prototype exactly as they would on a live instance, while
+  // only the module-level bake collaborators (modularFarBake, prepareVisual,
+  // tintedFarMaterials, farSourceMaterials, skinTexture, skinEmissiveTexture)
+  // are stubbed, since those need a loaded GLB and asset registry this test
+  // has no reason to stand up.
+
+  afterEach(() => vi.restoreAllMocks());
+
+  function fakeVisual(overrides: Record<string, unknown> = {}) {
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access, see buildComposedFar
+    const fake: any = Object.create(CharacterVisual.prototype);
+    Object.assign(fake, {
+      farBakeTried: false,
+      look: { app: {}, worn: {} },
+      key: 'test_key',
+      model: new THREE.Group(),
+      entityColor: 0xffffff,
+      skinIndex: 0,
+      tintedFarClaims: new Set(),
+      shadowProxy: null,
+      poseWrap: new THREE.Group(),
+      originalMaterials: new Map(),
+      farMesh: null,
+      farMaterials: null,
+      // A ghost is on before this mesh ever existed, the exact scenario the
+      // fix closes: a player who stealthed near the camera, then walked far
+      // enough to cross into the far band for the first time.
+      ghosted: true,
+      ghostStyle: 'spirit',
+      ghostMaterials: new Map(),
+      soulRend: false,
+      metamorph: false,
+      moonkin: false,
+      shadowform: false,
+      runeTint: null,
+      auraGlowIntensity: 0,
+      ...overrides,
+    });
+    return fake;
+  }
+
+  it('applies the ghost overlay to the far mesh it just minted', () => {
+    const rawFarMats = [new THREE.MeshStandardMaterial({ name: 'far_body' })];
+    vi.spyOn(assets, 'modularFarBake').mockReturnValue({
+      geo: new THREE.BufferGeometry(),
+      isBody: [true],
+    } as unknown as ReturnType<typeof assets.modularFarBake>);
+    vi.spyOn(assets, 'prepareVisual').mockReturnValue({
+      def: {},
+    } as unknown as ReturnType<typeof assets.prepareVisual>);
+    vi.spyOn(assets, 'farSourceMaterials').mockReturnValue([]);
+    vi.spyOn(assets, 'skinTexture').mockReturnValue(null);
+    vi.spyOn(assets, 'skinEmissiveTexture').mockReturnValue(null);
+    vi.spyOn(assets, 'tintedFarMaterials').mockReturnValue(rawFarMats);
+
+    const fake = fakeVisual();
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access
+    const proto = CharacterVisual.prototype as any;
+    // Call-through spies (not mocks): they record order without replacing the
+    // real behavior, so buildFarMeshes still mints a real farMesh and
+    // applyVisualMaterials still runs the real ghost-material chain.
+    const order: string[] = [];
+    const buildFarMeshesSpy = vi.spyOn(fake, 'buildFarMeshes').mockImplementation(function (
+      this: unknown,
+      ...args: unknown[]
+    ) {
+      order.push('buildFarMeshes');
+      return proto.buildFarMeshes.apply(this, args);
+    });
+    const applyVisualMaterialsSpy = vi
+      .spyOn(fake, 'applyVisualMaterials')
+      .mockImplementation(function (this: unknown) {
+        order.push('applyVisualMaterials');
+        return proto.applyVisualMaterials.call(this);
+      });
+
+    proto.buildComposedFar.call(fake);
+
+    // The property under test: applyVisualMaterials must run, and it must run
+    // AFTER the mesh exists to catch up (a call before buildFarMeshes would
+    // find farMesh still null and overlay nothing).
+    expect(buildFarMeshesSpy).toHaveBeenCalledTimes(1);
+    expect(applyVisualMaterialsSpy).toHaveBeenCalledTimes(1);
+    expect(order).toEqual(['buildFarMeshes', 'applyVisualMaterials']);
+
+    // And the effect actually reached the mesh: a ghosted body's far material
+    // is a transparent clone, never the raw tinted material tintedFarMaterials
+    // handed back. Without the fix this stays the raw, opaque reference.
+    const farMesh = fake.farMesh as THREE.Mesh;
+    expect(farMesh).not.toBeNull();
+    const farMat = (farMesh.material as THREE.Material[])[0] as THREE.MeshStandardMaterial;
+    expect(farMat).not.toBe(rawFarMats[0]);
+    expect(farMat.transparent).toBe(true);
+  });
+
+  it('never calls applyVisualMaterials when the bake yields nothing, so the cheap path stays cheap', () => {
+    vi.spyOn(assets, 'modularFarBake').mockReturnValue(null);
+    const fake = fakeVisual();
+    const applyVisualMaterialsSpy = vi.spyOn(fake, 'applyVisualMaterials');
+
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access
+    (CharacterVisual.prototype as any).buildComposedFar.call(fake);
+
+    expect(applyVisualMaterialsSpy).not.toHaveBeenCalled();
+    expect(fake.farBakeTried).toBe(true);
+  });
+});
+
+describe('attemptComposedFar keeps farBakeTried in step with a refused budget', () => {
+  // The retry state machine is `setFar` -> `attemptComposedFar` -> `update()`,
+  // and it rests on one property attemptComposedFar is not free to break:
+  // farBakeTried only latches true once buildComposedFar actually ran (pinned
+  // as source above: "peeks before spending the budget, and goes pending when
+  // refused"). A refused budget must leave farBakeTried false (and
+  // farBakePending true) so update()'s
+  // `this.farBakePending && this.far && !this.farBakeTried` guard keeps
+  // retrying every frame until a slot frees. Moving `this.farBakeTried = true`
+  // out of buildComposedFar and up into attemptComposedFar, above the budget
+  // check, keeps every pinned text fragment above intact (peek still precedes
+  // the budget call, farBakePending still gets set) while silently stranding a
+  // budget-refused character articulated forever: nothing throws, it just
+  // never retries.
+
+  afterEach(() => vi.restoreAllMocks());
+
+  function fakeVisual(overrides: Record<string, unknown> = {}) {
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access, see attemptComposedFar
+    const fake: any = Object.create(CharacterVisual.prototype);
+    Object.assign(fake, {
+      farBakeTried: false,
+      farBakePending: false,
+      look: { app: {}, worn: {} },
+      key: 'test_key',
+      model: new THREE.Group(),
+      entityColor: 0xffffff,
+      skinIndex: 0,
+      tintedFarClaims: new Set(),
+      shadowProxy: null,
+      poseWrap: new THREE.Group(),
+      originalMaterials: new Map(),
+      farMesh: null,
+      farMaterials: null,
+      ghosted: false,
+      ghostStyle: 'spirit',
+      ghostMaterials: new Map(),
+      soulRend: false,
+      metamorph: false,
+      moonkin: false,
+      shadowform: false,
+      runeTint: null,
+      auraGlowIntensity: 0,
+      ...overrides,
+    });
+    return fake;
+  }
+
+  it('leaves farBakeTried false and goes pending when the budget refuses', () => {
+    vi.spyOn(assets, 'peekModularFarBake').mockReturnValue(null);
+    const budget = vi.spyOn(assets, 'takeFarBakeBudget').mockReturnValue(false);
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access
+    const proto = CharacterVisual.prototype as any;
+    const buildComposedFarSpy = vi.spyOn(proto, 'buildComposedFar');
+    const fake = fakeVisual();
+
+    proto.attemptComposedFar.call(fake);
+
+    expect(budget).toHaveBeenCalledTimes(1);
+    // The property the mutation breaks: a refused attempt must never reach
+    // buildComposedFar, so farBakeTried (which only buildComposedFar sets)
+    // stays false and the retry guard in update() can fire again next frame.
+    expect(buildComposedFarSpy).not.toHaveBeenCalled();
+    expect(fake.farBakeTried).toBe(false);
+    expect(fake.farBakePending).toBe(true);
+  });
+
+  it('proceeds through the real bake and latches farBakeTried when the budget allows', () => {
+    vi.spyOn(assets, 'peekModularFarBake').mockReturnValue(null);
+    vi.spyOn(assets, 'takeFarBakeBudget').mockReturnValue(true);
+    vi.spyOn(assets, 'modularFarBake').mockReturnValue({
+      geo: new THREE.BufferGeometry(),
+      isBody: [true],
+    } as unknown as ReturnType<typeof assets.modularFarBake>);
+    vi.spyOn(assets, 'prepareVisual').mockReturnValue({
+      def: {},
+    } as unknown as ReturnType<typeof assets.prepareVisual>);
+    vi.spyOn(assets, 'farSourceMaterials').mockReturnValue([]);
+    vi.spyOn(assets, 'skinTexture').mockReturnValue(null);
+    vi.spyOn(assets, 'skinEmissiveTexture').mockReturnValue(null);
+    vi.spyOn(assets, 'tintedFarMaterials').mockReturnValue([
+      new THREE.MeshStandardMaterial({ name: 'far_body' }),
+    ]);
+    const fake = fakeVisual();
+
+    // biome-ignore lint/suspicious/noExplicitAny: private-method access
+    (CharacterVisual.prototype as any).attemptComposedFar.call(fake);
+
+    expect(fake.farBakeTried).toBe(true);
+    expect(fake.farBakePending).toBe(false);
+    expect(fake.farMesh).not.toBeNull();
+  });
+});
+
+// peekModularFarBake and modularFarBake are the cheap/expensive pair the whole
+// budgeted far path rests on. peekModularFarBake is pinned only by call-text
+// above ("answers the peek from the cache without minting a variant"), which a
+// mutant satisfies while gutting the behavior: `return null` unconditionally
+// still contains none of the forbidden substrings, and every character with an
+// already-baked part set would queue behind the 30ms budget instead of reusing
+// what modularFarBake already minted. Driving the real functions needs a real
+// (mocked) GLTF loader and a fresh module instance, the same seam
+// character_visual_material_release.test.ts uses for full CharacterVisual
+// construction: a trivial non-skinned stub scene flows harmlessly through
+// modularVariant (nothing to drop, no skinned parts to merge) and
+// attachAllProps (no bone in the stub for any attach slot to resolve against),
+// so the real assembleModular/bakeStaticPose pipeline runs end to end without
+// needing authored rig/bone data.
+describe('peekModularFarBake and modularFarBake', () => {
+  afterEach(() => {
+    vi.doUnmock('../src/render/assets/loader');
+    vi.resetModules();
+  });
+
+  function stubGltf() {
+    const scene = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+    m.name = 'body';
+    scene.add(m);
+    return { scene, animations: [] };
+  }
+
+  async function loadAssetsReady(): Promise<AssetsModule> {
+    vi.resetModules();
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+    }));
+    const assetsModule = (await import('../src/render/characters/assets')) as AssetsModule;
+    await assetsModule.charactersReady();
+    return assetsModule;
+  }
+
+  it('mints a bake once through the real modularFarBake, then the peek answers it for free', async () => {
+    const assetsModule = await loadAssetsReady();
+    const key = MODULAR_WARRIOR_KEY;
+
+    // Nothing minted yet for this part set.
+    expect(assetsModule.peekModularFarBake(key, DEFAULT_LOOK)).toBeNull();
+
+    const minted = assetsModule.modularFarBake(key, DEFAULT_LOOK);
+    expect(minted).not.toBeNull();
+
+    const budgetSpy = vi.spyOn(assetsModule, 'takeFarBakeBudget');
+    const peeked = assetsModule.peekModularFarBake(key, DEFAULT_LOOK);
+
+    // The property the `return null` mutation breaks: an already-baked part
+    // set answers from the cache, the SAME object modularFarBake minted.
+    expect(peeked).toBe(minted);
+    // ...and for free: the peek must never spend the per-frame bake budget.
+    expect(budgetSpy).not.toHaveBeenCalled();
+
+    // An unrelated key never matches a cached entry.
+    expect(assetsModule.peekModularFarBake('does_not_exist_key', DEFAULT_LOOK)).toBeNull();
+  }, 20000);
 });
