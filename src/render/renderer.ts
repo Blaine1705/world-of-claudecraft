@@ -80,6 +80,13 @@ import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
+import {
+  type BlobShadowSlot,
+  blobBaseRadius,
+  blobShadowPlanInto,
+  createBlobShadowSlot,
+} from './blob_shadow_core';
+import { BlobShadows } from './blob_shadows';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -693,6 +700,15 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 // The literal lives in `crowd_lod.ts` beside the factors that scale it.
 const ENTITY_LOD_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
+// Contact-blob grounding range on the tiers with no dynamic shadows. Anchored
+// to the FIXED articulated-rig range for the same reason weapon_vfx_shed_core.ts
+// is (read its header): the live crowd-adaptive band edge swings with one
+// client's visible-rig count, so a cue keyed to it would pulse as unrelated
+// players wander through the frustum and two viewers standing in the same spot
+// would not even agree on where it ends. It also lands just inside the 62yd
+// proxy-shadow band the shadowed tiers ground bodies over, so the two tiers
+// carry the cue about as far as each other.
+const BLOB_SHADOW_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 
 // Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
 // animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
@@ -1802,6 +1818,11 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
+  // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
+  // dynamic shadow (null everywhere else), plus the one scratch slot the
+  // entity loop refills per character.
+  private blobShadows: BlobShadows | null = null;
+  private blobShadowSlot: BlobShadowSlot = createBlobShadowSlot();
   // Pooled scratch for the night light field's dynamic entries (the body
   // collector rewrites it each frame; entries past the count are stale).
   private nightBodyLights: NightLightSite[] = [];
@@ -2727,6 +2748,17 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
+    // Contact-blob grounding, and ONLY where the real shadow pass is off: on
+    // those tiers a body has no contact cue whatsoever and reads as floating.
+    // The tier is fixed for this renderer's lifetime (a graphics change tears
+    // the Renderer down and builds a new one, see
+    // src/game/graphics_rebuild_coordinator.ts), so the gate is settled once
+    // here rather than re-read every frame, and there is no live toggle path.
+    if (!GFX.dynamicShadows) {
+      this.blobShadows = new BlobShadows();
+      setRenderCategory(this.blobShadows.mesh, 'ui3d');
+      this.scene.add(this.blobShadows.mesh);
+    }
     // Ember pools at every authored campfire: static, so they bucket per zone
     // and ride the same distance cull as the lamps.
     this.emberPools = buildEmberPools(this.sim.cfg.seed);
@@ -10745,6 +10777,9 @@ export class Renderer {
     const shadowRangeSq = lodBands.shadowRangeSq;
     const shadowsEnabled = this.sun.castShadow;
     let visibleRigCount = 0;
+    // Contact blobs are refilled from scratch inside the loop below (null on
+    // every tier that casts real shadows).
+    this.blobShadows?.begin();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -11619,6 +11654,37 @@ export class Renderer {
         v.group.position.y = smoothY;
         if (isSelf) selfPos.y = smoothY;
       }
+      // Contact blob (no-dynamic-shadow tiers only; the painter is null on the
+      // rest). Filled here rather than from a walk of its own because
+      // everything it needs has just been settled for this body: the drawn feet
+      // height, whether the body is on a surface at all, the frustum answer,
+      // and the distance. Far-LOD bodies are included on purpose: the blob is
+      // read off the entity, not the rig, so a frozen static mesh keeps its
+      // grounding. A corpse keeps its blob for as long as the body is drawn.
+      //
+      // Ground reference: the DRAWN feet height while the body is on a
+      // surface, which is exact and free, and keeps a blob flush with a dock, a
+      // crate top, or a step the smoother is still easing. Only an airborne or
+      // swimming body pays a terrain sample (a handful per frame at most), and
+      // for a swimmer the lake bed below collapses the blob by height, which is
+      // what should happen to a body that is not touching the ground.
+      if (this.blobShadows) {
+        const onSurface = !airborne && !swimming;
+        const blobGroundY = onSurface ? smoothY : groundHeight(x, z, this.sim.cfg.seed);
+        this.blobShadows.push(
+          blobShadowPlanInto(
+            this.blobShadowSlot,
+            x,
+            smoothY,
+            z,
+            blobGroundY,
+            blobBaseRadius(active.height, v.liveScale),
+            d2,
+            BLOB_SHADOW_RANGE_SQ,
+            v.group.visible && active.root.visible && charOnScreen,
+          ),
+        );
+      }
       // Terrain lean: near bodies tip toward the surface they stand on. The
       // gradient is resampled on a cadence (four terrain samples) and damped
       // in between, so a crowd costs a handful of samples per frame, and a
@@ -12158,6 +12224,7 @@ export class Renderer {
       if (!charOnScreen) v.group.visible = false;
     }
     this.lastVisibleRigCount = visibleRigCount;
+    this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
 
     // Night mob glow: a warm pool of light on the ground under every nearby body
@@ -13102,6 +13169,9 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    // Renderer-owned (not a module singleton): a graphics rebuild drops this
+    // whole renderer, so its pool, texture and material go with it.
+    this.blobShadows?.dispose();
   }
 
   /**
