@@ -311,7 +311,7 @@ export function parseCreationCosmetics(
   // a HIDDEN helm.
   //
   // The default only ever applies to a client that omits the field, and the
-  // creator never does — it always posts the toggle. So an omission means a
+  // creator never does: it always posts the toggle. So an omission means a
   // client that predates this feature: a cached web bundle, an older native
   // shell, a script. Those characters have no authored face to bury and used to
   // get a helm, so defaulting them to hidden would silently change what they
@@ -393,9 +393,14 @@ export function buildCharacterList(
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
-      // Already normalized at write; echoed so char-select composes THIS
-      // character's body instead of the device-global draft.
-      appearance: c.appearance ?? null,
+      // Re-validated here the same way the join path does (ws_auth.ts
+      // sanitizeAppearance): this column is JSONB and a row could predate the
+      // current bounds, so raw `c.appearance` can carry a document today's
+      // rules would reject or empty out, e.g. `{}`. Sanitizing keeps
+      // char-select and the in-world render agreeing on the same look instead
+      // of char-select composing a default modular body for a row the join
+      // path nulls out.
+      appearance: sanitizeAppearance(c.appearance),
       // Mirror of state.helmHidden so the roster preview wears (or bares) the
       // kit helm exactly as the world last saw this character.
       helmHidden: c.state?.helmHidden === true,
@@ -872,7 +877,7 @@ async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
   // does rather than being a preview that evaporates on Save.
   //
   // An omission is NULL, not false. The real editor always posts the field, so
-  // only a client that does not offer the toggle can omit it — and defaulting
+  // only a client that does not offer the toggle can omit it, and defaulting
   // that to false made the UPDATE run `state - 'helmHidden'`, actively UN-hiding
   // a helm the player had hidden in world. Null leaves the blob alone.
   const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : null;

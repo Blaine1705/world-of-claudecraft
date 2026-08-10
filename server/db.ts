@@ -2992,9 +2992,9 @@ export async function setCharacterHotbarLayout(
 
 /** Spend a character's one-shot appearance reroll: write the new look and burn
  *  the token in ONE statement, so two concurrent rerolls cannot both succeed.
- *  All eligibility lives in the WHERE arm — ownership + realm (BOLA, matching
+ *  All eligibility lives in the WHERE arm: ownership + realm (BOLA, matching
  *  getCharacter's scoping), inside the free window or never designed, and the
- *  unspent token — and the row is only touched when every check passes. Returns
+ *  unspent token, and the row is only touched when every check passes. Returns
  *  whether the reroll was applied; false = not owned / outside the window with a
  *  look already / already spent, which the route maps to its error body. The appearance is already normalized by the
  *  caller (untrusted client input, hotbar_layout's contract).
@@ -3013,18 +3013,26 @@ export async function setCharacterHotbarLayout(
  *  turntable view. It is sim state, so it patches the one key inside the state
  *  blob rather than rewriting it (a whole-blob write from an HTTP route would
  *  clobber a live session's progress), and follows the sim's zero-default
- *  omission convention: hidden writes the key, shown removes it — and BOTH
+ *  omission convention: hidden writes the key, shown removes it, and BOTH
  *  arms are guarded on an actual change, because jsonb_set and `-` each mint a
  *  whole new datum: an unguarded write detoasts, re-serializes and re-TOASTs
  *  the entire state blob even when the value is identical, leaving dead chunks
  *  behind for autovacuum. A NULL
  *  helmHidden means the client did not offer the toggle at all and the blob is
- *  left untouched — defaulting that to false would actively UN-hide a helm the
+ *  left untouched: defaulting that to false would actively UN-hide a helm the
  *  player had hidden in world. A character that has never been saved (state IS
  *  NULL) is likewise left alone; its blob is written
  *  fresh on first entry. A LIVE session still holds the old value in memory and
  *  would autosave over this, which is what the route's setHelmHiddenForCharacter
- *  push exists to prevent. */
+ *  push exists to prevent.
+ *
+ *  Unlike characterUpdateStatement, this write carries no character_leases fence.
+ *  That is deliberate, not an oversight: the UPDATE only ever patches the single
+ *  helmHidden key inside the state blob (never the whole thing), so a takeover
+ *  racing this cannot tear it the way a full state write could, and the
+ *  applyAppearanceForCharacter/setHelmHiddenForCharacter push onto the live
+ *  session right after is what reconciles an online character with the row it
+ *  just wrote. */
 export async function consumeAppearanceReroll(
   accountId: number,
   characterId: number,
@@ -3069,7 +3077,7 @@ export async function listCharacterNamesForSitemap(limit = 50000): Promise<strin
 // the same shape as getCharacter so the sheet normalizer treats both alike.
 export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, appearance FROM characters WHERE id = $1 AND realm = $2',
     [characterId, REALM],
   );
   return res.rows[0] ?? null;
@@ -3138,7 +3146,7 @@ export async function createCharacterCapped(
       return null;
     }
     const res = await client.query(
-      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
       [
         accountId,
         name,

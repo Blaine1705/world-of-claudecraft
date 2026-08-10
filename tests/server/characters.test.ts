@@ -1065,6 +1065,28 @@ describe('roster appearance echoes', () => {
     expect(rows[0]).toMatchObject({ name: 'Designed', appearance: look, helmHidden: true });
     expect(rows[1]).toMatchObject({ name: 'Bare', appearance: null, helmHidden: false });
   });
+
+  it('nulls a legacy empty-object appearance instead of echoing it raw', async () => {
+    // A row whose appearance column is `{}` (or a slider map that sanitizes down
+    // to nothing, `{"face":{}}`) predates the current sanitizeAppearance bounds.
+    // Echoing it raw is truthy through charselectLook, so char-select would
+    // compose the default modular body for a character the join path (ws_auth.ts
+    // sanitizeAppearance) renders as the bare class rig in world. The roster must
+    // agree with the join path: both null it out.
+    authedDb({
+      listCharacters: async () => [
+        charRow({ id: 1, name: 'EmptyObject', appearance: {} }),
+        charRow({ id: 2, name: 'EmptySlider', appearance: { face: {} } }),
+      ],
+    });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const rows = (res.body as { characters: Record<string, unknown>[] }).characters;
+    expect(rows[0]).toMatchObject({ name: 'EmptyObject', appearance: null });
+    expect(rows[1]).toMatchObject({ name: 'EmptySlider', appearance: null });
+  });
 });
 
 describe('reroll route hardening', () => {
@@ -1077,6 +1099,21 @@ describe('reroll route hardening', () => {
     const at = src.indexOf("path: '/api/characters/:id/appearance-reroll'");
     expect(at).toBeGreaterThan(-1);
     expect(src.slice(at, at + 400)).toContain('rateLimit(CHARACTER_REROLL_POLICY');
+  });
+
+  it('mounts activeGuard, not readGuard, ahead of the limiter (source pin)', () => {
+    // A read-scoped companion token must not be able to spend the one-shot
+    // redesign. The middleware order matters here (auth guard before the
+    // limiter, matching the other mutation routes), so this pin fails loudly
+    // if a future edit swaps in readGuard instead of leaving the route open.
+    const src = readFileSync(resolve(process.cwd(), 'server/characters.ts'), 'utf8');
+    const at = src.indexOf("path: '/api/characters/:id/appearance-reroll'");
+    expect(at).toBeGreaterThan(-1);
+    const slice = src.slice(at, at + 400);
+    expect(slice).toContain('activeGuard');
+    expect(slice.indexOf('activeGuard')).toBeLessThan(
+      slice.indexOf('rateLimit(CHARACTER_REROLL_POLICY'),
+    );
   });
 });
 
