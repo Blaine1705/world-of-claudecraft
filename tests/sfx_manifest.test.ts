@@ -3,6 +3,7 @@
 // when the manifest is regenerated. Uses real temp directories (existsSync is
 // the tested behaviour; mocking fs defeats the purpose).
 
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -10,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 // @ts-expect-error scripts use the repository's untyped Node ESM convention
 import * as manifestModule from '../scripts/sfx/manifest.mjs';
+import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 
 const {
   buildSfxManifestData,
@@ -434,20 +436,24 @@ describe('meteor/flamestrike asset binding', () => {
   const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
   const sfxDir = path.join(repoRoot, 'public/audio/sfx');
 
-  it('keeps meteor.mp3 and flamestrike.mp3 as two distinct clips', () => {
+  // Pinned via `sha256sum public/audio/sfx/meteor.mp3 public/audio/sfx/flamestrike.mp3`
+  // against the recordings committed by d83aab74ac (the swap fix). A byte-distinct
+  // check alone cannot catch a RE-swap: two swapped files are still byte-distinct
+  // from each other, and the original bug here was a missing meteor.mp3, not a
+  // swap. Pinning each file's own literal hash catches both a re-swap and either
+  // file silently changing out from under the binding.
+  const METEOR_SHA256 = 'd57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416';
+  const FLAMESTRIKE_SHA256 = 'bd4257d3567b43f5228066cba5f1dff5c31b205c9314bfb4c7f0d6cbfebcdf15';
+
+  it('pins meteor.mp3 and flamestrike.mp3 to their exact committed recordings', () => {
     const meteor = readFileSync(path.join(sfxDir, 'meteor.mp3'));
     const flamestrike = readFileSync(path.join(sfxDir, 'flamestrike.mp3'));
-    expect(meteor.equals(flamestrike)).toBe(false);
+    expect(createHash('sha256').update(meteor).digest('hex')).toBe(METEOR_SHA256);
+    expect(createHash('sha256').update(flamestrike).digest('hex')).toBe(FLAMESTRIKE_SHA256);
   });
 
-  it('pins the literal filenames both content keys resolve to in the generated manifest', () => {
-    const manifest = readFileSync(
-      path.join(repoRoot, 'src/game/sfx_manifest.generated.ts'),
-      'utf8',
-    );
-    expect(manifest).toContain('"meteor": {');
-    expect(manifest).toMatch(/"meteor":\s*\{[\s\S]*?\/audio\/sfx\/meteor\.mp3/);
-    expect(manifest).toContain('"flamestrike": {');
-    expect(manifest).toMatch(/"flamestrike":\s*\{[\s\S]*?\/audio\/sfx\/flamestrike\.mp3/);
+  it('binds the "meteor" and "flamestrike" manifest keys to the right file each', () => {
+    expect(SFX_CLIPS.meteor.url.split('?')[0]).toBe('/audio/sfx/meteor.mp3');
+    expect(SFX_CLIPS.flamestrike.url.split('?')[0]).toBe('/audio/sfx/flamestrike.mp3');
   });
 });
