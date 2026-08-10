@@ -63,13 +63,15 @@ describe('entry-crash recovery arms tight memory', () => {
 });
 
 describe('tight-memory residency diet', () => {
-  it('skips the two secondary-context preview prewarms on the tight profile', () => {
-    const gateAt = mainSource.indexOf('if (!GFX.tightMemory) {');
-    const characterPrewarmAt = mainSource.indexOf('await hud.prewarmCharacterPreview();');
-    const armoryPrewarmAt = mainSource.indexOf('await hud.prewarmArmoryPreview();');
-    expect(gateAt).toBeGreaterThan(-1);
-    expect(characterPrewarmAt).toBeGreaterThan(gateAt);
-    expect(armoryPrewarmAt).toBeGreaterThan(characterPrewarmAt);
+  it('skips the secondary-context preview prewarm schedule on the tight profile', () => {
+    const startAt = mainSource.indexOf('if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();');
+    expect(startAt).toBeGreaterThan(-1);
+    // The schedule runs BEHIND the live frame (post-reveal), so the secondary
+    // preview contexts never add to the curtained entry allocation spike; the
+    // tight profile skips them entirely and keeps the lazy first-open path.
+    const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
+    expect(revealAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(revealAt);
   });
 });
 

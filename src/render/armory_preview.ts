@@ -39,7 +39,7 @@ export interface ArmoryPreviewHandle {
   setSkin(skinId: string | null): void;
   setMode(mode: ArmoryPreviewMode): void;
   setScene(scene: ArmorySceneKey): void;
-  prewarm(skinIds: readonly string[]): Promise<void>;
+  prewarm(skinIds: readonly string[], modes?: readonly ArmoryPreviewMode[]): Promise<void>;
   dispose(): void;
 }
 
@@ -415,10 +415,16 @@ export function createArmoryPreview(
       sceneKey = next;
       applyScene();
     },
-    async prewarm(skinIds: readonly string[]): Promise<void> {
+    async prewarm(
+      skinIds: readonly string[],
+      // The post-entry lane warms one mode per paced unit (a whole-skin unit
+      // measured 170 to 225 ms of main-thread block in live play; one mode
+      // roughly halves it). Curtained callers keep the both-modes default.
+      modes: readonly ArmoryPreviewMode[] = ['character', 'weapon'],
+    ): Promise<void> {
       if (disposed || prewarming) return;
       const unique = [...new Set(skinIds)].filter((id) => WEAPON_SKINS[id]);
-      if (unique.length === 0) return;
+      if (unique.length === 0 || modes.length === 0) return;
       const previousSize = new THREE.Vector2();
       renderer.getSize(previousSize);
       const previousPixelRatio = renderer.getPixelRatio();
@@ -449,16 +455,20 @@ export function createArmoryPreview(
           activeWeaponRig?.vfx?.setPixelScale(pixelHeight());
 
           // Compile and draw the exact character-mode light/material graph.
-          mode = 'character';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
+          if (modes.includes('character')) {
+            mode = 'character';
+            applyMode();
+            await renderer.compileAsync(scene, camera);
+            composer.render();
+          }
 
           // Then the exact weapon-only graph (ground pool + showcase VFX).
-          mode = 'weapon';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
+          if (modes.includes('weapon')) {
+            mode = 'weapon';
+            applyMode();
+            await renderer.compileAsync(scene, camera);
+            composer.render();
+          }
 
           // Keep the loading overlay responsive and avoid turning 29 bounded
           // warmups into one giant main-thread task on browsers whose shader

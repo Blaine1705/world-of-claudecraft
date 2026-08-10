@@ -33,21 +33,39 @@ describe('Armory preview lifecycle', () => {
     expect(preview).toContain('composer.render();\n        prewarming = false;');
   });
 
-  it('warms every armory skin before the loading screen fades online', () => {
+  it('walks every armory skin through the post-entry prewarm schedule', () => {
     expect(store).toContain('WEAPON_SKIN_LIST.map((skin) => skin.id)');
-    expect(hud).toContain('async prewarmArmoryPreview()');
-    const start = main.indexOf('await hud.prewarmCharacterPreview()');
-    const loadingWarm = main.slice(start, main.indexOf('setLoadingPercent(100', start));
-    expect(loadingWarm).toContain('await hud.prewarmArmoryPreview()');
+    expect(hud).toContain('this.dailyRewardsWindow.armoryPrewarmSkinIds()');
+    // One MODE per paced unit (a whole-skin unit was a measured 170 to 225 ms
+    // main-thread block in live play).
+    expect(hud).toContain(
+      'this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode])',
+    );
+    // The schedule starts after the reveal (post-entry paced units), no longer
+    // holding the loading curtain for the whole catalog.
+    const revealAt = main.indexOf('const revealWorld = (): void => {');
+    expect(revealAt).toBeGreaterThan(-1);
+    const startAt = main.indexOf('hud.startPostEntryPreviewPrewarm();', revealAt);
+    expect(startAt).toBeGreaterThan(revealAt);
   });
 
-  it('warms both portrait framings before Inspect can request a PNG capture', () => {
-    const start = hud.indexOf('async prewarmCharacterPreview()');
-    const end = hud.indexOf('async prewarmArmoryPreview()', start);
-    const warm = hud.slice(start, end);
-    expect(warm).toContain("['headshot', 'body'] as const");
-    expect(warm).toContain('playerPortraitDataUrl(portraitClass, skin, framing)');
-    expect(warm).toContain('window.setTimeout(resolve, 0)');
+  it('warms both portrait framings so Inspect never pays the first PNG capture', () => {
+    // The plan lives in the pure core; the hud composes it with the real
+    // portrait thunk.
+    const core = readFileSync(
+      new URL('../src/ui/preview_prewarm_core.ts', import.meta.url),
+      'utf8',
+    );
+    const start = core.indexOf('export function buildPostEntryPreviewPrewarmUnits');
+    expect(start).toBeGreaterThan(-1);
+    const plan = core.slice(start);
+    expect(plan).toContain("['headshot', 'body'] as const");
+    expect(plan).toContain('deps.renderPortrait(portraitClass, skin, framing)');
+    const hudStart = hud.indexOf('private postEntryPreviewPrewarmUnits()');
+    expect(hudStart).toBeGreaterThan(-1);
+    const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
+    expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
+    expect(compose).toContain('playerPortraitDataUrl(portraitClass as PlayerClass, skin, framing)');
   });
 
   it('prewarms player-card poses and never resizes the live preview to capture them', () => {
@@ -57,6 +75,6 @@ describe('Armory preview lifecycle', () => {
     expect(capture).toContain('new THREE.WebGLRenderTarget');
     expect(capture).toContain('readRenderTargetPixelsAsync');
     expect(capture).not.toContain('this.renderer.setSize(');
-    expect(hud).toContain('prewarmCloseupPoses(CARD_POSES)');
+    expect(hud).toContain('prewarmCloseupPoses([pose])');
   });
 });

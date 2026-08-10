@@ -5260,6 +5260,28 @@ export class Renderer {
       });
   }
 
+  private previewPrewarmLane: Promise<void> = Promise.resolve();
+
+  /** Post-entry secondary-context preview prewarm (paperdoll, armory, portrait
+   *  caches): one bounded unit per idle slot, arbitrated with every other lane
+   *  that reaches WebGL. releaseTail because a unit's cost is dominated by its
+   *  compileAsync links, which settle off-thread. Rejections propagate to the
+   *  caller per unit; the lane itself never wedges on one. */
+  queueSecondaryPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
+    const queued = this.previewPrewarmLane
+      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }))
+      .then(() =>
+        this.backgroundGpuWork.run(unit, GPU_WORK_PRIORITY.BACKGROUND, label, {
+          releaseTail: true,
+        }),
+      );
+    this.previewPrewarmLane = queued.then(
+      () => undefined,
+      () => undefined,
+    );
+    return queued;
+  }
+
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
   private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
   private readonly textureUploadTaskSet = new Set<Promise<void>>();

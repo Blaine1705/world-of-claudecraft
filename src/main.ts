@@ -4776,25 +4776,19 @@ async function startGame(
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
-  // Each preview prewarm mints a SECONDARY WebGL context beside the world
-  // renderer: real WebKit GPU-process residency held for a window the player
-  // may never open. The 4 GB-class tight profile skips both and keeps their
-  // documented lazy first-open path instead (the catch arms below already
-  // promise exactly that fallback).
+  // The paperdoll/armory/portrait preview prewarms no longer hold the curtain:
+  // they start after the reveal (see revealWorld below) as paced background
+  // GPU units. Measured on the reference desktop they were 11 to 26 s of the
+  // entry spent on secondary contexts for windows the player may never open.
+  // Only the paperdoll SHELL still builds here (~700 ms): it is the one coarse
+  // step the paced lane cannot split, and behind the curtain it costs nothing
+  // a player can feel. The tight profile keeps skipping every secondary
+  // context and retains the documented lazy first-open path.
   if (!GFX.tightMemory) {
     try {
-      await hud.prewarmCharacterPreview();
+      hud.prewarmCharPreviewShell();
     } catch (err) {
-      // The paperdoll preview is optional UI. If its secondary WebGL context
-      // cannot prewarm, opening the window can still take the normal lazy path.
-      console.warn('Character preview prewarm failed', err);
-    }
-    try {
-      await hud.prewarmArmoryPreview();
-    } catch (err) {
-      // The store is optional and online-only. A secondary-context failure must
-      // never prevent entering the world; opening it can retain the lazy path.
-      console.warn('Armory preview prewarm failed', err);
+      console.warn('Character preview shell prewarm failed', err);
     }
   }
   // The far vista has been building eagerly since the renderer was
@@ -4871,6 +4865,12 @@ async function startGame(
           // One-time machine-local performance nudge (packet 0 rulings R14-R16):
           // the assembler polls the same PerfMonitor the reporter reads.
           initPerfNudge({ perf, desktopShell: DESKTOP_APP });
+          // Post-entry preview prewarm (paperdoll, armory catalog, portrait
+          // caches): one bounded unit per idle slot on the renderer's
+          // background GPU queue, paused while the owning window is open. The
+          // 4 GB-class tight profile still skips the secondary contexts
+          // entirely and keeps their documented lazy first-open path.
+          if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();
           // First-run camera-mode prompt (issue #1727): show once per browser on a
           // mouse-driven interface, after any spawn cinematic has finished. Applies
           // the choice through the same applySetting path as the Key Bindings toggle.
