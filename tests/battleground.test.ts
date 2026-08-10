@@ -4276,13 +4276,14 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
     // backfiller whose pet dies leaves the field without it while a
     // start-of-match fighter gets theirs back.
     const { sim, pids } = tenInQueue();
-    const match = sim.ctx.bgMatches.get(pids[0])!;
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
     toActive(sim, match);
 
     const spare = sim.addPlayer('hunter', 'Spare');
     tp(sim, spare, 6, -40);
-    sim.entities.get(spare)!.level = 20;
-    restorePet(sim.ctx, sim.entities.get(spare)!, {
+    const spareEntity = must(sim.entities.get(spare), 'spare entity');
+    spareEntity.level = 20;
+    restorePet(sim.ctx, spareEntity, {
       templateId: 'wild_boar',
       name: 'Rip',
       level: 20,
@@ -4290,7 +4291,7 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
       dead: false,
       mode: 'defensive',
     });
-    const pet = sim.petOf(spare, true)!;
+    const pet = must(sim.petOf(spare, true), 'pet');
     sim.bgQueueJoin(spare);
     bgResolveDesertion(sim.ctx, match.teams[0][0]);
     sim.tick(); // opens the OFFER
@@ -4299,11 +4300,11 @@ describe('Thornhollow Fields: a pet that walks in alive walks back out alive', (
     expect(match.preMatchPets.has(spare)).toBe(true);
 
     kill(sim, pet.id);
-    expect(sim.entities.get(pet.id)!.dead).toBe(true);
+    expect(must(sim.entities.get(pet.id), 'pet entity').dead).toBe(true);
     endBgMatch(sim.ctx, match, 0, 'caps');
     const back = sim.petOf(spare, true);
     expect(back).toBeTruthy();
-    expect(back!.dead).toBe(false);
+    expect(must(back, 'back').dead).toBe(false);
   });
 });
 
