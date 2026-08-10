@@ -120,7 +120,7 @@ interface AttributionTargetFixture {
 // budget-governed shadow cadence; renderer.ts edits only). No capture was
 // retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '48a49c89f210637e8d03562af616b8717b4ff954dad7dd84e7778ee5ca9800a8';
+  '2ddc6060fee7edeb2fbabf3dcb9949841baf6afcef29531f4a2057bcc6620469';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
