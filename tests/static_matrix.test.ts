@@ -46,6 +46,34 @@ describe('static matrix traversal', () => {
     expect(child.matrixWorld.elements[12]).toBe(7);
   });
 
+  it('the plain scene walk composes a live child streamed under a SUBTREE-frozen root', () => {
+    // Load-bearing r185 premise, pinned so a future three change reds here
+    // instead of silently breaking the world: updateMatrixWorld recurses
+    // children UNCONDITIONALLY (r165 pruned the walk at a
+    // matrixWorldAutoUpdate=false node), and that unconditional descent is
+    // the only thing placing content streamed under an already-frozen root.
+    // The live case today is water gap sheets: water.ts buildSheet adds a
+    // default-flag mesh at y = waterLevel() under a group frozen by the zone
+    // load's freeze pass, and nothing ever refreshes it explicitly. If this
+    // arm reds on a three bump, streamed-under-frozen content (gap-sheet
+    // water first) is rendering at identity transforms.
+    const scene = new THREE.Scene();
+    scene.updateMatrix();
+    scene.matrixAutoUpdate = false;
+    const root = new THREE.Group();
+    scene.add(root);
+    freezeStaticSubtreeMatrices(root);
+
+    const streamed = new THREE.Object3D();
+    streamed.position.y = 6.4;
+    root.add(streamed);
+    scene.updateMatrixWorld();
+
+    // Assert the composed ELEMENTS directly: getWorldPosition self-heals via
+    // its own updateWorldMatrix call and would mask a pruned walk.
+    expect(streamed.matrixWorld.elements[13]).toBe(6.4);
+  });
+
   it('re-freezing a subtree-frozen root rebakes the root compose (r185 gate)', () => {
     // r185's force flag does not bypass the matrixWorldAutoUpdate gate, so a
     // plain updateMatrixWorld(true) bake skips the root's own compose on a

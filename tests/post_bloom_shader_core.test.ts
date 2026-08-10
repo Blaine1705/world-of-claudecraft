@@ -116,6 +116,26 @@ describe('restoreClassicBloomComposite', () => {
     );
   });
 
+  it('pins the installed lerpBloomFactor helper body to the r165 literal', () => {
+    // The rebuilt main() calls the INSTALLED helper verbatim (the restore
+    // splices main() only), so the fail-closed story needs the helper body
+    // pinned too: a future three changing the 1.2 mirror constant or the mix
+    // would silently re-grade every bloom mip while the composite pin stayed
+    // green.
+    const stripWs = (s: string): string => s.replace(/\s+/g, '');
+    const restored = restoreClassicBloomComposite(INSTALLED_COMPOSITE, NUM_MIPS);
+    const helperStart = restored.indexOf('float lerpBloomFactor');
+    expect(helperStart).toBeGreaterThan(-1);
+    const helperEnd = restored.indexOf('}', helperStart);
+    const helper = restored.slice(helperStart, helperEnd + 1);
+    expect(stripWs(helper)).toBe(
+      stripWs(`float lerpBloomFactor(const in float factor) {
+        float mirrorFactor = 1.2 - factor;
+        return mix(factor, mirrorFactor, bloomRadius);
+      }`),
+    );
+  });
+
   it('rebuilds main() equal to the r165 shape with its tint terms stripped', () => {
     // The migration claim is an IDENTICAL COMPOSITE STAGE across the 0.165 to
     // 0.185 train (the blur mips and bright-pass weights feeding it moved
@@ -153,6 +173,52 @@ describe('PreparedBloomPass internals against the installed three', () => {
     expect(pass.bloomTexture).toBe(pass.renderTargetsHorizontal[0].texture);
     expect(pass.compositeMaterial.fragmentShader).not.toContain('bloomTintColors');
     expect(pass.compositeMaterial.uniforms.bloomTintColors).toBeUndefined();
+    pass.dispose();
+  });
+
+  it('constructs with the r165 bloomFactors mip weights', () => {
+    // The composite pin fixes the shader TEXT; the mip weights live in a JS
+    // uniform default upstream owns. A future three re-weighting them would
+    // re-grade bloom under a green text pin, so pin the values themselves.
+    const pass = new PreparedBloomPass(new Vector2(64, 64), 0.4, 0.6, 1.32);
+    expect(pass.compositeMaterial.uniforms.bloomFactors.value).toEqual([1.0, 0.8, 0.6, 0.4, 0.2]);
+    pass.dispose();
+  });
+
+  it('drives every quad draw through the production _fsQuad read, ending on the composite', () => {
+    // Executed smoke for the render() override's own `_fsQuad` access: the
+    // suite's other arm reads the handle from the outside, which stays green
+    // if a coherent three rename changes both the base pass field and this
+    // pass's read expectations. Driving render() through a stubbed renderer
+    // executes the real cast-based read and the real draw sequence.
+    const pass = new PreparedBloomPass(new Vector2(64, 64), 0.4, 0.6, 1.32);
+    const quad = (pass as unknown as { _fsQuad: FullScreenQuad })._fsQuad;
+    const draws: { target: unknown; material: unknown }[] = [];
+    let currentTarget: unknown = null;
+    const stub = {
+      autoClear: true,
+      state: { buffers: { stencil: { setTest: () => {} } } },
+      setRenderTarget(target: unknown) {
+        currentTarget = target;
+      },
+      render() {
+        draws.push({ target: currentTarget, material: quad.material });
+      },
+    };
+    const readBuffer = { texture: { isTexture: true } };
+    pass.render(
+      stub as never,
+      undefined as never,
+      readBuffer as never,
+    );
+    // 1 high-pass + 2 blur draws per mip + 1 composite.
+    expect(draws).toHaveLength(2 + 2 * pass.nMips);
+    expect(draws[0]?.material).toBe(pass.materialHighPassFilter);
+    const last = draws[draws.length - 1];
+    expect(last?.material).toBe(pass.compositeMaterial);
+    expect(last?.target).toBe(pass.renderTargetsHorizontal[0]);
+    // render() restores the renderer's autoClear after the pass.
+    expect(stub.autoClear).toBe(true);
     pass.dispose();
   });
 });
