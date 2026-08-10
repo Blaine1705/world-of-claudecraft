@@ -117,10 +117,10 @@ import {
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
+import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
-import { applySetProcs } from './set_procs';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
