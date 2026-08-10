@@ -917,12 +917,14 @@ describe('CI workflow parity', () => {
   });
 
   it('aborts dead checkout transfers workflow-wide instead of riding a job bound', () => {
-    // First net under the job bounds above: the stall class is a git fetch at
-    // zero throughput, so git's own low-speed abort ends the transfer after
-    // 120 consecutive seconds under 1000 bytes per second and
-    // actions/checkout retries the fetch in-step, self-healing most stalls in
-    // minutes (rationale on the ci.yml env block; run 31392590628 is the
-    // three-kills-in-a-row incident that motivated it). Exact values, one
+    // First net under the job bounds above: git's low-speed abort ends a
+    // transfer trickling under 1000 bytes per second for 120 consecutive
+    // seconds and actions/checkout retries the fetch in-step. Known limit,
+    // recorded on the ci.yml env block: the 2026-08-10 hang variant (run
+    // 31402711619) dies in a phase the speed timer never polices and is
+    // caught by the auto-rerun net instead; this block stays for the
+    // trickle variant (run 31392590628 is the three-kills-in-a-row incident
+    // that motivated the pair). Exact values, one
     // WORKFLOW-level block: every job's checkout and every run-step git fetch
     // must inherit the same floor, and a job- or step-level redeclaration
     // could shadow it with a value nobody measured. The second net (the
