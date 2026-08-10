@@ -63,13 +63,18 @@ export const FEAR_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
 /** Plain (non-fear) cc abilities whose landed moment now has a dedicated
  *  recording (fx:'ccImpact'): Sundering Gavel/hammer_of_justice (stun),
  *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate),
- *  Gut Punch/cheap_shot (stun, the stealth opener). All four are archetype
- *  'cc' (normally uncovered). */
+ *  Gut Punch/cheap_shot (stun, the stealth opener), Low Blow/kidney_shot
+ *  (stun, reuses cheap_shot's recording), and sap (incapacitate). All six
+ *  are archetype 'cc' (normally uncovered), except kidney_shot, whose real
+ *  VFX archetype is 'strike' (already covered by RECORDED_IMPACT_ARCHETYPES),
+ *  so its membership here is harmless, consistent bookkeeping rather than
+ *  load-bearing. */
 export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'hammer_of_justice',
   'entangling_roots',
   'blind',
   'cheap_shot',
+  'kidney_shot',
   'sap',
 ]);
 

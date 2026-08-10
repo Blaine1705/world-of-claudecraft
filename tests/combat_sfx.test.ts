@@ -319,6 +319,18 @@ describe('combat SFX policy', () => {
         }),
       ).toEqual({ key: ability, anchorId: 20 });
     }
+    // Low Blow (kidney_shot) reuses Gut Punch's (cheap_shot) recording, not
+    // its own key, same reuse mechanism as Eviscerate/Rupture.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'ccImpact',
+        ability: 'kidney_shot',
+      }),
+    ).toEqual({ key: 'cheap_shot', anchorId: 20 });
     // No ability id, or an ability not in the covered set: no cue at all
     // (the sim only ever emits ccImpact for this set, but the client
     // resolver stays defensive regardless).
