@@ -1054,7 +1054,7 @@ export const es: EnTranslations = {
       "blurb": "Dos fortalezas en ruinas se enfrentan a través de una hondonada amurallada a la sombra de Thornpeak: los Carmesí al sur, los Azur al norte, y entre ellos el antiguo Patio en Ruinas que ninguno ha controlado jamás. Cinco por bando, una bandera cada uno, y el primero en llevar tres de las suyas a casa se queda con el campo.",
       "modeTag": "5c5 Captura la Bandera",
       "offlineNote": "Campos Espinosos se está sincronizando. La cola se abrirá en cuanto el reino responda.",
-      "ratingSummary": "Índice. {wins} victorias / {losses} derrotas",
+      "ratingSummary": "Índice. {wins} victorias / {losses} derrotas / {draws} empates",
       "careerCaptures": "Capturas de tu carrera: {count}",
       "enterQueue": "Entrar en la cola",
       "enterQueueParty": "Entrar en la cola (grupo de {count})",
@@ -3311,6 +3311,8 @@ export const es: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const es: EnTranslations = {
       "outOfRange": "Fuera de alcance.",
       "noTarget": "No tienes objetivo.",
       "tooClose": "¡Demasiado cerca!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Debes mirar a tu objetivo.",
       "targetHealthBelow": "Esa habilidad requiere que el objetivo tenga menos de {percent}% de salud.",
       "dagger": "Debes llevar una daga.",
@@ -8166,7 +8169,7 @@ export const es: EnTranslations = {
       "queueNote": "Te emparejarán con el retador en línea de índice más cercano y te teletransportarán a la arena. Gana para subir; el primero en ceder (1 de salud) pierde. Vuelves exactamente donde entraste en cola.",
       "ladderAllTime": "Clasificación - histórica",
       "ladderOnline": "Clasificación - en línea",
-      "ratingSummary": "Índice - {wins} victorias / {losses} derrotas",
+      "ratingSummary": "Índice - {wins} victorias / {losses} derrotas / {draws} empates",
       "statusCountdown": "Prepárate...",
       "statusReturning": "Volviendo al mundo... {seconds}",
       "statusFight": "¡Lucha hasta la rendición!",
@@ -9540,6 +9543,10 @@ export const es: EnTranslations = {
       "die_by_sword": {
         "name": "Morir por la Espada",
         "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temeridad",

@@ -644,6 +644,20 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // Low Blow (kidney_shot) reuses the Gut Punch (cheap_shot) recording:
+        // Jamie's explicit call when the cheap_shot take was made ("it can be
+        // used for both cheapshot and kidney shot"), same reuse mechanism as
+        // Eviscerate/Rupture above.
+        if (ability.id === 'kidney_shot') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -2723,6 +2737,11 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
+        // A rush to a FRIENDLY target (Intervene) is pure repositioning: it mints no
+        // rage and never flags the caster into combat. Only the hostile Onrush does,
+        // and it is gated on hostility rather than on the ability id so any future
+        // friendly rush inherits the same rule.
+        if (ctx.isFriendlyTo(p, target)) break;
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

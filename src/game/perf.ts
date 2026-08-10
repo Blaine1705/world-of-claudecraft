@@ -6,7 +6,12 @@ import {
   type HitchSummary,
   type SceneCensusReport,
 } from '../render/scene_census_core';
-import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import {
+  createHeapSawtooth,
+  type HeapFloorTrend,
+  type HeapFloorValley,
+  type HeapSawtoothSummary,
+} from './heap_sawtooth';
 import {
   createHitchForensics,
   type HitchForensicsRecord,
@@ -87,6 +92,12 @@ export interface PerfSnapshot {
   census?: SceneCensusReport;
   /** Overlay-gated hitch correlation from the renderer; absent when the overlay is off. */
   hitches?: HitchSummary;
+}
+
+export interface HitchPerfReport {
+  heapSawtooth: HeapSawtoothSummary | null;
+  heapFloor: HeapFloorTrend | null;
+  heapFloorSeries: readonly HeapFloorValley[];
 }
 
 export type PerfInputDebugState = Record<string, unknown>;
@@ -394,6 +405,7 @@ export class PerfMonitor {
   private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
   private heapSawtooth = createHeapSawtooth({
     readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
+    recordFloorSeries: () => this.enabled,
   });
   private hitchForensics = createHitchForensics();
   private lastForensicsAt = 0;
@@ -690,6 +702,10 @@ export class PerfMonitor {
       state.views = r.views;
       state.gpuQueueUnits = r.gpuQueue.units;
       state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
+      // Monotonic on purpose: a unit that never settles moves neither of the
+      // two above, so a hitch bracketing a new stall reads as the queue
+      // wedging rather than as an empty diff.
+      state.gpuQueueStalls = r.gpuQueue.stallCount;
       state.effectiveRenderScale = r.effectiveRenderScale;
       state.budgetMode = r.renderBudget.mode;
       // Day/night dimension: a hitch cluster that only appears with
@@ -1025,6 +1041,16 @@ export class PerfMonitor {
   report(): PerfSnapshot {
     this.lastSnapshot = this.snapshot();
     return this.lastSnapshot;
+  }
+
+  /** Read-only heap evidence for local `?perf` hitch runs, never fleet telemetry. */
+  hitchReport(): HitchPerfReport | null {
+    if (!this.enabled) return null;
+    return {
+      heapSawtooth: this.heapSawtooth.summary(),
+      heapFloor: this.heapSawtooth.floorTrend(),
+      heapFloorSeries: this.heapSawtooth.floorSeries(),
+    };
   }
 
   copyReport(): void {

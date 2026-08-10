@@ -1054,7 +1054,7 @@ export const da_DK: EnTranslations = {
       "blurb": "To ruinerede borge står over for hinanden på tværs af en ommuret hulning i skyggen af Tornetop: Karmoisin mod syd, Azurblå mod nord, og den ældre Ruingård imellem dem, som ingen af dem nogensinde har holdt. Fem på hver side, ét banner hver, og den første til at bringe tre af deres egne hjem tager marken.",
       "modeTag": "5v5 fang flaget",
       "offlineNote": "Tornehulemarkerne synkroniserer. Køen åbner, så snart riget svarer.",
-      "ratingSummary": "Rating. {wins} sejre / {losses} nederlag",
+      "ratingSummary": "Rating. {wins} sejre / {losses} nederlag / {draws} uafgjorte",
       "careerCaptures": "Erobringer i karrieren: {count}",
       "enterQueue": "Gå i kø",
       "enterQueueParty": "Gå i kø (gruppe på {count})",
@@ -3311,6 +3311,8 @@ export const da_DK: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const da_DK: EnTranslations = {
       "outOfRange": "Uden for rækkevidde.",
       "noTarget": "Du har intet mål.",
       "tooClose": "For tæt på!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Du skal vende ansigtet mod dit mål.",
       "targetHealthBelow": "Den evne kræver, at målet er under {percent}% helbred.",
       "dagger": "Du skal føre en daggert.",
@@ -8166,7 +8169,7 @@ export const da_DK: EnTranslations = {
       "queueNote": "Du bliver matchet med den nærmeste rangerede udfordrer online og derefter teleporteret til sandet. Vind for at kravle op; den første, der overgiver sig (1 helbred), taber. Du vender tilbage præcis hvor du stillede dig i kø.",
       "ladderAllTime": "Rangliste - Gennem Tiden",
       "ladderOnline": "Rangliste - Online",
-      "ratingSummary": "Rating - {wins} sejre / {losses} nederlag",
+      "ratingSummary": "Rating - {wins} sejre / {losses} nederlag / {draws} uafgjorte",
       "statusCountdown": "Tag dig sammen...",
       "statusReturning": "Vender tilbage til verden... {seconds}",
       "statusFight": "Kæmp til overgivelse!",
@@ -9540,6 +9543,10 @@ export const da_DK: EnTranslations = {
       "die_by_sword": {
         "name": "Dø ved Sværdet",
         "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Dumdristighed",
