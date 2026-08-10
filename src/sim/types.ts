@@ -4365,6 +4365,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // piece. A standing wardrobe preference (never auto-cleared), it rides the
   // entity wire (`hh` bit) so peers and portraits present the chosen look.
   helmHidden: boolean;
+  // The authored modular-creator look (characters.appearance column), riding
+  // the identity wire (`app`) so every client in view composes this player's
+  // real body. Deliberately opaque here: the sim never reads it, and typing it
+  // as the render layer's ModularAppearance would put a src/render import into
+  // the sim. Consumers normalize it (normalizeAppearance) before composing.
+  // Null/absent = no authored look; the legacy class rig renders.
+  modularAppearance?: Record<string, unknown> | null;
   // /afk display mirror: true while this player's PlayerMeta.away is in `afk`
   // mode. Kept in lockstep with meta.away by src/sim/social/away.ts so the flag
   // rides the entity (wire `ak` bit) to other clients' nameplates and the social
@@ -5238,6 +5245,10 @@ export type SimEvent = { pid?: number } & (
         | 'whisper'
         | 'general'
         | 'party'
+        // Everyone in the sender's battleground, BOTH teams. Cross-team on
+        // purpose: talking to the opposing side is the whole reason it exists
+        // (players were falling back to General for it).
+        | 'battleground'
         | 'guild'
         | 'officer'
         | 'world'

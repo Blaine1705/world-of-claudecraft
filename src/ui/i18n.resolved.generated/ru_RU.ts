@@ -3668,7 +3668,9 @@ export const ru_RU: EnTranslations = {
       "delete_confirm": "Введите имя персонажа, чтобы подтвердить удаление.",
       "already_in_world": "Персонаж уже находится в мире.",
       "taken_over": "Вашего персонажа перехватила другая сессия.",
-      "rename_required": "Перед входом в мир этому персонажу нужно сменить имя."
+      "rename_required": "Перед входом в мир этому персонажу нужно сменить имя.",
+      "invalid_appearance": "Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.",
+      "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна."
     },
     "moderation": {
       "suspended_until": "Эта учетная запись заблокирована до {date}.",
@@ -5636,6 +5638,8 @@ export const ru_RU: EnTranslations = {
       "chanWhisperBody": "Личное сообщение одному игроку по имени, где бы он ни был. Используйте его для тихого слова.",
       "chanParty": "Группа.",
       "chanPartyBody": "Говорите со всеми в своей группе, как бы далеко друг от друга вы ни разошлись.",
+      "chanBattleground": "Поле боя.",
+      "chanBattlegroundBody": "Разговор со всеми бойцами на поле боя, с обеими сторонами. Только пока идёт бой.",
       "chanGeneral": "Общий.",
       "chanGeneralBody": "Всегда включённый канал на всё королевство, что достаёт до каждого, кто в сети, — удобный, чтобы задать вопрос или просто поболтать. В отличие от каналов World и Looking for Group, подписываться на него вовсе не нужно.",
       "chanWorld": "Мир.",
@@ -6495,7 +6499,7 @@ export const ru_RU: EnTranslations = {
     "browSoft": "Мягкие",
     "browThick": "Густые",
     "browAngled": "Наклонные",
-    "earrings": "Серьги",
+    "earrings": "Пирсинг",
     "jewelMaterial": "Материал украшений",
     "jewelDefault": "Как выковано",
     "jewelGold": "Золото",
@@ -7605,7 +7609,12 @@ export const ru_RU: EnTranslations = {
     "sortLevel": "Уровень",
     "sortName": "Имя",
     "sortRecent": "Недавно сыгранные",
-    "sortPlaytime": "Время в игре"
+    "sortPlaytime": "Время в игре",
+    "redesign": "Переделать",
+    "redesignHint": "Этот персонаж создан до появления нового редактора внешности. У вас есть одна бесплатная переделка; она расходуется при сохранении.",
+    "redesignTitle": "Переделать: {name}",
+    "redesignSave": "Сохранить новый облик",
+    "redesignCancel": "Оставить текущий облик"
   },
   "deleteCharacter": {
     "title": "Удалить персонажа",
@@ -7737,6 +7746,7 @@ export const ru_RU: EnTranslations = {
           "say": "Сказать",
           "yell": "Крик",
           "party": "Группа",
+          "battleground": "Поле боя",
           "general": "Общий",
           "world": "Мир",
           "lfg": "Поиск группы",
@@ -7898,6 +7908,7 @@ export const ru_RU: EnTranslations = {
     "chat": {
       "rightClickName": "ПКМ по {name}",
       "templates": {
+        "battleground": "[Поле боя] {name}: {message}",
         "party": "[Группа] {name}: {message}",
         "yell": "{name} кричит: {message}",
         "whisper": "{name} шепчет: {message}",

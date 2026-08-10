@@ -3668,7 +3668,9 @@ export const da_DK: EnTranslations = {
       "delete_confirm": "Skriv karakterens navn for at bekræfte sletning.",
       "already_in_world": "Karakteren er allerede i verdenen.",
       "taken_over": "Din karakter blev overtaget af en anden session.",
-      "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen."
+      "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Denne konto er suspenderet indtil {date}.",
@@ -5636,6 +5638,8 @@ export const da_DK: EnTranslations = {
       "chanWhisperBody": "En privat besked til én spiller ved navn, uanset hvor de er. Brug den til et stille ord.",
       "chanParty": "Følgesvende.",
       "chanPartyBody": "Tal med alle i din gruppe, uanset hvor spredt I er.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Almen.",
       "chanGeneralBody": "En altid-tændt rigsdækkende kanal, der når alle online, god til at stille et spørgsmål eller småsnakke. I modsætning til World og Looking for Group behøver du aldrig at melde dig til.",
       "chanWorld": "Verden.",
@@ -6495,7 +6499,7 @@ export const da_DK: EnTranslations = {
     "browSoft": "Bløde",
     "browThick": "Tykke",
     "browAngled": "Vinklede",
-    "earrings": "Øreringe",
+    "earrings": "Piercinger",
     "jewelMaterial": "Smykkemateriale",
     "jewelDefault": "Som Smedet",
     "jewelGold": "Guld",
@@ -7605,7 +7609,12 @@ export const da_DK: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Navn",
     "sortRecent": "Senest spillet",
-    "sortPlaytime": "Spilletid"
+    "sortPlaytime": "Spilletid",
+    "redesign": "Omdesign",
+    "redesignHint": "Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.",
+    "redesignTitle": "Omdesign {name}",
+    "redesignSave": "Gem nyt udseende",
+    "redesignCancel": "Behold nuværende udseende"
   },
   "deleteCharacter": {
     "title": "Slet Karakter",
@@ -7737,6 +7746,7 @@ export const da_DK: EnTranslations = {
           "say": "Sig",
           "yell": "Råb",
           "party": "Gruppe",
+          "battleground": "Battleground",
           "general": "Generelt",
           "world": "Verden",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const da_DK: EnTranslations = {
     "chat": {
       "rightClickName": "Højreklik på {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Gruppe] {name}: {message}",
         "yell": "{name} råber: {message}",
         "whisper": "{name} hvisker: {message}",

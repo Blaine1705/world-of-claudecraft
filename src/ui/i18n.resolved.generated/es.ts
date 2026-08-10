@@ -3668,7 +3668,9 @@ export const es: EnTranslations = {
       "delete_confirm": "Escribe el nombre del personaje para confirmar la eliminación.",
       "already_in_world": "El personaje ya está en el mundo.",
       "taken_over": "Otra sesión tomó el control de tu personaje.",
-      "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo."
+      "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Esta cuenta está suspendida hasta {date}.",
@@ -5636,6 +5638,8 @@ export const es: EnTranslations = {
       "chanWhisperBody": "Un mensaje privado a un jugador por su nombre, esté donde esté. Úsalo para una palabra discreta.",
       "chanParty": "Grupo.",
       "chanPartyBody": "Habla con todos los de tu grupo, por dispersos que estéis.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "General.",
       "chanGeneralBody": "Un canal del reino entero siempre activo que llega a todos los que están conectados, ideal para hacer una pregunta o charlar en general. A diferencia de Mundo y Buscar grupo, nunca tienes que unirte de forma manual.",
       "chanWorld": "Mundo.",
@@ -6495,7 +6499,7 @@ export const es: EnTranslations = {
     "browSoft": "Suaves",
     "browThick": "Gruesas",
     "browAngled": "Inclinadas",
-    "earrings": "Aretes",
+    "earrings": "Piercings",
     "jewelMaterial": "Material de joyería",
     "jewelDefault": "Original",
     "jewelGold": "Oro",
@@ -7605,7 +7609,12 @@ export const es: EnTranslations = {
     "sortLevel": "Nivel",
     "sortName": "Nombre",
     "sortRecent": "Jugados recientemente",
-    "sortPlaytime": "Tiempo de juego"
+    "sortPlaytime": "Tiempo de juego",
+    "redesign": "Rediseñar",
+    "redesignHint": "Este personaje es anterior al nuevo creador de personajes. Tienes un rediseño gratuito; se consume al guardar.",
+    "redesignTitle": "Rediseñar a {name}",
+    "redesignSave": "Guardar nuevo aspecto",
+    "redesignCancel": "Conservar aspecto actual"
   },
   "deleteCharacter": {
     "title": "Eliminar personaje",
@@ -7737,6 +7746,7 @@ export const es: EnTranslations = {
           "say": "Decir",
           "yell": "Gritar",
           "party": "Grupo",
+          "battleground": "Battleground",
           "general": "General",
           "world": "Mundo",
           "lfg": "BdG",
@@ -7898,6 +7908,7 @@ export const es: EnTranslations = {
     "chat": {
       "rightClickName": "Clic derecho en {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grupo] {name}: {message}",
         "yell": "{name} grita: {message}",
         "whisper": "{name} susurra: {message}",

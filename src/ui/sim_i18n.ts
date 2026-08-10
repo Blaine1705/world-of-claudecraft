@@ -8804,6 +8804,7 @@ type BgExtraKey =
   | 'teamCrimson'
   | 'teamAzure'
   | 'errInBattleground'
+  | 'errNotInBattleground'
   | 'errQueueDead'
   | 'errQueueInMatch'
   | 'errMemberQueued'
@@ -8859,6 +8860,7 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
+  errNotInBattleground: 'You are not in a battleground.',
   errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
   errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
   errMemberQueued: 'A party member is already queued or in a match.',
@@ -8897,6 +8899,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤红队',
     teamAzure: '蔚蓝队',
     errInBattleground: '你已经在战场中了。',
+    errNotInBattleground: '你不在战场中。',
     errQueueDead: '死亡状态下无法排队进入荆谷原野。',
     errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
     errMemberQueued: '有队友已在队列或比赛中。',
@@ -8934,6 +8937,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤紅隊',
     teamAzure: '蔚藍隊',
     errInBattleground: '你已經在戰場中了。',
+    errNotInBattleground: '你不在戰場中。',
     errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
     errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
     errMemberQueued: '有隊友已在佇列或比賽中。',
@@ -8976,6 +8980,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'クリムゾン',
     teamAzure: 'アズール',
     errInBattleground: 'すでに戦場にいます。',
+    errNotInBattleground: '戦場にいません。',
     errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
     errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
     errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
@@ -9021,6 +9026,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '진홍팀',
     teamAzure: '청람팀',
     errInBattleground: '이미 전장에 있습니다.',
+    errNotInBattleground: '전장에 있지 않습니다.',
     errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
@@ -9066,6 +9072,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Багровых',
     teamAzure: 'Лазурных',
     errInBattleground: 'Вы уже находитесь на поле боя.',
+    errNotInBattleground: 'Вы не находитесь на поле боя.',
     errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
     errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
     errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
@@ -9112,6 +9119,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Crimson',
     teamAzure: 'Azure',
     errInBattleground: 'You are already in a battleground.',
+    errNotInBattleground: 'You are not in a battleground.',
     errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
     errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
     errMemberQueued: 'A party member is already queued or in a match.',
@@ -9160,6 +9168,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9210,6 +9219,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9259,6 +9269,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9308,6 +9319,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9357,6 +9369,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'i Cremisi',
     teamAzure: 'gli Azzurri',
     errInBattleground: 'Sei già in un campo di battaglia.',
+    errNotInBattleground: 'Non sei in un campo di battaglia.',
     errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
     errQueueInMatch:
       'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
@@ -9408,6 +9421,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'die Karmesinroten',
     teamAzure: 'die Azurblauen',
     errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errNotInBattleground: 'Du bist auf keinem Schlachtfeld.',
     errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
     errQueueInMatch:
       'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
@@ -9458,6 +9472,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesins',
     teamAzure: 'Azuis',
     errInBattleground: 'Você já está em um campo de batalha.',
+    errNotInBattleground: 'Você não está em um campo de batalha.',
     errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
     errQueueInMatch:
       'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
@@ -9507,6 +9522,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Rudé',
     teamAzure: 'Azurové',
     errInBattleground: 'Už jsi na bojišti.',
+    errNotInBattleground: 'Nejsi na bojišti.',
     errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
     errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
     errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
@@ -9554,6 +9570,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmozijnen',
     teamAzure: 'de Azuren',
     errInBattleground: 'Je bent al op een slagveld.',
+    errNotInBattleground: 'Je bent niet op een slagveld.',
     errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
     errQueueInMatch:
       'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
@@ -9604,6 +9621,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Szkarłatnych',
     teamAzure: 'Lazurowych',
     errInBattleground: 'Jesteś już na polu bitwy.',
+    errNotInBattleground: 'Nie jesteś na polu bitwy.',
     errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
     errQueueInMatch:
       'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
@@ -9652,6 +9670,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Merah Tua',
     teamAzure: 'Biru Langit',
     errInBattleground: 'Kamu sudah berada di medan perang.',
+    errNotInBattleground: 'Kamu tidak berada di medan perang.',
     errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
     errQueueInMatch:
       'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
@@ -9699,6 +9718,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Kızıllar',
     teamAzure: 'Gökmaviler',
     errInBattleground: 'Zaten bir savaş alanındasın.',
+    errNotInBattleground: 'Bir savaş alanında değilsin.',
     errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
     errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
     errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
@@ -9742,6 +9762,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinröda',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du är redan på ett slagfält.',
+    errNotInBattleground: 'Du är inte på ett slagfält.',
     errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
     errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
     errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
@@ -9785,6 +9806,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'phe Đỏ Thẫm',
     teamAzure: 'phe Xanh Biếc',
     errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errNotInBattleground: 'Bạn không ở trong chiến trường.',
     errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
     errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
     errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
@@ -9831,6 +9853,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinrøde',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du er allerede på en slagmark.',
+    errNotInBattleground: 'Du er ikke på en slagmark.',
     errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
     errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
     errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
@@ -11175,6 +11198,7 @@ const RULES: Rule[] = [
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {
     re: /^You cannot queue for Thornhollow Fields while dead\.$/,
     build: () => tBg('errQueueDead'),

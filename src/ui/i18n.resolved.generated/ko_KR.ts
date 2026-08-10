@@ -3668,7 +3668,9 @@ export const ko_KR: EnTranslations = {
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
-      "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다."
+      "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
+      "invalid_appearance": "해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.",
+      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다."
     },
     "moderation": {
       "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
@@ -5636,6 +5638,8 @@ export const ko_KR: EnTranslations = {
       "chanWhisperBody": "어디에 있든 한 플레이어에게 이름을 지정해 보내는 비공개 메시지입니다. 조용히 한마디 건넬 때 쓰세요.",
       "chanParty": "파티.",
       "chanPartyBody": "아무리 흩어져 있어도 파티원 모두에게 이야기할 수 있습니다.",
+      "chanBattleground": "전장.",
+      "chanBattlegroundBody": "전장에 있는 모든 전투원과 대화합니다. 양 팀 모두에게 전달되며, 경기 중에만 사용할 수 있습니다.",
       "chanGeneral": "일반.",
       "chanGeneralBody": "온라인에 접속한 모두에게 닿는, 서버 전역에서 늘 켜져 있는 채널로, 질문을 던지거나 이런저런 이야기를 나누기 좋습니다. 세계 채널이나 파티 찾기 채널과 달리, 따로 참여를 신청할 필요가 전혀 없습니다.",
       "chanWorld": "세계.",
@@ -6495,7 +6499,7 @@ export const ko_KR: EnTranslations = {
     "browSoft": "부드럽게",
     "browThick": "짙게",
     "browAngled": "치켜올림",
-    "earrings": "귀걸이",
+    "earrings": "피어싱",
     "jewelMaterial": "장신구 재질",
     "jewelDefault": "원본 그대로",
     "jewelGold": "황금",
@@ -7605,7 +7609,12 @@ export const ko_KR: EnTranslations = {
     "sortLevel": "레벨",
     "sortName": "이름",
     "sortRecent": "최근 플레이",
-    "sortPlaytime": "플레이 시간"
+    "sortPlaytime": "플레이 시간",
+    "redesign": "재디자인",
+    "redesignHint": "이 캐릭터는 새 캐릭터 편집기 이전에 생성되었습니다. 무료 재디자인 기회가 1회 있으며, 저장할 때 사용됩니다.",
+    "redesignTitle": "{name} 재디자인",
+    "redesignSave": "새 외형 저장",
+    "redesignCancel": "현재 외형 유지"
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",
@@ -7737,6 +7746,7 @@ export const ko_KR: EnTranslations = {
           "say": "말하기",
           "yell": "외치기",
           "party": "파티",
+          "battleground": "전장",
           "general": "일반",
           "world": "전체",
           "lfg": "파티 찾기",
@@ -7898,6 +7908,7 @@ export const ko_KR: EnTranslations = {
     "chat": {
       "rightClickName": "{name} 우클릭",
       "templates": {
+        "battleground": "[전장] {name}: {message}",
         "party": "[파티] {name}: {message}",
         "yell": "{name} 외침: {message}",
         "whisper": "{name} 귓속말: {message}",

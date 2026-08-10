@@ -3668,7 +3668,9 @@ export const tr_TR: EnTranslations = {
       "delete_confirm": "Silmeyi onaylamak için karakter adını yazın.",
       "already_in_world": "Karakter zaten dünyada.",
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
-      "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır."
+      "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Bu hesap {date} tarihine kadar askıya alındı.",
@@ -5636,6 +5638,8 @@ export const tr_TR: EnTranslations = {
       "chanWhisperBody": "Nerede olursa olsun, isimle tek bir oyuncuya özel bir mesaj. Sessiz bir çift söz için kullan.",
       "chanParty": "Grup.",
       "chanPartyBody": "Ne kadar dağılmış olursanız olun, grubundaki herkesle konuş.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Genel.",
       "chanGeneralBody": "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
       "chanWorld": "Dünya.",
@@ -6495,7 +6499,7 @@ export const tr_TR: EnTranslations = {
     "browSoft": "Yumuşak",
     "browThick": "Kalın",
     "browAngled": "Açılı",
-    "earrings": "Küpeler",
+    "earrings": "Piercingler",
     "jewelMaterial": "Takı Malzemesi",
     "jewelDefault": "Dövüldüğü Gibi",
     "jewelGold": "Altın",
@@ -7605,7 +7609,12 @@ export const tr_TR: EnTranslations = {
     "sortLevel": "Seviye",
     "sortName": "Ad",
     "sortRecent": "Son Oynanan",
-    "sortPlaytime": "Oynama Süresi"
+    "sortPlaytime": "Oynama Süresi",
+    "redesign": "Yeniden Tasarla",
+    "redesignHint": "Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.",
+    "redesignTitle": "{name} karakterini yeniden tasarla",
+    "redesignSave": "Yeni Görünümü Kaydet",
+    "redesignCancel": "Mevcut Görünümü Koru"
   },
   "deleteCharacter": {
     "title": "Karakteri Sil",
@@ -7737,6 +7746,7 @@ export const tr_TR: EnTranslations = {
           "say": "Söyle",
           "yell": "Bağır",
           "party": "Grup",
+          "battleground": "Battleground",
           "general": "Genel",
           "world": "Dünya",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const tr_TR: EnTranslations = {
     "chat": {
       "rightClickName": "{name} oyuncusuna sağ tıkla",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grup] {name}: {message}",
         "yell": "{name} bağırıyor: {message}",
         "whisper": "{name} fısıldıyor: {message}",

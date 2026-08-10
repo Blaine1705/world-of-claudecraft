@@ -3668,7 +3668,9 @@ export const cs_CZ: EnTranslations = {
       "delete_confirm": "Pro potvrzení smazání napiš jméno postavy.",
       "already_in_world": "Postava už je ve světě.",
       "taken_over": "Tvoje postava byla převzata jinou relací.",
-      "rename_required": "Tato postava musí být před vstupem do světa přejmenována."
+      "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Tento účet je pozastavený do {date}.",
@@ -5636,6 +5638,8 @@ export const cs_CZ: EnTranslations = {
       "chanWhisperBody": "Soukromá zpráva jednomu hráči podle jména, ať je kdekoli. Použij pro tichou domluvu.",
       "chanParty": "Party.",
       "chanPartyBody": "Mluv se všemi ve skupině bez ohledu na to, jak jsou rozptýlení.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Obecný.",
       "chanGeneralBody": "Vždy zapnutý kanál pro celý svět, který dosáhne ke všem online, dobrý na otázku nebo běžné povídání. Na rozdíl od World a Looking for Group se do něj nemusíš přihlašovat.",
       "chanWorld": "World.",
@@ -6495,7 +6499,7 @@ export const cs_CZ: EnTranslations = {
     "browSoft": "Jemné",
     "browThick": "Husté",
     "browAngled": "Šikmé",
-    "earrings": "Náušnice",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiál šperků",
     "jewelDefault": "Původní",
     "jewelGold": "Zlato",
@@ -7605,7 +7609,12 @@ export const cs_CZ: EnTranslations = {
     "sortLevel": "Úroveň",
     "sortName": "Jméno",
     "sortRecent": "Nedávno hrané",
-    "sortPlaytime": "Čas hraní"
+    "sortPlaytime": "Čas hraní",
+    "redesign": "Přetvořit",
+    "redesignHint": "Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.",
+    "redesignTitle": "Přetvořit postavu {name}",
+    "redesignSave": "Uložit nový vzhled",
+    "redesignCancel": "Ponechat současný vzhled"
   },
   "deleteCharacter": {
     "title": "Smazat postavu",
@@ -7737,6 +7746,7 @@ export const cs_CZ: EnTranslations = {
           "say": "Říct",
           "yell": "Křik",
           "party": "Skupina",
+          "battleground": "Battleground",
           "general": "Obecné",
           "world": "Svět",
           "lfg": "Hledání skupiny",
@@ -7898,6 +7908,7 @@ export const cs_CZ: EnTranslations = {
     "chat": {
       "rightClickName": "Pravé kliknutí na {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Skupina] {name}: {message}",
         "yell": "{name} křičí: {message}",
         "whisper": "{name} šeptá: {message}",

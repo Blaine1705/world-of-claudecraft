@@ -3668,7 +3668,9 @@ export const nl_NL: EnTranslations = {
       "delete_confirm": "Typ de personagenaam om de verwijdering te bevestigen.",
       "already_in_world": "Personage is al in de wereld.",
       "taken_over": "Je personage is overgenomen door een andere sessie.",
-      "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden."
+      "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Dit account is geschorst tot {date}.",
@@ -5636,6 +5638,8 @@ export const nl_NL: EnTranslations = {
       "chanWhisperBody": "Een privébericht aan één speler bij naam, waar diegene ook is. Gebruik het voor een stil woordje.",
       "chanParty": "Groep.",
       "chanPartyBody": "Praat met iedereen in je groep, hoe verspreid je ook bent.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Algemeen.",
       "chanGeneralBody": "Een altijd actief kanaal voor het hele rijk dat iedereen die online is bereikt, handig om een vraag te stellen of te kletsen. Anders dan World en Looking for Group hoef je je nooit aan te melden.",
       "chanWorld": "Wereld.",
@@ -6495,7 +6499,7 @@ export const nl_NL: EnTranslations = {
     "browSoft": "Zacht",
     "browThick": "Dik",
     "browAngled": "Schuin",
-    "earrings": "Oorbellen",
+    "earrings": "Piercings",
     "jewelMaterial": "Juwelenmateriaal",
     "jewelDefault": "Zoals Gesmeed",
     "jewelGold": "Goud",
@@ -7605,7 +7609,12 @@ export const nl_NL: EnTranslations = {
     "sortLevel": "Niveau",
     "sortName": "Naam",
     "sortRecent": "Onlangs gespeeld",
-    "sortPlaytime": "Speeltijd"
+    "sortPlaytime": "Speeltijd",
+    "redesign": "Herontwerpen",
+    "redesignHint": "Dit personage stamt van vóór de nieuwe personagemaker. Je hebt één gratis herontwerp; het wordt gebruikt zodra je opslaat.",
+    "redesignTitle": "{name} herontwerpen",
+    "redesignSave": "Nieuw uiterlijk opslaan",
+    "redesignCancel": "Huidig uiterlijk behouden"
   },
   "deleteCharacter": {
     "title": "Personage verwijderen",
@@ -7737,6 +7746,7 @@ export const nl_NL: EnTranslations = {
           "say": "Zeggen",
           "yell": "Schreeuwen",
           "party": "Groep",
+          "battleground": "Battleground",
           "general": "Algemeen",
           "world": "Wereld",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const nl_NL: EnTranslations = {
     "chat": {
       "rightClickName": "Klik met rechts op {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Groep] {name}: {message}",
         "yell": "{name} schreeuwt: {message}",
         "whisper": "{name} fluistert: {message}",

@@ -3668,7 +3668,9 @@ export const pl_PL: EnTranslations = {
       "delete_confirm": "Wpisz imię postaci, aby potwierdzić usunięcie.",
       "already_in_world": "Postać jest już w świecie.",
       "taken_over": "Twoją postać przejęła inna sesja.",
-      "rename_required": "Tę postać trzeba przemianować przed wejściem do świata."
+      "rename_required": "Tę postać trzeba przemianować przed wejściem do świata.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "To konto jest zawieszone do {date}.",
@@ -5636,6 +5638,8 @@ export const pl_PL: EnTranslations = {
       "chanWhisperBody": "Prywatna wiadomość do jednego gracza po imieniu, gdziekolwiek się znajduje. Użyj jej na ciche słówko.",
       "chanParty": "Drużyna.",
       "chanPartyBody": "Rozmawiaj ze wszystkimi w swojej grupie, bez względu na to, jak bardzo jesteście rozproszeni.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Ogólny.",
       "chanGeneralBody": "Zawsze aktywny kanał obejmujący całe królestwo, docierający do wszystkich zalogowanych, dobry do zadania pytania lub ogólnej pogawędki. W przeciwieństwie do World i Looking for Group, nigdy nie musisz się do niego zapisywać.",
       "chanWorld": "Świat.",
@@ -6495,7 +6499,7 @@ export const pl_PL: EnTranslations = {
     "browSoft": "Delikatne",
     "browThick": "Gęste",
     "browAngled": "Skośne",
-    "earrings": "Kolczyki",
+    "earrings": "Piercing",
     "jewelMaterial": "Materiał biżuterii",
     "jewelDefault": "Jak wykute",
     "jewelGold": "Złoto",
@@ -7605,7 +7609,12 @@ export const pl_PL: EnTranslations = {
     "sortLevel": "Poziom",
     "sortName": "Imię",
     "sortRecent": "Ostatnio grane",
-    "sortPlaytime": "Czas gry"
+    "sortPlaytime": "Czas gry",
+    "redesign": "Przeprojektuj",
+    "redesignHint": "Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
+    "redesignTitle": "Przeprojektuj postać {name}",
+    "redesignSave": "Zapisz nowy wygląd",
+    "redesignCancel": "Zachowaj obecny wygląd"
   },
   "deleteCharacter": {
     "title": "Usuń postać",
@@ -7737,6 +7746,7 @@ export const pl_PL: EnTranslations = {
           "say": "Mów",
           "yell": "Krzycz",
           "party": "Drużyna",
+          "battleground": "Battleground",
           "general": "Ogólny",
           "world": "Świat",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const pl_PL: EnTranslations = {
     "chat": {
       "rightClickName": "Kliknij prawym {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Drużyna] {name}: {message}",
         "yell": "{name} krzyczy: {message}",
         "whisper": "{name} szepcze: {message}",

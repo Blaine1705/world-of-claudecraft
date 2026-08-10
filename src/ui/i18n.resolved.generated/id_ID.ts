@@ -3668,7 +3668,9 @@ export const id_ID: EnTranslations = {
       "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
       "already_in_world": "Karakter sudah berada di dalam dunia.",
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
-      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia."
+      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
+      "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
+      "reroll_unavailable": "This character does not have a free redesign available."
     },
     "moderation": {
       "suspended_until": "Akun ini ditangguhkan hingga {date}.",
@@ -5636,6 +5638,8 @@ export const id_ID: EnTranslations = {
       "chanWhisperBody": "Pesan pribadi kepada satu pemain berdasarkan nama, di mana pun mereka berada. Gunakan untuk percakapan tenang.",
       "chanParty": "Party.",
       "chanPartyBody": "Bicaralah dengan semua orang di kelompokmu, sejauh apa pun kalian terpencar.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Umum.",
       "chanGeneralBody": "Saluran seluruh realm yang selalu aktif dan menjangkau semua orang yang sedang online, cocok untuk bertanya atau mengobrol umum. Tidak seperti World dan Looking for Group, kamu tak pernah perlu memilih untuk ikut serta.",
       "chanWorld": "Dunia.",
@@ -6495,7 +6499,7 @@ export const id_ID: EnTranslations = {
     "browSoft": "Lembut",
     "browThick": "Tebal",
     "browAngled": "Miring",
-    "earrings": "Anting",
+    "earrings": "Tindik",
     "jewelMaterial": "Bahan Perhiasan",
     "jewelDefault": "Bawaan Tempa",
     "jewelGold": "Emas",
@@ -7605,7 +7609,12 @@ export const id_ID: EnTranslations = {
     "sortLevel": "Level",
     "sortName": "Nama",
     "sortRecent": "Baru Dimainkan",
-    "sortPlaytime": "Waktu Bermain"
+    "sortPlaytime": "Waktu Bermain",
+    "redesign": "Desain Ulang",
+    "redesignHint": "Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.",
+    "redesignTitle": "Desain Ulang {name}",
+    "redesignSave": "Simpan Tampilan Baru",
+    "redesignCancel": "Pertahankan Tampilan Saat Ini"
   },
   "deleteCharacter": {
     "title": "Hapus Karakter",
@@ -7737,6 +7746,7 @@ export const id_ID: EnTranslations = {
           "say": "Berkata",
           "yell": "Berteriak",
           "party": "Party",
+          "battleground": "Battleground",
           "general": "Umum",
           "world": "Dunia",
           "lfg": "LFG",
@@ -7898,6 +7908,7 @@ export const id_ID: EnTranslations = {
     "chat": {
       "rightClickName": "Klik kanan {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",

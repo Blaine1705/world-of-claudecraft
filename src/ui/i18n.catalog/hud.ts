@@ -47,6 +47,7 @@ const hudStringsEn = {
           say: 'Say',
           yell: 'Yell',
           party: 'Party',
+          battleground: 'Battleground',
           general: 'General',
           world: 'World',
           lfg: 'LFG',
@@ -208,6 +209,7 @@ const hudStringsEn = {
     chat: {
       rightClickName: 'Right-click {name}',
       templates: {
+        battleground: '[Battleground] {name}: {message}',
         party: '[Party] {name}: {message}',
         yell: '{name} yells: {message}',
         whisper: '{name} whispers: {message}',

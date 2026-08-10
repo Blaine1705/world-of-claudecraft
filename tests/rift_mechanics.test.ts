@@ -5,6 +5,7 @@ import { solveLockActions } from '../src/sim/lockpick';
 import { generateRiftFloor, isSetPieceSeed, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The rift's variety mechanics (v3): ice-slide, strength-boulder, sequence, the
 // way-out beacon, lava, and the rolling-boulder hazard. Puzzle/hazard kind is a
@@ -39,7 +40,13 @@ function killAll(sim: Sim): void {
 // player invulnerable for puzzle-solving cases (a dead player skips triggers). The
 // damage tests pass god:false so hazard/roller hits register.
 function enter(seed: number, { god = true }: { god?: boolean } = {}): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.enterRift(seed, 20, sim.player.id);
   killAll(sim);
   sim.player.gm = god;

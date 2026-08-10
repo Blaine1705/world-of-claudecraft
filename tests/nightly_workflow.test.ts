@@ -128,6 +128,23 @@ describe('nightly gate workflow', () => {
     expect(tests).toContain(
       'run: npm test -- --maxWorkers="$(node -p \'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))\')"',
     );
+    // The nightly is the ONE run that restores the balance harnesses' full
+    // sweep configuration (docs/qa-gate.md, "The balance-harness diet"): the
+    // PR-tier long-sims lanes run the diet configuration, and this env flag
+    // is what keeps the full five-seed depth running anywhere at all.
+    // Name-to-env-to-run adjacency (comment lines allowed) so a commented-out
+    // or step-detached copy cannot satisfy it.
+    expect(tests).toMatch(
+      new RegExp(
+        String.raw`- name: Run tests \(full suite, PR tier\)\n` +
+          String.raw`(?: {8}#[^\n]*\n)* {8}env:\n` +
+          String.raw` {10}WOC_FULL_BALANCE_SWEEP: '1'\n` +
+          String.raw` {8}run: npm test -- --maxWorkers=`,
+      ),
+    );
+    // Nowhere else: the flag is nightly-depth-only by design, so a copy on
+    // the checks or browser lanes (or a second one in tests) is a mistake.
+    expect(workflow.match(/WOC_FULL_BALANCE_SWEEP/g)).toHaveLength(1);
     // Unsharded by design: a --shard flag here would quietly turn the nightly
     // proof into a partial run.
     expect(tests).not.toContain('--shard');

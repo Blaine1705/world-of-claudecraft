@@ -1785,6 +1785,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
   'character.delete': '削除',
+  'character.redesign': '再デザイン',
+  'character.redesignHint':
+    'このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。',
+  'character.redesignTitle': '{name}を再デザイン',
+  'character.redesignSave': '新しい外見を保存',
+  'character.redesignCancel': '現在の外見を保持',
   'character.rename': '名前変更',
   'character.newNamePlaceholder': '新しいキャラクター名',
   'character.tabCharacters': 'キャラクター',
@@ -2044,6 +2050,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': 'メーターを閉じる',
   'hud.chat.rightClickName': '{name}を右クリック',
   'hud.chat.templates.party': '[パーティ] {name}: {message}',
+  'hud.chat.templates.battleground': '[戦場] {name}: {message}',
   'hud.chat.templates.yell': '{name}の叫び: {message}',
   'hud.chat.templates.whisper': '{name}のささやき: {message}',
   'hud.chat.templates.toWhisper': '{name}へ: {message}',
@@ -5429,6 +5436,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '仲間募集',
   'hud.core.chatChannels.names.officer': 'オフィサー',
   'hud.core.chatChannels.names.party': 'パーティ',
+  'hud.core.chatChannels.names.battleground': '戦場',
   'hud.core.chatChannels.names.say': '発言',
   'hud.core.chatChannels.names.world': 'ワールド',
   'hud.core.chatChannels.names.yell': '叫び',
@@ -6928,6 +6936,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'パーティ募集。',
   'guide.social.chanLfgBody':
     'ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。',
+  'guide.social.chanBattleground': '戦場。',
+  'guide.social.chanBattlegroundBody':
+    '戦場にいるすべての戦士と、敵味方を問わず話せます。試合中のみ利用できます。',
   'guide.social.chanParty': 'パーティ。',
   'guide.social.chanPartyBody': 'どれだけ離れていても、グループの全員に話しかけられます。',
   'guide.social.chanSay': 'セイ。',
@@ -8493,6 +8504,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
+  'apiError.character.invalid_appearance':
+    'この外見は保存できませんでした。デザインを調整してもう一度お試しください。',
+  'apiError.character.reroll_unavailable': 'このキャラクターには無料の再デザインがありません。',
   'apiError.moderation.suspended_until': 'このアカウントは {date} まで停止されています。',
   'apiError.moderation.suspended': 'このアカウントは停止されています。',
   'apiError.moderation.banned': 'このアカウントは利用停止されています。',

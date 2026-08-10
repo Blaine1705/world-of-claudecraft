@@ -975,6 +975,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // "<name> returns to your side." line Revive Pet uses, so it is matched by
     // the existing rule; scanning keeps any future literal here under the guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_match_return.ts'), 'utf8'),
+    // The shared pet round trip both that match path and the owner-resurrection
+    // path (src/sim/pet/pet_owner_revive.ts, which emits nothing of its own) call:
+    // the two "<name> returns to your side." arms now live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_return.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
     // Overworld portal transitions (the Veiled Hollow cave). The live flavor
