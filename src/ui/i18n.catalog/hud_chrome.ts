@@ -4579,8 +4579,9 @@ export const hudChromeStrings = {
     // ranked rift's first-clear race (addRiftProgressionLoot), any rank. The
     // English names the RACE, not a personal milestone: a party that clears a
     // ranked event after its first clear mints nothing (claimRiftFirstClear
-    // returns won: false), and the five non-Latin fills already carry the
-    // race reading (the Phase 21 QA copy fix aligned the English to them).
+    // returns won: false). The five non-Latin fills were sharpened WITH this
+    // English at Phase 21 QA (both gained the ranked and party qualifiers;
+    // the old fills carried the race reading but not those qualifiers).
     sourceActivityRiftFirstClear:
       "Awarded to every member of the party that wins a ranked Rift's first clear",
     // The aria label folds the lines through formatList (Intl.ListFormat), so

@@ -3104,12 +3104,14 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(rowChips).toHaveLength(1);
     expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(1);
     expect(rowChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
-    // Then the page header, on the same live window.
+    // Then the page header, on the same live window (bare count mirrored so
+    // a stray hook cannot hide on this surface either).
     click(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
     const headerChips = [
       ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-retired]'),
     ];
     expect(headerChips).toHaveLength(1);
+    expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(1);
     expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.retiredLabel'));
   });
 
@@ -3125,12 +3127,14 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
     expect(row.querySelector('[data-retired]')).toBeNull();
     const vaultRow = must(rig.el, `[data-page="${VAULT_PAGE_ID}"]`);
     expect(vaultRow.querySelector('[data-personal]')).toBeNull();
-    // Then the page header, on the same live window (the vault arm's mirror).
+    // Then the page header, on the same live window (the vault arm's mirror,
+    // bare count included so a stray personal hook cannot hide either).
     click(rig.el, `[data-page="${RIFTBOUND_PAGE_ID}"]`);
     const headerChips = [
       ...rig.el.querySelectorAll<HTMLElement>('.reliquary-complete-badge[data-personal]'),
     ];
     expect(headerChips).toHaveLength(1);
+    expect(rig.el.querySelectorAll('[data-personal]')).toHaveLength(1);
     expect(headerChips[0]?.textContent).toBe(t('hudChrome.reliquary.personalLabel'));
     expect(rig.el.querySelectorAll('[data-retired]')).toHaveLength(0);
   });

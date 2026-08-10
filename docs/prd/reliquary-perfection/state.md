@@ -961,7 +961,13 @@ Update this line as phases complete.
   window remains outside the mobile overlap audit's WINDOW_MATRIX (the same
   pre-existing family as the Phase 20 inspect deferral); its mobile posture
   at the 35-page shelf is evidenced by the committed 844x390 capture set,
-  and joining the matrix is the recipe-backed hardening.
+  and joining the matrix is the recipe-backed hardening. (g) the professions
+  blob-growth guard's source scrape misses sibling keys inside a multi-line
+  conditional spread group (its [^)]* skips to the innermost key: bgRating,
+  bgWins, bgLosses, and bgCaptures are classified only because the runtime
+  fixture arms them), so a future key in such a group that the fixture does
+  not arm escapes both arms of the census; pre-existing, recorded at the
+  Phase 21 QA round-2 review, optional hardening.
 - OWNER-VISIBLE note from Phase 21 QA (recorded, not decided): the Conquerors
   shelf deed col_reliquary_conquerors, and feat_book_complete behind it, grew
   a long tail this phase: the 47-piece honor stock, the 31 rare drops, and

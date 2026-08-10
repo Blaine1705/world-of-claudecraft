@@ -884,12 +884,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
     const deedsSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8')
       // Strip BOTH comment forms before matching, so neither a line comment
-      // nor a /* */ block holding the old code can satisfy the pin (the
-      // source-text-pin-comment-gameable trap). Line comments FIRST: a /*
-      // inside a // line must not open a block match that swallows code.
-      .split('\n')
-      .filter((line) => !/^\s*\/\//.test(line))
-      .join('\n')
+      // (whole-line OR trailing) nor a /* */ block holding the old code can
+      // satisfy the pin (the source-text-pin-comment-gameable trap). Line
+      // comments FIRST: a /* inside a // comment must not open a block match
+      // that swallows code.
+      .replace(/\/\/.*$/gm, '')
       .replace(/\/\*[\s\S]*?\*\//g, '');
     expect(deedsSrc).toMatch(
       /if \(RARE_SLAIN_TEMPLATES\.has\(mob\.templateId\)\) \{\s*for \(const meta of eligible\) \{\s*markVisited\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*noteReliquaryMark\(ctx, meta, `slain:\$\{mob\.templateId\}`\);\s*\}\s*\}/,
