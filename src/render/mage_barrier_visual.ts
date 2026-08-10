@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { clamp01 } from './num_clamp';
 
 const REFERENCE_CHARACTER_HEIGHT = 1.8;
 const REVEAL_SECONDS = 0.22;
@@ -30,10 +31,6 @@ const PALETTES: Record<MageBarrierTheme, BarrierPalette> = {
 const SHELL_GEOMETRY = new THREE.SphereGeometry(0.98, 24, 16);
 const RUNE_GEOMETRY = new THREE.TorusGeometry(0.9, 0.025, 5, 48);
 const MOTE_GEOMETRY = new THREE.OctahedronGeometry(0.055, 0);
-
-function clamp01(value: number): number {
-  return Math.max(0, Math.min(1, value));
-}
 
 function easeOutCubic(t: number): number {
   const u = 1 - t;
