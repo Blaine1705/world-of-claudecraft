@@ -59,49 +59,24 @@ const AMBIGUOUS_GENERATED_AURA_IDS: ReadonlySet<string> = new Set(['fear_incap']
 // choice-row coverage derives it from the live ProcDef producers in tests, while
 // the remaining entries are direct non-choice producer seams. Prefix guessing
 // would misattribute unrelated mob and control auras.
+// Re-derived on the class-overhaul integration: the overhauls replaced most
+// classic choice rows with their own (whose procs carry authored talent
+// icons), so only the seven surviving classic aura-producing procs and the
+// five non-choice producer seams remain. Dedicated aura art for the overhaul
+// procs is recorded follow-up work.
 export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map([
   ['aether_surge_free', 'arcane_surge'],
-  ['dru_briar_ambush', 'entangling_roots'],
-  ['dru_empowered_touch', 'healing_touch'],
-  ['dru_grove_covenant', 'mark_of_the_wild'],
-  ['dru_improved_barkskin', 'barkskin'],
-  ['dru_improved_wildbolt', 'wrath'],
-  ['dru_moonspite', 'moonfire'],
-  ['dru_natures_bounty', 'rejuvenation'],
-  ['dru_redmaw', 'claw'],
-  ['dru_savage_fury', 'ferocious_bite'],
-  ['dru_survival_of_the_fittest', 'bear_form'],
-  ['dru_wildsurge', 'bear_form'],
+  ['dru_gripping_ambush', 'entangling_roots'],
+  ['dru_ironhide_reflex', 'bear_form'],
   ['feral_instinct_energy', 'feral_charge'],
   ['fury_enrage', 'enrage_passive'],
-  ['hun_deathless_will', 'aspect_of_the_monkey'],
   ['ignite', 'ignition'],
   ['natures_fury', 'hurricane'],
-  ['pal_divine_wisdom', 'flash_of_light'],
-  ['pal_greater_blessing', 'blessing_of_might'],
-  ['pri_blessed_recovery', 'flash_heal'],
-  ['pri_heal_echo', 'heal'],
   ['pri_inner_fire', 'power_word_shield'],
-  ['pri_lingering_ward', 'lesser_heal'],
-  ['pri_nocturns', 'lesser_heal'],
-  ['pri_searing_light', 'smite'],
-  ['rog_blindside_opening', 'gouge'],
-  ['rog_final_notice', 'eviscerate'],
-  ['rog_improved_backstab', 'backstab'],
-  ['rog_improved_cutthroat_tempo', 'slice_and_dice'],
+  ['pri_measured_faith', 'lesser_heal'],
   ['rog_improved_evasion', 'evasion'],
-  ['rog_master_assassin', 'ambush'],
-  ['sha_elemental_attunement', 'lightning_bolt'],
-  ['sha_fault_line', 'lightning_bolt'],
-  ['sha_guiding_spirits', 'healing_wave'],
-  ['sha_storm_recall', 'lightning_bolt'],
-  ['sha_undertow_promise', 'healing_wave'],
-  ['sha_ward_surge', 'lightning_shield'],
-  ['wlk_curse_mastery', 'curse_of_agony'],
-  ['wlk_demon_armor', 'demon_skin'],
-  ['wlk_grave_rhythm', 'shadow_bolt'],
-  ['wlk_grimoire_of_carnage', 'summon_felhunter'],
-  ['wlk_umbral_mastery', 'shadow_bolt'],
+  ['rog_slipstream', 'sinister_strike'],
+  ['wlk_curse_mastery', 'wlk_r17_demonic_resilience'],
 ]);
 
 function stripGeneratedSuffix(id: string): string | null {

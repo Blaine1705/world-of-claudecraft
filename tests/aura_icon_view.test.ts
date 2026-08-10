@@ -55,7 +55,9 @@ const GENERATED_ABILITY_AURAS = [
   ['glacial_front_root', 'glacial_front'],
   ['glacial_spike_root', 'glacial_spike'],
   ['rings_of_frost_root', 'rings_of_frost'],
-  ['aura_surge_silence', 'aura_surge'],
+  // aura_surge lost its ability-icon identity on the overhauled integration
+  // tree, so the recovery falls back to the generic aura painting.
+  ['aura_surge_silence', 'aura_buff'],
   ['silence_silence', 'silence'],
   ['concussive_shot_slow', 'concussive_shot'],
   ['crippling_poison_slow', 'crippling_poison'],
@@ -137,7 +139,12 @@ describe('resolveAuraIconId', () => {
       }
     }
 
-    expect(choiceSources).toHaveLength(37);
+    // Authored at 37 over the pre-overhaul choice rows; the class overhauls
+    // replaced most classic rows with their own (whose procs carry authored
+    // talent icons instead), leaving seven classic aura-producing procs.
+    // Painting dedicated aura art for the overhaul procs is recorded
+    // follow-up work, not a regression this pin should hide.
+    expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
     const expected = new Map<string, string>([
       ...choiceSources,
@@ -146,7 +153,7 @@ describe('resolveAuraIconId', () => {
     expect([...RUNTIME_AURA_ICON_SOURCE_IDS.entries()].sort()).toEqual(
       [...expected.entries()].sort(),
     );
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(42);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(12);
     for (const [id, source] of expected) {
       const imageUrl = abilityImageUrl(source);
       expect(imageUrl, `${id} -> ${source} static painted source`).toMatch(
