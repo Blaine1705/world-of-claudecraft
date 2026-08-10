@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-09T21:22:17.551Z",
+  "generatedAt": "2026-08-10T04:33:00.640Z",
   "auditScope": {
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 817,
-    "liveItemDefinitions": 831,
-    "generatedHeroicDefinitions": 63,
+    "itemArtFilesReviewed": 822,
+    "liveItemDefinitions": 837,
+    "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
-    "heroicWeaponArtAliases": 15,
+    "heroicWeaponArtAliases": 16,
     "modifiedItemArtCount": 274,
     "modifiedItemArtPaths": [
       "public/ui/items/acolytes_circlet.webp",
@@ -305,12 +305,31 @@
       "held_offhand": 9,
       "junk": 81,
       "mount": 9,
-      "potion": 12,
+      "potion": 13,
       "quest": 97,
       "tool": 45,
       "ui-backpack": 1,
-      "weapon": 119
-    }
+      "weapon": 123
+    },
+    "incrementalReviews": [
+      {
+        "reviewedAt": "2026-08-10",
+        "branch": "integration/v031-class-overhauls",
+        "reviewer": "owner",
+        "addedIds": [
+          "boneglass_shiv",
+          "duskwhisper",
+          "marrowpoint",
+          "rimefang",
+          "soul_stone"
+        ],
+        "provenance": [
+          "docs/achievements/integration-dagger-icons-2026-08-10/generation-report.json",
+          "docs/achievements/missing-painted-icons-accepted-art.json"
+        ],
+        "note": "The four class-overhaul integration daggers and the soul_stone painting, generated under woc-item-icon-v1 and owner-reviewed pass on 2026-08-10; the 2026-08-09 campaign review of the prior 817 files stands unchanged."
+      }
+    ]
   },
   "reviewContract": {
     "visualCriteria": [
@@ -351,7 +370,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 817,
+    "passCount": 822,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -406,6 +425,7 @@
       "bone_fragments",
       "bonechill_cord",
       "bonechill_striders",
+      "boneglass_shiv",
       "boneguard_breastplate",
       "bonelord_mantle",
       "boneplate_vest",
@@ -522,6 +542,7 @@
       "duskfang_dirk",
       "duskhide_wraps",
       "duskthorn_mantle",
+      "duskwhisper",
       "duskwisp_essence",
       "eastbrook_arming_sword",
       "eastbrook_buckler",
@@ -780,6 +801,7 @@
       "mantle_of_the_unhorsed",
       "marlows_grand_roast",
       "marrowlord_boneboots",
+      "marrowpoint",
       "marrowtread_boots",
       "marsh_mint_tea",
       "marshcloth_robe",
@@ -934,6 +956,7 @@
       "riftbound_band_of_guile",
       "riftbound_band_of_insight",
       "riftbound_band_of_might",
+      "rimefang",
       "riptide_dirk",
       "ritual_phylactery",
       "riveted_copper_girdle",
@@ -995,6 +1018,7 @@
       "soggy_boot",
       "soggy_moccasin",
       "sootscale_mantle",
+      "soul_stone",
       "soulflame_cord",
       "soulflame_cowl",
       "soulflame_gloves",
@@ -1175,7 +1199,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 817 shipping item-art files pass the visual contract after the documented retries."
+    "summary": "All 822 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10."
   },
   "nonVisualContentWatch": [
     {
@@ -1332,8 +1356,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "5a4e46556d459f83462570b66a56e1ec11b015dbd5c7594ffe4112bbda51cfbb",
-      "bytes": 448700
+      "sha256": "ea04f7224e4a13e35d098c6a1cc96dbda6b38df43fdff6252d1eae0dfcd98933",
+      "bytes": 451256
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1347,7 +1371,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "506d52c032c1e702bba35e313463bb46e55a3ce7e6e3944d12d618df17b89385",
+    "sheetSetSha256": "acad50b8d261f88630e3ca323322d1522a4cfa0b3ea024111662fbdcda822c89",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2567,64 +2591,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--128-color.png",
-        "sha256": "bd2b736b1dae3495c132ba8cceefe5b0bade495ca77cd42979ba9fbb6ecf0300",
-        "bytes": 429230,
+        "sha256": "808176f6cea1b14d963509df8c44e29cd71966baef99f2b293f90fc6f28b0828",
+        "bytes": 463307,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--40-color.png",
-        "sha256": "1806b7ad65f06969f4f9963216bebe95d9bf931a3a47ce4205732088a4e9d76a",
-        "bytes": 79909,
+        "sha256": "51e891663a2b526f46c22c3f59acbad9aa618c1ef31e5d7672bcbe081ac01018",
+        "bytes": 85295,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--28-color.png",
-        "sha256": "45f94bc38fb5bf18b507bf4063f34f93513aada2c8ad6ca0484be6a5d2c760b5",
-        "bytes": 55735,
+        "sha256": "6f74c91f11bfdf5993b910353e26f762f3e3263f25eb6ebb7a2f6474bfa36025",
+        "bytes": 59085,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--22-color.png",
-        "sha256": "116af11041a44b23f7ac7fba34c3fc46e7e9f52cc0f61c69ce04862edf61d615",
-        "bytes": 44256,
+        "sha256": "d645bad51bfedb5dcee9dfc4164176ac968cccd7024f36c20ffb6abf9116da49",
+        "bytes": 46871,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--28-grayscale.png",
-        "sha256": "70df9146eb0944440dd4f362436a21fdc420554149d17ca9fe4fa2bebaaecfbb",
-        "bytes": 42997,
+        "sha256": "a80785c8514a6b21e6888f21bedc05c871e384bf10c88de9714e2134a70ed6e4",
+        "bytes": 45416,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--64-circle.png",
-        "sha256": "71542ea3a39ea86dffdd241e3ccd31d54d0c0d14c68685716422833b0e3d96ac",
-        "bytes": 138230,
+        "sha256": "2d9bdb88eeda4cf8dedbd814fd6355745fd813e55e4617861ccb58263e54df01",
+        "bytes": 148210,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--small-multiview.png",
-        "sha256": "53c891b0ad0f3de8c64f1e00b9d9d07ecad3d22c2e1a1cceeed65e33702fe73f",
-        "bytes": 248648,
+        "sha256": "9115c709f865b165798cd304736ed60a5e282eab3653926dff87339f0aa4b070",
+        "bytes": 267214,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--identity.png",
-        "sha256": "9825ccfb0927021cd43b016dceb61044fdd5f4210b5a99b5056ff1c3230e36b1",
-        "bytes": 446284,
+        "sha256": "0b27a882897d20d00d48825d7ca754a60a7a1a23aadef45b77f30f0c4ecdbd15",
+        "bytes": 480758,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -2887,133 +2911,133 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--128-color.png",
-        "sha256": "ad4305b3a91806b76b0578b8f0670761e5a5bd10d415dfc66f62f5887eb1f629",
-        "bytes": 2355918,
+        "sha256": "28c0b7d25dcbcdb5490e7a0c9b82e01c8ff002552329e5708855cc8dccae0d67",
+        "bytes": 2343201,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--40-color.png",
-        "sha256": "8102a93c7c9bc89704967b061f20c41285ff6aa9ddb76e941e6fd499bcf007aa",
-        "bytes": 461134,
+        "sha256": "f9fb1bc9539900f673d655aad92431514c6226897da4409a74bf3635f75f061e",
+        "bytes": 460615,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-color.png",
-        "sha256": "0549356784cb52415c8adaee3b553fb15bcba295d2ec2287b7150ff33376e1e9",
-        "bytes": 309791,
+        "sha256": "7bc0f440ab437b025d7158c2efdf01fb75a5cd6302becf0c70740a7988187f4b",
+        "bytes": 309449,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--22-color.png",
-        "sha256": "e5393ff1bcfb3f1464625e770d16b02523869a40049e05d1827771ab5dbfb2cb",
-        "bytes": 237085,
+        "sha256": "07462dcb9e99d1d9f9ff04c1db7ab880555913fa647538d971b9b7850cc657b7",
+        "bytes": 236741,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-grayscale.png",
-        "sha256": "6e992abccacb54befe73b89a5155034fe537d1e76d1da8aa450abb1d7effb0e0",
-        "bytes": 215670,
+        "sha256": "8ecf2e0138fd130d91827b86f2ff362930d54179ab50e9c1dcd9660bf609d18c",
+        "bytes": 215120,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--64-circle.png",
-        "sha256": "0f62d4e52c033050fa4fd2640846cdc51cf0a132e36bfe839258bf3c7fd1d31d",
-        "bytes": 729991,
+        "sha256": "43a9dba3f59abd9a7a2017a86eacbc82d3c57831b4f69182272225a0b8e05f46",
+        "bytes": 727058,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--small-multiview.png",
-        "sha256": "d136f968681d11ae6d8dc1bb4103788916eef28f972377182e0749345aff1f18",
-        "bytes": 1394817,
+        "sha256": "10368a0dba07519b3fa1d425735dcfe35b69ec4c475e4018910245befe2ea02d",
+        "bytes": 1391548,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--identity.png",
-        "sha256": "427704206e8822810c28a898a461432206e4e249cc075ff142e3ccabe01d0d75",
-        "bytes": 2446956,
+        "sha256": "00a7fc648856095bd9bfd2f449968b5b0bf7bca4dd709740cb1df858f2bb789b",
+        "bytes": 2433526,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--128-color.png",
-        "sha256": "2621255c25c81d2c3d92b71fc9a3218d998615de102b7ae3ce053a11735fc27a",
-        "bytes": 909205,
+        "sha256": "465cc21428f171948b6e0a59639203150e086a8d90198086b36aa2206ff69e98",
+        "bytes": 1037424,
         "width": 1600,
-        "height": 708,
+        "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--40-color.png",
-        "sha256": "cf051c9251a8698e94675b4302a553f0c0ad54d192e47d6312d4ed1b7ef58c51",
-        "bytes": 188654,
+        "sha256": "43a035e4bdf4d125c12d719b49d375818b7b8e7a92c92b366493b4f4aaea9288",
+        "bytes": 213054,
         "width": 1600,
-        "height": 532,
+        "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-color.png",
-        "sha256": "0ba5350d1838931dff0a7a24792c04876b695efb890d4ad16d33bcc260b79b2d",
-        "bytes": 135969,
+        "sha256": "b95f10e71216d6e568f53f89ba5da0d117fffbde13c205f55ff954e8e22a9f16",
+        "bytes": 152274,
         "width": 1600,
-        "height": 708,
+        "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--22-color.png",
-        "sha256": "d07af89cf0c21d5eb0e370d907be797e75bf58442fb3d7a57113240802c7106f",
-        "bytes": 108660,
+        "sha256": "08ff03647103cb2899783b2eba07dab162d3d6a8afb9356c0732ec8e83e37a1b",
+        "bytes": 121326,
         "width": 1600,
-        "height": 708,
+        "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-grayscale.png",
-        "sha256": "6c4fe38459d51dc30e50cd643d4f16d3d270c401b1ace2fc05298d827ee04975",
-        "bytes": 99644,
+        "sha256": "7fb20a9a123844a97557bb91abc835a1bf535f0508b00f3068c9f4eaefc2f3f9",
+        "bytes": 112911,
         "width": 1600,
-        "height": 708,
+        "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--64-circle.png",
-        "sha256": "5a9d269ec3163202e21faef9ae159bc589b07e53ada14922fa8e1b8c7f7355d9",
-        "bytes": 307005,
+        "sha256": "ac01ded0ac0e0340e953c08108c76f1453b5cd8a0b3864798a7b1dba042ebc87",
+        "bytes": 345029,
         "width": 1600,
-        "height": 708,
+        "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--small-multiview.png",
-        "sha256": "6ddc3a66523c5c0b8d0d2954b71e66f82278b42e4726b42ce14d96c084593319",
-        "bytes": 570419,
+        "sha256": "ac841bc758b59f2667b336f8f458d804854af0db728893cb77d9d793750ccf4c",
+        "bytes": 645240,
         "width": 1800,
-        "height": 916,
+        "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--identity.png",
-        "sha256": "71156c25390c7ffab0421929bb06ce8b21b559f95b8fe5f3e1f3a7d72b7a2177",
-        "bytes": 953820,
+        "sha256": "2ae8d23a5828cae35ce1a5b66deaff3c0d851fdc5f4ca8bda65f88d5868f55d0",
+        "bytes": 1085894,
         "width": 1800,
-        "height": 860,
+        "height": 1064,
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "2c96473916c10df2118b02bba0edc914acefb61a16e16f46c4467ee924876c1a"
+    "shippingCatalogSha256": "17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff"
   }
 }

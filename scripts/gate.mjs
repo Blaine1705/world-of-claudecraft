@@ -63,7 +63,7 @@ const shell = process.platform === 'win32';
 // side effect of an empty PATH also making `npm` itself unspawnable.
 // Both preflights now live in lib/gate_preflight.mjs so gate:select shares them
 // rather than silently losing the early, clear failure they exist to produce.
-runGatePreflights({ label: 'gate', shell });
+await runGatePreflights({ label: 'gate', shell });
 
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
