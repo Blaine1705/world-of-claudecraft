@@ -136,7 +136,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
 export const GATE_TURBO_UI_ARGS = Object.freeze(['--ui=stream']);
 
 /**
- * Args for `npx turbo run <tasks...>`.
+ * Args for `turbo run <tasks...>`.
  * @param {ReadonlyArray<string>} tasks package.json script names
  * @returns {string[]}
  */
@@ -149,7 +149,7 @@ export function turboRunArgs(tasks) {
       throw new Error(`turboRunArgs: invalid task ${JSON.stringify(t)}`);
     }
   }
-  return ['turbo', 'run', ...tasks, ...GATE_TURBO_UI_ARGS];
+  return ['run', ...tasks, ...GATE_TURBO_UI_ARGS];
 }
 
 /**
@@ -158,5 +158,5 @@ export function turboRunArgs(tasks) {
  * @param {ReadonlyArray<string>} args
  */
 export function isTurboGateStep(cmd, args) {
-  return cmd === 'npx' && Array.isArray(args) && args[0] === 'turbo' && args[1] === 'run';
+  return /(?:^|[\\/])turbo(?:\.cmd)?$/.test(cmd) && Array.isArray(args) && args[0] === 'run';
 }

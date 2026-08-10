@@ -2,6 +2,7 @@
 // harness. Keeps generate-once (Phase 2), turbo artifact cache (Phase 8), and
 // never-cache vitest semantics in one place so profile timings match the real
 // merge bar.
+import path from 'node:path';
 import { gateVitestSkipPretestEnv } from './gate_artifact_skip.mjs';
 import { turboRunArgs } from './gate_task_cache.mjs';
 
@@ -52,6 +53,7 @@ export const I18N_ARTIFACTS = Object.freeze([
  *
  * @param {number} workers
  * @param {{
+ *   repoRoot?: string,
  *   releaseTier?: boolean,
  *   skipBrowser?: boolean,
  *   skipBuilds?: boolean,
@@ -67,11 +69,12 @@ export const I18N_ARTIFACTS = Object.freeze([
  * }>}
  */
 export function buildFullGateSteps(workers, opts = {}) {
+  const turboCmd = path.join(opts.repoRoot ?? process.cwd(), 'node_modules', '.bin', 'turbo');
   /** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
   const steps = [
     {
       name: 'i18n + wiki + sfx artifacts',
-      cmd: 'npx',
+      cmd: turboCmd,
       args: turboRunArgs(['i18n:gen', 'wiki:content', 'sfx:check']),
     },
     {
@@ -128,19 +131,19 @@ export function buildFullGateSteps(workers, opts = {}) {
   if (!opts.skipTypes && !opts.skipBuilds) {
     steps.push({
       name: 'typecheck + env/server/bot builds',
-      cmd: 'npx',
+      cmd: turboCmd,
       args: turboRunArgs(['check:types', 'build:env', 'build:server', 'build:bot']),
     });
     steps.push({
       name: 'client build',
-      cmd: 'npx',
+      cmd: turboCmd,
       args: turboRunArgs(['build:bundle']),
     });
   } else {
     if (!opts.skipTypes) {
       steps.push({
         name: 'typecheck',
-        cmd: 'npx',
+        cmd: turboCmd,
         args: turboRunArgs(['check:types']),
       });
     }
@@ -148,22 +151,22 @@ export function buildFullGateSteps(workers, opts = {}) {
       steps.push(
         {
           name: 'env build',
-          cmd: 'npx',
+          cmd: turboCmd,
           args: turboRunArgs(['build:env']),
         },
         {
           name: 'server build',
-          cmd: 'npx',
+          cmd: turboCmd,
           args: turboRunArgs(['build:server']),
         },
         {
           name: 'bot build',
-          cmd: 'npx',
+          cmd: turboCmd,
           args: turboRunArgs(['build:bot']),
         },
         {
           name: 'client build',
-          cmd: 'npx',
+          cmd: turboCmd,
           args: turboRunArgs(['build:bundle']),
         },
       );

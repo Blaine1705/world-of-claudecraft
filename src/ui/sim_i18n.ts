@@ -8783,6 +8783,37 @@ function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
 }
 
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
+}
+
 // Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
 // English is authoritative; the non-Latin surfaces ship real fills (the M16
 // spirit) and the remaining locales fall back to English here until the
@@ -10831,7 +10862,7 @@ const RULES: Rule[] = [
   },
   {
     re: /^You must be level (\d+) to queue for the arena\.$/,
-    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+    build: (m) => tArenaMinLevelQueueError(m[1]),
   },
   {
     re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
@@ -11083,6 +11114,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,
