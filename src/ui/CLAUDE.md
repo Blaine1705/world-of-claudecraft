@@ -571,6 +571,15 @@ same file), and each module's header carries its own contract.
   Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
   and compositor-only until it commits through Hud's shared position clamp. Bump
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
+- **interface_unlock.ts** (pure `interface_unlock_core.ts`): the "Unlock interface" Interface
+  option (Combat tab). It owns no geometry: it is a registry of `MovableFrame`s plus one flag,
+  and a flip asks each entry's `isActive()` before loosening it, so a character with no pet out
+  and a disabled action bar never gain a draggable frame. Adding a frame is a row in
+  `HUD_FRAME_SPECS` plus its `isActive` probe in `Hud.initInterfaceUnlock`, never a branch in
+  the coordinator. `movable_frame.ts` carries two config shapes for this: the three unit frames
+  keep an always-visible corner button and move only, while the frames this option governs pass
+  `buttonOnlyWhenUnlocked` + `scalable` and so carry no chrome until they are unlocked. It is
+  also the SINGLE `relocalize()` fan-out arm for every `MovableFrame` in the HUD.
 - **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
   **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
   **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds

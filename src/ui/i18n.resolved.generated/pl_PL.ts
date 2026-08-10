@@ -2451,6 +2451,14 @@ export const pl_PL: EnTranslations = {
     "frameReset": {
       "label": "Resetuj pozycje ramek"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Wymaga poziomu {level}",
       "riftTier": "Przedmiot Szczeliny rangi {tier}",

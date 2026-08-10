@@ -2451,6 +2451,14 @@ export const sv_SE: EnTranslations = {
     "frameReset": {
       "label": "Återställ ramarnas positioner"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",
       "riftTier": "Revföremål av grad {tier}",

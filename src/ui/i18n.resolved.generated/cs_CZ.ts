@@ -2451,6 +2451,14 @@ export const cs_CZ: EnTranslations = {
     "frameReset": {
       "label": "Resetovat pozice rámů"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
       "riftTier": "Trhlinový předmět stupně {tier}",

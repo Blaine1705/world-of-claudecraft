@@ -2863,6 +2863,20 @@ export const hudChromeStrings = {
   frameReset: {
     label: 'Reset Frame Positions',
   },
+  // Interface panel (Combat tab) row above Auto-Attack on Ability Use: one press
+  // loosens every movable HUD frame (action bars, cast bar, menu rail, minimap,
+  // unit and pet frames) so they can be dragged and scaled, and the button
+  // relabels itself to the lock action while they are loose. `unlockFrame` /
+  // `lockFrame` name each frame's own corner button, `resizeFrame` its SE grip.
+  // All wordy (M16), so the five non-Latin fills land in this same change.
+  interfaceUnlock: {
+    label: 'Interface Frames',
+    unlock: 'Unlock interface',
+    lock: 'Lock interface',
+    unlockFrame: 'Unlock this frame',
+    lockFrame: 'Lock this frame',
+    resizeFrame: 'Drag to resize this frame',
+  },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs
   // through formatNumber.

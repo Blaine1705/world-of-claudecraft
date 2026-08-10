@@ -2451,6 +2451,14 @@ export const zh_TW: EnTranslations = {
     "frameReset": {
       "label": "重置框體位置"
     },
+    "interfaceUnlock": {
+      "label": "介面框體",
+      "unlock": "解鎖介面",
+      "lock": "鎖定介面",
+      "unlockFrame": "解鎖此框體",
+      "lockFrame": "鎖定此框體",
+      "resizeFrame": "拖曳以調整此框體大小"
+    },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",
       "riftTier": "{tier}級裂隙物品",

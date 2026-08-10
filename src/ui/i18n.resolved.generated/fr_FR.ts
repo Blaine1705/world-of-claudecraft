@@ -2451,6 +2451,14 @@ export const fr_FR: EnTranslations = {
     "frameReset": {
       "label": "Réinitialiser la position des cadres"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
       "riftTier": "Objet de faille de rang {tier}",

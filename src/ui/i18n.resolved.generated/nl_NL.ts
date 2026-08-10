@@ -2451,6 +2451,14 @@ export const nl_NL: EnTranslations = {
     "frameReset": {
       "label": "Frameposities herstellen"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Vereist niveau {level}",
       "riftTier": "{tier}-rangs Rift-voorwerp",

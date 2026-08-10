@@ -1162,6 +1162,99 @@
   body.mobile-touch .warlock-doom-frame > .tf-move-btn {
     display: none;
   }
+
+  /* ---------------------------------------------------------------------------
+     "Unlock interface" (interface_unlock.ts): the action bars, cast bar, menu
+     rail, minimap and pet frame become movable + scalable while body carries
+     .interface-unlocked. They share the unit frames' MovableFrame controller, so
+     the chrome is the same corner button plus the shared .panel-resize-grip; the
+     only difference is that neither is present until the interface is unlocked,
+     which keeps the stock HUD exactly as it was. Desktop only, like every other
+     frame gesture here.
+     --------------------------------------------------------------------------- */
+  #actionbar.tf-unlocked,
+  #actionbar2.tf-unlocked,
+  #actionbar3.tf-unlocked,
+  #castbar.tf-unlocked,
+  #side-buttons.tf-unlocked,
+  #minimap-wrap.tf-unlocked,
+  #pet-frame.tf-unlocked {
+    cursor: move;
+    outline: 1px dashed var(--gold);
+    outline-offset: 2px;
+    touch-action: none;
+  }
+  /* The corner button and grip need a positioned host to hang off. The action
+     bars, minimap wrap and pet frame are already positioned or in-flow blocks;
+     stating it here means the chrome never lands in the wrong corner. */
+  #actionbar,
+  #actionbar2,
+  #actionbar3,
+  #side-buttons {
+    position: relative;
+  }
+  #actionbar .tf-move-btn,
+  #actionbar2 .tf-move-btn,
+  #actionbar3 .tf-move-btn,
+  #castbar .tf-move-btn,
+  #side-buttons .tf-move-btn,
+  #minimap-wrap .tf-move-btn,
+  #pet-frame .tf-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    cursor: var(--cursor-point);
+    z-index: 21;
+  }
+  #actionbar .tf-move-btn:focus-visible,
+  #actionbar2 .tf-move-btn:focus-visible,
+  #actionbar3 .tf-move-btn:focus-visible,
+  #castbar .tf-move-btn:focus-visible,
+  #side-buttons .tf-move-btn:focus-visible,
+  #minimap-wrap .tf-move-btn:focus-visible,
+  #pet-frame .tf-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The button is built once and hidden until unlocked (the controller also sets
+     the `hidden` attribute, which takes it out of the tab order). */
+  .tf-move-btn-hidden {
+    display: none;
+  }
+  /* MovableFrame's own grip carries a second class so this gate cannot reach the
+     chat box or the meter panels, whose grips are always live. It only appears on
+     a frame that is actually loose, mirroring the target aura panel's
+     .ta-unlocked gate. */
+  .mf-resize-grip {
+    display: none;
+  }
+  .tf-unlocked > .mf-resize-grip {
+    display: block;
+  }
+  /* The cast bar is hidden except while casting, so unlocking shows it as a
+     dimmed placeholder that can be positioned. !important is load-bearing: the
+     cast-bar painter writes `display` inline through the elided writers, and an
+     inline value beats an ordinary rule. A real cast repaints over the top of
+     this, so it never suppresses live cast information. */
+  body.interface-unlocked #castbar {
+    display: block !important;
+    opacity: 0.55;
+  }
+  body.hud-frame-dragging,
+  body.hud-frame-dragging * {
+    user-select: none;
+  }
+  body.mobile-touch .tf-move-btn,
+  body.mobile-touch .tf-unlocked > .mf-resize-grip {
+    display: none;
+  }
   .portrait-wrap {
     position: relative;
     width: 64px;

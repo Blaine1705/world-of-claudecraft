@@ -2451,6 +2451,14 @@ export const ru_RU: EnTranslations = {
     "frameReset": {
       "label": "Сбросить положение рамок"
     },
+    "interfaceUnlock": {
+      "label": "Рамки интерфейса",
+      "unlock": "Разблокировать интерфейс",
+      "lock": "Заблокировать интерфейс",
+      "unlockFrame": "Разблокировать эту рамку",
+      "lockFrame": "Заблокировать эту рамку",
+      "resizeFrame": "Потяните, чтобы изменить размер рамки"
+    },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",
       "riftTier": "Предмет разлома ранга {tier}",

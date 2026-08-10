@@ -2451,6 +2451,14 @@ export const en_CA: EnTranslations = {
     "frameReset": {
       "label": "Reset Frame Positions"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Requires Level {level}",
       "riftTier": "{tier}-rank Rift item",

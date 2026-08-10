@@ -2451,6 +2451,14 @@ export const ja_JP: EnTranslations = {
     "frameReset": {
       "label": "フレーム位置をリセット"
     },
+    "interfaceUnlock": {
+      "label": "インターフェースフレーム",
+      "unlock": "インターフェースのロックを解除",
+      "lock": "インターフェースをロック",
+      "unlockFrame": "このフレームのロックを解除",
+      "lockFrame": "このフレームをロック",
+      "resizeFrame": "ドラッグしてこのフレームのサイズを変更"
+    },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
       "riftTier": "{tier}ランク・リフト装備",

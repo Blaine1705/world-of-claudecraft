@@ -2451,6 +2451,14 @@ export const ko_KR: EnTranslations = {
     "frameReset": {
       "label": "프레임 위치 초기화"
     },
+    "interfaceUnlock": {
+      "label": "인터페이스 프레임",
+      "unlock": "인터페이스 잠금 해제",
+      "lock": "인터페이스 잠금",
+      "unlockFrame": "이 프레임 잠금 해제",
+      "lockFrame": "이 프레임 잠금",
+      "resizeFrame": "드래그하여 이 프레임 크기 조절"
+    },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
       "riftTier": "{tier} 등급 균열 아이템",

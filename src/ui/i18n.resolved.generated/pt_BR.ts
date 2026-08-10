@@ -2451,6 +2451,14 @@ export const pt_BR: EnTranslations = {
     "frameReset": {
       "label": "Redefinir Posições dos Quadros"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Requer Nível {level}",
       "riftTier": "Item da Fenda de nível {tier}",

@@ -2451,6 +2451,14 @@ export const vi_VN: EnTranslations = {
     "frameReset": {
       "label": "Đặt Lại Vị Trí Các Khung"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
       "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",

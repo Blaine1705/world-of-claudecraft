@@ -2451,6 +2451,14 @@ export const id_ID: EnTranslations = {
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
       "riftTier": "Barang Rift peringkat {tier}",

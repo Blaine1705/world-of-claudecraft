@@ -494,6 +494,8 @@ import {
   raidMarkerDataUrl,
 } from './icons';
 import { InspectWindow } from './inspect_window';
+import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
+import { HUD_FRAME_SPECS } from './interface_unlock_core';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -1906,6 +1908,11 @@ export class Hud {
   private targetFrameMover: MovableFrame | null = null;
   private playerFrameMover: MovableFrame | null = null;
   private partyFrameMover: MovableFrame | null = null;
+  // The "Unlock interface" coordinator (interface_unlock.ts): the action bars,
+  // cast bar, menu rail, minimap and pet frame get their movers from the pure
+  // frame table, and the three unit frames above join the same toggle so one
+  // press loosens the whole HUD.
+  private readonly interfaceUnlock = new InterfaceUnlock({ document });
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
   private localIgnoredNames = new Set<string>();
@@ -3615,23 +3622,85 @@ export class Hud {
       fallbackSize: { w: 360, h: 240 },
       isMobileLayout,
     });
+    this.initInterfaceUnlock(isMobileLayout);
+  }
+
+  // The frames the "Unlock interface" option governs. Each row of the pure table
+  // becomes a MovableFrame with no permanent chrome (buttonOnlyWhenUnlocked) and
+  // the shared SE grip, plus the `isActive` probe that decides whether unlocking
+  // may loosen it: a character with no pet out, or with the optional action bars
+  // switched off, has no frame there to move. The three unit frames keep their
+  // own corner buttons and simply join the same registry.
+  private initInterfaceUnlock(isMobileLayout: () => boolean): void {
+    for (const spec of HUD_FRAME_SPECS) {
+      const frame = document.getElementById(spec.elementId);
+      if (!frame) continue;
+      const detach = makeUiRootDetacher(document, spec, frame);
+      const mover = new MovableFrame({
+        frame,
+        storageKey: spec.storageKey,
+        unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
+        lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
+        resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+        draggingBodyClass: 'hud-frame-dragging',
+        fallbackSize: spec.fallbackSize,
+        isMobileLayout,
+        scalable: true,
+        buttonOnlyWhenUnlocked: true,
+        onPositioned: detach,
+      });
+      this.interfaceUnlock.register({
+        id: spec.id,
+        mover,
+        isActive: () => this.isHudFrameActive(spec.id, frame),
+      });
+    }
+    const unitFrames: Array<[string, MovableFrame | null, () => boolean]> = [
+      ['playerFrame', this.playerFrameMover, () => true],
+      ['targetFrame', this.targetFrameMover, () => this.targetFrameEl?.style.display !== 'none'],
+      ['partyFrames', this.partyFrameMover, () => this.partyFramesEl.children.length > 0],
+    ];
+    for (const [id, mover, isActive] of unitFrames) {
+      if (mover) this.interfaceUnlock.register({ id, mover, isActive });
+    }
+  }
+
+  // Is this frame live for the character right now? The cast bar is the one row
+  // that answers yes while hidden: every class casts, it is simply not casting
+  // this instant, so the unlocked stylesheet shows it as a dimmed placeholder to
+  // be positioned. Everything else reports what the player can actually see.
+  private isHudFrameActive(id: string, frame: HTMLElement): boolean {
+    if (id === 'castBar') return true;
+    if (id === 'actionBar2') return document.body.classList.contains('show-actionbar2');
+    if (id === 'actionBar3') return document.body.classList.contains('show-actionbar3');
+    return frame.style.display !== 'none';
+  }
+
+  /** Toggle every movable HUD frame between locked and unlocked. Returns the new
+   *  state, which is what the Interface option row repaints its label from. */
+  toggleInterfaceUnlock(): boolean {
+    return this.interfaceUnlock.toggle();
+  }
+
+  /** True while the HUD frames accept a move / resize gesture. */
+  isInterfaceUnlocked(): boolean {
+    return this.interfaceUnlock.isUnlocked;
   }
 
   // Public: snap all movable unit frames back to their stock CSS spots and
   // forget the saved drags. Wired to the "Reset Frame Positions" interface option.
   resetUnitFrames(): void {
-    this.targetFrameMover?.reset();
-    this.playerFrameMover?.reset();
-    this.partyFrameMover?.reset();
+    // resetAll() locks the interface first and then resets every registered
+    // frame, which covers the three unit frames as well as the action bars, cast
+    // bar, menu, minimap and pet frame.
+    this.interfaceUnlock.resetAll();
     this.doomMeter.resetPosition();
   }
 
   /** Repaint persisted visual-space geometry after a live UI Scale change. */
   reapplySavedGeometry(): void {
     this.chatGeometry.reapply();
-    this.targetFrameMover?.reapplyPosition();
-    this.playerFrameMover?.reapplyPosition();
-    this.partyFrameMover?.reapplyPosition();
+    this.interfaceUnlock.reapplyAll();
     this.doomMeter.reapplyPosition();
   }
 
@@ -5010,6 +5079,8 @@ export class Hud {
     log: (message) => this.log(message, '#ffd100'),
     resetChatWindow: () => this.resetChatWindow(),
     resetUnitFrames: () => this.resetUnitFrames(),
+    isInterfaceUnlocked: () => this.isInterfaceUnlocked(),
+    toggleInterfaceUnlock: () => this.toggleInterfaceUnlock(),
     getChatTimestamps: () => this.chatTimestamps,
     setChatTimestamps: (on) => {
       this.chatTimestamps = on;
@@ -6284,9 +6355,8 @@ export class Hud {
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
-    this.targetFrameMover?.relocalize();
-    this.playerFrameMover?.relocalize();
-    this.partyFrameMover?.relocalize();
+    // Covers the three unit frames and every frame the interface toggle governs.
+    this.interfaceUnlock.relocalize();
     this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();

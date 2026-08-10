@@ -2451,6 +2451,14 @@ export const tr_TR: EnTranslations = {
     "frameReset": {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Gereken Seviye {level}",
       "riftTier": "{tier} dereceli Yarık eşyası",

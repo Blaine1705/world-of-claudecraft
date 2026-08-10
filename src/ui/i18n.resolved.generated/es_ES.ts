@@ -2451,6 +2451,14 @@ export const es_ES: EnTranslations = {
     "frameReset": {
       "label": "Restablecer posición de los marcos"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}",
       "riftTier": "Objeto de Brecha de rango {tier}",

@@ -93,9 +93,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
-  'this.targetFrameMover.relocalize|',
-  'this.playerFrameMover.relocalize|',
-  'this.partyFrameMover.relocalize|',
+  // One arm for every MovableFrame in the HUD: the three unit frames and the
+  // frames the "Unlock interface" option governs all register with the same
+  // coordinator, which forwards relocalize() to each of them.
+  'this.interfaceUnlock.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.doomMeter.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',

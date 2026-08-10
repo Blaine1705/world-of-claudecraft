@@ -69,6 +69,7 @@ import {
   t,
 } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
+import { interfaceUnlockLabelKey } from './interface_unlock_core';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -290,6 +291,10 @@ export interface OptionsWindowDeps {
   resetChatWindow(): void;
   /** Reset the movable player + target unit frames to their stock spots. */
   resetUnitFrames(): void;
+  /** True while every movable HUD frame accepts a move / resize gesture. */
+  isInterfaceUnlocked(): boolean;
+  /** Flip every movable HUD frame at once; returns the new unlocked state. */
+  toggleInterfaceUnlock(): boolean;
   /** Chat-timestamp state (Hud owns it; the chat renderer reads the same fields). */
   getChatTimestamps(): boolean;
   setChatTimestamps(on: boolean): void;
@@ -1408,6 +1413,10 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
+    // Combat leads with the interface unlock action, directly above the
+    // Auto-Attack on Ability Use toggle the declarative list opens with.
+    if (tab === 'combat') this.interfaceUnlockRow(body);
+
     if (hooks)
       this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
         this.renderInterface();
@@ -1536,6 +1545,36 @@ export class OptionsWindow {
     });
     framesRow.append(framesName, framesBtn);
     body.append(framesRow);
+  }
+
+  // "Unlock interface": one press loosens every movable HUD frame (the three
+  // action bars, the cast bar, the menu rail, the minimap and the player / pet
+  // frames) so they can be dragged and scaled, and the button relabels itself to
+  // "Lock interface" while they are loose. An action rather than a stored
+  // setting, so it is a bespoke row rather than a boolToggle: the unlocked state
+  // deliberately does not survive a reload (a frame always loads locked, the
+  // same rule the per-frame corner buttons have always followed). Combat tab,
+  // rendered directly above Auto-Attack on Ability Use.
+  private interfaceUnlockRow(body: HTMLElement): void {
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = t('hudChrome.interfaceUnlock.label');
+    const btn = document.createElement('button');
+    btn.className = 'btn set-toggle';
+    const sync = (unlocked: boolean) => {
+      btn.textContent = t(interfaceUnlockLabelKey(unlocked));
+      btn.setAttribute('aria-pressed', String(unlocked));
+      btn.classList.toggle('active', unlocked);
+    };
+    sync(this.deps.isInterfaceUnlocked());
+    btn.addEventListener('click', () => {
+      audio.click();
+      sync(this.deps.toggleInterfaceUnlock());
+    });
+    row.append(name, btn);
+    body.append(row);
   }
 
   // -------------------------------------------------------------------------

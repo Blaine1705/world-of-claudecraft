@@ -2451,6 +2451,14 @@ export const da_DK: EnTranslations = {
     "frameReset": {
       "label": "Nulstil rammepositioner"
     },
+    "interfaceUnlock": {
+      "label": "Interface Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Drag to resize this frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}",
       "riftTier": "{tier}-rangs Rift-genstand",

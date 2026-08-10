@@ -2451,6 +2451,14 @@ export const en_XA: EnTranslations = {
     "frameReset": {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
+    "interfaceUnlock": {
+      "label": "[Íñţéŕƒáçé Ƒŕáɱéš]",
+      "unlock": "[Úñļóçķ íñţéŕƒáçé]",
+      "lock": "[Ļóçķ íñţéŕƒáçé]",
+      "unlockFrame": "[Úñļóçķ ţĥíš ƒŕáɱé]",
+      "lockFrame": "[Ļóçķ ţĥíš ƒŕáɱé]",
+      "resizeFrame": "[Ðŕáĝ ţó ŕéšížé ţĥíš ƒŕáɱé]"
+    },
     "itemTooltip": {
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
       "riftTier": "[{tier}-ŕáñķ Ŕíƒţ íţéɱ]",
