@@ -155,6 +155,14 @@ export class ReliquaryWindow {
    *  async read lands, and null renders NO rarity nodes at all. */
   private rarity: ReliquaryRarity | null = null;
   private rarityFetchSeq = 0;
+  /** Bumped when a fetch lands so the refresh SIGNATURE moves and the slow
+   *  band repaints through the normal world-driven path. The landing never
+   *  calls render() itself: a direct render would bypass the composing hold,
+   *  read as player-driven to the live region, and consume none of the
+   *  focus-restore machinery a rebuild owes (the three hazards the fresh
+   *  frontend review named). Latency is one band tick, which the population
+   *  line can afford. */
+  private rarityGen = 0;
   private nav: ReliquaryNavId = 'overview';
   private pageId: string | null = null;
   private search = '';
@@ -437,11 +445,12 @@ export class ReliquaryWindow {
   }
 
   /** One rarity fetch per fresh open (the DeedsWindow rarity pattern). The
-   *  async result repaints in place when it lands (the signature diff cannot
-   *  see it, so that render is explicit); the sequence guard drops a stale
-   *  response after a close/reopen race, and the opened check drops one that
-   *  lands after close. Null-on-failure is the facet contract: a rejection or
-   *  null keeps this.rarity null and nothing renders. */
+   *  landing only stores the aggregate and moves the refresh signature (see
+   *  rarityGen); the next slow-band refreshIfChanged paints it with every
+   *  rebuild discipline intact. The sequence guard drops a stale response
+   *  after a close/reopen race, and the opened check drops one that lands
+   *  after close. Null-on-failure is the facet contract: a rejection or null
+   *  keeps this.rarity null and nothing renders. */
   private fetchRarity(): void {
     const seq = ++this.rarityFetchSeq;
     this.rarity = null;
@@ -451,7 +460,7 @@ export class ReliquaryWindow {
       .then((rarity) => {
         if (seq !== this.rarityFetchSeq || !this.opened || rarity === null) return;
         this.rarity = rarity;
-        this.render();
+        this.rarityGen += 1;
       })
       .catch(() => {
         /* null-on-failure is the facet contract; a rejection renders nothing */
@@ -843,24 +852,29 @@ export class ReliquaryWindow {
       firstFindCount,
       pageOwned,
     });
-    return reliquaryRefreshSig({
-      owned: catalog.owned,
-      total: catalog.total,
-      curatorRank: world.reliquaryCuratorRank(),
-      recentSig: reliquaryRecentSig(input.recent),
-      marksSize: world.reliquaryMarks.size,
-      nav: input.nav,
-      pageId: input.pageId,
-      clearsDigest,
-      ownershipDigest,
-      // A repeat obtain of a relic already on the wall moves nothing else in
-      // this signature: no set grows, no first-find key is minted, no total
-      // changes. Without this dimension an open window would keep painting the
-      // previous tally until something unrelated happened to repaint it.
-      countsDigest: reliquaryObtainCountsDigest(world.reliquaryObtainCounts),
-      search: input.search,
-      ownedFilter: input.ownedFilter,
-    });
+    return (
+      reliquaryRefreshSig({
+        owned: catalog.owned,
+        total: catalog.total,
+        curatorRank: world.reliquaryCuratorRank(),
+        recentSig: reliquaryRecentSig(input.recent),
+        marksSize: world.reliquaryMarks.size,
+        nav: input.nav,
+        pageId: input.pageId,
+        clearsDigest,
+        ownershipDigest,
+        // A repeat obtain of a relic already on the wall moves nothing else in
+        // this signature: no set grows, no first-find key is minted, no total
+        // changes. Without this dimension an open window would keep painting the
+        // previous tally until something unrelated happened to repaint it.
+        countsDigest: reliquaryObtainCountsDigest(world.reliquaryObtainCounts),
+        search: input.search,
+        ownedFilter: input.ownedFilter,
+        // Painter-side dimension: the rarity aggregate is window state (fetched
+        // per open), not world state, so the generation rides here rather than
+        // in the pure sig fold.
+      }) + `|r${this.rarityGen}`
+    );
   }
 
   /**
@@ -1366,7 +1380,11 @@ export class ReliquaryWindow {
       // which is why the gate above never asks the browser about it.
       `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
-      `<header class="reliquary-page-header">` +
+      // tabindex -1 + a focus key: spotlightPage parks the reading position
+      // here on a deep link, and the key is what lets a fetch-driven or
+      // slow-band rebuild RESTORE that position instead of dropping a
+      // keyboard player onto Close moments after they arrived.
+      `<header class="reliquary-page-header" tabindex="-1" data-focus-key="page-header">` +
       `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${this.outsideCompletionChipHtml(page.pageId)}${done}` +
       // Same control, same focus key as the shelf row's: the shelf list and a
       // page detail are mutually exclusive surfaces (contentHtml), so one page
@@ -1629,9 +1647,10 @@ export class ReliquaryWindow {
 
   /** The population-rarity sentence for one cell, or null when there is
    *  nothing to say (offline, fetch failure, empty population, or a relic
-   *  nobody has found; weapon-skin and title relics are always absent from
-   *  the aggregate). ONE resolver feeds the tooltip line AND the aria fold so
-   *  the two surfaces cannot disagree (the sourceLines agreement contract). */
+   *  nobody has found; weapon-skin, title, AND mount relics are always
+   *  absent from the aggregate, see the ReliquaryRarity facet doc). ONE
+   *  resolver feeds the tooltip line AND the aria fold so the two surfaces
+   *  cannot disagree (the sourceLines agreement contract). */
   private cellRarityText(cell: ReliquaryGridCellModel): string | null {
     const fraction = reliquaryRarityFraction(this.rarity, cell.id);
     if (fraction === null) return null;

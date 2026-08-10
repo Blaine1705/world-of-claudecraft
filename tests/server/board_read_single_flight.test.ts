@@ -926,9 +926,12 @@ describe('the reliquary rarity slice shares the deeds rarity cache entry', () =>
     dbMocks.reliquaryRarityCounts.mockResolvedValue(reliquaryAggregate());
     const deeds = await seam.getDeedsRarity();
     expect(deeds.earned[LISTABLE_DEED_ID]).toBe(40);
-    // One refresh, both scans, once each.
+    // One refresh, both scans, once each, and the reliquary arm receives the
+    // deeds denominator (same predicate) so it never re-counts the eligible
+    // population inside the same refresh.
     expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
     expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledWith(rarityAggregate().totalEligible);
     // The decisive oracle against a second cadence: within the TTL the
     // reliquary read is a pure cache hit, so NEITHER scan runs again.
     expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
@@ -968,6 +971,44 @@ describe('the reliquary rarity slice shares the deeds rarity cache entry', () =>
     dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
     dbMocks.reliquaryRarityCounts.mockRejectedValueOnce(new Error('db down'));
     expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it('a slice that kept failing past the staleness bound drops to empty instead of serving forever', async () => {
+    // The carry-forward keeps the previous reliquary slice across a failed
+    // arm, but only inside RELIQUARY_RARITY_MAX_STALE_MS (three TTLs): past
+    // it, month-old counts indistinguishable from fresh ones would be worse
+    // than an honest empty degrade.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-11T12:00:00.000Z'));
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockResolvedValueOnce(reliquaryAggregate());
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    // First failed cycle at +6 min: inside the bound, stale-serves.
+    vi.setSystemTime(new Date('2026-07-11T12:06:00.000Z'));
+    dbMocks.reliquaryRarityCounts.mockRejectedValue(new Error('db down'));
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    // Past three TTLs of reliquary age: the carry-forward stops.
+    vi.setSystemTime(new Date('2026-07-11T12:21:00.000Z'));
+    expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+  });
+
+  it('a reliquary-arm failure still installs a FRESH deeds slice: no deeds blackout, no retry storm', async () => {
+    // The deeds slice installs BEFORE the heavier reliquary arm runs, so the
+    // pre-existing deeds feature can never be blanked by the new scan failing,
+    // and the fresh cache stamp negative-caches the failed arm for one TTL
+    // window instead of re-running the healthy deeds scan per anonymous retry.
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockRejectedValueOnce(new Error('db down'));
+    expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+    const deeds = await seam.getDeedsRarity();
+    expect(deeds.earned[LISTABLE_DEED_ID]).toBe(40);
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+    // Within the TTL neither getter re-runs either scan.
+    await readReliquaryRarity();
+    await seam.getDeedsRarity();
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
     expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
   });
 });

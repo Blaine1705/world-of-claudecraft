@@ -93,16 +93,20 @@ describe('reliquaryRarityCounts', () => {
     await reliquaryRarityCounts();
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toContain('jsonb_array_elements_text');
-    expect(sql).toContain("c.state->'deedStats'->'itemsDiscovered'");
-    // The malformed-path guard: a non-array at the path unnests as empty rather
-    // than failing the whole refresh.
-    expect(sql).toContain('jsonb_typeof');
+    // The single-reference detoast guard: strict jsonpath with silent-on-error
+    // answers [] for a missing path, a scalar, or an object (all four shapes
+    // verified on a live Postgres 16), and names c.state exactly once so the
+    // blob detoasts once per arm, not twice.
+    expect(sql).toContain(
+      "jsonb_path_query_array(c.state, 'strict $.deedStats.itemsDiscovered[*]', '{}', true)",
+    );
+    expect((sql.match(/c\.state/g) ?? []).length).toBe(2);
     expect(sql).toContain('ANY($2::text[])');
     expect(sql).toContain('GROUP BY x.id');
     expectEligibilityAxes(sql);
     // Not a sibling arm's blob path: a copy-paste that leaves this arm reading
     // reliquary.marks still satisfies every pin above.
-    expect(sql).not.toContain("'reliquary'");
+    expect(sql).not.toContain('$.reliquary');
     expect(params[0]).toBe(DEED_RARITY_MIN_LEVEL);
     // The bound set is DERIVED from the catalog, so growing the catalog cannot
     // stale this pin. The floor is what keeps the derivation honest: an import
@@ -118,8 +122,10 @@ describe('reliquaryRarityCounts', () => {
     await reliquaryRarityCounts();
     const [sql, params] = dbMock.query.mock.calls[1];
     expect(sql).toContain('jsonb_array_elements_text');
-    expect(sql).toContain("c.state->'reliquary'->'marks'");
-    expect(sql).toContain('jsonb_typeof');
+    expect(sql).toContain(
+      "jsonb_path_query_array(c.state, 'strict $.reliquary.marks[*]', '{}', true)",
+    );
+    expect((sql.match(/c\.state/g) ?? []).length).toBe(2);
     expect(sql).toContain('ANY($2::text[])');
     expect(sql).toContain('GROUP BY x.id');
     expectEligibilityAxes(sql);
@@ -137,13 +143,15 @@ describe('reliquaryRarityCounts', () => {
     await reliquaryRarityCounts();
     const [sql, params] = dbMock.query.mock.calls[2];
     expect(sql).toContain('jsonb_array_elements_text');
-    expect(sql).toContain("c.state->'reliquary'->'illuminatedPages'");
-    expect(sql).toContain('jsonb_typeof');
+    expect(sql).toContain(
+      "jsonb_path_query_array(c.state, 'strict $.reliquary.illuminatedPages[*]', '{}', true)",
+    );
+    expect((sql.match(/c\.state/g) ?? []).length).toBe(2);
     expect(sql).toContain('ANY($2::text[])');
     expect(sql).toContain('GROUP BY x.id');
     expectEligibilityAxes(sql);
     expect(sql).not.toContain('itemsDiscovered');
-    expect(sql).not.toContain("->'marks'");
+    expect(sql).not.toContain('.marks');
     expect(params[0]).toBe(DEED_RARITY_MIN_LEVEL);
     const pageIds: string[] = params[1];
     expect(pageIds).toEqual([...RELIQUARY_PAGE_ORDER]);
@@ -181,5 +189,63 @@ describe('reliquaryRarityCounts', () => {
     const { found, illuminated } = await reliquaryRarityCounts();
     expect(Object.keys(found).sort()).toEqual([ITEM_RELIC_ID, MARK_RELIC_ID].sort());
     expect(Object.keys(illuminated).sort()).toEqual([PAGE_ID]);
+  });
+});
+
+describe('the same-refresh denominator handoff', () => {
+  it('skips the eligible COUNT and passes the handed-over number through', async () => {
+    // main.ts hands the deeds denominator over (same predicate constants), so
+    // the shared refresh never walks characters JOIN accounts twice for the
+    // same number; only a standalone call pays for its own COUNT.
+    dbMock.query
+      .mockResolvedValueOnce({ rows: [] } as never)
+      .mockResolvedValueOnce({ rows: [] } as never)
+      .mockResolvedValueOnce({ rows: [] } as never);
+    const result = await reliquaryRarityCounts(345);
+    expect(result.totalEligible).toBe(345);
+    expect(dbMock.query).toHaveBeenCalledTimes(3);
+    for (const [sql] of dbMock.query.mock.calls) {
+      expect(sql).not.toContain('AS eligible');
+    }
+  });
+});
+
+describe('the SQL blob paths match the sim serializer layout', () => {
+  // The scan depends on the persisted blob's key names, and a save-shape
+  // rename would silently ZERO every count rather than fail (the
+  // migration-safety concern the db review named). Derive the pinned segments
+  // from the REAL serializers, so the rename reds here first.
+  it('every SQL sub-key is a key the real serializers write', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { freshDeedStats, serializeDeedStats } = await import('../../src/sim/deeds');
+    const { freshReliquaryState, serializeReliquaryState } = await import(
+      '../../src/sim/reliquary'
+    );
+    const src = readFileSync(
+      new URL('../../server/reliquary_rarity_db.ts', import.meta.url),
+      'utf8',
+    );
+    const state = freshReliquaryState();
+    state.marks.add('slain:old_greyjaw');
+    state.illuminatedPages.add('conquerors_hollow_crypt');
+    const savedReliquary = serializeReliquaryState(state);
+    expect(savedReliquary ? Object.keys(savedReliquary) : []).toEqual(
+      expect.arrayContaining(['marks', 'illuminatedPages']),
+    );
+    expect(src).toContain('$.reliquary.marks');
+    expect(src).toContain('$.reliquary.illuminatedPages');
+    const stats = freshDeedStats();
+    stats.itemsDiscovered.add('cryptbone_helm');
+    const savedStats = serializeDeedStats(stats);
+    expect(savedStats ? Object.keys(savedStats) : []).toEqual(
+      expect.arrayContaining(['itemsDiscovered']),
+    );
+    expect(src).toContain('$.deedStats.itemsDiscovered');
+    // Top-level segments: the sim.ts save composition writes these exact keys
+    // through shorthand spreads (source pin; the runtime save path is
+    // exercised end to end by the sim suites).
+    const simSrc = readFileSync(new URL('../../src/sim/sim.ts', import.meta.url), 'utf8');
+    expect(simSrc).toContain('return deedStats ? { deedStats } : {}');
+    expect(simSrc).toContain('return reliquary ? { reliquary } : {}');
   });
 });

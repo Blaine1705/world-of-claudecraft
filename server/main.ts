@@ -858,10 +858,22 @@ setOnModerationQueueChanged(bustModerationQueueCache);
 // window no matter which UI asks, instead of giving a second full-table scan
 // its own cadence.
 const DEEDS_RARITY_TTL_MS = 5 * 60_000;
+// The reliquary slice may carry forward across a failed arm (see the refresh
+// below), so it carries its own age stamp with a drop-to-empty bound: without
+// one, an arm that fails every cycle would serve arbitrarily old counts
+// indistinguishable from fresh ones. Three TTLs of staleness is where honest
+// degrades beats stale serves for a slow-moving cosmetic read.
+const RELIQUARY_RARITY_MAX_STALE_MS = 3 * DEEDS_RARITY_TTL_MS;
+const EMPTY_RELIQUARY_RARITY: import('../src/world_api').ReliquaryRarity = {
+  totalEligible: 0,
+  found: {},
+  illuminated: {},
+};
 let deedsRarityCache: {
   at: number;
   payload: import('../src/world_api').DeedsRarity;
   reliquary: import('../src/world_api').ReliquaryRarity;
+  reliquaryAt: number;
 } | null = null;
 
 // Single-flight the rarity refresh so a login-page storm on a cold or just-expired
@@ -874,11 +886,42 @@ let deedsRarityCache: {
 // (rarity is not moderation-visible in the delisting sense); if it is ever
 // added there, the same boardEpoch capture-before-install guard the
 // leaderboard refreshes carry must be added in that same change.
+// NOTE on scope: "at most one walk per TTL" is a PER-PROCESS bound. Every
+// realm process holds its own cache and flight against the one Postgres, so N
+// processes mean up to N unstaggered walks per TTL window; harmless at the
+// measured cost, stated here so a future multi-realm scale-up prices it in.
 const refreshDeedsRarityShared = singleFlight(
   async (): Promise<import('../src/world_api').DeedsRarity> => {
-    const payload = publicRarityPayload(await deedRarityCounts());
-    const reliquary = await reliquaryRarityCounts();
-    deedsRarityCache = { at: Date.now(), payload, reliquary };
+    const startedAt = Date.now();
+    const counts = await deedRarityCounts();
+    const payload = publicRarityPayload(counts);
+    // Install the deeds slice BEFORE the heavier reliquary arm, so a
+    // reliquary-only failure can never blank the pre-existing deeds feature
+    // (a cold getDeedsRarity would otherwise degrade to the empty aggregate),
+    // and the fresh `at` stamp negative-caches the failed arm for one TTL
+    // window instead of re-running the healthy deeds scan on every anonymous
+    // retry. The reliquary slice carries forward until its arm succeeds, but
+    // only inside the staleness bound: past it, honest empty beats a count
+    // that could be arbitrarily old.
+    const carried = deedsRarityCache;
+    const carriedFresh =
+      carried !== null && Date.now() - carried.reliquaryAt <= RELIQUARY_RARITY_MAX_STALE_MS;
+    deedsRarityCache = {
+      at: Date.now(),
+      payload,
+      reliquary: carriedFresh ? carried.reliquary : EMPTY_RELIQUARY_RARITY,
+      reliquaryAt: carried?.reliquaryAt ?? 0,
+    };
+    // The deeds denominator is byte-identical to the reliquary one (shared
+    // predicate constants), so hand it over rather than counting twice; the
+    // UNSTRIPPED aggregate carries it (publicRarityPayload only strips ids).
+    const reliquary = await reliquaryRarityCounts(counts.totalEligible);
+    deedsRarityCache = { at: Date.now(), payload, reliquary, reliquaryAt: Date.now() };
+    // The one observability line for the walk: elapsed and the population it
+    // covered, so the growth curve is visible before the endpoint degrades.
+    console.log(
+      `rarity refresh: ${Date.now() - startedAt}ms, ${counts.totalEligible} eligible characters`,
+    );
     return payload;
   },
 );
@@ -906,7 +949,7 @@ async function getReliquaryRarity(): Promise<import('../src/world_api').Reliquar
   } catch (err) {
     console.error('reliquary rarity refresh failed:', err);
   }
-  return deedsRarityCache?.reliquary ?? { totalEligible: 0, found: {}, illuminated: {} };
+  return deedsRarityCache?.reliquary ?? EMPTY_RELIQUARY_RARITY;
 }
 
 // Project-stats counters cache. Unlike the player/guild/arena boards, the

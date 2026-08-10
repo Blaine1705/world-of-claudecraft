@@ -3191,11 +3191,14 @@ describe('ReliquaryWindow: the outside-completion chips', () => {
 // ---------------------------------------------------------------------------
 
 describe('population rarity', () => {
-  /** The fetch-per-open resolves on the microtask queue and repaints
-   *  explicitly; two ticks cover the then-chain deterministically. */
-  const flushRarityFetch = async (): Promise<void> => {
+  /** Land the fetched aggregate: flush the microtask then drive the slow
+   *  band. The landing only stores the aggregate and moves the refresh
+   *  signature (rarityGen); the NEXT refreshIfChanged paints it through the
+   *  normal world-driven path, so these tests drive exactly that. */
+  const landRarity = async (rig: Rig): Promise<void> => {
     await Promise.resolve();
     await Promise.resolve();
+    rig.w.refreshIfChanged();
   };
 
   const rarityPercent = (fraction: number): string =>
@@ -3221,7 +3224,7 @@ describe('population rarity', () => {
   it('a missing relic tooltip gains the rarity line and the aria composes it', async () => {
     const { state, relicId } = seededState();
     const rig = openPage(state, PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(rig);
     const node = must(rig.el, `[data-cell-id="${relicId}"]`);
     expect(node.dataset.cellOwned).toBe('0');
     const line = t('hudChrome.reliquary.rarityLine', { percent: rarityPercent(3 / 200) });
@@ -3236,29 +3239,64 @@ describe('population rarity', () => {
   });
 
   it('a sibling cell whose id is absent from the aggregate renders NO rarity line', async () => {
-    const { state } = seededState();
+    const { state, relicId } = seededState();
     const rig = openPage(state, PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(rig);
     const other = pageDef(PAGE_ID).relics[1];
     if (!other || other.kind !== 'item') {
       throw new Error(`content premise: ${PAGE_ID} keeps a second ITEM relic slot`);
     }
+    // Positive control on the SAME paint: the seeded sibling shows the line,
+    // so the absent-id assertions below discriminate the per-id gate rather
+    // than a feature that never rendered at all.
+    const seededHtml = tooltipFor(rig, must(rig.el, `[data-cell-id="${relicId}"]`))?.() ?? '';
+    expect((seededHtml.match(/of collectors/g) ?? []).length).toBe(1);
     const node = must(rig.el, `[data-cell-id="${other.itemId}"]`);
     const html = tooltipFor(rig, node)?.() ?? '';
-    // Absent-from-map is the zero-found wire shape AND the weapon-skin/title
+    // Absent-from-map is the zero-found wire shape AND the skin/title/mount
     // shape (the server never counts those kinds), so this arm is the whole
     // "no data means no node" contract for a live aggregate.
-    expect(html).not.toContain(esc(t('hudChrome.reliquary.rarityLine', { percent: '' }).trim()));
     expect(html).not.toContain('of collectors');
     const aria = node.getAttribute('aria-label') ?? '';
     expect(aria).not.toContain('of collectors');
+  });
+
+  it('mount and weapon-skin cells render no rarity line even with a live aggregate', async () => {
+    // The aggregate never counts possession-based or account-scoped kinds
+    // (the ReliquaryRarity facet doc): a mount cell keys on the MOUNT id, not
+    // the reins item id, so nothing in the maps can match it. Pin one real
+    // cell per kind rather than arguing by equivalence to "absent id".
+    const { state } = seededState();
+    const rig = openPage(state, UNHINTED_PAGE_ID, 'horizons');
+    await landRarity(rig);
+    const mountNode = must(rig.el, `[data-cell-id="${UNHINTED_MOUNT_ID}"]`);
+    expect(tooltipFor(rig, mountNode)?.() ?? '').not.toContain('of collectors');
+    // A real weapon-skin slot from the live catalog, wherever it lives.
+    let skinPage: string | null = null;
+    let skinId: string | null = null;
+    for (const page of RELIQUARY_PAGES_BY_ID ? Object.values(RELIQUARY_PAGES_BY_ID) : []) {
+      const skin = page.relics.find((r) => r.kind === 'weapon_skin');
+      if (skin && skin.kind === 'weapon_skin') {
+        skinPage = page.id;
+        skinId = skin.skinId;
+        break;
+      }
+    }
+    if (skinPage === null || skinId === null) {
+      throw new Error('content premise: the catalog keeps at least one weapon-skin slot');
+    }
+    const rig2 = makeWindow(seededState().state, { open: false });
+    rig2.w.openWithPage(skinPage);
+    await landRarity(rig2);
+    const skinNode = must(rig2.el, `[data-cell-id="${skinId}"]`);
+    expect(tooltipFor(rig2, skinNode)?.() ?? '').not.toContain('of collectors');
   });
 
   it('an OWNED item relic keeps the rarity line on the full-item-tooltip branch', async () => {
     const { state, relicId } = seededState();
     state.itemsDiscovered.add(relicId);
     const rig = openPage(state, PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(rig);
     const node = must(rig.el, `[data-cell-id="${relicId}"]`);
     expect(node.dataset.cellOwned).toBe('1');
     const html = tooltipFor(rig, node)?.() ?? '';
@@ -3268,9 +3306,7 @@ describe('population rarity', () => {
     expect(html).toContain(`data-item-tooltip="${relicId}"`);
     const line = t('hudChrome.reliquary.rarityLine', { percent: rarityPercent(3 / 200) });
     expect(html).toContain(`<div class="tt-line">${esc(line)}</div>`);
-    expect(html.indexOf(line === '' ? 'never' : esc(line))).toBeGreaterThan(
-      html.indexOf(`data-item-tooltip="${relicId}"`),
-    );
+    expect(html.indexOf(esc(line))).toBeGreaterThan(html.indexOf(`data-item-tooltip="${relicId}"`));
   });
 
   it('an owned MARK cell carries the rarity line on the plain-body arm', async () => {
@@ -3282,7 +3318,7 @@ describe('population rarity', () => {
     };
     state.marks.add('slain:old_greyjaw');
     const rig = openPage(state, 'conquerors_rares_of_the_realm');
-    await flushRarityFetch();
+    await landRarity(rig);
     const node = must(rig.el, '[data-cell-id="slain:old_greyjaw"]');
     expect(node.dataset.cellOwned).toBe('1');
     const line = t('hudChrome.reliquary.rarityLine', { percent: rarityPercent(2 / 200) });
@@ -3295,7 +3331,7 @@ describe('population rarity', () => {
   it('the page header shows the illumination line only for a counted page', async () => {
     const { state } = seededState();
     const rig = openPage(state, PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(rig);
     const node = must(rig.el, '.reliquary-page-rarity');
     expect(node.textContent).toBe(
       t('hudChrome.reliquary.pageRarityLine', { percent: rarityPercent(5 / 200) }),
@@ -3303,7 +3339,7 @@ describe('population rarity', () => {
     // A page absent from the illuminated map (nobody has illuminated it, the
     // permanent Riftbound state) renders NO node, never a zero line.
     const other = openPage(seededState().state, MULTI_SOURCE_PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(other);
     expect(other.el.querySelector('.reliquary-page-rarity')).toBeNull();
   });
 
@@ -3311,12 +3347,61 @@ describe('population rarity', () => {
     const state = baseState();
     expect(state.rarity).toBeNull();
     const rig = openPage(state, PAGE_ID);
-    await flushRarityFetch();
+    await landRarity(rig);
     expect(rig.el.querySelector('.reliquary-page-rarity')).toBeNull();
     const relic = pageDef(PAGE_ID).relics[0];
     const relicId = relic?.kind === 'item' ? relic.itemId : '';
     const node = must(rig.el, `[data-cell-id="${relicId}"]`);
     const html = tooltipFor(rig, node)?.() ?? '';
     expect(html).not.toContain('of collectors');
+  });
+
+  it('the landing paint never re-announces the result count (world-driven path)', async () => {
+    // close() keeps the ownership chip for the session, so a reopen onto a
+    // filtered page is the reachable shape where a player-driven landing
+    // would have announced "N relics" out of nowhere (the live-region
+    // discipline the fresh review flagged). The band paint is world-driven
+    // and the text is unchanged, so the region must stay silent.
+    const { state } = seededState();
+    const rig = openPage(state, PAGE_ID);
+    await landRarity(rig);
+    click(rig.el, '[data-filter="missing"]');
+    rig.w.close();
+    rig.w.open();
+    const live = liveRegion(rig.el);
+    expect(live?.textContent ?? '').toBe('');
+    await landRarity(rig);
+    expect(must(rig.el, '.reliquary-page-rarity').textContent).toContain('of collectors');
+    expect(live?.textContent ?? '').toBe('');
+  });
+
+  it('the landing paint keeps focus on a deep-linked page header', async () => {
+    // A cold openWithPage parks the reading position on the page header; the
+    // fetch lands moments later and rebuilds the window. The header carries a
+    // focus key exactly so this rebuild restores the position instead of
+    // dropping a keyboard player onto Close.
+    const { state } = seededState();
+    const rig = makeWindow(state, { open: false });
+    rig.w.openWithPage(PAGE_ID);
+    const headerBefore = must(rig.el, '.reliquary-page-header');
+    expect(document.activeElement).toBe(headerBefore);
+    await landRarity(rig);
+    const headerAfter = must(rig.el, '.reliquary-page-header');
+    expect(document.activeElement).toBe(headerAfter);
+    expect(must(rig.el, '.reliquary-page-rarity').textContent).toContain('of collectors');
+  });
+
+  it('a response landing after close is dropped, and a reopen fetch wins a race', async () => {
+    // Late landing: the guard drops a response that resolves after close.
+    const { state } = seededState();
+    const rig = openPage(state, PAGE_ID);
+    rig.w.close();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect((rig.w as unknown as { rarity: unknown }).rarity).toBeNull();
+    // Reopen: close() kept the page, so the fresh fetch lands on it normally.
+    rig.w.open();
+    await landRarity(rig);
+    expect(must(rig.el, '.reliquary-page-rarity').textContent).toContain('of collectors');
   });
 });

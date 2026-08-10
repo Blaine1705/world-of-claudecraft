@@ -36,6 +36,7 @@ import {
   pageCompletion,
 } from '../sim/reliquary';
 import { DEED_STAT_KEYS, type DeedDef, type DeedStatKey, type DeedStats } from '../sim/types';
+import type { ReliquaryRarity } from '../world_api';
 import type { TranslationKey } from './i18n';
 
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
@@ -1318,14 +1319,17 @@ export function reliquaryFocusFallbackKey(focusKey: string | null): string | nul
 /** The population-rarity fraction for one relic id, or null when there is
  *  nothing to render: no aggregate (offline, or the fetch failed), an empty
  *  eligible population, or a relic nobody has found (absent from the map by
- *  the endpoint contract; weapon-skin and title relics are always absent).
- *  The painter renders a rarity line only for a non-null value, so absent
- *  data means no node at all (the deedRarityFraction contract). */
+ *  the endpoint contract; weapon-skin, title, and mount relics are always
+ *  absent). The painter renders a rarity line only for a non-null value, so
+ *  absent data means no node at all (the deedRarityFraction contract). The
+ *  hasOwn gate keeps a wire-parsed map honest: a prototype-colliding id must
+ *  read as absent, never as a function. */
 export function reliquaryRarityFraction(
-  rarity: import('../world_api').ReliquaryRarity | null,
+  rarity: ReliquaryRarity | null,
   relicId: string,
 ): number | null {
   if (rarity === null || rarity.totalEligible <= 0) return null;
+  if (!Object.hasOwn(rarity.found, relicId)) return null;
   const found = rarity.found[relicId];
   if (found === undefined) return null;
   // The aggregate's scans are not one snapshot, so a count can outrun the
@@ -1336,12 +1340,14 @@ export function reliquaryRarityFraction(
 /** The illumination-rarity fraction for one page id, on exactly the
  *  reliquaryRarityFraction contract (null means the header omits the line;
  *  a page nobody has illuminated is absent from the map, which also covers
- *  the personal Riftbound page that can never illuminate). */
+ *  the personal Riftbound page: it can never illuminate, pinned in
+ *  tests/reliquary_state.test.ts and the reliquary content sweep). */
 export function reliquaryPageRarityFraction(
-  rarity: import('../world_api').ReliquaryRarity | null,
+  rarity: ReliquaryRarity | null,
   pageId: string,
 ): number | null {
   if (rarity === null || rarity.totalEligible <= 0) return null;
+  if (!Object.hasOwn(rarity.illuminated, pageId)) return null;
   const illuminated = rarity.illuminated[pageId];
   if (illuminated === undefined) return null;
   return Math.min(1, illuminated / rarity.totalEligible);
