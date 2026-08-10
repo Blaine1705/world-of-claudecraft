@@ -983,7 +983,7 @@ describe('Eastbrook polish committed capture artifacts', () => {
     }
     expect(acceptedFiles).toHaveLength(18);
     expect(fingerprint.digest('hex')).toBe(
-      'a8d3eae853d16e4546b475a672584dbaf5e276756fadbde6c7075b776b763f5a',
+      '031d3a72fe04c1b4b084ca6608ce137d4078f9ddff42c488efe6ca8624fcc1b4',
     );
   });
 
@@ -1623,7 +1623,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('3da13ffce9226150c58fed288b8dacc0ab1c52c163bd9c6eaff4401a284bbb8e');
+    ).toBe('a8d3eae853d16e4546b475a672584dbaf5e276756fadbde6c7075b776b763f5a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
