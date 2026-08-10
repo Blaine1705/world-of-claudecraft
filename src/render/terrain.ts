@@ -18,6 +18,7 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import {
@@ -745,18 +746,6 @@ let splatAlbedoCache: SplatAlbedoArray | null = null;
  * that had to fill any placeholder re-packs on the next world build, when
  * the deferred preload has had time to land.
  */
-/** True when a texture image can feed CanvasRenderingContext2D.drawImage. A
- *  CompressedTexture's image is a plain {width,height} descriptor that PASSES
- *  a width-truthiness check and then throws inside drawImage, which is how a
- *  KTX2 colour layer took the whole renderer down at world build; the pack
- *  below degrades such a layer to its neutral fail-safe instead. */
-export function isCanvasDrawableImage(img: unknown): img is CanvasImageSource {
-  if (typeof HTMLImageElement !== 'undefined' && img instanceof HTMLImageElement) return true;
-  if (typeof HTMLCanvasElement !== 'undefined' && img instanceof HTMLCanvasElement) return true;
-  if (typeof ImageBitmap !== 'undefined' && img instanceof ImageBitmap) return true;
-  if (typeof OffscreenCanvas !== 'undefined' && img instanceof OffscreenCanvas) return true;
-  return false;
-}
 
 function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
   if (splatAlbedoCache?.complete) return splatAlbedoCache;

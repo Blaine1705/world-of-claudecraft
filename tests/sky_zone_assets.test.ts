@@ -248,4 +248,38 @@ describe('zone-scoped sky assets', () => {
     );
     expect(material.vertexShader).toContain('gl_Position.z = gl_Position.w;');
   });
+
+  it('gives every reachable sky key a residency region, so none can become always-evictable', async () => {
+    // The residency plan keeps a biome by the distance to its nearest region
+    // rectangle; a key with NO region has no distance, is never inside the
+    // keep radius, and would be evicted on every recheck and re-fetched on
+    // every approach forever. Every sky key REACHABLE in a world must
+    // therefore map to a region: zone biomes through the zones the renderer
+    // passes (the LIVE world's list, so a custom map's paint-only biome is
+    // covered too), the place-keyed skies through their override windows.
+    const sky = await import('../src/render/sky');
+    const { ZONES } = await import('../src/sim/data');
+    const builtIn = new Set(sky.skyResidencyRegions().map((r: { key: string }) => r.key));
+    for (const zone of ZONES) {
+      expect(builtIn.has(zone.biome), `zone biome ${zone.biome} has no residency region`).toBe(
+        true,
+      );
+    }
+    for (const key of ['farshore', 'vale_cup']) {
+      expect(builtIn.has(key), `place-keyed sky ${key} has no residency region`).toBe(true);
+    }
+    // The custom-map arm: a paint-only biome present in the PASSED zone list
+    // gets a region, which is what makes the renderer's live-zone wiring
+    // sufficient for editor worlds.
+    const custom = sky.skyResidencyRegions([
+      { id: 'z', biome: 'beach', zMin: 0, zMax: 100, xMin: 0, xMax: 100 },
+    ] as never);
+    expect(custom.some((r: { key: string }) => r.key === 'beach')).toBe(true);
+    // And the renderer derives its list from the live world, not static ZONES.
+    const renderer = (await import('node:fs')).readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer).toContain('skyResidencyRegions(this.sim.cfg.world?.zones ?? ZONES)');
+  });
 });

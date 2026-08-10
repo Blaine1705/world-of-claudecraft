@@ -1897,7 +1897,16 @@ export class Renderer {
   // what the zone prepare lane would have: prepareZoneSky PMREMs zone.biome, and
   // the two place-keyed skies (farshore, vale_cup) have never had an env RT.
   private readonly zoneSkyBiomes: ReadonlySet<SkyKey> = new Set(ZONES.map((zone) => zone.biome));
-  private readonly skyResidencyRegionList = skyResidencyRegions();
+  // Derived lazily from the LIVE world's zones, not the static ZONES table: a
+  // custom map (the editor) can place a paint-only biome (beach, desert,
+  // volcano, cave) that no built-in realm declares, and a resident sky key
+  // with no region would be evicted on every recheck and re-fetched on every
+  // arrival, forever.
+  private skyResidencyRegionListCache: ReturnType<typeof skyResidencyRegions> | null = null;
+  private skyResidencyRegionList(): ReturnType<typeof skyResidencyRegions> {
+    this.skyResidencyRegionListCache ??= skyResidencyRegions(this.sim.cfg.world?.zones ?? ZONES);
+    return this.skyResidencyRegionListCache;
+  }
   private readonly skyResidencyEnsuring = new Set<SkyKey>();
   private envOutdoorIntensity = ENV_INTENSITY;
   private envTransition: EnvironmentMapTransition<SkyKey> = createEnvironmentMapTransition(
@@ -3363,6 +3372,10 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    // Renderer-owned (not a module singleton): the graphics-rebuild teardown
+    // comes through HERE (shutdown -> disposeRendererResources), so the blob
+    // pool, texture and material release with the rest of the GPU state.
+    bestEffort(() => this.blobShadows?.dispose());
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
     if (webgl) {
@@ -3667,7 +3680,7 @@ export class Renderer {
     // prepare. A region's centre always resolves to the zone that owns it, for
     // the place-keyed windows (the Farshore isle, the Sowfield bowl) too.
     const ensurable = new Set<SkyKey>();
-    for (const region of this.skyResidencyRegionList) {
+    for (const region of this.skyResidencyRegionList()) {
       if (ensurable.has(region.key)) continue;
       const zoneId = this.zoneIdAt(
         (region.minX + region.maxX) / 2,
@@ -3676,7 +3689,7 @@ export class Renderer {
       if (zoneId !== null && this.preparedZones.has(zoneId)) ensurable.add(region.key);
     }
     const plan = computeSkyResidencyPlan<SkyKey>({
-      regions: this.skyResidencyRegionList,
+      regions: this.skyResidencyRegionList(),
       cameraX,
       cameraZ,
       ensurable,
@@ -13169,8 +13182,6 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
-    // Renderer-owned (not a module singleton): a graphics rebuild drops this
-    // whole renderer, so its pool, texture and material go with it.
     this.blobShadows?.dispose();
   }
 
