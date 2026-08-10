@@ -21,12 +21,16 @@
 // measureSfxTruePeakDb spawns ffmpeg, so re-running this over the whole
 // custom-key catalog (every `sfx:manifest` build) is one subprocess per take
 // even when nobody touched the audio since the last run. The generated JSON
-// therefore also carries each take's fingerprint (mtime + byte size) and its
-// measured peak alongside the key's ceiling: a track whose fingerprint still
-// matches the stored one reuses the stored peak instead of re-invoking
-// ffmpeg, and only a changed (or new) take pays the measurement cost.
+// therefore also carries each take's fingerprint (a content sha256 + byte
+// size) and its measured peak alongside the key's ceiling: a track whose
+// fingerprint still matches the stored one reuses the stored peak instead of
+// re-invoking ffmpeg, and only a changed (or new) take pays the measurement
+// cost. The fingerprint is content-based, not mtime-based: git does not
+// preserve mtime, so a fingerprint keyed on it would never hit on a fresh
+// clone, worktree, or CI checkout, defeating the whole point of the cache.
 
-import { existsSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { measureSfxTruePeakDb } from './conform_audio.mjs';
 import { discoverSfxTracks } from './sfx_manifest_builder.mjs';
@@ -39,7 +43,12 @@ export const SFX_GAIN_CEILING_PATH = 'scripts/sfx/sfx_gain_ceiling.generated.jso
 // enforcement already uses (see conform_audio.mjs's LONG_FORM_LIMIT_DB).
 const SAFETY_FLOOR_DBFS = -1;
 
-function readStoredGainCeilingRecords(repoRoot) {
+// Tolerant read for the CACHE path only: a corrupt or unreadable stored file
+// just means "nothing cached", falling back to a full re-measure of every
+// track. Never use this for the consumer-facing read (readSfxGainCeilings
+// below), which must propagate a genuinely corrupt file loudly instead of
+// silently dropping every custom key back to an 0dB ceiling.
+function readStoredGainCeilingRecordsTolerant(repoRoot) {
   const path = join(repoRoot, SFX_GAIN_CEILING_PATH);
   if (!existsSync(path)) return {};
   try {
@@ -49,16 +58,17 @@ function readStoredGainCeilingRecords(repoRoot) {
   }
 }
 
-// mtime + size is cheap to stat and good enough to detect "this take was
-// re-recorded, re-conformed, or replaced since we last measured it": either
-// one moving forces a re-measure, both matching skips the ffmpeg subprocess.
+// Content sha256 + byte size: deterministic across machines, unlike mtime,
+// which git does not preserve, so it detects "this take was re-recorded,
+// re-conformed, or replaced since we last measured it" without ever missing
+// a cache hit purely because of a fresh checkout.
 function trackFingerprint(path) {
-  const stat = statSync(path);
-  return { mtimeMs: stat.mtimeMs, size: stat.size };
+  const contents = readFileSync(path);
+  return { sha256: createHash('sha256').update(contents).digest('hex'), size: contents.length };
 }
 
 function fingerprintsMatch(a, b) {
-  return !!a && !!b && a.mtimeMs === b.mtimeMs && a.size === b.size;
+  return !!a && !!b && a.sha256 === b.sha256 && a.size === b.size;
 }
 
 // Older (pre-fingerprint) generated files stored a bare number per key; treat
@@ -80,7 +90,7 @@ export function computeSfxGainCeilingRecords(repoRoot, ffmpegPath) {
   const customKeys = new Set(
     SFX.filter((entry) => entry.custom === true).map((entry) => entry.key),
   );
-  const stored = readStoredGainCeilingRecords(repoRoot);
+  const stored = readStoredGainCeilingRecordsTolerant(repoRoot);
   const records = {};
   for (const key of [...customKeys].sort()) {
     const source = discovered.entries[key];
@@ -113,8 +123,14 @@ export function computeSfxGainCeilings(repoRoot, ffmpegPath) {
   return ceilingsFromRecords(computeSfxGainCeilingRecords(repoRoot, ffmpegPath));
 }
 
+// Consumer-facing read (the playback_profile.mjs validator's source of
+// truth): a missing file is legitimately "no custom keys yet" and returns
+// empty, but a PRESENT, unparsable file is a real corruption and must throw
+// rather than silently resolving every custom key back to an 0dB ceiling.
 export function readSfxGainCeilings(repoRoot) {
-  const records = readStoredGainCeilingRecords(repoRoot);
+  const path = join(repoRoot, SFX_GAIN_CEILING_PATH);
+  if (!existsSync(path)) return {};
+  const records = JSON.parse(readFileSync(path, 'utf8'));
   const ceilings = {};
   for (const [key, value] of Object.entries(records)) {
     ceilings[key] = typeof value === 'number' ? value : value?.ceilingDb;

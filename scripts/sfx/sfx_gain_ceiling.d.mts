@@ -2,7 +2,7 @@ export declare const SFX_GAIN_CEILING_PATH: string;
 
 export interface SfxGainCeilingTrack {
   filename: string;
-  mtimeMs: number;
+  sha256: string;
   size: number;
   peakDb: number;
 }
