@@ -51,8 +51,10 @@ const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
  * duration outside hostile player-versus-player combat, a fixed staged
  * schedule for polymorph/fear, the shared 100/50/25/immune multiplier ladder
  * for root/lockout, and null once that ladder is exhausted (DR-immune, apply
- * nothing). `now` and `isHostileTo` are passed in rather than read off a host
- * so the resolver stays a pure function of its arguments.
+ * nothing). `now` and `isHostileTo` are passed in rather than read off a host:
+ * this keeps the resolver a leaf module with no `SimContext` dependency, so a
+ * Vitest can import and exercise it directly. It is NOT a pure function of its
+ * arguments: three of its exits write the new DR stage to `target.ccDr`.
  *
  * Balance pass (maintainer): player stuns are exempt from PvP diminishing
  * returns. They operate differently from fear: short flat durations behind

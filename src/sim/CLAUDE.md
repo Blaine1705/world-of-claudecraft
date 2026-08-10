@@ -133,7 +133,10 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 ### Pure leaves (no `SimContext`; a Vitest imports them directly)
 `threat.ts`/`spatial.ts`/`format_money.ts` above are the pattern; reuse or imitate one of
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
-power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
+power coefficients), `stun_dr.ts` (CC diminishing-return categories, PLUS the PvP
+diminishing-returns ladder: the seven `PVP_*_DR_*` reset/multiplier/duration constants
+and the player-sourced crowd-control funnel, `crowdControlDurationAfterDr`/
+`diminishedCrowdControlDuration`), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
 legality), `launch_paperdoll_slots.ts` (the FROZEN launch-era eleven-slot list, for
 launch-era completeness records ONLY: never validate a slot against it, use

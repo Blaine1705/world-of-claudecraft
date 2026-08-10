@@ -87,6 +87,14 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(diminishedCrowdControlDuration(0, hostile, source, target, 'root', 8)).toBeNull();
   });
 
+  it('walks the same 100/50/25/immune ladder for lockout via the PVP_STUN_DR_RESET timer', () => {
+    const { source, target } = players();
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'lockout', 8)).toBe(8);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'lockout', 8)).toBe(4);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'lockout', 8)).toBe(2);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'lockout', 8)).toBeNull();
+  });
+
   it('uses the fixed staged durations for polymorph', () => {
     const { source, target } = players();
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'polymorph', 30)).toBe(10);
