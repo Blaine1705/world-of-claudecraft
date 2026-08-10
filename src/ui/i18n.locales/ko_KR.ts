@@ -12251,7 +12251,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
   'entities.npcs.wayfarer_bryn.title': '항구 안내인',
   'entities.npcs.wayfarer_bryn.greeting':
-    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 동쪽 바닷가의 나룻배 마법진은 일 년 내내 양방향으로 통한답니다.',
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 서쪽 바닷가의 나룻배 마법진은 일 년 내내 양방향으로 통한답니다.',
   'entities.npcs.instructor_maren.name': '교관 마렌',
   'entities.npcs.instructor_maren.title': '수련 사범',
   'entities.npcs.instructor_maren.greeting':
@@ -12273,7 +12273,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_find_your_feet.objectives.1.label': '뱃사공 오도 방문',
   'entities.quests.q_ps_strike_true.title': '정확한 일격',
   'entities.quests.q_ps_strike_true.text':
-    '한 번도 휘둘러 본 적 없는 칼은 그저 무거운 막대기일 뿐이에요, {playerName}. 야영지 남쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 하나를 골라 자세를 잡고, 셋이 쓰러질 때까지 내리치세요. 허수아비는 반격하지 않아요. 이 해안 너머의 것들은 반격하죠.',
+    '한 번도 휘둘러 본 적 없는 칼은 그저 무거운 막대기일 뿐이에요, {playerName}. 야영지 남서쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 하나를 골라 자세를 잡고, 셋이 쓰러질 때까지 내리치세요. 허수아비는 반격하지 않아요. 이 해안 너머의 것들은 반격하죠.',
   'entities.quests.q_ps_strike_true.completion':
     '셋을 쓰러뜨렸고, 손아귀도 벌써 단단해졌네요. 그 감각을 기억하세요, {playerName}. 발을 딛고, 시선을 들고, 온몸으로 휘두르기. 골짜기의 늑대는 짚보다 빠르지만, 같은 산수에 쓰러진답니다.',
   'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',

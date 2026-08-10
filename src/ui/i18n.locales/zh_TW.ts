@@ -12044,7 +12044,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口嚮導',
   'entities.npcs.wayfarer_bryn.greeting':
-    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：東岸的渡送法陣一年到頭雙向通行。',
+    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：西岸的渡送法陣一年到頭雙向通行。',
   'entities.npcs.instructor_maren.name': '教官瑪倫',
   'entities.npcs.instructor_maren.title': '試煉導師',
   'entities.npcs.instructor_maren.greeting':
@@ -12066,7 +12066,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_find_your_feet.objectives.1.label': '拜訪渡船人奧多',
   'entities.quests.q_ps_strike_true.title': '擊中要害',
   'entities.quests.q_ps_strike_true.text':
-    '從沒揮過的劍不過是根沉棍子，{playerName}。營地以南練武場上的草人生來就是挨打的：挑一個，站穩，砍到三個散架為止。它們不會還手。這片海濱之外的東西可會。',
+    '從沒揮過的劍不過是根沉棍子，{playerName}。營地西南練武場上的草人生來就是挨打的：挑一個，站穩，砍到三個散架為止。它們不會還手。這片海濱之外的東西可會。',
   'entities.quests.q_ps_strike_true.completion':
     '三個倒下，你的手也穩多了。記住這種感覺，{playerName}：站穩腳，抬起眼，全力揮出。谷地的狼比稻草快，但同樣的算術也能放倒牠們。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',

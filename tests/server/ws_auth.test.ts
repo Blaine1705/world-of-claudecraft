@@ -1001,6 +1001,41 @@ describe('createWsAuth: bank bonus stamp', () => {
   });
 });
 
+describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact)', () => {
+  it('stamps firstCharacter true when the account-wide count is at most 1', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.characterCountForAccount = vi.fn(async () => 1);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(deps.characterCountForAccount).toHaveBeenCalledTimes(1);
+    expect(deps.characterCountForAccount).toHaveBeenCalledWith(1);
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBe(true);
+  });
+
+  it('stamps firstCharacter false for an account with other characters', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.characterCountForAccount = vi.fn(async () => 3);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBe(false);
+  });
+
+  it('never recomputes on the resume arm, like bankBonus (locked policy)', async () => {
+    const { ws, game, deps, req } = setup();
+    game.hasSessionForCharacter = vi.fn(() => true);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(deps.characterCountForAccount).not.toHaveBeenCalled();
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBeUndefined();
+  });
+});
+
 describe('createWsAuth: onConnection', () => {
   beforeEach(() => {
     vi.useFakeTimers();

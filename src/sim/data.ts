@@ -95,19 +95,6 @@ import {
   FARSHORE_ZONE,
 } from './content/farshore';
 import {
-  PROVING_SHORE_CAMPS,
-  PROVING_SHORE_ITEMS,
-  PROVING_SHORE_MOBS,
-  PROVING_SHORE_NPCS,
-  PROVING_SHORE_OBJECTS,
-  PROVING_SHORE_PORTALS,
-  PROVING_SHORE_PROPS,
-  PROVING_SHORE_QUEST_ORDER,
-  PROVING_SHORE_QUESTS,
-  PROVING_SHORE_ROADS,
-  PROVING_SHORE_ZONE,
-} from './content/proving_shore';
-import {
   FROSTVEIL_CAMPS,
   FROSTVEIL_ESCORTS,
   FROSTVEIL_ITEMS,
@@ -176,6 +163,19 @@ import {
   PALMREACH_ZONE,
 } from './content/palmreach';
 import { STATIONS } from './content/professions';
+import {
+  PROVING_SHORE_CAMPS,
+  PROVING_SHORE_ITEMS,
+  PROVING_SHORE_MOBS,
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
+  PROVING_SHORE_PORTALS,
+  PROVING_SHORE_PROPS,
+  PROVING_SHORE_QUEST_ORDER,
+  PROVING_SHORE_QUESTS,
+  PROVING_SHORE_ROADS,
+  PROVING_SHORE_ZONE,
+} from './content/proving_shore';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -522,8 +522,11 @@ export const CAMPS: CampDef[] = [
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
   // The Proving Shore's camps are all offStream (private rng sub-streams), so
-  // their position in this array cannot shift any earlier camp's draws; they
-  // still append LAST by the standing rule.
+  // their position in this array cannot shift any earlier camp's SHARED-STREAM
+  // draws; they still append LAST by the standing rule. Entity ids after the
+  // camps loop DO shift (+1 per new construction-time entity), so id-seeded
+  // private streams (mob/idle_rng.ts) move: a content append like this one
+  // legitimately re-mints the parity goldens without touching a draw digest.
   ...PROVING_SHORE_CAMPS,
 ];
 

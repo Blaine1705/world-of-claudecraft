@@ -73,6 +73,22 @@ describe('tutorial greeting one-shot', () => {
     expect(emitted).toHaveLength(1);
   });
 
+  it('fires through the real Sim.tick mail phase within the first second', () => {
+    const sim = makeSim();
+    const seen: SimEvent[] = [];
+    // The sweep runs on the 1 Hz cadence, so 21 real ticks cover the first
+    // firing window through the actual mail-phase wiring, not a stub ctx.
+    for (let t = 0; t < 21; t++) seen.push(...sim.tick());
+    const greetings = seen.filter((e) => e.type === 'tutorialGreeting');
+    expect(greetings).toEqual([
+      { type: 'tutorialGreeting', pid: sim.playerId, firstCharacter: true },
+    ]);
+    // And never again on later swept ticks.
+    const later: SimEvent[] = [];
+    for (let t = 0; t < 21; t++) later.push(...sim.tick());
+    expect(later.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
+  });
+
   it('does not re-fire across save/load, and omits the flag while unset', () => {
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;
@@ -116,6 +132,34 @@ describe('startTutorial (the ferry)', () => {
     const sim = makeSim();
     sim.setPlayerLevel(2, sim.playerId);
     const e = sim.entities.get(sim.playerId)!;
+    const before = { ...e.pos };
+    sim.startTutorial();
+    expect(e.pos.x).toBe(before.x);
+    expect(e.pos.z).toBe(before.z);
+  });
+
+  it('refuses in combat (the flag guards the emit, this gate guards the wire)', () => {
+    const sim = makeSim();
+    const e = sim.entities.get(sim.playerId)!;
+    e.inCombat = true;
+    const before = { ...e.pos };
+    sim.startTutorial();
+    expect(e.pos.x).toBe(before.x);
+    expect(e.pos.z).toBe(before.z);
+  });
+
+  it('refuses from the instance band', () => {
+    const sim = makeSim();
+    const e = sim.entities.get(sim.playerId)!;
+    e.pos.x = 100_500; // inside the instance plane, past DUNGEON_X_THRESHOLD
+    sim.startTutorial();
+    expect(e.pos.x).toBe(100_500);
+  });
+
+  it('refuses while dead', () => {
+    const sim = makeSim();
+    const e = sim.entities.get(sim.playerId)!;
+    e.dead = true;
     const before = { ...e.pos };
     sim.startTutorial();
     expect(e.pos.x).toBe(before.x);

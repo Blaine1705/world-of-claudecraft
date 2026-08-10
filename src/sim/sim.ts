@@ -411,7 +411,6 @@ import {
   serializeNodeReadiness,
 } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
-import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import {
   completeSalvageCast as completeSalvageCastImpl,
@@ -493,6 +492,7 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
@@ -8940,6 +8940,17 @@ export class Sim {
     return this.players.get(this.primaryId)?.lastMasterwork ?? null;
   }
 
+  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
+  // ferry ride to the Proving Shore. All gates (alive, out of combat, level 1,
+  // overworld) re-run here on the authoritative copy; the client never
+  // predicts it.
+  startTutorial(pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    resolveStartTutorial(this.ctx, r.e);
+  }
+
   // Mobile crafting station command (Professions 2.0, wiring #1134):
   // a thin delegate onto professions/mobile_station.ts, resolved on the
   // deterministic tick the command arrives on, same shape as craftItem
@@ -8961,16 +8972,6 @@ export class Sim {
   // train_already_known and never re-charges. Denials surface ONLY through
   // the event plus the lastTrainResult probe (the craftItem single-surface
   // doctrine: no ctx.error toast, or the deny would print twice).
-  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
-  // ferry ride to the Proving Shore. All gates (alive, level 1, overworld)
-  // re-run here on the authoritative copy; the client never predicts it.
-  startTutorial(pid?: number): void {
-    if (refusedWhileDead(this.ctx, pid)) return;
-    const r = this.ctx.resolve(pid);
-    if (!r) return;
-    resolveStartTutorial(this.ctx, r.e, r.meta);
-  }
-
   trainRecipe(recipeId: string, pid?: number): void {
     if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);

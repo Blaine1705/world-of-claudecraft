@@ -1845,7 +1845,7 @@ function applyIsleCoast(x: number, z: number, h: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Proving Shore: the tutorial island in the starter sea east of Eastbrook
+// The Proving Shore: the tutorial island in the starter sea west of Eastbrook
 // Vale (negative x; the Farshore recipe mirrored into the opposite column).
 // No land border and no causeway: the only ways over are the tutorial
 // greeting's ferry and the crossing-circle portal pair, and swim fatigue
@@ -1854,7 +1854,7 @@ function applyIsleCoast(x: number, z: number, h: number): number {
 const PS_LAND_LOBES = [
   { x: -330, z: 20, r: 70 }, // the island's heart
   { x: -292, z: 58, r: 45 }, // Dawnrest Camp's shelf
-  { x: -272, z: 66, r: 34 }, // the Old Pier's point, facing the vale
+  { x: -272, z: 66, r: 34 }, // the Old Pier's point, facing the vale (east)
   { x: -352, z: -28, r: 50 }, // the practice downs
   { x: -286, z: -6, r: 40 }, // the wreck line's strand
 ] as const;
@@ -1870,7 +1870,8 @@ export function provingLandness(x: number, z: number): number {
 }
 
 // The tutorial island's coast: the applyIsleCoast recipe with the vale-facing
-// seam mirrored to the cell's east edge (x = -180). Every window edge fades.
+// seam mirrored to the cell's vale-side edge (x = -180). Every window edge
+// fades.
 function applyProvingCoast(x: number, z: number, h: number): number {
   if (x < -566 || x > -166) return h;
   const zSeam = smoothstep(-188, -172, z) * (1 - smoothstep(172, 188, z));

@@ -12246,7 +12246,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。東の浜の渡しの円環は、年中どちら向きにも通じているからね。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。西の浜の渡しの円環は、年中どちら向きにも通じているからね。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -12268,7 +12268,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_find_your_feet.objectives.1.label': '渡し守オドを訪ねる',
   'entities.quests.q_ps_strike_true.title': '確かな一撃',
   'entities.quests.q_ps_strike_true.text':
-    '振ったことのない剣は、ただの重い棒だよ、{playerName}。野営地の南の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
+    '振ったことのない剣は、ただの重い棒だよ、{playerName}。野営地の南西の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
   'entities.quests.q_ps_strike_true.completion':
     '三体倒して、握りももう確かになってきた。その感覚を忘れないで、{playerName}。足を据え、目を上げ、全身で振り抜く。渓谷の狼は藁より速いが、同じ算術で倒れるものだよ。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',

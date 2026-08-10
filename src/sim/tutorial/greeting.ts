@@ -19,7 +19,7 @@
 
 import { PROVING_SHORE_ARRIVAL } from '../content/proving_shore';
 import { DUNGEON_X_THRESHOLD } from '../data';
-import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { displacePlayer } from '../displacement';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -58,33 +58,17 @@ export function updateTutorialGreeting(ctx: SimContext): void {
 /** The ferry ride the greeting's accept button books: the standard
  *  displacement recipe (portals.ts), gated so it can never be abused as a
  *  free escape teleport. Server-validated: level 1, alive (the caller's dead
- *  gate), overworld only. */
-export function resolveStartTutorial(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
-  if (p.pos.x > DUNGEON_X_THRESHOLD) {
-    ctx.error(meta.entityId, 'You cannot set sail from here.');
+ *  gate), out of combat, overworld only. The persisted flag guards only the
+ *  greeting EMIT, so this command-side gate set is what keeps the wire token
+ *  from doubling as an unmetered combat exit. */
+export function resolveStartTutorial(ctx: SimContext, p: Entity): void {
+  if (p.pos.x > DUNGEON_X_THRESHOLD || p.inCombat) {
+    ctx.error(p.id, 'You cannot set sail from here.');
     return;
   }
   if (p.level > 1) {
-    ctx.error(meta.entityId, 'The Proving Shore has nothing left to teach you.');
+    ctx.error(p.id, 'The Proving Shore has nothing left to teach you.');
     return;
   }
-  // The one every-teleport session teardown (session_teardown.ts).
-  cancelProfessionSessionOnDisplacement(ctx, p);
-  p.pos = ctx.groundPos(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z);
-  p.prevPos = { ...p.pos };
-  ctx.rebucket(p);
-  p.facing = PROVING_SHORE_ARRIVAL.facing;
-  p.targetId = null;
-  p.autoAttack = false;
-  // Land settled: no carried-over jump arc or fall distance (portals.ts).
-  p.vy = 0;
-  p.jumping = false;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
-  ctx.emit({
-    type: 'log',
-    text: 'The ferry sets you down on the Proving Shore.',
-    color: '#b9f',
-    pid: p.id,
-  });
+  displacePlayer(ctx, p, PROVING_SHORE_ARRIVAL, 'The ferry sets you down on the Proving Shore.');
 }

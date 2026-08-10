@@ -13326,7 +13326,7 @@ export const pt_BR: EnTranslations = {
       "wayfarer_bryn": {
         "name": "Wayfarer Bryn",
         "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the east strand runs both ways, every day of the year."
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the west strand runs both ways, every day of the year."
       },
       "instructor_maren": {
         "name": "Instructor Maren",
@@ -15304,7 +15304,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "A blade you have never swung is just a heavy stick, {playerName}. The effigies on the practice yard south of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
+        "text": "A blade you have never swung is just a heavy stick, {playerName}. The effigies on the practice yard southwest of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
         "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.",
         "objectives": {
           "0": {

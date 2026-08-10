@@ -613,9 +613,6 @@ import {
 } from './profession_identity_view';
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
-import { markNewAdventurerTutorialSeen } from './tutorial';
-import { buildTutorialGreetingModel } from './tutorial_greeting_view';
-import { renderTutorialGreeting } from './tutorial_greeting_window';
 import { ProfessionsWindow } from './professions_window';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
@@ -679,6 +676,8 @@ import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_fo
 import { renderTownFocusWindow } from './town_focus_window';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
+import { buildTutorialGreetingModel } from './tutorial_greeting_view';
+import { renderTutorialGreeting } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
@@ -13459,10 +13458,11 @@ export class Hud {
     this.tutorialGreetingTrap = null;
     const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
       onPlay: () => {
-        // The island's on-rails chain replaces the Eastbrook coachmark
-        // overlay, so latch it done before the ferry ride; the server
-        // re-validates the command itself.
-        markNewAdventurerTutorialSeen();
+        // Fire-and-forget by design: the server re-validates and the >30 yd
+        // displacement drives the arrival flow. The Eastbrook coachmark is
+        // NOT latched here; it simply never engages while the player stands
+        // on the island (isFreshCharacter's position guard), so a dropped
+        // command costs nothing.
         this.sim.startTutorial();
         this.closeTutorialGreeting();
       },

@@ -42,7 +42,6 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldergleam Rest', x: -60, z: 1004 },
   { id: 'gy_farshore', name: 'Gullhaven Rest', x: 290, z: 86 },
-  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -324, z: 58 },
   // At the zone's own graveyard field (willowfen.ts): the old (-346, 338) spot
   // sits inside Bridgemere's moat ring, below WATER_LEVEL, and the Pale Keeper
   // spawned underwater there.
@@ -57,6 +56,10 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   { id: 'gy_frostveil', name: 'Frostveil Barrow', x: -34, z: 1576 },
   { id: 'gy_drakelands', name: 'Drakelands Cairns', x: 422, z: 1885 },
   { id: 'gy_amberfall', name: 'Amberfall Rest', x: -336, z: 2050 },
+  // The Proving Shore (tutorial island). Appended LAST: spirit healers spawn
+  // in this array's order, so a mid-array insert would renumber every later
+  // healer's entity id for no reason (the camps append-last discipline).
+  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -324, z: 58 },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this

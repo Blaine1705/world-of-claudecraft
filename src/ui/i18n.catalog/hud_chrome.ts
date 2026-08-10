@@ -538,12 +538,6 @@ export const hudChromeStrings = {
     // and the Latin overlays stay pending.
     chatPlaceholder: 'Say something... (! for community commands)',
   },
-  // New-adventurer tutorial copy for the touch interface. The default tutorial
-  // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
-  // which is wrong on a phone whose only controls are the on-screen sticks and
-  // the Use / More action buttons. These touch variants are swapped in when the
-  // mobile-touch interface is active (see tutorial_copy.ts). English-only add, so
-  // they live here in the hud_chrome domain rather than the constrained `hud` one.
   // The spawn greeting dialog (tutorial island): the harbor guide's one-time
   // offer of passage to the Proving Shore, first-character welcome vs
   // returning-player refresher, and the two choice buttons
@@ -556,6 +550,12 @@ export const hudChromeStrings = {
     play: 'Take the tutorial',
     skip: 'Skip the tutorial',
   },
+  // New-adventurer tutorial copy for the touch interface. The default tutorial
+  // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
+  // which is wrong on a phone whose only controls are the on-screen sticks and
+  // the Use / More action buttons. These touch variants are swapped in when the
+  // mobile-touch interface is active (see tutorial_copy.ts). English-only add, so
+  // they live here in the hud_chrome domain rather than the constrained `hud` one.
   tutorial: {
     // "movement stick", not "left stick": left-handed mode swaps the two thumb
     // sticks (and the stick can float to wherever you touch), so a fixed side is

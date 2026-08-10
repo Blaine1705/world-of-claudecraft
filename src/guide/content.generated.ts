@@ -2203,10 +2203,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 2,
         "rare": false,
         "templateId": "shore_scuttler",
-        "model": "mob_wolf",
+        "model": "mob_crab",
         "tint": "#7a5a3a",
         "tintStrength": 0.35,
-        "still": "/guide-stills/mob_wolf__7a5a3a__s35.webp"
+        "still": "/guide-stills/mob_crab__7a5a3a__s35.webp"
       },
       {
         "name": "Wild Boar",
@@ -2677,10 +2677,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 1,
         "rare": false,
         "templateId": "training_effigy",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "mob_training_dummy",
+        "tint": "#9a7b4f",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_training_dummy__9a7b4f__s35.webp"
       },
       {
         "name": "Vale Bandit",
@@ -10808,5 +10808,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "mob_training_dummy": {
+    "url": "models/creatures/training_dummy.glb",
+    "idle": "Idle",
+    "height": 2.3,
+    "tintStrength": 0.35
   }
 };

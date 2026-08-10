@@ -1,6 +1,7 @@
 // The Proving Shore (levels 1-2). A small tutorial island in the starter sea
-// east of Eastbrook Vale (negative x: the engine convention is +x west, see
-// the bearings note in farshore.ts), the free mirror of the Farshore's slot. New
+// WEST of Eastbrook Vale (negative x; the compass renders +x as east, see
+// src/ui/compass.ts: facing 0 = +Z = north, bearing 90 = east = +x), the
+// free mirror of the Farshore's slot on the opposite column. New
 // characters are offered passage here by Wayfarer Bryn at the Eastbrook
 // spawn (the tutorial greeting dialog, src/sim/tutorial/greeting.ts); the
 // island itself is a training camp: an on-rails quest chain that teaches
@@ -69,7 +70,7 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 ] as { x: number; z: number }[][];
 
 // The ferry crossing: a portal pair between the Old Pier's crossing circle
-// and the vale's east strand, so a graduate walks out (and a returning
+// and the vale's west strand, so a graduate walks out (and a returning
 // player walks back in for a refresher) with no one-way teleport. The
 // tutorial greeting's accept path (sim/tutorial/greeting.ts) lands at
 // PROVING_SHORE_ARRIVAL beside the a-side landing.
@@ -149,7 +150,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x8a6a9a,
     questIds: [],
     greeting:
-      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the east strand runs both ways, every day of the year.',
+      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the west strand runs both ways, every day of the year.',
   },
   instructor_maren: {
     id: 'instructor_maren',
@@ -217,7 +218,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'A blade you have never swung is just a heavy stick, $N. The effigies on the practice yard south of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.',
+    text: 'A blade you have never swung is just a heavy stick, $N. The effigies on the practice yard southwest of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.',
     completionText:
       'Three down, and your grip already surer. Remember the feel of it, $N: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [

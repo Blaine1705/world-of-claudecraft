@@ -69,6 +69,11 @@ export function isFreshCharacter(world: IWorld): boolean {
   const p = world.player;
   if (!p) return false;
   if (world.playerId < 0 || p.id !== world.playerId) return false;
+  // A fresh character standing on the Proving Shore (the tutorial island,
+  // the whole column west of the vale at x < -180) is being taught by the
+  // island's own on-rails chain; this Eastbrook coachmark stays quiet there
+  // and still engages normally if they ferry back with no quest history.
+  if (p.pos.x < -180) return false;
   return p.level === 1 && world.questsDone.size === 0 && world.questLog.size === 0;
 }
 
@@ -404,13 +409,6 @@ export class TutorialOverlay {
     this.root = null;
     this.arrow = null;
   }
-}
-
-/** Latch the overlay done from outside (the tutorial-island greeting's
- *  accept path): the island's on-rails chain replaces this coachmark, so a
- *  player who sails never sees the Eastbrook five-step. */
-export function markNewAdventurerTutorialSeen(): void {
-  writeDone();
 }
 
 function readDone(): boolean {
