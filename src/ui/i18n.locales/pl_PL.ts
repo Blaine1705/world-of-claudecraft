@@ -9729,8 +9729,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Księga Czynów to miejsce, w którym świat prowadzi rachunek wszystkiego, czego dokonałeś: od pierwszych kroków poza początkową doliną po najtrudniejsze starcia, jakie królestwo ma do zaoferowania. Zdobywaj czyny podczas gry, noś tytuły, które przyznają, i patrz, jak twoja Renoma rośnie.',
   'guide.deedsPage.renownHeading': 'Renoma',
   'guide.deedsPage.rewardBorder': 'Obramowanie',
-  'guide.deedsPage.rewardsBody':
-    'Nagrody służą wyłącznie ozdobie i właśnie o to chodzi. Niektóre czyny przyznają tytuł do noszenia albo obramowanie, które oprawi twoje imię, nigdy zaś nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł w Księdze Czynów, a będzie ci towarzyszył na plakietce z imieniem, na czacie i w rankingach, na oczach wszystkich.',
   'guide.deedsPage.rewardsHeading': 'Tytuły i obramowania',
   'guide.nav.deeds': 'Księga Czynów',
   'hudChrome.deeds.broadcastLine': '{name} dokonuje czynu: {deed}',
@@ -9773,7 +9771,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Ostatnie:',
   'hudChrome.deeds.renownChip': '{renown} Renomy',
   'hudChrome.deeds.renownLabel': 'Renoma',
-  'hudChrome.deeds.retroSummary': 'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
   'hudChrome.deeds.searchAria': 'Szukaj czynów po nazwie',
   'hudChrome.deeds.searchPlaceholder': 'Szukaj czynów',
   'hudChrome.deeds.title': 'Księga Czynów',

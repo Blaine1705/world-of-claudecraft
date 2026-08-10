@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "539f31b1",
+      "state": "b8802dfa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -69,6 +69,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -133,7 +137,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 967,
-      "state": "dfdb67ed",
+      "state": "4229b9e4",
       "events": "266bb8fa",
       "rng": {
         "draws": 10,
@@ -144,7 +148,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "6cee8ea0",
+      "state": "91d2c797",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -155,7 +159,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 967,
-      "state": "9ab6cf5e",
+      "state": "f88c3db5",
       "events": "9091c704",
       "rng": {
         "draws": 174,
@@ -166,7 +170,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 967,
-      "state": "42133723",
+      "state": "23af84a2",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -177,7 +181,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "0db115e0",
+      "state": "0e8fce57",
       "events": "d74f9fd6",
       "rng": {
         "draws": 533,
@@ -188,7 +192,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "d8f67f41",
+      "state": "b79d8f08",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -199,7 +203,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "d8f67f41",
+      "state": "b79d8f08",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -276,6 +280,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
