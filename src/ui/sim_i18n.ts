@@ -1057,6 +1057,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada para los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del registro.',
@@ -1495,6 +1497,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada a los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del libro mayor.',
@@ -1944,6 +1948,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe reste scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et endormi.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -2393,6 +2399,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe est scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et inerte.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un Sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -3036,6 +3044,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tomba è sigillata ai vivi finché i morti non ti chiamano a sé.',
     'groundPickup.cryptRitualCircleDeny': 'Il cerchio rituale giace freddo e dormiente.',
+    'groundPickup.castawayCrateDeny': 'I cirripedi tengono sigillata la cassa.',
+    'groundPickup.castawayCrateEnough': 'Hai già abbastanza casse alla deriva.',
     'groundPickup.supplyCrateEnough': 'Hai già abbastanza casse di rifornimenti.',
     'groundPickup.gravecallerSigilEnough': 'Porti già con te un Sigillo di Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Hai già abbastanza pagine di registro.',
@@ -3479,6 +3489,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Das Grab ist vor den Lebenden versiegelt, bis die Toten Euch zu ihm rufen.',
     'groundPickup.cryptRitualCircleDeny': 'Der Ritualkreis liegt kalt und erloschen da.',
+    'groundPickup.castawayCrateDeny': 'Seepocken halten die Kiste versiegelt.',
+    'groundPickup.castawayCrateEnough': 'Ihr habt bereits genug Treibgutkisten.',
     'groundPickup.supplyCrateEnough': 'Ihr habt bereits genug Vorratskisten.',
     'groundPickup.gravecallerSigilEnough': 'Ihr tragt bereits ein Gravecaller-Siegel.',
     'groundPickup.ledgerPageEnough': 'Ihr habt bereits genug Buchseiten.',
@@ -3970,6 +3982,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者开口索要之前，这道铭文还轮不到你来拓印。',
     'groundPickup.graveSealedDeny': '坟墓向生者封闭，直到死者召唤你前来。',
     'groundPickup.cryptRitualCircleDeny': '仪式法阵冰冷沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壶把货箱封得严严实实。',
+    'groundPickup.castawayCrateEnough': '你已经有足够的漂流货箱了。',
     'groundPickup.supplyCrateEnough': '你已经有足够的补给箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已经带着一枚唤墓者徽记了。',
     'groundPickup.ledgerPageEnough': '你已经有足够的账页了。',
@@ -4398,6 +4412,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者開口索要之前，你無權拓印這道守護符文。',
     'groundPickup.graveSealedDeny': '在亡者召喚你之前，這座墳墓不容生者踏入。',
     'groundPickup.cryptRitualCircleDeny': '儀式法陣冰冷而沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壺把貨箱封得嚴嚴實實。',
+    'groundPickup.castawayCrateEnough': '你已經有足夠的漂流貨箱了。',
     'groundPickup.supplyCrateEnough': '你已經有足夠的補給箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已經帶著一枚喚墓者徽記了。',
     'groundPickup.ledgerPageEnough': '你已經有足夠的帳頁了。',
@@ -4831,6 +4847,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '죽은 자들이 당신을 부르기 전까지 무덤은 산 자에게 봉인되어 있습니다.',
     'groundPickup.cryptRitualCircleDeny': '의식진은 차갑게 식은 채 잠들어 있습니다.',
+    'groundPickup.castawayCrateDeny': '따개비가 상자를 단단히 봉하고 있습니다.',
+    'groundPickup.castawayCrateEnough': '표류 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.supplyCrateEnough': '보급 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.gravecallerSigilEnough': '무덤부름 인장은 이미 지니고 있습니다.',
     'groundPickup.ledgerPageEnough': '장부 페이지는 이미 충분히 갖고 있습니다.',
@@ -5271,6 +5289,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '死者に呼ばれるそのときまで、墓は生者を拒んで封じられています。',
     'groundPickup.cryptRitualCircleDeny': '儀式の円は冷たく、眠りについています。',
+    'groundPickup.castawayCrateDeny': 'フジツボが木箱を固く閉ざしています。',
+    'groundPickup.castawayCrateEnough': '漂着した木箱はすでに十分あります。',
     'groundPickup.supplyCrateEnough': '補給箱はすでに十分あります。',
     'groundPickup.gravecallerSigilEnough': 'グレイブコーラーの印章はすでに携えています。',
     'groundPickup.ledgerPageEnough': '帳簿のページはすでに十分あります。',
@@ -5661,6 +5681,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'O túmulo está selado contra os vivos até que os mortos chamem você a ele.',
     'groundPickup.cryptRitualCircleDeny': 'O círculo ritual jaz frio e adormecido.',
+    'groundPickup.castawayCrateDeny': 'Cracas mantêm o caixote lacrado.',
+    'groundPickup.castawayCrateEnough': 'Você já tem caixotes à deriva suficientes.',
     'groundPickup.supplyCrateEnough': 'Você já tem caixotes de suprimentos suficientes.',
     'groundPickup.gravecallerSigilEnough': 'Você já carrega um Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Você já tem páginas de livro-caixa suficientes.',
@@ -6155,6 +6177,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Могила запечатана от живых, пока мёртвые сами не призовут вас к ней.',
     'groundPickup.cryptRitualCircleDeny': 'Ритуальный круг остыл и дремлет.',
+    'groundPickup.castawayCrateDeny': 'Ракушки намертво запечатали ящик.',
+    'groundPickup.castawayCrateEnough': 'У вас уже достаточно выброшенных морем ящиков.',
     'groundPickup.supplyCrateEnough': 'У вас уже достаточно ящиков с припасами.',
     'groundPickup.gravecallerSigilEnough': 'Вы уже несёте с собой Сигил Могильного Зова.',
     'groundPickup.ledgerPageEnough': 'У вас уже достаточно страниц погребальной книги.',

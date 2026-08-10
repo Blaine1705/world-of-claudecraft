@@ -63,6 +63,8 @@ export const BASE_NEW = {
     'groundPickup.moongateRubbingDeny': 'Ochranu nesmíš obkreslit, dokud o to strážce nepožádá.',
     'groundPickup.graveSealedDeny': 'Hrob je zapečetěný před živými, dokud tě mrtví nepovolají.',
     'groundPickup.cryptRitualCircleDeny': 'Rituální kruh leží chladný a nečinný.',
+    'groundPickup.castawayCrateDeny': 'Vilejši drží bednu pevně zavřenou.',
+    'groundPickup.castawayCrateEnough': 'Už máš dost vyplavených beden.',
     'groundPickup.supplyCrateEnough': 'Už máš dost zásobovacích beden.',
     'groundPickup.gravecallerSigilEnough': 'Už neseš pečeť Hrobovolajícího.',
     'groundPickup.ledgerPageEnough': 'Už máš dost stránek účetní knihy.',
@@ -353,6 +355,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Graven er forseglet mod de levende, indtil de døde kalder dig til den.',
     'groundPickup.cryptRitualCircleDeny': 'Ritualcirklen ligger kold og slumrende.',
+    'groundPickup.castawayCrateDeny': 'Rurer holder kassen forseglet.',
+    'groundPickup.castawayCrateEnough': 'Du har allerede vraggodskasser nok.',
     'groundPickup.supplyCrateEnough': 'Du har allerede forsyningskasser nok.',
     'groundPickup.gravecallerSigilEnough': 'Du bærer allerede Gravkalderens Segl.',
     'groundPickup.ledgerPageEnough': 'Du har allerede regnskabssider nok.',
@@ -653,6 +657,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Makam itu tersegel bagi yang hidup sampai para mati memanggilmu ke sana.',
     'groundPickup.cryptRitualCircleDeny': 'Lingkaran ritual itu terbaring dingin dan tertidur.',
+    'groundPickup.castawayCrateDeny': 'Teritip menyegel peti itu rapat-rapat.',
+    'groundPickup.castawayCrateEnough': 'Kamu sudah punya cukup peti terdampar.',
     'groundPickup.supplyCrateEnough': 'Kamu sudah punya cukup peti pasokan.',
     'groundPickup.gravecallerSigilEnough': 'Kamu sudah membawa Sigil Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Kamu sudah punya cukup halaman buku besar.',
@@ -957,6 +963,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Het graf is tegen de levenden verzegeld tot de doden je erheen roepen.',
     'groundPickup.cryptRitualCircleDeny': 'De rituele cirkel ligt er koud en sluimerend bij.',
+    'groundPickup.castawayCrateDeny': 'Zeepokken houden de kist verzegeld.',
+    'groundPickup.castawayCrateEnough': 'Je hebt al genoeg aangespoelde kisten.',
     'groundPickup.supplyCrateEnough': 'Je hebt al genoeg voorradenkisten.',
     'groundPickup.gravecallerSigilEnough': 'Je draagt al een Grafroepers Zegel.',
     'groundPickup.ledgerPageEnough': 'Je hebt al genoeg grootboekbladen.',
@@ -1257,6 +1265,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Grób jest zapieczętowany przed żywymi, póki zmarli cię do niego nie wezwą.',
     'groundPickup.cryptRitualCircleDeny': 'Krąg rytualny spoczywa zimny i uśpiony.',
+    'groundPickup.castawayCrateDeny': 'Pąkle szczelnie pieczętują skrzynię.',
+    'groundPickup.castawayCrateEnough': 'Masz już dosyć wyrzuconych na brzeg skrzyń.',
     'groundPickup.supplyCrateEnough': 'Masz już dosyć skrzyń z zaopatrzeniem.',
     'groundPickup.gravecallerSigilEnough': 'Nosisz już Sygil Grobowego Przyzywacza.',
     'groundPickup.ledgerPageEnough': 'Masz już dosyć stron księgi.',
@@ -1555,6 +1565,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Graven är förseglad för de levande tills de döda kallar dig till den.',
     'groundPickup.cryptRitualCircleDeny': 'Ritualcirkeln ligger kall och slumrande.',
+    'groundPickup.castawayCrateDeny': 'Havstulpaner håller lådan förseglad.',
+    'groundPickup.castawayCrateEnough': 'Du har redan tillräckligt många vrakgodslådor.',
     'groundPickup.supplyCrateEnough': 'Du har redan tillräckligt många förrådslådor.',
     'groundPickup.gravecallerSigilEnough': 'Du bär redan på Gravkallarens sigill.',
     'groundPickup.ledgerPageEnough': 'Du har redan tillräckligt många liggarsidor.',
@@ -1851,6 +1863,8 @@ export const BASE_NEW = {
       'Gözcü istemedikçe korumanın baskısını çıkarmak sana düşmez.',
     'groundPickup.graveSealedDeny': 'Ölüler seni çağırana dek mezar yaşayanlara mühürlü.',
     'groundPickup.cryptRitualCircleDeny': 'Ayin çemberi soğuk ve uykuda duruyor.',
+    'groundPickup.castawayCrateDeny': 'Midyeler sandığı sımsıkı mühürlemiş.',
+    'groundPickup.castawayCrateEnough': 'Zaten yeterince kazazede sandığın var.',
     'groundPickup.supplyCrateEnough': 'Zaten yeterince erzak sandığın var.',
     'groundPickup.gravecallerSigilEnough': "Zaten yanında bir Mezarçağıran'ın Mührü var.",
     'groundPickup.ledgerPageEnough': 'Zaten yeterince defter sayfan var.',
@@ -2147,6 +2161,8 @@ export const BASE_NEW = {
     'groundPickup.graveSealedDeny':
       'Ngôi mộ được phong kín trước người sống cho đến khi người chết gọi bạn đến.',
     'groundPickup.cryptRitualCircleDeny': 'Vòng tròn nghi lễ nằm lạnh lẽo và im lìm.',
+    'groundPickup.castawayCrateDeny': 'Hàu biển bịt kín chiếc thùng.',
+    'groundPickup.castawayCrateEnough': 'Bạn đã có đủ thùng trôi dạt.',
     'groundPickup.supplyCrateEnough': 'Bạn đã có đủ thùng tiếp tế.',
     'groundPickup.gravecallerSigilEnough': 'Bạn đã mang theo một Ấn Phù Của Triệu Mộ Giả.',
     'groundPickup.ledgerPageEnough': 'Bạn đã có đủ trang sổ cái.',
