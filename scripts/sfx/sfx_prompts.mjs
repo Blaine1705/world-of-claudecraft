@@ -472,6 +472,10 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'meteor',
+    custom: true,
+  },
+  {
     key: 'flamestrike',
     custom: true,
   },

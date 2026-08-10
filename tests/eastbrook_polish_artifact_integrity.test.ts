@@ -681,13 +681,23 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // so all three literals mint to values matching neither parent. No capture was
 // retaken.
 // Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
-// tank-mount-sfx branch: both parents move renderer.ts (the airborne/
-// range-gate mountEngine fixes on this side), so all three literals mint to
-// values matching neither parent. No capture was retaken.
+// mip-release branch: both parents move renderer.ts, so all three literals mint
+// to values matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so all
+// three literals mint to values matching neither parent. No capture was
+// retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '298dafc0dcc4c1f826536b72ab107c4f867dad54a111912a76a54596905d88ba';
+  '3e62defc310b6eb120ad66cd5ea629713c58d33ba9c87b4e02f0e5b066f83ea4';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e0cb1e6cc8572ceacab7b005e69618914993087dbfdf45d79e3aecd18b65bc6d';
+  '3455c52bb8541eeba4541c006b51f35fe833dd13574518c674d825590e76dd2f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1588,15 +1598,32 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-minted after pinning the three specifier exact (PR 3165 review): only
     // the pnpm-lock.yaml specifier row moved. No capture was retaken.
-    // Re-minted for the merge of release/v0.36.0 into the tank-mount-sfx
-    // branch: the first-order composite follows both parents' renderer.ts
-    // inputs (the airborne/range-gate mountEngine fixes on this side), then
-    // this second-order performance seal follows the swept evidence bytes.
-    // No capture was retaken.
+    // Re-minted for the merge of release/v0.36.0 into the render caches branch:
+    // the first-order composite follows both parents' renderer.ts and
+    // prewarm_policy.ts inputs, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3220/3221) into the
+    // KTX2 mip-release branch: the first-order composite follows both parents'
+    // renderer.ts inputs, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of release/v0.36.0 (post PR 3222) into the
+    // prewarm sky-unstarve branch: the first-order composite follows both
+    // parents' renderer.ts inputs plus this branch's prewarm_policy.ts
+    // (sky.ts moved too but is not a provenance input), then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-pinned for the review fixes on the prewarm sky-unstarve PR: the
+    // first-order composite follows the renderer.ts edits (deadlineExempt sky
+    // entry, unified view-cap trim rule, deferred-lane gate and priority
+    // threading), then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+    // archetype and scene-texture counts; renderer.ts edits only). No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('f4e46c559b78cbd1feb2d52c79e774e8e0020bb95e17c294354c78e26d50d773');
+    ).toBe('3da13ffce9226150c58fed288b8dacc0ab1c52c163bd9c6eaff4401a284bbb8e');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

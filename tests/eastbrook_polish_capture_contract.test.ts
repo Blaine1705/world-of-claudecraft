@@ -102,12 +102,22 @@ interface AttributionTargetFixture {
 // branch's bounded character-visual pool wiring on the rendererIntegration
 // leaf, so the merged tree mints a value matching neither parent. No capture
 // was retaken.
-// Re-minted for the merge of release/v0.36.0 into the tank-mount-sfx branch:
-// both parents move renderer.ts (the airborne/range-gate mountEngine fixes on
-// this side), so the rendererIntegration leaf mints a value matching neither
-// parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
+// mip-release branch: both parents move renderer.ts, so the rendererIntegration
+// leaf mints a value matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 (post PR 3222) into the prewarm
+// sky-unstarve branch: both parents move renderer.ts (this branch also moves
+// prewarm_policy.ts; sky.ts moved too but is not a provenance input), so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the review fixes on the prewarm sky-unstarve PR (deadlineExempt
+// sky entry, unified view-cap trim rule, deferred-lane gate and priority
+// threading; renderer.ts edits only). No capture was retaken.
+// Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
+// archetype and scene-texture counts; renderer.ts edits only). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e0cb1e6cc8572ceacab7b005e69618914993087dbfdf45d79e3aecd18b65bc6d';
+  '3455c52bb8541eeba4541c006b51f35fe833dd13574518c674d825590e76dd2f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
