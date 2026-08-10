@@ -20,15 +20,22 @@
 //
 // The parsed half is deliberately not a hash restatement: it reads the GLB
 // container by hand (header, chunk table), then re-reads the same file through
-// glTF-Transform and pins mesh/primitive/node/material/texture shape, the KTX2
-// (`KHR_texture_basisu`) encoding the shipping base mandates
-// (`tests/glb_texture_compression.test.ts`), and a byte budget that survives a
-// deliberate re-pin of the hashes.
+// glTF-Transform and pins mesh/primitive/node/material/texture shape, the two
+// compression layers the shipping base mandates, and a byte budget that survives
+// a deliberate re-pin of the hashes. The layers are the KTX2 texture encoding
+// (`KHR_texture_basisu`, `tests/glb_texture_compression.test.ts`) and the
+// geometry pass (`EXT_meshopt_compression` + `KHR_mesh_quantization`): these pads
+// take the geometry pass like every other shipped GLB, and
+// `tests/glb_meshopt_coverage.test.ts` owns that invariant tree-wide, so what is
+// pinned here is what quantization did to THESE bodies (the node TRS now carries
+// the dequantization offset and scale, and the attribute accessors store
+// integers whose normalized bounds are the geometry).
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { getBounds, NodeIO, Primitive } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
@@ -67,12 +74,19 @@ interface RuneAssetContract {
   readonly binChunkBytes: number;
   readonly nodeName: string;
   readonly nodeTranslation: readonly [number, number, number];
+  /** Node scale, which quantization loads with the dequantization factor. */
+  readonly nodeScale: readonly [number, number, number];
   readonly meshName: string;
   readonly materialName: string;
   readonly textureName: string;
   readonly triangles: number;
   readonly vertices: number;
-  /** POSITION accessor bounds (pre-node-transform). */
+  /**
+   * POSITION accessor bounds in the mesh's own quantized frame, read normalized:
+   * `KHR_mesh_quantization` stores these as normalized shorts, so the raw values
+   * are integers and the normalized ones (-1..1 here) are the geometry. The node
+   * TRS above maps this frame to the scene frame pinned by `sceneMin`/`sceneMax`.
+   */
   readonly positionMin: readonly [number, number, number];
   readonly positionMax: readonly [number, number, number];
   /** Scene bounds (node transform applied), which is what the runtime measures. */
@@ -84,61 +98,66 @@ const RUNE_CONTRACTS: readonly RuneAssetContract[] = [
   {
     id: 'damage',
     url: '/models/battleground/rune_damage.glb',
-    bytes: 75_316,
-    sha256: '1e789f53a60751c8208025e403665cb730e93db13422d5b2224aed12f590de49',
-    jsonChunkBytes: 1504,
-    binChunkBytes: 73_784,
+    bytes: 64_228,
+    sha256: 'daaed6232dc5d1aa039a5f80958da65215ffc55ecc34a17f96a46f8723e679f1',
+    jsonChunkBytes: 2524,
+    binChunkBytes: 61_676,
     nodeName: 'tripo_node_de6c7805',
-    nodeTranslation: [0, 0, 0],
+    nodeTranslation: [0, 0.3134765625, 0],
+    nodeScale: [0.4990234971046448, 0.4990234971046448, 0.4990234971046448],
     meshName: 'tripo_mesh_de6c7805',
     materialName: 'tripo_mat_de6c7805',
     textureName: 'crossed_swords_3d_model_basecolor',
     triangles: 468,
     vertices: 482,
-    positionMin: [-0.4990234971046448, 0, -0.0947265475988388],
-    positionMax: [0.4990234971046448, 0.626953125, 0.0947265475988388],
-    sceneMin: [-0.4990234971046448, 0, -0.0947265475988388],
-    sceneMax: [0.4990234971046448, 0.626953125, 0.0947265475988388],
+    positionMin: [-1, -0.6281319620349742, -0.18982512894070253],
+    positionMax: [1, 0.6281319620349742, 0.18982512894070253],
+    sceneMin: [-0.4990234971046448, 0.00002395416210521084, -0.09472719968232948],
+    sceneMax: [0.4990234971046448, 0.6269291708378948, 0.09472719968232948],
   },
   {
     id: 'defense',
     url: '/models/battleground/rune_defense.glb',
-    bytes: 55_684,
-    sha256: 'b9dddf0ebfdfaeb75f00b6d38eaf48bd9df36d6c3d95bb5e8e25db6a7b8b011a',
-    jsonChunkBytes: 1464,
-    binChunkBytes: 54_192,
+    bytes: 54_616,
+    sha256: '4975002fda877d994731bd364ca0d8f62d4e23078aceeb110b9eb997834f4d16',
+    jsonChunkBytes: 2432,
+    binChunkBytes: 52_156,
     nodeName: 'shield',
-    nodeTranslation: [0, 0, 0],
+    nodeTranslation: [0, 0.5, 0],
+    nodeScale: [0.5, 0.5, 0.5],
     meshName: 'tripo_mesh_6a72d06f',
     materialName: 'tripo_mat_6a72d06f',
     textureName: 'shield_ward_glb_basecolor',
     triangles: 102,
     vertices: 85,
-    positionMin: [-0.0668334886431694, 0, -0.3366699516773224],
-    positionMax: [0.0668334886431694, 1, 0.3366699516773224],
-    sceneMin: [-0.0668334886431694, 0, -0.3366699516773224],
-    sceneMax: [0.0668334886431694, 1, 0.3366699516773224],
+    positionMin: [-0.1336710715048677, -1, -0.67329935605945],
+    positionMax: [0.1336710715048677, 1, 0.67329935605945],
+    sceneMin: [-0.06683553575243385, 0, -0.336649678029725],
+    sceneMax: [0.06683553575243385, 1, 0.336649678029725],
   },
   {
     id: 'sprint',
     url: '/models/battleground/rune_sprint.glb',
-    bytes: 80_292,
-    sha256: '05d9eb844529730c1c8c05d667d2137d53530a23ab56dacd470f8d37098c6aba',
-    jsonChunkBytes: 1536,
-    binChunkBytes: 78_728,
+    bytes: 65_860,
+    sha256: '384bf467b5cd4b05f304b35b3d2bc15d8afe185a42235d13235933a81d1c8b7c',
+    jsonChunkBytes: 2536,
+    binChunkBytes: 63_296,
     nodeName: 'powerup speed',
-    // The one non-identity node transform in the set, and it is load-bearing: see
-    // the off-center coupling case at the bottom of this file.
-    nodeTranslation: [0.17184953391551971, 0, 0],
+    // Quantization gave every pad a non-identity node TRS, but the x term is the
+    // one that is not dequantization bookkeeping: it is the original off-center
+    // offset, and it is load-bearing, see the off-center coupling case at the
+    // bottom of this file.
+    nodeTranslation: [0.17184953391551971, 0.4931640625, 0],
+    nodeScale: [0.4990234971046448, 0.4990234971046448, 0.4990234971046448],
     meshName: 'tripo_mesh_3a136827',
     materialName: 'tripo_mat_3a136827',
     textureName: 'winged_boot_3d_model_basecolor',
     triangles: 490,
     vertices: 655,
-    positionMin: [-0.3505859971046448, 0, -0.4990234971046448],
-    positionMax: [0.3505859971046448, 0.986328125, 0.4990234971046448],
-    sceneMin: [-0.17873646318912506, 0, -0.4990234971046448],
-    sceneMax: [0.5224355310201645, 0.986328125, 0.4990234971046448],
+    positionMin: [-0.7025971251564074, -0.9882808923612171, -1],
+    positionMax: [0.7025971251564074, 0.9882808923612171, 1],
+    sceneMin: [-0.17876294053570047, -0.000011324527793565853, -0.4990234971046448],
+    sceneMax: [0.52246200836674, 0.9863394495277935, 0.4990234971046448],
   },
 ];
 
@@ -211,7 +230,10 @@ function readRuneJson(contract: RuneAssetContract): RuneGlbJson {
 }
 
 async function readRuneDocument(contract: RuneAssetContract) {
-  const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
   return (await io.read(assetPathFor(contract.url))).getRoot();
 }
 
@@ -305,8 +327,16 @@ describe('Thornhollow Fields rune pad GLB contract (documented exporter exemptio
       // KHR_texture_basisu must stay REQUIRED, not merely used: GLTFLoader only
       // fails loudly on a missing KTX2Loader when the extension is required, and
       // silently renders black otherwise (tests/glb_texture_compression.test.ts).
-      expect(json.extensionsUsed).toEqual(['KHR_texture_basisu']);
-      expect(json.extensionsRequired).toEqual(['KHR_texture_basisu']);
+      expect(json.extensionsUsed).toEqual([
+        'EXT_meshopt_compression',
+        'KHR_mesh_quantization',
+        'KHR_texture_basisu',
+      ]);
+      expect(json.extensionsRequired).toEqual([
+        'EXT_meshopt_compression',
+        'KHR_mesh_quantization',
+        'KHR_texture_basisu',
+      ]);
       expect(json.images).toHaveLength(1);
       expect(json.images?.[0].mimeType).toBe('image/ktx2');
       expect(json.images?.[0].name).toBe(contract.textureName);
@@ -316,10 +346,12 @@ describe('Thornhollow Fields rune pad GLB contract (documented exporter exemptio
       expect(json.textures?.[0].extensions?.KHR_texture_basisu).toEqual({ source: 0 });
       expect(json.samplers).toHaveLength(1);
 
-      // The rest of the raw table: one buffer, one interleaved vertex view, one
-      // index view, one KTX2 view, and the four accessors those feed.
-      expect(json.buffers).toHaveLength(1);
-      expect(json.bufferViews).toHaveLength(3);
+      // The rest of the raw table, as meshopt leaves it: the storage buffer plus
+      // the zero-filled fallback buffer the extension mandates, then the KTX2
+      // view and the four compressed geometry views (indices, and one per vertex
+      // attribute), feeding the same four accessors.
+      expect(json.buffers).toHaveLength(2);
+      expect(json.bufferViews).toHaveLength(5);
       expect(json.accessors).toHaveLength(4);
       expect(json.animations ?? []).toHaveLength(0);
       expect(json.skins ?? []).toHaveLength(0);
@@ -350,7 +382,7 @@ describe('Thornhollow Fields rune pad GLB contract (documented exporter exemptio
     const node = scene.listChildren()[0];
     expect(node.getTranslation()).toEqual(contract.nodeTranslation);
     expect(node.getRotation()).toEqual([0, 0, 0, 1]);
-    expect(node.getScale()).toEqual([1, 1, 1]);
+    expect(node.getScale()).toEqual([...contract.nodeScale]);
 
     const mesh = node.getMesh();
     if (!mesh) throw new Error(`${contract.url} node carries no mesh`);
@@ -375,10 +407,14 @@ describe('Thornhollow Fields rune pad GLB contract (documented exporter exemptio
     expect((indices?.getCount() ?? 0) / 3).toBe(contract.triangles);
     expect(contract.triangles).toBeLessThanOrEqual(RUNE_TRIANGLE_CEILING);
     // A UV outside 0..1 means the atlas got re-packed or the wrap mode changed.
-    expect(Math.min(...uv.getMin([]))).toBeGreaterThanOrEqual(0);
-    expect(Math.max(...uv.getMax([]))).toBeLessThanOrEqual(1);
-    expect(position.getMin([])).toEqual([...contract.positionMin]);
-    expect(position.getMax([])).toEqual([...contract.positionMax]);
+    // Read normalized, because quantization stores these as raw integers and the
+    // 0..1 range is the thing being asserted, not the storage encoding.
+    expect(Math.min(...uv.getMinNormalized([]))).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...uv.getMaxNormalized([]))).toBeLessThanOrEqual(1);
+    // Same reason: normalized, so this keeps meaning geometry bounds in the
+    // mesh's quantized frame rather than the shorts they are stored as.
+    expect(position.getMinNormalized([])).toEqual([...contract.positionMin]);
+    expect(position.getMaxNormalized([])).toEqual([...contract.positionMax]);
 
     for (const [index, accessor] of root.listAccessors().entries()) {
       const array = accessor.getArray();
@@ -414,8 +450,9 @@ describe('Thornhollow Fields rune pad GLB contract (documented exporter exemptio
     expect(bounds.max).toEqual([...contract.sceneMax]);
     // Every pad body is floor-seated in its own export; `prepareRuneModel`
     // re-anchors from the measured bounds, so this is a shape fact, not a
-    // placement one.
-    expect(bounds.min[1]).toBe(0);
+    // placement one. Approximate because quantization rounds the floor to within
+    // a fraction of a quantization step of zero, never away from it.
+    expect(bounds.min[1]).toBeCloseTo(0, 4);
   });
 
   it('keeps the Sprint pad off-center on x, which the runtime re-centers', async () => {

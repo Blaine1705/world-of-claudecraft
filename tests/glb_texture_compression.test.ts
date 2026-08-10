@@ -7,6 +7,16 @@
 // exception is the WEAPON_VFX skin set, whose emissive derivation draws the
 // baseColor image into a canvas and therefore needs a drawable webp/png.
 //
+// This suite owns the TEXTURE half of that pipeline step only. The GEOMETRY
+// half (quantization + EXT_meshopt_compression) is
+// tests/glb_meshopt_coverage.test.ts. Keeping them apart is the point: the
+// drawable-texture exception was implemented as a removal from the converter's
+// whole file walk, which silently made it a geometry exception too (issue
+// #3287). The two are now independent flags. The WEAPON_VFX skins still ship
+// raw geometry, but for a different and separately documented reason: they live
+// under models/weapons, which is exempt from the geometry ADD because
+// quantization recentres a mesh and the renderer's grip path assumes it did not.
+//
 // An asset exporter re-run silently reverts its outputs to webp (nothing in
 // scripts/assets knows about KTX2); this suite is what turns that drift red.
 // The fix is one command:
