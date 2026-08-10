@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "c167fb3375562fbae1695cde5d57cadae3cdab7f750aa8608dcd26976f71b12b",
-  "catalogHash": "dcd6e4672261d2def84a237d0d77561f6531220f0a4ba8d982fa6000f70fa3b3",
+  "bundleId": "4e0366fc71920afb2f882f6f1e4d65a3a332cbff20756c801e007e35c10a86f8",
+  "catalogHash": "538389235484af903830dc6c34b394636be2c0a27510954f5dee8afaf06286a5",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -158,6 +158,18 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "battle_shout": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/battle_shout.mp3?v=9b2f045520dd",
+          "bytes": 25747,
+          "sha256": "9b2f045520dd32b74e062572bd2d1ee3462109dfab62620bf00b05714db8696e"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "blind": {
@@ -434,6 +446,42 @@
         }
       ],
       "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "defiant_bellow": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/defiant_bellow.mp3?v=83d7fd434600",
+          "bytes": 20732,
+          "sha256": "83d7fd43460042ec5fc86b2b9c082c568cb17ff7dc694e6be467f8fba9aa6402"
+        }
+      ],
+      "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "demoralizing_shout": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/demoralizing_shout.mp3?v=c95247f56488",
+          "bytes": 19478,
+          "sha256": "c95247f5648823b24eca4db5b715fa14eb630ddd0212b6d9a62e50996e0a995e"
+        }
+      ],
+      "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "emboldening_roar": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/emboldening_roar.mp3?v=0a77c601779e",
+          "bytes": 27628,
+          "sha256": "0a77c601779e7ec0ff4553b7a16eb8a1d19e265eb9f169e9876de1e27c0633e2"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "entangling_roots": {
@@ -986,6 +1034,18 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "intimidating_shout": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/intimidating_shout.mp3?v=02a6acedbbdd",
+          "bytes": 28882,
+          "sha256": "02a6acedbbdd73ac83889144576b52dd97c9e936f954b0b191860998425d4adb"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "lockpick_advanced_1": {
@@ -3242,6 +3302,18 @@
         }
       ],
       "gain": 2.570396,
+      "playbackRate": 1
+    },
+    "rallying_cry": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/rallying_cry.mp3?v=080a3ef53486",
+          "bytes": 24493,
+          "sha256": "080a3ef5348688828a51f1569db18f1aceabc27c923551a8cb1f76b3cf453582"
+        }
+      ],
+      "gain": 1.840772,
       "playbackRate": 1
     },
     "sap": {
