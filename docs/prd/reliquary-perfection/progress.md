@@ -2665,3 +2665,18 @@ the screenshot set. Outcome: PASS WITH ONE DEFECT FIXED.
   counters (release-caused, red only on the merged tree's full run; the
   classification is mirrored here and worth flagging upstream). Both files
   re-run green after the fix.
+- SECOND SYNC (post-push, at the owner's direction): the release moved 32
+  more commits (the v0.36 artwork overhaul among them), merged as
+  022d286461 with seven conflicts resolved keeping both intents. The two
+  structural ones: DEED_ART_PENDING now holds exactly the nine branch-owned
+  Reliquary deeds (the release's completion wave painted every deed IT has
+  and emptied the set; no col_reliquary art is committed), with the deed-art
+  suites recomposed to walk both arms (271 deeds, 262 painted, 9 procedural
+  fallbacks); and the release-re-minted c4b_effect_dispatch parity golden
+  needed the same shape-only re-mint as rift_boss_floor (68 state hashes
+  plus 48 empty reliquary blocks vs the release side, zero rng or event
+  lines): the second occurrence of the release-scenario-golden class this
+  session, now a recorded post-sync expectation. Post-merge battery: 16
+  files, 1208 green; tsc clean. The screenshot set re-captured on the merged
+  tree because the artwork overhaul changes the item art inside the shots;
+  CI babysitting skipped at the owner's direction.
