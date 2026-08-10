@@ -13,6 +13,15 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formName.form_cat': '狼形态',
+  'guide.gear.slotOffhand': '副手',
+  'guide.glossary.claudiumTerm': 'Claudium',
+  'guide.glossary.riftTerm': '裂隙',
+  'guide.howToPlay.step0Title': '进入游戏',
+  'guide.interfacePage.framePetTitle': '你的宠物',
+  'guide.interfacePage.winBagsTitle': '背包（B）',
+  'guide.riftsPage.rankFmt': '{rank} 级',
+  'hudChrome.comboMeter.label': '连击点',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '放大',
   'hudChrome.controller.zoomOut': '缩小',

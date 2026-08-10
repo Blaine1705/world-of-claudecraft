@@ -13,6 +13,15 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formName.form_cat': 'ウルフフォーム',
+  'guide.gear.slotOffhand': 'オフハンド',
+  'guide.glossary.claudiumTerm': 'Claudium',
+  'guide.glossary.riftTerm': 'リフト',
+  'guide.howToPlay.step0Title': 'ゲームを始める',
+  'guide.interfacePage.framePetTitle': 'ペット',
+  'guide.interfacePage.winBagsTitle': 'バッグ（B）',
+  'guide.riftsPage.rankFmt': 'ランク{rank}',
+  'hudChrome.comboMeter.label': 'CP',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'ズームイン',
   'hudChrome.controller.zoomOut': 'ズームアウト',

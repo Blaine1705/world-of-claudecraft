@@ -13,6 +13,15 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formName.form_cat': 'Облик волка',
+  'guide.gear.slotOffhand': 'Левая рука',
+  'guide.glossary.claudiumTerm': 'Claudium',
+  'guide.glossary.riftTerm': 'Разлом',
+  'guide.howToPlay.step0Title': 'Войдите в игру',
+  'guide.interfacePage.framePetTitle': 'Ваш питомец',
+  'guide.interfacePage.winBagsTitle': 'Сумки (B)',
+  'guide.riftsPage.rankFmt': 'Ранг {rank}',
+  'hudChrome.comboMeter.label': 'ОС',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'Приблизить',
   'hudChrome.controller.zoomOut': 'Отдалить',

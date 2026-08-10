@@ -1247,7 +1247,7 @@ describe('i18n Localization Key Coverage', () => {
       };
       setLanguage('es');
       expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
-        'Carga doble',
+        'Intervenir',
       );
       expect(
         renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
