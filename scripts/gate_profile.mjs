@@ -150,6 +150,7 @@ if (args.steps) {
     skipBuilds: args.skipBuilds,
     skipVitest: args.skipVitest,
     skipTypes: args.skipTypes,
+    repoRoot: ROOT,
   });
 
   if (args.dryRun) {
