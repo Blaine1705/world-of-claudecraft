@@ -15,7 +15,7 @@
 | 5 | Governor and LOW tier | done | 2026-08-09 | 2026-08-09 |
 | 5 QA | Verify phase 5 | done | 2026-08-09 | 2026-08-09 |
 | 6 | three.js 0.185 train | done | 2026-08-09 | 2026-08-09 |
-| 6 QA | Verify phase 6 | not started | | |
+| 6 QA | Verify phase 6 | done | 2026-08-09 | 2026-08-10 |
 | 7 | Desktop prefs store and window memory | not started | | |
 | 7 QA | Verify phase 7 | not started | | |
 | 8 | Display modes and power | not started | | |
@@ -1091,3 +1091,114 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   direct-profile no-shadows invariant pin, the re-freeze flag-preserving
   bake); (5) the export_entry.js PCFSoft renames stay batched with the phase
   11 seal re-mint.
+
+### Phase 6 QA (2026-08-09/10, three.js 0.185 train verification)
+
+- QA-start base merge 215d4ac8c2 took release tip 7ce12bad9e (1096 files:
+  upstream perf items incl. the desktop KTX2 mip release, frame-budgeted
+  grass builds, the bounded character visual pool, hitch referee,
+  allocation-free nameplates/i18n, the artwork overhaul, pvp draws,
+  battleground backfill, sfx batches). Five conflicts reconciled by hand; the
+  load-bearing one ported upstream's new raw-context KTX2 fallback probe to
+  r185 semantics (astcHDRSupported via the astc extension's hdr profile plus
+  the Linux Mesa emulated-format filter; r165 had neither, and the six-key
+  workerConfig is a type error under @types 0.185), with both polarities and
+  per-conjunct arms pinned in tests/ktx2_support.test.ts. The
+  gfx_override_core low hash was re-minted on the merged tree with the
+  other five rows matching the release pins byte for byte (the phase 5 low
+  retune stacking on upstream's C1 pool bound). history.jsonl is the
+  chronological union of both parents (12 + 5 rows).
+- PERF GATE (fresh medians vs the frozen pre-upgrade baselines; low x4,
+  others x2; commit-per-run): low town-idle +20.2 / town-look +19.2 /
+  open-run -18.8 RED / east-run +5.4 (bimodal 227-306) / combat-vfx -7.3
+  RED; medium all green (+3.6 to +13.0); high town-idle -10.0 / others green
+  (+2.1 to +10.9); ultra town-idle -21.2, town-look -8.1 / field scenarios
+  strongly green (+12.2 to +25.5). ATTRIBUTION against the phase 6
+  post-train pre-merge rows: the train made medium/high/ultra FASTER
+  everywhere (high town-idle 41.7 to 49.2, ultra 36.1 to 38.4); the
+  high/ultra town reds are MERGE-OWNED (upstream f53e5a37d1..7ce12bad9e
+  regressed town-idle across tiers, scaling with tier: low -6, medium -13,
+  high -24, ultra -25 percent vs the pre-merge post-train rows), so they are
+  upstream perf-packet territory, not train misses. The two LOW reds are
+  train-owned (upstream wins bought combat back from -18/-33 to -7.3 and
+  open-run from -23 to -18.8). 1 percent lows at 5 s windows are about 3
+  frames and swing +/-100 percent run to run; recorded, not gated. Notably
+  low open-run 1 percent lows IMPROVED +106 percent (41.6 to 85.7): the mean
+  regressed while worst-frame behavior got much better.
+- LOW-REGRESSION ATTRIBUTION (live in-page probe, gfx=low, real GPU,
+  stationary open + combat vantages): full scene walk = 8,900 nodes, 3,523
+  auto-update, 1,751 nodes under gated roots (the set r165 pruned), 43
+  hidden views carrying 1,543 always-recomposing rig nodes; measured
+  scene.updateMatrixWorld() cost 0.43 ms (about 4-6 percent of a low frame).
+  Detaching every hidden gated view live recovered at most ~4 percent fps;
+  skipping the entire walk ~5 percent. The r185 matrix-walk/hidden-rig
+  mechanism is real but CANNOT explain -18.8 percent on open-run: the
+  balance sits in the moving/streaming render path (consistent with both
+  moving scenarios splitting from the improving idle scenarios). The
+  ledgered hidden-view mitigation was therefore evaluated and NOT landed
+  (recovers a twentieth of the gap for real churn); per the stopping rules
+  the low open-run/combat delta is a HOLD-OR-ACCEPT decision surfaced to the
+  user, with the postprocessing/n8ao fallback ladder inapplicable (three
+  core, not post chain).
+- CROWD DECAY (first run on this branch, no frozen reference; this run IS
+  the reference now): solo 28.3 / crowd-10 32.4 / crowd-20 30.4 / crowd-35
+  30.0 / crowd-50 29.8 fps, entity phase 0.8 to 1.5 ms linear, bench verdict
+  PASS (flat curve, no cliff). Deviation recorded: the phase-06-qa.md
+  "compare its decay curve" step had nothing to compare against.
+- AUDIT WORKFLOW (52 agents, zero losses: 8 area auditors + 4 fresh
+  re-litigations + 2 adversarial skeptics per actionable finding): all four
+  re-litigations UPHOLD (bloom composite restore, direct-profile no-shadows
+  pin, flag-preserving re-freeze bake, texture-upload premise flip). Fresh
+  hit-list re-derive: 13/15 items MATCH the recorded walk, 2 record-level
+  discrepancies with no code gap. Anchor audit: the 92/29 claim reconciles
+  exactly (92 anchor sites; 29 files registering onBeforeCompile); 35+
+  anchors across 15 files spot-verified against the installed r185 sources,
+  all clean. Merge-drift: 8 branch-owned files touched, every branch
+  semantic survived symbol-level inspection; no planning-doc premise broken.
+  20 actionable findings -> 17 confirmed by both skeptics, 2 splits (both
+  resolved against the finding with direct evidence), 1 killed.
+- THE MOON FINDING (filed blocking, resolved benign with a mechanism): the
+  day-night clock is UTC-anchored (day_night_clock.ts cyclePhase(Date.now())),
+  so parity captures taken ~75 minutes apart sit at different phases; the
+  after-medium east moon is absent from after-high east on the SAME build.
+  Consequence: the swiftshader parity diffs OVERSTATE the r181 delta on
+  dusk/night scenes. The decision materials were re-captured with the phase
+  frozen (/daynight day) on BOTH sides: tmp/r181-showcase-frozen/
+  <tier>-{before,after}/ (8 biome vantages x 4 tiers, real-GPU ANGLE,
+  identical framing; the unfrozen full-location sets remain in
+  tmp/r181-showcase/). All showcase captures rendered on the Intel iGPU
+  (chromium ANGLE default on this MUXless box), identical on both sides, so
+  the lighting comparison holds; fps overlays are directional only.
+- FIX COMMITS (each probe-verified on the committed tree): 0f7d484b2c
+  comment-truth sweep (bloom claims scoped to the composite stage, the
+  upstream r182 blur-kernel + Rec.709 bright-pass deltas recorded as
+  accepted r181-bucket feeders; texture-upload premise names the real sky
+  env/dome consumers; prepareZoneSky + dome-exemption r165 premises
+  re-anchored; ktx2_mip_release header records its r185 re-verification).
+  d94a8832b7 bloom + matrix-walk fail-closed pins (lerpBloomFactor body,
+  bloomFactors weights, executed _fsQuad render smoke through production's
+  cast; streamed-child assertions moved off self-healing getWorldPosition
+  onto matrixWorld elements; the new static_matrix premise arm pins r185's
+  unconditional child recursion, the walk that places water gap sheets).
+  0d580aadef Mesa per-conjunct arms, the no-shadows pin widened to the full
+  hint grid (floor 13), the texture-upload stale-range arm. 11bf88933b
+  night-light splat off the deprecated inverseTransformDirection alias.
+  42d7b6f4b8 draw-stats session rebind on webglcontextrestored (pre-existing
+  release-branch defect, cherry-pick candidate: three replaces webgl.info on
+  restore and the composer-tier accumulator kept reading the dead object).
+- PROBE ROUND: 12/12 KILLED with named failing tests on the committed tree
+  (re-freeze bake revert, refresh-helper gut, camera-refresh call-site
+  strip, bloom-restore identity, vColor revert, prewarm normals-bit drop,
+  ktx2 preseed re-key, astcHDR drop, Mesa single-conjunct, drawStats rebind
+  drop, night-light revert, texture-upload clear drop, direct-profile
+  shadows flip).
+- SHADER SMOKE on the merged tree: clean at low AND ultra with
+  checkShaderErrors ON; only the pre-existing training-dummy lazy-preload
+  race, identical at both tiers.
+- Process notes: the phase-06-qa.md test-quality and perf:crowd steps ran
+  (workflow area + orchestrator); the heap-sawtooth ungated-tick interplay
+  with the hidden-window skip is a phase 7 diagnostics candidate; the
+  dome-upload loading-screen exemption premise softened by 0.185
+  row-batching (comment updated, revisit candidate); the high/ultra
+  merge-owned town-idle regression is surfaced to the user for upstream
+  routing.

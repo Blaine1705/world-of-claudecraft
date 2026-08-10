@@ -223,6 +223,37 @@ all dirty:false via commit-per-run. Next up: phase 6 QA (phase-06-qa.md),
 fresh session, pull+merge first; the r181 acceptance and the low-tier
 open-run/combat regression are the two user-facing decisions.
 
+Phase 6 QA done (2026-08-09/10, verdict PASS-WITH-FOLLOWUPS carrying TWO USER
+DECISIONS; QA-start merge 215d4ac8c2 took release tip 7ce12bad9e, 1096 files,
+five conflicts hand-reconciled incl. the raw-context KTX2 probe ported to r185
+semantics with astcHDR + the Linux Mesa filter; fixes 0f7d484b2c comment-truth
+sweep, d94a8832b7 bloom + matrix-walk pins, 0d580aadef one-arm/vacuity arms,
+11bf88933b night-light GLSL rename, 42d7b6f4b8 drawStats context-restore
+rebind, plus a style commit; tree clean, LOCAL-ONLY intact). Perf gate on
+fresh medians vs the frozen pre-upgrade baselines: medium green everywhere;
+high/ultra green on every field scenario with the town reds attributed
+MERGE-OWNED (upstream f53e5a37d1..7ce12bad9e regressed town-idle across tiers,
+scaling composer-tier-ward to -24/-25 percent vs the post-train pre-merge
+rows; the train itself made high/ultra FASTER everywhere); LOW open-run -18.8
+and combat-vfx -7.3 percent remain train-owned (upstream wins bought back
+combat from -18/-33). Attribution probe: the r185 matrix walk measures 0.43 ms
+(4-6 percent of a low frame) and detaching every hidden gated rig recovers at
+most ~4 percent, so the ledgered hidden-view mitigation CANNOT close the gap
+(not landed); the balance sits in the moving/streaming path; per the stopping
+rules the low delta is a hold-or-accept USER decision (note: low open-run 1
+percent lows improved +106 percent). The r181 lighting acceptance is the other
+USER decision, with frozen-phase real-GPU pairs (the day-night clock is
+UTC-anchored, which also explains the parity moon as capture-time drift) in
+tmp/r181-showcase-frozen/. Audit workflow 52 agents zero losses: four
+re-litigations all UPHOLD, hit-list 13/15 MATCH (2 record-only discrepancies),
+92/29 anchors reconcile, 20 actionable findings -> 17 confirmed / 2 resolved
+splits / 1 killed, all fixed except the user decisions. Probe round 12/12
+killed rc!=0 with named tests. Shader smoke clean at low and ultra. Crowd
+decay flat (solo 28.3 to crowd-50 29.8; first reference on this branch). Next
+up: phase 7 (phase-07-prefs-window-memory.md), fresh session, pull+merge
+first; read the phase 6 QA notes in progress.md for the merge-owned town
+regression and the two open user decisions before building on top.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -494,10 +525,33 @@ prewarm_policy (hasNormals arm), scene_census_core (r185 ordering fake +
 source pin), basis_transcoder_csp (two-site shapes), eastbrook pins
 (vColor.rgb). tests/three_compile_async_patch.test.ts wording moved off
 r165.
+Phase 6 QA additions: tests/ktx2_support.test.ts astcHDR-profile arms, Mesa
+filter both-polarity + per-conjunct arms; tests/gfx.test.ts no-shadows pin
+over the full hint grid (floor 13); tests/texture_upload.test.ts stale-range
+arm + consumer-honest premise comment; tests/post_bloom_shader_core.test.ts
+lerpBloomFactor body pin, bloomFactors weights pin, executed _fsQuad render
+smoke; tests/static_matrix.test.ts streamed-under-frozen premise arm (r185
+unconditional recursion, the water gap-sheet placer);
+tests/three_streaming_buffers.test.ts elements-based assertions;
+tests/draw_stats_core.test.ts context-restore rebind pins + the three
+info-replacement premise pin; tests/vfx.test.ts restore-handler ordering pin;
+tests/night_light_field.test.ts canonical-helper pin. renderer.ts:
+onWebGLContextRestored rebinds drawStats; night_light_field.ts uses
+transformDirectionByInverseViewMatrix. Showcase evidence (gitignored):
+tmp/r181-showcase-frozen/ (frozen-phase pairs, the decision set),
+tmp/r181-showcase/ (unfrozen full-location sets), tmp/perf-parity/ (phase 6
+swiftshader mechanical pairs). Attribution + probe artifacts in the session
+scratchpad (low-attrib.json, probe-results.json, crowd-phase6qa.json).
+
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
-raw runs in tmp/perf-baseline/, gitignored). Phase 6 freezes the pre-upgrade
-baseline with `node scripts/perf_baseline.mjs baseline --preset <p>`.
+raw runs in tmp/perf-baseline/, gitignored). Phase 6 froze the pre-upgrade
+baselines at 519f1c328d; the phase 6 QA rows (4x low, 2x each medium/high/
+ultra, commit-per-run) are the fresh-vs-frozen evidence. NOTE for future perf
+work: chromium ANGLE on this MUXless box renders on the Intel iGPU by default;
+frozen and fresh rows share that stack so comparisons hold, but absolute fps
+is iGPU-bound, and any recipe change that moves the browser onto the 5090
+invalidates cross-era comparisons.
 
 ## Known gotchas for this packet
 
