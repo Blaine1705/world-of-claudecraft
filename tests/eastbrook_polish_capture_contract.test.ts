@@ -102,11 +102,12 @@ interface AttributionTargetFixture {
 // branch's bounded character-visual pool wiring on the rendererIntegration
 // leaf, so the merged tree mints a value matching neither parent. No capture
 // was retaken.
-// Re-minted for the merge of release/v0.36.0 (post PR 3220/3221) into the KTX2
-// mip-release branch: both parents move renderer.ts, so the rendererIntegration
-// leaf mints a value matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into feature/rift-mechanics-sfx-clean:
+// the branch's perf commit moved renderer.ts, base moved the same provenance
+// inputs twice more since the last mint, so the rendererIntegration leaf mints a
+// value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c54ca4bb6e4feb07c49af5bbdbf4261cf81a1e817bbf718f3dd82d7884591482';
+  '35758d0c214b8b2f3203b3a25c11b2f2f5f57df362ec14b3d504bdbeb5bbc1e0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
