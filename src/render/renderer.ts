@@ -481,6 +481,11 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import {
+  createShadowCadenceState,
+  resetShadowCadence,
+  updateShadowCadence,
+} from './shadow_cadence_core';
+import {
   type ShadowAnchor,
   shadowTexelWorldSize,
   snapShadowAnchor,
@@ -1772,6 +1777,10 @@ export class Renderer {
   // follows the player in whole-texel steps (anti shadow-swimming).
   private shadowTexelWorld = 0;
   private readonly shadowSnappedAnchor: ShadowAnchor = { x: 0, y: 0, z: 0 };
+  // Budget-governed shadow cadence (shadow_cadence_core.ts): under sustained
+  // render-budget pressure the shadow map updates every other frame, halving
+  // the second scene draw; applied right after the governor each frame.
+  private readonly shadowCadence = createShadowCadenceState();
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -4219,6 +4228,8 @@ export class Renderer {
       this.renderBudgetMaxScale(),
     );
     this.applyRenderBudgetState(this.renderBudgetState);
+    resetShadowCadence(this.shadowCadence);
+    this.applyShadowCadence();
     this.applyResolution();
   }
 
@@ -4807,6 +4818,23 @@ export class Renderer {
     this.stableFrameTime = state.stableSeconds;
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
+    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
+    this.applyShadowCadence();
+  }
+
+  /** Write the cadence plan onto three's shadowMap flags. Runs before the
+   *  frame's render; the prewarm and census probes save/restore these same
+   *  flags around their own bounded renders, and the per-frame re-assert
+   *  here makes their restore self-healing either way. */
+  private applyShadowCadence(): void {
+    if (!this.sun.castShadow) return;
+    const shadowMap = this.webgl.shadowMap;
+    const autoUpdate = !this.shadowCadence.halfRate;
+    if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
+    // Under half rate three skips the pass when both flags are false and
+    // clears needsUpdate after each rendered pass, so the every-other-frame
+    // arm is exactly this write.
+    if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true;
   }
 
   private runtimeViewCreateBudget(dt: number): number {
