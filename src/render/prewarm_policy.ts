@@ -23,6 +23,7 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.landmarks',
   'views.persistent-portals',
   'views.nearby',
+  'world.settle-state',
   'textures.scene',
   'programs.compile',
   'world.initial-frame',
@@ -46,8 +47,16 @@ export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primi
 
 /** Whole-scene GPU submits that can synchronously link every visible program
  * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
- * once WebGL enters the driver, so omit them to preserve the entry hard limit. */
+ * once WebGL enters the driver, so omit them to preserve the entry hard limit.
+ * world.settle-state joins them: its lazy world builds (and a woken water
+ * height-field's real submits) have no internal deadline on a profile whose
+ * whole point is bounded main-thread slices. The cost of skipping it is that
+ * textures.scene (which still runs here) collects against pre-settle state,
+ * an accepted residual misalignment: this profile also skips the compile
+ * monolith and the initial frame, the two consumers the alignment mostly
+ * serves. */
 export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
+  'world.settle-state',
   'world.initial-frame',
   'programs.compile',
   'programs.budget-variants',
@@ -177,6 +186,77 @@ export interface PrewarmPolicy {
   finishFullManifestBeforeReveal: boolean;
 }
 
+/**
+ * What a manifest entry actually got done before a deadline (or a pending
+ * asset prefetch) stopped it. `trimmed` is the load-bearing bit: it means the
+ * entry deliberately stopped or deferred with planned work remaining, so the
+ * summary must never call it completed. The counts are informational context
+ * for the perf report; entries whose remaining work is unknowable (a scan cut
+ * short mid-iteration) may report done without planned.
+ */
+export interface PrewarmEntryProgress {
+  done?: number;
+  planned?: number;
+  trimmed: boolean;
+}
+
+/**
+ * The honest status for an entry whose run() returned without throwing. A
+ * deadline-trimmed or prefetch-deferred entry is 'partial', never 'completed':
+ * the historical bug was entities.player-archetypes hitting its build deadline
+ * having built ZERO visuals and still reporting completed, which made the boot
+ * starvation invisible in every prewarm summary.
+ */
+export function resolvePrewarmEntryStatus(
+  progress: PrewarmEntryProgress | null | undefined,
+): 'completed' | 'partial' {
+  return progress?.trimmed ? 'partial' : 'completed';
+}
+
+/**
+ * How long the sky manifest entry may wait inline for the decoupled HDRI
+ * prefetch (fetch + worker decode, started at prewarm begin) before deferring
+ * the remaining uploads to the background lane. The tail entries
+ * (world.initial-frame, programs.compile) are deadlineExempt on the async
+ * desktop arm and start regardless; what the reserve actually buys is compile
+ * RUN time before prewarmCompileUnitDeadline stops the unit loop: a slow
+ * network must never starve that window the way the old inline await did
+ * (measured 11.5s of a 12s boot budget).
+ * finishFullManifestBeforeReveal (desktop Insane) waits without bound: that
+ * profile's contract is a complete manifest behind the loading cover, and its
+ * runEntry ignores the soft deadline anyway.
+ */
+export function skyAssetInlineWaitMs(input: {
+  nowMs: number;
+  deadlineMs: number;
+  reserveMs: number;
+  finishFullManifestBeforeReveal: boolean;
+}): number {
+  if (input.finishFullManifestBeforeReveal) return Number.POSITIVE_INFINITY;
+  return Math.max(0, input.deadlineMs - Math.max(0, input.reserveMs) - input.nowMs);
+}
+
+export interface SkyBiomePartition<T> {
+  /** Biomes whose decoded assets are already resident and can upload inline. */
+  resident: T[];
+  /** Biomes still in flight; their uploads join the background lane on arrival. */
+  missing: T[];
+}
+
+/** Split the initial sky biomes by decoded-asset residency at entry time. */
+export function partitionResidentSkyBiomes<T>(
+  biomes: readonly T[],
+  isResident: (biome: T) => boolean,
+): SkyBiomePartition<T> {
+  const resident: T[] = [];
+  const missing: T[] = [];
+  for (const biome of biomes) {
+    if (isResident(biome)) resident.push(biome);
+    else missing.push(biome);
+  }
+  return { resident, missing };
+}
+
 /** True when a soft-deadline manifest entry should resume after world reveal. */
 export function prewarmEntryShouldDefer(
   entryStartedMs: number,
@@ -187,6 +267,74 @@ export function prewarmEntryShouldDefer(
 ): boolean {
   if (entryStartedMs >= hardDeadlineMs) return true;
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
+}
+
+/** The mesh-shape bits three folds into a program's cache key, structurally
+ * typed so this decision layer stays Three-free. */
+export interface ProgramContentMeshShape {
+  isSkinnedMesh?: boolean;
+  isInstancedMesh?: boolean;
+  /** An instanceColor buffer flips USE_INSTANCING_COLOR into the key. */
+  hasInstanceColor?: boolean;
+  isBatchedMesh?: boolean;
+  /** morphAttributes.position PRESENT: three defines USE_MORPHTARGETS on
+   *  presence, even for an empty array, so present-with-zero and absent are
+   *  distinct variants. */
+  hasMorphPositions?: boolean;
+  /** The EXACT morph target count: three keys morphTargetsCount, so a
+   *  boolean here hid variants (a morphs=2 and a morphs=6 mesh relinked at
+   *  draw time against a morphs=4 stand-in). */
+  morphTargetCount?: number;
+  morphNormalCount?: number;
+  morphColorCount?: number;
+  /** geometry.attributes.tangent flips vertexTangents. */
+  hasTangents?: boolean;
+  /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
+  vertexColorItemSize?: number;
+  castShadow?: boolean;
+}
+
+/**
+ * Program-content keys for compile-unit dedupe: one key per material slot,
+ * covering the object and geometry bits of three r165's program cache key
+ * this repo can produce (skinning, instancing and instance colour, batched
+ * meshes, morph position/normal/colour presence and counts, tangents, vertex
+ * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
+ * colour textures (batchingColor) and Points uv presence (pointsUvs), which
+ * the repo does not produce on this path; adopt either and this key must
+ * learn it. A coarser key elects a stand-in
+ * whose program variant differs, and every other geometry shape of that
+ * material is SKIPPED by the dedupe and relinks synchronously at first draw,
+ * which is the stall the compile lane exists to prevent. In-repo fidelity
+ * precedent: occluderGhostVariantKey (occluder_ghost_prewarm.ts).
+ */
+export function prewarmProgramContentKeys(
+  shape: ProgramContentMeshShape,
+  materialIds: readonly string[],
+): string[] {
+  const token =
+    `${shape.isSkinnedMesh ? 's' : 'm'}${shape.isInstancedMesh ? 'i' : ''}` +
+    `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
+    `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
+    `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
+    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
+    `${shape.castShadow ? 'c' : ''}`;
+  return materialIds.map((id) => `${token}:${id}`);
+}
+
+/** Where the programs.compile unit loop must stop so world.initial-frame (the
+ * one uninterruptible whole-scene submit that links whatever compile did not
+ * reach) always has room before the GPU-submit guard. Without the reserve, an
+ * exempt compile that lawfully consumed the whole soft budget left the frame
+ * starting past the deadline, cancelled outright, and the initial scene's
+ * programs linked at first LIVE draw instead (measured: 102-318 ms submit
+ * stalls, 17 programs in one frame). Mirrors prewarmBuildDeadline's reserve,
+ * one pipeline stage later. */
+export function prewarmCompileUnitDeadline(
+  gpuSubmitDeadlineMs: number,
+  frameReserveMs: number,
+): number {
+  return gpuSubmitDeadlineMs - Math.max(0, frameReserveMs);
 }
 
 /** Build cutoff paired with the entry policy. Full Insane prewarm may use the

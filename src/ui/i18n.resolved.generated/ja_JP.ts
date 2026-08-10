@@ -1054,7 +1054,7 @@ export const ja_JP: EnTranslations = {
       "blurb": "ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。",
       "modeTag": "5v5キャプチャー・ザ・フラッグ",
       "offlineNote": "ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。",
-      "ratingSummary": "レーティング。{wins}勝 / {losses}敗",
+      "ratingSummary": "レーティング。{wins}勝 / {losses}敗 / {draws}分",
       "careerCaptures": "通算キャプチャー:{count}",
       "enterQueue": "キューに参加",
       "enterQueueParty": "キューに参加({count}人パーティ)",
@@ -3009,6 +3009,11 @@ export const ja_JP: EnTranslations = {
       "toolEffectRechargeFull": "{effect}はすでに完全に充填されている。",
       "toolEffectRechargeToolCapped": "{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。",
       "toolEffectRechargeMaterials": "{effect}の再充填には{material}x{count}が必要だ。",
+      "craftingProgress": "製作中：残り{remaining}秒（全{total}秒）。",
+      "disenchantingProgress": "分解中：残り{remaining}秒（全{total}秒）。",
+      "enchantingProgress": "付与中：残り{remaining}秒（全{total}秒）。",
+      "salvagingProgress": "解体中：残り{remaining}秒（全{total}秒）。",
+      "rechargingToolEffectProgress": "道具の効果を再充填中：残り{remaining}秒（全{total}秒）。",
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
@@ -3303,6 +3308,16 @@ export const ja_JP: EnTranslations = {
       "denyNotCrafted": "先に受注品を製作してください（受注トグルをオンに）。",
       "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
       "denyNoSpace": "依頼者のバッグに空きがありません。"
+    },
+    "bgOffer": {
+      "title": "ソーンホロウ平原の準備が整いました",
+      "backfillTitle": "ソーンホロウ平原が戦士を求めています",
+      "backfillBody": "この戦いはすでに進行中です。人数の足りない側に加わります。この試合はレーティングに影響しません。",
+      "accepted": "{size} 人中 {accepted} 人が承認",
+      "remaining": "残り {seconds} 秒",
+      "accept": "承認",
+      "decline": "辞退",
+      "acceptedWait": "他の参加者を待っています..."
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -7403,6 +7418,9 @@ export const ja_JP: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
+    "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyOther": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "dismiss": "閉じる"
   },
   "perfNudge": {
@@ -7864,6 +7882,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
       "deathRecapFalling": "死亡しました。転落死しました。",
       "deathRecapDrowned": "死亡しました。溺死しました。",
+      "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -7907,6 +7926,7 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "射程外です。",
       "noTarget": "対象がいません。",
       "tooClose": "近すぎます！",
+      "mustTargetAlly": "味方を対象にしてください。",
       "facing": "対象の方を向いている必要があります。",
       "targetHealthBelow": "その能力は対象の体力が{percent}%未満でなければ使えません。",
       "dagger": "短剣を装備する必要があります。",
@@ -8149,7 +8169,7 @@ export const ja_JP: EnTranslations = {
       "queueNote": "オンライン中で最も近いレートの挑戦者と組み合わされ、砂地へ転送されます。勝てば上昇し、先に降参した側（体力1）が負けます。キューに入った場所へ正確に戻ります。",
       "ladderAllTime": "ランキング - 全期間",
       "ladderOnline": "ランキング - オンライン",
-      "ratingSummary": "レート - {wins}勝 / {losses}敗",
+      "ratingSummary": "レート - {wins}勝 / {losses}敗 / {draws}分",
       "statusCountdown": "身構えてください...",
       "statusReturning": "世界へ戻っています... {seconds}",
       "statusFight": "降参まで戦え！",
@@ -9523,6 +9543,10 @@ export const ja_JP: EnTranslations = {
       "die_by_sword": {
         "name": "剣に死す",
         "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。"
       },
       "recklessness": {
         "name": "無謀",

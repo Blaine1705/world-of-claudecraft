@@ -909,7 +909,7 @@ export const hudChromeStrings = {
       'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
-    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses / {draws} draws',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
     enterQueueParty: 'Enter the Queue (party of {count})',
@@ -3704,6 +3704,15 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // In-progress readouts for the four crafting/gathering-service actions plus
+    // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
+    // countdown chat lines shown while the action channels.
+    craftingProgress: 'You are crafting: {remaining}s of {total}s remaining.',
+    disenchantingProgress: 'You are disenchanting: {remaining}s of {total}s remaining.',
+    enchantingProgress: 'You are enchanting: {remaining}s of {total}s remaining.',
+    salvagingProgress: 'You are salvaging: {remaining}s of {total}s remaining.',
+    rechargingToolEffectProgress:
+      'You are recharging a tool effect: {remaining}s of {total}s remaining.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -4235,6 +4244,20 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    backfillTitle: 'Thornhollow Fields needs a fighter',
+    backfillBody:
+      'This battle is already under way. You will join the side that is short, and this match will not change your rating.',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',

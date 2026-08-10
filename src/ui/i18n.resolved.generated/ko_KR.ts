@@ -1054,7 +1054,7 @@ export const ko_KR: EnTranslations = {
       "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 세 번 가져오는 쪽이 전장을 차지한다.",
       "modeTag": "5v5 깃발 뺏기",
       "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
-      "ratingSummary": "레이팅. {wins}승 / {losses}패",
+      "ratingSummary": "레이팅. {wins}승 / {losses}패 / {draws}무",
       "careerCaptures": "통산 탈취: {count}",
       "enterQueue": "대기열 참가",
       "enterQueueParty": "대기열 참가({count}인 파티)",
@@ -3009,6 +3009,11 @@ export const ko_KR: EnTranslations = {
       "toolEffectRechargeFull": "{effect}은(는) 이미 완전히 충전되어 있습니다.",
       "toolEffectRechargeToolCapped": "{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.",
       "toolEffectRechargeMaterials": "{effect} 재충전에는 {material} x{count}이(가) 필요합니다.",
+      "craftingProgress": "제작 중: {total}초 중 {remaining}초 남음.",
+      "disenchantingProgress": "분해 중: {total}초 중 {remaining}초 남음.",
+      "enchantingProgress": "마법부여 중: {total}초 중 {remaining}초 남음.",
+      "salvagingProgress": "수리 재료 회수 중: {total}초 중 {remaining}초 남음.",
+      "rechargingToolEffectProgress": "도구 효과 재충전 중: {total}초 중 {remaining}초 남음.",
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
       "nextUnlockSpecialized": "전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다",
@@ -3303,6 +3308,16 @@ export const ko_KR: EnTranslations = {
       "denyNotCrafted": "먼저 주문 제작품을 만드세요 (주문 제작 토글을 켜고).",
       "denyOutOfRange": "의뢰를 전달하려면 의뢰인 근처에 있어야 합니다.",
       "denyNoSpace": "의뢰인의 가방에 공간이 없습니다."
+    },
+    "bgOffer": {
+      "title": "쏜할로우 평원이 준비되었습니다",
+      "backfillTitle": "쏜할로우 평원에 전사가 필요합니다",
+      "backfillBody": "이 전투는 이미 진행 중입니다. 인원이 부족한 쪽에 합류하며, 이 전투는 평점에 영향을 주지 않습니다.",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 참가자를 기다리는 중..."
     },
     "finder": {
       "title": "던전 찾기",
@@ -7403,6 +7418,9 @@ export const ko_KR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
     "bodyWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
+    "hybridBodyWindows": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
+    "hybridBodyLinux": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
+    "hybridBodyOther": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저와 운영체제의 그래픽 설정을 확인하여 활성화하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
     "dismiss": "닫기"
   },
   "perfNudge": {
@@ -7864,6 +7882,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapAbility": "사망했습니다. {ability}(으)로 사망했습니다.",
       "deathRecapFalling": "사망했습니다. 추락사했습니다.",
       "deathRecapDrowned": "사망했습니다. 익사했습니다.",
+      "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
@@ -7907,6 +7926,7 @@ export const ko_KR: EnTranslations = {
       "outOfRange": "사정거리 밖입니다.",
       "noTarget": "대상이 없습니다.",
       "tooClose": "너무 가깝습니다!",
+      "mustTargetAlly": "아군을 대상으로 지정해야 합니다.",
       "facing": "대상을 바라봐야 합니다.",
       "targetHealthBelow": "그 능력은 대상 생명력이 {percent}% 미만이어야 합니다.",
       "dagger": "단검을 착용해야 합니다.",
@@ -8149,7 +8169,7 @@ export const ko_KR: EnTranslations = {
       "queueNote": "온라인 중인 가장 가까운 평점의 도전자와 매칭된 뒤 모래장으로 순간이동합니다. 승리하면 순위가 오르고, 먼저 항복한 쪽(생명력 1)이 패배합니다. 대기열에 들어간 바로 그 자리로 돌아옵니다.",
       "ladderAllTime": "순위표 - 전체",
       "ladderOnline": "순위표 - 온라인",
-      "ratingSummary": "평점 - {wins}승 / {losses}패",
+      "ratingSummary": "평점 - {wins}승 / {losses}패 / {draws}무",
       "statusCountdown": "마음을 다잡으세요...",
       "statusReturning": "세계로 돌아가는 중... {seconds}",
       "statusFight": "항복할 때까지 싸우세요!",
@@ -9523,6 +9543,10 @@ export const ko_KR: EnTranslations = {
       "die_by_sword": {
         "name": "검의 승부",
         "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
+      },
+      "intervene": {
+        "name": "엄호",
+        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다."
       },
       "recklessness": {
         "name": "무모함",
