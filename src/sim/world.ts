@@ -1618,7 +1618,25 @@ function applyValeCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
-  return h + (floor + (h - floor) * t - h) * w;
+  let out = h + (floor + (h - floor) * t - h) * w;
+  // At the vale's northwest coast a low beach shelf (a few yards above water)
+  // aprons the foot of the steep grey cliff and reads as a proud triangle spit
+  // where it meets the bay (player report). Submerge that shelf so the bay water
+  // runs right up to the cliff foot with no spit. The height gate lowers ONLY
+  // the low shelf and never the cliff it fronts (protected from 12.5yd up); the
+  // z window covers the shelf and fades out before the cliff shoulder (z ~146),
+  // and the x window spans the shelf around x = -172. Deepened to open-sea level
+  // so it reads as bay water, not a submerged sandbar.
+  const spitW =
+    smoothstep(116, 122, z) *
+    (1 - smoothstep(141, 146, z)) *
+    (1 - smoothstep(22, 40, Math.abs(x + 172))) *
+    (1 - smoothstep(9.5, 12.5, out));
+  if (spitW > 0) {
+    const sea = Math.min(out, WATER_LEVEL - 2);
+    out = out + (sea - out) * spitW;
+  }
+  return out;
 }
 
 // The Ferrywalk: a natural sandbar causeway from the vale's west point across
