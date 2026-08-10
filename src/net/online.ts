@@ -140,6 +140,7 @@ import {
   type ReliquaryCatalogCompletion,
   type ReliquaryFirstFindView,
   type ReliquaryPageCompletion,
+  type ReliquaryRarity,
   type RiftFloorView,
   type SocialInfo,
   type ToolEffectSlotView,
@@ -5025,6 +5026,30 @@ export class ClientWorld implements IWorld {
       { deedStats: this.deedStats, delveClears: this.delveClears },
       page.clearSource,
     );
+  }
+  // The relic population-rarity aggregate: a lazy anonymous REST read on the
+  // deedsRarity shape below, resolving the endpoint payload verbatim or null
+  // on any failure (the facet's documented no-data value; the window omits
+  // every rarity line). The consumer caches per window-open, so no TTL cache
+  // here.
+  async reliquaryRarity(): Promise<ReliquaryRarity | null> {
+    try {
+      const res = await fetch(apiUrl('/api/reliquary/rarity', this.base));
+      if (!res.ok) return null;
+      const data = (await res.json()) as ReliquaryRarity;
+      if (
+        typeof data?.totalEligible !== 'number' ||
+        typeof data?.found !== 'object' ||
+        data.found === null ||
+        typeof data?.illuminated !== 'object' ||
+        data.illuminated === null
+      ) {
+        return null;
+      }
+      return data;
+    } catch {
+      return null;
+    }
   }
   // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
   // async-read variant), resolving the endpoint payload verbatim or null on

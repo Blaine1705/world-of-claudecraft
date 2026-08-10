@@ -3670,3 +3670,13 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
     expect(meta.deedsEarned.has('col_reliquary_illum_thunzharr')).toBe(true);
   });
 });
+
+describe('reliquaryRarity (offline facet arm)', () => {
+  it('always resolves null: a sandbox has no population to aggregate', async () => {
+    // The deedsRarity stub doctrine: deterministic, no fetch, no clock, and
+    // null is the value the window's omission arm keys on, so the offline
+    // Reliquary renders zero rarity nodes rather than fabricated zeros.
+    const sim = makeSim();
+    await expect(sim.reliquaryRarity()).resolves.toBeNull();
+  });
+});

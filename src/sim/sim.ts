@@ -4788,6 +4788,13 @@ export class Sim {
     if (!page) return undefined;
     return clearCountForSource(this.primary, page.clearSource);
   }
+  // Offline the sandbox has no population, so there is no relic rarity to
+  // report: always null (the facet's documented no-data value; the window
+  // omits every rarity line). Deterministic, no fetch, no clock (the
+  // deedsRarity stub doctrine below).
+  reliquaryRarity(): Promise<import('../world_api').ReliquaryRarity | null> {
+    return Promise.resolve(null);
+  }
   // Offline the sandbox has no population, so there is no rarity to report:
   // always null (the facet's documented no-data value; the window hides the
   // slot). Deterministic, no fetch, no clock (the dailyRewards stub doctrine).

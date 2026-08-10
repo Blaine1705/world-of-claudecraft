@@ -233,6 +233,7 @@ export type {
   ReliquaryCatalogCompletion,
   ReliquaryFirstFindView,
   ReliquaryPageCompletion,
+  ReliquaryRarity,
 } from './world_api/reliquary';
 export type {
   CharacterProfile,

@@ -432,6 +432,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryCatalogCompletion', kind: 'method' },
   { name: 'reliquaryCuratorRank', kind: 'method' },
   { name: 'reliquaryPageClearCount', kind: 'method' },
+  { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -587,9 +588,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // and the data/method split can disagree even when the total agrees. Only
     // running the suite says what these numbers really are; never reconcile
     // them by arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(313);
+    expect(IWORLD_MEMBERS.length).toBe(314);
     expect(DATA_MEMBERS.length).toBe(82);
-    expect(METHOD_MEMBERS.length).toBe(231);
+    expect(METHOD_MEMBERS.length).toBe(232);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -833,6 +834,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryObtainCounts',
       'reliquaryPageClearCount',
       'reliquaryPageCompletion',
+      'reliquaryRarity',
       'reliquaryRecent',
       'renamePet',
       'renown',
@@ -1172,6 +1174,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryCuratorRank',
       'reliquaryPageClearCount',
       'reliquaryPageCompletion',
+      'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
       'respec',
@@ -1754,6 +1757,7 @@ const FACET_RELIQUARY = [
   'reliquaryCatalogCompletion',
   'reliquaryCuratorRank',
   'reliquaryPageClearCount',
+  'reliquaryRarity',
 ] as const satisfies readonly (keyof IWorldReliquary)[];
 type _ExhaustReliquary = AssertNever<
   Exclude<keyof IWorldReliquary, (typeof FACET_RELIQUARY)[number]>
@@ -1836,8 +1840,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(313);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(313);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(314);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(314);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
