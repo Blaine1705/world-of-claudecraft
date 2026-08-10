@@ -7,7 +7,7 @@ import {
 export type { StableCooldownWire, StableTimerWireVersion };
 export { STABLE_TIMER_WIRE_VERSION };
 
-// Unknown markers are isolated from both legacy and v2 decoding so a future
+// Unknown markers are isolated from both legacy and stable decoding so a future
 // server cannot make an older client reinterpret fields it does not understand.
 export type SnapshotTimerWireMode = 'legacy' | 'stable' | 'unsupported';
 

@@ -2,6 +2,7 @@ import type {
   AccountCosmetics,
   ActionBarLayout,
   ActionBarLayoutRestore,
+  ActiveConsecration,
   ActiveFrostRing,
   ActiveTemporalHourglass,
   BankBonusSource,
@@ -40,6 +41,8 @@ import {
   resolvePosition,
   seatGroundedAt,
 } from './colliders';
+import { resolveActionReplacement } from './combat/action_replacement';
+import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -81,11 +84,13 @@ import {
   handleDeath as handleDeathImpl,
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
+import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
+import { updateGuardian } from './combat/guardians';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -95,10 +100,38 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
+import { resolveColdsightAbility } from './combat/hunter_coldsight';
+import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
+import { clearPacklordState } from './combat/hunter_packlord';
+import {
+  clearHunterTalentState,
+  hunterPetFerocityDamageMultiplier,
+  resolveHunterSharedAbility,
+} from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
+import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
+import { radiantResonanceCastTime } from './combat/paladin_radiant_resonance';
+import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
+import {
+  PALADIN_DEVOTION_ABILITY_IDS,
+  stripPaladinDevotionsFromSource,
+} from './combat/paladin_support';
+import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
+import {
+  completeVeilboundMarch,
+  updateVeilboundMarchMovement,
+  veilboundMarchBlocksAura,
+} from './combat/paladin_veilbound_march';
+import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
+import { cleanupPriestState } from './combat/priest/lifecycle';
+import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
+import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
+import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
+import { blockedMeleeDamage } from './combat/shield_block';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
@@ -109,6 +142,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { applyTalentMods } from './content/classes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
@@ -313,6 +347,13 @@ import {
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
 import {
+  grantDevotionFromBlock,
+  grantGroundAoEDevotionOnFirstHit,
+  MAX_DEVOTION,
+  resolveAscensionAbility,
+  updatePaladinDevotion,
+} from './paladin_devotion';
+import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
   PLAYER_MAX_CLIMB_SLOPE,
@@ -473,7 +514,12 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
-import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
+import {
+  createSimContext,
+  type DamageResolution,
+  type SimContext,
+  type SimContextHost,
+} from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
@@ -627,6 +673,7 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
+  RIGHTEOUS_FURY_THREAT_MULT,
   SUMMONED_ADD_THREAT_SEED,
   TAUNT_FORCE_SECONDS,
   threatEntries,
@@ -1122,11 +1169,15 @@ export interface ResolvedAbility {
   cost: number;
   castTime: number;
   cooldown: number; // base def.cooldown, after talent cooldown modifiers
+  /** Cooldown map key when a cooldown-carrying transform shares the base
+   *  button's clock (one slot, one clock); absent for every other resolve. */
+  cooldownId?: string;
   effects: AbilityEffect[];
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
+  ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
   // Set when a next_cast_free/next_execute_free empowerment (e.g. Borrowed Tempo)
   // zeroed this cast's cost: a spendsCombo finisher cast this way banks its combo
   // points instead of spending them (issue #2426), since "free" means the whole
@@ -1135,8 +1186,13 @@ export interface ResolvedAbility {
   freeCast?: boolean;
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
+  ruinousBrandCopy?: { targetId: number; value: number };
   /** 1-based authoritative charge stage for hold-to-charge spells. */
   empowerLevel?: number;
+  hunterApex?: boolean;
+  hunterOverdraw?: boolean;
+  hunterRhythm?: boolean;
 }
 
 export interface RewardCounters {
@@ -1585,7 +1641,8 @@ export interface AwayStatus {
 // cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState {
   // Production content migration revision. Revision 1 is the v0.26 all-class
-  // Talents V2 migration; absent means a pre-v0.26 character JSONB save.
+  // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
+  // Absent means a pre-v0.26 character JSONB save.
   contentRevision?: number;
   level: number;
   xp: number;
@@ -1830,6 +1887,7 @@ export interface PetState {
   mode?: PetMode;
   autoTaunt?: boolean;
   autoWaterJet?: boolean;
+  autoSkill?: boolean;
 }
 
 // PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
@@ -1878,6 +1936,8 @@ const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.f
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
 export class Sim {
+  // Offline/local Sim always has the implementation bundled with its HUD.
+  readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
   cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
@@ -2121,6 +2181,22 @@ export class Sim {
       });
     }
     return hourglasses;
+  }
+  get activeConsecrations(): ActiveConsecration[] {
+    const consecrations: ActiveConsecration[] = [];
+    for (const effect of this.groundAoEs) {
+      const consecration = effect.consecration;
+      if (!consecration || effect.remaining <= 0) continue;
+      consecrations.push({
+        id: consecration.id,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+        duration: consecration.duration,
+        remaining: effect.remaining,
+      });
+    }
+    return consecrations;
   }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
@@ -3366,7 +3442,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? Math.min(player.maxResource, Math.max(0, savedState.resource))
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     } else {
@@ -3374,7 +3450,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? player.maxResource
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     }
@@ -3457,7 +3533,9 @@ export class Sim {
         this.worldContent.playerStart,
       );
     }
-    if (savedState?.pet) this.restorePet(player, savedState.pet);
+    if (savedState?.pet && petCommands.canRestorePetState(meta, savedState.pet)) {
+      this.restorePet(player, savedState.pet);
+    }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
     // re-entrant save can never double-book the letter.
@@ -3712,6 +3790,9 @@ export class Sim {
     // silently left IN_PROGRESS); the one-time fee stays paid either way.
     if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
     this.preparePlayerLeave(pid);
+    clearSpiritmendCurrents(this.ctx, pid);
+    const leaving = this.entities.get(pid);
+    if (leaving) clearShamanTalentState(this.ctx, leaving);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
@@ -3749,6 +3830,9 @@ export class Sim {
     this.duelInvites.delete(pid);
     // mobs forget the leaving player; persistent hunter pets are serialized
     // with the character and removed from the live world instead of released
+    despawnTemporaryNecromancyUndead(this.ctx, pid);
+    clearOssuaryMarks(this.ctx, pid);
+    clearAfflictionState(this.ctx, pid);
     const pet = this.petOf(pid, true);
     if (pet) this.despawnPersistentPet(pet);
     for (const m of this.entities.values()) {
@@ -3789,7 +3873,18 @@ export class Sim {
   preparePlayerLeave(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    if (!meta.leaving) {
+      const leavingEntity = this.entities.get(pid);
+      if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
+    }
     meta.leaving = true;
+    cleanupPriestState(this.ctx, pid);
+    const leaving = this.entities.get(pid);
+    if (leaving && meta.cls === 'hunter') {
+      clearHunterTalentState(this.ctx, leaving);
+      clearPacklordState(this.ctx, leaving);
+      clearFieldcraftState(this.ctx, leaving);
+    }
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -4807,6 +4902,12 @@ export class Sim {
   }
 
   emit(ev: SimEvent): void {
+    if (ev.type === 'damage' && ev.sourceOwnerId === undefined) {
+      const sourceOwnerId = this.entities.get(ev.sourceId)?.ownerId;
+      if (sourceOwnerId !== null && sourceOwnerId !== undefined) {
+        ev.sourceOwnerId = sourceOwnerId;
+      }
+    }
     this.events.push(ev);
   }
 
@@ -5567,7 +5668,9 @@ export class Sim {
     const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
     // (Frost's second Ice Block charge is resolved inside abilitiesKnownAt, the
     // shared known-list builder, so ClientWorld's recomputed list matches.)
-    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
+    // questsDone gates quest-earned abilities (paladin recall_the_fallen); it is
+    // restored before this runs at load, so a returning character keeps them.
+    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone);
     if (announce) {
       for (const k of meta.known) {
         const prev = before.get(k.def.id);
@@ -5738,7 +5841,13 @@ export class Sim {
     let m = threatModifier(source, school);
     if (source.kind === 'player') {
       const meta = this.players.get(source.id);
-      if (meta) m *= 1 + this.playerMods(meta).global.threatPct;
+      if (meta) {
+        m *= 1 + this.playerMods(meta).global.threatPct;
+        const hasBurningOath = meta.known.some(
+          (known) => known.def.id === 'righteous_fury' && known.def.passive === true,
+        );
+        if (hasBurningOath && school === 'holy') m *= RIGHTEOUS_FURY_THREAT_MULT;
+      }
     }
     return m;
   }
@@ -5746,8 +5855,28 @@ export class Sim {
   resolvedAbility(abilityId: string, pid?: number): ResolvedAbility | null {
     const r = this.resolve(pid);
     if (!r) return null;
-    const found = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
-    if (!found) return null;
+    const known = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
+    if (!known) return null;
+    // Action-slot replacement: the base id stays on the hotbar while the
+    // resolved definition follows aura state (rogue engine transforms and the
+    // hunter resolvers land here, the one choke point the cast path, cost
+    // checks, and the server all read).
+    let found = resolveActionReplacement(known, r.e);
+    found = resolveColdsightAbility(found, r.e, r.meta);
+    found = resolveHunterSharedAbility(found, r.e, r.meta);
+    found = resolveVespersAbility(found, r.meta);
+    // `known` already carries its own talent mods, baked in once when
+    // r.meta.known was built (abilitiesKnownAt -> applyTalentMods). A
+    // wholesale def swap (resolveActionReplacement's rogue engine transforms,
+    // or the hunter Pack Rally swap inside resolveHunterSharedAbility) lands
+    // on a raw ABILITIES def instead, which never went through that bake, so
+    // give it its own (possibly empty) mods pass here, exactly once, keyed by
+    // its FINAL id, after every resolver above has had a chance to swap it.
+    // Compare ids, not object identity: Coldsight/Vespers return a
+    // `{...resolved}` spread copy even when they leave the def untouched, and
+    // keying on `found !== known` would re-run the bake on that copy and
+    // double-apply the mods `known` already carries.
+    if (found.def.id !== known.def.id) applyTalentMods(found, this.playerMods(r.meta));
     // A "draining curse" (cost_tax aura) inflates the resource cost of every
     // ability the victim uses. Resolve it here, the single choke point all cost
     // checks/spends read, so the affordability check and the spend stay in
@@ -5770,7 +5899,16 @@ export class Sim {
     if (abilityId === 'arcane_surge' && cost > 0) {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
-    return cost === found.cost ? found : { ...found, cost };
+    const costResolved = cost === found.cost ? found : { ...found, cost };
+    const ascensionResolved = resolveAscensionAbility(
+      r.e,
+      this.playerMods(r.meta).spec,
+      costResolved,
+    );
+    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime);
+    return castTime === ascensionResolved.castTime
+      ? ascensionResolved
+      : { ...ascensionResolved, castTime };
   }
 
   // Highest active cost_tax aura, expressed as a cost multiplier (1 = no tax).
@@ -5825,6 +5963,8 @@ export class Sim {
       if (!p.dead) {
         ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
+        updateVeilboundMarchMovement(this.ctx, p);
+        completeVeilboundMarch(this.ctx, p);
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
@@ -5894,8 +6034,12 @@ export class Sim {
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
-        if (this.shouldSkipIdleMobTick(e)) continue;
-        this.updateMob(e);
+        if (e.guardianState) {
+          if (!updateGuardian(this.ctx, e)) continue;
+        } else {
+          if (this.shouldSkipIdleMobTick(e)) continue;
+          this.updateMob(e);
+        }
         // Tag the mob.update lap with the mob so the host can attribute this slice
         // of the phase cost to its zone/group. The sim reads nothing
         // from it and allocates nothing, so this stays behavior- and parity-inert.
@@ -5948,7 +6092,11 @@ export class Sim {
     }
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
-      if (p) p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
+      if (p) {
+        p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
+        updatePaladinDevotion(p, DT, this.playerMods(meta).global.paladinSacredReserve > 0);
+        druidEngineCombatState(this.ctx, p);
+      }
     }
     lap?.('engaged');
 
@@ -6136,8 +6284,11 @@ export class Sim {
   // Body moved to player_motion.ts (MV1). The ghost/aura math is host-agnostic
   // there; only the Fiesta augment needs PlayerMeta, so this delegate feeds it in.
   moveSpeedMult(e: Entity): number {
-    const extra =
-      e.kind === 'player' ? (this.players.get(e.id)?.fiestaSpecial.moveSpeedPct ?? 0) : 0;
+    const meta = e.kind === 'player' ? this.players.get(e.id) : undefined;
+    let extra = meta?.fiestaSpecial.moveSpeedPct ?? 0;
+    if (meta && this.playerMods(meta).global.paladinDivineSteed > 0 && e.paladinDevotion) {
+      extra += 0.15 * (e.paladinDevotion.value / MAX_DEVOTION);
+    }
     return moveSpeedMultImpl(e, extra);
   }
 
@@ -6198,6 +6349,7 @@ export class Sim {
     }
     const ownerMeta = this.players.get(e.ownerId);
     if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
     return mult;
   }
 
@@ -6291,6 +6443,7 @@ export class Sim {
     const target = this.entities.get(p.chargeTargetId);
     p.chargeTimeLeft -= DT;
     const done = (arrived: boolean): boolean => {
+      finishBloodhook(this.ctx, p, target ?? null, arrived);
       p.chargeTargetId = null;
       p.chargePath = [];
       if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
@@ -6452,6 +6605,7 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
+    if (advanceValkyrsCalling(this.ctx, p)) return;
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
     if (meta.mountRace?.phase === 'countdown') return;
@@ -6541,6 +6695,7 @@ export class Sim {
       return;
     }
     let zoneStruck = 0;
+    let zoneEffectiveDamage = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
       zoneStruck++;
@@ -6565,6 +6720,7 @@ export class Sim {
       if (effect.igniteFrac && dmg > 0 && !target.dead) {
         applyIgnite(this.ctx, source, target, Math.round(dmg * effect.igniteFrac));
       }
+      const hpBefore = target.hp;
       this.dealDamage(
         source,
         target,
@@ -6577,6 +6733,7 @@ export class Sim {
         threatOpts,
         direct,
       );
+      if (target.hp < hpBefore) zoneEffectiveDamage++;
     }
     // Blizzard: every enemy this pulse struck shaves the running Frozen Orb
     // cooldown, bounded by the per-cast budget reset at zone placement
@@ -6584,6 +6741,7 @@ export class Sim {
     if (effect.orbCdr && zoneStruck > 0 && source.kind === 'player') {
       frostMageChannelPulse(this.ctx, source, 'blizzard', zoneStruck);
     }
+    grantGroundAoEDevotionOnFirstHit(source, effect, zoneEffectiveDamage);
   }
 
   // -------------------------------------------------------------------------
@@ -6683,9 +6841,15 @@ export class Sim {
     // the bgFlag 'dropped' call to all ten), never the generic splice below,
     // which would strip the buff and leave the flag carried.
     if (this.ctx.bgCancelFlagAura(e, auraId)) return;
-    const removed = removeCancelableAura(e.auras, auraId);
+    const isPaladinDevotion = PALADIN_DEVOTION_ABILITY_IDS.has(auraId);
+    const removed = removeCancelableAura(e.auras, auraId, isPaladinDevotion ? e.id : undefined);
     if (!removed) return;
+    if (auraId === 'divine_ascension' && e.paladinDevotion) {
+      e.paladinDevotion.ascensionCharges = 0;
+      e.paladinDevotion.ascensionRemaining = 0;
+    }
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id, auraId);
     if (removed.kind === 'stealth') {
       e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     }
@@ -6736,6 +6900,9 @@ export class Sim {
     abilityId: string | null = null,
     canCrit = true,
     canTriggerWeaponProcs = true,
+    beaconTransferEligible = false,
+    alreadyResolved = false,
+    resolution?: { resolved: number },
   ): number {
     return applyHealImpl(
       this.ctx,
@@ -6746,6 +6913,9 @@ export class Sim {
       abilityId,
       canCrit,
       canTriggerWeaponProcs,
+      beaconTransferEligible,
+      alreadyResolved,
+      resolution,
     );
   }
 
@@ -6768,6 +6938,10 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
+    if (veilboundMarchBlocksAura(target, aura)) return;
+    if (aura.kind === 'slow' && target.auras.some((active) => active.kind === 'slow_immunity')) {
+      return;
+    }
     if (
       this.isIceBlocked(target) &&
       this.isIceBlockCrowdControlAura(aura.kind) &&
@@ -6922,6 +7096,7 @@ export class Sim {
   // blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
     if (source.id !== target.id && this.isIceBlocked(target)) return 0;
+    if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
     // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
     // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
     // and never displaces the victim, so a caster keeps casting through it.
@@ -7086,6 +7261,7 @@ export class Sim {
     e.auras.splice(idx, 1);
     e.stealthed = false; // keep the cache live without waiting for updateAuras
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    duskLingerOnStealthBreak(this.ctx, e);
     applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
   }
 
@@ -7095,6 +7271,7 @@ export class Sim {
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    onGhostWolfExited(this.ctx, e);
   }
 
   private forceDismountPlayer(e: Entity): void {
@@ -7210,6 +7387,10 @@ export class Sim {
     petCommands.petWaterJet(this.ctx, pid);
   }
 
+  petSpecial(pid?: number): void {
+    petCommands.petSpecial(this.ctx, pid);
+  }
+
   feedPet(itemId: string, pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
@@ -7234,6 +7415,10 @@ export class Sim {
 
   setPetAutoWaterJet(enabled: boolean, pid?: number): void {
     petCommands.setPetAutoWaterJet(this.ctx, enabled, pid);
+  }
+
+  setPetAutoSpecial(enabled: boolean, pid?: number): void {
+    petCommands.setPetAutoSpecial(this.ctx, enabled, pid);
   }
 
   // despawnPet (summoned-demon hard despawn: player-target + threat scrub) moved to
@@ -7286,6 +7471,7 @@ export class Sim {
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
@@ -7310,6 +7496,8 @@ export class Sim {
     alreadyFinal = false,
     abilityId: string | null = null,
     aoe = false,
+    resolution?: DamageResolution,
+    resolvedHpLoss = false,
   ): number {
     return dealDamageImpl(
       this.ctx,
@@ -7327,6 +7515,8 @@ export class Sim {
       alreadyFinal,
       abilityId,
       aoe,
+      resolution,
+      resolvedHpLoss,
     );
   }
 
@@ -7655,11 +7845,21 @@ export class Sim {
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= this.petDamageMult(mob);
-    const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
+    const rawDmg = dmg; // pre-armor, post-crit/enrage, basis for cleave splash
     dmg *= 1 - mobArmorReduction(mob, target, this.effectiveArmor(target));
     const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
     if (blocked) {
-      dmg = Math.max(1, dmg - target.blockValue);
+      const targetMeta = target.kind === 'player' ? this.players.get(target.id) : undefined;
+      const targetSpec = targetMeta?.talents.spec ?? null;
+      dmg = blockedMeleeDamage(
+        dmg,
+        target.blockValue,
+        target.templateId === 'paladin' && targetSpec === 'protection',
+      );
+      if (targetMeta && targetSpec === 'protection') {
+        grantDevotionFromBlock(target);
+        tryGrantSolarReprisal(this.ctx, target, 'block');
+      }
     }
     const dealt = Math.max(1, Math.round(dmg));
     this.dealDamage(mob, target, dealt, crit, 'physical', null, blocked ? 'block' : 'hit');
@@ -10026,6 +10226,8 @@ export class Sim {
   // and database, so they only exist in online play. The offline Sim satisfies
   // the IWorld surface with inert stubs.
   realm = '';
+  // Offline the player owns the world, so admin-gated dev surfaces are open.
+  accountAdmin = true;
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
@@ -11180,7 +11382,11 @@ export class Sim {
                 // 2026-07-12): other chronomancers' echoes still heal in the sim but
                 // never show in this viewer's group/raid strip. echoVisibleTo reads
                 // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(e.auras.filter((a) => echoVisibleTo(a, this.primaryId))),
+                auras: partyFrameAuras(
+                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
+                  undefined,
+                  e.maxHp,
+                ),
               },
             ]
           : [];

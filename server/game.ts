@@ -60,6 +60,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
@@ -110,6 +111,8 @@ import {
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  PET_SPECIAL_WIRE_VERSION,
+  type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
@@ -1008,6 +1011,7 @@ export interface ClientSession {
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
+  petSpecialWireVersion: 0 | PetSpecialWireVersion;
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
@@ -1180,6 +1184,7 @@ export interface AdminLiveAura {
   value: number;
   remaining: number;
   duration: number;
+  permanent?: boolean;
 }
 
 export interface AdminLiveLocation {
@@ -1228,6 +1233,7 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  perm?: 1;
   // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
   // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
   // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
@@ -1382,14 +1388,21 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
 // result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
 // measurable source of short-lived garbage. Output is byte-identical to the
 // prior spread chain; only the allocation shape changed.
+// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
+// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
+// aura visible instead of decoding the v3 sentinel as already expired.
+const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
+
 function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
   const w: WireAura = {
     id: a.id,
     name: a.name,
     kind: a.kind,
-    rem: round2(a.remaining),
-    dur: a.duration,
+    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
+    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
   };
+  if (permanent) w.perm = 1;
   // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
   // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
@@ -1405,7 +1418,12 @@ function wireAura(a: Aura): WireAura {
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
   if (a.school !== 'physical') w.school = a.school;
-  if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+  // teach the live stage including 0 and 1, and the decode side cannot tell
+  // "absent because 1" from "absent because 0", so the count is always sent.
+  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
+  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
   // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
   // buff icon can badge the count online exactly as offline; undefined for every other aura.
   if (a.charges !== undefined) w.charges = a.charges;
@@ -1451,6 +1469,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
     out.castTot = round2(e.castTotal);
+    if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
   // Mount summon/dismount transition, so every client can time the summon FX / call
@@ -1501,8 +1520,19 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
     if (e.petAutoWaterJet) out.pw = 1;
+    if ((e.petSkillTimer ?? 0) > 0) out.ps = round2(e.petSkillTimer ?? 0);
+    if (e.petAutoSkill) out.px = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
+  // Remote Paladins need the compact active-charge count so every client can
+  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
+  // with the exact Devotion value and remaining duration for the local HUD.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    // Omit-when-default like the fields above (review 3050): the idle 0 was
+    // serialized into every snapshot for every remote paladin.
+    const ascensionCharges = e.paladinDevotion?.ascensionCharges ?? 0;
+    if (ascensionCharges > 0) out.pasc = ascensionCharges;
+  }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (includeAuras && e.auras.length > 0) {
@@ -3533,6 +3563,7 @@ export class GameServer {
         sourceUrl?: string | null;
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
+        petSpecialWireVersion?: 0 | PetSpecialWireVersion;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -3579,6 +3610,15 @@ export class GameServer {
       characterId,
       bankBonus: meta.bankBonus,
     });
+    const player = this.sim.entities.get(pid);
+    if (player) {
+      player.petSpecialCommandsSupported = meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (meta.petSpecialWireVersion !== PET_SPECIAL_WIRE_VERSION) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === pid) entity.petAutoSkill = false;
+      }
+    }
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -3672,6 +3712,8 @@ export class GameServer {
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
+      petSpecialWireVersion:
+        meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0,
       timerWireCache: new StableSelfTimerWireCache(),
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
@@ -3777,6 +3819,9 @@ export class GameServer {
       name,
       cls,
       realm: REALM,
+      // Staff advert for admin-gated client surfaces (the /dev Spawns tab).
+      // Every gated command is re-checked server-side, so a forged true is inert.
+      admin: session.isAdmin,
       // Soft (cosmetic) words the client masks locally when its profanity
       // filter is on. Hard words are never sent — they're enforced server-side.
       softWords: this.chatFilter.softWords(),
@@ -3872,6 +3917,18 @@ export class GameServer {
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    session.petSpecialWireVersion =
+      meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const player = this.sim.entities.get(session.pid);
+    if (player) {
+      player.petSpecialCommandsSupported =
+        session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (session.petSpecialWireVersion === 0) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
+      }
+    }
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
@@ -3884,6 +3941,7 @@ export class GameServer {
       name: session.name,
       cls,
       realm: REALM,
+      admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
     });
@@ -5701,8 +5759,9 @@ export class GameServer {
           name: a.name,
           kind: a.kind,
           value: a.value,
-          remaining: round2(a.remaining),
-          duration: a.duration,
+          remaining: a.permanent ? 0 : round2(a.remaining),
+          duration: a.permanent ? 0 : a.duration,
+          permanent: a.permanent,
         })),
       });
     }
@@ -7071,6 +7130,17 @@ export class GameServer {
       case 'pet_auto_water_jet':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
+      case 'pet_special':
+        if (session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION) sim.petSpecial(pid);
+        break;
+      case 'pet_auto_special':
+        if (
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION &&
+          typeof msg.enabled === 'boolean'
+        ) {
+          sim.setPetAutoSpecial(msg.enabled, pid);
+        }
+        break;
       case 'pet_feed':
         if (typeof msg.item === 'string') {
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
@@ -8016,6 +8086,7 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
+    const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8222,10 +8293,27 @@ export class GameServer {
           );
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        const consecrations = activeConsecrations
+          .filter((consecration) => {
+            const dx = consecration.x - anchorEntity.pos.x;
+            const dz = consecration.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (consecration) =>
+              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
+          );
+        const consecrationsJson =
+          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
+        const petSpecialWireJson =
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
+            ? `,"psw":${PET_SPECIAL_WIRE_VERSION}`
+            : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>
@@ -8395,6 +8483,13 @@ export class GameServer {
       fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
+      pdev: p.paladinDevotion
+        ? {
+            value: p.paladinDevotion.value,
+            charges: p.paladinDevotion.ascensionCharges,
+            remaining: round2(p.paladinDevotion.ascensionRemaining),
+          }
+        : null,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
@@ -9761,6 +9856,18 @@ export class GameServer {
       }
       this.devTierPids.add(pid); // keep the chain refresh from clobbering it
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
+      return null;
+    }
+    // The spawn-control dev commands (spawn/despawn/killtarget) are staff-only
+    // even where ALLOW_DEV_COMMANDS is on: on a shared PBE realm any tester may
+    // self-serve gear and travel, but conjuring or deleting mobs reshapes the
+    // world every other tester is standing in. The client hides the Spawns tab
+    // for non-staff; this is the authoritative check behind that advert.
+    if (
+      /^\/(?:dev\s+(?:spawn|despawn|killtarget)|devspawn|devdespawn|devkilltarget)\b/i.test(text) &&
+      !session.isAdmin
+    ) {
+      this.sendChatNotice(session, '[dev] Spawn controls require an administrator account.');
       return null;
     }
     if (!text.startsWith('/')) {
