@@ -427,6 +427,30 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'intimidating_shout',
+    custom: true,
+  },
+  {
+    key: 'battle_shout',
+    custom: true,
+  },
+  {
+    key: 'demoralizing_shout',
+    custom: true,
+  },
+  {
+    key: 'emboldening_roar',
+    custom: true,
+  },
+  {
+    key: 'defiant_bellow',
+    custom: true,
+  },
+  {
+    key: 'rallying_cry',
+    custom: true,
+  },
+  {
     key: 'ice_block',
     custom: true,
   },
