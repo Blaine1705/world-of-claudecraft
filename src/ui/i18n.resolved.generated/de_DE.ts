@@ -1054,7 +1054,7 @@ export const de_DE: EnTranslations = {
       "blurb": "Zwei zerstörte Festungen stehen sich in einer ummauerten Senke im Schatten des Thornpeak gegenüber: Karmesin im Süden, Azur im Norden, und der ältere Ruinenhof dazwischen, den keine von beiden je gehalten hat. Fünf gegen fünf, je ein Banner, und wer zuerst drei der gegnerischen heimbringt, gewinnt das Feld.",
       "modeTag": "5v5 Flaggenraub",
       "offlineNote": "Thornhollow-Felder synchronisiert sich. Die Warteschlange öffnet, sobald das Reich antwortet.",
-      "ratingSummary": "Wertung. {wins} Siege / {losses} Niederlagen",
+      "ratingSummary": "Wertung. {wins} Siege / {losses} Niederlagen / {draws} Unentschieden",
       "careerCaptures": "Eroberungen der Karriere: {count}",
       "enterQueue": "In Warteschlange",
       "enterQueueParty": "In Warteschlange (Gruppe von {count})",
@@ -3311,6 +3311,8 @@ export const de_DE: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const de_DE: EnTranslations = {
       "outOfRange": "Außer Reichweite.",
       "noTarget": "Ihr habt kein Ziel.",
       "tooClose": "Zu nah!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Ihr müsst Eurem Ziel zugewandt sein.",
       "targetHealthBelow": "Diese Fähigkeit erfordert, dass das Ziel unter {percent}% Gesundheit hat.",
       "dagger": "Ihr müsst einen Dolch führen.",
@@ -8166,7 +8169,7 @@ export const de_DE: EnTranslations = {
       "queueNote": "Ihr werdet mit dem online nächstbewerteten Herausforderer gepaart und in den Sand teleportiert. Gewinnt, um aufzusteigen; wer zuerst aufgibt (1 Gesundheit), verliert. Ihr kehrt genau an den Ort zurück, an dem Ihr Euch eingereiht habt.",
       "ladderAllTime": "Rangliste - gesamt",
       "ladderOnline": "Rangliste - online",
-      "ratingSummary": "Wertung - {wins} Siege / {losses} Niederlagen",
+      "ratingSummary": "Wertung - {wins} Siege / {losses} Niederlagen / {draws} Unentschieden",
       "statusCountdown": "Macht Euch bereit...",
       "statusReturning": "Rückkehr in die Welt... {seconds}",
       "statusFight": "Kämpft bis zur Aufgabe!",
@@ -9540,6 +9543,10 @@ export const de_DE: EnTranslations = {
       "die_by_sword": {
         "name": "Tod durch das Schwert",
         "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Tollkühnheit",

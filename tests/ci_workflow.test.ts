@@ -69,7 +69,7 @@ const CHECK_RUN_STEPS = [
   'run: npm run build:env',
   'run: npm run build:server',
   'run: npm run build:bot',
-  'run: npm run build\n',
+  'run: npm run wiki:content && npm run build:bundle\n',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a
@@ -308,6 +308,14 @@ describe('CI workflow parity', () => {
       browserGate.indexOf('run: npx playwright install --with-deps chromium'),
     );
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    // No restore-keys: the key is already exact-version-scoped, so a prefix
+    // fallback could only ever restore a PRIOR Playwright version's binaries
+    // alongside the new install. actions/cache never evicts an old entry, so
+    // every future version bump would silently leave that stale version's
+    // Chromium cached forever instead of a clean version-scoped miss.
+    // Anchored to the YAML key shape (bare, double- or single-quoted) so a
+    // step comment mentioning the phrase cannot satisfy the pin.
+    expect(browserGate).not.toMatch(/\n\s+["']?restore-keys["']?:/);
   });
 
   it('posts the i18n coverage summary and diffs the committed artifacts in both check jobs', () => {

@@ -1054,7 +1054,7 @@ export const it_IT: EnTranslations = {
       "blurb": "Due rocche in rovina si fronteggiano in una valletta murata all'ombra di Thornpeak: i Cremisi a sud, gli Azzurri a nord, e tra loro il più antico Cortile in Rovina che nessuno dei due ha mai conquistato. Cinque contro cinque, una bandiera a testa, e la prima squadra che ne riporta a casa tre si aggiudica il campo.",
       "modeTag": "5c5 Cattura la Bandiera",
       "offlineNote": "I Campi di Thornhollow si stanno sincronizzando. La coda si apre non appena il reame risponde.",
-      "ratingSummary": "Indice. {wins} vittorie / {losses} sconfitte",
+      "ratingSummary": "Indice. {wins} vittorie / {losses} sconfitte / {draws} pareggi",
       "careerCaptures": "Catture in carriera: {count}",
       "enterQueue": "Entra in coda",
       "enterQueueParty": "Entra in coda (gruppo di {count})",
@@ -3311,6 +3311,8 @@ export const it_IT: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Fuori portata.",
       "noTarget": "Non hai un bersaglio.",
       "tooClose": "Troppo vicino!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",
@@ -8166,7 +8169,7 @@ export const it_IT: EnTranslations = {
       "queueNote": "Verrai abbinato al contendente online con indice più vicino e teletrasportato nell'arena. Vinci per salire; il primo a cedere (1 salute) perde. Torni esattamente dove ti sei messo in coda.",
       "ladderAllTime": "Classifica - storica",
       "ladderOnline": "Classifica - online",
-      "ratingSummary": "Indice - {wins} vittorie / {losses} sconfitte",
+      "ratingSummary": "Indice - {wins} vittorie / {losses} sconfitte / {draws} pareggi",
       "statusCountdown": "Preparati...",
       "statusReturning": "Ritorno al mondo... {seconds}",
       "statusFight": "Combatti fino alla resa!",
@@ -9540,6 +9543,10 @@ export const it_IT: EnTranslations = {
       "die_by_sword": {
         "name": "Morte per la Spada",
         "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temerarietà",
