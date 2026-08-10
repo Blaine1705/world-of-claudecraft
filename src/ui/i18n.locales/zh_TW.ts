@@ -1965,6 +1965,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': '關閉統計',
   'hud.chat.rightClickName': '右鍵點擊 {name}',
   'hud.chat.templates.party': '[隊伍] {name}：{message}',
+  'hud.chat.templates.battleground': '[戰場] {name}：{message}',
   'hud.chat.templates.yell': '{name}大喊：{message}',
   'hud.chat.templates.whisper': '{name}悄悄說：{message}',
   'hud.chat.templates.toWhisper': '對{name}說：{message}',
@@ -5252,6 +5253,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '尋求組隊',
   'hud.core.chatChannels.names.officer': '幹部',
   'hud.core.chatChannels.names.party': '隊伍',
+  'hud.core.chatChannels.names.battleground': '戰場',
   'hud.core.chatChannels.names.say': '說話',
   'hud.core.chatChannels.names.world': '世界',
   'hud.core.chatChannels.names.yell': '大喊',
@@ -6661,6 +6663,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': '尋找隊伍。',
   'guide.social.chanLfgBody':
     '一個選擇性加入、涵蓋全伺服器的頻道，用來尋找人一同挑戰地城。開啟它的分頁即可加入。',
+  'guide.social.chanBattleground': '戰場。',
+  'guide.social.chanBattlegroundBody':
+    '與戰場中的所有戰士交談，雙方陣營都能看到。僅在比賽進行時可用。',
   'guide.social.chanParty': '隊伍。',
   'guide.social.chanPartyBody': '與你隊伍中的每一個人交談，無論你們分得多開。',
   'guide.social.chanSay': '說話。',

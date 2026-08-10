@@ -5638,6 +5638,8 @@ export const en_CA: EnTranslations = {
       "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
       "chanParty": "Party.",
       "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "General.",
       "chanGeneralBody": "An always-on realm-wide channel that reaches everyone online, good for asking a question or general chatter. Unlike World and Looking for Group, you never have to opt in.",
       "chanWorld": "World.",
@@ -7744,6 +7746,7 @@ export const en_CA: EnTranslations = {
           "say": "Say",
           "yell": "Yell",
           "party": "Party",
+          "battleground": "Battleground",
           "general": "General",
           "world": "World",
           "lfg": "LFG",
@@ -7905,6 +7908,7 @@ export const en_CA: EnTranslations = {
     "chat": {
       "rightClickName": "Right-click {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} yells: {message}",
         "whisper": "{name} whispers: {message}",

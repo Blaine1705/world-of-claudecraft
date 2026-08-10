@@ -2059,6 +2059,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': 'メーターを閉じる',
   'hud.chat.rightClickName': '{name}を右クリック',
   'hud.chat.templates.party': '[パーティ] {name}: {message}',
+  'hud.chat.templates.battleground': '[戦場] {name}: {message}',
   'hud.chat.templates.yell': '{name}の叫び: {message}',
   'hud.chat.templates.whisper': '{name}のささやき: {message}',
   'hud.chat.templates.toWhisper': '{name}へ: {message}',
@@ -5444,6 +5445,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '仲間募集',
   'hud.core.chatChannels.names.officer': 'オフィサー',
   'hud.core.chatChannels.names.party': 'パーティ',
+  'hud.core.chatChannels.names.battleground': '戦場',
   'hud.core.chatChannels.names.say': '発言',
   'hud.core.chatChannels.names.world': 'ワールド',
   'hud.core.chatChannels.names.yell': '叫び',
@@ -6943,6 +6945,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': 'パーティ募集。',
   'guide.social.chanLfgBody':
     'ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。',
+  'guide.social.chanBattleground': '戦場。',
+  'guide.social.chanBattlegroundBody':
+    '戦場にいるすべての戦士と、敵味方を問わず話せます。試合中のみ利用できます。',
   'guide.social.chanParty': 'パーティ。',
   'guide.social.chanPartyBody': 'どれだけ離れていても、グループの全員に話しかけられます。',
   'guide.social.chanSay': 'セイ。',

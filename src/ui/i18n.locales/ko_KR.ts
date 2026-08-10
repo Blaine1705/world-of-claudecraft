@@ -2040,6 +2040,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': '미터 닫기',
   'hud.chat.rightClickName': '{name} 우클릭',
   'hud.chat.templates.party': '[파티] {name}: {message}',
+  'hud.chat.templates.battleground': '[전장] {name}: {message}',
   'hud.chat.templates.yell': '{name} 외침: {message}',
   'hud.chat.templates.whisper': '{name} 귓속말: {message}',
   'hud.chat.templates.toWhisper': '{name}에게: {message}',
@@ -5418,6 +5419,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.lfg': '파티 찾기',
   'hud.core.chatChannels.names.officer': '장교',
   'hud.core.chatChannels.names.party': '파티',
+  'hud.core.chatChannels.names.battleground': '전장',
   'hud.core.chatChannels.names.say': '말하기',
   'hud.core.chatChannels.names.world': '전체',
   'hud.core.chatChannels.names.yell': '외치기',
@@ -6933,6 +6935,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': '파티 찾기.',
   'guide.social.chanLfgBody':
     '던전을 함께 돌 사람을 찾기 위한, 선택 참여형 렐름 전체 채널입니다. 해당 탭을 열어 참여하세요.',
+  'guide.social.chanBattleground': '전장.',
+  'guide.social.chanBattlegroundBody':
+    '전장에 있는 모든 전투원과 대화합니다. 양 팀 모두에게 전달되며, 경기 중에만 사용할 수 있습니다.',
   'guide.social.chanParty': '파티.',
   'guide.social.chanPartyBody': '아무리 흩어져 있어도 파티원 모두에게 이야기할 수 있습니다.',
   'guide.social.chanSay': '말하기.',

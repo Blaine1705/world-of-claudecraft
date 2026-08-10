@@ -41,6 +41,7 @@ import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
+import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -164,6 +165,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // owner (pet/pet_match_return.ts). Recorded before the entity goes, since
         // afterwards it is unknowable. Pure state, no rng.
         noteMatchPetUnravelled(ctx, mob);
+        // The same fact for the owner's own death: a demon that leaves no corpse
+        // has to be REBUILT when its owner is resurrected, not revived in place
+        // (pet/pet_owner_revive.ts). Also pure state, no rng.
+        notePetUnravelledOnOwnerDeath(ctx, mob);
         ctx.despawnPet(mob);
       }
       return;

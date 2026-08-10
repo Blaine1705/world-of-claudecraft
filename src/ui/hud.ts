@@ -1169,6 +1169,7 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 // keys the MovableFrames read.
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
+  battleground: 'hud.chat.templates.battleground',
   yell: 'hud.chat.templates.yell',
   whisper: 'hud.chat.templates.whisper',
   toWhisper: 'hud.chat.templates.toWhisper',
@@ -12506,6 +12507,18 @@ export class Hud {
                 ev.classId,
               );
               break;
+            case 'battleground':
+              this.chatLogFrom(
+                ev.from,
+                ev.text,
+                CHAT_TEMPLATE_KEYS.battleground,
+                'battleground',
+                ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
+                ev.classId,
+              );
+              break;
             case 'yell':
               this.chatLogFrom(
                 ev.from,
@@ -12969,6 +12982,12 @@ export class Hud {
         }
         case 'bgEnd': {
           this.bgKillFeed.clear();
+          // The /bg send-stickiness dies with the match it belonged to. The
+          // server clears its own remembered channel on this same event, but the
+          // HUD composes a plain line through its sticky BEFORE sending, so
+          // without this half the first plain line after every match is still
+          // composed as /bg and comes back refused.
+          this.chatWindow.clearBattlegroundSticky();
           // The verdict is ONE big word through the same banner family the flag
           // calls use, over its own secondary lines. WHICH strings those are is
           // the pure core's decision (hud/battleground/bg_end_banner_view.ts).

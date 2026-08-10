@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "es_ES": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "fr_FR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "fr_CA": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "de_DE": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "nl_NL": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "pl_PL": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "id_ID": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "tr_TR": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "sv_SE": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "vi_VN": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ],
+  "da_DK": [
+    "guide.social.chanBattleground",
+    "guide.social.chanBattlegroundBody",
+    "hud.chat.templates.battleground",
+    "hud.core.chatChannels.names.battleground"
+  ]
 };

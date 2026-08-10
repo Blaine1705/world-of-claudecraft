@@ -5638,6 +5638,8 @@ export const sv_SE: EnTranslations = {
       "chanWhisperBody": "Ett privat meddelande till en spelare vid namn, var de än är. Använd det för ett tyst ord.",
       "chanParty": "Grupp.",
       "chanPartyBody": "Prata med alla i din grupp, oavsett hur utspridda ni är.",
+      "chanBattleground": "Battleground.",
+      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
       "chanGeneral": "Allmänt.",
       "chanGeneralBody": "En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.",
       "chanWorld": "Värld.",
@@ -7744,6 +7746,7 @@ export const sv_SE: EnTranslations = {
           "say": "Säg",
           "yell": "Ropa",
           "party": "Grupp",
+          "battleground": "Battleground",
           "general": "Allmänt",
           "world": "Världen",
           "lfg": "LFG",
@@ -7905,6 +7908,7 @@ export const sv_SE: EnTranslations = {
     "chat": {
       "rightClickName": "Högerklicka på {name}",
       "templates": {
+        "battleground": "[Battleground] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",

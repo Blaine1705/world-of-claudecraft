@@ -1001,6 +1001,22 @@ describe('hunter pets', () => {
     expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
+  it('limits pet damage detection for stealthed enemy players to close range', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    teleport(sim, pet, 0, 0);
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    teleport(sim, rogue, 12, 0);
+    const outsideHp = rogue.hp;
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(outsideHp);
+
+    teleport(sim, rogue, 4, 0);
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(outsideHp);
+  });
+
   it('friendly target spells can affect controlled pets', () => {
     const { sim, wolf: pet } = tamedSetup();
     const druidId = sim.addPlayer('druid', 'Druid');
