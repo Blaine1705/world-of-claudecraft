@@ -74,6 +74,17 @@ function sameStringList(
   return true;
 }
 
+// Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+// engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+// teach the live stage including 0 and 1, and the decode side cannot tell
+// "absent because 1" from "absent because 0", so the count is always sent.
+// Mirrors the legacy wireAura stacks rule in server/game.ts exactly, so both
+// encoders cannot drift.
+function wireStacks(aura: Aura): number | undefined {
+  if (isPersistentEngineAura(aura.id)) return aura.stacks ?? 0;
+  return aura.stacks && aura.stacks > 1 ? aura.stacks : undefined;
+}
+
 function auraMatches(
   record: StableAuraRecord,
   aura: Aura,
@@ -93,7 +104,7 @@ function auraMatches(
     record.value3 === aura.value3 &&
     record.tickInterval === aura.tickInterval &&
     record.school === aura.school &&
-    record.stacks === (aura.stacks && aura.stacks > 1 ? aura.stacks : undefined) &&
+    record.stacks === wireStacks(aura) &&
     record.charges === aura.charges &&
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
@@ -117,7 +128,7 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     value3: aura.value3,
     tickInterval: aura.tickInterval,
     school: aura.school,
-    stacks: aura.stacks && aura.stacks > 1 ? aura.stacks : undefined,
+    stacks: wireStacks(aura),
     charges: aura.charges,
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,

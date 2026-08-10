@@ -183,6 +183,52 @@ describe('StableAuraWireCache', () => {
     expect(JSON.parse(resumed.json)[0]).toMatchObject({ exp: 17 });
     expect(JSON.parse(resumed.json)[0]).not.toHaveProperty('rem');
   });
+
+  it('always sends stacks for a persistent engine bank, including 0 and 1', () => {
+    const cache = new StableAuraWireCache();
+    const bank = aura('moontide', 86_400);
+    bank.stacks = 0;
+
+    const zeroStage = cache.encode([bank], 0, false);
+    expect(zeroStage.json).toContain('"stacks":0');
+
+    bank.stacks = 1;
+    const oneStage = cache.encode([bank], 0, false);
+    expect(oneStage.json).toContain('"stacks":1');
+  });
+
+  it('rebuilds a persistent engine bank on a 0 to 1 stage transition', () => {
+    const cache = new StableAuraWireCache();
+    const bank = aura('moontide', 86_400);
+    bank.stacks = 0;
+    const zeroStage = cache.encode([bank], 0, false);
+    const rebuilds = cache.rebuilds;
+
+    bank.stacks = 1;
+    const oneStage = cache.encode([bank], 0, false);
+
+    expect(oneStage).not.toBe(zeroStage);
+    expect(oneStage.json).not.toBe(zeroStage.json);
+    expect(cache.rebuilds).toBe(rebuilds + 1);
+  });
+
+  it('still applies the sparsity rule to an ordinary (non-bank) aura at 0 or 1 stacks', () => {
+    const cache = new StableAuraWireCache();
+    const ordinary = aura('ordinary_buff', 10);
+
+    ordinary.stacks = 0;
+    const zeroStacks = cache.encode([ordinary], 0, false);
+    expect(JSON.parse(zeroStacks.json)[0]).not.toHaveProperty('stacks');
+
+    ordinary.stacks = 1;
+    const oneStack = cache.encode([ordinary], 0, false);
+    expect(JSON.parse(oneStack.json)[0]).not.toHaveProperty('stacks');
+    expect(oneStack).toBe(zeroStacks);
+
+    ordinary.stacks = 2;
+    const twoStacks = cache.encode([ordinary], 0, false);
+    expect(JSON.parse(twoStacks.json)[0]).toMatchObject({ stacks: 2 });
+  });
 });
 
 describe('StableSelfTimerWireCache', () => {
