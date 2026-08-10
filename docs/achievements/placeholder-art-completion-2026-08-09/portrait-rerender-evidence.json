@@ -31,11 +31,7 @@
     "trackedScript": "scripts/render_finder_portraits.mjs",
     "trackedScriptSha256": "d33305853e13545e8c1822bc1076299d63ace4a6494e040fc6a52c5b3cebb6d2",
     "command": "ONLY=gravedigger_mosley,castaway_navigator,fisher_bram node scripts/render_finder_portraits.mjs",
-    "only": [
-      "gravedigger_mosley",
-      "castaway_navigator",
-      "fisher_bram"
-    ],
+    "only": ["gravedigger_mosley", "castaway_navigator", "fisher_bram"],
     "runs": 2,
     "resultPerRun": "3/230 selected jobs rendered, 0 failed, 0 page errors",
     "byteStableAcrossRuns": true,
@@ -63,11 +59,7 @@
     "trackedScript": "scripts/render_finder_portraits.mjs",
     "trackedScriptSha256": "d33305853e13545e8c1822bc1076299d63ace4a6494e040fc6a52c5b3cebb6d2",
     "command": "ONLY=cindraleth_maw_matriarch,grubjaw,the_wreck_warden node scripts/render_finder_portraits.mjs",
-    "only": [
-      "cindraleth_maw_matriarch",
-      "grubjaw",
-      "the_wreck_warden"
-    ],
+    "only": ["cindraleth_maw_matriarch", "grubjaw", "the_wreck_warden"],
     "runs": 2,
     "resultPerRun": "3/230 selected jobs rendered, 0 failed, 0 page errors",
     "byteStableAcrossRuns": true,
@@ -112,9 +104,7 @@
         "modelBytes": 444244,
         "idle": "Idle",
         "height": 2.6,
-        "show": [
-          "Barbarian_BearHat"
-        ],
+        "show": ["Barbarian_BearHat"],
         "attach": {
           "model": "models/weapons/axe_2handed.glb",
           "modelSha256": "8a68d165fa09dfe96b4e2473344161b910ddea10a916333cbdaacdcd17493af6",
@@ -355,21 +345,9 @@
     "blankPortraits": [],
     "croppedPortraits": [],
     "escortTintReview": {
-      "order": [
-        "gravedigger_mosley",
-        "castaway_navigator",
-        "fisher_bram"
-      ],
-      "expectedTintSwatches": [
-        "#8a7a5a",
-        "#4a7a9c",
-        "#4a6a8a"
-      ],
-      "observed": [
-        "olive-brown wash",
-        "lighter blue-teal wash",
-        "deeper slate-blue wash"
-      ],
+      "order": ["gravedigger_mosley", "castaway_navigator", "fisher_bram"],
+      "expectedTintSwatches": ["#8a7a5a", "#4a7a9c", "#4a6a8a"],
+      "observed": ["olive-brown wash", "lighter blue-teal wash", "deeper slate-blue wash"],
       "pairwiseNormalizedRmse": {
         "gravedigger_mosley:castaway_navigator": 0.0115524,
         "gravedigger_mosley:fisher_bram": 0.0111748,
@@ -378,11 +356,7 @@
       "distinctOutputHashes": true
     },
     "wrongModelReview": {
-      "order": [
-        "cindraleth_maw_matriarch",
-        "grubjaw",
-        "the_wreck_warden"
-      ],
+      "order": ["cindraleth_maw_matriarch", "grubjaw", "the_wreck_warden"],
       "before": [
         "floating generic dragon stand-in",
         "generic troll stand-in",
