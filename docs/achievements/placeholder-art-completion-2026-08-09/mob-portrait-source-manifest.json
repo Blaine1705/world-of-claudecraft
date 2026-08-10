@@ -6,18 +6,18 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "2ff7c94828753ecbcc2afed75812cc3b4b01c008300f2cf5341fbe3763625c92",
+  "rendererFingerprint": "0ca94035dd87c4c5208b959f5384b693b6fc0901ccc5dfbf518bd828c7cbc3de",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 10612,
-        "sha256": "880ce694cf37f72ef39c4d1932b812e09f2d43fd70eedcae850d40a2544e5709"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 7528,
-        "sha256": "9c0e229d5ddf62b480df001d0c8a0bc045ffdfb15f772f955bb5cb521a2d2377"
+        "bytes": 8194,
+        "sha256": "935fef8fb5cbd506a3db29c4fb302b6dd695ea4274d22e3c9eccc6bd78c5e2b4"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
